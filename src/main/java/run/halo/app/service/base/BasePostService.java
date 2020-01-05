@@ -195,24 +195,96 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     @NonNull
     POST filterIfEncrypt(@NonNull POST post);
 
+    /**
+     * Convert POST to minimal dto.
+     *
+     * @param post post must not be null.
+     * @return minimal dto.
+     */
     @NonNull
     BasePostMinimalDTO convertToMinimal(@NonNull POST post);
 
+    /**
+     * Convert list of POST to minimal dto of list.
+     *
+     * @param posts posts must not be null.
+     * @return a list of minimal dto.
+     */
     @NonNull
     List<BasePostMinimalDTO> convertToMinimal(@Nullable List<POST> posts);
 
+    /**
+     * Convert page of POST to minimal dto of page.
+     *
+     * @param postPage postPage must not be null.
+     * @return a page of minimal dto.
+     */
     @NonNull
     Page<BasePostMinimalDTO> convertToMinimal(@NonNull Page<POST> postPage);
 
+    /**
+     * Convert POST to simple dto.
+     *
+     * @param post post must not be null.
+     * @return simple dto.
+     */
     @NonNull
     BasePostSimpleDTO convertToSimple(@NonNull POST post);
 
+    /**
+     * Convert list of POST to list of simple dto.
+     *
+     * @param posts posts must not be null.
+     * @return a list of simple dto.
+     */
     @NonNull
     List<BasePostSimpleDTO> convertToSimple(@Nullable List<POST> posts);
 
+    /**
+     * Convert page of POST to page of simple dto.
+     *
+     * @param postPage postPage must not be null.
+     * @return a page of simple dto.
+     */
     @NonNull
     Page<BasePostSimpleDTO> convertToSimple(@NonNull Page<POST> postPage);
 
+    /**
+     * Convert POST to detail dto.
+     *
+     * @param post post must not be null.
+     * @return detail dto.
+     */
     @NonNull
     BasePostDetailDTO convertToDetail(@NonNull POST post);
+
+    /**
+     * Updates draft content.
+     *
+     * @param content draft content could be blank
+     * @param postId  post id must not be null
+     * @return updated post
+     */
+    @NonNull
+    POST updateDraftContent(@Nullable String content, @NonNull Integer postId);
+
+    /**
+     * Updates post status.
+     *
+     * @param status post status must not be null
+     * @param postId post id must not be null
+     * @return updated post
+     */
+    @NonNull
+    POST updateStatus(@NonNull PostStatus status, @NonNull Integer postId);
+
+    /**
+     * Updates post status by ids.
+     *
+     * @param ids    post ids must not be null
+     * @param status post status must not be null
+     * @return updated posts
+     */
+    @NonNull
+    List<POST> updateStatusByIds(@NonNull List<Integer> ids, @NonNull PostStatus status);
 }

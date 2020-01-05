@@ -1,5 +1,6 @@
 package run.halo.app.security.filter;
 
+import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.service.OptionService;
 
@@ -17,8 +18,10 @@ import java.io.IOException;
  */
 public class ContentFilter extends AbstractAuthenticationFilter {
 
-    public ContentFilter(HaloProperties haloProperties, OptionService optionService) {
-        super(haloProperties, optionService);
+    public ContentFilter(HaloProperties haloProperties,
+                         OptionService optionService,
+                         StringCacheStore cacheStore) {
+        super(haloProperties, optionService, cacheStore);
     }
 
     @Override

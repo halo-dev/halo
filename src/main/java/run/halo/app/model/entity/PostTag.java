@@ -1,7 +1,6 @@
 package run.halo.app.model.entity;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
@@ -11,7 +10,7 @@ import java.util.Objects;
  * Post tag entity.
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 @Data
 @Entity

@@ -188,6 +188,25 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    public Set<String> listCustomTemplates(String themeId, String prefix) {
+        // Get the theme path
+        Path themePath = Paths.get(getThemeOfNonNullBy(themeId).getThemePath());
+
+        try (Stream<Path> pathStream = Files.list(themePath)) {
+            return pathStream.filter(path -> StringUtils.startsWithIgnoreCase(path.getFileName().toString(), prefix))
+                    .map(path -> {
+                        // Remove prefix
+                        String customTemplate = StringUtils.removeStartIgnoreCase(path.getFileName().toString(), prefix);
+                        // Remove suffix
+                        return StringUtils.removeEndIgnoreCase(customTemplate, HaloConst.SUFFIX_FTL);
+                    })
+                    .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new ServiceException("Failed to list files of path " + themePath.toString(), e);
+        }
+    }
+
+    @Override
     public boolean templateExists(String template) {
         if (StringUtils.isBlank(template)) {
             return false;

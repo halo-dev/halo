@@ -3,7 +3,9 @@ package run.halo.app.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.ArchiveMonthVO;
@@ -12,6 +14,7 @@ import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.base.BasePostService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +23,7 @@ import java.util.Set;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-14
  */
 public interface PostService extends BasePostService<Post> {
@@ -50,6 +54,19 @@ public interface PostService extends BasePostService<Post> {
      * @param post        post must not be null
      * @param tagIds      tag id set
      * @param categoryIds category id set
+     * @param postMetas   post metas
+     * @param autoSave    autoSave
+     * @return post created
+     */
+    @NonNull
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave);
+
+    /**
+     * Creates post by post param.
+     *
+     * @param post        post must not be null
+     * @param tagIds      tag id set
+     * @param categoryIds category id set
      * @param autoSave    autoSave
      * @return post created
      */
@@ -66,7 +83,7 @@ public interface PostService extends BasePostService<Post> {
      * @return updated post
      */
     @NonNull
-    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave);
+    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave);
 
     /**
      * Gets post by post status and url.
@@ -78,6 +95,15 @@ public interface PostService extends BasePostService<Post> {
     @NonNull
     @Override
     Post getBy(@NonNull PostStatus status, @NonNull String url);
+
+    /**
+     * Removes posts in batch.
+     *
+     * @param ids ids must not be null.
+     * @return a list of deleted post.
+     */
+    @NonNull
+    List<Post> removeByIds(@NonNull Collection<Integer> ids);
 
     /**
      * Lists year archives.
@@ -141,4 +167,26 @@ public interface PostService extends BasePostService<Post> {
     @NonNull
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
 
+    /**
+     * Converts to a page of post detail dto.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail dto
+     */
+    Page<BasePostDetailDTO> convertToDetailDto(@NonNull Page<Post> postPage);
+
+    /**
+     * Converts to a page of detail vo.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail vo
+     */
+    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
+
+    /**
+     * Publish a post visit event.
+     *
+     * @param postId postId must not be null
+     */
+    void publishVisitEvent(@NonNull Integer postId);
 }

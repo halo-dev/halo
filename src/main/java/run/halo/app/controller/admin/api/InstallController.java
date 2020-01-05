@@ -2,6 +2,7 @@ package run.halo.app.controller.admin.api;
 
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.crypto.SecureUtil;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,7 +39,7 @@ import java.util.Set;
  * Installation controller.
  *
  * @author ryanwang
- * @date : 2019-03-17
+ * @date 2019-03-17
  */
 @Slf4j
 @Controller
@@ -78,6 +79,7 @@ public class InstallController {
     @PostMapping
     @ResponseBody
     @CacheLock
+    @ApiOperation("Initializes the blog")
     public BaseResponse<String> installBlog(@RequestBody InstallParam installParam) {
         // Validate manually
         ValidationUtils.validate(installParam, CreateCheck.class);
@@ -179,7 +181,7 @@ public class InstallController {
     @Nullable
     private Category createDefaultCategoryIfAbsent() {
         long categoryCount = categoryService.count();
-        if (categoryCount == 0) {
+        if (categoryCount > 0) {
             return null;
         }
 

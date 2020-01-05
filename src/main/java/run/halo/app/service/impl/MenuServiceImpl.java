@@ -78,6 +78,24 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
+    public List<MenuVO> listByTeamAsTree(String team, Sort sort) {
+        Assert.notNull(team, "Team must not be null");
+
+        List<Menu> menus = menuRepository.findByTeam(team, sort);
+
+        if (CollectionUtils.isEmpty(menus)) {
+            return Collections.emptyList();
+        }
+
+        MenuVO topLevelMenu = createTopLevelMenu();
+
+        concreteTree(topLevelMenu, menus);
+
+        List<MenuVO> children = topLevelMenu.getChildren();
+        return children;
+    }
+
+    @Override
     public Menu createBy(MenuParam menuParam) {
         Assert.notNull(menuParam, "Menu param must not be null");
 
@@ -110,6 +128,11 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         Assert.notNull(id, "Menu parent id must not be null");
 
         return menuRepository.findByParentId(id);
+    }
+
+    @Override
+    public List<String> listAllTeams() {
+        return menuRepository.findAllTeams();
     }
 
     @Override

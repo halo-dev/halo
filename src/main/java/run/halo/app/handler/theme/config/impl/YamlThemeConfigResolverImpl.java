@@ -22,7 +22,8 @@ import java.util.Map;
  * Theme configuration resolver.
  *
  * @author johnniang
- * @date 4/10/19
+ * @author ryanwang
+ * @date 2019-04-10
  */
 @Slf4j
 @Service
@@ -116,6 +117,7 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 item.setType(InputType.typeOf(itemMap.get("type")));
                 item.setDefaultValue(itemMap.get("default"));
                 item.setPlaceholder(itemMap.getOrDefault("placeholder", "").toString());
+                item.setDescription(itemMap.getOrDefault("description", "").toString());
 
                 // Handle options
                 item.setOptions(handleOptions(itemMap.get("options")));
@@ -142,6 +144,7 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 item.setType(InputType.typeOf(itemMap.get("type")));
                 item.setDefaultValue(itemMap.get("default"));
                 item.setPlaceholder(itemMap.getOrDefault("placeholder", "").toString());
+                item.setDescription(itemMap.getOrDefault("description", "").toString());
 
                 // Handle options
                 item.setOptions(handleOptions(itemMap.get("options")));

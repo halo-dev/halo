@@ -4,11 +4,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.InternalSheetDTO;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.base.BasePostService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Sheet service interface.
@@ -30,6 +33,16 @@ public interface SheetService extends BasePostService<Sheet> {
     Sheet createBy(@NonNull Sheet sheet, boolean autoSave);
 
     /**
+     * Creates a sheet.
+     *
+     * @param sheet      sheet must not be null
+     * @param sheetMetas sheet metas
+     * @param autoSave   autoSave
+     * @return created sheet
+     */
+    Sheet createBy(@NonNull Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave);
+
+    /**
      * Updates a sheet.
      *
      * @param sheet    sheet must not be null
@@ -38,6 +51,16 @@ public interface SheetService extends BasePostService<Sheet> {
      */
     @NonNull
     Sheet updateBy(@NonNull Sheet sheet, boolean autoSave);
+
+    /**
+     * Updates a sheet.
+     *
+     * @param sheet      sheet must not be null
+     * @param sheetMetas sheet metas
+     * @param autoSave   autoSave
+     * @return updated sheet
+     */
+    Sheet updateBy(@NonNull Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave);
 
     /**
      * Gets by url
@@ -92,4 +115,20 @@ public interface SheetService extends BasePostService<Sheet> {
      */
     @NonNull
     Page<SheetListVO> convertToListVo(@NonNull Page<Sheet> sheetPage);
+
+    /**
+     * Converts to detail vo.
+     *
+     * @param sheet sheet must not be null
+     * @return sheet detail vo
+     */
+    @NonNull
+    SheetDetailVO convertToDetailVo(@NonNull Sheet sheet);
+
+    /**
+     * Publish a sheet visit event.
+     *
+     * @param sheetId sheetId must not be null
+     */
+    void publishVisitEvent(@NonNull Integer sheetId);
 }

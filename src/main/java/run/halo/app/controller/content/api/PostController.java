@@ -16,10 +16,7 @@ import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostCommentParam;
-import run.halo.app.model.vo.BaseCommentVO;
-import run.halo.app.model.vo.BaseCommentWithParentVO;
-import run.halo.app.model.vo.CommentWithHasChildrenVO;
-import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.*;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.PostService;
@@ -54,9 +51,9 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<BasePostSimpleDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+    public Page<PostListVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        return postService.convertToSimple(postPage);
+        return postService.convertToListVo(postPage);
     }
 
     @PostMapping(value = "search")

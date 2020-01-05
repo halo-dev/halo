@@ -18,7 +18,7 @@ import java.util.Optional;
  * Base post repository.
  *
  * @author johnniang
- * @date 3/22/19
+ * @date 2019-03-22
  */
 public interface BasePostRepository<POST extends BasePost> extends BaseRepository<POST, Integer> {
 
@@ -108,9 +108,22 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      */
     long countByStatus(@NonNull PostStatus status);
 
-    boolean existsByUrl(@NonNull String title);
+    /**
+     * Determine if the url exists.
+     *
+     * @param url url must not be null.
+     * @return true or false.
+     */
+    boolean existsByUrl(@NonNull String url);
 
-    boolean existsByIdNotAndUrl(@NonNull Integer id, @NonNull String title);
+    /**
+     * Determine if the url exists.
+     *
+     * @param id  post id must not be null.
+     * @param url url must not be null.
+     * @return true or false.
+     */
+    boolean existsByIdNotAndUrl(@NonNull Integer id, @NonNull String url);
 
     /**
      * Get post by url
@@ -142,4 +155,36 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     @Query("update BasePost p set p.likes = p.likes + :likes where p.id = :postId")
     int updateLikes(@Param("likes") long likes, @Param("postId") @NonNull Integer postId);
 
+    /**
+     * Updates post original content.
+     *
+     * @param content content could be blank but disallow to be null
+     * @param postId  post id must not be null
+     * @return updated rows
+     */
+    @Modifying
+    @Query("update BasePost p set p.originalContent = :content where p.id = :postId")
+    int updateOriginalContent(@Param("content") @NonNull String content, @Param("postId") @NonNull Integer postId);
+
+    /**
+     * Updates post status by post id.
+     *
+     * @param status post status must not be null.
+     * @param postId post id must not be null.
+     * @return updated rows.
+     */
+    @Modifying
+    @Query("update BasePost p set p.status = :status where p.id = :postId")
+    int updateStatus(@Param("status") @NonNull PostStatus status, @Param("postId") @NonNull Integer postId);
+
+    /**
+     * Updates post format content by post id.
+     *
+     * @param formatContent format content must not be null.
+     * @param postId        post id must not be null.
+     * @return updated rows.
+     */
+    @Modifying
+    @Query("update BasePost p set p.formatContent = :formatContent where p.id = :postId")
+    int updateFormatContent(@Param("formatContent") @NonNull String formatContent, @Param("postId") @NonNull Integer postId);
 }

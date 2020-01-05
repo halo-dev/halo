@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import run.halo.app.exception.ForbiddenException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -67,5 +68,15 @@ public class DirectoryAttackTest {
         System.out.println("Absolute path: " + path.toAbsolutePath());
         System.out.println("Name count: " + path.getNameCount());
         System.out.println("Normalized path: " + path.normalize());
+    }
+
+    @Test
+    public void traversalTestWhenSuccess() {
+        FileUtils.checkDirectoryTraversal("/etc/", "/etc/halo/halo/../test");
+    }
+
+    @Test(expected = ForbiddenException.class)
+    public void traversalTestWhenFailure() {
+        FileUtils.checkDirectoryTraversal("/etc/", "/etc/../tmp");
     }
 }

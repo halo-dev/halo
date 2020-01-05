@@ -1,4 +1,3 @@
-<#import "/common/macro/common_macro.ftl" as common>
 <#macro head title,keywords,description>
 <!DOCTYPE html>
 <html>
@@ -14,10 +13,43 @@
     <meta name="author" content="${user.nickname!}" />
     <meta name="keywords" content="${keywords!}"/>
     <meta name="description" content="${description!}" />
-    <@common.globalHeader />
+    <@global.head />
     <link href="${static!}/source/css/font-awesome.min.css" type="text/css" rel="stylesheet"/>
     <link rel="stylesheet" href="${static!}/source/css/blog_basic.min.css?version=88107691fe">
     <link href="${static!}/source/css/style.min.css" type="text/css" rel="stylesheet" />
+
+    <#if is_post?? || is_sheet??>
+        <link href="${static!}/source/plugins/prism/css/prism-${settings.code_pretty!'Default'}.css" type="text/css" rel="stylesheet" />
+        <script type="text/javascript" src="${static!}/source/plugins/prism/js/prism.js"></script>
+        <style>
+            table {
+                border-spacing: 0;
+                border-collapse: collapse;
+                margin-top: 0;
+                margin-bottom: 16px;
+                display: block;
+                width: 100%;
+                overflow: auto;
+
+            }
+            table th {
+                font-weight: 600;
+            }
+            table th,
+            table td {
+                padding: 6px 13px;
+                border: 1px solid #dfe2e5;
+            }
+            table tr {
+                background-color: #fff;
+                border-top: 1px solid #c6cbd1;
+            }
+            table tr:nth-child(2n) {
+                background-color: #f6f8fa;
+            }
+        </style>
+    </#if>
+
     <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="/atom.xml">
     <style>
         <#if !settings.post_title_uppper!true>
@@ -76,7 +108,7 @@
 	  xhr.send();
     </#if>
 </script>
-<@common.statistics />
+<@global.statistics />
 </body>
 </html>
 </#macro>
