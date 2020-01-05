@@ -197,7 +197,6 @@
 
     <TargetCommentDrawer
       :visible="journalCommentVisible"
-      :title="journal.title"
       :description="journal.content"
       :target="`journals`"
       :id="journal.id"
