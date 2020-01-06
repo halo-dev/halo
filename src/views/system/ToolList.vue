@@ -18,7 +18,7 @@
             <div slot="title">
               <a-icon type="experiment" /> 开发者选项
             </div>
-            <p>点击进入开发者选项页面</p>
+            <p style="min-height: 50px;">点击进入开发者选项页面</p>
             <a-button
               type="primary"
               style="float:right"
@@ -39,9 +39,32 @@
             :bodyStyle="{ padding: '16px' }"
           >
             <div slot="title">
+              <a-icon type="html5" /> 静态部署
+            </div>
+            <p style="min-height: 50px;">生成静态页面并部署到 Github Pages 之类的托管平台</p>
+            <a-button
+              type="primary"
+              style="float:right"
+              @click="handleToStaticPagesManage"
+            >管理</a-button>
+          </a-card>
+        </a-col>
+        <a-col
+          :xl="6"
+          :lg="6"
+          :md="12"
+          :sm="24"
+          :xs="24"
+          :style="{ marginBottom: '12px' }"
+        >
+          <a-card
+            :bordered="false"
+            :bodyStyle="{ padding: '16px' }"
+          >
+            <div slot="title">
               <a-icon type="hdd" /> 博客备份
             </div>
-            <p>支持备份全站数据</p>
+            <p style="min-height: 50px;">备份全站数据，支持下载到本地</p>
             <a-button
               type="primary"
               style="float:right"
@@ -64,7 +87,7 @@
             <div slot="title">
               <a-icon type="file-markdown" /> Markdown 文章导入
             </div>
-            <p>支持 Hexo/Jekyll 文章导入并解析元数据</p>
+            <p style="min-height: 50px;">支持 Hexo/Jekyll 文章导入并解析元数据</p>
             <a-button
               type="primary"
               style="float:right"
@@ -127,6 +150,9 @@ export default {
     },
     handleToDeveloperOptions() {
       this.$router.push({ name: 'DeveloperOptions' })
+    },
+    handleToStaticPagesManage() {
+      this.$router.push({ name: 'StaticPagesManage' })
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()

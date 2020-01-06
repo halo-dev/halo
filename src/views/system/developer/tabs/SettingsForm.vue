@@ -1,5 +1,8 @@
 <template>
-  <a-form layout="vertical">
+  <a-form
+    layout="vertical"
+    :wrapperCol="wrapperCol"
+  >
     <a-form-item label="开发者选项：">
       <a-switch v-model="options.developer_mode" />
     </a-form-item>
@@ -18,7 +21,13 @@ export default {
   name: 'SettingsForm',
   data() {
     return {
-      options: []
+      options: [],
+      wrapperCol: {
+        xl: { span: 8 },
+        lg: { span: 8 },
+        sm: { span: 12 },
+        xs: { span: 24 }
+      }
     }
   },
   created() {

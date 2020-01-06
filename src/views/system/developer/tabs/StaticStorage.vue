@@ -27,7 +27,7 @@
       </div>
       <div style="margin-top:15px">
         <a-table
-          :rowKey="record => record.name"
+          :rowKey="record => record.id"
           :columns="columns"
           :dataSource="sortedStatics"
           :pagination="false"
