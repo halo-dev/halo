@@ -1,3 +1,9 @@
+buildscript {
+    repositories {
+        maven { url = "http://maven.aliyun.com/nexus/content/groups/public/" }
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '2.2.1.RELEASE'
     id "io.freefair.lombok" version "3.6.6"
