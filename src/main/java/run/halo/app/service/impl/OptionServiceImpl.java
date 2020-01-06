@@ -36,6 +36,7 @@ import run.halo.app.utils.ValidationUtils;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * OptionService implementation class
@@ -458,6 +459,21 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             saveProperty(PrimaryProperties.BIRTHDAY, String.valueOf(currentTime));
             return currentTime;
         });
+    }
+
+    @Override
+    public List<OptionDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<Option> options = listAll();
+        List<Option> replaced = new ArrayList<>();
+        options.forEach(option -> {
+            if (StringUtils.isNotEmpty(option.getValue())) {
+                option.setValue(option.getValue().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(option);
+        });
+        List<Option> updated = updateInBatch(replaced);
+        publishOptionUpdatedEvent();
+        return updated.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @Override
