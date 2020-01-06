@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * RequestRecord entity.
@@ -13,10 +14,9 @@ import javax.persistence.*;
  * @author ijkzen
  */
 @Data
-@Entity
-@Table(name = "record")
 @ToString
 @EqualsAndHashCode(callSuper = true)
+@Entity
 public class RequestRecord extends BaseEntity {
 
     @Id
@@ -37,6 +37,9 @@ public class RequestRecord extends BaseEntity {
 
     @Column
     private String device;
+
+    @Column(columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    private Date time;
 
     @Column
     private String ip;

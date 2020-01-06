@@ -65,6 +65,7 @@ ext {
     image4jVersion = '0.7zensight1'
     flywayVersion = '6.1.0'
     h2Version = '1.4.196'
+    uaVersion = '1.4.3'
 }
 
 dependencies {
@@ -108,6 +109,8 @@ dependencies {
     implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
+
+    implementation "com.github.ua-parser:uap-java:$uaVersion"
 
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly 'mysql:mysql-connector-java'
