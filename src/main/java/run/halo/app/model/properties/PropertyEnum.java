@@ -155,6 +155,9 @@ public interface PropertyEnum extends ValueEnum<String> {
         propertyEnumClasses.add(SeoProperties.class);
         propertyEnumClasses.add(UpOssProperties.class);
         propertyEnumClasses.add(ApiProperties.class);
+        propertyEnumClasses.add(StaticDeployProperties.class);
+        propertyEnumClasses.add(GitStaticDeployProperties.class);
+        propertyEnumClasses.add(NetlifyStaticDeployProperties.class);
 
         Map<String, PropertyEnum> result = new HashMap<>();
 

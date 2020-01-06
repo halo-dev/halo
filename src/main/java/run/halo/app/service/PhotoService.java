@@ -80,4 +80,13 @@ public interface PhotoService extends CrudService<Photo, Integer> {
      * @return list of teams
      */
     List<String> listAllTeams();
+
+    /**
+     * Replace photo url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced photos.
+     */
+    List<PhotoDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
 }
