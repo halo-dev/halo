@@ -249,11 +249,11 @@ Admin 版本：${this.adminVersion}
 UA 信息：${navigator.userAgent}`
       this.$copyText(text)
         .then(message => {
-          console.log('copy', message)
+          this.$log.debug('copy', message)
           this.$message.success('复制成功！')
         })
         .catch(err => {
-          console.log('copy.err', err)
+          this.$log.debug('copy.err', err)
           this.$message.error('复制失败！')
         })
     },
