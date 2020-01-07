@@ -11,13 +11,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import run.halo.app.controller.content.model.PostModel;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.ThemeService;
+
+import java.util.Objects;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -38,23 +42,36 @@ public class ContentIndexController {
 
     private final ThemeService themeService;
 
+    private final PostModel postModel;
+
     public ContentIndexController(PostService postService,
                                   OptionService optionService,
-                                  ThemeService themeService) {
+                                  ThemeService themeService,
+                                  PostModel postModel) {
         this.postService = postService;
         this.optionService = optionService;
         this.themeService = themeService;
+        this.postModel = postModel;
     }
 
 
     /**
      * Render blog index
      *
+     * @param p     post id
      * @param model model
      * @return template path: themes/{theme}/index.ftl
      */
     @GetMapping
-    public String index(Model model) {
+    public String index(Integer p, String token, Model model) {
+
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
+
+        if (PostPermalinkType.ID.equals(permalinkType) && !Objects.isNull(p)) {
+            Post post = postService.getById(p);
+            return postModel.post(post, token, model);
+        }
+
         return this.index(model, 1);
     }
 

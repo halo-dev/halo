@@ -16,7 +16,6 @@ import run.halo.app.security.token.AuthToken;
 import run.halo.app.service.AdminService;
 import run.halo.app.service.OptionService;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 /**

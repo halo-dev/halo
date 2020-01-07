@@ -14,11 +14,14 @@ import java.util.List;
  *
  * @author johnniang
  * @author guqing
+ * @author ryanwang
  * @date 2019-03-19
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class PostListVO extends BasePostSimpleDTO {
+
+    private String fullPath;
 
     private Long commentCount;
 

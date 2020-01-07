@@ -95,6 +95,16 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    public POST getBy(PostStatus status, Integer id) {
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(id, "Post id must not be null");
+
+        Optional<POST> postOptional = basePostRepository.getByIdAndStatus(id, status);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(id));
+    }
+
+    @Override
     public List<POST> listAllBy(PostStatus status) {
         Assert.notNull(status, "Post status must not be null");
 
