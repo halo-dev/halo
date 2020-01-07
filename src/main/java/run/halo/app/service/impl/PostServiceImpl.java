@@ -24,8 +24,10 @@ import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.properties.PermalinkProperties;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
@@ -450,6 +452,12 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         String blogUrl = optionService.getBlogBaseUrl();
 
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
+
+        String pathSuffix = optionService.getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
+
+        String archivesPrefix = optionService.getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
+
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
@@ -485,6 +493,20 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
+
+            StringBuilder fullPath = new StringBuilder(blogUrl);
+            if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+                fullPath.append("/")
+                        .append(archivesPrefix)
+                        .append("/")
+                        .append(postListVO.getUrl())
+                        .append(pathSuffix);
+            } else if (permalinkType.equals(PostPermalinkType.ID)) {
+                fullPath.append("/?p=")
+                        .append(postListVO.getId());
+            }
+
+            postListVO.setFullPath(fullPath.toString());
 
             return postListVO;
         });

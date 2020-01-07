@@ -1,11 +1,6 @@
 package run.halo.app.controller.content;
 
-import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,16 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.controller.content.model.PostModel;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostPermalinkType;
-import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.properties.PostProperties;
-import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
-import run.halo.app.service.ThemeService;
 
 import java.util.Objects;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Blog index page controller
@@ -40,17 +29,13 @@ public class ContentIndexController {
 
     private final OptionService optionService;
 
-    private final ThemeService themeService;
-
     private final PostModel postModel;
 
     public ContentIndexController(PostService postService,
                                   OptionService optionService,
-                                  ThemeService themeService,
                                   PostModel postModel) {
         this.postService = postService;
         this.optionService = optionService;
-        this.themeService = themeService;
         this.postModel = postModel;
     }
 
@@ -69,7 +54,7 @@ public class ContentIndexController {
 
         if (PostPermalinkType.ID.equals(permalinkType) && !Objects.isNull(p)) {
             Post post = postService.getById(p);
-            return postModel.post(post, token, model);
+            return postModel.content(post, token, model);
         }
 
         return this.index(model, 1);
@@ -85,18 +70,6 @@ public class ContentIndexController {
     @GetMapping(value = "page/{page}")
     public String index(Model model,
                         @PathVariable(value = "page") Integer page) {
-        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
-        int pageSize = optionService.getPostPageSize();
-        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)));
-
-        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
-
-        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
-
-        model.addAttribute("is_index", true);
-        model.addAttribute("posts", posts);
-        model.addAttribute("rainbow", rainbow);
-        return themeService.render("index");
+        return postModel.list(page, model, "is_index", "index");
     }
 }

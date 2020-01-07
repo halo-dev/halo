@@ -2,7 +2,7 @@
     <div class="post animated fadeInDown">
         <div class="post-title">
             <h3>
-                <a href="${context!}/archives/${post.url}">${post.title}</a>
+                <a href="${post.fullPath!}">${post.title}</a>
             </h3>
         </div>
         <div class="post-content">
