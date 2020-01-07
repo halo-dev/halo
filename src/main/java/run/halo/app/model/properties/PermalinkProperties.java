@@ -37,7 +37,13 @@ public enum PermalinkProperties implements PropertyEnum {
      * Sheet prefix
      * such as: /s/${url}
      */
-    SHEET_PREFIX("sheet_prefix", String.class, "s");
+    SHEET_PREFIX("sheet_prefix", String.class, "s"),
+
+    /**
+     * Path suffix
+     * such as: .html or .jsp
+     */
+    PATH_SUFFIX("path_suffix", String.class, "");
 
     private final String value;
 

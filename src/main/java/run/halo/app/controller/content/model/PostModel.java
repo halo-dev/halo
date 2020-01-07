@@ -1,7 +1,11 @@
 package run.halo.app.controller.content.model;
 
+import cn.hutool.core.util.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.StringCacheStore;
@@ -11,15 +15,21 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 
 import java.util.List;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 /**
- * @author ryan0up
- * @date 2020/1/7
+ * Post Model
+ *
+ * @author ryanwang
+ * @date 2020-01-07
  */
 @Component
 public class PostModel {
@@ -54,7 +64,7 @@ public class PostModel {
         this.cacheStore = cacheStore;
     }
 
-    public String post(Post post, String token, Model model) {
+    public String content(Post post, String token, Model model) {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
             String redirect = String.format("%s/archives/%s/password", optionService.getBlogBaseUrl(), post.getUrl());
@@ -91,5 +101,22 @@ public class PostModel {
         }
 
         return themeService.render("post");
+    }
+
+    public String list(Integer page, Model model, String decide, String template) {
+        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
+        int pageSize = optionService.getPostPageSize();
+        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)));
+
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> posts = postService.convertToListVo(postPage);
+
+        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        model.addAttribute(decide, true);
+        model.addAttribute("posts", posts);
+        model.addAttribute("rainbow", rainbow);
+        model.addAttribute("pageRainbow", rainbow);
+        return themeService.render(template);
     }
 }
