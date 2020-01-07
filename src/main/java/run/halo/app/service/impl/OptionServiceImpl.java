@@ -22,6 +22,7 @@ import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.params.OptionQuery;
@@ -459,6 +460,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             saveProperty(PrimaryProperties.BIRTHDAY, String.valueOf(currentTime));
             return currentTime;
         });
+    }
+
+    @Override
+    public PostPermalinkType getPostPermalinkType() {
+        return getEnumByPropertyOrDefault(PermalinkProperties.POST_PERMALINK_TYPE, PostPermalinkType.class, PostPermalinkType.DEFAULT);
     }
 
     @Override
