@@ -87,14 +87,14 @@ public class RequestRecordServiceImpl implements RequestRecordService {
     }
 
     private String getIp(HttpServletRequest request) {
-        if (isNullOrEmpty(request.getRemoteAddr())) {
-            if (isNullOrEmpty(request.getHeader("X-Real-IP"))) {
+        if (isNullOrEmpty(request.getHeader("X-Real-IP"))) {
+            if (isNullOrEmpty(request.getRemoteAddr())) {
                 return null;
             } else {
-                return request.getHeader("X-Real-IP");
+                return request.getRemoteAddr();
             }
         } else {
-            return request.getRemoteAddr();
+            return request.getHeader("X-Real-IP");
         }
     }
 
