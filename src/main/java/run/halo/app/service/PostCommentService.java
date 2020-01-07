@@ -12,9 +12,11 @@ import run.halo.app.service.base.BaseCommentService;
 import java.util.List;
 
 /**
- * PostComment service.
+ * Post comment service interface.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-14
  */
 public interface PostCommentService extends BaseCommentService<PostComment> {
 
@@ -26,6 +28,15 @@ public interface PostCommentService extends BaseCommentService<PostComment> {
      */
     @NonNull
     Page<PostCommentWithPostVO> convertToWithPostVo(@NonNull Page<PostComment> commentPage);
+
+    /**
+     * Converts to with post vo
+     *
+     * @param comment comment
+     * @return a comment with post vo
+     */
+    @NonNull
+    PostCommentWithPostVO convertToWithPostVo(@NonNull PostComment comment);
 
     /**
      * Converts to with post vo

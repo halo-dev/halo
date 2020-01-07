@@ -55,7 +55,7 @@ public class OptionController {
     @ApiOperation("Options for comment")
     public Map<String, Object> comment() {
         List<String> keys = new ArrayList<>();
-        keys.add("comment_gavatar_default");
+        keys.add("comment_gravatar_default");
         keys.add("comment_content_placeholder");
         return optionService.listOptions(keys);
     }

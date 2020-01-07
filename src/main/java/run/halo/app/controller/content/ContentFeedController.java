@@ -2,6 +2,7 @@ package run.halo.app.controller.content;
 
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,19 +18,23 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.vo.PostListVO;
+import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * @author ryanwang
- * @date : 2019-03-21
+ * @date 2019-03-21
  */
+@Slf4j
 @Controller
 public class ContentFeedController {
 
@@ -74,7 +79,7 @@ public class ContentFeedController {
     @GetMapping(value = {"atom", "atom.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
     public String atom(Model model) throws IOException, TemplateException {
-        model.addAttribute("posts", buildPosts(buildPostPageable(optionService.getPostPageSize())));
+        model.addAttribute("posts", buildPosts(buildPostPageable(optionService.getRssPageSize())));
         Template template = freeMarker.getConfiguration().getTemplate("common/web/atom.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -141,9 +146,17 @@ public class ContentFeedController {
      * @param pageable pageable
      * @return List<Post>
      */
-    private List<PostListVO> buildPosts(@NonNull Pageable pageable) {
+    private List<PostDetailVO> buildPosts(@NonNull Pageable pageable) {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
+        Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
+        posts.getContent().forEach(postListVO -> {
+            try {
+                // Encode post url
+                postListVO.setUrl(URLEncoder.encode(postListVO.getUrl(), StandardCharsets.UTF_8.name()));
+            } catch (UnsupportedEncodingException e) {
+                log.warn("Failed to encode url: " + postListVO.getUrl(), e);
+            }
+        });
         return posts.getContent();
     }
 }

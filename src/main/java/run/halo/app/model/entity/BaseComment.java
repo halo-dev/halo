@@ -12,6 +12,8 @@ import javax.persistence.*;
  * Base comment entity.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-20
  */
 @Data
 @Entity(name = "BaseComment")
@@ -50,10 +52,10 @@ public class BaseComment extends BaseEntity {
     private String authorUrl;
 
     /**
-     * Gavatar md5
+     * Gravatar md5
      */
-    @Column(name = "gavatar_md5", columnDefinition = "varchar(128) default ''")
-    private String gavatarMd5;
+    @Column(name = "gravatar_md5", columnDefinition = "varchar(128) default ''")
+    private String gravatarMd5;
 
     /**
      * Comment content.
@@ -78,6 +80,12 @@ public class BaseComment extends BaseEntity {
      */
     @Column(name = "is_admin", columnDefinition = "tinyint default 0")
     private Boolean isAdmin;
+
+    /**
+     * Allow notification.
+     */
+    @Column(name = "allow_notification", columnDefinition = "tinyint default 1")
+    private Boolean allowNotification;
 
     /**
      * Post id.
@@ -117,8 +125,8 @@ public class BaseComment extends BaseEntity {
             authorUrl = "";
         }
 
-        if (gavatarMd5 == null) {
-            gavatarMd5 = "";
+        if (gravatarMd5 == null) {
+            gravatarMd5 = "";
         }
 
         if (status == null) {
@@ -132,6 +140,9 @@ public class BaseComment extends BaseEntity {
         if (isAdmin == null) {
             isAdmin = false;
         }
-    }
 
+        if (allowNotification == null) {
+            allowNotification = true;
+        }
+    }
 }

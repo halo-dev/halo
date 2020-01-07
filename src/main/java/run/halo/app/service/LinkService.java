@@ -11,11 +11,19 @@ import run.halo.app.service.base.CrudService;
 import java.util.List;
 
 /**
- * Link service.
+ * Link service interface.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-14
  */
 public interface LinkService extends CrudService<Link, Integer> {
+
+    String META_NAME = "name";
+
+    String META_DESCRIPTION = "description";
+
+    String META_CONTENT = "content";
 
     /**
      * List link dtos.
@@ -51,4 +59,19 @@ public interface LinkService extends CrudService<Link, Integer> {
      * @return true if exists; false otherwise
      */
     boolean existByName(String name);
+
+    /**
+     * List all link teams.
+     *
+     * @return a list of teams.
+     */
+    List<String> listAllTeams();
+
+    /**
+     * Get link by parse url.
+     *
+     * @param url url must not be null
+     * @return link dto
+     */
+    LinkDTO getByParse(@NonNull String url);
 }

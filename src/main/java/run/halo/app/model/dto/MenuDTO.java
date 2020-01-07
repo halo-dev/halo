@@ -10,6 +10,7 @@ import run.halo.app.model.entity.Menu;
  * Menu output dto.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 4/3/19
  */
 @Data
@@ -30,4 +31,6 @@ public class MenuDTO implements OutputConverter<MenuDTO, Menu> {
     private String icon;
 
     private Integer parentId;
+
+    private String team;
 }

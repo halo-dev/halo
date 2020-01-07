@@ -6,10 +6,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.TagPostPostCountProjection;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.PostTagRepository;
@@ -25,7 +27,8 @@ import java.util.stream.Collectors;
  * Post tag service implementation.
  *
  * @author johnniang
- * @date 3/19/19
+ * @author ryanwang
+ * @date 2019-03-19
  */
 @Service
 public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> implements PostTagService {
@@ -114,12 +117,47 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     }
 
     @Override
+    public List<Post> listPostsBy(Integer tagId, PostStatus status) {
+        Assert.notNull(tagId, "Tag id must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public List<Post> listPostsBy(String slug, PostStatus status) {
+        Assert.notNull(slug, "Tag slug must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        Tag tag = tagRepository.getBySlugName(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
+
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tag.getId(), status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
     public Page<Post> pagePostsBy(Integer tagId, Pageable pageable) {
         Assert.notNull(tagId, "Tag id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId);
+
+        return postRepository.findAllByIdIn(postIds, pageable);
+    }
+
+    @Override
+    public Page<Post> pagePostsBy(Integer tagId, PostStatus status, Pageable pageable) {
+        Assert.notNull(tagId, "Tag id must not be null");
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
 
         return postRepository.findAllByIdIn(postIds, pageable);
     }

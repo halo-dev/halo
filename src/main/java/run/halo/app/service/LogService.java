@@ -6,9 +6,10 @@ import run.halo.app.model.entity.Log;
 import run.halo.app.service.base.CrudService;
 
 /**
- * Log service.
+ * Log service interface.
  *
  * @author johnniang
+ * @date 2019-03-14
  */
 public interface LogService extends CrudService<Log, Long> {
 

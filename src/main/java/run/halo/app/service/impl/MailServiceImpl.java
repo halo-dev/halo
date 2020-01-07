@@ -20,7 +20,7 @@ import java.util.Properties;
  * Mail service implementation.
  *
  * @author ryanwang
- * @date : 2019-03-17
+ * @date 2019-03-17
  */
 @Slf4j
 @Service
@@ -37,13 +37,6 @@ public class MailServiceImpl implements MailService {
 
     }
 
-    /**
-     * Sends a simple email
-     *
-     * @param to      recipient
-     * @param subject subject
-     * @param content content
-     */
     @Override
     public void sendMail(String to, String subject, String content) {
         loadConfig();
@@ -59,18 +52,10 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], content: [{}]",
                     to, fromUsername, subject, content);
-            throw new EmailException("Failed to send email to " + to, e);
+            throw new EmailException("发送邮件到 " + to + " 失败，请检查 SMTP 服务配置是否正确", e);
         }
     }
 
-    /**
-     * Sends template mail
-     *
-     * @param to           recipient
-     * @param subject      subject
-     * @param content      content
-     * @param templateName template name
-     */
     @Override
     public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
         loadConfig();
@@ -89,19 +74,10 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], template name: [{}], content: [{}]",
                     to, fromUsername, subject, templateName, content);
-            throw new EmailException("Failed to send template email to " + to, e).setErrorData(templateName);
+            throw new EmailException("发送模板邮件到 " + to + " 失败，请检查 SMTP 服务配置是否正确", e);
         }
     }
 
-    /**
-     * Sends mail with attachments
-     *
-     * @param to             recipient
-     * @param subject        subject
-     * @param content        content
-     * @param templateName   template name
-     * @param attachFilename attachment path
-     */
     @Override
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilename) {
         loadConfig();
@@ -121,7 +97,7 @@ public class MailServiceImpl implements MailService {
         } catch (Exception e) {
             log.debug("Email properties: to username: [{}], from username: [{}], subject: [{}], template name: [{}], attachment: [{}], content: [{}]",
                     to, fromUsername, subject, templateName, attachFilename, content);
-            throw new EmailException("Failed to send attachment email to " + to, e);
+            throw new EmailException("发送附件邮件到 " + to + " 失败，请检查 SMTP 服务配置是否正确", e);
         }
     }
 

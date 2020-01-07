@@ -4,7 +4,6 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Category;
-import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.SlugUtils;
 
 import javax.validation.constraints.NotBlank;
@@ -14,7 +13,8 @@ import javax.validation.constraints.Size;
  * Category param.
  *
  * @author johnniang
- * @date 3/21/19
+ * @author ryanwang
+ * @date 2019-03-21
  */
 @Data
 public class CategoryParam implements InputConverter<Category> {
@@ -46,13 +46,8 @@ public class CategoryParam implements InputConverter<Category> {
     @Override
     public Category convertTo() {
         // Handle default value
-        if (StringUtils.isBlank(slugName)) {
-            slugName = SlugUtils.slugify(name);
 
-            if (StringUtils.isBlank(slugName)) {
-                slugName = HaloUtils.initializeUrlIfBlank(slugName);
-            }
-        }
+        slugName = StringUtils.isBlank(slugName) ? SlugUtils.slug(name) : SlugUtils.slug(slugName);
 
         return InputConverter.super.convertTo();
     }

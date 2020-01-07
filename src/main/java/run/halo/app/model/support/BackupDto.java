@@ -10,9 +10,10 @@ import java.util.Date;
  * </pre>
  *
  * @author ryanwang
- * @date : 2018/6/4
+ * @date 2018/6/4
  */
 @Data
+@Deprecated
 public class BackupDto {
 
     /**

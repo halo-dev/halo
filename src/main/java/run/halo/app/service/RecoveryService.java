@@ -7,8 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
  * Recovery service interface.
  *
  * @author johnniang
- * @date 19-4-26
+ * @date 2019-04-26
  */
+@Deprecated
 public interface RecoveryService {
 
     /**

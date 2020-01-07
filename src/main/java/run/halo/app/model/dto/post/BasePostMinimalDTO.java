@@ -6,7 +6,6 @@ import lombok.ToString;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.enums.PostType;
 
 import java.util.Date;
 
@@ -27,8 +26,6 @@ public class BasePostMinimalDTO implements OutputConverter<BasePostMinimalDTO, B
     private PostStatus status;
 
     private String url;
-
-    private PostType type;
 
     private Date updateTime;
 

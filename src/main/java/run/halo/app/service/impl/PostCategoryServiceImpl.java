@@ -6,10 +6,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryWithPostCountDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.repository.PostCategoryRepository;
@@ -25,7 +27,9 @@ import java.util.stream.Collectors;
  * Post category service implementation.
  *
  * @author johnniang
- * @date 3/19/19
+ * @author ryanwang
+ * @author guqing
+ * @date 2019-03-19
  */
 @Service
 public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, Integer> implements PostCategoryService {
@@ -46,7 +50,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
-    public List<Category> listCategoryBy(Integer postId) {
+    public List<Category> listCategoriesBy(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
 
         // Find all category ids
@@ -94,12 +98,47 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
+    public List<Post> listPostBy(Integer categoryId, PostStatus status) {
+        Assert.notNull(categoryId, "Category id must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public List<Post> listPostBy(String slug, PostStatus status) {
+        Assert.notNull(slug, "Category slug must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        Category category = categoryRepository.getBySlugName(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+
+        Set<Integer> postsIds = postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
+
+        return postRepository.findAllById(postsIds);
+    }
+
+    @Override
     public Page<Post> pagePostBy(Integer categoryId, Pageable pageable) {
         Assert.notNull(categoryId, "Category id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
         Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId);
+
+        return postRepository.findAllByIdIn(postIds, pageable);
+    }
+
+    @Override
+    public Page<Post> pagePostBy(Integer categoryId, PostStatus status, Pageable pageable) {
+        Assert.notNull(categoryId, "Category id must not be null");
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
 
         return postRepository.findAllByIdIn(postIds, pageable);
     }
@@ -174,7 +213,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
     @Override
     public List<PostCategory> removeByPostId(Integer postId) {
-        Assert.notNull(postId, "PoremoveByIdst id must not be null");
+        Assert.notNull(postId, "Post id must not be null");
 
         return postCategoryRepository.deleteByPostId(postId);
     }

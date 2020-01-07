@@ -8,7 +8,7 @@ import lombok.Data;
  * </pre>
  *
  * @author : Yawn
- * @date : 2018/12/3
+ * @date 2018/12/3
  */
 @Data
 public class QiNiuPutSet {
@@ -17,6 +17,7 @@ public class QiNiuPutSet {
      * 文件hash值
      */
     public String hash;
+
     /**
      * 文件名
      */

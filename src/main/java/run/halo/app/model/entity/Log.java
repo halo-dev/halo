@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.enums.LogType;
-import run.halo.app.utils.ServletUtils;
 
 import javax.persistence.*;
 
@@ -60,7 +59,8 @@ public class Log extends BaseEntity {
         }
 
         // Get ip address
-        ipAddress = ServletUtils.getRequestIp();
+        // ###!!! Do not get request IP from here due to asynchronous
+        // ipAddress = ServletUtils.getRequestIp();
 
         if (ipAddress == null) {
             logKey = "";

@@ -1,20 +1,27 @@
 package run.halo.app.controller.admin.api;
 
+import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.StringCacheStore;
 import run.halo.app.model.dto.InternalSheetDTO;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.SheetParam;
+import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetService;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -31,20 +38,28 @@ public class SheetController {
 
     private final SheetService sheetService;
 
-    public SheetController(SheetService sheetService) {
+    private final StringCacheStore cacheStore;
+
+    private final OptionService optionService;
+
+    public SheetController(SheetService sheetService,
+                           StringCacheStore cacheStore,
+                           OptionService optionService) {
         this.sheetService = sheetService;
+        this.cacheStore = cacheStore;
+        this.optionService = optionService;
     }
 
     @GetMapping("{sheetId:\\d+}")
     @ApiOperation("Gets a sheet")
-    public BasePostDetailDTO getBy(@PathVariable("sheetId") Integer sheetId) {
+    public SheetDetailVO getBy(@PathVariable("sheetId") Integer sheetId) {
         Sheet sheet = sheetService.getById(sheetId);
-        return sheetService.convertToDetail(sheet);
+        return sheetService.convertToDetailVo(sheet);
     }
 
     @GetMapping
     @ApiOperation("Gets a page of sheet")
-    public Page<SheetListVO> pageBy(@PageableDefault(sort = "editTime", direction = DESC) Pageable pageable) {
+    public Page<SheetListVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Sheet> sheetPage = sheetService.pageBy(pageable);
         return sheetService.convertToListVo(sheetPage);
     }
@@ -57,15 +72,15 @@ public class SheetController {
 
     @PostMapping
     @ApiOperation("Creates a sheet")
-    public BasePostDetailDTO createBy(@RequestBody @Valid SheetParam sheetParam,
-                                      @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
-        Sheet sheet = sheetService.createBy(sheetParam.convertTo(), autoSave);
-        return sheetService.convertToDetail(sheet);
+    public SheetDetailVO createBy(@RequestBody @Valid SheetParam sheetParam,
+                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+        Sheet sheet = sheetService.createBy(sheetParam.convertTo(), sheetParam.getSheetMetas(), autoSave);
+        return sheetService.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}")
     @ApiOperation("Updates a sheet")
-    public BasePostDetailDTO updateBy(
+    public SheetDetailVO updateBy(
             @PathVariable("sheetId") Integer sheetId,
             @RequestBody @Valid SheetParam sheetParam,
             @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
@@ -73,12 +88,13 @@ public class SheetController {
 
         sheetParam.update(sheetToUpdate);
 
-        Sheet sheet = sheetService.updateBy(sheetToUpdate, autoSave);
+        Sheet sheet = sheetService.updateBy(sheetToUpdate, sheetParam.getSheetMetas(), autoSave);
 
-        return sheetService.convertToDetail(sheet);
+        return sheetService.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}/{status}")
+    @ApiOperation("Updates a sheet")
     public void updateStatusBy(
             @PathVariable("sheetId") Integer sheetId,
             @PathVariable("status") PostStatus status) {
@@ -93,8 +109,22 @@ public class SheetController {
 
     @DeleteMapping("{sheetId:\\d+}")
     @ApiOperation("Deletes a sheet")
-    public BasePostDetailDTO deleteBy(@PathVariable("sheetId") Integer sheetId) {
+    public SheetDetailVO deleteBy(@PathVariable("sheetId") Integer sheetId) {
         Sheet sheet = sheetService.removeById(sheetId);
-        return sheetService.convertToDetail(sheet);
+        return sheetService.convertToDetailVo(sheet);
+    }
+
+    @GetMapping("preview/{sheetId:\\d+}")
+    @ApiOperation("Gets a sheet preview link")
+    public String preview(@PathVariable("sheetId") Integer sheetId) throws UnsupportedEncodingException {
+        Sheet sheet = sheetService.getById(sheetId);
+
+        String token = IdUtil.simpleUUID();
+
+        // cache preview token
+        cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
+
+        // build preview post url and return
+        return String.format("%s/s/%s?token=%s", optionService.getBlogBaseUrl(), URLEncoder.encode(sheet.getUrl(), StandardCharsets.UTF_8.name()), token);
     }
 }

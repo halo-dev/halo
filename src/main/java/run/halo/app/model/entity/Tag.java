@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Tag entity
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 @Data
 @Entity
@@ -33,7 +33,7 @@ public class Tag extends BaseEntity {
     /**
      * Tag slug name.
      */
-    @Column(name = "slug_name", columnDefinition = "varchar(255) not null")
+    @Column(name = "slug_name", columnDefinition = "varchar(255) not null", unique = true)
     private String slugName;
 
     @Override

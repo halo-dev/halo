@@ -14,7 +14,7 @@
         <language>zh-CN</language>
         <sy:updatePeriod>hourly</sy:updatePeriod>
         <sy:updateFrequency>1</sy:updateFrequency>
-        <generator>https://github.com/halo-dev/halo</generator>
+        <generator>https://halo.run</generator>
     </channel>
     <#if posts?? && posts?size gt 0>
         <#list posts as post>
@@ -26,8 +26,8 @@
                 <dc:creator><![CDATA[${user.nickname!}]]></dc:creator>
 
                 <#if post.categories?? && post.categories?size gt 0>
-                    <#list post.categories as cate>
-                        <category><![CDATA[${cate.name!}]]></category>
+                    <#list post.categories as category>
+                        <category><![CDATA[${category.name!}]]></category>
                     </#list>
                 </#if>
                 <description>
@@ -37,10 +37,13 @@
                 </description>
                 <content:encoded>
                     <![CDATA[
-                        ${post.summary!}
+                        <#if (options.rss_content_type!'full') == 'full'>
+                            ${post.formatContent!}
+                        <#else>
+                            ${post.summary!}
+                        </#if>
                     ]]>
                 </content:encoded>
-                <slash:comments>${post.commentCount!0}</slash:comments>
             </item>
         </#list>
     </#if>

@@ -14,9 +14,11 @@ import run.halo.app.service.base.CrudService;
 import java.util.List;
 
 /**
- * Photo service.
+ * Photo service interface.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-14
  */
 public interface PhotoService extends CrudService<Photo, Integer> {
 
@@ -48,6 +50,14 @@ public interface PhotoService extends CrudService<Photo, Integer> {
     /**
      * Pages photo output dtos.
      *
+     * @param pageable page info must not be null
+     * @return a page of photo output dto
+     */
+    Page<PhotoDTO> pageBy(@NonNull Pageable pageable);
+
+    /**
+     * Pages photo output dtos.
+     *
      * @param pageable   page info must not be null
      * @param photoQuery photoQuery
      * @return a page of photo output dto
@@ -63,4 +73,11 @@ public interface PhotoService extends CrudService<Photo, Integer> {
      */
     @NonNull
     Photo createBy(@NonNull PhotoParam photoParam);
+
+    /**
+     * List all teams.
+     *
+     * @return list of teams
+     */
+    List<String> listAllTeams();
 }

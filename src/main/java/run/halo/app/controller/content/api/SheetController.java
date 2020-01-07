@@ -3,17 +3,19 @@ package run.halo.app.controller.content.api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
+import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.SheetCommentParam;
-import run.halo.app.model.vo.BaseCommentVO;
-import run.halo.app.model.vo.BaseCommentWithParentVO;
-import run.halo.app.model.vo.CommentWithHasChildrenVO;
+import run.halo.app.model.vo.*;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
@@ -26,9 +28,10 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Sheet controller.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 19-4-26
  */
-@RestController("PortalSheetController")
+@RestController("ApiContentSheetController")
 @RequestMapping("/api/content/sheets")
 public class SheetController {
 
@@ -42,6 +45,33 @@ public class SheetController {
         this.sheetService = sheetService;
         this.sheetCommentService = sheetCommentService;
         this.optionService = optionService;
+    }
+
+    @GetMapping
+    @ApiOperation("Lists sheets")
+    public Page<SheetListVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+        Page<Sheet> sheetPage = sheetService.pageBy(PostStatus.PUBLISHED, pageable);
+        return sheetService.convertToListVo(sheetPage);
+    }
+
+    @GetMapping("{sheetId:\\d+}")
+    @ApiOperation("Gets a sheet")
+    public SheetDetailVO getBy(@PathVariable("sheetId") Integer sheetId,
+                               @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+                               @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheetService.getById(sheetId));
+
+        if (formatDisabled) {
+            // Clear the format content
+            sheetDetailVO.setFormatContent(null);
+        }
+
+        if (sourceDisabled) {
+            // Clear the original content
+            sheetDetailVO.setOriginalContent(null);
+        }
+
+        return sheetDetailVO;
     }
 
     @GetMapping("{sheetId:\\d+}/comments/top_view")

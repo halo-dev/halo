@@ -3,12 +3,13 @@ package run.halo.app.handler.theme.config.support;
 import lombok.Data;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Theme property.
  *
  * @author ryanwang
- * @date : 2019-03-22
+ * @date 2019-03-22
  */
 @Data
 public class ThemeProperty {
@@ -83,10 +84,24 @@ public class ThemeProperty {
      */
     private String screenshots;
 
+    /**
+     * Post preset metas.
+     */
+    private Set<String> postMetaField;
+
+    /**
+     * Sheet preset metas.
+     */
+    private Set<String> sheetMetaField;
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ThemeProperty that = (ThemeProperty) o;
         return id.equals(that.id);
     }
@@ -97,7 +112,7 @@ public class ThemeProperty {
     }
 
     @Data
-    public static class Author {
+    private static class Author {
 
         /**
          * Author name.

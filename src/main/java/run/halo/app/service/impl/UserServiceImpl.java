@@ -14,6 +14,7 @@ import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.params.UserParam;
@@ -29,10 +30,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
- * UserService implementation class
+ * UserService implementation class.
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @author johnniang
+ * @date 2019-03-14
  */
 @Service
 public class UserServiceImpl extends AbstractCrudService<User, Integer> implements UserService {
@@ -73,30 +75,17 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     public User getByUsernameOfNonNull(String username) {
-        return getByUsername(username).orElseThrow(() -> new NotFoundException("The username dose not exist").setErrorData(username));
+        return getByUsername(username).orElseThrow(() -> new NotFoundException("The username does not exist").setErrorData(username));
     }
 
-    /**
-     * Gets user by email.
-     *
-     * @param email email must not be blank
-     * @return an optional user
-     */
     @Override
     public Optional<User> getByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    /**
-     * Gets non null user by email.
-     *
-     * @param email email
-     * @return user info
-     * @throws NotFoundException throws when the username does not exist
-     */
     @Override
     public User getByEmailOfNonNull(String email) {
-        return getByEmail(email).orElseThrow(() -> new NotFoundException("The email dose not exist").setErrorData(email));
+        return getByEmail(email).orElseThrow(() -> new NotFoundException("The email does not exist").setErrorData(email));
     }
 
     @Override
@@ -124,7 +113,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         User updatedUser = update(user);
 
         // Log it
-        eventPublisher.publishEvent(new LogEvent(this, updatedUser.getId().toString(), LogType.PASSWORD_UPDATED, oldPassword));
+        eventPublisher.publishEvent(new LogEvent(this, updatedUser.getId().toString(), LogType.PASSWORD_UPDATED, HaloUtils.desensitize(oldPassword, 2, 1)));
 
         return updatedUser;
     }
@@ -193,4 +182,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         user.setPassword(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
     }
 
+    @Override
+    public boolean verifyUser(String username, String password) {
+        User user = getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
+        return user.getUsername().equals(username) && user.getEmail().equals(password);
+    }
 }

@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Link entity
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 @Data
 @Entity
@@ -54,12 +54,21 @@ public class Link extends BaseEntity {
     @Column(name = "team", columnDefinition = "varchar(255) default ''")
     private String team;
 
+    /**
+     * Sort.
+     */
+    @Column(name = "priority", columnDefinition = "int default 0")
+    private Integer priority;
 
     @Override
     public void prePersist() {
         super.prePersist();
 
         id = null;
+
+        if (priority == null) {
+            priority = 0;
+        }
 
         if (logo == null) {
             logo = "";

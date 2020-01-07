@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * Journal comment service implementation.
  *
  * @author johnniang
- * @date 19-4-25
+ * @date 2019-04-25
  */
 @Service
 public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalComment> implements JournalCommentService {
@@ -49,7 +49,7 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
     @Override
     public void validateTarget(Integer journalId) {
         if (!journalRepository.existsById(journalId)) {
-            throw new NotFoundException("该日志不存在或已删除").setErrorData(journalId);
+            throw new NotFoundException("查询不到该日志信息").setErrorData(journalId);
         }
     }
 

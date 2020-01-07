@@ -1,4 +1,3 @@
-<#include "/common/macro/common_macro.ftl">
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -44,6 +43,6 @@
 <script src="${static!}/source/plugins/gallery/js/jquery.min.js"></script>
 <script src="${static!}/source/plugins/gallery/js/skel.min.js"></script>
 <script src="${static!}/source/plugins/gallery/js/main.js"></script>
-<@statistics></@statistics>
+<@global.statistics />
 </body>
 </html>

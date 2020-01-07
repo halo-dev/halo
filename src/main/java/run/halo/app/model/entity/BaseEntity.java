@@ -14,9 +14,9 @@ import java.util.Date;
  * @author johnniang
  * @date 3/20/19
  */
-@MappedSuperclass
 @Data
 @ToString
+@MappedSuperclass
 @EqualsAndHashCode
 public class BaseEntity {
 

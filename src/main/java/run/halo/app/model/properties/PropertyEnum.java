@@ -29,7 +29,7 @@ public interface PropertyEnum extends ValueEnum<String> {
      */
     @SuppressWarnings("unchecked")
     static <T> T convertTo(@NonNull String value, @NonNull Class<T> type) {
-        Assert.hasText(value, "Value must not be null");
+        Assert.notNull(value, "Value must not be null");
         Assert.notNull(type, "Type must not be null");
 
         if (type.isAssignableFrom(String.class)) {
@@ -57,7 +57,7 @@ public interface PropertyEnum extends ValueEnum<String> {
         }
 
         if (type.isAssignableFrom(Double.class)) {
-            return (T) Byte.valueOf(value);
+            return (T) Double.valueOf(value);
         }
 
         if (type.isAssignableFrom(Float.class)) {
@@ -143,7 +143,7 @@ public interface PropertyEnum extends ValueEnum<String> {
     static Map<String, PropertyEnum> getValuePropertyEnumMap() {
         // Get all properties
         List<Class<? extends PropertyEnum>> propertyEnumClasses = new LinkedList<>();
-        propertyEnumClasses.add(AliYunProperties.class);
+        propertyEnumClasses.add(AliOssProperties.class);
         propertyEnumClasses.add(AttachmentProperties.class);
         propertyEnumClasses.add(BlogProperties.class);
         propertyEnumClasses.add(CommentProperties.class);
@@ -151,9 +151,10 @@ public interface PropertyEnum extends ValueEnum<String> {
         propertyEnumClasses.add(OtherProperties.class);
         propertyEnumClasses.add(PostProperties.class);
         propertyEnumClasses.add(PrimaryProperties.class);
-        propertyEnumClasses.add(QnYunProperties.class);
+        propertyEnumClasses.add(QiniuOssProperties.class);
         propertyEnumClasses.add(SeoProperties.class);
-        propertyEnumClasses.add(UpYunProperties.class);
+        propertyEnumClasses.add(UpOssProperties.class);
+        propertyEnumClasses.add(ApiProperties.class);
 
         Map<String, PropertyEnum> result = new HashMap<>();
 

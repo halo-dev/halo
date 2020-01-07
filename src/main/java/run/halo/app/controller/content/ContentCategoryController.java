@@ -13,16 +13,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
-import run.halo.app.service.CategoryService;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostCategoryService;
-import run.halo.app.service.ThemeService;
+import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.*;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
+ * Category controller.
+ *
  * @author ryanwang
- * @date : 2019/3/20
+ * @date 2019-03-20
  */
 @Controller
 @RequestMapping(value = "/categories")
@@ -34,25 +35,29 @@ public class ContentCategoryController {
 
     private final PostCategoryService postCategoryService;
 
+    private final PostService postService;
+
     private final OptionService optionService;
 
     public ContentCategoryController(CategoryService categoryService,
                                      ThemeService themeService,
                                      PostCategoryService postCategoryService,
-                                     OptionService optionService) {
+                                     PostService postService, OptionService optionService) {
         this.categoryService = categoryService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
+        this.postService = postService;
         this.optionService = optionService;
     }
 
     /**
      * Render category list page
      *
-     * @return template path: theme/{theme}/categories.ftl
+     * @return template path: themes/{theme}/categories.ftl
      */
     @GetMapping
-    public String categories() {
+    public String categories(Model model) {
+        model.addAttribute("is_categories", true);
         return themeService.render("categories");
     }
 
@@ -61,7 +66,7 @@ public class ContentCategoryController {
      *
      * @param model    model
      * @param slugName slugName
-     * @return template path: theme/{theme}/category.ftl
+     * @return template path: themes/{theme}/category.ftl
      */
     @GetMapping(value = "{slugName}")
     public String categories(Model model,
@@ -75,7 +80,7 @@ public class ContentCategoryController {
      * @param model    model
      * @param slugName slugName
      * @param page     current page number
-     * @return template path: theme/{theme}/category.ftl
+     * @return template path: themes/{theme}/category.ftl
      */
     @GetMapping("{slugName}/page/{page}")
     public String categories(Model model,
@@ -83,13 +88,14 @@ public class ContentCategoryController {
                              @PathVariable("page") Integer page,
                              @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         // Get category by slug name
-        final Category category = categoryService.getBySlugName(slugName);
+        final Category category = categoryService.getBySlugNameOfNonNull(slugName);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
-        Page<Post> posts = postCategoryService.pagePostBy(category.getId(), pageable);
+        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
+        Page<PostListVO> posts = postService.convertToListVo(postPage);
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
-        model.addAttribute("is_categories", true);
+        model.addAttribute("is_category", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("category", category);

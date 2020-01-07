@@ -1,6 +1,9 @@
 package run.halo.app.model.support;
 
+import org.springframework.http.HttpHeaders;
+
 import java.io.File;
+import java.time.Duration;
 
 /**
  * <pre>
@@ -8,7 +11,7 @@ import java.io.File;
  * </pre>
  *
  * @author ryanwang
- * @date : 2017/12/29
+ * @date 2017/12/29
  */
 public class HaloConst {
 
@@ -18,12 +21,22 @@ public class HaloConst {
     public final static String USER_HOME = System.getProperties().getProperty("user.home");
 
     /**
+     * Temporary directory.
+     */
+    public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");
+
+    /**
+     * Halo backup prefix.
+     */
+    public final static String HALO_BACKUP_PREFIX = "halo-backup-";
+
+    /**
      * Default theme name.
      */
     public final static String DEFAULT_THEME_ID = "caicai_anatole";
 
     /**
-     * version constant
+     * Version constant. (Available in production environment)
      */
     public static final String HALO_VERSION;
 
@@ -77,6 +90,37 @@ public class HaloConst {
      * YouTube 视频正则表达式
      */
     public static final String YOUTUBE_VIDEO_REG_PATTERN = "\\[youtube:(\\w+)\\,(\\d+)\\,(\\d+)\\]";
+    /**
+     * Github Api url for halo-admin release.
+     */
+    public final static String HALO_ADMIN_RELEASES_LATEST = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
+    /**
+     * Halo admin version regex.
+     */
+    public final static String HALO_ADMIN_VERSION_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
+    public final static String HALO_ADMIN_RELATIVE_PATH = "templates/admin/";
+    public final static String HALO_ADMIN_RELATIVE_BACKUP_PATH = "templates/admin-backup/";
+    /**
+     * Content token header name.
+     */
+    public final static String API_ACCESS_KEY_HEADER_NAME = "API-" + HttpHeaders.AUTHORIZATION;
+    /**
+     * Admin token header name.
+     */
+    public final static String ADMIN_TOKEN_HEADER_NAME = "ADMIN-" + HttpHeaders.AUTHORIZATION;
+    /**
+     * Admin token param name.
+     */
+    public final static String ADMIN_TOKEN_QUERY_NAME = "admin_token";
+    /**
+     * Temporary token.
+     */
+    public final static String TEMP_TOKEN = "temp_token";
+    /**
+     * Content api token param name
+     */
+    public final static String API_ACCESS_KEY_QUERY_NAME = "api_access_key";
+    public final static Duration TEMP_TOKEN_EXPIRATION = Duration.ofDays(7);
     /**
      * user_session
      */

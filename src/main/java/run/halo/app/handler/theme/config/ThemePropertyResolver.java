@@ -9,7 +9,7 @@ import java.io.IOException;
  * Theme file resolver.
  *
  * @author johnniang
- * @date 4/11/19
+ * @date 2019-04-11
  */
 public interface ThemePropertyResolver {
 

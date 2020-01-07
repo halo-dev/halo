@@ -99,8 +99,9 @@ public class ServiceUtils {
      * @return a map which key from list data and value is data
      */
     @NonNull
-    public static <ID, D, V> Map<ID, V> convertToMap(Collection<D> list, Function<D, ID> keyFunction, Function<D, V> valueFunction) {
-        Assert.notNull(keyFunction, "mapping function must not be null");
+    public static <ID, D, V> Map<ID, V> convertToMap(@Nullable Collection<D> list, @NonNull Function<D, ID> keyFunction, @NonNull Function<D, V> valueFunction) {
+        Assert.notNull(keyFunction, "Key function must not be null");
+        Assert.notNull(valueFunction, "Value function must not be null");
 
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();

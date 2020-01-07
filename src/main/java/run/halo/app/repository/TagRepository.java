@@ -25,15 +25,16 @@ public interface TagRepository extends BaseRepository<Tag, Integer> {
     /**
      * Get tag by slug name
      *
-     * @param slugName slug name
-     * @return Tag
+     * @param slugName slug name must not be null.
+     * @return an optional of slug name.
      */
     Optional<Tag> getBySlugName(@NonNull String slugName);
 
     /**
      * Get tag by name
-     * @param name name
-     * @return Tag
+     *
+     * @param name name must not be null.
+     * @return an optional of tag
      */
     Optional<Tag> getByName(@NonNull String name);
 }

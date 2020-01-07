@@ -2,8 +2,6 @@ package run.halo.app.model.dto;
 
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * @author ryanwang
  * @date 2019-05-25
@@ -11,13 +9,14 @@ import java.util.Date;
 @Data
 public class BackupDTO {
 
-    private String fileName;
+    @Deprecated
+    private String downloadUrl;
 
-    private Date createTime;
+    private String downloadLink;
 
-    private String fileSize;
+    private String filename;
 
-    private String fileType;
+    private Long updateTime;
 
-    private String type;
+    private Long fileSize;
 }

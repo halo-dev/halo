@@ -1,38 +1,7 @@
 <#include "module/macro.ftl">
-<@head title="${post.title!} · ${options.blog_title!'Anatole'}" keywords="${post.title!},${options.seo_keywords!'Anatole'}" description="${post.summary!'Anatole'}"></@head>
+<@head title="${sheet.title!} · ${options.blog_title!}" keywords="${sheet.title!},${options.seo_keywords!}" description="${sheet.summary!}" />
 <#include "module/sidebar.ftl">
 <div class="main">
-    <link href="${static!}/source/plugins/prism/prism.css" type="text/css" rel="stylesheet" />
-    <style>
-        code, tt {
-            font-size: 1.2em;
-        }
-        table {
-            border-spacing: 0;
-            border-collapse: collapse;
-            margin-top: 0;
-            margin-bottom: 16px;
-            display: block;
-            width: 100%;
-            overflow: auto;
-
-        }
-        table th {
-            font-weight: 600;
-        }
-        table th,
-        table td {
-            padding: 6px 13px;
-            border: 1px solid #dfe2e5;
-        }
-        table tr {
-            background-color: #fff;
-            border-top: 1px solid #c6cbd1;
-        }
-        table tr:nth-child(2n) {
-            background-color: #f6f8fa;
-        }
-    </style>
     <#include "module/page-top.ftl">
     <div class="autopagerize_page_element">
         <div class="content">
@@ -40,19 +9,19 @@
                 <div class="post animated fadeInDown">
                     <div class="post-title">
                         <h3>
-                            <a>${post.title!}</a>
+                            <a>${sheet.title!}</a>
                         </h3>
                     </div>
                     <div class="post-content">
-                        ${post.formatContent!}
+                        ${sheet.formatContent!}
                     </div>
                     <div class="post-footer">
                         <div class="meta">
                             <div class="info">
                                 <i class="fa fa-sun-o"></i>
-                                <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
+                                <span class="date">${sheet.createTime?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="${context!}/archives/${post.url!}#comment_widget">Comments</a>
+                                <a href="${context!}/archives/${sheet.url!}#comment_widget">Comments</a>
                             </div>
                         </div>
                     </div>
@@ -67,7 +36,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${context!}/archives/${post.url!} ,${options.blog_title!},${post.title!},;"
+                        <a href="http://twitter.com/home?status=${context!}/archives/${sheet.url!} ,${options.blog_title!},${sheet.title!},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
@@ -79,5 +48,4 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="${static!}/source/plugins/prism/prism.js"></script>
 <@footer></@footer>

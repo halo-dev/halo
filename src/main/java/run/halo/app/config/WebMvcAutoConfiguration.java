@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -22,19 +23,24 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.controller.support.PageJacksonSerializer;
+import run.halo.app.core.PageJacksonSerializer;
 import run.halo.app.factory.StringToEnumConverterFactory;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Properties;
+
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELATIVE_PATH;
+import static run.halo.app.utils.HaloUtils.*;
 
 /**
  * Mvc configuration.
  *
  * @author ryanwang
- * @date : 2018/1/2
+ * @date 2018-01-02
  */
 @Slf4j
 @Configuration
@@ -77,22 +83,21 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String workDir = FILE_PROTOCOL + haloProperties.getWorkDir();
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/")
-                .addResourceLocations(workDir + "static/");
+        String workDir = FILE_PROTOCOL + ensureSuffix(haloProperties.getWorkDir(), FILE_SEPARATOR);
+        String backupDir = FILE_PROTOCOL + ensureSuffix(haloProperties.getBackupDir(), FILE_SEPARATOR);
         registry.addResourceHandler("/**")
                 .addResourceLocations(workDir + "templates/themes/")
                 .addResourceLocations(workDir + "templates/admin/")
-                .addResourceLocations("classpath:/admin/");
-        registry.addResourceHandler("/upload/**")
+                .addResourceLocations("classpath:/admin/")
+                .addResourceLocations(workDir + "static/");
+
+        String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
+        String adminPathPattern = ensureSuffix(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
+
+        registry.addResourceHandler(uploadUrlPattern)
                 .addResourceLocations(workDir + "upload/");
-        registry.addResourceHandler("/favicon.ico")
-                .addResourceLocations("classpath:/static/halo-admin/images/favicon.ico");
-        registry.addResourceHandler("/backup/**")
-                .addResourceLocations(workDir + "backup/");
-        registry.addResourceHandler("/admin/**")
-                .addResourceLocations(workDir + "templates/admin/")
+        registry.addResourceHandler(adminPathPattern)
+                .addResourceLocations(workDir + HALO_ADMIN_RELATIVE_PATH)
                 .addResourceLocations("classpath:/admin/");
 
         if (!haloProperties.isDocDisabled()) {
@@ -120,8 +125,16 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
         configurer.setDefaultEncoding("UTF-8");
 
+        Properties properties = new Properties();
+        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common,/common/macro/global_macro.ftl as global");
+
+        configurer.setFreemarkerSettings(properties);
+
         // Predefine configuration
         freemarker.template.Configuration configuration = configurer.createConfiguration();
+
+        configuration.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
+
         if (haloProperties.isProductionEnv()) {
             configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         }

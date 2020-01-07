@@ -11,9 +11,11 @@ import run.halo.app.service.base.CrudService;
 import java.util.Optional;
 
 /**
- * User service.
+ * User service interface.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-14
  */
 public interface UserService extends CrudService<User, Integer> {
 
@@ -122,4 +124,13 @@ public interface UserService extends CrudService<User, Integer> {
      * @param plainPassword plain password must not be blank
      */
     void setPassword(@NonNull User user, @NonNull String plainPassword);
+
+    /**
+     * verify user's email and username
+     *
+     * @param username username must not be null
+     * @param password password must not be null
+     * @return boolean
+     */
+    boolean verifyUser(@NonNull String username, @NonNull String password);
 }

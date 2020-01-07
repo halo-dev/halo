@@ -1,6 +1,5 @@
 package run.halo.app.utils;
 
-import io.micrometer.core.annotation.TimedSet;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -17,7 +16,6 @@ import static org.junit.Assert.assertTrue;
  * @date 3/27/19
  */
 public class PathsTest {
-
 
     @Test
     public void getTest() {

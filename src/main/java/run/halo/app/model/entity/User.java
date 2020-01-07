@@ -12,7 +12,7 @@ import java.util.Date;
  * User entity
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 @Data
 @Entity
