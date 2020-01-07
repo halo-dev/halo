@@ -70,7 +70,7 @@
                 <a-form-item label="屏蔽搜索引擎：">
                   <a-switch v-model="options.seo_spider_disabled" />
                 </a-form-item>
-                <a-form-item label="关键词： ">
+                <a-form-item label="关键词：">
                   <a-input
                     v-model="options.seo_keywords"
                     placeholder="多个关键词以英文状态下的逗号隔开"
@@ -579,6 +579,61 @@
                 </a-tabs>
               </div>
             </a-tab-pane>
+            <a-tab-pane key="permalink">
+              <span slot="tab">
+                <a-icon type="link" />固定链接
+              </span>
+              <a-form
+                layout="vertical"
+                :wrapperCol="wrapperCol"
+              >
+                <a-form-item label="文章固定链接类型：">
+                  <template slot="help">
+                    <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/archives/${url}</span>
+                    <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}/1970/01/${url}</span>
+                    <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}/1970/01/01/${url}</span>
+                    <span v-else-if="options.post_permalink_type === 'ID'">{{ options.blog_url }}/?p=${id}</span>
+                  </template>
+                  <a-select v-model="options.post_permalink_type">
+                    <a-select-option
+                      v-for="item in Object.keys(permalinkType)"
+                      :key="item"
+                      :value="item"
+                    >{{ permalinkType[item].text }}</a-select-option>
+                  </a-select>
+                </a-form-item>
+                <a-form-item label="自定义页面前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.sheet_prefix }}/${url}</span>
+                  </template>
+                  <a-input v-model="options.sheet_prefix" />
+                </a-form-item>
+                <a-form-item label="归档前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.archives_prefix }}</span>
+                  </template>
+                  <a-input v-model="options.archives_prefix" />
+                </a-form-item>
+                <a-form-item label="分类前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.categories_prefix }}/${slugName}</span>
+                  </template>
+                  <a-input v-model="options.categories_prefix" />
+                </a-form-item>
+                <a-form-item label="标签前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.tags_prefix }}/${slugName}</span>
+                  </template>
+                  <a-input v-model="options.tags_prefix" />
+                </a-form-item>
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    @click="handleSaveOptions"
+                  >保存</a-button>
+                </a-form-item>
+              </a-form>
+            </a-tab-pane>
             <a-tab-pane key="api">
               <span slot="tab">
                 <a-icon type="thunderbolt" />API 设置
@@ -675,6 +730,7 @@ import { mapActions } from 'vuex'
 import optionApi from '@/api/option'
 import mailApi from '@/api/mail'
 import attachmentApi from '@/api/attachment'
+import postApi from '@/api/post'
 
 export default {
   components: {
@@ -683,6 +739,7 @@ export default {
   data() {
     return {
       attachmentType: attachmentApi.type,
+      permalinkType: postApi.permalinkType,
       wrapperCol: {
         xl: { span: 8 },
         lg: { span: 8 },
