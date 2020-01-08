@@ -58,3 +58,6 @@ logging:
 
 halo:
   download-timeout: 5m
+
+leveldb:
+  storefolder: ~/.halo/leveldb/
