@@ -21,7 +21,7 @@
                                 <i class="fa fa-sun-o"></i>
                                 <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="${context!}/archives/${post.url}#comment_widget">Comments</a>
+                                <a href="${post.fullPath!}#comment_widget">Comments</a>
                                 <#if tags?size gt 0>
                                     <i class="fa fa-tag"></i>
                                     <#list tags as tag>
@@ -42,7 +42,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${context!}/archives/${post.url} ,${options.blog_title!},${post.title},;"
+                        <a href="http://twitter.com/home?status=${post.fullPath!} ,${options.blog_title!},${post.title},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>
@@ -50,12 +50,12 @@
                     <ul class="clearfix">
                         <#if nextPost??>
                             <li class="next pagbuttons">
-                                <a class="btn" role="navigation" href="${context!}/archives/${nextPost.url}" title="${nextPost.title}">下一篇</a>
+                                <a class="btn" role="navigation" href="${nextPost.fullPath!}" title="${nextPost.title}">下一篇</a>
                             </li>
                         </#if>
                         <#if prePost??>
                             <li class="pre pagbuttons">
-                                <a class="btn" role="navigation" href="${context!}/archives/${prePost.url}" title="${prePost.title}">上一篇</a>
+                                <a class="btn" role="navigation" href="${prePost.fullPath!}" title="${prePost.title}">上一篇</a>
                             </li>
                         </#if>
                     </ul>

@@ -21,8 +21,6 @@ import java.util.List;
 @Data
 public class PostListVO extends BasePostSimpleDTO {
 
-    private String fullPath;
-
     private Long commentCount;
 
     private List<TagDTO> tags;
