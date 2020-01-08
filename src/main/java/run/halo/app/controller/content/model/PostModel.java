@@ -40,9 +40,13 @@ public class PostModel {
 
     private final PostCategoryService postCategoryService;
 
-    private final PostMetaService postMetaService;
+    private final CategoryService categoryService;
 
     private final PostTagService postTagService;
+
+    private final TagService tagService;
+
+    private final PostMetaService postMetaService;
 
     private final OptionService optionService;
 
@@ -51,15 +55,19 @@ public class PostModel {
     public PostModel(PostService postService,
                      ThemeService themeService,
                      PostCategoryService postCategoryService,
+                     CategoryService categoryService,
                      PostMetaService postMetaService,
                      PostTagService postTagService,
+                     TagService tagService,
                      OptionService optionService,
                      StringCacheStore cacheStore) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
+        this.categoryService = categoryService;
         this.postMetaService = postMetaService;
         this.postTagService = postTagService;
+        this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
     }
@@ -89,8 +97,8 @@ public class PostModel {
 
         model.addAttribute("is_post", true);
         model.addAttribute("post", postService.convertToDetailVo(post));
-        model.addAttribute("categories", categories);
-        model.addAttribute("tags", tags);
+        model.addAttribute("categories", categoryService.convertTo(categories));
+        model.addAttribute("tags", tagService.convertTo(tags));
         model.addAttribute("metas", postMetaService.convertToMap(metas));
 
         // TODO,Will be deprecated
