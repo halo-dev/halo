@@ -1,5 +1,6 @@
 package run.halo.app.service.base;
 
+import javax.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -8,6 +9,7 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 
 import java.util.Date;
@@ -257,6 +259,15 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     BasePostDetailDTO convertToDetail(@NonNull POST post);
+
+    /**
+     * Gets next post.
+     * @param post post must not be null
+     * @param previous Whether to retrieve previous post.
+     * @return
+     */
+    @NotNull
+    Optional<POST> getAdjacentPost(POST post, boolean previous);
 
     /**
      * Updates draft content.

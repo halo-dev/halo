@@ -1,5 +1,6 @@
 package run.halo.app.repository.base;
 
+import javax.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -90,6 +91,36 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     Page<POST> findAllByStatusAndCreateTimeAfter(@NonNull PostStatus status, @NonNull Date createTime, @NonNull Pageable pageable);
 
     /**
+     * Finds all post by status and edit time after
+     * @param status    status must not be null
+     * @param editTime  edit time must not be null
+     * @param pageable  page info must not be null
+     * @return a page of post
+     */
+    @NotNull
+    Page<POST> findAllByStatusAndEditTimeAfter(@NotNull PostStatus status, @NonNull Date editTime, @NonNull Pageable pageable);
+
+    /**
+     * Finds all post by status and visits bigger
+     * @param status
+     * @param visits
+     * @param pageable
+     * @return
+     */
+    @NotNull
+    Page<POST> findByStatusAndVisitsGreaterThanEqual(@NotNull PostStatus status, @NotNull Long visits, @NotNull Pageable pageable);
+
+    /**
+     * Finds all post by status and visits less
+     * @param status
+     * @param visits
+     * @param pageable
+     * @return
+     */
+    @NotNull
+    Page<POST> findByStatusAndVisitsLessThanEqual(@NotNull PostStatus status, @NotNull Long visits, @NotNull Pageable pageable);
+
+    /**
      * Gets post by url and status.
      *
      * @param url    url must not be blank
@@ -155,6 +186,13 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     @Query("update BasePost p set p.likes = p.likes + :likes where p.id = :postId")
     int updateLikes(@Param("likes") long likes, @Param("postId") @NonNull Integer postId);
 
+    /**
+     * counts posts by status and visits
+     * @param status status of post
+     * @param visits visits count
+     * @return posts count
+     */
+    long countByStatusAndVisits(@NotNull PostStatus status, @NotNull Long visits);
     /**
      * Updates post original content.
      *

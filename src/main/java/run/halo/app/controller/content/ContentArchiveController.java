@@ -140,6 +140,8 @@ public class ContentArchiveController {
         postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
         postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
 
+        postService.getAdjacentPost(post, false);
+
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         List<PostMeta> metas = postMetaService.listBy(post.getId());
