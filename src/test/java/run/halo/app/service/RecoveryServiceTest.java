@@ -8,6 +8,8 @@ import run.halo.app.utils.JsonUtils;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,9 +51,7 @@ public class RecoveryServiceTest {
 
     private String getMigrationContent() throws IOException, URISyntaxException {
         URL migrationUrl = ResourceUtils.getURL(ResourceUtils.CLASSPATH_URL_PREFIX + "migration-test.json");
-
         Path path = Paths.get(migrationUrl.toURI());
-
-        return new String(Files.readAllBytes(path));
+        return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
     }
 }
