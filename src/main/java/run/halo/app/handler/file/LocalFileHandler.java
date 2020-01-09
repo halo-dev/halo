@@ -14,9 +14,10 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.ImageUtils;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,12 +55,9 @@ public class LocalFileHandler implements FileHandler {
      * Thumbnail height.
      */
     private final static int THUMB_HEIGHT = 256;
-
-    ReentrantLock lock = new ReentrantLock();
-
     private final OptionService optionService;
-
     private final String workDir;
+    ReentrantLock lock = new ReentrantLock();
 
     public LocalFileHandler(OptionService optionService,
                             HaloProperties haloProperties) {
@@ -151,7 +149,7 @@ public class LocalFileHandler implements FileHandler {
                     Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
 
                     // Read as image
-                    BufferedImage originalImage = ImageIO.read(uploadPath.toFile());
+                    BufferedImage originalImage = ImageUtils.getImageFromFile(new FileInputStream(uploadPath.toFile()), extension);
                     // Set width and height
                     uploadResult.setWidth(originalImage.getWidth());
                     uploadResult.setHeight(originalImage.getHeight());
@@ -238,5 +236,4 @@ public class LocalFileHandler implements FileHandler {
         }
         return result;
     }
-
 }

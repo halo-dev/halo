@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
+import run.halo.app.model.entity.JournalComment;
 import run.halo.app.model.enums.JournalType;
 import run.halo.app.model.params.JournalParam;
 import run.halo.app.model.params.JournalQuery;
@@ -19,6 +21,7 @@ import run.halo.app.repository.JournalRepository;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import javax.persistence.criteria.Predicate;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
  * @author ryanwang
  * @date 2019-04-24
  */
+@Slf4j
 @Service
 public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> implements JournalService {
 
@@ -50,7 +54,19 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
     public Journal createBy(JournalParam journalParam) {
         Assert.notNull(journalParam, "Journal param must not be null");
 
-        return create(journalParam.convertTo());
+        Journal journal = journalParam.convertTo();
+        journal.setContent(MarkdownUtils.renderHtml(journal.getSourceContent()));
+
+        return create(journal);
+    }
+
+    @Override
+    public Journal updateBy(Journal journal) {
+        Assert.notNull(journal, "Journal must not be null");
+
+        journal.setContent(MarkdownUtils.renderHtml(journal.getSourceContent()));
+
+        return update(journal);
     }
 
     @Override
@@ -70,6 +86,17 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
         Assert.notNull(type, "Journal type must not be null");
         Assert.notNull(pageable, "Page info must not be null");
         return journalRepository.findAllByType(type, pageable);
+    }
+
+    @Override
+    public Journal removeById(Integer id) {
+        Assert.notNull(id, "Journal id must not be null");
+
+        // Remove journal comments
+        List<JournalComment> journalComments = journalCommentService.removeByPostId(id);
+        log.debug("Removed journal comments: [{}]", journalComments);
+
+        return super.removeById(id);
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author johnniang
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Transactional(readOnly = true)
 public interface CategoryService extends CrudService<Category, Integer> {
@@ -67,6 +67,7 @@ public interface CategoryService extends CrudService<Category, Integer> {
 
     /**
      * List categories by parent id.
+     *
      * @param id parent id.
      * @return list of category.
      */

@@ -17,6 +17,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +27,8 @@ import java.util.List;
  * @param <DOMAIN> domain type
  * @param <ID>     id type
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-15
  */
 @Slf4j
 public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, ID> implements BaseRepository<DOMAIN, ID> {
@@ -68,8 +71,8 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
      * @return a list of domains
      */
     @Override
-    public List<DOMAIN> findAllByIdIn(Iterable<ID> ids, Sort sort) {
-        Assert.notNull(ids, "The given Iterable of Id's must not be null!");
+    public List<DOMAIN> findAllByIdIn(Collection<ID> ids, Sort sort) {
+        Assert.notNull(ids, "The given Collection of Id's must not be null!");
         Assert.notNull(sort, "Sort info must nto be null");
 
         log.debug("Customized findAllById method was invoked");
@@ -90,8 +93,8 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
     }
 
     @Override
-    public Page<DOMAIN> findAllByIdIn(Iterable<ID> ids, Pageable pageable) {
-        Assert.notNull(ids, "The given Iterable of Id's must not be null!");
+    public Page<DOMAIN> findAllByIdIn(Collection<ID> ids, Pageable pageable) {
+        Assert.notNull(ids, "The given Collection of Id's must not be null!");
         Assert.notNull(pageable, "Page info must nto be null");
 
         if (!ids.iterator().hasNext()) {
@@ -119,7 +122,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
      */
     @Override
     @Transactional
-    public long deleteByIdIn(Iterable<ID> ids) {
+    public long deleteByIdIn(Collection<ID> ids) {
 
         log.debug("Customized deleteByIdIn method was invoked");
         // Find all domains
@@ -147,7 +150,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         private static final long serialVersionUID = 1L;
         private final JpaEntityInformation<T, ?> entityInformation;
         @Nullable
-        ParameterExpression<Iterable> parameter;
+        ParameterExpression<Collection> parameter;
 
         ByIdsSpecification(JpaEntityInformation<T, ?> entityInformation) {
             this.entityInformation = entityInformation;
@@ -156,7 +159,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         @Override
         public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
             Path<?> path = root.get(this.entityInformation.getIdAttribute());
-            this.parameter = cb.parameter(Iterable.class);
+            this.parameter = cb.parameter(Collection.class);
             return path.in(this.parameter);
         }
     }

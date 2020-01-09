@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.PostMeta;
-import run.halo.app.repository.PostMetaRepository;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.repository.base.BaseMetaRepository;
 import run.halo.app.service.PostMetaService;
 
 /**
@@ -13,20 +13,17 @@ import run.halo.app.service.PostMetaService;
  *
  * @author ryanwang
  * @author ikaisec
+ * @author guqing
  * @date 2019-08-04
  */
 @Slf4j
 @Service
 public class PostMetaServiceImpl extends BaseMetaServiceImpl<PostMeta> implements PostMetaService {
 
-    private final PostMetaRepository postMetaRepository;
-
     private final PostRepository postRepository;
 
-    public PostMetaServiceImpl(PostMetaRepository postMetaRepository,
-                               PostRepository postRepository) {
-        super(postMetaRepository);
-        this.postMetaRepository = postMetaRepository;
+    public PostMetaServiceImpl(BaseMetaRepository<PostMeta> baseMetaRepository, PostRepository postRepository) {
+        super(baseMetaRepository);
         this.postRepository = postRepository;
     }
 

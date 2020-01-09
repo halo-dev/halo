@@ -18,7 +18,11 @@
                     <link>${options.blog_url}/archives/${post.url!}</link>
                     <content:encoded>
                         <![CDATA[
-                            ${post.summary!}
+                            <#if (options.rss_content_type!'full') == 'full'>
+                                ${post.formatContent!}
+                            <#else>
+                                ${post.summary!}
+                            </#if>
                         ]]>
                     </content:encoded>
                     <pubDate>${post.createTime}</pubDate>

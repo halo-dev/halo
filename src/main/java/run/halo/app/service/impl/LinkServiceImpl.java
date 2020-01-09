@@ -1,5 +1,8 @@
 package run.halo.app.service.impl;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -8,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.dto.LinkDTO;
 import run.halo.app.model.entity.Link;
 import run.halo.app.model.params.LinkParam;
@@ -17,6 +21,7 @@ import run.halo.app.service.LinkService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,6 +98,35 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         link.setName(name);
 
         return linkRepository.exists(Example.of(link));
+    }
+
+    @Override
+    public List<String> listAllTeams() {
+        return linkRepository.findAllTeams();
+    }
+
+    @Override
+    public LinkDTO getByParse(String url) {
+        Assert.hasText(url, "Url must not be blank");
+        LinkDTO linkDTO = new LinkDTO();
+        linkDTO.setUrl(url);
+        try {
+            Document document = Jsoup.connect(url).get();
+
+            // Get html title.
+            linkDTO.setName(document.title());
+
+            // Get html metas.
+            Elements metas = document.head().select("meta");
+            metas.forEach(element -> {
+                if (META_DESCRIPTION.equalsIgnoreCase(element.attr(META_NAME))) {
+                    linkDTO.setDescription(element.attr(META_CONTENT));
+                }
+            });
+        } catch (IOException e) {
+            throw new BadRequestException("获取网站信息失败").setErrorData(e);
+        }
+        return linkDTO;
     }
 
     @NonNull

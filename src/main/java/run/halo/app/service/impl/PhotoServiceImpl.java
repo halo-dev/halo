@@ -83,6 +83,15 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
     }
 
     @Override
+    public Page<PhotoDTO> pageBy(Pageable pageable) {
+        Assert.notNull(pageable, "Page info must not be null");
+
+        Page<Photo> photos = photoRepository.findAll(pageable);
+
+        return photos.map(photo -> new PhotoDTO().convertFrom(photo));
+    }
+
+    @Override
     public Page<PhotoDTO> pageDtosBy(Pageable pageable, PhotoQuery photoQuery) {
         Assert.notNull(pageable, "Page info must not be null");
 

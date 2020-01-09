@@ -10,7 +10,7 @@ import javax.persistence.*;
  * Menu entity
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 @Data
 @Entity
@@ -88,7 +88,7 @@ public class Menu extends BaseEntity {
             parentId = 0;
         }
 
-        if(team == null){
+        if (team == null) {
             team = "";
         }
     }

@@ -11,7 +11,7 @@ import javax.persistence.*;
  * Attachment entity
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 @Data
 @Entity
@@ -52,7 +52,7 @@ public class Attachment extends BaseEntity {
     /**
      * Attachment media type.
      */
-    @Column(name = "media_type", columnDefinition = "varchar(50) not null")
+    @Column(name = "media_type", columnDefinition = "varchar(127) not null")
     private String mediaType;
 
     /**

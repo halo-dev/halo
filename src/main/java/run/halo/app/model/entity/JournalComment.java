@@ -7,7 +7,7 @@ import javax.persistence.Entity;
  * Journal comment.
  *
  * @author johnniang
- * @date 19-4-25
+ * @date 2019-04-25
  */
 @Entity(name = "JournalComment")
 @DiscriminatorValue("2")

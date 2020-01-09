@@ -34,7 +34,7 @@ public class FilenameUtils {
         int separatorLastIndex = StringUtils.lastIndexOf(filename, File.separatorChar);
 
         if (separatorLastIndex == filename.length() - 1) {
-            return "";
+            return StringUtils.EMPTY;
         }
 
         if (separatorLastIndex >= 0 && separatorLastIndex < filename.length() - 1) {
@@ -70,7 +70,7 @@ public class FilenameUtils {
         int separatorLastIndex = StringUtils.lastIndexOf(filename, File.separatorChar);
 
         if (separatorLastIndex == filename.length() - 1) {
-            return "";
+            return StringUtils.EMPTY;
         }
 
         if (separatorLastIndex >= 0 && separatorLastIndex < filename.length() - 1) {
@@ -81,7 +81,7 @@ public class FilenameUtils {
         int dotLastIndex = StringUtils.lastIndexOf(filename, '.');
 
         if (dotLastIndex < 0) {
-            return "";
+            return StringUtils.EMPTY;
         }
 
         return filename.substring(dotLastIndex + 1);

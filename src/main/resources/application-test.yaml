@@ -1,6 +1,6 @@
 server:
   port: 8090
-  use-forward-headers: true
+  forward-headers-strategy: native
   compression:
     enabled: false
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
@@ -35,20 +35,26 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  flyway:
+    enabled: false
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-  mvc:
-    favicon:
-      enabled: false
   cache:
     type: none
+management:
+  endpoints:
+    web:
+      base-path: /api/admin/actuator
+      exposure:
+        include: ['httptrace', 'metrics','env','logfile','health']
 logging:
   level:
     run.halo.app: DEBUG
     org.hibernate: ERROR
-  path: ${user.home}/halo-test/logs
+  file:
+    path: ${user.home}/halo-test/logs
 
 halo:
   doc-disabled: false

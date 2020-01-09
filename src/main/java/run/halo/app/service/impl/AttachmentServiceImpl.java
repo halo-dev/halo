@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.handler.file.FileHandlers;
@@ -24,16 +26,15 @@ import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.HaloUtils;
 
 import javax.persistence.criteria.Predicate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * AttachmentService implementation
  *
  * @author ryanwang
  * @author johnniang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Slf4j
 @Service
@@ -141,6 +142,15 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     }
 
     @Override
+    public List<Attachment> removePermanently(@Nullable Collection<Integer> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+
+        return ids.stream().map(this::removePermanently).collect(Collectors.toList());
+    }
+
+    @Override
     public AttachmentDTO convertToDto(Attachment attachment) {
         Assert.notNull(attachment, "Attachment must not be null");
 
@@ -166,6 +176,11 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     @Override
     public List<String> listAllMediaType() {
         return attachmentRepository.findAllMediaType();
+    }
+
+    @Override
+    public List<AttachmentType> listAllType() {
+        return attachmentRepository.findAllType();
     }
 
     @Override
