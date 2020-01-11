@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  *
  * @author ryanwang
  * @author johnniang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Slf4j
 @Service
@@ -181,6 +181,22 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     @Override
     public List<AttachmentType> listAllType() {
         return attachmentRepository.findAllType();
+    }
+
+    @Override
+    public List<Attachment> replaceUrl(String oldUrl, String newUrl) {
+        List<Attachment> attachments = listAll();
+        List<Attachment> replaced = new ArrayList<>();
+        attachments.forEach(attachment -> {
+            if (StringUtils.isNotEmpty(attachment.getPath())) {
+                attachment.setPath(attachment.getPath().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(attachment.getThumbPath())) {
+                attachment.setThumbPath(attachment.getThumbPath().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(attachment);
+        });
+        return updateInBatch(replaced);
     }
 
     @Override

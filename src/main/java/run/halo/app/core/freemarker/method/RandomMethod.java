@@ -10,8 +10,10 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
+ * Freemarker template random method.
+ *
  * @author ryanwang
- * @date : 2018/12/21
+ * @date 2018-12-21
  */
 @Component
 public class RandomMethod implements TemplateMethodModelEx {

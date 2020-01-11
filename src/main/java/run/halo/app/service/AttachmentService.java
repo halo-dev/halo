@@ -19,14 +19,15 @@ import java.util.List;
  * Attachment service.
  *
  * @author johnniang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 public interface AttachmentService extends CrudService<Attachment, Integer> {
 
     /**
      * Pages attachment output dtos.
      *
-     * @param pageable page info must not be null
+     * @param pageable        page info must not be null
+     * @param attachmentQuery attachment query param.
      * @return a page of attachment output dto
      */
     @NonNull
@@ -82,4 +83,13 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @return list of type.
      */
     List<AttachmentType> listAllType();
+
+    /**
+     * Replace attachment url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced attachments.
+     */
+    List<Attachment> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
 }

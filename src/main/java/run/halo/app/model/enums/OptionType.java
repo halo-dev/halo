@@ -4,7 +4,7 @@ package run.halo.app.model.enums;
  * Option Type.
  *
  * @author ryanwang
- * @date : 2019-12-02
+ * @date 2019-12-02
  */
 public enum OptionType implements ValueEnum<Integer> {
 

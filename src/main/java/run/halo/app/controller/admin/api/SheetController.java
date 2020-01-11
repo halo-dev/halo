@@ -94,6 +94,7 @@ public class SheetController {
     }
 
     @PutMapping("{sheetId:\\d+}/{status}")
+    @ApiOperation("Updates a sheet")
     public void updateStatusBy(
             @PathVariable("sheetId") Integer sheetId,
             @PathVariable("status") PostStatus status) {
@@ -114,6 +115,7 @@ public class SheetController {
     }
 
     @GetMapping("preview/{sheetId:\\d+}")
+    @ApiOperation("Gets a sheet preview link")
     public String preview(@PathVariable("sheetId") Integer sheetId) throws UnsupportedEncodingException {
         Sheet sheet = sheetService.getById(sheetId);
 

@@ -353,6 +353,14 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    public String renderWithSuffix(String pageName) {
+        // Get activated theme
+        ThemeProperty activatedTheme = getActivatedTheme();
+        // Build render url
+        return String.format(RENDER_TEMPLATE_SUFFIX, activatedTheme.getFolderName(), pageName);
+    }
+
+    @Override
     public String getActivatedThemeId() {
         if (activatedThemeId == null) {
             synchronized (this) {

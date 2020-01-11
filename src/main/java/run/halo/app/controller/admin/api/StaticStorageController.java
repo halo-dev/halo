@@ -25,26 +25,26 @@ public class StaticStorageController {
     }
 
     @GetMapping
-    @ApiOperation("List static files.")
+    @ApiOperation("Lists static files")
     public List<StaticFile> list() {
         return staticStorageService.listStaticFolder();
     }
 
     @DeleteMapping
-    @ApiOperation("Delete file by relative path")
+    @ApiOperation("Deletes file by relative path")
     public void deletePermanently(@RequestParam("path") String path) {
         staticStorageService.delete(path);
     }
 
     @PostMapping
-    @ApiOperation("Create folder")
+    @ApiOperation("Creates a folder")
     public void createFolder(String basePath,
                              @RequestParam("folderName") String folderName) {
         staticStorageService.createFolder(basePath, folderName);
     }
 
     @PostMapping("upload")
-    @ApiOperation("Upload static file")
+    @ApiOperation("Uploads static file")
     public void upload(String basePath,
                        @RequestPart("file") MultipartFile file) {
         staticStorageService.update(basePath, file);

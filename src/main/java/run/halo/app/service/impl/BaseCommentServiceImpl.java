@@ -15,7 +15,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.comment.CommentNewEvent;
-import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
@@ -235,6 +234,12 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public long countByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+        return baseCommentRepository.countByPostId(postId);
+    }
+
+    @Override
     public long countByStatus(CommentStatus status) {
         return baseCommentRepository.countByStatus(status);
     }
@@ -342,14 +347,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         comment.setStatus(status);
 
         // Update comment
-        COMMENT updatedComment = update(comment);
-
-        if (CommentStatus.PUBLISHED.equals(status)) {
-            // Pass a comment
-            eventPublisher.publishEvent(new CommentPassEvent(this, commentId));
-        }
-
-        return updatedComment;
+        return update(comment);
     }
 
     @Override
@@ -610,6 +608,20 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         commentPage.forEach(this::filterIpAddress);
 
         return commentPage;
+    }
+
+    @Override
+    public List<BaseCommentDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<COMMENT> comments = listAll();
+        List<COMMENT> replaced = new ArrayList<>();
+        comments.forEach(comment -> {
+            if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
+                comment.setAuthorUrl(comment.getAuthorUrl().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(comment);
+        });
+        List<COMMENT> updated = updateInBatch(replaced);
+        return convertTo(updated);
     }
 
     /**

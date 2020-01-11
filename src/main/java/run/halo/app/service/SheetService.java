@@ -124,4 +124,11 @@ public interface SheetService extends BasePostService<Sheet> {
      */
     @NonNull
     SheetDetailVO convertToDetailVo(@NonNull Sheet sheet);
+
+    /**
+     * Publish a sheet visit event.
+     *
+     * @param sheetId sheetId must not be null
+     */
+    void publishVisitEvent(@NonNull Integer sheetId);
 }

@@ -40,6 +40,11 @@ public enum TencentCosProperties implements PropertyEnum {
     COS_SECRET_KEY("cos_tencent_secret_key", String.class, ""),
 
     /**
+     * Tencent cos source
+     */
+    COS_SOURCE("cos_tencent_source", String.class, ""),
+
+    /**
      * Tencent cos style rule.
      */
     COS_STYLE_RULE("cos_tencent_style_rule", String.class, ""),
