@@ -65,6 +65,11 @@ public interface ThemeService {
     String RENDER_TEMPLATE = "themes/%s/%s";
 
     /**
+     * Render template with suffix.
+     */
+    String RENDER_TEMPLATE_SUFFIX = "themes/%s/%s.ftl";
+
+    /**
      * Theme cache key.
      */
     String THEMES_CACHE_KEY = "themes";
@@ -230,6 +235,15 @@ public interface ThemeService {
      */
     @NonNull
     String render(@NonNull String pageName);
+
+    /**
+     * Renders a theme page.
+     *
+     * @param pageName must not be blank
+     * @return full path of the theme page
+     */
+    @NonNull
+    String renderWithSuffix(@NonNull String pageName);
 
     /**
      * Gets current theme id.

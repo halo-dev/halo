@@ -38,10 +38,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseMetaDTO;
-import run.halo.app.model.dto.CategoryDTO;
-import run.halo.app.model.dto.TagDTO;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
@@ -50,8 +48,10 @@ import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.LogType;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.properties.PermalinkProperties;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
@@ -190,9 +190,55 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     public Post getBy(PostStatus status, String url) {
-        Post post = super.getBy(status, url);
+        return super.getBy(status, url);
+    }
 
-        return post;
+    @Override
+    public Post getBy(Integer year, Integer month, String url) {
+        Assert.notNull(year, "Post create year must not be null");
+        Assert.notNull(month, "Post create month must not be null");
+        Assert.notNull(url, "Post url must not be null");
+
+        Optional<Post> postOptional = postRepository.findBy(year, month, url);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+    }
+
+    @Override
+    public Post getBy(Integer year, Integer month, String url, PostStatus status) {
+        Assert.notNull(year, "Post create year must not be null");
+        Assert.notNull(month, "Post create month must not be null");
+        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        Optional<Post> postOptional = postRepository.findBy(year, month, url, status);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+    }
+
+    @Override
+    public Post getBy(Integer year, Integer month, Integer day, String url) {
+        Assert.notNull(year, "Post create year must not be null");
+        Assert.notNull(month, "Post create month must not be null");
+        Assert.notNull(day, "Post create day must not be null");
+        Assert.notNull(url, "Post url must not be null");
+
+        Optional<Post> postOptional = postRepository.findBy(year, month, day, url);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+    }
+
+    @Override
+    public Post getBy(Integer year, Integer month, Integer day, String url, PostStatus status) {
+        Assert.notNull(year, "Post create year must not be null");
+        Assert.notNull(month, "Post create month must not be null");
+        Assert.notNull(day, "Post create day must not be null");
+        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        Optional<Post> postOptional = postRepository.findBy(year, month, day, url, status);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -205,9 +251,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     public Post getByUrl(String url) {
-        Post post = super.getByUrl(url);
-
-        return post;
+        return super.getByUrl(url);
     }
 
     @Override
@@ -486,6 +530,12 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         String blogUrl = optionService.getBlogBaseUrl();
 
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
+
+        String pathSuffix = optionService.getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
+
+        String archivesPrefix = optionService.getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
+
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
@@ -500,7 +550,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     .orElseGet(LinkedList::new)
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(tag -> (TagDTO) new TagDTO().convertFrom(tag))
+                    .map(tagService::convertTo)
                     .collect(Collectors.toList()));
 
             // Set categories
@@ -508,7 +558,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     .orElseGet(LinkedList::new)
                     .stream()
                     .filter(Objects::nonNull)
-                    .map(category -> (CategoryDTO) new CategoryDTO().convertFrom(category))
+                    .map(categoryService::convertTo)
                     .collect(Collectors.toList()));
 
             // Set post metas
@@ -522,20 +572,37 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
-            return postListVO;
-        });
-    }
-
-    @Override
-    public Page<BasePostDetailDTO> convertToDetailDto(Page<Post> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(post -> {
-            BasePostDetailDTO postDetailDTO = new BasePostDetailDTO().convertFrom(post);
-            if (StringUtils.isBlank(postDetailDTO.getSummary())) {
-                postDetailDTO.setSummary(generateSummary(post.getFormatContent()));
+            StringBuilder fullPath = new StringBuilder(blogUrl)
+                    .append("/");
+            if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+                fullPath.append(archivesPrefix)
+                        .append("/")
+                        .append(postListVO.getUrl())
+                        .append(pathSuffix);
+            } else if (permalinkType.equals(PostPermalinkType.ID)) {
+                fullPath.append("?p=")
+                        .append(postListVO.getId());
+            } else if (permalinkType.equals(PostPermalinkType.DATE)) {
+                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
+                        .append("/")
+                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
+                        .append("/")
+                        .append(postListVO.getUrl())
+                        .append(pathSuffix);
+            } else if (permalinkType.equals(PostPermalinkType.DAY)) {
+                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
+                        .append("/")
+                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
+                        .append("/")
+                        .append(DateUtil.dayOfMonth(postListVO.getCreateTime()))
+                        .append("/")
+                        .append(postListVO.getUrl())
+                        .append(pathSuffix);
             }
-            return postDetailDTO;
+
+            postListVO.setFullPath(fullPath.toString());
+
+            return postListVO;
         });
     }
 

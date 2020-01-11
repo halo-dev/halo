@@ -7,8 +7,6 @@ import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.params.ResetPasswordParam;
 import run.halo.app.security.token.AuthToken;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Admin service interface.
  *

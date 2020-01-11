@@ -84,7 +84,6 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String workDir = FILE_PROTOCOL + ensureSuffix(haloProperties.getWorkDir(), FILE_SEPARATOR);
-        String backupDir = FILE_PROTOCOL + ensureSuffix(haloProperties.getBackupDir(), FILE_SEPARATOR);
         registry.addResourceHandler("/**")
                 .addResourceLocations(workDir + "templates/themes/")
                 .addResourceLocations(workDir + "templates/admin/")
@@ -108,6 +107,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
                     .addResourceLocations("classpath:/META-INF/resources/webjars/");
         }
     }
+
 
     @Override
     public void addFormatters(FormatterRegistry registry) {

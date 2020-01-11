@@ -10,6 +10,7 @@ import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.params.OptionQuery;
@@ -337,6 +338,22 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return birthday timestamp
      */
     long getBirthday();
+
+    /**
+     * Get post permalink type.
+     *
+     * @return PostPermalinkType
+     */
+    PostPermalinkType getPostPermalinkType();
+
+    /**
+     * Replace option url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced options.
+     */
+    List<OptionDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
 
     /**
      * Converts to option output dto.
