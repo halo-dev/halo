@@ -6,6 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.PageUtil;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -329,8 +330,10 @@ public class StaticPageServiceImpl implements StaticPageService {
         for (Post post : posts) {
             log.info("Generate archives/{}/index.html", post.getUrl());
             ModelMap model = new ModelMap();
-            postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
-            postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
+
+            List<Post> adjacentPostList = postService.getAdjacentPostList(post);
+            Optional.ofNullable(adjacentPostList.get(0)).ifPresent(prePost -> model.addAttribute("prePost", prePost));
+            Optional.ofNullable(adjacentPostList.get(1)).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
 
             List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
             List<Tag> tags = postTagService.listTagsBy(post.getId());

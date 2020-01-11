@@ -232,7 +232,7 @@ public interface PostService extends BasePostService<Post> {
     void publishVisitEvent(@NonNull Integer postId);
 
     /**
-     * Gets next post.
+     * Gets pre && next post.
      * @param currentPost post must not be null
      * @return
      */
