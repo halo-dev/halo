@@ -132,11 +132,11 @@ postApi.permalinkType = {
   },
   DATE: {
     type: 'DATE',
-    text: '年月日型'
+    text: '年月型'
   },
   DAY: {
     type: 'DAY',
-    text: '年月型'
+    text: '年月日型'
   },
   ID: {
     type: 'ID',
