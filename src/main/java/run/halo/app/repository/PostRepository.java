@@ -69,7 +69,7 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
      * @param url   post url
      * @return a optional of post
      */
-    @Query("select post from Post post where DateUtil.year(post.createTime) = :year and DateUtil.month(post.createTime) = :month and DateUtil.day(post.createTime) = :day and post.url = :url")
+    @Query("select post from Post post where DateUtil.year(post.createTime) = :year and DateUtil.month(post.createTime) = :month and DateUtil.dayOfMonth(post.createTime) = :day and post.url = :url")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month, @Param("day") Integer day, @Param("url") String url);
 
     /**
@@ -82,6 +82,6 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
      * @param status post status
      * @return a optional of post
      */
-    @Query("select post from Post post where DateUtil.year(post.createTime) = :year and DateUtil.month(post.createTime) = :month and DateUtil.day(post.createTime) = :day and post.url = :url and post.status = :status")
+    @Query("select post from Post post where DateUtil.year(post.createTime) = :year and DateUtil.month(post.createTime) = :month and DateUtil.dayOfMonth(post.createTime) = :day and post.url = :url and post.status = :status")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month, @Param("day") Integer day, @Param("url") String url, @Param("status") PostStatus status);
 }

@@ -68,4 +68,35 @@ public class ContentContentController {
             throw new NotFoundException("Not Found");
         }
     }
+
+    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{url}")
+    public String content(@PathVariable("year") Integer year,
+                          @PathVariable("month") Integer month,
+                          @PathVariable("url") String url,
+                          @RequestParam(value = "token", required = false) String token,
+                          Model model) {
+        PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
+        if (postPermalinkType.equals(PostPermalinkType.DATE)) {
+            Post post = postService.getBy(year, month, url);
+            return postModel.content(post, token, model);
+        } else {
+            throw new NotFoundException("Not Found");
+        }
+    }
+
+    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{day:^[^A-Za-z]*$}/{url}")
+    public String content(@PathVariable("year") Integer year,
+                          @PathVariable("month") Integer month,
+                          @PathVariable("day") Integer day,
+                          @PathVariable("url") String url,
+                          @RequestParam(value = "token", required = false) String token,
+                          Model model) {
+        PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
+        if (postPermalinkType.equals(PostPermalinkType.DAY)) {
+            Post post = postService.getBy(year, month, day, url);
+            return postModel.content(post, token, model);
+        } else {
+            throw new NotFoundException("Not Found");
+        }
+    }
 }

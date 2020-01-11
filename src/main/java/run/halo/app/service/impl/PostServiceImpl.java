@@ -536,16 +536,32 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
-            StringBuilder fullPath = new StringBuilder(blogUrl);
+            StringBuilder fullPath = new StringBuilder(blogUrl)
+                    .append("/");
             if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
-                fullPath.append("/")
-                        .append(archivesPrefix)
+                fullPath.append(archivesPrefix)
                         .append("/")
                         .append(postListVO.getUrl())
                         .append(pathSuffix);
             } else if (permalinkType.equals(PostPermalinkType.ID)) {
-                fullPath.append("/?p=")
+                fullPath.append("?p=")
                         .append(postListVO.getId());
+            } else if (permalinkType.equals(PostPermalinkType.DATE)) {
+                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
+                        .append("/")
+                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
+                        .append("/")
+                        .append(postListVO.getUrl())
+                        .append(pathSuffix);
+            } else if (permalinkType.equals(PostPermalinkType.DAY)) {
+                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
+                        .append("/")
+                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
+                        .append("/")
+                        .append(DateUtil.dayOfMonth(postListVO.getCreateTime()))
+                        .append("/")
+                        .append(postListVO.getUrl())
+                        .append(pathSuffix);
             }
 
             postListVO.setFullPath(fullPath.toString());
