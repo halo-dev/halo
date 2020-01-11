@@ -2,6 +2,7 @@ package run.halo.app.controller.content;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.PageUtil;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -137,10 +138,10 @@ public class ContentArchiveController {
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         }
         postService.publishVisitEvent(post.getId());
-        postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
-        postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
 
-        postService.getAdjacentPost(post, false);
+        List<Post> adjacentPostList = postService.getAdjacentPostList(post);
+        Optional.ofNullable(adjacentPostList.get(0)).ifPresent(prePost -> model.addAttribute("prePost", prePost));
+        Optional.ofNullable(adjacentPostList.get(1)).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());

@@ -1,7 +1,9 @@
 package run.halo.app.service;
 
+import javax.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
@@ -189,4 +191,20 @@ public interface PostService extends BasePostService<Post> {
      * @param postId postId must not be null
      */
     void publishVisitEvent(@NonNull Integer postId);
+
+    /**
+     * Gets next post.
+     * @param currentPost post must not be null
+     * @return
+     */
+    @NotNull
+    List<Post> getAdjacentPostList(Post currentPost);
+
+    /**
+     * Get Post Pageable default sort
+     * @Desc contains three parts. First, Top Priority; Second, From Custom index sort; Third, basic id sort
+     * @return
+     */
+    @NotNull
+    Sort getPostDefaultSort();
 }

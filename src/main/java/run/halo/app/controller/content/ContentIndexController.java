@@ -39,8 +39,8 @@ public class ContentIndexController {
     private final ThemeService themeService;
 
     public ContentIndexController(PostService postService,
-                                  OptionService optionService,
-                                  ThemeService themeService) {
+            OptionService optionService,
+            ThemeService themeService) {
         this.postService = postService;
         this.optionService = optionService;
         this.themeService = themeService;
@@ -62,15 +62,16 @@ public class ContentIndexController {
      * Render blog index
      *
      * @param model model
-     * @param page  current page number
+     * @param page current page number
      * @return template path: themes/{theme}/index.ftl
      */
     @GetMapping(value = "page/{page}")
     public String index(Model model,
-                        @PathVariable(value = "page") Integer page) {
-        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
+            @PathVariable(value = "page") Integer page) {
+
         int pageSize = optionService.getPostPageSize();
-        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)));
+        Pageable pageable = PageRequest
+                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);

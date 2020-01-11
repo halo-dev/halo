@@ -1,13 +1,11 @@
 package run.halo.app.service.impl;
 
-import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -20,7 +18,6 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
-import run.halo.app.model.enums.PostPageableSortEnum;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
@@ -112,14 +109,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public List<POST> listPrePosts(Date date, int size) {
         Assert.notNull(date, "Date must not be null");
 
-        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
-
-        // dividing createTime, editTime and visits
-
-
         return basePostRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED,
                 date,
-                PageRequest.of(0, size, Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort))))
+                PageRequest.of(0, size, Sort.by(ASC, "createTime")))
                 .getContent();
     }
 
@@ -127,11 +119,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public List<POST> listNextPosts(Date date, int size) {
         Assert.notNull(date, "Date must not be null");
 
-        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
-
         return basePostRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED,
                 date,
-                PageRequest.of(0, size, Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort))))
+                PageRequest.of(0, size, Sort.by(DESC, "createTime")))
                 .getContent();
     }
 
@@ -458,54 +448,5 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
         return StringUtils.substring(text, 0, summaryLength);
-    }
-
-    @Override
-    public @NotNull Optional<POST> getAdjacentPost(POST post, boolean previous) {
-        Assert.notNull(post, "Post must not be null");
-
-        // get custom sort type
-        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
-
-        Direction indexSortType = previous ? DESC : ASC;
-
-        // get post from top priority
-        if (post.getTopPriority() > 0){
-            basePostRepository.findByStatusAndVisitsGreaterThanEqualAndTopPriorityGreaterThan(PostStatus.PUBLISHED, post.getVisits(), 0)
-        }
-
-
-
-        if (PostPageableSortEnum.VISITS.getValue().equalsIgnoreCase(indexSort)){
-            // for visits sort
-
-            // get the same visits count
-            Long sameVisitsCount = basePostRepository.countByStatusAndVisits(PostStatus.PUBLISHED, post.getVisits());
-
-            List<POST> postList =  previous ?
-                    basePostRepository.findByStatusAndVisitsGreaterThanEqual(PostStatus.PUBLISHED,
-                        post.getVisits(),
-                        PageRequest.of(0, Long.valueOf(sameVisitsCount + 1L).intValue(), Sort.by(indexSortType, "topPriority").and(Sort.by(indexSortType, indexSort))))
-                        .getContent()
-                    :
-                    basePostRepository.findByStatusAndVisitsLessThanEqual (PostStatus.PUBLISHED,
-                        post.getVisits(),
-                        PageRequest.of(0, Long.valueOf(sameVisitsCount + 1L).intValue(), Sort.by(indexSortType, "topPriority").and(Sort.by(indexSortType, indexSort))))
-                        .getContent();
-            if (CollectionUtils.isEmpty(postList)){
-                return Optional.empty();
-            }
-
-
-
-        } else {
-            // for createTime and editTime
-            if (previous){
-
-                return basePostRepository.getByStatusAnd()
-            }
-        }
-
-        return Optional.empty();
     }
 }
