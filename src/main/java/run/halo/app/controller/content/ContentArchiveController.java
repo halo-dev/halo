@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.cache.lock.CacheLock;
-import run.halo.app.controller.content.model.PostModel;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.OptionService;
@@ -34,39 +33,12 @@ public class ContentArchiveController {
 
     private final StringCacheStore cacheStore;
 
-    private final PostModel postModel;
-
     public ContentArchiveController(PostService postService,
                                     OptionService optionService,
-                                    StringCacheStore cacheStore,
-                                    PostModel postModel) {
+                                    StringCacheStore cacheStore) {
         this.postService = postService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
-        this.postModel = postModel;
-    }
-
-    /**
-     * Render post archives page.
-     *
-     * @param model model
-     * @return template path : themes/{theme}/archives.ftl
-     */
-    @GetMapping
-    public String archives(Model model) {
-        return this.archives(model, 1);
-    }
-
-    /**
-     * Render post archives page.
-     *
-     * @param model model
-     * @return template path : themes/{theme}/archives.ftl
-     */
-    @GetMapping(value = "page/{page}")
-    public String archives(Model model,
-                           @PathVariable(value = "page") Integer page) {
-        return postModel.list(page, model, "is_archives", "archives");
     }
 
     @GetMapping(value = "{url}/password")

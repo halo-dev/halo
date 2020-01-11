@@ -30,10 +30,8 @@ public class ContentSheetController {
 
     private final PhotoService photoService;
 
-    public ContentSheetController(
-            ThemeService themeService,
-            PhotoService photoService
-    ) {
+    public ContentSheetController(ThemeService themeService,
+                                  PhotoService photoService) {
         this.themeService = themeService;
         this.photoService = photoService;
     }
