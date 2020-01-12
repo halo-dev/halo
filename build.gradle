@@ -66,6 +66,7 @@ ext {
     flywayVersion = '6.1.0'
     h2Version = '1.4.196'
     uaVersion = '1.4.3'
+    levelDbVersion = '0.12'
 }
 
 dependencies {
@@ -112,6 +113,7 @@ dependencies {
 
     implementation "com.github.ua-parser:uap-java:$uaVersion"
 
+    implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly 'mysql:mysql-connector-java'
 
