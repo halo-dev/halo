@@ -51,15 +51,15 @@ public class RecordTask {
                 log.info("ip: " + requestRecord.getIp());
                 recordService.save(requestRecord);
             } else {
-                IpLocation location = restTemplate.getForObject(
-                        "http://ip-api.com/json/" + requestRecord.getIp() + "?lang=zh-CN",
-                        IpLocation.class
-                );
-                requestRecord.setCountry(location.getCountry());
-                requestRecord.setRegion(location.getRegion());
-                requestRecord.setCity(location.getCity());
-                recordService.save(requestRecord);
                 try {
+                    IpLocation location = restTemplate.getForObject(
+                            "http://ip-api.com/json/" + requestRecord.getIp() + "?lang=zh-CN",
+                            IpLocation.class
+                    );
+                    requestRecord.setCountry(location.getCountry());
+                    requestRecord.setRegion(location.getRegion());
+                    requestRecord.setCity(location.getCity());
+                    recordService.save(requestRecord);
 //                  sleeping due to frequency limitation of API, 45 request per minute
                     Thread.sleep(1500);
                 } catch (InterruptedException e) {
