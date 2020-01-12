@@ -21,7 +21,7 @@
                                 <i class="fa fa-sun-o"></i>
                                 <span class="date">${sheet.createTime?string("yyyy-MM-dd")}</span>
                                 <i class="fa fa-comment-o"></i>
-                                <a href="${context!}/archives/${sheet.url!}#comment_widget">Comments</a>
+                                <a href="${sheet.fullPath!}#comment_widget">Comments</a>
                             </div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                            class="fa fa-weibo"></a>
                     </div>
                     <div class="twitter">
-                        <a href="http://twitter.com/home?status=${context!}/archives/${sheet.url!} ,${options.blog_title!},${sheet.title!},;"
+                        <a href="http://twitter.com/home?status=${sheet.fullPath!} ,${options.blog_title!},${sheet.title!},;"
                            class="fa fa-twitter"></a>
                     </div>
                 </div>

@@ -22,6 +22,7 @@ import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.params.OptionQuery;
@@ -36,6 +37,7 @@ import run.halo.app.utils.ValidationUtils;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * OptionService implementation class
@@ -458,6 +460,26 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             saveProperty(PrimaryProperties.BIRTHDAY, String.valueOf(currentTime));
             return currentTime;
         });
+    }
+
+    @Override
+    public PostPermalinkType getPostPermalinkType() {
+        return getEnumByPropertyOrDefault(PermalinkProperties.POST_PERMALINK_TYPE, PostPermalinkType.class, PostPermalinkType.DEFAULT);
+    }
+
+    @Override
+    public List<OptionDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<Option> options = listAll();
+        List<Option> replaced = new ArrayList<>();
+        options.forEach(option -> {
+            if (StringUtils.isNotEmpty(option.getValue())) {
+                option.setValue(option.getValue().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(option);
+        });
+        List<Option> updated = updateInBatch(replaced);
+        publishOptionUpdatedEvent();
+        return updated.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @Override
