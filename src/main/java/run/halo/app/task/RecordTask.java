@@ -48,7 +48,6 @@ public class RecordTask {
                 requestRecord.setCountry(origin.getCountry());
                 requestRecord.setRegion(origin.getRegion());
                 requestRecord.setCity(origin.getCity());
-                log.info("ip: " + requestRecord.getIp());
                 recordService.save(requestRecord);
             } else {
                 try {
