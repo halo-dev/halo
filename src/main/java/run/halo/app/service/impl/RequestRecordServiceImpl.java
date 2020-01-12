@@ -117,6 +117,6 @@ public class RequestRecordServiceImpl implements RequestRecordService {
 
     @Override
     public List<RequestRecord> getIncompleteRecordList() {
-        return this.requestRecordRepository.findRequestRecordsByCity(EMPTY);
+        return this.requestRecordRepository.findAllByCity(EMPTY);
     }
 }
