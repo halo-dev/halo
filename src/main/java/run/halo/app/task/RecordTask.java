@@ -63,7 +63,7 @@ public class RecordTask {
 //                  sleeping due to frequency limitation of API, 45 request per minute
                     Thread.sleep(1500);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error("occurred error when execute record task", e);
                 }
             }
         });
