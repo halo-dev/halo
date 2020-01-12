@@ -23,39 +23,39 @@ public class RequestRecord extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(name = "operatingSystem", columnDefinition = "varchar(255) not null")
     private String operatingSystem;
 
-    @Column
+    @Column(name = "operatingSystemVersion", columnDefinition = "varchar(255) not null")
     private String operatingSystemVersion;
 
-    @Column
+    @Column(name = "browser", columnDefinition = "varchar(255) not null")
     private String browser;
 
-    @Column
+    @Column(name = "browserVersion", columnDefinition = "varchar(255) not null")
     private String browserVersion;
 
-    @Column
+    @Column(name = "device", columnDefinition = "varchar(255) not null")
     private String device;
 
-    @Column(columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Column(name = "time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
     private Date time;
 
-    @Column
+    @Column(name = "ip", columnDefinition = "varchar(255) not null")
     private String ip;
 
-    @Column
+    @Column(name = "url", columnDefinition = "varchar(255) not null")
     private String url;
 
-    @Column
+    @Column(name = "country", columnDefinition = "varchar(255) not null")
     private String country;
 
-    @Column
+    @Column(name = "region", columnDefinition = "varchar(255) not null")
     private String region;
 
-    @Column
+    @Column(name = "city", columnDefinition = "varchar(255) not null")
     private String city;
 
-    @Column
+    @Column(name = "httpMethod", columnDefinition = "varchar(255) not null")
     private String httpMethod;
 }
