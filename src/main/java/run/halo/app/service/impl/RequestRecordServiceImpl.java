@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import run.halo.app.model.entity.RequestRecord;
 import run.halo.app.repository.RequestRecordRepository;
 import run.halo.app.service.RequestRecordService;
+import run.halo.app.utils.ServletUtils;
 import ua_parser.Client;
 import ua_parser.Parser;
 
@@ -56,8 +57,7 @@ public class RequestRecordServiceImpl implements RequestRecordService {
             String browserVersion = client.userAgent.major;
             String device = client.device.family;
             Date time = new Date();
-            String ip = getIp(request);
-            log.info("ip: " + ip);
+            String ip = ServletUtils.getRequestIp();
 
             if (ip == null || !isIp(ip)) {
                 return null;
@@ -84,18 +84,6 @@ public class RequestRecordServiceImpl implements RequestRecordService {
 
     private boolean isNullOrEmpty(String value) {
         return value == null || value.isEmpty();
-    }
-
-    private String getIp(HttpServletRequest request) {
-        if (isNullOrEmpty(request.getHeader("X-Real-IP"))) {
-            if (isNullOrEmpty(request.getRemoteAddr())) {
-                return null;
-            } else {
-                return request.getRemoteAddr();
-            }
-        } else {
-            return request.getHeader("X-Real-IP");
-        }
     }
 
     private boolean isIp(String ip) {
