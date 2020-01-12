@@ -61,6 +61,14 @@ public class HaloProperties {
      */
     private Duration downloadTimeout = Duration.ofSeconds(30);
 
+    /**
+     * cache store impl
+     * memory
+     * level
+     */
+    private String cache = "memory";
+
+
     public HaloProperties() throws IOException {
         // Create work directory if not exist
         Files.createDirectories(Paths.get(workDir));
