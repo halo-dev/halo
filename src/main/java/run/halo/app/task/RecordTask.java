@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import run.halo.app.model.entity.IpLocation;
 import run.halo.app.model.entity.RequestRecord;
-import run.halo.app.service.impl.RequestRecordServiceImpl;
+import run.halo.app.service.RequestRecordService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,11 +23,11 @@ public class RecordTask {
 
     private static final int TWELVE_HOUR = 1000 * 60 * 60 * 12;
 
-    private final RequestRecordServiceImpl recordService;
+    private final RequestRecordService recordService;
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    public RecordTask(RequestRecordServiceImpl recordService) {
+    public RecordTask(RequestRecordService recordService) {
         this.recordService = recordService;
         List<HttpMessageConverter<?>> messageConverters = new ArrayList<HttpMessageConverter<?>>();
         MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
