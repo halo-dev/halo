@@ -9,6 +9,7 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.vo.AdjacentPostVO;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
@@ -234,10 +235,11 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Gets pre && next post.
      * @param currentPost post must not be null
-     * @return
+     * @return AdjacentPostVO. it contains prePost and nextPost.
+     * AdjacentPostVO will not be null. But prePost and nextPost may be null.
      */
     @NotNull
-    List<Post> getAdjacentPostList(Post currentPost);
+    AdjacentPostVO getAdjacentPosts(Post currentPost);
 
     /**
      * Get Post Pageable default sort

@@ -40,6 +40,7 @@ import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseMetaDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
@@ -53,6 +54,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.properties.PermalinkProperties;
 import run.halo.app.model.properties.PostProperties;
+import run.halo.app.model.vo.AdjacentPostVO;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
@@ -201,7 +203,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Optional<Post> postOptional = postRepository.findBy(year, month, url);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -213,7 +216,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Optional<Post> postOptional = postRepository.findBy(year, month, url, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -225,7 +229,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Optional<Post> postOptional = postRepository.findBy(year, month, day, url);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -238,7 +243,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Optional<Post> postOptional = postRepository.findBy(year, month, day, url, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -532,9 +538,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         PostPermalinkType permalinkType = optionService.getPostPermalinkType();
 
-        String pathSuffix = optionService.getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
+        String pathSuffix = optionService
+                .getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
 
-        String archivesPrefix = optionService.getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
+        String archivesPrefix = optionService
+                .getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
 
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
@@ -745,7 +753,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public @NotNull List<Post> getAdjacentPostList(Post currentPost) {
+    public @NotNull AdjacentPostVO getAdjacentPosts(Post currentPost) {
         Assert.notNull(currentPost, "Post must not be null");
 
         // get pageable post list
@@ -781,33 +789,33 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             page++;
         }
 
-        List<Post> resultList = new ArrayList<>(2);
-
         if (CollectionUtils.isEmpty(postList)) {
-            return resultList;
+            // if post list is empty, return empty object
+            return AdjacentPostVO.builder().build();
         }
 
+        // get current post index in post list
         List<Integer> idList = postList.stream().map(Post::getId).collect(Collectors.toList());
         Integer index = idList.indexOf(currentPost.getId());
 
         if (index == -1) {
-            return resultList;
+            // if not found, return empty object
+            return AdjacentPostVO.builder().build();
         }
 
-        //setup preContentArchiveController
+        AdjacentPostVO adjacentPostVO = new AdjacentPostVO();
+
+        //setup pre
+        //TODO convert POST to PostVO (with fullPath)
         if (index > 0) {
-            resultList.add(postList.get(index - 1));
-        } else {
-            resultList.add(null);
+            adjacentPostVO.setPrePost(postList.get(index - 1));
         }
         // setup next
         if (index < postList.size() - 1) {
-            resultList.add(postList.get(index + 1));
-        } else {
-            resultList.add(null);
+            adjacentPostVO.setNextPost(postList.get(index + 1));
         }
 
-        return resultList;
+        return adjacentPostVO;
     }
 
     @Override

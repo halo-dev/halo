@@ -50,13 +50,11 @@
                     <ul class="clearfix">
                         <#if nextPost??>
                             <li class="next pagbuttons">
-                                ${nextPost.title} : ${nextPost.fullPath!}
                                 <a class="btn" role="navigation" href="${nextPost.fullPath!}" title="${nextPost.title}">下一篇</a>
                             </li>
                         </#if>
                         <#if prePost??>
                             <li class="pre pagbuttons">
-                                ${prePost.title} : ${prePost.fullPath!}
                                 <a class="btn" role="navigation" href="${prePost.fullPath!}" title="${prePost.title}">上一篇</a>
                             </li>
                         </#if>
