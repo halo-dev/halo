@@ -1,5 +1,7 @@
 package run.halo.app.handler.migrate;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.enums.MigrateType;
 
@@ -9,6 +11,8 @@ import run.halo.app.model.enums.MigrateType;
  * @author ryanwang
  * @date 2019-10-30
  */
+@Slf4j
+@Component
 public class CnBlogsMigrateHandler implements MigrateHandler {
 
     @Override

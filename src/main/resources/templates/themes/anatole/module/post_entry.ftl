@@ -2,7 +2,7 @@
     <div class="post animated fadeInDown">
         <div class="post-title">
             <h3>
-                <a href="${context!}/archives/${post.url}">${post.title}</a>
+                <a href="${post.fullPath!}">${post.title}</a>
             </h3>
         </div>
         <div class="post-content">
@@ -19,7 +19,7 @@
                     <i class="fa fa-sun-o"></i>
                     <span class="date">${post.createTime?string("yyyy-MM-dd")}</span>
                     <i class="fa fa-comment-o"></i>
-                    <a href="${context!}/archives/${post.url}#comment_widget">Comments</a>
+                    <a href="${post.fullPath!}#comment_widget">Comments</a>
                     <#if post.tags?size gt 0>
                         <i class="fa fa-tag"></i>
                         <#list post.tags as tag>

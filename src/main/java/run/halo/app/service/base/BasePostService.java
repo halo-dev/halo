@@ -18,7 +18,8 @@ import java.util.Optional;
  * Base post service implementation.
  *
  * @author johnniang
- * @date 19-4-24
+ * @author ryanwang
+ * @date 2019-04-24
  */
 public interface BasePostService<POST extends BasePost> extends CrudService<POST, Integer> {
 
@@ -62,6 +63,16 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     POST getBy(@NonNull PostStatus status, @NonNull String url);
+
+    /**
+     * Gets post by post status and id.
+     *
+     * @param status post status must not be null
+     * @param id     post id must not be blank
+     * @return post info
+     */
+    @NonNull
+    POST getBy(@NonNull PostStatus status, @NonNull Integer id);
 
     /**
      * Lists all posts by post status.
@@ -287,4 +298,14 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     List<POST> updateStatusByIds(@NonNull List<Integer> ids, @NonNull PostStatus status);
+
+    /**
+     * Replace post blog url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced posts.
+     */
+    @NonNull
+    List<BasePostDetailDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
 }

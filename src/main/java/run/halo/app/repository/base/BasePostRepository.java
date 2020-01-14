@@ -18,6 +18,7 @@ import java.util.Optional;
  * Base post repository.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-03-22
  */
 public interface BasePostRepository<POST extends BasePost> extends BaseRepository<POST, Integer> {
@@ -98,6 +99,16 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      */
     @NonNull
     Optional<POST> getByUrlAndStatus(@NonNull String url, @NonNull PostStatus status);
+
+    /**
+     * Gets post by id and status.
+     *
+     * @param id     id must not be blank
+     * @param status status must not be null
+     * @return an optional post
+     */
+    @NonNull
+    Optional<POST> getByIdAndStatus(@NonNull Integer id, @NonNull PostStatus status);
 
 
     /**

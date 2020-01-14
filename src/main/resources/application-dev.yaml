@@ -64,3 +64,4 @@ halo:
   production-env: false
   auth-enabled: true
   workDir: ${user.home}/halo-dev/
+  cache: level
