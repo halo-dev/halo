@@ -9,18 +9,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.enums.CommentViolationTypeEnum;
 import run.halo.app.model.params.CommentQuery;
+import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.repository.PostCommentRepository;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.service.CommentBlackListService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.ServiceUtils;
+import run.halo.app.utils.ServletUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,14 +48,18 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
 
     private final PostRepository postRepository;
 
+    private final CommentBlackListService commentBlackListService;
+
     public PostCommentServiceImpl(PostCommentRepository postCommentRepository,
                                   PostRepository postRepository,
                                   UserService userService,
                                   OptionService optionService,
+                                  CommentBlackListService commentBlackListService,
                                   ApplicationEventPublisher eventPublisher) {
         super(postCommentRepository, optionService, userService, eventPublisher);
         this.postCommentRepository = postCommentRepository;
         this.postRepository = postRepository;
+        this.commentBlackListService = commentBlackListService;
     }
 
     @Override
@@ -110,4 +119,14 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
             throw new BadRequestException("该文章已经被禁止评论").setErrorData(postId);
         }
     }
+
+    @Override
+    public void validateCommentBlackListStatus() {
+        CommentViolationTypeEnum banStatus = commentBlackListService.commentsBanStatus(ServletUtils.getRequestIp());
+        Integer banTime = optionService.getByPropertyOrDefault(CommentProperties.COMMENT_BAN_TIME, Integer.class, 10);
+        if (banStatus == CommentViolationTypeEnum.FREQUENTLY) {
+            throw new ForbiddenException(String.format("您的评论过于频繁，请%s分钟之后再试。", banTime));
+        }
+    }
+
 }

@@ -49,4 +49,9 @@ public interface PostCommentService extends BaseCommentService<PostComment> {
 
     @NonNull
     Page<PostCommentWithPostVO> pageTreeBy(@NonNull CommentQuery commentQuery, @NonNull Pageable pageable);
+
+    /**
+     * Validate CommentBlackList Status
+     */
+    void validateCommentBlackListStatus();
 }
