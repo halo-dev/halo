@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentViolationTypeEnum;
 import run.halo.app.model.params.CommentQuery;
+import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.repository.PostCommentRepository;
 import run.halo.app.repository.PostRepository;
@@ -121,8 +123,9 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     @Override
     public void validateCommentBlackListStatus() {
         CommentViolationTypeEnum banStatus = commentBlackListService.commentsBanStatus(ServletUtils.getRequestIp());
+        Integer banTime = optionService.getByPropertyOrDefault(CommentProperties.COMMENT_BAN_TIME, Integer.class, 10);
         if (banStatus == CommentViolationTypeEnum.FREQUENTLY) {
-            throw new BadRequestException("您的评论过于频繁，请10分钟之后再试。");
+            throw new ForbiddenException(String.format("您的评论过于频繁，请%s分钟之后再试。", banTime));
         }
     }
 

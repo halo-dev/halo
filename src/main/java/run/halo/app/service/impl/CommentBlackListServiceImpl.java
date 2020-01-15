@@ -4,15 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import run.halo.app.model.entity.CommentBlackList;
 import run.halo.app.model.enums.CommentViolationTypeEnum;
+import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.repository.CommentBlackListRepository;
 import run.halo.app.repository.PostCommentRepository;
 import run.halo.app.service.CommentBlackListService;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -28,12 +29,14 @@ public class CommentBlackListServiceImpl extends AbstractCrudService<CommentBlac
     private static ZoneId zoneId = ZoneId.of("Asia/Shanghai");
     private final CommentBlackListRepository commentBlackListRepository;
     private final PostCommentRepository postCommentRepository;
+    private final OptionService optionService;
 
 
-    public CommentBlackListServiceImpl(CommentBlackListRepository commentBlackListRepository, PostCommentRepository postCommentRepository) {
+    public CommentBlackListServiceImpl(CommentBlackListRepository commentBlackListRepository, PostCommentRepository postCommentRepository, OptionService optionService) {
         super(commentBlackListRepository);
         this.commentBlackListRepository = commentBlackListRepository;
         this.postCommentRepository = postCommentRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -45,35 +48,37 @@ public class CommentBlackListServiceImpl extends AbstractCrudService<CommentBlac
         3. 如果在时隔N分钟内，还有多次评论，可被认定为恶意攻击者；
         4. 对恶意攻击者进行N分钟的封禁；
         */
-        CommentBlackList blackList = commentBlackListRepository.getByIpAddress(ipAddress);
+        Optional<CommentBlackList> blackList = commentBlackListRepository.findByIpAddress(ipAddress);
         LocalDateTime now = LocalDateTime.now();
         Date endTime = new Date(now.atZone(zoneId).toInstant().toEpochMilli());
-        Date startTime = new Date(now.minusMinutes(10).atZone(zoneId).toInstant().toEpochMilli());
-        int range = 30;
+        Integer banTime = optionService.getByPropertyOrDefault(CommentProperties.COMMENT_BAN_TIME, Integer.class, 10);
+        Date startTime = new Date(now.minusMinutes(banTime)
+                .atZone(zoneId).toInstant().toEpochMilli());
+        Integer range = optionService.getByPropertyOrDefault(CommentProperties.COMMENT_RANGE, Integer.class, 30);
         boolean isPresent = postCommentRepository.countByIpAndTime(ipAddress, startTime, endTime) >= range;
-       if (isPresent && Objects.nonNull(blackList)) {
-            update(now, blackList);
+        if (isPresent && blackList.isPresent()) {
+            update(now, blackList.get(), banTime);
             return CommentViolationTypeEnum.FREQUENTLY;
         } else if (isPresent) {
-            blackList = CommentBlackList
+            CommentBlackList commentBlackList = CommentBlackList
                     .builder()
-                    .banTime(getBanTime(now))
+                    .banTime(getBanTime(now, banTime))
                     .ipAddress(ipAddress)
                     .build();
-            super.create(blackList);
+            super.create(commentBlackList);
             return CommentViolationTypeEnum.FREQUENTLY;
         }
         return CommentViolationTypeEnum.NORMAL;
     }
 
-    private void update(LocalDateTime localDateTime, CommentBlackList blackList) {
-        blackList.setBanTime(getBanTime(localDateTime));
+    private void update(LocalDateTime localDateTime, CommentBlackList blackList, Integer banTime) {
+        blackList.setBanTime(getBanTime(localDateTime, banTime));
         int updateResult = commentBlackListRepository.updateByIpAddress(blackList);
         Optional.of(updateResult)
                 .filter(result -> result <= 0).ifPresent(result -> log.error("更新评论封禁时间失败"));
     }
 
-    private Date getBanTime(LocalDateTime localDateTime) {
-        return new Date(localDateTime.plusMinutes(10).atZone(zoneId).toInstant().toEpochMilli());
+    private Date getBanTime(LocalDateTime localDateTime, Integer banTime) {
+        return new Date(localDateTime.plusMinutes(banTime).atZone(zoneId).toInstant().toEpochMilli());
     }
 }
