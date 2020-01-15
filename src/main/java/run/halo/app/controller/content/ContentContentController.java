@@ -132,7 +132,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{url}")
+//    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{url}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("url") String url,
@@ -147,7 +147,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{day:^[^A-Za-z]*$}/{url}")
+//    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{day:^[^A-Za-z]*$}/{url}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("day") Integer day,
