@@ -1,1 +1,5 @@
 rootProject.name = 'halo'
+
+// include 'halo-admin'
+// include 'halo-common'
+include 'halo-content'

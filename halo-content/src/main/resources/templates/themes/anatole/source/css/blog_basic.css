@@ -1,0 +1,232 @@
+.post-content p{
+    font-size: 16px!important;
+}
+.post-content .tip {
+    position: relative;
+    margin: 2em 0;
+    padding: 12px 24px 12px 30px;
+    border-left: 4px solid #f66;
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    background-color: #f8f8f8
+}
+
+.post-content .tip br {
+    /**display: none**/
+}
+
+.post-content .tip:before {
+    position: absolute;
+    top: 14px;
+    left: -12px;
+    content: "!";
+    width: 20px;
+    height: 20px;
+    border-radius: 100%;
+    color: #fff;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: bold;
+    text-align: center;
+    background-color: #f66;
+    font-family: 'Dosis', 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif
+}
+
+.content > .post > .post-content > p {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+pre {
+    font-size: 16px;
+    font-family: 'Roboto Mono', 'Lucida Console', 'Trebuchet MS', 'Courier New', Monaco, courier, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft Jhenghei', 'Microsoft YaHei', monospace !important
+}
+
+pre .function .keyword, pre .constant {
+    color: #0092db !important
+}
+
+pre .keyword, pre .attribute {
+    color: #e96900 !important
+}
+
+pre .number, pre .literal {
+    color: #ae81ff !important
+}
+
+pre .tag, pre .tag .title, pre .change, pre .winutils, pre .flow, pre .lisp .title, pre .clojure .built_in, pre .nginx .title, pre .tex .special {
+    color: #2973b7 !important
+}
+
+pre .symbol, pre .symbol .string, pre .value, pre .regexp {
+    color: #42b983 !important
+}
+
+pre .title {
+    color: #83B917 !important
+}
+
+pre .tag .value, pre .string, pre .subst, pre .haskell .type, pre .preprocessor, pre .ruby .class .parent, pre .built_in, pre .sql .aggregate, pre .django .template_tag, pre .django .variable, pre .smalltalk .class, pre .javadoc, pre .django .filter .argument, pre .smalltalk .localvars, pre .smalltalk .array, pre .attr_selector, pre .pseudo, pre .addition, pre .stream, pre .envvar, pre .apache .tag, pre .apache .cbracket, pre .tex .command, pre .prompt {
+    color: #42b983 !important
+}
+
+pre .comment, pre .java .annotation, pre .python .decorator, pre .template_comment, pre .pi, pre .doctype, pre .shebang, pre .apache .sqbracket, pre .tex .formula {
+    color: #b3b3b3 !important
+}
+
+pre .deletion {
+    color: #BA4545 !important
+}
+
+pre .coffeescript .javascript, pre .javascript .xml, pre .tex .formula, pre .xml .javascript, pre .xml .vbscript, pre .xml .css, pre .xml .cdata {
+    opacity: 0.5 !important
+}
+
+html {
+    height: 100%;
+    max-height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    line-height: 1.6em;
+}
+
+.clear {
+    clear: both;
+    display: block;
+    overflow: hidden;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    text-rendering: optimizeLegibility;
+    line-height: 1;
+    margin: 2rem 0;
+}
+
+h1 {
+    font-size: 2.1rem;
+    line-height: 1.2em;
+}
+
+h2 {
+    font-size: 1.9rem;
+    line-height: 1.2em;
+}
+
+h3 {
+    font-size: 1.75rem;
+}
+
+h4 {
+    font-size: 1.3rem;
+}
+
+h5 {
+    font-size: 1.3rem;
+}
+
+h6 {
+    font-size: 1.3rem;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+p, ul, ol, dl {
+    margin: 1em 0;
+}
+
+ol ol, ul ul, ul ol, ol ul {
+    margin: 0.4em 0;
+}
+
+ul p, ol p, li p, .content li p, blockquote p, .content blockquote p,
+.post blockquote p, .post li p {
+    margin: 0;
+    overflow: visible;
+}
+
+a img {
+    border: none;
+}
+
+dl dt {
+    float: left;
+    width: 180px;
+    overflow: hidden;
+    clear: left;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+dl dd {
+    margin-left: 200px;
+    margin-bottom: 1em;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #efefef;
+    margin: 3.2em 0;
+    padding: 0;
+}
+
+blockquote {
+    box-sizing: border-box;
+    margin: 1.6em 0 1.6em -2.2em;
+    padding: 0 0 0 1.6em;
+    border-left: #4a4a4a 0.4em solid;
+}
+
+blockquote p {
+    margin: 0.8em 0;
+}
+
+blockquote small {
+    display: inline-block;
+    margin: 0.8em 0 0.8em 1.5em;
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+blockquote small:before {
+    content: '\2014 \00A0';
+}
+
+blockquote cite {
+    font-weight: bold;
+}
+
+blockquote cite a {
+    font-weight: normal;
+}
+
+mark {
+    background-color: #ffc336;
+}
+
+code, tt {
+    white-space: pre-wrap;
+    color: #d14;
+    border-radius: 2px;
+}
+
+.toc {
+    border: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+    padding: 10px 30px;
+}
