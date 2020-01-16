@@ -32,7 +32,10 @@
         <a-input v-model="options.git_static_deploy_email" />
       </a-form-item>
       <a-form-item label="Token：">
-        <a-input-password v-model="options.git_static_deploy_token" />
+        <a-input-password
+          v-model="options.git_static_deploy_token"
+          autocomplete="new-password"
+        />
       </a-form-item>
       <a-form-item label="CNAME：">
         <a-input v-model="options.git_static_deploy_cname" />
@@ -49,7 +52,10 @@
         <a-input v-model="options.netlify_static_deploy_site_id" />
       </a-form-item>
       <a-form-item label="Token：">
-        <a-input-password v-model="options.netlify_static_deploy_token" />
+        <a-input-password
+          v-model="options.netlify_static_deploy_token"
+          autocomplete="new-password"
+        />
       </a-form-item>
     </div>
     <a-form-item>

@@ -247,6 +247,7 @@
                     <a-input-password
                       v-model="options.smms_api_secret_token"
                       placeholder="需要到 sm.ms 官网注册后获取"
+                      autocomplete="new-password"
                     />
                   </a-form-item>
                 </div>
@@ -273,7 +274,10 @@
                     <a-input v-model="options.oss_upyun_operator" />
                   </a-form-item>
                   <a-form-item label="操作员密码：">
-                    <a-input-password v-model="options.oss_upyun_password" />
+                    <a-input-password
+                      v-model="options.oss_upyun_password"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="文件目录：">
                     <a-input v-model="options.oss_upyun_source" />
@@ -315,10 +319,16 @@
                     />
                   </a-form-item>
                   <a-form-item label="Access Key：">
-                    <a-input-password v-model="options.oss_qiniu_access_key" />
+                    <a-input-password
+                      v-model="options.oss_qiniu_access_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="Secret Key：">
-                    <a-input-password v-model="options.oss_qiniu_secret_key" />
+                    <a-input-password
+                      v-model="options.oss_qiniu_secret_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="文件目录：">
                     <a-input
@@ -371,10 +381,16 @@
                     <a-input v-model="options.oss_ali_endpoint" />
                   </a-form-item>
                   <a-form-item label="Access Key：">
-                    <a-input-password v-model="options.oss_ali_access_key" />
+                    <a-input-password
+                      v-model="options.oss_ali_access_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="Access Secret：">
-                    <a-input-password v-model="options.oss_ali_access_secret" />
+                    <a-input-password
+                      v-model="options.oss_ali_access_secret"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="文件目录：">
                     <a-input
@@ -421,10 +437,16 @@
                     <a-input v-model="options.bos_baidu_endpoint" />
                   </a-form-item>
                   <a-form-item label="Access Key：">
-                    <a-input-password v-model="options.bos_baidu_access_key" />
+                    <a-input-password
+                      v-model="options.bos_baidu_access_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="Secret Key：">
-                    <a-input-password v-model="options.bos_baidu_secret_key" />
+                    <a-input-password
+                      v-model="options.bos_baidu_secret_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="图片处理策略：">
                     <a-input
@@ -469,10 +491,16 @@
                     />
                   </a-form-item>
                   <a-form-item label="Secret Id：">
-                    <a-input-password v-model="options.cos_tencent_secret_id" />
+                    <a-input-password
+                      v-model="options.cos_tencent_secret_id"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="Secret Key：">
-                    <a-input-password v-model="options.cos_tencent_secret_key" />
+                    <a-input-password
+                      v-model="options.cos_tencent_secret_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="文件目录：">
                     <a-input
@@ -534,6 +562,7 @@
                         <a-input-password
                           v-model="options.email_password"
                           placeholder="部分邮箱可能是授权码"
+                          autocomplete="new-password"
                         />
                       </a-form-item>
                       <a-form-item label="发件人：">
@@ -652,7 +681,10 @@
                   <a-switch v-model="options.api_enabled" />
                 </a-form-item>
                 <a-form-item label="Access key：">
-                  <a-input-password v-model="options.api_access_key" />
+                  <a-input-password
+                    v-model="options.api_access_key"
+                    autocomplete="new-password"
+                  />
                 </a-form-item>
                 <a-form-item>
                   <a-button
