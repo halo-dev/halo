@@ -247,7 +247,7 @@
                     >
                       <a
                         v-if="item.status=='PUBLISHED'"
-                        :href="options.blog_url+'/archives/'+item.url"
+                        :href="options.blog_url+'/s/'+item.url"
                         target="_blank"
                         style="text-decoration: none;"
                       >
