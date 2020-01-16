@@ -1,12 +1,32 @@
 package run.halo.app.service.impl;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.text.StrBuilder;
 import cn.hutool.core.util.StrUtil;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,30 +40,38 @@ import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseMetaDTO;
-import run.halo.app.model.entity.*;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
+import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostCategory;
+import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.entity.PostMeta;
+import run.halo.app.model.entity.PostTag;
+import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.properties.PermalinkProperties;
+import run.halo.app.model.properties.PostProperties;
+import run.halo.app.model.vo.AdjacentPostVO;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.repository.PostRepository;
-import run.halo.app.service.*;
+import run.halo.app.service.CategoryService;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.PostCategoryService;
+import run.halo.app.service.PostCommentService;
+import run.halo.app.service.PostMetaService;
+import run.halo.app.service.PostService;
+import run.halo.app.service.PostTagService;
+import run.halo.app.service.TagService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.SlugUtils;
-
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Post service implementation.
@@ -77,14 +105,14 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private final OptionService optionService;
 
     public PostServiceImpl(PostRepository postRepository,
-                           TagService tagService,
-                           CategoryService categoryService,
-                           PostTagService postTagService,
-                           PostCategoryService postCategoryService,
-                           PostCommentService postCommentService,
-                           ApplicationEventPublisher eventPublisher,
-                           PostMetaService postMetaService,
-                           OptionService optionService) {
+            TagService tagService,
+            CategoryService categoryService,
+            PostTagService postTagService,
+            PostCategoryService postCategoryService,
+            PostCommentService postCommentService,
+            ApplicationEventPublisher eventPublisher,
+            PostMetaService postMetaService,
+            OptionService optionService) {
         super(postRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;
@@ -121,22 +149,26 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     @Transactional
-    public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave) {
+    public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds,
+            Set<PostMeta> postMetas, boolean autoSave) {
         PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds, postMetas);
         if (!autoSave) {
             // Log the creation
-            LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
+            LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(),
+                    LogType.POST_PUBLISHED, createdPost.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return createdPost;
     }
 
     @Override
-    public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave) {
+    public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds,
+            boolean autoSave) {
         PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds, null);
         if (!autoSave) {
             // Log the creation
-            LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(), LogType.POST_PUBLISHED, createdPost.getTitle());
+            LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(),
+                    LogType.POST_PUBLISHED, createdPost.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return createdPost;
@@ -144,13 +176,15 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     @Transactional
-    public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave) {
+    public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds,
+            Set<PostMeta> postMetas, boolean autoSave) {
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
         PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds, postMetas);
         if (!autoSave) {
             // Log the creation
-            LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(), LogType.POST_EDITED, updatedPost.getTitle());
+            LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(),
+                    LogType.POST_EDITED, updatedPost.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return updatedPost;
@@ -169,7 +203,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Optional<Post> postOptional = postRepository.findBy(year, month, url);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -181,7 +216,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Optional<Post> postOptional = postRepository.findBy(year, month, url, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -193,7 +229,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Optional<Post> postOptional = postRepository.findBy(year, month, day, url);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -206,7 +243,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Optional<Post> postOptional = postRepository.findBy(year, month, day, url, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
     }
 
     @Override
@@ -225,7 +263,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public List<ArchiveYearVO> listYearArchives() {
         // Get all posts
-        List<Post> posts = postRepository.findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+        List<Post> posts = postRepository
+                .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
 
         Map<Integer, List<Post>> yearPostMap = new HashMap<>(8);
 
@@ -234,7 +273,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             yearPostMap.computeIfAbsent(calendar.get(Calendar.YEAR), year -> new LinkedList<>())
                     .add(post);
         });
-
 
         List<ArchiveYearVO> archives = new LinkedList<>();
 
@@ -257,7 +295,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public List<ArchiveMonthVO> listMonthArchives() {
         // Get all posts
-        List<Post> posts = postRepository.findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+        List<Post> posts = postRepository
+                .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
 
         Map<Integer, Map<Integer, List<Post>>> yearMonthPostMap = new HashMap<>(8);
 
@@ -265,7 +304,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             Calendar calendar = DateUtils.convertTo(post.getCreateTime());
 
             yearMonthPostMap.computeIfAbsent(calendar.get(Calendar.YEAR), year -> new HashMap<>())
-                    .computeIfAbsent((calendar.get(Calendar.MONTH) + 1), month -> new LinkedList<>())
+                    .computeIfAbsent((calendar.get(Calendar.MONTH) + 1),
+                            month -> new LinkedList<>())
                     .add(post);
         });
 
@@ -384,7 +424,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public String exportMarkdown(Post post) {
         Assert.notNull(post, "Post must not be null");
 
-
         StrBuilder content = new StrBuilder("---\n");
 
         content.append("type: ").append("post").append("\n");
@@ -419,7 +458,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         if (postMetas.size() > 0) {
             content.append("postMetas:").append("\n");
             for (PostMeta postMeta : postMetas) {
-                content.append("  - ").append(postMeta.getKey()).append(" :  ").append(postMeta.getValue()).append("\n");
+                content.append("  - ").append(postMeta.getKey()).append(" :  ")
+                        .append(postMeta.getValue()).append("\n");
             }
         }
 
@@ -467,7 +507,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Post deletedPost = super.removeById(postId);
 
         // Log it
-        eventPublisher.publishEvent(new LogEvent(this, postId.toString(), LogType.POST_DELETED, deletedPost.getTitle()));
+        eventPublisher.publishEvent(new LogEvent(this, postId.toString(), LogType.POST_DELETED,
+                deletedPost.getTitle()));
 
         return deletedPost;
     }
@@ -484,7 +525,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
 
         // Get category list map
-        Map<Integer, List<Category>> categoryListMap = postCategoryService.listCategoryListMap(postIds);
+        Map<Integer, List<Category>> categoryListMap = postCategoryService
+                .listCategoryListMap(postIds);
 
         // Get comment count
         Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
@@ -496,9 +538,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         PostPermalinkType permalinkType = optionService.getPostPermalinkType();
 
-        String pathSuffix = optionService.getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
+        String pathSuffix = optionService
+                .getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
 
-        String archivesPrefix = optionService.getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
+        String archivesPrefix = optionService
+                .getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
 
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
@@ -579,14 +623,15 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     /**
      * Converts to post detail vo.
      *
-     * @param post         post must not be null
-     * @param tags         tags
-     * @param categories   categories
+     * @param post post must not be null
+     * @param tags tags
+     * @param categories categories
      * @param postMetaList postMetas
      * @return post detail vo
      */
     @NonNull
-    private PostDetailVO convertTo(@NonNull Post post, @Nullable List<Tag> tags, @Nullable List<Category> categories, List<PostMeta> postMetaList) {
+    private PostDetailVO convertTo(@NonNull Post post, @Nullable List<Tag> tags,
+            @Nullable List<Category> categories, List<PostMeta> postMetaList) {
         Assert.notNull(post, "Post must not be null");
 
         // Convert to base detail vo
@@ -641,17 +686,20 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 postSubquery.select(postCategoryRoot.get("postId"));
                 postSubquery.where(
                         criteriaBuilder.equal(root.get("id"), postCategoryRoot.get("postId")),
-                        criteriaBuilder.equal(postCategoryRoot.get("categoryId"), postQuery.getCategoryId()));
+                        criteriaBuilder.equal(postCategoryRoot.get("categoryId"),
+                                postQuery.getCategoryId()));
                 predicates.add(criteriaBuilder.exists(postSubquery));
             }
 
             if (postQuery.getKeyword() != null) {
                 // Format like condition
-                String likeCondition = String.format("%%%s%%", StringUtils.strip(postQuery.getKeyword()));
+                String likeCondition = String
+                        .format("%%%s%%", StringUtils.strip(postQuery.getKeyword()));
 
                 // Build like predicate
                 Predicate titleLike = criteriaBuilder.like(root.get("title"), likeCondition);
-                Predicate originalContentLike = criteriaBuilder.like(root.get("originalContent"), likeCondition);
+                Predicate originalContentLike = criteriaBuilder
+                        .like(root.get("originalContent"), likeCondition);
 
                 predicates.add(criteriaBuilder.or(titleLike, originalContentLike));
             }
@@ -660,7 +708,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         };
     }
 
-    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas) {
+    private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds,
+            Set<Integer> categoryIds, Set<PostMeta> postMetas) {
         Assert.notNull(post, "Post param must not be null");
 
         // Create or update post
@@ -677,17 +726,21 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Category> categories = categoryService.listAllByIds(categoryIds);
 
         // Create post tags
-        List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(), ServiceUtils.fetchProperty(tags, Tag::getId));
+        List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(),
+                ServiceUtils.fetchProperty(tags, Tag::getId));
 
         log.debug("Created post tags: [{}]", postTags);
 
         // Create post categories
-        List<PostCategory> postCategories = postCategoryService.mergeOrCreateByIfAbsent(post.getId(), ServiceUtils.fetchProperty(categories, Category::getId));
+        List<PostCategory> postCategories = postCategoryService
+                .mergeOrCreateByIfAbsent(post.getId(),
+                        ServiceUtils.fetchProperty(categories, Category::getId));
 
         log.debug("Created post categories: [{}]", postCategories);
 
         // Create post meta data
-        List<PostMeta> postMetaList = postMetaService.createOrUpdateByPostId(post.getId(), postMetas);
+        List<PostMeta> postMetaList = postMetaService
+                .createOrUpdateByPostId(post.getId(), postMetas);
         log.debug("Created post postMetas: [{}]", postMetaList);
 
         // Convert to post detail vo
@@ -697,5 +750,78 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public void publishVisitEvent(Integer postId) {
         eventPublisher.publishEvent(new PostVisitEvent(this, postId));
+    }
+
+    @Override
+    public @NotNull AdjacentPostVO getAdjacentPosts(Post currentPost) {
+        Assert.notNull(currentPost, "Post must not be null");
+
+        // get pageable post list
+        List<Post> postList = new ArrayList<>();
+        // init fist page && default page size
+        Integer page = 1;
+        Integer defaultPageSize = 500;
+        boolean needNext = true;
+
+        // get custom sort type
+        Sort sort = getPostDefaultSort();
+        Pageable pageable = null;
+        PostStatus postStatus = PostStatus.PUBLISHED;
+        long totalCount = countByStatus(postStatus);
+
+        while (needNext && totalCount > postList.size()) {
+            pageable = PageRequest
+                    .of(page >= 1 ? page - 1 : page, defaultPageSize, sort);
+
+            Page<Post> postPage = pageBy(postStatus, pageable);
+            List<Post> pageablePostList = postPage.getContent();
+            if (pageablePostList.size() == 0) {
+                break;
+            }
+            postList.addAll(postPage.getContent());
+            if (postList.stream().filter(it -> it.getId().equals(currentPost.getId())).count() == 1
+                    && !postList.stream().reduce((first, second) -> second).get().getId()
+                    .equals(currentPost.getId())) {
+                // contains the post && the post is not in the end
+                needNext = false;
+            }
+
+            page++;
+        }
+
+        if (CollectionUtils.isEmpty(postList)) {
+            // if post list is empty, return empty object
+            return AdjacentPostVO.builder().build();
+        }
+
+        // get current post index in post list
+        List<Integer> idList = postList.stream().map(Post::getId).collect(Collectors.toList());
+        Integer index = idList.indexOf(currentPost.getId());
+
+        if (index == -1) {
+            // if not found, return empty object
+            return AdjacentPostVO.builder().build();
+        }
+
+        AdjacentPostVO adjacentPostVO = new AdjacentPostVO();
+
+        //setup pre
+        //TODO convert POST to PostVO (with fullPath)
+        if (index > 0) {
+            adjacentPostVO.setPrePost(postList.get(index - 1));
+        }
+        // setup next
+        if (index < postList.size() - 1) {
+            adjacentPostVO.setNextPost(postList.get(index + 1));
+        }
+
+        return adjacentPostVO;
+    }
+
+    @Override
+    public @NotNull Sort getPostDefaultSort() {
+        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
+                .toString();
+        return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)).and(Sort.by(DESC, "id"));
     }
 }
