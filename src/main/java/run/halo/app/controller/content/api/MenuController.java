@@ -15,11 +15,11 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Portal menu controller.
+ * Content menu controller.
  *
  * @author johnniang
  * @author ryanwang
- * @date 4/3/19
+ * @date 2019-04-03
  */
 @RestController("ApiContentMenuController")
 @RequestMapping("/api/content/menus")

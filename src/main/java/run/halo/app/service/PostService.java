@@ -1,6 +1,5 @@
 package run.halo.app.service;
 
-import javax.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -9,13 +8,10 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
-import run.halo.app.model.vo.AdjacentPostVO;
-import run.halo.app.model.vo.ArchiveMonthVO;
-import run.halo.app.model.vo.ArchiveYearVO;
-import run.halo.app.model.vo.PostDetailVO;
-import run.halo.app.model.vo.PostListVO;
+import run.halo.app.model.vo.*;
 import run.halo.app.service.base.BasePostService;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -234,6 +230,7 @@ public interface PostService extends BasePostService<Post> {
 
     /**
      * Gets pre && next post.
+     *
      * @param currentPost post must not be null
      * @return AdjacentPostVO. it contains prePost and nextPost.
      * AdjacentPostVO will not be null. But prePost and nextPost may be null.
@@ -243,8 +240,9 @@ public interface PostService extends BasePostService<Post> {
 
     /**
      * Get Post Pageable default sort
-     * @Desc contains three parts. First, Top Priority; Second, From Custom index sort; Third, basic id sort
+     *
      * @return
+     * @Desc contains three parts. First, Top Priority; Second, From Custom index sort; Third, basic id sort
      */
     @NotNull
     Sort getPostDefaultSort();

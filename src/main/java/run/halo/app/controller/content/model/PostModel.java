@@ -1,7 +1,6 @@
 package run.halo.app.controller.content.model;
 
 import cn.hutool.core.util.PageUtil;
-import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,14 +50,14 @@ public class PostModel {
     private final StringCacheStore cacheStore;
 
     public PostModel(PostService postService,
-            ThemeService themeService,
-            PostCategoryService postCategoryService,
-            CategoryService categoryService,
-            PostMetaService postMetaService,
-            PostTagService postTagService,
-            TagService tagService,
-            OptionService optionService,
-            StringCacheStore cacheStore) {
+                     ThemeService themeService,
+                     PostCategoryService postCategoryService,
+                     CategoryService categoryService,
+                     PostMetaService postMetaService,
+                     PostTagService postTagService,
+                     TagService tagService,
+                     OptionService optionService,
+                     StringCacheStore cacheStore) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;

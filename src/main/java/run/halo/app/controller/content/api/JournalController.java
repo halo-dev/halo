@@ -29,7 +29,7 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Content Journal controller.
+ * Content journal controller.
  *
  * @author johnniang
  * @author ryanwang

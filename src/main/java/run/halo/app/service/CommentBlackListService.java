@@ -4,6 +4,7 @@ import run.halo.app.model.enums.CommentViolationTypeEnum;
 
 /**
  * Comment BlackList Service
+ *
  * @author Lei XinXin
  * @date 2020/1/3
  */

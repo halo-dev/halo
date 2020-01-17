@@ -59,7 +59,7 @@ public class ContentContentController {
         this.sheetService = sheetService;
     }
 
-    @GetMapping("{prefix}")
+    //    @GetMapping("{prefix}")
     public String content(@PathVariable("prefix") String prefix,
                           Model model) {
         String archivesPrefix = optionService.getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, PermalinkProperties.ARCHIVES_PREFIX.defaultValue());
@@ -89,7 +89,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{prefix}/{url}")
+    //    @GetMapping("{prefix}/{url}")
     public String content(@PathVariable("prefix") String prefix,
                           @PathVariable("url") String url,
                           @RequestParam(value = "token", required = false) String token,
@@ -132,7 +132,7 @@ public class ContentContentController {
         }
     }
 
-//    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{url}")
+    //    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{url}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("url") String url,
@@ -147,7 +147,7 @@ public class ContentContentController {
         }
     }
 
-//    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{day:^[^A-Za-z]*$}/{url}")
+    //    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{day:^[^A-Za-z]*$}/{url}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("day") Integer day,
