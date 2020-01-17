@@ -69,7 +69,7 @@ public class HaloConfiguration {
             case "level":
                 stringCacheStore = new LevelCacheStore();
                 break;
-                
+
             case "memory":
             default:
                 //memory or default

@@ -10,10 +10,10 @@ import run.halo.app.service.PostService;
 import java.util.List;
 
 /**
- * Archive portal controller.
+ * Content archive controller.
  *
  * @author johnniang
- * @date 4/2/19
+ * @date 2019-04-02
  */
 @RestController("ApiContentArchiveController")
 @RequestMapping("/api/content/archives")

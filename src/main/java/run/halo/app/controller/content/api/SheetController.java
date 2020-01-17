@@ -25,11 +25,11 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Sheet controller.
+ * Content sheet controller.
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-26
+ * @date 2019-04-26
  */
 @RestController("ApiContentSheetController")
 @RequestMapping("/api/content/sheets")

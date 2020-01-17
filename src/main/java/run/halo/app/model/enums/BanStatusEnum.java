@@ -4,6 +4,7 @@ import lombok.Getter;
 
 /**
  * 封禁状态
+ *
  * @author Lei XinXin
  * @date 2020/1/5
  */
@@ -12,9 +13,11 @@ public enum BanStatusEnum {
     /**
      * 封禁状态
      */
-    NORMAL(0),;
+    NORMAL(0),
+    ;
 
     private int status;
+
     BanStatusEnum(int status) {
         this.status = status;
     }

@@ -26,10 +26,10 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Portal post controller.
+ * Content post controller.
  *
  * @author johnniang
- * @date 4/2/19
+ * @date 2019-04-02
  */
 @RestController("ApiContentPostController")
 @RequestMapping("/api/content/posts")

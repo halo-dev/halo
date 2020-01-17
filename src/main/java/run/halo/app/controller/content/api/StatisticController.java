@@ -9,7 +9,7 @@ import run.halo.app.model.dto.StatisticWithUserDTO;
 import run.halo.app.service.StatisticService;
 
 /**
- * Statistic controller.
+ * Content statistic controller.
  *
  * @author ryan0up
  * @date 2019-12-16

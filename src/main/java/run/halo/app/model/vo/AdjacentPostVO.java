@@ -1,11 +1,12 @@
 package run.halo.app.model.vo;
 
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import run.halo.app.model.entity.Post;
+
+import java.util.Optional;
 
 /**
  * AdjacentPost class
@@ -22,7 +23,7 @@ public class AdjacentPostVO {
     private Post prePost;
     private Post nextPost;
 
-    public Optional<Post> getOptionalPrePost(){
+    public Optional<Post> getOptionalPrePost() {
         return Optional.ofNullable(this.getPrePost());
     }
 
