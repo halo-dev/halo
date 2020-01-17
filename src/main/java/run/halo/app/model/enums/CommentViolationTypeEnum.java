@@ -21,6 +21,7 @@ public enum CommentViolationTypeEnum {
     ;
 
     private int type;
+
     CommentViolationTypeEnum(int type) {
         this.type = type;
     }

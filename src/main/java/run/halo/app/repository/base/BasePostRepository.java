@@ -1,8 +1,5 @@
 package run.halo.app.repository.base;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,6 +9,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Base post repository.
