@@ -61,7 +61,6 @@ ext {
     h2Version = '1.4.196'
     levelDbVersion = '0.12'
     jsonVersion = '20190722'
-    commonsIOVersion = '2.6'
     fastJsonVersion = '1.2.56'
 }
 
@@ -108,7 +107,6 @@ dependencies {
     implementation "org.flywaydb:flyway-core:$flywayVersion"
 
     implementation "org.json:json:$jsonVersion"
-    implementation "commons-io:commons-io:$commonsIOVersion"
     implementation "com.alibaba:fastjson:$fastJsonVersion"
     
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"

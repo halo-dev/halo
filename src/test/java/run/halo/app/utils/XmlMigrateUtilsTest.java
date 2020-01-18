@@ -1,7 +1,6 @@
 package run.halo.app.utils;
 
 import com.alibaba.fastjson.JSONObject;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.handler.migrate.converter.Converter;
@@ -11,7 +10,6 @@ import run.halo.app.handler.migrate.support.wordpress.Rss;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,7 +27,7 @@ public class XmlMigrateUtilsTest {
         JSONObject json = readXml();
         System.out.println("WordPress blog json data:" + json);
         Rss rss = json.getObject("rss", Rss.class);
-        System.out.println(rss);
+//        System.out.println(rss);
     }
 
     @Test

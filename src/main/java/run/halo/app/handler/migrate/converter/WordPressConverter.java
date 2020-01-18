@@ -43,10 +43,11 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
         }
 
         Channel channel = rss.getChannel();
-
         List<Item> items = channel.getItems();
-        Assert.notNull(items, "解析出错,文章item项不能为null");
 
+        if (CollectionUtils.isEmpty(items)) {
+            return new ArrayList<>();
+        }
         return getBasePost(items);
     }
 
