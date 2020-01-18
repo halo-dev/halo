@@ -5,26 +5,41 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 博客迁移数据转换器,只定义从T转U的单向转换
+ * 博客迁移数据转换器,只定义从SOURCE转TARGET的单向转换
+ *
  * @author guqing
  * @date 2020-01-18 16:45
  */
-public class Converter<T, U> {
+public interface Converter<SOURCE, TARGET> {
+
     /**
-     *  从 T 转换为 U
+     * 将source转换为target
+     *
+     * @param s 需要转换的源对象
+     * @return 返回转换得到的结果对象
      */
-    private Function<T, U> fromDto;
+    TARGET converterFromDto(SOURCE s);
 
-    public Converter(final Function<T, U> fromDto) {
-        this.fromDto = fromDto;
+    /**
+     * 从SOURCE转为TARGET
+     *
+     * @param s        source,需要转换的原始SOURCE集合
+     * @param function 具体转换逻辑
+     * @return 返回转换得到的TARGET对象
+     */
+    default TARGET converterFromDto(SOURCE s, Function<SOURCE, TARGET> function) {
+        return function.apply(s);
     }
 
-    public final U converterFromDto(final T dto){
-        return fromDto.apply(dto);
-    }
-
-    public final List<U> batchConverterFromDto(final List<T> dtos){
-        return dtos.stream().map(this::converterFromDto).collect(Collectors.toList());
+    /**
+     * 批量从SOURCE转换得到TARGET
+     *
+     * @param list     需要转换的原始SOURCE集合
+     * @param function 具体转换逻辑
+     * @return 返回转换得到的TARGET集合结果
+     */
+    default List<TARGET> batchConverterFromDto(List<SOURCE> list, Function<SOURCE, TARGET> function) {
+        return list.stream().map(s -> converterFromDto(s, function)).collect(Collectors.toList());
     }
 }
 
