@@ -6,7 +6,9 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * <p>  </p>
+ * <p>
+ * WordPress导出的xml中对应的channel节点下的子节点将被映射为该类的属性
+ * </p>
  *
  * @author guqing
  * @date 2019-11-17 13:57

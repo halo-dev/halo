@@ -4,7 +4,10 @@ import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 
 /**
- * <p>  </p>
+ * <p>
+ * WordPress导出的xml中对于的comment节点下的子节点值将被映射为该类的属性,
+ * 最终会被转换为{@link run.halo.app.model.entity.PostComment}
+ * </p>
  *
  * @author guqing
  * @date 2019-11-17 14:01

@@ -38,7 +38,7 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
      * 自定义转换规则
      */
     public List<PostVO> apply(Rss rss) {
-        if(Objects.isNull(rss) || Objects.isNull(rss.getChannel())) {
+        if (Objects.isNull(rss) || Objects.isNull(rss.getChannel())) {
             return new ArrayList<>();
         }
 
@@ -53,7 +53,7 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
     private List<PostVO> getBasePost(List<Item> items) {
         List<PostVO> posts = new ArrayList<>();
 
-        if(CollectionUtils.isEmpty(items)) {
+        if (CollectionUtils.isEmpty(items)) {
             return posts;
         }
 
@@ -68,7 +68,7 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
             List<WpCategory> categories = item.getCategories();
             List<Category> categoryModelList = new ArrayList<>();
             List<Tag> tags = new ArrayList<>();
-            if(!CollectionUtils.isEmpty(categories)) {
+            if (!CollectionUtils.isEmpty(categories)) {
                 categories.forEach(category -> {
                     String domain = category.getDomain();
                     if (StringUtils.equals("post_tag", domain)) {
@@ -101,7 +101,7 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
 
     private List<BaseComment> getCommentsFromItem(Item item) {
         List<BaseComment> baseComments = new ArrayList<>();
-        if(Objects.isNull(item) || Objects.isNull(item.getComments())) {
+        if (Objects.isNull(item) || Objects.isNull(item.getComments())) {
             return baseComments;
         }
 
