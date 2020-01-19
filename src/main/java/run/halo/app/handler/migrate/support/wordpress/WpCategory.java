@@ -1,6 +1,7 @@
 package run.halo.app.handler.migrate.support.wordpress;
 
 import lombok.Data;
+import run.halo.app.handler.migrate.utils.PropertyMappingTo;
 import run.halo.app.model.entity.PostCategory;
 
 /**
@@ -13,6 +14,10 @@ import run.halo.app.model.entity.PostCategory;
 @Data
 public class WpCategory {
     private String domain;
+
+    @PropertyMappingTo("slugName")
     private String nicename;
+
+    @PropertyMappingTo("name")
     private String content;
 }

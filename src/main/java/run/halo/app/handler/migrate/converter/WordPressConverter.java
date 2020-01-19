@@ -1,25 +1,20 @@
 package run.halo.app.handler.migrate.converter;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.DigestUtils;
 import run.halo.app.handler.migrate.support.vo.PostVO;
 import run.halo.app.handler.migrate.support.wordpress.*;
+import run.halo.app.handler.migrate.utils.RelationMapperUtils;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Tag;
-import run.halo.app.model.enums.CommentStatus;
-import run.halo.app.model.enums.PostCreateFrom;
-import run.halo.app.model.enums.PostStatus;
-import run.halo.app.utils.MarkdownUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * WordPress博客数据迁移转换器
@@ -45,7 +40,7 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
         Channel channel = rss.getChannel();
         List<Item> items = channel.getItems();
 
-        if (CollectionUtils.isEmpty(items)) {
+        if (items == null) {
             return new ArrayList<>();
         }
         return getBasePost(items);
@@ -53,14 +48,12 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
 
     private List<PostVO> getBasePost(List<Item> items) {
         List<PostVO> posts = new ArrayList<>();
-
-        if (CollectionUtils.isEmpty(items)) {
+        if (items == null) {
             return posts;
         }
 
         for (Item item : items) {
             PostVO postVo = new PostVO();
-
             // 设置文章
             BasePost post = getBasePostFromItem(item);
             postVo.setBasePost(post);
@@ -69,18 +62,14 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
             List<WpCategory> categories = item.getCategories();
             List<Category> categoryModelList = new ArrayList<>();
             List<Tag> tags = new ArrayList<>();
-            if (!CollectionUtils.isEmpty(categories)) {
+            if (categories != null) {
                 categories.forEach(category -> {
                     String domain = category.getDomain();
-                    if (StringUtils.equals("post_tag", domain)) {
-                        Tag tag = new Tag();
-                        tag.setName(category.getDomain());
-                        tag.setSlugName(category.getNicename());
+                    if ("post_tag".equals(domain)) {
+                        Tag tag = RelationMapperUtils.convertFrom(category, Tag.class);
                         tags.add(tag);
-                    } else if (StringUtils.equals("category", domain)) {
-                        Category categoryModel = new Category();
-                        categoryModel.setName(domain);
-                        categoryModel.setSlugName(category.getNicename());
+                    } else if ("category".equals(domain)) {
+                        Category categoryModel = RelationMapperUtils.convertFrom(category, Category.class);
                         categoryModelList.add(categoryModel);
                     }
                 });
@@ -90,7 +79,6 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
             postVo.setTags(tags);
 
             // 设置评论
-            System.out.println(item);
             List<BaseComment> comments = getCommentsFromItem(item);
             postVo.setComments(comments);
 
@@ -108,21 +96,7 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
 
         List<Comment> comments = item.getComments();
         for (Comment comment : comments) {
-            BaseComment baseComment = new BaseComment();
-            baseComment.setAllowNotification(true);
-            baseComment.setAuthor(comment.getCommentAuthor());
-            baseComment.setAuthorUrl(comment.getCommentAuthorUrl());
-            baseComment.setContent(comment.getCommentContent());
-            baseComment.setEmail(comment.getCommentAuthorEmail());
-            if (StringUtils.isNotBlank(comment.getCommentAuthorEmail())) {
-                String md5DigestAsHex = DigestUtils.md5DigestAsHex(comment.getCommentAuthorEmail().getBytes());
-                baseComment.setGravatarMd5(md5DigestAsHex);
-            }
-            baseComment.setIpAddress(comment.getCommentAuthorIp());
-            baseComment.setParentId(comment.getCommentParent());
-            baseComment.setStatus(CommentStatus.PUBLISHED);
-            baseComment.setTopPriority(0);
-
+            BaseComment baseComment = RelationMapperUtils.convertFrom(comment, BaseComment.class);
             baseComments.add(baseComment);
         }
 
@@ -130,33 +104,18 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
     }
 
     private BasePost getBasePostFromItem(Item item) {
-        BasePost post = new BasePost();
-        post.setTitle(item.getTitle());
-        post.setPassword(item.getPostPassword());
-        post.setFormatContent(item.getContent());
-        post.setOriginalContent(MarkdownUtils.renderMarkdown(item.getContent()));
-        post.setLikes(0L);
-        post.setCreateFrom(PostCreateFrom.ADMIN);
-
+        BasePost post = RelationMapperUtils.convertFrom(item, BasePost.class);
         String postDate = item.getPostDate();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        if (postDate == null) {
-            post.setEditTime(new Date());
-        } else {
+        if (postDate != null) {
             LocalDateTime dateTime = LocalDateTime.parse(postDate, formatter);
             Date date = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
             post.setEditTime(date);
+            // 设置url为文章编辑时的时间毫秒数
+            post.setUrl(post.getEditTime() + "");
+        } else {
+            post.setUrl(System.currentTimeMillis() + "");
         }
-
-        post.setStatus(PostStatus.PUBLISHED);
-
-        // 设置url为文章编辑时的时间毫秒数
-        Date editTime = post.getEditTime();
-        post.setUrl(editTime.getTime() + "");
-
-        post.setVisits(0L);
-        post.setDeleted(false);
-        post.setTopPriority(0);
         return post;
     }
 }

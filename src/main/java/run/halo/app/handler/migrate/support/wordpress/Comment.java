@@ -2,6 +2,7 @@ package run.halo.app.handler.migrate.support.wordpress;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
+import run.halo.app.handler.migrate.utils.PropertyMappingTo;
 
 /**
  * <p>
@@ -18,28 +19,33 @@ public class Comment {
     private String commentId;
 
     @JSONField(name = "wp:comment_author")
-
+    @PropertyMappingTo("author")
     private String commentAuthor;
 
     @JSONField(name = "wp:comment_author_email")
+    @PropertyMappingTo("email")
     private String commentAuthorEmail;
 
     @JSONField(name = "wp:comment_author_url")
+    @PropertyMappingTo("authorUrl")
     private String commentAuthorUrl;
 
     @JSONField(name = "wp:comment_author_IP")
+    @PropertyMappingTo("ipAddress")
     private String commentAuthorIp;
 
     @JSONField(name = "wp:comment_date")
     private String commentDate;
 
     @JSONField(name = "wp:comment_content")
+    @PropertyMappingTo("content")
     private String commentContent;
 
     @JSONField(name = "wp:comment_approved")
     private String commentApproved;
 
     @JSONField(name = "wp:comment_parent")
+    @PropertyMappingTo("parentId")
     private Long commentParent;
 
     @JSONField(name = "wp:comment_user_id")

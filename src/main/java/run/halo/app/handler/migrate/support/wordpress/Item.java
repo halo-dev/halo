@@ -2,6 +2,7 @@ package run.halo.app.handler.migrate.support.wordpress;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
+import run.halo.app.handler.migrate.utils.PropertyMappingTo;
 import run.halo.app.model.entity.BasePost;
 
 import java.util.List;
@@ -27,8 +28,9 @@ public class Item {
     private String creator;
 
     private String description;
-    @JSONField(name = "content:encoded")
 
+    @JSONField(name = "content:encoded")
+    @PropertyMappingTo("formatContent")
     private String content;
 
     @JSONField(name = "wp:comment_status")
@@ -38,6 +40,7 @@ public class Item {
     private String status;
 
     @JSONField(name = "wp:post_password")
+    @PropertyMappingTo("password")
     private String postPassword;
 
     @JSONField(name = "wp:is_sticky")
