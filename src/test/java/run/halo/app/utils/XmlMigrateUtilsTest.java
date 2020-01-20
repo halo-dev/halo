@@ -36,7 +36,7 @@ public class XmlMigrateUtilsTest {
         Rss rss = json.getObject("rss", Rss.class);
 //        System.out.println("WordPress blog rss data:" + rss);
         Converter<Rss, List<PostVO>> converter = new WordPressConverter();
-        List<PostVO> postVoList = converter.converterFromDto(rss);
+        List<PostVO> postVoList = converter.convertFrom(rss);
         System.out.println(postVoList);
     }
 

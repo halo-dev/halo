@@ -25,8 +25,8 @@ import java.util.Objects;
 public class WordPressConverter implements Converter<Rss, List<PostVO>> {
 
     @Override
-    public List<PostVO> converterFromDto(Rss rss) {
-        return converterFromDto(rss, this::apply);
+    public List<PostVO> convertFrom(Rss rss) {
+        return convertFrom(rss, this::apply);
     }
 
     /**

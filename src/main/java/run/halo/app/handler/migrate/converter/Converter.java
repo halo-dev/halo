@@ -18,7 +18,7 @@ public interface Converter<SOURCE, TARGET> {
      * @param s 需要转换的源对象
      * @return 返回转换得到的结果对象
      */
-    TARGET converterFromDto(SOURCE s);
+    TARGET convertFrom(SOURCE s);
 
     /**
      * 从SOURCE转为TARGET
@@ -27,7 +27,7 @@ public interface Converter<SOURCE, TARGET> {
      * @param function 具体转换逻辑
      * @return 返回转换得到的TARGET对象
      */
-    default TARGET converterFromDto(SOURCE s, Function<SOURCE, TARGET> function) {
+    default TARGET convertFrom(SOURCE s, Function<SOURCE, TARGET> function) {
         return function.apply(s);
     }
 
@@ -39,7 +39,7 @@ public interface Converter<SOURCE, TARGET> {
      * @return 返回转换得到的TARGET集合结果
      */
     default List<TARGET> batchConverterFromDto(List<SOURCE> list, Function<SOURCE, TARGET> function) {
-        return list.stream().map(s -> converterFromDto(s, function)).collect(Collectors.toList());
+        return list.stream().map(s -> convertFrom(s, function)).collect(Collectors.toList());
     }
 }
 
