@@ -90,7 +90,7 @@ public class WordPressMigrateHandler implements MigrateHandler {
 
             // 转换
             Converter<Rss, List<PostVO>> converter = new WordPressConverter();
-            List<PostVO> postVoList = converter.converterFromDto(rss);
+            List<PostVO> postVoList = converter.converterFrom(rss);
 
             log.debug("Migrated posts: [{}]", postVoList);
         } catch (Exception e) {
