@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.enums.GlobalPathType;
+
 /**
  * Other properties.
  *
@@ -22,7 +24,12 @@ public enum OtherProperties implements PropertyEnum {
     /**
      * Statistics platform code,such as Google Analytics.
      */
-    STATISTICS_CODE("blog_statistics_code", String.class, "");
+    STATISTICS_CODE("blog_statistics_code", String.class, ""),
+
+    /**
+     * Global path type. relative or absolute
+     */
+    GLOBAL_PATH_TYPE("global_path_type", GlobalPathType.class, GlobalPathType.ABSOLUTE.name());
 
     private final String value;
 
