@@ -104,7 +104,7 @@ public class FreemarkerConfigAwareListener {
         ThemeProperty activatedTheme = themeService.getActivatedTheme();
 
         // Get global path type.
-        GlobalPathType pathType = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_PATH_TYPE, GlobalPathType.class, GlobalPathType.ABSOLUTE);
+        GlobalPathType pathType = optionService.getEnumByPropertyOrDefault(OtherProperties.GLOBAL_PATH_TYPE, GlobalPathType.class, GlobalPathType.ABSOLUTE);
 
         configuration.setSharedVariable("theme", activatedTheme);
         configuration.setSharedVariable("static", pathType.equals(GlobalPathType.ABSOLUTE) ? optionService.getBlogBaseUrl() : "" + "/" + activatedTheme.getFolderName());
