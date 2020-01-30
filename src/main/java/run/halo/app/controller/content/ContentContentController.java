@@ -59,7 +59,7 @@ public class ContentContentController {
         this.sheetService = sheetService;
     }
 
-    //    @GetMapping("{prefix}")
+    @GetMapping("{prefix}")
     public String content(@PathVariable("prefix") String prefix,
                           Model model) {
         String archivesPrefix = optionService.getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, PermalinkProperties.ARCHIVES_PREFIX.defaultValue());
@@ -89,7 +89,7 @@ public class ContentContentController {
         }
     }
 
-    //    @GetMapping("{prefix}/{url}")
+    @GetMapping("{prefix}/{url}")
     public String content(@PathVariable("prefix") String prefix,
                           @PathVariable("url") String url,
                           @RequestParam(value = "token", required = false) String token,
