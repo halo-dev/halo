@@ -12,6 +12,7 @@ spring:
       enabled: always
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:halo-test
 
     # H2 Database 配置
     #    driver-class-name: org.h2.Driver
@@ -36,9 +37,7 @@ spring:
       ddl-auto: create-drop
     show-sql: true
   flyway:
-    locations: classpath:/migration
-    baseline-on-migrate: true
-    baseline-version: 1
+    enabled: false
   servlet:
     multipart:
       max-file-size: 10MB
