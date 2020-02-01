@@ -11,11 +11,14 @@ import run.halo.app.handler.migrate.utils.PropertyMappingTo;
  * </p>
  *
  * @author guqing
+ * @author ryanwang
  * @date 2019-11-17 14:01
  */
 @Data
 public class Comment {
+
     @JSONField(name = "wp:comment_id")
+    @PropertyMappingTo("id")
     private String commentId;
 
     @JSONField(name = "wp:comment_author")

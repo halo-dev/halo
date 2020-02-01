@@ -11,21 +11,15 @@ import java.util.List;
  * <p> WordPress导出的xml中对于的item子节点的值将会被映射到该类的属性上,最终被解析为文章属性{@link BasePost} </p>
  *
  * @author guqing
+ * @author ryanwang
  * @date 2019-11-17 13:59
  */
 @Data
 public class Item {
+
     private String title;
 
-    private String link;
-
     private String pubDate;
-
-    @JSONField(name = "post_date")
-    private String postDate;
-
-    @JSONField(name = "dc:creator")
-    private String creator;
 
     private String description;
 
@@ -33,8 +27,19 @@ public class Item {
     @PropertyMappingTo("formatContent")
     private String content;
 
+    @JSONField(name = "excerpt:encoded")
+    @PropertyMappingTo("summary")
+    private String excerpt;
+
+    @JSONField(name = "wp:post_date")
+    private String postDate;
+
     @JSONField(name = "wp:comment_status")
     private String commentStatus;
+
+    @JSONField(name = "wp:post_name")
+    @PropertyMappingTo("url")
+    private String postName;
 
     @JSONField(name = "wp:status")
     private String status;
@@ -44,6 +49,7 @@ public class Item {
     private String postPassword;
 
     @JSONField(name = "wp:is_sticky")
+    @PropertyMappingTo("topPriority")
     private Integer isSticky;
 
     @JSONField(name = "wp:comment")
