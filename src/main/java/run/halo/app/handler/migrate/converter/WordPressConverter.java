@@ -1,5 +1,7 @@
 package run.halo.app.handler.migrate.converter;
 
+import cn.hutool.core.date.DateUtil;
+import org.apache.commons.lang3.StringUtils;
 import run.halo.app.handler.migrate.support.vo.PostVO;
 import run.halo.app.handler.migrate.support.wordpress.*;
 import run.halo.app.handler.migrate.utils.RelationMapperUtils;
@@ -7,19 +9,18 @@ import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.utils.MarkdownUtils;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * WordPress博客数据迁移转换器
+ * WordPress 博客数据迁移转换器
  *
  * @author guqing
+ * @author ryanwang
  * @date 2020-01-18 16:50
  */
 public class WordPressConverter implements Converter<Rss, List<PostVO>> {
@@ -46,6 +47,12 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
         return getBasePost(items);
     }
 
+    /**
+     * Gets post vo list from items.
+     *
+     * @param items wordpress items.
+     * @return a list of post vo.
+     */
     private List<PostVO> getBasePost(List<Item> items) {
         List<PostVO> posts = new ArrayList<>();
         if (items == null) {
@@ -88,6 +95,12 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
         return posts;
     }
 
+    /**
+     * Gets item's comments.
+     *
+     * @param item wordpress item.
+     * @return a list of baseComment.
+     */
     private List<BaseComment> getCommentsFromItem(Item item) {
         List<BaseComment> baseComments = new ArrayList<>();
         if (Objects.isNull(item) || Objects.isNull(item.getComments())) {
@@ -97,25 +110,30 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
         List<Comment> comments = item.getComments();
         for (Comment comment : comments) {
             BaseComment baseComment = RelationMapperUtils.convertFrom(comment, BaseComment.class);
+            Date commentDate = DateUtil.parseDateTime(comment.getCommentDate());
+            baseComment.setCreateTime(commentDate);
+            baseComment.setUpdateTime(commentDate);
             baseComments.add(baseComment);
         }
 
         return baseComments;
     }
 
+    /**
+     * Gets base post from item.
+     *
+     * @param item wordpress item.
+     * @return base post.
+     */
     private BasePost getBasePostFromItem(Item item) {
         BasePost post = RelationMapperUtils.convertFrom(item, BasePost.class);
-        String postDate = item.getPostDate();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        if (postDate != null) {
-            LocalDateTime dateTime = LocalDateTime.parse(postDate, formatter);
-            Date date = Date.from(dateTime.atZone(ZoneId.systemDefault()).toInstant());
-            post.setEditTime(date);
-            // 设置url为文章编辑时的时间毫秒数
-            post.setUrl(post.getEditTime() + "");
-        } else {
-            post.setUrl(System.currentTimeMillis() + "");
+        Date postDate = DateUtil.parseDateTime(item.getPostDate());
+        if (StringUtils.isNoneEmpty(post.getFormatContent())) {
+            post.setOriginalContent(MarkdownUtils.renderMarkdown(post.getFormatContent()));
         }
+        post.setCreateTime(postDate);
+        post.setUpdateTime(postDate);
+        post.setEditTime(postDate);
         return post;
     }
 }
