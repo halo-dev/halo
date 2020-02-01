@@ -12,7 +12,6 @@ import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
-import run.halo.app.model.enums.GlobalPathType;
 import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
@@ -102,11 +101,10 @@ public class FreemarkerConfigAwareListener {
         // Get current activated theme.
         ThemeProperty activatedTheme = themeService.getActivatedTheme();
 
-        // Get global path type.
-        GlobalPathType pathType = optionService.getEnumByPropertyOrDefault(OtherProperties.GLOBAL_PATH_TYPE, GlobalPathType.class, GlobalPathType.ABSOLUTE);
+        Boolean enabledAbsolutePath = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, true);
 
         configuration.setSharedVariable("theme", activatedTheme);
-        configuration.setSharedVariable("static", (pathType.equals(GlobalPathType.ABSOLUTE) ? optionService.getBlogBaseUrl() : "") + "/" + activatedTheme.getFolderName());
+        configuration.setSharedVariable("static", (enabledAbsolutePath ? optionService.getBlogBaseUrl() : "") + "/" + activatedTheme.getFolderName());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         log.debug("Loaded theme and settings");
     }

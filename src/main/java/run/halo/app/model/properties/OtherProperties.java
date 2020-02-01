@@ -1,7 +1,5 @@
 package run.halo.app.model.properties;
 
-import run.halo.app.model.enums.GlobalPathType;
-
 /**
  * Other properties.
  *
@@ -27,9 +25,9 @@ public enum OtherProperties implements PropertyEnum {
     STATISTICS_CODE("blog_statistics_code", String.class, ""),
 
     /**
-     * Global path type. relative or absolute
+     * Global absolute path enabled.
      */
-    GLOBAL_PATH_TYPE("global_path_type", GlobalPathType.class, GlobalPathType.ABSOLUTE.name());
+    GLOBAL_ABSOLUTE_PATH_ENABLED("global_absolute_path_enabled", Boolean.class, "true");
 
     private final String value;
 
