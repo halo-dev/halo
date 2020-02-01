@@ -62,6 +62,7 @@ ext {
     levelDbVersion = '0.12'
     jsonVersion = '20190722'
     fastJsonVersion = '1.2.56'
+    templateInheritance = "0.4.RELEASE"
 }
 
 dependencies {
@@ -70,6 +71,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-undertow'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation "kr.pe.kwonnam.freemarker:freemarker-template-inheritance:$templateInheritance"
 
     implementation "io.github.biezhi:oh-my-email:$ohMyEmailVersion"
     implementation "cn.hutool:hutool-core:$hutoolVersion"
