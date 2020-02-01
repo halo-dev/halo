@@ -104,7 +104,7 @@ public class FreemarkerConfigAwareListener {
         Boolean enabledAbsolutePath = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, true);
 
         configuration.setSharedVariable("theme", activatedTheme);
-        configuration.setSharedVariable("static", (enabledAbsolutePath ? optionService.getBlogBaseUrl() : "") + "/" + activatedTheme.getFolderName());
+        configuration.setSharedVariable("static", (enabledAbsolutePath ? optionService.getBlogBaseUrl() : "") + "/themesv/" + activatedTheme.getFolderName());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         log.debug("Loaded theme and settings");
     }
