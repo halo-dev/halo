@@ -122,7 +122,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 
     @Bean
     public Map<String, TemplateModel> freemarkerLayoutDirectives() {
-        Map<String, TemplateModel> freemarkerLayoutDirectives = new HashMap<>(3);
+        Map<String, TemplateModel> freemarkerLayoutDirectives = new HashMap<>(5);
         freemarkerLayoutDirectives.put("extends", new ExtendsDirective());
         freemarkerLayoutDirectives.put("block", new BlockDirective());
         freemarkerLayoutDirectives.put("put", new PutDirective());
@@ -159,7 +159,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         configurer.setConfiguration(configuration);
 
         // Set layout variable
-        Map<String, Object> freemarkerVariables = new HashMap<>(1);
+        Map<String, Object> freemarkerVariables = new HashMap<>(5);
 
         freemarkerVariables.put("layout", freemarkerLayoutDirectives());
 
