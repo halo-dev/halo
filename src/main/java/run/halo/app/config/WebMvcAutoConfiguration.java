@@ -43,7 +43,7 @@ import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELATIVE_PATH;
 import static run.halo.app.utils.HaloUtils.*;
 
 /**
- * Mvc configuration.
+ * Spring mvc configuration.
  *
  * @author ryanwang
  * @date 2018-01-02
@@ -90,11 +90,16 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String workDir = FILE_PROTOCOL + ensureSuffix(haloProperties.getWorkDir(), FILE_SEPARATOR);
+
+        // register /** resource handler.
         registry.addResourceHandler("/**")
-                .addResourceLocations(workDir + "templates/themes/")
                 .addResourceLocations(workDir + "templates/admin/")
                 .addResourceLocations("classpath:/admin/")
                 .addResourceLocations(workDir + "static/");
+
+        // register /themes/** resource handler.
+        registry.addResourceHandler("/themes/**")
+                .addResourceLocations(workDir + "templates/themes/");
 
         String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
         String adminPathPattern = ensureSuffix(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
@@ -159,7 +164,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         configurer.setConfiguration(configuration);
 
         // Set layout variable
-        Map<String, Object> freemarkerVariables = new HashMap<>(5);
+        Map<String, Object> freemarkerVariables = new HashMap<>(3);
 
         freemarkerVariables.put("layout", freemarkerLayoutDirectives());
 
