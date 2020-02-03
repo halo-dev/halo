@@ -36,10 +36,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
-import run.halo.app.utils.FileUtils;
-import run.halo.app.utils.FilenameUtils;
-import run.halo.app.utils.GitUtils;
-import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -483,7 +480,7 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         // Not support current halo version.
-        if (StringUtils.isNotEmpty(tmpThemeProperty.getRequire()) && !HaloUtils.compareVersion(HaloConst.HALO_VERSION, tmpThemeProperty.getRequire())) {
+        if (StringUtils.isNotEmpty(tmpThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, tmpThemeProperty.getRequire())) {
             throw new ThemeNotSupportException("当前主题仅支持 Halo " + tmpThemeProperty.getRequire() + " 以上的版本");
         }
 
@@ -593,7 +590,7 @@ public class ThemeServiceImpl implements ThemeService {
             }
 
             // Not support current halo version.
-            if (StringUtils.isNotEmpty(prepareThemeProperty.getRequire()) && !HaloUtils.compareVersion(HaloConst.HALO_VERSION, prepareThemeProperty.getRequire())) {
+            if (StringUtils.isNotEmpty(prepareThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, prepareThemeProperty.getRequire())) {
                 throw new ThemeNotSupportException("新版本主题仅支持 Halo " + prepareThemeProperty.getRequire() + " 以上的版本");
             }
 
@@ -679,7 +676,7 @@ public class ThemeServiceImpl implements ThemeService {
             ThemeProperty updatedThemeProperty = getProperty(Paths.get(themeProperty.getThemePath()));
 
             // Not support current halo version.
-            if (StringUtils.isNotEmpty(updatedThemeProperty.getRequire()) && !HaloUtils.compareVersion(HaloConst.HALO_VERSION, updatedThemeProperty.getRequire())) {
+            if (StringUtils.isNotEmpty(updatedThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, updatedThemeProperty.getRequire())) {
                 // reset theme version
                 git.reset()
                         .setMode(ResetCommand.ResetType.HARD)

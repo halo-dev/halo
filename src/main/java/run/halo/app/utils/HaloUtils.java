@@ -1,6 +1,5 @@
 package run.halo.app.utils;
 
-import com.sun.xml.internal.ws.util.VersionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -217,17 +216,6 @@ public class HaloUtils {
     @NonNull
     public static String randomUUIDWithoutDash() {
         return StringUtils.remove(UUID.randomUUID().toString(), '-');
-    }
-
-    /**
-     * Compare version.
-     *
-     * @param current current version.
-     * @param require require version.
-     * @return true or false.
-     */
-    public static boolean compareVersion(String current, String require) {
-        return VersionUtil.compare(current, require) >= 0;
     }
 
     /**
