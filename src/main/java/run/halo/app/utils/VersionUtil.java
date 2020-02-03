@@ -76,6 +76,6 @@ public class VersionUtil {
      * @return true or false.
      */
     public static boolean compareVersion(String current, String require) {
-        return com.sun.xml.internal.ws.util.VersionUtil.compare(current, require) >= 0;
+        return compare(current, require) >= 0;
     }
 }

@@ -2,7 +2,6 @@ package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.stream.IntStream;
@@ -143,20 +142,5 @@ public class HaloUtilsTest {
 
         url = HaloUtils.compositeHttpUrl("https://halo.run/", "/path1/", "/path2/");
         assertEquals("https://halo.run/path1/path2", url);
-    }
-
-    @Test
-    public void compareVersion() {
-        Assert.assertTrue(HaloUtils.compareVersion("1.2.0","1.1.1"));
-
-        Assert.assertTrue(HaloUtils.compareVersion("1.2.1","1.2.0"));
-
-        Assert.assertTrue(HaloUtils.compareVersion("1.2.0","1.1.1.0"));
-
-        Assert.assertTrue(HaloUtils.compareVersion("1.2.0","0.4.4"));
-
-        Assert.assertFalse(HaloUtils.compareVersion("1.1.1","1.2.0"));
-
-        Assert.assertFalse(HaloUtils.compareVersion("0.0.1","1.2.0"));
     }
 }
