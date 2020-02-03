@@ -15,7 +15,8 @@ import static org.junit.Assert.assertThat;
  * Halo utilities test.
  *
  * @author johnniang
- * @date 3/29/19
+ * @author ryanwang
+ * @date 2019-03-29
  */
 @Slf4j
 public class HaloUtilsTest {
@@ -142,5 +143,20 @@ public class HaloUtilsTest {
 
         url = HaloUtils.compositeHttpUrl("https://halo.run/", "/path1/", "/path2/");
         assertEquals("https://halo.run/path1/path2", url);
+    }
+
+    @Test
+    public void compareVersion() {
+        Assert.assertTrue(HaloUtils.compareVersion("1.2.0","1.1.1"));
+
+        Assert.assertTrue(HaloUtils.compareVersion("1.2.1","1.2.0"));
+
+        Assert.assertTrue(HaloUtils.compareVersion("1.2.0","1.1.1.0"));
+
+        Assert.assertTrue(HaloUtils.compareVersion("1.2.0","0.4.4"));
+
+        Assert.assertFalse(HaloUtils.compareVersion("1.1.1","1.2.0"));
+
+        Assert.assertFalse(HaloUtils.compareVersion("0.0.1","1.2.0"));
     }
 }

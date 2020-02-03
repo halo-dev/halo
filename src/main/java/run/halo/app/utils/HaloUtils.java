@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import com.sun.xml.internal.ws.util.VersionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -17,7 +18,7 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
  *
  * @author ryanwang
  * @author johnniang
- * @date 2017/12/22
+ * @date 2017-12-22
  */
 @Slf4j
 public class HaloUtils {
@@ -219,6 +220,17 @@ public class HaloUtils {
     }
 
     /**
+     * Compare version.
+     *
+     * @param current current version.
+     * @param require require version.
+     * @return true or false.
+     */
+    public static boolean compareVersion(String current, String require) {
+        return VersionUtil.compare(current, require) >= 0;
+    }
+
+    /**
      * Initialize url if blank.
      *
      * @param url url can be blank
@@ -230,22 +242,6 @@ public class HaloUtils {
             return url;
         }
         return String.valueOf(System.currentTimeMillis());
-    }
-
-    /**
-     * Normalize url.
-     *
-     * @param url url must not be blank
-     * @return normalized url
-     */
-    @NonNull
-    public static String normalizeUrl(@NonNull String url) {
-        Assert.hasText(url, "Url must not be blank");
-
-        StringUtils.removeEnd(url, "html");
-        StringUtils.removeEnd(url, "htm");
-
-        return SlugUtils.slugify(url);
     }
 
     /**
