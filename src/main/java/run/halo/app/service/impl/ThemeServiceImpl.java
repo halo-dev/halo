@@ -541,7 +541,7 @@ public class ThemeServiceImpl implements ThemeService {
             pullFromGit(updatingTheme);
         } catch (Exception e) {
             if (e instanceof ThemeNotSupportException) {
-                throw new ThemeNotSupportException(e.getMessage());
+                throw (ThemeNotSupportException) e;
             }
             throw new ThemeUpdateException("主题更新失败！您与主题作者可能同时更改了同一个文件，您也可以尝试删除主题并重新拉取最新的主题", e).setErrorData(themeId);
         }
