@@ -68,10 +68,4 @@ public class HaloProperties {
      */
     private String cache = "memory";
 
-
-    public HaloProperties() throws IOException {
-        // Create work directory if not exist
-        Files.createDirectories(Paths.get(workDir));
-        Files.createDirectories(Paths.get(backupDir));
-    }
 }
