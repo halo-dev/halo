@@ -92,7 +92,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
 
         tagDTO.setFullPath(fullPath.toString());
 
-        return new TagDTO().convertFrom(tag);
+        return tagDTO;
     }
 
     @Override

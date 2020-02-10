@@ -214,6 +214,15 @@ public interface PostService extends BasePostService<Post> {
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
 
     /**
+     * Converts to a list of post list vo.
+     *
+     * @param posts post must not be null
+     * @return a list of post list vo
+     */
+    @NonNull
+    List<PostListVO> convertToListVo(@NonNull List<Post> posts);
+
+    /**
      * Converts to a page of detail vo.
      *
      * @param postPage post page must not be null
