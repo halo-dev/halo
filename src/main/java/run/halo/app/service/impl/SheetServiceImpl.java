@@ -50,18 +50,21 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     private final ThemeService themeService;
 
+    private final OptionService optionService;
+
     public SheetServiceImpl(SheetRepository sheetRepository,
                             ApplicationEventPublisher eventPublisher,
                             SheetCommentService sheetCommentService,
-                            OptionService optionService,
                             SheetMetaService sheetMetaService,
-                            ThemeService themeService) {
+                            ThemeService themeService,
+                            OptionService optionService) {
         super(sheetRepository, optionService);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;
         this.sheetMetaService = sheetMetaService;
         this.themeService = themeService;
+        this.optionService = optionService;
     }
 
     @Override
@@ -129,9 +132,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     public Sheet getByUrl(String url) {
         Assert.hasText(url, "Url must not be blank");
 
-        Sheet sheet = sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
-
-        return sheet;
+        return sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
     }
 
     @Override
@@ -141,9 +142,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         Optional<Sheet> postOptional = sheetRepository.getByUrlAndStatus(url, status);
 
-        Sheet sheet = postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
-
-        return sheet;
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
     }
 
     @Override
@@ -254,6 +253,21 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         return sheetPage.map(sheet -> {
             SheetListVO sheetListVO = new SheetListVO().convertFrom(sheet);
             sheetListVO.setCommentCount(sheetCommentCountMap.getOrDefault(sheet.getId(), 0L));
+
+            StringBuilder fullPath = new StringBuilder();
+
+            if (optionService.isEnabledAbsolutePath()) {
+                fullPath.append(optionService.getBlogBaseUrl());
+            }
+
+            fullPath.append("/")
+                    .append(optionService.getSheetPrefix())
+                    .append("/")
+                    .append(sheet.getUrl())
+                    .append(optionService.getPathSuffix());
+
+            sheetListVO.setFullPath(fullPath.toString());
+
             return sheetListVO;
         });
     }
@@ -289,6 +303,21 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
 
         sheetDetailVO.setCommentCount(sheetCommentService.countByPostId(sheet.getId()));
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/")
+                .append(optionService.getSheetPrefix())
+                .append("/")
+                .append(sheet.getUrl())
+                .append(optionService.getPathSuffix());
+
+        sheetDetailVO.setFullPath(fullPath.toString());
+
         return sheetDetailVO;
     }
 
