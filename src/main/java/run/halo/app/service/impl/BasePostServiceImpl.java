@@ -29,10 +29,7 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -95,6 +92,16 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Optional<POST> postOptional = basePostRepository.getByUrlAndStatus(url, status);
 
         return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+    }
+
+    @Override
+    public POST getBy(PostStatus status, Integer id) {
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(id, "Post id must not be null");
+
+        Optional<POST> postOptional = basePostRepository.getByIdAndStatus(id, status);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(id));
     }
 
     @Override
@@ -393,6 +400,26 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         return ids.stream().map(id -> {
             return updateStatus(status, id);
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BasePostDetailDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<POST> posts = listAll();
+        List<POST> replaced = new ArrayList<>();
+        posts.forEach(post -> {
+            if (StringUtils.isNotEmpty(post.getThumbnail())) {
+                post.setThumbnail(post.getThumbnail().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(post.getOriginalContent())) {
+                post.setOriginalContent(post.getOriginalContent().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(post.getFormatContent())) {
+                post.setFormatContent(post.getFormatContent().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(post);
+        });
+        List<POST> updated = updateInBatch(replaced);
+        return updated.stream().map(this::convertToDetail).collect(Collectors.toList());
     }
 
     @Override

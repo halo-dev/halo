@@ -14,6 +14,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.RestTemplate;
 import run.halo.app.cache.InMemoryCacheStore;
+import run.halo.app.cache.LevelCacheStore;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.filter.CorsFilter;
@@ -63,7 +64,22 @@ public class HaloConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public StringCacheStore stringCacheStore() {
-        return new InMemoryCacheStore();
+        StringCacheStore stringCacheStore;
+        switch (haloProperties.getCache()) {
+            case "level":
+                stringCacheStore = new LevelCacheStore();
+                break;
+
+            case "memory":
+            default:
+                //memory or default
+                stringCacheStore = new InMemoryCacheStore();
+                break;
+
+        }
+        log.info("halo cache store load impl : [{}]", stringCacheStore.getClass());
+        return stringCacheStore;
+
     }
 
     /**

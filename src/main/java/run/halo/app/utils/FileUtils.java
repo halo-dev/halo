@@ -211,8 +211,11 @@ public class FileUtils {
         try (Stream<Path> pathStream = Files.list(unzippedPath)) {
             List<Path> childrenPath = pathStream.collect(Collectors.toList());
 
-            if (childrenPath.size() == 1 && Files.isDirectory(childrenPath.get(0))) {
-                return childrenPath.get(0);
+            Path realPath = childrenPath.get(0);
+            if (childrenPath.size() == 1 && Files.isDirectory(realPath)) {
+                // Check directory traversal
+                checkDirectoryTraversal(unzippedPath, realPath);
+                return realPath;
             }
             return unzippedPath;
         }

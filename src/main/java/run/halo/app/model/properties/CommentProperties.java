@@ -25,7 +25,12 @@ public enum CommentProperties implements PropertyEnum {
 
     CONTENT_PLACEHOLDER("comment_content_placeholder", String.class, ""),
 
-    INTERNAL_PLUGIN_JS("comment_internal_plugin_js", String.class, "//cdn.jsdelivr.net/gh/halo-dev/halo-comment@latest/dist/halo-comment.min.js");
+    INTERNAL_PLUGIN_JS("comment_internal_plugin_js", String.class, "//cdn.jsdelivr.net/gh/halo-dev/halo-comment@latest/dist/halo-comment.min.js"),
+
+    COMMENT_BAN_TIME("comment_ban_time", Integer.class, "10"),
+
+    COMMENT_RANGE("comment_range", Integer.class, "30");
+
 
     private final String value;
 

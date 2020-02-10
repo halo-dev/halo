@@ -21,10 +21,10 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Category portal controller.
+ * Content category controller.
  *
  * @author ryanwang
- * @date 6/9/19
+ * @date 2019-06-09
  */
 @RestController("ApiContentCategoryController")
 @RequestMapping("/api/content/categories")

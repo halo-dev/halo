@@ -19,6 +19,7 @@ import run.halo.app.utils.ImageUtils;
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -142,14 +143,14 @@ public class LocalFileHandler implements FileHandler {
             // Check file type
             if (FileHandler.isImageType(uploadResult.getMediaType()) && !isSvg) {
                 lock.lock();
-                try {
+                try (InputStream uploadFileInputStream = new FileInputStream(uploadPath.toFile())) {
                     // Upload a thumbnail
                     String thumbnailBasename = basename + THUMBNAIL_SUFFIX;
                     String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
                     Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
 
                     // Read as image
-                    BufferedImage originalImage = ImageUtils.getImageFromFile(new FileInputStream(uploadPath.toFile()), extension);
+                    BufferedImage originalImage = ImageUtils.getImageFromFile(uploadFileInputStream, extension);
                     // Set width and height
                     uploadResult.setWidth(originalImage.getWidth());
                     uploadResult.setHeight(originalImage.getHeight());
@@ -232,7 +233,7 @@ public class LocalFileHandler implements FileHandler {
             log.debug("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath.toString());
             result = true;
         } catch (Throwable t) {
-            log.warn("Failed to generate thumbnail: [{}]", thumbPath);
+            log.warn("Failed to generate thumbnail: " + thumbPath, t);
         }
         return result;
     }
