@@ -1,5 +1,6 @@
 package run.halo.app.controller.content;
 
+import cn.hutool.core.util.URLUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,7 +69,7 @@ public class MainController {
     public void avatar(HttpServletResponse response) throws IOException {
         User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         if (StringUtils.isNotEmpty(user.getAvatar())) {
-            response.sendRedirect(user.getAvatar());
+            response.sendRedirect(URLUtil.normalize(user.getAvatar()));
         }
     }
 
@@ -76,7 +77,7 @@ public class MainController {
     public void logo(HttpServletResponse response) throws IOException {
         String blogLogo = optionService.getByProperty(BlogProperties.BLOG_LOGO).orElse("").toString();
         if (StringUtils.isNotEmpty(blogLogo)) {
-            response.sendRedirect(blogLogo);
+            response.sendRedirect(URLUtil.normalize(blogLogo));
         }
     }
 
@@ -84,7 +85,7 @@ public class MainController {
     public void favicon(HttpServletResponse response) throws IOException {
         String favicon = optionService.getByProperty(BlogProperties.BLOG_FAVICON).orElse("").toString();
         if (StringUtils.isNotEmpty(favicon)) {
-            response.sendRedirect(favicon);
+            response.sendRedirect(URLUtil.normalize(favicon));
         }
     }
 }
