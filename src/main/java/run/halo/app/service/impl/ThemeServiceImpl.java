@@ -597,6 +597,8 @@ public class ThemeServiceImpl implements ThemeService {
             // Coping new theme files to old theme folder.
             FileUtils.copyFolder(preparePath, Paths.get(updatingTheme.getThemePath()));
 
+            eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
+
             // Gets theme property again.
             return getProperty(Paths.get(updatingTheme.getThemePath()));
         } catch (IOException e) {
