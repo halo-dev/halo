@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.2.1.RELEASE'
+    id 'org.springframework.boot' version '2.2.2.RELEASE'
     id "io.freefair.lombok" version "3.6.6"
 //    id 'war'
     id 'java'
@@ -59,6 +59,10 @@ ext {
     image4jVersion = '0.7zensight1'
     flywayVersion = '6.1.0'
     h2Version = '1.4.196'
+    levelDbVersion = '0.12'
+    jsonVersion = '20190722'
+    fastJsonVersion = '1.2.56'
+    templateInheritance = "0.4.RELEASE"
 }
 
 dependencies {
@@ -67,6 +71,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-undertow'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation "kr.pe.kwonnam.freemarker:freemarker-template-inheritance:$templateInheritance"
 
     implementation "io.github.biezhi:oh-my-email:$ohMyEmailVersion"
     implementation "cn.hutool:hutool-core:$hutoolVersion"
@@ -103,6 +108,10 @@ dependencies {
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
 
+    implementation "org.json:json:$jsonVersion"
+    implementation "com.alibaba:fastjson:$fastJsonVersion"
+    
+    implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly 'mysql:mysql-connector-java'
 

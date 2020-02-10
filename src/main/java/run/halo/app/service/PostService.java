@@ -2,18 +2,16 @@ package run.halo.app.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
-import run.halo.app.model.vo.ArchiveMonthVO;
-import run.halo.app.model.vo.ArchiveYearVO;
-import run.halo.app.model.vo.PostDetailVO;
-import run.halo.app.model.vo.PostListVO;
+import run.halo.app.model.vo.*;
 import run.halo.app.service.base.BasePostService;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -97,6 +95,54 @@ public interface PostService extends BasePostService<Post> {
     Post getBy(@NonNull PostStatus status, @NonNull String url);
 
     /**
+     * Gets post by post year and month and url.
+     *
+     * @param year  post create year.
+     * @param month post create month.
+     * @param url   post url.
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String url);
+
+    /**
+     * Gets post by post year and month and url.
+     *
+     * @param year   post create year.
+     * @param month  post create month.
+     * @param url    post url.
+     * @param status post status.
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String url, @NonNull PostStatus status);
+
+    /**
+     * Gets post by post year and month and url.
+     *
+     * @param year  post create year.
+     * @param month post create month.
+     * @param day   post create day.
+     * @param url   post url.
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String url);
+
+    /**
+     * Gets post by post year and month and url.
+     *
+     * @param year   post create year.
+     * @param month  post create month.
+     * @param day    post create day.
+     * @param url    post url.
+     * @param status post status.
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String url, @NonNull PostStatus status);
+
+    /**
      * Removes posts in batch.
      *
      * @param ids ids must not be null.
@@ -168,14 +214,6 @@ public interface PostService extends BasePostService<Post> {
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
 
     /**
-     * Converts to a page of post detail dto.
-     *
-     * @param postPage post page must not be null
-     * @return a page of post detail dto
-     */
-    Page<BasePostDetailDTO> convertToDetailDto(@NonNull Page<Post> postPage);
-
-    /**
      * Converts to a page of detail vo.
      *
      * @param postPage post page must not be null
@@ -189,4 +227,23 @@ public interface PostService extends BasePostService<Post> {
      * @param postId postId must not be null
      */
     void publishVisitEvent(@NonNull Integer postId);
+
+    /**
+     * Gets pre && next post.
+     *
+     * @param currentPost post must not be null
+     * @return AdjacentPostVO. it contains prePost and nextPost.
+     * AdjacentPostVO will not be null. But prePost and nextPost may be null.
+     */
+    @NotNull
+    AdjacentPostVO getAdjacentPosts(Post currentPost);
+
+    /**
+     * Get Post Pageable default sort
+     *
+     * @return
+     * @Desc contains three parts. First, Top Priority; Second, From Custom index sort; Third, basic id sort
+     */
+    @NotNull
+    Sort getPostDefaultSort();
 }

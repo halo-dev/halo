@@ -2,7 +2,6 @@ package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.stream.IntStream;
@@ -15,7 +14,8 @@ import static org.junit.Assert.assertThat;
  * Halo utilities test.
  *
  * @author johnniang
- * @date 3/29/19
+ * @author ryanwang
+ * @date 2019-03-29
  */
 @Slf4j
 public class HaloUtilsTest {

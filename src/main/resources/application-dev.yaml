@@ -3,7 +3,6 @@ server:
   forward-headers-strategy: native
   compression:
     enabled: false
-    mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -13,13 +12,13 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
-    # H2 Database 配置
+    # H2 database configuration.
     driver-class-name: org.h2.Driver
     url: jdbc:h2:file:~/halo-dev/db/halo
     username: admin
     password: 123456
 
-    # MySQL 配置
+    # MySQL database configuration.
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://127.0.0.1:3306/halo_dev?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
 #    username: root
@@ -64,3 +63,4 @@ halo:
   production-env: false
   auth-enabled: true
   workDir: ${user.home}/halo-dev/
+  cache: level

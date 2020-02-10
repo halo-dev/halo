@@ -22,11 +22,11 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Portal tag controller.
+ * Content tag controller.
  *
  * @author johnniang
  * @author ryanwang
- * @date 4/2/19
+ * @date 2019-04-02
  */
 @RestController("ApiContentTagController")
 @RequestMapping("/api/content/tags")

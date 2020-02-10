@@ -304,4 +304,13 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     <T extends BaseCommentDTO> Page<T> filterIpAddress(@NonNull Page<T> commentPage);
 
+    /**
+     * Replace comment url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced comments.
+     */
+    List<BaseCommentDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
+
 }

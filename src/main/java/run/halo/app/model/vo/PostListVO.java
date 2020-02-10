@@ -14,6 +14,7 @@ import java.util.List;
  *
  * @author johnniang
  * @author guqing
+ * @author ryanwang
  * @date 2019-03-19
  */
 @EqualsAndHashCode(callSuper = true)
