@@ -10,6 +10,7 @@ import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.repository.TagRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.TagService;
 import run.halo.app.service.base.AbstractCrudService;
 
@@ -30,9 +31,13 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
 
     private final TagRepository tagRepository;
 
-    public TagServiceImpl(TagRepository tagRepository) {
+    private final OptionService optionService;
+
+    public TagServiceImpl(TagRepository tagRepository,
+                          OptionService optionService) {
         super(tagRepository);
         this.tagRepository = tagRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -70,6 +75,22 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     @Override
     public TagDTO convertTo(Tag tag) {
         Assert.notNull(tag, "Tag must not be null");
+
+        TagDTO tagDTO = new TagDTO().convertFrom(tag);
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/")
+                .append(optionService.getTagsPrefix())
+                .append("/")
+                .append(tag.getSlugName())
+                .append(optionService.getPathSuffix());
+
+        tagDTO.setFullPath(fullPath.toString());
 
         return new TagDTO().convertFrom(tag);
     }

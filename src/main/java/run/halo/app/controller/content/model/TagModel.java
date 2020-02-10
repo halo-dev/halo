@@ -59,7 +59,7 @@ public class TagModel {
         model.addAttribute("is_tag", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
-        model.addAttribute("tag", tag);
+        model.addAttribute("tag", tagService.convertTo(tag));
         return themeService.render("tag");
     }
 }

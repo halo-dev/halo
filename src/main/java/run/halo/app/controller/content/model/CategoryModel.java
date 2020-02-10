@@ -59,7 +59,7 @@ public class CategoryModel {
         model.addAttribute("is_category", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
-        model.addAttribute("category", category);
+        model.addAttribute("category", categoryService.convertTo(category));
         return themeService.render("category");
     }
 }

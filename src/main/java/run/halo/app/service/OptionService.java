@@ -26,6 +26,7 @@ import java.util.Optional;
  * Option service interface.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-03-14
  */
 public interface OptionService extends CrudService<Option, Integer> {
@@ -345,6 +346,48 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return PostPermalinkType
      */
     PostPermalinkType getPostPermalinkType();
+
+    /**
+     * Get sheet custom prefix.
+     *
+     * @return sheet prefix.
+     */
+    String getSheetPrefix();
+
+    /**
+     * Get archives custom prefix.
+     *
+     * @return archives prefix.
+     */
+    String getArchivesPrefix();
+
+    /**
+     * Get categories custom prefix.
+     *
+     * @return categories prefix.
+     */
+    String getCategoriesPrefix();
+
+    /**
+     * Get tags custom prefix.
+     *
+     * @return tags prefix.
+     */
+    String getTagsPrefix();
+
+    /**
+     * Get custom path suffix.
+     *
+     * @return path suffix.
+     */
+    String getPathSuffix();
+
+    /**
+     * Is enabled absolute path.
+     *
+     * @return true or false.
+     */
+    Boolean isEnabledAbsolutePath();
 
     /**
      * Replace option url in batch.
