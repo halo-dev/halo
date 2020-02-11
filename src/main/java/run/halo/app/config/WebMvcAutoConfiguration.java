@@ -236,8 +236,7 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
 
         private void initBlackPatterns() {
             String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
-            String adminPathPattern = ensureBoth(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
-
+            String adminPathPattern = ensureBoth(haloProperties.getAdminPath(), URL_SEPARATOR) + "?*/**";
 
             blackPatterns.add("/themes/**");
             blackPatterns.add("/js/**");
