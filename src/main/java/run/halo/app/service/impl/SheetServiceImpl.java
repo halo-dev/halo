@@ -198,21 +198,21 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         InternalSheetDTO linkSheet = new InternalSheetDTO();
         linkSheet.setId(1);
         linkSheet.setTitle("友情链接");
-        linkSheet.setUrl("/links");
+        linkSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getLinksPrefix());
         linkSheet.setStatus(themeService.templateExists("links.ftl"));
 
         // photos sheet
         InternalSheetDTO photoSheet = new InternalSheetDTO();
         photoSheet.setId(2);
         photoSheet.setTitle("图库页面");
-        photoSheet.setUrl("/photos");
+        photoSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getPhotosPrefix());
         photoSheet.setStatus(themeService.templateExists("photos.ftl"));
 
         // journals sheet
         InternalSheetDTO journalSheet = new InternalSheetDTO();
         journalSheet.setId(3);
         journalSheet.setTitle("日志页面");
-        journalSheet.setUrl("/journals");
+        journalSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getJournalsPrefix());
         journalSheet.setStatus(themeService.templateExists("journals.ftl"));
 
         internalSheetDTOS.add(linkSheet);

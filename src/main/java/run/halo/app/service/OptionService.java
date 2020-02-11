@@ -355,6 +355,27 @@ public interface OptionService extends CrudService<Option, Integer> {
     String getSheetPrefix();
 
     /**
+     * Get links page custom prefix.
+     *
+     * @return links page prefix.
+     */
+    String getLinksPrefix();
+
+    /**
+     * Get photos page custom prefix.
+     *
+     * @return photos page prefix.
+     */
+    String getPhotosPrefix();
+
+    /**
+     * Get journals page custom prefix.
+     *
+     * @return journals page prefix.
+     */
+    String getJournalsPrefix();
+
+    /**
      * Get archives custom prefix.
      *
      * @return archives prefix.
