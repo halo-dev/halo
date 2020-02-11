@@ -9,11 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.entity.SheetMeta;
@@ -27,6 +29,7 @@ import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Sheet service implementation.
@@ -283,6 +286,39 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         List<SheetMeta> sheetMetas = sheetMetaService.listBy(sheet.getId());
         // Convert to detail vo
         return convertTo(sheet, sheetMetas);
+    }
+
+    @Override
+    public BasePostMinimalDTO convertToMinimal(Sheet sheet) {
+        Assert.notNull(sheet, "Sheet must not be null");
+        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(sheet);
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/")
+                .append(optionService.getSheetPrefix())
+                .append("/")
+                .append(sheet.getUrl())
+                .append(optionService.getPathSuffix());
+
+        basePostMinimalDTO.setFullPath(fullPath.toString());
+
+        return basePostMinimalDTO;
+    }
+
+    @Override
+    public List<BasePostMinimalDTO> convertToMinimal(List<Sheet> sheets) {
+        if (CollectionUtils.isEmpty(sheets)) {
+            return Collections.emptyList();
+        }
+
+        return sheets.stream()
+                .map(this::convertToMinimal)
+                .collect(Collectors.toList());
     }
 
     @NonNull

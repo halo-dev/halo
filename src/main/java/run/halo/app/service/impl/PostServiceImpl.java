@@ -21,6 +21,7 @@ import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseMetaDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostPermalinkType;
@@ -30,6 +31,7 @@ import run.halo.app.model.properties.PermalinkProperties;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.*;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.repository.base.BasePostRepository;
 import run.halo.app.service.*;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
@@ -76,7 +78,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final OptionService optionService;
 
-    public PostServiceImpl(PostRepository postRepository,
+    public PostServiceImpl(BasePostRepository<Post> basePostRepository,
+                           OptionService optionService,
+                           PostRepository postRepository,
                            TagService tagService,
                            CategoryService categoryService,
                            PostTagService postTagService,
@@ -84,8 +88,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                            PostCommentService postCommentService,
                            ApplicationEventPublisher eventPublisher,
                            PostMetaService postMetaService,
-                           OptionService optionService) {
-        super(postRepository, optionService);
+                           OptionService optionService1) {
+        super(basePostRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;
@@ -94,7 +98,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         this.postCommentService = postCommentService;
         this.eventPublisher = eventPublisher;
         this.postMetaService = postMetaService;
-        this.optionService = optionService;
+        this.optionService = optionService1;
     }
 
     @Override
@@ -685,6 +689,67 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public Page<PostDetailVO> convertToDetailVo(Page<Post> postPage) {
         Assert.notNull(postPage, "Post page must not be null");
         return postPage.map(this::convertToDetailVo);
+    }
+
+    @Override
+    public BasePostMinimalDTO convertToMinimal(Post post) {
+        Assert.notNull(post, "Post must not be null");
+        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(post);
+
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
+
+        String pathSuffix = optionService.getPathSuffix();
+
+        String archivesPrefix = optionService.getArchivesPrefix();
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/");
+
+        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+            fullPath.append(archivesPrefix)
+                    .append("/")
+                    .append(post.getUrl())
+                    .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID)) {
+            fullPath.append("?p=")
+                    .append(post.getId());
+        } else if (permalinkType.equals(PostPermalinkType.DATE)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                    .append("/")
+                    .append(DateUtil.month(post.getCreateTime()) + 1)
+                    .append("/")
+                    .append(post.getUrl())
+                    .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.DAY)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                    .append("/")
+                    .append(DateUtil.month(post.getCreateTime()) + 1)
+                    .append("/")
+                    .append(DateUtil.dayOfMonth(post.getCreateTime()))
+                    .append("/")
+                    .append(post.getUrl())
+                    .append(pathSuffix);
+        }
+
+        basePostMinimalDTO.setFullPath(fullPath.toString());
+
+        return basePostMinimalDTO;
+    }
+
+    @Override
+    public List<BasePostMinimalDTO> convertToMinimal(List<Post> posts) {
+        if (CollectionUtils.isEmpty(posts)) {
+            return Collections.emptyList();
+        }
+
+        return posts.stream()
+                .map(this::convertToMinimal)
+                .collect(Collectors.toList());
     }
 
     /**

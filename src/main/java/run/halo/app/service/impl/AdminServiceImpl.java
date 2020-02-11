@@ -131,6 +131,7 @@ public class AdminServiceImpl implements AdminService {
         this.mode = mode;
     }
 
+
     @Override
     public AuthToken authenticate(LoginParam loginParam) {
         Assert.notNull(loginParam, "Login param must not be null");
