@@ -209,7 +209,7 @@
 - 修复导出博客数据的问题。
 
 ## Tips
-> 此版本为 0.x 最后一个版本，不支持直接升级到 v1.0 版本。如需从 0.x 升级为 v1.0，请参考 https://halo.run/docs/migrate-from-0.4.4.html
+> 此版本为 0.x 最后一个版本，不支持直接升级到 v1.0 版本。如需从 0.x 升级为 v1.0，请参考 https://halo.run/archives/install-migrate-from-044
 
 # 0.4.3
 ## New features

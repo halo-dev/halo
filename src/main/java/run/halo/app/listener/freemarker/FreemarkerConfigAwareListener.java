@@ -10,6 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
+import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.properties.OtherProperties;
@@ -23,7 +24,8 @@ import run.halo.app.service.UserService;
  * Freemarker config aware listener.
  *
  * @author johnniang
- * @date 19-4-20
+ * @author ryanwang
+ * @date 2019-04-20
  */
 @Slf4j
 @Component
@@ -64,6 +66,13 @@ public class FreemarkerConfigAwareListener {
     @EventListener
     public void onThemeActivatedEvent(ThemeActivatedEvent themeActivatedEvent) throws TemplateModelException {
         log.debug("Received theme activated event");
+
+        loadThemeConfig();
+    }
+
+    @EventListener
+    public void onThemeUpdatedEvent(ThemeUpdatedEvent event) throws TemplateModelException {
+        log.debug("Received theme updated event");
 
         loadThemeConfig();
     }
