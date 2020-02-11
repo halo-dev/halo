@@ -22,12 +22,12 @@ import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseMetaDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
+import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
-import run.halo.app.model.properties.PermalinkProperties;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.*;
 import run.halo.app.repository.PostRepository;
@@ -510,14 +510,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Get post meta list map
         Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
 
-        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
-
-        String pathSuffix = optionService
-                .getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
-
-        String archivesPrefix = optionService
-                .getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
-
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
@@ -554,35 +546,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
-            StringBuilder fullPath = new StringBuilder(optionService.getBlogBaseUrl())
-                    .append("/");
-            if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
-                fullPath.append(archivesPrefix)
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            } else if (permalinkType.equals(PostPermalinkType.ID)) {
-                fullPath.append("?p=")
-                        .append(postListVO.getId());
-            } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
-                        .append("/")
-                        .append(DateUtil.dayOfMonth(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            }
-
-            postListVO.setFullPath(fullPath.toString());
+            postListVO.setFullPath(buildFullPath(post));
 
             return postListVO;
         });
@@ -606,14 +570,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Get post meta list map
         Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
-
-        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
-
-        String pathSuffix = optionService
-                .getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
-
-        String archivesPrefix = optionService
-                .getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
 
         return posts.stream().map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
@@ -651,35 +607,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
-            StringBuilder fullPath = new StringBuilder(optionService.getBlogBaseUrl())
-                    .append("/");
-            if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
-                fullPath.append(archivesPrefix)
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            } else if (permalinkType.equals(PostPermalinkType.ID)) {
-                fullPath.append("?p=")
-                        .append(postListVO.getId());
-            } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
-                        .append("/")
-                        .append(DateUtil.dayOfMonth(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            }
-
-            postListVO.setFullPath(fullPath.toString());
+            postListVO.setFullPath(buildFullPath(post));
 
             return postListVO;
         }).collect(Collectors.toList());
@@ -696,47 +624,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(post, "Post must not be null");
         BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(post);
 
-        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
-
-        String pathSuffix = optionService.getPathSuffix();
-
-        String archivesPrefix = optionService.getArchivesPrefix();
-
-        StringBuilder fullPath = new StringBuilder();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            fullPath.append(optionService.getBlogBaseUrl());
-        }
-
-        fullPath.append("/");
-
-        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
-            fullPath.append(archivesPrefix)
-                    .append("/")
-                    .append(post.getUrl())
-                    .append(pathSuffix);
-        } else if (permalinkType.equals(PostPermalinkType.ID)) {
-            fullPath.append("?p=")
-                    .append(post.getId());
-        } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
-                    .append("/")
-                    .append(DateUtil.month(post.getCreateTime()) + 1)
-                    .append("/")
-                    .append(post.getUrl())
-                    .append(pathSuffix);
-        } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
-                    .append("/")
-                    .append(DateUtil.month(post.getCreateTime()) + 1)
-                    .append("/")
-                    .append(DateUtil.dayOfMonth(post.getCreateTime()))
-                    .append("/")
-                    .append(post.getUrl())
-                    .append(pathSuffix);
-        }
-
-        basePostMinimalDTO.setFullPath(fullPath.toString());
+        basePostMinimalDTO.setFullPath(buildFullPath(post));
 
         return basePostMinimalDTO;
     }
@@ -750,6 +638,22 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return posts.stream()
                 .map(this::convertToMinimal)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public BasePostSimpleDTO convertToSimple(Post post) {
+        Assert.notNull(post, "Post must not be null");
+
+        BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
+
+        // Set summary
+        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
+            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
+        }
+
+        basePostSimpleDTO.setFullPath(buildFullPath(post));
+
+        return basePostSimpleDTO;
     }
 
     /**
@@ -792,47 +696,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         postDetailVO.setCommentCount(postCommentService.countByPostId(post.getId()));
 
-        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
-
-        String pathSuffix = optionService.getPathSuffix();
-
-        String archivesPrefix = optionService.getArchivesPrefix();
-
-        StringBuilder fullPath = new StringBuilder();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            fullPath.append(optionService.getBlogBaseUrl());
-        }
-
-        fullPath.append("/");
-
-        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
-            fullPath.append(archivesPrefix)
-                    .append("/")
-                    .append(post.getUrl())
-                    .append(pathSuffix);
-        } else if (permalinkType.equals(PostPermalinkType.ID)) {
-            fullPath.append("?p=")
-                    .append(post.getId());
-        } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
-                    .append("/")
-                    .append(DateUtil.month(post.getCreateTime()) + 1)
-                    .append("/")
-                    .append(post.getUrl())
-                    .append(pathSuffix);
-        } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
-                    .append("/")
-                    .append(DateUtil.month(post.getCreateTime()) + 1)
-                    .append("/")
-                    .append(DateUtil.dayOfMonth(post.getCreateTime()))
-                    .append("/")
-                    .append(post.getUrl())
-                    .append(pathSuffix);
-        }
-
-        postDetailVO.setFullPath(fullPath.toString());
+        postDetailVO.setFullPath(buildFullPath(post));
 
         return postDetailVO;
     }
@@ -996,5 +860,49 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
                 .toString();
         return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)).and(Sort.by(DESC, "id"));
+    }
+
+    private String buildFullPath(Post post) {
+
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
+
+        String pathSuffix = optionService.getPathSuffix();
+
+        String archivesPrefix = optionService.getArchivesPrefix();
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/");
+
+        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+            fullPath.append(archivesPrefix)
+                    .append("/")
+                    .append(post.getUrl())
+                    .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID)) {
+            fullPath.append("?p=")
+                    .append(post.getId());
+        } else if (permalinkType.equals(PostPermalinkType.DATE)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                    .append("/")
+                    .append(DateUtil.month(post.getCreateTime()) + 1)
+                    .append("/")
+                    .append(post.getUrl())
+                    .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.DAY)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                    .append("/")
+                    .append(DateUtil.month(post.getCreateTime()) + 1)
+                    .append("/")
+                    .append(DateUtil.dayOfMonth(post.getCreateTime()))
+                    .append("/")
+                    .append(post.getUrl())
+                    .append(pathSuffix);
+        }
+        return fullPath.toString();
     }
 }

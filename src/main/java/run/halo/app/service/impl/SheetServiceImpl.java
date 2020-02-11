@@ -257,19 +257,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
             SheetListVO sheetListVO = new SheetListVO().convertFrom(sheet);
             sheetListVO.setCommentCount(sheetCommentCountMap.getOrDefault(sheet.getId(), 0L));
 
-            StringBuilder fullPath = new StringBuilder();
-
-            if (optionService.isEnabledAbsolutePath()) {
-                fullPath.append(optionService.getBlogBaseUrl());
-            }
-
-            fullPath.append("/")
-                    .append(optionService.getSheetPrefix())
-                    .append("/")
-                    .append(sheet.getUrl())
-                    .append(optionService.getPathSuffix());
-
-            sheetListVO.setFullPath(fullPath.toString());
+            sheetListVO.setFullPath(buildFullPath(sheet));
 
             return sheetListVO;
         });
@@ -293,19 +281,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Assert.notNull(sheet, "Sheet must not be null");
         BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(sheet);
 
-        StringBuilder fullPath = new StringBuilder();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            fullPath.append(optionService.getBlogBaseUrl());
-        }
-
-        fullPath.append("/")
-                .append(optionService.getSheetPrefix())
-                .append("/")
-                .append(sheet.getUrl())
-                .append(optionService.getPathSuffix());
-
-        basePostMinimalDTO.setFullPath(fullPath.toString());
+        basePostMinimalDTO.setFullPath(buildFullPath(sheet));
 
         return basePostMinimalDTO;
     }
@@ -340,19 +316,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         sheetDetailVO.setCommentCount(sheetCommentService.countByPostId(sheet.getId()));
 
-        StringBuilder fullPath = new StringBuilder();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            fullPath.append(optionService.getBlogBaseUrl());
-        }
-
-        fullPath.append("/")
-                .append(optionService.getSheetPrefix())
-                .append("/")
-                .append(sheet.getUrl())
-                .append(optionService.getPathSuffix());
-
-        sheetDetailVO.setFullPath(fullPath.toString());
+        sheetDetailVO.setFullPath(buildFullPath(sheet));
 
         return sheetDetailVO;
     }
@@ -375,5 +339,21 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         if (exist) {
             throw new AlreadyExistsException("页面路径 " + sheet.getUrl() + " 已存在");
         }
+    }
+
+    private String buildFullPath(Sheet sheet) {
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/")
+                .append(optionService.getSheetPrefix())
+                .append("/")
+                .append(sheet.getUrl())
+                .append(optionService.getPathSuffix());
+
+        return fullPath.toString();
     }
 }
