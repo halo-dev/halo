@@ -518,7 +518,6 @@ import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import TagSelect from './components/TagSelect'
 import CategoryTree from './components/CategoryTree'
-import { mapGetters } from 'vuex'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 const columns = [

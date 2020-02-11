@@ -62,12 +62,12 @@
                       style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
                     >
                       <a
-                        :href="options.blog_url+item.url"
+                        :href="item.url"
                         target="_blank"
                         v-if="item.status"
                       >{{ item.title }}</a>
                       <a
-                        :href="options.blog_url+item.url"
+                        :href="item.url"
                         target="_blank"
                         disabled
                         v-else
@@ -124,12 +124,12 @@
                   </router-link>
                   <a-divider type="vertical" />
                   <a
-                    :href="options.blog_url+record.url"
+                    :href="record.url"
                     target="_blank"
                     v-if="record.status"
                   >访问</a>
                   <a
-                    :href="options.blog_url+record.url"
+                    :href="record.url"
                     target="_blank"
                     disabled
                     v-else
@@ -637,7 +637,7 @@ export default {
     },
     handleSheetToMenu(sheet) {
       this.menu['name'] = sheet.title
-      this.menu['url'] = `/s/${sheet.url}`
+      this.menu['url'] = `${sheet.fullPath}`
       menuApi.create(this.menu).then(response => {
         this.$message.success('添加到菜单成功！')
         this.menu = {}

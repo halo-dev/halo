@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import commentApi from '@/api/comment'
 import postApi from '@/api/post'
 import sheetApi from '@/api/sheet'

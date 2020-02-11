@@ -125,7 +125,6 @@
 </template>
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { mapGetters } from 'vuex'
 import commentApi from '@/api/comment'
 export default {
   name: 'CommentDetail',

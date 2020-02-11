@@ -322,7 +322,6 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { mapGetters } from 'vuex'
 import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import RecentCommentTab from './components/RecentCommentTab'

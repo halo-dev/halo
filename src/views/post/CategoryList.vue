@@ -311,7 +311,7 @@ export default {
     },
     handleCategoryToMenu(category) {
       this.menu['name'] = category.name
-      this.menu['url'] = `/categories/${category.slugName}`
+      this.menu['url'] = `${category.fullPath}`
       menuApi.create(this.menu).then(response => {
         this.$message.success('添加到菜单成功！')
         this.menu = {}
