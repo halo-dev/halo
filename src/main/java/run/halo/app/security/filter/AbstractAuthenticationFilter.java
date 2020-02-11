@@ -9,14 +9,11 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotInstallException;
 import run.halo.app.model.properties.PrimaryProperties;
-import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.handler.AuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
-import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.OptionService;
 
 import javax.servlet.FilterChain;
@@ -24,7 +21,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Abstract authentication filter.
@@ -157,11 +157,6 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
             return;
         }
 
-        if (checkForTempToken(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         try {
             // Do authenticate
             doAuthenticate(request, response, filterChain);
@@ -170,41 +165,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         }
     }
 
-    private boolean checkForTempToken(HttpServletRequest request) {
-        // Get token from request
-        String tempToken = getTokenFromRequest(request, HaloConst.TEMP_TOKEN, HaloConst.TEMP_TOKEN);
-
-        if (StringUtils.isEmpty(tempToken)) {
-            return false;
-        }
-
-        String tempTokenKey = SecurityUtils.buildTempTokenKey(tempToken);
-        // Check the token
-        Optional<Integer> tokenCountOptional = cacheStore.getAny(tempTokenKey, Integer.class);
-
-        if (!tokenCountOptional.isPresent()) {
-            // If the token is not found
-            throw new ForbiddenException("The temporary token has been expired").setErrorData(tempToken);
-        }
-
-        log.info("Got valid temp token: [{}]", tempToken);
-
-        int count = tokenCountOptional.get();
-        // TODO May cause unsafe thread, fixing next time
-        // Count down
-        count--;
-        if (count <= 0) {
-            // If count is less than 0, then clear this temp token
-            cacheStore.delete(tempTokenKey);
-        } else {
-            // Put the less count
-            cacheStore.put(tempTokenKey, String.valueOf(count));
-        }
-
-        return true;
-    }
-
-    String getTokenFromRequest(@NonNull HttpServletRequest request, @NonNull String tokenQueryName, @NonNull String tokenHeaderName) {
+    protected String getTokenFromRequest(@NonNull HttpServletRequest request, @NonNull String tokenQueryName, @NonNull String tokenHeaderName) {
         Assert.notNull(request, "Http servlet request must not be null");
         Assert.hasText(tokenQueryName, "Token query name must not be blank");
         Assert.hasText(tokenHeaderName, "Token header name must not be blank");

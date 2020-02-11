@@ -26,9 +26,6 @@ public class SecurityUtils {
 
     private final static String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";
 
-    private final static String TEMP_TOKEN_CACHE_PREFIX = "halo.temp.token.";
-
-
     private SecurityUtils() {
     }
 
@@ -60,10 +57,4 @@ public class SecurityUtils {
         return TOKEN_REFRESH_CACHE_PREFIX + refreshToken;
     }
 
-    @NonNull
-    public static String buildTempTokenKey(@NonNull String tempToken) {
-        Assert.hasText(tempToken, "Temporary token must not be blank");
-
-        return TEMP_TOKEN_CACHE_PREFIX + tempToken;
-    }
 }
