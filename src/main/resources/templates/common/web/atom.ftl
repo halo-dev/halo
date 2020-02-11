@@ -14,14 +14,14 @@
         <language>zh-CN</language>
         <sy:updatePeriod>hourly</sy:updatePeriod>
         <sy:updateFrequency>1</sy:updateFrequency>
-        <generator>https://halo.run</generator>
+        <generator>Halo ${version!} (https://halo.run)</generator>
     </channel>
     <#if posts?? && posts?size gt 0>
         <#list posts as post>
             <item>
                 <title><![CDATA[${post.title!}]]></title>
-                <link>${context!}/archives/${post.url!}</link>
-                <comments>${context!}/archives/${post.url!}#comments</comments>
+                <link>${post.fullPath!}</link>
+                <comments>${post.fullPath!}#comments</comments>
                 <pubDate>${post.createTime!}</pubDate>
                 <dc:creator><![CDATA[${user.nickname!}]]></dc:creator>
 

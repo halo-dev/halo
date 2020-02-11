@@ -102,6 +102,13 @@ public class FreemarkerConfigAwareListener {
         configuration.setSharedVariable("options", optionService.listOptions());
         configuration.setSharedVariable("context", optionService.getBlogBaseUrl());
         configuration.setSharedVariable("version", HaloConst.HALO_VERSION);
+
+//        configuration.setSharedVariable("blog_title", optionService.getBlogTitle());
+//        configuration.setSharedVariable("rss_path", optionService.getBlogBaseUrl() + "/rss.xml");
+//        configuration.setSharedVariable("atom_path", optionService.getBlogBaseUrl() + "/atom.xml");
+//        configuration.setSharedVariable("sitemap_xml_path", optionService.getBlogBaseUrl() + "/sitemap.xml");
+//        configuration.setSharedVariable("sitemap_html_path", optionService.getBlogBaseUrl() + "/sitemap.html");
+
         log.debug("Loaded options");
     }
 

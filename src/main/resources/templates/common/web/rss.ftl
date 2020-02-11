@@ -15,7 +15,7 @@
                             ${post.title!}
                         ]]>
                     </title>
-                    <link>${options.blog_url}/archives/${post.url!}</link>
+                    <link>${post.fullPath!}</link>
                     <content:encoded>
                         <![CDATA[
                             <#if (options.rss_content_type!'full') == 'full'>

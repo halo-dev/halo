@@ -141,7 +141,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
         <#if posts?? && posts?size gt 0>
             <#list posts as post>
                 <li>
-                    <div class="T1 pull-left"><a href="${context!}/archives/${post.url!}" title="${post.title!}">${post.title!} | ${options.blog_title!}</a></div>
+                    <div class="T1 pull-left"><a href="${post.fullPath!}" title="${post.title!}">${post.title!} | ${options.blog_title!}</a></div>
                     <div class="T2 pull-right">${post.createTime?string('yyyy-MM-dd')}</div>
                     <div class="T3 pull-right">daily</div>
                     <div class="T4 pull-right">0.6</div>
@@ -156,10 +156,10 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
     <ul id="contentTable">
         <@categoryTag method="list">
             <#if categories?? && categories?size gt 0>
-                <#list categories as cate>
+                <#list categories as category>
                     <li>
-                        <div class="T1 pull-left"><a href="${options.blog_url}/categories/${cate.slugName!}" title="${cate.name}">${cate.name} | ${options.blog_title!}</a></div>
-                        <div class="T2 pull-right">${cate.createTime?string('yyyy-MM-dd')}</div>
+                        <div class="T1 pull-left"><a href="${category.fullPath!}" title="${category.name}">${category.name} | ${options.blog_title!}</a></div>
+                        <div class="T2 pull-right">${category.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
                     </li>
@@ -176,7 +176,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             <#if tags?? && tags?size gt 0>
                 <#list tags as tag>
                     <li>
-                        <div class="T1 pull-left"><a href="${options.blog_url}/tags/${tag.slugName!}" title="${tag.name}">${tag.name} | ${options.blog_title!}</a></div>
+                        <div class="T1 pull-left"><a href="${tag.fullPath!}" title="${tag.name}">${tag.name} | ${options.blog_title!}</a></div>
                         <div class="T2 pull-right">${tag.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
