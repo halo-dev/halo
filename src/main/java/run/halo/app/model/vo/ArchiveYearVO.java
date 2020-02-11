@@ -3,6 +3,7 @@ package run.halo.app.model.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 
 import java.util.Comparator;
 import java.util.List;
@@ -20,7 +21,7 @@ public class ArchiveYearVO {
 
     private Integer year;
 
-    private List<PostListVO> posts;
+    private List<BasePostMinimalDTO> posts;
 
     public static class ArchiveComparator implements Comparator<ArchiveYearVO> {
 

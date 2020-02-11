@@ -256,7 +256,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Build archive
             ArchiveYearVO archive = new ArchiveYearVO();
             archive.setYear(year);
-            archive.setPosts(convertToListVo(postList));
+            archive.setPosts(convertToMinimal(postList));
 
             // Add archive
             archives.add(archive);
@@ -292,7 +292,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     ArchiveMonthVO archive = new ArchiveMonthVO();
                     archive.setYear(year);
                     archive.setMonth(month);
-                    archive.setPosts(convertToListVo(postList));
+                    archive.setPosts(convertToMinimal(postList));
 
                     archives.add(archive);
                 }));
