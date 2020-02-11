@@ -11,6 +11,7 @@ import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.HaloUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class MainController {
 
     @GetMapping("${halo.admin-path:admin}")
     public void admin(HttpServletResponse response) throws IOException {
-        String adminIndexRedirectUri = StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/") + INDEX_REDIRECT_URI;
+        String adminIndexRedirectUri = HaloUtils.ensureBoth(haloProperties.getAdminPath(), HaloUtils.URL_SEPARATOR) + INDEX_REDIRECT_URI;
         response.sendRedirect(adminIndexRedirectUri);
     }
 
