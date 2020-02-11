@@ -619,8 +619,8 @@
                 <a-form-item label="文章固定链接类型：">
                   <template slot="help">
                     <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/${url}{{ options.path_suffix }}</span>
-                    <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}/1970/01/${url}{{ options.path_suffix }}</span>
-                    <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}/1970/01/01/${url}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}/1970/1/${url}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}/1970/1/1/${url}{{ options.path_suffix }}</span>
                     <span v-else-if="options.post_permalink_type === 'ID'">{{ options.blog_url }}/?p=${id}</span>
                   </template>
                   <a-select v-model="options.post_permalink_type">

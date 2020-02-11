@@ -26,7 +26,7 @@
               </a-form-item>
               <a-form-item
                 label="页面路径："
-                :help="options.blog_url+'/s/'+ (selectedSheet.url ? selectedSheet.url : '{auto_generate}')"
+                :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.url ? selectedSheet.url : '{auto_generate}')"
               >
                 <a-input v-model="selectedSheet.url" />
               </a-form-item>

@@ -8,7 +8,11 @@ const keys = [
   'developer_mode',
   'attachment_upload_image_preview_enable',
   'attachment_upload_max_parallel_uploads',
-  'attachment_upload_max_files'
+  'attachment_upload_max_files',
+  'sheet_prefix',
+  'post_permalink_type',
+  'archives_prefix',
+  'path_suffix'
 ]
 const option = {
   state: {
