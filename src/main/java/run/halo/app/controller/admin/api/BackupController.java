@@ -68,6 +68,7 @@ public class BackupController {
             contentType = request.getServletContext().getMimeType(backupResource.getFile().getAbsolutePath());
         } catch (IOException e) {
             log.warn("Could not determine file type", e);
+            // Ignore this error
         }
 
         return ResponseEntity.ok()
