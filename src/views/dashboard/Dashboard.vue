@@ -124,7 +124,7 @@
                       <a
                         v-if="item.status=='PUBLISHED' || item.status == 'INTIMATE'"
                         slot="title"
-                        :href="options.blog_url+'/archives/'+item.url"
+                        :href="item.fullPath"
                         target="_blank"
                       >{{ item.title }}</a>
                       <a
@@ -396,8 +396,7 @@ export default {
         log.type = this.logType[log.type].text
         return log
       })
-    },
-    ...mapGetters(['options'])
+    }
   },
   destroyed: function() {
     if (this.logDrawerVisible) {

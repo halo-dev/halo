@@ -247,7 +247,7 @@
                     >
                       <a
                         v-if="item.status=='PUBLISHED'"
-                        :href="options.blog_url+'/s/'+item.url"
+                        :href="item.fullPath"
                         target="_blank"
                         style="text-decoration: none;"
                       >
@@ -298,7 +298,7 @@
                 >
                   <a
                     v-if="record.status=='PUBLISHED'"
-                    :href="options.blog_url+'/s/'+record.url"
+                    :href="record.fullPath"
                     target="_blank"
                     style="text-decoration: none;"
                   >

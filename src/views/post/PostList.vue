@@ -237,7 +237,7 @@
                 />
                 <a
                   v-if="item.status=='PUBLISHED' || item.status == 'INTIMATE'"
-                  :href="options.blog_url+'/archives/'+item.url"
+                  :href="item.fullPath"
                   target="_blank"
                   style="text-decoration: none;"
                 >
@@ -318,7 +318,7 @@
             />
             <a
               v-if="record.status=='PUBLISHED' || record.status == 'INTIMATE'"
-              :href="options.blog_url+'/archives/'+record.url"
+              :href="record.fullPath"
               target="_blank"
               style="text-decoration: none;"
             >
@@ -620,8 +620,7 @@ export default {
         post.statusProperty = this.postStatus[post.status]
         return post
       })
-    },
-    ...mapGetters(['options'])
+    }
   },
   created() {
     this.loadPosts()
