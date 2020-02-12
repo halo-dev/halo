@@ -125,7 +125,12 @@ public class HaloConst {
      * Content api token param name
      */
     public final static String API_ACCESS_KEY_QUERY_NAME = "api_access_key";
-    public final static Duration TEMP_TOKEN_EXPIRATION = Duration.ofDays(7);
+
+    public final static String ONE_TIME_TOKEN_QUERY_NAME = "ott";
+
+    public final static String ONE_TIME_TOKEN_HEADER_NAME = "ott";
+
+
     /**
      * user_session
      */

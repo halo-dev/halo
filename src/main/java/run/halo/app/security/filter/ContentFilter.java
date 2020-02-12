@@ -2,6 +2,8 @@ package run.halo.app.security.filter;
 
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.model.enums.Mode;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
 
 import javax.servlet.FilterChain;
@@ -20,8 +22,10 @@ public class ContentFilter extends AbstractAuthenticationFilter {
 
     public ContentFilter(HaloProperties haloProperties,
                          OptionService optionService,
-                         StringCacheStore cacheStore) {
-        super(haloProperties, optionService, cacheStore);
+                         StringCacheStore cacheStore,
+                         OneTimeTokenService oneTimeTokenService,
+                         Mode mode) {
+        super(haloProperties, optionService, cacheStore, oneTimeTokenService, mode);
     }
 
     @Override
