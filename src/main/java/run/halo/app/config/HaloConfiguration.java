@@ -3,6 +3,7 @@ package run.halo.app.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -19,11 +20,13 @@ import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.filter.CorsFilter;
 import run.halo.app.filter.LogFilter;
+import run.halo.app.model.enums.Mode;
 import run.halo.app.security.filter.AdminAuthenticationFilter;
 import run.halo.app.security.filter.ApiAuthenticationFilter;
 import run.halo.app.security.filter.ContentFilter;
 import run.halo.app.security.handler.ContentAuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.HaloUtils;
@@ -116,8 +119,10 @@ public class HaloConfiguration {
     @Bean
     public FilterRegistrationBean<ContentFilter> contentFilter(HaloProperties haloProperties,
                                                                OptionService optionService,
-                                                               StringCacheStore cacheStore) {
-        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService, cacheStore);
+                                                               StringCacheStore cacheStore,
+                                                               OneTimeTokenService oneTimeTokenService,
+                                                               @Value("${spring.profiles.active:prod}") String activeProfile) {
+        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService, cacheStore, oneTimeTokenService, Mode.valueFrom(activeProfile));
         contentFilter.setFailureHandler(new ContentAuthenticationFailureHandler());
 
         String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
@@ -142,8 +147,10 @@ public class HaloConfiguration {
     public FilterRegistrationBean<ApiAuthenticationFilter> apiAuthenticationFilter(HaloProperties haloProperties,
                                                                                    ObjectMapper objectMapper,
                                                                                    OptionService optionService,
-                                                                                   StringCacheStore cacheStore) {
-        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService, cacheStore);
+                                                                                   StringCacheStore cacheStore,
+                                                                                   OneTimeTokenService oneTimeTokenService,
+                                                                                   @Value("${spring.profiles.active:prod}") String activeProfile) {
+        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService, cacheStore, oneTimeTokenService, Mode.valueFrom(activeProfile));
         apiFilter.addExcludeUrlPatterns(
                 "/api/content/*/comments",
                 "/api/content/**/comments/**",
@@ -170,8 +177,11 @@ public class HaloConfiguration {
                                                                                        UserService userService,
                                                                                        HaloProperties haloProperties,
                                                                                        ObjectMapper objectMapper,
-                                                                                       OptionService optionService) {
-        AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties, optionService);
+                                                                                       OptionService optionService,
+                                                                                       OneTimeTokenService oneTimeTokenService,
+                                                                                       @Value("${spring.profiles.active:prod}") String activeProfile) {
+        AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService,
+                haloProperties, optionService, oneTimeTokenService, Mode.valueFrom(activeProfile));
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());
@@ -188,8 +198,7 @@ public class HaloConfiguration {
                 "/api/admin/password/code",
                 "/api/admin/password/reset"
         );
-        adminAuthenticationFilter.setFailureHandler(
-                failureHandler);
+        adminAuthenticationFilter.setFailureHandler(failureHandler);
 
         FilterRegistrationBean<AdminAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(adminAuthenticationFilter);

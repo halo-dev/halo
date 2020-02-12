@@ -1,5 +1,5 @@
 server:
-  port: 8090
+  port: 18090
   forward-headers-strategy: native
   compression:
     enabled: false
@@ -59,4 +59,5 @@ logging:
 
 halo:
   doc-disabled: false
+  auth-enable: false
   workDir: ${user.home}/halo-test/
