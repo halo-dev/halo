@@ -57,6 +57,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     public void onApplicationEvent(ApplicationStartedEvent event) {
         this.migrate();
         this.initThemes();
+        this.initDirectory();
         this.printStartInfo();
     }
 
@@ -139,5 +140,25 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         }
 
         return fileSystem;
+    }
+
+    private void initDirectory() {
+        Path workPath = Paths.get(haloProperties.getWorkDir());
+        Path backupPath = Paths.get(haloProperties.getBackupDir());
+
+        try {
+            if (Files.notExists(workPath)) {
+                Files.createDirectories(workPath);
+                log.info("Created work directory: [{}]", workPath);
+            }
+
+            if (Files.notExists(backupPath)) {
+                Files.createDirectories(backupPath);
+                log.info("Created backup directory: [{}]", backupPath);
+            }
+
+        } catch (IOException ie) {
+            throw new RuntimeException("Failed to initialize directories", ie);
+        }
     }
 }
