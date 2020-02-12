@@ -20,24 +20,19 @@ public enum Mode {
      * Get mode from value.
      *
      * @param value mode value
-     * @return runtime mode or null if the value is mismatch
+     * @return runtime mode
      */
-    @Nullable
     @JsonCreator
     public static Mode valueFrom(@Nullable String value) {
-        if (StringUtils.isBlank(value) || "prod".equalsIgnoreCase(value)) {
-            return Mode.PRODUCTION;
-        }
-
-        if ("dev".equalsIgnoreCase(value)) {
+        if (StringUtils.equalsIgnoreCase("dev", value)) {
             return Mode.DEVELOPMENT;
         }
 
-        if ("test".equalsIgnoreCase(value)) {
+        if (StringUtils.equalsIgnoreCase("test", value)) {
             return Mode.TEST;
         }
 
-        return null;
+        return PRODUCTION;
     }
 
     @JsonValue

@@ -9,11 +9,16 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.ForbiddenException;
+import run.halo.app.exception.HaloException;
 import run.halo.app.exception.NotInstallException;
+import run.halo.app.model.enums.Mode;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.handler.AuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
 
 import javax.servlet.FilterChain;
@@ -25,6 +30,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
+import static run.halo.app.model.support.HaloConst.ONE_TIME_TOKEN_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.ONE_TIME_TOKEN_QUERY_NAME;
 
 /**
  * Abstract authentication filter.
@@ -43,18 +51,26 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
     protected final StringCacheStore cacheStore;
 
-    private AuthenticationFailureHandler failureHandler;
+    private OneTimeTokenService oneTimeTokenService;
+
+    private final Mode mode;
+
+    private volatile AuthenticationFailureHandler failureHandler;
     /**
      * Exclude url patterns.
      */
-    private Set<String> excludeUrlPatterns = new HashSet<>(2);
+    private Set<String> excludeUrlPatterns = new HashSet<>(16);
 
     AbstractAuthenticationFilter(HaloProperties haloProperties,
                                  OptionService optionService,
-                                 StringCacheStore cacheStore) {
+                                 StringCacheStore cacheStore,
+                                 OneTimeTokenService oneTimeTokenService,
+                                 Mode mode) {
         this.haloProperties = haloProperties;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
+        this.oneTimeTokenService = oneTimeTokenService;
+        this.mode = mode;
 
         antPathMatcher = new AntPathMatcher();
     }
@@ -74,7 +90,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     protected boolean shouldNotFilter(HttpServletRequest request) {
         Assert.notNull(request, "Http servlet request must not be null");
 
-        return excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, request.getServletPath()));
+        return excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, request.getRequestURI()));
     }
 
     /**
@@ -115,7 +131,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      * @return authentication failure handler
      */
     @NonNull
-    protected AuthenticationFailureHandler getFailureHandler() {
+    private AuthenticationFailureHandler getFailureHandler() {
         if (failureHandler == null) {
             synchronized (this) {
                 if (failureHandler == null) {
@@ -135,7 +151,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      *
      * @param failureHandler authentication failure handler
      */
-    public void setFailureHandler(@NonNull AuthenticationFailureHandler failureHandler) {
+    public synchronized void setFailureHandler(@NonNull AuthenticationFailureHandler failureHandler) {
         Assert.notNull(failureHandler, "Authentication failure handler must not be null");
 
         this.failureHandler = failureHandler;
@@ -146,25 +162,70 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         // Check whether the blog is installed or not
         Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 
-        if (!isInstalled) {
+        if (!isInstalled && mode != Mode.TEST) {
             // If not installed
             getFailureHandler().onFailure(request, response, new NotInstallException("当前博客还没有初始化"));
             return;
         }
 
-        if (shouldNotFilter(request)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         try {
+            // Check the one-time-token
+            if (isSufficientOneTimeToken(request)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             // Do authenticate
             doAuthenticate(request, response, filterChain);
+        } catch (HaloException e) {
+            getFailureHandler().onFailure(request, response, e);
         } finally {
             SecurityContextHolder.clearContext();
         }
     }
 
+    /**
+     * Check if the sufficient one-time token is set.
+     *
+     * @param request http servlet request
+     * @return true if sufficient; false otherwise
+     */
+    private boolean isSufficientOneTimeToken(HttpServletRequest request) {
+        // Check the param
+        final String oneTimeToken = getTokenFromRequest(request, ONE_TIME_TOKEN_QUERY_NAME, ONE_TIME_TOKEN_HEADER_NAME);
+
+        if (StringUtils.isBlank(oneTimeToken)) {
+            // If no one-time token is not provided, skip
+            return false;
+        }
+
+        // Get allowed uri
+        String allowedUri = oneTimeTokenService.get(oneTimeToken)
+                .orElseThrow(() -> new BadRequestException("The one-time token does not exist").setErrorData(oneTimeToken));
+
+        // Get request uri
+        String requestUri = request.getRequestURI();
+
+        if (!StringUtils.equals(requestUri, allowedUri)) {
+            // If the request uri mismatches the allowed uri
+            // TODO using ant path matcher could be better
+            throw new ForbiddenException("The one-time token does not correspond the request uri").setErrorData(oneTimeToken);
+        }
+
+        // Revoke the token before return
+        oneTimeTokenService.revoke(oneTimeToken);
+
+        return true;
+    }
+
+    /**
+     * Get token from http servlet request.
+     *
+     * @param request         http servlet request must not be null
+     * @param tokenQueryName  token query name must not be blank
+     * @param tokenHeaderName token header name must not be blank
+     * @return corresponding token
+     */
     protected String getTokenFromRequest(@NonNull HttpServletRequest request, @NonNull String tokenQueryName, @NonNull String tokenHeaderName) {
         Assert.notNull(request, "Http servlet request must not be null");
         Assert.hasText(tokenQueryName, "Token query name must not be blank");
@@ -176,7 +237,6 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         // Get from param
         if (StringUtils.isBlank(accessKey)) {
             accessKey = request.getParameter(tokenQueryName);
-
             log.debug("Got access key from parameter: [{}: {}]", tokenQueryName, accessKey);
         } else {
             log.debug("Got access key from header: [{}: {}]", tokenHeaderName, accessKey);

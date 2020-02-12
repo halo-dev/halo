@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
-import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
@@ -23,6 +22,7 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.BackupService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
@@ -54,34 +54,40 @@ import java.util.stream.Stream;
 @Slf4j
 public class BackupServiceImpl implements BackupService {
 
-    public static final String BACKUP_TOKEN_KEY_PREFIX = "backup-token-";
+    private static final String BACKUP_RESOURCE_BASE_URI = "/api/admin/backups/halo";
+
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     private final PostService postService;
+
     private final PostTagService postTagService;
+
     private final OptionService optionService;
-    private final StringCacheStore cacheStore;
+
+    private final OneTimeTokenService oneTimeTokenService;
+
     private final HaloProperties haloProperties;
 
     public BackupServiceImpl(PostService postService,
                              PostTagService postTagService,
                              OptionService optionService,
-                             StringCacheStore stringCacheStore,
+                             OneTimeTokenService oneTimeTokenService,
                              HaloProperties haloProperties) {
         this.postService = postService;
         this.postTagService = postTagService;
         this.optionService = optionService;
-        this.cacheStore = stringCacheStore;
+        this.oneTimeTokenService = oneTimeTokenService;
         this.haloProperties = haloProperties;
     }
 
     /**
      * Sanitizes the specified file name.
      *
-     * @param unsanitized the specified file name
+     * @param unSanitized the specified file name
      * @return sanitized file name
      */
-    public static String sanitizeFilename(final String unsanitized) {
-        return unsanitized.
+    public static String sanitizeFilename(final String unSanitized) {
+        return unSanitized.
                 replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
                 replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
                 replaceAll("\\s", "");
@@ -291,11 +297,21 @@ public class BackupServiceImpl implements BackupService {
      * @param filename filename must not be blank
      * @return download url
      */
+    @NonNull
     private String buildDownloadUrl(@NonNull String filename) {
         Assert.hasText(filename, "File name must not be blank");
 
         // Composite http url
-        return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), "api/admin/backups/halo", filename);
+        String backupUri = BACKUP_RESOURCE_BASE_URI + HaloUtils.URL_SEPARATOR + filename;
+
+        // Get a one-time token
+        String oneTimeToken = oneTimeTokenService.create(backupUri);
+
+        // Build full url
+        return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), backupUri)
+                + "?"
+                + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
+                + "=" + oneTimeToken;
     }
 
 }
