@@ -260,7 +260,7 @@ public class CommentEventListener {
             subject.append("您在【")
                     .append(blogTitle)
                     .append("】评论的日志")
-                    .append("》有了新的评论。");
+                    .append("有了新的评论。");
         }
 
         mailService.sendTemplateMail(baseAuthorEmail, subject.toString(), data, "common/mail_template/mail_reply.ftl");
