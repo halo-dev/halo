@@ -2,7 +2,7 @@ package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.annotation.DisableApi;
+import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.PasswordParam;
@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @PutMapping("profiles/password")
-    @DisableApi
+    @DisableOnCondition
     @ApiOperation("Updates user's password")
     public BaseResponse updatePassword(@RequestBody @Valid PasswordParam passwordParam, User user) {
         userService.updatePassword(passwordParam.getOldPassword(), passwordParam.getNewPassword(), user.getId());

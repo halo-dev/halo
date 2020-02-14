@@ -13,7 +13,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface DisableApi {
+public @interface DisableOnCondition {
     @AliasFor("mode")
     Mode value() default Mode.DEMO;
 

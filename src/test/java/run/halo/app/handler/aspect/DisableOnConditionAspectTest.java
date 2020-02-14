@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import run.halo.app.security.service.OneTimeTokenService;
@@ -23,21 +22,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("demo")
 @AutoConfigureMockMvc
-class DisableApiAspectTest {
+class DisableOnConditionAspectTest {
     @Autowired
     MockMvc mvc;
 
     @Autowired
     OneTimeTokenService oneTimeTokenService;
 
-    static final String REQUEST_URI = "/api/admin/options/1";
+    static final String REQUEST_URI = "/api/admin/test/disableOnCondition";
 
     @Test
-    void deleteOptionTest() throws Exception {
-        String ott = oneTimeTokenService.create(REQUEST_URI);
-        mvc.perform(delete(REQUEST_URI + "?ott={ott}", ott))
+    void blockAccessTest() throws Exception {
+    }
+
+    @Test
+    void ableAccessTest() throws Exception {
+        String ott = oneTimeTokenService.create(REQUEST_URI + "/yes");
+        mvc.perform(get(REQUEST_URI + "/yes?ott={ott}", ott))
                 .andDo(print())
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.status", is(HttpStatus.FORBIDDEN.value())));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())));
+
     }
 }
