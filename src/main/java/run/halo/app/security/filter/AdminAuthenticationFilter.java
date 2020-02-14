@@ -7,7 +7,6 @@ import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.model.entity.User;
-import run.halo.app.model.enums.Mode;
 import run.halo.app.security.authentication.AuthenticationImpl;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
@@ -43,9 +42,8 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
                                      UserService userService,
                                      HaloProperties haloProperties,
                                      OptionService optionService,
-                                     OneTimeTokenService oneTimeTokenService,
-                                     Mode mode) {
-        super(haloProperties, optionService, cacheStore, oneTimeTokenService, mode);
+                                     OneTimeTokenService oneTimeTokenService) {
+        super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.userService = userService;
         this.haloProperties = haloProperties;
     }
