@@ -14,6 +14,7 @@ import org.springframework.lang.Nullable;
 public enum Mode {
     PRODUCTION,
     DEVELOPMENT,
+    DEMO,
     TEST;
 
     /**
@@ -30,6 +31,10 @@ public enum Mode {
 
         if (StringUtils.equalsIgnoreCase("test", value)) {
             return Mode.TEST;
+        }
+
+        if (StringUtils.equalsIgnoreCase("demo", value)) {
+            return Mode.DEMO;
         }
 
         return PRODUCTION;
