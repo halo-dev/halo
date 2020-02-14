@@ -13,6 +13,7 @@ import org.springframework.lang.Nullable;
 public enum Mode {
     PRODUCTION,
     DEVELOPMENT,
+    DEMO,
     TEST;
 
     /**

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
@@ -43,6 +44,7 @@ public class OptionController {
     }
 
     @PostMapping("saving")
+    @DisableOnCondition
     @ApiOperation("Saves options")
     public void saveOptions(@Valid @RequestBody List<OptionParam> optionParams) {
         optionService.save(optionParams);
@@ -73,12 +75,14 @@ public class OptionController {
     }
 
     @PostMapping
+    @DisableOnCondition
     @ApiOperation("Creates option")
     public void createBy(@RequestBody @Valid OptionParam optionParam) {
         optionService.save(optionParam);
     }
 
     @PutMapping("{optionId:\\d+}")
+    @DisableOnCondition
     @ApiOperation("Updates option")
     public void updateBy(@PathVariable("optionId") Integer optionId,
                          @RequestBody @Valid OptionParam optionParam) {
@@ -86,12 +90,14 @@ public class OptionController {
     }
 
     @DeleteMapping("{optionId:\\d+}")
+    @DisableOnCondition
     @ApiOperation("Deletes option")
     public void deletePermanently(@PathVariable("optionId") Integer optionId) {
         optionService.removePermanently(optionId);
     }
 
     @PostMapping("map_view/saving")
+    @DisableOnCondition
     @ApiOperation("Saves options by option map")
     public void saveOptionsWithMapView(@RequestBody Map<String, Object> optionMap) {
         optionService.save(optionMap);
