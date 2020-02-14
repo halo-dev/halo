@@ -21,10 +21,10 @@ spring:
     password: 123456
 
     # MySQL database configuration.
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-#    username: root
-#    password: 123456
+  #    driver-class-name: com.mysql.cj.jdbc.Driver
+  #    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+  #    username: root
+  #    password: 123456
 
   h2:
     console:
@@ -60,5 +60,6 @@ halo:
   doc-disabled: false
   production-env: false
   auth-enabled: true
+  mode: demo
   workDir: ${user.home}/halo-demo/
   cache: level
