@@ -1,5 +1,6 @@
 package run.halo.app.handler.aspect;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -11,6 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import run.halo.app.Application;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.annotation.DisableApi;
 import run.halo.app.model.enums.Mode;
 import run.halo.app.model.support.BaseResponse;
@@ -21,6 +23,7 @@ import run.halo.app.model.support.BaseResponse;
  * @date 2020-02-14 14:08
  */
 @Aspect
+@Slf4j
 @Component
 public class DisableApiAspect {
     @Value("${spring.profiles.active:prod}")
@@ -31,17 +34,12 @@ public class DisableApiAspect {
 
     @Around("pointcut() && @annotation(disableApi)")
     public Object around(ProceedingJoinPoint joinPoint,
-                         DisableApi disableApi){
+                         DisableApi disableApi) throws Throwable {
         Mode mode = disableApi.mode();
         if(StringUtils.equalsIgnoreCase(mode.name(), activeProfile)) {
-            return new BaseResponse<>(HttpStatus.FORBIDDEN.value(), "禁止访问",null);
+            throw new ForbiddenException("禁止访问");
         }
-        Object proceed = null;
-        try {
-            proceed = joinPoint.proceed();
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-        return proceed;
+
+        return joinPoint.proceed();
     }
 }
