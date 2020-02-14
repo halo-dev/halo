@@ -33,8 +33,6 @@ public class DisableApiAspect {
     public Object around(ProceedingJoinPoint joinPoint,
                          DisableApi disableApi){
         Mode mode = disableApi.mode();
-        System.out.println(activeProfile);
-        System.out.println(mode.name());
         if(StringUtils.equalsIgnoreCase(mode.name(), activeProfile)) {
             return new BaseResponse<>(HttpStatus.FORBIDDEN.value(), "禁止访问",null);
         }
