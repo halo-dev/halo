@@ -7,7 +7,6 @@ import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.exception.ForbiddenException;
-import run.halo.app.model.enums.Mode;
 import run.halo.app.model.properties.ApiProperties;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.security.service.OneTimeTokenService;
@@ -36,9 +35,8 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
     public ApiAuthenticationFilter(HaloProperties haloProperties,
                                    OptionService optionService,
                                    StringCacheStore cacheStore,
-                                   OneTimeTokenService oneTimeTokenService,
-                                   Mode mode) {
-        super(haloProperties, optionService, cacheStore, oneTimeTokenService, mode);
+                                   OneTimeTokenService oneTimeTokenService) {
+        super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.optionService = optionService;
     }
 

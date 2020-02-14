@@ -2,7 +2,6 @@ package run.halo.app.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
 /**
@@ -25,19 +24,17 @@ public enum Mode {
      */
     @JsonCreator
     public static Mode valueFrom(@Nullable String value) {
-        if (StringUtils.equalsIgnoreCase("dev", value)) {
-            return Mode.DEVELOPMENT;
+        Mode modeResult = null;
+        for (Mode mode : values()) {
+            if (mode.name().equalsIgnoreCase(value)) {
+                modeResult = mode;
+                break;
+            }
         }
-
-        if (StringUtils.equalsIgnoreCase("test", value)) {
-            return Mode.TEST;
+        if (modeResult == null) {
+            modeResult = PRODUCTION;
         }
-
-        if (StringUtils.equalsIgnoreCase("demo", value)) {
-            return Mode.DEMO;
-        }
-
-        return PRODUCTION;
+        return modeResult;
     }
 
     @JsonValue
