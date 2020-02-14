@@ -116,19 +116,13 @@ public class AliOssFileHandler implements FileHandler {
                 }
             }
 
+            log.info("Uploaded file: [{}] successfully", file.getOriginalFilename());
             return uploadResult;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new FileOperationException("Failed to upload file to Ali OSS", e).setErrorData(file.getOriginalFilename());
         } finally {
             ossClient.shutdown();
         }
-
-        // Build result
-        UploadResult result = new UploadResult();
-
-        log.info("File: [{}] uploaded successfully", file.getOriginalFilename());
-
-        return result;
     }
 
     @Override

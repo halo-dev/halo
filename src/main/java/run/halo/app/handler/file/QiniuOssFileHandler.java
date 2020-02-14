@@ -108,8 +108,10 @@ public class QiniuOssFileHandler implements FileHandler {
             // Put the file
             Response response = uploadManager.put(file.getInputStream(), upFilePath.toString(), uploadToken, null, null);
 
-            log.debug("QnYun response: [{}]", response.toString());
-            log.debug("QnYun response body: [{}]", response.bodyString());
+            if (log.isDebugEnabled()) {
+                log.debug("QnYun response: [{}]", response.toString());
+                log.debug("QnYun response body: [{}]", response.bodyString());
+            }
 
             response.jsonToObject(QiNiuPutSet.class);
 
