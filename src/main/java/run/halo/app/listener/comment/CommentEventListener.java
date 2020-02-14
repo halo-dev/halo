@@ -78,6 +78,8 @@ public class CommentEventListener {
 
         Map<String, Object> data = new HashMap<>();
 
+        StringBuilder subject = new StringBuilder();
+
         if (newEvent.getSource() instanceof PostCommentService) {
             // Get postComment id
             PostComment postComment = postCommentService.getById(newEvent.getCommentId());
@@ -93,6 +95,11 @@ public class CommentEventListener {
             data.put("page", post.getTitle());
             data.put("author", postComment.getAuthor());
             data.put("content", postComment.getContent());
+
+            subject.append("您的博客文章《")
+                    .append(post.getTitle())
+                    .append("》有了新的评论。");
+
         } else if (newEvent.getSource() instanceof SheetCommentService) {
             SheetComment sheetComment = sheetCommentService.getById(newEvent.getCommentId());
 
@@ -107,6 +114,10 @@ public class CommentEventListener {
             data.put("page", sheet.getTitle());
             data.put("author", sheetComment.getAuthor());
             data.put("content", sheetComment.getContent());
+
+            subject.append("您的博客页面《")
+                    .append(sheet.getTitle())
+                    .append("》有了新的评论。");
         } else if (newEvent.getSource() instanceof JournalCommentService) {
             JournalComment journalComment = journalCommentService.getById(newEvent.getCommentId());
 
@@ -120,9 +131,11 @@ public class CommentEventListener {
             data.put("page", journal.getCreateTime());
             data.put("author", journalComment.getAuthor());
             data.put("content", journalComment.getContent());
+
+            subject.append("您的博客日志有了新的评论");
         }
 
-        mailService.sendTemplateMail(user.getEmail(), "您的博客有新的评论", data, "common/mail_template/mail_notice.ftl");
+        mailService.sendTemplateMail(user.getEmail(), subject.toString(), data, "common/mail_template/mail_notice.ftl");
     }
 
     /**
@@ -145,6 +158,8 @@ public class CommentEventListener {
         String blogTitle = optionService.getBlogTitle();
 
         Map<String, Object> data = new HashMap<>();
+
+        StringBuilder subject = new StringBuilder();
 
         log.debug("replyEvent.getSource():" + replyEvent.getSource().toString());
 
@@ -176,6 +191,12 @@ public class CommentEventListener {
             data.put("baseContent", baseComment.getContent());
             data.put("replyAuthor", postComment.getAuthor());
             data.put("replyContent", postComment.getContent());
+
+            subject.append("您在【")
+                    .append(blogTitle)
+                    .append("】评论的文章《")
+                    .append(post.getTitle())
+                    .append("》有了新的评论。");
         } else if (replyEvent.getSource() instanceof SheetCommentService) {
 
             SheetComment sheetComment = sheetCommentService.getById(replyEvent.getCommentId());
@@ -204,6 +225,12 @@ public class CommentEventListener {
             data.put("baseContent", baseComment.getContent());
             data.put("replyAuthor", sheetComment.getAuthor());
             data.put("replyContent", sheetComment.getContent());
+
+            subject.append("您在【")
+                    .append(blogTitle)
+                    .append("】评论的页面《")
+                    .append(sheet.getTitle())
+                    .append("》有了新的评论。");
         } else if (replyEvent.getSource() instanceof JournalCommentService) {
             JournalComment journalComment = journalCommentService.getById(replyEvent.getCommentId());
 
@@ -229,8 +256,13 @@ public class CommentEventListener {
             data.put("baseContent", baseComment.getContent());
             data.put("replyAuthor", journalComment.getAuthor());
             data.put("replyContent", journalComment.getContent());
+
+            subject.append("您在【")
+                    .append(blogTitle)
+                    .append("】评论的日志")
+                    .append("》有了新的评论。");
         }
 
-        mailService.sendTemplateMail(baseAuthorEmail, "您在【" + blogTitle + "】的评论有新回复", data, "common/mail_template/mail_reply.ftl");
+        mailService.sendTemplateMail(baseAuthorEmail, subject.toString(), data, "common/mail_template/mail_reply.ftl");
     }
 }
