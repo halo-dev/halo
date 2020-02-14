@@ -45,16 +45,19 @@ class DisableOnConditionAspectTest {
 
     @Test()
     void blockAccessTest() throws Exception {
+        Throwable t = null;
         try {
-
             mvc.perform(get(REQUEST_URI + "/no"))
                     .andDo(print())
                     .andReturn();
         } catch (NestedServletException nse) {
-            Assertions.assertThrows(ForbiddenException.class, () -> {
-                throw nse.getCause();
-            });
+            t = nse;
         }
+        Assertions.assertNotNull(t);
+        final Throwable rootException = t;
+        Assertions.assertThrows(ForbiddenException.class, () -> {
+            throw rootException.getCause();
+        });
     }
 
     @Test
