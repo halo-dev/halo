@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.Application;
 import run.halo.app.cache.lock.CacheLock;
+import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.params.LoginParam;
@@ -66,6 +67,7 @@ public class AdminController {
     }
 
     @PutMapping("password/reset")
+    @DisableOnCondition
     @ApiOperation("Resets password by verify code")
     public void resetPassword(@RequestBody @Valid ResetPasswordParam param) {
         adminService.resetPasswordByCode(param);
@@ -104,12 +106,14 @@ public class AdminController {
     }
 
     @PutMapping("spring/application.yaml")
+    @DisableOnCondition
     @ApiOperation("Updates application config content")
     public void updateSpringApplicationConfig(@RequestParam(name = "content") String content) {
         adminService.updateApplicationConfig(content);
     }
 
     @PostMapping(value = {"halo/restart", "spring/restart"})
+    @DisableOnCondition
     @ApiOperation("Restarts halo server")
     public void restartApplication() {
         Application.restart();
