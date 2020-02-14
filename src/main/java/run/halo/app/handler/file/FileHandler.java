@@ -77,7 +77,7 @@ public interface FileHandler {
      * Checks if the given type is supported.
      *
      * @param type attachment type
-     * @return true if supported; false or else
+     * @return true if supported; false otherwise
      */
-    boolean supportType(@Nullable AttachmentType type);
+    boolean supportType(@Nullable String type);
 }

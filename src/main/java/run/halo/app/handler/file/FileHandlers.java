@@ -34,6 +34,7 @@ public class FileHandlers {
     public FileHandlers(ApplicationContext applicationContext) {
         // Add all file handler
         addFileHandlers(applicationContext.getBeansOfType(FileHandler.class).values());
+        log.info("Registered {} file handler(s)", fileHandlers.size());
     }
 
     /**
@@ -46,16 +47,30 @@ public class FileHandlers {
      */
     @NonNull
     public UploadResult upload(@NonNull MultipartFile file, @NonNull AttachmentType attachmentType) {
-        Assert.notNull(file, "Multipart file must not be null");
         Assert.notNull(attachmentType, "Attachment type must not be null");
 
+        return upload(file, attachmentType.name());
+    }
+
+    /**
+     * Uploads files.
+     *
+     * @param file multipart file must not be null
+     * @param type store type
+     * @return upload result
+     * @throws FileOperationException throws when fail to delete attachment or no available file handler to upload it
+     */
+    @NonNull
+    public UploadResult upload(@NonNull MultipartFile file, @Nullable String type) {
+        Assert.notNull(file, "Multipart file must not be null");
+
         for (FileHandler fileHandler : fileHandlers) {
-            if (fileHandler.supportType(attachmentType)) {
+            if (fileHandler.supportType(type)) {
                 return fileHandler.upload(file);
             }
         }
 
-        throw new FileOperationException("No available file handler to upload the file").setErrorData(attachmentType);
+        throw new FileOperationException("No available file handlers to upload the file").setErrorData(type);
     }
 
     /**
@@ -67,15 +82,25 @@ public class FileHandlers {
     public void delete(@NonNull Attachment attachment) {
         Assert.notNull(attachment, "Attachment must not be null");
 
+        delete(attachment.getType().name(), attachment.getFileKey());
+    }
+
+    /**
+     * Deletes attachment.
+     *
+     * @param key file key
+     * @throws FileOperationException throws when fail to delete attachment or no available file handler to delete it
+     */
+    public void delete(@Nullable String type, @NonNull String key) {
         for (FileHandler fileHandler : fileHandlers) {
-            if (fileHandler.supportType(attachment.getType())) {
+            if (fileHandler.supportType(type)) {
                 // Delete the file
-                fileHandler.delete(attachment.getFileKey());
+                fileHandler.delete(key);
                 return;
             }
         }
 
-        throw new FileOperationException("No available file handler to delete the file").setErrorData(attachment);
+        throw new FileOperationException("No available file handlers to delete the file").setErrorData(type);
     }
 
     /**

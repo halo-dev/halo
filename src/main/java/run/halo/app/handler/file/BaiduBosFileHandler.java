@@ -64,7 +64,7 @@ public class BaiduBosFileHandler implements FileHandler {
         domain = protocol + domain;
 
         try {
-            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
@@ -132,7 +132,7 @@ public class BaiduBosFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.BAIDUBOS.equals(type);
+    public boolean supportType(String type) {
+        return AttachmentType.BAIDUBOS.name().equalsIgnoreCase(type);
     }
 }

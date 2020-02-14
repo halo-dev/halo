@@ -87,7 +87,7 @@ public class QiniuOssFileHandler implements FileHandler {
                 .append("/");
 
         try {
-            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             StringBuilder upFilePath = new StringBuilder();
@@ -175,7 +175,7 @@ public class QiniuOssFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.QINIUOSS.equals(type);
+    public boolean supportType(String type) {
+        return AttachmentType.QINIUOSS.name().equalsIgnoreCase(type);
     }
 }

@@ -101,7 +101,7 @@ public class LocalFileHandler implements FileHandler {
         // Build directory
         String subDir = UPLOAD_SUB_DIR + year + FILE_SEPARATOR + month + FILE_SEPARATOR;
 
-        String originalBasename = FilenameUtils.getBasename(file.getOriginalFilename());
+        String originalBasename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
 
         // Get basename
         String basename = originalBasename + '-' + HaloUtils.randomUUIDWithoutDash();
@@ -214,8 +214,8 @@ public class LocalFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.LOCAL.equals(type);
+    public boolean supportType(String type) {
+        return AttachmentType.LOCAL.name().equalsIgnoreCase(type);
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
