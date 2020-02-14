@@ -138,7 +138,7 @@
         >保存</a-button>
       </template>
       <a-form layout="vertical">
-        <a-form-item label="页面标题：">
+        <a-form-item label="页面标题：" help="* 需要主题进行适配">
           <a-input v-model="options.photos_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">

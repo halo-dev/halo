@@ -217,7 +217,7 @@
         >保存</a-button>
       </template>
       <a-form layout="vertical">
-        <a-form-item label="页面标题：">
+        <a-form-item label="页面标题：" help="* 需要主题进行适配">
           <a-input v-model="options.links_title" />
         </a-form-item>
       </a-form>

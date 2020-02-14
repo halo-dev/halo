@@ -3,7 +3,11 @@
     <a-row>
       <a-col :span="24">
         <div class="card-container">
-          <a-tabs type="card">
+          <a-tabs
+            type="card"
+            class="general"
+            v-if="!advancedOptions"
+          >
             <a-tab-pane key="general">
               <span slot="tab">
                 <a-icon type="tool" />常规设置
@@ -608,6 +612,64 @@
                 </a-tabs>
               </div>
             </a-tab-pane>
+            <a-tab-pane key="other">
+              <span slot="tab">
+                <a-icon type="align-left" />其他设置
+              </span>
+              <a-form
+                layout="vertical"
+                :wrapperCol="wrapperCol"
+              >
+                <a-form-item label="自定义全局 head：">
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.blog_custom_head"
+                    placeholder="放置于每个页面的 <head></head> 标签中"
+                  />
+                </a-form-item>
+                <a-form-item label="自定义内容页 head：">
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.blog_custom_content_head"
+                    placeholder="仅放置于内容页面的 <head></head> 标签中"
+                  />
+                </a-form-item>
+                <a-form-item label="统计代码：">
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.blog_statistics_code"
+                    placeholder="第三方网站统计的代码，如：Google Analytics、百度统计、CNZZ 等"
+                  />
+                </a-form-item>
+                <!-- <a-form-item
+                  label="黑名单 IP："
+
+                >
+                  <a-input
+                    type="textarea"
+                    :autosize="{ minRows: 5 }"
+                    v-model="options.blog_ip_blacklist"
+                    placeholder="多个 IP 地址换行隔开"
+                  />
+                </a-form-item> -->
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    @click="handleSaveOptions"
+                  >保存</a-button>
+                </a-form-item>
+              </a-form>
+            </a-tab-pane>
+          </a-tabs>
+
+          <a-tabs
+            type="card"
+            class="advanced"
+            v-else
+          >
             <a-tab-pane key="permalink">
               <span slot="tab">
                 <a-icon type="link" />固定链接
@@ -712,61 +774,25 @@
                 </a-form-item>
               </a-form>
             </a-tab-pane>
-            <a-tab-pane key="other">
-              <span slot="tab">
-                <a-icon type="align-left" />其他设置
-              </span>
-              <a-form
-                layout="vertical"
-                :wrapperCol="wrapperCol"
-              >
-                <a-form-item label="自定义全局 head：">
-                  <a-input
-                    type="textarea"
-                    :autosize="{ minRows: 5 }"
-                    v-model="options.blog_custom_head"
-                    placeholder="放置于每个页面的 <head></head> 标签中"
-                  />
-                </a-form-item>
-                <a-form-item label="自定义内容页 head：">
-                  <a-input
-                    type="textarea"
-                    :autosize="{ minRows: 5 }"
-                    v-model="options.blog_custom_content_head"
-                    placeholder="仅放置于内容页面的 <head></head> 标签中"
-                  />
-                </a-form-item>
-                <a-form-item label="统计代码：">
-                  <a-input
-                    type="textarea"
-                    :autosize="{ minRows: 5 }"
-                    v-model="options.blog_statistics_code"
-                    placeholder="第三方网站统计的代码，如：Google Analytics、百度统计、CNZZ 等"
-                  />
-                </a-form-item>
-                <!-- <a-form-item
-                  label="黑名单 IP："
-
-                >
-                  <a-input
-                    type="textarea"
-                    :autosize="{ minRows: 5 }"
-                    v-model="options.blog_ip_blacklist"
-                    placeholder="多个 IP 地址换行隔开"
-                  />
-                </a-form-item> -->
-                <a-form-item>
-                  <a-button
-                    type="primary"
-                    @click="handleSaveOptions"
-                  >保存</a-button>
-                </a-form-item>
-              </a-form>
-            </a-tab-pane>
           </a-tabs>
         </div>
       </a-col>
     </a-row>
+
+    <div style="position: fixed;bottom: 30px;right: 30px;">
+      <a-tooltip placement="top">
+        <template slot="title">
+          <span>{{ advancedOptions?'基础选项':'高级选项' }}</span>
+        </template>
+        <a-button
+          type="primary"
+          shape="circle"
+          icon="setting"
+          size="large"
+          @click="handleAdvancedOptions()"
+        ></a-button>
+      </a-tooltip>
+    </div>
 
     <AttachmentSelectDrawer
       v-model="logoDrawerVisible"
@@ -806,6 +832,7 @@ export default {
       faviconDrawerVisible: false,
       options: [],
       mailParam: {},
+      advancedOptions: false,
       tencentCosRegions: [
         {
           text: '北京一区',
@@ -1182,6 +1209,9 @@ export default {
     handleSelectFavicon(data) {
       this.options.blog_favicon = encodeURI(data.path)
       this.faviconDrawerVisible = false
+    },
+    handleAdvancedOptions() {
+      this.advancedOptions = !this.advancedOptions
     }
   }
 }
