@@ -53,8 +53,6 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
     private OneTimeTokenService oneTimeTokenService;
 
-    private final Mode mode;
-
     private volatile AuthenticationFailureHandler failureHandler;
     /**
      * Exclude url patterns.
@@ -64,13 +62,11 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     AbstractAuthenticationFilter(HaloProperties haloProperties,
                                  OptionService optionService,
                                  StringCacheStore cacheStore,
-                                 OneTimeTokenService oneTimeTokenService,
-                                 Mode mode) {
+                                 OneTimeTokenService oneTimeTokenService) {
         this.haloProperties = haloProperties;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
         this.oneTimeTokenService = oneTimeTokenService;
-        this.mode = mode;
 
         antPathMatcher = new AntPathMatcher();
     }
@@ -162,7 +158,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         // Check whether the blog is installed or not
         Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 
-        if (!isInstalled && mode != Mode.TEST) {
+        if (!isInstalled && Mode.TEST.equals(haloProperties.getMode())) {
             // If not installed
             getFailureHandler().onFailure(request, response, new NotInstallException("当前博客还没有初始化"));
             return;

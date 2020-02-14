@@ -23,7 +23,6 @@ import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.LogType;
-import run.halo.app.model.enums.Mode;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.params.ResetPasswordParam;
@@ -300,7 +299,7 @@ public class AdminServiceImpl implements AdminService {
 
         environmentDTO.setVersion(HaloConst.HALO_VERSION);
 
-        environmentDTO.setMode(Mode.valueFrom(this.mode));
+        environmentDTO.setMode(haloProperties.getMode());
 
         return environmentDTO;
     }

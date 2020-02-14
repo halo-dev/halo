@@ -60,4 +60,5 @@ logging:
 halo:
   doc-disabled: false
   auth-enable: false
+  mode: test
   workDir: ${user.home}/halo-test/

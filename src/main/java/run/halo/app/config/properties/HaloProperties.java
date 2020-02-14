@@ -2,10 +2,8 @@ package run.halo.app.config.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import run.halo.app.model.enums.Mode;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 
 import static run.halo.app.model.support.HaloConst.*;
@@ -35,6 +33,11 @@ public class HaloProperties {
      * Authentication enabled
      */
     private boolean authEnabled = true;
+
+    /**
+     * Halo startup mode.
+     */
+    private Mode mode = Mode.PRODUCTION;
 
     /**
      * Admin path.
