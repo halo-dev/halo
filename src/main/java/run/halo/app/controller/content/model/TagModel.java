@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
@@ -50,16 +51,37 @@ public class TagModel {
     public String listPost(Model model, String slugName, Integer page) {
         // Get tag by slug name
         final Tag tag = tagService.getBySlugNameOfNonNull(slugName);
+        TagDTO tagDTO = tagService.convertTo(tag);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), Sort.by(DESC, "createTime"));
         Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
+
+        // TODO remove this variable
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        // Next page and previous page url.
+        StringBuilder nextPageFullPath = new StringBuilder(tagDTO.getFullPath());
+        StringBuilder prePageFullPath = new StringBuilder(tagDTO.getFullPath());
+
+        nextPageFullPath.append("/page/")
+                .append(posts.getNumber() + 2)
+                .append(optionService.getPathSuffix());
+
+        if (posts.getNumber() == 1) {
+            prePageFullPath.append("/");
+        } else {
+            prePageFullPath.append("/page/")
+                    .append(posts.getNumber())
+                    .append(optionService.getPathSuffix());
+        }
 
         model.addAttribute("is_tag", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
-        model.addAttribute("tag", tagService.convertTo(tag));
+        model.addAttribute("tag", tagDTO);
+        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
+        model.addAttribute("prePageFullPath", prePageFullPath.toString());
         return themeService.render("tag");
     }
 }

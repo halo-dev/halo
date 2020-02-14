@@ -122,12 +122,36 @@ public class PostModel {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
+        // TODO remove this variable
         int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        // Next page and previous page url.
+        StringBuilder nextPageFullPath = new StringBuilder();
+        StringBuilder prePageFullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            nextPageFullPath.append(optionService.getBlogBaseUrl());
+            prePageFullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        nextPageFullPath.append("/page/")
+                .append(posts.getNumber() + 2)
+                .append(optionService.getPathSuffix());
+
+        if (posts.getNumber() == 1) {
+            prePageFullPath.append("/");
+        } else {
+            prePageFullPath.append("/page/")
+                    .append(posts.getNumber())
+                    .append(optionService.getPathSuffix());
+        }
 
         model.addAttribute(decide, true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("pageRainbow", rainbow);
+        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
+        model.addAttribute("prePageFullPath", prePageFullPath.toString());
         return themeService.render(template);
     }
 }
