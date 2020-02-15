@@ -19,28 +19,19 @@ import javax.validation.constraints.Size;
 @Data
 public class CategoryParam implements InputConverter<Category> {
 
-    /**
-     * Category name.
-     */
     @NotBlank(message = "分类名称不能为空")
     @Size(max = 50, message = "分类名称的字符长度不能超过 {max}")
     private String name;
 
-    /**
-     * Category slug name.
-     */
     @Size(max = 50, message = "分类别名的字符长度不能超过 {max}")
     private String slugName;
 
-    /**
-     * Category description.
-     */
     @Size(max = 100, message = "分类描述的字符长度不能超过 {max}")
     private String description;
 
-    /**
-     * Parent category.
-     */
+    @Size(max = 1023, message = "封面图链接的字符长度不能超过 {max}")
+    private String thumbnail;
+
     private Integer parentId = 0;
 
     @Override
@@ -49,6 +40,20 @@ public class CategoryParam implements InputConverter<Category> {
 
         slugName = StringUtils.isBlank(slugName) ? SlugUtils.slug(name) : SlugUtils.slug(slugName);
 
+        if (null == thumbnail) {
+            thumbnail = "";
+        }
+
         return InputConverter.super.convertTo();
+    }
+
+    @Override
+    public void update(Category category) {
+
+        if (null == thumbnail) {
+            thumbnail = "";
+        }
+
+        InputConverter.super.update(category);
     }
 }
