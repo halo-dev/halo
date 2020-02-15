@@ -22,6 +22,8 @@ public class TagDTO implements OutputConverter<TagDTO, Tag> {
 
     private String slugName;
 
+    private String thumbnail;
+
     private Date createTime;
 
     private String fullPath;
