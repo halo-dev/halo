@@ -85,7 +85,7 @@
         <a-divider />
 
         <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">缩略图</h3>
+          <h3 class="post-setting-drawer-title">封面图</h3>
           <div class="post-setting-drawer-item">
             <div class="sheet-thumb">
               <img
@@ -98,7 +98,7 @@
                 <a-form-item>
                   <a-input
                     v-model="selectedSheet.thumbnail"
-                    placeholder="点击缩略图选择图片，或者输入外部链接"
+                    placeholder="点击封面图选择图片，或者输入外部链接"
                   ></a-input>
                 </a-form-item>
               </a-form>
