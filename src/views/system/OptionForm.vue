@@ -681,8 +681,8 @@
                 <a-form-item label="文章固定链接类型：">
                   <template slot="help">
                     <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/${url}{{ options.path_suffix }}</span>
-                    <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}/1970/1/${url}{{ options.path_suffix }}</span>
-                    <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}/1970/1/1/${url}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ new Date() | moment_post_date }}${url}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}{{ new Date() | moment_post_day }}${url}{{ options.path_suffix }}</span>
                     <span v-else-if="options.post_permalink_type === 'ID'">{{ options.blog_url }}/?p=${id}</span>
                   </template>
                   <a-select v-model="options.post_permalink_type">
@@ -737,7 +737,7 @@
                 </a-form-item>
                 <a-form-item label="路径后缀：">
                   <template slot="help">
-                    <span>仅对部分路径有效</span>
+                    <span>仅对内建路径有效</span>
                   </template>
                   <a-input v-model="options.path_suffix" />
                 </a-form-item>
@@ -751,7 +751,7 @@
             </a-tab-pane>
             <a-tab-pane key="api">
               <span slot="tab">
-                <a-icon type="thunderbolt" />API 设置
+                <a-icon type="api" />API 设置
               </span>
               <a-form
                 layout="vertical"
@@ -774,6 +774,28 @@
                 </a-form-item>
               </a-form>
             </a-tab-pane>
+            <a-tab-pane key="advanced-other">
+              <span slot="tab">
+                <a-icon type="align-left" />其他设置
+              </span>
+              <a-form
+                layout="vertical"
+                :wrapperCol="wrapperCol"
+              >
+                <a-form-item
+                  label="全局绝对路径："
+                  help="* 对网站上面的所有页面路径、本地附件路径、以及主题中的静态资源路径有效。"
+                >
+                  <a-switch v-model="options.global_absolute_path_enabled" />
+                </a-form-item>
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    @click="handleSaveOptions"
+                  >保存</a-button>
+                </a-form-item>
+              </a-form>
+            </a-tab-pane>
           </a-tabs>
         </div>
       </a-col>
@@ -787,7 +809,7 @@
         <a-button
           type="primary"
           shape="circle"
-          icon="setting"
+          :icon="`${advancedOptions?'setting':'thunderbolt'}`"
           size="large"
           @click="handleAdvancedOptions()"
         ></a-button>
