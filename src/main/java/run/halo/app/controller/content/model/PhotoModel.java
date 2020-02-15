@@ -52,6 +52,9 @@ public class PhotoModel {
                     .append("/");
             prePageFullPath.append(optionService.getBlogBaseUrl())
                     .append("/");
+        } else {
+            nextPageFullPath.append("/");
+            prePageFullPath.append("/");
         }
 
         nextPageFullPath.append(optionService.getPhotosPrefix());

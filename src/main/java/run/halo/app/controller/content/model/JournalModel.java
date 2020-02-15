@@ -57,6 +57,9 @@ public class JournalModel {
                     .append("/");
             prePageFullPath.append(optionService.getBlogBaseUrl())
                     .append("/");
+        } else {
+            nextPageFullPath.append("/");
+            prePageFullPath.append("/");
         }
 
         nextPageFullPath.append(optionService.getJournalsPrefix());

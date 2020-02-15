@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0">
     <channel>
-        <title>${options.blog_title!}</title>
-        <link>${options.blog_url!}</link>
+        <title>${blog_title!}</title>
+        <link>${blog_url!}</link>
         <#if user.description??>
             <description>${user.description!}</description>
         </#if>

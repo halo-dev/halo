@@ -13,7 +13,8 @@ import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
-import run.halo.app.model.properties.OtherProperties;
+import run.halo.app.model.properties.BlogProperties;
+import run.halo.app.model.properties.SeoProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
@@ -99,15 +100,29 @@ public class FreemarkerConfigAwareListener {
     }
 
     private void loadOptionsConfig() throws TemplateModelException {
+
+        String context = optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() + "/" : "/";
+
         configuration.setSharedVariable("options", optionService.listOptions());
-        configuration.setSharedVariable("context", optionService.getBlogBaseUrl());
+        configuration.setSharedVariable("context", context);
         configuration.setSharedVariable("version", HaloConst.HALO_VERSION);
 
-//        configuration.setSharedVariable("blog_title", optionService.getBlogTitle());
-//        configuration.setSharedVariable("rss_path", optionService.getBlogBaseUrl() + "/rss.xml");
-//        configuration.setSharedVariable("atom_path", optionService.getBlogBaseUrl() + "/atom.xml");
-//        configuration.setSharedVariable("sitemap_xml_path", optionService.getBlogBaseUrl() + "/sitemap.xml");
-//        configuration.setSharedVariable("sitemap_html_path", optionService.getBlogBaseUrl() + "/sitemap.html");
+        configuration.setSharedVariable("blog_title", optionService.getBlogTitle());
+        configuration.setSharedVariable("blog_url", optionService.getBlogBaseUrl());
+        configuration.setSharedVariable("blog_logo", optionService.getByPropertyOrDefault(BlogProperties.BLOG_LOGO, String.class, BlogProperties.BLOG_LOGO.defaultValue()));
+        configuration.setSharedVariable("seo_keywords", optionService.getByPropertyOrDefault(SeoProperties.KEYWORDS, String.class, SeoProperties.KEYWORDS.defaultValue()));
+        configuration.setSharedVariable("seo_description", optionService.getByPropertyOrDefault(SeoProperties.DESCRIPTION, String.class, SeoProperties.DESCRIPTION.defaultValue()));
+
+        configuration.setSharedVariable("rss_url", optionService.getBlogBaseUrl() + "/rss.xml");
+        configuration.setSharedVariable("atom_url", optionService.getBlogBaseUrl() + "/atom.xml");
+        configuration.setSharedVariable("sitemap_xml_url", optionService.getBlogBaseUrl() + "/sitemap.xml");
+        configuration.setSharedVariable("sitemap_html_url", optionService.getBlogBaseUrl() + "/sitemap.html");
+        configuration.setSharedVariable("links_url", context + optionService.getLinksPrefix());
+        configuration.setSharedVariable("photos_url", context + optionService.getPhotosPrefix());
+        configuration.setSharedVariable("journals_url", context + optionService.getJournalsPrefix());
+        configuration.setSharedVariable("archives_url", context + optionService.getArchivesPrefix());
+        configuration.setSharedVariable("categories_url", context + optionService.getCategoriesPrefix());
+        configuration.setSharedVariable("tags_url", context + optionService.getTagsPrefix());
 
         log.debug("Loaded options");
     }
@@ -117,9 +132,7 @@ public class FreemarkerConfigAwareListener {
         // Get current activated theme.
         ThemeProperty activatedTheme = themeService.getActivatedTheme();
 
-        Boolean enabledAbsolutePath = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, true);
-
-        String themeBasePath = (enabledAbsolutePath ? optionService.getBlogBaseUrl() : "") + "/themes/" + activatedTheme.getFolderName();
+        String themeBasePath = (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/themes/" + activatedTheme.getFolderName();
 
         configuration.setSharedVariable("theme", activatedTheme);
 

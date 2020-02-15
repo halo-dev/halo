@@ -7,7 +7,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>${options.blog_title!} 网站地图</title>
+    <title>${blog_title!} 网站地图</title>
     <meta name="robots" content="index,follow"/>
     <style type="text/css">
         body {
@@ -119,8 +119,8 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
     </style>
 </head>
 <body>
-<h2 style="text-align: center; margin-top: 20px">${options.blog_title!} 网站地图 </h2>
-<div id="nav"><a href="${context!}"><strong>${options.blog_title!}</strong></a> &raquo; <a href="${context!}/sitemap.html">站点地图</a></div>
+<h2 style="text-align: center; margin-top: 20px">${blog_title!} 网站地图 </h2>
+<div id="nav"><a href="${blog_url!}"><strong>${blog_title!}</strong></a> &raquo; <a href="${sitemap_html_url!}">站点地图</a></div>
 <div id="content">
     <h3>最新文章</h3>
     <ul id="contentTable">
@@ -132,8 +132,8 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
         </li>
         <div class="clear"></div>
         <li>
-            <div class="T1 pull-left"><a href="${context!}" title="${options.blog_title!}">${options.blog_title!}</a></div>
-            <div class="T2 pull-right">${options.blog_start!}</div>
+            <div class="T1 pull-left"><a href="${blog_url!}" title="${blog_title!}">${blog_title!}</a></div>
+            <div class="T2 pull-right">${(options.birthday)?number_to_date?string("yyyy-MM-dd")} </div>
             <div class="T3 pull-right">daily</div>
             <div class="T4 pull-right">1</div>
         </li>
@@ -141,7 +141,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
         <#if posts?? && posts?size gt 0>
             <#list posts as post>
                 <li>
-                    <div class="T1 pull-left"><a href="${post.fullPath!}" title="${post.title!}">${post.title!} | ${options.blog_title!}</a></div>
+                    <div class="T1 pull-left"><a href="${post.fullPath!}" title="${post.title!}">${post.title!} | ${blog_title!}</a></div>
                     <div class="T2 pull-right">${post.createTime?string('yyyy-MM-dd')}</div>
                     <div class="T3 pull-right">daily</div>
                     <div class="T4 pull-right">0.6</div>
@@ -158,7 +158,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             <#if categories?? && categories?size gt 0>
                 <#list categories as category>
                     <li>
-                        <div class="T1 pull-left"><a href="${category.fullPath!}" title="${category.name}">${category.name} | ${options.blog_title!}</a></div>
+                        <div class="T1 pull-left"><a href="${category.fullPath!}" title="${category.name}">${category.name} | ${blog_title!}</a></div>
                         <div class="T2 pull-right">${category.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
@@ -176,7 +176,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             <#if tags?? && tags?size gt 0>
                 <#list tags as tag>
                     <li>
-                        <div class="T1 pull-left"><a href="${tag.fullPath!}" title="${tag.name}">${tag.name} | ${options.blog_title!}</a></div>
+                        <div class="T1 pull-left"><a href="${tag.fullPath!}" title="${tag.name}">${tag.name} | ${blog_title!}</a></div>
                         <div class="T2 pull-right">${tag.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
@@ -188,7 +188,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
     </ul>
 </div>
 <div id="footer">
-    该文件由 <a href="${context!}" title="${options.blog_title!}">${options.blog_title!}</a> 网站自动生成。
+    该文件由 <a href="${context!}" title="${blog_title!}">${blog_title!}</a> 网站自动生成。
 </div>
 </body>
 </html>
