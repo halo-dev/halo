@@ -40,7 +40,7 @@ public class PostParam implements InputConverter<Post> {
 
     private String summary;
 
-    @Size(max = 255, message = "文章缩略图链接的字符长度不能超过 {max}")
+    @Size(max = 1023, message = "封面图链接的字符长度不能超过 {max}")
     private String thumbnail;
 
     private Boolean disallowComment = false;

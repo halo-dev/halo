@@ -10,6 +10,8 @@ import javax.persistence.*;
  * Category entity.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-15
  */
 @Data
 @Entity
@@ -39,6 +41,12 @@ public class Category extends BaseEntity {
      */
     @Column(name = "description", columnDefinition = "varchar(100) default ''")
     private String description;
+
+    /**
+     * Cover thumbnail of the category.
+     */
+    @Column(name = "thumbnail", columnDefinition = "varchar(1023) default ''")
+    private String thumbnail;
 
     /**
      * Parent category.
