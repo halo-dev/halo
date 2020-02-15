@@ -9,7 +9,10 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
+        <a-card
+          :title="title"
+          :bodyStyle="{ padding: '16px' }"
+        >
           <a-form layout="horizontal">
             <a-form-item
               label="名称："
@@ -22,6 +25,20 @@
               help="* 一般为单个标签页面的标识，最好为英文"
             >
               <a-input v-model="tagToCreate.slugName" />
+            </a-form-item>
+            <a-form-item
+              label="封面图"
+              help="* 在标签页面可展示，需要主题支持"
+            >
+              <a-input v-model="tagToCreate.thumbnail">
+                <a
+                  href="javascript:void(0);"
+                  slot="addonAfter"
+                  @click="()=>this.thumbnailDrawerVisible = true"
+                >
+                  <a-icon type="picture" />
+                </a>
+              </a-input>
             </a-form-item>
             <a-form-item>
               <a-button
@@ -64,8 +81,11 @@
         :xs="24"
         :style="{ 'padding-bottom': '12px' }"
       >
-        <a-card title="所有标签" :bodyStyle="{ padding: '16px' }">
-          <a-empty v-if="tags.length==0"/>
+        <a-card
+          title="所有标签"
+          :bodyStyle="{ padding: '16px' }"
+        >
+          <a-empty v-if="tags.length==0" />
           <a-tooltip
             placement="topLeft"
             v-for="tag in tags"
@@ -84,18 +104,27 @@
         </a-card>
       </a-col>
     </a-row>
+
+    <AttachmentSelectDrawer
+      v-model="thumbnailDrawerVisible"
+      @listenToSelect="handleSelectThumbnail"
+      title="选择封面图"
+    />
   </div>
 </template>
 
 <script>
 import tagApi from '@/api/tag'
+import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 
 export default {
+  components: { AttachmentSelectDrawer },
   data() {
     return {
       formType: 'create',
       tags: [],
-      tagToCreate: {}
+      tagToCreate: {},
+      thumbnailDrawerVisible: false
     }
   },
   computed: {
@@ -155,6 +184,10 @@ export default {
         })
       }
       this.handleAddTag()
+    },
+    handleSelectThumbnail(data) {
+      this.$set(this.tagToCreate, 'thumbnail', encodeURI(data.path))
+      this.thumbnailDrawerVisible = false
     }
   }
 }

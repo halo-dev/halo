@@ -33,6 +33,20 @@
               />
             </a-form-item>
             <a-form-item
+              label="封面图"
+              help="* 在分类页面可展示，需要主题支持"
+            >
+              <a-input v-model="categoryToCreate.thumbnail">
+                <a
+                  href="javascript:void(0);"
+                  slot="addonAfter"
+                  @click="()=>this.thumbnailDrawerVisible = true"
+                >
+                  <a-icon type="picture" />
+                </a>
+              </a-input>
+            </a-form-item>
+            <a-form-item
               label="描述："
               help="* 分类描述，部分主题可显示"
             >
@@ -206,12 +220,19 @@
         </a-card>
       </a-col>
     </a-row>
+
+    <AttachmentSelectDrawer
+      v-model="thumbnailDrawerVisible"
+      @listenToSelect="handleSelectThumbnail"
+      title="选择封面图"
+    />
   </div>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import CategorySelectTree from './components/CategorySelectTree'
+import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import categoryApi from '@/api/category'
 import menuApi from '@/api/menu'
 
@@ -239,13 +260,14 @@ const columns = [
   }
 ]
 export default {
-  components: { CategorySelectTree },
+  components: { CategorySelectTree, AttachmentSelectDrawer },
   mixins: [mixin, mixinDevice],
   data() {
     return {
       formType: 'create',
       categories: [],
       categoryToCreate: {},
+      thumbnailDrawerVisible: false,
       menu: {},
       loading: false,
       columns
@@ -316,6 +338,10 @@ export default {
         this.$message.success('添加到菜单成功！')
         this.menu = {}
       })
+    },
+    handleSelectThumbnail(data) {
+      this.$set(this.categoryToCreate, 'thumbnail', encodeURI(data.path))
+      this.thumbnailDrawerVisible = false
     }
   }
 }
