@@ -497,7 +497,7 @@ const internalColumns = [
     dataIndex: 'title'
   },
   {
-    title: '访问路径',
+    title: '访问地址',
     dataIndex: 'url'
   },
   {

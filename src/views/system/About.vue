@@ -20,7 +20,7 @@
                 <a-icon type="copy" />
               </a>
             </template>
-            <a-popconfirm
+            <!-- <a-popconfirm
               slot="extra"
               placement="left"
               okText="确定"
@@ -41,7 +41,7 @@
                 icon="cloud-download"
               >
               </a-button>
-            </a-popconfirm>
+            </a-popconfirm> -->
 
             <ul style="margin: 0;padding: 0;list-style: none;">
               <li>Server 版本：{{ environments.version }}</li>
@@ -132,20 +132,14 @@ export default {
           contributions: 0
         }
       ],
-      contributorsLoading: true,
-      updating: false
+      contributorsLoading: true
     }
   },
   created() {
     this.getEnvironments()
     this.fetchContributors()
     this.checkServerUpdate()
-    this.checkAdminUpdate()
-  },
-  computed: {
-    updateText() {
-      return this.updating ? '更新中...' : '更新'
-    }
+    // this.checkAdminUpdate()
   },
   methods: {
     getEnvironments() {
@@ -153,20 +147,20 @@ export default {
         this.environments = response.data.data
       })
     },
-    confirmUpdate() {
-      this.updating = true
-      adminApi
-        .updateAdminAssets()
-        .then(response => {
-          this.$notification.success({
-            message: '更新成功',
-            description: '请刷新后体验最新版本！'
-          })
-        })
-        .finally(() => {
-          this.updating = false
-        })
-    },
+    // confirmUpdate() {
+    //   this.updating = true
+    //   adminApi
+    //     .updateAdminAssets()
+    //     .then(response => {
+    //       this.$notification.success({
+    //         message: '更新成功',
+    //         description: '请刷新后体验最新版本！'
+    //       })
+    //     })
+    //     .finally(() => {
+    //       this.updating = false
+    //     })
+    // },
     handleCopyEnvironments() {
       const text = `Server 版本：${this.environments.version}
 Admin 版本：${this.adminVersion}
@@ -189,7 +183,6 @@ User Agent：${navigator.userAgent}`
       axios
         .get('https://api.github.com/repos/halo-dev/halo/contributors')
         .then(response => {
-          console.log(response.data)
           _this.contributors = response.data
           this.contributorsLoading = false
         })
@@ -240,48 +233,48 @@ User Agent：${navigator.userAgent}`
           console.error('Check update fail', error)
         })
     },
-    async checkAdminUpdate() {
-      const _this = this
+    // async checkAdminUpdate() {
+    //   const _this = this
 
-      axios
-        .get('https://api.github.com/repos/halo-dev/halo-admin/releases/latest')
-        .then(response => {
-          const data = response.data
-          if (data.draft || data.prerelease) {
-            return
-          }
-          const current = _this.calculateIntValue(_this.adminVersion)
-          const latest = _this.calculateIntValue(data.name)
-          if (current >= latest) {
-            return
-          }
-          const title = '新版本提醒'
-          const content = '检测到 Admin 新版本：' + data.name + '，点击下方按钮可直接更新为最新版本。'
-          this.$notification.open({
-            message: title,
-            description: content,
-            icon: <a-icon type="smile" style="color: #108ee9" />,
-            btn: h => {
-              return h(
-                'a-button',
-                {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => _this.confirmUpdate()
-                  }
-                },
-                '点击更新'
-              )
-            }
-          })
-        })
-        .catch(function(error) {
-          console.error('Check update fail', error)
-        })
-    },
+    //   axios
+    //     .get('https://api.github.com/repos/halo-dev/halo-admin/releases/latest')
+    //     .then(response => {
+    //       const data = response.data
+    //       if (data.draft || data.prerelease) {
+    //         return
+    //       }
+    //       const current = _this.calculateIntValue(_this.adminVersion)
+    //       const latest = _this.calculateIntValue(data.name)
+    //       if (current >= latest) {
+    //         return
+    //       }
+    //       const title = '新版本提醒'
+    //       const content = '检测到 Admin 新版本：' + data.name + '，点击下方按钮可直接更新为最新版本。'
+    //       this.$notification.open({
+    //         message: title,
+    //         description: content,
+    //         icon: <a-icon type="smile" style="color: #108ee9" />,
+    //         btn: h => {
+    //           return h(
+    //             'a-button',
+    //             {
+    //               props: {
+    //                 type: 'primary',
+    //                 size: 'small'
+    //               },
+    //               on: {
+    //                 click: () => _this.confirmUpdate()
+    //               }
+    //             },
+    //             '点击更新'
+    //           )
+    //         }
+    //       })
+    //     })
+    //     .catch(function(error) {
+    //       console.error('Check update fail', error)
+    //     })
+    // },
     calculateIntValue(version) {
       version = version.replace(/v/g, '')
       const ss = version.split('.')
