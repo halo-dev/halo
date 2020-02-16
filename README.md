@@ -1,37 +1,40 @@
 <h1 align="center"><a href="https://github.com/halo-dev" target="_blank">halo-admin</a></h1>
 
-> halo-admin 是 [Halo](https://github.com/halo-dev) 的后台管理项目，使用 Vue 构建。希望更多的小伙伴参与到该项目的开发，让其更加完善。
+> halo-admin 是 [Halo](https://github.com/halo-dev/halo) 的管理端项目。
 
-## Project setup
+<p align="center">
+<a href="https://www.npmjs.com/package/halo-admin"><img alt="npm release" src="https://img.shields.io/npm/v/halo-admin?style=flat-square"/></a>
+<a href="https://github.com/halo-dev/halo-admin/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/halo-dev/halo-admin/total.svg?style=flat-square"></a>
+<a href="https://github.com/halo-dev/halo-admin/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo-admin.svg?style=flat-square"></a>
+<a href="https://travis-ci.org/halo-dev/halo-admin"><img alt="Travis CI" src="https://img.shields.io/travis/halo-dev/halo-admin.svg?style=flat-square"/></a>
+</p>
+
+------------------------------
+
+## 部署方案
+
+目前 Halo 的运行包内已经包含了构建好的页面，所以如果你不需要额外部署 admin，你无需做任何操作。
+
+### 独立部署
+
+克隆项目：
 
 ```bash
-npm install
+git clone https://github.com/halo-dev/halo-admin
 ```
 
-### Compiles and hot-reloads for development
+检出最新版本：
 
 ```bash
-npm run serve
+git checkout v1.2.0
 ```
 
-### Compiles and minifies for production
+打包构建：
 
 ```bash
+npm i
+
 npm run build
 ```
 
-### Run your tests
-
-```bash
-npm run test
-```
-
-### Lints and fixes files
-
-```bash
-npm run lint
-```
-
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
+最后，得到 dist 文件夹之后就可以单独部署了。
