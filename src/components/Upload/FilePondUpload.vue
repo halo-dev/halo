@@ -120,7 +120,7 @@ export default {
   },
   methods: {
     handleFilePondInit() {
-      console.log('FilePond has initialized')
+      this.$log.debug('FilePond has initialized')
     },
     handleClearFileList() {
       this.$refs.pond.removeFiles()

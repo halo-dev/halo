@@ -47,6 +47,7 @@
           :style="{'animation-delay': '0.3s'}"
         >
           <a-button
+            :loading="landing"
             type="primary"
             :block="true"
             @click="handleLogin"
@@ -139,7 +140,8 @@ export default {
       apiModifyVisible: false,
       defaultApiBefore: window.location.protocol + '//',
       apiUrl: window.location.host,
-      resetPasswordButton: false
+      resetPasswordButton: false,
+      landing: false
     }
   },
   computed: {
@@ -169,11 +171,17 @@ export default {
         this.$message.warn('密码不能为空！')
         return
       }
-
-      this.login({ username: this.username, password: this.password }).then(response => {
-        // Go to dashboard
-        this.loginSuccess()
-      })
+      this.landing = true
+      this.login({ username: this.username, password: this.password })
+        .then(response => {
+          // Go to dashboard
+          this.loginSuccess()
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.landing = false
+          }, 500)
+        })
     },
     loginSuccess() {
       // Cache the user info

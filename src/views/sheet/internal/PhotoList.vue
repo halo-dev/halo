@@ -59,7 +59,10 @@
               </a-row>
             </a-form>
           </div>
-          <div class="table-operator" style="margin-bottom: 0;">
+          <div
+            class="table-operator"
+            style="margin-bottom: 0;"
+          >
             <a-button
               type="primary"
               icon="plus"
@@ -85,7 +88,10 @@
               @click="showDrawer(item)"
             >
               <div class="photo-thumb">
-                <img :src="item.thumbnail" loading="lazy">
+                <img
+                  :src="item.thumbnail"
+                  loading="lazy"
+                >
               </div>
               <a-card-meta style="padding: 0.8rem;">
                 <ellipsis
@@ -110,6 +116,39 @@
         @showSizeChange="handlePaginationChange"
       />
     </div>
+    <div style="position: fixed;bottom: 30px;right: 30px;">
+      <a-button
+        type="primary"
+        shape="circle"
+        icon="setting"
+        size="large"
+        @click="()=>this.optionFormVisible=true"
+      ></a-button>
+    </div>
+    <a-modal
+      v-model="optionFormVisible"
+      title="页面设置"
+      :afterClose="onOptionFormClose"
+    >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleSaveOptions()"
+        >保存</a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item label="页面标题：" help="* 需要主题进行适配">
+          <a-input v-model="options.photos_title" />
+        </a-form-item>
+        <a-form-item label="每页显示条数：">
+          <a-input
+            type="number"
+            v-model="options.photos_page_size"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
     <a-drawer
       title="图片详情"
       :width="isMobile()?'100%':'460'"
@@ -137,7 +176,7 @@
             </div>
           </a-skeleton>
         </a-col>
-        <a-divider style="margin: 24px 0 12px 0;"/>
+        <a-divider style="margin: 24px 0 12px 0;" />
 
         <a-col :span="24">
           <a-skeleton
@@ -289,9 +328,11 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import photoApi from '@/api/photo'
+import optionApi from '@/api/option'
 
 export default {
   components: {
@@ -304,6 +345,7 @@ export default {
       drawerLoading: false,
       listLoading: true,
       thumDrawerVisible: false,
+      optionFormVisible: false,
       photo: {},
       photos: [],
       teams: [],
@@ -319,14 +361,17 @@ export default {
         sort: null,
         keyword: null,
         team: null
-      }
+      },
+      options: []
     }
   },
   created() {
     this.loadPhotos()
     this.loadTeams()
+    this.loadFormOptions()
   },
   methods: {
+    ...mapActions(['loadOptions']),
     loadPhotos() {
       this.listLoading = true
       this.queryParam.page = this.pagination.page - 1
@@ -336,6 +381,11 @@ export default {
         this.photos = response.data.data.content
         this.pagination.total = response.data.data.total
         this.listLoading = false
+      })
+    },
+    loadFormOptions() {
+      optionApi.listAll().then(response => {
+        this.options = response.data.data
       })
     },
     handleQuery() {
@@ -406,6 +456,17 @@ export default {
       this.drawerVisible = false
       this.photo = {}
       this.editable = false
+    },
+    handleSaveOptions() {
+      optionApi.save(this.options).then(response => {
+        this.loadFormOptions()
+        this.loadOptions()
+        this.$message.success('保存成功！')
+        this.optionFormVisible = false
+      })
+    },
+    onOptionFormClose() {
+      this.optionFormVisible = false
     }
   }
 }

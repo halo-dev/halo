@@ -56,13 +56,13 @@
                 <a
                   slot="description"
                   target="_blank"
-                  :href="options.blog_url+'/archives/'+comment.post.url"
+                  :href="comment.post.fullPath"
                   v-if="this.type=='posts'"
                 >{{ comment.post.title }}</a>
                 <a
                   slot="description"
                   target="_blank"
-                  :href="options.blog_url+'/s/'+comment.sheet.url"
+                  :href="comment.sheet.fullPath"
                   v-else-if="this.type=='sheets'"
                 >{{ comment.sheet.title }}</a>
                 <span
@@ -125,7 +125,6 @@
 </template>
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { mapGetters } from 'vuex'
 import commentApi from '@/api/comment'
 export default {
   name: 'CommentDetail',
@@ -136,7 +135,6 @@ export default {
       detailLoading: true,
       editable: false,
       commentStatus: commentApi.commentStatus,
-      options: [],
       keys: ['blog_url']
     }
   },
@@ -162,9 +160,6 @@ export default {
         return ['posts', 'sheets', 'journals'].indexOf(value) !== -1
       }
     }
-  },
-  computed: {
-    ...mapGetters(['options'])
   },
   watch: {
     visible: function(newValue, oldValue) {

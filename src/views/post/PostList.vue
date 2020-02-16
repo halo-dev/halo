@@ -237,7 +237,7 @@
                 />
                 <a
                   v-if="item.status=='PUBLISHED' || item.status == 'INTIMATE'"
-                  :href="options.blog_url+'/archives/'+item.url"
+                  :href="item.fullPath"
                   target="_blank"
                   style="text-decoration: none;"
                 >
@@ -318,7 +318,7 @@
             />
             <a
               v-if="record.status=='PUBLISHED' || record.status == 'INTIMATE'"
-              :href="options.blog_url+'/archives/'+record.url"
+              :href="record.fullPath"
               target="_blank"
               style="text-decoration: none;"
             >
@@ -518,7 +518,6 @@ import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
 import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import TagSelect from './components/TagSelect'
 import CategoryTree from './components/CategoryTree'
-import { mapGetters } from 'vuex'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 const columns = [
@@ -620,8 +619,7 @@ export default {
         post.statusProperty = this.postStatus[post.status]
         return post
       })
-    },
-    ...mapGetters(['options'])
+    }
   },
   created() {
     this.loadPosts()

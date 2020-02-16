@@ -187,12 +187,12 @@
                 发表在
                 <a
                   v-if="type==='posts'"
-                  :href="options.blog_url+'/archives/'+item.post.url"
+                  :href="item.post.fullPath"
                   target="_blank"
                 >《{{ item.post.title }}》</a>
                 <a
                   v-if="type === 'sheets'"
-                  :href="options.blog_url+'/s/'+item.sheet.url"
+                  :href="item.sheet.fullPath"
                   target="_blank"
                 >《{{ item.sheet.title }}》</a>
               </template>
@@ -282,14 +282,14 @@
             v-if="type==='posts'"
             slot="post"
             slot-scope="post"
-            :href="options.blog_url+'/archives/'+post.url"
+            :href="post.fullPath"
             target="_blank"
           >{{ post.title }}</a>
           <a
             v-if="type === 'sheets'"
             slot="sheet"
             slot-scope="sheet"
-            :href="options.blog_url+'/s/'+sheet.url"
+            :href="sheet.fullPath"
             target="_blank"
           >{{ sheet.title }}</a>
           <span
@@ -429,7 +429,6 @@
 </template>
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { mapGetters } from 'vuex'
 import CommentDetail from './CommentDetail'
 import marked from 'marked'
 import commentApi from '@/api/comment'
@@ -561,8 +560,7 @@ export default {
         comment.content = marked(comment.content)
         return comment
       })
-    },
-    ...mapGetters(['options'])
+    }
   },
   methods: {
     loadComments() {

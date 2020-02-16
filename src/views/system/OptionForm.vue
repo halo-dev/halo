@@ -3,7 +3,11 @@
     <a-row>
       <a-col :span="24">
         <div class="card-container">
-          <a-tabs type="card">
+          <a-tabs
+            type="card"
+            class="general"
+            v-if="!advancedOptions"
+          >
             <a-tab-pane key="general">
               <span slot="tab">
                 <a-icon type="tool" />常规设置
@@ -70,7 +74,7 @@
                 <a-form-item label="屏蔽搜索引擎：">
                   <a-switch v-model="options.seo_spider_disabled" />
                 </a-form-item>
-                <a-form-item label="关键词： ">
+                <a-form-item label="关键词：">
                   <a-input
                     v-model="options.seo_keywords"
                     placeholder="多个关键词以英文状态下的逗号隔开"
@@ -247,6 +251,7 @@
                     <a-input-password
                       v-model="options.smms_api_secret_token"
                       placeholder="需要到 sm.ms 官网注册后获取"
+                      autocomplete="new-password"
                     />
                   </a-form-item>
                 </div>
@@ -273,7 +278,10 @@
                     <a-input v-model="options.oss_upyun_operator" />
                   </a-form-item>
                   <a-form-item label="操作员密码：">
-                    <a-input-password v-model="options.oss_upyun_password" />
+                    <a-input-password
+                      v-model="options.oss_upyun_password"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="文件目录：">
                     <a-input v-model="options.oss_upyun_source" />
@@ -315,10 +323,16 @@
                     />
                   </a-form-item>
                   <a-form-item label="Access Key：">
-                    <a-input-password v-model="options.oss_qiniu_access_key" />
+                    <a-input-password
+                      v-model="options.oss_qiniu_access_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="Secret Key：">
-                    <a-input-password v-model="options.oss_qiniu_secret_key" />
+                    <a-input-password
+                      v-model="options.oss_qiniu_secret_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="文件目录：">
                     <a-input
@@ -371,10 +385,16 @@
                     <a-input v-model="options.oss_ali_endpoint" />
                   </a-form-item>
                   <a-form-item label="Access Key：">
-                    <a-input-password v-model="options.oss_ali_access_key" />
+                    <a-input-password
+                      v-model="options.oss_ali_access_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="Access Secret：">
-                    <a-input-password v-model="options.oss_ali_access_secret" />
+                    <a-input-password
+                      v-model="options.oss_ali_access_secret"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="文件目录：">
                     <a-input
@@ -421,10 +441,16 @@
                     <a-input v-model="options.bos_baidu_endpoint" />
                   </a-form-item>
                   <a-form-item label="Access Key：">
-                    <a-input-password v-model="options.bos_baidu_access_key" />
+                    <a-input-password
+                      v-model="options.bos_baidu_access_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="Secret Key：">
-                    <a-input-password v-model="options.bos_baidu_secret_key" />
+                    <a-input-password
+                      v-model="options.bos_baidu_secret_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="图片处理策略：">
                     <a-input
@@ -469,10 +495,16 @@
                     />
                   </a-form-item>
                   <a-form-item label="Secret Id：">
-                    <a-input-password v-model="options.cos_tencent_secret_id" />
+                    <a-input-password
+                      v-model="options.cos_tencent_secret_id"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="Secret Key：">
-                    <a-input-password v-model="options.cos_tencent_secret_key" />
+                    <a-input-password
+                      v-model="options.cos_tencent_secret_key"
+                      autocomplete="new-password"
+                    />
                   </a-form-item>
                   <a-form-item label="文件目录：">
                     <a-input
@@ -534,6 +566,7 @@
                         <a-input-password
                           v-model="options.email_password"
                           placeholder="部分邮箱可能是授权码"
+                          autocomplete="new-password"
                         />
                       </a-form-item>
                       <a-form-item label="发件人：">
@@ -578,28 +611,6 @@
                   </a-tab-pane>
                 </a-tabs>
               </div>
-            </a-tab-pane>
-            <a-tab-pane key="api">
-              <span slot="tab">
-                <a-icon type="thunderbolt" />API 设置
-              </span>
-              <a-form
-                layout="vertical"
-                :wrapperCol="wrapperCol"
-              >
-                <a-form-item label="API 服务：">
-                  <a-switch v-model="options.api_enabled" />
-                </a-form-item>
-                <a-form-item label="Access key：">
-                  <a-input-password v-model="options.api_access_key" />
-                </a-form-item>
-                <a-form-item>
-                  <a-button
-                    type="primary"
-                    @click="handleSaveOptions"
-                  >保存</a-button>
-                </a-form-item>
-              </a-form>
             </a-tab-pane>
             <a-tab-pane key="other">
               <span slot="tab">
@@ -653,9 +664,157 @@
               </a-form>
             </a-tab-pane>
           </a-tabs>
+
+          <a-tabs
+            type="card"
+            class="advanced"
+            v-else
+          >
+            <a-tab-pane key="permalink">
+              <span slot="tab">
+                <a-icon type="link" />固定链接
+              </span>
+              <a-form
+                layout="vertical"
+                :wrapperCol="wrapperCol"
+              >
+                <a-form-item label="文章固定链接类型：">
+                  <template slot="help">
+                    <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/${url}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ new Date() | moment_post_date }}${url}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}{{ new Date() | moment_post_day }}${url}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'ID'">{{ options.blog_url }}/?p=${id}</span>
+                  </template>
+                  <a-select v-model="options.post_permalink_type">
+                    <a-select-option
+                      v-for="item in Object.keys(permalinkType)"
+                      :key="item"
+                      :value="item"
+                    >{{ permalinkType[item].text }}</a-select-option>
+                  </a-select>
+                </a-form-item>
+                <a-form-item label="自定义页面前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.sheet_prefix }}/${url}{{ options.path_suffix }}</span>
+                  </template>
+                  <a-input v-model="options.sheet_prefix" />
+                </a-form-item>
+                <a-form-item label="友情链接页面前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.links_prefix }}</span>
+                  </template>
+                  <a-input v-model="options.links_prefix" />
+                </a-form-item>
+                <a-form-item label="图库页面前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.photos_prefix }}</span>
+                  </template>
+                  <a-input v-model="options.photos_prefix" />
+                </a-form-item>
+                <a-form-item label="日志页面前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.journals_prefix }}</span>
+                  </template>
+                  <a-input v-model="options.journals_prefix" />
+                </a-form-item>
+                <a-form-item label="归档前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.archives_prefix }}{{ options.path_suffix }}</span>
+                  </template>
+                  <a-input v-model="options.archives_prefix" />
+                </a-form-item>
+                <a-form-item label="分类前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.categories_prefix }}/${slugName}{{ options.path_suffix }}</span>
+                  </template>
+                  <a-input v-model="options.categories_prefix" />
+                </a-form-item>
+                <a-form-item label="标签前缀：">
+                  <template slot="help">
+                    <span>{{ options.blog_url }}/{{ options.tags_prefix }}/${slugName}{{ options.path_suffix }}</span>
+                  </template>
+                  <a-input v-model="options.tags_prefix" />
+                </a-form-item>
+                <a-form-item label="路径后缀：">
+                  <template slot="help">
+                    <span>仅对内建路径有效</span>
+                  </template>
+                  <a-input v-model="options.path_suffix" />
+                </a-form-item>
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    @click="handleSaveOptions"
+                  >保存</a-button>
+                </a-form-item>
+              </a-form>
+            </a-tab-pane>
+            <a-tab-pane key="api">
+              <span slot="tab">
+                <a-icon type="api" />API 设置
+              </span>
+              <a-form
+                layout="vertical"
+                :wrapperCol="wrapperCol"
+              >
+                <a-form-item label="API 服务：">
+                  <a-switch v-model="options.api_enabled" />
+                </a-form-item>
+                <a-form-item label="Access key：">
+                  <a-input-password
+                    v-model="options.api_access_key"
+                    autocomplete="new-password"
+                  />
+                </a-form-item>
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    @click="handleSaveOptions"
+                  >保存</a-button>
+                </a-form-item>
+              </a-form>
+            </a-tab-pane>
+            <a-tab-pane key="advanced-other">
+              <span slot="tab">
+                <a-icon type="align-left" />其他设置
+              </span>
+              <a-form
+                layout="vertical"
+                :wrapperCol="wrapperCol"
+              >
+                <a-form-item
+                  label="全局绝对路径："
+                  help="* 对网站上面的所有页面路径、本地附件路径、以及主题中的静态资源路径有效。"
+                >
+                  <a-switch v-model="options.global_absolute_path_enabled" />
+                </a-form-item>
+                <a-form-item>
+                  <a-button
+                    type="primary"
+                    @click="handleSaveOptions"
+                  >保存</a-button>
+                </a-form-item>
+              </a-form>
+            </a-tab-pane>
+          </a-tabs>
         </div>
       </a-col>
     </a-row>
+
+    <div style="position: fixed;bottom: 30px;right: 30px;">
+      <a-tooltip placement="top">
+        <template slot="title">
+          <span>{{ advancedOptions?'基础选项':'高级选项' }}</span>
+        </template>
+        <a-button
+          type="primary"
+          shape="circle"
+          :icon="`${advancedOptions?'setting':'thunderbolt'}`"
+          size="large"
+          @click="handleAdvancedOptions()"
+        ></a-button>
+      </a-tooltip>
+    </div>
 
     <AttachmentSelectDrawer
       v-model="logoDrawerVisible"
@@ -675,6 +834,7 @@ import { mapActions } from 'vuex'
 import optionApi from '@/api/option'
 import mailApi from '@/api/mail'
 import attachmentApi from '@/api/attachment'
+import postApi from '@/api/post'
 
 export default {
   components: {
@@ -683,6 +843,7 @@ export default {
   data() {
     return {
       attachmentType: attachmentApi.type,
+      permalinkType: postApi.permalinkType,
       wrapperCol: {
         xl: { span: 8 },
         lg: { span: 8 },
@@ -693,6 +854,7 @@ export default {
       faviconDrawerVisible: false,
       options: [],
       mailParam: {},
+      advancedOptions: false,
       tencentCosRegions: [
         {
           text: '北京一区',
@@ -1069,6 +1231,9 @@ export default {
     handleSelectFavicon(data) {
       this.options.blog_favicon = encodeURI(data.path)
       this.faviconDrawerVisible = false
+    },
+    handleAdvancedOptions() {
+      this.advancedOptions = !this.advancedOptions
     }
   }
 }

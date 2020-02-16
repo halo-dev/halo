@@ -19,7 +19,7 @@
             target="_blank"
           >{{ item.author }}</a> 发表在 《<a
             v-if="item.post.status=='PUBLISHED' || item.post.status=='INTIMATE'"
-            :href="options.blog_url+'/archives/'+item.post.url"
+            :href="item.post.fullPath"
             target="_blank"
           >{{ item.post.title }}</a><a
             v-else-if="item.post.status=='DRAFT'"
@@ -40,7 +40,7 @@
             target="_blank"
           >{{ item.author }}</a> 发表在 《<a
             v-if="item.sheet.status=='PUBLISHED'"
-            :href="options.blog_url+'/s/'+item.sheet.url"
+            :href="item.sheet.fullPath"
             target="_blank"
           >{{ item.sheet.title }}</a><a
             v-else-if="item.sheet.status=='DRAFT'"
@@ -71,7 +71,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import commentApi from '@/api/comment'
 import postApi from '@/api/post'
 import sheetApi from '@/api/sheet'
@@ -101,8 +100,7 @@ export default {
         comment.content = marked(comment.content)
         return comment
       })
-    },
-    ...mapGetters(['options'])
+    }
   },
   created() {
     this.loadComments()

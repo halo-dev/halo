@@ -20,7 +20,7 @@
                 <a-icon type="copy" />
               </a>
             </template>
-            <a-popconfirm
+            <!-- <a-popconfirm
               slot="extra"
               placement="left"
               okText="确定"
@@ -41,7 +41,7 @@
                 icon="cloud-download"
               >
               </a-button>
-            </a-popconfirm>
+            </a-popconfirm> -->
 
             <ul style="margin: 0;padding: 0;list-style: none;">
               <li>Server 版本：{{ environments.version }}</li>
@@ -55,10 +55,10 @@
               href="https://github.com/halo-dev"
               target="_blank"
               style="margin-right: 10px;"
-            >开源地址
+            >开源组织
               <a-icon type="link" /></a>
             <a
-              href="https://halo.run/guide"
+              href="https://halo.run"
               target="_blank"
               style="margin-right: 10px;"
             >用户文档
@@ -75,38 +75,25 @@
             title="开发者"
             :bordered="false"
             :bodyStyle="{ padding: '16px' }"
+            :loading="contributorsLoading"
           >
             <a
-              :href="item.github"
-              v-for="(item,index) in developers"
+              :href="item.html_url"
+              v-for="(item,index) in contributors"
               :key="index"
               target="_blank"
             >
               <a-tooltip
                 placement="top"
-                :title="item.name"
+                :title="item.login"
               >
                 <a-avatar
                   size="large"
-                  :src="item.avatar"
-                  :style="{ marginRight: '10px' }"
+                  :src="item.avatar_url"
+                  :style="{ marginRight: '10px',marginBottom: '10px'}"
                 />
               </a-tooltip>
             </a>
-          </a-card>
-
-          <a-card
-            title="时间轴"
-            :bordered="false"
-            :bodyStyle="{ padding: '16px' }"
-          >
-            <a-timeline>
-              <a-timeline-item>...</a-timeline-item>
-              <a-timeline-item
-                v-for="(item, index) in steps"
-                :key="index"
-              >{{ item.date }} {{ item.content }}</a-timeline-item>
-            </a-timeline>
           </a-card>
         </a-card>
       </a-col>
@@ -122,104 +109,37 @@ export default {
     return {
       adminVersion: this.VERSION,
       environments: {},
-      developers: [
+      contributors: [
         {
-          name: 'Ryan Wang',
-          avatar: '//cn.gravatar.com/avatar/7cc7f29278071bd4dce995612d428834?s=256&d=mm',
-          website: 'https://ryanc.cc',
-          github: 'https://github.com/ruibaby'
-        },
-        {
-          name: 'John Niang',
-          avatar: '//cn.gravatar.com/avatar/1dcf60ef27363dae539385d5bae9b2bd?s=256&d=mm',
-          website: 'https://johnniang.me',
-          github: 'https://github.com/johnniang'
-        },
-        {
-          name: 'Aquan',
-          avatar: '//cn.gravatar.com/avatar/3958035fa354403fa9ca3fca36b08068?s=256&d=mm',
-          website: 'https://blog.eunji.cn',
-          github: 'https://github.com/aquanlerou'
-        },
-        {
-          name: 'appdev',
-          avatar: '//cn.gravatar.com/avatar/08cf681fb7c6ad1b4fe70a8269c2103c?s=256&d=mm',
-          website: 'https://www.apkdv.com',
-          github: 'https://github.com/appdev'
-        },
-        {
-          name: 'guqing',
-          avatar: '//cn.gravatar.com/avatar/ad062ba572c8b006bfd2cbfc43fdee5e?s=256&d=mm',
-          website: 'http://www.guqing.xyz',
-          github: 'https://github.com/guqing'
+          login: '',
+          id: 0,
+          node_id: '',
+          avatar_url: '',
+          gravatar_id: '',
+          url: '',
+          html_url: '',
+          followers_url: '',
+          following_url: '',
+          gists_url: '',
+          starred_url: '',
+          subscriptions_url: '',
+          organizations_url: '',
+          repos_url: '',
+          events_url: '',
+          received_events_url: '',
+          type: '',
+          site_admin: false,
+          contributions: 0
         }
       ],
-      steps: [
-        {
-          date: '2019-09-11',
-          content: 'Halo v1.1.0 发布'
-        },
-        {
-          date: '2019-07-09',
-          content: 'Halo v1.0.3 发布'
-        },
-        {
-          date: '2019-07-08',
-          content: 'Star 数达到 6500'
-        },
-        {
-          date: '2019-06-01',
-          content: '1.0 正式版发布'
-        },
-        {
-          date: '2019-05-03',
-          content: 'Star 数达到 3300'
-        },
-        {
-          date: '2019-01-30',
-          content: 'John Niang 加入开发'
-        },
-        {
-          date: '2018-10-18',
-          content: '构建镜像到 Docker hub'
-        },
-        {
-          date: '2018-09-22',
-          content: 'Star 数达到 800'
-        },
-        {
-          date: '2018-05-02',
-          content: '第一条 Issue'
-        },
-        {
-          date: '2018-05-01',
-          content: 'Star 数达到 100'
-        },
-        {
-          date: '2018-04-29',
-          content: '第一个 Pull request'
-        },
-        {
-          date: '2018-04-28',
-          content: '正式开源'
-        },
-        {
-          date: '2018-03-21',
-          content: '确定命名为 Halo，并上传到 Github'
-        }
-      ],
-      updating: false
+      contributorsLoading: true
     }
   },
   created() {
     this.getEnvironments()
+    this.fetchContributors()
     this.checkServerUpdate()
-    this.checkAdminUpdate()
-  },
-  computed: {
-    updateText() {
-      return this.updating ? '更新中...' : '更新'
-    }
+    // this.checkAdminUpdate()
   },
   methods: {
     getEnvironments() {
@@ -227,34 +147,47 @@ export default {
         this.environments = response.data.data
       })
     },
-    confirmUpdate() {
-      this.updating = true
-      adminApi
-        .updateAdminAssets()
-        .then(response => {
-          this.$notification.success({
-            message: '更新成功',
-            description: '请刷新后体验最新版本！'
-          })
-        })
-        .finally(() => {
-          this.updating = false
-        })
-    },
+    // confirmUpdate() {
+    //   this.updating = true
+    //   adminApi
+    //     .updateAdminAssets()
+    //     .then(response => {
+    //       this.$notification.success({
+    //         message: '更新成功',
+    //         description: '请刷新后体验最新版本！'
+    //       })
+    //     })
+    //     .finally(() => {
+    //       this.updating = false
+    //     })
+    // },
     handleCopyEnvironments() {
       const text = `Server 版本：${this.environments.version}
 Admin 版本：${this.adminVersion}
 数据库：${this.environments.database}
 运行模式：${this.environments.mode}
-UA 信息：${navigator.userAgent}`
+User Agent：${navigator.userAgent}`
       this.$copyText(text)
         .then(message => {
-          console.log('copy', message)
+          this.$log.debug('copy', message)
           this.$message.success('复制成功！')
         })
         .catch(err => {
-          console.log('copy.err', err)
+          this.$log.debug('copy.err', err)
           this.$message.error('复制失败！')
+        })
+    },
+    async fetchContributors() {
+      this.contributorsLoading = true
+      const _this = this
+      axios
+        .get('https://api.github.com/repos/halo-dev/halo/contributors')
+        .then(response => {
+          _this.contributors = response.data
+          this.contributorsLoading = false
+        })
+        .catch(function(error) {
+          console.error('Fetch contributors error', error)
         })
     },
     async checkServerUpdate() {
@@ -300,48 +233,48 @@ UA 信息：${navigator.userAgent}`
           console.error('Check update fail', error)
         })
     },
-    async checkAdminUpdate() {
-      const _this = this
+    // async checkAdminUpdate() {
+    //   const _this = this
 
-      axios
-        .get('https://api.github.com/repos/halo-dev/halo-admin/releases/latest')
-        .then(response => {
-          const data = response.data
-          if (data.draft || data.prerelease) {
-            return
-          }
-          const current = _this.calculateIntValue(_this.adminVersion)
-          const latest = _this.calculateIntValue(data.name)
-          if (current >= latest) {
-            return
-          }
-          const title = '新版本提醒'
-          const content = '检测到 Admin 新版本：' + data.name + '，点击下方按钮可直接更新为最新版本。'
-          this.$notification.open({
-            message: title,
-            description: content,
-            icon: <a-icon type="smile" style="color: #108ee9" />,
-            btn: h => {
-              return h(
-                'a-button',
-                {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  on: {
-                    click: () => _this.confirmUpdate()
-                  }
-                },
-                '点击更新'
-              )
-            }
-          })
-        })
-        .catch(function(error) {
-          console.error('Check update fail', error)
-        })
-    },
+    //   axios
+    //     .get('https://api.github.com/repos/halo-dev/halo-admin/releases/latest')
+    //     .then(response => {
+    //       const data = response.data
+    //       if (data.draft || data.prerelease) {
+    //         return
+    //       }
+    //       const current = _this.calculateIntValue(_this.adminVersion)
+    //       const latest = _this.calculateIntValue(data.name)
+    //       if (current >= latest) {
+    //         return
+    //       }
+    //       const title = '新版本提醒'
+    //       const content = '检测到 Admin 新版本：' + data.name + '，点击下方按钮可直接更新为最新版本。'
+    //       this.$notification.open({
+    //         message: title,
+    //         description: content,
+    //         icon: <a-icon type="smile" style="color: #108ee9" />,
+    //         btn: h => {
+    //           return h(
+    //             'a-button',
+    //             {
+    //               props: {
+    //                 type: 'primary',
+    //                 size: 'small'
+    //               },
+    //               on: {
+    //                 click: () => _this.confirmUpdate()
+    //               }
+    //             },
+    //             '点击更新'
+    //           )
+    //         }
+    //       })
+    //     })
+    //     .catch(function(error) {
+    //       console.error('Check update fail', error)
+    //     })
+    // },
     calculateIntValue(version) {
       version = version.replace(/v/g, '')
       const ss = version.split('.')

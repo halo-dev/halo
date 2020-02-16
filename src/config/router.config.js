@@ -186,6 +186,13 @@ export const asyncRouterMap = [
             meta: { title: '小工具', hiddenHeaderContent: false }
           },
           {
+            path: '/system/tools/staticpages',
+            name: 'StaticPagesManage',
+            hidden: true,
+            component: () => import('@/views/system/staticpages/StaticPagesManage'),
+            meta: { title: '静态部署', hiddenHeaderContent: false }
+          },
+          {
             path: '/system/about',
             name: 'About',
             component: () => import('@/views/system/About'),

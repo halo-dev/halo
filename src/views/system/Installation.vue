@@ -247,8 +247,8 @@ export default {
     handleNextStep(e) {
       e.preventDefault()
       this.bloggerForm.validateFields((error, values) => {
-        console.log('error', error)
-        console.log('Received values of form: ', values)
+        this.$log.debug('error', error)
+        this.$log.debug('Received values of form: ', values)
         if (error != null) {
         } else {
           this.stepCurrent++

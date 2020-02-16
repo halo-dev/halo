@@ -124,4 +124,23 @@ postApi.postStatus = {
     text: '私密'
   }
 }
+
+postApi.permalinkType = {
+  DEFAULT: {
+    type: 'DEFAULT',
+    text: '默认'
+  },
+  DATE: {
+    type: 'DATE',
+    text: '年月型'
+  },
+  DAY: {
+    type: 'DAY',
+    text: '年月日型'
+  },
+  ID: {
+    type: 'ID',
+    text: 'ID 型'
+  }
+}
 export default postApi

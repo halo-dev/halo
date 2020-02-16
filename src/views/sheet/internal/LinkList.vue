@@ -195,11 +195,40 @@
         </a-card>
       </a-col>
     </a-row>
+    <div style="position: fixed;bottom: 30px;right: 30px;">
+      <a-button
+        type="primary"
+        shape="circle"
+        icon="setting"
+        size="large"
+        @click="()=>this.optionFormVisible=true"
+      ></a-button>
+    </div>
+    <a-modal
+      v-model="optionFormVisible"
+      title="页面设置"
+      :afterClose="onOptionFormClose"
+    >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleSaveOptions()"
+        >保存</a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item label="页面标题：" help="* 需要主题进行适配">
+          <a-input v-model="options.links_title" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import optionApi from '@/api/option'
 import linkApi from '@/api/link'
 const columns = [
   {
@@ -231,12 +260,14 @@ export default {
   data() {
     return {
       formType: 'create',
+      optionFormVisible: false,
       data: [],
       loading: false,
       columns,
       links: [],
       link: {},
-      teams: []
+      teams: [],
+      options: []
     }
   },
   computed: {
@@ -250,8 +281,10 @@ export default {
   created() {
     this.loadLinks()
     this.loadTeams()
+    this.loadFormOptions()
   },
   methods: {
+    ...mapActions(['loadOptions']),
     loadLinks() {
       this.loading = true
       linkApi.listAll().then(response => {
@@ -262,6 +295,11 @@ export default {
     loadTeams() {
       linkApi.listTeams().then(response => {
         this.teams = response.data.data
+      })
+    },
+    loadFormOptions() {
+      optionApi.listAll().then(response => {
+        this.options = response.data.data
       })
     },
     handleSaveClick() {
@@ -318,6 +356,17 @@ export default {
         })
       }
       this.handleAddLink()
+    },
+    handleSaveOptions() {
+      optionApi.save(this.options).then(response => {
+        this.loadFormOptions()
+        this.loadOptions()
+        this.$message.success('保存成功！')
+        this.optionFormVisible = false
+      })
+    },
+    onOptionFormClose() {
+      this.optionFormVisible = false
     }
   }
 }

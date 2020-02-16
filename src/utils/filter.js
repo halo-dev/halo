@@ -22,6 +22,14 @@ Vue.filter('moment', function(dataStr, pattern = 'YYYY-MM-DD HH:mm') {
   return moment(dataStr).format(pattern)
 })
 
+Vue.filter('moment_post_date', function(dataStr, pattern = '/YYYY/M/') {
+  return moment(dataStr).format(pattern)
+})
+
+Vue.filter('moment_post_day', function(dataStr, pattern = '/YYYY/M/D/') {
+  return moment(dataStr).format(pattern)
+})
+
 Vue.filter('timeAgo', timeAgo)
 
 Vue.filter('fileSizeFormat', function(value) {
