@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <title type="text">${options.blog_title!}</title>
+    <title type="text">${blog_title!}</title>
     <#if user.description??>
         <subtitle type="text">${user.description!}</subtitle>
     </#if>

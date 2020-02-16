@@ -188,7 +188,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
     </ul>
 </div>
 <div id="footer">
-    该文件由 <a href="${context!}" title="${blog_title!}">${blog_title!}</a> 网站自动生成。
+    该文件由 <a href="${blog_url!}" title="${blog_title!}">${blog_title!}</a> 网站自动生成。
 </div>
 </body>
 </html>

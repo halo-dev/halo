@@ -1,8 +1,8 @@
 <div style="text-align:center">
     <img src="${user.avatar!}" width="100" height="100" alt="${user.nickname!}">
-    <h3>${options.blog_title!}</h3>
+    <h3>${blog_title!}</h3>
     <h4>
-        <a href="${context!}" target="_blank">${context!}</a>
+        <a href="${blog_url!}" target="_blank">${blog_url!}</a>
     </h4>
 </div>
 

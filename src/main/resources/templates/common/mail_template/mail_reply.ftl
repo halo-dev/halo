@@ -23,7 +23,7 @@
                 <p style="color: #6e6e6e;font-size:13px;line-height:24px;">(此邮件由系统自动发出, 请勿回复。如有打扰，请见谅。)</p>
             </div>
             <p style="color: #6e6e6e;font-size:13px;line-height:24px;text-align:right;padding:0 32px">邮件发自：
-                <a href="${blog_url!}" style="color:#51a0e3;text-decoration:none">${options.blog_title!}</a>
+                <a href="${blog_url!}" style="color:#51a0e3;text-decoration:none">${blog_title!}</a>
             </p>
         </div>
     </div>
