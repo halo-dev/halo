@@ -72,21 +72,21 @@ public class PostModel {
     public String content(Post post, String token, Model model) {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
-            String redirect = String
-                    .format("%s/archives/%s/password", optionService.getBlogBaseUrl(),
-                            post.getUrl());
-            return "redirect:" + redirect;
+            model.addAttribute("url", post.getUrl());
+            return "common/template/post_password";
         }
 
-        if (!StringUtils.isEmpty(token)) {
+        if (StringUtils.isEmpty(token)) {
+            post = postService.getBy(PostStatus.PUBLISHED, post.getUrl());
+        } else {
             // verify token
-            String cachedToken = cacheStore.getAny(token, String.class)
-                    .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
+            String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该文章的访问权限");
             }
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         }
+
         postService.publishVisitEvent(post.getId());
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);

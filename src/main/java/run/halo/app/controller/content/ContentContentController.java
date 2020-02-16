@@ -1,21 +1,28 @@
 package run.halo.app.controller.content;
 
+import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.controller.content.model.*;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostPermalinkType;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author ryanwang
@@ -46,6 +53,8 @@ public class ContentContentController {
 
     private final ThemeService themeService;
 
+    private final StringCacheStore cacheStore;
+
     public ContentContentController(PostModel postModel,
                                     SheetModel sheetModel,
                                     CategoryModel categoryModel,
@@ -55,7 +64,8 @@ public class ContentContentController {
                                     OptionService optionService,
                                     PostService postService,
                                     SheetService sheetService,
-                                    ThemeService themeService) {
+                                    ThemeService themeService,
+                                    StringCacheStore cacheStore) {
         this.postModel = postModel;
         this.sheetModel = sheetModel;
         this.categoryModel = categoryModel;
@@ -66,6 +76,7 @@ public class ContentContentController {
         this.postService = postService;
         this.sheetService = sheetService;
         this.themeService = themeService;
+        this.cacheStore = cacheStore;
     }
 
     @GetMapping("{prefix}")
@@ -169,5 +180,39 @@ public class ContentContentController {
         } else {
             throw new NotFoundException("Not Found");
         }
+    }
+
+    @PostMapping(value = "archives/{url:.*}/password")
+    @CacheLock(traceRequest = true, expired = 2)
+    public String password(@PathVariable("url") String url,
+                           @RequestParam(value = "password") String password) throws UnsupportedEncodingException {
+        Post post = postService.getBy(PostStatus.INTIMATE, url);
+
+        post.setUrl(URLEncoder.encode(post.getUrl(), StandardCharsets.UTF_8.name()));
+
+        BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
+
+        StringBuilder redirectUrl = new StringBuilder();
+
+        if (!optionService.isEnabledAbsolutePath()) {
+            redirectUrl.append(optionService.getBlogBaseUrl());
+        }
+
+        redirectUrl.append(postMinimalDTO.getFullPath());
+
+        if (password.equals(post.getPassword())) {
+            String token = IdUtil.simpleUUID();
+            cacheStore.putAny(token, token, 10, TimeUnit.SECONDS);
+
+            if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
+                redirectUrl.append("&token=")
+                        .append(token);
+            } else {
+                redirectUrl.append("?token=")
+                        .append(token);
+            }
+        }
+
+        return "redirect:" + redirectUrl;
     }
 }
