@@ -630,11 +630,33 @@ export default {
       this.postSettingVisible = false
     }
   },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      vm.queryParam.page = to.query.page
+      vm.queryParam.size = to.query.size
+      vm.queryParam.sort = to.query.sort
+      vm.queryParam.keyword = to.query.keyword
+      vm.queryParam.categoryId = to.query.categoryId
+      vm.queryParam.status = to.query.status
+    })
+  },
   beforeRouteLeave(to, from, next) {
     if (this.postSettingVisible) {
       this.postSettingVisible = false
     }
     next()
+  },
+  watch: {
+    queryParam: {
+      deep: true,
+      handler: function(newVal, oldVal) {
+        if (newVal) {
+          const params = JSON.parse(JSON.stringify(this.queryParam))
+          const path = this.$router.history.current.path
+          this.$router.push({ path, query: params }).catch(err => err)
+        }
+      }
+    }
   },
   methods: {
     loadPosts() {
