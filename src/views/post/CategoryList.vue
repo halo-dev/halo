@@ -179,6 +179,19 @@
               {{ text }}
             </ellipsis>
             <span
+              slot="postCount"
+              slot-scope="text,record"
+              style="cursor: pointer;"
+              @click="handleQueryCategoryPosts(record)"
+            >
+              <a-badge
+                :count="record.postCount"
+                :numberStyle="{backgroundColor: '#00e0ff'} "
+                :showZero="true"
+                :overflowCount="9999"
+              />
+            </span>
+            <span
               slot="action"
               slot-scope="text, record"
             >
@@ -251,7 +264,8 @@ const columns = [
   },
   {
     title: '文章数',
-    dataIndex: 'postCount'
+    dataIndex: 'postCount',
+    scopedSlots: { customRender: 'postCount' }
   },
   {
     title: '操作',
@@ -342,6 +356,9 @@ export default {
     handleSelectThumbnail(data) {
       this.$set(this.categoryToCreate, 'thumbnail', encodeURI(data.path))
       this.thumbnailDrawerVisible = false
+    },
+    handleQueryCategoryPosts(category) {
+      this.$router.push({ name: 'PostList', query: { categoryId: category.id } })
     }
   }
 }
