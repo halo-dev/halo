@@ -158,7 +158,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         // Check whether the blog is installed or not
         Boolean isInstalled = optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
 
-        if (!isInstalled && Mode.TEST.equals(haloProperties.getMode())) {
+        if (!isInstalled && !Mode.TEST.equals(haloProperties.getMode())) {
             // If not installed
             getFailureHandler().onFailure(request, response, new NotInstallException("当前博客还没有初始化"));
             return;
