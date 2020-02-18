@@ -227,7 +227,7 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
             log.debug("Looking path: [{}]", lookupPath);
             for (String blackPattern : blackPatterns) {
                 if (this.pathMatcher.match(blackPattern, lookupPath)) {
-                    log.info("Skipped path [{}] with pattern: [{}]", lookupPath, blackPattern);
+                    log.debug("Skipped path [{}] with pattern: [{}]", lookupPath, blackPattern);
                     return null;
                 }
             }
