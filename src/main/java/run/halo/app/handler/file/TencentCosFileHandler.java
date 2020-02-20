@@ -78,7 +78,7 @@ public class TencentCosFileHandler implements FileHandler {
         }
 
         try {
-            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             StringBuilder upFilePath = new StringBuilder();
@@ -163,7 +163,7 @@ public class TencentCosFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.TENCENTCOS.equals(type);
+    public boolean supportType(String type) {
+        return AttachmentType.TENCENTCOS.name().equalsIgnoreCase(type);
     }
 }

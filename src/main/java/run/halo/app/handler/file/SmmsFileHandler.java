@@ -2,7 +2,6 @@ package run.halo.app.handler.file;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -123,7 +122,7 @@ public class SmmsFileHandler implements FileHandler {
 
         // Build result
         UploadResult result = new UploadResult();
-        result.setFilename(FilenameUtils.getBasename(file.getOriginalFilename()));
+        result.setFilename(FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename())));
         result.setSuffix(FilenameUtils.getExtension(file.getOriginalFilename()));
         result.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
 
@@ -164,8 +163,8 @@ public class SmmsFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.SMMS.equals(type);
+    public boolean supportType(String type) {
+        return AttachmentType.SMMS.name().equalsIgnoreCase(type);
     }
 
     /**
@@ -179,7 +178,6 @@ public class SmmsFileHandler implements FileHandler {
     }
 
     @Data
-    @ToString
     @NoArgsConstructor
     private static class SmmsResponse {
 
@@ -195,7 +193,6 @@ public class SmmsFileHandler implements FileHandler {
     }
 
     @Data
-    @ToString(callSuper = true)
     @NoArgsConstructor
     private static class SmmsResponseData {
 

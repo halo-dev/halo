@@ -234,6 +234,6 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
      */
     @NonNull
     private AttachmentType getAttachmentType() {
-        return optionService.getEnumByPropertyOrDefault(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.class, AttachmentType.LOCAL);
+        return Objects.requireNonNull(optionService.getEnumByPropertyOrDefault(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.class, AttachmentType.LOCAL));
     }
 }
