@@ -2,8 +2,6 @@
 
 > Halo 是一款现代化的个人独立博客系统，给习惯写博客的同学多一个选择。
 
-
-
 <p align="center">
 <a href="#"><img alt="JDK" src="https://img.shields.io/badge/JDK-1.8-yellow.svg?style=flat-square"/></a>
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square"/></a>
@@ -21,20 +19,24 @@
 
 轻快，简洁，功能强大，使用 Java 开发的博客系统。
 
-> [官方社区](https://bbs.halo.run) | [QQ 交流群](https://jq.qq.com/?_wv=1027&k=5tnr930) | [Telegram 交流群](https://t.me/HaloBlog) | [Telegram 频道](https://t.me/halo_dev) | [WeHalo 小程序](https://github.com/aquanlerou/WeHalo)。
+> [官网](https://halo.run) | [社区](https://bbs.halo.run) | [QQ 交流群](https://jq.qq.com/?_wv=1027&k=5tnr930) | [Telegram 交流群](https://t.me/HaloBlog) | [Telegram 频道](https://t.me/halo_dev)
+
+## 声明
+
+> 本项目旨在创造一个好的产品以供人们使用（虽然现在并不是太好），并非一个所谓提供学习的项目。所以，不提供任何学习代码的帮助。所以，请不要在讨论群，issues，论坛发起任何有关代码学习的问题。当然，如果你是要参与代码贡献，我们非常欢迎。
 
 ## 快速开始
 
 ### 下载最新的 Halo 安装包
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.1.1/halo-1.1.1.jar --output halo-latest.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.2.0/halo-1.2.0.jar --output halo-latest.jar
 ```
 
 或者
 
 ```bash
-wget https://github.com/halo-dev/halo/releases/download/v1.1.1/halo-1.1.1.jar -O halo-latest.jar
+wget https://github.com/halo-dev/halo/releases/download/v1.2.0/halo-1.2.0.jar -O halo-latest.jar
 ```
 
 ### 启动 Halo
@@ -43,7 +45,7 @@ wget https://github.com/halo-dev/halo/releases/download/v1.1.1/halo-1.1.1.jar -O
 java -jar halo-latest.jar
 ```
 
-详细文档请移步：<https://halo.run/guide>
+详细文档请移步：<https://halo.run/archives/install-quick-start>
 
 ## 博客示例
 
@@ -54,13 +56,14 @@ java -jar halo-latest.jar
 - 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
 - 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
 - 管理 APP（halo-app）：<https://github.com/halo-dev/halo-app>
-- 主题仓库：<https://halo.run/theme>
+- 主题仓库：<https://halo.run/s/themes>
+- WeHalo 小程序：<https://github.com/aquanlerou/WeHalo>
 
 ## 许可证
 
 [![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
-> Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议，即便是在中国。
+> Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议。
 
 ## 贡献
 参考 [CONTRIBUTING](./CONTRIBUTING.md)。
@@ -80,8 +83,6 @@ java -jar halo-latest.jar
 ![theme-walker.png](https://i.loli.net/2019/09/11/F6CjZKJX1N2x5dU.png)
 
 ![theme-icarus.png](https://i.loli.net/2019/09/11/4lO2wNCLiqyIJmR.png)
-
-![theme-destiny.png](https://i.loli.net/2019/09/11/q4t86cCPUEwlGMn.png)
 
 ![install.png](https://i.loli.net/2019/09/11/Iu1eMzZDg6frw97.png)
 

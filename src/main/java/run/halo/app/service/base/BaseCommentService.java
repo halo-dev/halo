@@ -23,7 +23,8 @@ import java.util.Map;
  * Base comment service interface.
  *
  * @author johnniang
- * @date 19-4-24
+ * @author ryanwang
+ * @date 2019-04-24
  */
 public interface BaseCommentService<COMMENT extends BaseComment> extends CrudService<COMMENT, Long> {
 
@@ -88,10 +89,31 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      *
      * @param postId   post id must not be null
      * @param pageable page info must not be null
+     * @param status   status must not be null
+     * @return a page of comment vo
+     */
+    @NonNull
+    Page<BaseCommentVO> pageVosAllBy(@NonNull Integer postId, @NonNull Pageable pageable);
+
+    /**
+     * Lists comment vos by post id.
+     *
+     * @param postId   post id must not be null
+     * @param pageable page info must not be null
      * @return a page of comment vo
      */
     @NonNull
     Page<BaseCommentVO> pageVosBy(@NonNull Integer postId, @NonNull Pageable pageable);
+
+    /**
+     * Lists comment vos by list of COMMENT.
+     *
+     * @param comments comments must not be null
+     * @param pageable page info must not be null
+     * @return a page of comment vo
+     */
+    @NonNull
+    Page<BaseCommentVO> pageVosBy(@NonNull List<COMMENT> comments, @NonNull Pageable pageable);
 
     /**
      * Lists comment with parent vo.
@@ -111,6 +133,14 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     Map<Integer, Long> countByPostIds(@Nullable Collection<Integer> postIds);
+
+    /**
+     * Count comments by post id.
+     *
+     * @param postId post id must not be null.
+     * @return comments count
+     */
+    long countByPostId(@NonNull Integer postId);
 
     /**
      * Counts by comment status.
@@ -148,6 +178,33 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      */
     @NonNull
     COMMENT updateStatus(@NonNull Long commentId, @NonNull CommentStatus status);
+
+    /**
+     * Updates comment status by ids.
+     *
+     * @param ids    comment ids must not be null
+     * @param status comment status must not be null
+     * @return updated comments
+     */
+    @NonNull
+    List<COMMENT> updateStatusByIds(@NonNull List<Long> ids, @NonNull CommentStatus status);
+
+    /**
+     * Remove comments by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of comments
+     */
+    List<COMMENT> removeByPostId(@NonNull Integer postId);
+
+    /**
+     * Removes comments in batch.
+     *
+     * @param ids ids must not be null.
+     * @return a list of deleted comment.
+     */
+    @NonNull
+    List<COMMENT> removeByIds(@NonNull Collection<Long> ids);
 
     /**
      * Converts to base comment dto.
@@ -216,6 +273,17 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId, @NonNull CommentStatus status, @NonNull Sort sort);
 
     /**
+     * Lists children comments.
+     *
+     * @param targetId        target id must not be null
+     * @param commentParentId comment parent id must not be null
+     * @param sort            sort info must not be null
+     * @return a list of children comment
+     */
+    @NonNull
+    List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId, @NonNull Sort sort);
+
+    /**
      * Filters comment ip address.
      *
      * @param comment comment dto must not be null
@@ -235,5 +303,14 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      * @param commentPage comment page
      */
     <T extends BaseCommentDTO> Page<T> filterIpAddress(@NonNull Page<T> commentPage);
+
+    /**
+     * Replace comment url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced comments.
+     */
+    List<BaseCommentDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
 
 }

@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -28,10 +29,9 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -50,6 +50,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     private final BasePostRepository<POST> basePostRepository;
 
     private final OptionService optionService;
+
+    private final Pattern SUMMARY_PATTERN = Pattern.compile("\\s*|\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
                                OptionService optionService) {
@@ -90,6 +92,16 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Optional<POST> postOptional = basePostRepository.getByUrlAndStatus(url, status);
 
         return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+    }
+
+    @Override
+    public POST getBy(PostStatus status, Integer id) {
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(id, "Post id must not be null");
+
+        Optional<POST> postOptional = basePostRepository.getByIdAndStatus(id, status);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(id));
     }
 
     @Override
@@ -321,6 +333,96 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
+    public POST updateDraftContent(String content, Integer postId) {
+        Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
+
+        if (content == null) {
+            content = "";
+        }
+
+        POST post = getById(postId);
+
+        if (!StringUtils.equals(content, post.getOriginalContent())) {
+            // If content is different with database, then update database
+            int updatedRows = basePostRepository.updateOriginalContent(content, postId);
+            if (updatedRows != 1) {
+                throw new ServiceException("Failed to update original content of post with id " + postId);
+            }
+            // Set the content
+            post.setOriginalContent(content);
+        }
+
+        return post;
+    }
+
+    @Override
+    @Transactional
+    public POST updateStatus(PostStatus status, Integer postId) {
+        Assert.notNull(status, "Post status must not be null");
+        Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
+
+        // Get post
+        POST post = getById(postId);
+
+        if (!status.equals(post.getStatus())) {
+            // Update post
+            int updatedRows = basePostRepository.updateStatus(status, postId);
+            if (updatedRows != 1) {
+                throw new ServiceException("Failed to update post status of post with id " + postId);
+            }
+
+            post.setStatus(status);
+        }
+
+        // Sync content
+        if (PostStatus.PUBLISHED.equals(status)) {
+            // If publish this post, then convert the formatted content
+            String formatContent = MarkdownUtils.renderHtml(post.getOriginalContent());
+            int updatedRows = basePostRepository.updateFormatContent(formatContent, postId);
+
+            if (updatedRows != 1) {
+                throw new ServiceException("Failed to update post format content of post with id " + postId);
+            }
+
+            post.setFormatContent(formatContent);
+        }
+
+        return post;
+    }
+
+    @Override
+    @Transactional
+    public List<POST> updateStatusByIds(List<Integer> ids, PostStatus status) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(id -> {
+            return updateStatus(status, id);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BasePostDetailDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<POST> posts = listAll();
+        List<POST> replaced = new ArrayList<>();
+        posts.forEach(post -> {
+            if (StringUtils.isNotEmpty(post.getThumbnail())) {
+                post.setThumbnail(post.getThumbnail().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(post.getOriginalContent())) {
+                post.setOriginalContent(post.getOriginalContent().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(post.getFormatContent())) {
+                post.setFormatContent(post.getFormatContent().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(post);
+        });
+        List<POST> updated = updateInBatch(replaced);
+        return updated.stream().map(this::convertToDetail).collect(Collectors.toList());
+    }
+
+    @Override
     public POST create(POST post) {
         // Check title
         urlMustNotExist(post);
@@ -342,7 +444,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
      * @param post post must not be null
      */
     protected void urlMustNotExist(@NonNull POST post) {
-        Assert.notNull(post, "Sheet must not be null");
+        Assert.notNull(post, "Post must not be null");
 
         // Get url count
         boolean exist;
@@ -365,6 +467,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(htmlContent, "html content must not be null");
 
         String text = HaloUtils.cleanHtmlTag(htmlContent);
+
+        Matcher matcher = SUMMARY_PATTERN.matcher(text);
+        text = matcher.replaceAll("");
 
         // Get summary length
         Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);

@@ -19,6 +19,7 @@ import run.halo.app.service.RecoveryService;
  * @author johnniang
  * @date 19-4-26
  */
+@Deprecated
 @RestController
 @RequestMapping("/api/admin/recoveries")
 public class RecoveryController {

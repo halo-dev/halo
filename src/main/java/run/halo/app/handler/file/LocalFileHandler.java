@@ -8,16 +8,17 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.FileOperationException;
-import run.halo.app.exception.ServiceException;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.ImageUtils;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,12 +55,9 @@ public class LocalFileHandler implements FileHandler {
      * Thumbnail height.
      */
     private final static int THUMB_HEIGHT = 256;
-
-    ReentrantLock lock = new ReentrantLock();
-
     private final OptionService optionService;
-
     private final String workDir;
+    ReentrantLock lock = new ReentrantLock();
 
     public LocalFileHandler(OptionService optionService,
                             HaloProperties haloProperties) {
@@ -102,7 +100,7 @@ public class LocalFileHandler implements FileHandler {
         // Build directory
         String subDir = UPLOAD_SUB_DIR + year + FILE_SEPARATOR + month + FILE_SEPARATOR;
 
-        String originalBasename = FilenameUtils.getBasename(file.getOriginalFilename());
+        String originalBasename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
 
         // Get basename
         String basename = originalBasename + '-' + HaloUtils.randomUUIDWithoutDash();
@@ -118,7 +116,7 @@ public class LocalFileHandler implements FileHandler {
         // Get upload path
         Path uploadPath = Paths.get(workDir, subFilePath);
 
-        log.info("Uploading to directory: [{}]", uploadPath.toString());
+        log.info("Uploading file: [{}]to directory: [{}]", file.getOriginalFilename(), uploadPath.toString());
 
         try {
             // TODO Synchronize here
@@ -144,14 +142,14 @@ public class LocalFileHandler implements FileHandler {
             // Check file type
             if (FileHandler.isImageType(uploadResult.getMediaType()) && !isSvg) {
                 lock.lock();
-                try {
+                try (InputStream uploadFileInputStream = new FileInputStream(uploadPath.toFile())) {
                     // Upload a thumbnail
                     String thumbnailBasename = basename + THUMBNAIL_SUFFIX;
                     String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
                     Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
 
                     // Read as image
-                    BufferedImage originalImage = ImageIO.read(uploadPath.toFile());
+                    BufferedImage originalImage = ImageUtils.getImageFromFile(uploadFileInputStream, extension);
                     // Set width and height
                     uploadResult.setWidth(originalImage.getWidth());
                     uploadResult.setHeight(originalImage.getHeight());
@@ -172,10 +170,10 @@ public class LocalFileHandler implements FileHandler {
                 uploadResult.setThumbPath(subFilePath);
             }
 
+            log.info("Uploaded file: [{}] to directory: [{}] successfully", file.getOriginalFilename(), uploadPath.toString());
             return uploadResult;
         } catch (IOException e) {
-            log.error("Failed to upload file to local: " + uploadPath, e);
-            throw new ServiceException("上传附件失败").setErrorData(uploadPath);
+            throw new FileOperationException("上传附件失败").setErrorData(uploadPath);
         }
     }
 
@@ -184,7 +182,6 @@ public class LocalFileHandler implements FileHandler {
         Assert.hasText(key, "File key must not be blank");
         // Get path
         Path path = Paths.get(workDir, key);
-
 
         // Delete the file key
         try {
@@ -215,8 +212,8 @@ public class LocalFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.LOCAL.equals(type);
+    public boolean supportType(String type) {
+        return AttachmentType.LOCAL.name().equalsIgnoreCase(type);
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
@@ -234,9 +231,8 @@ public class LocalFileHandler implements FileHandler {
             log.debug("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath.toString());
             result = true;
         } catch (Throwable t) {
-            log.warn("Failed to generate thumbnail: [{}]", thumbPath);
+            log.warn("Failed to generate thumbnail: " + thumbPath, t);
         }
         return result;
     }
-
 }

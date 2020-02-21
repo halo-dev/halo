@@ -1,25 +1,37 @@
 server:
   port: 8090
+
+  # Response data gzip.
+  compression:
+    enabled: false
 spring:
   datasource:
-    type: com.zaxxer.hikari.HikariDataSource
 
-    # H2 Database 配置，如果你需要使用 MySQL，请注释掉该配置并取消注释 MySQL 的配置。
+    # H2 database configuration.
     driver-class-name: org.h2.Driver
     url: jdbc:h2:file:~/.halo/db/halo
     username: admin
     password: 123456
 
-    # MySQL 配置，如果你需要使用 H2 Database，请注释掉该配置并取消注释上方 H2 Database 的配置。
+    # MySQL database configuration.
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
 #    username: root
 #    password: 123456
 
-  # H2 Database 的控制台相关配置，如果你使用的是 MySQL ，请注释掉下方内容。
+  # H2 database console configuration.
   h2:
     console:
       settings:
         web-allow-others: false
       path: /h2-console
       enabled: false
+
+halo:
+
+  # Your admin client path is https://your-domain/{admin-path}
+  admin-path: admin
+
+  # memory or level
+  cache: memory
+

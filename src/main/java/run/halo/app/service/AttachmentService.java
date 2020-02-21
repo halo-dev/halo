@@ -7,9 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
+import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.base.CrudService;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -17,14 +19,15 @@ import java.util.List;
  * Attachment service.
  *
  * @author johnniang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 public interface AttachmentService extends CrudService<Attachment, Integer> {
 
     /**
      * Pages attachment output dtos.
      *
-     * @param pageable page info must not be null
+     * @param pageable        page info must not be null
+     * @param attachmentQuery attachment query param.
      * @return a page of attachment output dto
      */
     @NonNull
@@ -50,6 +53,15 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
     Attachment removePermanently(@NonNull Integer id);
 
     /**
+     * Removes attachment permanently in batch.
+     *
+     * @param ids attachment ids must not be null
+     * @return attachment detail list deleted
+     */
+    @NonNull
+    List<Attachment> removePermanently(@NonNull Collection<Integer> ids);
+
+    /**
      * Converts to attachment output dto.
      *
      * @param attachment attachment must not be null
@@ -64,4 +76,20 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @return list of media type
      */
     List<String> listAllMediaType();
+
+    /**
+     * List all type.
+     *
+     * @return list of type.
+     */
+    List<AttachmentType> listAllType();
+
+    /**
+     * Replace attachment url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced attachments.
+     */
+    List<Attachment> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
 }

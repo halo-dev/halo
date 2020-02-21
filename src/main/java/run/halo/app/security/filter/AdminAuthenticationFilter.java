@@ -2,9 +2,7 @@ package run.halo.app.security.filter;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
@@ -12,6 +10,7 @@ import run.halo.app.model.entity.User;
 import run.halo.app.security.authentication.AuthenticationImpl;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.security.support.UserDetail;
 import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.OptionService;
@@ -24,6 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_QUERY_NAME;
+
 /**
  * Admin authentication filter.
  *
@@ -32,43 +34,16 @@ import java.util.Optional;
 @Slf4j
 public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
-    /**
-     * Admin session key.
-     */
-    public final static String ADMIN_SESSION_KEY = "halo.admin.session";
-
-    /**
-     * Access token cache prefix.
-     */
-    public final static String TOKEN_ACCESS_CACHE_PREFIX = "halo.admin.access.token.";
-
-    /**
-     * Refresh token cache prefix.
-     */
-    public final static String TOKEN_REFRESH_CACHE_PREFIX = "halo.admin.refresh.token.";
-
-    /**
-     * Admin token header name.
-     */
-    public final static String ADMIN_TOKEN_HEADER_NAME = "ADMIN-" + HttpHeaders.AUTHORIZATION;
-
-    /**
-     * Admin token param name.
-     */
-    public final static String ADMIN_TOKEN_QUERY_NAME = "admin_token";
-
     private final HaloProperties haloProperties;
-
-    private final StringCacheStore cacheStore;
 
     private final UserService userService;
 
     public AdminAuthenticationFilter(StringCacheStore cacheStore,
                                      UserService userService,
                                      HaloProperties haloProperties,
-                                     OptionService optionService) {
-        super(haloProperties, optionService);
-        this.cacheStore = cacheStore;
+                                     OptionService optionService,
+                                     OneTimeTokenService oneTimeTokenService) {
+        super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.userService = userService;
         this.haloProperties = haloProperties;
     }
@@ -90,16 +65,14 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         String token = getTokenFromRequest(request);
 
         if (StringUtils.isBlank(token)) {
-            getFailureHandler().onFailure(request, response, new AuthenticationException("未登录，请登陆后访问"));
-            return;
+            throw new AuthenticationException("未登录，请登陆后访问");
         }
 
         // Get user id from cache
         Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
 
         if (!optionalUserId.isPresent()) {
-            getFailureHandler().onFailure(request, response, new AuthenticationException("Token 已过期或不存在").setErrorData(token));
-            return;
+            throw new AuthenticationException("Token 已过期或不存在").setErrorData(token);
         }
 
         // Get the user
@@ -117,21 +90,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
     @Override
     protected String getTokenFromRequest(@NonNull HttpServletRequest request) {
-        Assert.notNull(request, "Http servlet request must not be null");
-
-        // Get from header
-        String token = request.getHeader(ADMIN_TOKEN_HEADER_NAME);
-
-        // Get from param
-        if (StringUtils.isBlank(token)) {
-            token = request.getParameter(ADMIN_TOKEN_QUERY_NAME);
-
-            log.debug("Got token from parameter: [{}: {}]", ADMIN_TOKEN_QUERY_NAME, token);
-        } else {
-            log.debug("Got token from header: [{}: {}]", ADMIN_TOKEN_HEADER_NAME, token);
-        }
-
-        return token;
+        return getTokenFromRequest(request, ADMIN_TOKEN_QUERY_NAME, ADMIN_TOKEN_HEADER_NAME);
     }
 
 }

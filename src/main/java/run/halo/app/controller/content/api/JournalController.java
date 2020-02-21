@@ -29,13 +29,13 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Content Journal controller.
+ * Content journal controller.
  *
  * @author johnniang
  * @author ryanwang
  * @date 2019-04-26
  */
-@RestController("PortalJournalController")
+@RestController("ApiContentJournalController")
 @RequestMapping("/api/content/journals")
 public class JournalController {
 

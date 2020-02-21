@@ -10,7 +10,8 @@ import java.util.Date;
  * Tag output dto.
  *
  * @author johnniang
- * @date 3/19/19
+ * @author ryanwang
+ * @date 2019-03-19
  */
 @Data
 public class TagDTO implements OutputConverter<TagDTO, Tag> {
@@ -21,5 +22,9 @@ public class TagDTO implements OutputConverter<TagDTO, Tag> {
 
     private String slugName;
 
+    private String thumbnail;
+
     private Date createTime;
+
+    private String fullPath;
 }

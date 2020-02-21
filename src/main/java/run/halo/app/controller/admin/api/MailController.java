@@ -1,5 +1,6 @@
 package run.halo.app.controller.admin.api;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +15,7 @@ import javax.validation.Valid;
  * Mail controller.
  *
  * @author johnniang
- * @date 19-5-7
+ * @date 2019-05-07
  */
 @RestController
 @RequestMapping("/api/admin/mails")
@@ -27,6 +28,7 @@ public class MailController {
     }
 
     @PostMapping("test")
+    @ApiOperation("Tests the SMTP service")
     public BaseResponse testMail(@Valid @RequestBody MailParam mailParam) {
         mailService.sendMail(mailParam.getTo(), mailParam.getSubject(), mailParam.getContent());
         return BaseResponse.ok("发送成功");

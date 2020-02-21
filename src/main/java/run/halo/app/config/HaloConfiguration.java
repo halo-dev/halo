@@ -2,6 +2,7 @@ package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -13,6 +14,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.RestTemplate;
 import run.halo.app.cache.InMemoryCacheStore;
+import run.halo.app.cache.LevelCacheStore;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.filter.CorsFilter;
@@ -22,8 +24,10 @@ import run.halo.app.security.filter.ApiAuthenticationFilter;
 import run.halo.app.security.filter.ContentFilter;
 import run.halo.app.security.handler.ContentAuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.HttpClientUtils;
 
 import java.security.KeyManagementException;
@@ -40,7 +44,8 @@ import java.security.NoSuchAlgorithmException;
 @Slf4j
 public class HaloConfiguration {
 
-    private final static int TIMEOUT = 5000;
+    @Autowired
+    HaloProperties haloProperties;
 
     @Bean
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
@@ -49,16 +54,33 @@ public class HaloConfiguration {
     }
 
     @Bean
-    public RestTemplate httpsRestTemplate(RestTemplateBuilder builder) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
+            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate httpsRestTemplate = builder.build();
-        httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(TIMEOUT)));
+        httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
+                (int) haloProperties.getDownloadTimeout().toMillis())));
         return httpsRestTemplate;
     }
 
     @Bean
     @ConditionalOnMissingBean
     public StringCacheStore stringCacheStore() {
-        return new InMemoryCacheStore();
+        StringCacheStore stringCacheStore;
+        switch (haloProperties.getCache()) {
+            case "level":
+                stringCacheStore = new LevelCacheStore();
+                break;
+
+            case "memory":
+            default:
+                //memory or default
+                stringCacheStore = new InMemoryCacheStore();
+                break;
+
+        }
+        log.info("halo cache store load impl : [{}]", stringCacheStore.getClass());
+        return stringCacheStore;
+
     }
 
     /**
@@ -94,10 +116,21 @@ public class HaloConfiguration {
 
     @Bean
     public FilterRegistrationBean<ContentFilter> contentFilter(HaloProperties haloProperties,
-                                                               OptionService optionService) {
-        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService);
+                                                               OptionService optionService,
+                                                               StringCacheStore cacheStore,
+                                                               OneTimeTokenService oneTimeTokenService) {
+        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService, cacheStore, oneTimeTokenService);
         contentFilter.setFailureHandler(new ContentAuthenticationFailureHandler());
-        contentFilter.addExcludeUrlPatterns("/api/**", "/install", "/version", "/admin/**", "/js/**", "/css/**");
+
+        String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
+
+        contentFilter.addExcludeUrlPatterns(
+                adminPattern,
+                "/api/**",
+                "/install",
+                "/version",
+                "/js/**",
+                "/css/**");
 
         FilterRegistrationBean<ContentFilter> contentFrb = new FilterRegistrationBean<>();
         contentFrb.addUrlPatterns("/*");
@@ -110,8 +143,10 @@ public class HaloConfiguration {
     @Bean
     public FilterRegistrationBean<ApiAuthenticationFilter> apiAuthenticationFilter(HaloProperties haloProperties,
                                                                                    ObjectMapper objectMapper,
-                                                                                   OptionService optionService) {
-        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService);
+                                                                                   OptionService optionService,
+                                                                                   StringCacheStore cacheStore,
+                                                                                   OneTimeTokenService oneTimeTokenService) {
+        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService, cacheStore, oneTimeTokenService);
         apiFilter.addExcludeUrlPatterns(
                 "/api/content/*/comments",
                 "/api/content/**/comments/**",
@@ -138,8 +173,10 @@ public class HaloConfiguration {
                                                                                        UserService userService,
                                                                                        HaloProperties haloProperties,
                                                                                        ObjectMapper objectMapper,
-                                                                                       OptionService optionService) {
-        AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties, optionService);
+                                                                                       OptionService optionService,
+                                                                                       OneTimeTokenService oneTimeTokenService) {
+        AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService,
+                haloProperties, optionService, oneTimeTokenService);
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());
@@ -151,12 +188,12 @@ public class HaloConfiguration {
                 "/api/admin/refresh/*",
                 "/api/admin/installations",
                 "/api/admin/recoveries/migrations/*",
+                "/api/admin/migrations/*",
                 "/api/admin/is_installed",
                 "/api/admin/password/code",
                 "/api/admin/password/reset"
         );
-        adminAuthenticationFilter.setFailureHandler(
-                failureHandler);
+        adminAuthenticationFilter.setFailureHandler(failureHandler);
 
         FilterRegistrationBean<AdminAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(adminAuthenticationFilter);

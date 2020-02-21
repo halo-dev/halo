@@ -11,12 +11,15 @@ import java.util.Date;
  * Journal dto.
  *
  * @author johnniang
- * @date 19-4-24
+ * @author ryanwang
+ * @date 2019-04-24
  */
 @Data
 public class JournalDTO implements OutputConverter<JournalDTO, Journal> {
 
     private Integer id;
+
+    private String sourceContent;
 
     private String content;
 

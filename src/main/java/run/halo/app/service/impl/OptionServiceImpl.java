@@ -6,6 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -13,12 +16,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.StringCacheStore;
+import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
+import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
+import run.halo.app.model.params.OptionQuery;
 import run.halo.app.model.properties.*;
 import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
@@ -28,7 +35,9 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ValidationUtils;
 
+import javax.persistence.criteria.Predicate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * OptionService implementation class
@@ -41,20 +50,19 @@ import java.util.*;
 public class OptionServiceImpl extends AbstractCrudService<Option, Integer> implements OptionService {
 
     private final OptionRepository optionRepository;
-
     private final ApplicationContext applicationContext;
-
     private final StringCacheStore cacheStore;
-
     private final Map<String, PropertyEnum> propertyEnumMap;
-
     private final ApplicationEventPublisher eventPublisher;
+    private HaloProperties haloProperties;
 
-    public OptionServiceImpl(OptionRepository optionRepository,
+    public OptionServiceImpl(HaloProperties haloProperties,
+                             OptionRepository optionRepository,
                              ApplicationContext applicationContext,
                              StringCacheStore cacheStore,
                              ApplicationEventPublisher eventPublisher) {
         super(optionRepository);
+        this.haloProperties = haloProperties;
         this.optionRepository = optionRepository;
         this.applicationContext = applicationContext;
         this.cacheStore = cacheStore;
@@ -122,6 +130,21 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         Map<String, Object> optionMap = ServiceUtils.convertToMap(optionParams, OptionParam::getKey, OptionParam::getValue);
         save(optionMap);
+    }
+
+    @Override
+    public void save(OptionParam optionParam) {
+        Option option = optionParam.convertTo();
+        create(option);
+        publishOptionUpdatedEvent();
+    }
+
+    @Override
+    public void update(Integer optionId, OptionParam optionParam) {
+        Option optionToUpdate = getById(optionId);
+        optionParam.update(optionToUpdate);
+        update(optionToUpdate);
+        publishOptionUpdatedEvent();
     }
 
     @Override
@@ -212,6 +235,48 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         listOptions().forEach((key, value) -> result.add(new OptionDTO(key, value)));
 
         return result;
+    }
+
+    @Override
+    public Page<OptionSimpleDTO> pageDtosBy(Pageable pageable, OptionQuery optionQuery) {
+        Assert.notNull(pageable, "Page info must not be null");
+
+        Page<Option> optionPage = optionRepository.findAll(buildSpecByQuery(optionQuery), pageable);
+
+        return optionPage.map(this::convertToDto);
+    }
+
+    @Override
+    public Option removePermanently(Integer id) {
+        Option deletedOption = removeById(id);
+        publishOptionUpdatedEvent();
+        return deletedOption;
+    }
+
+    @NonNull
+    private Specification<Option> buildSpecByQuery(@NonNull OptionQuery optionQuery) {
+        Assert.notNull(optionQuery, "Option query must not be null");
+
+        return (Specification<Option>) (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new LinkedList<>();
+
+            if (optionQuery.getType() != null) {
+                predicates.add(criteriaBuilder.equal(root.get("type"), optionQuery.getType()));
+            }
+
+            if (optionQuery.getKeyword() != null) {
+
+                String likeCondition = String.format("%%%s%%", StringUtils.strip(optionQuery.getKeyword()));
+
+                Predicate keyLike = criteriaBuilder.like(root.get("key"), likeCondition);
+
+                Predicate valueLike = criteriaBuilder.like(root.get("value"), likeCondition);
+
+                predicates.add(criteriaBuilder.or(keyLike, valueLike));
+            }
+
+            return query.where(predicates.toArray(new Predicate[0])).getRestriction();
+        };
     }
 
     @Override
@@ -324,7 +389,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     @Override
     public Zone getQnYunZone() {
-        return getByProperty(QnYunProperties.OSS_ZONE).map(qiniuZone -> {
+        return getByProperty(QiniuOssProperties.OSS_ZONE).map(qiniuZone -> {
 
             Zone zone;
             switch (qiniuZone.toString()) {
@@ -373,7 +438,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         if (StrUtil.isNotBlank(blogUrl)) {
             blogUrl = StrUtil.removeSuffix(blogUrl, "/");
         } else {
-            blogUrl = String.format("http://%s:%s", HaloUtils.getMachineIP(), serverPort);
+            if (haloProperties.isProductionEnv()) {
+                blogUrl = String.format("http://%s:%s", "127.0.0.1", serverPort);
+            } else {
+                blogUrl = String.format("http://%s:%s", HaloUtils.getMachineIP(), serverPort);
+            }
         }
 
         return blogUrl;
@@ -391,6 +460,33 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
             saveProperty(PrimaryProperties.BIRTHDAY, String.valueOf(currentTime));
             return currentTime;
         });
+    }
+
+    @Override
+    public PostPermalinkType getPostPermalinkType() {
+        return getEnumByPropertyOrDefault(PermalinkProperties.POST_PERMALINK_TYPE, PostPermalinkType.class, PostPermalinkType.DEFAULT);
+    }
+
+    @Override
+    public List<OptionDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<Option> options = listAll();
+        List<Option> replaced = new ArrayList<>();
+        options.forEach(option -> {
+            if (StringUtils.isNotEmpty(option.getValue())) {
+                option.setValue(option.getValue().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(option);
+        });
+        List<Option> updated = updateInBatch(replaced);
+        publishOptionUpdatedEvent();
+        return updated.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public OptionSimpleDTO convertToDto(Option option) {
+        Assert.notNull(option, "Option must not be null");
+
+        return new OptionSimpleDTO().convertFrom(option);
     }
 
     private void cleanCache() {

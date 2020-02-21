@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostTag;
@@ -118,10 +119,22 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     @Override
     public List<Post> listPostsBy(Integer tagId, PostStatus status) {
         Assert.notNull(tagId, "Tag id must not be null");
-        Assert.notNull(tagId, "Post status must not be null");
+        Assert.notNull(status, "Post status must not be null");
 
         // Find all post ids
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public List<Post> listPostsBy(String slug, PostStatus status) {
+        Assert.notNull(slug, "Tag slug must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        Tag tag = tagRepository.getBySlugName(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
+
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tag.getId(), status);
 
         return postRepository.findAllById(postIds);
     }
@@ -140,7 +153,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     @Override
     public Page<Post> pagePostsBy(Integer tagId, PostStatus status, Pageable pageable) {
         Assert.notNull(tagId, "Tag id must not be null");
-        Assert.notNull(tagId, "Post status must not be null");
+        Assert.notNull(status, "Post status must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids

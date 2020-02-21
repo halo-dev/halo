@@ -1,6 +1,8 @@
 package run.halo.app.controller.admin.api;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.PasswordParam;
@@ -16,7 +18,7 @@ import javax.validation.Valid;
  * User controller.
  *
  * @author johnniang
- * @date 3/19/19
+ * @date 2019-03-19
  */
 @RestController
 @RequestMapping("/api/admin/users")
@@ -29,11 +31,13 @@ public class UserController {
     }
 
     @GetMapping("profiles")
+    @ApiOperation("Gets user profile")
     public UserDTO getProfile(User user) {
         return new UserDTO().convertFrom(user);
     }
 
     @PutMapping("profiles")
+    @ApiOperation("Updates user profile")
     public UserDTO updateProfile(@RequestBody UserParam userParam, User user) {
         // Validate the user param
         ValidationUtils.validate(userParam, UpdateCheck.class);
@@ -46,6 +50,8 @@ public class UserController {
     }
 
     @PutMapping("profiles/password")
+    @DisableOnCondition
+    @ApiOperation("Updates user's password")
     public BaseResponse updatePassword(@RequestBody @Valid PasswordParam passwordParam, User user) {
         userService.updatePassword(passwordParam.getOldPassword(), passwordParam.getNewPassword(), user.getId());
         return BaseResponse.ok("密码修改成功");

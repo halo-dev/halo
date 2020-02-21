@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * @author ryanwang
- * @date : 2019-04-07
+ * @date 2019-04-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

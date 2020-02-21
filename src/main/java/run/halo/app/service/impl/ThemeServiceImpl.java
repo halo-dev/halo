@@ -4,8 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
+import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,10 +36,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
-import run.halo.app.utils.FileUtils;
-import run.halo.app.utils.FilenameUtils;
-import run.halo.app.utils.GitUtils;
-import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -178,6 +180,25 @@ public class ThemeServiceImpl implements ThemeService {
                     .map(path -> {
                         // Remove prefix
                         String customTemplate = StringUtils.removeStartIgnoreCase(path.getFileName().toString(), CUSTOM_SHEET_PREFIX);
+                        // Remove suffix
+                        return StringUtils.removeEndIgnoreCase(customTemplate, HaloConst.SUFFIX_FTL);
+                    })
+                    .collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new ServiceException("Failed to list files of path " + themePath.toString(), e);
+        }
+    }
+
+    @Override
+    public Set<String> listCustomTemplates(String themeId, String prefix) {
+        // Get the theme path
+        Path themePath = Paths.get(getThemeOfNonNullBy(themeId).getThemePath());
+
+        try (Stream<Path> pathStream = Files.list(themePath)) {
+            return pathStream.filter(path -> StringUtils.startsWithIgnoreCase(path.getFileName().toString(), prefix))
+                    .map(path -> {
+                        // Remove prefix
+                        String customTemplate = StringUtils.removeStartIgnoreCase(path.getFileName().toString(), prefix);
                         // Remove suffix
                         return StringUtils.removeEndIgnoreCase(customTemplate, HaloConst.SUFFIX_FTL);
                     })
@@ -334,6 +355,14 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    public String renderWithSuffix(String pageName) {
+        // Get activated theme
+        ThemeProperty activatedTheme = getActivatedTheme();
+        // Build render url
+        return String.format(RENDER_TEMPLATE_SUFFIX, activatedTheme.getFolderName(), pageName);
+    }
+
+    @Override
     public String getActivatedThemeId() {
         if (activatedThemeId == null) {
             synchronized (this) {
@@ -450,6 +479,11 @@ public class ThemeServiceImpl implements ThemeService {
             throw new AlreadyExistsException("当前安装的主题已存在");
         }
 
+        // Not support current halo version.
+        if (StringUtils.isNotEmpty(tmpThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, tmpThemeProperty.getRequire())) {
+            throw new ThemeNotSupportException("当前主题仅支持 Halo " + tmpThemeProperty.getRequire() + " 以上的版本");
+        }
+
         // Copy the temporary path to current theme folder
         Path targetThemePath = themeWorkDir.resolve(tmpThemeProperty.getId());
         FileUtils.copyFolder(themeTmpPath, targetThemePath);
@@ -506,6 +540,9 @@ public class ThemeServiceImpl implements ThemeService {
         try {
             pullFromGit(updatingTheme);
         } catch (Exception e) {
+            if (e instanceof ThemeNotSupportException) {
+                throw (ThemeNotSupportException) e;
+            }
             throw new ThemeUpdateException("主题更新失败！您与主题作者可能同时更改了同一个文件，您也可以尝试删除主题并重新拉取最新的主题", e).setErrorData(themeId);
         }
 
@@ -552,8 +589,15 @@ public class ThemeServiceImpl implements ThemeService {
                 throw new ServiceException("上传的主题包不是该主题的更新包: " + file.getOriginalFilename());
             }
 
+            // Not support current halo version.
+            if (StringUtils.isNotEmpty(prepareThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, prepareThemeProperty.getRequire())) {
+                throw new ThemeNotSupportException("新版本主题仅支持 Halo " + prepareThemeProperty.getRequire() + " 以上的版本");
+            }
+
             // Coping new theme files to old theme folder.
             FileUtils.copyFolder(preparePath, Paths.get(updatingTheme.getThemePath()));
+
+            eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
 
             // Gets theme property again.
             return getProperty(Paths.get(updatingTheme.getThemePath()));
@@ -578,6 +622,15 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             git = GitUtils.openOrInit(Paths.get(themeProperty.getThemePath()));
+
+            Repository repository = git.getRepository();
+
+            RevWalk revWalk = new RevWalk(repository);
+
+            Ref ref = repository.getAllRefs().get(Constants.HEAD);
+
+            RevCommit lastCommit = revWalk.parseCommit(ref.getObjectId());
+
             // Force to set remote name
             git.remoteRemove().setRemoteName(THEME_PROVIDER_REMOTE_NAME).call();
             RemoteConfig remoteConfig = git.remoteAdd()
@@ -619,6 +672,19 @@ public class ThemeServiceImpl implements ThemeService {
                 log.debug("Merge result: [{}]", pullResult.getMergeResult());
 
                 throw new ThemeUpdateException("拉取失败！您与主题作者可能同时更改了同一个文件");
+            }
+
+            // updated successfully.
+            ThemeProperty updatedThemeProperty = getProperty(Paths.get(themeProperty.getThemePath()));
+
+            // Not support current halo version.
+            if (StringUtils.isNotEmpty(updatedThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, updatedThemeProperty.getRequire())) {
+                // reset theme version
+                git.reset()
+                        .setMode(ResetCommand.ResetType.HARD)
+                        .setRef(lastCommit.getName())
+                        .call();
+                throw new ThemeNotSupportException("新版本主题仅支持 Halo " + updatedThemeProperty.getRequire() + " 以上的版本");
             }
         } finally {
             GitUtils.closeQuietly(git);
@@ -799,7 +865,7 @@ public class ThemeServiceImpl implements ThemeService {
             // Set screenshots
             getScreenshotsFileName(themePath).ifPresent(screenshotsName ->
                     themeProperty.setScreenshots(StringUtils.join(optionService.getBlogBaseUrl(),
-                            "/",
+                            "/themes/",
                             FilenameUtils.getBasename(themeProperty.getThemePath()),
                             "/",
                             screenshotsName)));

@@ -1,6 +1,6 @@
 server:
-  port: 8090
-  use-forward-headers: true
+  port: 18090
+  forward-headers-strategy: native
   compression:
     enabled: false
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
@@ -12,12 +12,13 @@ spring:
       enabled: always
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:halo-test
 
     # H2 Database 配置
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/halo-test/db/halo
-    username: admin
-    password: 123456
+    #    driver-class-name: org.h2.Driver
+    #    url: jdbc:h2:file:~/halo-test/db/halo
+    #    username: admin
+    #    password: 123456
 
     # MySQL 配置
   #  driver-class-name: com.mysql.cj.jdbc.Driver
@@ -33,22 +34,31 @@ spring:
       enabled: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
+  flyway:
+    enabled: false
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
-  mvc:
-    favicon:
-      enabled: false
   cache:
     type: none
+management:
+  endpoints:
+    web:
+      base-path: /api/admin/actuator
+      exposure:
+        include: ['httptrace', 'metrics','env','logfile']
 logging:
   level:
     run.halo.app: DEBUG
     org.hibernate: ERROR
-  path: ${user.home}/halo-test/logs
+  file:
+    path: ${user.home}/halo-test/logs
 
 halo:
   doc-disabled: false
+  auth-enable: false
+  mode: test
+  workDir: ${user.home}/halo-test/

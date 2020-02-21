@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.1.7.RELEASE'
+    id 'org.springframework.boot' version '2.2.2.RELEASE'
     id "io.freefair.lombok" version "3.6.6"
 //    id 'war'
     id 'java'
@@ -9,7 +9,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'run.halo.app'
 archivesBaseName = 'halo'
-version = '1.1.1'
+version = '1.2.0'
 sourceCompatibility = '1.8'
 description = 'Halo, personal blog system developed in Java.'
 
@@ -43,7 +43,7 @@ bootJar {
 
 ext {
     ohMyEmailVersion = '0.0.4'
-    hutoolVersion = '4.6.3'
+    hutoolVersion = '5.0.3'
     upyunSdkVersion = '4.0.1'
     qiniuSdkVersion = '7.2.18'
     aliyunSdkVersion = '3.4.2'
@@ -56,6 +56,13 @@ ext {
     jgitVersion = '5.3.0.201903130848-r'
     flexmarkVersion = '0.42.12'
     thumbnailatorVersion = '0.4.8'
+    image4jVersion = '0.7zensight1'
+    flywayVersion = '6.1.0'
+    h2Version = '1.4.196'
+    levelDbVersion = '0.12'
+    jsonVersion = '20190722'
+    fastJsonVersion = '1.2.56'
+    templateInheritance = "0.4.RELEASE"
 }
 
 dependencies {
@@ -64,6 +71,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-undertow'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation "kr.pe.kwonnam.freemarker:freemarker-template-inheritance:$templateInheritance"
 
     implementation "io.github.biezhi:oh-my-email:$ohMyEmailVersion"
     implementation "cn.hutool:hutool-core:$hutoolVersion"
@@ -93,12 +101,20 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-ext-tables:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gitlab:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-html-parser:$flexmarkVersion"
 
     implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
+    implementation "net.sf.image4j:image4j:$image4jVersion"
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
 
-    runtimeOnly 'com.h2database:h2'
+    implementation "org.json:json:$jsonVersion"
+    implementation "com.alibaba:fastjson:$fastJsonVersion"
+    
+    implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
+    runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly 'mysql:mysql-connector-java'
+
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
