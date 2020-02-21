@@ -1,4 +1,4 @@
-package run.halo.app.service;
+package run.halo.app.mail;
 
 import java.util.Map;
 
@@ -17,7 +17,7 @@ public interface MailService {
      * @param subject subject
      * @param content content
      */
-    void sendMail(String to, String subject, String content);
+    void sendTextMail(String to, String subject, String content);
 
     /**
      * Send a email with html
@@ -36,7 +36,12 @@ public interface MailService {
      * @param subject        subject
      * @param content        content
      * @param templateName   template name
-     * @param attachFilename attachment path
+     * @param attachFilePath attachment full path name
      */
-    void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilename);
+    void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilePath);
+
+    /**
+     * Test email server connection.
+     */
+    void testConnection();
 }

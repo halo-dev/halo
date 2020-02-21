@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.ServiceException;
+import run.halo.app.mail.MailService;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.service.*;
@@ -141,7 +142,7 @@ public class CommentEventListener {
     /**
      * Received a new reply comment event.
      *
-     * @param newEvent reply comment event.
+     * @param replyEvent reply comment event.
      */
     @Async
     @EventListener
