@@ -42,7 +42,6 @@ bootJar {
 }
 
 ext {
-    ohMyEmailVersion = '0.0.4'
     hutoolVersion = '5.0.3'
     upyunSdkVersion = '4.0.1'
     qiniuSdkVersion = '7.2.18'
@@ -73,7 +72,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation "kr.pe.kwonnam.freemarker:freemarker-template-inheritance:$templateInheritance"
 
-    implementation "io.github.biezhi:oh-my-email:$ohMyEmailVersion"
     implementation "cn.hutool:hutool-core:$hutoolVersion"
     implementation "cn.hutool:hutool-crypto:$hutoolVersion"
     implementation "cn.hutool:hutool-extra:$hutoolVersion"
@@ -110,7 +108,7 @@ dependencies {
 
     implementation "org.json:json:$jsonVersion"
     implementation "com.alibaba:fastjson:$fastJsonVersion"
-    
+
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly 'mysql:mysql-connector-java'
