@@ -198,6 +198,18 @@ public interface OptionService extends CrudService<Option, Integer> {
 
     /**
      * Gets property value by blog property.
+     * <p>
+     * Default value from property default value.
+     *
+     * @param property     blog property must not be null
+     * @param propertyType property type must not be null
+     * @param <T>          property type
+     * @return property value
+     */
+    <T> T getByPropertyOrDefault(@NonNull PropertyEnum property, @NonNull Class<T> propertyType);
+
+    /**
+     * Gets property value by blog property.
      *
      * @param property     blog property must not be null
      * @param propertyType property type must not be null
