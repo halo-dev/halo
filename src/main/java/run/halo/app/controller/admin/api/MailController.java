@@ -5,9 +5,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.mail.MailService;
 import run.halo.app.model.params.MailParam;
 import run.halo.app.model.support.BaseResponse;
-import run.halo.app.mail.MailService;
 
 import javax.validation.Valid;
 
@@ -29,8 +29,16 @@ public class MailController {
 
     @PostMapping("test")
     @ApiOperation("Tests the SMTP service")
-    public BaseResponse testMail(@Valid @RequestBody MailParam mailParam) {
+    public BaseResponse<String> testMail(@Valid @RequestBody MailParam mailParam) {
         mailService.sendTextMail(mailParam.getTo(), mailParam.getSubject(), mailParam.getContent());
         return BaseResponse.ok("发送成功");
     }
+
+    @PostMapping("test/connection")
+    @ApiOperation("Test connection with email server")
+    public BaseResponse<String> testConnection() {
+        mailService.testConnection();
+        return BaseResponse.ok("您和邮箱服务器的连接通畅");
+    }
+
 }

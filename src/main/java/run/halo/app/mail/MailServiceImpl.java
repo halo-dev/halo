@@ -64,6 +64,11 @@ public class MailServiceImpl extends AbstractMailService implements ApplicationL
         });
     }
 
+    @Override
+    public void testConnection() {
+        super.testConnection();
+    }
+
 
     @Override
     public void onApplicationEvent(OptionUpdatedEvent event) {

@@ -11,6 +11,7 @@ import run.halo.app.exception.EmailException;
 import run.halo.app.model.properties.EmailProperties;
 import run.halo.app.service.OptionService;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import java.io.UnsupportedEncodingException;
 
@@ -32,6 +33,18 @@ public abstract class AbstractMailService implements MailService {
 
     protected AbstractMailService(OptionService optionService) {
         this.optionService = optionService;
+    }
+
+    public void testConnection() {
+        JavaMailSender javaMailSender = getMailSender();
+        if (javaMailSender instanceof JavaMailSenderImpl) {
+            JavaMailSenderImpl mailSender = (JavaMailSenderImpl) javaMailSender;
+            try {
+                mailSender.testConnection();
+            } catch (MessagingException e) {
+                throw new EmailException("无法连接到邮箱服务器，请检查邮箱配置.[" + e.getMessage() + "]", e);
+            }
+        }
     }
 
     /**

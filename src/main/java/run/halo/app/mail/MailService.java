@@ -39,4 +39,9 @@ public interface MailService {
      * @param attachFilePath attachment full path name
      */
     void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilePath);
+
+    /**
+     * Test email server connection.
+     */
+    void testConnection();
 }
