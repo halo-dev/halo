@@ -14,7 +14,9 @@ import run.halo.app.service.OptionService;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -97,15 +99,24 @@ public abstract class AbstractMailService implements MailService {
         // create mime message helper
         MimeMessageHelper messageHelper = new MimeMessageHelper(mailSender.createMimeMessage());
 
-        // handle message set separately
         try {
+            // set from-name
             messageHelper.setFrom(getFromAddress(mailSender));
+            // handle message set separately
             callback.handle(messageHelper);
+
+            // get mime message
+            MimeMessage mimeMessage = messageHelper.getMimeMessage();
+            // send email
+            mailSender.send(mimeMessage);
+
+            log.info("Sent an email to [{}] successfully, subject: [{}], sent date: [{}]",
+                    Arrays.toString(mimeMessage.getAllRecipients()),
+                    mimeMessage.getSubject(),
+                    mimeMessage.getSentDate());
         } catch (Exception e) {
             throw new EmailException("邮件发送失败，请检查 SMTP 服务配置是否正确", e);
         }
-
-        mailSender.send(messageHelper.getMimeMessage());
     }
 
     /**
