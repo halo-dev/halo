@@ -323,6 +323,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public <T> T getByPropertyOrDefault(PropertyEnum property, Class<T> propertyType) {
+        return getByProperty(property, propertyType).orElse(property.defaultValue(propertyType));
+    }
+
+    @Override
     public <T> Optional<T> getByProperty(PropertyEnum property, Class<T> propertyType) {
         return getByProperty(property).map(propertyValue -> PropertyEnum.convertTo(propertyValue.toString(), propertyType));
     }
