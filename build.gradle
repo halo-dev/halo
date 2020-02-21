@@ -71,6 +71,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-undertow'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation "kr.pe.kwonnam.freemarker:freemarker-template-inheritance:$templateInheritance"
+    implementation "com.sun.mail:jakarta.mail"
 
     implementation "cn.hutool:hutool-core:$hutoolVersion"
     implementation "cn.hutool:hutool-crypto:$hutoolVersion"
