@@ -31,7 +31,7 @@ public class MailController {
     @ApiOperation("Tests the SMTP service")
     public BaseResponse<String> testMail(@Valid @RequestBody MailParam mailParam) {
         mailService.sendTextMail(mailParam.getTo(), mailParam.getSubject(), mailParam.getContent());
-        return BaseResponse.ok("发送成功");
+        return BaseResponse.ok("已发送，请查收。若确认没有收到邮件，请检查服务器日志");
     }
 
     @PostMapping("test/connection")

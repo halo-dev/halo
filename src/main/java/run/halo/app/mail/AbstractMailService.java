@@ -3,6 +3,7 @@ package run.halo.app.mail;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -14,6 +15,8 @@ import run.halo.app.service.OptionService;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Abstract mail service.
@@ -23,18 +26,38 @@ import java.io.UnsupportedEncodingException;
 @Slf4j
 public abstract class AbstractMailService implements MailService {
 
+    private static final int DEFAULT_POOL_SIZE = 5;
+
     private JavaMailSender cachedMailSender;
 
     private MailProperties cachedMailProperties;
 
     private String cachedFromName;
 
-    private OptionService optionService;
+    protected final OptionService optionService;
+
+    @Nullable
+    private ExecutorService executorService;
 
     protected AbstractMailService(OptionService optionService) {
         this.optionService = optionService;
     }
 
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
+    @NonNull
+    public ExecutorService getExecutorService() {
+        if (this.executorService == null) {
+            this.executorService = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
+        }
+        return executorService;
+    }
+
+    /**
+     * Test connection with email server.
+     */
     public void testConnection() {
         JavaMailSender javaMailSender = getMailSender();
         if (javaMailSender instanceof JavaMailSenderImpl) {
@@ -52,7 +75,7 @@ public abstract class AbstractMailService implements MailService {
      *
      * @param callback mime message callback.
      */
-    protected void sendMailTemplate(Callback callback) {
+    protected void sendMailTemplate(@Nullable Callback callback) {
         if (callback == null) {
             log.info("Callback is null, skip to send email");
             return;
@@ -83,6 +106,23 @@ public abstract class AbstractMailService implements MailService {
         }
 
         mailSender.send(messageHelper.getMimeMessage());
+    }
+
+    /**
+     * Send mail template if executor service is enable.
+     *
+     * @param callback   callback message handler
+     * @param tryToAsync if the send procedure should try to asynchronous
+     */
+    protected void sendMailTemplate(boolean tryToAsync, @Nullable Callback callback) {
+        ExecutorService executorService = getExecutorService();
+        if (tryToAsync && executorService != null) {
+            // send mail asynchronously
+            executorService.execute(() -> sendMailTemplate(callback));
+        } else {
+            // send mail synchronously
+            sendMailTemplate(callback);
+        }
     }
 
     /**

@@ -34,7 +34,7 @@ public class MailServiceImpl extends AbstractMailService implements ApplicationL
 
     @Override
     public void sendTextMail(String to, String subject, String content) {
-        sendMailTemplate(messageHelper -> {
+        sendMailTemplate(true, messageHelper -> {
             messageHelper.setSubject(subject);
             messageHelper.setTo(to);
             messageHelper.setText(content);
@@ -43,7 +43,7 @@ public class MailServiceImpl extends AbstractMailService implements ApplicationL
 
     @Override
     public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
-        sendMailTemplate(messageHelper -> {
+        sendMailTemplate(true, messageHelper -> {
             // build message content with freemarker
             Template template = freeMarker.getConfiguration().getTemplate(templateName);
             String contentResult = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
@@ -56,7 +56,7 @@ public class MailServiceImpl extends AbstractMailService implements ApplicationL
 
     @Override
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilePath) {
-        sendMailTemplate((messageHelper) -> {
+        sendMailTemplate(true, (messageHelper) -> {
             messageHelper.setSubject(subject);
             messageHelper.setTo(to);
             Path attachmentPath = Paths.get(attachFilePath);
