@@ -40,6 +40,11 @@ public enum AliOssProperties implements PropertyEnum {
     OSS_ACCESS_SECRET("oss_ali_access_secret", String.class, ""),
 
     /**
+     * Aliyun oss source
+     */
+    OSS_SOURCE("oss_ali_source", String.class, ""),
+
+    /**
      * Aliyun oss style rule.
      */
     OSS_STYLE_RULE("oss_ali_style_rule", String.class, ""),

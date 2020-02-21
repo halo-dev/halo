@@ -13,6 +13,8 @@ import java.util.Date;
  * Base post minimal output dto.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-19
  */
 @Data
 @ToString
@@ -32,4 +34,6 @@ public class BasePostMinimalDTO implements OutputConverter<BasePostMinimalDTO, B
     private Date createTime;
 
     private Date editTime;
+
+    private String fullPath;
 }

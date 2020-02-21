@@ -16,6 +16,8 @@ import java.util.List;
 @ToString
 public class StaticFile implements Comparator<StaticFile> {
 
+    private String id;
+
     private String name;
 
     private String path;
@@ -24,7 +26,7 @@ public class StaticFile implements Comparator<StaticFile> {
 
     private Boolean isFile;
 
-    private String mediaType;
+    private String mimeType;
 
     private Long createTime;
 

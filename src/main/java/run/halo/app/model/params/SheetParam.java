@@ -36,6 +36,8 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private String originalContent;
 
+    private String summary;
+
     @Size(max = 255, message = "页面缩略图链接的字符长度不能超过 {max}")
     private String thumbnail;
 
@@ -43,7 +45,7 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private Date createTime;
 
-    @Size(max = 255, message = "Length of password must not be more than {max}")
+    @Size(max = 255, message = "页面密码的字符长度不能超过 {max}")
     private String password;
 
     @Size(max = 255, message = "Length of template must not be more than {max}")

@@ -29,10 +29,9 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
@@ -51,6 +50,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     private final BasePostRepository<POST> basePostRepository;
 
     private final OptionService optionService;
+
+    private final Pattern SUMMARY_PATTERN = Pattern.compile("\\s*|\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
                                OptionService optionService) {
@@ -91,6 +92,16 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Optional<POST> postOptional = basePostRepository.getByUrlAndStatus(url, status);
 
         return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+    }
+
+    @Override
+    public POST getBy(PostStatus status, Integer id) {
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(id, "Post id must not be null");
+
+        Optional<POST> postOptional = basePostRepository.getByIdAndStatus(id, status);
+
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(id));
     }
 
     @Override
@@ -392,6 +403,26 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    public List<BasePostDetailDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<POST> posts = listAll();
+        List<POST> replaced = new ArrayList<>();
+        posts.forEach(post -> {
+            if (StringUtils.isNotEmpty(post.getThumbnail())) {
+                post.setThumbnail(post.getThumbnail().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(post.getOriginalContent())) {
+                post.setOriginalContent(post.getOriginalContent().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(post.getFormatContent())) {
+                post.setFormatContent(post.getFormatContent().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(post);
+        });
+        List<POST> updated = updateInBatch(replaced);
+        return updated.stream().map(this::convertToDetail).collect(Collectors.toList());
+    }
+
+    @Override
     public POST create(POST post) {
         // Check title
         urlMustNotExist(post);
@@ -436,6 +467,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(htmlContent, "html content must not be null");
 
         String text = HaloUtils.cleanHtmlTag(htmlContent);
+
+        Matcher matcher = SUMMARY_PATTERN.matcher(text);
+        text = matcher.replaceAll("");
 
         // Get summary length
         Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);

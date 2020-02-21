@@ -16,7 +16,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Freemarker custom tag of photo.
  *
  * @author ryanwang
- * @date : 2019/4/21
+ * @date 2019-04-21
  */
 @Component
 public class PhotoTagDirective implements TemplateDirectiveModel {

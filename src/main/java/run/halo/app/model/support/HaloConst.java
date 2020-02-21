@@ -11,7 +11,7 @@ import java.time.Duration;
  * </pre>
  *
  * @author ryanwang
- * @date : 2017/12/29
+ * @date 2017/12/29
  */
 public class HaloConst {
 
@@ -29,6 +29,11 @@ public class HaloConst {
      * Halo backup prefix.
      */
     public final static String HALO_BACKUP_PREFIX = "halo-backup-";
+
+    /**
+     * Static pages pack prefix.
+     */
+    public final static String STATIC_PAGE_PACK_PREFIX = "static-pages-";
 
     /**
      * Default theme name.

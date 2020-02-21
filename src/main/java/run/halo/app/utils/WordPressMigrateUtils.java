@@ -9,13 +9,10 @@ import java.io.FileInputStream;
 import java.util.*;
 
 /**
- * 解析 WordPress 导出的 XML 数据为 Map 结果集
- *
  * @author guqing
- * @date 2019-10-29 14:49
+ * @date 2020-01-18 14:06
  */
 public class WordPressMigrateUtils {
-
     /**
      * 存储在此集合中的节点名称都会被解析为一个List存储
      */

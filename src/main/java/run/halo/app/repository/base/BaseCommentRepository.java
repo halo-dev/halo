@@ -7,9 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.model.entity.BaseComment;
-import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
@@ -70,6 +68,14 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
     /**
+     * Count comments by post id.
+     *
+     * @param postId post id must not be null.
+     * @return comments count
+     */
+    long countByPostId(@NonNull Integer postId);
+
+    /**
      * Counts by comment status.
      *
      * @param status comment status must not be null
@@ -125,7 +131,17 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
-    List<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status, Long parentId);
+    List<COMMENT> findAllByPostIdAndStatusAndParentId(@NonNull Integer postId, @NonNull CommentStatus status, @NonNull Long parentId);
+
+    /**
+     * Finds comments by post id and parent id.
+     *
+     * @param postId   post id must not be null
+     * @param parentId comment parent id must not be null
+     * @return a list of comment
+     */
+    @NonNull
+    List<COMMENT> findAllByPostIdAndParentId(@NonNull Integer postId, @NonNull Long parentId);
 
     /**
      * Finds all comments by status and parent id collection.
@@ -136,6 +152,14 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      */
     @NonNull
     List<COMMENT> findAllByStatusAndParentIdIn(@NonNull CommentStatus status, @NonNull Collection<Long> parentIds);
+
+    /**
+     * Finds all comments by parent id collection.
+     *
+     * @param parentIds parent id collection must not be null
+     * @return a list of comment
+     */
+    List<COMMENT> findAllByParentIdIn(@NonNull Collection<Long> parentIds);
 
     /**
      * Finds comments by post id, comment status and parent id.
@@ -150,6 +174,12 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
     Page<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status, Long parentId, Pageable pageable);
 
 
+    /**
+     * Finds direct children count by comment ids.
+     *
+     * @param commentIds comment ids must not be null.
+     * @return a list of CommentChildrenCountProjection
+     */
     @Query("select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment.id), comment.parentId) " +
             "from BaseComment comment " +
             "where comment.parentId in ?1 " +

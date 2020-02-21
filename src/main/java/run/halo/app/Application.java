@@ -13,12 +13,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import run.halo.app.repository.base.BaseRepositoryImpl;
 
 /**
- * <pre>
- *     Halo run!
- * </pre>
+ * Halo main class.
  *
  * @author ryanwang
- * @date : 2017/11/14
+ * @date 2017-11-14
  */
 @SpringBootApplication
 @EnableJpaAuditing
@@ -35,6 +33,7 @@ public class Application extends SpringBootServletInitializer {
 
         // Run application
         context = SpringApplication.run(Application.class, args);
+
     }
 
     /**

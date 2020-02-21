@@ -18,6 +18,7 @@ import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.model.properties.AttachmentProperties;
+import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.AttachmentService;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
  *
  * @author ryanwang
  * @author johnniang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Slf4j
 @Service
@@ -157,13 +158,15 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         // Get blog base url
         String blogBaseUrl = optionService.getBlogBaseUrl();
 
+        Boolean enabledAbsolutePath = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, true);
+
         // Convert to output dto
         AttachmentDTO attachmentDTO = new AttachmentDTO().convertFrom(attachment);
 
         if (Objects.equals(attachmentDTO.getType(), AttachmentType.LOCAL)) {
             // Append blog base url to path and thumbnail
-            String fullPath = StringUtils.join(blogBaseUrl, "/", attachmentDTO.getPath());
-            String fullThumbPath = StringUtils.join(blogBaseUrl, "/", attachmentDTO.getThumbPath());
+            String fullPath = StringUtils.join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getPath());
+            String fullThumbPath = StringUtils.join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getThumbPath());
 
             // Set full path and full thumb path
             attachmentDTO.setPath(fullPath);
@@ -176,6 +179,27 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     @Override
     public List<String> listAllMediaType() {
         return attachmentRepository.findAllMediaType();
+    }
+
+    @Override
+    public List<AttachmentType> listAllType() {
+        return attachmentRepository.findAllType();
+    }
+
+    @Override
+    public List<Attachment> replaceUrl(String oldUrl, String newUrl) {
+        List<Attachment> attachments = listAll();
+        List<Attachment> replaced = new ArrayList<>();
+        attachments.forEach(attachment -> {
+            if (StringUtils.isNotEmpty(attachment.getPath())) {
+                attachment.setPath(attachment.getPath().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(attachment.getThumbPath())) {
+                attachment.setThumbPath(attachment.getThumbPath().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(attachment);
+        });
+        return updateInBatch(replaced);
     }
 
     @Override

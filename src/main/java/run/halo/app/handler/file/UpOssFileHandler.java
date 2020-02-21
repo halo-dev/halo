@@ -20,7 +20,7 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 /**
- * Up Yun file handler.
+ * Up oss file handler.
  *
  * @author johnniang
  * @author ryanwang

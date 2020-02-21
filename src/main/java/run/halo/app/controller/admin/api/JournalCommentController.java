@@ -27,7 +27,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Journal comment controller.
  *
  * @author johnniang
- * @date 19-4-25
+ * @date 2019-04-25
  */
 @RestController
 @RequestMapping("/api/admin/journals/comments")
@@ -53,6 +53,7 @@ public class JournalCommentController {
     }
 
     @GetMapping("latest")
+    @ApiOperation("Lists latest journal comments")
     public List<JournalCommentWithJournalVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
                                                         @RequestParam(name = "status", required = false) CommentStatus status) {
         List<JournalComment> latestComments = journalCommentService.pageLatest(top, status).getContent();
@@ -64,7 +65,7 @@ public class JournalCommentController {
     public Page<BaseCommentVO> listCommentTree(@PathVariable("journalId") Integer journalId,
                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService.pageVosBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        return journalCommentService.pageVosAllBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{journalId:\\d+}/list_view")

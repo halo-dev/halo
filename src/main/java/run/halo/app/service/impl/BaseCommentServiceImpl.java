@@ -15,7 +15,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.comment.CommentNewEvent;
-import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
@@ -47,6 +46,8 @@ import run.halo.app.utils.ValidationUtils;
 import javax.persistence.criteria.Predicate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Base comment service implementation.
@@ -233,6 +234,12 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public long countByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+        return baseCommentRepository.countByPostId(postId);
+    }
+
+    @Override
     public long countByStatus(CommentStatus status) {
         return baseCommentRepository.countByStatus(status);
     }
@@ -340,14 +347,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         comment.setStatus(status);
 
         // Update comment
-        COMMENT updatedComment = update(comment);
-
-        if (CommentStatus.PUBLISHED.equals(status)) {
-            // Pass a comment
-            eventPublisher.publishEvent(new CommentPassEvent(this, commentId));
-        }
-
-        return updatedComment;
+        return update(comment);
     }
 
     @Override
@@ -372,10 +372,12 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
         COMMENT comment = baseCommentRepository.findById(id).orElseThrow(() -> new NotFoundException("查询不到该评论的信息").setErrorData(id));
 
-        if (comment.getParentId() == 0) {
-            // Remove comment children.
-            List<COMMENT> comments = baseCommentRepository.deleteByParentId(id);
-            log.debug("Removed comment children: [{}]", comments);
+        List<COMMENT> children = listChildrenBy(comment.getPostId(), id, Sort.by(DESC, "createTime"));
+
+        if (children.size() > 0) {
+            children.forEach(child -> {
+                super.removeById(child.getId());
+            });
         }
 
         return super.removeById(id);
@@ -538,6 +540,30 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public List<COMMENT> listChildrenBy(Integer targetId, Long commentParentId, Sort sort) {
+        Assert.notNull(targetId, "Target id must not be null");
+        Assert.notNull(commentParentId, "Comment parent id must not be null");
+        Assert.notNull(sort, "Sort info must not be null");
+
+        // Get comments recursively
+
+        // Get direct children
+        List<COMMENT> directChildren = baseCommentRepository.findAllByPostIdAndParentId(targetId, commentParentId);
+
+        // Create result container
+        Set<COMMENT> children = new HashSet<>();
+
+        // Get children comments
+        getChildrenRecursively(directChildren, children);
+
+        // Sort children
+        List<COMMENT> childrenList = new ArrayList<>(children);
+        childrenList.sort(Comparator.comparing(BaseComment::getId));
+
+        return childrenList;
+    }
+
+    @Override
     public <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment) {
         Assert.notNull(comment, "Base comment dto must not be null");
 
@@ -584,6 +610,20 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         return commentPage;
     }
 
+    @Override
+    public List<BaseCommentDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<COMMENT> comments = listAll();
+        List<COMMENT> replaced = new ArrayList<>();
+        comments.forEach(comment -> {
+            if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
+                comment.setAuthorUrl(comment.getAuthorUrl().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(comment);
+        });
+        List<COMMENT> updated = updateInBatch(replaced);
+        return convertTo(updated);
+    }
+
     /**
      * Get children comments recursively.
      *
@@ -607,6 +647,32 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
         // Recursively invoke
         getChildrenRecursively(directChildren, status, children);
+
+        // Add direct children to children result
+        children.addAll(topComments);
+    }
+
+    /**
+     * Get children comments recursively.
+     *
+     * @param topComments top comment list
+     * @param children    children result must not be null
+     */
+    private void getChildrenRecursively(@Nullable List<COMMENT> topComments, @NonNull Set<COMMENT> children) {
+        Assert.notNull(children, "Children comment set must not be null");
+
+        if (CollectionUtils.isEmpty(topComments)) {
+            return;
+        }
+
+        // Convert comment id set
+        Set<Long> commentIds = ServiceUtils.fetchProperty(topComments, COMMENT::getId);
+
+        // Get direct children
+        List<COMMENT> directChildren = baseCommentRepository.findAllByParentIdIn(commentIds);
+
+        // Recursively invoke
+        getChildrenRecursively(directChildren, children);
 
         // Add direct children to children result
         children.addAll(topComments);

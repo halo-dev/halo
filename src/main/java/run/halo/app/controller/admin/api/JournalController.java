@@ -62,7 +62,8 @@ public class JournalController {
                                @RequestBody @Valid JournalParam journalParam) {
         Journal journal = journalService.getById(id);
         journalParam.update(journal);
-        return new JournalDTO().convertFrom(journalService.update(journal));
+        Journal updatedJournal = journalService.updateBy(journal);
+        return journalService.convertTo(updatedJournal);
     }
 
     @DeleteMapping("{journalId:\\d+}")

@@ -16,7 +16,7 @@ import java.util.Map;
  * Freemarker custom tag of post.
  *
  * @author ryanwang
- * @date : 2018/4/26
+ * @date 2018-04-26
  */
 @Component
 public class PostTagDirective implements TemplateDirectiveModel {
@@ -48,13 +48,17 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     env.setVariable("posts", builder.build().wrap(postService.listLatest(top)));
                     break;
                 case "count":
-                    env.setVariable("count", builder.build().wrap(postService.count()));
+                    env.setVariable("count", builder.build().wrap(postService.countByStatus(PostStatus.PUBLISHED)));
                     break;
                 case "archiveYear":
                     env.setVariable("archives", builder.build().wrap(postService.listYearArchives()));
                     break;
                 case "archiveMonth":
                     env.setVariable("archives", builder.build().wrap(postService.listMonthArchives()));
+                    break;
+                case "archive":
+                    String type = params.get("type").toString();
+                    env.setVariable("archives", builder.build().wrap("year".equals(type) ? postService.listYearArchives() : postService.listMonthArchives()));
                     break;
                 case "listByCategoryId":
                     Integer categoryId = Integer.parseInt(params.get("categoryId").toString());

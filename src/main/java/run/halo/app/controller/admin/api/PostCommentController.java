@@ -125,6 +125,7 @@ public class PostCommentController {
     }
 
     @PutMapping("{commentId:\\d+}")
+    @ApiOperation("Updates a post comment")
     public BaseCommentDTO updateBy(@Valid @RequestBody PostCommentParam commentParam,
                                    @PathVariable("commentId") Long commentId) {
         PostComment commentToUpdate = postCommentService.getById(commentId);

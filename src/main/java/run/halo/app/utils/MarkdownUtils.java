@@ -1,7 +1,6 @@
 package run.halo.app.utils;
 
 import com.vladsch.flexmark.convert.html.FlexmarkHtmlParser;
-import com.vladsch.flexmark.ext.anchorlink.AnchorLinkExtension;
 import com.vladsch.flexmark.ext.attributes.AttributesExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiExtension;
@@ -33,14 +32,13 @@ import java.util.Map;
  * Markdown utils.
  *
  * @author ryanwang
- * @date : 2019/06/27
+ * @date 2019/06/27
  */
 public class MarkdownUtils {
 
     private static final DataHolder OPTIONS = new MutableDataSet()
             .set(Parser.EXTENSIONS, Arrays.asList(
                     AttributesExtension.create(),
-                    AnchorLinkExtension.create(),
                     AutolinkExtension.create(),
                     EmojiExtension.create(),
                     EscapedCharacterExtension.create(),
@@ -56,13 +54,15 @@ public class MarkdownUtils {
             .set(TocExtension.LEVELS, 255)
             .set(TablesExtension.WITH_CAPTION, false)
             .set(TablesExtension.COLUMN_SPANS, false)
+            .set(TablesExtension.MIN_SEPARATOR_DASHES, 1)
             .set(TablesExtension.MIN_HEADER_ROWS, 1)
             .set(TablesExtension.MAX_HEADER_ROWS, 1)
             .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
             .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
             .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
-            .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.GITHUB)
-            .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.IMAGE_ONLY);
+            .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
+            .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY)
+            .set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
 
@@ -76,7 +76,7 @@ public class MarkdownUtils {
      */
     public static String renderHtml(String markdown) {
         if (StringUtils.isBlank(markdown)) {
-            return "";
+            return StringUtils.EMPTY;
         }
 
         // Render netease music short url.

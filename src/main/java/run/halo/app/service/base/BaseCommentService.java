@@ -135,6 +135,14 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     Map<Integer, Long> countByPostIds(@Nullable Collection<Integer> postIds);
 
     /**
+     * Count comments by post id.
+     *
+     * @param postId post id must not be null.
+     * @return comments count
+     */
+    long countByPostId(@NonNull Integer postId);
+
+    /**
      * Counts by comment status.
      *
      * @param status comment status must not be null
@@ -265,6 +273,17 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
     List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId, @NonNull CommentStatus status, @NonNull Sort sort);
 
     /**
+     * Lists children comments.
+     *
+     * @param targetId        target id must not be null
+     * @param commentParentId comment parent id must not be null
+     * @param sort            sort info must not be null
+     * @return a list of children comment
+     */
+    @NonNull
+    List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId, @NonNull Sort sort);
+
+    /**
      * Filters comment ip address.
      *
      * @param comment comment dto must not be null
@@ -284,5 +303,14 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      * @param commentPage comment page
      */
     <T extends BaseCommentDTO> Page<T> filterIpAddress(@NonNull Page<T> commentPage);
+
+    /**
+     * Replace comment url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced comments.
+     */
+    List<BaseCommentDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
 
 }
