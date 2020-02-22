@@ -53,12 +53,12 @@
       >
         <analysis-card
           :loading="countsLoading"
-          title="总访问"
+          title="阅读量"
           :number="statisticsData.visitCount"
         >
           <a-tooltip slot="action">
             <template slot="title">
-              文章总访问共
+              文章阅读共
               <countTo
                 :startVal="0"
                 :endVal="statisticsData.visitCount"
