@@ -469,27 +469,35 @@ export default {
       this.saving = true
       if (this.selectedPost.id) {
         // Update the post
-        postApi.update(this.selectedPost.id, this.selectedPost, autoSave).then(response => {
-          this.$log.debug('Updated post', response.data.data)
-          if (updateSuccess) {
-            updateSuccess()
+        postApi
+          .update(this.selectedPost.id, this.selectedPost, autoSave)
+          .then(response => {
+            this.$log.debug('Updated post', response.data.data)
+            if (updateSuccess) {
+              updateSuccess()
+              this.$emit('onSaved', true)
+              this.$router.push({ name: 'PostList' })
+            }
+          })
+          .finally(() => {
             this.saving = false
-            this.$emit('onSaved', true)
-            this.$router.push({ name: 'PostList' })
-          }
-        })
+          })
       } else {
         // Create the post
-        postApi.create(this.selectedPost, autoSave).then(response => {
-          this.$log.debug('Created post', response.data.data)
-          if (createSuccess) {
-            createSuccess()
+        postApi
+          .create(this.selectedPost, autoSave)
+          .then(response => {
+            this.$log.debug('Created post', response.data.data)
+            if (createSuccess) {
+              createSuccess()
+              this.$emit('onSaved', true)
+              this.$router.push({ name: 'PostList' })
+            }
+            this.selectedPost = response.data.data
+          })
+          .finally(() => {
             this.saving = false
-            this.$emit('onSaved', true)
-            this.$router.push({ name: 'PostList' })
-          }
-          this.selectedPost = response.data.data
-        })
+          })
       }
     },
     onClose() {

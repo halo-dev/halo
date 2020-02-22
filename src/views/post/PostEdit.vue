@@ -185,25 +185,37 @@ export default {
       if (this.postToStage.id) {
         // Update the post
         if (draftOnly) {
-          postApi.updateDraft(this.postToStage.id, this.postToStage.originalContent).then(response => {
-            this.$message.success('保存草稿成功！')
-            this.saving = false
-          })
+          postApi
+            .updateDraft(this.postToStage.id, this.postToStage.originalContent)
+            .then(response => {
+              this.$message.success('保存草稿成功！')
+            })
+            .finally(() => {
+              this.saving = false
+            })
         } else {
-          postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
-            this.$log.debug('Updated post', response.data.data)
-            this.$message.success('保存草稿成功！')
-            this.saving = false
-          })
+          postApi
+            .update(this.postToStage.id, this.postToStage, false)
+            .then(response => {
+              this.$log.debug('Updated post', response.data.data)
+              this.$message.success('保存草稿成功！')
+            })
+            .finally(() => {
+              this.saving = false
+            })
         }
       } else {
         // Create the post
-        postApi.create(this.postToStage, false).then(response => {
-          this.$log.debug('Created post', response.data.data)
-          this.$message.success('保存草稿成功！')
-          this.postToStage = response.data.data
-          this.saving = false
-        })
+        postApi
+          .create(this.postToStage, false)
+          .then(response => {
+            this.$log.debug('Created post', response.data.data)
+            this.$message.success('保存草稿成功！')
+            this.postToStage = response.data.data
+          })
+          .finally(() => {
+            this.saving = false
+          })
       }
     },
     handleAttachmentUpload(pos, $file) {
@@ -234,20 +246,28 @@ export default {
         // Update the post
         postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
           this.$log.debug('Updated post', response.data.data)
-          postApi.preview(this.postToStage.id).then(response => {
-            window.open(response.data, '_blank')
-            this.saving = false
-          })
+          postApi
+            .preview(this.postToStage.id)
+            .then(response => {
+              window.open(response.data, '_blank')
+            })
+            .finally(() => {
+              this.saving = false
+            })
         })
       } else {
         // Create the post
         postApi.create(this.postToStage, false).then(response => {
           this.$log.debug('Created post', response.data.data)
           this.postToStage = response.data.data
-          postApi.preview(this.postToStage.id).then(response => {
-            window.open(response.data, '_blank')
-            this.saving = false
-          })
+          postApi
+            .preview(this.postToStage.id)
+            .then(response => {
+              window.open(response.data, '_blank')
+            })
+            .finally(() => {
+              this.saving = false
+            })
         })
       }
     },

@@ -171,18 +171,26 @@ export default {
         this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
       if (this.sheetToStage.id) {
-        sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
-          this.$log.debug('Updated sheet', response.data.data)
-          this.$message.success('保存草稿成功！')
-          this.saving = false
-        })
+        sheetApi
+          .update(this.sheetToStage.id, this.sheetToStage, false)
+          .then(response => {
+            this.$log.debug('Updated sheet', response.data.data)
+            this.$message.success('保存草稿成功！')
+          })
+          .finally(() => {
+            this.saving = false
+          })
       } else {
-        sheetApi.create(this.sheetToStage, false).then(response => {
-          this.$log.debug('Created sheet', response.data.data)
-          this.$message.success('保存草稿成功！')
-          this.sheetToStage = response.data.data
-          this.saving = false
-        })
+        sheetApi
+          .create(this.sheetToStage, false)
+          .then(response => {
+            this.$log.debug('Created sheet', response.data.data)
+            this.$message.success('保存草稿成功！')
+            this.sheetToStage = response.data.data
+          })
+          .finally(() => {
+            this.saving = false
+          })
       }
     },
     handleAttachmentUpload(pos, $file) {
@@ -212,19 +220,27 @@ export default {
       if (this.sheetToStage.id) {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
-          sheetApi.preview(this.sheetToStage.id).then(response => {
-            window.open(response.data, '_blank')
-            this.saving = false
-          })
+          sheetApi
+            .preview(this.sheetToStage.id)
+            .then(response => {
+              window.open(response.data, '_blank')
+            })
+            .finally(() => {
+              this.saving = false
+            })
         })
       } else {
         sheetApi.create(this.sheetToStage, false).then(response => {
           this.$log.debug('Created sheet', response.data.data)
           this.sheetToStage = response.data.data
-          sheetApi.preview(this.sheetToStage.id).then(response => {
-            window.open(response.data, '_blank')
-            this.saving = false
-          })
+          sheetApi
+            .preview(this.sheetToStage.id)
+            .then(response => {
+              window.open(response.data, '_blank')
+            })
+            .finally(() => {
+              this.saving = false
+            })
         })
       }
     },

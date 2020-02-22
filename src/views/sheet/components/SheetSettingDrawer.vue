@@ -304,26 +304,34 @@ export default {
       this.selectedSheet.sheetMetas = this.selectedSheetMetas
       this.saving = true
       if (this.selectedSheet.id) {
-        sheetApi.update(this.selectedSheet.id, this.selectedSheet, autoSave).then(response => {
-          this.$log.debug('Updated sheet', response.data.data)
-          if (updateSuccess) {
-            updateSuccess()
+        sheetApi
+          .update(this.selectedSheet.id, this.selectedSheet, autoSave)
+          .then(response => {
+            this.$log.debug('Updated sheet', response.data.data)
+            if (updateSuccess) {
+              updateSuccess()
+              this.$emit('onSaved', true)
+              this.$router.push({ name: 'SheetList' })
+            }
+          })
+          .finally(() => {
             this.saving = false
-            this.$emit('onSaved', true)
-            this.$router.push({ name: 'SheetList' })
-          }
-        })
+          })
       } else {
-        sheetApi.create(this.selectedSheet, autoSave).then(response => {
-          this.$log.debug('Created sheet', response.data.data)
-          if (createSuccess) {
-            createSuccess()
+        sheetApi
+          .create(this.selectedSheet, autoSave)
+          .then(response => {
+            this.$log.debug('Created sheet', response.data.data)
+            if (createSuccess) {
+              createSuccess()
+              this.$emit('onSaved', true)
+              this.$router.push({ name: 'SheetList' })
+            }
+            this.selectedSheet = response.data.data
+          })
+          .finally(() => {
             this.saving = false
-            this.$emit('onSaved', true)
-            this.$router.push({ name: 'SheetList' })
-          }
-          this.selectedSheet = response.data.data
-        })
+          })
       }
     },
     onClose() {
