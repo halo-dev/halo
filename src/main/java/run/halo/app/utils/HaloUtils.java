@@ -234,13 +234,13 @@ public class HaloUtils {
     }
 
     /**
-     * Normalize image url
+     * Normalize url
      *
      * @param originalUrl original url
      * @return normalized url.
      */
     @NonNull
-    public static String normalizeImageUrl(@NonNull String originalUrl) {
+    public static String normalizeUrl(@NonNull String originalUrl) {
         Assert.hasText(originalUrl, "Original Url must not be blank");
 
         if (StringUtils.startsWithAny(originalUrl, "/", "https://", "http://")

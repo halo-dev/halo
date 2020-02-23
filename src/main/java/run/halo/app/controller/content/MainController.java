@@ -69,7 +69,7 @@ public class MainController {
     public void avatar(HttpServletResponse response) throws IOException {
         User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         if (StringUtils.isNotEmpty(user.getAvatar())) {
-            response.sendRedirect(HaloUtils.normalizeImageUrl(user.getAvatar()));
+            response.sendRedirect(HaloUtils.normalizeUrl(user.getAvatar()));
         }
     }
 
@@ -77,7 +77,7 @@ public class MainController {
     public void logo(HttpServletResponse response) throws IOException {
         String blogLogo = optionService.getByProperty(BlogProperties.BLOG_LOGO).orElse("").toString();
         if (StringUtils.isNotEmpty(blogLogo)) {
-            response.sendRedirect(HaloUtils.normalizeImageUrl(blogLogo));
+            response.sendRedirect(HaloUtils.normalizeUrl(blogLogo));
         }
     }
 
@@ -85,7 +85,7 @@ public class MainController {
     public void favicon(HttpServletResponse response) throws IOException {
         String favicon = optionService.getByProperty(BlogProperties.BLOG_FAVICON).orElse("").toString();
         if (StringUtils.isNotEmpty(favicon)) {
-            response.sendRedirect(HaloUtils.normalizeImageUrl(favicon));
+            response.sendRedirect(HaloUtils.normalizeUrl(favicon));
         }
     }
 }
