@@ -18,7 +18,6 @@ import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.model.properties.AttachmentProperties;
-import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.AttachmentService;
@@ -158,7 +157,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         // Get blog base url
         String blogBaseUrl = optionService.getBlogBaseUrl();
 
-        Boolean enabledAbsolutePath = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, true);
+        Boolean enabledAbsolutePath = optionService.isEnabledAbsolutePath();
 
         // Convert to output dto
         AttachmentDTO attachmentDTO = new AttachmentDTO().convertFrom(attachment);

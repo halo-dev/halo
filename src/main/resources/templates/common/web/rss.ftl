@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
     <channel>
-        <title>${options.blog_title!}</title>
-        <link>${context!}</link>
+        <title>${blog_title!}</title>
+        <link>${blog_url!}</link>
         <#if user.description??>
             <description>${user.description!}</description>
         </#if>
         <language>zh-CN</language>
+        <generator>Halo ${version!}</generator>
         <#if posts?? && posts?size gt 0>
             <#list posts as post>
                 <item>
@@ -15,8 +16,8 @@
                             ${post.title!}
                         ]]>
                     </title>
-                    <link>${options.blog_url}/archives/${post.url!}</link>
-                    <content:encoded>
+                    <link>${post.fullPath!}</link>
+                    <description>
                         <![CDATA[
                             <#if (options.rss_content_type!'full') == 'full'>
                                 ${post.formatContent!}
@@ -24,8 +25,8 @@
                                 ${post.summary!}
                             </#if>
                         ]]>
-                    </content:encoded>
-                    <pubDate>${post.createTime}</pubDate>
+                    </description>
+                    <pubDate>${post.createTime?iso_local}</pubDate>
                 </item>
             </#list>
         </#if>
