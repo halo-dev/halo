@@ -49,7 +49,7 @@
                   <a-select-option
                     v-for="category in categories"
                     :key="category.id"
-                  >{{ category.name }}</a-select-option>
+                  >{{ category.name }} ({{ category.postCount }})</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -672,7 +672,7 @@ export default {
       })
     },
     loadCategories() {
-      categoryApi.listAll().then(response => {
+      categoryApi.listAll(true).then(response => {
         this.categories = response.data.data
       })
     },
