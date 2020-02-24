@@ -55,10 +55,10 @@ public class HaloConfiguration {
 
     @Bean
     public RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
-            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate httpsRestTemplate = builder.build();
         httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
-                (int) haloProperties.getDownloadTimeout().toMillis())));
+            (int) haloProperties.getDownloadTimeout().toMillis())));
         return httpsRestTemplate;
     }
 
@@ -125,12 +125,12 @@ public class HaloConfiguration {
         String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
 
         contentFilter.addExcludeUrlPatterns(
-                adminPattern,
-                "/api/**",
-                "/install",
-                "/version",
-                "/js/**",
-                "/css/**");
+            adminPattern,
+            "/api/**",
+            "/install",
+            "/version",
+            "/js/**",
+            "/css/**");
 
         FilterRegistrationBean<ContentFilter> contentFrb = new FilterRegistrationBean<>();
         contentFrb.addUrlPatterns("/*");
@@ -148,9 +148,9 @@ public class HaloConfiguration {
                                                                                    OneTimeTokenService oneTimeTokenService) {
         ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService, cacheStore, oneTimeTokenService);
         apiFilter.addExcludeUrlPatterns(
-                "/api/content/*/comments",
-                "/api/content/**/comments/**",
-                "/api/content/options/comment"
+            "/api/content/*/comments",
+            "/api/content/**/comments/**",
+            "/api/content/options/comment"
         );
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
@@ -176,7 +176,7 @@ public class HaloConfiguration {
                                                                                        OptionService optionService,
                                                                                        OneTimeTokenService oneTimeTokenService) {
         AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService,
-                haloProperties, optionService, oneTimeTokenService);
+            haloProperties, optionService, oneTimeTokenService);
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());
@@ -184,14 +184,14 @@ public class HaloConfiguration {
 
         // Config the admin filter
         adminAuthenticationFilter.addExcludeUrlPatterns(
-                "/api/admin/login",
-                "/api/admin/refresh/*",
-                "/api/admin/installations",
-                "/api/admin/recoveries/migrations/*",
-                "/api/admin/migrations/*",
-                "/api/admin/is_installed",
-                "/api/admin/password/code",
-                "/api/admin/password/reset"
+            "/api/admin/login",
+            "/api/admin/refresh/*",
+            "/api/admin/installations",
+            "/api/admin/recoveries/migrations/*",
+            "/api/admin/migrations/*",
+            "/api/admin/is_installed",
+            "/api/admin/password/code",
+            "/api/admin/password/reset"
         );
         adminAuthenticationFilter.setFailureHandler(failureHandler);
 

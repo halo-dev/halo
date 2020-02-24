@@ -56,7 +56,7 @@ public class MailServiceImpl extends AbstractMailService implements ApplicationL
 
     @Override
     public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilePath) {
-        sendMailTemplate(true, (messageHelper) -> {
+        sendMailTemplate(true, messageHelper -> {
             messageHelper.setSubject(subject);
             messageHelper.setTo(to);
             Path attachmentPath = Paths.get(attachFilePath);

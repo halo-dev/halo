@@ -168,8 +168,8 @@ public class StaticPageServiceImpl implements StaticPageService {
     public Path zipStaticPagesDirectory() {
         try {
             String staticPagePackName = HaloConst.STATIC_PAGE_PACK_PREFIX +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
-                    IdUtil.simpleUUID().hashCode() + ".zip";
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
+                IdUtil.simpleUUID().hashCode() + ".zip";
             Path staticPageZipPath = Files.createFile(Paths.get(STATIC_PAGE_PACK_DIR, staticPagePackName));
 
             FileUtils.zip(pagesDir, staticPageZipPath);

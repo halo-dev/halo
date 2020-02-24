@@ -1,12 +1,13 @@
 package run.halo.app.repository;
 
-import run.halo.app.model.entity.Sheet;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import run.halo.app.model.entity.Sheet;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@Slf4j
 public class SheetRepositoryTest {
 
     @Autowired
@@ -27,6 +29,6 @@ public class SheetRepositoryTest {
     @Test
     public void listAllTest() {
         List<Sheet> allSheets = sheetRepository.findAll();
-        System.out.println(allSheets);
+        log.debug("{}", allSheets);
     }
 }

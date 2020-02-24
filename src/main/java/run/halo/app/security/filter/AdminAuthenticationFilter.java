@@ -54,7 +54,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         if (!haloProperties.isAuthEnabled()) {
             // Set security
             userService.getCurrentUser().ifPresent(user ->
-                    SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
+                SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
 
             // Do filter
             filterChain.doFilter(request, response);

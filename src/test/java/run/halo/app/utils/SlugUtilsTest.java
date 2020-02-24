@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,6 +10,7 @@ import static org.hamcrest.Matchers.equalTo;
  * @author johnniang
  * @date 3/20/19
  */
+@Slf4j
 public class SlugUtilsTest {
 
     @Test
@@ -29,6 +31,6 @@ public class SlugUtilsTest {
     public void nullSlugTest() {
         String slug = SlugUtils.slug("+/~!@#$%^&*()_+");
 
-        System.out.println("slug：" + slug);
+        log.debug("slug：" + slug);
     }
 }

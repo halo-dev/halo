@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.net.URI;
@@ -14,6 +15,7 @@ import java.nio.file.Paths;
  * @author johnniang
  * @date 19-5-20
  */
+@Slf4j
 public class PathTest {
 
     @Test(expected = FileSystemNotFoundException.class)
@@ -22,6 +24,6 @@ public class PathTest {
         URI uri = new URI(file);
         Path path = Paths.get(uri);
 
-        System.out.println("Path: " + path.toString());
+        log.debug("Path: " + path.toString());
     }
 }

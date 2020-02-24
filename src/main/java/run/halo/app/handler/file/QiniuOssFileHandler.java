@@ -72,10 +72,10 @@ public class QiniuOssFileHandler implements FileHandler {
         // Build put plicy
         StringMap putPolicy = new StringMap();
         putPolicy.put("returnBody", "{\"size\":$(fsize), " +
-                "\"width\":$(imageInfo.width), " +
-                "\"height\":$(imageInfo.height)," +
-                " \"key\":\"$(key)\", " +
-                "\"hash\":\"$(etag)\"}");
+            "\"width\":$(imageInfo.width), " +
+            "\"height\":$(imageInfo.height)," +
+            " \"key\":\"$(key)\", " +
+            "\"hash\":\"$(etag)\"}");
         // Get upload token
         String uploadToken = auth.uploadToken(bucket, null, 3600, putPolicy);
 
@@ -83,8 +83,8 @@ public class QiniuOssFileHandler implements FileHandler {
         Path tmpPath = Paths.get(System.getProperty("java.io.tmpdir"), bucket);
 
         StringBuilder basePath = new StringBuilder(protocol)
-                .append(domain)
-                .append("/");
+            .append(domain)
+            .append("/");
 
         try {
             String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
@@ -93,13 +93,13 @@ public class QiniuOssFileHandler implements FileHandler {
             StringBuilder upFilePath = new StringBuilder();
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                        .append("/");
+                    .append("/");
             }
             upFilePath.append(basename)
-                    .append("_")
-                    .append(timestamp)
-                    .append(".")
-                    .append(extension);
+                .append("_")
+                .append(timestamp)
+                .append(".")
+                .append(extension);
 
             // Get file recorder for temp directory
             FileRecorder fileRecorder = new FileRecorder(tmpPath.toFile());

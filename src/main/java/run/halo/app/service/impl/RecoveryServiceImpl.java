@@ -240,8 +240,8 @@ public class RecoveryServiceImpl implements RecoveryService {
         log.debug("Migrated tags of post [{}]: [{}]", tags, createdPost.getId());
 
         List<PostComment> postComments = baseComments.stream()
-                .map(baseComment -> BeanUtils.transformFrom(baseComment, PostComment.class))
-                .collect(Collectors.toList());
+            .map(baseComment -> BeanUtils.transformFrom(baseComment, PostComment.class))
+            .collect(Collectors.toList());
 
         try {
             // Build virtual comment
@@ -269,8 +269,8 @@ public class RecoveryServiceImpl implements RecoveryService {
         List<BaseComment> baseComments = handleComment(commentsObject, createdSheet.getId());
 
         List<SheetComment> sheetComments = baseComments.stream()
-                .map(baseComment -> BeanUtils.transformFrom(baseComment, SheetComment.class))
-                .collect(Collectors.toList());
+            .map(baseComment -> BeanUtils.transformFrom(baseComment, SheetComment.class))
+            .collect(Collectors.toList());
 
         // Create comments
         try {
@@ -303,8 +303,8 @@ public class RecoveryServiceImpl implements RecoveryService {
         }
         // Get all children
         List<PostComment> children = postComments.stream()
-                .filter(postComment -> Objects.equals(oldParentId, postComment.getParentId()))
-                .collect(Collectors.toList());
+            .filter(postComment -> Objects.equals(oldParentId, postComment.getParentId()))
+            .collect(Collectors.toList());
 
 
         // Set parent id again
@@ -330,8 +330,8 @@ public class RecoveryServiceImpl implements RecoveryService {
         }
         // Get all children
         List<SheetComment> children = sheetComments.stream()
-                .filter(sheetComment -> Objects.equals(oldParentId, sheetComment.getParentId()))
-                .collect(Collectors.toList());
+            .filter(sheetComment -> Objects.equals(oldParentId, sheetComment.getParentId()))
+            .collect(Collectors.toList());
 
         // Set parent id again
         children.forEach(postComment -> postComment.setParentId(parentComment.getId()));

@@ -17,8 +17,7 @@ public enum CommentViolationTypeEnum {
     /**
      * 频繁
      */
-    FREQUENTLY(1),
-    ;
+    FREQUENTLY(1);
 
     private int type;
 

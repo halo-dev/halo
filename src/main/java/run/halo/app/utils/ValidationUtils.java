@@ -77,8 +77,8 @@ public class ValidationUtils {
         Map<String, String> errMap = new HashMap<>(4);
         // Format the error message
         constraintViolations.forEach(
-                constraintViolation ->
-                        errMap.put(constraintViolation.getPropertyPath().toString(), constraintViolation.getMessage()));
+            constraintViolation ->
+                errMap.put(constraintViolation.getPropertyPath().toString(), constraintViolation.getMessage()));
         return errMap;
     }
 

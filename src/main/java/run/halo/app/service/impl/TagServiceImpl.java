@@ -102,7 +102,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         }
 
         return tags.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 }

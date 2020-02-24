@@ -70,10 +70,10 @@ public class CommonController extends AbstractErrorController {
     @GetMapping
     public String handleError(HttpServletRequest request, HttpServletResponse response, Model model) {
         log.error("Request URL: [{}], URI: [{}], Request Method: [{}], IP: [{}]",
-                request.getRequestURL(),
-                request.getRequestURI(),
-                request.getMethod(),
-                ServletUtil.getClientIP(request));
+            request.getRequestURL(),
+            request.getRequestURI(),
+            request.getMethod(),
+            ServletUtil.getClientIP(request));
 
         handleCustomException(request);
 
@@ -138,9 +138,9 @@ public class CommonController extends AbstractErrorController {
 
         StringBuilder path = new StringBuilder();
         path.append("themes/")
-                .append(themeService.getActivatedTheme().getFolderName())
-                .append('/')
-                .append(FilenameUtils.getBasename(template));
+            .append(themeService.getActivatedTheme().getFolderName())
+            .append('/')
+            .append(FilenameUtils.getBasename(template));
 
         return path.toString();
     }

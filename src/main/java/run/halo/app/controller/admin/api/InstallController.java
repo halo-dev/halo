@@ -110,7 +110,7 @@ public class InstallController {
         createDefaultMenu();
 
         eventPublisher.publishEvent(
-                new LogEvent(this, user.getId().toString(), LogType.BLOG_INITIALIZED, "博客已成功初始化")
+            new LogEvent(this, user.getId().toString(), LogType.BLOG_INITIALIZED, "博客已成功初始化")
         );
 
         return BaseResponse.ok("安装完成！");
@@ -167,8 +167,8 @@ public class InstallController {
         postParam.setTitle("Hello Halo");
         postParam.setStatus(PostStatus.PUBLISHED);
         postParam.setOriginalContent("## Hello Halo!\n" +
-                "\n" +
-                "感谢使用 [Halo](https://github.com/halo-dev/halo) 进行创作，请删除该文章开始吧！");
+            "\n" +
+            "感谢使用 [Halo](https://github.com/halo-dev/halo) 进行创作，请删除该文章开始吧！");
 
         if (category != null) {
             Set<Integer> categoryIds = new HashSet<>();
@@ -218,7 +218,7 @@ public class InstallController {
         properties.put(BlogProperties.BLOG_LOCALE, installParam.getLocale());
         properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
         properties.put(BlogProperties.BLOG_URL, StringUtils.isBlank(installParam.getUrl()) ?
-                optionService.getBlogBaseUrl() : installParam.getUrl());
+            optionService.getBlogBaseUrl() : installParam.getUrl());
         properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
 
         // Create properties

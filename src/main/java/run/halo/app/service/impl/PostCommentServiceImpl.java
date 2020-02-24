@@ -91,17 +91,17 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
         Map<Integer, Post> postMap = ServiceUtils.convertToMap(postRepository.findAllById(postIds), Post::getId);
 
         return postComments.stream()
-                .filter(comment -> postMap.containsKey(comment.getPostId()))
-                .map(comment -> {
-                    // Convert to vo
-                    PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
+            .filter(comment -> postMap.containsKey(comment.getPostId()))
+            .map(comment -> {
+                // Convert to vo
+                PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
 
-                    BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId()));
+                BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId()));
 
-                    postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
+                postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
 
-                    return postCommentWithPostVO;
-                }).collect(Collectors.toList());
+                return postCommentWithPostVO;
+            }).collect(Collectors.toList());
     }
 
     private BasePostMinimalDTO buildPostFullPath(BasePostMinimalDTO basePostMinimalDTO) {
@@ -121,28 +121,28 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
 
         if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
             fullPath.append(archivesPrefix)
-                    .append("/")
-                    .append(basePostMinimalDTO.getUrl())
-                    .append(pathSuffix);
+                .append("/")
+                .append(basePostMinimalDTO.getUrl())
+                .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.ID)) {
             fullPath.append("?p=")
-                    .append(basePostMinimalDTO.getId());
+                .append(basePostMinimalDTO.getId());
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
             fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
-                    .append("/")
-                    .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
-                    .append("/")
-                    .append(basePostMinimalDTO.getUrl())
-                    .append(pathSuffix);
+                .append("/")
+                .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
+                .append("/")
+                .append(basePostMinimalDTO.getUrl())
+                .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
             fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
-                    .append("/")
-                    .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
-                    .append("/")
-                    .append(DateUtil.dayOfMonth(basePostMinimalDTO.getCreateTime()))
-                    .append("/")
-                    .append(basePostMinimalDTO.getUrl())
-                    .append(pathSuffix);
+                .append("/")
+                .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
+                .append("/")
+                .append(DateUtil.dayOfMonth(basePostMinimalDTO.getCreateTime()))
+                .append("/")
+                .append(basePostMinimalDTO.getUrl())
+                .append(pathSuffix);
         }
 
         basePostMinimalDTO.setFullPath(fullPath.toString());
@@ -153,7 +153,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     @Override
     public void validateTarget(Integer postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
 
         if (post.getDisallowComment()) {
             throw new BadRequestException("该文章已经被禁止评论").setErrorData(postId);

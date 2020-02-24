@@ -107,7 +107,7 @@ public class PostModel {
         model.addAttribute("comments", Page.empty());
 
         if (themeService.templateExists(
-                ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 
@@ -117,7 +117,7 @@ public class PostModel {
     public String list(Integer page, Model model, String decide, String template) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
@@ -135,15 +135,15 @@ public class PostModel {
         }
 
         nextPageFullPath.append("/page/")
-                .append(posts.getNumber() + 2)
-                .append(optionService.getPathSuffix());
+            .append(posts.getNumber() + 2)
+            .append(optionService.getPathSuffix());
 
         if (posts.getNumber() == 1) {
             prePageFullPath.append("/");
         } else {
             prePageFullPath.append("/page/")
-                    .append(posts.getNumber())
-                    .append(optionService.getPathSuffix());
+                .append(posts.getNumber())
+                .append(optionService.getPathSuffix());
         }
 
         model.addAttribute(decide, true);

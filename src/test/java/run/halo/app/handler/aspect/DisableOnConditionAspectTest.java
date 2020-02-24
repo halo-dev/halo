@@ -30,13 +30,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class DisableOnConditionAspectTest {
 
+    static final String REQUEST_URI = "/api/admin/test/disableOnCondition";
     @Autowired
     MockMvc mvc;
-
     @Autowired
     OptionService optionService;
-
-    static final String REQUEST_URI = "/api/admin/test/disableOnCondition";
 
     @BeforeEach
     void setUp() {
@@ -48,8 +46,8 @@ class DisableOnConditionAspectTest {
         Throwable t = null;
         try {
             mvc.perform(get(REQUEST_URI + "/no"))
-                    .andDo(print())
-                    .andReturn();
+                .andDo(print())
+                .andReturn();
         } catch (NestedServletException nse) {
             t = nse;
         }
@@ -63,8 +61,8 @@ class DisableOnConditionAspectTest {
     @Test
     void ableAccessTest() throws Exception {
         mvc.perform(get(REQUEST_URI + "/yes"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())));
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())));
     }
 }

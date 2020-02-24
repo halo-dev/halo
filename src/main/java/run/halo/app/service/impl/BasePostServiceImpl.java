@@ -51,7 +51,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
     private final OptionService optionService;
 
-    private final Pattern SUMMARY_PATTERN = Pattern.compile("\\s*|\t|\r|\n");
+    private final Pattern summaryPattern = Pattern.compile("\\s*|\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
                                OptionService optionService) {
@@ -117,9 +117,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(date, "Date must not be null");
 
         return basePostRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED,
-                date,
-                PageRequest.of(0, size, Sort.by(ASC, "createTime")))
-                .getContent();
+            date,
+            PageRequest.of(0, size, Sort.by(ASC, "createTime")))
+            .getContent();
     }
 
     @Override
@@ -127,9 +127,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(date, "Date must not be null");
 
         return basePostRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED,
-                date,
-                PageRequest.of(0, size, Sort.by(DESC, "createTime")))
-                .getContent();
+            date,
+            PageRequest.of(0, size, Sort.by(DESC, "createTime")))
+            .getContent();
     }
 
     @Override
@@ -282,8 +282,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return posts.stream()
-                .map(this::convertToMinimal)
-                .collect(Collectors.toList());
+            .map(this::convertToMinimal)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -314,8 +314,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return posts.stream()
-                .map(this::convertToSimple)
-                .collect(Collectors.toList());
+            .map(this::convertToSimple)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -468,7 +468,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         String text = HaloUtils.cleanHtmlTag(htmlContent);
 
-        Matcher matcher = SUMMARY_PATTERN.matcher(text);
+        Matcher matcher = summaryPattern.matcher(text);
         text = matcher.replaceAll("");
 
         // Get summary length

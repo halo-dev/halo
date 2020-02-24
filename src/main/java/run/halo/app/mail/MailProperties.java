@@ -34,13 +34,13 @@ public class MailProperties extends org.springframework.boot.autoconfigure.mail.
         properties.put(key, value);
     }
 
-    public void setProperties(Map<String, String> properties) {
-        this.properties = properties;
-    }
-
     @Override
     public Map<String, String> getProperties() {
         return this.properties;
+    }
+
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
     }
 
     @Override
