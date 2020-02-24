@@ -3,7 +3,6 @@ package run.halo.app.model;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.http.MediaType;
-import run.halo.app.service.support.HaloMediaType;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;

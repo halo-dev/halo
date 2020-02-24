@@ -50,7 +50,7 @@ public class PostCategory extends BaseEntity {
         }
         PostCategory that = (PostCategory) o;
         return categoryId.equals(that.categoryId) &&
-                postId.equals(that.postId);
+            postId.equals(that.postId);
     }
 
     @Override

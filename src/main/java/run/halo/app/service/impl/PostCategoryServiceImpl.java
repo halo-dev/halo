@@ -82,7 +82,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Foreach and collect
         postCategories.forEach(postCategory -> categoryListMap.computeIfAbsent(postCategory.getPostId(), postId -> new LinkedList<>())
-                .add(categoryMap.get(postCategory.getCategoryId())));
+            .add(categoryMap.get(postCategory.getCategoryId())));
 
         return categoryListMap;
     }
@@ -236,13 +236,13 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Convert and return
         return categories.stream()
-                .map(category -> {
-                    // Create category post count dto
-                    CategoryWithPostCountDTO categoryWithPostCountDTO = new CategoryWithPostCountDTO().convertFrom(category);
-                    // Set post count
-                    categoryWithPostCountDTO.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
-                    return categoryWithPostCountDTO;
-                })
-                .collect(Collectors.toList());
+            .map(category -> {
+                // Create category post count dto
+                CategoryWithPostCountDTO categoryWithPostCountDTO = new CategoryWithPostCountDTO().convertFrom(category);
+                // Set post count
+                categoryWithPostCountDTO.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+                return categoryWithPostCountDTO;
+            })
+            .collect(Collectors.toList());
     }
 }

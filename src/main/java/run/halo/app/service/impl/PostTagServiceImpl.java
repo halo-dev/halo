@@ -70,11 +70,11 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
         // Find post count
         return tags.stream().map(
-                tag -> {
-                    TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
-                    tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
-                    return tagWithCountOutputDTO;
-                }
+            tag -> {
+                TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
+                tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
+                return tagWithCountOutputDTO;
+            }
         ).collect(Collectors.toList());
     }
 

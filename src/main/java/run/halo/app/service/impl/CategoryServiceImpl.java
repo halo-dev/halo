@@ -108,8 +108,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
         // Get children for removing after
         List<Category> children = categories.stream()
-                .filter(category -> Objects.equal(parentCategory.getId(), category.getParentId()))
-                .collect(Collectors.toList());
+            .filter(category -> Objects.equal(parentCategory.getId(), category.getParentId()))
+            .collect(Collectors.toList());
 
         children.forEach(category -> {
             // Convert to child category vo
@@ -198,7 +198,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         }
 
         return categories.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 }

@@ -81,9 +81,9 @@ public class SheetController {
     @PutMapping("{sheetId:\\d+}")
     @ApiOperation("Updates a sheet")
     public SheetDetailVO updateBy(
-            @PathVariable("sheetId") Integer sheetId,
-            @RequestBody @Valid SheetParam sheetParam,
-            @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+        @PathVariable("sheetId") Integer sheetId,
+        @RequestBody @Valid SheetParam sheetParam,
+        @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         Sheet sheetToUpdate = sheetService.getById(sheetId);
 
         sheetParam.update(sheetToUpdate);
@@ -96,8 +96,8 @@ public class SheetController {
     @PutMapping("{sheetId:\\d+}/{status}")
     @ApiOperation("Updates a sheet")
     public void updateStatusBy(
-            @PathVariable("sheetId") Integer sheetId,
-            @PathVariable("status") PostStatus status) {
+        @PathVariable("sheetId") Integer sheetId,
+        @PathVariable("status") PostStatus status) {
         Sheet sheet = sheetService.getById(sheetId);
 
         // Set status

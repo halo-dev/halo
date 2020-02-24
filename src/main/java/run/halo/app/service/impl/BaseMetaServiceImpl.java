@@ -80,7 +80,7 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
 
         // Foreach and collect
         postMetas.forEach(postMeta -> postMetaListMap.computeIfAbsent(postMeta.getPostId(), postId -> new LinkedList<>())
-                .add(postMetaMap.get(postMeta.getId())));
+            .add(postMetaMap.get(postMeta.getId())));
 
         return postMetaListMap;
     }
@@ -130,7 +130,7 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
         }
 
         return postMetaList.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 }

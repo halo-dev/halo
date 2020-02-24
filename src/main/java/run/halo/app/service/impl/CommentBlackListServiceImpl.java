@@ -53,7 +53,7 @@ public class CommentBlackListServiceImpl extends AbstractCrudService<CommentBlac
         Date endTime = new Date(now.atZone(zoneId).toInstant().toEpochMilli());
         Integer banTime = optionService.getByPropertyOrDefault(CommentProperties.COMMENT_BAN_TIME, Integer.class, 10);
         Date startTime = new Date(now.minusMinutes(banTime)
-                .atZone(zoneId).toInstant().toEpochMilli());
+            .atZone(zoneId).toInstant().toEpochMilli());
         Integer range = optionService.getByPropertyOrDefault(CommentProperties.COMMENT_RANGE, Integer.class, 30);
         boolean isPresent = postCommentRepository.countByIpAndTime(ipAddress, startTime, endTime) >= range;
         if (isPresent && blackList.isPresent()) {
@@ -61,10 +61,10 @@ public class CommentBlackListServiceImpl extends AbstractCrudService<CommentBlac
             return CommentViolationTypeEnum.FREQUENTLY;
         } else if (isPresent) {
             CommentBlackList commentBlackList = CommentBlackList
-                    .builder()
-                    .banTime(getBanTime(now, banTime))
-                    .ipAddress(ipAddress)
-                    .build();
+                .builder()
+                .banTime(getBanTime(now, banTime))
+                .ipAddress(ipAddress)
+                .build();
             super.create(commentBlackList);
             return CommentViolationTypeEnum.FREQUENTLY;
         }
@@ -75,7 +75,7 @@ public class CommentBlackListServiceImpl extends AbstractCrudService<CommentBlac
         blackList.setBanTime(getBanTime(localDateTime, banTime));
         int updateResult = commentBlackListRepository.updateByIpAddress(blackList);
         Optional.of(updateResult)
-                .filter(result -> result <= 0).ifPresent(result -> log.error("更新评论封禁时间失败"));
+            .filter(result -> result <= 0).ifPresent(result -> log.error("更新评论封禁时间失败"));
     }
 
     private Date getBanTime(LocalDateTime localDateTime, Integer banTime) {

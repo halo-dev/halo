@@ -124,8 +124,8 @@ public class PostController {
     @PutMapping("{postId:\\d+}/status/{status}")
     @ApiOperation("Updates post status")
     public BasePostMinimalDTO updateStatusBy(
-            @PathVariable("postId") Integer postId,
-            @PathVariable("status") PostStatus status) {
+        @PathVariable("postId") Integer postId,
+        @PathVariable("status") PostStatus status) {
         Post post = postService.updateStatus(status, postId);
 
         return new BasePostMinimalDTO().convertFrom(post);
@@ -141,8 +141,8 @@ public class PostController {
     @PutMapping("{postId:\\d+}/status/draft/content")
     @ApiOperation("Updates draft")
     public BasePostDetailDTO updateDraftBy(
-            @PathVariable("postId") Integer postId,
-            @RequestBody PostContentParam contentParam) {
+        @PathVariable("postId") Integer postId,
+        @RequestBody PostContentParam contentParam) {
         // Update draft content
         Post post = postService.updateDraftContent(contentParam.getContent(), postId);
 

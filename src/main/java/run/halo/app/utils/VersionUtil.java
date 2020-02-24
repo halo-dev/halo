@@ -15,7 +15,7 @@ public class VersionUtil {
     }
 
     public static int[] getCanonicalVersion(String version) {
-        int[] canonicalVersion = new int[]{1, 1, 0, 0};
+        int[] canonicalVersion = new int[] {1, 1, 0, 0};
         StringTokenizer tokenizer = new StringTokenizer(version, ".");
         String token = tokenizer.nextToken();
         canonicalVersion[0] = Integer.parseInt(token);

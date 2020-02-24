@@ -397,8 +397,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
             return Collections.emptyList();
         }
         return comments.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -454,9 +454,9 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
             // Get sort order
             Sort.Order order = sort.filter(anOrder -> "id".equals(anOrder.getProperty()))
-                    .get()
-                    .findFirst()
-                    .orElseGet(() -> Sort.Order.desc("id"));
+                .get()
+                .findFirst()
+                .orElseGet(() -> Sort.Order.desc("id"));
 
             // Init sign
             int sign = order.getDirection().isAscending() ? 1 : -1;
@@ -696,8 +696,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
 
         // Get children
         List<COMMENT> children = comments.stream()
-                .filter(comment -> Objects.equals(parentComment.getId(), comment.getParentId()))
-                .collect(Collectors.toList());
+            .filter(comment -> Objects.equals(parentComment.getId(), comment.getParentId()))
+            .collect(Collectors.toList());
 
         // Add children
         children.forEach(comment -> {

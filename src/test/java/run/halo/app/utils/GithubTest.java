@@ -11,7 +11,6 @@ import run.halo.app.exception.BadRequestException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -27,12 +26,9 @@ import java.util.Map;
 @Ignore
 public class GithubTest {
 
-    private final Path tempPath;
-
     private final static String API_URL = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
-
     private final static String HALO_ADMIN_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
-
+    private final Path tempPath;
     private final RestTemplate restTemplate;
 
     public GithubTest() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
@@ -58,8 +54,8 @@ public class GithubTest {
                 Object name = aAssetMap.getOrDefault("name", "");
                 return name.toString().matches(HALO_ADMIN_REGEX);
             })
-                    .findFirst()
-                    .orElseThrow(() -> new BadRequestException("Halo admin has no assets available"));
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Halo admin has no assets available"));
 
             Object name = assetMap.getOrDefault("name", "");
             Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");

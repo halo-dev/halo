@@ -68,13 +68,13 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
         Map<Integer, Journal> journalMap = ServiceUtils.convertToMap(journals, Journal::getId);
 
         return journalComments.stream()
-                .filter(journalComment -> journalMap.containsKey(journalComment.getPostId()))
-                .map(journalComment -> {
-                    JournalCommentWithJournalVO journalCmtWithJournalVo = new JournalCommentWithJournalVO().convertFrom(journalComment);
-                    journalCmtWithJournalVo.setJournal(new JournalDTO().convertFrom(journalMap.get(journalComment.getPostId())));
-                    return journalCmtWithJournalVo;
-                })
-                .collect(Collectors.toList());
+            .filter(journalComment -> journalMap.containsKey(journalComment.getPostId()))
+            .map(journalComment -> {
+                JournalCommentWithJournalVO journalCmtWithJournalVo = new JournalCommentWithJournalVO().convertFrom(journalComment);
+                journalCmtWithJournalVo.setJournal(new JournalDTO().convertFrom(journalMap.get(journalComment.getPostId())));
+                return journalCmtWithJournalVo;
+            })
+            .collect(Collectors.toList());
     }
 
     @Override

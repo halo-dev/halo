@@ -3,7 +3,7 @@ package run.halo.app.model.enums;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Data type test.

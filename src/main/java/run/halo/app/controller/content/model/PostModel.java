@@ -73,15 +73,15 @@ public class PostModel {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
             String redirect = String
-                    .format("%s/archives/%s/password", optionService.getBlogBaseUrl(),
-                            post.getUrl());
+                .format("%s/archives/%s/password", optionService.getBlogBaseUrl(),
+                    post.getUrl());
             return "redirect:" + redirect;
         }
 
         if (!StringUtils.isEmpty(token)) {
             // verify token
             String cachedToken = cacheStore.getAny(token, String.class)
-                    .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
+                .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该文章的访问权限");
             }
@@ -107,7 +107,7 @@ public class PostModel {
         model.addAttribute("comments", Page.empty());
 
         if (themeService.templateExists(
-                ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 
@@ -117,7 +117,7 @@ public class PostModel {
     public String list(Integer page, Model model, String decide, String template) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);

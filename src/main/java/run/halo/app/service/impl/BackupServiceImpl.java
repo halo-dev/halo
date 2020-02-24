@@ -88,9 +88,9 @@ public class BackupServiceImpl implements BackupService {
      */
     public static String sanitizeFilename(final String unSanitized) {
         return unSanitized.
-                replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
-                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
-                replaceAll("\\s", "");
+            replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
+            replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
+            replaceAll("\\s", "");
     }
 
     @Override
@@ -170,8 +170,8 @@ public class BackupServiceImpl implements BackupService {
         try {
             // Create zip path for halo zip
             String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
-                    IdUtil.simpleUUID().hashCode() + ".zip";
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
+                IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
             Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
 
@@ -196,17 +196,17 @@ public class BackupServiceImpl implements BackupService {
         // Build backup dto
         try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
-                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
-                    .map(this::buildBackupDto)
-                    .sorted((leftBackup, rightBackup) -> {
-                        // Sort the result
-                        if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
-                            return 1;
-                        } else if (leftBackup.getUpdateTime() > rightBackup.getUpdateTime()) {
-                            return -1;
-                        }
-                        return 0;
-                    }).collect(Collectors.toList());
+                .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
+                .map(this::buildBackupDto)
+                .sorted((leftBackup, rightBackup) -> {
+                    // Sort the result
+                    if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
+                        return 1;
+                    } else if (leftBackup.getUpdateTime() > rightBackup.getUpdateTime()) {
+                        return -1;
+                    }
+                    return 0;
+                }).collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
         }
@@ -309,9 +309,9 @@ public class BackupServiceImpl implements BackupService {
 
         // Build full url
         return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), backupUri)
-                + "?"
-                + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
-                + "=" + oneTimeToken;
+            + "?"
+            + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
+            + "=" + oneTimeToken;
     }
 
 }

@@ -114,7 +114,7 @@ public class RelationMapperUtils {
 
         // Common situation
         fieldName = methodType + fieldName.substring(0, 1).toUpperCase() +
-                fieldName.substring(1);
+            fieldName.substring(1);
         return fieldName;
     }
 

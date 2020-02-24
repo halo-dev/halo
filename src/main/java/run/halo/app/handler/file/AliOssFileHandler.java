@@ -60,12 +60,12 @@ public class AliOssFileHandler implements FileHandler {
 
         if (StringUtils.isNotEmpty(domain)) {
             basePath.append(domain)
-                    .append("/");
+                .append("/");
         } else {
             basePath.append(bucketName)
-                    .append(".")
-                    .append(endPoint)
-                    .append("/");
+                .append(".")
+                .append(endPoint)
+                .append("/");
         }
 
         try {
@@ -76,14 +76,14 @@ public class AliOssFileHandler implements FileHandler {
 
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                        .append("/");
+                    .append("/");
             }
 
             upFilePath.append(basename)
-                    .append("_")
-                    .append(timestamp)
-                    .append(".")
-                    .append(extension);
+                .append("_")
+                .append(timestamp)
+                .append(".")
+                .append(extension);
 
             String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
 

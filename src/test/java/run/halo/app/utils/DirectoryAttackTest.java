@@ -4,7 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import run.halo.app.exception.ForbiddenException;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 

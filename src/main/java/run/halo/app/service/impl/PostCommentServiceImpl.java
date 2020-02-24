@@ -91,16 +91,16 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
         Map<Integer, Post> postMap = ServiceUtils.convertToMap(postRepository.findAllById(postIds), Post::getId);
 
         return postComments.stream()
-                .filter(comment -> postMap.containsKey(comment.getPostId()))
-                .map(comment -> {
-                    // Convert to vo
-                    PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
+            .filter(comment -> postMap.containsKey(comment.getPostId()))
+            .map(comment -> {
+                // Convert to vo
+                PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
 
-                    // Get post and set to the vo
-                    postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
+                // Get post and set to the vo
+                postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
 
-                    return postCommentWithPostVO;
-                }).collect(Collectors.toList());
+                return postCommentWithPostVO;
+            }).collect(Collectors.toList());
     }
 
     @Override
@@ -113,7 +113,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     @Override
     public void validateTarget(Integer postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
 
         if (post.getDisallowComment()) {
             throw new BadRequestException("该文章已经被禁止评论").setErrorData(postId);

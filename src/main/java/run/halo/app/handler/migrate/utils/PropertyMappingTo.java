@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  * @author guqing
  * @date 2020-1-19 13:51
  */
-@Target({ElementType.FIELD, ElementType.TYPE})
+@Target( {ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface PropertyMappingTo {

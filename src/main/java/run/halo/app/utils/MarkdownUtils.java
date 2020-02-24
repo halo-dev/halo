@@ -37,32 +37,32 @@ import java.util.Map;
 public class MarkdownUtils {
 
     private static final DataHolder OPTIONS = new MutableDataSet()
-            .set(Parser.EXTENSIONS, Arrays.asList(
-                    AttributesExtension.create(),
-                    AutolinkExtension.create(),
-                    EmojiExtension.create(),
-                    EscapedCharacterExtension.create(),
-                    StrikethroughExtension.create(),
-                    TaskListExtension.create(),
-                    InsExtension.create(),
-                    MediaTagsExtension.create(),
-                    TablesExtension.create(),
-                    TocExtension.create(),
-                    YamlFrontMatterExtension.create(),
-                    GitLabExtension.create())
-            )
-            .set(TocExtension.LEVELS, 255)
-            .set(TablesExtension.WITH_CAPTION, false)
-            .set(TablesExtension.COLUMN_SPANS, false)
-            .set(TablesExtension.MIN_SEPARATOR_DASHES, 1)
-            .set(TablesExtension.MIN_HEADER_ROWS, 1)
-            .set(TablesExtension.MAX_HEADER_ROWS, 1)
-            .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
-            .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
-            .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
-            .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
-            .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY)
-            .set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+        .set(Parser.EXTENSIONS, Arrays.asList(
+            AttributesExtension.create(),
+            AutolinkExtension.create(),
+            EmojiExtension.create(),
+            EscapedCharacterExtension.create(),
+            StrikethroughExtension.create(),
+            TaskListExtension.create(),
+            InsExtension.create(),
+            MediaTagsExtension.create(),
+            TablesExtension.create(),
+            TocExtension.create(),
+            YamlFrontMatterExtension.create(),
+            GitLabExtension.create())
+        )
+        .set(TocExtension.LEVELS, 255)
+        .set(TablesExtension.WITH_CAPTION, false)
+        .set(TablesExtension.COLUMN_SPANS, false)
+        .set(TablesExtension.MIN_SEPARATOR_DASHES, 1)
+        .set(TablesExtension.MIN_HEADER_ROWS, 1)
+        .set(TablesExtension.MAX_HEADER_ROWS, 1)
+        .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
+        .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
+        .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
+        .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
+        .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY)
+        .set(HtmlRenderer.SOFT_BREAK, "<br />\n");
 
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
 
