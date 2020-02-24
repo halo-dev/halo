@@ -9,11 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.entity.SheetMeta;
@@ -27,6 +29,7 @@ import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Sheet service implementation.
@@ -50,18 +53,21 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     private final ThemeService themeService;
 
+    private final OptionService optionService;
+
     public SheetServiceImpl(SheetRepository sheetRepository,
                             ApplicationEventPublisher eventPublisher,
                             SheetCommentService sheetCommentService,
-                            OptionService optionService,
                             SheetMetaService sheetMetaService,
-                            ThemeService themeService) {
+                            ThemeService themeService,
+                            OptionService optionService) {
         super(sheetRepository, optionService);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;
         this.sheetMetaService = sheetMetaService;
         this.themeService = themeService;
+        this.optionService = optionService;
     }
 
     @Override
@@ -129,9 +135,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     public Sheet getByUrl(String url) {
         Assert.hasText(url, "Url must not be blank");
 
-        Sheet sheet = sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
-
-        return sheet;
+        return sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
     }
 
     @Override
@@ -141,9 +145,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         Optional<Sheet> postOptional = sheetRepository.getByUrlAndStatus(url, status);
 
-        Sheet sheet = postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
-
-        return sheet;
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
     }
 
     @Override
@@ -196,21 +198,21 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         InternalSheetDTO linkSheet = new InternalSheetDTO();
         linkSheet.setId(1);
         linkSheet.setTitle("友情链接");
-        linkSheet.setUrl("/links");
+        linkSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getLinksPrefix());
         linkSheet.setStatus(themeService.templateExists("links.ftl"));
 
         // photos sheet
         InternalSheetDTO photoSheet = new InternalSheetDTO();
         photoSheet.setId(2);
         photoSheet.setTitle("图库页面");
-        photoSheet.setUrl("/photos");
+        photoSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getPhotosPrefix());
         photoSheet.setStatus(themeService.templateExists("photos.ftl"));
 
         // journals sheet
         InternalSheetDTO journalSheet = new InternalSheetDTO();
         journalSheet.setId(3);
         journalSheet.setTitle("日志页面");
-        journalSheet.setUrl("/journals");
+        journalSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getJournalsPrefix());
         journalSheet.setStatus(themeService.templateExists("journals.ftl"));
 
         internalSheetDTOS.add(linkSheet);
@@ -254,6 +256,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         return sheetPage.map(sheet -> {
             SheetListVO sheetListVO = new SheetListVO().convertFrom(sheet);
             sheetListVO.setCommentCount(sheetCommentCountMap.getOrDefault(sheet.getId(), 0L));
+
+            sheetListVO.setFullPath(buildFullPath(sheet));
+
             return sheetListVO;
         });
     }
@@ -269,6 +274,27 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         List<SheetMeta> sheetMetas = sheetMetaService.listBy(sheet.getId());
         // Convert to detail vo
         return convertTo(sheet, sheetMetas);
+    }
+
+    @Override
+    public BasePostMinimalDTO convertToMinimal(Sheet sheet) {
+        Assert.notNull(sheet, "Sheet must not be null");
+        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(sheet);
+
+        basePostMinimalDTO.setFullPath(buildFullPath(sheet));
+
+        return basePostMinimalDTO;
+    }
+
+    @Override
+    public List<BasePostMinimalDTO> convertToMinimal(List<Sheet> sheets) {
+        if (CollectionUtils.isEmpty(sheets)) {
+            return Collections.emptyList();
+        }
+
+        return sheets.stream()
+                .map(this::convertToMinimal)
+                .collect(Collectors.toList());
     }
 
     @NonNull
@@ -289,6 +315,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
 
         sheetDetailVO.setCommentCount(sheetCommentService.countByPostId(sheet.getId()));
+
+        sheetDetailVO.setFullPath(buildFullPath(sheet));
+
         return sheetDetailVO;
     }
 
@@ -310,5 +339,21 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         if (exist) {
             throw new AlreadyExistsException("页面路径 " + sheet.getUrl() + " 已存在");
         }
+    }
+
+    private String buildFullPath(Sheet sheet) {
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/")
+                .append(optionService.getSheetPrefix())
+                .append("/")
+                .append(sheet.getUrl())
+                .append(optionService.getPathSuffix());
+
+        return fullPath.toString();
     }
 }

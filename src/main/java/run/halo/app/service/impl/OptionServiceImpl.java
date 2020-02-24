@@ -473,6 +473,51 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public String getSheetPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.SHEET_PREFIX, String.class, PermalinkProperties.SHEET_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getLinksPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.LINKS_PREFIX, String.class, PermalinkProperties.LINKS_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getPhotosPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.PHOTOS_PREFIX, String.class, PermalinkProperties.PHOTOS_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getJournalsPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.JOURNALS_PREFIX, String.class, PermalinkProperties.JOURNALS_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getArchivesPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, PermalinkProperties.ARCHIVES_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getCategoriesPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.CATEGORIES_PREFIX, String.class, PermalinkProperties.CATEGORIES_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getTagsPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.TAGS_PREFIX, String.class, PermalinkProperties.TAGS_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getPathSuffix() {
+        return getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, PermalinkProperties.PATH_SUFFIX.defaultValue());
+    }
+
+    @Override
+    public Boolean isEnabledAbsolutePath() {
+        return getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, true);
+    }
+
+    @Override
     public List<OptionDTO> replaceUrl(String oldUrl, String newUrl) {
         List<Option> options = listAll();
         List<Option> replaced = new ArrayList<>();

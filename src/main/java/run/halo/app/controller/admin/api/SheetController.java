@@ -8,6 +8,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.SheetParam;
@@ -119,12 +120,26 @@ public class SheetController {
     public String preview(@PathVariable("sheetId") Integer sheetId) throws UnsupportedEncodingException {
         Sheet sheet = sheetService.getById(sheetId);
 
+        sheet.setUrl(URLEncoder.encode(sheet.getUrl(), StandardCharsets.UTF_8.name()));
+
+        BasePostMinimalDTO sheetMinimalDTO = sheetService.convertToMinimal(sheet);
+
         String token = IdUtil.simpleUUID();
 
         // cache preview token
         cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
 
+        StringBuilder previewUrl = new StringBuilder();
+
+        if (!optionService.isEnabledAbsolutePath()) {
+            previewUrl.append(optionService.getBlogBaseUrl());
+        }
+
+        previewUrl.append(sheetMinimalDTO.getFullPath())
+                .append("?token=")
+                .append(token);
+
         // build preview post url and return
-        return String.format("%s/s/%s?token=%s", optionService.getBlogBaseUrl(), URLEncoder.encode(sheet.getUrl(), StandardCharsets.UTF_8.name()), token);
+        return previewUrl.toString();
     }
 }

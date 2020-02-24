@@ -1,10 +1,10 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -15,7 +15,7 @@ import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentViolationTypeEnum;
-import run.halo.app.model.params.CommentQuery;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.repository.PostCommentRepository;
@@ -44,8 +44,6 @@ import java.util.stream.Collectors;
 @Service
 public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> implements PostCommentService {
 
-    private final PostCommentRepository postCommentRepository;
-
     private final PostRepository postRepository;
 
     private final CommentBlackListService commentBlackListService;
@@ -57,7 +55,6 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
                                   CommentBlackListService commentBlackListService,
                                   ApplicationEventPublisher eventPublisher) {
         super(postCommentRepository, optionService, userService, eventPublisher);
-        this.postCommentRepository = postCommentRepository;
         this.postRepository = postRepository;
         this.commentBlackListService = commentBlackListService;
     }
@@ -74,7 +71,10 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     public PostCommentWithPostVO convertToWithPostVo(PostComment comment) {
         Assert.notNull(comment, "PostComment must not be null");
         PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
-        postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postRepository.getOne(comment.getPostId())));
+
+        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(postRepository.getOne(comment.getPostId()));
+
+        postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
         return postCommentWithPostVO;
     }
 
@@ -96,18 +96,58 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
                 // Convert to vo
                 PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
 
-                // Get post and set to the vo
-                postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
+                BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId()));
+
+                postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
 
                 return postCommentWithPostVO;
             }).collect(Collectors.toList());
     }
 
-    @Override
-    public Page<PostCommentWithPostVO> pageTreeBy(CommentQuery commentQuery, Pageable pageable) {
-        Page<PostComment> postCommentPage = pageBy(commentQuery, pageable);
+    private BasePostMinimalDTO buildPostFullPath(BasePostMinimalDTO basePostMinimalDTO) {
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
 
-        return null;
+        String pathSuffix = optionService.getPathSuffix();
+
+        String archivesPrefix = optionService.getArchivesPrefix();
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/");
+
+        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+            fullPath.append(archivesPrefix)
+                .append("/")
+                .append(basePostMinimalDTO.getUrl())
+                .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID)) {
+            fullPath.append("?p=")
+                .append(basePostMinimalDTO.getId());
+        } else if (permalinkType.equals(PostPermalinkType.DATE)) {
+            fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
+                .append("/")
+                .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
+                .append("/")
+                .append(basePostMinimalDTO.getUrl())
+                .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.DAY)) {
+            fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
+                .append("/")
+                .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
+                .append("/")
+                .append(DateUtil.dayOfMonth(basePostMinimalDTO.getCreateTime()))
+                .append("/")
+                .append(basePostMinimalDTO.getUrl())
+                .append(pathSuffix);
+        }
+
+        basePostMinimalDTO.setFullPath(fullPath.toString());
+
+        return basePostMinimalDTO;
     }
 
     @Override

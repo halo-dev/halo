@@ -21,15 +21,17 @@ import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseMetaDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
+import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
-import run.halo.app.model.properties.PermalinkProperties;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.*;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.repository.base.BasePostRepository;
 import run.halo.app.service.*;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
@@ -76,16 +78,17 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final OptionService optionService;
 
-    public PostServiceImpl(PostRepository postRepository,
+    public PostServiceImpl(BasePostRepository<Post> basePostRepository,
+                           OptionService optionService,
+                           PostRepository postRepository,
                            TagService tagService,
                            CategoryService categoryService,
                            PostTagService postTagService,
                            PostCategoryService postCategoryService,
                            PostCommentService postCommentService,
                            ApplicationEventPublisher eventPublisher,
-                           PostMetaService postMetaService,
-                           OptionService optionService) {
-        super(postRepository, optionService);
+                           PostMetaService postMetaService) {
+        super(basePostRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;
@@ -506,16 +509,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Get post meta list map
         Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
 
-        String blogUrl = optionService.getBlogBaseUrl();
-
-        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
-
-        String pathSuffix = optionService
-            .getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
-
-        String archivesPrefix = optionService
-            .getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
-
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
@@ -552,44 +545,114 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
-            StringBuilder fullPath = new StringBuilder(blogUrl)
-                .append("/");
-            if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
-                fullPath.append(archivesPrefix)
-                    .append("/")
-                    .append(postListVO.getUrl())
-                    .append(pathSuffix);
-            } else if (permalinkType.equals(PostPermalinkType.ID)) {
-                fullPath.append("?p=")
-                    .append(postListVO.getId());
-            } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
-                    .append("/")
-                    .append(DateUtil.month(postListVO.getCreateTime()) + 1)
-                    .append("/")
-                    .append(postListVO.getUrl())
-                    .append(pathSuffix);
-            } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
-                    .append("/")
-                    .append(DateUtil.month(postListVO.getCreateTime()) + 1)
-                    .append("/")
-                    .append(DateUtil.dayOfMonth(postListVO.getCreateTime()))
-                    .append("/")
-                    .append(postListVO.getUrl())
-                    .append(pathSuffix);
-            }
-
-            postListVO.setFullPath(fullPath.toString());
+            postListVO.setFullPath(buildFullPath(post));
 
             return postListVO;
         });
     }
 
     @Override
+    public List<PostListVO> convertToListVo(List<Post> posts) {
+        Assert.notNull(posts, "Post page must not be null");
+
+        Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
+
+        // Get tag list map
+        Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
+
+        // Get category list map
+        Map<Integer, List<Category>> categoryListMap = postCategoryService
+            .listCategoryListMap(postIds);
+
+        // Get comment count
+        Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
+
+        // Get post meta list map
+        Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
+
+        return posts.stream().map(post -> {
+            PostListVO postListVO = new PostListVO().convertFrom(post);
+
+            if (StringUtils.isBlank(postListVO.getSummary())) {
+                postListVO.setSummary(generateSummary(post.getFormatContent()));
+            }
+
+            Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
+
+            // Set tags
+            postListVO.setTags(Optional.ofNullable(tagListMap.get(post.getId()))
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(tagService::convertTo)
+                .collect(Collectors.toList()));
+
+            // Set categories
+            postListVO.setCategories(Optional.ofNullable(categoryListMap.get(post.getId()))
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(categoryService::convertTo)
+                .collect(Collectors.toList()));
+
+            // Set post metas
+            postListVO.setPostMetas(Optional.ofNullable(postMetaListMap.get(post.getId()))
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(postMeta -> (BaseMetaDTO) new BaseMetaDTO().convertFrom(postMeta))
+                .collect(Collectors.toList()));
+
+            // Set comment count
+            postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
+
+            postListVO.setFullPath(buildFullPath(post));
+
+            return postListVO;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public Page<PostDetailVO> convertToDetailVo(Page<Post> postPage) {
         Assert.notNull(postPage, "Post page must not be null");
         return postPage.map(this::convertToDetailVo);
+    }
+
+    @Override
+    public BasePostMinimalDTO convertToMinimal(Post post) {
+        Assert.notNull(post, "Post must not be null");
+        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(post);
+
+        basePostMinimalDTO.setFullPath(buildFullPath(post));
+
+        return basePostMinimalDTO;
+    }
+
+    @Override
+    public List<BasePostMinimalDTO> convertToMinimal(List<Post> posts) {
+        if (CollectionUtils.isEmpty(posts)) {
+            return Collections.emptyList();
+        }
+
+        return posts.stream()
+            .map(this::convertToMinimal)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public BasePostSimpleDTO convertToSimple(Post post) {
+        Assert.notNull(post, "Post must not be null");
+
+        BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
+
+        // Set summary
+        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
+            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
+        }
+
+        basePostSimpleDTO.setFullPath(buildFullPath(post));
+
+        return basePostSimpleDTO;
     }
 
     /**
@@ -631,6 +694,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         postDetailVO.setPostMetas(postMetaService.convertTo(postMetaList));
 
         postDetailVO.setCommentCount(postCommentService.countByPostId(post.getId()));
+
+        postDetailVO.setFullPath(buildFullPath(post));
 
         return postDetailVO;
     }
@@ -731,8 +796,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // get pageable post list
         List<Post> postList = new ArrayList<>();
         // init fist page && default page size
-        Integer page = 1;
-        Integer defaultPageSize = 500;
+        int page = 1;
+        int defaultPageSize = 500;
         boolean needNext = true;
 
         // get custom sort type
@@ -768,7 +833,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // get current post index in post list
         List<Integer> idList = postList.stream().map(Post::getId).collect(Collectors.toList());
-        Integer index = idList.indexOf(currentPost.getId());
+        int index = idList.indexOf(currentPost.getId());
 
         if (index == -1) {
             // if not found, return empty object
@@ -777,8 +842,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         AdjacentPostVO adjacentPostVO = new AdjacentPostVO();
 
-        //setup pre
-        //TODO convert POST to PostVO (with fullPath)
+        // setup pre
         if (index > 0) {
             adjacentPostVO.setPrePost(postList.get(index - 1));
         }
@@ -795,5 +859,49 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
             .toString();
         return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)).and(Sort.by(DESC, "id"));
+    }
+
+    private String buildFullPath(Post post) {
+
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
+
+        String pathSuffix = optionService.getPathSuffix();
+
+        String archivesPrefix = optionService.getArchivesPrefix();
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/");
+
+        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+            fullPath.append(archivesPrefix)
+                .append("/")
+                .append(post.getUrl())
+                .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID)) {
+            fullPath.append("?p=")
+                .append(post.getId());
+        } else if (permalinkType.equals(PostPermalinkType.DATE)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                .append("/")
+                .append(DateUtil.month(post.getCreateTime()) + 1)
+                .append("/")
+                .append(post.getUrl())
+                .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.DAY)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                .append("/")
+                .append(DateUtil.month(post.getCreateTime()) + 1)
+                .append("/")
+                .append(DateUtil.dayOfMonth(post.getCreateTime()))
+                .append("/")
+                .append(post.getUrl())
+                .append(pathSuffix);
+        }
+        return fullPath.toString();
     }
 }

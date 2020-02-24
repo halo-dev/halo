@@ -16,6 +16,7 @@ import run.halo.app.model.projection.TagPostPostCountProjection;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.PostTagRepository;
 import run.halo.app.repository.TagRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
@@ -39,13 +40,17 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
     private final TagRepository tagRepository;
 
+    private final OptionService optionService;
+
     public PostTagServiceImpl(PostTagRepository postTagRepository,
                               PostRepository postRepository,
-                              TagRepository tagRepository) {
+                              TagRepository tagRepository,
+                              OptionService optionService) {
         super(postTagRepository);
         this.postTagRepository = postTagRepository;
         this.postRepository = postRepository;
         this.tagRepository = tagRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -73,6 +78,21 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
             tag -> {
                 TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
                 tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
+
+                StringBuilder fullPath = new StringBuilder();
+
+                if (optionService.isEnabledAbsolutePath()) {
+                    fullPath.append(optionService.getBlogBaseUrl());
+                }
+
+                fullPath.append("/")
+                    .append(optionService.getTagsPrefix())
+                    .append("/")
+                    .append(tag.getSlugName())
+                    .append(optionService.getPathSuffix());
+
+                tagWithCountOutputDTO.setFullPath(fullPath.toString());
+
                 return tagWithCountOutputDTO;
             }
         ).collect(Collectors.toList());

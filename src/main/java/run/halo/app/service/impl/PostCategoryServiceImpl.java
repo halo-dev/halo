@@ -16,6 +16,7 @@ import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.repository.PostCategoryRepository;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
@@ -40,13 +41,17 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
     private final CategoryRepository categoryRepository;
 
+    private final OptionService optionService;
+
     public PostCategoryServiceImpl(PostCategoryRepository postCategoryRepository,
                                    PostRepository postRepository,
-                                   CategoryRepository categoryRepository) {
+                                   CategoryRepository categoryRepository,
+                                   OptionService optionService) {
         super(postCategoryRepository);
         this.postCategoryRepository = postCategoryRepository;
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -241,6 +246,21 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
                 CategoryWithPostCountDTO categoryWithPostCountDTO = new CategoryWithPostCountDTO().convertFrom(category);
                 // Set post count
                 categoryWithPostCountDTO.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+
+                StringBuilder fullPath = new StringBuilder();
+
+                if (optionService.isEnabledAbsolutePath()) {
+                    fullPath.append(optionService.getBlogBaseUrl());
+                }
+
+                fullPath.append("/")
+                    .append(optionService.getCategoriesPrefix())
+                    .append("/")
+                    .append(category.getSlugName())
+                    .append(optionService.getPathSuffix());
+
+                categoryWithPostCountDTO.setFullPath(fullPath.toString());
+
                 return categoryWithPostCountDTO;
             })
             .collect(Collectors.toList());

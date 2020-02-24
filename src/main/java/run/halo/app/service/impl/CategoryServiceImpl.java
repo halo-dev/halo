@@ -15,6 +15,7 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.service.CategoryService;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
@@ -39,11 +40,15 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
     private final PostCategoryService postCategoryService;
 
+    private final OptionService optionService;
+
     public CategoryServiceImpl(CategoryRepository categoryRepository,
-                               PostCategoryService postCategoryService) {
+                               PostCategoryService postCategoryService,
+                               OptionService optionService) {
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
         this.postCategoryService = postCategoryService;
+        this.optionService = optionService;
     }
 
     @Override
@@ -188,7 +193,23 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     public CategoryDTO convertTo(Category category) {
         Assert.notNull(category, "Category must not be null");
 
-        return new CategoryDTO().convertFrom(category);
+        CategoryDTO categoryDTO = new CategoryDTO().convertFrom(category);
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/")
+                .append(optionService.getCategoriesPrefix())
+                .append("/")
+                .append(category.getSlugName())
+                .append(optionService.getPathSuffix());
+
+        categoryDTO.setFullPath(fullPath.toString());
+
+        return categoryDTO;
     }
 
     @Override

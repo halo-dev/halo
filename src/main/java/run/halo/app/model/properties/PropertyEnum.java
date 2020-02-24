@@ -152,6 +152,7 @@ public interface PropertyEnum extends ValueEnum<String> {
         propertyEnumClasses.add(EmailProperties.class);
         propertyEnumClasses.add(OtherProperties.class);
         propertyEnumClasses.add(PostProperties.class);
+        propertyEnumClasses.add(SheetProperties.class);
         propertyEnumClasses.add(PrimaryProperties.class);
         propertyEnumClasses.add(QiniuOssProperties.class);
         propertyEnumClasses.add(SeoProperties.class);
