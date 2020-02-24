@@ -9,6 +9,7 @@ import run.halo.app.exception.AuthenticationException;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.properties.ApiProperties;
 import run.halo.app.model.properties.CommentProperties;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
 
 import javax.servlet.FilterChain;
@@ -33,8 +34,9 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
     public ApiAuthenticationFilter(HaloProperties haloProperties,
                                    OptionService optionService,
-                                   StringCacheStore cacheStore) {
-        super(haloProperties, optionService, cacheStore);
+                                   StringCacheStore cacheStore,
+                                   OneTimeTokenService oneTimeTokenService) {
+        super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.optionService = optionService;
     }
 
@@ -50,8 +52,7 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
         Boolean apiEnabled = optionService.getByPropertyOrDefault(ApiProperties.API_ENABLED, Boolean.class, false);
 
         if (!apiEnabled) {
-            getFailureHandler().onFailure(request, response, new ForbiddenException("API has been disabled by blogger currently"));
-            return;
+            throw new ForbiddenException("API has been disabled by blogger currently");
         }
 
         // Get access key
@@ -59,8 +60,7 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
         if (StringUtils.isBlank(accessKey)) {
             // If the access key is missing
-            getFailureHandler().onFailure(request, response, new AuthenticationException("Missing API access key"));
-            return;
+            throw new AuthenticationException("Missing API access key");
         }
 
         // Get access key from option
@@ -68,14 +68,12 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
         if (!optionalAccessKey.isPresent()) {
             // If the access key is not set
-            getFailureHandler().onFailure(request, response, new AuthenticationException("API access key hasn't been set by blogger"));
-            return;
+            throw new AuthenticationException("API access key hasn't been set by blogger");
         }
 
         if (!StringUtils.equals(accessKey, optionalAccessKey.get())) {
             // If the access key is mismatch
-            getFailureHandler().onFailure(request, response, new AuthenticationException("API access key is mismatch"));
-            return;
+            throw new AuthenticationException("API access key is mismatch").setErrorData(accessKey);
         }
 
         // Do filter

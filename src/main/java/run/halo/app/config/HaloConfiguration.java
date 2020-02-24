@@ -24,6 +24,7 @@ import run.halo.app.security.filter.ApiAuthenticationFilter;
 import run.halo.app.security.filter.ContentFilter;
 import run.halo.app.security.handler.ContentAuthenticationFailureHandler;
 import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.HaloUtils;
@@ -116,8 +117,9 @@ public class HaloConfiguration {
     @Bean
     public FilterRegistrationBean<ContentFilter> contentFilter(HaloProperties haloProperties,
                                                                OptionService optionService,
-                                                               StringCacheStore cacheStore) {
-        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService, cacheStore);
+                                                               StringCacheStore cacheStore,
+                                                               OneTimeTokenService oneTimeTokenService) {
+        ContentFilter contentFilter = new ContentFilter(haloProperties, optionService, cacheStore, oneTimeTokenService);
         contentFilter.setFailureHandler(new ContentAuthenticationFailureHandler());
 
         String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
@@ -142,8 +144,9 @@ public class HaloConfiguration {
     public FilterRegistrationBean<ApiAuthenticationFilter> apiAuthenticationFilter(HaloProperties haloProperties,
                                                                                    ObjectMapper objectMapper,
                                                                                    OptionService optionService,
-                                                                                   StringCacheStore cacheStore) {
-        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService, cacheStore);
+                                                                                   StringCacheStore cacheStore,
+                                                                                   OneTimeTokenService oneTimeTokenService) {
+        ApiAuthenticationFilter apiFilter = new ApiAuthenticationFilter(haloProperties, optionService, cacheStore, oneTimeTokenService);
         apiFilter.addExcludeUrlPatterns(
                 "/api/content/*/comments",
                 "/api/content/**/comments/**",
@@ -170,8 +173,10 @@ public class HaloConfiguration {
                                                                                        UserService userService,
                                                                                        HaloProperties haloProperties,
                                                                                        ObjectMapper objectMapper,
-                                                                                       OptionService optionService) {
-        AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService, haloProperties, optionService);
+                                                                                       OptionService optionService,
+                                                                                       OneTimeTokenService oneTimeTokenService) {
+        AdminAuthenticationFilter adminAuthenticationFilter = new AdminAuthenticationFilter(cacheStore, userService,
+                haloProperties, optionService, oneTimeTokenService);
 
         DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());
@@ -188,8 +193,7 @@ public class HaloConfiguration {
                 "/api/admin/password/code",
                 "/api/admin/password/reset"
         );
-        adminAuthenticationFilter.setFailureHandler(
-                failureHandler);
+        adminAuthenticationFilter.setFailureHandler(failureHandler);
 
         FilterRegistrationBean<AdminAuthenticationFilter> authenticationFilter = new FilterRegistrationBean<>();
         authenticationFilter.setFilter(adminAuthenticationFilter);

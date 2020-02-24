@@ -58,7 +58,7 @@ public class UpOssFileHandler implements FileHandler {
 
         try {
             // Get file basename
-            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
             // Get file extension
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             // Get md5 value of the file
@@ -128,7 +128,7 @@ public class UpOssFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.UPOSS.equals(type);
+    public boolean supportType(String type) {
+        return AttachmentType.UPOSS.name().equalsIgnoreCase(type);
     }
 }

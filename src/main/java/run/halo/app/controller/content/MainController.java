@@ -11,6 +11,7 @@ import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.HaloUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class MainController {
 
     @GetMapping("${halo.admin-path:admin}")
     public void admin(HttpServletResponse response) throws IOException {
-        String adminIndexRedirectUri = StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/") + INDEX_REDIRECT_URI;
+        String adminIndexRedirectUri = HaloUtils.ensureBoth(haloProperties.getAdminPath(), HaloUtils.URL_SEPARATOR) + INDEX_REDIRECT_URI;
         response.sendRedirect(adminIndexRedirectUri);
     }
 
@@ -68,7 +69,7 @@ public class MainController {
     public void avatar(HttpServletResponse response) throws IOException {
         User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         if (StringUtils.isNotEmpty(user.getAvatar())) {
-            response.sendRedirect(user.getAvatar());
+            response.sendRedirect(HaloUtils.normalizeUrl(user.getAvatar()));
         }
     }
 
@@ -76,7 +77,7 @@ public class MainController {
     public void logo(HttpServletResponse response) throws IOException {
         String blogLogo = optionService.getByProperty(BlogProperties.BLOG_LOGO).orElse("").toString();
         if (StringUtils.isNotEmpty(blogLogo)) {
-            response.sendRedirect(blogLogo);
+            response.sendRedirect(HaloUtils.normalizeUrl(blogLogo));
         }
     }
 
@@ -84,7 +85,7 @@ public class MainController {
     public void favicon(HttpServletResponse response) throws IOException {
         String favicon = optionService.getByProperty(BlogProperties.BLOG_FAVICON).orElse("").toString();
         if (StringUtils.isNotEmpty(favicon)) {
-            response.sendRedirect(favicon);
+            response.sendRedirect(HaloUtils.normalizeUrl(favicon));
         }
     }
 }

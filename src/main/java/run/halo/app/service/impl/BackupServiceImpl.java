@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.http.client.utils.URIBuilder;
 import org.json.JSONObject;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
-import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
@@ -24,7 +22,7 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.security.util.SecurityUtils;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.BackupService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
@@ -34,7 +32,6 @@ import run.halo.app.utils.HaloUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -42,16 +39,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static run.halo.app.model.support.HaloConst.TEMP_TOKEN;
-import static run.halo.app.model.support.HaloConst.TEMP_TOKEN_EXPIRATION;
 
 /**
  * Backup service implementation.
@@ -64,34 +54,40 @@ import static run.halo.app.model.support.HaloConst.TEMP_TOKEN_EXPIRATION;
 @Slf4j
 public class BackupServiceImpl implements BackupService {
 
-    public static final String BACKUP_TOKEN_KEY_PREFIX = "backup-token-";
+    private static final String BACKUP_RESOURCE_BASE_URI = "/api/admin/backups/halo";
+
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     private final PostService postService;
+
     private final PostTagService postTagService;
+
     private final OptionService optionService;
-    private final StringCacheStore cacheStore;
+
+    private final OneTimeTokenService oneTimeTokenService;
+
     private final HaloProperties haloProperties;
 
     public BackupServiceImpl(PostService postService,
                              PostTagService postTagService,
                              OptionService optionService,
-                             StringCacheStore stringCacheStore,
+                             OneTimeTokenService oneTimeTokenService,
                              HaloProperties haloProperties) {
         this.postService = postService;
         this.postTagService = postTagService;
         this.optionService = optionService;
-        this.cacheStore = stringCacheStore;
+        this.oneTimeTokenService = oneTimeTokenService;
         this.haloProperties = haloProperties;
     }
 
     /**
      * Sanitizes the specified file name.
      *
-     * @param unsanitized the specified file name
+     * @param unSanitized the specified file name
      * @return sanitized file name
      */
-    public static String sanitizeFilename(final String unsanitized) {
-        return unsanitized.
+    public static String sanitizeFilename(final String unSanitized) {
+        return unSanitized.
                 replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
                 replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
                 replaceAll("\\s", "");
@@ -191,8 +187,14 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public List<BackupDTO> listHaloBackups() {
+        // Ensure the parent folder exist
+        Path backupParentPath = Paths.get(haloProperties.getBackupDir());
+        if (Files.notExists(backupParentPath)) {
+            return Collections.emptyList();
+        }
+
         // Build backup dto
-        try (Stream<Path> subPathStream = Files.list(Paths.get(haloProperties.getBackupDir()))) {
+        try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
                     .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
                     .map(this::buildBackupDto)
@@ -236,19 +238,32 @@ public class BackupServiceImpl implements BackupService {
     public Resource loadFileAsResource(String fileName) {
         Assert.hasText(fileName, "Backup file name must not be blank");
 
-        // Get backup file path
-        Path backupFilePath = Paths.get(haloProperties.getBackupDir(), fileName).normalize();
+        Path backupParentPath = Paths.get(haloProperties.getBackupDir());
+
         try {
+            if (Files.notExists(backupParentPath)) {
+                // Create backup parent path if it does not exists
+                Files.createDirectories(backupParentPath);
+            }
+
+            // Get backup file path
+            Path backupFilePath = Paths.get(haloProperties.getBackupDir(), fileName).normalize();
+
+            // Check directory traversal
+            run.halo.app.utils.FileUtils.checkDirectoryTraversal(backupParentPath, backupFilePath);
+
             // Build url resource
             Resource backupResource = new UrlResource(backupFilePath.toUri());
             if (!backupResource.exists()) {
-                // If the backup resouce is not exist
+                // If the backup resource is not exist
                 throw new NotFoundException("The file " + fileName + " was not found");
             }
             // Return the backup resource
             return backupResource;
         } catch (MalformedURLException e) {
             throw new NotFoundException("The file " + fileName + " was not found", e);
+        } catch (IOException e) {
+            throw new ServiceException("Failed to create backup parent path: " + backupParentPath, e);
         }
     }
 
@@ -271,8 +286,6 @@ public class BackupServiceImpl implements BackupService {
             backup.setFileSize(Files.size(backupPath));
         } catch (IOException e) {
             throw new ServiceException("Failed to access file " + backupPath, e);
-        } catch (URISyntaxException e) {
-            throw new ServiceException("Failed to generate download link for file: " + backupPath, e);
         }
 
         return backup;
@@ -284,36 +297,21 @@ public class BackupServiceImpl implements BackupService {
      * @param filename filename must not be blank
      * @return download url
      */
-    private String buildDownloadUrl(@NonNull String filename) throws URISyntaxException {
+    @NonNull
+    private String buildDownloadUrl(@NonNull String filename) {
         Assert.hasText(filename, "File name must not be blank");
 
         // Composite http url
-        String backupFullUrl = HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), "api/admin/backups/halo", filename);
+        String backupUri = BACKUP_RESOURCE_BASE_URI + HaloUtils.URL_SEPARATOR + filename;
 
-        // Get temp token
-        String tempToken = cacheStore.get(buildBackupTokenKey(filename)).orElseGet(() -> {
-            String token = buildTempToken(1);
-            // Cache this projection
-            cacheStore.putIfAbsent(buildBackupTokenKey(filename), token, TEMP_TOKEN_EXPIRATION.toDays(), TimeUnit.DAYS);
-            return token;
-        });
+        // Get a one-time token
+        String oneTimeToken = oneTimeTokenService.create(backupUri);
 
-        return new URIBuilder(backupFullUrl).addParameter(TEMP_TOKEN, tempToken).toString();
+        // Build full url
+        return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), backupUri)
+                + "?"
+                + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
+                + "=" + oneTimeToken;
     }
 
-    private String buildBackupTokenKey(String backupFileName) {
-        return BACKUP_TOKEN_KEY_PREFIX + backupFileName;
-    }
-
-    private String buildTempToken(@NonNull Object value) {
-        Assert.notNull(value, "Temp token value must not be null");
-
-        // Generate temp token
-        String tempToken = HaloUtils.randomUUIDWithoutDash();
-
-        // Cache the token
-        cacheStore.putIfAbsent(SecurityUtils.buildTempTokenKey(tempToken), value.toString(), TEMP_TOKEN_EXPIRATION.toDays(), TimeUnit.DAYS);
-
-        return tempToken;
-    }
 }

@@ -227,7 +227,7 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
             log.debug("Looking path: [{}]", lookupPath);
             for (String blackPattern : blackPatterns) {
                 if (this.pathMatcher.match(blackPattern, lookupPath)) {
-                    log.info("Skipped path [{}] with pattern: [{}]", lookupPath, blackPattern);
+                    log.debug("Skipped path [{}] with pattern: [{}]", lookupPath, blackPattern);
                     return null;
                 }
             }
@@ -236,8 +236,7 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
 
         private void initBlackPatterns() {
             String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
-            String adminPathPattern = ensureBoth(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
-
+            String adminPathPattern = ensureBoth(haloProperties.getAdminPath(), URL_SEPARATOR) + "?*/**";
 
             blackPatterns.add("/themes/**");
             blackPatterns.add("/js/**");

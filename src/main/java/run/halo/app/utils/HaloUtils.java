@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import cn.hutool.core.util.URLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -230,6 +231,24 @@ public class HaloUtils {
             return url;
         }
         return String.valueOf(System.currentTimeMillis());
+    }
+
+    /**
+     * Normalize url
+     *
+     * @param originalUrl original url
+     * @return normalized url.
+     */
+    @NonNull
+    public static String normalizeUrl(@NonNull String originalUrl) {
+        Assert.hasText(originalUrl, "Original Url must not be blank");
+
+        if (StringUtils.startsWithAny(originalUrl, "/", "https://", "http://")
+                && !StringUtils.startsWith(originalUrl, "//")) {
+            return originalUrl;
+        }
+
+        return URLUtil.normalize(originalUrl);
     }
 
     /**

@@ -18,12 +18,12 @@ import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
+import run.halo.app.mail.MailService;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.LogType;
-import run.halo.app.model.enums.Mode;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.params.ResetPasswordParam;
@@ -230,7 +230,7 @@ public class AdminServiceImpl implements AdminService {
 
         // Send email to administrator.
         String content = "您正在进行密码重置操作，如不是本人操作，请尽快做好相应措施。密码重置验证码如下（五分钟有效）：\n" + code;
-        mailService.sendMail(param.getEmail(), "找回密码验证码", content);
+        mailService.sendTextMail(param.getEmail(), "找回密码验证码", content);
     }
 
     @Override
@@ -301,7 +301,7 @@ public class AdminServiceImpl implements AdminService {
 
         environmentDTO.setVersion(HaloConst.HALO_VERSION);
 
-        environmentDTO.setMode(Mode.valueFrom(this.mode));
+        environmentDTO.setMode(haloProperties.getMode());
 
         return environmentDTO;
     }
@@ -311,7 +311,7 @@ public class AdminServiceImpl implements AdminService {
         Assert.hasText(refreshToken, "Refresh token must not be blank");
 
         Integer userId = cacheStore.getAny(SecurityUtils.buildTokenRefreshKey(refreshToken), Integer.class)
-                .orElseThrow(() -> new BadRequestException("登陆状态已失效，请重新登陆").setErrorData(refreshToken));
+                .orElseThrow(() -> new BadRequestException("登录状态已失效，请重新登录").setErrorData(refreshToken));
 
         // Get user info
         User user = userService.getById(userId);

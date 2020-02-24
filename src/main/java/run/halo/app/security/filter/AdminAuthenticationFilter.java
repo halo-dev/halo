@@ -10,6 +10,7 @@ import run.halo.app.model.entity.User;
 import run.halo.app.security.authentication.AuthenticationImpl;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.security.support.UserDetail;
 import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.OptionService;
@@ -35,14 +36,14 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private final HaloProperties haloProperties;
 
-
     private final UserService userService;
 
     public AdminAuthenticationFilter(StringCacheStore cacheStore,
                                      UserService userService,
                                      HaloProperties haloProperties,
-                                     OptionService optionService) {
-        super(haloProperties, optionService, cacheStore);
+                                     OptionService optionService,
+                                     OneTimeTokenService oneTimeTokenService) {
+        super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.userService = userService;
         this.haloProperties = haloProperties;
     }
@@ -64,16 +65,14 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         String token = getTokenFromRequest(request);
 
         if (StringUtils.isBlank(token)) {
-            getFailureHandler().onFailure(request, response, new AuthenticationException("未登录，请登陆后访问"));
-            return;
+            throw new AuthenticationException("未登录，请登录后访问");
         }
 
         // Get user id from cache
         Optional<Integer> optionalUserId = cacheStore.getAny(SecurityUtils.buildTokenAccessKey(token), Integer.class);
 
         if (!optionalUserId.isPresent()) {
-            getFailureHandler().onFailure(request, response, new AuthenticationException("Token 已过期或不存在").setErrorData(token));
-            return;
+            throw new AuthenticationException("Token 已过期或不存在").setErrorData(token);
         }
 
         // Get the user

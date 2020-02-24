@@ -28,6 +28,8 @@ public class CategoryDTO implements OutputConverter<CategoryDTO, Category> {
 
     private String description;
 
+    private String thumbnail;
+
     private Integer parentId;
 
     private Date createTime;

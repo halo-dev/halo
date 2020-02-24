@@ -143,4 +143,15 @@ public class HaloUtilsTest {
         url = HaloUtils.compositeHttpUrl("https://halo.run/", "/path1/", "/path2/");
         assertEquals("https://halo.run/path1/path2", url);
     }
+
+    @Test
+    public void normalizeUrl() {
+        assertEquals("/2019/2/2/avatar.jpg", HaloUtils.normalizeUrl("/2019/2/2/avatar.jpg"));
+
+        assertEquals("http://cn.gravatar.com/avatar?d=mm", HaloUtils.normalizeUrl("//cn.gravatar.com/avatar?d=mm"));
+
+        assertEquals("http://cn.gravatar.com/avatar?d=mm", HaloUtils.normalizeUrl("cn.gravatar.com/avatar?d=mm"));
+
+        assertEquals("https://cn.gravatar.com/avatar?d=mm", HaloUtils.normalizeUrl("https://cn.gravatar.com/avatar?d=mm"));
+    }
 }
