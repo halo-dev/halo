@@ -85,7 +85,7 @@ public class MenuController {
     }
 
     @GetMapping("teams")
-    @ApiOperation(("Lists all menu teams"))
+    @ApiOperation("Lists all menu teams")
     public List<String> teams() {
         return menuService.listAllTeams();
     }

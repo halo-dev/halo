@@ -12,8 +12,8 @@
     <module name="FileTabCharacter"/>
 
     <module name="RegexpSingleline">
-        <property name="format" value="System\.out\.println"/>
-        <property name="message" value="Prohibit invoking System.out.println in source code !"/>
+        <property name="format" value="System\.out"/>
+        <property name="message" value="Prohibit invoking System.out in source code !"/>
     </module>
 
     <module name="FileLength">
@@ -61,7 +61,7 @@
             <property name="format" value="(^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$)"/>
         </module>
         <module name="PackageName">
-            <property name="format" value="^run\.halo\.app(\.[a-zA-Z][a-zA-Z0-9]*)+$"/>
+            <property name="format" value="^run\.halo(\.[a-zA-Z][a-zA-Z0-9]*)+$"/>
         </module>
         <module name="ParameterName"/>
         <module name="StaticVariableName">

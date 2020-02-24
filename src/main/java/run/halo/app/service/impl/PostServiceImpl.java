@@ -276,7 +276,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             Calendar calendar = DateUtils.convertTo(post.getCreateTime());
 
             yearMonthPostMap.computeIfAbsent(calendar.get(Calendar.YEAR), year -> new HashMap<>())
-                .computeIfAbsent((calendar.get(Calendar.MONTH) + 1),
+                .computeIfAbsent(calendar.get(Calendar.MONTH) + 1,
                     month -> new LinkedList<>())
                 .add(post);
         });

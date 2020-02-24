@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -24,6 +25,7 @@ import java.util.Map;
  * @date 19-5-21
  */
 @Ignore
+@Slf4j
 public class GithubTest {
 
     private final static String API_URL = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
@@ -40,10 +42,10 @@ public class GithubTest {
     @SuppressWarnings("unchecked")
     public void getLatestReleaseTest() throws Throwable {
         ResponseEntity<Map> responseEntity = restTemplate.getForEntity(API_URL, Map.class);
-        System.out.println("Response: " + responseEntity);
+        log.debug("Response: " + responseEntity);
         Object assetsObject = responseEntity.getBody().get("assets");
-        System.out.println("Assets class: " + assetsObject.getClass());
-        System.out.println("Assets: " + assetsObject);
+        log.debug("Assets class: " + assetsObject.getClass());
+        log.debug("Assets: " + assetsObject);
         if (assetsObject instanceof List) {
             List assets = (List) assetsObject;
             Map assetMap = (Map) assets.stream().filter(aAsset -> {
@@ -61,11 +63,11 @@ public class GithubTest {
             Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");
             // Download the assets
             ResponseEntity<byte[]> downloadResponseEntity = restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
-            System.out.println("Download response entity status: " + downloadResponseEntity.getStatusCode());
+            log.debug("Download response entity status: " + downloadResponseEntity.getStatusCode());
 
             Path downloadedPath = Files.write(tempPath.resolve(name.toString()), downloadResponseEntity.getBody());
 
-            System.out.println("Downloaded path: " + downloadedPath.toString());
+            log.debug("Downloaded path: " + downloadedPath.toString());
         }
     }
 

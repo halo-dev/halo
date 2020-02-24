@@ -51,7 +51,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
     private final OptionService optionService;
 
-    private final Pattern SUMMARY_PATTERN = Pattern.compile("\\s*|\t|\r|\n");
+    private final Pattern summaryPattern = Pattern.compile("\\s*|\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
                                OptionService optionService) {
@@ -468,7 +468,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         String text = HaloUtils.cleanHtmlTag(htmlContent);
 
-        Matcher matcher = SUMMARY_PATTERN.matcher(text);
+        Matcher matcher = summaryPattern.matcher(text);
         text = matcher.replaceAll("");
 
         // Get summary length

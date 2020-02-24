@@ -126,19 +126,20 @@ public interface PropertyEnum extends ValueEnum<String> {
      * @return true if supports; false else
      */
     static boolean isSupportedType(Class<?> type) {
-        return type != null && (
-            type.isAssignableFrom(String.class)
-                || type.isAssignableFrom(Number.class)
-                || type.isAssignableFrom(Integer.class)
-                || type.isAssignableFrom(Long.class)
-                || type.isAssignableFrom(Boolean.class)
-                || type.isAssignableFrom(Short.class)
-                || type.isAssignableFrom(Byte.class)
-                || type.isAssignableFrom(Double.class)
-                || type.isAssignableFrom(Float.class)
-                || type.isAssignableFrom(Enum.class)
-                || type.isAssignableFrom(ValueEnum.class)
-        );
+        if (type == null) {
+            return false;
+        }
+        return type.isAssignableFrom(String.class)
+            || type.isAssignableFrom(Number.class)
+            || type.isAssignableFrom(Integer.class)
+            || type.isAssignableFrom(Long.class)
+            || type.isAssignableFrom(Boolean.class)
+            || type.isAssignableFrom(Short.class)
+            || type.isAssignableFrom(Byte.class)
+            || type.isAssignableFrom(Double.class)
+            || type.isAssignableFrom(Float.class)
+            || type.isAssignableFrom(Enum.class)
+            || type.isAssignableFrom(ValueEnum.class);
     }
 
     static Map<String, PropertyEnum> getValuePropertyEnumMap() {

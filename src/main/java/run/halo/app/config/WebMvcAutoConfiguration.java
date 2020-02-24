@@ -77,14 +77,15 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.stream()
             .filter(c -> c instanceof MappingJackson2HttpMessageConverter)
-            .findFirst().ifPresent(converter -> {
-            MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-            Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
-            JsonComponentModule module = new JsonComponentModule();
-            module.addSerializer(PageImpl.class, new PageJacksonSerializer());
-            ObjectMapper objectMapper = builder.modules(module).build();
-            mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
-        });
+            .findFirst()
+            .ifPresent(converter -> {
+                MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
+                Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
+                JsonComponentModule module = new JsonComponentModule();
+                module.addSerializer(PageImpl.class, new PageJacksonSerializer());
+                ObjectMapper objectMapper = builder.modules(module).build();
+                mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+            });
     }
 
     @Override

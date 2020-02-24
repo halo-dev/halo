@@ -2,6 +2,7 @@ package run.halo.app.handler.theme;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
  * @author johnniang
  * @date 4/11/19
  */
+@Slf4j
 public class YamlThemePropertyResolverTest {
 
     private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
@@ -29,6 +31,6 @@ public class YamlThemePropertyResolverTest {
 
         ThemeProperty themeProperty = yamlMapper.readValue(yaml, ThemeProperty.class);
 
-        System.out.println(themeProperty);
+        log.debug("[{}]", themeProperty);
     }
 }

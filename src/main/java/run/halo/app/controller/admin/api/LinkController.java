@@ -72,7 +72,7 @@ public class LinkController {
     }
 
     @GetMapping("teams")
-    @ApiOperation(("Lists all link teams"))
+    @ApiOperation("Lists all link teams")
     public List<String> teams() {
         return linkService.listAllTeams();
     }

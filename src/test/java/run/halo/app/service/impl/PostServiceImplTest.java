@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
+@Slf4j
 public class PostServiceImplTest {
 
     private String standardMdContent = "---\n" +
@@ -42,7 +44,7 @@ public class PostServiceImplTest {
     @Ignore
     public void getContent() {
         String exportMarkdown = postService.exportMarkdown(18);
-        System.out.println(exportMarkdown);
+        log.debug(exportMarkdown);
     }
 
     @Test

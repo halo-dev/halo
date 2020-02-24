@@ -13,8 +13,7 @@ public enum BanStatusEnum {
     /**
      * 封禁状态
      */
-    NORMAL(0),
-    ;
+    NORMAL(0);
 
     private int status;
 
