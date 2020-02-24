@@ -43,7 +43,7 @@ public class CommonResultControllerAdvice implements ResponseBodyAdvice<Object> 
      * additional serialization instructions) or simply cast it if already wrapped.
      */
     private MappingJacksonValue getOrCreateContainer(Object body) {
-        return (body instanceof MappingJacksonValue ? (MappingJacksonValue) body : new MappingJacksonValue(body));
+        return body instanceof MappingJacksonValue ? (MappingJacksonValue) body : new MappingJacksonValue(body);
     }
 
     private void beforeBodyWriteInternal(MappingJacksonValue bodyContainer,

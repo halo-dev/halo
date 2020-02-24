@@ -41,14 +41,14 @@ public class HttpClientUtils {
     @NonNull
     public static CloseableHttpClient createHttpsClient(int timeout) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         SSLContext sslContext = new SSLContextBuilder()
-                .loadTrustMaterial(null, (certificate, authType) -> true)
-                .build();
+            .loadTrustMaterial(null, (certificate, authType) -> true)
+            .build();
 
         return HttpClients.custom()
-                .setSSLContext(sslContext)
-                .setSSLHostnameVerifier(new NoopHostnameVerifier())
-                .setDefaultRequestConfig(getReqeustConfig(timeout))
-                .build();
+            .setSSLContext(sslContext)
+            .setSSLHostnameVerifier(new NoopHostnameVerifier())
+            .setDefaultRequestConfig(getReqeustConfig(timeout))
+            .build();
     }
 
     /**
@@ -59,10 +59,10 @@ public class HttpClientUtils {
      */
     private static RequestConfig getReqeustConfig(int timeout) {
         return RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setConnectionRequestTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build();
+            .setConnectTimeout(timeout)
+            .setConnectionRequestTimeout(timeout)
+            .setSocketTimeout(timeout)
+            .build();
     }
 
 

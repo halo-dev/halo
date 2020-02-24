@@ -2,7 +2,6 @@ package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.params.BaseCommentParam;
 import run.halo.app.model.params.JournalCommentParam;
 

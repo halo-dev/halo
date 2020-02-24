@@ -136,6 +136,6 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         }
 
         return links.stream().map(link -> (LinkDTO) new LinkDTO().convertFrom(link))
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 }

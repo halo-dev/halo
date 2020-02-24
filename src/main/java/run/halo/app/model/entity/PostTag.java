@@ -51,7 +51,7 @@ public class PostTag extends BaseEntity {
         }
         PostTag postTag = (PostTag) o;
         return Objects.equals(postId, postTag.postId) &&
-                Objects.equals(tagId, postTag.tagId);
+            Objects.equals(tagId, postTag.tagId);
     }
 
     @Override

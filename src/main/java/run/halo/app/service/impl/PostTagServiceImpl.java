@@ -75,26 +75,26 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
         // Find post count
         return tags.stream().map(
-                tag -> {
-                    TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
-                    tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
+            tag -> {
+                TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
+                tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
 
-                    StringBuilder fullPath = new StringBuilder();
+                StringBuilder fullPath = new StringBuilder();
 
-                    if (optionService.isEnabledAbsolutePath()) {
-                        fullPath.append(optionService.getBlogBaseUrl());
-                    }
-
-                    fullPath.append("/")
-                            .append(optionService.getTagsPrefix())
-                            .append("/")
-                            .append(tag.getSlugName())
-                            .append(optionService.getPathSuffix());
-
-                    tagWithCountOutputDTO.setFullPath(fullPath.toString());
-
-                    return tagWithCountOutputDTO;
+                if (optionService.isEnabledAbsolutePath()) {
+                    fullPath.append(optionService.getBlogBaseUrl());
                 }
+
+                fullPath.append("/")
+                    .append(optionService.getTagsPrefix())
+                    .append("/")
+                    .append(tag.getSlugName())
+                    .append(optionService.getPathSuffix());
+
+                tagWithCountOutputDTO.setFullPath(fullPath.toString());
+
+                return tagWithCountOutputDTO;
+            }
         ).collect(Collectors.toList());
     }
 

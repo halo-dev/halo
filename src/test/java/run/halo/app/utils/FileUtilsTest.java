@@ -37,25 +37,25 @@ public class FileUtilsTest {
 
         try (Stream<Path> pathStream = Files.walk(tempDirectory)) {
             List<Path> walkList = pathStream.collect(Collectors.toList());
-            walkList.forEach(System.out::println);
+            walkList.forEach(path -> log.debug(path.toString()));
             Assert.assertThat(walkList.size(), equalTo(4));
         }
 
         try (Stream<Path> pathStream = Files.walk(tempDirectory, 1)) {
             List<Path> walkList = pathStream.collect(Collectors.toList());
-            walkList.forEach(System.out::println);
+            walkList.forEach(path -> log.debug(path.toString()));
             Assert.assertThat(walkList.size(), equalTo(2));
         }
 
         try (Stream<Path> pathStream = Files.list(tempDirectory)) {
             List<Path> walkList = pathStream.collect(Collectors.toList());
-            walkList.forEach(System.out::println);
+            walkList.forEach(path -> log.debug(path.toString()));
             Assert.assertThat(walkList.size(), equalTo(1));
         }
 
         try (Stream<Path> pathStream = Files.list(testPath)) {
             List<Path> walkList = pathStream.collect(Collectors.toList());
-            walkList.forEach(System.out::println);
+            walkList.forEach(path -> log.debug(path.toString()));
             Assert.assertThat(walkList.size(), equalTo(0));
         }
 
@@ -103,9 +103,9 @@ public class FileUtilsTest {
             randomAccessFile.seek(2283640);
             byte[] buffer = new byte[1024];
             int count = randomAccessFile.read(buffer, 0, buffer.length);
-            System.out.println("Count: " + count);
+            log.debug("Count: [{}]", count);
             String bufString = new String(buffer);
-            System.out.println("Buffer String: " + bufString);
+            log.debug("Buffer String: [{}]", bufString);
         }
     }
 }

@@ -50,7 +50,7 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                     return;
                 }
 
-                Map tabMap = ((Map) tabYaml);
+                Map tabMap = (Map) tabYaml;
 
                 Group group = new Group();
 

@@ -68,13 +68,13 @@ public class TencentCosFileHandler implements FileHandler {
 
         if (StringUtils.isNotEmpty(domain)) {
             basePath.append(domain)
-                    .append("/");
+                .append("/");
         } else {
             basePath.append(bucketName)
-                    .append(".cos.")
-                    .append(region)
-                    .append(".myqcloud.com")
-                    .append("/");
+                .append(".cos.")
+                .append(region)
+                .append(".myqcloud.com")
+                .append("/");
         }
 
         try {
@@ -85,14 +85,14 @@ public class TencentCosFileHandler implements FileHandler {
 
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                        .append("/");
+                    .append("/");
             }
 
             upFilePath.append(basename)
-                    .append("_")
-                    .append(timestamp)
-                    .append(".")
-                    .append(extension);
+                .append("_")
+                .append(timestamp)
+                .append(".")
+                .append(extension);
 
             String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
 

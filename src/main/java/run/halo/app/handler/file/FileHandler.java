@@ -7,7 +7,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
-import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;

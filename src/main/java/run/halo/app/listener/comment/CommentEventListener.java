@@ -96,8 +96,8 @@ public class CommentEventListener {
             data.put("content", postComment.getContent());
 
             subject.append("您的博客文章《")
-                    .append(post.getTitle())
-                    .append("》有了新的评论。");
+                .append(post.getTitle())
+                .append("》有了新的评论。");
 
         } else if (newEvent.getSource() instanceof SheetCommentService) {
             SheetComment sheetComment = sheetCommentService.getById(newEvent.getCommentId());
@@ -112,8 +112,8 @@ public class CommentEventListener {
             data.put("content", sheetComment.getContent());
 
             subject.append("您的博客页面《")
-                    .append(sheet.getTitle())
-                    .append("》有了新的评论。");
+                .append(sheet.getTitle())
+                .append("》有了新的评论。");
         } else if (newEvent.getSource() instanceof JournalCommentService) {
             JournalComment journalComment = journalCommentService.getById(newEvent.getCommentId());
 
@@ -186,10 +186,10 @@ public class CommentEventListener {
             data.put("replyContent", postComment.getContent());
 
             subject.append("您在【")
-                    .append(blogTitle)
-                    .append("】评论的文章《")
-                    .append(post.getTitle())
-                    .append("》有了新的评论。");
+                .append(blogTitle)
+                .append("】评论的文章《")
+                .append(post.getTitle())
+                .append("》有了新的评论。");
         } else if (replyEvent.getSource() instanceof SheetCommentService) {
 
             SheetComment sheetComment = sheetCommentService.getById(replyEvent.getCommentId());
@@ -216,10 +216,10 @@ public class CommentEventListener {
             data.put("replyContent", sheetComment.getContent());
 
             subject.append("您在【")
-                    .append(blogTitle)
-                    .append("】评论的页面《")
-                    .append(sheet.getTitle())
-                    .append("》有了新的评论。");
+                .append(blogTitle)
+                .append("】评论的页面《")
+                .append(sheet.getTitle())
+                .append("》有了新的评论。");
         } else if (replyEvent.getSource() instanceof JournalCommentService) {
             JournalComment journalComment = journalCommentService.getById(replyEvent.getCommentId());
 
@@ -248,9 +248,9 @@ public class CommentEventListener {
             data.put("replyContent", journalComment.getContent());
 
             subject.append("您在【")
-                    .append(blogTitle)
-                    .append("】评论的日志")
-                    .append("有了新的评论。");
+                .append(blogTitle)
+                .append("】评论的日志")
+                .append("有了新的评论。");
         }
 
         mailService.sendTemplateMail(baseAuthorEmail, subject.toString(), data, "common/mail_template/mail_reply.ftl");
