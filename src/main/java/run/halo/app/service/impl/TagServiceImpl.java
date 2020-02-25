@@ -44,7 +44,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     @Transactional
     public Tag create(Tag tag) {
         // Check if the tag is exist
-        long count = tagRepository.countByNameOrSlugName(tag.getName(), tag.getSlugName());
+        long count = tagRepository.countByNameOrSlug(tag.getName(), tag.getSlug());
 
         log.debug("Tag count: [{}]", count);
 
@@ -58,13 +58,13 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     }
 
     @Override
-    public Tag getBySlugNameOfNonNull(String slugName) {
-        return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slugName));
+    public Tag getBySlugOfNonNull(String slug) {
+        return tagRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
     }
 
     @Override
-    public Tag getBySlugName(String slugName) {
-        return tagRepository.getBySlugName(slugName).orElse(null);
+    public Tag getBySlug(String slug) {
+        return tagRepository.getBySlug(slug).orElse(null);
     }
 
     @Override
@@ -85,10 +85,10 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         }
 
         fullPath.append("/")
-                .append(optionService.getTagsPrefix())
-                .append("/")
-                .append(tag.getSlugName())
-                .append(optionService.getPathSuffix());
+            .append(optionService.getTagsPrefix())
+            .append("/")
+            .append(tag.getSlug())
+            .append(optionService.getPathSuffix());
 
         tagDTO.setFullPath(fullPath.toString());
 

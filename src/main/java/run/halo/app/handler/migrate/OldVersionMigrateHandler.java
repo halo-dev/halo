@@ -150,7 +150,7 @@ public class OldVersionMigrateHandler implements MigrateHandler {
 
             BasePost post = new BasePost();
             post.setTitle(postMap.getOrDefault("postTitle", "").toString());
-            post.setUrl(postMap.getOrDefault("postUrl", "").toString());
+            post.setSlug(postMap.getOrDefault("postUrl", "").toString());
             post.setOriginalContent(postMap.getOrDefault("postContentMd", "").toString());
             post.setFormatContent(postMap.getOrDefault("postContent", "").toString());
             post.setSummary(postMap.getOrDefault("postSummary", "").toString());
@@ -402,14 +402,14 @@ public class OldVersionMigrateHandler implements MigrateHandler {
 
             Map<String, Object> categoryMap = (Map<String, Object>) categoryObject;
 
-            String slugName = categoryMap.getOrDefault("cateUrl", "").toString();
+            String slug = categoryMap.getOrDefault("cateUrl", "").toString();
 
-            Category category = categoryService.getBySlugName(slugName);
+            Category category = categoryService.getBySlug(slug);
 
             if (null == category) {
                 category = new Category();
                 category.setName(categoryMap.getOrDefault("cateName", "").toString());
-                category.setSlugName(slugName);
+                category.setSlug(slug);
                 category.setDescription(categoryMap.getOrDefault("cateDesc", "").toString());
                 category = categoryService.create(category);
             }
@@ -448,14 +448,14 @@ public class OldVersionMigrateHandler implements MigrateHandler {
 
             Map<String, Object> tagMap = (Map<String, Object>) tagObject;
 
-            String slugName = tagMap.getOrDefault("tagUrl", "").toString();
+            String slug = tagMap.getOrDefault("tagUrl", "").toString();
 
-            Tag tag = tagService.getBySlugName(slugName);
+            Tag tag = tagService.getBySlug(slug);
 
             if (null == tag) {
                 tag = new Tag();
                 tag.setName(tagMap.getOrDefault("tagName", "").toString());
-                tag.setSlugName(slugName);
+                tag.setSlug(slug);
                 tag = tagService.create(tag);
             }
 

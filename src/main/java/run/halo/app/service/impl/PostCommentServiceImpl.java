@@ -122,7 +122,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
         if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
             fullPath.append(archivesPrefix)
                 .append("/")
-                .append(basePostMinimalDTO.getUrl())
+                .append(basePostMinimalDTO.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.ID)) {
             fullPath.append("?p=")
@@ -132,7 +132,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
                 .append("/")
                 .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
                 .append("/")
-                .append(basePostMinimalDTO.getUrl())
+                .append(basePostMinimalDTO.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
             fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
@@ -141,7 +141,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
                 .append("/")
                 .append(DateUtil.dayOfMonth(basePostMinimalDTO.getCreateTime()))
                 .append("/")
-                .append(basePostMinimalDTO.getUrl())
+                .append(basePostMinimalDTO.getSlug())
                 .append(pathSuffix);
         }
 

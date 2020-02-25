@@ -54,9 +54,9 @@ public class JournalModel {
 
         if (optionService.isEnabledAbsolutePath()) {
             nextPageFullPath.append(optionService.getBlogBaseUrl())
-                    .append("/");
+                .append("/");
             prePageFullPath.append(optionService.getBlogBaseUrl())
-                    .append("/");
+                .append("/");
         } else {
             nextPageFullPath.append("/");
             prePageFullPath.append("/");
@@ -66,15 +66,15 @@ public class JournalModel {
         prePageFullPath.append(optionService.getJournalsPrefix());
 
         nextPageFullPath.append("/page/")
-                .append(journals.getNumber() + 2)
-                .append(optionService.getPathSuffix());
+            .append(journals.getNumber() + 2)
+            .append(optionService.getPathSuffix());
 
         if (journals.getNumber() == 1) {
             prePageFullPath.append("/");
         } else {
             prePageFullPath.append("/page/")
-                    .append(journals.getNumber())
-                    .append(optionService.getPathSuffix());
+                .append(journals.getNumber())
+                .append(optionService.getPathSuffix());
         }
 
         model.addAttribute("is_journals", true);

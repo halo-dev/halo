@@ -48,9 +48,9 @@ public class TagModel {
         return themeService.render("tags");
     }
 
-    public String listPost(Model model, String slugName, Integer page) {
-        // Get tag by slug name
-        final Tag tag = tagService.getBySlugNameOfNonNull(slugName);
+    public String listPost(Model model, String slug, Integer page) {
+        // Get tag by slug
+        final Tag tag = tagService.getBySlugOfNonNull(slug);
         TagDTO tagDTO = tagService.convertTo(tag);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), Sort.by(DESC, "createTime"));
@@ -65,15 +65,15 @@ public class TagModel {
         StringBuilder prePageFullPath = new StringBuilder(tagDTO.getFullPath());
 
         nextPageFullPath.append("/page/")
-                .append(posts.getNumber() + 2)
-                .append(optionService.getPathSuffix());
+            .append(posts.getNumber() + 2)
+            .append(optionService.getPathSuffix());
 
         if (posts.getNumber() == 1) {
             prePageFullPath.append("/");
         } else {
             prePageFullPath.append("/page/")
-                    .append(posts.getNumber())
-                    .append(optionService.getPathSuffix());
+                .append(posts.getNumber())
+                .append(optionService.getPathSuffix());
         }
 
         model.addAttribute("is_tag", true);

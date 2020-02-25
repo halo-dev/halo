@@ -163,7 +163,7 @@ public class InstallController {
         }
 
         PostParam postParam = new PostParam();
-        postParam.setUrl("hello-halo");
+        postParam.setSlug("hello-halo");
         postParam.setTitle("Hello Halo");
         postParam.setStatus(PostStatus.PUBLISHED);
         postParam.setOriginalContent("## Hello Halo!\n" +
@@ -187,7 +187,7 @@ public class InstallController {
 
         CategoryParam category = new CategoryParam();
         category.setName("未分类");
-        category.setSlugName("default");
+        category.setSlug("default");
         category.setDescription("未分类");
         ValidationUtils.validate(category);
         return categoryService.create(category.convertTo());
