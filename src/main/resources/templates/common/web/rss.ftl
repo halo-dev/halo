@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0">
     <channel>
-        <title>${blog_title!}</title>
-        <link>${blog_url!}</link>
-        <#if user.description??>
-            <description>${user.description!}</description>
+        <#if category??>
+            <title>分类：${category.name!} - ${blog_title!}</title>
+        <#else>
+            <title>${blog_title!}</title>
+        </#if>
+        <#if category??>
+            <link>${category.fullPath!}</link>
+        <#else>
+            <link>${blog_url!}</link>
+        </#if>
+        <#if category??>
+            <#if category.description?? && category.description!=''>
+                <description>${category.description!}</description>
+            </#if>
+        <#else>
+            <#if user.description?? && user.description!=''>
+                <description>${user.description!}</description>
+            </#if>
         </#if>
         <language>zh-CN</language>
         <generator>Halo ${version!}</generator>
