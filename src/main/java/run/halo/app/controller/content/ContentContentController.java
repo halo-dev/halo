@@ -115,80 +115,80 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{prefix}/{url:.+}")
+    @GetMapping("{prefix}/{slug:.+}")
     public String content(@PathVariable("prefix") String prefix,
-                          @PathVariable("url") String url,
+                          @PathVariable("slug") String slug,
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
 
         if (postPermalinkType.equals(PostPermalinkType.DEFAULT) && optionService.getArchivesPrefix().equals(prefix)) {
-            Post post = postService.getByUrl(url);
+            Post post = postService.getBySlug(slug);
             return postModel.content(post, token, model);
         } else if (optionService.getSheetPrefix().equals(prefix)) {
-            Sheet sheet = sheetService.getByUrl(url);
+            Sheet sheet = sheetService.getBySlug(slug);
             return sheetModel.content(sheet, token, model);
         } else if (optionService.getCategoriesPrefix().equals(prefix)) {
-            return categoryModel.listPost(model, url, 1);
+            return categoryModel.listPost(model, slug, 1);
         } else if (optionService.getTagsPrefix().equals(prefix)) {
-            return tagModel.listPost(model, url, 1);
+            return tagModel.listPost(model, slug, 1);
         } else {
             throw new NotFoundException("Not Found");
         }
     }
 
-    @GetMapping("{prefix}/{url}/page/{page:\\d+}")
+    @GetMapping("{prefix}/{slug}/page/{page:\\d+}")
     public String content(@PathVariable("prefix") String prefix,
-                          @PathVariable("url") String url,
+                          @PathVariable("slug") String slug,
                           @PathVariable("page") Integer page,
                           Model model) {
         if (optionService.getCategoriesPrefix().equals(prefix)) {
-            return categoryModel.listPost(model, url, page);
+            return categoryModel.listPost(model, slug, page);
         } else if (optionService.getTagsPrefix().equals(prefix)) {
-            return tagModel.listPost(model, url, page);
+            return tagModel.listPost(model, slug, page);
         } else {
             throw new NotFoundException("Not Found");
         }
     }
 
-    @GetMapping("{year:\\d+}/{month:\\d+}/{url:.+}")
+    @GetMapping("{year:\\d+}/{month:\\d+}/{slug:.+}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
-                          @PathVariable("url") String url,
+                          @PathVariable("slug") String slug,
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
         if (postPermalinkType.equals(PostPermalinkType.DATE)) {
-            Post post = postService.getBy(year, month, url);
+            Post post = postService.getBy(year, month, slug);
             return postModel.content(post, token, model);
         } else {
             throw new NotFoundException("Not Found");
         }
     }
 
-    @GetMapping("{year:\\d+}/{month:\\d+}/{day:\\d+}/{url:.+}")
+    @GetMapping("{year:\\d+}/{month:\\d+}/{day:\\d+}/{slug:.+}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("day") Integer day,
-                          @PathVariable("url") String url,
+                          @PathVariable("slug") String slug,
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
         if (postPermalinkType.equals(PostPermalinkType.DAY)) {
-            Post post = postService.getBy(year, month, day, url);
+            Post post = postService.getBy(year, month, day, slug);
             return postModel.content(post, token, model);
         } else {
             throw new NotFoundException("Not Found");
         }
     }
 
-    @PostMapping(value = "archives/{url:.*}/password")
+    @PostMapping(value = "archives/{slug:.*}/password")
     @CacheLock(traceRequest = true, expired = 2)
-    public String password(@PathVariable("url") String url,
+    public String password(@PathVariable("slug") String slug,
                            @RequestParam(value = "password") String password) throws UnsupportedEncodingException {
-        Post post = postService.getBy(PostStatus.INTIMATE, url);
+        Post post = postService.getBy(PostStatus.INTIMATE, slug);
 
-        post.setUrl(URLEncoder.encode(post.getUrl(), StandardCharsets.UTF_8.name()));
+        post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8.name()));
 
         BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
 
@@ -206,10 +206,10 @@ public class ContentContentController {
 
             if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
                 redirectUrl.append("&token=")
-                        .append(token);
+                    .append(token);
             } else {
                 redirectUrl.append("?token=")
-                        .append(token);
+                    .append(token);
             }
         }
 

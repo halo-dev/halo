@@ -38,7 +38,7 @@ public class SheetModel {
     public String content(Sheet sheet, String token, Model model) {
 
         if (StringUtils.isEmpty(token)) {
-            sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getUrl());
+            sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getSlug());
         } else {
             // verify token
             String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该页面的访问权限"));

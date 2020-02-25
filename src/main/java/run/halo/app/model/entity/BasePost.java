@@ -42,8 +42,15 @@ public class BasePost extends BaseEntity {
     /**
      * Post url.
      */
+    @Deprecated
     @Column(name = "url", columnDefinition = "varchar(255) not null", unique = true)
     private String url;
+
+    /**
+     * Post slug.
+     */
+    @Column(name = "slug", columnDefinition = "varchar(255)", unique = true)
+    private String slug;
 
     /**
      * Original content,not format.

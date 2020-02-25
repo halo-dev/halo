@@ -49,9 +49,9 @@ public class PhotoModel {
 
         if (optionService.isEnabledAbsolutePath()) {
             nextPageFullPath.append(optionService.getBlogBaseUrl())
-                    .append("/");
+                .append("/");
             prePageFullPath.append(optionService.getBlogBaseUrl())
-                    .append("/");
+                .append("/");
         } else {
             nextPageFullPath.append("/");
             prePageFullPath.append("/");
@@ -61,15 +61,15 @@ public class PhotoModel {
         prePageFullPath.append(optionService.getPhotosPrefix());
 
         nextPageFullPath.append("/page/")
-                .append(photos.getNumber() + 2)
-                .append(optionService.getPathSuffix());
+            .append(photos.getNumber() + 2)
+            .append(optionService.getPathSuffix());
 
         if (photos.getNumber() == 1) {
             prePageFullPath.append("/");
         } else {
             prePageFullPath.append("/page/")
-                    .append(photos.getNumber())
-                    .append(optionService.getPathSuffix());
+                .append(photos.getNumber())
+                .append(optionService.getPathSuffix());
         }
 
         model.addAttribute("is_photos", true);

@@ -72,12 +72,12 @@ public class PostModel {
     public String content(Post post, String token, Model model) {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
-            model.addAttribute("url", post.getUrl());
+            model.addAttribute("slug", post.getSlug());
             return "common/template/post_password";
         }
 
         if (StringUtils.isEmpty(token)) {
-            post = postService.getBy(PostStatus.PUBLISHED, post.getUrl());
+            post = postService.getBy(PostStatus.PUBLISHED, post.getSlug());
         } else {
             // verify token
             String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));

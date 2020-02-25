@@ -32,7 +32,11 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private PostStatus status = PostStatus.DRAFT;
 
+    @Deprecated
     private String url;
+
+    @Size(max = 255, message = "页面别名的字符长度不能超过 {max}")
+    private String slug;
 
     private String originalContent;
 
@@ -58,7 +62,7 @@ public class SheetParam implements InputConverter<Sheet> {
 
     @Override
     public Sheet convertTo() {
-        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(title) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";
@@ -69,7 +73,7 @@ public class SheetParam implements InputConverter<Sheet> {
 
     @Override
     public void update(Sheet sheet) {
-        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(title) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";

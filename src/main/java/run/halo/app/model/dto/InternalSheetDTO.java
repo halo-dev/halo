@@ -17,5 +17,5 @@ public class InternalSheetDTO {
 
     private String url;
 
-    private boolean status;
+    private Boolean status;
 }

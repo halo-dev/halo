@@ -17,13 +17,13 @@ public enum PermalinkProperties implements PropertyEnum {
 
     /**
      * Categories prefix
-     * such as: /categories or /categories/${slugName}
+     * such as: /categories or /categories/${slug}
      */
     CATEGORIES_PREFIX("categories_prefix", String.class, "categories"),
 
     /**
      * Tags prefix
-     * such as: /tags or /tags/${slugName}
+     * such as: /tags or /tags/${slug}
      */
     TAGS_PREFIX("tags_prefix", String.class, "tags"),
 
@@ -35,7 +35,7 @@ public enum PermalinkProperties implements PropertyEnum {
 
     /**
      * Sheet prefix
-     * such as: /s/${url}
+     * such as: /s/${slug}
      */
     SHEET_PREFIX("sheet_prefix", String.class, "s"),
 

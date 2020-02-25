@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.ServiceException;
-import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.mail.MailService;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.service.*;
@@ -122,8 +122,8 @@ public class CommentEventListener {
             Journal journal = journalService.getById(journalComment.getPostId());
 
             StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
-                    .append("/")
-                    .append(optionService.getJournalsPrefix());
+                .append("/")
+                .append(optionService.getJournalsPrefix());
             data.put("url", url.toString());
             data.put("page", journal.getCreateTime());
             data.put("author", journalComment.getAuthor());
@@ -238,8 +238,8 @@ public class CommentEventListener {
             Journal journal = journalService.getById(journalComment.getPostId());
 
             StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
-                    .append("/")
-                    .append(optionService.getJournalsPrefix());
+                .append("/")
+                .append(optionService.getJournalsPrefix());
             data.put("url", url);
             data.put("page", journal.getContent());
             data.put("baseAuthor", baseComment.getAuthor());

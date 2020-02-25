@@ -167,7 +167,7 @@ public class PostController {
     public String preview(@PathVariable("postId") Integer postId) throws UnsupportedEncodingException {
         Post post = postService.getById(postId);
 
-        post.setUrl(URLEncoder.encode(post.getUrl(), StandardCharsets.UTF_8.name()));
+        post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8.name()));
 
         BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
 
@@ -186,10 +186,10 @@ public class PostController {
 
         if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
             previewUrl.append("&token=")
-                    .append(token);
+                .append(token);
         } else {
             previewUrl.append("?token=")
-                    .append(token);
+                .append(token);
         }
 
         // build preview post url and return

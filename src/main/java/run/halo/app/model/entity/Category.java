@@ -27,14 +27,21 @@ public class Category extends BaseEntity {
     /**
      * Category name.
      */
-    @Column(name = "name", columnDefinition = "varchar(50) not null")
+    @Column(name = "name", columnDefinition = "varchar(255) not null")
     private String name;
 
     /**
      * Category slug name.
      */
+    @Deprecated
     @Column(name = "slug_name", columnDefinition = "varchar(50) not null", unique = true)
     private String slugName;
+
+    /**
+     * Category slug.
+     */
+    @Column(name = "slug", columnDefinition = "varchar(255)", unique = true)
+    private String slug;
 
     /**
      * Description,can be display on category page.

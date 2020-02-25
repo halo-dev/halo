@@ -153,13 +153,13 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     }
 
     @Override
-    public Category getBySlugName(String slugName) {
-        return categoryRepository.getBySlugName(slugName).orElse(null);
+    public Category getBySlug(String slug) {
+        return categoryRepository.getBySlug(slug).orElse(null);
     }
 
     @Override
-    public Category getBySlugNameOfNonNull(String slugName) {
-        return categoryRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slugName));
+    public Category getBySlugOfNonNull(String slug) {
+        return categoryRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
     }
 
     @Override
@@ -202,10 +202,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         }
 
         fullPath.append("/")
-                .append(optionService.getCategoriesPrefix())
-                .append("/")
-                .append(category.getSlugName())
-                .append(optionService.getPathSuffix());
+            .append(optionService.getCategoriesPrefix())
+            .append("/")
+            .append(category.getSlug())
+            .append(optionService.getPathSuffix());
 
         categoryDTO.setFullPath(fullPath.toString());
 
