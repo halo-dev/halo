@@ -48,9 +48,9 @@ public class CategoryModel {
         return themeService.render("categories");
     }
 
-    public String listPost(Model model, String slugName, Integer page) {
-        // Get category by slug name
-        final Category category = categoryService.getBySlugNameOfNonNull(slugName);
+    public String listPost(Model model, String slug, Integer page) {
+        // Get category by slug
+        final Category category = categoryService.getBySlugOfNonNull(slug);
         CategoryDTO categoryDTO = categoryService.convertTo(category);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), Sort.by(DESC, "createTime"));
@@ -65,15 +65,15 @@ public class CategoryModel {
         StringBuilder prePageFullPath = new StringBuilder(categoryDTO.getFullPath());
 
         nextPageFullPath.append("/page/")
-                .append(posts.getNumber() + 2)
-                .append(optionService.getPathSuffix());
+            .append(posts.getNumber() + 2)
+            .append(optionService.getPathSuffix());
 
         if (posts.getNumber() == 1) {
             prePageFullPath.append("/");
         } else {
             prePageFullPath.append("/page/")
-                    .append(posts.getNumber())
-                    .append(optionService.getPathSuffix());
+                .append(posts.getNumber())
+                .append(optionService.getPathSuffix());
         }
 
         model.addAttribute("is_category", true);

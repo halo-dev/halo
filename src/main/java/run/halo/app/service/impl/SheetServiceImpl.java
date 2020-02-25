@@ -132,20 +132,20 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    public Sheet getByUrl(String url) {
-        Assert.hasText(url, "Url must not be blank");
+    public Sheet getBySlug(String slug) {
+        Assert.hasText(slug, "Sheet slug must not be blank");
 
-        return sheetRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
+        return sheetRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
     }
 
     @Override
-    public Sheet getBy(PostStatus status, String url) {
-        Assert.notNull(status, "Post status must not be null");
-        Assert.hasText(url, "Post url must not be blank");
+    public Sheet getBy(PostStatus status, String slug) {
+        Assert.notNull(status, "Sheet status must not be null");
+        Assert.hasText(slug, "Sheet slug must not be blank");
 
-        Optional<Sheet> postOptional = sheetRepository.getByUrlAndStatus(url, status);
+        Optional<Sheet> postOptional = sheetRepository.getBySlugAndStatus(slug, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(url));
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
     }
 
     @Override
@@ -177,7 +177,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         content.append("type: ").append("sheet").append("\n");
         content.append("title: ").append(sheet.getTitle()).append("\n");
-        content.append("permalink: ").append(sheet.getUrl()).append("\n");
+        content.append("permalink: ").append(sheet.getSlug()).append("\n");
         content.append("thumbnail: ").append(sheet.getThumbnail()).append("\n");
         content.append("status: ").append(sheet.getStatus()).append("\n");
         content.append("date: ").append(sheet.getCreateTime()).append("\n");
@@ -191,8 +191,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     @Override
     public List<InternalSheetDTO> listInternal() {
-
-        List<InternalSheetDTO> internalSheetDTOS = new ArrayList<>();
 
         // links sheet
         InternalSheetDTO linkSheet = new InternalSheetDTO();
@@ -215,11 +213,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         journalSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getJournalsPrefix());
         journalSheet.setStatus(themeService.templateExists("journals.ftl"));
 
-        internalSheetDTOS.add(linkSheet);
-        internalSheetDTOS.add(photoSheet);
-        internalSheetDTOS.add(journalSheet);
-
-        return internalSheetDTOS;
+        return Arrays.asList(linkSheet, photoSheet, journalSheet);
     }
 
     @Override
@@ -293,8 +287,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
 
         return sheets.stream()
-                .map(this::convertToMinimal)
-                .collect(Collectors.toList());
+            .map(this::convertToMinimal)
+            .collect(Collectors.toList());
     }
 
     @NonNull
@@ -322,22 +316,22 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    protected void urlMustNotExist(Sheet sheet) {
+    protected void slugMustNotExist(Sheet sheet) {
         Assert.notNull(sheet, "Sheet must not be null");
 
-        // Get url count
+        // Get slug count
         boolean exist;
 
         if (ServiceUtils.isEmptyId(sheet.getId())) {
             // The sheet will be created
-            exist = sheetRepository.existsByUrl(sheet.getUrl());
+            exist = sheetRepository.existsBySlug(sheet.getSlug());
         } else {
             // The sheet will be updated
-            exist = sheetRepository.existsByIdNotAndUrl(sheet.getId(), sheet.getUrl());
+            exist = sheetRepository.existsByIdNotAndSlug(sheet.getId(), sheet.getSlug());
         }
 
         if (exist) {
-            throw new AlreadyExistsException("页面路径 " + sheet.getUrl() + " 已存在");
+            throw new AlreadyExistsException("页面别名 " + sheet.getSlug() + " 已存在");
         }
     }
 
@@ -349,10 +343,10 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
 
         fullPath.append("/")
-                .append(optionService.getSheetPrefix())
-                .append("/")
-                .append(sheet.getUrl())
-                .append(optionService.getPathSuffix());
+            .append(optionService.getSheetPrefix())
+            .append("/")
+            .append(sheet.getSlug())
+            .append(optionService.getPathSuffix());
 
         return fullPath.toString();
     }

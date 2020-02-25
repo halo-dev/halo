@@ -120,7 +120,7 @@ public class SheetController {
     public String preview(@PathVariable("sheetId") Integer sheetId) throws UnsupportedEncodingException {
         Sheet sheet = sheetService.getById(sheetId);
 
-        sheet.setUrl(URLEncoder.encode(sheet.getUrl(), StandardCharsets.UTF_8.name()));
+        sheet.setSlug(URLEncoder.encode(sheet.getSlug(), StandardCharsets.UTF_8.name()));
 
         BasePostMinimalDTO sheetMinimalDTO = sheetService.convertToMinimal(sheet);
 
@@ -136,8 +136,8 @@ public class SheetController {
         }
 
         previewUrl.append(sheetMinimalDTO.getFullPath())
-                .append("?token=")
-                .append(token);
+            .append("?token=")
+            .append(token);
 
         // build preview post url and return
         return previewUrl.toString();

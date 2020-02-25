@@ -57,12 +57,12 @@ public class TagController {
         return tagService.convertTo(tagService.listAll(sort));
     }
 
-    @GetMapping("{slugName}/posts")
-    @ApiOperation("Lists posts by tag slug name")
-    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slugName") String slugName,
+    @GetMapping("{slug}/posts")
+    @ApiOperation("Lists posts by tag slug")
+    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slug") String slug,
                                                @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
-        // Get tag by slug name
-        Tag tag = tagService.getBySlugNameOfNonNull(slugName);
+        // Get tag by slug
+        Tag tag = tagService.getBySlugOfNonNull(slug);
 
         // Get posts, convert and return
         Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);

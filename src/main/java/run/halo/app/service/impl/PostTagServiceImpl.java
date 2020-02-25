@@ -88,7 +88,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
                 fullPath.append("/")
                     .append(optionService.getTagsPrefix())
                     .append("/")
-                    .append(tag.getSlugName())
+                    .append(tag.getSlug())
                     .append(optionService.getPathSuffix());
 
                 tagWithCountOutputDTO.setFullPath(fullPath.toString());
@@ -152,7 +152,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         Assert.notNull(slug, "Tag slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Tag tag = tagRepository.getBySlugName(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
+        Tag tag = tagRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
 
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tag.getId(), status);
 

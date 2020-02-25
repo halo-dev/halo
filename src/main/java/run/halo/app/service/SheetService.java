@@ -66,11 +66,11 @@ public interface SheetService extends BasePostService<Sheet> {
      * Gets by url
      *
      * @param status post status must not be null
-     * @param url    post url must not be blank
+     * @param slug   post slug must not be blank
      * @return sheet
      */
     @Override
-    Sheet getBy(PostStatus status, String url);
+    Sheet getBy(PostStatus status, String slug);
 
     /**
      * Import sheet from markdown document.

@@ -22,7 +22,7 @@
     </#if>
     <#if category??>
         <link rel="alternate" type="text/html" href="${category.fullPath!}" />
-        <link rel="self" type="application/atom+xml" href="${blog_url!}/feed/categories/${category.slugName}.xml" />
+        <link rel="self" type="application/atom+xml" href="${blog_url!}/feed/categories/${category.slug}.xml" />
     <#else>
         <link rel="alternate" type="text/html" href="${blog_url!}" />
         <link rel="self" type="application/atom+xml" href="${atom_url!}" />
@@ -34,7 +34,7 @@
             <entry>
                 <title><![CDATA[${post.title!}]]></title>
                 <link rel="alternate" type="text/html" href="${post.fullPath!}" />
-                <id>tag:${blog_url!},${post.createTime?string('yyyy-MM-dd')}:${post.url!}</id>
+                <id>tag:${blog_url!},${post.createTime?string('yyyy-MM-dd')}:${post.slug!}</id>
                 <published>${post.createTime?iso_local}</published>
                 <updated>${post.editTime?iso_local}</updated>
                 <author>

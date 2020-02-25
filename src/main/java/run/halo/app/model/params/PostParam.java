@@ -34,7 +34,11 @@ public class PostParam implements InputConverter<Post> {
 
     private PostStatus status = PostStatus.DRAFT;
 
+    @Deprecated
     private String url;
+
+    @Size(max = 255, message = "文章别名的字符长度不能超过 {max}")
+    private String slug;
 
     private String originalContent;
 
@@ -66,7 +70,7 @@ public class PostParam implements InputConverter<Post> {
 
     @Override
     public Post convertTo() {
-        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(title) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";
@@ -77,7 +81,7 @@ public class PostParam implements InputConverter<Post> {
 
     @Override
     public void update(Post post) {
-        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(title) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";

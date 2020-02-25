@@ -118,7 +118,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(slug, "Category slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Category category = categoryRepository.getBySlugName(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+        Category category = categoryRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
 
         Set<Integer> postsIds = postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
 
@@ -256,7 +256,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
                 fullPath.append("/")
                     .append(optionService.getCategoriesPrefix())
                     .append("/")
-                    .append(category.getSlugName())
+                    .append(category.getSlug())
                     .append(optionService.getPathSuffix());
 
                 categoryWithPostCountDTO.setFullPath(fullPath.toString());

@@ -86,16 +86,16 @@ public class ContentFeedController {
     /**
      * Get category post rss.
      *
-     * @param model    model
-     * @param slugName slugName
+     * @param model model
+     * @param slug  slug
      * @return rss xml content
      * @throws IOException       throw IOException
      * @throws TemplateException throw TemplateException
      */
-    @GetMapping(value = {"feed/categories/{slugName}", "feed/categories/{slugName}.xml"}, produces = XML_MEDIA_TYPE)
+    @GetMapping(value = {"feed/categories/{slug}", "feed/categories/{slug}.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
-    public String feed(Model model, @PathVariable(name = "slugName") String slugName) throws IOException, TemplateException {
-        Category category = categoryService.getBySlugNameOfNonNull(slugName);
+    public String feed(Model model, @PathVariable(name = "slug") String slug) throws IOException, TemplateException {
+        Category category = categoryService.getBySlugOfNonNull(slug);
         CategoryDTO categoryDTO = categoryService.convertTo(category);
         model.addAttribute("category", categoryDTO);
         model.addAttribute("posts", buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO));
@@ -122,16 +122,16 @@ public class ContentFeedController {
     /**
      * Get category posts atom.xml
      *
-     * @param model    model
-     * @param slugName slugName
+     * @param model model
+     * @param slug  slug
      * @return atom xml content
      * @throws IOException       throw IOException
      * @throws TemplateException throw TemplateException
      */
-    @GetMapping(value = {"atom/categories/{slugName}", "atom/categories/{slugName}.xml"}, produces = XML_MEDIA_TYPE)
+    @GetMapping(value = {"atom/categories/{slug}", "atom/categories/{slug}.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
-    public String atom(Model model, @PathVariable(name = "slugName") String slugName) throws IOException, TemplateException {
-        Category category = categoryService.getBySlugNameOfNonNull(slugName);
+    public String atom(Model model, @PathVariable(name = "slug") String slug) throws IOException, TemplateException {
+        Category category = categoryService.getBySlugOfNonNull(slug);
         CategoryDTO categoryDTO = categoryService.convertTo(category);
         model.addAttribute("category", categoryDTO);
         model.addAttribute("posts", buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO));
@@ -213,12 +213,12 @@ public class ContentFeedController {
      * Build category posts.
      *
      * @param pageable pageable must not be null.
-     * @param slugName slugName must not be null.
+     * @param category category
      * @return list of post detail vo.
      */
     private List<PostDetailVO> buildCategoryPosts(@NonNull Pageable pageable, @NonNull CategoryDTO category) {
         Assert.notNull(pageable, "Pageable must not be null");
-        Assert.notNull(category, "Slug name must not be null");
+        Assert.notNull(category, "Category slug must not be null");
 
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);

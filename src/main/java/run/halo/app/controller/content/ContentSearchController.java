@@ -82,9 +82,9 @@ public class ContentSearchController {
 
         if (optionService.isEnabledAbsolutePath()) {
             nextPageFullPath.append(optionService.getBlogBaseUrl())
-                    .append("/");
+                .append("/");
             prePageFullPath.append(optionService.getBlogBaseUrl())
-                    .append("/");
+                .append("/");
         } else {
             nextPageFullPath.append("/");
             prePageFullPath.append("/");
@@ -94,20 +94,20 @@ public class ContentSearchController {
         prePageFullPath.append("search");
 
         nextPageFullPath.append("/page/")
-                .append(posts.getNumber() + 2)
-                .append(optionService.getPathSuffix())
-                .append("?keyword=")
-                .append(keyword);
+            .append(posts.getNumber() + 2)
+            .append(optionService.getPathSuffix())
+            .append("?keyword=")
+            .append(keyword);
 
         if (posts.getNumber() == 1) {
             prePageFullPath.append("?keyword=")
-                    .append(keyword);
+                .append(keyword);
         } else {
             prePageFullPath.append("/page/")
-                    .append(posts.getNumber())
-                    .append(optionService.getPathSuffix())
-                    .append("?keyword=")
-                    .append(keyword);
+                .append(posts.getNumber())
+                .append(optionService.getPathSuffix())
+                .append("?keyword=")
+                .append(keyword);
         }
 
         model.addAttribute("is_search", true);

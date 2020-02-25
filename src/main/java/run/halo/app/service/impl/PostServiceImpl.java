@@ -166,60 +166,60 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public Post getBy(PostStatus status, String url) {
-        return super.getBy(status, url);
+    public Post getBy(PostStatus status, String slug) {
+        return super.getBy(status, slug);
     }
 
     @Override
-    public Post getBy(Integer year, Integer month, String url) {
+    public Post getBy(Integer year, Integer month, String slug) {
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(month, "Post create month must not be null");
-        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, url);
+        Optional<Post> postOptional = postRepository.findBy(year, month, slug);
 
         return postOptional
-            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
-    public Post getBy(Integer year, Integer month, String url, PostStatus status) {
+    public Post getBy(Integer year, Integer month, String slug, PostStatus status) {
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(month, "Post create month must not be null");
-        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, url, status);
+        Optional<Post> postOptional = postRepository.findBy(year, month, slug, status);
 
         return postOptional
-            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
-    public Post getBy(Integer year, Integer month, Integer day, String url) {
+    public Post getBy(Integer year, Integer month, Integer day, String slug) {
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(month, "Post create month must not be null");
         Assert.notNull(day, "Post create day must not be null");
-        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, day, url);
+        Optional<Post> postOptional = postRepository.findBy(year, month, day, slug);
 
         return postOptional
-            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
-    public Post getBy(Integer year, Integer month, Integer day, String url, PostStatus status) {
+    public Post getBy(Integer year, Integer month, Integer day, String slug, PostStatus status) {
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(month, "Post create month must not be null");
         Assert.notNull(day, "Post create day must not be null");
-        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, day, url, status);
+        Optional<Post> postOptional = postRepository.findBy(year, month, day, slug, status);
 
         return postOptional
-            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
@@ -231,8 +231,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public Post getByUrl(String url) {
-        return super.getByUrl(url);
+    public Post getBySlug(String slug) {
+        return super.getBySlug(slug);
     }
 
     @Override
@@ -332,7 +332,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             post.setUpdateTime(DateUtil.parse(ele));
                             break;
                         case "permalink":
-                            post.setUrl(ele);
+                            post.setSlug(ele);
                             break;
                         case "thumbnail":
                             post.setThumbnail(ele);
@@ -348,7 +348,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             if (null == tag) {
                                 tag = new Tag();
                                 tag.setName(ele);
-                                tag.setSlugName(SlugUtils.slug(ele));
+                                tag.setSlug(SlugUtils.slug(ele));
                                 tag = tagService.create(tag);
                             }
                             tagIds.add(tag.getId());
@@ -358,7 +358,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             if (null == category) {
                                 category = new Category();
                                 category.setName(ele);
-                                category.setSlugName(SlugUtils.slug(ele));
+                                category.setSlug(SlugUtils.slug(ele));
                                 category.setDescription(ele);
                                 category = categoryService.create(category);
                             }
@@ -379,8 +379,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             post.setTitle(filename);
         }
 
-        if (StrUtil.isEmpty(post.getUrl())) {
-            post.setUrl(SlugUtils.slug(post.getTitle()));
+        if (StrUtil.isEmpty(post.getSlug())) {
+            post.setSlug(SlugUtils.slug(post.getTitle()));
         }
 
         post.setOriginalContent(markdown);
@@ -403,7 +403,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         content.append("type: ").append("post").append("\n");
         content.append("title: ").append(post.getTitle()).append("\n");
-        content.append("permalink: ").append(post.getUrl()).append("\n");
+        content.append("permalink: ").append(post.getSlug()).append("\n");
         content.append("thumbnail: ").append(post.getThumbnail()).append("\n");
         content.append("status: ").append(post.getStatus()).append("\n");
         content.append("date: ").append(post.getCreateTime()).append("\n");
@@ -880,7 +880,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
             fullPath.append(archivesPrefix)
                 .append("/")
-                .append(post.getUrl())
+                .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.ID)) {
             fullPath.append("?p=")
@@ -890,7 +890,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .append("/")
                 .append(DateUtil.month(post.getCreateTime()) + 1)
                 .append("/")
-                .append(post.getUrl())
+                .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
@@ -899,7 +899,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .append("/")
                 .append(DateUtil.dayOfMonth(post.getCreateTime()))
                 .append("/")
-                .append(post.getUrl())
+                .append(post.getSlug())
                 .append(pathSuffix);
         }
         return fullPath.toString();
