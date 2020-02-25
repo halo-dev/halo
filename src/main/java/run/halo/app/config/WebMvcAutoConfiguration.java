@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
-import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELATIVE_PATH;
 import static run.halo.app.utils.HaloUtils.*;
 
 /**
@@ -106,7 +105,6 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
 
         // register /** resource handler.
         registry.addResourceHandler("/**")
-            .addResourceLocations(workDir + "templates/admin/")
             .addResourceLocations("classpath:/admin/")
             .addResourceLocations(workDir + "static/");
 
@@ -120,7 +118,6 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         registry.addResourceHandler(uploadUrlPattern)
             .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler(adminPathPattern)
-            .addResourceLocations(workDir + HALO_ADMIN_RELATIVE_PATH)
             .addResourceLocations("classpath:/admin/");
 
         if (!haloProperties.isDocDisabled()) {
