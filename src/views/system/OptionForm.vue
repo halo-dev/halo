@@ -680,9 +680,9 @@
               >
                 <a-form-item label="文章固定链接类型：">
                   <template slot="help">
-                    <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/${url}{{ options.path_suffix }}</span>
-                    <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ new Date() | moment_post_date }}${url}{{ options.path_suffix }}</span>
-                    <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}{{ new Date() | moment_post_day }}${url}{{ options.path_suffix }}</span>
+                    <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/${slug}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ new Date() | moment_post_date }}${slug}{{ options.path_suffix }}</span>
+                    <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}{{ new Date() | moment_post_day }}${slug}{{ options.path_suffix }}</span>
                     <span v-else-if="options.post_permalink_type === 'ID'">{{ options.blog_url }}/?p=${id}</span>
                   </template>
                   <a-select v-model="options.post_permalink_type">
@@ -695,7 +695,7 @@
                 </a-form-item>
                 <a-form-item label="自定义页面前缀：">
                   <template slot="help">
-                    <span>{{ options.blog_url }}/{{ options.sheet_prefix }}/${url}{{ options.path_suffix }}</span>
+                    <span>{{ options.blog_url }}/{{ options.sheet_prefix }}/${slug}{{ options.path_suffix }}</span>
                   </template>
                   <a-input v-model="options.sheet_prefix" />
                 </a-form-item>
@@ -725,13 +725,13 @@
                 </a-form-item>
                 <a-form-item label="分类前缀：">
                   <template slot="help">
-                    <span>{{ options.blog_url }}/{{ options.categories_prefix }}/${slugName}{{ options.path_suffix }}</span>
+                    <span>{{ options.blog_url }}/{{ options.categories_prefix }}/${slug}{{ options.path_suffix }}</span>
                   </template>
                   <a-input v-model="options.categories_prefix" />
                 </a-form-item>
                 <a-form-item label="标签前缀：">
                   <template slot="help">
-                    <span>{{ options.blog_url }}/{{ options.tags_prefix }}/${slugName}{{ options.path_suffix }}</span>
+                    <span>{{ options.blog_url }}/{{ options.tags_prefix }}/${slug}{{ options.path_suffix }}</span>
                   </template>
                   <a-input v-model="options.tags_prefix" />
                 </a-form-item>

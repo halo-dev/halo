@@ -24,7 +24,7 @@
               label="别名："
               help="* 一般为单个分类页面的标识，最好为英文"
             >
-              <a-input v-model="categoryToCreate.slugName" />
+              <a-input v-model="categoryToCreate.slug" />
             </a-form-item>
             <a-form-item label="上级目录：">
               <category-select-tree
@@ -147,7 +147,7 @@
               </template>
               <a-list-item-meta>
                 <template slot="description">
-                  {{ item.slugName }}
+                  {{ item.slug }}
                 </template>
                 <span
                   slot="title"
@@ -256,7 +256,7 @@ const columns = [
   },
   {
     title: '别名',
-    dataIndex: 'slugName'
+    dataIndex: 'slug'
   },
   {
     title: '描述',

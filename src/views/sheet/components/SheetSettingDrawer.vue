@@ -26,9 +26,9 @@
               </a-form-item>
               <a-form-item
                 label="页面路径："
-                :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.url ? selectedSheet.url : '{auto_generate}')"
+                :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.slug ? selectedSheet.slug : '{slug}')"
               >
-                <a-input v-model="selectedSheet.url" />
+                <a-input v-model="selectedSheet.slug" />
               </a-form-item>
               <a-form-item label="发表时间：">
                 <a-date-picker
