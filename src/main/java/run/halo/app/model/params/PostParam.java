@@ -7,6 +7,7 @@ import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostCreateFrom;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.utils.SlugUtils;
 
@@ -39,6 +40,8 @@ public class PostParam implements InputConverter<Post> {
 
     @Size(max = 255, message = "文章别名的字符长度不能超过 {max}")
     private String slug;
+
+    private PostEditorType editorType;
 
     private String originalContent;
 
@@ -76,6 +79,10 @@ public class PostParam implements InputConverter<Post> {
             thumbnail = "";
         }
 
+        if (null == editorType) {
+            editorType = PostEditorType.MARKDOWN;
+        }
+
         return InputConverter.super.convertTo();
     }
 
@@ -85,6 +92,10 @@ public class PostParam implements InputConverter<Post> {
 
         if (null == thumbnail) {
             thumbnail = "";
+        }
+
+        if (null == editorType) {
+            editorType = PostEditorType.MARKDOWN;
         }
 
         InputConverter.super.update(post);

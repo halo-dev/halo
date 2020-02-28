@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.enums.PostEditorType;
+
 /**
  * Other properties.
  *
@@ -27,7 +29,12 @@ public enum OtherProperties implements PropertyEnum {
     /**
      * Global absolute path enabled.
      */
-    GLOBAL_ABSOLUTE_PATH_ENABLED("global_absolute_path_enabled", Boolean.class, "true");
+    GLOBAL_ABSOLUTE_PATH_ENABLED("global_absolute_path_enabled", Boolean.class, "true"),
+
+    /**
+     * Default post editor.
+     */
+    DEFAULT_EDITOR("default_editor", PostEditorType.class, PostEditorType.MARKDOWN.name());
 
     private final String value;
 
