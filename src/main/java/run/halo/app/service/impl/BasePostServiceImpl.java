@@ -18,6 +18,7 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
@@ -231,8 +232,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(post, "Post must not be null");
 
         // Render content
-        if (post.getStatus() == PostStatus.PUBLISHED) {
+        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+        } else {
+            post.setFormatContent(post.getOriginalContent());
         }
 
         // if password is not empty,change status to intimate

@@ -6,6 +6,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.utils.SlugUtils;
 
@@ -38,6 +39,8 @@ public class SheetParam implements InputConverter<Sheet> {
     @Size(max = 255, message = "页面别名的字符长度不能超过 {max}")
     private String slug;
 
+    private PostEditorType editorType;
+
     private String originalContent;
 
     private String summary;
@@ -68,6 +71,10 @@ public class SheetParam implements InputConverter<Sheet> {
             thumbnail = "";
         }
 
+        if (null == editorType) {
+            editorType = PostEditorType.MARKDOWN;
+        }
+
         return InputConverter.super.convertTo();
     }
 
@@ -77,6 +84,10 @@ public class SheetParam implements InputConverter<Sheet> {
 
         if (null == thumbnail) {
             thumbnail = "";
+        }
+
+        if (null == editorType) {
+            editorType = PostEditorType.MARKDOWN;
         }
 
         InputConverter.super.update(sheet);
