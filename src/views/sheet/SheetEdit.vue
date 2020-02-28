@@ -9,11 +9,19 @@
             placeholder="请输入页面标题"
           />
         </div>
+
         <div id="editor">
           <MarkdownEditor
+            v-if="sheetToStage.editorType=='MARKDOWN'"
             :originalContent="sheetToStage.originalContent"
-            @onSaveDraft="handleSaveDraft"
-            @onChange="onContentChange"
+            @onSaveDraft="handleSaveDraft(true)"
+            @onContentChange="onContentChange"
+          />
+
+          <RichTextEditor
+            v-else
+            :originalContent="sheetToStage.originalContent"
+            @onContentChange="onContentChange"
           />
         </div>
       </a-col>
@@ -33,7 +41,7 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="danger"
-        @click="handleSaveDraft"
+        @click="handleSaveDraft(false)"
         :disabled="saving"
       >保存草稿</a-button>
       <a-button
@@ -63,13 +71,16 @@ import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import MarkdownEditor from '@/components/editor/MarkdownEditor'
+import RichTextEditor from '@/components/editor/RichTextEditor'
+
 import sheetApi from '@/api/sheet'
 export default {
   components: {
     FooterToolBar,
     AttachmentDrawer,
     SheetSettingDrawer,
-    MarkdownEditor
+    MarkdownEditor,
+    RichTextEditor
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -140,6 +151,9 @@ export default {
       }
       return '当前页面数据未保存，确定要离开吗？'
     }
+    if (!this.sheetToStage.editorType) {
+      this.sheetToStage.editorType = this.options.default_editor
+    }
   },
   watch: {
     temporaryContent: function(newValue, oldValue) {
@@ -155,22 +169,35 @@ export default {
     ...mapGetters(['options'])
   },
   methods: {
-    handleSaveDraft() {
+    handleSaveDraft(draftOnly = false) {
+      this.$log.debug('Draft only: ' + draftOnly)
       this.sheetToStage.status = 'DRAFT'
-      this.saving = true
       if (!this.sheetToStage.title) {
         this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
+      this.saving = true
       if (this.sheetToStage.id) {
-        sheetApi
-          .update(this.sheetToStage.id, this.sheetToStage, false)
-          .then(response => {
-            this.$log.debug('Updated sheet', response.data.data)
-            this.$message.success('保存草稿成功！')
-          })
-          .finally(() => {
-            this.saving = false
-          })
+        if (draftOnly) {
+          sheetApi
+            .updateDraft(this.sheetToStage.id, this.sheetToStage.originalContent)
+            .then(response => {
+              this.$message.success('保存草稿成功！')
+            })
+            .finally(() => {
+              this.saving = false
+            })
+        } else {
+          sheetApi
+            .update(this.sheetToStage.id, this.sheetToStage, false)
+            .then(response => {
+              this.$log.debug('Updated sheet', response.data.data)
+              this.$message.success('保存草稿成功！')
+              this.sheetToStage = response.data.data
+            })
+            .finally(() => {
+              this.saving = false
+            })
+        }
       } else {
         sheetApi
           .create(this.sheetToStage, false)

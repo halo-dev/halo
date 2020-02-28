@@ -48,6 +48,16 @@ sheetApi.update = (sheetId, sheetToUpdate, autoSave) => {
   })
 }
 
+sheetApi.updateDraft = (sheetId, content) => {
+  return service({
+    url: `${baseUrl}/${sheetId}/status/draft/content`,
+    method: 'put',
+    data: {
+      content: content
+    }
+  })
+}
+
 sheetApi.updateStatus = (sheetId, status) => {
   return service({
     url: `${baseUrl}/${sheetId}/${status}`,

@@ -12,7 +12,8 @@ const keys = [
   'sheet_prefix',
   'post_permalink_type',
   'archives_prefix',
-  'path_suffix'
+  'path_suffix',
+  'default_editor'
 ]
 const option = {
   state: {

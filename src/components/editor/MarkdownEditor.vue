@@ -2,7 +2,7 @@
   <div>
     <halo-editor
       ref="md"
-      v-model="originalContentData"
+      v-model="originalContent"
       :boxShadow="false"
       :toolbars="toolbars"
       :ishljs="true"
@@ -40,7 +40,7 @@ export default {
       this.originalContentData = val
     },
     originalContentData(val) {
-      this.$emit('onChange', val)
+      this.$emit('onContentChange', val)
     }
   },
   methods: {

@@ -12,9 +12,16 @@
 
         <div id="editor">
           <MarkdownEditor
+            v-if="postToStage.editorType=='MARKDOWN'"
             :originalContent="postToStage.originalContent"
             @onSaveDraft="handleSaveDraft(true)"
-            @onChange="onContentChange"
+            @onContentChange="onContentChange"
+          />
+
+          <RichTextEditor
+            v-else
+            :originalContent="postToStage.originalContent"
+            @onContentChange="onContentChange"
           />
         </div>
       </a-col>
@@ -69,6 +76,7 @@ import PostSettingDrawer from './components/PostSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import MarkdownEditor from '@/components/editor/MarkdownEditor'
+import RichTextEditor from '@/components/editor/RichTextEditor'
 
 import postApi from '@/api/post'
 export default {
@@ -77,7 +85,8 @@ export default {
     PostSettingDrawer,
     FooterToolBar,
     AttachmentDrawer,
-    MarkdownEditor
+    MarkdownEditor,
+    RichTextEditor
   },
   data() {
     return {
@@ -151,6 +160,9 @@ export default {
       }
       return '当前页面数据未保存，确定要离开吗？'
     }
+    if (!this.postToStage.editorType) {
+      this.postToStage.editorType = this.options.default_editor
+    }
   },
   watch: {
     temporaryContent: function(newValue, oldValue) {
@@ -190,6 +202,7 @@ export default {
             .then(response => {
               this.$log.debug('Updated post', response.data.data)
               this.$message.success('保存草稿成功！')
+              this.postToStage = response.data.data
             })
             .finally(() => {
               this.saving = false
