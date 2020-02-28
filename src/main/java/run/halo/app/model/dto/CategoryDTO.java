@@ -24,7 +24,10 @@ public class CategoryDTO implements OutputConverter<CategoryDTO, Category> {
 
     private String name;
 
+    @Deprecated
     private String slugName;
+
+    private String slug;
 
     private String description;
 

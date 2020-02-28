@@ -54,7 +54,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         if (!haloProperties.isAuthEnabled()) {
             // Set security
             userService.getCurrentUser().ifPresent(user ->
-                    SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
+                SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
 
             // Do filter
             filterChain.doFilter(request, response);
@@ -65,7 +65,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         String token = getTokenFromRequest(request);
 
         if (StringUtils.isBlank(token)) {
-            throw new AuthenticationException("未登录，请登陆后访问");
+            throw new AuthenticationException("未登录，请登录后访问");
         }
 
         // Get user id from cache

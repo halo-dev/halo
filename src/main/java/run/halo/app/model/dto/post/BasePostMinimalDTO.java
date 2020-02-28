@@ -27,7 +27,10 @@ public class BasePostMinimalDTO implements OutputConverter<BasePostMinimalDTO, B
 
     private PostStatus status;
 
+    @Deprecated
     private String url;
+
+    private String slug;
 
     private Date updateTime;
 

@@ -15,7 +15,7 @@ import run.halo.app.model.entity.PostCategory;
 public class WpCategory {
     private String domain;
 
-    @PropertyMappingTo("slugName")
+    @PropertyMappingTo("slug")
     private String nicename;
 
     @PropertyMappingTo("name")

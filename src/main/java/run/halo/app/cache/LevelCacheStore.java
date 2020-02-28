@@ -28,8 +28,7 @@ public class LevelCacheStore extends StringCacheStore {
      */
     private final static long PERIOD = 60 * 1000;
 
-    private static DB leveldb;
-
+    private static DB LEVEL_DB;
 
     private Timer timer;
 
@@ -38,7 +37,7 @@ public class LevelCacheStore extends StringCacheStore {
 
     @PostConstruct
     public void init() {
-        if (leveldb != null) return;
+        if (LEVEL_DB != null) return;
         try {
             //work path
             File folder = new File(haloProperties.getWorkDir() + ".leveldb");
@@ -46,7 +45,7 @@ public class LevelCacheStore extends StringCacheStore {
             Options options = new Options();
             options.createIfMissing(true);
             //open leveldb store folder
-            leveldb = factory.open(folder, options);
+            LEVEL_DB = factory.open(folder, options);
             timer = new Timer();
             timer.scheduleAtFixedRate(new CacheExpiryCleaner(), 0, PERIOD);
         } catch (Exception ex) {
@@ -60,7 +59,7 @@ public class LevelCacheStore extends StringCacheStore {
     @PreDestroy
     public void preDestroy() {
         try {
-            leveldb.close();
+            LEVEL_DB.close();
             timer.cancel();
         } catch (IOException e) {
             log.error("close leveldb error ", e);
@@ -70,7 +69,7 @@ public class LevelCacheStore extends StringCacheStore {
     @Override
     Optional<CacheWrapper<String>> getInternal(String key) {
         Assert.hasText(key, "Cache key must not be blank");
-        byte[] bytes = leveldb.get(stringToBytes(key));
+        byte[] bytes = LEVEL_DB.get(stringToBytes(key));
         if (bytes != null) {
             String valueJson = bytesToString(bytes);
             return StringUtils.isEmpty(valueJson) ? Optional.empty() : jsonToCacheWrapper(valueJson);
@@ -88,9 +87,9 @@ public class LevelCacheStore extends StringCacheStore {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
         try {
-            leveldb.put(
-                    stringToBytes(key),
-                    stringToBytes(JsonUtils.objectToJson(cacheWrapper))
+            LEVEL_DB.put(
+                stringToBytes(key),
+                stringToBytes(JsonUtils.objectToJson(cacheWrapper))
             );
             return true;
         } catch (JsonProcessingException e) {
@@ -102,7 +101,7 @@ public class LevelCacheStore extends StringCacheStore {
 
     @Override
     public void delete(String key) {
-        leveldb.delete(stringToBytes(key));
+        LEVEL_DB.delete(stringToBytes(key));
         log.debug("cache remove key: [{}]", key);
     }
 
@@ -132,9 +131,9 @@ public class LevelCacheStore extends StringCacheStore {
         @Override
         public void run() {
             //batch
-            WriteBatch writeBatch = leveldb.createWriteBatch();
+            WriteBatch writeBatch = LEVEL_DB.createWriteBatch();
 
-            DBIterator iterator = leveldb.iterator();
+            DBIterator iterator = LEVEL_DB.iterator();
             long currentTimeMillis = System.currentTimeMillis();
             while (iterator.hasNext()) {
                 Map.Entry<byte[], byte[]> next = iterator.next();
@@ -147,8 +146,8 @@ public class LevelCacheStore extends StringCacheStore {
                 if (stringCacheWrapper.isPresent()) {
                     //get expireat time
                     long expireAtTime = stringCacheWrapper.map(CacheWrapper::getExpireAt)
-                            .map(Date::getTime)
-                            .orElse(0L);
+                        .map(Date::getTime)
+                        .orElse(0L);
                     //if expire
                     if (expireAtTime != 0 && currentTimeMillis > expireAtTime) {
                         writeBatch.delete(next.getKey());
@@ -156,7 +155,7 @@ public class LevelCacheStore extends StringCacheStore {
                     }
                 }
             }
-            leveldb.write(writeBatch);
+            LEVEL_DB.write(writeBatch);
         }
     }
 }

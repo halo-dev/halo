@@ -46,23 +46,23 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     long countByStatus(PostStatus status);
 
     /**
-     * Get post by url.
+     * Get post by slug.
      *
-     * @param url post url.
+     * @param slug post slug.
      * @return Post
      */
     @NonNull
-    POST getByUrl(@NonNull String url);
+    POST getBySlug(@NonNull String slug);
 
     /**
-     * Gets post by post status and url.
+     * Gets post by post status and slug.
      *
      * @param status post status must not be null
-     * @param url    post url must not be blank
+     * @param slug   post slug must not be blank
      * @return post info
      */
     @NonNull
-    POST getBy(@NonNull PostStatus status, @NonNull String url);
+    POST getBy(@NonNull PostStatus status, @NonNull String slug);
 
     /**
      * Gets post by post status and id.

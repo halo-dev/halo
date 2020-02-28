@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.*;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
-import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELATIVE_PATH;
 import static run.halo.app.utils.HaloUtils.*;
 
 /**
@@ -76,15 +75,16 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.stream()
-                .filter(c -> c instanceof MappingJackson2HttpMessageConverter)
-                .findFirst().ifPresent(converter -> {
-            MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-            Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
-            JsonComponentModule module = new JsonComponentModule();
-            module.addSerializer(PageImpl.class, new PageJacksonSerializer());
-            ObjectMapper objectMapper = builder.modules(module).build();
-            mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
-        });
+            .filter(c -> c instanceof MappingJackson2HttpMessageConverter)
+            .findFirst()
+            .ifPresent(converter -> {
+                MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
+                Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
+                JsonComponentModule module = new JsonComponentModule();
+                module.addSerializer(PageImpl.class, new PageJacksonSerializer());
+                ObjectMapper objectMapper = builder.modules(module).build();
+                mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+            });
     }
 
     @Override
@@ -105,29 +105,27 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
 
         // register /** resource handler.
         registry.addResourceHandler("/**")
-                .addResourceLocations(workDir + "templates/admin/")
-                .addResourceLocations("classpath:/admin/")
-                .addResourceLocations(workDir + "static/");
+            .addResourceLocations("classpath:/admin/")
+            .addResourceLocations(workDir + "static/");
 
         // register /themes/** resource handler.
         registry.addResourceHandler("/themes/**")
-                .addResourceLocations(workDir + "templates/themes/");
+            .addResourceLocations(workDir + "templates/themes/");
 
         String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
         String adminPathPattern = ensureSuffix(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
 
         registry.addResourceHandler(uploadUrlPattern)
-                .addResourceLocations(workDir + "upload/");
+            .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler(adminPathPattern)
-                .addResourceLocations(workDir + HALO_ADMIN_RELATIVE_PATH)
-                .addResourceLocations("classpath:/admin/");
+            .addResourceLocations("classpath:/admin/");
 
         if (!haloProperties.isDocDisabled()) {
             // If doc is enable
             registry.addResourceHandler("swagger-ui.html")
-                    .addResourceLocations("classpath:/META-INF/resources/");
+                .addResourceLocations("classpath:/META-INF/resources/");
             registry.addResourceHandler("/webjars/**")
-                    .addResourceLocations("classpath:/META-INF/resources/webjars/");
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
         }
     }
 

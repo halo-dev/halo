@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.service.SheetService;
@@ -35,17 +36,19 @@ public class SheetModel {
     }
 
     public String content(Sheet sheet, String token, Model model) {
-        if (!StringUtils.isEmpty(token)) {
-            // render markdown to html when preview sheet
-            sheet.setFormatContent(MarkdownUtils.renderHtml(sheet.getOriginalContent()));
 
+        if (StringUtils.isEmpty(token)) {
+            sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getSlug());
+        } else {
             // verify token
             String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该页面的访问权限"));
-
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该页面的访问权限");
             }
+            // render markdown to html when preview sheet
+            sheet.setFormatContent(MarkdownUtils.renderHtml(sheet.getOriginalContent()));
         }
+
         sheetService.publishVisitEvent(sheet.getId());
 
         SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);

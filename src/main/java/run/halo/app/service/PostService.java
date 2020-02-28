@@ -84,63 +84,63 @@ public interface PostService extends BasePostService<Post> {
     PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> postMetas, boolean autoSave);
 
     /**
-     * Gets post by post status and url.
+     * Gets post by post status and slug.
      *
      * @param status post status must not be null
-     * @param url    post url must not be blank
+     * @param slug   post slug must not be blank
      * @return post info
      */
     @NonNull
     @Override
-    Post getBy(@NonNull PostStatus status, @NonNull String url);
+    Post getBy(@NonNull PostStatus status, @NonNull String slug);
 
     /**
-     * Gets post by post year and month and url.
+     * Gets post by post year and month and slug.
      *
      * @param year  post create year.
      * @param month post create month.
-     * @param url   post url.
+     * @param slug  post slug.
      * @return post info
      */
     @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String url);
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String slug);
 
     /**
-     * Gets post by post year and month and url.
+     * Gets post by post year and month and slug.
      *
      * @param year   post create year.
      * @param month  post create month.
-     * @param url    post url.
+     * @param slug   post slug.
      * @param status post status.
      * @return post info
      */
     @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String url, @NonNull PostStatus status);
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String slug, @NonNull PostStatus status);
 
     /**
-     * Gets post by post year and month and url.
+     * Gets post by post year and month and slug.
      *
      * @param year  post create year.
      * @param month post create month.
      * @param day   post create day.
-     * @param url   post url.
+     * @param slug  post slug.
      * @return post info
      */
     @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String url);
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String slug);
 
     /**
-     * Gets post by post year and month and url.
+     * Gets post by post year and month and slug.
      *
      * @param year   post create year.
      * @param month  post create month.
      * @param day    post create day.
-     * @param url    post url.
+     * @param slug   post slug.
      * @param status post status.
      * @return post info
      */
     @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String url, @NonNull PostStatus status);
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String slug, @NonNull PostStatus status);
 
     /**
      * Removes posts in batch.
@@ -212,6 +212,15 @@ public interface PostService extends BasePostService<Post> {
      */
     @NonNull
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
+
+    /**
+     * Converts to a list of post list vo.
+     *
+     * @param posts post must not be null
+     * @return a list of post list vo
+     */
+    @NonNull
+    List<PostListVO> convertToListVo(@NonNull List<Post> posts);
 
     /**
      * Converts to a page of detail vo.

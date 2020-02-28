@@ -35,13 +35,13 @@ public interface SheetRepository extends BasePostRepository<Sheet> {
     Long countLike();
 
     /**
-     * Gets sheet by url and status.
+     * Gets sheet by slug and status.
      *
-     * @param url    url must not be blank
+     * @param slug   slug must not be blank
      * @param status status must not be null
      * @return an optional of sheet.
      */
     @NonNull
     @Override
-    Optional<Sheet> getByUrlAndStatus(@NonNull String url, @NonNull PostStatus status);
+    Optional<Sheet> getBySlugAndStatus(@NonNull String slug, @NonNull PostStatus status);
 }

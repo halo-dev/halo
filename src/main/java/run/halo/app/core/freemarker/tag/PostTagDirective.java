@@ -3,6 +3,7 @@ package run.halo.app.core.freemarker.tag;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.stereotype.Component;
+import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.PostCategoryService;
@@ -10,6 +11,7 @@ import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,7 +47,8 @@ public class PostTagDirective implements TemplateDirectiveModel {
             switch (method) {
                 case "latest":
                     int top = Integer.parseInt(params.get("top").toString());
-                    env.setVariable("posts", builder.build().wrap(postService.listLatest(top)));
+                    List<Post> posts = postService.listLatest(top);
+                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(posts)));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(postService.countByStatus(PostStatus.PUBLISHED)));
@@ -62,19 +65,19 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     break;
                 case "listByCategoryId":
                     Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
-                    env.setVariable("posts", builder.build().wrap(postCategoryService.listPostBy(categoryId, PostStatus.PUBLISHED)));
+                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(postCategoryService.listPostBy(categoryId, PostStatus.PUBLISHED))));
                     break;
                 case "listByCategorySlug":
                     String categorySlug = params.get("categorySlug").toString();
-                    env.setVariable("posts", builder.build().wrap(postCategoryService.listPostBy(categorySlug, PostStatus.PUBLISHED)));
+                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(postCategoryService.listPostBy(categorySlug, PostStatus.PUBLISHED))));
                     break;
                 case "listByTagId":
                     Integer tagId = Integer.parseInt(params.get("tagId").toString());
-                    env.setVariable("posts", builder.build().wrap(postTagService.listPostsBy(tagId, PostStatus.PUBLISHED)));
+                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(postTagService.listPostsBy(tagId, PostStatus.PUBLISHED))));
                     break;
                 case "listByTagSlug":
                     String tagSlug = params.get("tagSlug").toString();
-                    env.setVariable("posts", builder.build().wrap(postTagService.listPostsBy(tagSlug, PostStatus.PUBLISHED)));
+                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(postTagService.listPostsBy(tagSlug, PostStatus.PUBLISHED))));
                     break;
                 default:
                     break;

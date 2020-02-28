@@ -51,7 +51,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
     private final OptionService optionService;
 
-    private final Pattern SUMMARY_PATTERN = Pattern.compile("\\s*|\t|\r|\n");
+    private final Pattern summaryPattern = Pattern.compile("\\s*|\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
                                OptionService optionService) {
@@ -78,20 +78,20 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
-    public POST getByUrl(String url) {
-        Assert.hasText(url, "Url must not be blank");
+    public POST getBySlug(String slug) {
+        Assert.hasText(slug, "Slug must not be blank");
 
-        return basePostRepository.getByUrl(url).orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return basePostRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
-    public POST getBy(PostStatus status, String url) {
+    public POST getBy(PostStatus status, String slug) {
         Assert.notNull(status, "Post status must not be null");
-        Assert.hasText(url, "Post url must not be blank");
+        Assert.hasText(slug, "Post slug must not be blank");
 
-        Optional<POST> postOptional = basePostRepository.getByUrlAndStatus(url, status);
+        Optional<POST> postOptional = basePostRepository.getBySlugAndStatus(slug, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
@@ -117,9 +117,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(date, "Date must not be null");
 
         return basePostRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED,
-                date,
-                PageRequest.of(0, size, Sort.by(ASC, "createTime")))
-                .getContent();
+            date,
+            PageRequest.of(0, size, Sort.by(ASC, "createTime")))
+            .getContent();
     }
 
     @Override
@@ -127,9 +127,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(date, "Date must not be null");
 
         return basePostRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED,
-                date,
-                PageRequest.of(0, size, Sort.by(DESC, "createTime")))
-                .getContent();
+            date,
+            PageRequest.of(0, size, Sort.by(DESC, "createTime")))
+            .getContent();
     }
 
     @Override
@@ -282,8 +282,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return posts.stream()
-                .map(this::convertToMinimal)
-                .collect(Collectors.toList());
+            .map(this::convertToMinimal)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -314,8 +314,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return posts.stream()
-                .map(this::convertToSimple)
-                .collect(Collectors.toList());
+            .map(this::convertToSimple)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -425,7 +425,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     @Override
     public POST create(POST post) {
         // Check title
-        urlMustNotExist(post);
+        slugMustNotExist(post);
 
         return super.create(post);
     }
@@ -433,32 +433,32 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     @Override
     public POST update(POST post) {
         // Check title
-        urlMustNotExist(post);
+        slugMustNotExist(post);
 
         return super.update(post);
     }
 
     /**
-     * Check if the url is exist.
+     * Check if the slug is exist.
      *
      * @param post post must not be null
      */
-    protected void urlMustNotExist(@NonNull POST post) {
+    protected void slugMustNotExist(@NonNull POST post) {
         Assert.notNull(post, "Post must not be null");
 
-        // Get url count
+        // Get slug count
         boolean exist;
 
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created
-            exist = basePostRepository.existsByUrl(post.getUrl());
+            exist = basePostRepository.existsBySlug(post.getSlug());
         } else {
             // The sheet will be updated
-            exist = basePostRepository.existsByIdNotAndUrl(post.getId(), post.getUrl());
+            exist = basePostRepository.existsByIdNotAndSlug(post.getId(), post.getSlug());
         }
 
         if (exist) {
-            throw new AlreadyExistsException("文章路径 " + post.getUrl() + " 已存在");
+            throw new AlreadyExistsException("文章别名 " + post.getSlug() + " 已存在");
         }
     }
 
@@ -468,7 +468,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         String text = HaloUtils.cleanHtmlTag(htmlContent);
 
-        Matcher matcher = SUMMARY_PATTERN.matcher(text);
+        Matcher matcher = summaryPattern.matcher(text);
         text = matcher.replaceAll("");
 
         // Get summary length

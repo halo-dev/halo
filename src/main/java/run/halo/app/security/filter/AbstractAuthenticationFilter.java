@@ -197,7 +197,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
         // Get allowed uri
         String allowedUri = oneTimeTokenService.get(oneTimeToken)
-                .orElseThrow(() -> new BadRequestException("The one-time token does not exist").setErrorData(oneTimeToken));
+            .orElseThrow(() -> new BadRequestException("The one-time token does not exist").setErrorData(oneTimeToken));
 
         // Get request uri
         String requestUri = request.getRequestURI();

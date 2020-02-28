@@ -1,7 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '2.2.2.RELEASE'
     id "io.freefair.lombok" version "3.6.6"
-//    id 'war'
+    id 'checkstyle'
     id 'java'
 }
 
@@ -9,7 +9,7 @@ apply plugin: 'io.spring.dependency-management'
 
 group = 'run.halo.app'
 archivesBaseName = 'halo'
-version = '1.2.0'
+version = '1.3.0-beta.1'
 sourceCompatibility = '1.8'
 description = 'Halo, personal blog system developed in Java.'
 
@@ -42,7 +42,6 @@ bootJar {
 }
 
 ext {
-    ohMyEmailVersion = '0.0.4'
     hutoolVersion = '5.0.3'
     upyunSdkVersion = '4.0.1'
     qiniuSdkVersion = '7.2.18'
@@ -72,8 +71,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-undertow'
     implementation 'org.springframework.boot:spring-boot-starter-freemarker'
     implementation "kr.pe.kwonnam.freemarker:freemarker-template-inheritance:$templateInheritance"
+    implementation "com.sun.mail:jakarta.mail"
 
-    implementation "io.github.biezhi:oh-my-email:$ohMyEmailVersion"
     implementation "cn.hutool:hutool-core:$hutoolVersion"
     implementation "cn.hutool:hutool-crypto:$hutoolVersion"
     implementation "cn.hutool:hutool-extra:$hutoolVersion"
@@ -110,7 +109,7 @@ dependencies {
 
     implementation "org.json:json:$jsonVersion"
     implementation "com.alibaba:fastjson:$fastJsonVersion"
-    
+
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly 'mysql:mysql-connector-java'

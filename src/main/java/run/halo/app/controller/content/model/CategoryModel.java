@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
@@ -47,19 +48,40 @@ public class CategoryModel {
         return themeService.render("categories");
     }
 
-    public String listPost(Model model, String slugName, Integer page) {
-        // Get category by slug name
-        final Category category = categoryService.getBySlugNameOfNonNull(slugName);
+    public String listPost(Model model, String slug, Integer page) {
+        // Get category by slug
+        final Category category = categoryService.getBySlugOfNonNull(slug);
+        CategoryDTO categoryDTO = categoryService.convertTo(category);
 
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), Sort.by(DESC, "createTime"));
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
+
+        // TODO remove this variable
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        // Next page and previous page url.
+        StringBuilder nextPageFullPath = new StringBuilder(categoryDTO.getFullPath());
+        StringBuilder prePageFullPath = new StringBuilder(categoryDTO.getFullPath());
+
+        nextPageFullPath.append("/page/")
+            .append(posts.getNumber() + 2)
+            .append(optionService.getPathSuffix());
+
+        if (posts.getNumber() == 1) {
+            prePageFullPath.append("/");
+        } else {
+            prePageFullPath.append("/page/")
+                .append(posts.getNumber())
+                .append(optionService.getPathSuffix());
+        }
 
         model.addAttribute("is_category", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
-        model.addAttribute("category", category);
+        model.addAttribute("category", categoryDTO);
+        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
+        model.addAttribute("prePageFullPath", prePageFullPath.toString());
         return themeService.render("category");
     }
 }

@@ -20,7 +20,10 @@ public class TagDTO implements OutputConverter<TagDTO, Tag> {
 
     private String name;
 
+    @Deprecated
     private String slugName;
+
+    private String slug;
 
     private String thumbnail;
 

@@ -38,7 +38,7 @@ public class Item {
     private String commentStatus;
 
     @JSONField(name = "wp:post_name")
-    @PropertyMappingTo("url")
+    @PropertyMappingTo("slug")
     private String postName;
 
     @JSONField(name = "wp:status")

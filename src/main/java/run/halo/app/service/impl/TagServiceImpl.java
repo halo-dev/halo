@@ -10,6 +10,7 @@ import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.repository.TagRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.TagService;
 import run.halo.app.service.base.AbstractCrudService;
 
@@ -30,16 +31,20 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
 
     private final TagRepository tagRepository;
 
-    public TagServiceImpl(TagRepository tagRepository) {
+    private final OptionService optionService;
+
+    public TagServiceImpl(TagRepository tagRepository,
+                          OptionService optionService) {
         super(tagRepository);
         this.tagRepository = tagRepository;
+        this.optionService = optionService;
     }
 
     @Override
     @Transactional
     public Tag create(Tag tag) {
         // Check if the tag is exist
-        long count = tagRepository.countByNameOrSlugName(tag.getName(), tag.getSlugName());
+        long count = tagRepository.countByNameOrSlug(tag.getName(), tag.getSlug());
 
         log.debug("Tag count: [{}]", count);
 
@@ -53,13 +58,13 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     }
 
     @Override
-    public Tag getBySlugNameOfNonNull(String slugName) {
-        return tagRepository.getBySlugName(slugName).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slugName));
+    public Tag getBySlugOfNonNull(String slug) {
+        return tagRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
     }
 
     @Override
-    public Tag getBySlugName(String slugName) {
-        return tagRepository.getBySlugName(slugName).orElse(null);
+    public Tag getBySlug(String slug) {
+        return tagRepository.getBySlug(slug).orElse(null);
     }
 
     @Override
@@ -71,7 +76,23 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     public TagDTO convertTo(Tag tag) {
         Assert.notNull(tag, "Tag must not be null");
 
-        return new TagDTO().convertFrom(tag);
+        TagDTO tagDTO = new TagDTO().convertFrom(tag);
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/")
+            .append(optionService.getTagsPrefix())
+            .append("/")
+            .append(tag.getSlug())
+            .append(optionService.getPathSuffix());
+
+        tagDTO.setFullPath(fullPath.toString());
+
+        return tagDTO;
     }
 
     @Override
@@ -81,7 +102,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         }
 
         return tags.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 }

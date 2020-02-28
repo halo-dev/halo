@@ -72,26 +72,26 @@ public class PostModel {
     public String content(Post post, String token, Model model) {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
-            String redirect = String
-                    .format("%s/archives/%s/password", optionService.getBlogBaseUrl(),
-                            post.getUrl());
-            return "redirect:" + redirect;
+            model.addAttribute("slug", post.getSlug());
+            return "common/template/post_password";
         }
 
-        if (!StringUtils.isEmpty(token)) {
+        if (StringUtils.isEmpty(token)) {
+            post = postService.getBy(PostStatus.PUBLISHED, post.getSlug());
+        } else {
             // verify token
-            String cachedToken = cacheStore.getAny(token, String.class)
-                    .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
+            String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该文章的访问权限");
             }
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         }
+
         postService.publishVisitEvent(post.getId());
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
-        adjacentPostVO.getOptionalPrePost().ifPresent(prePost -> model.addAttribute("prePost", prePost));
-        adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
+        adjacentPostVO.getOptionalPrePost().ifPresent(prePost -> model.addAttribute("prePost", postService.convertToDetailVo(prePost)));
+        adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
@@ -107,7 +107,7 @@ public class PostModel {
         model.addAttribute("comments", Page.empty());
 
         if (themeService.templateExists(
-                ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 
@@ -117,17 +117,41 @@ public class PostModel {
     public String list(Integer page, Model model, String decide, String template) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
+        // TODO remove this variable
         int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        // Next page and previous page url.
+        StringBuilder nextPageFullPath = new StringBuilder();
+        StringBuilder prePageFullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            nextPageFullPath.append(optionService.getBlogBaseUrl());
+            prePageFullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        nextPageFullPath.append("/page/")
+            .append(posts.getNumber() + 2)
+            .append(optionService.getPathSuffix());
+
+        if (posts.getNumber() == 1) {
+            prePageFullPath.append("/");
+        } else {
+            prePageFullPath.append("/page/")
+                .append(posts.getNumber())
+                .append(optionService.getPathSuffix());
+        }
 
         model.addAttribute(decide, true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("pageRainbow", rainbow);
+        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
+        model.addAttribute("prePageFullPath", prePageFullPath.toString());
         return themeService.render(template);
     }
 }

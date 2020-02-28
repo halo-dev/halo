@@ -73,11 +73,49 @@ public class ContentSearchController {
 
         final Page<PostListVO> posts = postService.convertToListVo(postPage);
 
+        // TODO remove this variable
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        // Next page and previous page url.
+        StringBuilder nextPageFullPath = new StringBuilder();
+        StringBuilder prePageFullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            nextPageFullPath.append(optionService.getBlogBaseUrl())
+                .append("/");
+            prePageFullPath.append(optionService.getBlogBaseUrl())
+                .append("/");
+        } else {
+            nextPageFullPath.append("/");
+            prePageFullPath.append("/");
+        }
+
+        nextPageFullPath.append("search");
+        prePageFullPath.append("search");
+
+        nextPageFullPath.append("/page/")
+            .append(posts.getNumber() + 2)
+            .append(optionService.getPathSuffix())
+            .append("?keyword=")
+            .append(keyword);
+
+        if (posts.getNumber() == 1) {
+            prePageFullPath.append("?keyword=")
+                .append(keyword);
+        } else {
+            prePageFullPath.append("/page/")
+                .append(posts.getNumber())
+                .append(optionService.getPathSuffix())
+                .append("?keyword=")
+                .append(keyword);
+        }
+
         model.addAttribute("is_search", true);
         model.addAttribute("keyword", keyword);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
+        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
+        model.addAttribute("prePageFullPath", prePageFullPath.toString());
         return themeService.render("search");
     }
 }

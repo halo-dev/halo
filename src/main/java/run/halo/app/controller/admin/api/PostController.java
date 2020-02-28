@@ -11,6 +11,7 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
@@ -124,8 +125,8 @@ public class PostController {
     @PutMapping("{postId:\\d+}/status/{status}")
     @ApiOperation("Updates post status")
     public BasePostMinimalDTO updateStatusBy(
-            @PathVariable("postId") Integer postId,
-            @PathVariable("status") PostStatus status) {
+        @PathVariable("postId") Integer postId,
+        @PathVariable("status") PostStatus status) {
         Post post = postService.updateStatus(status, postId);
 
         return new BasePostMinimalDTO().convertFrom(post);
@@ -141,8 +142,8 @@ public class PostController {
     @PutMapping("{postId:\\d+}/status/draft/content")
     @ApiOperation("Updates draft")
     public BasePostDetailDTO updateDraftBy(
-            @PathVariable("postId") Integer postId,
-            @RequestBody PostContentParam contentParam) {
+        @PathVariable("postId") Integer postId,
+        @RequestBody PostContentParam contentParam) {
         // Update draft content
         Post post = postService.updateDraftContent(contentParam.getContent(), postId);
 
@@ -166,12 +167,32 @@ public class PostController {
     public String preview(@PathVariable("postId") Integer postId) throws UnsupportedEncodingException {
         Post post = postService.getById(postId);
 
+        post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8.name()));
+
+        BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
+
         String token = IdUtil.simpleUUID();
 
         // cache preview token
         cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
 
+        StringBuilder previewUrl = new StringBuilder();
+
+        if (!optionService.isEnabledAbsolutePath()) {
+            previewUrl.append(optionService.getBlogBaseUrl());
+        }
+
+        previewUrl.append(postMinimalDTO.getFullPath());
+
+        if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
+            previewUrl.append("&token=")
+                .append(token);
+        } else {
+            previewUrl.append("?token=")
+                .append(token);
+        }
+
         // build preview post url and return
-        return String.format("%s/archives/%s?token=%s", optionService.getBlogBaseUrl(), URLEncoder.encode(post.getUrl(), StandardCharsets.UTF_8.name()), token);
+        return previewUrl.toString();
     }
 }

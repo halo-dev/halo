@@ -21,15 +21,17 @@ import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseMetaDTO;
+import run.halo.app.model.dto.post.BasePostMinimalDTO;
+import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
-import run.halo.app.model.properties.PermalinkProperties;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.*;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.repository.base.BasePostRepository;
 import run.halo.app.service.*;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
@@ -76,16 +78,17 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final OptionService optionService;
 
-    public PostServiceImpl(PostRepository postRepository,
+    public PostServiceImpl(BasePostRepository<Post> basePostRepository,
+                           OptionService optionService,
+                           PostRepository postRepository,
                            TagService tagService,
                            CategoryService categoryService,
                            PostTagService postTagService,
                            PostCategoryService postCategoryService,
                            PostCommentService postCommentService,
                            ApplicationEventPublisher eventPublisher,
-                           PostMetaService postMetaService,
-                           OptionService optionService) {
-        super(postRepository, optionService);
+                           PostMetaService postMetaService) {
+        super(basePostRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;
@@ -127,7 +130,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(),
-                    LogType.POST_PUBLISHED, createdPost.getTitle());
+                LogType.POST_PUBLISHED, createdPost.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return createdPost;
@@ -140,7 +143,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(),
-                    LogType.POST_PUBLISHED, createdPost.getTitle());
+                LogType.POST_PUBLISHED, createdPost.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return createdPost;
@@ -156,67 +159,67 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(),
-                    LogType.POST_EDITED, updatedPost.getTitle());
+                LogType.POST_EDITED, updatedPost.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return updatedPost;
     }
 
     @Override
-    public Post getBy(PostStatus status, String url) {
-        return super.getBy(status, url);
+    public Post getBy(PostStatus status, String slug) {
+        return super.getBy(status, slug);
     }
 
     @Override
-    public Post getBy(Integer year, Integer month, String url) {
+    public Post getBy(Integer year, Integer month, String slug) {
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(month, "Post create month must not be null");
-        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, url);
+        Optional<Post> postOptional = postRepository.findBy(year, month, slug);
 
         return postOptional
-                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
-    public Post getBy(Integer year, Integer month, String url, PostStatus status) {
+    public Post getBy(Integer year, Integer month, String slug, PostStatus status) {
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(month, "Post create month must not be null");
-        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, url, status);
+        Optional<Post> postOptional = postRepository.findBy(year, month, slug, status);
 
         return postOptional
-                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
-    public Post getBy(Integer year, Integer month, Integer day, String url) {
+    public Post getBy(Integer year, Integer month, Integer day, String slug) {
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(month, "Post create month must not be null");
         Assert.notNull(day, "Post create day must not be null");
-        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, day, url);
+        Optional<Post> postOptional = postRepository.findBy(year, month, day, slug);
 
         return postOptional
-                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
-    public Post getBy(Integer year, Integer month, Integer day, String url, PostStatus status) {
+    public Post getBy(Integer year, Integer month, Integer day, String slug, PostStatus status) {
         Assert.notNull(year, "Post create year must not be null");
         Assert.notNull(month, "Post create month must not be null");
         Assert.notNull(day, "Post create day must not be null");
-        Assert.notNull(url, "Post url must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Optional<Post> postOptional = postRepository.findBy(year, month, day, url, status);
+        Optional<Post> postOptional = postRepository.findBy(year, month, day, slug, status);
 
         return postOptional
-                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(url));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
@@ -228,22 +231,22 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public Post getByUrl(String url) {
-        return super.getByUrl(url);
+    public Post getBySlug(String slug) {
+        return super.getBySlug(slug);
     }
 
     @Override
     public List<ArchiveYearVO> listYearArchives() {
         // Get all posts
         List<Post> posts = postRepository
-                .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+            .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
 
         Map<Integer, List<Post>> yearPostMap = new HashMap<>(8);
 
         posts.forEach(post -> {
             Calendar calendar = DateUtils.convertTo(post.getCreateTime());
             yearPostMap.computeIfAbsent(calendar.get(Calendar.YEAR), year -> new LinkedList<>())
-                    .add(post);
+                .add(post);
         });
 
         List<ArchiveYearVO> archives = new LinkedList<>();
@@ -268,7 +271,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public List<ArchiveMonthVO> listMonthArchives() {
         // Get all posts
         List<Post> posts = postRepository
-                .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+            .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
 
         Map<Integer, Map<Integer, List<Post>>> yearMonthPostMap = new HashMap<>(8);
 
@@ -276,22 +279,22 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             Calendar calendar = DateUtils.convertTo(post.getCreateTime());
 
             yearMonthPostMap.computeIfAbsent(calendar.get(Calendar.YEAR), year -> new HashMap<>())
-                    .computeIfAbsent((calendar.get(Calendar.MONTH) + 1),
-                            month -> new LinkedList<>())
-                    .add(post);
+                .computeIfAbsent(calendar.get(Calendar.MONTH) + 1,
+                    month -> new LinkedList<>())
+                .add(post);
         });
 
         List<ArchiveMonthVO> archives = new LinkedList<>();
 
         yearMonthPostMap.forEach((year, monthPostMap) ->
-                monthPostMap.forEach((month, postList) -> {
-                    ArchiveMonthVO archive = new ArchiveMonthVO();
-                    archive.setYear(year);
-                    archive.setMonth(month);
-                    archive.setPosts(convertToMinimal(postList));
+            monthPostMap.forEach((month, postList) -> {
+                ArchiveMonthVO archive = new ArchiveMonthVO();
+                archive.setYear(year);
+                archive.setMonth(month);
+                archive.setPosts(convertToMinimal(postList));
 
-                    archives.add(archive);
-                }));
+                archives.add(archive);
+            }));
 
         // Sort this list
         archives.sort(new ArchiveMonthVO.ArchiveComparator());
@@ -329,7 +332,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             post.setUpdateTime(DateUtil.parse(ele));
                             break;
                         case "permalink":
-                            post.setUrl(ele);
+                            post.setSlug(ele);
                             break;
                         case "thumbnail":
                             post.setThumbnail(ele);
@@ -345,7 +348,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             if (null == tag) {
                                 tag = new Tag();
                                 tag.setName(ele);
-                                tag.setSlugName(SlugUtils.slug(ele));
+                                tag.setSlug(SlugUtils.slug(ele));
                                 tag = tagService.create(tag);
                             }
                             tagIds.add(tag.getId());
@@ -355,7 +358,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             if (null == category) {
                                 category = new Category();
                                 category.setName(ele);
-                                category.setSlugName(SlugUtils.slug(ele));
+                                category.setSlug(SlugUtils.slug(ele));
                                 category.setDescription(ele);
                                 category = categoryService.create(category);
                             }
@@ -376,8 +379,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             post.setTitle(filename);
         }
 
-        if (StrUtil.isEmpty(post.getUrl())) {
-            post.setUrl(SlugUtils.slug(post.getTitle()));
+        if (StrUtil.isEmpty(post.getSlug())) {
+            post.setSlug(SlugUtils.slug(post.getTitle()));
         }
 
         post.setOriginalContent(markdown);
@@ -400,7 +403,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         content.append("type: ").append("post").append("\n");
         content.append("title: ").append(post.getTitle()).append("\n");
-        content.append("permalink: ").append(post.getUrl()).append("\n");
+        content.append("permalink: ").append(post.getSlug()).append("\n");
         content.append("thumbnail: ").append(post.getThumbnail()).append("\n");
         content.append("status: ").append(post.getStatus()).append("\n");
         content.append("date: ").append(post.getCreateTime()).append("\n");
@@ -431,7 +434,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             content.append("postMetas:").append("\n");
             for (PostMeta postMeta : postMetas) {
                 content.append("  - ").append(postMeta.getKey()).append(" :  ")
-                        .append(postMeta.getValue()).append("\n");
+                    .append(postMeta.getValue()).append("\n");
             }
         }
 
@@ -480,7 +483,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Log it
         eventPublisher.publishEvent(new LogEvent(this, postId.toString(), LogType.POST_DELETED,
-                deletedPost.getTitle()));
+            deletedPost.getTitle()));
 
         return deletedPost;
     }
@@ -498,23 +501,13 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Get category list map
         Map<Integer, List<Category>> categoryListMap = postCategoryService
-                .listCategoryListMap(postIds);
+            .listCategoryListMap(postIds);
 
         // Get comment count
         Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
 
         // Get post meta list map
         Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
-
-        String blogUrl = optionService.getBlogBaseUrl();
-
-        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
-
-        String pathSuffix = optionService
-                .getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, "");
-
-        String archivesPrefix = optionService
-                .getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, "");
 
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
@@ -527,69 +520,139 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             // Set tags
             postListVO.setTags(Optional.ofNullable(tagListMap.get(post.getId()))
-                    .orElseGet(LinkedList::new)
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .map(tagService::convertTo)
-                    .collect(Collectors.toList()));
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(tagService::convertTo)
+                .collect(Collectors.toList()));
 
             // Set categories
             postListVO.setCategories(Optional.ofNullable(categoryListMap.get(post.getId()))
-                    .orElseGet(LinkedList::new)
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .map(categoryService::convertTo)
-                    .collect(Collectors.toList()));
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(categoryService::convertTo)
+                .collect(Collectors.toList()));
 
             // Set post metas
             postListVO.setPostMetas(Optional.ofNullable(postMetaListMap.get(post.getId()))
-                    .orElseGet(LinkedList::new)
-                    .stream()
-                    .filter(Objects::nonNull)
-                    .map(postMeta -> (BaseMetaDTO) new BaseMetaDTO().convertFrom(postMeta))
-                    .collect(Collectors.toList()));
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(postMeta -> (BaseMetaDTO) new BaseMetaDTO().convertFrom(postMeta))
+                .collect(Collectors.toList()));
 
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
-            StringBuilder fullPath = new StringBuilder(blogUrl)
-                    .append("/");
-            if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
-                fullPath.append(archivesPrefix)
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            } else if (permalinkType.equals(PostPermalinkType.ID)) {
-                fullPath.append("?p=")
-                        .append(postListVO.getId());
-            } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-                fullPath.append(DateUtil.year(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(DateUtil.month(postListVO.getCreateTime()) + 1)
-                        .append("/")
-                        .append(DateUtil.dayOfMonth(postListVO.getCreateTime()))
-                        .append("/")
-                        .append(postListVO.getUrl())
-                        .append(pathSuffix);
-            }
-
-            postListVO.setFullPath(fullPath.toString());
+            postListVO.setFullPath(buildFullPath(post));
 
             return postListVO;
         });
     }
 
     @Override
+    public List<PostListVO> convertToListVo(List<Post> posts) {
+        Assert.notNull(posts, "Post page must not be null");
+
+        Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
+
+        // Get tag list map
+        Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
+
+        // Get category list map
+        Map<Integer, List<Category>> categoryListMap = postCategoryService
+            .listCategoryListMap(postIds);
+
+        // Get comment count
+        Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
+
+        // Get post meta list map
+        Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
+
+        return posts.stream().map(post -> {
+            PostListVO postListVO = new PostListVO().convertFrom(post);
+
+            if (StringUtils.isBlank(postListVO.getSummary())) {
+                postListVO.setSummary(generateSummary(post.getFormatContent()));
+            }
+
+            Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
+
+            // Set tags
+            postListVO.setTags(Optional.ofNullable(tagListMap.get(post.getId()))
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(tagService::convertTo)
+                .collect(Collectors.toList()));
+
+            // Set categories
+            postListVO.setCategories(Optional.ofNullable(categoryListMap.get(post.getId()))
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(categoryService::convertTo)
+                .collect(Collectors.toList()));
+
+            // Set post metas
+            postListVO.setPostMetas(Optional.ofNullable(postMetaListMap.get(post.getId()))
+                .orElseGet(LinkedList::new)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(postMeta -> (BaseMetaDTO) new BaseMetaDTO().convertFrom(postMeta))
+                .collect(Collectors.toList()));
+
+            // Set comment count
+            postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
+
+            postListVO.setFullPath(buildFullPath(post));
+
+            return postListVO;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public Page<PostDetailVO> convertToDetailVo(Page<Post> postPage) {
         Assert.notNull(postPage, "Post page must not be null");
         return postPage.map(this::convertToDetailVo);
+    }
+
+    @Override
+    public BasePostMinimalDTO convertToMinimal(Post post) {
+        Assert.notNull(post, "Post must not be null");
+        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(post);
+
+        basePostMinimalDTO.setFullPath(buildFullPath(post));
+
+        return basePostMinimalDTO;
+    }
+
+    @Override
+    public List<BasePostMinimalDTO> convertToMinimal(List<Post> posts) {
+        if (CollectionUtils.isEmpty(posts)) {
+            return Collections.emptyList();
+        }
+
+        return posts.stream()
+            .map(this::convertToMinimal)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public BasePostSimpleDTO convertToSimple(Post post) {
+        Assert.notNull(post, "Post must not be null");
+
+        BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
+
+        // Set summary
+        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
+            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
+        }
+
+        basePostSimpleDTO.setFullPath(buildFullPath(post));
+
+        return basePostSimpleDTO;
     }
 
     /**
@@ -632,6 +695,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         postDetailVO.setCommentCount(postCommentService.countByPostId(post.getId()));
 
+        postDetailVO.setFullPath(buildFullPath(post));
+
         return postDetailVO;
     }
 
@@ -657,21 +722,21 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 Root<PostCategory> postCategoryRoot = postSubquery.from(PostCategory.class);
                 postSubquery.select(postCategoryRoot.get("postId"));
                 postSubquery.where(
-                        criteriaBuilder.equal(root.get("id"), postCategoryRoot.get("postId")),
-                        criteriaBuilder.equal(postCategoryRoot.get("categoryId"),
-                                postQuery.getCategoryId()));
+                    criteriaBuilder.equal(root.get("id"), postCategoryRoot.get("postId")),
+                    criteriaBuilder.equal(postCategoryRoot.get("categoryId"),
+                        postQuery.getCategoryId()));
                 predicates.add(criteriaBuilder.exists(postSubquery));
             }
 
             if (postQuery.getKeyword() != null) {
                 // Format like condition
                 String likeCondition = String
-                        .format("%%%s%%", StringUtils.strip(postQuery.getKeyword()));
+                    .format("%%%s%%", StringUtils.strip(postQuery.getKeyword()));
 
                 // Build like predicate
                 Predicate titleLike = criteriaBuilder.like(root.get("title"), likeCondition);
                 Predicate originalContentLike = criteriaBuilder
-                        .like(root.get("originalContent"), likeCondition);
+                    .like(root.get("originalContent"), likeCondition);
 
                 predicates.add(criteriaBuilder.or(titleLike, originalContentLike));
             }
@@ -699,20 +764,20 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Create post tags
         List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(),
-                ServiceUtils.fetchProperty(tags, Tag::getId));
+            ServiceUtils.fetchProperty(tags, Tag::getId));
 
         log.debug("Created post tags: [{}]", postTags);
 
         // Create post categories
         List<PostCategory> postCategories = postCategoryService
-                .mergeOrCreateByIfAbsent(post.getId(),
-                        ServiceUtils.fetchProperty(categories, Category::getId));
+            .mergeOrCreateByIfAbsent(post.getId(),
+                ServiceUtils.fetchProperty(categories, Category::getId));
 
         log.debug("Created post categories: [{}]", postCategories);
 
         // Create post meta data
         List<PostMeta> postMetaList = postMetaService
-                .createOrUpdateByPostId(post.getId(), postMetas);
+            .createOrUpdateByPostId(post.getId(), postMetas);
         log.debug("Created post postMetas: [{}]", postMetaList);
 
         // Convert to post detail vo
@@ -731,8 +796,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // get pageable post list
         List<Post> postList = new ArrayList<>();
         // init fist page && default page size
-        Integer page = 1;
-        Integer defaultPageSize = 500;
+        int page = 1;
+        int defaultPageSize = 500;
         boolean needNext = true;
 
         // get custom sort type
@@ -743,7 +808,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         while (needNext && totalCount > postList.size()) {
             pageable = PageRequest
-                    .of(page >= 1 ? page - 1 : page, defaultPageSize, sort);
+                .of(page >= 1 ? page - 1 : page, defaultPageSize, sort);
 
             Page<Post> postPage = pageBy(postStatus, pageable);
             List<Post> pageablePostList = postPage.getContent();
@@ -752,8 +817,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
             postList.addAll(postPage.getContent());
             if (postList.stream().filter(it -> it.getId().equals(currentPost.getId())).count() == 1
-                    && !postList.stream().reduce((first, second) -> second).get().getId()
-                    .equals(currentPost.getId())) {
+                && !postList.stream().reduce((first, second) -> second).get().getId()
+                .equals(currentPost.getId())) {
                 // contains the post && the post is not in the end
                 needNext = false;
             }
@@ -768,7 +833,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // get current post index in post list
         List<Integer> idList = postList.stream().map(Post::getId).collect(Collectors.toList());
-        Integer index = idList.indexOf(currentPost.getId());
+        int index = idList.indexOf(currentPost.getId());
 
         if (index == -1) {
             // if not found, return empty object
@@ -777,8 +842,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         AdjacentPostVO adjacentPostVO = new AdjacentPostVO();
 
-        //setup pre
-        //TODO convert POST to PostVO (with fullPath)
+        // setup pre
         if (index > 0) {
             adjacentPostVO.setPrePost(postList.get(index - 1));
         }
@@ -793,7 +857,51 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public @NotNull Sort getPostDefaultSort() {
         String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
-                .toString();
+            .toString();
         return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)).and(Sort.by(DESC, "id"));
+    }
+
+    private String buildFullPath(Post post) {
+
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
+
+        String pathSuffix = optionService.getPathSuffix();
+
+        String archivesPrefix = optionService.getArchivesPrefix();
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append("/");
+
+        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+            fullPath.append(archivesPrefix)
+                .append("/")
+                .append(post.getSlug())
+                .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID)) {
+            fullPath.append("?p=")
+                .append(post.getId());
+        } else if (permalinkType.equals(PostPermalinkType.DATE)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                .append("/")
+                .append(DateUtil.month(post.getCreateTime()) + 1)
+                .append("/")
+                .append(post.getSlug())
+                .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.DAY)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                .append("/")
+                .append(DateUtil.month(post.getCreateTime()) + 1)
+                .append("/")
+                .append(DateUtil.dayOfMonth(post.getCreateTime()))
+                .append("/")
+                .append(post.getSlug())
+                .append(pathSuffix);
+        }
+        return fullPath.toString();
     }
 }
