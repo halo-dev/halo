@@ -11,15 +11,10 @@
         </div>
 
         <div id="editor">
-          <halo-editor
-            ref="md"
-            v-model="postToStage.originalContent"
-            :boxShadow="false"
-            :toolbars="toolbars"
-            :ishljs="true"
-            :autofocus="false"
-            @imgAdd="handleAttachmentUpload"
-            @save="handleSaveDraft(true)"
+          <MarkdownEditor
+            :originalContent="postToStage.originalContent"
+            @onSaveDraft="handleSaveDraft(true)"
+            @onChange="onContentChange"
           />
         </div>
       </a-col>
@@ -73,23 +68,19 @@ import moment from 'moment'
 import PostSettingDrawer from './components/PostSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
-import { toolbars } from '@/core/const'
-import { haloEditor } from 'halo-editor'
-import 'halo-editor/dist/css/index.css'
+import MarkdownEditor from '@/components/editor/MarkdownEditor'
 
 import postApi from '@/api/post'
-import attachmentApi from '@/api/attachment'
 export default {
   mixins: [mixin, mixinDevice],
   components: {
     PostSettingDrawer,
-    haloEditor,
     FooterToolBar,
-    AttachmentDrawer
+    AttachmentDrawer,
+    MarkdownEditor
   },
   data() {
     return {
-      toolbars,
       attachmentDrawerVisible: false,
       postSettingVisible: false,
       postToStage: {},
@@ -218,21 +209,6 @@ export default {
           })
       }
     },
-    handleAttachmentUpload(pos, $file) {
-      var formdata = new FormData()
-      formdata.append('file', $file)
-      attachmentApi.upload(formdata).then(response => {
-        var responseObject = response.data
-
-        if (responseObject.status === 200) {
-          var HaloEditor = this.$refs.md
-          HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
-          this.$message.success('图片上传成功！')
-        } else {
-          this.$message.error('图片上传失败：' + responseObject.message)
-        }
-      })
-    },
     handleShowPostSetting() {
       this.postSettingVisible = true
     },
@@ -270,6 +246,9 @@ export default {
             })
         })
       }
+    },
+    onContentChange(val) {
+      this.postToStage.originalContent = val
     },
     // 关闭文章设置抽屉
     onPostSettingsClose() {

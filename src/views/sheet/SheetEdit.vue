@@ -10,15 +10,10 @@
           />
         </div>
         <div id="editor">
-          <halo-editor
-            ref="md"
-            v-model="sheetToStage.originalContent"
-            :boxShadow="false"
-            :toolbars="toolbars"
-            :ishljs="true"
-            :autofocus="false"
-            @imgAdd="handleAttachmentUpload"
-            @save="handleSaveDraft"
+          <MarkdownEditor
+            :originalContent="sheetToStage.originalContent"
+            @onSaveDraft="handleSaveDraft"
+            @onChange="onContentChange"
           />
         </div>
       </a-col>
@@ -64,25 +59,21 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
 import moment from 'moment'
-import { toolbars } from '@/core/const'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
-import { haloEditor } from 'halo-editor'
-import 'halo-editor/dist/css/index.css'
+import MarkdownEditor from '@/components/editor/MarkdownEditor'
 import sheetApi from '@/api/sheet'
-import attachmentApi from '@/api/attachment'
 export default {
   components: {
-    haloEditor,
     FooterToolBar,
     AttachmentDrawer,
-    SheetSettingDrawer
+    SheetSettingDrawer,
+    MarkdownEditor
   },
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      toolbars,
       attachmentDrawerVisible: false,
       sheetSettingVisible: false,
       sheetToStage: {},
@@ -193,21 +184,6 @@ export default {
           })
       }
     },
-    handleAttachmentUpload(pos, $file) {
-      var formdata = new FormData()
-      formdata.append('file', $file)
-      attachmentApi.upload(formdata).then(response => {
-        var responseObject = response.data
-
-        if (responseObject.status === 200) {
-          var HaloEditor = this.$refs.md
-          HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
-          this.$message.success('图片上传成功！')
-        } else {
-          this.$message.error('图片上传失败：' + responseObject.message)
-        }
-      })
-    },
     handleShowSheetSetting() {
       this.sheetSettingVisible = true
     },
@@ -243,6 +219,9 @@ export default {
             })
         })
       }
+    },
+    onContentChange(val) {
+      this.sheetToStage.originalContent = val
     },
     onSheetSettingsClose() {
       this.sheetSettingVisible = false
