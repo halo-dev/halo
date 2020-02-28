@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.enums.PostCreateFrom;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 
 import javax.persistence.*;
@@ -51,6 +52,12 @@ public class BasePost extends BaseEntity {
      */
     @Column(name = "slug", columnDefinition = "varchar(255)", unique = true)
     private String slug;
+
+    /**
+     * Post editor type.
+     */
+    @Column(name = "editor_type", columnDefinition = "int default 0")
+    private PostEditorType editorType;
 
     /**
      * Original content,not format.
@@ -183,6 +190,10 @@ public class BasePost extends BaseEntity {
 
         if (formatContent == null) {
             formatContent = "";
+        }
+
+        if (editorType == null) {
+            editorType = PostEditorType.MARKDOWN;
         }
     }
 

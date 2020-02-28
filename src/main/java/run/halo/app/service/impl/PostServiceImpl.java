@@ -27,6 +27,7 @@ import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.*;
@@ -309,7 +310,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
 
-        Post post = new Post();
+        PostParam post = new PostParam();
 
         List<String> elementValue;
 
@@ -327,9 +328,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             break;
                         case "date":
                             post.setCreateTime(DateUtil.parse(ele));
-                            break;
-                        case "updated":
-                            post.setUpdateTime(DateUtil.parse(ele));
                             break;
                         case "permalink":
                             post.setSlug(ele);
@@ -385,7 +383,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         post.setOriginalContent(markdown);
 
-        return createBy(post, tagIds, categoryIds, false);
+        return createBy(post.convertTo(), tagIds, categoryIds, false);
     }
 
     @Override

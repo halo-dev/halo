@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.SheetDetailVO;
@@ -46,7 +47,11 @@ public class SheetModel {
                 throw new ForbiddenException("您没有该页面的访问权限");
             }
             // render markdown to html when preview sheet
-            sheet.setFormatContent(MarkdownUtils.renderHtml(sheet.getOriginalContent()));
+            if (sheet.getEditorType().equals(PostEditorType.MARKDOWN)) {
+                sheet.setFormatContent(MarkdownUtils.renderHtml(sheet.getOriginalContent()));
+            } else {
+                sheet.setFormatContent(sheet.getOriginalContent());
+            }
         }
 
         sheetService.publishVisitEvent(sheet.getId());

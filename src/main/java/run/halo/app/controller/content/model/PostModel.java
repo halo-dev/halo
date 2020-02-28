@@ -13,6 +13,7 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.AdjacentPostVO;
@@ -84,7 +85,11 @@ public class PostModel {
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该文章的访问权限");
             }
-            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+            if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
+                post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+            } else {
+                post.setFormatContent(post.getOriginalContent());
+            }
         }
 
         postService.publishVisitEvent(post.getId());
