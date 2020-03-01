@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.StringCacheStore;
@@ -17,6 +18,7 @@ import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.AdjacentPostVO;
+import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
@@ -119,7 +121,7 @@ public class PostModel {
         return themeService.render("post");
     }
 
-    public String list(Integer page, Model model, String decide, String template) {
+    public String list(Integer page, Model model) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
             .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
@@ -151,12 +153,62 @@ public class PostModel {
                 .append(optionService.getPathSuffix());
         }
 
-        model.addAttribute(decide, true);
+        model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("pageRainbow", rainbow);
         model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
         model.addAttribute("prePageFullPath", prePageFullPath.toString());
-        return themeService.render(template);
+        return themeService.render("index");
+    }
+
+    public String archives(Integer page, Model model) {
+        int pageSize = optionService.getPostPageSize();
+        Pageable pageable = PageRequest
+            .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+
+        Page<PostListVO> posts = postService.convertToListVo(postPage);
+
+        List<ArchiveYearVO> archives = postService.convertToYearArchives(postPage.getContent());
+
+        // TODO remove this variable
+        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        // Next page and previous page url.
+        StringBuilder nextPageFullPath = new StringBuilder();
+        StringBuilder prePageFullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            nextPageFullPath.append(optionService.getBlogBaseUrl());
+            prePageFullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        nextPageFullPath.append("/")
+            .append(optionService.getArchivesPrefix());
+        prePageFullPath.append("/")
+            .append(optionService.getArchivesPrefix());
+
+        nextPageFullPath.append("/page/")
+            .append(posts.getNumber() + 2)
+            .append(optionService.getPathSuffix());
+
+        if (posts.getNumber() == 1) {
+            prePageFullPath.append("/");
+        } else {
+            prePageFullPath.append("/page/")
+                .append(posts.getNumber())
+                .append(optionService.getPathSuffix());
+        }
+
+        model.addAttribute("is_archives", true);
+        model.addAttribute("posts", posts);
+        model.addAttribute("archives", archives);
+        model.addAttribute("rainbow", rainbow);
+        model.addAttribute("pageRainbow", rainbow);
+        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
+        model.addAttribute("prePageFullPath", prePageFullPath.toString());
+        return themeService.render("archives");
     }
 }

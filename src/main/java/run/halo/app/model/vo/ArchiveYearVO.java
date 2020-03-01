@@ -21,7 +21,7 @@ public class ArchiveYearVO {
 
     private Integer year;
 
-    private List<BasePostMinimalDTO> posts;
+    private List<PostListVO> posts;
 
     public static class ArchiveComparator implements Comparator<ArchiveYearVO> {
 

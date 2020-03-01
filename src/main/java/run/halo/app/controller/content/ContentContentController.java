@@ -83,7 +83,7 @@ public class ContentContentController {
     public String content(@PathVariable("prefix") String prefix,
                           Model model) {
         if (optionService.getArchivesPrefix().equals(prefix)) {
-            return postModel.list(1, model, "is_archives", "archives");
+            return postModel.archives(1, model);
         } else if (optionService.getCategoriesPrefix().equals(prefix)) {
             return categoryModel.list(model);
         } else if (optionService.getTagsPrefix().equals(prefix)) {
@@ -105,7 +105,7 @@ public class ContentContentController {
                           @PathVariable(value = "page") Integer page,
                           Model model) {
         if (optionService.getArchivesPrefix().equals(prefix)) {
-            return postModel.list(page, model, "is_archives", "archives");
+            return postModel.archives(page, model);
         } else if (optionService.getJournalsPrefix().equals(prefix)) {
             return journalModel.list(page, model);
         } else if (optionService.getPhotosPrefix().equals(prefix)) {
