@@ -20,32 +20,25 @@
                 <a-icon type="copy" />
               </a>
             </template>
-            <!-- <a-popconfirm
+            <a-popover
               slot="extra"
               placement="left"
-              okText="确定"
-              cancelText="取消"
-              @confirm="confirmUpdate"
+              :title="isLatest?'当前为最新版本':'有新版本'"
             >
-              <template slot="title">
-                <p>确定更新 <b>Halo admin</b> 吗？</p>
+              <template slot="content">
+                <p>{{ `当前版本：${environments.version}，` }}{{ isLatest?`已经是最新版本。`:`新版本：${latestData.name}，你可以点击下方按钮查看详情。` }}</p>
+                <a-button type="dashed" :href="latestData.html_url" target="_blank">查看详情</a-button>
               </template>
-              <a-icon
-                type="cloud-download"
-                slot="icon"
-              ></a-icon>
               <a-button
-                :loading="updating"
+                :loading="checking"
                 type="dashed"
                 shape="circle"
-                icon="cloud-download"
-              >
-              </a-button>
-            </a-popconfirm> -->
+                :icon="isLatest?'check-circle':'exclamation-circle'"
+              ></a-button>
+            </a-popover>
 
             <ul style="margin: 0;padding: 0;list-style: none;">
-              <li>Server 版本：{{ environments.version }}</li>
-              <li>Admin 版本：{{ adminVersion }}</li>
+              <li>版本：{{ environments.version }}</li>
               <li>数据库：{{ environments.database }}</li>
               <li>运行模式：{{ environments.mode }}</li>
               <li>启动时间：{{ environments.startTime | moment }}</li>
@@ -132,7 +125,10 @@ export default {
           contributions: 0
         }
       ],
-      contributorsLoading: true
+      contributorsLoading: true,
+      checking: false,
+      isLatest: false,
+      latestData: {}
     }
   },
   created() {
@@ -162,8 +158,7 @@ export default {
     //     })
     // },
     handleCopyEnvironments() {
-      const text = `Server 版本：${this.environments.version}
-Admin 版本：${this.adminVersion}
+      const text = `版本：${this.environments.version}
 数据库：${this.environments.database}
 运行模式：${this.environments.mode}
 User Agent：${navigator.userAgent}`
@@ -192,19 +187,22 @@ User Agent：${navigator.userAgent}`
     },
     async checkServerUpdate() {
       const _this = this
-
+      this.checking = true
       axios
         .get('https://api.github.com/repos/halo-dev/halo/releases/latest')
         .then(response => {
           const data = response.data
+          _this.latestData = data
           if (data.draft || data.prerelease) {
             return
           }
           const current = _this.calculateIntValue(_this.environments.version)
           const latest = _this.calculateIntValue(data.name)
           if (current >= latest) {
+            _this.isLatest = true
             return
           }
+          _this.isLatest = false
           const title = '新版本提醒'
           const content = '检测到 Server 新版本：' + data.name + '，点击下方按钮查看最新版本。'
           const url = data.html_url
@@ -231,6 +229,9 @@ User Agent：${navigator.userAgent}`
         })
         .catch(function(error) {
           console.error('Check update fail', error)
+        })
+        .finally(() => {
+          this.checking = false
         })
     },
     // async checkAdminUpdate() {
