@@ -153,7 +153,6 @@ public class SmmsFileHandler implements FileHandler {
         // Set user agent manually
         HttpHeaders headers = new HttpHeaders();
         // Set content type
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.set(HttpHeaders.AUTHORIZATION, apiSecretToken);
         headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
 
