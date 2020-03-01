@@ -17,6 +17,7 @@ import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.properties.SmmsProperties;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
@@ -82,6 +83,7 @@ public class SmmsFileHandler implements FileHandler {
         // Set content type
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.set(HttpHeaders.AUTHORIZATION, apiSecretToken);
+        headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
 
         LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
@@ -114,7 +116,7 @@ public class SmmsFileHandler implements FileHandler {
             throw new FileOperationException(smmsResponse == null ? "SM.MS 服务返回内容为空" : smmsResponse.getMessage()).setErrorData(smmsResponse);
         }
 
-        if (smmsResponse.getSuccess()) {
+        if (!smmsResponse.getSuccess()) {
             throw new FileOperationException("上传请求失败：" + smmsResponse.getMessage()).setErrorData(smmsResponse);
         }
 
@@ -143,11 +145,17 @@ public class SmmsFileHandler implements FileHandler {
     public void delete(String key) {
         Assert.hasText(key, "Deleting key must not be blank");
 
+        String apiSecretToken = optionService.getByPropertyOfNonNull(SmmsProperties.SMMS_API_SECRET_TOKEN).toString();
+
         // Build delete url
         String url = String.format(DELETE_API_V2, key);
 
         // Set user agent manually
         HttpHeaders headers = new HttpHeaders();
+        // Set content type
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.set(HttpHeaders.AUTHORIZATION, apiSecretToken);
+        headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
 
         // Delete the file
         ResponseEntity<String> responseEntity = httpsRestTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null, headers), String.class);
