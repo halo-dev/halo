@@ -242,6 +242,20 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Post> posts = postRepository
             .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
 
+        return convertToYearArchives(posts);
+    }
+
+    @Override
+    public List<ArchiveMonthVO> listMonthArchives() {
+        // Get all posts
+        List<Post> posts = postRepository
+            .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+
+        return convertToMonthArchives(posts);
+    }
+
+    @Override
+    public List<ArchiveYearVO> convertToYearArchives(List<Post> posts) {
         Map<Integer, List<Post>> yearPostMap = new HashMap<>(8);
 
         posts.forEach(post -> {
@@ -256,7 +270,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Build archive
             ArchiveYearVO archive = new ArchiveYearVO();
             archive.setYear(year);
-            archive.setPosts(convertToMinimal(postList));
+            archive.setPosts(convertToListVo(postList));
 
             // Add archive
             archives.add(archive);
@@ -269,10 +283,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public List<ArchiveMonthVO> listMonthArchives() {
-        // Get all posts
-        List<Post> posts = postRepository
-            .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+    public List<ArchiveMonthVO> convertToMonthArchives(List<Post> posts) {
 
         Map<Integer, Map<Integer, List<Post>>> yearMonthPostMap = new HashMap<>(8);
 
@@ -292,7 +303,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 ArchiveMonthVO archive = new ArchiveMonthVO();
                 archive.setYear(year);
                 archive.setMonth(month);
-                archive.setPosts(convertToMinimal(postList));
+                archive.setPosts(convertToListVo(postList));
 
                 archives.add(archive);
             }));

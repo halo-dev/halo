@@ -168,6 +168,22 @@ public interface PostService extends BasePostService<Post> {
     List<ArchiveMonthVO> listMonthArchives();
 
     /**
+     * Convert to year archives
+     *
+     * @param posts posts must not be null
+     * @return list of ArchiveYearVO
+     */
+    List<ArchiveYearVO> convertToYearArchives(@NonNull List<Post> posts);
+
+    /**
+     * Convert to month archives
+     *
+     * @param posts posts must not be null
+     * @return list of ArchiveMonthVO
+     */
+    List<ArchiveMonthVO> convertToMonthArchives(@NonNull List<Post> posts);
+
+    /**
      * Import post from markdown document.
      *
      * @param markdown markdown document.
