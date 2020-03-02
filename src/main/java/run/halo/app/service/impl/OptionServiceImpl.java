@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  * OptionService implementation class
  *
  * @author ryanwang
+ * @author johnniang
  * @date 2019-03-14
  */
 @Slf4j
@@ -365,9 +366,19 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getPostPageSize() {
         try {
-            return getByPropertyOrDefault(PostProperties.INDEX_PAGE_SIZE, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(PostProperties.INDEX_PAGE_SIZE, Integer.class, DEFAULT_POST_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(PostProperties.INDEX_PAGE_SIZE.getValue() + " option is not a number format", e);
+            return DEFAULT_POST_PAGE_SIZE;
+        }
+    }
+
+    @Override
+    public int getArchivesPageSize() {
+        try {
+            return getByPropertyOrDefault(PostProperties.ARCHIVES_PAGE_SIZE, Integer.class, DEFAULT_ARCHIVES_PAGE_SIZE);
+        } catch (NumberFormatException e) {
+            log.error(PostProperties.ARCHIVES_PAGE_SIZE.getValue() + " option is not a number format", e);
             return DEFAULT_POST_PAGE_SIZE;
         }
     }
@@ -385,7 +396,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getRssPageSize() {
         try {
-            return getByPropertyOrDefault(PostProperties.RSS_PAGE_SIZE, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(PostProperties.RSS_PAGE_SIZE, Integer.class, DEFAULT_RSS_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(PostProperties.RSS_PAGE_SIZE.getValue() + " setting is not a number format", e);
             return DEFAULT_RSS_PAGE_SIZE;
