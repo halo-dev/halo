@@ -54,10 +54,15 @@ public class SmmsFileHandler implements FileHandler {
 
     private final OptionService optionService;
 
+    private HttpHeaders headers = new HttpHeaders();
+
     public SmmsFileHandler(RestTemplate httpsRestTemplate,
                            OptionService optionService) {
         this.httpsRestTemplate = httpsRestTemplate;
         this.optionService = optionService;
+
+        headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
+        headers.set(HttpHeaders.AUTHORIZATION, optionService.getByPropertyOfNonNull(SmmsProperties.SMMS_API_SECRET_TOKEN).toString());
 
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
@@ -79,11 +84,8 @@ public class SmmsFileHandler implements FileHandler {
             throw new FileOperationException("不支持的文件类型，仅支持 \"jpeg, jpg, png, gif, bmp\" 格式的图片");
         }
 
-        HttpHeaders headers = new HttpHeaders();
         // Set content type
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set(HttpHeaders.AUTHORIZATION, apiSecretToken);
-        headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
 
         LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
@@ -145,16 +147,8 @@ public class SmmsFileHandler implements FileHandler {
     public void delete(String key) {
         Assert.hasText(key, "Deleting key must not be blank");
 
-        String apiSecretToken = optionService.getByPropertyOfNonNull(SmmsProperties.SMMS_API_SECRET_TOKEN).toString();
-
         // Build delete url
         String url = String.format(DELETE_API_V2, key);
-
-        // Set user agent manually
-        HttpHeaders headers = new HttpHeaders();
-        // Set content type
-        headers.set(HttpHeaders.AUTHORIZATION, apiSecretToken);
-        headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
 
         // Delete the file
         ResponseEntity<String> responseEntity = httpsRestTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null, headers), String.class);
