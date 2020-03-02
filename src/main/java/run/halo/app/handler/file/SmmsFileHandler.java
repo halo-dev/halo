@@ -61,9 +61,6 @@ public class SmmsFileHandler implements FileHandler {
         this.httpsRestTemplate = httpsRestTemplate;
         this.optionService = optionService;
 
-        headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
-        headers.set(HttpHeaders.AUTHORIZATION, optionService.getByPropertyOfNonNull(SmmsProperties.SMMS_API_SECRET_TOKEN).toString());
-
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
         mappingJackson2HttpMessageConverter.setSupportedMediaTypes(Collections.singletonList(MediaType.ALL));
         this.httpsRestTemplate.getMessageConverters().add(mappingJackson2HttpMessageConverter);
@@ -84,6 +81,7 @@ public class SmmsFileHandler implements FileHandler {
             throw new FileOperationException("不支持的文件类型，仅支持 \"jpeg, jpg, png, gif, bmp\" 格式的图片");
         }
 
+        setHeaders();
         // Set content type
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
@@ -150,6 +148,8 @@ public class SmmsFileHandler implements FileHandler {
         // Build delete url
         String url = String.format(DELETE_API_V2, key);
 
+        setHeaders();
+
         // Delete the file
         ResponseEntity<String> responseEntity = httpsRestTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null, headers), String.class);
 
@@ -177,6 +177,14 @@ public class SmmsFileHandler implements FileHandler {
      */
     private boolean isResponseSuccessfully(@Nullable SmmsResponse smmsResponse) {
         return smmsResponse != null && smmsResponse.getCode().equals(SUCCESS_CODE);
+    }
+
+    /**
+     * Set headers.
+     */
+    private void setHeaders() {
+        headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
+        headers.set(HttpHeaders.AUTHORIZATION, optionService.getByPropertyOfNonNull(SmmsProperties.SMMS_API_SECRET_TOKEN).toString());
     }
 
     @Data
