@@ -116,10 +116,16 @@
                     <a-select-option value="visits">点击量</a-select-option>
                   </a-select>
                 </a-form-item>
-                <a-form-item label="首页显示条数：">
+                <a-form-item label="首页每页条数：">
                   <a-input
                     type="number"
                     v-model="options.post_index_page_size"
+                  />
+                </a-form-item>
+                <a-form-item label="归档每页条数：">
+                  <a-input
+                    type="number"
+                    v-model="options.post_archives_page_size"
                   />
                 </a-form-item>
                 <a-form-item label="RSS 内容类型：">
@@ -707,19 +713,19 @@
                 </a-form-item>
                 <a-form-item label="友情链接页面前缀：">
                   <template slot="help">
-                    <span>{{ options.blog_url }}/{{ options.links_prefix }}</span>
+                    <span>{{ options.blog_url }}/{{ options.links_prefix }}{{ options.path_suffix }}</span>
                   </template>
                   <a-input v-model="options.links_prefix" />
                 </a-form-item>
                 <a-form-item label="图库页面前缀：">
                   <template slot="help">
-                    <span>{{ options.blog_url }}/{{ options.photos_prefix }}</span>
+                    <span>{{ options.blog_url }}/{{ options.photos_prefix }}{{ options.path_suffix }}</span>
                   </template>
                   <a-input v-model="options.photos_prefix" />
                 </a-form-item>
                 <a-form-item label="日志页面前缀：">
                   <template slot="help">
-                    <span>{{ options.blog_url }}/{{ options.journals_prefix }}</span>
+                    <span>{{ options.blog_url }}/{{ options.journals_prefix }}{{ options.path_suffix }}</span>
                   </template>
                   <a-input v-model="options.journals_prefix" />
                 </a-form-item>

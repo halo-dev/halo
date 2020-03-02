@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     title="页面设置"
-    :width="isMobile()?'100%':'460'"
+    :width="isMobile()?'100%':'480'"
     placement="right"
     closable
     destroyOnClose
@@ -25,8 +25,8 @@
                 <a-input v-model="selectedSheet.title" />
               </a-form-item>
               <a-form-item
-                label="页面路径："
-                :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.slug ? selectedSheet.slug : '{slug}')"
+                label="页面别名："
+                :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.slug ? selectedSheet.slug : '{slug}')+options.path_suffix"
               >
                 <a-input v-model="selectedSheet.slug" />
               </a-form-item>

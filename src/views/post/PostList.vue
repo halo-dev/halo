@@ -11,7 +11,7 @@
               :md="6"
               :sm="24"
             >
-              <a-form-item label="关键词">
+              <a-form-item label="关键词：">
                 <a-input
                   v-model="queryParam.keyword"
                   @keyup.enter="handleQuery()"
@@ -22,7 +22,7 @@
               :md="6"
               :sm="24"
             >
-              <a-form-item label="文章状态">
+              <a-form-item label="文章状态：">
                 <a-select
                   v-model="queryParam.status"
                   placeholder="请选择文章状态"
@@ -40,7 +40,7 @@
               :md="6"
               :sm="24"
             >
-              <a-form-item label="分类目录">
+              <a-form-item label="分类目录：">
                 <a-select
                   v-model="queryParam.categoryId"
                   placeholder="请选择分类"

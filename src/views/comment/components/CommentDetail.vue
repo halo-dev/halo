@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     title="评论详情"
-    :width="isMobile()?'100%':'460'"
+    :width="isMobile()?'100%':'480'"
     closable
     :visible="visible"
     destroyOnClose

@@ -33,7 +33,7 @@
               />
             </a-form-item>
             <a-form-item
-              label="封面图"
+              label="封面图："
               help="* 在分类页面可展示，需要主题支持"
             >
               <a-input v-model="categoryToCreate.thumbnail">

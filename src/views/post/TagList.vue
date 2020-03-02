@@ -21,13 +21,13 @@
               <a-input v-model="tagToCreate.name" />
             </a-form-item>
             <a-form-item
-              label="别名"
+              label="别名："
               help="* 一般为单个标签页面的标识，最好为英文"
             >
               <a-input v-model="tagToCreate.slug" />
             </a-form-item>
             <a-form-item
-              label="封面图"
+              label="封面图："
               help="* 在标签页面可展示，需要主题支持"
             >
               <a-input v-model="tagToCreate.thumbnail">

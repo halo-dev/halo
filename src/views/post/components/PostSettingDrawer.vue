@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     title="文章设置"
-    :width="isMobile()?'100%':'460'"
+    :width="isMobile()?'100%':'480'"
     placement="right"
     closable
     destroyOnClose
@@ -24,7 +24,7 @@
               >
                 <a-input v-model="selectedPost.title" />
               </a-form-item>
-              <a-form-item label="文章路径：">
+              <a-form-item label="文章别名：">
                 <template slot="help">
                   <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/{{ selectedPost.slug?selectedPost.slug:'${slug}' }}{{ options.path_suffix }}</span>
                   <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ selectedPost.createTime?selectedPost.createTime:new Date() | moment_post_date }}{{ selectedPost.slug?selectedPost.slug:'${slug}' }}{{ options.path_suffix }}</span>

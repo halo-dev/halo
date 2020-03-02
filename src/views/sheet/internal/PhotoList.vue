@@ -20,7 +20,7 @@
                   :md="6"
                   :sm="24"
                 >
-                  <a-form-item label="关键词">
+                  <a-form-item label="关键词：">
                     <a-input v-model="queryParam.keyword" />
                   </a-form-item>
                 </a-col>
@@ -28,7 +28,7 @@
                   :md="6"
                   :sm="24"
                 >
-                  <a-form-item label="分组">
+                  <a-form-item label="分组：">
                     <a-select
                       v-model="queryParam.team"
                       @change="handleQuery()"
@@ -151,7 +151,7 @@
     </a-modal>
     <a-drawer
       title="图片详情"
-      :width="isMobile()?'100%':'460'"
+      :width="isMobile()?'100%':'480'"
       closable
       :visible="drawerVisible"
       destroyOnClose

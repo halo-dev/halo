@@ -261,7 +261,7 @@
 
     <a-drawer
       title="操作日志"
-      :width="isMobile()?'100%':'460'"
+      :width="isMobile()?'100%':'480'"
       closable
       :visible="logDrawerVisible"
       destroyOnClose

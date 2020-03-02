@@ -20,7 +20,7 @@
                   :md="6"
                   :sm="24"
                 >
-                  <a-form-item label="关键词">
+                  <a-form-item label="关键词：">
                     <a-input
                       v-model="queryParam.keyword"
                       @keyup.enter="handleQuery()"
@@ -31,7 +31,7 @@
                   :md="6"
                   :sm="24"
                 >
-                  <a-form-item label="存储位置">
+                  <a-form-item label="存储位置：">
                     <a-select
                       v-model="queryParam.attachmentType"
                       @change="handleQuery()"
@@ -50,7 +50,7 @@
                   :md="6"
                   :sm="24"
                 >
-                  <a-form-item label="文件类型">
+                  <a-form-item label="文件类型：">
                     <a-select
                       v-model="queryParam.mediaType"
                       @change="handleQuery()"
