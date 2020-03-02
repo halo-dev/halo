@@ -4,7 +4,8 @@ package run.halo.app.model.properties;
  * Post properties.
  *
  * @author johnniang
- * @date 4/1/19
+ * @author ryanwang
+ * @date 2019-04-01
  */
 public enum PostProperties implements PropertyEnum {
 
@@ -27,6 +28,11 @@ public enum PostProperties implements PropertyEnum {
      * Post index page size.
      */
     INDEX_PAGE_SIZE("post_index_page_size", Integer.class, "10"),
+
+    /**
+     * Archives page size.
+     */
+    ARCHIVES_PAGE_SIZE("post_archives_page_size", Integer.class, "10"),
 
     /**
      * Post index sort.
