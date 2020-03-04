@@ -11,6 +11,7 @@ import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.SheetDetailVO;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
@@ -30,12 +31,23 @@ public class SheetModel {
 
     private final ThemeService themeService;
 
-    public SheetModel(SheetService sheetService, StringCacheStore cacheStore, ThemeService themeService) {
+    private final OptionService optionService;
+
+    public SheetModel(SheetService sheetService, StringCacheStore cacheStore, ThemeService themeService, OptionService optionService) {
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
         this.themeService = themeService;
+        this.optionService = optionService;
     }
 
+    /**
+     * Sheet content.
+     *
+     * @param sheet sheet
+     * @param token token
+     * @param model model
+     * @return template name
+     */
     public String content(Sheet sheet, String token, Model model) {
 
         if (StringUtils.isEmpty(token)) {
@@ -57,6 +69,20 @@ public class SheetModel {
         sheetService.publishVisitEvent(sheet.getId());
 
         SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
+
+        // Generate meta keywords.
+        if (StringUtils.isNotEmpty(sheet.getMetaKeywords())) {
+            model.addAttribute("meta_keywords", sheet.getMetaKeywords());
+        } else {
+            model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        }
+
+        // Generate meta description.
+        if (StringUtils.isNotEmpty(sheet.getMetaDescription())) {
+            model.addAttribute("meta_description", sheet.getMetaDescription());
+        } else {
+            model.addAttribute("meta_description", sheetService.generateDescription(sheet.getFormatContent()));
+        }
 
         // sheet and post all can use
         model.addAttribute("sheet", sheetDetailVO);

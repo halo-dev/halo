@@ -24,6 +24,7 @@ import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Post Model
@@ -104,6 +105,20 @@ public class PostModel {
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         List<PostMeta> metas = postMetaService.listBy(post.getId());
 
+        // Generate meta keywords.
+        if (StringUtils.isNotEmpty(post.getMetaKeywords())) {
+            model.addAttribute("meta_keywords", post.getMetaKeywords());
+        } else {
+            model.addAttribute("meta_keywords", tags.stream().map(Tag::getName).collect(Collectors.joining(",")));
+        }
+
+        // Generate meta description.
+        if (StringUtils.isNotEmpty(post.getMetaDescription())) {
+            model.addAttribute("meta_description", post.getMetaDescription());
+        } else {
+            model.addAttribute("meta_description", postService.generateDescription(post.getFormatContent()));
+        }
+
         model.addAttribute("is_post", true);
         model.addAttribute("post", postService.convertToDetailVo(post));
         model.addAttribute("categories", categoryService.convertTo(categories));
@@ -159,6 +174,8 @@ public class PostModel {
         model.addAttribute("pageRainbow", rainbow);
         model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
         model.addAttribute("prePageFullPath", prePageFullPath.toString());
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("index");
     }
 
@@ -209,6 +226,8 @@ public class PostModel {
         model.addAttribute("pageRainbow", rainbow);
         model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
         model.addAttribute("prePageFullPath", prePageFullPath.toString());
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("archives");
     }
 }

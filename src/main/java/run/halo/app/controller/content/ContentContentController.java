@@ -45,6 +45,8 @@ public class ContentContentController {
 
     private final PhotoModel photoModel;
 
+    private final LinkModel linkModel;
+
     private final OptionService optionService;
 
     private final PostService postService;
@@ -61,6 +63,7 @@ public class ContentContentController {
                                     TagModel tagModel,
                                     JournalModel journalModel,
                                     PhotoModel photoModel,
+                                    LinkModel linkModel,
                                     OptionService optionService,
                                     PostService postService,
                                     SheetService sheetService,
@@ -72,6 +75,7 @@ public class ContentContentController {
         this.tagModel = tagModel;
         this.journalModel = journalModel;
         this.photoModel = photoModel;
+        this.linkModel = linkModel;
         this.optionService = optionService;
         this.postService = postService;
         this.sheetService = sheetService;
@@ -93,8 +97,7 @@ public class ContentContentController {
         } else if (optionService.getPhotosPrefix().equals(prefix)) {
             return photoModel.list(1, model);
         } else if (optionService.getLinksPrefix().equals(prefix)) {
-            model.addAttribute("is_links", true);
-            return themeService.render("links");
+            return linkModel.list(model);
         } else {
             throw new NotFoundException("Not Found");
         }

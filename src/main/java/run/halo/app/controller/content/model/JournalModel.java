@@ -82,6 +82,8 @@ public class JournalModel {
         model.addAttribute("rainbow", rainbow);
         model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
         model.addAttribute("prePageFullPath", prePageFullPath.toString());
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("journals");
     }
 }
