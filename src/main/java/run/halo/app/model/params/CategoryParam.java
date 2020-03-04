@@ -23,9 +23,6 @@ public class CategoryParam implements InputConverter<Category> {
     @Size(max = 255, message = "分类名称的字符长度不能超过 {max}")
     private String name;
 
-    @Deprecated
-    private String slugName;
-
     @Size(max = 255, message = "分类别名的字符长度不能超过 {max}")
     private String slug;
 

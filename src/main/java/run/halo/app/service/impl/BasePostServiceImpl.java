@@ -426,6 +426,21 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    public String generateDescription(String content) {
+        Assert.notNull(content, "html content must not be null");
+
+        String text = HaloUtils.cleanHtmlTag(content);
+
+        Matcher matcher = summaryPattern.matcher(text);
+        text = matcher.replaceAll("");
+
+        // Get summary length
+        Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
+
+        return StringUtils.substring(text, 0, summaryLength);
+    }
+
+    @Override
     public POST create(POST post) {
         // Check title
         slugMustNotExist(post);

@@ -45,6 +45,8 @@ public class TagModel {
 
     public String list(Model model) {
         model.addAttribute("is_tags", true);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("tags");
     }
 
@@ -82,6 +84,8 @@ public class TagModel {
         model.addAttribute("tag", tagDTO);
         model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
         model.addAttribute("prePageFullPath", prePageFullPath.toString());
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("tag");
     }
 }

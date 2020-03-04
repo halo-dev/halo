@@ -308,4 +308,12 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     List<BasePostDetailDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
+
+    /**
+     * Generate description.
+     *
+     * @param content html content must not be null.
+     * @return description
+     */
+    String generateDescription(@NonNull String content);
 }

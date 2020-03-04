@@ -23,9 +23,6 @@ public class TagParam implements InputConverter<Tag> {
     @Size(max = 255, message = "标签名称的字符长度不能超过 {max}")
     private String name;
 
-    @Deprecated
-    private String slugName;
-
     @Size(max = 255, message = "标签别名的字符长度不能超过 {max}")
     private String slug;
 

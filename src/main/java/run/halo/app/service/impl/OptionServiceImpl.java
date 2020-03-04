@@ -470,6 +470,16 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public String getSeoKeywords() {
+        return getByProperty(SeoProperties.KEYWORDS).orElse("").toString();
+    }
+
+    @Override
+    public String getSeoDescription() {
+        return getByProperty(SeoProperties.DESCRIPTION).orElse("").toString();
+    }
+
+    @Override
     public long getBirthday() {
         return getByProperty(PrimaryProperties.BIRTHDAY, Long.class).orElseGet(() -> {
             long currentTime = DateUtils.now().getTime();
