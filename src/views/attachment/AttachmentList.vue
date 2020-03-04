@@ -371,7 +371,7 @@ export default {
     handleDeleteAttachmentInBatch() {
       var that = this
       if (this.batchSelectedAttachments.length <= 0) {
-        this.$message.success('你还未选择任何附件，请至少选择一个！')
+        this.$message.warn('你还未选择任何附件，请至少选择一个！')
         return
       }
       this.$confirm({
