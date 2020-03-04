@@ -111,6 +111,46 @@
             </div>
           </div>
         </div>
+        <a-divider class="divider-transparent" />
+      </div>
+    </a-skeleton>
+    <AttachmentSelectDrawer
+      v-model="thumbDrawerVisible"
+      @listenToSelect="handleSelectSheetThumb"
+      :drawerWidth="460"
+    />
+
+    <a-drawer
+      title="高级设置"
+      :width="isMobile()?'100%':'480'"
+      placement="right"
+      closable
+      destroyOnClose
+      @close="onAdvancedClose"
+      :visible="advancedVisible"
+    >
+      <div class="post-setting-drawer-content">
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">SEO 设置</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item label="关键词：">
+                <a-input
+                  v-model="selectedSheet.metaKeywords"
+                  placeholder="以英文逗号隔开，如不填写，将使用标签作为关键词"
+                />
+              </a-form-item>
+              <a-form-item label="描述：">
+                <a-input
+                  type="textarea"
+                  :autosize="{ minRows: 5 }"
+                  v-model="selectedSheet.metaDescription"
+                  placeholder="如不填写，会从页面中自动截取"
+                />
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
         <a-divider />
         <div :style="{ marginBottom: '16px' }">
           <h3 class="post-setting-drawer-title">元数据</h3>
@@ -148,13 +188,14 @@
         </div>
         <a-divider class="divider-transparent" />
       </div>
-    </a-skeleton>
-    <AttachmentSelectDrawer
-      v-model="thumbDrawerVisible"
-      @listenToSelect="handleSelectSheetThumb"
-      :drawerWidth="460"
-    />
+    </a-drawer>
+
     <div class="bottom-control">
+      <a-button
+        style="marginRight: 8px"
+        type="dashed"
+        @click="()=>this.advancedVisible = true"
+      >高级</a-button>
       <a-button
         style="marginRight: 8px"
         @click="handleDraftClick"
@@ -184,6 +225,7 @@ export default {
   data() {
     return {
       thumbDrawerVisible: false,
+      advancedVisible: false,
       settingLoading: true,
       selectedSheet: this.sheet,
       customTpls: [],
@@ -336,6 +378,9 @@ export default {
     },
     onClose() {
       this.$emit('close', false)
+    },
+    onAdvancedClose() {
+      this.advancedVisible = false
     },
     onSheetDateChange(value, dateString) {
       this.selectedSheet.createTime = value.valueOf()

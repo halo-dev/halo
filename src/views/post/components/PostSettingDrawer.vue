@@ -158,7 +158,7 @@
                   type="textarea"
                   :autosize="{ minRows: 5 }"
                   v-model="selectedPost.summary"
-                  placeholder="不填写则会自动生成"
+                  placeholder="如不填写，会从文章中自动截取"
                 />
               </a-form-item>
             </a-form>
@@ -191,6 +191,43 @@
                 @click="handleRemoveThumb"
               >移除</a-button>
             </div>
+          </div>
+        </div>
+        <a-divider class="divider-transparent" />
+      </div>
+    </a-skeleton>
+    <AttachmentSelectDrawer
+      v-model="thumbDrawerVisible"
+      @listenToSelect="handleSelectPostThumb"
+      :drawerWidth="460"
+    />
+
+    <a-drawer
+      title="高级设置"
+      :width="isMobile()?'100%':'480'"
+      placement="right"
+      closable
+      destroyOnClose
+      @close="onAdvancedClose"
+      :visible="advancedVisible"
+    >
+      <div class="post-setting-drawer-content">
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">SEO 设置</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item label="关键词：">
+                <a-input v-model="selectedPost.metaKeywords" placeholder="以英文逗号隔开，如不填写，将使用标签作为关键词"/>
+              </a-form-item>
+              <a-form-item label="描述：">
+                <a-input
+                  type="textarea"
+                  :autosize="{ minRows: 5 }"
+                  v-model="selectedPost.metaDescription"
+                  placeholder="如不填写，会从文章中自动截取"
+                />
+              </a-form-item>
+            </a-form>
           </div>
         </div>
         <a-divider />
@@ -230,13 +267,14 @@
         </div>
         <a-divider class="divider-transparent" />
       </div>
-    </a-skeleton>
-    <AttachmentSelectDrawer
-      v-model="thumbDrawerVisible"
-      @listenToSelect="handleSelectPostThumb"
-      :drawerWidth="460"
-    />
+    </a-drawer>
+
     <div class="bottom-control">
+      <a-button
+        style="marginRight: 8px"
+        type="dashed"
+        @click="()=>this.advancedVisible = true"
+      >高级</a-button>
       <a-button
         style="marginRight: 8px"
         @click="handleDraftClick"
@@ -282,6 +320,7 @@ export default {
     return {
       thumbDrawerVisible: false,
       categoryFormVisible: false,
+      advancedVisible: false,
       settingLoading: true,
       selectedPost: this.post,
       selectedTagIds: this.tagIds,
@@ -502,6 +541,9 @@ export default {
     },
     onClose() {
       this.$emit('close', false)
+    },
+    onAdvancedClose() {
+      this.advancedVisible = false
     },
     onPostDateChange(value, dateString) {
       this.selectedPost.createTime = value.valueOf()
