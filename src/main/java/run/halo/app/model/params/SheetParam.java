@@ -33,9 +33,6 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private PostStatus status = PostStatus.DRAFT;
 
-    @Deprecated
-    private String url;
-
     @Size(max = 255, message = "页面别名的字符长度不能超过 {max}")
     private String slug;
 
@@ -50,8 +47,6 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private Boolean disallowComment = false;
 
-    private Date createTime;
-
     @Size(max = 255, message = "页面密码的字符长度不能超过 {max}")
     private String password;
 
@@ -60,6 +55,12 @@ public class SheetParam implements InputConverter<Sheet> {
 
     @Min(value = 0, message = "Post top priority must not be less than {value}")
     private Integer topPriority = 0;
+
+    private Date createTime;
+
+    private String metaKeywords;
+
+    private String metaDescription;
 
     private Set<SheetMetaParam> sheetMetas;
 

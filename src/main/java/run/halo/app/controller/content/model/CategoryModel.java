@@ -43,11 +43,27 @@ public class CategoryModel {
         this.optionService = optionService;
     }
 
+    /**
+     * List categories.
+     *
+     * @param model model
+     * @return template name
+     */
     public String list(Model model) {
         model.addAttribute("is_categories", true);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("categories");
     }
 
+    /**
+     * List category posts.
+     *
+     * @param model model
+     * @param slug  slug
+     * @param page  current page
+     * @return template name
+     */
     public String listPost(Model model, String slug, Integer page) {
         // Get category by slug
         final Category category = categoryService.getBySlugOfNonNull(slug);
@@ -82,6 +98,8 @@ public class CategoryModel {
         model.addAttribute("category", categoryDTO);
         model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
         model.addAttribute("prePageFullPath", prePageFullPath.toString());
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("category");
     }
 }

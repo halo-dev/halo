@@ -355,6 +355,20 @@ public interface OptionService extends CrudService<Option, Integer> {
     String getBlogTitle();
 
     /**
+     * Gets global seo keywords.
+     *
+     * @return keywords
+     */
+    String getSeoKeywords();
+
+    /**
+     * Get global seo description.
+     *
+     * @return description
+     */
+    String getSeoDescription();
+
+    /**
      * Gets blog birthday.
      *
      * @return birthday timestamp

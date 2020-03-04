@@ -28,9 +28,6 @@ public class BasePostMinimalDTO implements OutputConverter<BasePostMinimalDTO, B
 
     private PostStatus status;
 
-    @Deprecated
-    private String url;
-
     private String slug;
 
     private PostEditorType editorType;
@@ -40,6 +37,10 @@ public class BasePostMinimalDTO implements OutputConverter<BasePostMinimalDTO, B
     private Date createTime;
 
     private Date editTime;
+
+    private String metaKeywords;
+
+    private String metaDescription;
 
     private String fullPath;
 }
