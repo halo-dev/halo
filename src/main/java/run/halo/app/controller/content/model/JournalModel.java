@@ -70,7 +70,7 @@ public class JournalModel {
             .append(optionService.getPathSuffix());
 
         if (journals.getNumber() == 1) {
-            prePageFullPath.append("/");
+            prePageFullPath.append(optionService.getPathSuffix());
         } else {
             prePageFullPath.append("/page/")
                 .append(journals.getNumber())

@@ -65,7 +65,7 @@ public class PhotoModel {
             .append(optionService.getPathSuffix());
 
         if (photos.getNumber() == 1) {
-            prePageFullPath.append("/");
+            prePageFullPath.append(optionService.getPathSuffix());
         } else {
             prePageFullPath.append("/page/")
                 .append(photos.getNumber())

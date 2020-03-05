@@ -77,15 +77,32 @@ public class CategoryModel {
         final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
         // Next page and previous page url.
-        StringBuilder nextPageFullPath = new StringBuilder(categoryDTO.getFullPath());
-        StringBuilder prePageFullPath = new StringBuilder(categoryDTO.getFullPath());
+        StringBuilder nextPageFullPath = new StringBuilder();
+        StringBuilder prePageFullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            nextPageFullPath.append(optionService.getBlogBaseUrl())
+                .append("/");
+            prePageFullPath.append(optionService.getBlogBaseUrl())
+                .append("/");
+        } else {
+            nextPageFullPath.append("/");
+            prePageFullPath.append("/");
+        }
+
+        nextPageFullPath.append(optionService.getCategoriesPrefix())
+            .append("/")
+            .append(category.getSlug());
+        prePageFullPath.append(optionService.getCategoriesPrefix())
+            .append("/")
+            .append(category.getSlug());
 
         nextPageFullPath.append("/page/")
             .append(posts.getNumber() + 2)
             .append(optionService.getPathSuffix());
 
         if (posts.getNumber() == 1) {
-            prePageFullPath.append("/");
+            prePageFullPath.append(optionService.getPathSuffix());
         } else {
             prePageFullPath.append("/page/")
                 .append(posts.getNumber())
