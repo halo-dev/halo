@@ -212,7 +212,7 @@ public class PostModel {
             .append(optionService.getPathSuffix());
 
         if (posts.getNumber() == 1) {
-            prePageFullPath.append("/");
+            prePageFullPath.append(optionService.getPathSuffix());
         } else {
             prePageFullPath.append("/page/")
                 .append(posts.getNumber())
