@@ -229,7 +229,8 @@ export default {
       pagination: {
         page: 1,
         size: 10,
-        sort: null
+        sort: null,
+        total: 1
       },
       queryParam: {
         page: 0,
