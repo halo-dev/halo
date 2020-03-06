@@ -216,10 +216,13 @@
           <h3 class="post-setting-drawer-title">SEO 设置</h3>
           <div class="post-setting-drawer-item">
             <a-form layout="vertical">
-              <a-form-item label="关键词：">
-                <a-input v-model="selectedPost.metaKeywords" placeholder="以英文逗号隔开，如不填写，将使用标签作为关键词"/>
+              <a-form-item label="自定义关键词：">
+                <a-input
+                  v-model="selectedPost.metaKeywords"
+                  placeholder="多个关键词以英文逗号隔开，如不填写，将自动使用标签作为关键词"
+                />
               </a-form-item>
-              <a-form-item label="描述：">
+              <a-form-item label="自定义描述：">
                 <a-input
                   type="textarea"
                   :autoSize="{ minRows: 5 }"
