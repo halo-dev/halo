@@ -982,7 +982,7 @@ export default {
           if (!this.options.smms_api_secret_token) {
             this.$notification['error']({
               message: '提示',
-              description: 'Secret Token不能为空！'
+              description: 'Secret Token 不能为空！'
             })
             return
           }
@@ -991,7 +991,7 @@ export default {
           if (!this.options.oss_upyun_domain) {
             this.$notification['error']({
               message: '提示',
-              description: '域名不能为空！'
+              description: '绑定域名不能为空！'
             })
             return
           }
@@ -1028,7 +1028,7 @@ export default {
           if (!this.options.oss_qiniu_domain) {
             this.$notification['error']({
               message: '提示',
-              description: '域名不能为空！'
+              description: '绑定域名不能为空！'
             })
             return
           }
