@@ -185,13 +185,13 @@ export const asyncRouterMap = [
             component: () => import('@/views/system/ToolList'),
             meta: { title: '小工具', hiddenHeaderContent: false }
           },
-          {
-            path: '/system/tools/staticpages',
-            name: 'StaticPagesManage',
-            hidden: true,
-            component: () => import('@/views/system/staticpages/StaticPagesManage'),
-            meta: { title: '静态部署', hiddenHeaderContent: false }
-          },
+          // {
+          //   path: '/system/tools/staticpages',
+          //   name: 'StaticPagesManage',
+          //   hidden: true,
+          //   component: () => import('@/views/system/staticpages/StaticPagesManage'),
+          //   meta: { title: '静态部署', hiddenHeaderContent: false }
+          // },
           {
             path: '/system/about',
             name: 'About',

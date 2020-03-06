@@ -26,7 +26,7 @@
             >进入</a-button>
           </a-card>
         </a-col>
-        <a-col
+        <!-- <a-col
           :xl="6"
           :lg="6"
           :md="12"
@@ -48,7 +48,7 @@
               @click="handleToStaticPagesManage"
             >管理</a-button>
           </a-card>
-        </a-col>
+        </a-col> -->
         <a-col
           :xl="6"
           :lg="6"
@@ -151,9 +151,9 @@ export default {
     handleToDeveloperOptions() {
       this.$router.push({ name: 'DeveloperOptions' })
     },
-    handleToStaticPagesManage() {
-      this.$router.push({ name: 'StaticPagesManage' })
-    },
+    // handleToStaticPagesManage() {
+    //   this.$router.push({ name: 'StaticPagesManage' })
+    // },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
     }
