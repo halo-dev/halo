@@ -1,6 +1,6 @@
 package run.halo.app.controller.content.model;
 
-import cn.hutool.core.util.PageUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -73,50 +73,17 @@ public class CategoryModel {
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
-        // TODO remove this variable
-        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
-
-        // Next page and previous page url.
-        StringBuilder nextPageFullPath = new StringBuilder();
-        StringBuilder prePageFullPath = new StringBuilder();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            nextPageFullPath.append(optionService.getBlogBaseUrl())
-                .append("/");
-            prePageFullPath.append(optionService.getBlogBaseUrl())
-                .append("/");
+        // Generate meta description.
+        if (StringUtils.isNotEmpty(category.getDescription())) {
+            model.addAttribute("meta_description", category.getDescription());
         } else {
-            nextPageFullPath.append("/");
-            prePageFullPath.append("/");
-        }
-
-        nextPageFullPath.append(optionService.getCategoriesPrefix())
-            .append("/")
-            .append(category.getSlug());
-        prePageFullPath.append(optionService.getCategoriesPrefix())
-            .append("/")
-            .append(category.getSlug());
-
-        nextPageFullPath.append("/page/")
-            .append(posts.getNumber() + 2)
-            .append(optionService.getPathSuffix());
-
-        if (posts.getNumber() == 1) {
-            prePageFullPath.append(optionService.getPathSuffix());
-        } else {
-            prePageFullPath.append("/page/")
-                .append(posts.getNumber())
-                .append(optionService.getPathSuffix());
+            model.addAttribute("meta_description", optionService.getSeoDescription());
         }
 
         model.addAttribute("is_category", true);
         model.addAttribute("posts", posts);
-        model.addAttribute("rainbow", rainbow);
         model.addAttribute("category", categoryDTO);
-        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
-        model.addAttribute("prePageFullPath", prePageFullPath.toString());
         model.addAttribute("meta_keywords", optionService.getSeoKeywords());
-        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("category");
     }
 }
