@@ -99,7 +99,7 @@
                     />
                     <a-input
                       type="textarea"
-                      :autosize="{ minRows: 5 }"
+                      :autoSize="{ minRows: 5 }"
                       v-model="themeSettings[item.name]"
                       :placeholder="item.placeholder"
                       v-else-if="item.type == 'TEXTAREA'"

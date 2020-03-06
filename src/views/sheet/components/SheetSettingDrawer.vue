@@ -74,7 +74,7 @@
               <a-form-item>
                 <a-input
                   type="textarea"
-                  :autosize="{ minRows: 5 }"
+                  :autoSize="{ minRows: 5 }"
                   v-model="selectedSheet.summary"
                   placeholder="不填写则会自动生成"
                 />
@@ -143,7 +143,7 @@
               <a-form-item label="描述：">
                 <a-input
                   type="textarea"
-                  :autosize="{ minRows: 5 }"
+                  :autoSize="{ minRows: 5 }"
                   v-model="selectedSheet.metaDescription"
                   placeholder="如不填写，会从页面中自动截取"
                 />

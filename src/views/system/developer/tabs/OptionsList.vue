@@ -172,7 +172,7 @@
         <a-form-item label="Value：">
           <a-input
             type="textarea"
-            :autosize="{ minRows: 5 }"
+            :autoSize="{ minRows: 5 }"
             v-model="optionToStage.value"
           />
         </a-form-item>

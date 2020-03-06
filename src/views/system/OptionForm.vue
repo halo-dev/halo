@@ -50,7 +50,7 @@
                 <a-form-item label="页脚信息：">
                   <a-input
                     type="textarea"
-                    :autosize="{ minRows: 5 }"
+                    :autoSize="{ minRows: 5 }"
                     v-model="options.blog_footer_info"
                     placeholder="支持 HTML 格式的文本"
                   />
@@ -83,7 +83,7 @@
                 <a-form-item label="博客描述：">
                   <a-input
                     type="textarea"
-                    :autosize="{ minRows: 5 }"
+                    :autoSize="{ minRows: 5 }"
                     v-model="options.seo_description"
                   />
                 </a-form-item>
@@ -191,7 +191,7 @@
                 <a-form-item label="评论模块 JS：">
                   <a-input
                     type="textarea"
-                    :autosize="{ minRows: 2 }"
+                    :autoSize="{ minRows: 2 }"
                     v-model="options.comment_internal_plugin_js"
                     placeholder="该设置仅对内置的评论模块有效"
                   />
@@ -211,7 +211,7 @@
                 >
                   <a-input
                     type="textarea"
-                    :autosize="{ minRows: 5 }"
+                    :autoSize="{ minRows: 5 }"
                     v-model="options.comment_custom_style"
                   />
                 </a-form-item> -->
@@ -609,7 +609,7 @@
                       <a-form-item label="内容：">
                         <a-input
                           type="textarea"
-                          :autosize="{ minRows: 5 }"
+                          :autoSize="{ minRows: 5 }"
                           v-model="mailParam.content"
                         />
                       </a-form-item>
@@ -635,7 +635,7 @@
                 <a-form-item label="自定义全局 head：">
                   <a-input
                     type="textarea"
-                    :autosize="{ minRows: 5 }"
+                    :autoSize="{ minRows: 5 }"
                     v-model="options.blog_custom_head"
                     placeholder="放置于每个页面的 <head></head> 标签中"
                   />
@@ -643,7 +643,7 @@
                 <a-form-item label="自定义内容页 head：">
                   <a-input
                     type="textarea"
-                    :autosize="{ minRows: 5 }"
+                    :autoSize="{ minRows: 5 }"
                     v-model="options.blog_custom_content_head"
                     placeholder="仅放置于内容页面的 <head></head> 标签中"
                   />
@@ -651,7 +651,7 @@
                 <a-form-item label="统计代码：">
                   <a-input
                     type="textarea"
-                    :autosize="{ minRows: 5 }"
+                    :autoSize="{ minRows: 5 }"
                     v-model="options.blog_statistics_code"
                     placeholder="第三方网站统计的代码，如：Google Analytics、百度统计、CNZZ 等"
                   />
@@ -662,7 +662,7 @@
                 >
                   <a-input
                     type="textarea"
-                    :autosize="{ minRows: 5 }"
+                    :autoSize="{ minRows: 5 }"
                     v-model="options.blog_ip_blacklist"
                     placeholder="多个 IP 地址换行隔开"
                   />

@@ -88,7 +88,7 @@
                   </a-form-item>
                   <a-form-item label="个人说明：">
                     <a-input
-                      :autosize="{ minRows: 5 }"
+                      :autoSize="{ minRows: 5 }"
                       type="textarea"
                       v-model="user.description"
                     />

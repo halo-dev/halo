@@ -53,7 +53,7 @@
               <a-input
                 type="textarea"
                 v-model="categoryToCreate.description"
-                :autosize="{ minRows: 3 }"
+                :autoSize="{ minRows: 3 }"
               />
             </a-form-item>
             <a-form-item>

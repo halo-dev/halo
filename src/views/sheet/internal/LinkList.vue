@@ -50,7 +50,7 @@
             <a-form-item label="描述：">
               <a-input
                 type="textarea"
-                :autosize="{ minRows: 5 }"
+                :autoSize="{ minRows: 5 }"
                 v-model="link.description"
               />
             </a-form-item>

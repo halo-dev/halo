@@ -156,7 +156,7 @@
               <a-form-item>
                 <a-input
                   type="textarea"
-                  :autosize="{ minRows: 5 }"
+                  :autoSize="{ minRows: 5 }"
                   v-model="selectedPost.summary"
                   placeholder="如不填写，会从文章中自动截取"
                 />
@@ -222,7 +222,7 @@
               <a-form-item label="描述：">
                 <a-input
                   type="textarea"
-                  :autosize="{ minRows: 5 }"
+                  :autoSize="{ minRows: 5 }"
                   v-model="selectedPost.metaDescription"
                   placeholder="如不填写，会从文章中自动截取"
                 />

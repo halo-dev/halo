@@ -281,7 +281,7 @@
                     <a-input
                       v-model="photo.description"
                       type="textarea"
-                      :autosize="{ minRows: 5 }"
+                      :autoSize="{ minRows: 5 }"
                     />
                   </template>
                   <span
