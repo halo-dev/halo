@@ -45,7 +45,7 @@ public class JournalCommentController {
 
     @GetMapping
     @ApiOperation("Lists journal comments")
-    public Page<JournalCommentWithJournalVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+    public Page<JournalCommentWithJournalVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
                                                     CommentQuery commentQuery) {
         Page<JournalComment> journalCommentPage = journalCommentService.pageBy(commentQuery, pageable);
 

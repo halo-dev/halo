@@ -47,7 +47,7 @@ public class SheetCommentController {
 
     @GetMapping
     @ApiOperation("Lists sheet comments")
-    public Page<SheetCommentWithSheetVO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+    public Page<SheetCommentWithSheetVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
                                                 CommentQuery commentQuery) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageBy(commentQuery, pageable);
         return sheetCommentService.convertToWithSheetVo(sheetCommentPage);

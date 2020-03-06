@@ -118,7 +118,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{prefix}/{slug:.+}")
+    @GetMapping("{prefix}/{slug}")
     public String content(@PathVariable("prefix") String prefix,
                           @PathVariable("slug") String slug,
                           @RequestParam(value = "token", required = false) String token,
@@ -154,7 +154,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{year:\\d+}/{month:\\d+}/{slug:.+}")
+    @GetMapping("{year:\\d+}/{month:\\d+}/{slug}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("slug") String slug,
@@ -169,7 +169,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{year:\\d+}/{month:\\d+}/{day:\\d+}/{slug:.+}")
+    @GetMapping("{year:\\d+}/{month:\\d+}/{day:\\d+}/{slug}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("day") Integer day,
