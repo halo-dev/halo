@@ -175,8 +175,8 @@ export const asyncRouterMap = [
           },
           {
             path: '/system/options',
-            name: 'OptionForm',
-            component: () => import('@/views/system/OptionForm'),
+            name: 'SystemOptions',
+            component: () => import('@/views/system/SystemOptions'),
             meta: { title: '博客设置', hiddenHeaderContent: false }
           },
           {

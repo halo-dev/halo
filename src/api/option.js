@@ -4,13 +4,18 @@ const baseUrl = '/api/admin/options'
 
 const optionApi = {}
 
-optionApi.listAll = keys => {
+optionApi.listAll = () => {
   return service({
     url: `${baseUrl}/map_view`,
-    params: {
-      key: keys
-    },
     method: 'get'
+  })
+}
+
+optionApi.listAllByKeys = keys => {
+  return service({
+    url: `${baseUrl}/map_view/keys`,
+    data: keys,
+    method: 'post'
   })
 }
 

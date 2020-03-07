@@ -31,7 +31,7 @@ const option = {
     }) {
       return new Promise((resolve, reject) => {
         optionApi
-          .listAll(keys)
+          .listAllByKeys(keys)
           .then(response => {
             commit('SET_OPTIONS', response.data.data)
             resolve(response)

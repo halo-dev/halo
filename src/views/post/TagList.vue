@@ -97,7 +97,7 @@
             </template>
             <a-tag
               color="blue"
-              style="margin-bottom: 8px"
+              style="margin-bottom: 8px;cursor:pointer;"
               @click="handleEditTag(tag)"
             >{{ tag.name }}</a-tag>
           </a-tooltip>
