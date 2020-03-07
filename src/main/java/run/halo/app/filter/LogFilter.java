@@ -2,6 +2,9 @@ package run.halo.app.filter;
 
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -16,6 +19,8 @@ import java.io.IOException;
  * @author johnniang
  */
 @Slf4j
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 9)
 public class LogFilter extends OncePerRequestFilter {
 
     @Override

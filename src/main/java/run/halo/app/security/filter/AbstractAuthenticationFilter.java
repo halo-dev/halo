@@ -7,6 +7,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UrlPathHelper;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.BadRequestException;
@@ -26,10 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static run.halo.app.model.support.HaloConst.ONE_TIME_TOKEN_HEADER_NAME;
 import static run.halo.app.model.support.HaloConst.ONE_TIME_TOKEN_QUERY_NAME;
@@ -45,6 +43,8 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
     protected final AntPathMatcher antPathMatcher;
 
+    private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+
     protected final HaloProperties haloProperties;
 
     protected final OptionService optionService;
@@ -58,6 +58,9 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      * Exclude url patterns.
      */
     private Set<String> excludeUrlPatterns = new HashSet<>(16);
+
+    private Set<String> urlPatterns = new LinkedHashSet<>();
+
 
     AbstractAuthenticationFilter(HaloProperties haloProperties,
                                  OptionService optionService,
@@ -86,7 +89,11 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     protected boolean shouldNotFilter(HttpServletRequest request) {
         Assert.notNull(request, "Http servlet request must not be null");
 
-        return excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, request.getRequestURI()));
+        // check white list
+        boolean result = excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, urlPathHelper.getRequestUri(request)));
+
+        return result || urlPatterns.stream().noneMatch(p -> antPathMatcher.match(p, urlPathHelper.getRequestUri(request)));
+
     }
 
     /**
@@ -119,6 +126,20 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         Assert.notNull(excludeUrlPatterns, "Exclude url patterns must not be null");
 
         this.excludeUrlPatterns = new HashSet<>(excludeUrlPatterns);
+    }
+
+    public void setUrlPatterns(Collection<String> urlPatterns) {
+        Assert.notNull(urlPatterns, "UrlPatterns must not be null");
+        this.urlPatterns = new LinkedHashSet<>(urlPatterns);
+    }
+
+    public Collection<String> getUrlPatterns() {
+        return this.urlPatterns;
+    }
+
+    public void addUrlPatterns(String... urlPatterns) {
+        Assert.notNull(urlPatterns, "UrlPatterns must not be null");
+        Collections.addAll(this.urlPatterns, urlPatterns);
     }
 
     /**
