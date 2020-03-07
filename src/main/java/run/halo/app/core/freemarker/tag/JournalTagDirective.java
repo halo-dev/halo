@@ -3,46 +3,30 @@ package run.halo.app.core.freemarker.tag;
 import cn.hutool.core.util.PageUtil;
 import freemarker.core.Environment;
 import freemarker.template.*;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import run.halo.app.model.entity.Category;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Pagination;
 import run.halo.app.model.support.RainbowPage;
-import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
-import run.halo.app.service.PostCategoryService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.springframework.data.domain.Sort.Direction.DESC;
-
 /**
- * Freemarker custom tag of category.
- *
  * @author ryanwang
- * @date 2019-03-22
+ * @date 2020-03-06
  */
 @Component
-public class CategoryTagDirective implements TemplateDirectiveModel {
-
-    private final CategoryService categoryService;
-
-    private final PostCategoryService postCategoryService;
+public class JournalTagDirective implements TemplateDirectiveModel {
 
     private final OptionService optionService;
 
-    public CategoryTagDirective(Configuration configuration,
-                                CategoryService categoryService,
-                                PostCategoryService postCategoryService,
-                                OptionService optionService) {
-        this.categoryService = categoryService;
-        this.postCategoryService = postCategoryService;
+    public JournalTagDirective(Configuration configuration,
+                               OptionService optionService) {
         this.optionService = optionService;
-        configuration.setSharedVariable("categoryTag", this);
+        configuration.setSharedVariable("journalTag", this);
     }
 
     @Override
@@ -52,17 +36,6 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
-                case "list":
-                    env.setVariable("categories", builder.build().wrap(postCategoryService.listCategoryWithPostCountDto(Sort.by(DESC, "createTime"))));
-                    break;
-                case "listByPostId":
-                    Integer postId = Integer.parseInt(params.get("postId").toString());
-                    List<Category> categories = postCategoryService.listCategoriesBy(postId);
-                    env.setVariable("categories", builder.build().wrap(categoryService.convertTo(categories)));
-                    break;
-                case "count":
-                    env.setVariable("count", builder.build().wrap(categoryService.count()));
-                    break;
                 case "pagination":
                     // Get params
                     int page = Integer.parseInt(params.get("page").toString());
@@ -87,12 +60,8 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
                         prePageFullPath.append("/");
                     }
 
-                    nextPageFullPath.append(optionService.getCategoriesPrefix())
-                        .append("/")
-                        .append(slug);
-                    prePageFullPath.append(optionService.getCategoriesPrefix())
-                        .append("/")
-                        .append(slug);
+                    nextPageFullPath.append(optionService.getJournalsPrefix());
+                    prePageFullPath.append(optionService.getJournalsPrefix());
 
                     nextPageFullPath.append("/page/")
                         .append(page + 2)
@@ -119,9 +88,7 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
                     }
 
                     nextPageFullPath.append("/")
-                        .append(optionService.getCategoriesPrefix())
-                        .append("/")
-                        .append(slug);
+                        .append(optionService.getJournalsPrefix());
 
                     fullPath.append("/page/");
 
@@ -142,6 +109,5 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
                     break;
             }
         }
-        body.render(env.getOut());
     }
 }
