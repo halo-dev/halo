@@ -114,7 +114,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
 
     @Override
-    public List<POST> listPrePosts(Date date, int size) {
+    public List<POST> listPrevPosts(Date date, int size) {
         Assert.notNull(date, "Date must not be null");
 
         return basePostRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED,
@@ -134,8 +134,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
-    public Optional<POST> getPrePost(Date date) {
-        List<POST> posts = listPrePosts(date, 1);
+    public Optional<POST> getPrevPost(Date date) {
+        List<POST> posts = listPrevPosts(date, 1);
 
         return CollectionUtils.isEmpty(posts) ? Optional.empty() : Optional.of(posts.get(0));
     }
