@@ -43,39 +43,8 @@ public class PhotoModel {
 
         Page<PhotoDTO> photos = photoService.pageBy(pageable);
 
-        // Next page and previous page url.
-        StringBuilder nextPageFullPath = new StringBuilder();
-        StringBuilder prePageFullPath = new StringBuilder();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            nextPageFullPath.append(optionService.getBlogBaseUrl())
-                .append("/");
-            prePageFullPath.append(optionService.getBlogBaseUrl())
-                .append("/");
-        } else {
-            nextPageFullPath.append("/");
-            prePageFullPath.append("/");
-        }
-
-        nextPageFullPath.append(optionService.getPhotosPrefix());
-        prePageFullPath.append(optionService.getPhotosPrefix());
-
-        nextPageFullPath.append("/page/")
-            .append(photos.getNumber() + 2)
-            .append(optionService.getPathSuffix());
-
-        if (photos.getNumber() == 1) {
-            prePageFullPath.append(optionService.getPathSuffix());
-        } else {
-            prePageFullPath.append("/page/")
-                .append(photos.getNumber())
-                .append(optionService.getPathSuffix());
-        }
-
         model.addAttribute("is_photos", true);
         model.addAttribute("photos", photos);
-        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
-        model.addAttribute("prePageFullPath", prePageFullPath.toString());
         model.addAttribute("meta_keywords", optionService.getSeoKeywords());
         model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("photos");
