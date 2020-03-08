@@ -97,7 +97,7 @@ public class PostModel {
         postService.publishVisitEvent(post.getId());
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
-        adjacentPostVO.getOptionalPrePost().ifPresent(prePost -> model.addAttribute("prePost", postService.convertToDetailVo(prePost)));
+        adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
         adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());

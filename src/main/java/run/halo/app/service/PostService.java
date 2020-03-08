@@ -257,8 +257,8 @@ public interface PostService extends BasePostService<Post> {
      * Gets pre && next post.
      *
      * @param currentPost post must not be null
-     * @return AdjacentPostVO. it contains prePost and nextPost.
-     * AdjacentPostVO will not be null. But prePost and nextPost may be null.
+     * @return AdjacentPostVO. it contains prevPost and nextPost.
+     * AdjacentPostVO will not be null. But prevPost and nextPost may be null.
      */
     @NotNull
     AdjacentPostVO getAdjacentPosts(Post currentPost);

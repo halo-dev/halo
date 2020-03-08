@@ -853,7 +853,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // setup pre
         if (index > 0) {
-            adjacentPostVO.setPrePost(postList.get(index - 1));
+            adjacentPostVO.setPrevPost(postList.get(index - 1));
         }
         // setup next
         if (index < postList.size() - 1) {
