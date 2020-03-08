@@ -1,9 +1,13 @@
 package run.halo.app.security.filter;
 
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.security.handler.ContentAuthenticationFailureHandler;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
+import run.halo.app.utils.HaloUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,6 +21,8 @@ import java.io.IOException;
  * @author johnniang
  * @date 19-5-6
  */
+@Component
+@Order(-1)
 public class ContentFilter extends AbstractAuthenticationFilter {
 
     public ContentFilter(HaloProperties haloProperties,
@@ -24,6 +30,18 @@ public class ContentFilter extends AbstractAuthenticationFilter {
                          StringCacheStore cacheStore,
                          OneTimeTokenService oneTimeTokenService) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
+
+        String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
+        addExcludeUrlPatterns(
+            adminPattern,
+            "/api/**",
+            "/install",
+            "/version",
+            "/js/**",
+            "/css/**");
+
+        // set failure handler
+        setFailureHandler(new ContentAuthenticationFailureHandler());
     }
 
     @Override
