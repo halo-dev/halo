@@ -1,8 +1,11 @@
 package run.halo.app.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
@@ -10,6 +13,7 @@ import run.halo.app.model.entity.User;
 import run.halo.app.security.authentication.AuthenticationImpl;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
+import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.security.support.UserDetail;
 import run.halo.app.security.util.SecurityUtils;
@@ -32,6 +36,8 @@ import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_QUERY_NAME;
  * @author johnniang
  */
 @Slf4j
+@Component
+@Order(1)
 public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private final HaloProperties haloProperties;
@@ -42,10 +48,32 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
                                      UserService userService,
                                      HaloProperties haloProperties,
                                      OptionService optionService,
-                                     OneTimeTokenService oneTimeTokenService) {
+                                     OneTimeTokenService oneTimeTokenService,
+                                     ObjectMapper objectMapper) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.userService = userService;
         this.haloProperties = haloProperties;
+
+        addUrlPatterns("/api/admin/**", "/api/content/comments");
+
+        addExcludeUrlPatterns(
+            "/api/admin/login",
+            "/api/admin/refresh/*",
+            "/api/admin/installations",
+            "/api/admin/recoveries/migrations/**",
+            "/api/admin/migrations/**",
+            "/api/admin/is_installed",
+            "/api/admin/password/code",
+            "/api/admin/password/reset"
+        );
+
+        // set failure handler
+        DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
+        failureHandler.setProductionEnv(haloProperties.isProductionEnv());
+        failureHandler.setObjectMapper(objectMapper);
+
+        setFailureHandler(failureHandler);
+
     }
 
     @Override
