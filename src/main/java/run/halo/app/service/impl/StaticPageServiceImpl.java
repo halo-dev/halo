@@ -332,7 +332,7 @@ public class StaticPageServiceImpl implements StaticPageService {
             ModelMap model = new ModelMap();
 
             AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
-            adjacentPostVO.getOptionalPrePost().ifPresent(prePost -> model.addAttribute("prePost", prePost));
+            adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", prevPost));
             adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
 
             List<Category> categories = postCategoryService.listCategoriesBy(post.getId());

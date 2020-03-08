@@ -15,7 +15,7 @@ public class Pagination {
 
     private String nextPageFullPath;
 
-    private String prePageFullPath;
+    private String prevPageFullPath;
 
     private Boolean hasPrev;
 
