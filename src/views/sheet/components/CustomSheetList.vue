@@ -150,11 +150,11 @@
       :dataSource="formattedSheets"
       :pagination="false"
       :loading="loading"
+      :scrollToFirstRowOnChange="true"
     >
       <span
         slot="sheetTitle"
         slot-scope="text,record"
-        style="max-width: 150px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
       >
         <a
           v-if="record.status=='PUBLISHED'"
@@ -347,6 +347,7 @@ const customColumns = [
   {
     title: '标题',
     dataIndex: 'title',
+    ellipsis: true,
     scopedSlots: { customRender: 'sheetTitle' }
   },
   {

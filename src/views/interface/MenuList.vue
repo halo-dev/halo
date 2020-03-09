@@ -175,13 +175,8 @@
             :dataSource="menus"
             :loading="loading"
             :rowKey="menu => menu.id"
+            :scrollToFirstRowOnChange="true"
           >
-            <ellipsis
-              :length="30"
-              tooltip
-              slot="name"
-              slot-scope="text"
-            >{{ text }}</ellipsis>
             <span
               slot="action"
               slot-scope="text, record"
@@ -215,14 +210,17 @@ const columns = [
   {
     title: '名称',
     dataIndex: 'name',
+    ellipsis: true,
     scopedSlots: { customRender: 'name' }
   },
   {
     title: '地址',
+    ellipsis: true,
     dataIndex: 'url'
   },
   {
     title: '分组',
+    ellipsis: true,
     dataIndex: 'team'
   },
   {

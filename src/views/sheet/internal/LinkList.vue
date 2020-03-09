@@ -157,6 +157,7 @@
             :dataSource="links"
             :loading="loading"
             :rowKey="link => link.id"
+            :scrollToFirstRowOnChange="true"
           >
             <template
               slot="url"
@@ -234,15 +235,18 @@ const columns = [
   {
     title: '名称',
     dataIndex: 'name',
+    ellipsis: true,
     scopedSlots: { customRender: 'name' }
   },
   {
     title: '网址',
     dataIndex: 'url',
+    ellipsis: true,
     scopedSlots: { customRender: 'url' }
   },
   {
     title: '分组',
+    ellipsis: true,
     dataIndex: 'team'
   },
   {

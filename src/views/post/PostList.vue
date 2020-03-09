@@ -303,11 +303,11 @@
           :dataSource="formattedPosts"
           :loading="postsLoading"
           :pagination="false"
+          :scrollToFirstRowOnChange="true"
         >
           <span
             slot="postTitle"
             slot-scope="text,record"
-            style="max-width: 150px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
             <a-icon
               type="pushpin"
@@ -525,6 +525,7 @@ const columns = [
     title: '标题',
     dataIndex: 'title',
     width: '150px',
+    ellipsis: true,
     scopedSlots: { customRender: 'postTitle' }
   },
   {

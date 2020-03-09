@@ -69,23 +69,8 @@
           :dataSource="formattedDatas"
           :loading="loading"
           :pagination="false"
+          :scrollToFirstRowOnChange="true"
         >
-          <ellipsis
-            :length="50"
-            tooltip
-            slot="key"
-            slot-scope="key"
-          >
-            {{ key }}
-          </ellipsis>
-          <ellipsis
-            :length="50"
-            tooltip
-            slot="value"
-            slot-scope="value"
-          >
-            {{ value }}
-          </ellipsis>
           <span
             slot="type"
             slot-scope="typeProperty"
@@ -187,11 +172,13 @@ const columns = [
   {
     title: 'Key',
     dataIndex: 'key',
+    ellipsis: true,
     scopedSlots: { customRender: 'key' }
   },
   {
     title: 'Value',
     dataIndex: 'value',
+    ellipsis: true,
     scopedSlots: { customRender: 'value' }
   },
   {

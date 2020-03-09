@@ -169,15 +169,8 @@
             :dataSource="categories"
             :rowKey="record => record.id"
             :loading="loading"
+            :scrollToFirstRowOnChange="true"
           >
-            <ellipsis
-              :length="30"
-              tooltip
-              slot="name"
-              slot-scope="text"
-            >
-              {{ text }}
-            </ellipsis>
             <span
               slot="postCount"
               slot-scope="text,record"
@@ -252,14 +245,17 @@ import menuApi from '@/api/menu'
 const columns = [
   {
     title: '名称',
+    ellipsis: true,
     dataIndex: 'name'
   },
   {
     title: '别名',
+    ellipsis: true,
     dataIndex: 'slug'
   },
   {
     title: '描述',
+    ellipsis: true,
     dataIndex: 'description'
   },
   {

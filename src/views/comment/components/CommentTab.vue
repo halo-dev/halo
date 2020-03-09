@@ -245,6 +245,7 @@
           :dataSource="formattedComments"
           :loading="loading"
           :pagination="false"
+          scrollToFirstRowOnChange
         >
           <template
             slot="author"
@@ -437,6 +438,7 @@ const postColumns = [
     title: '昵称',
     dataIndex: 'author',
     width: '150px',
+    ellipsis: true,
     scopedSlots: { customRender: 'author' }
   },
   {
@@ -455,6 +457,7 @@ const postColumns = [
     title: '评论文章',
     dataIndex: 'post',
     width: '200px',
+    ellipsis: true,
     scopedSlots: { customRender: 'post' }
   },
   {
@@ -475,6 +478,7 @@ const sheetColumns = [
     title: '昵称',
     dataIndex: 'author',
     width: '150px',
+    ellipsis: true,
     scopedSlots: { customRender: 'author' }
   },
   {
@@ -493,12 +497,13 @@ const sheetColumns = [
     title: '评论页面',
     dataIndex: 'sheet',
     width: '200px',
+    ellipsis: true,
     scopedSlots: { customRender: 'sheet' }
   },
   {
     title: '日期',
     dataIndex: 'createTime',
-    width: '150px',
+    width: '170px',
     scopedSlots: { customRender: 'createTime' }
   },
   {

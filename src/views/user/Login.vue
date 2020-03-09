@@ -130,6 +130,7 @@
 </template>
 
 <script>
+import adminApi from '@/api/admin'
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
@@ -148,6 +149,7 @@ export default {
     ...mapGetters({ defaultApiUrl: 'apiUrl' })
   },
   created() {
+    this.verifyIsInstall()
     const _this = this
     document.addEventListener('keydown', function(e) {
       if (e.keyCode === 72 && e.altKey && e.shiftKey) {
@@ -161,6 +163,13 @@ export default {
       setApiUrl: 'SET_API_URL',
       restoreApiUrl: 'RESTORE_API_URL'
     }),
+    verifyIsInstall() {
+      adminApi.isInstalled().then(response => {
+        if (!response.data.data) {
+          this.$router.push({ name: 'Install' })
+        }
+      })
+    },
     handleLogin() {
       if (!this.username) {
         this.$message.warn('用户名不能为空！')
