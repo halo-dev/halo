@@ -242,6 +242,7 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
             blackPatterns.add("/fonts/**");
             blackPatterns.add("/css/**");
             blackPatterns.add("/assets/**");
+            blackPatterns.add("/color.less");
             blackPatterns.add("/swagger-ui.html");
             blackPatterns.add("/csrf");
             blackPatterns.add("/webjars/**");

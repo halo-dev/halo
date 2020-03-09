@@ -91,7 +91,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return a list of previous post
      */
     @NonNull
-    List<POST> listPrePosts(@NonNull Date date, int size);
+    List<POST> listPrevPosts(@NonNull Date date, int size);
 
     /**
      * Lits next posts.
@@ -110,7 +110,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return an optional post
      */
     @NonNull
-    Optional<POST> getPrePost(@NonNull Date date);
+    Optional<POST> getPrevPost(@NonNull Date date);
 
     /**
      * Gets next post.
@@ -308,4 +308,12 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     List<BasePostDetailDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
+
+    /**
+     * Generate description.
+     *
+     * @param content html content must not be null.
+     * @return description
+     */
+    String generateDescription(@NonNull String content);
 }

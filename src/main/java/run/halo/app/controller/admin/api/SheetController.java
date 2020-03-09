@@ -8,9 +8,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.SheetParam;
 import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
@@ -106,6 +108,17 @@ public class SheetController {
 
         // Update
         sheetService.update(sheet);
+    }
+
+    @PutMapping("{sheetId:\\d+}/status/draft/content")
+    @ApiOperation("Updates draft")
+    public BasePostDetailDTO updateDraftBy(
+        @PathVariable("sheetId") Integer sheetId,
+        @RequestBody PostContentParam contentParam) {
+        // Update draft content
+        Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(), sheetId);
+
+        return new BasePostDetailDTO().convertFrom(sheet);
     }
 
     @DeleteMapping("{sheetId:\\d+}")

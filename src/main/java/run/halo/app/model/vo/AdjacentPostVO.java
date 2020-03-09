@@ -20,11 +20,11 @@ import java.util.Optional;
 @Builder
 public class AdjacentPostVO {
 
-    private Post prePost;
+    private Post prevPost;
     private Post nextPost;
 
-    public Optional<Post> getOptionalPrePost() {
-        return Optional.ofNullable(this.getPrePost());
+    public Optional<Post> getOptionalPrevPost() {
+        return Optional.ofNullable(this.getPrevPost());
     }
 
     public Optional<Post> getOptionalNextPost() {

@@ -1,10 +1,10 @@
 package run.halo.app.controller.content.model;
 
-import cn.hutool.core.util.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.StringCacheStore;
@@ -13,14 +13,17 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.AdjacentPostVO;
+import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Post Model
@@ -84,18 +87,36 @@ public class PostModel {
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该文章的访问权限");
             }
-            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+            if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
+                post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+            } else {
+                post.setFormatContent(post.getOriginalContent());
+            }
         }
 
         postService.publishVisitEvent(post.getId());
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
-        adjacentPostVO.getOptionalPrePost().ifPresent(prePost -> model.addAttribute("prePost", postService.convertToDetailVo(prePost)));
+        adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
         adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         List<PostMeta> metas = postMetaService.listBy(post.getId());
+
+        // Generate meta keywords.
+        if (StringUtils.isNotEmpty(post.getMetaKeywords())) {
+            model.addAttribute("meta_keywords", post.getMetaKeywords());
+        } else {
+            model.addAttribute("meta_keywords", tags.stream().map(Tag::getName).collect(Collectors.joining(",")));
+        }
+
+        // Generate meta description.
+        if (StringUtils.isNotEmpty(post.getMetaDescription())) {
+            model.addAttribute("meta_description", post.getMetaDescription());
+        } else {
+            model.addAttribute("meta_description", postService.generateDescription(post.getFormatContent()));
+        }
 
         model.addAttribute("is_post", true);
         model.addAttribute("post", postService.convertToDetailVo(post));
@@ -114,7 +135,7 @@ public class PostModel {
         return themeService.render("post");
     }
 
-    public String list(Integer page, Model model, String decide, String template) {
+    public String list(Integer page, Model model) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
             .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
@@ -122,36 +143,29 @@ public class PostModel {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
-        // TODO remove this variable
-        int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
-
-        // Next page and previous page url.
-        StringBuilder nextPageFullPath = new StringBuilder();
-        StringBuilder prePageFullPath = new StringBuilder();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            nextPageFullPath.append(optionService.getBlogBaseUrl());
-            prePageFullPath.append(optionService.getBlogBaseUrl());
-        }
-
-        nextPageFullPath.append("/page/")
-            .append(posts.getNumber() + 2)
-            .append(optionService.getPathSuffix());
-
-        if (posts.getNumber() == 1) {
-            prePageFullPath.append("/");
-        } else {
-            prePageFullPath.append("/page/")
-                .append(posts.getNumber())
-                .append(optionService.getPathSuffix());
-        }
-
-        model.addAttribute(decide, true);
+        model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
-        model.addAttribute("rainbow", rainbow);
-        model.addAttribute("pageRainbow", rainbow);
-        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
-        model.addAttribute("prePageFullPath", prePageFullPath.toString());
-        return themeService.render(template);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
+        return themeService.render("index");
+    }
+
+    public String archives(Integer page, Model model) {
+        int pageSize = optionService.getArchivesPageSize();
+        Pageable pageable = PageRequest
+            .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+
+        Page<PostListVO> posts = postService.convertToListVo(postPage);
+
+        List<ArchiveYearVO> archives = postService.convertToYearArchives(postPage.getContent());
+
+        model.addAttribute("is_archives", true);
+        model.addAttribute("posts", posts);
+        model.addAttribute("archives", archives);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
+        return themeService.render("archives");
     }
 }

@@ -3,7 +3,7 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import run.halo.app.model.enums.PostCreateFrom;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 
 import javax.persistence.*;
@@ -43,7 +43,7 @@ public class BasePost extends BaseEntity {
      * Post url.
      */
     @Deprecated
-    @Column(name = "url", columnDefinition = "varchar(255) not null", unique = true)
+    @Column(name = "url", columnDefinition = "varchar(255) not null")
     private String url;
 
     /**
@@ -51,6 +51,12 @@ public class BasePost extends BaseEntity {
      */
     @Column(name = "slug", columnDefinition = "varchar(255)", unique = true)
     private String slug;
+
+    /**
+     * Post editor type.
+     */
+    @Column(name = "editor_type", columnDefinition = "int default 0")
+    private PostEditorType editorType;
 
     /**
      * Original content,not format.
@@ -69,7 +75,7 @@ public class BasePost extends BaseEntity {
     /**
      * Post summary.
      */
-    @Column(name = "summary", columnDefinition = "varchar(500) default ''")
+    @Column(name = "summary", columnDefinition = "longtext default ''")
     private String summary;
 
     /**
@@ -109,12 +115,6 @@ public class BasePost extends BaseEntity {
     private Integer topPriority;
 
     /**
-     * Create from,server or WeChat.
-     */
-    @Column(name = "create_from", columnDefinition = "int default 0")
-    private PostCreateFrom createFrom;
-
-    /**
      * Likes
      */
     @Column(name = "likes", columnDefinition = "bigint default 0")
@@ -126,6 +126,18 @@ public class BasePost extends BaseEntity {
     @Column(name = "edit_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP)
     private Date editTime;
+
+    /**
+     * Meta keywords.
+     */
+    @Column(name = "meta_keywords", columnDefinition = "varchar(500) default ''")
+    private String metaKeywords;
+
+    /**
+     * Meta description.
+     */
+    @Column(name = "meta_description", columnDefinition = "varchar(1023) default ''")
+    private String metaDescription;
 
     @Override
     public void prePersist() {
@@ -165,10 +177,6 @@ public class BasePost extends BaseEntity {
             topPriority = 0;
         }
 
-        if (createFrom == null) {
-            createFrom = PostCreateFrom.ADMIN;
-        }
-
         if (visits == null || visits < 0) {
             visits = 0L;
         }
@@ -183,6 +191,10 @@ public class BasePost extends BaseEntity {
 
         if (formatContent == null) {
             formatContent = "";
+        }
+
+        if (editorType == null) {
+            editorType = PostEditorType.MARKDOWN;
         }
     }
 

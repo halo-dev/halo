@@ -45,6 +45,8 @@ public class ContentContentController {
 
     private final PhotoModel photoModel;
 
+    private final LinkModel linkModel;
+
     private final OptionService optionService;
 
     private final PostService postService;
@@ -61,6 +63,7 @@ public class ContentContentController {
                                     TagModel tagModel,
                                     JournalModel journalModel,
                                     PhotoModel photoModel,
+                                    LinkModel linkModel,
                                     OptionService optionService,
                                     PostService postService,
                                     SheetService sheetService,
@@ -72,6 +75,7 @@ public class ContentContentController {
         this.tagModel = tagModel;
         this.journalModel = journalModel;
         this.photoModel = photoModel;
+        this.linkModel = linkModel;
         this.optionService = optionService;
         this.postService = postService;
         this.sheetService = sheetService;
@@ -83,7 +87,7 @@ public class ContentContentController {
     public String content(@PathVariable("prefix") String prefix,
                           Model model) {
         if (optionService.getArchivesPrefix().equals(prefix)) {
-            return postModel.list(1, model, "is_archives", "archives");
+            return postModel.archives(1, model);
         } else if (optionService.getCategoriesPrefix().equals(prefix)) {
             return categoryModel.list(model);
         } else if (optionService.getTagsPrefix().equals(prefix)) {
@@ -93,8 +97,7 @@ public class ContentContentController {
         } else if (optionService.getPhotosPrefix().equals(prefix)) {
             return photoModel.list(1, model);
         } else if (optionService.getLinksPrefix().equals(prefix)) {
-            model.addAttribute("is_links", true);
-            return themeService.render("links");
+            return linkModel.list(model);
         } else {
             throw new NotFoundException("Not Found");
         }
@@ -105,7 +108,7 @@ public class ContentContentController {
                           @PathVariable(value = "page") Integer page,
                           Model model) {
         if (optionService.getArchivesPrefix().equals(prefix)) {
-            return postModel.list(page, model, "is_archives", "archives");
+            return postModel.archives(page, model);
         } else if (optionService.getJournalsPrefix().equals(prefix)) {
             return journalModel.list(page, model);
         } else if (optionService.getPhotosPrefix().equals(prefix)) {
@@ -115,7 +118,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{prefix}/{slug:.+}")
+    @GetMapping("{prefix}/{slug}")
     public String content(@PathVariable("prefix") String prefix,
                           @PathVariable("slug") String slug,
                           @RequestParam(value = "token", required = false) String token,
@@ -151,7 +154,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{year:\\d+}/{month:\\d+}/{slug:.+}")
+    @GetMapping("{year:\\d+}/{month:\\d+}/{slug}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("slug") String slug,
@@ -166,7 +169,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{year:\\d+}/{month:\\d+}/{day:\\d+}/{slug:.+}")
+    @GetMapping("{year:\\d+}/{month:\\d+}/{day:\\d+}/{slug}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("day") Integer day,

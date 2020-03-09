@@ -40,7 +40,7 @@ public class LogController {
 
     @GetMapping
     @ApiOperation("Lists logs")
-    public Page<LogDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+    public Page<LogDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Log> logPage = logService.listAll(pageable);
         return logPage.map(log -> new LogDTO().convertFrom(log));
     }

@@ -1,6 +1,5 @@
 package run.halo.app.controller.content.model;
 
-import cn.hutool.core.util.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +44,8 @@ public class TagModel {
 
     public String list(Model model) {
         model.addAttribute("is_tags", true);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("tags");
     }
 
@@ -53,35 +54,15 @@ public class TagModel {
         final Tag tag = tagService.getBySlugOfNonNull(slug);
         TagDTO tagDTO = tagService.convertTo(tag);
 
-        final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), Sort.by(DESC, "createTime"));
+        final Pageable pageable = PageRequest.of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "createTime"));
         Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
-        // TODO remove this variable
-        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
-
-        // Next page and previous page url.
-        StringBuilder nextPageFullPath = new StringBuilder(tagDTO.getFullPath());
-        StringBuilder prePageFullPath = new StringBuilder(tagDTO.getFullPath());
-
-        nextPageFullPath.append("/page/")
-            .append(posts.getNumber() + 2)
-            .append(optionService.getPathSuffix());
-
-        if (posts.getNumber() == 1) {
-            prePageFullPath.append("/");
-        } else {
-            prePageFullPath.append("/page/")
-                .append(posts.getNumber())
-                .append(optionService.getPathSuffix());
-        }
-
         model.addAttribute("is_tag", true);
         model.addAttribute("posts", posts);
-        model.addAttribute("rainbow", rainbow);
         model.addAttribute("tag", tagDTO);
-        model.addAttribute("nextPageFullPath", nextPageFullPath.toString());
-        model.addAttribute("prePageFullPath", prePageFullPath.toString());
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("tag");
     }
 }

@@ -28,7 +28,9 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
 
     private final PostCategoryService postCategoryService;
 
-    public CategoryTagDirective(Configuration configuration, CategoryService categoryService, PostCategoryService postCategoryService) {
+    public CategoryTagDirective(Configuration configuration,
+                                CategoryService categoryService,
+                                PostCategoryService postCategoryService) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
         configuration.setSharedVariable("categoryTag", this);

@@ -168,6 +168,22 @@ public interface PostService extends BasePostService<Post> {
     List<ArchiveMonthVO> listMonthArchives();
 
     /**
+     * Convert to year archives
+     *
+     * @param posts posts must not be null
+     * @return list of ArchiveYearVO
+     */
+    List<ArchiveYearVO> convertToYearArchives(@NonNull List<Post> posts);
+
+    /**
+     * Convert to month archives
+     *
+     * @param posts posts must not be null
+     * @return list of ArchiveMonthVO
+     */
+    List<ArchiveMonthVO> convertToMonthArchives(@NonNull List<Post> posts);
+
+    /**
      * Import post from markdown document.
      *
      * @param markdown markdown document.
@@ -241,8 +257,8 @@ public interface PostService extends BasePostService<Post> {
      * Gets pre && next post.
      *
      * @param currentPost post must not be null
-     * @return AdjacentPostVO. it contains prePost and nextPost.
-     * AdjacentPostVO will not be null. But prePost and nextPost may be null.
+     * @return AdjacentPostVO. it contains prevPost and nextPost.
+     * AdjacentPostVO will not be null. But prevPost and nextPost may be null.
      */
     @NotNull
     AdjacentPostVO getAdjacentPosts(Post currentPost);

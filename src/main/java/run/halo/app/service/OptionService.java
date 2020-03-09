@@ -33,6 +33,8 @@ public interface OptionService extends CrudService<Option, Integer> {
 
     int DEFAULT_POST_PAGE_SIZE = 10;
 
+    int DEFAULT_ARCHIVES_PAGE_SIZE = 10;
+
     int DEFAULT_COMMENT_PAGE_SIZE = 10;
 
     int DEFAULT_RSS_PAGE_SIZE = 20;
@@ -300,6 +302,13 @@ public interface OptionService extends CrudService<Option, Integer> {
     int getPostPageSize();
 
     /**
+     * Gets archives page size.
+     *
+     * @return page size
+     */
+    int getArchivesPageSize();
+
+    /**
      * Gets comment page size.
      *
      * @return page size
@@ -344,6 +353,20 @@ public interface OptionService extends CrudService<Option, Integer> {
      */
     @NonNull
     String getBlogTitle();
+
+    /**
+     * Gets global seo keywords.
+     *
+     * @return keywords
+     */
+    String getSeoKeywords();
+
+    /**
+     * Get global seo description.
+     *
+     * @return description
+     */
+    String getSeoDescription();
 
     /**
      * Gets blog birthday.

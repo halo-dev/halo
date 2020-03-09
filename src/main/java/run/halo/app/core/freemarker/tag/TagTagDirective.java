@@ -28,7 +28,9 @@ public class TagTagDirective implements TemplateDirectiveModel {
 
     private final PostTagService postTagService;
 
-    public TagTagDirective(Configuration configuration, TagService tagService, PostTagService postTagService) {
+    public TagTagDirective(Configuration configuration,
+                           TagService tagService,
+                           PostTagService postTagService) {
         this.tagService = tagService;
         this.postTagService = postTagService;
         configuration.setSharedVariable("tagTag", this);

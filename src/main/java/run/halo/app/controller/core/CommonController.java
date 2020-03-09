@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.NestedServletException;
 import run.halo.app.exception.HaloException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FilenameUtils;
 
@@ -52,13 +53,17 @@ public class CommonController extends AbstractErrorController {
 
     private final ErrorAttributes errorAttributes;
 
+    private final OptionService optionService;
+
     public CommonController(ThemeService themeService,
                             ErrorAttributes errorAttributes,
-                            ServerProperties serverProperties) {
+                            ServerProperties serverProperties,
+                            OptionService optionService) {
         super(errorAttributes);
         this.themeService = themeService;
         this.errorAttributes = errorAttributes;
         this.errorProperties = serverProperties.getError();
+        this.optionService = optionService;
     }
 
     /**
@@ -79,6 +84,8 @@ public class CommonController extends AbstractErrorController {
 
         Map<String, Object> errorDetail = Collections.unmodifiableMap(getErrorAttributes(request, isIncludeStackTrace(request)));
         model.addAttribute("error", errorDetail);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
 
         log.debug("Error detail: [{}]", errorDetail);
 

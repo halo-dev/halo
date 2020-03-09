@@ -27,6 +27,7 @@ import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.*;
@@ -241,6 +242,20 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Post> posts = postRepository
             .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
 
+        return convertToYearArchives(posts);
+    }
+
+    @Override
+    public List<ArchiveMonthVO> listMonthArchives() {
+        // Get all posts
+        List<Post> posts = postRepository
+            .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+
+        return convertToMonthArchives(posts);
+    }
+
+    @Override
+    public List<ArchiveYearVO> convertToYearArchives(List<Post> posts) {
         Map<Integer, List<Post>> yearPostMap = new HashMap<>(8);
 
         posts.forEach(post -> {
@@ -255,7 +270,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             // Build archive
             ArchiveYearVO archive = new ArchiveYearVO();
             archive.setYear(year);
-            archive.setPosts(convertToMinimal(postList));
+            archive.setPosts(convertToListVo(postList));
 
             // Add archive
             archives.add(archive);
@@ -268,10 +283,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public List<ArchiveMonthVO> listMonthArchives() {
-        // Get all posts
-        List<Post> posts = postRepository
-            .findAllByStatus(PostStatus.PUBLISHED, Sort.by(DESC, "createTime"));
+    public List<ArchiveMonthVO> convertToMonthArchives(List<Post> posts) {
 
         Map<Integer, Map<Integer, List<Post>>> yearMonthPostMap = new HashMap<>(8);
 
@@ -291,7 +303,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 ArchiveMonthVO archive = new ArchiveMonthVO();
                 archive.setYear(year);
                 archive.setMonth(month);
-                archive.setPosts(convertToMinimal(postList));
+                archive.setPosts(convertToListVo(postList));
 
                 archives.add(archive);
             }));
@@ -309,7 +321,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
 
-        Post post = new Post();
+        PostParam post = new PostParam();
 
         List<String> elementValue;
 
@@ -327,9 +339,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             break;
                         case "date":
                             post.setCreateTime(DateUtil.parse(ele));
-                            break;
-                        case "updated":
-                            post.setUpdateTime(DateUtil.parse(ele));
                             break;
                         case "permalink":
                             post.setSlug(ele);
@@ -385,7 +394,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         post.setOriginalContent(markdown);
 
-        return createBy(post, tagIds, categoryIds, false);
+        return createBy(post.convertTo(), tagIds, categoryIds, false);
     }
 
     @Override
@@ -844,7 +853,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // setup pre
         if (index > 0) {
-            adjacentPostVO.setPrePost(postList.get(index - 1));
+            adjacentPostVO.setPrevPost(postList.get(index - 1));
         }
         // setup next
         if (index < postList.size() - 1) {
