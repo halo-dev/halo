@@ -291,8 +291,8 @@ export default {
           hide()
         })
     },
-    handleDeleteTheme(key) {
-      themeApi.delete(key).then(response => {
+    handleDeleteTheme(themeId) {
+      themeApi.delete(themeId).then(response => {
         this.$message.success('删除成功！')
         this.loadThemes()
       })
@@ -347,23 +347,25 @@ export default {
       this.themeSettingVisible = true
     },
     handleConfirmDelete(item) {
+      const that = this
       this.$confirm({
         title: '提示',
         maskClosable: true,
         content: '确定删除【' + item.name + '】主题？',
         onOk() {
-          this.handleDeleteTheme(item.id)
+          that.handleDeleteTheme(item.id)
         },
         onCancel() {}
       })
     },
     handleConfirmUpdate(item) {
+      const that = this
       this.$confirm({
         title: '提示',
         maskClosable: true,
         content: '确定更新【' + item.name + '】主题？',
         onOk() {
-          this.handleUpdateTheme(item.id)
+          that.handleUpdateTheme(item.id)
         },
         onCancel() {}
       })

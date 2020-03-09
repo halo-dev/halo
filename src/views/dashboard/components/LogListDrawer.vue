@@ -76,7 +76,7 @@ export default {
         page: 1,
         size: 50,
         sort: null,
-        total: null
+        total: 1
       },
       logQueryParam: {
         page: 0,
