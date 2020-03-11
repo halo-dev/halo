@@ -20,7 +20,6 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.dto.BaseMetaDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.*;
@@ -544,12 +543,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .collect(Collectors.toList()));
 
             // Set post metas
-            postListVO.setPostMetas(Optional.ofNullable(postMetaListMap.get(post.getId()))
-                .orElseGet(LinkedList::new)
-                .stream()
-                .filter(Objects::nonNull)
-                .map(postMeta -> (BaseMetaDTO) new BaseMetaDTO().convertFrom(postMeta))
-                .collect(Collectors.toList()));
+            List<PostMeta> postMetas = Optional.ofNullable(postMetaListMap.get(post.getId()))
+                .orElseGet(LinkedList::new);
+            postListVO.setMetas(postMetaService.convertToMap(postMetas));
 
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
@@ -605,12 +601,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .collect(Collectors.toList()));
 
             // Set post metas
-            postListVO.setPostMetas(Optional.ofNullable(postMetaListMap.get(post.getId()))
-                .orElseGet(LinkedList::new)
-                .stream()
-                .filter(Objects::nonNull)
-                .map(postMeta -> (BaseMetaDTO) new BaseMetaDTO().convertFrom(postMeta))
-                .collect(Collectors.toList()));
+            List<PostMeta> postMetas = Optional.ofNullable(postMetaListMap.get(post.getId()))
+                .orElseGet(LinkedList::new);
+            postListVO.setMetas(postMetaService.convertToMap(postMetas));
 
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
@@ -700,7 +693,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Get post meta ids
         postDetailVO.setPostMetaIds(postMetaIds);
-        postDetailVO.setPostMetas(postMetaService.convertTo(postMetaList));
+        postDetailVO.setMetas(postMetaService.convertTo(postMetaList));
 
         postDetailVO.setCommentCount(postCommentService.countByPostId(post.getId()));
 

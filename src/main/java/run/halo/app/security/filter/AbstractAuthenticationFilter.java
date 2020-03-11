@@ -42,15 +42,10 @@ import static run.halo.app.model.support.HaloConst.ONE_TIME_TOKEN_QUERY_NAME;
 public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter {
 
     protected final AntPathMatcher antPathMatcher;
-
-    private final UrlPathHelper urlPathHelper = new UrlPathHelper();
-
     protected final HaloProperties haloProperties;
-
     protected final OptionService optionService;
-
     protected final StringCacheStore cacheStore;
-
+    private final UrlPathHelper urlPathHelper = new UrlPathHelper();
     private OneTimeTokenService oneTimeTokenService;
 
     private volatile AuthenticationFailureHandler failureHandler;
@@ -128,13 +123,13 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         this.excludeUrlPatterns = new HashSet<>(excludeUrlPatterns);
     }
 
+    public Collection<String> getUrlPatterns() {
+        return this.urlPatterns;
+    }
+
     public void setUrlPatterns(Collection<String> urlPatterns) {
         Assert.notNull(urlPatterns, "UrlPatterns must not be null");
         this.urlPatterns = new LinkedHashSet<>(urlPatterns);
-    }
-
-    public Collection<String> getUrlPatterns() {
-        return this.urlPatterns;
     }
 
     public void addUrlPatterns(String... urlPatterns) {

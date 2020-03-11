@@ -1,20 +1,23 @@
 package run.halo.app.controller.content.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.StringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.SheetMetaService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
+
+import java.util.List;
 
 /**
  * Sheet model.
@@ -27,14 +30,21 @@ public class SheetModel {
 
     private final SheetService sheetService;
 
+    private final SheetMetaService sheetMetaService;
+
     private final StringCacheStore cacheStore;
 
     private final ThemeService themeService;
 
     private final OptionService optionService;
 
-    public SheetModel(SheetService sheetService, StringCacheStore cacheStore, ThemeService themeService, OptionService optionService) {
+    public SheetModel(SheetService sheetService,
+                      SheetMetaService sheetMetaService,
+                      StringCacheStore cacheStore,
+                      ThemeService themeService,
+                      OptionService optionService) {
         this.sheetService = sheetService;
+        this.sheetMetaService = sheetMetaService;
         this.cacheStore = cacheStore;
         this.themeService = themeService;
         this.optionService = optionService;
@@ -70,6 +80,8 @@ public class SheetModel {
 
         SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
 
+        List<SheetMeta> metas = sheetMetaService.listBy(sheet.getId());
+
         // Generate meta keywords.
         if (StringUtils.isNotEmpty(sheet.getMetaKeywords())) {
             model.addAttribute("meta_keywords", sheet.getMetaKeywords());
@@ -88,9 +100,7 @@ public class SheetModel {
         model.addAttribute("sheet", sheetDetailVO);
         model.addAttribute("post", sheetDetailVO);
         model.addAttribute("is_sheet", true);
-
-        // TODO,Will be deprecated
-        model.addAttribute("comments", Page.empty());
+        model.addAttribute("metas", sheetMetaService.convertToMap(metas));
 
         if (themeService.templateExists(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_SHEET_PREFIX + sheet.getTemplate());

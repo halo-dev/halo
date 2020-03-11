@@ -33,6 +33,6 @@ public class PostDetailVO extends BasePostDetailDTO {
 
     private Set<Long> postMetaIds;
 
-    private List<BaseMetaDTO> postMetas;
+    private List<BaseMetaDTO> metas;
 }
 
