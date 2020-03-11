@@ -4,5 +4,5 @@ ${AnsiColor.BLUE}
   / /_/ / __ `/ / __ \
  / __  / /_/ / / /_/ /
 /_/ /_/\__,_/_/\____/
- ${AnsiColor.BRIGHT_YELLOW}
- ::: Spring-Boot ${spring-boot.version}     ::: Halo (version:${application.formatted-version})
+${AnsiColor.BRIGHT_YELLOW}
+Version: ${application.version}
