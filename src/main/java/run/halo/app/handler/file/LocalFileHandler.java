@@ -97,8 +97,10 @@ public class LocalFileHandler implements FileHandler {
         int year = current.get(Calendar.YEAR);
         int month = current.get(Calendar.MONTH) + 1;
 
+        String monthString = month < 10 ? "0" + month : String.valueOf(month);
+
         // Build directory
-        String subDir = UPLOAD_SUB_DIR + year + FILE_SEPARATOR + month + FILE_SEPARATOR;
+        String subDir = UPLOAD_SUB_DIR + year + FILE_SEPARATOR + monthString + FILE_SEPARATOR;
 
         String originalBasename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
 
@@ -137,7 +139,7 @@ public class LocalFileHandler implements FileHandler {
             uploadResult.setSize(file.getSize());
 
             // TODO refactor this: if image is svg ext. extension
-            boolean isSvg = "svg".equals(extension);
+            boolean isSvg = "svg" .equals(extension);
 
             // Check file type
             if (FileHandler.isImageType(uploadResult.getMediaType()) && !isSvg) {
