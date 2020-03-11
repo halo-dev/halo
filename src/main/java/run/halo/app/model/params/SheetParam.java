@@ -62,7 +62,7 @@ public class SheetParam implements InputConverter<Sheet> {
 
     private String metaDescription;
 
-    private Set<SheetMetaParam> sheetMetas;
+    private Set<SheetMetaParam> metas;
 
     @Override
     public Sheet convertTo() {
@@ -96,11 +96,11 @@ public class SheetParam implements InputConverter<Sheet> {
 
     public Set<SheetMeta> getSheetMetas() {
         Set<SheetMeta> sheetMetasSet = new HashSet<>();
-        if (CollectionUtils.isEmpty(sheetMetas)) {
+        if (CollectionUtils.isEmpty(metas)) {
             return sheetMetasSet;
         }
 
-        for (SheetMetaParam sheetMetaParam : sheetMetas) {
+        for (SheetMetaParam sheetMetaParam : metas) {
             SheetMeta sheetMeta = sheetMetaParam.convertTo();
             sheetMetasSet.add(sheetMeta);
         }
