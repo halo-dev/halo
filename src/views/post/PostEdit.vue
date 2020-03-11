@@ -31,7 +31,7 @@
       :post="postToStage"
       :tagIds="selectedTagIds"
       :categoryIds="selectedCategoryIds"
-      :postMetas="selectedPostMetas"
+      :metas="selectedMetas"
       :visible="postSettingVisible"
       @close="onPostSettingsClose"
       @onRefreshPost="onRefreshPostFromSetting"
@@ -95,7 +95,7 @@ export default {
       postToStage: {},
       selectedTagIds: [],
       selectedCategoryIds: [],
-      selectedPostMetas: [],
+      selectedMetas: [],
       isSaved: false,
       contentChanges: 0,
       saving: false
@@ -111,7 +111,7 @@ export default {
           vm.postToStage = post
           vm.selectedTagIds = post.tagIds
           vm.selectedCategoryIds = post.categoryIds
-          vm.selectedPostMetas = post.postMetas
+          vm.selectedMetas = post.metas
         })
       }
     })
@@ -276,8 +276,8 @@ export default {
     onRefreshCategoryIdsFromSetting(categoryIds) {
       this.selectedCategoryIds = categoryIds
     },
-    onRefreshPostMetasFromSetting(postMetas) {
-      this.selectedPostMetas = postMetas
+    onRefreshPostMetasFromSetting(metas) {
+      this.selectedMetas = metas
     },
     onSaved(isSaved) {
       this.isSaved = isSaved

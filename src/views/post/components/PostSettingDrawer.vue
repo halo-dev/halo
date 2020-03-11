@@ -238,21 +238,21 @@
           <h3 class="post-setting-drawer-title">元数据</h3>
           <a-form layout="vertical">
             <a-form-item
-              v-for="(postMeta, index) in selectedPostMetas"
+              v-for="(meta, index) in selectedMetas"
               :key="index"
-              :prop="'postMetas.' + index + '.value'"
+              :prop="'metas.' + index + '.value'"
             >
               <a-row :gutter="5">
                 <a-col :span="12">
-                  <a-input v-model="postMeta.key"><i slot="addonBefore">K</i></a-input>
+                  <a-input v-model="meta.key"><i slot="addonBefore">K</i></a-input>
                 </a-col>
                 <a-col :span="12">
-                  <a-input v-model="postMeta.value">
+                  <a-input v-model="meta.value">
                     <i slot="addonBefore">V</i>
                     <a
                       href="javascript:void(0);"
                       slot="addonAfter"
-                      @click.prevent="handleRemovePostMeta(postMeta)"
+                      @click.prevent="handleRemovePostMeta(meta)"
                     >
                       <a-icon type="close" />
                     </a>
@@ -347,7 +347,7 @@ export default {
       type: Array,
       required: true
     },
-    postMetas: {
+    metas: {
       type: Array,
       required: true
     },
@@ -396,7 +396,7 @@ export default {
     selectedCategoryIds(val) {
       this.$emit('onRefreshCategoryIds', val)
     },
-    selectedPostMetas(val) {
+    selectedMetas(val) {
       this.$emit('onRefreshPostMetas', val)
     },
     visible: function(newValue, oldValue) {
@@ -409,10 +409,10 @@ export default {
     }
   },
   computed: {
-    selectedPostMetas() {
-      // 不能将selectedPostMetas直接定义在data里
-      // 还没有获取到值就渲染视图,可以直接使用postMetas
-      return this.postMetas
+    selectedMetas() {
+      // 不能将selectedMetas直接定义在data里
+      // 还没有获取到值就渲染视图,可以直接使用metas
+      return this.metas
     },
     pickerDefaultValue() {
       if (this.selectedPost.createTime) {
@@ -436,12 +436,12 @@ export default {
       })
     },
     loadPresetMetasField() {
-      if (this.postMetas.length <= 0) {
+      if (this.metas.length <= 0) {
         themeApi.getActivatedTheme().then(response => {
           const fields = response.data.data.postMetaField
           if (fields && fields.length > 0) {
             for (let i = 0, len = fields.length; i < len; i++) {
-              this.selectedPostMetas.push({
+              this.selectedMetas.push({
                 value: '',
                 key: fields[i]
               })
@@ -507,7 +507,7 @@ export default {
       // Set tag ids
       this.selectedPost.tagIds = this.selectedTagIds
       // Set post metas
-      this.selectedPost.postMetas = this.selectedPostMetas
+      this.selectedPost.metas = this.selectedMetas
       this.saving = true
       if (this.selectedPost.id) {
         // Update the post
@@ -555,13 +555,13 @@ export default {
       this.selectedPost.createTime = value.valueOf()
     },
     handleRemovePostMeta(item) {
-      var index = this.selectedPostMetas.indexOf(item)
+      var index = this.selectedMetas.indexOf(item)
       if (index !== -1) {
-        this.selectedPostMetas.splice(index, 1)
+        this.selectedMetas.splice(index, 1)
       }
     },
     handleInsertPostMeta() {
-      this.selectedPostMetas.push({
+      this.selectedMetas.push({
         value: '',
         key: ''
       })

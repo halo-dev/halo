@@ -29,7 +29,7 @@
 
     <SheetSettingDrawer
       :sheet="sheetToStage"
-      :sheetMetas="selectedSheetMetas"
+      :metas="selectedMetas"
       :visible="sheetSettingVisible"
       @close="onSheetSettingsClose"
       @onRefreshSheet="onRefreshSheetFromSetting"
@@ -88,7 +88,7 @@ export default {
       attachmentDrawerVisible: false,
       sheetSettingVisible: false,
       sheetToStage: {},
-      selectedSheetMetas: [],
+      selectedMetas: [],
       isSaved: false,
       contentChanges: 0,
       saving: false
@@ -103,7 +103,7 @@ export default {
         sheetApi.get(sheetId).then(response => {
           const sheet = response.data.data
           vm.sheetToStage = sheet
-          vm.selectedSheetMetas = sheet.sheetMetas
+          vm.selectedMetas = sheet.metas
         })
       }
     })
@@ -256,8 +256,8 @@ export default {
     onRefreshSheetFromSetting(sheet) {
       this.sheetToStage = sheet
     },
-    onRefreshSheetMetasFromSetting(sheetMetas) {
-      this.selectedSheetMetas = sheetMetas
+    onRefreshSheetMetasFromSetting(metas) {
+      this.selectedMetas = metas
     },
     onSaved(isSaved) {
       this.isSaved = isSaved

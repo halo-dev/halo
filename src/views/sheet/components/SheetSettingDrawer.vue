@@ -156,21 +156,21 @@
           <h3 class="post-setting-drawer-title">元数据</h3>
           <a-form layout="vertical">
             <a-form-item
-              v-for="(sheetMeta, index) in selectedSheetMetas"
+              v-for="(meta, index) in selectedMetas"
               :key="index"
-              :prop="'sheetMeta.' + index + '.value'"
+              :prop="'meta.' + index + '.value'"
             >
               <a-row :gutter="5">
                 <a-col :span="12">
-                  <a-input v-model="sheetMeta.key"><i slot="addonBefore">K</i></a-input>
+                  <a-input v-model="meta.key"><i slot="addonBefore">K</i></a-input>
                 </a-col>
                 <a-col :span="12">
-                  <a-input v-model="sheetMeta.value">
+                  <a-input v-model="meta.value">
                     <i slot="addonBefore">V</i>
                     <a
                       href="javascript:void(0);"
                       slot="addonAfter"
-                      @click.prevent="handleRemoveSheetMeta(sheetMeta)"
+                      @click.prevent="handleRemoveSheetMeta(meta)"
                     >
                       <a-icon type="close" />
                     </a>
@@ -237,7 +237,7 @@ export default {
       type: Object,
       required: true
     },
-    sheetMetas: {
+    metas: {
       type: Array,
       required: true
     },
@@ -263,7 +263,7 @@ export default {
     selectedSheet(val) {
       this.$emit('onRefreshSheet', val)
     },
-    selectedSheetMetas(val) {
+    selectedMetas(val) {
       this.$emit('onRefreshSheetMetas', val)
     },
     visible: function(newValue, oldValue) {
@@ -274,8 +274,8 @@ export default {
     }
   },
   computed: {
-    selectedSheetMetas() {
-      return this.sheetMetas
+    selectedMetas() {
+      return this.metas
     },
     pickerDefaultValue() {
       if (this.selectedSheet.createTime) {
@@ -294,12 +294,12 @@ export default {
       }, 500)
     },
     loadPresetMetasField() {
-      if (this.sheetMetas.length <= 0) {
+      if (this.metas.length <= 0) {
         themeApi.getActivatedTheme().then(response => {
           const fields = response.data.data.sheetMetaField
           if (fields && fields.length > 0) {
             for (let i = 0, len = fields.length; i < len; i++) {
-              this.selectedSheetMetas.push({
+              this.selectedMetas.push({
                 value: '',
                 key: fields[i]
               })
@@ -343,7 +343,7 @@ export default {
         })
         return
       }
-      this.selectedSheet.sheetMetas = this.selectedSheetMetas
+      this.selectedSheet.metas = this.selectedMetas
       this.saving = true
       if (this.selectedSheet.id) {
         sheetApi
@@ -389,13 +389,13 @@ export default {
       this.selectedSheet.createTime = value.valueOf()
     },
     handleRemoveSheetMeta(item) {
-      var index = this.selectedSheetMetas.indexOf(item)
+      var index = this.selectedMetas.indexOf(item)
       if (index !== -1) {
-        this.selectedSheetMetas.splice(index, 1)
+        this.selectedMetas.splice(index, 1)
       }
     },
     handleInsertSheetMeta() {
-      this.selectedSheetMetas.push({
+      this.selectedMetas.push({
         value: '',
         key: ''
       })

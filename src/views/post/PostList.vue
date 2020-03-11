@@ -487,7 +487,7 @@
       :post="selectedPost"
       :tagIds="selectedTagIds"
       :categoryIds="selectedCategoryIds"
-      :postMetas="selectedPostMetas"
+      :metas="selectedMetas"
       :needTitle="true"
       :saveDraftButton="false"
       :savePublishButton="false"
@@ -600,7 +600,7 @@ export default {
       columns,
       selectedRowKeys: [],
       categories: [],
-      selectedPostMetas: [
+      selectedMetas: [
         {
           key: '',
           value: ''
@@ -749,7 +749,7 @@ export default {
         this.selectedPost = response.data.data
         this.selectedTagIds = this.selectedPost.tagIds
         this.selectedCategoryIds = this.selectedPost.categoryIds
-        this.selectedPostMetas = this.selectedPost.postMetas
+        this.selectedMetas = this.selectedPost.metas
         this.postSettingVisible = true
       })
     },
@@ -791,8 +791,8 @@ export default {
     onRefreshCategoryIdsFromSetting(categoryIds) {
       this.selectedCategoryIds = categoryIds
     },
-    onRefreshPostMetasFromSetting(postMetas) {
-      this.selectedPostMetas = postMetas
+    onRefreshPostMetasFromSetting(metas) {
+      this.selectedMetas = metas
     }
   }
 }
