@@ -124,9 +124,6 @@ public class PostModel {
         model.addAttribute("tags", tagService.convertTo(tags));
         model.addAttribute("metas", postMetaService.convertToMap(metas));
 
-        // TODO,Will be deprecated
-        model.addAttribute("comments", Page.empty());
-
         if (themeService.templateExists(
             ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
