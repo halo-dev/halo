@@ -60,7 +60,6 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
             "/api/admin/login",
             "/api/admin/refresh/*",
             "/api/admin/installations",
-            "/api/admin/recoveries/migrations/**",
             "/api/admin/migrations/**",
             "/api/admin/is_installed",
             "/api/admin/password/code",
