@@ -125,8 +125,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     @Transactional
     public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds,
-                                 Set<PostMeta> postMetas, boolean autoSave) {
-        PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds, postMetas);
+                                 Set<PostMeta> metas, boolean autoSave) {
+        PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds, metas);
         if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, createdPost.getId().toString(),
@@ -152,10 +152,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     @Transactional
     public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds,
-                                 Set<PostMeta> postMetas, boolean autoSave) {
+                                 Set<PostMeta> metas, boolean autoSave) {
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
-        PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds, postMetas);
+        PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds, metas);
         if (!autoSave) {
             // Log the creation
             LogEvent logEvent = new LogEvent(this, updatedPost.getId().toString(),
@@ -436,11 +436,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
         }
 
-        List<PostMeta> postMetas = postMetaService.listBy(post.getId());
+        List<PostMeta> metas = postMetaService.listBy(post.getId());
 
-        if (postMetas.size() > 0) {
-            content.append("postMetas:").append("\n");
-            for (PostMeta postMeta : postMetas) {
+        if (metas.size() > 0) {
+            content.append("metas:").append("\n");
+            for (PostMeta postMeta : metas) {
                 content.append("  - ").append(postMeta.getKey()).append(" :  ")
                     .append(postMeta.getValue()).append("\n");
             }
@@ -457,10 +457,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         // List categories
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
-        // List postMetas
-        List<PostMeta> postMetas = postMetaService.listBy(post.getId());
+        // List metas
+        List<PostMeta> metas = postMetaService.listBy(post.getId());
         // Convert to detail vo
-        return convertTo(post, tags, categories, postMetas);
+        return convertTo(post, tags, categories, metas);
     }
 
     @Override
@@ -479,9 +479,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         log.debug("Removed post categories: [{}]", postCategories);
 
-        // Remove post metas
-        List<PostMeta> postMetas = postMetaService.removeByPostId(postId);
-        log.debug("Removed post metas: [{}]", postMetas);
+        // Remove metas
+        List<PostMeta> metas = postMetaService.removeByPostId(postId);
+        log.debug("Removed post metas: [{}]", metas);
 
         // Remove post comments
         List<PostComment> postComments = postCommentService.removeByPostId(postId);
@@ -543,9 +543,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .collect(Collectors.toList()));
 
             // Set post metas
-            List<PostMeta> postMetas = Optional.ofNullable(postMetaListMap.get(post.getId()))
+            List<PostMeta> metas = Optional.ofNullable(postMetaListMap.get(post.getId()))
                 .orElseGet(LinkedList::new);
-            postListVO.setMetas(postMetaService.convertToMap(postMetas));
+            postListVO.setMetas(postMetaService.convertToMap(metas));
 
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
@@ -601,9 +601,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .collect(Collectors.toList()));
 
             // Set post metas
-            List<PostMeta> postMetas = Optional.ofNullable(postMetaListMap.get(post.getId()))
+            List<PostMeta> metas = Optional.ofNullable(postMetaListMap.get(post.getId()))
                 .orElseGet(LinkedList::new);
-            postListVO.setMetas(postMetaService.convertToMap(postMetas));
+            postListVO.setMetas(postMetaService.convertToMap(metas));
 
             // Set comment count
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
@@ -663,7 +663,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
      * @param post         post must not be null
      * @param tags         tags
      * @param categories   categories
-     * @param postMetaList postMetas
+     * @param postMetaList postMetaList
      * @return post detail vo
      */
     @NonNull
@@ -681,7 +681,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Extract ids
         Set<Integer> tagIds = ServiceUtils.fetchProperty(tags, Tag::getId);
         Set<Integer> categoryIds = ServiceUtils.fetchProperty(categories, Category::getId);
-        Set<Long> postMetaIds = ServiceUtils.fetchProperty(postMetaList, PostMeta::getId);
+        Set<Long> metaIds = ServiceUtils.fetchProperty(postMetaList, PostMeta::getId);
 
         // Get post tag ids
         postDetailVO.setTagIds(tagIds);
@@ -692,7 +692,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         postDetailVO.setCategories(categoryService.convertTo(categories));
 
         // Get post meta ids
-        postDetailVO.setPostMetaIds(postMetaIds);
+        postDetailVO.setMetaIds(metaIds);
         postDetailVO.setMetas(postMetaService.convertTo(postMetaList));
 
         postDetailVO.setCommentCount(postCommentService.countByPostId(post.getId()));
@@ -748,7 +748,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds,
-                                        Set<Integer> categoryIds, Set<PostMeta> postMetas) {
+                                        Set<Integer> categoryIds, Set<PostMeta> metas) {
         Assert.notNull(post, "Post param must not be null");
 
         // Create or update post
@@ -779,8 +779,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Create post meta data
         List<PostMeta> postMetaList = postMetaService
-            .createOrUpdateByPostId(post.getId(), postMetas);
-        log.debug("Created post postMetas: [{}]", postMetaList);
+            .createOrUpdateByPostId(post.getId(), metas);
+        log.debug("Created post metas: [{}]", postMetaList);
 
         // Convert to post detail vo
         return convertTo(post, tags, categories, postMetaList);
