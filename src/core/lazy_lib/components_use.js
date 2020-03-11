@@ -41,7 +41,6 @@ import {
   Tag,
   TimePicker,
   Tooltip,
-  Upload,
   Drawer,
   Skeleton,
   Comment,
@@ -91,7 +90,6 @@ Vue.use(Tabs)
 Vue.use(Tag)
 Vue.use(TimePicker)
 Vue.use(Tooltip)
-Vue.use(Upload)
 Vue.use(Skeleton)
 Vue.use(Comment)
 Vue.use(ConfigProvider)

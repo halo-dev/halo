@@ -24,8 +24,6 @@
               </a-step>
               <a-step title="博客信息">
               </a-step>
-              <a-step title="数据迁移">
-              </a-step>
             </a-steps>
             <a-divider dashed />
             <!-- Blogger info -->
@@ -161,30 +159,6 @@
               </a-form-item>
             </a-form>
 
-            <!-- Data migration -->
-            <div v-show="stepCurrent == 2">
-              <a-alert
-                style="margin-bottom: 1rem"
-                message="如果有迁移需求，请点击并选择'迁移文件'"
-                type="info"
-                class="animated fadeInUp"
-              />
-              <Upload
-                :name="migrationUploadName"
-                accept="application/json"
-                :uploadHandler="handleMigrationUpload"
-                @remove="handleMigrationFileRemove"
-                class="animated fadeIn"
-                :style="{'animation-delay': '0.2s'}"
-              >
-                <p class="ant-upload-drag-icon">
-                  <a-icon type="inbox" />
-                </p>
-                <p class="ant-upload-text">点击选择文件或将文件拖拽到此处</p>
-                <p class="ant-upload-hint">仅支持单个文件上传</p>
-              </Upload>
-            </div>
-
             <a-row
               class="install-action"
               type="flex"
@@ -220,14 +194,11 @@
 
 <script>
 import adminApi from '@/api/admin'
-import recoveryApi from '@/api/recovery'
 
 export default {
   data() {
     return {
       installation: {},
-      migrationUploadName: 'file',
-      migrationData: null,
       stepCurrent: 0,
       bloggerForm: this.$form.createForm(this)
     }
@@ -255,22 +226,6 @@ export default {
         }
       })
     },
-    handleMigrationUpload(data) {
-      this.$log.debug('Selected data', data)
-      this.migrationData = data
-      return new Promise((resolve, reject) => {
-        this.$log.debug('Handle uploading')
-        resolve()
-      })
-    },
-    handleMigrationFileRemove(file) {
-      this.$log.debug('Removed file', file)
-      this.$log.debug('Migration file from data', this.migrationData.get(this.migrationUploadName))
-      if (this.migrationData.get(this.migrationUploadName).uid === file.uid) {
-        this.migrationData = null
-        this.migrationFile = null
-      }
-    },
     install() {
       adminApi.install(this.installation).then(response => {
         this.$log.debug('Installation response', response)
@@ -292,16 +247,7 @@ export default {
         return
       }
 
-      // Handle migration
-      if (this.migrationData) {
-        recoveryApi.migrate(this.migrationData).then(response => {
-          this.$log.debug('Migrated successfullly')
-          this.$message.success('数据迁移成功！')
-          this.install()
-        })
-      } else {
-        this.install()
-      }
+      this.install()
     }
   }
 }
