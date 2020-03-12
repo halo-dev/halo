@@ -49,7 +49,10 @@
                   <a-radio :value="true">关闭</a-radio>
                 </a-radio-group>
               </a-form-item>
-              <a-form-item label="自定义模板：">
+              <a-form-item
+                label="自定义模板："
+                v-if="customTpls.length>0"
+              >
                 <a-select v-model="selectedSheet.template">
                   <a-select-option
                     key=""

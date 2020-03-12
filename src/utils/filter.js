@@ -22,11 +22,11 @@ Vue.filter('moment', function(dataStr, pattern = 'YYYY-MM-DD HH:mm') {
   return moment(dataStr).format(pattern)
 })
 
-Vue.filter('moment_post_date', function(dataStr, pattern = '/YYYY/M/') {
+Vue.filter('moment_post_date', function(dataStr, pattern = '/YYYY/MM/') {
   return moment(dataStr).format(pattern)
 })
 
-Vue.filter('moment_post_day', function(dataStr, pattern = '/YYYY/M/D/') {
+Vue.filter('moment_post_day', function(dataStr, pattern = '/YYYY/MM/DD/') {
   return moment(dataStr).format(pattern)
 })
 

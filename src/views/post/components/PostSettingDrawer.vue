@@ -68,7 +68,10 @@
                   <a-radio :value="0">否</a-radio>
                 </a-radio-group>
               </a-form-item>
-              <a-form-item label="自定义模板：">
+              <a-form-item
+                label="自定义模板："
+                v-if="customTpls.length > 0"
+              >
                 <a-select v-model="selectedPost.template">
                   <a-select-option
                     key=""
