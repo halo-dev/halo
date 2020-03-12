@@ -82,11 +82,11 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    public Sheet createBy(Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave) {
+    public Sheet createBy(Sheet sheet, Set<SheetMeta> metas, boolean autoSave) {
         Sheet createdSheet = createOrUpdateBy(sheet);
 
         // Create sheet meta data
-        List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(sheet.getId(), sheetMetas);
+        List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(sheet.getId(), metas);
         log.debug("Created sheet metas: [{}]", sheetMetaList);
 
         if (!autoSave) {
@@ -109,11 +109,11 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    public Sheet updateBy(Sheet sheet, Set<SheetMeta> sheetMetas, boolean autoSave) {
+    public Sheet updateBy(Sheet sheet, Set<SheetMeta> metas, boolean autoSave) {
         Sheet updatedSheet = createOrUpdateBy(sheet);
 
         // Create sheet meta data
-        List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(updatedSheet.getId(), sheetMetas);
+        List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(updatedSheet.getId(), metas);
         log.debug("Created sheet metas: [{}]", sheetMetaList);
 
         if (!autoSave) {
@@ -220,8 +220,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     public Sheet removeById(Integer id) {
 
         // Remove sheet metas
-        List<SheetMeta> sheetMetas = sheetMetaService.removeByPostId(id);
-        log.debug("Removed sheet metas: [{}]", sheetMetas);
+        List<SheetMeta> metas = sheetMetaService.removeByPostId(id);
+        log.debug("Removed sheet metas: [{}]", metas);
 
         // Remove sheet comments
         List<SheetComment> sheetComments = sheetCommentService.removeByPostId(id);
@@ -264,10 +264,10 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     @Override
     public SheetDetailVO convertToDetailVo(Sheet sheet) {
-        // List sheetMetas
-        List<SheetMeta> sheetMetas = sheetMetaService.listBy(sheet.getId());
+        // List metas
+        List<SheetMeta> metas = sheetMetaService.listBy(sheet.getId());
         // Convert to detail vo
-        return convertTo(sheet, sheetMetas);
+        return convertTo(sheet, metas);
     }
 
     @Override
@@ -292,17 +292,17 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @NonNull
-    private SheetDetailVO convertTo(@NonNull Sheet sheet, List<SheetMeta> sheetMetas) {
+    private SheetDetailVO convertTo(@NonNull Sheet sheet, List<SheetMeta> metas) {
         Assert.notNull(sheet, "Sheet must not be null");
 
         // Convert to base detail vo
         SheetDetailVO sheetDetailVO = new SheetDetailVO().convertFrom(sheet);
 
-        Set<Long> sheetMetaIds = ServiceUtils.fetchProperty(sheetMetas, SheetMeta::getId);
+        Set<Long> metaIds = ServiceUtils.fetchProperty(metas, SheetMeta::getId);
 
         // Get sheet meta ids
-        sheetDetailVO.setSheetMetaIds(sheetMetaIds);
-        sheetDetailVO.setSheetMetas(sheetMetaService.convertTo(sheetMetas));
+        sheetDetailVO.setMetaIds(metaIds);
+        sheetDetailVO.setMetas(sheetMetaService.convertTo(metas));
 
         if (StringUtils.isBlank(sheetDetailVO.getSummary())) {
             sheetDetailVO.setSummary(generateSummary(sheet.getFormatContent()));

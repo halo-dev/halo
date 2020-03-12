@@ -67,7 +67,7 @@ public class PostParam implements InputConverter<Post> {
 
     private Set<Integer> categoryIds;
 
-    private Set<PostMetaParam> postMetas;
+    private Set<PostMetaParam> metas;
 
     @Override
     public Post convertTo() {
@@ -101,11 +101,11 @@ public class PostParam implements InputConverter<Post> {
 
     public Set<PostMeta> getPostMetas() {
         Set<PostMeta> postMetaSet = new HashSet<>();
-        if (CollectionUtils.isEmpty(postMetas)) {
+        if (CollectionUtils.isEmpty(metas)) {
             return postMetaSet;
         }
 
-        for (PostMetaParam postMetaParam : postMetas) {
+        for (PostMetaParam postMetaParam : metas) {
             PostMeta postMeta = postMetaParam.convertTo();
             postMetaSet.add(postMeta);
         }

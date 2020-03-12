@@ -47,8 +47,7 @@ public class PostTagDirective implements TemplateDirectiveModel {
             switch (method) {
                 case "latest":
                     int top = Integer.parseInt(params.get("top").toString());
-                    List<Post> posts = postService.listLatest(top);
-                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(posts)));
+                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(postService.listLatest(top))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(postService.countByStatus(PostStatus.PUBLISHED)));
@@ -69,7 +68,8 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     break;
                 case "listByCategorySlug":
                     String categorySlug = params.get("categorySlug").toString();
-                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(postCategoryService.listPostBy(categorySlug, PostStatus.PUBLISHED))));
+                    List<Post> posts = postCategoryService.listPostBy(categorySlug, PostStatus.PUBLISHED);
+                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(posts)));
                     break;
                 case "listByTagId":
                     Integer tagId = Integer.parseInt(params.get("tagId").toString());
