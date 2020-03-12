@@ -104,12 +104,20 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
             }).collect(Collectors.toList());
     }
 
-    private BasePostMinimalDTO buildPostFullPath(BasePostMinimalDTO basePostMinimalDTO) {
+    private BasePostMinimalDTO buildPostFullPath(BasePostMinimalDTO post) {
         PostPermalinkType permalinkType = optionService.getPostPermalinkType();
 
         String pathSuffix = optionService.getPathSuffix();
 
         String archivesPrefix = optionService.getArchivesPrefix();
+
+        int month = DateUtil.month(post.getCreateTime()) + 1;
+
+        String monthString = month < 10 ? "0" + month : String.valueOf(month);
+
+        int day = DateUtil.dayOfMonth(post.getCreateTime());
+
+        String dayString = day < 10 ? "0" + day : String.valueOf(day);
 
         StringBuilder fullPath = new StringBuilder();
 
@@ -122,32 +130,32 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
         if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
             fullPath.append(archivesPrefix)
                 .append("/")
-                .append(basePostMinimalDTO.getSlug())
+                .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.ID)) {
             fullPath.append("?p=")
-                .append(basePostMinimalDTO.getId());
+                .append(post.getId());
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-            fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
+            fullPath.append(DateUtil.year(post.getCreateTime()))
                 .append("/")
-                .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
+                .append(monthString)
                 .append("/")
-                .append(basePostMinimalDTO.getSlug())
+                .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-            fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
+            fullPath.append(DateUtil.year(post.getCreateTime()))
                 .append("/")
-                .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
+                .append(monthString)
                 .append("/")
-                .append(DateUtil.dayOfMonth(basePostMinimalDTO.getCreateTime()))
+                .append(dayString)
                 .append("/")
-                .append(basePostMinimalDTO.getSlug())
+                .append(post.getSlug())
                 .append(pathSuffix);
         }
 
-        basePostMinimalDTO.setFullPath(fullPath.toString());
+        post.setFullPath(fullPath.toString());
 
-        return basePostMinimalDTO;
+        return post;
     }
 
     @Override
