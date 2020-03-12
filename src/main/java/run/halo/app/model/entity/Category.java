@@ -3,6 +3,7 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -27,44 +28,44 @@ public class Category extends BaseEntity {
     /**
      * Category name.
      */
-    @Column(name = "name", columnDefinition = "varchar(255) not null")
+    @Column(name = "name", nullable = false)
     private String name;
 
     /**
      * Category slug name.
      */
     @Deprecated
-    @Column(name = "slug_name", columnDefinition = "varchar(50) not null", unique = true)
+    @Column(name = "slug_name")
     private String slugName;
 
     /**
      * Category slug.
      */
-    @Column(name = "slug", columnDefinition = "varchar(255)", unique = true)
+    @Column(name = "slug", unique = true)
     private String slug;
 
     /**
      * Description,can be display on category page.
      */
-    @Column(name = "description", columnDefinition = "varchar(100) default ''")
+    @Column(name = "description", length = 100)
     private String description;
 
     /**
      * Cover thumbnail of the category.
      */
-    @Column(name = "thumbnail", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "thumbnail", length = 1023)
     private String thumbnail;
 
     /**
      * Parent category.
      */
-    @Column(name = "parent_id", columnDefinition = "int default 0")
+    @Column(name = "parent_id")
+    @ColumnDefault("0")
     private Integer parentId;
 
     @Override
     public void prePersist() {
         super.prePersist();
-        id = null;
 
         if (description == null) {
             description = "";

@@ -21,6 +21,7 @@ import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.BackupService;
@@ -137,7 +138,7 @@ public class BackupServiceImpl implements BackupService {
 
             if (StringUtils.isNotBlank(post.getPassword())) {
                 passwords.add(one);
-            } else if (post.getDeleted()) {
+            } else if (post.getStatus() == PostStatus.DRAFT) {
                 drafts.add(one);
             } else {
                 posts.add(one);

@@ -26,25 +26,18 @@ public class ThemeSetting extends BaseEntity {
     /**
      * Setting key.
      */
-    @Column(name = "setting_key", columnDefinition = "varchar(255) not null")
+    @Column(name = "setting_key", nullable = false)
     private String key;
 
     /**
      * Setting value
      */
-    @Column(name = "setting_value", columnDefinition = "varchar(10239) not null")
+    @Column(name = "setting_value", nullable = false)
     private String value;
 
     /**
      * Theme id.
      */
-    @Column(name = "theme_id", columnDefinition = "varchar(255) not null")
+    @Column(name = "theme_id", nullable = false)
     private String themeId;
-
-    @Override
-    protected void prePersist() {
-        super.prePersist();
-
-        id = null;
-    }
 }
