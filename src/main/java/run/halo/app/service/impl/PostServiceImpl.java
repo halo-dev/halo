@@ -871,6 +871,14 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         String archivesPrefix = optionService.getArchivesPrefix();
 
+        int month = DateUtil.month(post.getCreateTime()) + 1;
+
+        String monthString = month < 10 ? "0" + month : String.valueOf(month);
+
+        int day = DateUtil.dayOfMonth(post.getCreateTime());
+
+        String dayString = day < 10 ? "0" + day : String.valueOf(day);
+
         StringBuilder fullPath = new StringBuilder();
 
         if (optionService.isEnabledAbsolutePath()) {
@@ -890,16 +898,16 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
                 .append("/")
-                .append(DateUtil.month(post.getCreateTime()) + 1)
+                .append(monthString)
                 .append("/")
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
                 .append("/")
-                .append(DateUtil.month(post.getCreateTime()) + 1)
+                .append(monthString)
                 .append("/")
-                .append(DateUtil.dayOfMonth(post.getCreateTime()))
+                .append(dayString)
                 .append("/")
                 .append(post.getSlug())
                 .append(pathSuffix);
