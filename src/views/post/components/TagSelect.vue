@@ -6,7 +6,7 @@
       allowClear
       mode="tags"
       placeholder="选择或输入标签"
-      @blur="handleBlur"
+      @change="handleChange"
     >
       <a-select-option
         v-for="tag in tags"
@@ -76,8 +76,8 @@ export default {
         }
       })
     },
-    handleBlur() {
-      this.$log.debug('Blured')
+    handleChange() {
+      this.$log.debug('Changed')
       const tagNamesToCreate = this.selectedTagNames.filter(tagName => !this.tagNameMap[tagName])
 
       this.$log.debug('Tag names to create', tagNamesToCreate)
