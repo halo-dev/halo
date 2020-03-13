@@ -214,8 +214,8 @@ public class LocalFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.LOCAL.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.LOCAL;
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
