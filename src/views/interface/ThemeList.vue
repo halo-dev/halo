@@ -152,8 +152,34 @@
       <div class="custom-tab-wrapper">
         <a-tabs>
           <a-tab-pane
-            tab="远程拉取"
+            tab="本地上传"
             key="1"
+          >
+            <FilePondUpload
+              ref="upload"
+              name="file"
+              accept="application/zip"
+              label="点击选择主题包或将主题包拖拽到此处<br>仅支持 ZIP 格式的文件"
+              :uploadHandler="uploadHandler"
+              @success="handleUploadSuccess"
+            >
+            </FilePondUpload>
+            <a-alert
+              type="info"
+              closable
+            >
+              <template slot="message">
+                更多主题请访问：
+                <a
+                  target="_blank"
+                  href="https://halo.run/s/themes"
+                >https://halo.run/s/themes</a>
+              </template>
+            </a-alert>
+          </a-tab-pane>
+          <a-tab-pane
+            tab="远程拉取"
+            key="2"
           >
             <a-form layout="vertical">
               <a-form-item label="远程地址：">
@@ -172,28 +198,14 @@
               closable
             >
               <template slot="message">
-                远程地址即主题仓库地址，如：https://github.com/halo-dev/halo-theme-quick-starter。
+                远程地址即主题仓库地址，使用这种方式安装的一般为开发版本，请谨慎使用。
                 <br>更多主题请访问：
                 <a
                   target="_blank"
-                  href="https://halo.run/theme"
-                >https://halo.run/theme</a>
+                  href="https://halo.run/s/themes"
+                >https://halo.run/s/themes</a>
               </template>
             </a-alert>
-          </a-tab-pane>
-          <a-tab-pane
-            tab="本地上传"
-            key="2"
-          >
-            <FilePondUpload
-              ref="upload"
-              name="file"
-              accept="application/zip"
-              label="点击选择主题包或将主题包拖拽到此处<br>仅支持 ZIP 格式的文件"
-              :uploadHandler="uploadHandler"
-              @success="handleUploadSuccess"
-            >
-            </FilePondUpload>
           </a-tab-pane>
         </a-tabs>
       </div>
