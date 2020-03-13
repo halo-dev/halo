@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
+import run.halo.app.exception.RepeatTypeException;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
@@ -72,16 +73,19 @@ public class FileHandlers {
     @NonNull
     public FileHandlers addFileHandlers(@Nullable Collection<FileHandler> fileHandlers) {
         if (!CollectionUtils.isEmpty(fileHandlers)) {
-            for (FileHandler handler : fileHandlers){
+            for (FileHandler handler : fileHandlers) {
+                if (this.fileHandlers.containsKey(handler.getAttachmentType())) {
+                    throw new RepeatTypeException("Same attachment type implements must be unique");
+                }
                 this.fileHandlers.put(handler.getAttachmentType(), handler);
             }
         }
         return this;
     }
 
-    private FileHandler getSupportedType(AttachmentType type){
+    private FileHandler getSupportedType(AttachmentType type) {
         FileHandler handler = fileHandlers.getOrDefault(type, fileHandlers.get(AttachmentType.LOCAL));
-        if (handler == null){
+        if (handler == null) {
             throw new FileOperationException("No available file handlers to operate the file").setErrorData(type);
         }
         return handler;
