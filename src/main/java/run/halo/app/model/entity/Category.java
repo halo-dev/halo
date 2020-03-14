@@ -13,7 +13,8 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "categories")
+@Table(name = "categories",
+	indexs={@Index(name="categories_name", columnList="name")})
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Category extends BaseEntity {
