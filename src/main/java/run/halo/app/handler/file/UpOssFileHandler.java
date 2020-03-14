@@ -128,7 +128,7 @@ public class UpOssFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.UPOSS.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.UPOSS;
     }
 }

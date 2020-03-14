@@ -934,7 +934,6 @@ public class ThemeServiceImpl implements ThemeService {
                 return true;
             }
         }
-
         return false;
     }
 }

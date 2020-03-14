@@ -177,7 +177,7 @@ public class QiniuOssFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.QINIUOSS.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.QINIUOSS;
     }
 }

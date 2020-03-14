@@ -214,8 +214,8 @@ public class LocalFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.LOCAL.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.LOCAL;
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
@@ -234,6 +234,9 @@ public class LocalFileHandler implements FileHandler {
             result = true;
         } catch (Throwable t) {
             log.warn("Failed to generate thumbnail: " + thumbPath, t);
+        } finally {
+            // Disposes of this graphics context and releases any system resources that it is using.
+            originalImage.getGraphics().dispose();
         }
         return result;
     }

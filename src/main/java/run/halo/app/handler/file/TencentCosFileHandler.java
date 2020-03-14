@@ -163,7 +163,7 @@ public class TencentCosFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.TENCENTCOS.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.TENCENTCOS;
     }
 }

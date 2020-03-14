@@ -132,7 +132,7 @@ public class BaiduBosFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.BAIDUBOS.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.BAIDUBOS;
     }
 }
