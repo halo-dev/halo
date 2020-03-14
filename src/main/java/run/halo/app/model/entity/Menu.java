@@ -15,7 +15,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "menus")
+@Table(name = "menus", indexes = {@Index(name = "menus_parent_id", columnList = "parent_id")})
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Menu extends BaseEntity {
