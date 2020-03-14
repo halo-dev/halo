@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "photos")
+@Table(name = "photos", indexes = {@Index(name = "photos_team", columnList = "team")})
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Photo extends BaseEntity {
