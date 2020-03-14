@@ -148,7 +148,8 @@ public class AliOssFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.ALIOSS.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.ALIOSS;
     }
+
 }
