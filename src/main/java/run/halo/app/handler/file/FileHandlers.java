@@ -16,6 +16,7 @@ import run.halo.app.model.support.UploadResult;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * File handler manager.
@@ -30,7 +31,7 @@ public class FileHandlers {
     /**
      * File handler container.
      */
-    private final HashMap<AttachmentType, FileHandler> fileHandlers = new HashMap<>(16);
+    private final ConcurrentHashMap<AttachmentType, FileHandler> fileHandlers = new ConcurrentHashMap<>(16);
 
     public FileHandlers(ApplicationContext applicationContext) {
         // Add all file handler
