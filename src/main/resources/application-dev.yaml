@@ -64,4 +64,4 @@ halo:
   auth-enabled: true
   mode: development
   workDir: ${user.home}/halo-dev/
-  cache: level
+  cache: memory

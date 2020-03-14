@@ -3,6 +3,7 @@ package run.halo.app.controller.content;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -42,6 +43,8 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class ContentFeedController {
 
     private final static String UTF_8_SUFFIX = ";charset=UTF-8";
+
+    private final static String XML_INVAID_CHAR = "[\\x00-\\x1F\\x7F]";
 
     private final static String XML_MEDIA_TYPE = MediaType.APPLICATION_XML_VALUE + UTF_8_SUFFIX;
 
@@ -206,6 +209,10 @@ public class ContentFeedController {
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
+        posts.getContent().forEach(postDetailVO -> {
+            postDetailVO.setFormatContent(RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVAID_CHAR, ""));
+            postDetailVO.setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVAID_CHAR, ""));
+        });
         return posts.getContent();
     }
 
@@ -222,6 +229,10 @@ public class ContentFeedController {
 
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
+        posts.getContent().forEach(postDetailVO -> {
+            postDetailVO.setFormatContent(RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVAID_CHAR, ""));
+            postDetailVO.setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVAID_CHAR, ""));
+        });
         return posts.getContent();
     }
 }
