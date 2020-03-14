@@ -14,7 +14,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "tags")
+@Table(name = "tags", indexes = {@Index(name = "tags_name", columnList = "name")})
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Tag extends BaseEntity {
@@ -27,31 +27,25 @@ public class Tag extends BaseEntity {
     /**
      * Tag name.
      */
-    @Column(name = "name", columnDefinition = "varchar(255) not null")
+    @Column(name = "name", nullable = false)
     private String name;
 
     /**
      * Tag slug name.
      */
     @Deprecated
-    @Column(name = "slug_name", columnDefinition = "varchar(255) not null", unique = true)
+    @Column(name = "slug_name")
     private String slugName;
 
     /**
      * Tag slug.
      */
-    @Column(name = "slug", columnDefinition = "varchar(255)", unique = true)
+    @Column(name = "slug", unique = true)
     private String slug;
 
     /**
      * Cover thumbnail of the tag.
      */
-    @Column(name = "thumbnail", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "thumbnail", length = 1023)
     private String thumbnail;
-
-    @Override
-    protected void prePersist() {
-        super.prePersist();
-        id = null;
-    }
 }
