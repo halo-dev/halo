@@ -26,20 +26,14 @@ public class PostTag extends BaseEntity {
     /**
      * Post id.
      */
-    @Column(name = "post_id", columnDefinition = "int not null")
+    @Column(name = "post_id", nullable = false)
     private Integer postId;
 
     /**
      * Tag id.
      */
-    @Column(name = "tag_id", columnDefinition = "int not null")
+    @Column(name = "tag_id", nullable = false)
     private Integer tagId;
-
-    @Override
-    public void prePersist() {
-        super.prePersist();
-        id = null;
-    }
 
     @Override
     public boolean equals(Object o) {

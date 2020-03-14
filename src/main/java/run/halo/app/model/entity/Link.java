@@ -3,6 +3,7 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -27,44 +28,43 @@ public class Link extends BaseEntity {
     /**
      * Link name.
      */
-    @Column(name = "name", columnDefinition = "varchar(255) not null")
+    @Column(name = "name", nullable = false)
     private String name;
 
     /**
      * Link website address.
      */
-    @Column(name = "url", columnDefinition = "varchar(1023) not null")
+    @Column(name = "url", length = 1023, nullable = false)
     private String url;
 
     /**
      * Website logo.
      */
-    @Column(name = "logo", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "logo", length = 1023)
     private String logo;
 
     /**
      * Website description.
      */
-    @Column(name = "description", columnDefinition = "varchar(255) default ''")
+    @Column(name = "description")
     private String description;
 
     /**
      * Link team name.
      */
-    @Column(name = "team", columnDefinition = "varchar(255) default ''")
+    @Column(name = "team")
     private String team;
 
     /**
      * Sort.
      */
-    @Column(name = "priority", columnDefinition = "int default 0")
+    @Column(name = "priority")
+    @ColumnDefault("0")
     private Integer priority;
 
     @Override
     public void prePersist() {
         super.prePersist();
-
-        id = null;
 
         if (priority == null) {
             priority = 0;

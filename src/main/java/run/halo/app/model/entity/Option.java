@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 import run.halo.app.model.enums.OptionType;
 
 import javax.persistence.*;
@@ -30,19 +31,20 @@ public class Option extends BaseEntity {
     /**
      * option type
      */
-    @Column(name = "type", columnDefinition = "int default 0")
+    @Column(name = "type")
+    @ColumnDefault("0")
     private OptionType type;
 
     /**
      * option key
      */
-    @Column(name = "option_key", columnDefinition = "varchar(100) not null")
+    @Column(name = "option_key", length = 100, nullable = false)
     private String key;
 
     /**
      * option value
      */
-    @Column(name = "option_value", columnDefinition = "varchar(1023) not null")
+    @Column(name = "option_value", length = 1023, nullable = false)
     private String value;
 
     public Option(String key, String value) {
@@ -59,7 +61,6 @@ public class Option extends BaseEntity {
     @Override
     public void prePersist() {
         super.prePersist();
-        id = null;
 
         if (type == null) {
             type = OptionType.INTERNAL;

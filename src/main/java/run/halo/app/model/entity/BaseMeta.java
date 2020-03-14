@@ -29,18 +29,18 @@ public class BaseMeta extends BaseEntity {
     /**
      * Post id.
      */
-    @Column(name = "post_id", columnDefinition = "int not null")
+    @Column(name = "post_id", nullable = false)
     private Integer postId;
 
     /**
      * meta key
      */
-    @Column(name = "meta_key", columnDefinition = "varchar(100) not null")
+    @Column(name = "meta_key", nullable = false)
     private String key;
 
     /**
      * meta value
      */
-    @Column(name = "meta_value", columnDefinition = "varchar(1023) not null")
+    @Column(name = "meta_value", length = 1023, nullable = false)
     private String value;
 }

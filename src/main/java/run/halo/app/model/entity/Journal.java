@@ -3,6 +3,7 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 import run.halo.app.model.enums.JournalType;
 
 import javax.persistence.*;
@@ -25,23 +26,25 @@ public class Journal extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "source_content", columnDefinition = "varchar(1023) not null default ''")
+    @Column(name = "source_content", nullable = false)
+    @Lob
     private String sourceContent;
 
-    @Column(name = "content", columnDefinition = "text not null")
+    @Column(name = "content", nullable = false)
+    @Lob
     private String content;
 
-    @Column(name = "likes", columnDefinition = "bigint default 0")
+    @Column(name = "likes")
+    @ColumnDefault("0")
     private Long likes;
 
-    @Column(name = "type", columnDefinition = "int default 1")
+    @Column(name = "type")
+    @ColumnDefault("1")
     private JournalType type;
 
     @Override
     public void prePersist() {
         super.prePersist();
-
-        id = null;
 
         if (likes == null || likes < 0) {
             likes = 0L;
