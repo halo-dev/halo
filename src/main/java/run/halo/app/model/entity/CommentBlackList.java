@@ -23,7 +23,7 @@ public class CommentBlackList extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "ip_address", columnDefinition = "VARCHAR(127) NOT NULL")
+    @Column(name = "ip_address", length = 127, nullable = false)
     private String ipAddress;
 
     /**
