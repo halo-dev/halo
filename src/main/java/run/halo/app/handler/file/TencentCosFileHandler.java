@@ -22,6 +22,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
+import javax.imageio.ImageReader;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
@@ -118,9 +119,9 @@ public class TencentCosFileHandler implements FileHandler {
 
             // Handle thumbnail
             if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                BufferedImage image = ImageUtils.getImageFromFile(file.getInputStream(), extension);
-                uploadResult.setWidth(image.getWidth());
-                uploadResult.setHeight(image.getHeight());
+                ImageReader image = ImageUtils.getImageReaderFromFile(file.getInputStream(), extension);
+                uploadResult.setWidth(image.getWidth(0));
+                uploadResult.setHeight(image.getHeight(0));
                 if (ImageUtils.EXTENSION_ICO.equals(extension)) {
                     uploadResult.setThumbPath(filePath);
                 } else {
