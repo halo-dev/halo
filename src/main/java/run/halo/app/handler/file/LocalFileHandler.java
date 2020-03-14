@@ -236,7 +236,9 @@ public class LocalFileHandler implements FileHandler {
             log.warn("Failed to generate thumbnail: " + thumbPath, t);
         } finally {
             // Disposes of this graphics context and releases any system resources that it is using.
-            originalImage.getGraphics().dispose();
+            if (originalImage != null) {
+                originalImage.getGraphics().dispose();
+            }
         }
         return result;
     }
