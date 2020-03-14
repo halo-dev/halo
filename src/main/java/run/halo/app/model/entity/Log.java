@@ -27,32 +27,31 @@ public class Log extends BaseEntity {
     /**
      * Log key.
      */
-    @Column(name = "log_key", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "log_key", length = 1023)
     private String logKey;
 
     /**
      * Log type.
      */
-    @Column(name = "type", columnDefinition = "int not null")
+    @Column(name = "type", nullable = false)
     private LogType type;
 
     /**
      * Log content.
      */
-    @Column(name = "content", columnDefinition = "varchar(1023) not null")
+    @Column(name = "content", length = 1023, nullable = false)
     private String content;
 
     /**
      * Operator's ip address.
      */
-    @Column(name = "ip_address", columnDefinition = "varchar(127) default ''")
+    @Column(name = "ip_address", length = 127)
     private String ipAddress;
 
 
     @Override
     public void prePersist() {
         super.prePersist();
-        id = null;
 
         if (logKey == null) {
             logKey = "";

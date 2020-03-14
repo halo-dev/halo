@@ -139,7 +139,7 @@ public class LocalFileHandler implements FileHandler {
             uploadResult.setSize(file.getSize());
 
             // TODO refactor this: if image is svg ext. extension
-            boolean isSvg = "svg" .equals(extension);
+            boolean isSvg = "svg".equals(extension);
 
             // Check file type
             if (FileHandler.isImageType(uploadResult.getMediaType()) && !isSvg) {

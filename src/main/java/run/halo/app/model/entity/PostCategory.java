@@ -33,13 +33,6 @@ public class PostCategory extends BaseEntity {
     @Column(name = "post_id")
     private Integer postId;
 
-
-    @Override
-    public void prePersist() {
-        super.prePersist();
-        id = null;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -26,19 +26,15 @@
             <#list posts as post>
                 <item>
                     <title>
-                        <![CDATA[
-                            ${post.title!}
-                        ]]>
+                        <![CDATA[${post.title!}]]>
                     </title>
                     <link>${post.fullPath!}</link>
                     <description>
-                        <![CDATA[
-                            <#if (options.rss_content_type!'full') == 'full'>
-                                ${post.formatContent!}
-                            <#else>
-                                ${post.summary!}
-                            </#if>
-                        ]]>
+                        <#if (options.rss_content_type!'full') == 'full'>
+                            <![CDATA[${post.formatContent!}]]>
+                        <#else>
+                            <![CDATA[${post.summary!}]]>
+                        </#if>
                     </description>
                     <pubDate>${post.createTime?iso_local}</pubDate>
                 </item>

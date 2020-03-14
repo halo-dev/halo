@@ -86,6 +86,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             .baselineOnMigrate(true)
             .dataSource(url, username, password)
             .load();
+        flyway.repair();
         flyway.migrate();
         log.info("Migrate database succeed.");
     }
