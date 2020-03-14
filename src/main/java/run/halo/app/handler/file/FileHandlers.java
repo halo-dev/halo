@@ -15,7 +15,6 @@ import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
