@@ -20,7 +20,6 @@ import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
 import javax.imageio.ImageReader;
-import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 /**
