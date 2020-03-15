@@ -174,13 +174,13 @@
                 >上一步</a-button>
                 <a-button
                   type="primary"
-                  v-if="stepCurrent != 2"
+                  v-if="stepCurrent != 1"
                   @click="handleNextStep"
                 >下一步</a-button>
               </div>
               <a-button
-                v-if="stepCurrent == 2"
-                type="danger"
+                v-if="stepCurrent == 1"
+                type="primary"
                 icon="upload"
                 @click="handleInstall"
               >安装</a-button>
