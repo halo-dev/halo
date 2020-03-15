@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryWithPostCountDTO;
 import run.halo.app.model.entity.Category;
@@ -238,7 +239,19 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Query category post count
         Map<Integer, Long> categoryPostCountMap = ServiceUtils.convertToMap(postCategoryRepository.findPostCount(), CategoryPostCountProjection::getCategoryId, CategoryPostCountProjection::getPostCount);
-
+        Map<Integer,Category> idObjMap = categories.stream().collect(Collectors.toMap(Category::getId, item -> item));
+        Map<Integer, Long> idCountMap = new HashMap<>(categoryPostCountMap);
+        for (Category category : categories) {
+            long postCount = idCountMap.getOrDefault(category.getId(), 0L);
+            Category obj = category;
+            while (!ObjectUtils.isEmpty(obj)) {
+                obj = idObjMap.get(obj.getParentId());
+                if (obj == null) {
+                    break;
+                }
+                categoryPostCountMap.put(obj.getId(), postCount + categoryPostCountMap.getOrDefault(obj.getId(), 0L));
+            }
+        }
         // Convert and return
         return categories.stream()
             .map(category -> {
