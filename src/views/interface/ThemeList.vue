@@ -128,7 +128,7 @@
             <a
               rel="noopener noreferrer"
               href="javascript:void(0);"
-              @click="()=>this.uploadThemeVisible = true"
+              @click="uploadThemeVisible = true"
             >安装主题</a>
           </a-menu-item>
           <a-menu-item>

@@ -22,7 +22,7 @@
               <div class="avatar">
                 <img
                   :src="user.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
-                  @click="()=>this.attachmentDrawerVisible = true"
+                  @click="attachmentDrawerVisible = true"
                 >
               </div>
             </a-tooltip>

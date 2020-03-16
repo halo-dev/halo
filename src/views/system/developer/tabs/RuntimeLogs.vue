@@ -26,7 +26,7 @@
       <a-button
         type="primary"
         style="margin-right: 8px;"
-        @click="()=>this.loadLogs()"
+        @click="loadLogs()"
       >刷新</a-button>
       <a-button
         type="dashed"

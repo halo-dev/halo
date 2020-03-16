@@ -12,17 +12,16 @@
 
         <div id="editor">
           <MarkdownEditor
-            v-if="postToStage.editorType=='MARKDOWN'"
             :originalContent="postToStage.originalContent"
             @onSaveDraft="handleSaveDraft(true)"
             @onContentChange="onContentChange"
           />
 
-          <RichTextEditor
+          <!-- <RichTextEditor
             v-else
             :originalContent="postToStage.originalContent"
             @onContentChange="onContentChange"
-          />
+          /> -->
         </div>
       </a-col>
     </a-row>
@@ -61,7 +60,7 @@
       >发布</a-button>
       <a-button
         type="dashed"
-        @click="()=>this.attachmentDrawerVisible = true"
+        @click="attachmentDrawerVisible = true"
         style="margin-left: 8px;"
       >附件库</a-button>
     </footer-tool-bar>
@@ -70,13 +69,13 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { mapGetters } from 'vuex'
+// import { mapGetters } from 'vuex'
 import moment from 'moment'
 import PostSettingDrawer from './components/PostSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import MarkdownEditor from '@/components/editor/MarkdownEditor'
-import RichTextEditor from '@/components/editor/RichTextEditor'
+// import RichTextEditor from '@/components/editor/RichTextEditor'
 
 import postApi from '@/api/post'
 export default {
@@ -85,8 +84,8 @@ export default {
     PostSettingDrawer,
     FooterToolBar,
     AttachmentDrawer,
-    MarkdownEditor,
-    RichTextEditor
+    MarkdownEditor
+    // RichTextEditor
   },
   data() {
     return {
@@ -160,9 +159,9 @@ export default {
       }
       return '当前页面数据未保存，确定要离开吗？'
     }
-    if (!this.postToStage.editorType) {
-      this.postToStage.editorType = this.options.default_editor
-    }
+    // if (!this.postToStage.editorType) {
+    //   this.postToStage.editorType = this.options.default_editor
+    // }
   },
   watch: {
     temporaryContent: function(newValue, oldValue) {
@@ -174,8 +173,8 @@ export default {
   computed: {
     temporaryContent() {
       return this.postToStage.originalContent
-    },
-    ...mapGetters(['options'])
+    }
+    // ...mapGetters(['options'])
   },
   methods: {
     handleSaveDraft(draftOnly = false) {

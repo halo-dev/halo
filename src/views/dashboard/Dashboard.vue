@@ -233,7 +233,7 @@
             >
               <a
                 href="javascript:void(0);"
-                @click="()=>this.logListDrawerVisible = true"
+                @click="logListDrawerVisible = true"
               >
                 <a-icon type="ellipsis" />
               </a>

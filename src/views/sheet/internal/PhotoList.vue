@@ -122,7 +122,7 @@
         shape="circle"
         icon="setting"
         size="large"
-        @click="()=>this.optionFormVisible=true"
+        @click="optionFormVisible=true"
       ></a-button>
     </div>
     <a-modal
@@ -298,7 +298,7 @@
       <AttachmentSelectDrawer
         v-model="thumDrawerVisible"
         @listenToSelect="selectPhotoThumb"
-        :drawerWidth="460"
+        :drawerWidth="480"
       />
       <a-divider class="divider-transparent" />
       <div class="bottom-control">

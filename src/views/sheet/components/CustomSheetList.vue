@@ -321,6 +321,7 @@
       :metas="selectedMetas"
       :visible="sheetSettingVisible"
       :needTitle="true"
+      :saveDraftButton="false"
       @close="onSheetSettingsClose"
       @onRefreshSheet="onRefreshSheetFromSetting"
       @onRefreshSheetMetas="onRefreshSheetMetasFromSetting"

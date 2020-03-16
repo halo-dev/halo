@@ -12,7 +12,7 @@
     "ant-design-vue": "^1.5.0-beta.1",
     "axios": "^0.19.2",
     "enquire.js": "^2.1.6",
-    "filepond": "^4.12.0",
+    "filepond": "^4.13.0",
     "filepond-plugin-image-preview": "^4.6.1",
     "halo-editor": "^2.8.2",
     "marked": "^0.8.0",

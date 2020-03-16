@@ -176,7 +176,7 @@
               <img
                 class="img"
                 :src="selectedPost.thumbnail || '/images/placeholder.jpg'"
-                @click="()=>this.thumbDrawerVisible=true"
+                @click="thumbDrawerVisible=true"
               >
 
               <a-form layout="vertial">
@@ -202,7 +202,7 @@
     <AttachmentSelectDrawer
       v-model="thumbDrawerVisible"
       @listenToSelect="handleSelectPostThumb"
-      :drawerWidth="460"
+      :drawerWidth="480"
     />
 
     <a-drawer
@@ -279,7 +279,7 @@
       <a-button
         style="marginRight: 8px"
         type="dashed"
-        @click="()=>this.advancedVisible = true"
+        @click="advancedVisible = true"
       >高级</a-button>
       <a-button
         style="marginRight: 8px"
@@ -290,15 +290,8 @@
       <a-button
         @click="handlePublishClick"
         type="primary"
-        v-if="savePublishButton"
         :disabled="saving"
-      >发布</a-button>
-      <a-button
-        @click="handlePublishClick"
-        type="primary"
-        v-if="saveButton"
-        :disabled="saving"
-      >保存</a-button>
+      > {{ selectedPost.id?'保存':'发布' }} </a-button>
     </div>
   </a-drawer>
 </template>
@@ -354,11 +347,6 @@ export default {
       type: Array,
       required: true
     },
-    visible: {
-      type: Boolean,
-      required: false,
-      default: true
-    },
     needTitle: {
       type: Boolean,
       required: false,
@@ -369,15 +357,10 @@ export default {
       required: false,
       default: true
     },
-    savePublishButton: {
+    visible: {
       type: Boolean,
       required: false,
       default: true
-    },
-    saveButton: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
   watch: {
@@ -484,20 +467,13 @@ export default {
     },
     handleDraftClick() {
       this.selectedPost.status = 'DRAFT'
-      this.savePost()
+      this.createOrUpdatePost()
     },
     handlePublishClick() {
       this.selectedPost.status = 'PUBLISHED'
-      this.savePost()
+      this.createOrUpdatePost()
     },
-    savePost() {
-      this.createOrUpdatePost(
-        () => this.$message.success('文章发布成功'),
-        () => this.$message.success('文章发布成功'),
-        false
-      )
-    },
-    createOrUpdatePost(createSuccess, updateSuccess, autoSave) {
+    createOrUpdatePost() {
       if (!this.selectedPost.title) {
         this.$notification['error']({
           message: '提示',
@@ -515,14 +491,18 @@ export default {
       if (this.selectedPost.id) {
         // Update the post
         postApi
-          .update(this.selectedPost.id, this.selectedPost, autoSave)
+          .update(this.selectedPost.id, this.selectedPost, false)
           .then(response => {
             this.$log.debug('Updated post', response.data.data)
-            if (updateSuccess) {
-              updateSuccess()
-              this.$emit('onSaved', true)
-              this.$router.push({ name: 'PostList' })
+
+            if (this.selectedPost.status === 'DRAFT') {
+              this.$message.success('草稿保存成功！')
+            } else {
+              this.$message.success('文章更新成功！')
             }
+
+            this.$emit('onSaved', true)
+            this.$router.push({ name: 'PostList' })
           })
           .finally(() => {
             this.saving = false
@@ -530,14 +510,18 @@ export default {
       } else {
         // Create the post
         postApi
-          .create(this.selectedPost, autoSave)
+          .create(this.selectedPost, false)
           .then(response => {
             this.$log.debug('Created post', response.data.data)
-            if (createSuccess) {
-              createSuccess()
-              this.$emit('onSaved', true)
-              this.$router.push({ name: 'PostList' })
+
+            if (this.selectedPost.status === 'DRAFT') {
+              this.$message.success('草稿保存成功！')
+            } else {
+              this.$message.success('文章发布成功！')
             }
+
+            this.$emit('onSaved', true)
+            this.$router.push({ name: 'PostList' })
             this.selectedPost = response.data.data
           })
           .finally(() => {

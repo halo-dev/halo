@@ -202,7 +202,7 @@
         shape="circle"
         icon="setting"
         size="large"
-        @click="()=>this.optionFormVisible=true"
+        @click="optionFormVisible=true"
       ></a-button>
     </div>
     <a-modal

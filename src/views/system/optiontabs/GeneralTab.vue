@@ -18,7 +18,7 @@
           <a
             href="javascript:void(0);"
             slot="addonAfter"
-            @click="()=>this.logoDrawerVisible = true"
+            @click="logoDrawerVisible = true"
           >
             <a-icon type="picture" />
           </a>
@@ -29,7 +29,7 @@
           <a
             href="javascript:void(0);"
             slot="addonAfter"
-            @click="()=>this.faviconDrawerVisible = true"
+            @click="faviconDrawerVisible = true"
           >
             <a-icon type="picture" />
           </a>

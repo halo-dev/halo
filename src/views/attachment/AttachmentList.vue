@@ -189,7 +189,7 @@
       v-if="selectAttachment"
       :attachment="selectAttachment"
       :addToPhoto="true"
-      @delete="() => this.loadAttachments()"
+      @delete="loadAttachments()"
     />
   </page-view>
 </template>

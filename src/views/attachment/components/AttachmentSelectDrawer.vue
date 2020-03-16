@@ -107,7 +107,7 @@ export default {
     drawerWidth: {
       type: Number,
       required: false,
-      default: 460
+      default: 480
     },
     title: {
       type: String,

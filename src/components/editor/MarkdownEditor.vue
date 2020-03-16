@@ -2,7 +2,7 @@
   <div>
     <halo-editor
       ref="md"
-      v-model="originalContent"
+      v-model="originalContentData"
       :boxShadow="false"
       :toolbars="toolbars"
       :ishljs="true"

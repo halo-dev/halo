@@ -163,7 +163,7 @@
         shape="circle"
         icon="setting"
         size="large"
-        @click="()=>this.optionFormVisible=true"
+        @click="optionFormVisible=true"
       ></a-button>
     </div>
     <a-modal
@@ -205,7 +205,7 @@
       <template slot="footer">
         <a-button
           type="dashed"
-          @click="()=>this.attachmentDrawerVisible = true"
+          @click="attachmentDrawerVisible = true"
         >附件库</a-button>
         <a-button
           key="submit"

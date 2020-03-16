@@ -490,8 +490,6 @@
       :metas="selectedMetas"
       :needTitle="true"
       :saveDraftButton="false"
-      :savePublishButton="false"
-      :saveButton="true"
       :visible="postSettingVisible"
       @close="onPostSettingsClose"
       @onRefreshPost="onRefreshPostFromSetting"

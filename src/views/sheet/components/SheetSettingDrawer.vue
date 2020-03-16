@@ -94,7 +94,7 @@
               <img
                 class="img"
                 :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
-                @click="()=>this.thumbDrawerVisible = true"
+                @click="thumbDrawerVisible = true"
               >
 
               <a-form layout="vertial">
@@ -120,7 +120,7 @@
     <AttachmentSelectDrawer
       v-model="thumbDrawerVisible"
       @listenToSelect="handleSelectSheetThumb"
-      :drawerWidth="460"
+      :drawerWidth="480"
     />
 
     <a-drawer
@@ -197,9 +197,10 @@
       <a-button
         style="marginRight: 8px"
         type="dashed"
-        @click="()=>this.advancedVisible = true"
+        @click="advancedVisible = true"
       >高级</a-button>
       <a-button
+        v-if="saveDraftButton"
         style="marginRight: 8px"
         @click="handleDraftClick"
         :disabled="saving"
@@ -208,7 +209,7 @@
         type="primary"
         @click="handlePublishClick"
         :disabled="saving"
-      >发布</a-button>
+      >{{ selectedSheet.id?'保存':'发布' }}</a-button>
     </div>
   </a-drawer>
 </template>
@@ -248,6 +249,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    saveDraftButton: {
+      type: Boolean,
+      required: false,
+      default: true
     },
     visible: {
       type: Boolean,
@@ -325,20 +331,13 @@ export default {
     },
     handlePublishClick() {
       this.selectedSheet.status = 'PUBLISHED'
-      this.saveSheet()
+      this.createOrUpdateSheet()
     },
     handleDraftClick() {
       this.selectedSheet.status = 'DRAFT'
-      this.saveSheet()
+      this.createOrUpdateSheet()
     },
-    saveSheet() {
-      this.createOrUpdateSheet(
-        () => this.$message.success('页面发布成功！'),
-        () => this.$message.success('页面发布成功！'),
-        false
-      )
-    },
-    createOrUpdateSheet(createSuccess, updateSuccess, autoSave) {
+    createOrUpdateSheet() {
       if (!this.selectedSheet.title) {
         this.$notification['error']({
           message: '提示',
@@ -350,28 +349,36 @@ export default {
       this.saving = true
       if (this.selectedSheet.id) {
         sheetApi
-          .update(this.selectedSheet.id, this.selectedSheet, autoSave)
+          .update(this.selectedSheet.id, this.selectedSheet, false)
           .then(response => {
             this.$log.debug('Updated sheet', response.data.data)
-            if (updateSuccess) {
-              updateSuccess()
-              this.$emit('onSaved', true)
-              this.$router.push({ name: 'SheetList' })
+
+            if (this.selectedSheet.status === 'DRAFT') {
+              this.$message.success('草稿保存成功！')
+            } else {
+              this.$message.success('页面更新成功！')
             }
+
+            this.$emit('onSaved', true)
+            this.$router.push({ name: 'SheetList' })
           })
           .finally(() => {
             this.saving = false
           })
       } else {
         sheetApi
-          .create(this.selectedSheet, autoSave)
+          .create(this.selectedSheet, false)
           .then(response => {
             this.$log.debug('Created sheet', response.data.data)
-            if (createSuccess) {
-              createSuccess()
-              this.$emit('onSaved', true)
-              this.$router.push({ name: 'SheetList' })
+
+            if (this.selectedSheet.status === 'DRAFT') {
+              this.$message.success('草稿保存成功！')
+            } else {
+              this.$message.success('页面发布成功！')
             }
+
+            this.$emit('onSaved', true)
+            this.$router.push({ name: 'SheetList' })
             this.selectedSheet = response.data.data
           })
           .finally(() => {

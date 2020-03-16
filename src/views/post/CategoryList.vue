@@ -40,7 +40,7 @@
                 <a
                   href="javascript:void(0);"
                   slot="addonAfter"
-                  @click="()=>this.thumbnailDrawerVisible = true"
+                  @click="thumbnailDrawerVisible = true"
                 >
                   <a-icon type="picture" />
                 </a>

@@ -12,17 +12,16 @@
 
         <div id="editor">
           <MarkdownEditor
-            v-if="sheetToStage.editorType=='MARKDOWN'"
             :originalContent="sheetToStage.originalContent"
             @onSaveDraft="handleSaveDraft(true)"
             @onContentChange="onContentChange"
           />
 
-          <RichTextEditor
+          <!-- <RichTextEditor
             v-else
             :originalContent="sheetToStage.originalContent"
             @onContentChange="onContentChange"
-          />
+          /> -->
         </div>
       </a-col>
     </a-row>
@@ -57,7 +56,7 @@
       <a-button
         type="dashed"
         style="margin-left: 8px;"
-        @click="()=>this.attachmentDrawerVisible = true"
+        @click="attachmentDrawerVisible = true"
       >附件库</a-button>
     </footer-tool-bar>
   </div>
@@ -65,13 +64,13 @@
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import { mapGetters } from 'vuex'
+// import { mapGetters } from 'vuex'
 import moment from 'moment'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import MarkdownEditor from '@/components/editor/MarkdownEditor'
-import RichTextEditor from '@/components/editor/RichTextEditor'
+// import RichTextEditor from '@/components/editor/RichTextEditor'
 
 import sheetApi from '@/api/sheet'
 export default {
@@ -79,8 +78,8 @@ export default {
     FooterToolBar,
     AttachmentDrawer,
     SheetSettingDrawer,
-    MarkdownEditor,
-    RichTextEditor
+    MarkdownEditor
+    // RichTextEditor
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -151,9 +150,9 @@ export default {
       }
       return '当前页面数据未保存，确定要离开吗？'
     }
-    if (!this.sheetToStage.editorType) {
-      this.sheetToStage.editorType = this.options.default_editor
-    }
+    // if (!this.sheetToStage.editorType) {
+    //   this.sheetToStage.editorType = this.options.default_editor
+    // }
   },
   watch: {
     temporaryContent: function(newValue, oldValue) {
@@ -165,8 +164,8 @@ export default {
   computed: {
     temporaryContent() {
       return this.sheetToStage.originalContent
-    },
-    ...mapGetters(['options'])
+    }
+    // ...mapGetters(['options'])
   },
   methods: {
     handleSaveDraft(draftOnly = false) {

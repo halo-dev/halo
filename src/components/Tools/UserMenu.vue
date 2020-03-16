@@ -17,9 +17,14 @@
       href="javascript:void(0)"
       @click="showOptionModal"
     >
-      <span class="action">
-        <a-icon type="setting" />
-      </span>
+      <a-tooltip
+        placement="bottom"
+        title="后台布局设置"
+      >
+        <span class="action">
+          <a-icon type="setting" />
+        </span>
+      </a-tooltip>
     </a>
     <header-comment class="action" />
     <a-dropdown>

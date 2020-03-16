@@ -59,7 +59,7 @@
         <a-button
           type="primary"
           icon="plus"
-          @click="()=>this.formVisible=true"
+          @click="formVisible=true"
         >新增</a-button>
       </div>
       <div style="margin-top:15px">

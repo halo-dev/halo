@@ -68,7 +68,7 @@
             <a-button
               type="primary"
               style="float:right"
-              @click="()=>this.backupDrawerVisible = true"
+              @click="backupDrawerVisible = true"
             >备份</a-button>
           </a-card>
         </a-col>

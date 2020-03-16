@@ -4,12 +4,12 @@
       layout="vertical"
       :wrapperCol="wrapperCol"
     >
-      <a-form-item label="默认编辑器：">
+      <!-- <a-form-item label="默认编辑器：">
         <a-select v-model="options.default_editor">
           <a-select-option value="MARKDOWN">Markdown 编辑器</a-select-option>
           <a-select-option value="RICHTEXT">富文本编辑器</a-select-option>
         </a-select>
-      </a-form-item>
+      </a-form-item> -->
       <a-form-item label="首页文章排序：">
         <a-select v-model="options.post_index_sort">
           <a-select-option value="createTime">创建时间</a-select-option>
