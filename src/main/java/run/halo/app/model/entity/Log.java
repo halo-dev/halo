@@ -4,6 +4,7 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 import run.halo.app.model.enums.LogType;
 
 import javax.persistence.*;
@@ -21,7 +22,8 @@ import javax.persistence.*;
 public class Log extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
     private Long id;
 
     /**

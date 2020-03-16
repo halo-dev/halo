@@ -25,10 +25,10 @@ public class MigrateController {
         this.migrateService = migrateService;
     }
 
-    @PostMapping("halo_v0_4_4")
-    @ApiOperation("Migrate from Halo 0.4.4")
-    public void migrateHaloOldVersion(@RequestPart("file") MultipartFile file) {
-        migrateService.migrate(file, MigrateType.OLD_VERSION);
+    @PostMapping("halo")
+    @ApiOperation("Migrate from Halo")
+    public void migrateHalo(@RequestPart("file") MultipartFile file) {
+        migrateService.migrate(file, MigrateType.HALO);
     }
 
     @PostMapping("wordpress")

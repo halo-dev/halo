@@ -75,6 +75,7 @@ public interface FileHandler {
 
     /**
      * Get attachment type is supported.
+     *
      * @return attachment type
      */
     AttachmentType getAttachmentType();
