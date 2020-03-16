@@ -164,6 +164,12 @@ public class InstallController {
             return null;
         }
 
+        long commentCount = postCommentService.count();
+
+        if (commentCount > 0) {
+            return null;
+        }
+
         PostComment comment = new PostComment();
         comment.setAuthor("Halo");
         comment.setAuthorUrl("https://halo.run");
@@ -175,7 +181,9 @@ public class InstallController {
 
     @Nullable
     private PostDetailVO createDefaultPostIfAbsent(@Nullable Category category) {
+
         long publishedCount = postService.countByStatus(PostStatus.PUBLISHED);
+
         if (publishedCount > 0) {
             return null;
         }
@@ -210,6 +218,11 @@ public class InstallController {
 
     @Nullable
     private void createDefaultSheet() {
+        long publishedCount = sheetService.countByStatus(PostStatus.PUBLISHED);
+        if (publishedCount > 0) {
+            return;
+        }
+
         SheetParam sheetParam = new SheetParam();
         sheetParam.setSlug("about");
         sheetParam.setTitle("关于页面");
@@ -261,10 +274,19 @@ public class InstallController {
         properties.put(PrimaryProperties.IS_INSTALLED, Boolean.TRUE.toString());
         properties.put(BlogProperties.BLOG_LOCALE, installParam.getLocale());
         properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
-        properties.put(BlogProperties.BLOG_URL, StringUtils.isBlank(installParam.getUrl()) ?
-            optionService.getBlogBaseUrl() : installParam.getUrl());
-        properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
-        properties.put(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.FALSE.toString());
+        properties.put(BlogProperties.BLOG_URL, StringUtils.isBlank(installParam.getUrl()) ? optionService.getBlogBaseUrl() : installParam.getUrl());
+
+        Long birthday = optionService.getByPropertyOrDefault(PrimaryProperties.BIRTHDAY, Long.class, 0L);
+
+        if (birthday.equals(0L)) {
+            properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
+        }
+
+        Boolean globalAbsolutePathEnabled = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, null);
+
+        if (globalAbsolutePathEnabled == null) {
+            properties.put(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.FALSE.toString());
+        }
 
         // Create properties
         optionService.saveProperties(properties);

@@ -6,6 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.lang.NonNull;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.event.options.OptionUpdatedEvent;
+import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.BackupDTO;
@@ -98,7 +101,9 @@ public class BackupServiceImpl implements BackupService {
 
     private final HaloProperties haloProperties;
 
-    public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService, CommentBlackListService commentBlackListService, JournalService journalService, JournalCommentService journalCommentService, LinkService linkService, LogService logService, MenuService menuService, OptionService optionService, PhotoService photoService, PostService postService, PostCategoryService postCategoryService, PostCommentService postCommentService, PostMetaService postMetaService, PostTagService postTagService, SheetService sheetService, SheetCommentService sheetCommentService, SheetMetaService sheetMetaService, TagService tagService, ThemeSettingService themeSettingService, UserService userService, OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService, CommentBlackListService commentBlackListService, JournalService journalService, JournalCommentService journalCommentService, LinkService linkService, LogService logService, MenuService menuService, OptionService optionService, PhotoService photoService, PostService postService, PostCategoryService postCategoryService, PostCommentService postCommentService, PostMetaService postMetaService, PostTagService postTagService, SheetService sheetService, SheetCommentService sheetCommentService, SheetMetaService sheetMetaService, TagService tagService, ThemeSettingService themeSettingService, UserService userService, OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties, ApplicationEventPublisher eventPublisher) {
         this.attachmentService = attachmentService;
         this.categoryService = categoryService;
         this.commentBlackListService = commentBlackListService;
@@ -122,6 +127,7 @@ public class BackupServiceImpl implements BackupService {
         this.userService = userService;
         this.oneTimeTokenService = oneTimeTokenService;
         this.haloProperties = haloProperties;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -316,6 +322,8 @@ public class BackupServiceImpl implements BackupService {
         List<Option> options = data.getJSONArray("options").toJavaList(Option.class);
         optionService.createInBatch(options);
 
+        eventPublisher.publishEvent(new OptionUpdatedEvent(this));
+
         List<Photo> photos = data.getJSONArray("photos").toJavaList(Photo.class);
         photoService.createInBatch(photos);
 
@@ -345,6 +353,8 @@ public class BackupServiceImpl implements BackupService {
 
         List<ThemeSetting> themeSettings = data.getJSONArray("theme_settings").toJavaList(ThemeSetting.class);
         themeSettingService.createInBatch(themeSettings);
+
+        eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
     }
 
     /**

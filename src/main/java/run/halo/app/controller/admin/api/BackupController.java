@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.service.BackupService;
@@ -37,6 +38,7 @@ public class BackupController {
 
     @PostMapping("halo")
     @ApiOperation("Backups halo")
+    @DisableOnCondition
     public BackupDTO backupHalo() {
         return backupService.zipWorkDirectory();
     }
@@ -49,6 +51,7 @@ public class BackupController {
 
     @GetMapping("halo/{fileName:.+}")
     @ApiOperation("Downloads backup file")
+    @DisableOnCondition
     public ResponseEntity<Resource> downloadBackup(@PathVariable("fileName") String fileName, HttpServletRequest request) {
         log.info("Try to download backup file: [{}]", fileName);
 
@@ -72,6 +75,7 @@ public class BackupController {
 
     @DeleteMapping("halo")
     @ApiOperation("Deletes a backup")
+    @DisableOnCondition
     public void deleteBackup(@RequestParam("filename") String filename) {
         backupService.deleteHaloBackup(filename);
     }
@@ -83,6 +87,7 @@ public class BackupController {
     }
 
     @GetMapping("export/data")
+    @DisableOnCondition
     public ResponseEntity<String> exportData() {
 
         String contentType = "application/octet-stream;charset=UTF-8";
