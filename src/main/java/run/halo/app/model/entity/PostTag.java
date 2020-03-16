@@ -14,7 +14,9 @@ import java.util.Objects;
  */
 @Data
 @Entity
-@Table(name = "post_tags")
+@Table(name = "post_tags",
+    indexes = {@Index(name = "post_tags_post_id", columnList = "post_id"),
+        @Index(name = "post_tags_tag_id", columnList = "tag_id")})
 @ToString(callSuper = true)
 public class PostTag extends BaseEntity {
 
