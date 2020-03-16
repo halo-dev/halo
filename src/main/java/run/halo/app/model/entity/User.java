@@ -16,7 +16,9 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+    indexes = {@Index(name = "users_username", columnList = "username"),
+        @Index(name = "users_email", columnList = "email")})
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class User extends BaseEntity {
