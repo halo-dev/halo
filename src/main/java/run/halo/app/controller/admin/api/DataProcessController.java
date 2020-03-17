@@ -1,7 +1,9 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.service.DataProcessService;
 import run.halo.app.service.ThemeSettingService;
 
