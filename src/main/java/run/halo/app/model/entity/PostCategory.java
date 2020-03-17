@@ -15,7 +15,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "post_categories",
     indexes = {@Index(name = "post_categories_post_id", columnList = "post_id"),
-    @Index(name = "post_categories_category_id", columnList = "category_id")})
+        @Index(name = "post_categories_category_id", columnList = "category_id")})
 @Data
 @ToString(callSuper = true)
 public class PostCategory extends BaseEntity {

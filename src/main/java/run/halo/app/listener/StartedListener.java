@@ -148,6 +148,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     private void initDirectory() {
         Path workPath = Paths.get(haloProperties.getWorkDir());
         Path backupPath = Paths.get(haloProperties.getBackupDir());
+        Path dataExportPath = Paths.get(haloProperties.getDataExportDir());
 
         try {
             if (Files.notExists(workPath)) {
@@ -158,6 +159,11 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             if (Files.notExists(backupPath)) {
                 Files.createDirectories(backupPath);
                 log.info("Created backup directory: [{}]", backupPath);
+            }
+
+            if (Files.notExists(dataExportPath)) {
+                Files.createDirectories(dataExportPath);
+                log.info("Created data export directory: [{}]", dataExportPath);
             }
 
         } catch (IOException ie) {
