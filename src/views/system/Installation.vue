@@ -24,6 +24,8 @@
               </a-step>
               <a-step title="博客信息">
               </a-step>
+              <a-step title="数据导入">
+              </a-step>
             </a-steps>
             <a-divider dashed />
             <!-- Blogger info -->
@@ -159,6 +161,23 @@
               </a-form-item>
             </a-form>
 
+            <!-- Data migration -->
+            <div v-show="stepCurrent == 2">
+              <a-alert
+                style="margin-bottom: 1rem"
+                message="如果有数据导入需求，请点击并选择之前导出的文件。需要注意的是，并不是所有数据都会导入，该初始化表单的数据会覆盖你导入的数据。"
+                type="info"
+              />
+              <FilePondUpload
+                ref="upload"
+                name="file"
+                accept="application/json"
+                label="拖拽或点击选择数据文件，请确认是否为 Halo 后台导出的文件。"
+                :multiple="false"
+                :uploadHandler="handleMigrationUpload"
+              ></FilePondUpload>
+            </div>
+
             <a-row
               class="install-action"
               type="flex"
@@ -174,12 +193,12 @@
                 >上一步</a-button>
                 <a-button
                   type="primary"
-                  v-if="stepCurrent != 1"
+                  v-if="stepCurrent != 2"
                   @click="handleNextStep"
                 >下一步</a-button>
               </div>
               <a-button
-                v-if="stepCurrent == 1"
+                v-if="stepCurrent == 2"
                 type="primary"
                 icon="upload"
                 @click="handleInstall"
@@ -194,18 +213,20 @@
 
 <script>
 import adminApi from '@/api/admin'
+import migrateApi from '@/api/migrate'
 
 export default {
   data() {
     return {
       installation: {},
       stepCurrent: 0,
+      migrationData: null,
       bloggerForm: this.$form.createForm(this)
     }
   },
   created() {
     this.verifyIsInstall()
-    this.installation.url = window.location.protocol + '//' + window.location.host
+    this.$set(this.installation, 'url', window.location.protocol + '//' + window.location.host)
   },
   methods: {
     verifyIsInstall() {
@@ -224,6 +245,14 @@ export default {
         } else {
           this.stepCurrent++
         }
+      })
+    },
+    handleMigrationUpload(data) {
+      this.$log.debug('Selected data', data)
+      this.migrationData = data
+      return new Promise((resolve, reject) => {
+        this.$log.debug('Handle uploading')
+        resolve()
       })
     },
     install() {
@@ -247,7 +276,21 @@ export default {
         return
       }
 
-      this.install()
+      if (this.migrationData) {
+        const hide = this.$message.loading('数据导入中...', 0)
+        migrateApi
+          .migrate(this.migrationData)
+          .then(response => {
+            this.$log.debug('Migrated successfullly')
+            this.$message.success('数据导入成功！')
+            this.install()
+          })
+          .finally(() => {
+            hide()
+          })
+      } else {
+        this.install()
+      }
     }
   }
 }
