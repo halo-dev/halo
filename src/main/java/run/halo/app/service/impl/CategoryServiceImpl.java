@@ -123,6 +123,21 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
             if (parentCategory.getChildren() == null) {
                 parentCategory.setChildren(new LinkedList<>());
             }
+
+            StringBuilder fullPath = new StringBuilder();
+
+            if (optionService.isEnabledAbsolutePath()) {
+                fullPath.append(optionService.getBlogBaseUrl());
+            }
+
+            fullPath.append("/")
+                .append(optionService.getCategoriesPrefix())
+                .append("/")
+                .append(child.getSlug())
+                .append(optionService.getPathSuffix());
+
+            child.setFullPath(fullPath.toString());
+
             // Add child
             parentCategory.getChildren().add(child);
         });
