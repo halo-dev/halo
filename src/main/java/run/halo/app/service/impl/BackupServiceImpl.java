@@ -2,6 +2,8 @@ package run.halo.app.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.io.file.FileWriter;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +53,9 @@ import java.util.stream.Stream;
 @Slf4j
 public class BackupServiceImpl implements BackupService {
 
-    private static final String BACKUP_RESOURCE_BASE_URI = "/api/admin/backups/halo";
+    private static final String BACKUP_RESOURCE_BASE_URI = "/api/admin/backups/work-dir";
+
+    private static final String DATA_EXPORT_BASE_URI = "/api/admin/backups/data";
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -155,7 +159,7 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public BackupDTO zipWorkDirectory() {
+    public BackupDTO backupWorkDirectory() {
         // Zip work directory to temporary file
         try {
             // Create zip path for halo zip
@@ -169,14 +173,14 @@ public class BackupServiceImpl implements BackupService {
             run.halo.app.utils.FileUtils.zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
 
             // Build backup dto
-            return buildBackupDto(haloZipPath);
+            return buildBackupDto(BACKUP_RESOURCE_BASE_URI, haloZipPath);
         } catch (IOException e) {
             throw new ServiceException("Failed to backup halo", e);
         }
     }
 
     @Override
-    public List<BackupDTO> listHaloBackups() {
+    public List<BackupDTO> listWorkDirBackups() {
         // Ensure the parent folder exist
         Path backupParentPath = Paths.get(haloProperties.getBackupDir());
         if (Files.notExists(backupParentPath)) {
@@ -187,7 +191,7 @@ public class BackupServiceImpl implements BackupService {
         try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
                 .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
-                .map(this::buildBackupDto)
+                .map((backupPath) -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
                 .sorted((leftBackup, rightBackup) -> {
                     // Sort the result
                     if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
@@ -203,7 +207,7 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public void deleteHaloBackup(String fileName) {
+    public void deleteWorkDirBackup(String fileName) {
         Assert.hasText(fileName, "File name must not be blank");
 
         Path backupRootPath = Paths.get(haloProperties.getBackupDir());
@@ -225,10 +229,11 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public Resource loadFileAsResource(String fileName) {
+    public Resource loadFileAsResource(String basePath, String fileName) {
+        Assert.hasText(basePath, "Base path must not be blank");
         Assert.hasText(fileName, "Backup file name must not be blank");
 
-        Path backupParentPath = Paths.get(haloProperties.getBackupDir());
+        Path backupParentPath = Paths.get(basePath);
 
         try {
             if (Files.notExists(backupParentPath)) {
@@ -237,7 +242,7 @@ public class BackupServiceImpl implements BackupService {
             }
 
             // Get backup file path
-            Path backupFilePath = Paths.get(haloProperties.getBackupDir(), fileName).normalize();
+            Path backupFilePath = Paths.get(basePath, fileName).normalize();
 
             // Check directory traversal
             run.halo.app.utils.FileUtils.checkDirectoryTraversal(backupParentPath, backupFilePath);
@@ -258,7 +263,7 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public JSONObject exportData() {
+    public BackupDTO exportData() {
         JSONObject data = new JSONObject();
         data.put("version", HaloConst.HALO_VERSION);
         data.put("export_date", DateUtil.now());
@@ -283,7 +288,67 @@ public class BackupServiceImpl implements BackupService {
         data.put("tags", tagService.listAll());
         data.put("theme_settings", themeSettingService.listAll());
         data.put("user", userService.listAll());
-        return data;
+
+        try {
+            String haloDataFileName = HaloConst.HALO_DATA_EXPORT_PREFIX +
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
+                IdUtil.simpleUUID().hashCode() + ".json";
+
+            Path haloDataPath = Files.createFile(Paths.get(haloProperties.getDataExportDir(), haloDataFileName));
+
+            FileWriter fileWriter = new FileWriter(haloDataPath.toFile(), CharsetUtil.UTF_8);
+            fileWriter.write(data.toJSONString());
+
+            return buildBackupDto(DATA_EXPORT_BASE_URI, haloDataPath);
+        } catch (IOException e) {
+            throw new ServiceException("导出数据失败", e);
+        }
+    }
+
+    @Override
+    public List<BackupDTO> listExportedData() {
+
+        Path exportedDataParentPath = Paths.get(haloProperties.getDataExportDir());
+        if (Files.notExists(exportedDataParentPath)) {
+            return Collections.emptyList();
+        }
+
+        try (Stream<Path> subPathStream = Files.list(exportedDataParentPath)) {
+            return subPathStream
+                .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
+                .map((backupPath) -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
+                .sorted((leftBackup, rightBackup) -> {
+                    // Sort the result
+                    if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
+                        return 1;
+                    } else if (leftBackup.getUpdateTime() > rightBackup.getUpdateTime()) {
+                        return -1;
+                    }
+                    return 0;
+                }).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new ServiceException("Failed to fetch exported data", e);
+        }
+    }
+
+    @Override
+    public void deleteExportedData(String fileName) {
+        Assert.hasText(fileName, "File name must not be blank");
+
+        Path dataExportRootPath = Paths.get(haloProperties.getDataExportDir());
+
+        Path backupPath = dataExportRootPath.resolve(fileName);
+
+        run.halo.app.utils.FileUtils.checkDirectoryTraversal(dataExportRootPath, backupPath);
+
+        try {
+            // Delete backup file
+            Files.delete(backupPath);
+        } catch (NoSuchFileException e) {
+            throw new NotFoundException("The file " + fileName + " was not found", e);
+        } catch (IOException e) {
+            throw new ServiceException("Failed to delete backup", e);
+        }
     }
 
     @Override
@@ -363,14 +428,14 @@ public class BackupServiceImpl implements BackupService {
      * @param backupPath backup path must not be null
      * @return backup dto
      */
-    private BackupDTO buildBackupDto(@NonNull Path backupPath) {
+    private BackupDTO buildBackupDto(@NonNull String basePath, @NonNull Path backupPath) {
+        Assert.notNull(basePath, "Base path must not be null");
         Assert.notNull(backupPath, "Backup path must not be null");
 
         String backupFileName = backupPath.getFileName().toString();
         BackupDTO backup = new BackupDTO();
         try {
-            backup.setDownloadUrl(buildDownloadUrl(backupFileName));
-            backup.setDownloadLink(backup.getDownloadUrl());
+            backup.setDownloadLink(buildDownloadUrl(basePath, backupFileName));
             backup.setFilename(backupFileName);
             backup.setUpdateTime(Files.getLastModifiedTime(backupPath).toMillis());
             backup.setFileSize(Files.size(backupPath));
@@ -388,11 +453,12 @@ public class BackupServiceImpl implements BackupService {
      * @return download url
      */
     @NonNull
-    private String buildDownloadUrl(@NonNull String filename) {
+    private String buildDownloadUrl(@NonNull String basePath, @NonNull String filename) {
+        Assert.notNull(basePath, "Base path must not be null");
         Assert.hasText(filename, "File name must not be blank");
 
         // Composite http url
-        String backupUri = BACKUP_RESOURCE_BASE_URI + HaloUtils.URL_SEPARATOR + filename;
+        String backupUri = basePath + HaloUtils.URL_SEPARATOR + filename;
 
         // Get a one-time token
         String oneTimeToken = oneTimeTokenService.create(backupUri);

@@ -1,6 +1,5 @@
 package run.halo.app.service;
 
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +13,7 @@ import java.util.List;
  * Backup service interface.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-04-26
  */
 public interface BackupService {
@@ -33,7 +33,7 @@ public interface BackupService {
      * @return backup dto.
      */
     @NonNull
-    BackupDTO zipWorkDirectory();
+    BackupDTO backupWorkDirectory();
 
 
     /**
@@ -42,23 +42,24 @@ public interface BackupService {
      * @return backup list
      */
     @NonNull
-    List<BackupDTO> listHaloBackups();
+    List<BackupDTO> listWorkDirBackups();
 
     /**
      * Deletes backup.
      *
      * @param fileName filename must not be blank
      */
-    void deleteHaloBackup(@NonNull String fileName);
+    void deleteWorkDirBackup(@NonNull String fileName);
 
     /**
      * Loads file as resource.
      *
      * @param fileName backup file name must not be blank.
+     * @param basePath base path
      * @return resource of the given file
      */
     @NonNull
-    Resource loadFileAsResource(@NonNull String fileName);
+    Resource loadFileAsResource(@NonNull String basePath, @NonNull String fileName);
 
 
     /**
@@ -67,7 +68,21 @@ public interface BackupService {
      * @return data
      */
     @NonNull
-    JSONObject exportData();
+    BackupDTO exportData();
+
+    /**
+     * List all exported data.
+     *
+     * @return list of backup dto
+     */
+    List<BackupDTO> listExportedData();
+
+    /**
+     * Deletes exported data.
+     *
+     * @param fileName fileName
+     */
+    void deleteExportedData(@NonNull String fileName);
 
     /**
      * Import data
