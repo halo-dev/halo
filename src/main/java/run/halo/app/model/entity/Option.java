@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenericGenerator;
 import run.halo.app.model.enums.OptionType;
 
 import javax.persistence.*;
@@ -25,7 +26,8 @@ import javax.persistence.*;
 public class Option extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
     private Integer id;
 
     /**
@@ -44,7 +46,8 @@ public class Option extends BaseEntity {
     /**
      * option value
      */
-    @Column(name = "option_value", length = 1023, nullable = false)
+    @Column(name = "option_value", nullable = false)
+    @Lob
     private String value;
 
     public Option(String key, String value) {

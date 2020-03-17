@@ -4,6 +4,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -11,6 +12,8 @@ import java.lang.reflect.Type;
  * Reflection utilities.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-15
  */
 public class ReflectionUtils {
 
@@ -88,5 +91,27 @@ public class ReflectionUtils {
         }
 
         return getParameterizedType(superClassType, extensionClass.getGenericSuperclass());
+    }
+
+    /**
+     * Gets field value from Object.
+     *
+     * @param fieldName fieldName must not be null
+     * @param object    object must not be null.
+     * @return value
+     */
+    public static Object getFieldValue(@NonNull String fieldName, @NonNull Object object) {
+        Assert.notNull(fieldName, "FieldName must not be null");
+        Assert.notNull(object, "Object type must not be null");
+        Object value = null;
+        try {
+            String firstLetter = fieldName.substring(0, 1).toUpperCase();
+            String getter = "get" + firstLetter + fieldName.substring(1);
+            Method method = object.getClass().getMethod(getter);
+            value = method.invoke(object);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return value;
     }
 }

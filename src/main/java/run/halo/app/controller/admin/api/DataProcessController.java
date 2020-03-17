@@ -23,18 +23,18 @@ public class DataProcessController {
         this.themeSettingService = themeSettingService;
     }
 
-    @PutMapping("url/replace")
-    @ApiOperation("Replace url in all table.")
-    public void replaceUrl(@RequestParam("oldUrl") String oldUrl,
-                           @RequestParam("newUrl") String newUrl) {
-        dataProcessService.replaceAllUrl(oldUrl, newUrl);
-    }
-
-    @DeleteMapping("themes/settings/inactivated")
-    @ApiOperation("Delete inactivated theme settings.")
-    public void deleteInactivatedThemeSettings() {
-        themeSettingService.deleteInactivated();
-    }
+//    @PutMapping("url/replace")
+//    @ApiOperation("Replace url in all table.")
+//    public void replaceUrl(@RequestParam("oldUrl") String oldUrl,
+//                           @RequestParam("newUrl") String newUrl) {
+//        dataProcessService.replaceAllUrl(oldUrl, newUrl);
+//    }
+//
+//    @DeleteMapping("themes/settings/inactivated")
+//    @ApiOperation("Delete inactivated theme settings.")
+//    public void deleteInactivatedThemeSettings() {
+//        themeSettingService.deleteInactivated();
+//    }
 
     @DeleteMapping("tags/unused")
     @ApiOperation("Delete unused tags")
