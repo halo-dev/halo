@@ -15,10 +15,10 @@
           :number="statisticsData.postCount"
         >
           <router-link
-            :to="{ name:'PostList' }"
+            :to="{ name:'PostEdit' }"
             slot="action"
           >
-            <a-icon type="link" />
+            <a-icon type="plus" />
           </router-link>
         </analysis-card>
       </a-col>
