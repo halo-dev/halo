@@ -38,7 +38,7 @@
             <a-list-item-meta>
               <a
                 slot="title"
-                :href="file.downloadUrl"
+                :href="file.downloadLink"
               >
                 <a-icon
                   type="schedule"
