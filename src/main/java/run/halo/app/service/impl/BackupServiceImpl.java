@@ -191,7 +191,7 @@ public class BackupServiceImpl implements BackupService {
         try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
                 .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
-                .map((backupPath) -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
+                .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
                 .sorted((leftBackup, rightBackup) -> {
                     // Sort the result
                     if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
@@ -316,7 +316,7 @@ public class BackupServiceImpl implements BackupService {
         try (Stream<Path> subPathStream = Files.list(exportedDataParentPath)) {
             return subPathStream
                 .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
-                .map((backupPath) -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
+                .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
                 .sorted((leftBackup, rightBackup) -> {
                     // Sort the result
                     if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
