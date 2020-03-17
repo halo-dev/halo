@@ -4,10 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import freemarker.template.TemplateModel;
-import kr.pe.kwonnam.freemarker.inheritance.BlockDirective;
-import kr.pe.kwonnam.freemarker.inheritance.ExtendsDirective;
-import kr.pe.kwonnam.freemarker.inheritance.PutDirective;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +35,10 @@ import run.halo.app.security.resolver.AuthenticationArgumentResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 import static run.halo.app.utils.HaloUtils.*;
@@ -135,16 +134,6 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         registry.addConverterFactory(new StringToEnumConverterFactory());
     }
 
-    @Bean
-    public Map<String, TemplateModel> freemarkerLayoutDirectives() {
-        Map<String, TemplateModel> freemarkerLayoutDirectives = new HashMap<>(5);
-        freemarkerLayoutDirectives.put("extends", new ExtendsDirective());
-        freemarkerLayoutDirectives.put("block", new BlockDirective());
-        freemarkerLayoutDirectives.put("put", new PutDirective());
-
-        return freemarkerLayoutDirectives;
-    }
-
     /**
      * Configuring freemarker template file path.
      *
@@ -172,13 +161,6 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
 
         // Set predefined freemarker configuration
         configurer.setConfiguration(configuration);
-
-        // Set layout variable
-        Map<String, Object> freemarkerVariables = new HashMap<>(3);
-
-        freemarkerVariables.put("layout", freemarkerLayoutDirectives());
-
-        configurer.setFreemarkerVariables(freemarkerVariables);
 
         return configurer;
     }
