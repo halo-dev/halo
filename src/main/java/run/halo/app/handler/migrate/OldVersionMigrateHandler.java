@@ -688,6 +688,6 @@ public class OldVersionMigrateHandler implements MigrateHandler {
 
     @Override
     public boolean supportType(MigrateType type) {
-        return MigrateType.OLD_VERSION.equals(type);
+        return false;
     }
 }

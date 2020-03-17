@@ -1,6 +1,6 @@
 package run.halo.app.service;
 
-import org.json.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,28 +19,13 @@ import java.util.List;
 public interface BackupService {
 
     /**
-     * Backup posts and sheets
+     * Import markdown content.
      *
      * @param file file
-     * @return post info
+     * @return base post detail dto
+     * @throws IOException throws IOException
      */
     BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException;
-
-
-    /**
-     * export posts by hexo formatter
-     *
-     * @return json object
-     */
-    JSONObject exportHexoMDs();
-
-    /**
-     * Exports the specified articles to the specified dir path.
-     *
-     * @param posts
-     * @param path
-     */
-    void exportHexoMd(List<JSONObject> posts, String path);
 
     /**
      * Zips work directory.
@@ -74,4 +59,21 @@ public interface BackupService {
      */
     @NonNull
     Resource loadFileAsResource(@NonNull String fileName);
+
+
+    /**
+     * Export all database's data.
+     *
+     * @return data
+     */
+    @NonNull
+    JSONObject exportData();
+
+    /**
+     * Import data
+     *
+     * @param file file
+     * @throws IOException throws IOException
+     */
+    void importData(MultipartFile file) throws IOException;
 }

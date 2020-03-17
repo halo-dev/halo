@@ -1,36 +1,31 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.json.JSONObject;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
-import org.yaml.snakeyaml.Yaml;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.event.options.OptionUpdatedEvent;
+import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
-import run.halo.app.model.entity.Post;
-import run.halo.app.model.entity.Tag;
-import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.entity.*;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.service.OneTimeTokenService;
-import run.halo.app.service.BackupService;
-import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
-import run.halo.app.service.PostTagService;
+import run.halo.app.service.*;
 import run.halo.app.utils.HaloUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
@@ -40,7 +35,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,26 +55,79 @@ public class BackupServiceImpl implements BackupService {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
+    private final AttachmentService attachmentService;
+
+    private final CategoryService categoryService;
+
+    private final CommentBlackListService commentBlackListService;
+
+    private final JournalService journalService;
+
+    private final JournalCommentService journalCommentService;
+
+    private final LinkService linkService;
+
+    private final LogService logService;
+
+    private final MenuService menuService;
+
+    private final OptionService optionService;
+
+    private final PhotoService photoService;
+
     private final PostService postService;
+
+    private final PostCategoryService postCategoryService;
+
+    private final PostCommentService postCommentService;
+
+    private final PostMetaService postMetaService;
 
     private final PostTagService postTagService;
 
-    private final OptionService optionService;
+    private final SheetService sheetService;
+
+    private final SheetCommentService sheetCommentService;
+
+    private final SheetMetaService sheetMetaService;
+
+    private final TagService tagService;
+
+    private final ThemeSettingService themeSettingService;
+
+    private final UserService userService;
 
     private final OneTimeTokenService oneTimeTokenService;
 
     private final HaloProperties haloProperties;
 
-    public BackupServiceImpl(PostService postService,
-                             PostTagService postTagService,
-                             OptionService optionService,
-                             OneTimeTokenService oneTimeTokenService,
-                             HaloProperties haloProperties) {
-        this.postService = postService;
-        this.postTagService = postTagService;
+    private final ApplicationEventPublisher eventPublisher;
+
+    public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService, CommentBlackListService commentBlackListService, JournalService journalService, JournalCommentService journalCommentService, LinkService linkService, LogService logService, MenuService menuService, OptionService optionService, PhotoService photoService, PostService postService, PostCategoryService postCategoryService, PostCommentService postCommentService, PostMetaService postMetaService, PostTagService postTagService, SheetService sheetService, SheetCommentService sheetCommentService, SheetMetaService sheetMetaService, TagService tagService, ThemeSettingService themeSettingService, UserService userService, OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties, ApplicationEventPublisher eventPublisher) {
+        this.attachmentService = attachmentService;
+        this.categoryService = categoryService;
+        this.commentBlackListService = commentBlackListService;
+        this.journalService = journalService;
+        this.journalCommentService = journalCommentService;
+        this.linkService = linkService;
+        this.logService = logService;
+        this.menuService = menuService;
         this.optionService = optionService;
+        this.photoService = photoService;
+        this.postService = postService;
+        this.postCategoryService = postCategoryService;
+        this.postCommentService = postCommentService;
+        this.postMetaService = postMetaService;
+        this.postTagService = postTagService;
+        this.sheetService = sheetService;
+        this.sheetCommentService = sheetCommentService;
+        this.sheetMetaService = sheetMetaService;
+        this.tagService = tagService;
+        this.themeSettingService = themeSettingService;
+        this.userService = userService;
         this.oneTimeTokenService = oneTimeTokenService;
         this.haloProperties = haloProperties;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -103,66 +152,6 @@ public class BackupServiceImpl implements BackupService {
         // TODO sheet import
 
         return postService.importMarkdown(markdown, file.getOriginalFilename());
-    }
-
-    @Override
-    public JSONObject exportHexoMDs() {
-        final JSONObject ret = new JSONObject();
-        final List<JSONObject> posts = new ArrayList<>();
-        ret.put("posts", (Object) posts);
-        final List<JSONObject> passwords = new ArrayList<>();
-        ret.put("passwords", (Object) passwords);
-        final List<JSONObject> drafts = new ArrayList<>();
-        ret.put("drafts", (Object) drafts);
-
-        List<Post> postList = postService.listAll();
-        Map<Integer, List<Tag>> talMap = postTagService.listTagListMapBy(postList.stream().map(Post::getId).collect(Collectors.toList()));
-        for (Post post : postList) {
-            final Map<String, Object> front = new LinkedHashMap<>();
-            final String title = post.getTitle();
-            front.put("title", title);
-            final String date = DateFormatUtils.format(post.getCreateTime(), "yyyy-MM-dd HH:mm:ss");
-            front.put("date", date);
-            front.put("updated", DateFormatUtils.format(post.getUpdateTime(), "yyyy-MM-dd HH:mm:ss"));
-            final List<String> tags = talMap.get(post.getId()).stream().map(Tag::getName).collect(Collectors.toList());
-            if (tags.isEmpty()) {
-                tags.add("halo");
-            }
-            front.put("tags", tags);
-            front.put("permalink", "");
-            final JSONObject one = new JSONObject();
-            one.put("front", new Yaml().dump(front));
-            one.put("title", title);
-            one.put("content", post.getOriginalContent());
-            one.put("created", post.getCreateTime().getTime());
-
-            if (StringUtils.isNotBlank(post.getPassword())) {
-                passwords.add(one);
-            } else if (post.getStatus() == PostStatus.DRAFT) {
-                drafts.add(one);
-            } else {
-                posts.add(one);
-            }
-        }
-
-        return ret;
-    }
-
-    @Override
-    public void exportHexoMd(List<JSONObject> posts, String dirPath) {
-        posts.forEach(post -> {
-            final String filename = sanitizeFilename(post.optString("title")) + ".md";
-            final String text = post.optString("front") + "---" + LINE_SEPARATOR + post.optString("content");
-
-            try {
-                final String date = DateFormatUtils.format(post.optLong("created"), "yyyyMM");
-                final String dir = dirPath + File.separator + date + File.separator;
-                new File(dir).mkdirs();
-                FileUtils.writeStringToFile(new File(dir + filename), text, "UTF-8");
-            } catch (final Exception e) {
-                log.error("Write markdown file failed", e);
-            }
-        });
     }
 
     @Override
@@ -266,6 +255,106 @@ public class BackupServiceImpl implements BackupService {
         } catch (IOException e) {
             throw new ServiceException("Failed to create backup parent path: " + backupParentPath, e);
         }
+    }
+
+    @Override
+    public JSONObject exportData() {
+        JSONObject data = new JSONObject();
+        data.put("version", HaloConst.HALO_VERSION);
+        data.put("export_date", DateUtil.now());
+        data.put("attachments", attachmentService.listAll());
+        data.put("categories", categoryService.listAll());
+        data.put("comment_black_list", commentBlackListService.listAll());
+        data.put("journals", journalService.listAll());
+        data.put("journal_comments", journalCommentService.listAll());
+        data.put("links", linkService.listAll());
+        data.put("logs", logService.listAll());
+        data.put("menus", menuService.listAll());
+        data.put("options", optionService.listAll());
+        data.put("photos", photoService.listAll());
+        data.put("posts", postService.listAll());
+        data.put("post_categories", postCategoryService.listAll());
+        data.put("post_comments", postCommentService.listAll());
+        data.put("post_metas", postMetaService.listAll());
+        data.put("post_tags", postTagService.listAll());
+        data.put("sheets", sheetService.listAll());
+        data.put("sheet_comments", sheetCommentService.listAll());
+        data.put("sheet_metas", sheetMetaService.listAll());
+        data.put("tags", tagService.listAll());
+        data.put("theme_settings", themeSettingService.listAll());
+        data.put("user", userService.listAll());
+        return data;
+    }
+
+    @Override
+    public void importData(MultipartFile file) throws IOException {
+        String jsonContent = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);
+
+        JSONObject data = JSONObject.parseObject(jsonContent);
+
+        List<Attachment> attachments = data.getJSONArray("attachments").toJavaList(Attachment.class);
+        attachmentService.createInBatch(attachments);
+
+        List<Category> categories = data.getJSONArray("categories").toJavaList(Category.class);
+        categoryService.createInBatch(categories);
+
+        List<Tag> tags = data.getJSONArray("tags").toJavaList(Tag.class);
+        tagService.createInBatch(tags);
+
+        List<CommentBlackList> commentBlackList = data.getJSONArray("comment_black_list").toJavaList(CommentBlackList.class);
+        commentBlackListService.createInBatch(commentBlackList);
+
+        List<Journal> journals = data.getJSONArray("journals").toJavaList(Journal.class);
+        journalService.createInBatch(journals);
+
+        List<JournalComment> journalComments = data.getJSONArray("journal_comments").toJavaList(JournalComment.class);
+        journalCommentService.createInBatch(journalComments);
+
+        List<Link> links = data.getJSONArray("links").toJavaList(Link.class);
+        linkService.createInBatch(links);
+
+        List<Log> logs = data.getJSONArray("logs").toJavaList(Log.class);
+        logService.createInBatch(logs);
+
+        List<Menu> menus = data.getJSONArray("menus").toJavaList(Menu.class);
+        menuService.createInBatch(menus);
+
+        List<Option> options = data.getJSONArray("options").toJavaList(Option.class);
+        optionService.createInBatch(options);
+
+        eventPublisher.publishEvent(new OptionUpdatedEvent(this));
+
+        List<Photo> photos = data.getJSONArray("photos").toJavaList(Photo.class);
+        photoService.createInBatch(photos);
+
+        List<Post> posts = data.getJSONArray("posts").toJavaList(Post.class);
+        postService.createInBatch(posts);
+
+        List<PostCategory> postCategories = data.getJSONArray("post_categories").toJavaList(PostCategory.class);
+        postCategoryService.createInBatch(postCategories);
+
+        List<PostComment> postComments = data.getJSONArray("post_comments").toJavaList(PostComment.class);
+        postCommentService.createInBatch(postComments);
+
+        List<PostMeta> postMetas = data.getJSONArray("post_metas").toJavaList(PostMeta.class);
+        postMetaService.createInBatch(postMetas);
+
+        List<PostTag> postTags = data.getJSONArray("post_tags").toJavaList(PostTag.class);
+        postTagService.createInBatch(postTags);
+
+        List<Sheet> sheets = data.getJSONArray("sheets").toJavaList(Sheet.class);
+        sheetService.createInBatch(sheets);
+
+        List<SheetComment> sheetComments = data.getJSONArray("sheet_comments").toJavaList(SheetComment.class);
+        sheetCommentService.createInBatch(sheetComments);
+
+        List<SheetMeta> sheetMetas = data.getJSONArray("sheet_metas").toJavaList(SheetMeta.class);
+        sheetMetaService.createInBatch(sheetMetas);
+
+        List<ThemeSetting> themeSettings = data.getJSONArray("theme_settings").toJavaList(ThemeSetting.class);
+        themeSettingService.createInBatch(themeSettings);
+
+        eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
     }
 
     /**

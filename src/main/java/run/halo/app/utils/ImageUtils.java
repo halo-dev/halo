@@ -30,7 +30,7 @@ public class ImageUtils {
         }
     }
 
-    public static ImageReader getImageReaderFromFile(InputStream is,String formatName) {
+    public static ImageReader getImageReaderFromFile(InputStream is, String formatName) {
         try {
             Iterator<ImageReader> readerIterator = ImageIO.getImageReadersByFormatName(formatName);
             ImageReader reader = readerIterator.next();

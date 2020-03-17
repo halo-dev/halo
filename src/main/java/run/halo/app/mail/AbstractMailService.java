@@ -55,6 +55,7 @@ public abstract class AbstractMailService implements MailService {
     /**
      * Test connection with email server.
      */
+    @Override
     public void testConnection() {
         JavaMailSender javaMailSender = getMailSender();
         if (javaMailSender instanceof JavaMailSenderImpl) {
