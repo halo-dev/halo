@@ -7,7 +7,7 @@ plugins {
 
 group = 'run.halo.app'
 archivesBaseName = 'halo'
-version = '1.3.0-beta.2'
+version = '1.3.0-beta.3'
 sourceCompatibility = '1.8'
 description = 'Halo, An excellent open source blog publishing application.'
 
