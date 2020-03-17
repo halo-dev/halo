@@ -64,12 +64,27 @@
             <div slot="title">
               <a-icon type="hdd" /> 博客备份
             </div>
-            <p style="min-height: 50px;">备份全站数据，支持下载到本地</p>
-            <a-button
-              type="primary"
-              style="float:right"
-              @click="backupDrawerVisible = true"
-            >备份</a-button>
+            <p style="min-height: 50px;">支持备份全站数据和数据导出，支持下载到本地</p>
+
+            <a-dropdown style="float:right">
+              <a-menu slot="overlay">
+                <a-menu-item
+                  key="1"
+                  @click="backupWorkDirDrawerVisible = true"
+                >
+                  整站备份
+                </a-menu-item>
+                <a-menu-item
+                  key="2"
+                  @click="exportDataDrawerVisible = true"
+                >
+                  数据导出
+                </a-menu-item>
+              </a-menu>
+              <a-button style="margin-left: 8px"> 备份
+                <a-icon type="down" />
+              </a-button>
+            </a-dropdown>
           </a-card>
         </a-col>
         <a-col
@@ -111,7 +126,8 @@
           :uploadHandler="uploadHandler"
         ></FilePondUpload>
       </a-modal>
-      <BackupDrawer v-model="backupDrawerVisible"></BackupDrawer>
+      <BackupWorkDirDrawer v-model="backupWorkDirDrawerVisible"></BackupWorkDirDrawer>
+      <ExportDataDrawer v-model="exportDataDrawerVisible"></ExportDataDrawer>
     </div>
   </div>
 </template>
@@ -119,13 +135,15 @@
 <script>
 import { mapGetters } from 'vuex'
 import backupApi from '@/api/backup'
-import BackupDrawer from './components/BackupDrawer'
+import BackupWorkDirDrawer from './components/BackupWorkDirDrawer'
+import ExportDataDrawer from './components/ExportDataDrawer'
 
 export default {
-  components: { BackupDrawer },
+  components: { BackupWorkDirDrawer, ExportDataDrawer },
   data() {
     return {
-      backupDrawerVisible: false,
+      backupWorkDirDrawerVisible: false,
+      exportDataDrawerVisible: false,
       markdownUpload: false,
       uploadHandler: backupApi.importMarkdown
     }

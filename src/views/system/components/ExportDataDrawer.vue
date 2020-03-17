@@ -1,6 +1,6 @@
 <template>
   <a-drawer
-    title="博客备份"
+    title="数据导出"
     :width="isMobile()?'100%':'480'"
     closable
     :visible="visible"
@@ -13,19 +13,19 @@
     >
       <a-col :span="24">
         <a-alert
-          message="注意：备份后生成的压缩文件存储在临时文件中，重启服务器会造成备份文件的丢失，所以请尽快下载！"
+          message="注意：导出后的数据文件存储在临时文件中，重启服务器会造成备份文件的丢失，所以请尽快下载！"
           banner
           closable
         />
-        <a-divider>历史备份</a-divider>
+        <a-divider>历史文件</a-divider>
         <a-list
           itemLayout="vertical"
           size="small"
-          :dataSource="backups"
+          :dataSource="files"
         >
           <a-list-item
             slot="renderItem"
-            slot-scope="backup"
+            slot-scope="file"
           >
             <a-button
               slot="extra"
@@ -33,20 +33,20 @@
               style="color: red"
               icon="delete"
               :loading="deleting"
-              @click="handleBackupDeleteClick(backup.filename)"
+              @click="handleFileDeleteClick(file.filename)"
             >删除</a-button>
             <a-list-item-meta>
               <a
                 slot="title"
-                :href="backup.downloadUrl"
+                :href="file.downloadUrl"
               >
                 <a-icon
                   type="schedule"
                   style="color: #52c41a"
                 />
-                {{ backup.filename }}
+                {{ file.filename }}
               </a>
-              <p slot="description">{{ backup.updateTime | timeAgo }}/{{ backup.fileSize | fileSizeFormat }}</p>
+              <p slot="description">{{ file.updateTime | timeAgo }}/{{ file.fileSize | fileSizeFormat }}</p>
             </a-list-item-meta>
           </a-list-item>
           <div
@@ -66,13 +66,13 @@
         icon="download"
         style="marginRight: 8px"
         :loading="backuping"
-        @click="handleBackupClick"
+        @click="handleExportClick"
       >备份</a-button>
       <a-button
         type="dashed"
         icon="reload"
         :loading="loading"
-        @click="handleBAckupRefreshClick"
+        @click="handleFilesRefreshClick"
       >刷新</a-button>
     </div>
   </a-drawer>
@@ -81,14 +81,14 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import backupApi from '@/api/backup'
 export default {
-  name: 'BackupDrawer',
+  name: 'ExportDataDrawer',
   mixins: [mixin, mixinDevice],
   data() {
     return {
       backuping: false,
       loading: false,
       deleting: false,
-      backups: []
+      files: []
     }
   },
   model: {
@@ -105,44 +105,44 @@ export default {
   watch: {
     visible: function(newValue, oldValue) {
       if (newValue) {
-        this.getBackups()
+        this.listFiles()
       }
     }
   },
   methods: {
-    getBackups() {
+    listFiles() {
       this.loading = true
       backupApi
-        .listHaloBackups()
+        .listExportedData()
         .then(response => {
-          this.backups = response.data.data
+          this.files = response.data.data
         })
         .finally(() => (this.loading = false))
     },
-    handleBackupClick() {
+    handleExportClick() {
       this.backuping = true
       backupApi
-        .backupHalo()
+        .exportData()
         .then(response => {
-          this.$notification.success({ message: '备份成功！' })
-          this.getBackups()
+          this.$message.success('导出成功！')
+          this.listFiles()
         })
         .finally(() => {
           this.backuping = false
         })
     },
-    handleBackupDeleteClick(filename) {
+    handleFileDeleteClick(filename) {
       this.deleting = true
       backupApi
-        .deleteHaloBackup(filename)
+        .deleteExportedData(filename)
         .then(response => {
-          this.$notification.success({ message: '删除成功！' })
-          this.getBackups()
+          this.$message.success('删除成功！')
+          this.listFiles()
         })
         .finally(() => (this.deleting = false))
     },
-    handleBAckupRefreshClick() {
-      this.getBackups()
+    handleFilesRefreshClick() {
+      this.listFiles()
     },
     onClose() {
       this.$emit('close', false)
