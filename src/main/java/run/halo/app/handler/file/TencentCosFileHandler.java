@@ -119,6 +119,7 @@ public class TencentCosFileHandler implements FileHandler {
             // Handle thumbnail
             if (FileHandler.isImageType(uploadResult.getMediaType())) {
                 ImageReader image = ImageUtils.getImageReaderFromFile(file.getInputStream(), extension);
+                assert image != null;
                 uploadResult.setWidth(image.getWidth(0));
                 uploadResult.setHeight(image.getHeight(0));
                 if (ImageUtils.EXTENSION_ICO.equals(extension)) {
