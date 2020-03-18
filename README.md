@@ -3,7 +3,6 @@
 > Halo 是一款现代化的个人独立博客系统，给习惯写博客的同学多一个选择。
 
 <p align="center">
-<a href="#"><img alt="JDK" src="https://img.shields.io/badge/JDK-1.8-yellow.svg?style=flat-square"/></a>
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square"/></a>
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/halo-dev/halo/total.svg?style=flat-square"></a>
 <a href="https://hub.docker.com/r/ruibaby/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/ruibaby/halo?style=flat-square"></a>
@@ -15,11 +14,11 @@
 
 ## 简介
 
-**Halo** [ˈheɪloʊ]，意为光环。当然，你也可以当成拼音读(哈喽)。
+**Halo** `[ˈheɪloʊ]`，意为光环。当然，你也可以当成拼音读(哈喽)。
 
 一个优秀的开源博客发布应用，值得一试。
 
-> [官网](https://halo.run) | [社区](https://bbs.halo.run) | [QQ 交流群](https://jq.qq.com/?_wv=1027&k=5tnr930) | [Telegram 交流群](https://t.me/HaloBlog) | [Telegram 频道](https://t.me/halo_dev)
+> [官网 & 文档](https://halo.run) | [社区](https://bbs.halo.run) | [Telegram 频道](https://t.me/halo_dev)
 
 ## 声明
 
