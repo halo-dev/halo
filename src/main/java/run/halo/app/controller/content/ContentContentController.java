@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.controller.content.model.*;
 import run.halo.app.exception.NotFoundException;
@@ -17,7 +17,6 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
-import run.halo.app.service.ThemeService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -53,9 +52,7 @@ public class ContentContentController {
 
     private final SheetService sheetService;
 
-    private final ThemeService themeService;
-
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
     public ContentContentController(PostModel postModel,
                                     SheetModel sheetModel,
@@ -67,8 +64,7 @@ public class ContentContentController {
                                     OptionService optionService,
                                     PostService postService,
                                     SheetService sheetService,
-                                    ThemeService themeService,
-                                    StringCacheStore cacheStore) {
+                                    AbstractStringCacheStore cacheStore) {
         this.postModel = postModel;
         this.sheetModel = sheetModel;
         this.categoryModel = categoryModel;
@@ -79,7 +75,6 @@ public class ContentContentController {
         this.optionService = optionService;
         this.postService = postService;
         this.sheetService = sheetService;
-        this.themeService = themeService;
         this.cacheStore = cacheStore;
     }
 

@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.text.StrBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -30,6 +29,8 @@ import run.halo.app.utils.ServiceUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Sheet service implementation.
@@ -173,7 +174,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     public String exportMarkdown(Sheet sheet) {
         Assert.notNull(sheet, "Sheet must not be null");
 
-        StrBuilder content = new StrBuilder("---\n");
+        StringBuilder content = new StringBuilder("---\n");
 
         content.append("type: ").append("sheet").append("\n");
         content.append("title: ").append(sheet.getTitle()).append("\n");
@@ -342,9 +343,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append("/")
+        fullPath.append(URL_SEPARATOR)
             .append(optionService.getSheetPrefix())
-            .append("/")
+            .append(URL_SEPARATOR)
             .append(sheet.getSlug())
             .append(optionService.getPathSuffix());
 

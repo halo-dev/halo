@@ -1,8 +1,6 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.text.StrBuilder;
-import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -46,6 +44,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Post service implementation.
@@ -383,11 +382,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             post.setStatus(PostStatus.PUBLISHED);
         }
 
-        if (StrUtil.isEmpty(post.getTitle())) {
+        if (StringUtils.isEmpty(post.getTitle())) {
             post.setTitle(filename);
         }
 
-        if (StrUtil.isEmpty(post.getSlug())) {
+        if (StringUtils.isEmpty(post.getSlug())) {
             post.setSlug(SlugUtils.slug(post.getTitle()));
         }
 
@@ -407,7 +406,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public String exportMarkdown(Post post) {
         Assert.notNull(post, "Post must not be null");
 
-        StrBuilder content = new StrBuilder("---\n");
+        StringBuilder content = new StringBuilder("---\n");
 
         content.append("type: ").append("post").append("\n");
         content.append("title: ").append(post.getTitle()).append("\n");
@@ -885,11 +884,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append("/");
+        fullPath.append(URL_SEPARATOR);
 
         if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
             fullPath.append(archivesPrefix)
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.ID)) {
@@ -897,18 +896,18 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .append(post.getId());
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(monthString)
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(monthString)
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(dayString)
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
         }

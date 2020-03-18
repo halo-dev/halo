@@ -8,11 +8,11 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.UrlPathHelper;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.ForbiddenException;
-import run.halo.app.exception.HaloException;
 import run.halo.app.exception.NotInstallException;
 import run.halo.app.model.enums.Mode;
 import run.halo.app.model.properties.PrimaryProperties;
@@ -44,7 +44,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     protected final AntPathMatcher antPathMatcher;
     protected final HaloProperties haloProperties;
     protected final OptionService optionService;
-    protected final StringCacheStore cacheStore;
+    protected final AbstractStringCacheStore cacheStore;
     private final UrlPathHelper urlPathHelper = new UrlPathHelper();
     private OneTimeTokenService oneTimeTokenService;
 
@@ -59,7 +59,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
     AbstractAuthenticationFilter(HaloProperties haloProperties,
                                  OptionService optionService,
-                                 StringCacheStore cacheStore,
+                                 AbstractStringCacheStore cacheStore,
                                  OneTimeTokenService oneTimeTokenService) {
         this.haloProperties = haloProperties;
         this.optionService = optionService;
@@ -189,7 +189,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
             // Do authenticate
             doAuthenticate(request, response, filterChain);
-        } catch (HaloException e) {
+        } catch (AbstractHaloException e) {
             getFailureHandler().onFailure(request, response, e);
         } finally {
             SecurityContextHolder.clearContext();

@@ -22,7 +22,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
@@ -68,7 +68,7 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final OptionService optionService;
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
     private final ThemeConfigResolver themeConfigResolver;
 
@@ -90,7 +90,7 @@ public class ThemeServiceImpl implements ThemeService {
 
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
-                            StringCacheStore cacheStore,
+                            AbstractStringCacheStore cacheStore,
                             ThemeConfigResolver themeConfigResolver,
                             ThemePropertyResolver themePropertyResolver,
                             RestTemplate restTemplate,
