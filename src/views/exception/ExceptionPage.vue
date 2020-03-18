@@ -1,18 +1,14 @@
 <template>
   <div class="exception">
-    <div class="img">
-      <img :src="config[type].img" />
-    </div>
-    <div class="content">
-      <h1>{{ config[type].title }}</h1>
-      <div class="desc">{{ config[type].desc }}</div>
-      <div class="action">
-        <a-button
-          type="primary"
-          @click="handleToHome"
-        >返回首页</a-button>
-      </div>
-    </div>
+    <a-result
+      :status="type"
+      :title="type"
+      :subTitle="config[type].desc"
+    >
+      <template v-slot:extra>
+        <a-button type="primary" @click="handleToHome">返回仪表盘</a-button>
+      </template>
+    </a-result>
   </div>
 </template>
 
