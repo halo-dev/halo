@@ -1,6 +1,5 @@
 package run.halo.app.controller.admin.api;
 
-import cn.hutool.core.text.StrBuilder;
 import cn.hutool.crypto.SecureUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
-import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.entity.User;
@@ -159,15 +157,15 @@ public class InstallController {
 
 
     @Nullable
-    private BaseComment createDefaultComment(@Nullable PostDetailVO post) {
+    private void createDefaultComment(@Nullable PostDetailVO post) {
         if (post == null) {
-            return null;
+            return;
         }
 
         long commentCount = postCommentService.count();
 
         if (commentCount > 0) {
-            return null;
+            return;
         }
 
         PostComment comment = new PostComment();
@@ -176,7 +174,7 @@ public class InstallController {
         comment.setContent("欢迎使用 Halo，这是你的第一条评论，头像来自 [Gravatar](https://cn.gravatar.com)，你也可以通过注册 [Gravatar](https://cn.gravatar.com) 来显示自己的头像。");
         comment.setEmail("hi@halo.run");
         comment.setPostId(post.getId());
-        return postCommentService.create(comment);
+        postCommentService.create(comment);
     }
 
     @Nullable
@@ -260,10 +258,9 @@ public class InstallController {
             // Update user
             return userService.update(user);
         }).orElseGet(() -> {
-            StrBuilder gravatar = new StrBuilder("//cn.gravatar.com/avatar/");
-            gravatar.append(SecureUtil.md5(installParam.getEmail()));
-            gravatar.append("?s=256&d=mm");
-            installParam.setAvatar(gravatar.toString());
+            String gravatar = "//cn.gravatar.com/avatar/" + SecureUtil.md5(installParam.getEmail()) +
+                "?s=256&d=mm";
+            installParam.setAvatar(gravatar);
             return userService.createBy(installParam);
         });
     }

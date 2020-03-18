@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * CategoryService implementation class.
  *
@@ -130,9 +132,9 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
                 fullPath.append(optionService.getBlogBaseUrl());
             }
 
-            fullPath.append("/")
+            fullPath.append(URL_SEPARATOR)
                 .append(optionService.getCategoriesPrefix())
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(child.getSlug())
                 .append(optionService.getPathSuffix());
 
@@ -216,9 +218,9 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append("/")
+        fullPath.append(URL_SEPARATOR)
             .append(optionService.getCategoriesPrefix())
-            .append("/")
+            .append(URL_SEPARATOR)
             .append(category.getSlug())
             .append(optionService.getPathSuffix());
 

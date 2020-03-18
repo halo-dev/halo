@@ -24,6 +24,12 @@ public class HaloConst {
      */
     public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");
 
+    public final static String PROTOCOL_HTTPS = "https://";
+
+    public final static String PROTOCOL_HTTP = "http://";
+
+    public final static String URL_SEPARATOR = "/";
+
     /**
      * Halo backup prefix.
      */

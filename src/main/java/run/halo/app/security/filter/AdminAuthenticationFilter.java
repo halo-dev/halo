@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.model.entity.User;
@@ -44,7 +44,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private final UserService userService;
 
-    public AdminAuthenticationFilter(StringCacheStore cacheStore,
+    public AdminAuthenticationFilter(AbstractStringCacheStore cacheStore,
                                      UserService userService,
                                      HaloProperties haloProperties,
                                      OptionService optionService,

@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author johnniang
  */
 @Slf4j
-public class InMemoryCacheStore extends StringCacheStore {
+public class InMemoryCacheStore extends AbstractStringCacheStore {
 
     /**
      * Cleaner schedule period. (ms)

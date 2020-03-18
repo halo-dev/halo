@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * @author ryanwang
  * @date 2020-03-07
@@ -71,7 +73,7 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                         .append(pathSuffix);
 
                     if (page == 1) {
-                        prevPageFullPath.append("/");
+                        prevPageFullPath.append(URL_SEPARATOR);
                     } else {
                         prevPageFullPath.append("/page/")
                             .append(page)
@@ -90,9 +92,9 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                     break;
                 case "archives":
 
-                    nextPageFullPath.append("/")
+                    nextPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getArchivesPrefix());
-                    prevPageFullPath.append("/")
+                    prevPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getArchivesPrefix());
 
                     nextPageFullPath.append("/page/")
@@ -108,7 +110,7 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                             .append(pathSuffix);
                     }
 
-                    fullPath.append("/")
+                    fullPath.append(URL_SEPARATOR)
                         .append(optionService.getArchivesPrefix());
 
                     fullPath.append("/page/");
@@ -124,9 +126,9 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                 case "search":
                     String keyword = params.get("keyword").toString();
 
-                    nextPageFullPath.append("/")
+                    nextPageFullPath.append(URL_SEPARATOR)
                         .append("search");
-                    prevPageFullPath.append("/")
+                    prevPageFullPath.append(URL_SEPARATOR)
                         .append("search");
 
                     nextPageFullPath.append("/page/")
@@ -147,7 +149,7 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                             .append(keyword);
                     }
 
-                    fullPath.append("/")
+                    fullPath.append(URL_SEPARATOR)
                         .append("search");
 
                     fullPath.append("/page/");
@@ -163,13 +165,13 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                 case "tagPosts":
                     String tagSlug = params.get("slug").toString();
 
-                    nextPageFullPath.append("/")
+                    nextPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getTagsPrefix())
-                        .append("/")
+                        .append(URL_SEPARATOR)
                         .append(tagSlug);
-                    prevPageFullPath.append("/")
+                    prevPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getTagsPrefix())
-                        .append("/")
+                        .append(URL_SEPARATOR)
                         .append(tagSlug);
 
                     nextPageFullPath.append("/page/")
@@ -184,9 +186,9 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                             .append(pathSuffix);
                     }
 
-                    fullPath.append("/")
+                    fullPath.append(URL_SEPARATOR)
                         .append(optionService.getTagsPrefix())
-                        .append("/")
+                        .append(URL_SEPARATOR)
                         .append(tagSlug);
 
                     fullPath.append("/page/");
@@ -202,13 +204,13 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                 case "categoryPosts":
                     String categorySlug = params.get("slug").toString();
 
-                    nextPageFullPath.append("/")
+                    nextPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getCategoriesPrefix())
-                        .append("/")
+                        .append(URL_SEPARATOR)
                         .append(categorySlug);
-                    prevPageFullPath.append("/")
+                    prevPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getCategoriesPrefix())
-                        .append("/")
+                        .append(URL_SEPARATOR)
                         .append(categorySlug);
 
                     nextPageFullPath.append("/page/")
@@ -223,9 +225,9 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                             .append(pathSuffix);
                     }
 
-                    fullPath.append("/")
+                    fullPath.append(URL_SEPARATOR)
                         .append(optionService.getCategoriesPrefix())
-                        .append("/")
+                        .append(URL_SEPARATOR)
                         .append(categorySlug);
 
                     fullPath.append("/page/");
@@ -240,9 +242,9 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                     break;
                 case "photos":
 
-                    nextPageFullPath.append("/")
+                    nextPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getPhotosPrefix());
-                    prevPageFullPath.append("/")
+                    prevPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getPhotosPrefix());
 
                     nextPageFullPath.append("/page/")
@@ -257,7 +259,7 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                             .append(pathSuffix);
                     }
 
-                    fullPath.append("/")
+                    fullPath.append(URL_SEPARATOR)
                         .append(optionService.getPhotosPrefix());
 
                     fullPath.append("/page/");
@@ -272,9 +274,9 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                     break;
                 case "journals":
 
-                    nextPageFullPath.append("/")
+                    nextPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getJournalsPrefix());
-                    prevPageFullPath.append("/")
+                    prevPageFullPath.append(URL_SEPARATOR)
                         .append(optionService.getJournalsPrefix());
 
                     nextPageFullPath.append("/page/")
@@ -289,7 +291,7 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                             .append(pathSuffix);
                     }
 
-                    fullPath.append("/")
+                    fullPath.append(URL_SEPARATOR)
                         .append(optionService.getJournalsPrefix());
 
                     fullPath.append("/page/");

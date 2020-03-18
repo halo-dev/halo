@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import run.halo.app.exception.HaloException;
+import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.utils.ExceptionUtils;
 import run.halo.app.utils.ValidationUtils;
@@ -106,8 +106,8 @@ public class ControllerExceptionHandler {
         return baseResponse;
     }
 
-    @ExceptionHandler(HaloException.class)
-    public ResponseEntity<BaseResponse> handleHaloException(HaloException e) {
+    @ExceptionHandler(AbstractHaloException.class)
+    public ResponseEntity<BaseResponse> handleHaloException(AbstractHaloException e) {
         BaseResponse<Object> baseResponse = handleBaseException(e);
         baseResponse.setStatus(e.getStatus().value());
         baseResponse.setData(e.getErrorData());

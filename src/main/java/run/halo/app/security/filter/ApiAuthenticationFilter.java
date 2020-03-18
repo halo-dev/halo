@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.exception.ForbiddenException;
@@ -40,7 +40,7 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
     public ApiAuthenticationFilter(HaloProperties haloProperties,
                                    OptionService optionService,
-                                   StringCacheStore cacheStore,
+                                   AbstractStringCacheStore cacheStore,
                                    OneTimeTokenService oneTimeTokenService,
                                    ObjectMapper objectMapper) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);

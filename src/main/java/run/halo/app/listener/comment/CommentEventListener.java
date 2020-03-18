@@ -2,8 +2,8 @@ package run.halo.app.listener.comment;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
-import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -166,7 +166,7 @@ public class CommentEventListener {
 
             PostComment baseComment = postCommentService.getById(postComment.getParentId());
 
-            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -196,7 +196,7 @@ public class CommentEventListener {
 
             SheetComment baseComment = sheetCommentService.getById(sheetComment.getParentId());
 
-            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -225,7 +225,7 @@ public class CommentEventListener {
 
             JournalComment baseComment = journalCommentService.getById(journalComment.getParentId());
 
-            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 

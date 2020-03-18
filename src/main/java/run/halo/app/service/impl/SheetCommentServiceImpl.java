@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * Sheet comment service implementation.
  *
@@ -97,9 +99,9 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append("/")
+        fullPath.append(URL_SEPARATOR)
             .append(optionService.getSheetPrefix())
-            .append("/")
+            .append(URL_SEPARATOR)
             .append(basePostMinimalDTO.getSlug())
             .append(optionService.getPathSuffix());
 

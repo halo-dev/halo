@@ -11,9 +11,25 @@ import org.springframework.lang.Nullable;
  * @date 19-6-10
  */
 public enum Mode {
+
+    /**
+     * Production mode
+     */
     PRODUCTION,
+
+    /**
+     * Develop mode
+     */
     DEVELOPMENT,
+
+    /**
+     * Demo mode
+     */
     DEMO,
+
+    /**
+     * Test mode
+     */
     TEST;
 
     /**

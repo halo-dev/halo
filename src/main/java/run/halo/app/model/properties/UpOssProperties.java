@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.support.HaloConst;
+
 /**
  * Upyun oss properties.
  *
@@ -27,7 +29,7 @@ public enum UpOssProperties implements PropertyEnum {
     /**
      * upyun oss domain protocol
      */
-    OSS_PROTOCOL("oss_upyun_domain_protocol", String.class, "https://"),
+    OSS_PROTOCOL("oss_upyun_domain_protocol", String.class, HaloConst.PROTOCOL_HTTPS),
 
     /**
      * upyun oss domain

@@ -62,7 +62,7 @@ public class BackupController {
         // Load file as resource
         Resource backupResource = backupService.loadFileAsResource(haloProperties.getBackupDir(), fileName);
 
-        String contentType = "application/octet-stream";
+        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         // Try to determine file's content type
         try {
             contentType = request.getServletContext().getMimeType(backupResource.getFile().getAbsolutePath());
@@ -119,7 +119,7 @@ public class BackupController {
         // Load exported data as resource
         Resource exportDataResource = backupService.loadFileAsResource(haloProperties.getDataExportDir(), fileName);
 
-        String contentType = "application/octet-stream";
+        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         // Try to determine file's content type
         try {
             contentType = request.getServletContext().getMimeType(exportDataResource.getFile().getAbsolutePath());
