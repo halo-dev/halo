@@ -25,6 +25,8 @@ import run.halo.app.utils.ImageUtils;
 import javax.imageio.ImageReader;
 import java.util.Objects;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * Tencent cos file handler.
  *
@@ -68,13 +70,13 @@ public class TencentCosFileHandler implements FileHandler {
 
         if (StringUtils.isNotEmpty(domain)) {
             basePath.append(domain)
-                .append("/");
+                .append(URL_SEPARATOR);
         } else {
             basePath.append(bucketName)
                 .append(".cos.")
                 .append(region)
                 .append(".myqcloud.com")
-                .append("/");
+                .append(URL_SEPARATOR);
         }
 
         try {
@@ -85,7 +87,7 @@ public class TencentCosFileHandler implements FileHandler {
 
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                    .append("/");
+                    .append(URL_SEPARATOR);
             }
 
             upFilePath.append(basename)

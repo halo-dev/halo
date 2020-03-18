@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
  * @author johnniang
  * @date 19-4-23
  */
-public abstract class CommentBaseEvent extends ApplicationEvent {
+public abstract class AbstractCommentBaseEvent extends ApplicationEvent {
 
     /**
      * PostComment id.
@@ -23,7 +23,7 @@ public abstract class CommentBaseEvent extends ApplicationEvent {
      * @param source    the object on which the event initially occurred (never {@code null})
      * @param commentId comment id
      */
-    public CommentBaseEvent(Object source, @NonNull Long commentId) {
+    public AbstractCommentBaseEvent(Object source, @NonNull Long commentId) {
         super(source);
 
         Assert.notNull(commentId, "PostComment id must not be null");

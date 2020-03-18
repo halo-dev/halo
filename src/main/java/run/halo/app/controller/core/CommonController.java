@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.util.NestedServletException;
-import run.halo.app.exception.HaloException;
+import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
@@ -170,8 +170,8 @@ public class CommonController extends AbstractErrorController {
 
         if (throwable instanceof NestedServletException) {
             Throwable rootCause = ((NestedServletException) throwable).getRootCause();
-            if (rootCause instanceof HaloException) {
-                HaloException haloException = (HaloException) rootCause;
+            if (rootCause instanceof AbstractHaloException) {
+                AbstractHaloException haloException = (AbstractHaloException) rootCause;
                 request.setAttribute("javax.servlet.error.status_code", haloException.getStatus().value());
                 request.setAttribute("javax.servlet.error.exception", rootCause);
                 request.setAttribute("javax.servlet.error.message", haloException.getMessage());

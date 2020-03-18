@@ -11,9 +11,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.RestTemplate;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.cache.InMemoryCacheStore;
 import run.halo.app.cache.LevelCacheStore;
-import run.halo.app.cache.StringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.utils.HttpClientUtils;
 
@@ -51,8 +51,8 @@ public class HaloConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public StringCacheStore stringCacheStore() {
-        StringCacheStore stringCacheStore;
+    public AbstractStringCacheStore stringCacheStore() {
+        AbstractStringCacheStore stringCacheStore;
         switch (haloProperties.getCache()) {
             case "level":
                 stringCacheStore = new LevelCacheStore();

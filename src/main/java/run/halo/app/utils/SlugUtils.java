@@ -1,6 +1,6 @@
 package run.halo.app.utils;
 
-import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
@@ -51,6 +51,6 @@ public class SlugUtils {
             replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
             replaceAll("\\s", "")
             .toLowerCase(Locale.ENGLISH);
-        return StrUtil.isNotEmpty(slug) ? slug : String.valueOf(System.currentTimeMillis());
+        return StringUtils.isNotEmpty(slug) ? slug : String.valueOf(System.currentTimeMillis());
     }
 }

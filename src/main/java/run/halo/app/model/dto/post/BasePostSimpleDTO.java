@@ -18,7 +18,7 @@ public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
     private String thumbnail;
 
-    private Long visits = 0L;
+    private Long visits;
 
     private Boolean disallowComment;
 
@@ -26,7 +26,7 @@ public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
     private String template;
 
-    private Integer topPriority = 0;
+    private Integer topPriority;
 
-    private Long likes = 0L;
+    private Long likes;
 }

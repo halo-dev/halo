@@ -3,7 +3,7 @@ package run.halo.app.controller.content.model;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
@@ -32,7 +32,7 @@ public class SheetModel {
 
     private final SheetMetaService sheetMetaService;
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
     private final ThemeService themeService;
 
@@ -40,7 +40,7 @@ public class SheetModel {
 
     public SheetModel(SheetService sheetService,
                       SheetMetaService sheetMetaService,
-                      StringCacheStore cacheStore,
+                      AbstractStringCacheStore cacheStore,
                       ThemeService themeService,
                       OptionService optionService) {
         this.sheetService = sheetService;

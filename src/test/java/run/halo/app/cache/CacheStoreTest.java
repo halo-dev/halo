@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
  */
 public class CacheStoreTest {
 
-    private StringCacheStore cacheStore = new InMemoryCacheStore();
+    private AbstractStringCacheStore cacheStore = new InMemoryCacheStore();
 
     @Test(expected = IllegalArgumentException.class)
     public void putNullValueTest() {

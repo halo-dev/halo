@@ -21,6 +21,8 @@ import run.halo.app.utils.ImageUtils;
 import javax.imageio.ImageReader;
 import java.util.Objects;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * Ali oss file handler.
  *
@@ -60,12 +62,12 @@ public class AliOssFileHandler implements FileHandler {
 
         if (StringUtils.isNotEmpty(domain)) {
             basePath.append(domain)
-                .append("/");
+                .append(URL_SEPARATOR);
         } else {
             basePath.append(bucketName)
                 .append(".")
                 .append(endPoint)
-                .append("/");
+                .append(URL_SEPARATOR);
         }
 
         try {
@@ -76,7 +78,7 @@ public class AliOssFileHandler implements FileHandler {
 
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                    .append("/");
+                    .append(URL_SEPARATOR);
             }
 
             upFilePath.append(basename)

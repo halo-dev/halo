@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
@@ -85,7 +85,7 @@ public class AdminServiceImpl implements AdminService {
 
     private final MailService mailService;
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
     private final RestTemplate restTemplate;
 
@@ -107,7 +107,7 @@ public class AdminServiceImpl implements AdminService {
                             UserService userService,
                             LinkService linkService,
                             MailService mailService,
-                            StringCacheStore cacheStore,
+                            AbstractStringCacheStore cacheStore,
                             RestTemplate restTemplate,
                             HaloProperties haloProperties,
                             ApplicationEventPublisher eventPublisher,

@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * PostCommentService implementation class
  *
@@ -125,11 +127,11 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append("/");
+        fullPath.append(URL_SEPARATOR);
 
         if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
             fullPath.append(archivesPrefix)
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.ID)) {
@@ -137,18 +139,18 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
                 .append(post.getId());
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(monthString)
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(monthString)
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(dayString)
-                .append("/")
+                .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
         }
