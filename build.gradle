@@ -6,10 +6,13 @@ plugins {
 }
 
 group = 'run.halo.app'
-archivesBaseName = 'halo'
 version = '1.3.0-beta.3'
-sourceCompatibility = '1.8'
 description = 'Halo, An excellent open source blog publishing application.'
+
+java {
+    archivesBaseName = 'halo'
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
 
 repositories {
     maven {
@@ -55,7 +58,7 @@ ext {
     set('httpclientVersion', "4.5.12")
     set('dataformatYamlVersion', "2.10.3")
     set('jgitVersion', "5.7.0.202003110725-r")
-    set('flexmarkVersion', "0.42.12")
+    set('flexmarkVersion', "0.60.2")
     set('thumbnailatorVersion', "0.4.11")
     set('image4jVersion', "0.7zensight1")
     set('flywayVersion', "6.3.1")
@@ -63,6 +66,7 @@ ext {
     set('levelDbVersion', "0.12")
     set('jsonVersion', "20190722")
     set('fastJsonVersion', "1.2.66")
+    set('annotationsVersion',"3.0.1")
 }
 
 dependencies {
@@ -87,6 +91,7 @@ dependencies {
     implementation "org.apache.httpcomponents:httpclient:${httpclientVersion}"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${dataformatYamlVersion}"
     implementation "org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}"
+    implementation "com.google.code.findbugs:annotations:${annotationsVersion}"
 
     implementation "com.vladsch.flexmark:flexmark:${flexmarkVersion}"
     implementation "com.vladsch.flexmark:flexmark-ext-attributes:${flexmarkVersion}"
@@ -99,9 +104,10 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-ext-media-tags:${flexmarkVersion}"
     implementation "com.vladsch.flexmark:flexmark-ext-tables:${flexmarkVersion}"
     implementation "com.vladsch.flexmark:flexmark-ext-toc:${flexmarkVersion}"
+    implementation "com.vladsch.flexmark:flexmark-ext-superscript:${flexmarkVersion}"
     implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:${flexmarkVersion}"
     implementation "com.vladsch.flexmark:flexmark-ext-gitlab:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-html-parser:${flexmarkVersion}"
+//    implementation "com.vladsch.flexmark:flexmark-html-parser:${flexmarkVersion}"
 
     implementation "net.coobird:thumbnailator:${thumbnailatorVersion}"
     implementation "net.sf.image4j:image4j:${image4jVersion}"

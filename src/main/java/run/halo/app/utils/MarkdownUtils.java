@@ -1,6 +1,5 @@
 package run.halo.app.utils;
 
-import com.vladsch.flexmark.convert.html.FlexmarkHtmlParser;
 import com.vladsch.flexmark.ext.attributes.AttributesExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiExtension;
@@ -12,6 +11,7 @@ import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
 import com.vladsch.flexmark.ext.gitlab.GitLabExtension;
 import com.vladsch.flexmark.ext.ins.InsExtension;
 import com.vladsch.flexmark.ext.media.tags.MediaTagsExtension;
+import com.vladsch.flexmark.ext.superscript.SuperscriptExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor;
@@ -19,8 +19,8 @@ import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
-import com.vladsch.flexmark.util.options.DataHolder;
-import com.vladsch.flexmark.util.options.MutableDataSet;
+import com.vladsch.flexmark.util.data.DataHolder;
+import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.support.HaloConst;
 
@@ -32,7 +32,7 @@ import java.util.Map;
  * Markdown utils.
  *
  * @author ryanwang
- * @date 2019/06/27
+ * @date 2019-06-27
  */
 public class MarkdownUtils {
 
@@ -48,6 +48,7 @@ public class MarkdownUtils {
             MediaTagsExtension.create(),
             TablesExtension.create(),
             TocExtension.create(),
+            SuperscriptExtension.create(),
             YamlFrontMatterExtension.create(),
             GitLabExtension.create())
         )
@@ -99,15 +100,15 @@ public class MarkdownUtils {
         return RENDERER.render(document);
     }
 
-    /**
-     * Render html document to markdown document.
-     *
-     * @param html html document
-     * @return markdown document
-     */
-    public static String renderMarkdown(String html) {
-        return FlexmarkHtmlParser.parse(html);
-    }
+//    /**
+//     * Render html document to markdown document.
+//     *
+//     * @param html html document
+//     * @return markdown document
+//     */
+//    public static String renderMarkdown(String html) {
+//        return FlexmarkHtmlParser.parse(html);
+//    }
 
     /**
      * Get front-matter
