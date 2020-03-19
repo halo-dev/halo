@@ -19,12 +19,6 @@ import java.util.List;
  */
 public interface LinkService extends CrudService<Link, Integer> {
 
-    String META_NAME = "name";
-
-    String META_DESCRIPTION = "description";
-
-    String META_CONTENT = "content";
-
     /**
      * List link dtos.
      *
@@ -66,12 +60,4 @@ public interface LinkService extends CrudService<Link, Integer> {
      * @return a list of teams.
      */
     List<String> listAllTeams();
-
-    /**
-     * Get link by parse url.
-     *
-     * @param url url must not be null
-     * @return link dto
-     */
-    LinkDTO getByParse(@NonNull String url);
 }

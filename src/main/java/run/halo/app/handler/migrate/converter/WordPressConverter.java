@@ -129,7 +129,7 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
         BasePost post = RelationMapperUtils.convertFrom(item, BasePost.class);
         Date postDate = DateUtil.parseDateTime(item.getPostDate());
         if (StringUtils.isNoneEmpty(post.getFormatContent())) {
-            post.setOriginalContent(MarkdownUtils.renderMarkdown(post.getFormatContent()));
+            post.setOriginalContent(post.getFormatContent());
         }
         post.setCreateTime(postDate);
         post.setUpdateTime(postDate);
