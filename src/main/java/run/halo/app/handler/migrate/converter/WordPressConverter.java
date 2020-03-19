@@ -9,7 +9,6 @@ import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Tag;
-import run.halo.app.utils.MarkdownUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
