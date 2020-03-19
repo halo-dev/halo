@@ -9,7 +9,6 @@ import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Tag;
-import run.halo.app.utils.MarkdownUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -129,7 +128,7 @@ public class WordPressConverter implements Converter<Rss, List<PostVO>> {
         BasePost post = RelationMapperUtils.convertFrom(item, BasePost.class);
         Date postDate = DateUtil.parseDateTime(item.getPostDate());
         if (StringUtils.isNoneEmpty(post.getFormatContent())) {
-            post.setOriginalContent(MarkdownUtils.renderMarkdown(post.getFormatContent()));
+            post.setOriginalContent(post.getFormatContent());
         }
         post.setCreateTime(postDate);
         post.setUpdateTime(postDate);
