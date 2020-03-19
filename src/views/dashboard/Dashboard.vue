@@ -39,7 +39,7 @@
             :to="{ name:'Comments' }"
             slot="action"
           >
-            <a-icon type="link" />
+            <a-icon type="unordered-list" />
           </router-link>
         </analysis-card>
       </a-col>
