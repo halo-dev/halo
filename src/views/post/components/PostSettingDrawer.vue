@@ -33,12 +33,6 @@
                 </template>
                 <a-input v-model="selectedPost.slug" />
               </a-form-item>
-              <a-form-item label="访问密码：">
-                <a-input-password
-                  v-model="selectedPost.password"
-                  autocomplete="new-password"
-                />
-              </a-form-item>
 
               <a-form-item label="发表时间：">
                 <a-date-picker
@@ -215,6 +209,20 @@
       :visible="advancedVisible"
     >
       <div class="post-setting-drawer-content">
+        <div :style="{ marginBottom: '16px' }">
+          <h3 class="post-setting-drawer-title">加密设置</h3>
+          <div class="post-setting-drawer-item">
+            <a-form layout="vertical">
+              <a-form-item label="访问密码：">
+                <a-input-password
+                  v-model="selectedPost.password"
+                  autocomplete="new-password"
+                />
+              </a-form-item>
+            </a-form>
+          </div>
+        </div>
+        <a-divider />
         <div :style="{ marginBottom: '16px' }">
           <h3 class="post-setting-drawer-title">SEO 设置</h3>
           <div class="post-setting-drawer-item">
