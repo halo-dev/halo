@@ -48,15 +48,15 @@ logApi.logType = {
   },
   LOGGED_IN: {
     value: 25,
-    text: '用户登陆'
+    text: '用户登录'
   },
   LOGGED_OUT: {
     value: 30,
-    text: '注销登陆'
+    text: '注销登录'
   },
   LOGIN_FAILED: {
     value: 35,
-    text: '登陆失败'
+    text: '登录失败'
   },
   PASSWORD_UPDATED: {
     value: 40,

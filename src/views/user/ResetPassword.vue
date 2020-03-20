@@ -110,7 +110,7 @@
               class="tip animated fadeInUp"
               :style="{'animation-delay': '0.7s'}"
             >
-              返回登陆
+              返回登录
             </a>
           </router-link>
         </a-row>
