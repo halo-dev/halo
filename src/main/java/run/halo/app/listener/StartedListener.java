@@ -2,6 +2,7 @@ package run.halo.app.listener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.internal.jdbc.JdbcUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ansi.AnsiColor;
@@ -16,6 +17,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.properties.PrimaryProperties;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.FileUtils;
@@ -23,6 +25,9 @@ import run.halo.app.utils.FileUtils;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.Collections;
 
 /**
@@ -57,7 +62,11 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
-        this.migrate();
+        try {
+            this.migrate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         this.initThemes();
         this.initDirectory();
         this.printStartInfo();
@@ -77,8 +86,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     /**
      * Migrate database.
      */
-    private void migrate() {
+    private void migrate() throws SQLException {
         log.info("Starting migrate database...");
+
         Flyway flyway = Flyway
             .configure()
             .locations("classpath:/migration")
@@ -88,6 +98,19 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             .load();
         flyway.repair();
         flyway.migrate();
+
+        // Gets database connection
+        Connection connection = flyway.getConfiguration().getDataSource().getConnection();
+
+        // Gets database metadata
+        DatabaseMetaData databaseMetaData = JdbcUtils.getDatabaseMetaData(connection);
+
+        // Gets database product name
+        HaloConst.DATABASE_PRODUCT_NAME = databaseMetaData.getDatabaseProductName() + " " + databaseMetaData.getDatabaseProductVersion();
+
+        // Close connection.
+        connection.close();
+
         log.info("Migrate database succeed.");
     }
 
