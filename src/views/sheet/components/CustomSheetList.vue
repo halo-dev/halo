@@ -408,7 +408,6 @@ export default {
       selectedMetas: [],
       sheetSettingVisible: false,
       sheetCommentVisible: false,
-      internalSheets: [],
       sheets: [],
       menu: {}
     }

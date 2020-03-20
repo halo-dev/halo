@@ -4,11 +4,11 @@
       <a-col :span="24">
         <div class="card-container">
           <a-tabs type="card">
-            <a-tab-pane key="internal">
+            <a-tab-pane key="independent">
               <span slot="tab">
-                <a-icon type="paper-clip" />内置页面
+                <a-icon type="paper-clip" />独立页面
               </span>
-              <InternalSheetList />
+              <IndependentSheetList />
             </a-tab-pane>
             <a-tab-pane key="custom">
               <span slot="tab">
@@ -24,12 +24,12 @@
 </template>
 
 <script>
-import InternalSheetList from './components/InternalSheetList'
+import IndependentSheetList from './components/IndependentSheetList'
 import CustomSheetList from './components/CustomSheetList'
 
 export default {
   components: {
-    InternalSheetList,
+    IndependentSheetList,
     CustomSheetList
   }
 }

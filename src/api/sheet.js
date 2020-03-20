@@ -12,9 +12,9 @@ sheetApi.list = params => {
   })
 }
 
-sheetApi.listInternal = () => {
+sheetApi.listIndependent = () => {
   return service({
-    url: `${baseUrl}/internal`,
+    url: `${baseUrl}/independent`,
     method: 'get'
   })
 }

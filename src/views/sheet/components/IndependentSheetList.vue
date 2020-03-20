@@ -6,7 +6,7 @@
       itemLayout="vertical"
       size="large"
       :pagination="false"
-      :dataSource="internalSheets"
+      :dataSource="independentSheets"
       :loading="loading"
     >
       <a-list-item
@@ -17,27 +17,14 @@
         <template slot="actions">
           <span>
             <router-link
-              :to="{name:'LinkList'}"
-              v-if="item.id==1"
-            >
-              <a-icon type="edit" />
-            </router-link>
-            <router-link
-              :to="{name:'PhotoList'}"
-              v-if="item.id==2"
-            >
-              <a-icon type="edit" />
-            </router-link>
-            <router-link
-              :to="{name:'JournalList'}"
-              v-if="item.id==3"
+              :to="{name:item.routeName}"
             >
               <a-icon type="edit" />
             </router-link>
           </span>
         </template>
         <template slot="extra">
-          <span v-if="item.status">可用</span>
+          <span v-if="item.available">可用</span>
           <span v-else>不可用
             <a-tooltip
               slot="action"
@@ -53,12 +40,12 @@
             style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
             <a
-              :href="item.url"
+              :href="item.fullPath"
               target="_blank"
-              v-if="item.status"
+              v-if="item.available"
             >{{ item.title }}</a>
             <a
-              :href="item.url"
+              :href="item.fullPath"
               target="_blank"
               disabled
               v-else
@@ -72,17 +59,17 @@
     <!-- Desktop -->
     <a-table
       v-else
-      :columns="internalColumns"
-      :dataSource="internalSheets"
+      :columns="independentColumns"
+      :dataSource="independentSheets"
       :pagination="false"
-      :rowKey="page => page.id"
+      :rowKey="sheet => sheet.id"
       :loading="loading"
     >
       <template
-        slot="status"
-        slot-scope="status"
+        slot="available"
+        slot-scope="available"
       >
-        <span v-if="status">可用</span>
+        <span v-if="available">可用</span>
         <span v-else>不可用
           <a-tooltip
             slot="action"
@@ -97,31 +84,18 @@
         slot-scope="text, record"
       >
         <router-link
-          :to="{name:'LinkList'}"
-          v-if="record.id==1"
-        >
-          <a href="javascript:void(0);">管理</a>
-        </router-link>
-        <router-link
-          :to="{name:'PhotoList'}"
-          v-if="record.id==2"
-        >
-          <a href="javascript:void(0);">管理</a>
-        </router-link>
-        <router-link
-          :to="{name:'JournalList'}"
-          v-if="record.id==3"
+          :to="{name:record.routeName}"
         >
           <a href="javascript:void(0);">管理</a>
         </router-link>
         <a-divider type="vertical" />
         <a
-          :href="record.url"
+          :href="record.fullPath"
           target="_blank"
-          v-if="record.status"
+          v-if="record.available"
         >访问</a>
         <a
-          :href="record.url"
+          :href="record.fullPath"
           target="_blank"
           disabled
           v-else
@@ -133,19 +107,19 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import sheetApi from '@/api/sheet'
-const internalColumns = [
+const independentColumns = [
   {
     title: '页面名称',
     dataIndex: 'title'
   },
   {
     title: '访问地址',
-    dataIndex: 'url'
+    dataIndex: 'fullPath'
   },
   {
     title: '状态',
-    dataIndex: 'status',
-    scopedSlots: { customRender: 'status' }
+    dataIndex: 'available',
+    scopedSlots: { customRender: 'available' }
   },
   {
     title: '操作',
@@ -155,23 +129,23 @@ const internalColumns = [
   }
 ]
 export default {
-  name: 'InternalSheetList',
+  name: 'IndependentSheetList',
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      internalColumns,
-      internalSheets: [],
+      independentColumns,
+      independentSheets: [],
       loading: false
     }
   },
   created() {
-    this.loadInternalSheets()
+    this.loadIndependentSheets()
   },
   methods: {
-    loadInternalSheets() {
+    loadIndependentSheets() {
       this.loading = true
-      sheetApi.listInternal().then(response => {
-        this.internalSheets = response.data.data
+      sheetApi.listIndependent().then(response => {
+        this.independentSheets = response.data.data
         this.loading = false
       })
     }

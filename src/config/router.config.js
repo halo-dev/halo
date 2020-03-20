@@ -76,21 +76,21 @@ export const asyncRouterMap = [
             path: '/sheets/links',
             name: 'LinkList',
             hidden: true,
-            component: () => import('@/views/sheet/internal/LinkList'),
+            component: () => import('@/views/sheet/independent/LinkList'),
             meta: { title: '友情链接', hiddenHeaderContent: false }
           },
           {
             path: '/sheets/photos',
             name: 'PhotoList',
             hidden: true,
-            component: () => import('@/views/sheet/internal/PhotoList'),
+            component: () => import('@/views/sheet/independent/PhotoList'),
             meta: { title: '图库', hiddenHeaderContent: false }
           },
           {
             path: '/sheets/journals',
             name: 'JournalList',
             hidden: true,
-            component: () => import('@/views/sheet/internal/JournalList'),
+            component: () => import('@/views/sheet/independent/JournalList'),
             meta: { title: '日志', hiddenHeaderContent: false }
           }
         ]
