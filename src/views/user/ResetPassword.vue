@@ -154,7 +154,7 @@ export default {
       adminApi
         .sendResetCode(this.resetParam)
         .then(response => {
-          this.$message.info('邮件发送成功，五分钟内有效')
+          this.$message.success('邮件发送成功，五分钟内有效')
         })
         .finally(() => {
           hide()
@@ -204,7 +204,7 @@ export default {
         return
       }
       adminApi.resetPassword(this.resetParam).then(response => {
-        this.$message.info('密码重置成功！')
+        this.$message.success('密码重置成功！')
         this.$router.push({ name: 'Login' })
       })
     }

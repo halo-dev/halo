@@ -722,7 +722,7 @@ export default {
     },
     handleEditStatusMore(status) {
       if (this.selectedRowKeys.length <= 0) {
-        this.$message.success('请至少选择一项！')
+        this.$message.info('请至少选择一项！')
         return
       }
       postApi.updateStatusInBatch(this.selectedRowKeys, status).then(response => {
@@ -733,7 +733,7 @@ export default {
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {
-        this.$message.success('请至少选择一项！')
+        this.$message.info('请至少选择一项！')
         return
       }
       postApi.deleteInBatch(this.selectedRowKeys).then(response => {

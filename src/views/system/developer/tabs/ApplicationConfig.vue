@@ -82,7 +82,7 @@ export default {
     },
     handleRestartApplication() {
       adminApi.restartApplication().then(response => {
-        this.$message.success(`重启中...`)
+        this.$message.info(`重启中...`)
       })
     }
   }
