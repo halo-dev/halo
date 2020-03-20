@@ -2,7 +2,7 @@ package run.halo.app.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
-import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.model.dto.IndependentSheetDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostStatus;
@@ -100,12 +100,12 @@ public interface SheetService extends BasePostService<Sheet> {
     String exportMarkdown(@NonNull Sheet sheet);
 
     /**
-     * List internal sheets.
+     * List independent sheets.
      *
-     * @return list of internal sheets
+     * @return list of independent sheets
      */
     @NonNull
-    List<InternalSheetDTO> listInternal();
+    List<IndependentSheetDTO> listIndependentSheets();
 
     /**
      * Converts to list dto page.
