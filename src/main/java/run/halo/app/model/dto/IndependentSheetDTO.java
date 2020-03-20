@@ -9,13 +9,15 @@ import lombok.Data;
  * @date 2019/5/4
  */
 @Data
-public class InternalSheetDTO {
+public class IndependentSheetDTO {
 
     private Integer id;
 
     private String title;
 
-    private String url;
+    private String fullPath;
 
-    private Boolean status;
+    private String routeName;
+
+    private Boolean available;
 }
