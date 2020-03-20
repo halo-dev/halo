@@ -50,18 +50,18 @@ wget https://github.com/halo-dev/halo/releases/download/v1.2.0/halo-1.2.0.jar -O
 java -jar halo-latest.jar
 ```
 
-详细部署文档请移步：<https://halo.run/archives/install-quick-start>
+详细部署文档请移步：<https://halo.run/archives/install-quick-start.html>
 
 ## 博客示例
 
-请移步： <https://halo.run/s/user-wall>。
+请移步： <https://halo.run/p/user-wall.html>。
 
 ## 周边
 
 - 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
 - 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
 - 管理 APP（已停止维护）：<https://github.com/halo-dev/halo-app>
-- 主题仓库：<https://halo.run/s/themes>
+- 主题仓库：<https://halo.run/p/themes.html>
 - 资源下载：<https://dl.halo.run>
 - WeHalo 小程序：<https://github.com/aquanlerou/WeHalo>
 
