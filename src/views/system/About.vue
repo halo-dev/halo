@@ -204,7 +204,7 @@ User Agent：${navigator.userAgent}`
           }
           _this.isLatest = false
           const title = '新版本提醒'
-          const content = '检测到 Server 新版本：' + data.name + '，点击下方按钮查看最新版本。'
+          const content = '检测到 Halo 新版本：' + data.name + '，点击下方按钮查看最新版本。'
           const url = data.html_url
           this.$notification.open({
             message: title,
