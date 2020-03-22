@@ -8,7 +8,8 @@ import {
   DEFAULT_FIXED_SIDEMENU,
   DEFAULT_FIXED_HEADER_HIDDEN,
   DEFAULT_CONTENT_WIDTH_TYPE,
-  API_URL
+  API_URL,
+  LAYOUT_SETTING
 } from '@/store/mutation-types'
 
 const app = {
@@ -22,7 +23,8 @@ const app = {
     fixSiderbar: false,
     autoHideHeader: false,
     color: null,
-    apiUrl: null
+    apiUrl: null,
+    layoutSetting: false
   },
   mutations: {
     SET_API_URL: (state, apiUrl) => {
@@ -72,6 +74,10 @@ const app = {
     TOGGLE_COLOR: (state, color) => {
       Vue.ls.set(DEFAULT_COLOR, color)
       state.color = color
+    },
+    TOGGLE_LAYOUT_SETTING: (state, show) => {
+      Vue.ls.set(LAYOUT_SETTING, show)
+      state.layoutSetting = show
     }
   },
   actions: {
@@ -107,6 +113,9 @@ const app = {
     },
     ToggleColor({ commit }, color) {
       commit('TOGGLE_COLOR', color)
+    },
+    ToggleLayoutSetting({ commit }, show) {
+      commit('TOGGLE_LAYOUT_SETTING', show)
     }
   }
 }

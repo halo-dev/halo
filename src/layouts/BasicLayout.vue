@@ -54,6 +54,8 @@
         <global-footer />
       </a-layout-footer>
     </a-layout>
+
+    <setting-drawer ref="drawer"></setting-drawer>
   </a-layout>
 </template>
 
@@ -68,6 +70,7 @@ import RouteView from './RouteView'
 import SideMenu from '@/components/Menu/SideMenu'
 import GlobalHeader from '@/components/GlobalHeader'
 import GlobalFooter from '@/components/GlobalFooter'
+import SettingDrawer from '@/components/SettingDrawer/SettingDrawer'
 
 export default {
   name: 'BasicLayout',
@@ -76,7 +79,8 @@ export default {
     RouteView,
     SideMenu,
     GlobalHeader,
-    GlobalFooter
+    GlobalFooter,
+    SettingDrawer
   },
   data() {
     return {

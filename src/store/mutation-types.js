@@ -10,6 +10,7 @@ export const DEFAULT_CONTENT_WIDTH_TYPE = 'DEFAULT_CONTENT_WIDTH_TYPE'
 export const USER = 'USER'
 export const API_URL = 'API_URL'
 export const OPTIONS = 'OPTIONS'
+export const LAYOUT_SETTING = 'LAYOUT_SETTING'
 
 export const CONTENT_WIDTH_TYPE = {
   Fluid: 'Fluid',

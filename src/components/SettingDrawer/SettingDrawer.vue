@@ -7,7 +7,7 @@
       width="300"
       closable
       @close="onClose"
-      :visible="visible"
+      :visible="layoutSetting"
     >
       <div class="setting-drawer-index-content">
         <div :style="{ marginBottom: '24px' }">
@@ -194,6 +194,7 @@ import SettingItem from '@/components/SettingDrawer/SettingItem'
 import config from '@/config/defaultSettings'
 import { updateTheme, colorList } from './setting'
 import { mixin, mixinDevice } from '@/utils/mixin'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -202,7 +203,6 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      visible: false,
       colorList,
       baseConfig: Object.assign({}, config)
     }
@@ -214,15 +214,13 @@ export default {
       updateTheme(this.primaryColor)
     }
   },
+  computed: {
+    ...mapGetters(['layoutSetting'])
+  },
   methods: {
-    showDrawer() {
-      this.visible = true
-    },
+    ...mapActions(['setSidebar', 'ToggleLayoutSetting']),
     onClose() {
-      this.visible = false
-    },
-    toggle() {
-      this.visible = !this.visible
+      this.ToggleLayoutSetting(false)
     },
     handleMenuTheme(theme) {
       this.baseConfig.navTheme = theme
