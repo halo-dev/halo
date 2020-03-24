@@ -46,7 +46,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     protected final OptionService optionService;
     protected final AbstractStringCacheStore cacheStore;
     private final UrlPathHelper urlPathHelper = new UrlPathHelper();
-    private OneTimeTokenService oneTimeTokenService;
+    private final OneTimeTokenService oneTimeTokenService;
 
     private volatile AuthenticationFailureHandler failureHandler;
     /**

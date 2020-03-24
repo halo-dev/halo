@@ -17,9 +17,6 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
-import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
@@ -33,12 +30,9 @@ import run.halo.app.factory.StringToEnumConverterFactory;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 import static run.halo.app.utils.HaloUtils.*;
@@ -188,48 +182,4 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         return new HaloRequestMappingHandlerMapping(haloProperties);
     }
 
-    private static class HaloRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
-
-        private final Set<String> blackPatterns = new HashSet<>(16);
-
-        private final PathMatcher pathMatcher;
-
-        private final HaloProperties haloProperties;
-
-        public HaloRequestMappingHandlerMapping(HaloProperties haloProperties) {
-            this.haloProperties = haloProperties;
-            this.initBlackPatterns();
-            pathMatcher = new AntPathMatcher();
-        }
-
-        @Override
-        protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
-            log.debug("Looking path: [{}]", lookupPath);
-            for (String blackPattern : blackPatterns) {
-                if (this.pathMatcher.match(blackPattern, lookupPath)) {
-                    log.debug("Skipped path [{}] with pattern: [{}]", lookupPath, blackPattern);
-                    return null;
-                }
-            }
-            return super.lookupHandlerMethod(lookupPath, request);
-        }
-
-        private void initBlackPatterns() {
-            String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
-            String adminPathPattern = ensureBoth(haloProperties.getAdminPath(), URL_SEPARATOR) + "?*/**";
-
-            blackPatterns.add("/themes/**");
-            blackPatterns.add("/js/**");
-            blackPatterns.add("/images/**");
-            blackPatterns.add("/fonts/**");
-            blackPatterns.add("/css/**");
-            blackPatterns.add("/assets/**");
-            blackPatterns.add("/color.less");
-            blackPatterns.add("/swagger-ui.html");
-            blackPatterns.add("/csrf");
-            blackPatterns.add("/webjars/**");
-            blackPatterns.add(uploadUrlPattern);
-            blackPatterns.add(adminPathPattern);
-        }
-    }
 }

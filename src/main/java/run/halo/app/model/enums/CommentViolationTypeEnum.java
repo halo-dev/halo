@@ -19,7 +19,7 @@ public enum CommentViolationTypeEnum {
      */
     FREQUENTLY(1);
 
-    private int type;
+    private final int type;
 
     CommentViolationTypeEnum(int type) {
         this.type = type;
