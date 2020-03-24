@@ -31,6 +31,8 @@ public class ContentFilter extends AbstractAuthenticationFilter {
                          OneTimeTokenService oneTimeTokenService) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
 
+        addUrlPatterns("/**");
+
         String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
         addExcludeUrlPatterns(
             adminPattern,
