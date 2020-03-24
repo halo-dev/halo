@@ -1,6 +1,6 @@
 {
   "name": "halo-admin",
-  "version": "1.3.0-beta.3",
+  "version": "1.3.0-beta.4",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -9,7 +9,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "ant-design-vue": "^1.5.0-rc.3",
+    "ant-design-vue": "^1.5.0-rc.5",
     "axios": "^0.19.2",
     "enquire.js": "^2.1.6",
     "filepond": "^4.13.0",
