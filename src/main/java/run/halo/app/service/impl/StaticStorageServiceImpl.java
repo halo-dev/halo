@@ -117,6 +117,10 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
 
         Path path;
 
+        if (StringUtils.startsWith(folderName, API_FOLDER_NAME)) {
+            throw new FileOperationException("目录名称 " + folderName + " 不合法");
+        }
+
         if (StringUtils.isEmpty(basePath)) {
             path = Paths.get(staticDir.toString(), folderName);
         } else {
@@ -135,10 +139,14 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
     }
 
     @Override
-    public void update(String basePath, MultipartFile file) {
+    public void upload(String basePath, MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
         Path uploadPath;
+
+        if (StringUtils.startsWith(file.getOriginalFilename(), API_FOLDER_NAME)) {
+            throw new FileOperationException("文件名称 " + file.getOriginalFilename() + " 不合法");
+        }
 
         if (StringUtils.isEmpty(basePath)) {
             uploadPath = Paths.get(staticDir.toString(), file.getOriginalFilename());

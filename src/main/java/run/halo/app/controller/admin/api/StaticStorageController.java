@@ -47,6 +47,6 @@ public class StaticStorageController {
     @ApiOperation("Uploads static file")
     public void upload(String basePath,
                        @RequestPart("file") MultipartFile file) {
-        staticStorageService.update(basePath, file);
+        staticStorageService.upload(basePath, file);
     }
 }
