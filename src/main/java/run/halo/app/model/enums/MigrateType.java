@@ -23,7 +23,7 @@ public enum MigrateType implements ValueEnum<Integer> {
      */
     CNBLOGS(2);
 
-    private Integer value;
+    private final Integer value;
 
     MigrateType(Integer value) {
         this.value = value;

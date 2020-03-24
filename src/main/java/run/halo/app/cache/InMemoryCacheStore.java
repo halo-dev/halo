@@ -34,7 +34,7 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     /**
      * Lock.
      */
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     public InMemoryCacheStore() {
         // Run a cache store cleaner
