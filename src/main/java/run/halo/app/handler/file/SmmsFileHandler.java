@@ -54,7 +54,7 @@ public class SmmsFileHandler implements FileHandler {
 
     private final OptionService optionService;
 
-    private HttpHeaders headers = new HttpHeaders();
+    private final HttpHeaders headers = new HttpHeaders();
 
     public SmmsFileHandler(RestTemplate httpsRestTemplate,
                            OptionService optionService) {

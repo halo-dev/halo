@@ -18,7 +18,7 @@ public enum StaticDeployType implements ValueEnum<Integer> {
      */
     NETLIFY(1);
 
-    private Integer value;
+    private final Integer value;
 
     StaticDeployType(Integer value) {
         this.value = value;

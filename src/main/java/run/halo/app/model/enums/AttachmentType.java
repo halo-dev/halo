@@ -43,7 +43,7 @@ public enum AttachmentType implements ValueEnum<Integer> {
      */
     TENCENTCOS(6);
 
-    private Integer value;
+    private final Integer value;
 
     AttachmentType(Integer value) {
         this.value = value;

@@ -15,7 +15,7 @@ public enum BanStatusEnum {
      */
     NORMAL(0);
 
-    private int status;
+    private final int status;
 
     BanStatusEnum(int status) {
         this.status = status;

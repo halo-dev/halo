@@ -52,8 +52,8 @@ public enum UpOssProperties implements PropertyEnum {
     OSS_THUMBNAIL_STYLE_RULE("oss_upyun_thumbnail_style_rule", String.class, "");
 
     private final String defaultValue;
-    private String value;
-    private Class<?> type;
+    private final String value;
+    private final Class<?> type;
 
     UpOssProperties(String value, Class<?> type, String defaultValue) {
         this.defaultValue = defaultValue;
