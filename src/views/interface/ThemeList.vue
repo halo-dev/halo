@@ -172,8 +172,8 @@
                 更多主题请访问：
                 <a
                   target="_blank"
-                  href="https://halo.run/s/themes"
-                >https://halo.run/s/themes</a>
+                  href="https://halo.run/p/themes"
+                >https://halo.run/p/themes</a>
               </template>
             </a-alert>
           </a-tab-pane>
@@ -202,8 +202,8 @@
                 <br>更多主题请访问：
                 <a
                   target="_blank"
-                  href="https://halo.run/s/themes"
-                >https://halo.run/s/themes</a>
+                  href="https://halo.run/p/themes"
+                >https://halo.run/p/themes</a>
               </template>
             </a-alert>
           </a-tab-pane>
