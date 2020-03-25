@@ -19,7 +19,7 @@ public class DisableOnConditionController {
     @GetMapping("/no")
     @DisableOnCondition
     public BaseResponse<String> blockAccess() {
-        return BaseResponse.ok("测试静止访问");
+        return BaseResponse.ok("测试禁止访问");
     }
 
     @GetMapping("/yes")
