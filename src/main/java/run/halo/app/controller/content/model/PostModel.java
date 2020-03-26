@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
@@ -50,7 +50,7 @@ public class PostModel {
 
     private final OptionService optionService;
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
     public PostModel(PostService postService,
                      ThemeService themeService,
@@ -60,7 +60,7 @@ public class PostModel {
                      PostTagService postTagService,
                      TagService tagService,
                      OptionService optionService,
-                     StringCacheStore cacheStore) {
+                     AbstractStringCacheStore cacheStore) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;

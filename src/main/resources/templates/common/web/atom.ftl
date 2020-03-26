@@ -41,14 +41,12 @@
                     <name>${user.nickname!}</name>
                     <uri>${blog_url!}</uri>
                 </author>
-                <content type="html" xml:base="${blog_url!}" xml:lang="en">
-                    <![CDATA[
-                        <#if (options.rss_content_type!'full') == 'full'>
-                            ${post.formatContent!}
-                        <#else>
-                            ${post.summary!}
-                        </#if>
-                    ]]>
+                <content type="html">
+                    <#if (options.rss_content_type!'full') == 'full'>
+                        <![CDATA[${post.formatContent!}]]>
+                    <#else>
+                        <![CDATA[${post.summary!}]]>
+                    </#if>
                 </content>
             </entry>
         </#list>

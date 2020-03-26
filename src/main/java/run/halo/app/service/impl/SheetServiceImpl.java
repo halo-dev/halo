@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.text.StrBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -14,7 +13,7 @@ import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.model.dto.IndependentSheetDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
@@ -30,6 +29,8 @@ import run.halo.app.utils.ServiceUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Sheet service implementation.
@@ -173,7 +174,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     public String exportMarkdown(Sheet sheet) {
         Assert.notNull(sheet, "Sheet must not be null");
 
-        StrBuilder content = new StrBuilder("---\n");
+        StringBuilder content = new StringBuilder("---\n");
 
         content.append("type: ").append("sheet").append("\n");
         content.append("title: ").append(sheet.getTitle()).append("\n");
@@ -190,28 +191,35 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    public List<InternalSheetDTO> listInternal() {
+    public List<IndependentSheetDTO> listIndependentSheets() {
+
+        String context = (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/";
+
+        // TODO 日后将重构该部分，提供接口用于拓展独立页面，以供插件系统使用。
 
         // links sheet
-        InternalSheetDTO linkSheet = new InternalSheetDTO();
+        IndependentSheetDTO linkSheet = new IndependentSheetDTO();
         linkSheet.setId(1);
         linkSheet.setTitle("友情链接");
-        linkSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getLinksPrefix());
-        linkSheet.setStatus(themeService.templateExists("links.ftl"));
+        linkSheet.setFullPath(context + optionService.getLinksPrefix());
+        linkSheet.setRouteName("LinkList");
+        linkSheet.setAvailable(themeService.templateExists("links.ftl"));
 
         // photos sheet
-        InternalSheetDTO photoSheet = new InternalSheetDTO();
+        IndependentSheetDTO photoSheet = new IndependentSheetDTO();
         photoSheet.setId(2);
         photoSheet.setTitle("图库页面");
-        photoSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getPhotosPrefix());
-        photoSheet.setStatus(themeService.templateExists("photos.ftl"));
+        photoSheet.setFullPath(context + optionService.getPhotosPrefix());
+        photoSheet.setRouteName("PhotoList");
+        photoSheet.setAvailable(themeService.templateExists("photos.ftl"));
 
         // journals sheet
-        InternalSheetDTO journalSheet = new InternalSheetDTO();
+        IndependentSheetDTO journalSheet = new IndependentSheetDTO();
         journalSheet.setId(3);
         journalSheet.setTitle("日志页面");
-        journalSheet.setUrl((optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/" + optionService.getJournalsPrefix());
-        journalSheet.setStatus(themeService.templateExists("journals.ftl"));
+        journalSheet.setFullPath(context + optionService.getJournalsPrefix());
+        journalSheet.setRouteName("JournalList");
+        journalSheet.setAvailable(themeService.templateExists("journals.ftl"));
 
         return Arrays.asList(linkSheet, photoSheet, journalSheet);
     }
@@ -342,9 +350,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append("/")
+        fullPath.append(URL_SEPARATOR)
             .append(optionService.getSheetPrefix())
-            .append("/")
+            .append(URL_SEPARATOR)
             .append(sheet.getSlug())
             .append(optionService.getPathSuffix());
 

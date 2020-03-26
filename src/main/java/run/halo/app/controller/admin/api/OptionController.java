@@ -44,8 +44,8 @@ public class OptionController {
     }
 
     @PostMapping("saving")
-    @DisableOnCondition
     @ApiOperation("Saves options")
+    @DisableOnCondition
     public void saveOptions(@Valid @RequestBody List<OptionParam> optionParams) {
         optionService.save(optionParams);
     }
@@ -78,30 +78,30 @@ public class OptionController {
     }
 
     @PostMapping
-    @DisableOnCondition
     @ApiOperation("Creates option")
+    @DisableOnCondition
     public void createBy(@RequestBody @Valid OptionParam optionParam) {
         optionService.save(optionParam);
     }
 
     @PutMapping("{optionId:\\d+}")
-    @DisableOnCondition
     @ApiOperation("Updates option")
+    @DisableOnCondition
     public void updateBy(@PathVariable("optionId") Integer optionId,
                          @RequestBody @Valid OptionParam optionParam) {
         optionService.update(optionId, optionParam);
     }
 
     @DeleteMapping("{optionId:\\d+}")
-    @DisableOnCondition
     @ApiOperation("Deletes option")
+    @DisableOnCondition
     public void deletePermanently(@PathVariable("optionId") Integer optionId) {
         optionService.removePermanently(optionId);
     }
 
     @PostMapping("map_view/saving")
-    @DisableOnCondition
     @ApiOperation("Saves options by option map")
+    @DisableOnCondition
     public void saveOptionsWithMapView(@RequestBody Map<String, Object> optionMap) {
         optionService.save(optionMap);
     }

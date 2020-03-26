@@ -24,6 +24,8 @@ import run.halo.app.utils.ServiceUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * Post tag service implementation.
  *
@@ -85,9 +87,9 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
                     fullPath.append(optionService.getBlogBaseUrl());
                 }
 
-                fullPath.append("/")
+                fullPath.append(URL_SEPARATOR)
                     .append(optionService.getTagsPrefix())
-                    .append("/")
+                    .append(URL_SEPARATOR)
                     .append(tag.getSlug())
                     .append(optionService.getPathSuffix());
 

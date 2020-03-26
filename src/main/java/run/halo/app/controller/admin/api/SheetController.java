@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.cache.StringCacheStore;
-import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.model.dto.IndependentSheetDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
@@ -41,12 +41,12 @@ public class SheetController {
 
     private final SheetService sheetService;
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
     private final OptionService optionService;
 
     public SheetController(SheetService sheetService,
-                           StringCacheStore cacheStore,
+                           AbstractStringCacheStore cacheStore,
                            OptionService optionService) {
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
@@ -67,10 +67,10 @@ public class SheetController {
         return sheetService.convertToListVo(sheetPage);
     }
 
-    @GetMapping("internal")
-    @ApiOperation("Lists internal sheets")
-    public List<InternalSheetDTO> internalSheets() {
-        return sheetService.listInternal();
+    @GetMapping("independent")
+    @ApiOperation("Lists independent sheets")
+    public List<IndependentSheetDTO> independentSheets() {
+        return sheetService.listIndependentSheets();
     }
 
     @PostMapping

@@ -22,7 +22,7 @@ import java.util.*;
  * Create by Pencilso on 2020/1/9 7:20 下午
  */
 @Slf4j
-public class LevelCacheStore extends StringCacheStore {
+public class LevelCacheStore extends AbstractStringCacheStore {
     /**
      * Cleaner schedule period. (ms)
      */
@@ -37,7 +37,9 @@ public class LevelCacheStore extends StringCacheStore {
 
     @PostConstruct
     public void init() {
-        if (LEVEL_DB != null) return;
+        if (LEVEL_DB != null) {
+            return;
+        }
         try {
             //work path
             File folder = new File(haloProperties.getWorkDir() + ".leveldb");

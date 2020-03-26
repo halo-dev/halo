@@ -3,6 +3,8 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenericGenerator;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 
@@ -17,133 +19,141 @@ import java.util.Date;
  */
 @Data
 @Entity(name = "BasePost")
-@Table(name = "posts")
+@Table(name = "posts",
+    indexes = {@Index(name = "posts_type_status", columnList = "type, status"),
+        @Index(name = "posts_create_time", columnList = "create_time")})
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BasePost extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
     private Integer id;
 
     /**
      * Post title.
      */
-    @Column(name = "title", columnDefinition = "varchar(100) not null")
+    @Column(name = "title", nullable = false)
     private String title;
 
     /**
      * Post status.
      */
-    @Column(name = "status", columnDefinition = "int default 1")
+    @Column(name = "status")
+    @ColumnDefault("1")
     private PostStatus status;
 
     /**
      * Post url.
      */
     @Deprecated
-    @Column(name = "url", columnDefinition = "varchar(255) not null")
+    @Column(name = "url")
     private String url;
 
     /**
      * Post slug.
      */
-    @Column(name = "slug", columnDefinition = "varchar(255)", unique = true)
+    @Column(name = "slug", unique = true)
     private String slug;
 
     /**
      * Post editor type.
      */
-    @Column(name = "editor_type", columnDefinition = "int default 0")
+    @Column(name = "editor_type")
+    @ColumnDefault("0")
     private PostEditorType editorType;
 
     /**
      * Original content,not format.
      */
-    @Column(name = "original_content", columnDefinition = "longtext not null")
+    @Column(name = "original_content", nullable = false)
+    @Lob
     private String originalContent;
 
     /**
      * Rendered content.
-     *
-     * @see run.halo.app.utils.MarkdownUtils#renderHtml(String)
      */
-    @Column(name = "format_content", columnDefinition = "longtext not null")
+    @Column(name = "format_content")
+    @Lob
     private String formatContent;
 
     /**
      * Post summary.
      */
-    @Column(name = "summary", columnDefinition = "longtext default ''")
+    @Column(name = "summary")
+    @Lob
     private String summary;
 
     /**
      * Cover thumbnail of the post.
      */
-    @Column(name = "thumbnail", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "thumbnail", length = 1023)
     private String thumbnail;
 
     /**
      * Post visits.
      */
-    @Column(name = "visits", columnDefinition = "bigint default 0")
+    @Column(name = "visits")
+    @ColumnDefault("0")
     private Long visits;
 
     /**
      * Whether to allow comments.
      */
-    @Column(name = "disallow_comment", columnDefinition = "int default 0")
+    @Column(name = "disallow_comment")
+    @ColumnDefault("0")
     private Boolean disallowComment;
 
     /**
      * Post password.
      */
-    @Column(name = "password", columnDefinition = "varchar(255) default ''")
+    @Column(name = "password")
     private String password;
 
     /**
      * Custom template.
      */
-    @Column(name = "template", columnDefinition = "varchar(255) default ''")
+    @Column(name = "template")
     private String template;
 
     /**
      * Whether to top the post.
      */
-    @Column(name = "top_priority", columnDefinition = "int default 0")
+    @Column(name = "top_priority")
+    @ColumnDefault("0")
     private Integer topPriority;
 
     /**
      * Likes
      */
-    @Column(name = "likes", columnDefinition = "bigint default 0")
+    @Column(name = "likes")
+    @ColumnDefault("0")
     private Long likes;
 
     /**
      * Edit time.
      */
-    @Column(name = "edit_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Column(name = "edit_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date editTime;
 
     /**
      * Meta keywords.
      */
-    @Column(name = "meta_keywords", columnDefinition = "varchar(500) default ''")
+    @Column(name = "meta_keywords", length = 511)
     private String metaKeywords;
 
     /**
      * Meta description.
      */
-    @Column(name = "meta_description", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "meta_description", length = 1023)
     private String metaDescription;
 
     @Override
     public void prePersist() {
         super.prePersist();
-
-        id = null;
 
         if (editTime == null) {
             editTime = getCreateTime();

@@ -2,7 +2,7 @@ package run.halo.app.security.filter;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.security.handler.ContentAuthenticationFailureHandler;
 import run.halo.app.security.service.OneTimeTokenService;
@@ -27,9 +27,11 @@ public class ContentFilter extends AbstractAuthenticationFilter {
 
     public ContentFilter(HaloProperties haloProperties,
                          OptionService optionService,
-                         StringCacheStore cacheStore,
+                         AbstractStringCacheStore cacheStore,
                          OneTimeTokenService oneTimeTokenService) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
+
+        addUrlPatterns("/**");
 
         String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
         addExcludeUrlPatterns(

@@ -24,6 +24,8 @@ import run.halo.app.utils.ServiceUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * Post category service implementation.
  *
@@ -253,9 +255,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
                     fullPath.append(optionService.getBlogBaseUrl());
                 }
 
-                fullPath.append("/")
+                fullPath.append(URL_SEPARATOR)
                     .append(optionService.getCategoriesPrefix())
-                    .append("/")
+                    .append(URL_SEPARATOR)
                     .append(category.getSlug())
                     .append(optionService.getPathSuffix());
 

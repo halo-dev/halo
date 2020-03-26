@@ -16,7 +16,7 @@ public enum PostEditorType implements ValueEnum<Integer> {
      */
     RICHTEXT(1);
 
-    private Integer value;
+    private final Integer value;
 
     PostEditorType(Integer value) {
         this.value = value;

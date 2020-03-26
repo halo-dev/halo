@@ -2,7 +2,7 @@ package run.halo.app.security.service.impl;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.utils.HaloUtils;
 
@@ -22,9 +22,9 @@ public class OneTimeTokenServiceImpl implements OneTimeTokenService {
      */
     public static final int OTT_EXPIRED_DAY = 1;
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
-    public OneTimeTokenServiceImpl(StringCacheStore cacheStore) {
+    public OneTimeTokenServiceImpl(AbstractStringCacheStore cacheStore) {
         this.cacheStore = cacheStore;
     }
 

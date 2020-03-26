@@ -1,6 +1,5 @@
 package run.halo.app.controller.admin.api;
 
-import cn.hutool.core.text.StrBuilder;
 import cn.hutool.crypto.SecureUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
-import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.entity.User;
@@ -159,9 +157,15 @@ public class InstallController {
 
 
     @Nullable
-    private BaseComment createDefaultComment(@Nullable PostDetailVO post) {
+    private void createDefaultComment(@Nullable PostDetailVO post) {
         if (post == null) {
-            return null;
+            return;
+        }
+
+        long commentCount = postCommentService.count();
+
+        if (commentCount > 0) {
+            return;
         }
 
         PostComment comment = new PostComment();
@@ -170,12 +174,14 @@ public class InstallController {
         comment.setContent("欢迎使用 Halo，这是你的第一条评论，头像来自 [Gravatar](https://cn.gravatar.com)，你也可以通过注册 [Gravatar](https://cn.gravatar.com) 来显示自己的头像。");
         comment.setEmail("hi@halo.run");
         comment.setPostId(post.getId());
-        return postCommentService.create(comment);
+        postCommentService.create(comment);
     }
 
     @Nullable
     private PostDetailVO createDefaultPostIfAbsent(@Nullable Category category) {
+
         long publishedCount = postService.countByStatus(PostStatus.PUBLISHED);
+
         if (publishedCount > 0) {
             return null;
         }
@@ -210,6 +216,11 @@ public class InstallController {
 
     @Nullable
     private void createDefaultSheet() {
+        long publishedCount = sheetService.countByStatus(PostStatus.PUBLISHED);
+        if (publishedCount > 0) {
+            return;
+        }
+
         SheetParam sheetParam = new SheetParam();
         sheetParam.setSlug("about");
         sheetParam.setTitle("关于页面");
@@ -247,10 +258,9 @@ public class InstallController {
             // Update user
             return userService.update(user);
         }).orElseGet(() -> {
-            StrBuilder gravatar = new StrBuilder("//cn.gravatar.com/avatar/");
-            gravatar.append(SecureUtil.md5(installParam.getEmail()));
-            gravatar.append("?s=256&d=mm");
-            installParam.setAvatar(gravatar.toString());
+            String gravatar = "//cn.gravatar.com/avatar/" + SecureUtil.md5(installParam.getEmail()) +
+                "?s=256&d=mm";
+            installParam.setAvatar(gravatar);
             return userService.createBy(installParam);
         });
     }
@@ -261,10 +271,19 @@ public class InstallController {
         properties.put(PrimaryProperties.IS_INSTALLED, Boolean.TRUE.toString());
         properties.put(BlogProperties.BLOG_LOCALE, installParam.getLocale());
         properties.put(BlogProperties.BLOG_TITLE, installParam.getTitle());
-        properties.put(BlogProperties.BLOG_URL, StringUtils.isBlank(installParam.getUrl()) ?
-            optionService.getBlogBaseUrl() : installParam.getUrl());
-        properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
-        properties.put(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.FALSE.toString());
+        properties.put(BlogProperties.BLOG_URL, StringUtils.isBlank(installParam.getUrl()) ? optionService.getBlogBaseUrl() : installParam.getUrl());
+
+        Long birthday = optionService.getByPropertyOrDefault(PrimaryProperties.BIRTHDAY, Long.class, 0L);
+
+        if (birthday.equals(0L)) {
+            properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
+        }
+
+        Boolean globalAbsolutePathEnabled = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, null);
+
+        if (globalAbsolutePathEnabled == null) {
+            properties.put(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.FALSE.toString());
+        }
 
         // Create properties
         optionService.saveProperties(properties);

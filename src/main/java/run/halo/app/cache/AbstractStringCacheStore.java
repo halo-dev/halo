@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @author johnniang
  */
 @Slf4j
-public abstract class StringCacheStore extends AbstractCacheStore<String, String> {
+public abstract class AbstractStringCacheStore extends AbstractCacheStore<String, String> {
 
     public <T> void putAny(String key, T value) {
         try {

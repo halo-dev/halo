@@ -4,7 +4,7 @@
 update posts set `slug`=`url`;
 alter table posts modify slug varchar(255) not null;
 alter table posts modify url varchar(255) null;
-alter table posts modify summary longtext default '';
+alter table posts modify summary longtext;
 
 -- Migrate categories Table
 update categories set `slug`=`slug_name`;
