@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * PostCommentService implementation class
  *
@@ -104,12 +106,20 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
             }).collect(Collectors.toList());
     }
 
-    private BasePostMinimalDTO buildPostFullPath(BasePostMinimalDTO basePostMinimalDTO) {
+    private BasePostMinimalDTO buildPostFullPath(BasePostMinimalDTO post) {
         PostPermalinkType permalinkType = optionService.getPostPermalinkType();
 
         String pathSuffix = optionService.getPathSuffix();
 
         String archivesPrefix = optionService.getArchivesPrefix();
+
+        int month = DateUtil.month(post.getCreateTime()) + 1;
+
+        String monthString = month < 10 ? "0" + month : String.valueOf(month);
+
+        int day = DateUtil.dayOfMonth(post.getCreateTime());
+
+        String dayString = day < 10 ? "0" + day : String.valueOf(day);
 
         StringBuilder fullPath = new StringBuilder();
 
@@ -117,37 +127,37 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append("/");
+        fullPath.append(URL_SEPARATOR);
 
         if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
             fullPath.append(archivesPrefix)
-                .append("/")
-                .append(basePostMinimalDTO.getSlug())
+                .append(URL_SEPARATOR)
+                .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.ID)) {
             fullPath.append("?p=")
-                .append(basePostMinimalDTO.getId());
+                .append(post.getId());
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-            fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
-                .append("/")
-                .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
-                .append("/")
-                .append(basePostMinimalDTO.getSlug())
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                .append(URL_SEPARATOR)
+                .append(monthString)
+                .append(URL_SEPARATOR)
+                .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-            fullPath.append(DateUtil.year(basePostMinimalDTO.getCreateTime()))
-                .append("/")
-                .append(DateUtil.month(basePostMinimalDTO.getCreateTime()) + 1)
-                .append("/")
-                .append(DateUtil.dayOfMonth(basePostMinimalDTO.getCreateTime()))
-                .append("/")
-                .append(basePostMinimalDTO.getSlug())
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                .append(URL_SEPARATOR)
+                .append(monthString)
+                .append(URL_SEPARATOR)
+                .append(dayString)
+                .append(URL_SEPARATOR)
+                .append(post.getSlug())
                 .append(pathSuffix);
         }
 
-        basePostMinimalDTO.setFullPath(fullPath.toString());
+        post.setFullPath(fullPath.toString());
 
-        return basePostMinimalDTO;
+        return post;
     }
 
     @Override

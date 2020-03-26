@@ -18,7 +18,7 @@ import java.lang.reflect.ParameterizedType;
 @Data
 public abstract class BaseMetaParam<META> implements InputConverter<META> {
 
-    @NotBlank(message = "文章id不能为空")
+    @NotBlank(message = "文章 id 不能为空")
     private Integer postId;
 
     @NotBlank(message = "Meta key 不能为空")

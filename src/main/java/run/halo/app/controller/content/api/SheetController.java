@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.Sheet;
@@ -20,6 +21,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -116,6 +118,9 @@ public class SheetController {
     @ApiOperation("Comments a post")
     @CacheLock(autoDelete = false, traceRequest = true)
     public BaseCommentDTO comment(@RequestBody SheetCommentParam sheetCommentParam) {
+
+        // Escape content
+        sheetCommentParam.setContent(HtmlUtils.htmlEscape(sheetCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
         return sheetCommentService.convertTo(sheetCommentService.createBy(sheetCommentParam));
     }
 }

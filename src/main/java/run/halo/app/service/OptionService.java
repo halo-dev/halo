@@ -1,6 +1,7 @@
 package run.halo.app.service;
 
 import com.qiniu.common.Zone;
+import com.qiniu.storage.Region;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -328,7 +329,16 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return qiniu zone
      */
     @NonNull
+    @Deprecated
     Zone getQnYunZone();
+
+    /**
+     * Get qiniu oss region.
+     *
+     * @return qiniu region
+     */
+    @NonNull
+    Region getQiniuRegion();
 
     /**
      * Gets locale.

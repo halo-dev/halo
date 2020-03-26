@@ -8,22 +8,29 @@ import org.springframework.lang.Nullable;
  * Base exception of the project.
  *
  * @author johnniang
+ * @author ryan0up
+ * @date 2019-03-15
  */
-public abstract class HaloException extends RuntimeException {
+public abstract class AbstractHaloException extends RuntimeException {
 
     /**
      * Error errorData.
      */
     private Object errorData;
 
-    public HaloException(String message) {
+    public AbstractHaloException(String message) {
         super(message);
     }
 
-    public HaloException(String message, Throwable cause) {
+    public AbstractHaloException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Http status code
+     *
+     * @return {@link HttpStatus}
+     */
     @NonNull
     public abstract HttpStatus getStatus();
 
@@ -39,7 +46,7 @@ public abstract class HaloException extends RuntimeException {
      * @return current exception.
      */
     @NonNull
-    public HaloException setErrorData(@Nullable Object errorData) {
+    public AbstractHaloException setErrorData(@Nullable Object errorData) {
         this.errorData = errorData;
         return this;
     }

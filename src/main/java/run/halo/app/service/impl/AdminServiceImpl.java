@@ -5,14 +5,13 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.exception.BadRequestException;
@@ -85,17 +84,13 @@ public class AdminServiceImpl implements AdminService {
 
     private final MailService mailService;
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
     private final RestTemplate restTemplate;
 
     private final HaloProperties haloProperties;
 
     private final ApplicationEventPublisher eventPublisher;
-
-    private final String driverClassName;
-
-    private final String mode;
 
     public AdminServiceImpl(PostService postService,
                             SheetService sheetService,
@@ -107,12 +102,10 @@ public class AdminServiceImpl implements AdminService {
                             UserService userService,
                             LinkService linkService,
                             MailService mailService,
-                            StringCacheStore cacheStore,
+                            AbstractStringCacheStore cacheStore,
                             RestTemplate restTemplate,
                             HaloProperties haloProperties,
-                            ApplicationEventPublisher eventPublisher,
-                            @Value("${spring.datasource.driver-class-name}") String driverClassName,
-                            @Value("${spring.profiles.active:prod}") String mode) {
+                            ApplicationEventPublisher eventPublisher) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.attachmentService = attachmentService;
@@ -127,8 +120,6 @@ public class AdminServiceImpl implements AdminService {
         this.restTemplate = restTemplate;
         this.haloProperties = haloProperties;
         this.eventPublisher = eventPublisher;
-        this.driverClassName = driverClassName;
-        this.mode = mode;
     }
 
 
@@ -297,7 +288,7 @@ public class AdminServiceImpl implements AdminService {
         // Get application start time.
         environmentDTO.setStartTime(ManagementFactory.getRuntimeMXBean().getStartTime());
 
-        environmentDTO.setDatabase("org.h2.Driver".equals(driverClassName) ? "H2" : "MySQL");
+        environmentDTO.setDatabase(DATABASE_PRODUCT_NAME);
 
         environmentDTO.setVersion(HaloConst.HALO_VERSION);
 

@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * TagService implementation class.
  *
@@ -84,9 +86,9 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append("/")
+        fullPath.append(URL_SEPARATOR)
             .append(optionService.getTagsPrefix())
-            .append("/")
+            .append(URL_SEPARATOR)
             .append(tag.getSlug())
             .append(optionService.getPathSuffix());
 

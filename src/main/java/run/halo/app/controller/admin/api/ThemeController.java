@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
+import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.params.ThemeContentParam;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
@@ -75,12 +76,14 @@ public class ThemeController {
 
     @PutMapping("files/content")
     @ApiOperation("Updates template content")
+    @DisableOnCondition
     public void updateContentBy(@RequestBody ThemeContentParam param) {
         themeService.saveTemplateContent(param.getPath(), param.getContent());
     }
 
     @PutMapping("{themeId}/files/content")
     @ApiOperation("Updates template content by theme id")
+    @DisableOnCondition
     public void updateContentBy(@PathVariable("themeId") String themeId,
                                 @RequestBody ThemeContentParam param) {
         themeService.saveTemplateContent(themeId, param.getPath(), param.getContent());
@@ -149,6 +152,7 @@ public class ThemeController {
 
     @DeleteMapping("{themeId}")
     @ApiOperation("Deletes a theme")
+    @DisableOnCondition
     public void deleteBy(@PathVariable("themeId") String themeId) {
         themeService.deleteTheme(themeId);
     }
@@ -187,7 +191,7 @@ public class ThemeController {
 
     @GetMapping(value = "activation/template/exists")
     @ApiOperation("Determines if template exists")
-    public BaseResponse exists(@RequestParam(value = "template") String template) {
+    public BaseResponse<Boolean> exists(@RequestParam(value = "template") String template) {
         return BaseResponse.ok(themeService.templateExists(template));
     }
 }

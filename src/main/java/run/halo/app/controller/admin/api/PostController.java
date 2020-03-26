@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -43,12 +43,12 @@ public class PostController {
 
     private final PostService postService;
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
     private final OptionService optionService;
 
     public PostController(PostService postService,
-                          StringCacheStore cacheStore,
+                          AbstractStringCacheStore cacheStore,
                           OptionService optionService) {
         this.postService = postService;
         this.cacheStore = cacheStore;

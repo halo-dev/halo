@@ -28,7 +28,7 @@ public enum PostPermalinkType implements ValueEnum<Integer> {
      */
     ID(3);
 
-    private Integer value;
+    private final Integer value;
 
     PostPermalinkType(Integer value) {
         this.value = value;

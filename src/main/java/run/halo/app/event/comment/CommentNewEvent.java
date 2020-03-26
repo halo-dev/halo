@@ -8,7 +8,7 @@ import org.springframework.lang.NonNull;
  * @author johnniang
  * @date 19-4-23
  */
-public class CommentNewEvent extends CommentBaseEvent {
+public class CommentNewEvent extends AbstractCommentBaseEvent {
 
     /**
      * Create a new ApplicationEvent.

@@ -2,8 +2,8 @@ package run.halo.app.listener.comment;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
-import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -48,7 +48,9 @@ public class CommentEventListener {
 
     private final UserService userService;
 
-    public CommentEventListener(MailService mailService, OptionService optionService, PostCommentService postCommentService, SheetCommentService sheetCommentService, JournalCommentService journalCommentService, PostService postService, SheetService sheetService, JournalService journalService, UserService userService) {
+    private final ThemeService themeService;
+
+    public CommentEventListener(MailService mailService, OptionService optionService, PostCommentService postCommentService, SheetCommentService sheetCommentService, JournalCommentService journalCommentService, PostService postService, SheetService sheetService, JournalService journalService, UserService userService, ThemeService themeService) {
         this.mailService = mailService;
         this.optionService = optionService;
         this.postCommentService = postCommentService;
@@ -58,6 +60,7 @@ public class CommentEventListener {
         this.sheetService = sheetService;
         this.journalService = journalService;
         this.userService = userService;
+        this.themeService = themeService;
     }
 
     /**
@@ -90,8 +93,8 @@ public class CommentEventListener {
 
             BasePostMinimalDTO post = postService.convertToMinimal(postService.getById(postComment.getPostId()));
 
-            data.put("url", post.getFullPath());
-            data.put("page", post.getTitle());
+            data.put("pageFullPath", post.getFullPath());
+            data.put("pageTitle", post.getTitle());
             data.put("author", postComment.getAuthor());
             data.put("content", postComment.getContent());
 
@@ -106,8 +109,8 @@ public class CommentEventListener {
 
             BasePostMinimalDTO sheet = sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
 
-            data.put("url", sheet.getFullPath());
-            data.put("page", sheet.getTitle());
+            data.put("pageFullPath", sheet.getFullPath());
+            data.put("pageTitle", sheet.getTitle());
             data.put("author", sheetComment.getAuthor());
             data.put("content", sheetComment.getContent());
 
@@ -124,15 +127,21 @@ public class CommentEventListener {
             StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
                 .append("/")
                 .append(optionService.getJournalsPrefix());
-            data.put("url", url.toString());
-            data.put("page", journal.getCreateTime());
+            data.put("pageFullPath", url.toString());
+            data.put("pageTitle", journal.getCreateTime());
             data.put("author", journalComment.getAuthor());
             data.put("content", journalComment.getContent());
 
             subject.append("您的博客日志有了新的评论");
         }
 
-        mailService.sendTemplateMail(user.getEmail(), subject.toString(), data, "common/mail_template/mail_notice.ftl");
+        String template = "common/mail_template/mail_notice.ftl";
+
+        if (themeService.templateExists("mail_template/mail_notice.ftl")) {
+            template = themeService.renderWithSuffix("mail_template/mail_notice");
+        }
+
+        mailService.sendTemplateMail(user.getEmail(), subject.toString(), data, template);
     }
 
     /**
@@ -166,7 +175,7 @@ public class CommentEventListener {
 
             PostComment baseComment = postCommentService.getById(postComment.getParentId());
 
-            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -178,8 +187,8 @@ public class CommentEventListener {
 
             BasePostMinimalDTO post = postService.convertToMinimal(postService.getById(postComment.getPostId()));
 
-            data.put("url", post.getFullPath());
-            data.put("page", post.getTitle());
+            data.put("pageFullPath", post.getFullPath());
+            data.put("pageTitle", post.getTitle());
             data.put("baseAuthor", baseComment.getAuthor());
             data.put("baseContent", baseComment.getContent());
             data.put("replyAuthor", postComment.getAuthor());
@@ -196,7 +205,7 @@ public class CommentEventListener {
 
             SheetComment baseComment = sheetCommentService.getById(sheetComment.getParentId());
 
-            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -208,8 +217,8 @@ public class CommentEventListener {
 
             BasePostMinimalDTO sheet = sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
 
-            data.put("url", sheet.getFullPath());
-            data.put("page", sheet.getTitle());
+            data.put("pageFullPath", sheet.getFullPath());
+            data.put("pageTitle", sheet.getTitle());
             data.put("baseAuthor", baseComment.getAuthor());
             data.put("baseContent", baseComment.getContent());
             data.put("replyAuthor", sheetComment.getAuthor());
@@ -225,7 +234,7 @@ public class CommentEventListener {
 
             JournalComment baseComment = journalCommentService.getById(journalComment.getParentId());
 
-            if (StrUtil.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -240,8 +249,8 @@ public class CommentEventListener {
             StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
                 .append("/")
                 .append(optionService.getJournalsPrefix());
-            data.put("url", url);
-            data.put("page", journal.getContent());
+            data.put("pageFullPath", url);
+            data.put("pageTitle", journal.getContent());
             data.put("baseAuthor", baseComment.getAuthor());
             data.put("baseContent", baseComment.getContent());
             data.put("replyAuthor", journalComment.getAuthor());
@@ -253,6 +262,12 @@ public class CommentEventListener {
                 .append("有了新的评论。");
         }
 
-        mailService.sendTemplateMail(baseAuthorEmail, subject.toString(), data, "common/mail_template/mail_reply.ftl");
+        String template = "common/mail_template/mail_reply.ftl";
+
+        if (themeService.templateExists("mail_template/mail_reply.ftl")) {
+            template = themeService.renderWithSuffix("mail_template/mail_reply");
+        }
+
+        mailService.sendTemplateMail(baseAuthorEmail, subject.toString(), data, template);
     }
 }

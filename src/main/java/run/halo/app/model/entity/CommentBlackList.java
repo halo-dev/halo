@@ -1,6 +1,7 @@
 package run.halo.app.model.entity;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -20,10 +21,11 @@ import java.util.Date;
 @NoArgsConstructor
 public class CommentBlackList extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
     private Long id;
 
-    @Column(name = "ip_address", columnDefinition = "VARCHAR(127) NOT NULL")
+    @Column(name = "ip_address", length = 127, nullable = false)
     private String ipAddress;
 
     /**

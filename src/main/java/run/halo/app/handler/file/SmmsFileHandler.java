@@ -54,7 +54,7 @@ public class SmmsFileHandler implements FileHandler {
 
     private final OptionService optionService;
 
-    private HttpHeaders headers = new HttpHeaders();
+    private final HttpHeaders headers = new HttpHeaders();
 
     public SmmsFileHandler(RestTemplate httpsRestTemplate,
                            OptionService optionService) {
@@ -165,8 +165,8 @@ public class SmmsFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.SMMS.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.SMMS;
     }
 
     /**

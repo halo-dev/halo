@@ -4,6 +4,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.model.entity.ThemeSetting;
+import run.halo.app.service.base.CrudService;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Map;
  * @author johnniang
  * @date 2019-04-08
  */
-public interface ThemeSettingService {
+public interface ThemeSettingService extends CrudService<ThemeSetting, Integer> {
 
 
     /**

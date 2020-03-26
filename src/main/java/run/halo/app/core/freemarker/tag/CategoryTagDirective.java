@@ -46,6 +46,9 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
                 case "list":
                     env.setVariable("categories", builder.build().wrap(postCategoryService.listCategoryWithPostCountDto(Sort.by(DESC, "createTime"))));
                     break;
+                case "tree":
+                    env.setVariable("categories", builder.build().wrap(categoryService.listAsTree(Sort.by(DESC, "createTime"))));
+                    break;
                 case "listByPostId":
                     Integer postId = Integer.parseInt(params.get("postId").toString());
                     List<Category> categories = postCategoryService.listCategoriesBy(postId);
