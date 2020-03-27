@@ -133,4 +133,15 @@ public interface UserService extends CrudService<User, Integer> {
      * @return boolean
      */
     boolean verifyUser(@NonNull String username, @NonNull String password);
+
+    /**
+     * Updates user twoFactorAuth.
+     *
+     * @param isOpen      use two factor auth, default is false
+     * @param tfaKey      two factor auth key
+     * @param userId      user id must not be null
+     * @return updated user detail
+     */
+    boolean setTwoFactorAuth(boolean isOpen, @NonNull String tfaKey, @NonNull Integer userId);
+
 }

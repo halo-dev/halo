@@ -187,4 +187,15 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         User user = getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         return user.getUsername().equals(username) && user.getEmail().equals(password);
     }
+
+    @Override
+    public boolean setTwoFactorAuth(boolean isOpen, @NonNull String tfaKey,@NonNull Integer userId) {
+        if (isOpen) {
+
+        } else {
+
+        }
+
+        return false;
+    }
 }

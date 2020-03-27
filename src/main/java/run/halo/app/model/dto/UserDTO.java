@@ -31,6 +31,8 @@ public class UserDTO implements OutputConverter<UserDTO, User> {
 
     private String description;
 
+    private Boolean useTfa;
+
     private Date createTime;
 
     private Date updateTime;

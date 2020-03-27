@@ -69,6 +69,17 @@ public class User extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date expireTime;
 
+    /**
+     * mfa type (current: tfa)
+     */
+    @Column(name = "mfa_type", length = 8)
+    private String mfaType;
+
+    /**
+     * two factor auth key
+     */
+    @Column(name = "mfa_key", length = 64)
+    private String mfaKey;
 
     @Override
     public void prePersist() {
