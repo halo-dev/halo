@@ -1,10 +1,6 @@
 package run.halo.app.cache;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -18,12 +14,9 @@ import static org.junit.Assert.*;
  * @author johnniang
  * @date 3/28/19
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class CacheStoreTest {
 
-    @Autowired
-    private StringCacheStore cacheStore;
+    private StringCacheStore cacheStore = new InMemoryCacheStore();
 
     @Test(expected = IllegalArgumentException.class)
     public void putNullValueTest() {

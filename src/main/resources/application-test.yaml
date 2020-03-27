@@ -12,12 +12,13 @@ spring:
       enabled: always
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:halo-test
 
     # H2 Database 配置
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/halo-test/db/halo
-    username: admin
-    password: 123456
+    #    driver-class-name: org.h2.Driver
+    #    url: jdbc:h2:file:~/halo-test/db/halo
+    #    username: admin
+    #    password: 123456
 
     # MySQL 配置
   #  driver-class-name: com.mysql.cj.jdbc.Driver
@@ -33,7 +34,7 @@ spring:
       enabled: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
   flyway:
     enabled: false
@@ -48,7 +49,7 @@ management:
     web:
       base-path: /api/admin/actuator
       exposure:
-        include: ['httptrace', 'metrics','env','logfile','health']
+        include: ['httptrace', 'metrics','env','logfile']
 logging:
   level:
     run.halo.app: DEBUG
@@ -58,3 +59,4 @@ logging:
 
 halo:
   doc-disabled: false
+  workDir: ${user.home}/halo-test/

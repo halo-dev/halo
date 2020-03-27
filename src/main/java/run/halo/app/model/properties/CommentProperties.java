@@ -32,7 +32,6 @@ public enum CommentProperties implements PropertyEnum {
     COMMENT_RANGE("comment_range", Integer.class, "30");
 
 
-
     private final String value;
 
     private final Class<?> type;

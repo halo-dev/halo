@@ -45,6 +45,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -473,6 +475,8 @@ public class AdminServiceImpl implements AdminService {
 
         File file = new File(haloProperties.getWorkDir(), LOG_PATH);
 
+        List<String> linesArray = new ArrayList<>();
+
         StringBuilder result = new StringBuilder();
 
         if (!file.exists()) {
@@ -493,8 +497,7 @@ public class AdminServiceImpl implements AdminService {
                     randomAccessFile.seek(pos);
                     if (randomAccessFile.readByte() == '\n') {
                         String line = randomAccessFile.readLine();
-                        result.append(new String(line.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
-                        result.append(StringUtils.LF);
+                        linesArray.add(new String(line.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
                         count++;
                         if (count == lines) {
                             break;
@@ -503,8 +506,7 @@ public class AdminServiceImpl implements AdminService {
                 }
                 if (pos == 0) {
                     randomAccessFile.seek(0);
-                    result.append(new String(randomAccessFile.readLine().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
-                    result.append(StringUtils.LF);
+                    linesArray.add(new String(randomAccessFile.readLine().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
                 }
             }
         } catch (Exception e) {
@@ -518,6 +520,14 @@ public class AdminServiceImpl implements AdminService {
                 }
             }
         }
+
+        Collections.reverse(linesArray);
+
+        linesArray.forEach(line -> {
+            result.append(line)
+                    .append(StringUtils.LF);
+        });
+
         return result.toString();
     }
 }

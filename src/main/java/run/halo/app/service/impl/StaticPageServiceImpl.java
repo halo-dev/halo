@@ -30,6 +30,7 @@ import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.properties.StaticDeployProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.StaticPageFile;
+import run.halo.app.model.vo.AdjacentPostVO;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.model.vo.SheetDetailVO;
@@ -329,8 +330,10 @@ public class StaticPageServiceImpl implements StaticPageService {
         for (Post post : posts) {
             log.info("Generate archives/{}/index.html", post.getUrl());
             ModelMap model = new ModelMap();
-            postService.getNextPost(post.getCreateTime()).ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
-            postService.getPrePost(post.getCreateTime()).ifPresent(prePost -> model.addAttribute("prePost", prePost));
+
+            AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
+            adjacentPostVO.getOptionalPrePost().ifPresent(prePost -> model.addAttribute("prePost", prePost));
+            adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
 
             List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
             List<Tag> tags = postTagService.listTagsBy(post.getId());

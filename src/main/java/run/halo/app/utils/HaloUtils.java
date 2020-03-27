@@ -17,7 +17,7 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
  *
  * @author ryanwang
  * @author johnniang
- * @date 2017/12/22
+ * @date 2017-12-22
  */
 @Slf4j
 public class HaloUtils {
@@ -230,22 +230,6 @@ public class HaloUtils {
             return url;
         }
         return String.valueOf(System.currentTimeMillis());
-    }
-
-    /**
-     * Normalize url.
-     *
-     * @param url url must not be blank
-     * @return normalized url
-     */
-    @NonNull
-    public static String normalizeUrl(@NonNull String url) {
-        Assert.hasText(url, "Url must not be blank");
-
-        StringUtils.removeEnd(url, "html");
-        StringUtils.removeEnd(url, "htm");
-
-        return SlugUtils.slugify(url);
     }
 
     /**

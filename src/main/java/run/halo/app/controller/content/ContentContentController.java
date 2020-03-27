@@ -77,7 +77,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{prefix}/page/{page}")
+    @GetMapping("{prefix}/page/{page:\\d+}")
     public String content(@PathVariable("prefix") String prefix,
                           @PathVariable(value = "page") Integer page,
                           Model model) {
@@ -89,7 +89,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{prefix}/{url}")
+    @GetMapping("{prefix}/{url:.+}")
     public String content(@PathVariable("prefix") String prefix,
                           @PathVariable("url") String url,
                           @RequestParam(value = "token", required = false) String token,
@@ -115,7 +115,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{prefix}/{url}/page/{page}")
+    @GetMapping("{prefix}/{url}/page/{page:\\d+}")
     public String content(@PathVariable("prefix") String prefix,
                           @PathVariable("url") String url,
                           @PathVariable("page") Integer page,
@@ -132,7 +132,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{url}")
+    @GetMapping("{year:\\d+}/{month:\\d+}/{url:.+}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("url") String url,
@@ -147,7 +147,7 @@ public class ContentContentController {
         }
     }
 
-    @GetMapping("{year:^[^A-Za-z]*$}/{month:^[^A-Za-z]*$}/{day:^[^A-Za-z]*$}/{url}")
+    @GetMapping("{year:\\d+}/{month:\\d+}/{day:\\d+}/{url:.+}")
     public String content(@PathVariable("year") Integer year,
                           @PathVariable("month") Integer month,
                           @PathVariable("day") Integer day,

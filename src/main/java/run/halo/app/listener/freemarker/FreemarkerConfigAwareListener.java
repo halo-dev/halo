@@ -10,8 +10,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
+import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
+import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
@@ -22,7 +24,8 @@ import run.halo.app.service.UserService;
  * Freemarker config aware listener.
  *
  * @author johnniang
- * @date 19-4-20
+ * @author ryanwang
+ * @date 2019-04-20
  */
 @Slf4j
 @Component
@@ -68,6 +71,13 @@ public class FreemarkerConfigAwareListener {
     }
 
     @EventListener
+    public void onThemeUpdatedEvent(ThemeUpdatedEvent event) throws TemplateModelException {
+        log.debug("Received theme updated event");
+
+        loadThemeConfig();
+    }
+
+    @EventListener
     public void onUserUpdate(UserUpdatedEvent event) throws TemplateModelException {
         log.debug("Received user updated event, user id: [{}]", event.getUserId());
 
@@ -96,9 +106,21 @@ public class FreemarkerConfigAwareListener {
     }
 
     private void loadThemeConfig() throws TemplateModelException {
+
+        // Get current activated theme.
         ThemeProperty activatedTheme = themeService.getActivatedTheme();
+
+        Boolean enabledAbsolutePath = optionService.getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, true);
+
+        String themeBasePath = (enabledAbsolutePath ? optionService.getBlogBaseUrl() : "") + "/themes/" + activatedTheme.getFolderName();
+
         configuration.setSharedVariable("theme", activatedTheme);
-        configuration.setSharedVariable("static", optionService.getBlogBaseUrl() + "/" + activatedTheme.getFolderName());
+
+        // TODO: It will be removed in future versions
+        configuration.setSharedVariable("static", themeBasePath);
+
+        configuration.setSharedVariable("theme_base", themeBasePath);
+
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         log.debug("Loaded theme and settings");
     }

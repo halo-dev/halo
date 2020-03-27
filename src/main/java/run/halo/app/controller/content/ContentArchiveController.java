@@ -33,6 +33,7 @@ public class ContentArchiveController {
 
     private final StringCacheStore cacheStore;
 
+
     public ContentArchiveController(PostService postService,
                                     OptionService optionService,
                                     StringCacheStore cacheStore) {
@@ -41,14 +42,14 @@ public class ContentArchiveController {
         this.cacheStore = cacheStore;
     }
 
-    @GetMapping(value = "{url}/password")
+    @GetMapping(value = "{url:.*}/password")
     public String password(@PathVariable("url") String url,
                            Model model) {
         model.addAttribute("url", url);
         return "common/template/post_password";
     }
 
-    @PostMapping(value = "{url}/password")
+    @PostMapping(value = "{url:.*}/password")
     @CacheLock(traceRequest = true, expired = 2)
     public String password(@PathVariable("url") String url,
                            @RequestParam(value = "password") String password) {
