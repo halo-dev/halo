@@ -16,7 +16,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "attachments")
+@Table(name = "attachments", indexes = {@Index(name = "attachments_media_type", columnList = "media_type")})
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Attachment extends BaseEntity {
