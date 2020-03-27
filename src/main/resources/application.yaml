@@ -37,7 +37,7 @@ spring:
     multipart:
       max-file-size: 10240MB
       max-request-size: 10240MB
-      location: ${java.io.tmpdir}
+      location: \${java.io.tmpdir}
 management:
   endpoints:
     web:
@@ -48,7 +48,10 @@ logging:
   level:
     run.halo.app: INFO
   file:
-    path: ${user.home}/.halo/logs
+    path: \${user.home}/.halo/logs
 
 halo:
   download-timeout: 5m
+
+application:
+  version: ${version}
