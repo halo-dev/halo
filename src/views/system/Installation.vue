@@ -202,6 +202,7 @@
                 type="primary"
                 icon="upload"
                 @click="handleInstall"
+                :loading="installing"
               >安装</a-button>
             </a-row>
           </a-card>
@@ -221,7 +222,8 @@ export default {
       installation: {},
       stepCurrent: 0,
       migrationData: null,
-      bloggerForm: this.$form.createForm(this)
+      bloggerForm: this.$form.createForm(this),
+      installing: false
     }
   },
   created() {
@@ -256,13 +258,18 @@ export default {
       })
     },
     install() {
-      adminApi.install(this.installation).then(response => {
-        this.$log.debug('Installation response', response)
-        this.$message.success('安装成功！')
-        setTimeout(() => {
-          this.$router.push({ name: 'Login' })
-        }, 300)
-      })
+      adminApi
+        .install(this.installation)
+        .then(response => {
+          this.$log.debug('Installation response', response)
+          this.$message.success('安装成功！')
+          setTimeout(() => {
+            this.$router.push({ name: 'Login' })
+          }, 300)
+        })
+        .finally(() => {
+          this.installing = false
+        })
     },
     handleInstall() {
       const password = this.installation.password
@@ -275,7 +282,7 @@ export default {
         this.$message.error('确认密码和密码不匹配')
         return
       }
-
+      this.installing = true
       if (this.migrationData) {
         const hide = this.$message.loading('数据导入中...', 0)
         migrateApi

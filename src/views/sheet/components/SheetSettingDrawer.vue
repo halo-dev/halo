@@ -26,7 +26,7 @@
               </a-form-item>
               <a-form-item
                 label="页面别名："
-                :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.slug ? selectedSheet.slug : '{slug}')+options.path_suffix"
+                :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.slug ? selectedSheet.slug : '{slug}')+(options.path_suffix?options.path_suffix:'')"
               >
                 <a-input v-model="selectedSheet.slug" />
               </a-form-item>
