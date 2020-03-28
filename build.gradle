@@ -70,7 +70,7 @@ ext {
     h2Version =  "1.4.196"
     levelDbVersion =  "0.12"
     jsonVersion =  "20190722"
-    fastJsonVersion =  "1.2.66"
+    fastJsonVersion =  "1.2.67"
     annotationsVersion = "3.0.1"
 }
 
