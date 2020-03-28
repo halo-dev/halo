@@ -13,19 +13,25 @@ spring:
       enabled: always
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
+    #    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://139.9.113.57:3306/newhalo?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: user
+    password: panzhe123user
+
 
     # H2 database configuration.
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/.halo/db/halo
-    username: admin
-    password: 123456
-
-  h2:
-    console:
-      settings:
-        web-allow-others: false
-      path: /h2-console
-      enabled: false
+#    driver-class-name: org.h2.Driver
+#    url: jdbc:h2:file:~/.halo/db/halo
+#    username: admin
+#    password: 123456
+#
+#  h2:
+#    console:
+#      settings:
+#        web-allow-others: false
+#      path: /h2-console
+#      enabled: false
   jpa:
     hibernate:
       ddl-auto: update
