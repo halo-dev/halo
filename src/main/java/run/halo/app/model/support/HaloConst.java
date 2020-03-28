@@ -51,10 +51,6 @@ public class HaloConst {
     public final static String DEFAULT_THEME_ID = "caicai_anatole";
 
     /**
-     * Version constant. (Available in production environment)
-     */
-    public static final String HALO_VERSION;
-    /**
      * Path separator.
      */
     public static final String FILE_SEPARATOR = File.separator;
@@ -143,8 +139,9 @@ public class HaloConst {
      */
     public static String USER_SESSION_KEY = "user_session";
 
-    static {
-        // Set version
-        HALO_VERSION = HaloConst.class.getPackage().getImplementationVersion();
-    }
+    /**
+     * Version constant.
+     */
+    public static String HALO_VERSION = null;
+
 }
