@@ -26,9 +26,9 @@
               </a-form-item>
               <a-form-item label="文章别名：">
                 <template slot="help">
-                  <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/{{ selectedPost.slug?selectedPost.slug:'${slug}' }}{{ options.path_suffix }}</span>
-                  <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ selectedPost.createTime?selectedPost.createTime:new Date() | moment_post_date }}{{ selectedPost.slug?selectedPost.slug:'${slug}' }}{{ options.path_suffix }}</span>
-                  <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}{{ selectedPost.createTime?selectedPost.createTime:new Date() | moment_post_day }}{{ selectedPost.slug?selectedPost.slug:'${slug}' }}{{ options.path_suffix }}</span>
+                  <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/{{ selectedPost.slug?selectedPost.slug:'${slug}' }}{{ (options.path_suffix?options.path_suffix:'') }}</span>
+                  <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ selectedPost.createTime?selectedPost.createTime:new Date() | moment_post_date }}{{ selectedPost.slug?selectedPost.slug:'${slug}' }}{{ (options.path_suffix?options.path_suffix:'') }}</span>
+                  <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}{{ selectedPost.createTime?selectedPost.createTime:new Date() | moment_post_day }}{{ selectedPost.slug?selectedPost.slug:'${slug}' }}{{ (options.path_suffix?options.path_suffix:'') }}</span>
                   <span v-else-if="options.post_permalink_type === 'ID'">{{ options.blog_url }}/?p={{ selectedPost.id?selectedPost.id:'${id}' }}</span>
                 </template>
                 <a-input v-model="selectedPost.slug" />

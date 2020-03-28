@@ -4,12 +4,12 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build-jsdelivr": "vue-cli-service build --mode jsdelivr",
+    "build:jsdelivr": "vue-cli-service build --mode jsdelivr",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "ant-design-vue": "^1.5.0-rc.5",
+    "ant-design-vue": "^1.5.0-rc.7",
     "axios": "^0.19.2",
     "enquire.js": "^2.1.6",
     "filepond": "^4.13.0",
