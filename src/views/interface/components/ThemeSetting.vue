@@ -148,6 +148,17 @@
                         <a-icon type="picture" />
                       </a>
                     </a-input>
+                    <a-input-number
+                      v-model="themeSettings[item.name]"
+                      :defaultValue="item.defaultValue"
+                      v-else-if="item.type == 'NUMBER'"
+                      style="width:100%"
+                    />
+                    <a-switch
+                      v-model="themeSettings[item.name]"
+                      :defaultChecked="item.defaultValue"
+                      v-else-if="item.type == 'SWITCH'"
+                    />
                     <a-input
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
