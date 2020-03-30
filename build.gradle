@@ -1,22 +1,22 @@
 plugins {
-    id 'org.springframework.boot' version '2.2.5.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    id 'checkstyle'
-    id 'java'
+    id "org.springframework.boot" version "2.2.5.RELEASE"
+    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+    id "checkstyle"
+    id "java"
 }
 
-group = 'run.halo.app'
-version = '1.3.0'
-description = 'Halo, An excellent open source blog publishing application.'
+group = "run.halo.app"
+version = "1.3.1"
+description = "Halo, An excellent open source blog publishing application."
 
 java {
-    archivesBaseName = 'halo'
+    archivesBaseName = "halo"
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
 repositories {
     maven {
-        url 'https://maven.aliyun.com/nexus/content/groups/public'
+        url "https://maven.aliyun.com/nexus/content/groups/public"
     }
     mavenCentral()
     jcenter()
@@ -24,8 +24,8 @@ repositories {
 
 configurations {
     implementation {
-        exclude module: 'spring-boot-starter-tomcat'
-        exclude module: 'slf4j-log4j12'
+        exclude module: "spring-boot-starter-tomcat"
+        exclude module: "slf4j-log4j12"
     }
 
     developmentOnly
@@ -39,95 +39,100 @@ configurations {
     }
 }
 
-bootJar {
-    manifest {
-        attributes('Implementation-Title': 'Halo Application',
-                'Implementation-Version': archiveVersion)
+
+springBoot {
+    buildInfo()
+}
+
+// gradle 的 Property Expansion 的占位符 ${..} 与 springboot 的占位符 冲突， springboot 的需要转义 \${..}
+processResources {
+    filesMatching("application.yaml") {
+        expand(project.properties)
     }
 }
 
 ext {
-    set('hutoolVersion', "5.2.3")
-    set('upyunSdkVersion', "4.2.0")
-    set('qiniuSdkVersion', "7.2.28")
-    set('aliyunSdkVersion', "3.8.1")
-    set('baiduSdkVersion', "0.10.36")
-    set('qcloudSdkVersion', "5.6.18")
-    set('swaggerVersion', "2.9.2")
-    set('commonsLangVersion', "3.9")
-    set('httpclientVersion', "4.5.12")
-    set('dataformatYamlVersion', "2.10.3")
-    set('jgitVersion', "5.7.0.202003110725-r")
-    set('flexmarkVersion', "0.60.2")
-    set('thumbnailatorVersion', "0.4.11")
-    set('image4jVersion', "0.7zensight1")
-    set('flywayVersion', "6.3.1")
-    set('h2Version', "1.4.196")
-    set('levelDbVersion', "0.12")
-    set('jsonVersion', "20190722")
-    set('fastJsonVersion', "1.2.66")
-    set('annotationsVersion',"3.0.1")
+    hutoolVersion =  "5.2.3"
+    upyunSdkVersion =  "4.2.0"
+    qiniuSdkVersion =  "7.2.28"
+    aliyunSdkVersion =  "3.8.1"
+    baiduSdkVersion =  "0.10.36"
+    qcloudSdkVersion =  "5.6.18"
+    swaggerVersion =  "2.9.2"
+    commonsLangVersion =  "3.9"
+    httpclientVersion =  "4.5.12"
+    dataformatYamlVersion =  "2.10.3"
+    jgitVersion =  "5.7.0.202003110725-r"
+    flexmarkVersion =  "0.60.2"
+    thumbnailatorVersion =  "0.4.11"
+    image4jVersion =  "0.7zensight1"
+    flywayVersion =  "6.3.1"
+    h2Version =  "1.4.196"
+    levelDbVersion =  "0.12"
+    jsonVersion =  "20190722"
+    fastJsonVersion =  "1.2.67"
+    annotationsVersion = "3.0.1"
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-undertow'
-    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-undertow"
+    implementation "org.springframework.boot:spring-boot-starter-freemarker"
     implementation "com.sun.mail:jakarta.mail"
 
-    implementation "cn.hutool:hutool-core:${hutoolVersion}"
-    implementation "cn.hutool:hutool-crypto:${hutoolVersion}"
-    implementation "cn.hutool:hutool-extra:${hutoolVersion}"
-    implementation "com.upyun:java-sdk:${upyunSdkVersion}"
-    implementation "com.qiniu:qiniu-java-sdk:${qiniuSdkVersion}"
-    implementation "com.aliyun.oss:aliyun-sdk-oss:${aliyunSdkVersion}"
-    implementation "com.baidubce:bce-java-sdk:${baiduSdkVersion}"
-    implementation "com.qcloud:cos_api:${qcloudSdkVersion}"
-    implementation "io.springfox:springfox-swagger2:${swaggerVersion}"
-    implementation "io.springfox:springfox-swagger-ui:${swaggerVersion}"
-    implementation "org.apache.commons:commons-lang3:${commonsLangVersion}"
-    implementation "org.apache.httpcomponents:httpclient:${httpclientVersion}"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${dataformatYamlVersion}"
-    implementation "org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}"
-    implementation "com.google.code.findbugs:annotations:${annotationsVersion}"
+    implementation "cn.hutool:hutool-core:$hutoolVersion"
+    implementation "cn.hutool:hutool-crypto:$hutoolVersion"
+    implementation "cn.hutool:hutool-extra:$hutoolVersion"
+    implementation "com.upyun:java-sdk:$upyunSdkVersion"
+    implementation "com.qiniu:qiniu-java-sdk:$qiniuSdkVersion"
+    implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"
+    implementation "com.baidubce:bce-java-sdk:$baiduSdkVersion"
+    implementation "com.qcloud:cos_api:$qcloudSdkVersion"
+    implementation "io.springfox:springfox-swagger2:$swaggerVersion"
+    implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
+    implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
+    implementation "org.apache.httpcomponents:httpclient:$httpclientVersion"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$dataformatYamlVersion"
+    implementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
+    implementation "com.google.code.findbugs:annotations:$annotationsVersion"
 
-    implementation "com.vladsch.flexmark:flexmark:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-attributes:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-autolink:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-emoji:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-escaped-character:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-gfm-tasklist:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-ins:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-media-tags:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-tables:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-toc:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-superscript:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:${flexmarkVersion}"
-    implementation "com.vladsch.flexmark:flexmark-ext-gitlab:${flexmarkVersion}"
-//    implementation "com.vladsch.flexmark:flexmark-html-parser:${flexmarkVersion}"
+    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-autolink:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-emoji:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-escaped-character:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gfm-tasklist:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-ins:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-media-tags:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-tables:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-superscript:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gitlab:$flexmarkVersion"
+//    implementation "com.vladsch.flexmark:flexmark-html-parser:$flexmarkVersion"
 
-    implementation "net.coobird:thumbnailator:${thumbnailatorVersion}"
-    implementation "net.sf.image4j:image4j:${image4jVersion}"
-    implementation "org.flywaydb:flyway-core:${flywayVersion}"
+    implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
+    implementation "net.sf.image4j:image4j:$image4jVersion"
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
 
-    implementation "org.json:json:${jsonVersion}"
-    implementation "com.alibaba:fastjson:${fastJsonVersion}"
+    implementation "org.json:json:$jsonVersion"
+    implementation "com.alibaba:fastjson:$fastJsonVersion"
 
-    implementation "org.iq80.leveldb:leveldb:${levelDbVersion}"
-    runtimeOnly "com.h2database:h2:${h2Version}"
-    runtimeOnly 'mysql:mysql-connector-java'
+    implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
+    runtimeOnly "com.h2database:h2:$h2Version"
+    runtimeOnly "mysql:mysql-connector-java"
 
 
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
 
-    testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly "org.projectlombok:lombok"
+    testAnnotationProcessor "org.projectlombok:lombok"
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly "org.springframework.boot:spring-boot-devtools"
 }

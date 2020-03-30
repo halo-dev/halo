@@ -44,7 +44,12 @@ public enum InputType {
     /**
      * Attachment picker input type
      */
-    ATTACHMENT;
+    ATTACHMENT,
+
+    /**
+     * Switch input type, only true or false
+     */
+    SWITCH;
 
     /**
      * Convert type to input type.
