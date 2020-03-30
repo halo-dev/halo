@@ -3,6 +3,8 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
+import run.halo.app.model.enums.MFAType;
 import run.halo.app.utils.DateUtils;
 
 import javax.persistence.*;
@@ -72,8 +74,9 @@ public class User extends BaseEntity {
     /**
      * mfa type (current: tfa)
      */
-    @Column(name = "mfa_type", length = 8)
-    private String mfaType;
+    @Column(name = "mfa_type", nullable = false)
+    @ColumnDefault("0")
+    private MFAType mfaType;
 
     /**
      * two factor auth key

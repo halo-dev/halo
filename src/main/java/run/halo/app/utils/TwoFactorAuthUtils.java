@@ -1,6 +1,7 @@
 package run.halo.app.utils;
 
 import run.halo.app.exception.AuthenticationException;
+import run.halo.app.exception.BadRequestException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -31,11 +32,21 @@ public class TwoFactorAuthUtils {
             boolean result = TimeBasedOneTimePasswordUtil.validateCurrentNumber(tfaKey, validCode, VALID_TFA_WINDOW_MILLIS);
             if (!result) throw new AuthenticationException("两步验证码验证错误，请确认时间是否同步");
         } catch (NumberFormatException e) {
-            throw new AuthenticationException("两步验证码请输入数字");
+            throw new BadRequestException("两步验证码请输入数字");
         } catch (GeneralSecurityException e) {
-            throw new AuthenticationException("两步验证码验证异常");
+            throw new BadRequestException("两步验证码验证异常");
         }
     }
+
+    public static String generateOtpAuthUrl(final String userName, final String tfaKey) {
+        return TimeBasedOneTimePasswordUtil.generateOtpAuthUrl(userName, tfaKey);
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println(generateOtpAuthUrl("12","43"));
+    }
+
 }
 
 /**
@@ -277,7 +288,7 @@ class TimeBasedOneTimePasswordUtil {
     }
 
     private static void addOtpAuthPart(String keyId, String secret, StringBuilder sb) {
-        sb.append("otpauth://totp/").append(keyId).append("%3Fsecret%3D").append(secret);
+        sb.append("otpauth://totp/").append(keyId).append("?secret=").append(secret);
     }
 
     /**
