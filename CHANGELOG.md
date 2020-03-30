@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 1.3.1
+
+# Fixed
+
+- 修复自定义页面设置中的地址预览出现 undefined 的问题。
+- 升级 fastjson 版本为 `1.2.67`。
+
 # 1.3.0
 
 ## Feature
