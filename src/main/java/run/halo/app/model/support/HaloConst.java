@@ -20,6 +20,11 @@ public class HaloConst {
     public final static String USER_HOME = System.getProperties().getProperty("user.home");
 
     /**
+     * User work directory.
+     */
+    public final static String WORK_DIR = System.getProperties().getProperty("user.dir");
+
+    /**
      * Temporary directory.
      */
     public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");

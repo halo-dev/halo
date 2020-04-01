@@ -1,0 +1,143 @@
+package run.halo.app.cache;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
+
+import javax.annotation.PreDestroy;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+import org.springframework.util.StringUtils;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.HostAndPort;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Date;
+import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.utils.JsonUtils;
+
+/**
+ * Redis cache store.
+ *
+ * @author chaos
+ */
+@Slf4j
+public class RedisCacheStore extends StringCacheStore {
+    private volatile static  JedisCluster redis;
+    protected HaloProperties haloProperties;
+
+    /**
+     * Cache container.
+     */
+    private final static ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER = new ConcurrentHashMap<>();
+
+    /**
+     * Lock.
+     */
+    private Lock lock = new ReentrantLock();
+
+    private void initRedis(){
+        JedisPoolConfig cfg = new JedisPoolConfig();
+        cfg.setMaxIdle(2);
+        cfg.setMaxTotal(30);
+        cfg.setMaxWaitMillis(5000);
+        Set<HostAndPort> nodes = new HashSet<>();
+        for (String hostPort:this.haloProperties.getCacheRedisNodes()){
+            String[] temp = hostPort.split(":");
+            if(temp.length > 0){
+                String host = temp[0];
+                int port = 6379;
+                if(temp.length > 1){
+                    try {
+                       port = Integer.parseInt(temp[1]);
+                    }catch (Exception ex){
+
+                    }
+                }
+                nodes.add(new HostAndPort(host, port));
+            }
+        }
+        if(nodes.isEmpty()){
+            nodes.add(new HostAndPort("127.0.0.1", 6379));
+        }
+        redis = new JedisCluster(nodes, 5, 20, 3, this.haloProperties.getCacheRedisPassword(), cfg);
+        log.info("Initialized cache redis cluster: {}", redis.getClusterNodes());
+    }
+
+    protected JedisCluster redis(){
+        if(redis == null){
+            synchronized (RedisCacheStore.class){
+                if(redis != null){
+                    return redis;
+                }
+                initRedis();
+                return redis;
+            }
+        }
+        return redis;
+    }
+
+    public RedisCacheStore(HaloProperties haloProperties) {
+        this.haloProperties = haloProperties;
+        initRedis();
+    }
+
+    @Override
+    Optional<CacheWrapper<String>> getInternal(String key) {
+        Assert.hasText(key, "Cache key must not be blank");
+        String v = redis.get(key);
+        return StringUtils.isEmpty(v) ? Optional.empty() : jsonToCacheWrapper(v);
+    }
+
+    @Override
+    void putInternal(String key, CacheWrapper<String> cacheWrapper) {
+        putInternalIfAbsent(key, cacheWrapper);
+        try {
+            redis.set(key, JsonUtils.objectToJson(cacheWrapper));
+            Date ttl = cacheWrapper.getExpireAt();
+            if(ttl != null){
+                redis.pexpireAt(key, ttl.getTime());
+            }
+        }catch (Exception e){
+            log.warn("Put cache fail json2object key: [{}] value:[{}]", key, cacheWrapper);
+        }
+    }
+
+    @Override
+    Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
+        Assert.hasText(key, "Cache key must not be blank");
+        Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
+        try {
+            if(redis.setnx(key, JsonUtils.objectToJson(cacheWrapper)) <= 0){
+                log.warn("Failed to put the cache, because the key: [{}] has been present already", key);
+                return false;
+            }
+            Date ttl = cacheWrapper.getExpireAt();
+            if(ttl != null){
+                redis.pexpireAt(key, ttl.getTime());
+            }
+            return true;
+        } catch (JsonProcessingException e) {
+            log.warn("Put cache fail json2object key: [{}] value:[{}]", key, cacheWrapper);
+        }
+        log.debug("Cache key: [{}], original cache wrapper: [{}]", key, cacheWrapper);
+        return false;
+    }
+
+    @Override
+    public void delete(String key) {
+        Assert.hasText(key, "Cache key must not be blank");
+        redis.del(key);
+        log.debug("Removed key: [{}]", key);
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        log.debug("Closing redis cache cluster client.");
+        redis.close();
+    }
+}

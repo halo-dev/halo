@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import run.halo.app.model.enums.Mode;
 
+import java.util.ArrayList;
 import java.time.Duration;
 
 import static run.halo.app.model.support.HaloConst.*;
@@ -47,7 +48,7 @@ public class HaloProperties {
     /**
      * Work directory.
      */
-    private String workDir = ensureSuffix(USER_HOME, FILE_SEPARATOR) + ".halo" + FILE_SEPARATOR;
+    private String workDir = ensureSuffix(WORK_DIR, FILE_SEPARATOR) + ".halo" + FILE_SEPARATOR;
 
     /**
      * Halo backup directory.(Not recommended to modify this config);
@@ -70,5 +71,10 @@ public class HaloProperties {
      * level
      */
     private String cache = "memory";
+
+    private ArrayList<String> cacheRedisNodes = new ArrayList<>();
+
+    private String cacheRedisPassword = "";
+
 
 }

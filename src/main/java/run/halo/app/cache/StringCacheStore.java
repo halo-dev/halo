@@ -18,6 +18,17 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public abstract class StringCacheStore extends AbstractCacheStore<String, String> {
+    protected Optional<CacheWrapper<String>> jsonToCacheWrapper(String json) {
+        Assert.hasText(json, "json value must not be null");
+        CacheWrapper<String> cacheWrapper = null;
+        try {
+            cacheWrapper = JsonUtils.jsonToObject(json, CacheWrapper.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.debug("erro json to wrapper value bytes: [{}]", json, e);
+        }
+        return Optional.ofNullable(cacheWrapper);
+    }
 
     public <T> void putAny(String key, T value) {
         try {
