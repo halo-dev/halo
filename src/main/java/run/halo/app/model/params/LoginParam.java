@@ -2,6 +2,7 @@ package run.halo.app.model.params;
 
 import lombok.Data;
 import lombok.ToString;
+import run.halo.app.model.enums.MFAType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -24,7 +25,7 @@ public class LoginParam {
     @Size(max = 100, message = "用户密码字符长度不能超过 {max}")
     private String password;
 
-    @Size(min = 6, max = 6, message = "MFAuth Code应为 {max} 位")
-    private String authCode;
+    @Size(min = 6, max = 6, message = "两步验证码应为 {max} 位")
+    private String authcode;
 
 }

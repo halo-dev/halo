@@ -3,6 +3,7 @@ package run.halo.app.service.impl;
 import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -19,6 +20,7 @@ import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.mail.MailService;
 import run.halo.app.model.dto.EnvironmentDTO;
+import run.halo.app.model.dto.LoginPreCheckDTO;
 import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
@@ -126,7 +128,7 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
-    public AuthToken authenticate(LoginParam loginParam) {
+    public User authenticate(LoginParam loginParam) {
         Assert.notNull(loginParam, "Login param must not be null");
 
         String username = loginParam.getUsername();
@@ -155,9 +157,20 @@ public class AdminServiceImpl implements AdminService {
             throw new BadRequestException(mismatchTip);
         }
 
-        // check mfa code
+        return user;
+    }
+
+    @Override
+    public AuthToken authCodeCheck(LoginParam loginParam) {
+        // get user
+        final  User user = this.authenticate(loginParam);
+
+        // check authCode
         if (MFAType.useMFA(user.getMfaType())) {
-            TwoFactorAuthUtils.validateTFACode(user.getMfaKey(), loginParam.getAuthCode());
+            if (StrUtil.isBlank(loginParam.getAuthcode())) {
+                throw new BadRequestException("请输入两步验证码");
+            }
+            TwoFactorAuthUtils.validateTFACode(user.getMfaKey(), loginParam.getAuthcode());
         }
 
         if (SecurityContextHolder.getContext().isAuthenticated()) {
@@ -528,5 +541,21 @@ public class AdminServiceImpl implements AdminService {
         });
 
         return result.toString();
+    }
+
+    @Override
+    public LoginPreCheckDTO getUserEnv(@NonNull String username) {
+        Assert.notNull(username, "username must not be null");
+
+        boolean useMFA = true;
+        try {
+            final User user = Validator.isEmail(username) ?
+                    userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
+            useMFA = MFAType.useMFA(user.getMfaType());
+        } catch (NotFoundException e) {
+            log.error("Failed to find user by name: " + username, e);
+            eventPublisher.publishEvent(new LogEvent(this, username, LogType.LOGIN_FAILED, username));
+        }
+        return new LoginPreCheckDTO(useMFA);
     }
 }

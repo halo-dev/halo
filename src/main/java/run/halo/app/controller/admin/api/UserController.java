@@ -10,6 +10,7 @@ import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.MFAType;
+import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.params.PasswordParam;
 import run.halo.app.model.params.MultiFactorAuthParam;
 import run.halo.app.model.params.UserParam;

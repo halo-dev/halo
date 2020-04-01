@@ -70,7 +70,12 @@ public enum LogType implements ValueEnum<Integer> {
     /**
      * MFA Updated
      */
-    MFA_UPDATED(65);
+    MFA_UPDATED(65),
+
+    /**
+     * Logged pre check
+     */
+    LOGGED_PRE_CHECK(70);
 
     private final Integer value;
 
