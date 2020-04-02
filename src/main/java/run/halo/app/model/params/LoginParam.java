@@ -2,7 +2,6 @@ package run.halo.app.model.params;
 
 import lombok.Data;
 import lombok.ToString;
-import run.halo.app.model.enums.MFAType;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

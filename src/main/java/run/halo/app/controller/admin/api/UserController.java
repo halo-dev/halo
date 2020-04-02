@@ -91,7 +91,7 @@ public class UserController {
     @CacheLock(autoDelete = false, prefix = "mfa")
     @DisableOnCondition
     public MultiFactorAuthVO updateMFAuth(@RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
-        if ((StrUtil.isNotBlank(user.getMfaKey()) && MFAType.useMFA(multiFactorAuthParam.getMfaType()))) {
+        if (StrUtil.isNotBlank(user.getMfaKey()) && MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.TFA_TOTP);
         } else if (StrUtil.isBlank(user.getMfaKey()) && !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.NONE);

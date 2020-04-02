@@ -42,11 +42,6 @@ public class TwoFactorAuthUtils {
         return TimeBasedOneTimePasswordUtil.generateOtpAuthUrl(userName, tfaKey);
     }
 
-
-    public static void main(String[] args) {
-        System.out.println(generateOtpAuthUrl("12","43"));
-    }
-
 }
 
 /**
@@ -92,12 +87,12 @@ class TimeBasedOneTimePasswordUtil {
      */
     private static int NUM_DIGITS_OUTPUT = 6;
 
-    private static final String blockOfZeros;
+    private static final String BLOCK_OF_ZEROS;
 
     static {
         char[] chars = new char[NUM_DIGITS_OUTPUT];
         Arrays.fill(chars, '0');
-        blockOfZeros = new String(chars);
+        BLOCK_OF_ZEROS = new String(chars);
     }
 
     /**
@@ -247,7 +242,7 @@ class TimeBasedOneTimePasswordUtil {
         for (int i = offset; i < offset + 4; ++i) {
             truncatedHash <<= 8;
             // get the 4 bytes at the offset
-            truncatedHash |= (hash[i] & 0xFF);
+            truncatedHash |= hash[i] & 0xFF;
         }
         // cut off the top bit
         truncatedHash &= 0x7FFFFFFF;
@@ -301,7 +296,7 @@ class TimeBasedOneTimePasswordUtil {
         } else {
             StringBuilder sb = new StringBuilder(digits);
             int zeroCount = digits - numStr.length();
-            sb.append(blockOfZeros, 0, zeroCount);
+            sb.append(BLOCK_OF_ZEROS, 0, zeroCount);
             sb.append(numStr);
             return sb.toString();
         }
@@ -387,7 +382,7 @@ class TimeBasedOneTimePasswordUtil {
                     break;
                 case 7:
                     // all 5 bits is lower 5 bits
-                    working |= (val & 0x1F);
+                    working |= val & 0x1F;
                     result[resultIndex++] = (byte) working;
                     which = 0;
                     break;
