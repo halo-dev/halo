@@ -30,7 +30,7 @@ public class TwoFactorAuthUtils {
         try {
             int validCode = Integer.parseInt(tfaCode);
             boolean result = TimeBasedOneTimePasswordUtil.validateCurrentNumber(tfaKey, validCode, VALID_TFA_WINDOW_MILLIS);
-            if (!result) throw new AuthenticationException("两步验证码验证错误，请确认时间是否同步");
+            if (!result) throw new BadRequestException("两步验证码验证错误，请确认时间是否同步");
         } catch (NumberFormatException e) {
             throw new BadRequestException("两步验证码请输入数字");
         } catch (GeneralSecurityException e) {

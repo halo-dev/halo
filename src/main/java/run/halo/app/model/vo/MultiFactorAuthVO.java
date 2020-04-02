@@ -1,8 +1,7 @@
 package run.halo.app.model.vo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
+import run.halo.app.model.enums.MFAType;
 
 /**
  * MultiFactorAuth VO.
@@ -12,13 +11,19 @@ import lombok.ToString;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 public class MultiFactorAuthVO {
 
-    private String qrImages;
+    private String qrImage;
 
     private String optAuthUrl;
 
     private String mfaKey;
 
+    private MFAType mfaType;
+
+    public MultiFactorAuthVO(MFAType mfaType) {
+        this.mfaType = mfaType;
+    }
 }

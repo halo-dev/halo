@@ -5,14 +5,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.MFAType;
-import run.halo.app.model.params.LoginParam;
-import run.halo.app.model.params.PasswordParam;
 import run.halo.app.model.params.MultiFactorAuthParam;
+import run.halo.app.model.params.PasswordParam;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.UpdateCheck;
@@ -67,16 +67,17 @@ public class UserController {
         return BaseResponse.ok("密码修改成功");
     }
 
-    @GetMapping("mfa/generate")
+    @PutMapping("mfa/generate")
     @ApiOperation("Generate Multi-Factor Auth qr image")
     @DisableOnCondition
-    public MultiFactorAuthVO generateMFAQrImage(@RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
+    public MultiFactorAuthVO generateMFAQrImage(@RequestBody MultiFactorAuthParam multiFactorAuthParam, User user) {
         if (MFAType.NONE == user.getMfaType()) {
             if (MFAType.TFA_TOTP == multiFactorAuthParam.getMfaType()) {
                 String mfaKey = TwoFactorAuthUtils.generateTFAKey();
                 String optAuthUrl = TwoFactorAuthUtils.generateOtpAuthUrl(user.getNickname(), mfaKey);
-                String qrImageBase64 = Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 256, 256));
-                return new MultiFactorAuthVO("image/png;base64," + qrImageBase64, optAuthUrl, mfaKey);
+                String qrImageBase64 = "data:image/png;base64," +
+                        Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 128, 128));
+                return new MultiFactorAuthVO(qrImageBase64, optAuthUrl, mfaKey, MFAType.TFA_TOTP);
             } else {
                 throw new BadRequestException("暂不支持的MFA认证的方式");
             }
@@ -87,31 +88,20 @@ public class UserController {
 
     @PutMapping("mfa/update")
     @ApiOperation("Updates user's Multi Factor Auth")
+    @CacheLock(autoDelete = false, prefix = "mfa")
     @DisableOnCondition
-    public BaseResponse<String> updateMFAuth(@RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
-        if ((StrUtil.isNotBlank(user.getMfaKey()) && multiFactorAuthParam.useMFA())) {
-            return BaseResponse.ok("两步验证已是开启状态，不需要再次开启");
-        } else if (StrUtil.isBlank(user.getMfaKey()) && !multiFactorAuthParam.useMFA()) {
-            return BaseResponse.ok("两步验证已是关闭状态，不需要再次关闭");
+    public MultiFactorAuthVO updateMFAuth(@RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
+        if ((StrUtil.isNotBlank(user.getMfaKey()) && MFAType.useMFA(multiFactorAuthParam.getMfaType()))) {
+            return new MultiFactorAuthVO(MFAType.TFA_TOTP);
+        } else if (StrUtil.isBlank(user.getMfaKey()) && !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
+            return new MultiFactorAuthVO(MFAType.NONE);
         } else {
             final String tfaKey = StrUtil.isNotBlank(user.getMfaKey()) ? user.getMfaKey() : multiFactorAuthParam.getMfaKey();
-            TwoFactorAuthUtils.validateTFACode(tfaKey, multiFactorAuthParam.getAuthCode());
+            TwoFactorAuthUtils.validateTFACode(tfaKey, multiFactorAuthParam.getAuthcode());
         }
-        // 保存两步验证
-        userService.updateMFA(multiFactorAuthParam.getMfaType(), multiFactorAuthParam.getMfaKey(), user.getId());
+        // update MFA key
+        User updateUser = userService.updateMFA(multiFactorAuthParam.getMfaType(), multiFactorAuthParam.getMfaKey(), user.getId());
 
-        String tips = multiFactorAuthParam.useMFA() ? "两步验证已启用,下次登陆生效!" : "两步验证已关闭";
-        return BaseResponse.ok(tips);
-    }
-
-    @PutMapping("mfa/check")
-    @ApiOperation("check user's Multi-Factor Auth")
-    @DisableOnCondition
-    public BaseResponse<String> checkMFAuth(@RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
-        if (!MFAType.useMFA(user.getMfaType())) {
-            return BaseResponse.ok("未开启MFA认证");
-        }
-        TwoFactorAuthUtils.validateTFACode(user.getMfaKey(), multiFactorAuthParam.getAuthCode());
-        return BaseResponse.ok("check success!");
+        return new MultiFactorAuthVO(updateUser.getMfaType());
     }
 }

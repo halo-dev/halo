@@ -21,10 +21,6 @@ public class MultiFactorAuthParam {
 
     @NotBlank(message = "MFA Code不能为空")
     @Size(min = 6, max = 6, message = "MFA Code应为 {max} 位")
-    private String authCode;
-
-    public boolean useMFA() {
-        return this.mfaType != null && this.mfaType != MFAType.NONE;
-    }
+    private String authcode;
 
 }
