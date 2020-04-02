@@ -1,12 +1,12 @@
 package run.halo.app.controller.content.model;
 
-import cn.hutool.core.util.PageUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
@@ -44,22 +44,25 @@ public class TagModel {
 
     public String list(Model model) {
         model.addAttribute("is_tags", true);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("tags");
     }
 
-    public String listPost(Model model, String slugName, Integer page) {
-        // Get tag by slug name
-        final Tag tag = tagService.getBySlugNameOfNonNull(slugName);
+    public String listPost(Model model, String slug, Integer page) {
+        // Get tag by slug
+        final Tag tag = tagService.getBySlugOfNonNull(slug);
+        TagDTO tagDTO = tagService.convertTo(tag);
 
-        final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), Sort.by(DESC, "createTime"));
+        final Pageable pageable = PageRequest.of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "createTime"));
         Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
-        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
 
         model.addAttribute("is_tag", true);
         model.addAttribute("posts", posts);
-        model.addAttribute("rainbow", rainbow);
-        model.addAttribute("tag", tag);
+        model.addAttribute("tag", tagDTO);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("tag");
     }
 }

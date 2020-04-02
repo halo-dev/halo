@@ -24,7 +24,7 @@ public class CategoryDTO implements OutputConverter<CategoryDTO, Category> {
 
     private String name;
 
-    private String slugName;
+    private String slug;
 
     private String description;
 

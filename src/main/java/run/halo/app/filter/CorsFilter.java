@@ -1,7 +1,10 @@
 package run.halo.app.filter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -21,6 +24,8 @@ import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_HEADER_NAME;
  *
  * @author johnniang
  */
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class CorsFilter extends GenericFilterBean {
 
     private final static String ALLOW_HEADERS = StringUtils.joinWith(",", HttpHeaders.CONTENT_TYPE, ADMIN_TOKEN_HEADER_NAME, API_ACCESS_KEY_HEADER_NAME);

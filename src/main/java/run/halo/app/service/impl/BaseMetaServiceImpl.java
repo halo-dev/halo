@@ -36,24 +36,24 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
 
     @Override
     @Transactional
-    public List<META> createOrUpdateByPostId(Integer postId, Set<META> postMetas) {
+    public List<META> createOrUpdateByPostId(Integer postId, Set<META> metas) {
         Assert.notNull(postId, "Post id must not be null");
 
         // firstly remove post metas by post id
         removeByPostId(postId);
 
-        if (CollectionUtils.isEmpty(postMetas)) {
+        if (CollectionUtils.isEmpty(metas)) {
             return Collections.emptyList();
         }
 
         // Save post metas
-        postMetas.forEach(postMeta -> {
+        metas.forEach(postMeta -> {
             if (StringUtils.isNotEmpty(postMeta.getValue()) && StringUtils.isNotEmpty(postMeta.getKey())) {
                 postMeta.setPostId(postId);
                 baseMetaRepository.save(postMeta);
             }
         });
-        return new ArrayList<>(postMetas);
+        return new ArrayList<>(metas);
     }
 
     @Override
@@ -69,18 +69,18 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
             return Collections.emptyMap();
         }
 
-        // Find all post metas
-        List<META> postMetas = baseMetaRepository.findAllByPostIdIn(postIds);
+        // Find all metas
+        List<META> metas = baseMetaRepository.findAllByPostIdIn(postIds);
 
-        // Convert to post meta map
-        Map<Long, META> postMetaMap = ServiceUtils.convertToMap(postMetas, META::getId);
+        // Convert to meta map
+        Map<Long, META> postMetaMap = ServiceUtils.convertToMap(metas, META::getId);
 
         // Create category list map
         Map<Integer, List<META>> postMetaListMap = new HashMap<>();
 
         // Foreach and collect
-        postMetas.forEach(postMeta -> postMetaListMap.computeIfAbsent(postMeta.getPostId(), postId -> new LinkedList<>())
-                .add(postMetaMap.get(postMeta.getId())));
+        metas.forEach(meta -> postMetaListMap.computeIfAbsent(meta.getPostId(), postId -> new LinkedList<>())
+            .add(postMetaMap.get(meta.getId())));
 
         return postMetaListMap;
     }
@@ -130,7 +130,7 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
         }
 
         return postMetaList.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 }

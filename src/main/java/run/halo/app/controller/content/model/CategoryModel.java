@@ -1,12 +1,13 @@
 package run.halo.app.controller.content.model;
 
-import cn.hutool.core.util.PageUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
@@ -42,24 +43,47 @@ public class CategoryModel {
         this.optionService = optionService;
     }
 
+    /**
+     * List categories.
+     *
+     * @param model model
+     * @return template name
+     */
     public String list(Model model) {
         model.addAttribute("is_categories", true);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
+        model.addAttribute("meta_description", optionService.getSeoDescription());
         return themeService.render("categories");
     }
 
-    public String listPost(Model model, String slugName, Integer page) {
-        // Get category by slug name
-        final Category category = categoryService.getBySlugNameOfNonNull(slugName);
+    /**
+     * List category posts.
+     *
+     * @param model model
+     * @param slug  slug
+     * @param page  current page
+     * @return template name
+     */
+    public String listPost(Model model, String slug, Integer page) {
+        // Get category by slug
+        final Category category = categoryService.getBySlugOfNonNull(slug);
+        CategoryDTO categoryDTO = categoryService.convertTo(category);
 
-        final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), Sort.by(DESC, "createTime"));
+        final Pageable pageable = PageRequest.of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "createTime"));
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
-        final int[] rainbow = PageUtil.rainbow(page, posts.getTotalPages(), 3);
+
+        // Generate meta description.
+        if (StringUtils.isNotEmpty(category.getDescription())) {
+            model.addAttribute("meta_description", category.getDescription());
+        } else {
+            model.addAttribute("meta_description", optionService.getSeoDescription());
+        }
 
         model.addAttribute("is_category", true);
         model.addAttribute("posts", posts);
-        model.addAttribute("rainbow", rainbow);
-        model.addAttribute("category", category);
+        model.addAttribute("category", categoryDTO);
+        model.addAttribute("meta_keywords", optionService.getSeoKeywords());
         return themeService.render("category");
     }
 }

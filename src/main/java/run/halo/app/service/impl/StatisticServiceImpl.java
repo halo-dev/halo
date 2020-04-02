@@ -68,7 +68,7 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public StatisticDTO getStatistic() {
         StatisticDTO statisticDTO = new StatisticDTO();
-        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED) + sheetService.countByStatus(PostStatus.PUBLISHED));
+        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
 
         // Handle comment count
         long postCommentCount = postCommentService.countByStatus(CommentStatus.PUBLISHED);

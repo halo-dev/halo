@@ -1,34 +1,28 @@
 package run.halo.app.controller.admin.api;
 
-import cn.hutool.core.util.ZipUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.json.JSONObject;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import run.halo.app.exception.FileOperationException;
+import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.service.BackupService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**
  * Backup controller
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-04-26
  */
 @RestController
@@ -38,31 +32,37 @@ public class BackupController {
 
     private final BackupService backupService;
 
-    public BackupController(BackupService backupService) {
+    private final HaloProperties haloProperties;
+
+    public BackupController(BackupService backupService,
+                            HaloProperties haloProperties) {
         this.backupService = backupService;
+        this.haloProperties = haloProperties;
     }
 
-    @PostMapping("halo")
-    @ApiOperation("Backups halo")
+    @PostMapping("work-dir")
+    @ApiOperation("Backups work directory")
+    @DisableOnCondition
     public BackupDTO backupHalo() {
-        return backupService.zipWorkDirectory();
+        return backupService.backupWorkDirectory();
     }
 
-    @GetMapping("halo")
-    @ApiOperation("Gets all backups")
+    @GetMapping("work-dir")
+    @ApiOperation("Gets all work directory backups")
     public List<BackupDTO> listBackups() {
-        return backupService.listHaloBackups();
+        return backupService.listWorkDirBackups();
     }
 
-    @GetMapping("halo/{fileName:.+}")
-    @ApiOperation("Downloads backup file")
+    @GetMapping("work-dir/{fileName:.+}")
+    @ApiOperation("Downloads a work directory backup file")
+    @DisableOnCondition
     public ResponseEntity<Resource> downloadBackup(@PathVariable("fileName") String fileName, HttpServletRequest request) {
         log.info("Try to download backup file: [{}]", fileName);
 
         // Load file as resource
-        Resource backupResource = backupService.loadFileAsResource(fileName);
+        Resource backupResource = backupService.loadFileAsResource(haloProperties.getBackupDir(), fileName);
 
-        String contentType = "application/octet-stream";
+        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         // Try to determine file's content type
         try {
             contentType = request.getServletContext().getMimeType(backupResource.getFile().getAbsolutePath());
@@ -72,65 +72,64 @@ public class BackupController {
         }
 
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + backupResource.getFilename() + "\"")
-                .body(backupResource);
+            .contentType(MediaType.parseMediaType(contentType))
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + backupResource.getFilename() + "\"")
+            .body(backupResource);
     }
 
-    @DeleteMapping("halo")
-    @ApiOperation("Deletes a backup")
+    @DeleteMapping("work-dir")
+    @ApiOperation("Deletes a work directory backup")
+    @DisableOnCondition
     public void deleteBackup(@RequestParam("filename") String filename) {
-        backupService.deleteHaloBackup(filename);
+        backupService.deleteWorkDirBackup(filename);
     }
 
-    @PostMapping("import/markdown")
-    @ApiOperation("Import markdown")
+    @PostMapping("markdown")
+    @ApiOperation("Imports markdown")
     public BasePostDetailDTO backupMarkdowns(@RequestPart("file") MultipartFile file) throws IOException {
         return backupService.importMarkdown(file);
     }
 
-    @GetMapping("export/hexo")
-    @ApiOperation("export hexo markdown")
-    public void exportMarkdowns(HttpServletResponse response) {
-        final String tmpDir = System.getProperty("java.io.tmpdir");
-        final String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-        String localFilePath = tmpDir + File.separator + "halo-markdown-" + date;
-        log.trace(localFilePath);
-        final File localFile = new File(localFilePath);
-        final File postDir = new File(localFilePath + File.separator + "posts");
-        final File passwordDir = new File(localFilePath + File.separator + "passwords");
-        final File draftDir = new File(localFilePath + File.separator + "drafts");
+    @PostMapping("data")
+    @ApiOperation("Exports all data")
+    @DisableOnCondition
+    public BackupDTO exportData() {
+        return backupService.exportData();
+    }
+
+    @GetMapping("data")
+    @ApiOperation("Lists all exported data")
+    public List<BackupDTO> listExportedData() {
+        return backupService.listExportedData();
+    }
+
+    @DeleteMapping("data")
+    @ApiOperation("Deletes a exported data")
+    @DisableOnCondition
+    public void deleteExportedData(@RequestParam("filename") String filename) {
+        backupService.deleteExportedData(filename);
+    }
+
+    @GetMapping("data/{fileName:.+}")
+    @ApiOperation("Downloads a exported data")
+    @DisableOnCondition
+    public ResponseEntity<Resource> downloadExportedData(@PathVariable("fileName") String fileName, HttpServletRequest request) {
+        log.info("Try to download exported data file: [{}]", fileName);
+
+        // Load exported data as resource
+        Resource exportDataResource = backupService.loadFileAsResource(haloProperties.getDataExportDir(), fileName);
+
+        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        // Try to determine file's content type
         try {
-            if (!postDir.mkdirs()) {
-                throw new Exception("Create dir [" + postDir.getPath() + "] failed");
-            }
-            if (!passwordDir.mkdirs()) {
-                throw new Exception("Create dir [" + passwordDir.getPath() + "] failed");
-            }
-            if (!draftDir.mkdirs()) {
-                throw new Exception("Create dir [" + draftDir.getPath() + "] failed");
-            }
-            final JSONObject result = backupService.exportHexoMDs();
-            final List<JSONObject> posts = (List<JSONObject>) result.opt("posts");
-            backupService.exportHexoMd(posts, postDir.getPath());
-            final List<JSONObject> passwords = (List<JSONObject>) result.opt("passwords");
-            backupService.exportHexoMd(passwords, passwordDir.getPath());
-            final List<JSONObject> drafts = (List<JSONObject>) result.opt("drafts");
-            backupService.exportHexoMd(drafts, draftDir.getPath());
-
-            final File zipFile = ZipUtil.zip(localFile);
-            byte[] zipData;
-            try (final FileInputStream inputStream = new FileInputStream(zipFile)) {
-                zipData = IOUtils.toByteArray(inputStream);
-                response.setContentType("application/zip");
-                final String fileName = "halo-markdown-" + date + ".zip";
-                response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-            }
-
-            response.getOutputStream().write(zipData);
-        } catch (final Exception e) {
-            log.error("Export failed", e);
-            throw new FileOperationException("文章导出失败", e);
+            contentType = request.getServletContext().getMimeType(exportDataResource.getFile().getAbsolutePath());
+        } catch (IOException e) {
+            log.warn("Could not determine file type", e);
         }
+
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(contentType))
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportDataResource.getFilename() + "\"")
+            .body(exportDataResource);
     }
 }

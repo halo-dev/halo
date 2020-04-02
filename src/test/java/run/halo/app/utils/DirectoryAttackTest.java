@@ -1,10 +1,10 @@
 package run.halo.app.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import run.halo.app.exception.ForbiddenException;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -14,6 +14,7 @@ import java.nio.file.Paths;
  * @author johnniang
  * @date 4/9/19
  */
+@Slf4j
 public class DirectoryAttackTest {
 
     private String userHome = System.getProperty("user.home");
@@ -25,8 +26,8 @@ public class DirectoryAttackTest {
 
         Path testPath = Paths.get(userHome + "/../../etc/passwd");
 
-        System.out.println("Work directory path: " + workDirPath);
-        System.out.println("Test path: " + testPath);
+        log.debug("Work directory path: [{}]", workDirPath);
+        log.debug("Test path: [{}]", testPath);
 
         Assert.assertFalse(testPath.startsWith(workDirPath));
         Assert.assertFalse(workDirPath.startsWith(testPath));
@@ -38,8 +39,8 @@ public class DirectoryAttackTest {
 
         Path testPath = Paths.get(userHome + "/halo-test/test.txt");
 
-        System.out.println("Work directory path: " + workDirPath);
-        System.out.println("Test path: " + testPath);
+        log.debug("Work directory path: [{}]", workDirPath);
+        log.debug("Test path: [{}]", testPath);
 
         Assert.assertTrue(testPath.startsWith(workDirPath));
         Assert.assertFalse(workDirPath.startsWith(testPath));
@@ -52,8 +53,8 @@ public class DirectoryAttackTest {
 
         Path testPath = Paths.get("/etc/passwd");
 
-        System.out.println("Work directory path: " + workDirPath);
-        System.out.println("Test path: " + testPath);
+        log.debug("Work directory path: [{}]", workDirPath);
+        log.debug("Test path: [{}]", testPath);
 
         Assert.assertTrue(testPath.startsWith(workDirPath));
         Assert.assertFalse(workDirPath.startsWith(testPath));
@@ -64,10 +65,10 @@ public class DirectoryAttackTest {
         String pathname = "/home/test/../../etc/";
         Path path = Paths.get(pathname);
 
-        System.out.println("Path: " + path);
-        System.out.println("Absolute path: " + path.toAbsolutePath());
-        System.out.println("Name count: " + path.getNameCount());
-        System.out.println("Normalized path: " + path.normalize());
+        log.debug("Path: [{}]", path);
+        log.debug("Absolute path: [{}]", path.toAbsolutePath());
+        log.debug("Name count: [{}]", path.getNameCount());
+        log.debug("Normalized path: [{}]", path.normalize());
     }
 
     @Test

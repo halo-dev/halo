@@ -4,11 +4,13 @@ import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import run.halo.app.model.entity.Category;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -26,7 +28,9 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
 
     private final PostCategoryService postCategoryService;
 
-    public CategoryTagDirective(Configuration configuration, CategoryService categoryService, PostCategoryService postCategoryService) {
+    public CategoryTagDirective(Configuration configuration,
+                                CategoryService categoryService,
+                                PostCategoryService postCategoryService) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
         configuration.setSharedVariable("categoryTag", this);
@@ -42,9 +46,13 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
                 case "list":
                     env.setVariable("categories", builder.build().wrap(postCategoryService.listCategoryWithPostCountDto(Sort.by(DESC, "createTime"))));
                     break;
+                case "tree":
+                    env.setVariable("categories", builder.build().wrap(categoryService.listAsTree(Sort.by(DESC, "createTime"))));
+                    break;
                 case "listByPostId":
                     Integer postId = Integer.parseInt(params.get("postId").toString());
-                    env.setVariable("categories", builder.build().wrap(postCategoryService.listCategoriesBy(postId)));
+                    List<Category> categories = postCategoryService.listCategoriesBy(postId);
+                    env.setVariable("categories", builder.build().wrap(categoryService.convertTo(categories)));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(categoryService.count()));

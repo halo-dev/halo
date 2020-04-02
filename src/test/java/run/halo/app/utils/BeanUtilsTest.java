@@ -3,13 +3,13 @@ package run.halo.app.utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * BeanUtils test.
@@ -38,8 +38,8 @@ public class BeanUtilsTest {
     @Test
     public void transformFromInBatch() {
         TestA[] as = {
-                new TestA(1, 2),
-                new TestA(3, 4)
+            new TestA(1, 2),
+            new TestA(3, 4)
         };
 
         List<TestA> aList = Arrays.asList(as);

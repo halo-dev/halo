@@ -211,8 +211,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         }
 
         return menus.stream()
-                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
-                .collect(Collectors.toList());
+            .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+            .collect(Collectors.toList());
     }
 
     private void nameMustNotExist(@NonNull Menu menu) {

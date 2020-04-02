@@ -43,12 +43,6 @@ public class LinkController {
         return new LinkDTO().convertFrom(linkService.getById(id));
     }
 
-    @GetMapping("parse")
-    @ApiOperation("Gets link by parse url")
-    public LinkDTO getByParse(@RequestParam("url") String url) {
-        return linkService.getByParse(url);
-    }
-
     @PostMapping
     @ApiOperation("Creates a link")
     public LinkDTO createBy(@RequestBody @Valid LinkParam linkParam) {
@@ -72,7 +66,7 @@ public class LinkController {
     }
 
     @GetMapping("teams")
-    @ApiOperation(("Lists all link teams"))
+    @ApiOperation("Lists all link teams")
     public List<String> teams() {
         return linkService.listAllTeams();
     }

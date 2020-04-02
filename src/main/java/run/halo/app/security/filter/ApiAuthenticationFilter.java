@@ -1,14 +1,18 @@
 package run.halo.app.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
-import run.halo.app.cache.StringCacheStore;
+import org.springframework.stereotype.Component;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.properties.ApiProperties;
 import run.halo.app.model.properties.CommentProperties;
+import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
 
@@ -28,21 +32,37 @@ import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_QUERY_NAME;
  * @author johnniang
  */
 @Slf4j
+@Component
+@Order(0)
 public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
 
     private final OptionService optionService;
 
     public ApiAuthenticationFilter(HaloProperties haloProperties,
                                    OptionService optionService,
-                                   StringCacheStore cacheStore,
-                                   OneTimeTokenService oneTimeTokenService) {
+                                   AbstractStringCacheStore cacheStore,
+                                   OneTimeTokenService oneTimeTokenService,
+                                   ObjectMapper objectMapper) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.optionService = optionService;
+
+        addUrlPatterns("/api/content/**");
+
+        addExcludeUrlPatterns(
+            "/api/content/**/comments",
+            "/api/content/**/comments/**",
+            "/api/content/options/comment"
+        );
+
+        // set failure handler
+        DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
+        failureHandler.setProductionEnv(haloProperties.isProductionEnv());
+        failureHandler.setObjectMapper(objectMapper);
+        setFailureHandler(failureHandler);
     }
 
     @Override
     protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         if (!haloProperties.isAuthEnabled()) {
             filterChain.doFilter(request, response);
             return;

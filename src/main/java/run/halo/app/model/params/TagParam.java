@@ -24,7 +24,7 @@ public class TagParam implements InputConverter<Tag> {
     private String name;
 
     @Size(max = 255, message = "标签别名的字符长度不能超过 {max}")
-    private String slugName;
+    private String slug;
 
     @Size(max = 1023, message = "封面图链接的字符长度不能超过 {max}")
     private String thumbnail;
@@ -32,7 +32,7 @@ public class TagParam implements InputConverter<Tag> {
     @Override
     public Tag convertTo() {
 
-        slugName = StringUtils.isBlank(slugName) ? SlugUtils.slug(name) : SlugUtils.slug(slugName);
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(name) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";
@@ -43,6 +43,8 @@ public class TagParam implements InputConverter<Tag> {
 
     @Override
     public void update(Tag tag) {
+
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(name) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";

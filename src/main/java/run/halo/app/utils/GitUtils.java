@@ -37,9 +37,9 @@ public class GitUtils {
         Git git = null;
         try {
             git = Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setDirectory(targetPath.toFile())
-                    .call();
+                .setURI(repoUrl)
+                .setDirectory(targetPath.toFile())
+                .call();
             log.debug("Cloned git repo [{}] successfully", repoUrl);
         } finally {
             closeQuietly(git);

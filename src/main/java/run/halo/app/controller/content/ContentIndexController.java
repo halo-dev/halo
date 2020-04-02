@@ -70,6 +70,6 @@ public class ContentIndexController {
     @GetMapping(value = "page/{page}")
     public String index(Model model,
                         @PathVariable(value = "page") Integer page) {
-        return postModel.list(page, model, "is_index", "index");
+        return postModel.list(page, model);
     }
 }

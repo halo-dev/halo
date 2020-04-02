@@ -54,12 +54,12 @@ public class CategoryController {
         return categoryService.convertTo(categoryService.listAll(sort));
     }
 
-    @GetMapping("{slugName}/posts")
-    @ApiOperation("Lists posts by category slug name")
-    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slugName") String slugName,
+    @GetMapping("{slug}/posts")
+    @ApiOperation("Lists posts by category slug")
+    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slug") String slug,
                                                @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
-        // Get category by slug name
-        Category category = categoryService.getBySlugNameOfNonNull(slugName);
+        // Get category by slug
+        Category category = categoryService.getBySlugOfNonNull(slug);
 
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         return postService.convertToSimple(postPage);

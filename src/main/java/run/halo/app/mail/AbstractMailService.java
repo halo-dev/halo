@@ -29,24 +29,15 @@ import java.util.concurrent.Executors;
 public abstract class AbstractMailService implements MailService {
 
     private static final int DEFAULT_POOL_SIZE = 5;
-
-    private JavaMailSender cachedMailSender;
-
-    private MailProperties cachedMailProperties;
-
-    private String cachedFromName;
-
     protected final OptionService optionService;
-
+    private JavaMailSender cachedMailSender;
+    private MailProperties cachedMailProperties;
+    private String cachedFromName;
     @Nullable
     private ExecutorService executorService;
 
     protected AbstractMailService(OptionService optionService) {
         this.optionService = optionService;
-    }
-
-    public void setExecutorService(ExecutorService executorService) {
-        this.executorService = executorService;
     }
 
     @NonNull
@@ -57,9 +48,14 @@ public abstract class AbstractMailService implements MailService {
         return executorService;
     }
 
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
     /**
      * Test connection with email server.
      */
+    @Override
     public void testConnection() {
         JavaMailSender javaMailSender = getMailSender();
         if (javaMailSender instanceof JavaMailSenderImpl) {
@@ -111,9 +107,9 @@ public abstract class AbstractMailService implements MailService {
             mailSender.send(mimeMessage);
 
             log.info("Sent an email to [{}] successfully, subject: [{}], sent date: [{}]",
-                    Arrays.toString(mimeMessage.getAllRecipients()),
-                    mimeMessage.getSubject(),
-                    mimeMessage.getSentDate());
+                Arrays.toString(mimeMessage.getAllRecipients()),
+                mimeMessage.getSubject(),
+                mimeMessage.getSentDate());
         } catch (Exception e) {
             throw new EmailException("邮件发送失败，请检查 SMTP 服务配置是否正确", e);
         }

@@ -97,8 +97,10 @@ public class LocalFileHandler implements FileHandler {
         int year = current.get(Calendar.YEAR);
         int month = current.get(Calendar.MONTH) + 1;
 
+        String monthString = month < 10 ? "0" + month : String.valueOf(month);
+
         // Build directory
-        String subDir = UPLOAD_SUB_DIR + year + FILE_SEPARATOR + month + FILE_SEPARATOR;
+        String subDir = UPLOAD_SUB_DIR + year + FILE_SEPARATOR + monthString + FILE_SEPARATOR;
 
         String originalBasename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
 
@@ -212,8 +214,8 @@ public class LocalFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.LOCAL.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.LOCAL;
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
@@ -232,6 +234,11 @@ public class LocalFileHandler implements FileHandler {
             result = true;
         } catch (Throwable t) {
             log.warn("Failed to generate thumbnail: " + thumbPath, t);
+        } finally {
+            // Disposes of this graphics context and releases any system resources that it is using.
+            if (originalImage != null) {
+                originalImage.getGraphics().dispose();
+            }
         }
         return result;
     }

@@ -17,10 +17,9 @@ public enum CommentViolationTypeEnum {
     /**
      * 频繁
      */
-    FREQUENTLY(1),
-    ;
+    FREQUENTLY(1);
 
-    private int type;
+    private final int type;
 
     CommentViolationTypeEnum(int type) {
         this.type = type;

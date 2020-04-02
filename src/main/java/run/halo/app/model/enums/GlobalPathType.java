@@ -18,7 +18,7 @@ public enum GlobalPathType implements ValueEnum<Integer> {
      */
     ABSOLUTE(1);
 
-    private Integer value;
+    private final Integer value;
 
     GlobalPathType(Integer value) {
         this.value = value;

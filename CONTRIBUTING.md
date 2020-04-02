@@ -2,14 +2,48 @@
 
 ### 开发步骤
 
-1. `Fork` 本仓库到你自己的 Github。
-2. `Clone` 你刚刚 Fork 的仓库到本地。
-3. 执行 `git checkout dev` 切换到 `dev` 分支并进行开发。
-4. 提交代码到自己的仓库。
-5. 回到自己的仓库页面，选择 `New pull request` 按钮，创建 `Pull request` 到原仓库的 `dev` 分支。
-6. 等待合并。
+#### 1. Fork 此仓库
+
+点击右上角的 `fork` 按钮即可。
+
+#### 2. Clone 仓库到本地
+
+```bash
+git clone https://github.com/{YOUR_USERNAME}/halo
+
+git submodule init
+
+git submodule update
+```
+
+#### 3. 创建新的开发分支
+
+```bash
+git checkout -b {BRANCH_NAME}
+```
+
+#### 4. 提交代码
+
+```bash
+git push origin {BRANCH_NAME}
+```
+
+#### 5. 提交 pull request
+
+回到自己的仓库页面，选择 `New pull request` 按钮，创建 `Pull request` 到原仓库的 `master` 分支。
+
+然后等待我们 Review 即可，如有 `Change Request`，再本地修改之后再次提交即可。
+
+#### 6. 更新主仓库代码到自己的仓库
+
+```bash
+git remote add upstream git@github.com:halo-dev/halo.git
+
+git pull upstream master
+
+git push
+```
 
 ### 开发规范
 
-1. 在提交前请使用 IDE 格式化代码。
-2. 不接受创建 `Pull request` 到 `master` 分支。
+请参考 [https://halo.run/archives/code-style](https://halo.run/archives/code-style)，请确保所有代码格式化之后再提交。

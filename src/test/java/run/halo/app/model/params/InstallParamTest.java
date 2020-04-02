@@ -2,7 +2,6 @@ package run.halo.app.model.params;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import run.halo.app.model.support.AllCheck;
 import run.halo.app.model.support.CreateCheck;
 
 import javax.validation.ConstraintViolation;

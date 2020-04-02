@@ -29,10 +29,21 @@ public class HaloConst {
      */
     public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");
 
+    public final static String PROTOCOL_HTTPS = "https://";
+
+    public final static String PROTOCOL_HTTP = "http://";
+
+    public final static String URL_SEPARATOR = "/";
+
     /**
      * Halo backup prefix.
      */
     public final static String HALO_BACKUP_PREFIX = "halo-backup-";
+
+    /**
+     * Halo data export prefix.
+     */
+    public final static String HALO_DATA_EXPORT_PREFIX = "halo-data-export-";
 
     /**
      * Static pages pack prefix.
@@ -45,20 +56,13 @@ public class HaloConst {
     public final static String DEFAULT_THEME_ID = "caicai_anatole";
 
     /**
-     * Version constant. (Available in production environment)
-     */
-    public static final String HALO_VERSION;
-
-    /**
      * Path separator.
      */
     public static final String FILE_SEPARATOR = File.separator;
-
     /**
      * Suffix of freemarker template file
      */
     public static final String SUFFIX_FTL = ".ftl";
-
     /**
      * Custom freemarker tag method key.
      */
@@ -129,19 +133,20 @@ public class HaloConst {
      * Content api token param name
      */
     public final static String API_ACCESS_KEY_QUERY_NAME = "api_access_key";
-
     public final static String ONE_TIME_TOKEN_QUERY_NAME = "ott";
-
     public final static String ONE_TIME_TOKEN_HEADER_NAME = "ott";
-
-
+    /**
+     * Database product name.
+     */
+    public static String DATABASE_PRODUCT_NAME = null;
     /**
      * user_session
      */
     public static String USER_SESSION_KEY = "user_session";
 
-    static {
-        // Set version
-        HALO_VERSION = HaloConst.class.getPackage().getImplementationVersion();
-    }
+    /**
+     * Version constant.
+     */
+    public static String HALO_VERSION = null;
+
 }

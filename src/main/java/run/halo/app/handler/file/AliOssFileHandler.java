@@ -18,8 +18,10 @@ import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
-import java.awt.image.BufferedImage;
+import javax.imageio.ImageReader;
 import java.util.Objects;
+
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Ali oss file handler.
@@ -60,12 +62,12 @@ public class AliOssFileHandler implements FileHandler {
 
         if (StringUtils.isNotEmpty(domain)) {
             basePath.append(domain)
-                    .append("/");
+                .append(URL_SEPARATOR);
         } else {
             basePath.append(bucketName)
-                    .append(".")
-                    .append(endPoint)
-                    .append("/");
+                .append(".")
+                .append(endPoint)
+                .append(URL_SEPARATOR);
         }
 
         try {
@@ -76,14 +78,14 @@ public class AliOssFileHandler implements FileHandler {
 
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                        .append("/");
+                    .append(URL_SEPARATOR);
             }
 
             upFilePath.append(basename)
-                    .append("_")
-                    .append(timestamp)
-                    .append(".")
-                    .append(extension);
+                .append("_")
+                .append(timestamp)
+                .append(".")
+                .append(extension);
 
             String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
 
@@ -106,9 +108,10 @@ public class AliOssFileHandler implements FileHandler {
 
             // Handle thumbnail
             if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                BufferedImage image = ImageUtils.getImageFromFile(file.getInputStream(), extension);
-                uploadResult.setWidth(image.getWidth());
-                uploadResult.setHeight(image.getHeight());
+                ImageReader image = ImageUtils.getImageReaderFromFile(file.getInputStream(), extension);
+                assert image != null;
+                uploadResult.setWidth(image.getWidth(0));
+                uploadResult.setHeight(image.getHeight(0));
                 if (ImageUtils.EXTENSION_ICO.equals(extension)) {
                     uploadResult.setThumbPath(filePath);
                 } else {
@@ -148,7 +151,8 @@ public class AliOssFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(String type) {
-        return AttachmentType.ALIOSS.name().equalsIgnoreCase(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.ALIOSS;
     }
+
 }

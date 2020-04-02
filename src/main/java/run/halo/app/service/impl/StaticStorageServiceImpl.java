@@ -1,13 +1,18 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.event.StaticStorageChangedEvent;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.support.StaticFile;
@@ -30,16 +35,18 @@ import java.util.stream.Stream;
  * @date 2019-12-06
  */
 @Service
-public class StaticStorageServiceImpl implements StaticStorageService {
+@Slf4j
+public class StaticStorageServiceImpl implements StaticStorageService, ApplicationListener<ApplicationStartedEvent> {
 
     private final Path staticDir;
 
-    private final HaloProperties haloProperties;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public StaticStorageServiceImpl(HaloProperties haloProperties) throws IOException {
+    public StaticStorageServiceImpl(HaloProperties haloProperties,
+                                    ApplicationEventPublisher eventPublisher) throws IOException {
         staticDir = Paths.get(haloProperties.getWorkDir(), STATIC_FOLDER);
+        this.eventPublisher = eventPublisher;
         FileUtils.createIfAbsent(staticDir);
-        this.haloProperties = haloProperties;
     }
 
     @Override
@@ -90,7 +97,7 @@ public class StaticStorageServiceImpl implements StaticStorageService {
         Assert.notNull(relativePath, "Relative path must not be null");
 
         Path path = Paths.get(staticDir.toString(), relativePath);
-        System.out.println(path.toString());
+        log.debug(path.toString());
 
         try {
             if (path.toFile().isDirectory()) {
@@ -98,6 +105,7 @@ public class StaticStorageServiceImpl implements StaticStorageService {
             } else {
                 Files.deleteIfExists(path);
             }
+            onChange();
         } catch (IOException e) {
             throw new FileOperationException("文件 " + relativePath + " 删除失败", e);
         }
@@ -108,6 +116,10 @@ public class StaticStorageServiceImpl implements StaticStorageService {
         Assert.notNull(folderName, "Folder name path must not be null");
 
         Path path;
+
+        if (StringUtils.startsWith(folderName, API_FOLDER_NAME)) {
+            throw new FileOperationException("目录名称 " + folderName + " 不合法");
+        }
 
         if (StringUtils.isEmpty(basePath)) {
             path = Paths.get(staticDir.toString(), folderName);
@@ -127,10 +139,14 @@ public class StaticStorageServiceImpl implements StaticStorageService {
     }
 
     @Override
-    public void update(String basePath, MultipartFile file) {
+    public void upload(String basePath, MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
         Path uploadPath;
+
+        if (StringUtils.startsWith(file.getOriginalFilename(), API_FOLDER_NAME)) {
+            throw new FileOperationException("文件名称 " + file.getOriginalFilename() + " 不合法");
+        }
 
         if (StringUtils.isEmpty(basePath)) {
             uploadPath = Paths.get(staticDir.toString(), file.getOriginalFilename());
@@ -145,8 +161,18 @@ public class StaticStorageServiceImpl implements StaticStorageService {
         try {
             Files.createFile(uploadPath);
             file.transferTo(uploadPath);
+            onChange();
         } catch (IOException e) {
             throw new ServiceException("上传文件失败").setErrorData(uploadPath);
         }
+    }
+
+    private void onChange() {
+        eventPublisher.publishEvent(new StaticStorageChangedEvent(this, staticDir));
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationStartedEvent event) {
+        onChange();
     }
 }

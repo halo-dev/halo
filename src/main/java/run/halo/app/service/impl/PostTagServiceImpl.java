@@ -16,12 +16,15 @@ import run.halo.app.model.projection.TagPostPostCountProjection;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.PostTagRepository;
 import run.halo.app.repository.TagRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Post tag service implementation.
@@ -39,13 +42,17 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
     private final TagRepository tagRepository;
 
+    private final OptionService optionService;
+
     public PostTagServiceImpl(PostTagRepository postTagRepository,
                               PostRepository postRepository,
-                              TagRepository tagRepository) {
+                              TagRepository tagRepository,
+                              OptionService optionService) {
         super(postTagRepository);
         this.postTagRepository = postTagRepository;
         this.postRepository = postRepository;
         this.tagRepository = tagRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -70,11 +77,26 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
         // Find post count
         return tags.stream().map(
-                tag -> {
-                    TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
-                    tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
-                    return tagWithCountOutputDTO;
+            tag -> {
+                TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
+                tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
+
+                StringBuilder fullPath = new StringBuilder();
+
+                if (optionService.isEnabledAbsolutePath()) {
+                    fullPath.append(optionService.getBlogBaseUrl());
                 }
+
+                fullPath.append(URL_SEPARATOR)
+                    .append(optionService.getTagsPrefix())
+                    .append(URL_SEPARATOR)
+                    .append(tag.getSlug())
+                    .append(optionService.getPathSuffix());
+
+                tagWithCountOutputDTO.setFullPath(fullPath.toString());
+
+                return tagWithCountOutputDTO;
+            }
         ).collect(Collectors.toList());
     }
 
@@ -132,7 +154,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
         Assert.notNull(slug, "Tag slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Tag tag = tagRepository.getBySlugName(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
+        Tag tag = tagRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
 
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tag.getId(), status);
 

@@ -74,10 +74,9 @@ public interface FileHandler {
     void delete(@NonNull String key);
 
     /**
-     * Checks if the given type is supported.
+     * Get attachment type is supported.
      *
-     * @param type attachment type
-     * @return true if supported; false otherwise
+     * @return attachment type
      */
-    boolean supportType(@Nullable String type);
+    AttachmentType getAttachmentType();
 }

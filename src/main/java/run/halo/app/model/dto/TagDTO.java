@@ -20,7 +20,7 @@ public class TagDTO implements OutputConverter<TagDTO, Tag> {
 
     private String name;
 
-    private String slugName;
+    private String slug;
 
     private String thumbnail;
 

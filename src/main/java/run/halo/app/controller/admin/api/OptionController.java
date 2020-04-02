@@ -1,10 +1,10 @@
 package run.halo.app.controller.admin.api;
 
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.OptionDTO;
@@ -44,20 +44,23 @@ public class OptionController {
     }
 
     @PostMapping("saving")
-    @DisableOnCondition
     @ApiOperation("Saves options")
+    @DisableOnCondition
     public void saveOptions(@Valid @RequestBody List<OptionParam> optionParams) {
         optionService.save(optionParams);
     }
 
     @GetMapping("map_view")
     @ApiOperation("Lists all options with map view")
-    public Map<String, Object> listAllWithMapView(@RequestParam(value = "key[]", required = false) List<String> keys) {
-        if (CollectionUtils.isEmpty(keys)) {
-            return optionService.listOptions();
-        }
+    public Map<String, Object> listAllWithMapView() {
+        return optionService.listOptions();
+    }
 
-        return optionService.listOptions(keys);
+    @PostMapping("map_view/keys")
+    @ApiOperation("Lists options with map view by keys")
+    public Map<String, Object> listAllWithMapView(@RequestBody String keys) {
+        List<String> parsedKeys = JSON.parseArray(keys, String.class);
+        return optionService.listOptions(parsedKeys);
     }
 
     @GetMapping("list_view")
@@ -75,30 +78,30 @@ public class OptionController {
     }
 
     @PostMapping
-    @DisableOnCondition
     @ApiOperation("Creates option")
+    @DisableOnCondition
     public void createBy(@RequestBody @Valid OptionParam optionParam) {
         optionService.save(optionParam);
     }
 
     @PutMapping("{optionId:\\d+}")
-    @DisableOnCondition
     @ApiOperation("Updates option")
+    @DisableOnCondition
     public void updateBy(@PathVariable("optionId") Integer optionId,
                          @RequestBody @Valid OptionParam optionParam) {
         optionService.update(optionId, optionParam);
     }
 
     @DeleteMapping("{optionId:\\d+}")
-    @DisableOnCondition
     @ApiOperation("Deletes option")
+    @DisableOnCondition
     public void deletePermanently(@PathVariable("optionId") Integer optionId) {
         optionService.removePermanently(optionId);
     }
 
     @PostMapping("map_view/saving")
-    @DisableOnCondition
     @ApiOperation("Saves options by option map")
+    @DisableOnCondition
     public void saveOptionsWithMapView(@RequestBody Map<String, Object> optionMap) {
         optionService.save(optionMap);
     }

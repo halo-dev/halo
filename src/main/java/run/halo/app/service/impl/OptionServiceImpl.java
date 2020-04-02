@@ -1,7 +1,7 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import com.qiniu.common.Zone;
+import com.qiniu.storage.Region;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.MissingPropertyException;
@@ -31,7 +31,6 @@ import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.DateUtils;
-import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ValidationUtils;
 
@@ -43,6 +42,7 @@ import java.util.stream.Collectors;
  * OptionService implementation class
  *
  * @author ryanwang
+ * @author johnniang
  * @date 2019-03-14
  */
 @Slf4j
@@ -51,15 +51,15 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
     private final OptionRepository optionRepository;
     private final ApplicationContext applicationContext;
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
     private final Map<String, PropertyEnum> propertyEnumMap;
     private final ApplicationEventPublisher eventPublisher;
-    private HaloProperties haloProperties;
+    private final HaloProperties haloProperties;
 
     public OptionServiceImpl(HaloProperties haloProperties,
                              OptionRepository optionRepository,
                              ApplicationContext applicationContext,
-                             StringCacheStore cacheStore,
+                             AbstractStringCacheStore cacheStore,
                              ApplicationEventPublisher eventPublisher) {
         super(optionRepository);
         this.haloProperties = haloProperties;
@@ -192,17 +192,17 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
             // Add default property
             propertyEnumMap.keySet()
-                    .stream()
-                    .filter(key -> !keys.contains(key))
-                    .forEach(key -> {
-                        PropertyEnum propertyEnum = propertyEnumMap.get(key);
+                .stream()
+                .filter(key -> !keys.contains(key))
+                .forEach(key -> {
+                    PropertyEnum propertyEnum = propertyEnumMap.get(key);
 
-                        if (StringUtils.isBlank(propertyEnum.defaultValue())) {
-                            return;
-                        }
+                    if (StringUtils.isBlank(propertyEnum.defaultValue())) {
+                        return;
+                    }
 
-                        result.put(key, PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
-                    });
+                    result.put(key, PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
+                });
 
             // Cache the result
             cacheStore.putAny(OPTIONS_KEY, result);
@@ -222,8 +222,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         Map<String, Object> result = new HashMap<>(keys.size());
 
         keys.stream()
-                .filter(optionMap::containsKey)
-                .forEach(key -> result.put(key, optionMap.get(key)));
+            .filter(optionMap::containsKey)
+            .forEach(key -> result.put(key, optionMap.get(key)));
 
         return result;
     }
@@ -365,9 +365,19 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getPostPageSize() {
         try {
-            return getByPropertyOrDefault(PostProperties.INDEX_PAGE_SIZE, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(PostProperties.INDEX_PAGE_SIZE, Integer.class, DEFAULT_POST_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(PostProperties.INDEX_PAGE_SIZE.getValue() + " option is not a number format", e);
+            return DEFAULT_POST_PAGE_SIZE;
+        }
+    }
+
+    @Override
+    public int getArchivesPageSize() {
+        try {
+            return getByPropertyOrDefault(PostProperties.ARCHIVES_PAGE_SIZE, Integer.class, DEFAULT_ARCHIVES_PAGE_SIZE);
+        } catch (NumberFormatException e) {
+            log.error(PostProperties.ARCHIVES_PAGE_SIZE.getValue() + " option is not a number format", e);
             return DEFAULT_POST_PAGE_SIZE;
         }
     }
@@ -385,7 +395,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public int getRssPageSize() {
         try {
-            return getByPropertyOrDefault(PostProperties.RSS_PAGE_SIZE, Integer.class, DEFAULT_COMMENT_PAGE_SIZE);
+            return getByPropertyOrDefault(PostProperties.RSS_PAGE_SIZE, Integer.class, DEFAULT_RSS_PAGE_SIZE);
         } catch (NumberFormatException e) {
             log.error(PostProperties.RSS_PAGE_SIZE.getValue() + " setting is not a number format", e);
             return DEFAULT_RSS_PAGE_SIZE;
@@ -423,6 +433,36 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public Region getQiniuRegion() {
+        return getByProperty(QiniuOssProperties.OSS_ZONE).map(qiniuZone -> {
+
+            Region region;
+            switch (qiniuZone.toString()) {
+                case "z0":
+                    region = Region.region0();
+                    break;
+                case "z1":
+                    region = Region.region1();
+                    break;
+                case "z2":
+                    region = Region.region2();
+                    break;
+                case "na0":
+                    region = Region.regionNa0();
+                    break;
+                case "as0":
+                    region = Region.regionAs0();
+                    break;
+                default:
+                    // Default is detecting zone automatically
+                    region = Region.autoRegion();
+            }
+            return region;
+
+        }).orElseGet(Region::autoRegion);
+    }
+
+    @Override
     public Locale getLocale() {
         return getByProperty(BlogProperties.BLOG_LOCALE).map(localeStr -> {
             try {
@@ -440,14 +480,10 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
         String blogUrl = getByProperty(BlogProperties.BLOG_URL).orElse("").toString();
 
-        if (StrUtil.isNotBlank(blogUrl)) {
-            blogUrl = StrUtil.removeSuffix(blogUrl, "/");
+        if (StringUtils.isNotBlank(blogUrl)) {
+            blogUrl = StringUtils.removeEnd(blogUrl, "/");
         } else {
-            if (haloProperties.isProductionEnv()) {
-                blogUrl = String.format("http://%s:%s", "127.0.0.1", serverPort);
-            } else {
-                blogUrl = String.format("http://%s:%s", HaloUtils.getMachineIP(), serverPort);
-            }
+            blogUrl = String.format("http://%s:%s", "127.0.0.1", serverPort);
         }
 
         return blogUrl;
@@ -456,6 +492,16 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public String getBlogTitle() {
         return getByProperty(BlogProperties.BLOG_TITLE).orElse("").toString();
+    }
+
+    @Override
+    public String getSeoKeywords() {
+        return getByProperty(SeoProperties.KEYWORDS).orElse("").toString();
+    }
+
+    @Override
+    public String getSeoDescription() {
+        return getByProperty(SeoProperties.DESCRIPTION).orElse("").toString();
     }
 
     @Override
@@ -470,6 +516,51 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public PostPermalinkType getPostPermalinkType() {
         return getEnumByPropertyOrDefault(PermalinkProperties.POST_PERMALINK_TYPE, PostPermalinkType.class, PostPermalinkType.DEFAULT);
+    }
+
+    @Override
+    public String getSheetPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.SHEET_PREFIX, String.class, PermalinkProperties.SHEET_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getLinksPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.LINKS_PREFIX, String.class, PermalinkProperties.LINKS_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getPhotosPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.PHOTOS_PREFIX, String.class, PermalinkProperties.PHOTOS_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getJournalsPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.JOURNALS_PREFIX, String.class, PermalinkProperties.JOURNALS_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getArchivesPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.ARCHIVES_PREFIX, String.class, PermalinkProperties.ARCHIVES_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getCategoriesPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.CATEGORIES_PREFIX, String.class, PermalinkProperties.CATEGORIES_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getTagsPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.TAGS_PREFIX, String.class, PermalinkProperties.TAGS_PREFIX.defaultValue());
+    }
+
+    @Override
+    public String getPathSuffix() {
+        return getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, PermalinkProperties.PATH_SUFFIX.defaultValue());
+    }
+
+    @Override
+    public Boolean isEnabledAbsolutePath() {
+        return getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class, true);
     }
 
     @Override

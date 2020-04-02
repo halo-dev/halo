@@ -7,11 +7,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
-import run.halo.app.cache.StringCacheStore;
+import org.springframework.web.util.UrlPathHelper;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.ForbiddenException;
-import run.halo.app.exception.HaloException;
 import run.halo.app.exception.NotInstallException;
 import run.halo.app.model.enums.Mode;
 import run.halo.app.model.properties.PrimaryProperties;
@@ -26,10 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static run.halo.app.model.support.HaloConst.ONE_TIME_TOKEN_HEADER_NAME;
 import static run.halo.app.model.support.HaloConst.ONE_TIME_TOKEN_QUERY_NAME;
@@ -44,14 +42,11 @@ import static run.halo.app.model.support.HaloConst.ONE_TIME_TOKEN_QUERY_NAME;
 public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter {
 
     protected final AntPathMatcher antPathMatcher;
-
     protected final HaloProperties haloProperties;
-
     protected final OptionService optionService;
-
-    protected final StringCacheStore cacheStore;
-
-    private OneTimeTokenService oneTimeTokenService;
+    protected final AbstractStringCacheStore cacheStore;
+    private final UrlPathHelper urlPathHelper = new UrlPathHelper();
+    private final OneTimeTokenService oneTimeTokenService;
 
     private volatile AuthenticationFailureHandler failureHandler;
     /**
@@ -59,9 +54,12 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
      */
     private Set<String> excludeUrlPatterns = new HashSet<>(16);
 
+    private Set<String> urlPatterns = new LinkedHashSet<>();
+
+
     AbstractAuthenticationFilter(HaloProperties haloProperties,
                                  OptionService optionService,
-                                 StringCacheStore cacheStore,
+                                 AbstractStringCacheStore cacheStore,
                                  OneTimeTokenService oneTimeTokenService) {
         this.haloProperties = haloProperties;
         this.optionService = optionService;
@@ -86,7 +84,11 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
     protected boolean shouldNotFilter(HttpServletRequest request) {
         Assert.notNull(request, "Http servlet request must not be null");
 
-        return excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, request.getRequestURI()));
+        // check white list
+        boolean result = excludeUrlPatterns.stream().anyMatch(p -> antPathMatcher.match(p, urlPathHelper.getRequestUri(request)));
+
+        return result || urlPatterns.stream().noneMatch(p -> antPathMatcher.match(p, urlPathHelper.getRequestUri(request)));
+
     }
 
     /**
@@ -119,6 +121,20 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
         Assert.notNull(excludeUrlPatterns, "Exclude url patterns must not be null");
 
         this.excludeUrlPatterns = new HashSet<>(excludeUrlPatterns);
+    }
+
+    public Collection<String> getUrlPatterns() {
+        return this.urlPatterns;
+    }
+
+    public void setUrlPatterns(Collection<String> urlPatterns) {
+        Assert.notNull(urlPatterns, "UrlPatterns must not be null");
+        this.urlPatterns = new LinkedHashSet<>(urlPatterns);
+    }
+
+    public void addUrlPatterns(String... urlPatterns) {
+        Assert.notNull(urlPatterns, "UrlPatterns must not be null");
+        Collections.addAll(this.urlPatterns, urlPatterns);
     }
 
     /**
@@ -173,7 +189,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
             // Do authenticate
             doAuthenticate(request, response, filterChain);
-        } catch (HaloException e) {
+        } catch (AbstractHaloException e) {
             getFailureHandler().onFailure(request, response, e);
         } finally {
             SecurityContextHolder.clearContext();
@@ -197,7 +213,7 @@ public abstract class AbstractAuthenticationFilter extends OncePerRequestFilter 
 
         // Get allowed uri
         String allowedUri = oneTimeTokenService.get(oneTimeToken)
-                .orElseThrow(() -> new BadRequestException("The one-time token does not exist").setErrorData(oneTimeToken));
+            .orElseThrow(() -> new BadRequestException("The one-time token does not exist").setErrorData(oneTimeToken));
 
         // Get request uri
         String requestUri = request.getRequestURI();

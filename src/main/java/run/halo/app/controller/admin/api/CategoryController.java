@@ -46,8 +46,8 @@ public class CategoryController {
     @GetMapping
     @ApiOperation("Lists all categories")
     public List<? extends CategoryDTO> listAll(
-            @SortDefault(sort = "updateTime", direction = DESC) Sort sort,
-            @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
+        @SortDefault(sort = "createTime", direction = DESC) Sort sort,
+        @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
         if (more) {
             return postCategoryService.listCategoryWithPostCountDto(sort);
         }

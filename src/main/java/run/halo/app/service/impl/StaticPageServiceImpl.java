@@ -168,8 +168,8 @@ public class StaticPageServiceImpl implements StaticPageService {
     public Path zipStaticPagesDirectory() {
         try {
             String staticPagePackName = HaloConst.STATIC_PAGE_PACK_PREFIX +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
-                    IdUtil.simpleUUID().hashCode() + ".zip";
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
+                IdUtil.simpleUUID().hashCode() + ".zip";
             Path staticPageZipPath = Files.createFile(Paths.get(STATIC_PAGE_PACK_DIR, staticPagePackName));
 
             FileUtils.zip(pagesDir, staticPageZipPath);
@@ -313,7 +313,7 @@ public class StaticPageServiceImpl implements StaticPageService {
     }
 
     /**
-     * Generate archives/{url}/index.html.
+     * Generate archives/{slug}/index.html.
      *
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
@@ -328,11 +328,11 @@ public class StaticPageServiceImpl implements StaticPageService {
         List<Post> posts = postService.listAllBy(PostStatus.PUBLISHED);
 
         for (Post post : posts) {
-            log.info("Generate archives/{}/index.html", post.getUrl());
+            log.info("Generate archives/{}/index.html", post.getSlug());
             ModelMap model = new ModelMap();
 
             AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
-            adjacentPostVO.getOptionalPrePost().ifPresent(prePost -> model.addAttribute("prePost", prePost));
+            adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", prevPost));
             adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", nextPost));
 
             List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
@@ -348,14 +348,14 @@ public class StaticPageServiceImpl implements StaticPageService {
             Template template = freeMarkerConfigurer.getConfiguration().getTemplate(themeService.renderWithSuffix("post"));
             String html = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
 
-            FileWriter fileWriter = new FileWriter(getPageFile("archives/" + post.getUrl() + "/index.html"), "UTF-8");
+            FileWriter fileWriter = new FileWriter(getPageFile("archives/" + post.getSlug() + "/index.html"), "UTF-8");
             fileWriter.write(html);
-            log.info("Generate archives/{}/index.html succeed.", post.getUrl());
+            log.info("Generate archives/{}/index.html succeed.", post.getSlug());
         }
     }
 
     /**
-     * Generate s/{url}/index.html.
+     * Generate s/{slug}/index.html.
      *
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
@@ -368,7 +368,7 @@ public class StaticPageServiceImpl implements StaticPageService {
 
         List<Sheet> sheets = sheetService.listAllBy(PostStatus.PUBLISHED);
         for (Sheet sheet : sheets) {
-            log.info("Generate s/{}/index.html", sheet.getUrl());
+            log.info("Generate s/{}/index.html", sheet.getSlug());
             ModelMap model = new ModelMap();
 
             SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
@@ -385,10 +385,10 @@ public class StaticPageServiceImpl implements StaticPageService {
             Template template = freeMarkerConfigurer.getConfiguration().getTemplate(themeService.renderWithSuffix(templateName));
             String html = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
 
-            FileWriter fileWriter = new FileWriter(getPageFile("s/" + sheet.getUrl() + "/index.html"), "UTF-8");
+            FileWriter fileWriter = new FileWriter(getPageFile("s/" + sheet.getSlug() + "/index.html"), "UTF-8");
             fileWriter.write(html);
 
-            log.info("Generate s/{}/index.html succeed.", sheet.getUrl());
+            log.info("Generate s/{}/index.html succeed.", sheet.getSlug());
         }
     }
 
@@ -486,7 +486,7 @@ public class StaticPageServiceImpl implements StaticPageService {
     }
 
     /**
-     * Generate categories/{slugName}/index.html and categories/{slugName}/{page}/index.html.
+     * Generate categories/{slug}/index.html and categories/{slug}/{page}/index.html.
      *
      * @param page     current page
      * @param category current category
@@ -517,21 +517,21 @@ public class StaticPageServiceImpl implements StaticPageService {
         FileWriter fileWriter;
 
         if (page == 1) {
-            fileWriter = new FileWriter(getPageFile("categories/" + category.getSlugName() + "/index.html"), "UTF-8");
+            fileWriter = new FileWriter(getPageFile("categories/" + category.getSlug() + "/index.html"), "UTF-8");
         } else {
-            fileWriter = new FileWriter(getPageFile("categories/" + category.getSlugName() + "/page/" + page + "/index.html"), "UTF-8");
+            fileWriter = new FileWriter(getPageFile("categories/" + category.getSlug() + "/page/" + page + "/index.html"), "UTF-8");
         }
 
         fileWriter.write(html);
 
         if (postPage.hasNext()) {
             generateCategory(postPage.getNumber() + 2, category);
-            log.info("Generate categories/{}/page/{}/index.html", category.getSlugName(), postPage.getNumber() + 2);
+            log.info("Generate categories/{}/page/{}/index.html", category.getSlug(), postPage.getNumber() + 2);
         }
     }
 
     /**
-     * Generate tags/{slugName}/index.html and tags/{slugName}/{page}/index.html.
+     * Generate tags/{slug}/index.html and tags/{slug}/{page}/index.html.
      *
      * @param page     current page
      * @param category current category
@@ -562,16 +562,16 @@ public class StaticPageServiceImpl implements StaticPageService {
         FileWriter fileWriter;
 
         if (page == 1) {
-            fileWriter = new FileWriter(getPageFile("tags/" + tag.getSlugName() + "/index.html"), "UTF-8");
+            fileWriter = new FileWriter(getPageFile("tags/" + tag.getSlug() + "/index.html"), "UTF-8");
         } else {
-            fileWriter = new FileWriter(getPageFile("tags/" + tag.getSlugName() + "/page/" + page + "/index.html"), "UTF-8");
+            fileWriter = new FileWriter(getPageFile("tags/" + tag.getSlug() + "/page/" + page + "/index.html"), "UTF-8");
         }
 
         fileWriter.write(html);
 
         if (postPage.hasNext()) {
             generateTag(postPage.getNumber() + 2, tag);
-            log.info("Generate tags/{}/page/{}/index.html", tag.getSlugName(), postPage.getNumber() + 2);
+            log.info("Generate tags/{}/page/{}/index.html", tag.getSlug(), postPage.getNumber() + 2);
         }
     }
 
@@ -801,10 +801,10 @@ public class StaticPageServiceImpl implements StaticPageService {
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
         posts.getContent().forEach(postListVO -> {
             try {
-                // Encode post url
-                postListVO.setUrl(URLEncoder.encode(postListVO.getUrl(), StandardCharsets.UTF_8.name()));
+                // Encode post slug
+                postListVO.setSlug(URLEncoder.encode(postListVO.getSlug(), StandardCharsets.UTF_8.name()));
             } catch (UnsupportedEncodingException e) {
-                log.warn("Failed to encode url: " + postListVO.getUrl(), e);
+                log.warn("Failed to encode url: " + postListVO.getSlug(), e);
             }
         });
         return posts.getContent();

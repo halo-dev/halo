@@ -6,7 +6,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
-import run.halo.app.model.enums.PostCreateFrom;
+import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.utils.SlugUtils;
 
@@ -34,7 +34,10 @@ public class PostParam implements InputConverter<Post> {
 
     private PostStatus status = PostStatus.DRAFT;
 
-    private String url;
+    @Size(max = 255, message = "文章别名的字符长度不能超过 {max}")
+    private String slug;
+
+    private PostEditorType editorType;
 
     private String originalContent;
 
@@ -56,20 +59,26 @@ public class PostParam implements InputConverter<Post> {
 
     private Date createTime;
 
-    private PostCreateFrom createFrom = PostCreateFrom.ADMIN;
+    private String metaKeywords;
+
+    private String metaDescription;
 
     private Set<Integer> tagIds;
 
     private Set<Integer> categoryIds;
 
-    private Set<PostMetaParam> postMetas;
+    private Set<PostMetaParam> metas;
 
     @Override
     public Post convertTo() {
-        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(title) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";
+        }
+
+        if (null == editorType) {
+            editorType = PostEditorType.MARKDOWN;
         }
 
         return InputConverter.super.convertTo();
@@ -77,10 +86,14 @@ public class PostParam implements InputConverter<Post> {
 
     @Override
     public void update(Post post) {
-        url = StringUtils.isBlank(url) ? SlugUtils.slug(title) : SlugUtils.slug(url);
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(title) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";
+        }
+
+        if (null == editorType) {
+            editorType = PostEditorType.MARKDOWN;
         }
 
         InputConverter.super.update(post);
@@ -88,11 +101,11 @@ public class PostParam implements InputConverter<Post> {
 
     public Set<PostMeta> getPostMetas() {
         Set<PostMeta> postMetaSet = new HashSet<>();
-        if (CollectionUtils.isEmpty(postMetas)) {
+        if (CollectionUtils.isEmpty(metas)) {
             return postMetaSet;
         }
 
-        for (PostMetaParam postMetaParam : postMetas) {
+        for (PostMetaParam postMetaParam : metas) {
             PostMeta postMeta = postMetaParam.convertTo();
             postMetaSet.add(postMeta);
         }

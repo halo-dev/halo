@@ -150,7 +150,7 @@ public class OldVersionMigrateHandler implements MigrateHandler {
 
             BasePost post = new BasePost();
             post.setTitle(postMap.getOrDefault("postTitle", "").toString());
-            post.setUrl(postMap.getOrDefault("postUrl", "").toString());
+            post.setSlug(postMap.getOrDefault("postUrl", "").toString());
             post.setOriginalContent(postMap.getOrDefault("postContentMd", "").toString());
             post.setFormatContent(postMap.getOrDefault("postContent", "").toString());
             post.setSummary(postMap.getOrDefault("postSummary", "").toString());
@@ -230,8 +230,8 @@ public class OldVersionMigrateHandler implements MigrateHandler {
         log.debug("Migrated tags of post [{}]: [{}]", tags, createdPost.getId());
 
         List<PostComment> postComments = baseComments.stream()
-                .map(baseComment -> BeanUtils.transformFrom(baseComment, PostComment.class))
-                .collect(Collectors.toList());
+            .map(baseComment -> BeanUtils.transformFrom(baseComment, PostComment.class))
+            .collect(Collectors.toList());
 
         try {
             // Build virtual comment
@@ -259,8 +259,8 @@ public class OldVersionMigrateHandler implements MigrateHandler {
         List<BaseComment> baseComments = handleComment(commentsObject, createdSheet.getId());
 
         List<SheetComment> sheetComments = baseComments.stream()
-                .map(baseComment -> BeanUtils.transformFrom(baseComment, SheetComment.class))
-                .collect(Collectors.toList());
+            .map(baseComment -> BeanUtils.transformFrom(baseComment, SheetComment.class))
+            .collect(Collectors.toList());
 
         // Create comments
         try {
@@ -293,8 +293,8 @@ public class OldVersionMigrateHandler implements MigrateHandler {
         }
         // Get all children
         List<PostComment> children = postComments.stream()
-                .filter(postComment -> Objects.equals(oldParentId, postComment.getParentId()))
-                .collect(Collectors.toList());
+            .filter(postComment -> Objects.equals(oldParentId, postComment.getParentId()))
+            .collect(Collectors.toList());
 
 
         // Set parent id again
@@ -320,8 +320,8 @@ public class OldVersionMigrateHandler implements MigrateHandler {
         }
         // Get all children
         List<SheetComment> children = sheetComments.stream()
-                .filter(sheetComment -> Objects.equals(oldParentId, sheetComment.getParentId()))
-                .collect(Collectors.toList());
+            .filter(sheetComment -> Objects.equals(oldParentId, sheetComment.getParentId()))
+            .collect(Collectors.toList());
 
         // Set parent id again
         children.forEach(postComment -> postComment.setParentId(parentComment.getId()));
@@ -402,14 +402,14 @@ public class OldVersionMigrateHandler implements MigrateHandler {
 
             Map<String, Object> categoryMap = (Map<String, Object>) categoryObject;
 
-            String slugName = categoryMap.getOrDefault("cateUrl", "").toString();
+            String slug = categoryMap.getOrDefault("cateUrl", "").toString();
 
-            Category category = categoryService.getBySlugName(slugName);
+            Category category = categoryService.getBySlug(slug);
 
             if (null == category) {
                 category = new Category();
                 category.setName(categoryMap.getOrDefault("cateName", "").toString());
-                category.setSlugName(slugName);
+                category.setSlug(slug);
                 category.setDescription(categoryMap.getOrDefault("cateDesc", "").toString());
                 category = categoryService.create(category);
             }
@@ -448,14 +448,14 @@ public class OldVersionMigrateHandler implements MigrateHandler {
 
             Map<String, Object> tagMap = (Map<String, Object>) tagObject;
 
-            String slugName = tagMap.getOrDefault("tagUrl", "").toString();
+            String slug = tagMap.getOrDefault("tagUrl", "").toString();
 
-            Tag tag = tagService.getBySlugName(slugName);
+            Tag tag = tagService.getBySlug(slug);
 
             if (null == tag) {
                 tag = new Tag();
                 tag.setName(tagMap.getOrDefault("tagName", "").toString());
-                tag.setSlugName(slugName);
+                tag.setSlug(slug);
                 tag = tagService.create(tag);
             }
 
@@ -688,6 +688,6 @@ public class OldVersionMigrateHandler implements MigrateHandler {
 
     @Override
     public boolean supportType(MigrateType type) {
-        return MigrateType.OLD_VERSION.equals(type);
+        return false;
     }
 }

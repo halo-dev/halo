@@ -1,6 +1,7 @@
 package run.halo.app.utils;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.handler.migrate.converter.Converter;
@@ -20,25 +21,24 @@ import java.util.List;
  * @author guqing
  * @date 2020-01-18 14:02
  */
+@Slf4j
 public class XmlMigrateUtilsTest {
 
     @Test
     void testXmlMigrateUtils() throws IOException, URISyntaxException {
         JSONObject json = readXml();
-        System.out.println("WordPress blog json data:" + json);
+        log.debug("WordPress blog json data:" + json);
         Rss rss = json.getObject("rss", Rss.class);
-//        System.out.println(rss);
     }
 
     @Test
     void testWordPressConvert() throws IOException, URISyntaxException {
         JSONObject json = readXml();
         Rss rss = json.getObject("rss", Rss.class);
-//        System.out.println("WordPress blog rss data:" + rss);
         Converter<Rss, List<PostVO>> converter = new WordPressConverter();
         List<PostVO> postVoList = converter.convertFrom(rss);
 
-        System.out.println(postVoList);
+        log.debug("{}", postVoList);
     }
 
     private JSONObject readXml() throws IOException, URISyntaxException {

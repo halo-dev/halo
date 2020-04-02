@@ -31,22 +31,22 @@ public interface CategoryService extends CrudService<Category, Integer> {
     List<CategoryVO> listAsTree(@NonNull Sort sort);
 
     /**
-     * Get category by slug name
+     * Get category by slug
      *
-     * @param slugName slug name
+     * @param slug slug
      * @return Category
      */
     @NonNull
-    Category getBySlugName(@NonNull String slugName);
+    Category getBySlug(@NonNull String slug);
 
     /**
-     * Get category by slug name
+     * Get category by slug
      *
-     * @param slugName slug name
+     * @param slug slug
      * @return Category
      */
     @NonNull
-    Category getBySlugNameOfNonNull(String slugName);
+    Category getBySlugOfNonNull(String slug);
 
     /**
      * Get Category by name.
