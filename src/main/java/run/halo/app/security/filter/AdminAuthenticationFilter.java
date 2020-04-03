@@ -63,7 +63,8 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
             "/api/admin/migrations/halo",
             "/api/admin/is_installed",
             "/api/admin/password/code",
-            "/api/admin/password/reset"
+            "/api/admin/password/reset",
+            "/api/admin/login/precheck"
         );
 
         // set failure handler
