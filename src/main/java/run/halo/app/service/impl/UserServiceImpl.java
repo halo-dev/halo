@@ -181,6 +181,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         Assert.hasText(plainPassword, "Plain password must not be blank");
 
         user.setPassword(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
+        user.setMfaType(MFAType.NONE);
+        user.setMfaKey(null);
     }
 
     @Override
