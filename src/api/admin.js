@@ -33,12 +33,24 @@ adminApi.install = data => {
   })
 }
 
-adminApi.login = (username, password) => {
+adminApi.loginPreCheck = (username, password) => {
+  return service({
+    url: `${baseUrl}/login/precheck`,
+    data: {
+      username: username,
+      password: password
+    },
+    method: 'post'
+  })
+}
+
+adminApi.login = (username, password, authcode) => {
   return service({
     url: `${baseUrl}/login`,
     data: {
       username: username,
-      password: password
+      password: password,
+      authcode: authcode
     },
     method: 'post'
   })

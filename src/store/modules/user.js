@@ -45,11 +45,12 @@ const user = {
       commit
     }, {
       username,
-      password
+      password,
+      authcode
     }) {
       return new Promise((resolve, reject) => {
         adminApi
-          .login(username, password)
+          .login(username, password, authcode)
           .then(response => {
             const token = response.data.data
             Vue.$log.debug('Got token', token)

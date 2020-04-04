@@ -30,4 +30,36 @@ userApi.updatePassword = (oldPassword, newPassword) => {
   })
 }
 
+userApi.mfaGenerate = (mfaType) => {
+  return service({
+    url: `${baseUrl}/mfa/generate`,
+    method: 'put',
+    data: {
+      mfaType: mfaType
+    }
+  })
+}
+
+userApi.mfaUpdate = (mfaType, mfaKey, authcode) => {
+  return service({
+    url: `${baseUrl}/mfa/update`,
+    method: 'put',
+    data: {
+      mfaType: mfaType,
+      mfaKey: mfaKey,
+      authcode: authcode
+    }
+  })
+}
+
+userApi.mfaCheck = (authcode) => {
+  return service({
+    url: `${baseUrl}/mfa/check`,
+    method: 'put',
+    data: {
+      authcode: authcode
+    }
+  })
+}
+
 export default userApi
