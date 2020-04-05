@@ -293,12 +293,12 @@
         style="marginRight: 8px"
         @click="handleDraftClick"
         v-if="saveDraftButton"
-        :disabled="saving"
+        :loading="draftSaving"
       >保存草稿</a-button>
       <a-button
         @click="handlePublishClick"
         type="primary"
-        :disabled="saving"
+        :loading="saving"
       > {{ selectedPost.id?'保存':'发布' }} </a-button>
     </div>
   </a-drawer>
@@ -335,7 +335,8 @@ export default {
       categories: [],
       categoryToCreate: {},
       customTpls: [],
-      saving: false
+      saving: false,
+      draftSaving: false
     }
   },
   props: {
@@ -495,7 +496,11 @@ export default {
       this.selectedPost.tagIds = this.selectedTagIds
       // Set post metas
       this.selectedPost.metas = this.selectedMetas
-      this.saving = true
+      if (this.selectedPost.status === 'DRAFT') {
+        this.draftSaving = true
+      } else {
+        this.saving = true
+      }
       if (this.selectedPost.id) {
         // Update the post
         postApi
@@ -514,6 +519,7 @@ export default {
           })
           .finally(() => {
             this.saving = false
+            this.draftSaving = false
           })
       } else {
         // Create the post
@@ -534,6 +540,7 @@ export default {
           })
           .finally(() => {
             this.saving = false
+            this.draftSaving = false
           })
       }
     },

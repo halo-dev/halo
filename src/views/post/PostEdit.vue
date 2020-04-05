@@ -46,12 +46,12 @@
       <a-button
         type="danger"
         @click="handleSaveDraft(false)"
-        :disabled="saving"
+        :loading="draftSaving"
       >保存草稿</a-button>
       <a-button
         @click="handlePreview"
         style="margin-left: 8px;"
-        :disabled="saving"
+        :loading="previewSaving"
       >预览</a-button>
       <a-button
         type="primary"
@@ -97,7 +97,8 @@ export default {
       selectedMetas: [],
       isSaved: false,
       contentChanges: 0,
-      saving: false
+      draftSaving: false,
+      previewSaving: false
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -183,7 +184,7 @@ export default {
       if (!this.postToStage.title) {
         this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
-      this.saving = true
+      this.draftSaving = true
       if (this.postToStage.id) {
         // Update the post
         if (draftOnly) {
@@ -193,7 +194,7 @@ export default {
               this.$message.success('保存草稿成功！')
             })
             .finally(() => {
-              this.saving = false
+              this.draftSaving = false
             })
         } else {
           postApi
@@ -204,7 +205,7 @@ export default {
               this.postToStage = response.data.data
             })
             .finally(() => {
-              this.saving = false
+              this.draftSaving = false
             })
         }
       } else {
@@ -217,7 +218,7 @@ export default {
             this.postToStage = response.data.data
           })
           .finally(() => {
-            this.saving = false
+            this.draftSaving = false
           })
       }
     },
@@ -229,7 +230,7 @@ export default {
       if (!this.postToStage.title) {
         this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
-      this.saving = true
+      this.previewSaving = true
       if (this.postToStage.id) {
         // Update the post
         postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
@@ -240,7 +241,7 @@ export default {
               window.open(response.data, '_blank')
             })
             .finally(() => {
-              this.saving = false
+              this.previewSaving = false
             })
         })
       } else {
@@ -254,7 +255,7 @@ export default {
               window.open(response.data, '_blank')
             })
             .finally(() => {
-              this.saving = false
+              this.previewSaving = false
             })
         })
       }

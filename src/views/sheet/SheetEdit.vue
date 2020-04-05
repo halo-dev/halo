@@ -41,12 +41,12 @@
       <a-button
         type="danger"
         @click="handleSaveDraft(false)"
-        :disabled="saving"
+        :loading="draftSaving"
       >保存草稿</a-button>
       <a-button
         @click="handlePreview"
         style="margin-left: 8px;"
-        :disabled="saving"
+        :loading="previewSaving"
       >预览</a-button>
       <a-button
         type="primary"
@@ -90,7 +90,8 @@ export default {
       selectedMetas: [],
       isSaved: false,
       contentChanges: 0,
-      saving: false
+      draftSaving: false,
+      previewSaving: false
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -174,7 +175,7 @@ export default {
       if (!this.sheetToStage.title) {
         this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
-      this.saving = true
+      this.draftSaving = true
       if (this.sheetToStage.id) {
         if (draftOnly) {
           sheetApi
@@ -183,7 +184,7 @@ export default {
               this.$message.success('保存草稿成功！')
             })
             .finally(() => {
-              this.saving = false
+              this.draftSaving = false
             })
         } else {
           sheetApi
@@ -194,7 +195,7 @@ export default {
               this.sheetToStage = response.data.data
             })
             .finally(() => {
-              this.saving = false
+              this.draftSaving = false
             })
         }
       } else {
@@ -206,7 +207,7 @@ export default {
             this.sheetToStage = response.data.data
           })
           .finally(() => {
-            this.saving = false
+            this.draftSaving = false
           })
       }
     },
@@ -218,7 +219,7 @@ export default {
       if (!this.sheetToStage.title) {
         this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
       }
-      this.saving = true
+      this.previewSaving = true
       if (this.sheetToStage.id) {
         sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
@@ -228,7 +229,7 @@ export default {
               window.open(response.data, '_blank')
             })
             .finally(() => {
-              this.saving = false
+              this.previewSaving = false
             })
         })
       } else {
@@ -241,7 +242,7 @@ export default {
               window.open(response.data, '_blank')
             })
             .finally(() => {
-              this.saving = false
+              this.previewSaving = false
             })
         })
       }

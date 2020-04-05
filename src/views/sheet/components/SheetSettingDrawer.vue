@@ -203,12 +203,12 @@
         v-if="saveDraftButton"
         style="marginRight: 8px"
         @click="handleDraftClick"
-        :disabled="saving"
+        :loading="draftSaving"
       >保存草稿</a-button>
       <a-button
         type="primary"
         @click="handlePublishClick"
-        :disabled="saving"
+        :loading="saving"
       >{{ selectedSheet.id?'保存':'发布' }}</a-button>
     </div>
   </a-drawer>
@@ -233,7 +233,8 @@ export default {
       settingLoading: true,
       selectedSheet: this.sheet,
       customTpls: [],
-      saving: false
+      saving: false,
+      draftSaving: false
     }
   },
   props: {
@@ -346,7 +347,11 @@ export default {
         return
       }
       this.selectedSheet.metas = this.selectedMetas
-      this.saving = true
+      if (this.selectedSheet.status === 'DRAFT') {
+        this.draftSaving = true
+      } else {
+        this.saving = true
+      }
       if (this.selectedSheet.id) {
         sheetApi
           .update(this.selectedSheet.id, this.selectedSheet, false)
@@ -360,10 +365,11 @@ export default {
             }
 
             this.$emit('onSaved', true)
-            this.$router.push({ name: 'SheetList' })
+            this.$router.push({ name: 'SheetList', query: { activeKey: 'custom' } })
           })
           .finally(() => {
             this.saving = false
+            this.draftSaving = false
           })
       } else {
         sheetApi
@@ -378,11 +384,12 @@ export default {
             }
 
             this.$emit('onSaved', true)
-            this.$router.push({ name: 'SheetList' })
+            this.$router.push({ name: 'SheetList', query: { activeKey: 'custom' } })
             this.selectedSheet = response.data.data
           })
           .finally(() => {
             this.saving = false
+            this.draftSaving = false
           })
       }
     },

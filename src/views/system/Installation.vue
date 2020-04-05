@@ -231,8 +231,8 @@ export default {
     this.$set(this.installation, 'url', window.location.protocol + '//' + window.location.host)
   },
   methods: {
-    handleValidateConfirmPassword(rule,value, callback){
-      if (this.installation.confirmPassword && this.installation.password !==  this.installation.confirmPassword ) {
+    handleValidateConfirmPassword(rule, value, callback) {
+      if (this.installation.confirmPassword && this.installation.password !== this.installation.confirmPassword) {
         callback('确认密码和密码不匹配')
       }
       callback()

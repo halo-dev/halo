@@ -71,12 +71,20 @@ logApi.logType = {
     text: '页面发布'
   },
   SHEET_EDITED: {
-    value: 50,
+    value: 55,
     text: '页面修改'
   },
   SHEET_DELETED: {
-    value: 50,
+    value: 60,
     text: '页面删除'
+  },
+  MFA_UPDATED: {
+    value: 65,
+    text: '两步验证'
+  },
+  LOGGED_PRE_CHECK: {
+    value: 70,
+    text: '登陆验证'
   }
 }
 
