@@ -80,10 +80,11 @@ public class CommentEventListener {
 
         User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
 
-
         Map<String, Object> data = new HashMap<>();
 
         StringBuilder subject = new StringBuilder();
+
+        Boolean enabledAbsolutePath = optionService.isEnabledAbsolutePath();
 
         if (newEvent.getSource() instanceof PostCommentService) {
             // Get postComment id
@@ -93,7 +94,7 @@ public class CommentEventListener {
 
             BasePostMinimalDTO post = postService.convertToMinimal(postService.getById(postComment.getPostId()));
 
-            data.put("pageFullPath", post.getFullPath());
+            data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() : optionService.getBlogBaseUrl() + post.getFullPath());
             data.put("pageTitle", post.getTitle());
             data.put("author", postComment.getAuthor());
             data.put("content", postComment.getContent());
@@ -109,7 +110,7 @@ public class CommentEventListener {
 
             BasePostMinimalDTO sheet = sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
 
-            data.put("pageFullPath", sheet.getFullPath());
+            data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() : optionService.getBlogBaseUrl() + sheet.getFullPath());
             data.put("pageTitle", sheet.getTitle());
             data.put("author", sheetComment.getAuthor());
             data.put("content", sheetComment.getContent());
@@ -167,6 +168,8 @@ public class CommentEventListener {
 
         StringBuilder subject = new StringBuilder();
 
+        Boolean enabledAbsolutePath = optionService.isEnabledAbsolutePath();
+
         log.debug("replyEvent.getSource():" + replyEvent.getSource().toString());
 
         if (replyEvent.getSource() instanceof PostCommentService) {
@@ -187,7 +190,7 @@ public class CommentEventListener {
 
             BasePostMinimalDTO post = postService.convertToMinimal(postService.getById(postComment.getPostId()));
 
-            data.put("pageFullPath", post.getFullPath());
+            data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() : optionService.getBlogBaseUrl() + post.getFullPath());
             data.put("pageTitle", post.getTitle());
             data.put("baseAuthor", baseComment.getAuthor());
             data.put("baseContent", baseComment.getContent());
@@ -217,7 +220,7 @@ public class CommentEventListener {
 
             BasePostMinimalDTO sheet = sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
 
-            data.put("pageFullPath", sheet.getFullPath());
+            data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() : optionService.getBlogBaseUrl() + sheet.getFullPath());
             data.put("pageTitle", sheet.getTitle());
             data.put("baseAuthor", baseComment.getAuthor());
             data.put("baseContent", baseComment.getContent());
