@@ -63,6 +63,7 @@ ext {
     jsonVersion = '20190722'
     fastJsonVersion = '1.2.56'
     templateInheritance = "0.4.RELEASE"
+    huaweiObsVersion = "3.19.7"
 }
 
 dependencies {
@@ -82,6 +83,7 @@ dependencies {
     implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"
     implementation "com.baidubce:bce-java-sdk:$baiduSdkVersion"
     implementation "com.qcloud:cos_api:$qcloudSdkVersion"
+    implementation "com.huaweicloud:esdk-obs-java:$huaweiObsVersion"
     implementation "io.springfox:springfox-swagger2:$swaggerVersion"
     implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
