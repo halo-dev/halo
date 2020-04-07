@@ -19,10 +19,7 @@ public class HaloConst {
      */
     public final static String USER_HOME = System.getProperties().getProperty("user.home");
 
-    /**
-     * User work directory.
-     */
-    public final static String WORK_DIR = System.getProperties().getProperty("user.dir");
+    public final static String ENV_HALO_HOME = System.getenv("HALO_HOME");
 
     /**
      * Temporary directory.
@@ -148,5 +145,4 @@ public class HaloConst {
      * Version constant.
      */
     public static String HALO_VERSION = null;
-
 }

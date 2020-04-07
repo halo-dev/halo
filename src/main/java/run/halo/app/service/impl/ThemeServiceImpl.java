@@ -48,6 +48,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipInputStream;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
@@ -79,14 +81,19 @@ public class ThemeServiceImpl implements ThemeService {
     private final ApplicationEventPublisher eventPublisher;
 
     /**
+     * in seconds.
+     */
+    protected static final long ACTIVATED_THEME_SYNC_INTERVAL = 5;
+
+    /**
      * Activated theme id.
      */
-    private String activatedThemeId;
+    private volatile String activatedThemeId;
 
     /**
      * Activated theme property.
      */
-    private ThemeProperty activatedTheme;
+    private volatile ThemeProperty activatedTheme;
 
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
@@ -103,6 +110,17 @@ public class ThemeServiceImpl implements ThemeService {
 
         themeWorkDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
         this.eventPublisher = eventPublisher;
+        // check activated theme option changes every 5 seconds.
+        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() -> {
+            try {
+                String newActivatedThemeId = optionService.getByPropertyOrDefault(PrimaryProperties.THEME, String.class, DEFAULT_THEME_ID);
+                if (newActivatedThemeId != activatedThemeId) {
+                    activateTheme(newActivatedThemeId);
+                }
+            } catch (Exception e) {
+                log.warn("theme option sync exception: {}", e);
+            }
+        }, ACTIVATED_THEME_SYNC_INTERVAL, ACTIVATED_THEME_SYNC_INTERVAL, TimeUnit.SECONDS);
     }
 
     @Override

@@ -139,7 +139,5 @@ public class RedisCacheStore extends AbstractStringCacheStore {
 
     @PreDestroy
     public void preDestroy() {
-        log.debug("Closing redis cache cluster client.");
-        REDIS.close();
     }
 }

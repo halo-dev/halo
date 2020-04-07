@@ -47,10 +47,12 @@ public class HaloProperties {
      */
     private String adminPath = "admin";
 
+    private String haloHomeDir = ENV_HALO_HOME == null ? USER_HOME : ENV_HALO_HOME;
+
     /**
      * Work directory.
      */
-    private String workDir = ensureSuffix(WORK_DIR, FILE_SEPARATOR) + ".halo" + FILE_SEPARATOR;
+    private String workDir = ensureSuffix(haloHomeDir, FILE_SEPARATOR) + ".halo" + FILE_SEPARATOR;
 
     /**
      * Halo backup directory.(Not recommended to modify this config);
