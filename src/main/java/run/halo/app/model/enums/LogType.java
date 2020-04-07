@@ -65,7 +65,17 @@ public enum LogType implements ValueEnum<Integer> {
     /**
      * Sheet deleted
      */
-    SHEET_DELETED(60);
+    SHEET_DELETED(60),
+
+    /**
+     * MFA Updated
+     */
+    MFA_UPDATED(65),
+
+    /**
+     * Logged pre check
+     */
+    LOGGED_PRE_CHECK(70);
 
     private final Integer value;
 

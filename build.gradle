@@ -73,6 +73,7 @@ ext {
     fastJsonVersion =  "1.2.67"
     annotationsVersion = "3.0.1"
     jedisVersion= '3.2.0'
+    zxingVersion = "3.4.0"
 }
 
 dependencies {
@@ -122,6 +123,8 @@ dependencies {
 
     implementation "org.json:json:$jsonVersion"
     implementation "com.alibaba:fastjson:$fastJsonVersion"
+
+    implementation "com.google.zxing:core:$zxingVersion"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
