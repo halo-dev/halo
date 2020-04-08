@@ -73,6 +73,7 @@ ext {
     fastJsonVersion =  "1.2.67"
     annotationsVersion = "3.0.1"
     zxingVersion = "3.4.0"
+    huaweiObsVersion = "3.19.7"
 }
 
 dependencies {
@@ -91,6 +92,7 @@ dependencies {
     implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"
     implementation "com.baidubce:bce-java-sdk:$baiduSdkVersion"
     implementation "com.qcloud:cos_api:$qcloudSdkVersion"
+    implementation "com.huaweicloud:esdk-obs-java:$huaweiObsVersion"
     implementation "io.springfox:springfox-swagger2:$swaggerVersion"
     implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
