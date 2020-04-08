@@ -24,4 +24,7 @@ public class LoginParam {
     @Size(max = 100, message = "用户密码字符长度不能超过 {max}")
     private String password;
 
+    @Size(min = 6, max = 6, message = "两步验证码应为 {max} 位")
+    private String authcode;
+
 }

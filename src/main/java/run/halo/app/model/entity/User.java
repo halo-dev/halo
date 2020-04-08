@@ -3,6 +3,8 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
+import run.halo.app.model.enums.MFAType;
 import run.halo.app.utils.DateUtils;
 
 import javax.persistence.*;
@@ -69,6 +71,18 @@ public class User extends BaseEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date expireTime;
 
+    /**
+     * mfa type (current: tfa)
+     */
+    @Column(name = "mfa_type", nullable = false)
+    @ColumnDefault("0")
+    private MFAType mfaType;
+
+    /**
+     * two factor auth key
+     */
+    @Column(name = "mfa_key", length = 64)
+    private String mfaKey;
 
     @Override
     public void prePersist() {

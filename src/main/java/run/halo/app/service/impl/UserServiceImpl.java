@@ -17,6 +17,7 @@ import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.LogType;
+import run.halo.app.model.enums.MFAType;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.repository.UserRepository;
 import run.halo.app.service.UserService;
@@ -180,11 +181,32 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         Assert.hasText(plainPassword, "Plain password must not be blank");
 
         user.setPassword(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
+        user.setMfaType(MFAType.NONE);
+        user.setMfaKey(null);
     }
 
     @Override
     public boolean verifyUser(String username, String password) {
         User user = getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         return user.getUsername().equals(username) && user.getEmail().equals(password);
+    }
+
+    @Override
+    @NonNull
+    public User updateMFA(@NonNull MFAType mfaType, String mfaKey,@NonNull Integer userId) {
+        Assert.notNull(mfaType, "MFA Type must not be null");
+
+        // get User
+        User user = getById(userId);
+        // set MFA
+        user.setMfaType(mfaType);
+        user.setMfaKey((MFAType.NONE == mfaType) ? null : mfaKey);
+        // Update this user
+        User updatedUser = update(user);
+        // Log it
+        eventPublisher.publishEvent(new LogEvent(this, updatedUser.getId().toString(), LogType.MFA_UPDATED, "MFA Type:" + mfaType));
+
+        return updatedUser;
+
     }
 }
