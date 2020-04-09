@@ -113,6 +113,10 @@ attachmentApi.type = {
   TENCENTCOS: {
     type: 'TENCENTCOS',
     text: '腾讯云'
+  },
+  HUAWEIOBS: {
+    type: 'HUAWEIOBS',
+    text: '华为云'
   }
 }
 

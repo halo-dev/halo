@@ -310,6 +310,65 @@
           />
         </a-form-item>
       </div>
+      <div
+        id="huaweiObsForm"
+        v-show="options.attachment_type === 'HUAWEIOBS'"
+      >
+        <a-form-item label="绑定域名协议：">
+          <a-select v-model="options.obs_huawei_domain_protocol">
+            <a-select-option value="https://">HTTPS</a-select-option>
+            <a-select-option value="http://">HTTP</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="绑定域名：">
+          <a-input
+            v-model="options.obs_huawei_domain"
+            placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
+          />
+        </a-form-item>
+        <a-form-item label="Bucket（桶名称）：">
+          <a-input
+            v-model="options.obs_huawei_bucket_name"
+            placeholder="桶名称"
+          />
+        </a-form-item>
+        <a-form-item label="EndPoint（终端节点）：">
+          <a-input
+            v-model="options.obs_huawei_endpoint"
+            placeholder="Endpoint"
+          />
+        </a-form-item>
+        <a-form-item label="Access Key：">
+          <a-input-password
+            v-model="options.obs_huawei_access_key"
+            autocomplete="new-password"
+          />
+        </a-form-item>
+        <a-form-item label="Access Secret：">
+          <a-input-password
+            v-model="options.obs_huawei_access_secret"
+            autocomplete="new-password"
+          />
+        </a-form-item>
+        <a-form-item label="文件目录：">
+          <a-input
+            v-model="options.obs_huawei_source"
+            placeholder="不填写则上传到根目录"
+          />
+        </a-form-item>
+        <a-form-item label="图片处理策略：">
+          <a-input
+            v-model="options.obs_huawei_style_rule"
+            placeholder="请到华为云控制台的图片处理创建"
+          />
+        </a-form-item>
+        <a-form-item label="缩略图处理策略：">
+          <a-input
+            v-model="options.obs_huawei_thumbnail_style_rule"
+            placeholder="请到华为云控制台的图片处理获取，一般为后台展示所用"
+          />
+        </a-form-item>
+      </div>
       <a-form-item>
         <a-button
           type="primary"
@@ -565,6 +624,36 @@ export default {
             this.$notification['error']({
               message: '提示',
               description: 'Secret Key 不能为空！'
+            })
+            return
+          }
+          break
+        case 'HUAWEIOBS':
+          if (!this.options.obs_huawei_bucket_name) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Bucket 不能为空！'
+            })
+            return
+          }
+          if (!this.options.obs_huawei_endpoint) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'EndPoint（终端节点） 不能为空！'
+            })
+            return
+          }
+          if (!this.options.obs_huawei_access_key) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Key 不能为空！'
+            })
+            return
+          }
+          if (!this.options.obs_huawei_access_secret) {
+            this.$notification['error']({
+              message: '提示',
+              description: 'Access Secret 不能为空！'
             })
             return
           }
