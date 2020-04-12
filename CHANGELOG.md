@@ -10,15 +10,15 @@
 
 ## Change
 
-- 优化初始化页面的表单验证。halo-admin#116
-- 优化文章发布体验。halo-admin#125
-- 优化仪表盘的操作记录列表展示。halo-admin#128
-- 升级 UI 组件。halo-admin#128
+- 优化初始化页面的表单验证。halo-dev/halo-admin#116
+- 优化文章发布体验。halo-dev/halo-admin#125
+- 优化仪表盘的操作记录列表展示。halo-dev/halo-admin#128
+- 升级 UI 组件。halo-dev/halo-admin#128
 
 ## Fixed
 
 - 修复评论邮件中页面地址不正确的问题。#749
-- 修复初始化页面的数据导入无法正常显示的问题。halo-admin#128
+- 修复初始化页面的数据导入无法正常显示的问题。halo-dev/halo-admin#128
 
 # 1.3.1
 
