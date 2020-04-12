@@ -175,6 +175,7 @@
                 label="拖拽或点击选择数据文件，请确认是否为 Halo 后台导出的文件。"
                 :multiple="false"
                 :uploadHandler="handleMigrationUpload"
+                :loadOptions="false"
               ></FilePondUpload>
             </div>
 
