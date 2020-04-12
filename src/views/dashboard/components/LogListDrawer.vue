@@ -27,7 +27,10 @@
                 <a-list-item-meta :description="item.createTime | timeAgo">
                   <span slot="title">{{ item.type }}</span>
                 </a-list-item-meta>
-                <div>{{ item.content }}</div>
+                <ellipsis
+                  :length="35"
+                  tooltip
+                >{{ item.content }}</ellipsis>
               </a-list-item>
             </a-list>
           </a-skeleton>

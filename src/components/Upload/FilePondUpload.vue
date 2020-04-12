@@ -7,9 +7,9 @@
       :allow-multiple="multiple"
       :allowRevert="false"
       :accepted-file-types="accept"
-      :maxParallelUploads="options.attachment_upload_max_parallel_uploads"
-      :allowImagePreview="options.attachment_upload_image_preview_enable"
-      :maxFiles="options.attachment_upload_max_files"
+      :maxParallelUploads="loadOptions?options.attachment_upload_max_parallel_uploads:1"
+      :allowImagePreview="loadOptions?options.attachment_upload_image_preview_enable:false"
+      :maxFiles="loadOptions?options.attachment_upload_max_files:1"
       labelFileProcessing="上传中"
       labelFileProcessingComplete="上传完成"
       labelFileProcessingAborted="取消上传"
@@ -70,6 +70,11 @@ export default {
     uploadHandler: {
       type: Function,
       required: true
+    },
+    loadOptions: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   data: function() {

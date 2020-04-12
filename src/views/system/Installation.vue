@@ -94,7 +94,7 @@
                   placeholder="用户密码（8-100位）"
                   v-decorator="[
                     'password',
-                    {rules: [{ required: true, message: '请输入密码（8-100位）' }]}
+                    {rules: [{ required: true, message: '请输入密码（8-100位）' },{ validator: handleValidatePassword }]}
                   ]"
                 >
                   <a-icon
@@ -111,10 +111,10 @@
                 <a-input
                   v-model="installation.confirmPassword"
                   type="password"
-                  placeholder="确定密码"
+                  placeholder="确认密码"
                   v-decorator="[
                     'confirmPassword',
-                    {rules: [{ required: true, message: '请确定密码' },{ validator: handleValidateConfirmPassword }]}
+                    {rules: [{ required: true, message: '请输入确认密码' },{ validator: handleValidateConfirmPassword }]}
                   ]"
                 >
                   <a-icon
@@ -233,7 +233,15 @@ export default {
   methods: {
     handleValidateConfirmPassword(rule, value, callback) {
       if (this.installation.confirmPassword && this.installation.password !== this.installation.confirmPassword) {
+        // eslint-disable-next-line standard/no-callback-literal
         callback('确认密码和密码不匹配')
+      }
+      callback()
+    },
+    handleValidatePassword(rule, value, callback) {
+      if (this.installation.password.length < 8) {
+        // eslint-disable-next-line standard/no-callback-literal
+        callback('密码不能低于 8 位')
       }
       callback()
     },
