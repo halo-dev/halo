@@ -24,7 +24,7 @@ public class HttpClientUtils {
     /**
      * Timeout (Default is 5s).
      */
-    private final static int TIMEOUT = 5000;
+    private static final int TIMEOUT = 5000;
 
     private HttpClientUtils() {
     }

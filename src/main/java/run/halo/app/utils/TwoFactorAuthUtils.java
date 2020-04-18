@@ -12,7 +12,7 @@ import java.util.Random;
 
 public class TwoFactorAuthUtils {
 
-    private final static int VALID_TFA_WINDOW_MILLIS = 60_000;
+    private static final int VALID_TFA_WINDOW_MILLIS = 60_000;
 
     public static String generateTFAKey() {
         return TimeBasedOneTimePasswordUtil.generateBase32Secret(32);

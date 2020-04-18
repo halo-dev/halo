@@ -42,19 +42,19 @@ public class LocalFileHandler implements FileHandler {
     /**
      * Upload sub directory.
      */
-    private final static String UPLOAD_SUB_DIR = "upload/";
+    private static final String UPLOAD_SUB_DIR = "upload/";
 
-    private final static String THUMBNAIL_SUFFIX = "-thumbnail";
+    private static final String THUMBNAIL_SUFFIX = "-thumbnail";
 
     /**
      * Thumbnail width.
      */
-    private final static int THUMB_WIDTH = 256;
+    private static final int THUMB_WIDTH = 256;
 
     /**
      * Thumbnail height.
      */
-    private final static int THUMB_HEIGHT = 256;
+    private static final int THUMB_HEIGHT = 256;
     private final OptionService optionService;
     private final String workDir;
     ReentrantLock lock = new ReentrantLock();

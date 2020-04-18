@@ -33,7 +33,7 @@ public class DateTimeUtils {
     /**
      * 标准日期格式：HHmm
      */
-    public final static String TIME_PATTERN = "HHmm";
+    public static final String TIME_PATTERN = "HHmm";
     /**
      * 标准日期格式 {@link DateTimeFormatter} HHmm
      */
@@ -41,7 +41,7 @@ public class DateTimeUtils {
     /**
      * 标准日期格式：HH:mm
      */
-    public final static String NORM_TIME_PATTERN = "HH:mm";
+    public static final String NORM_TIME_PATTERN = "HH:mm";
     /**
      * 标准日期格式 {@link DateTimeFormatter} HH:mm
      */
