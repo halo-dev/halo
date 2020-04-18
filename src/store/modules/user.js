@@ -13,7 +13,7 @@ const user = {
   },
   mutations: {
     SET_TOKEN: (state, token) => {
-      Vue.ls.set(ACCESS_TOKEN, token)
+      Vue.ls.set(ACCESS_TOKEN, token, token ? token.expired_in * 1000 : null)
       state.token = token
     },
     CLEAR_TOKEN: state => {
