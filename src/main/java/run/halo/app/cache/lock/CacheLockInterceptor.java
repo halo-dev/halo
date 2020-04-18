@@ -27,9 +27,9 @@ import java.lang.annotation.Annotation;
 @Configuration
 public class CacheLockInterceptor {
 
-    private final static String CACHE_LOCK_PREFOX = "cache_lock_";
+    private static final String CACHE_LOCK_PREFOX = "cache_lock_";
 
-    private final static String CACHE_LOCK_VALUE = "locked";
+    private static final String CACHE_LOCK_VALUE = "locked";
 
     private final StringCacheStore cacheStore;
 

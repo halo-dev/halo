@@ -38,16 +38,16 @@ import java.util.Objects;
 public class SmmsFileHandler implements FileHandler {
 
     @Deprecated
-    private final static String UPLOAD_API = "https://sm.ms/api/upload";
+    private static final String UPLOAD_API = "https://sm.ms/api/upload";
 
-    private final static String UPLOAD_API_V2 = "https://sm.ms/api/v2/upload";
+    private static final String UPLOAD_API_V2 = "https://sm.ms/api/v2/upload";
 
     @Deprecated
-    private final static String DELETE_API = "https://sm.ms/api/delete/%s";
+    private static final String DELETE_API = "https://sm.ms/api/delete/%s";
 
-    private final static String DELETE_API_V2 = "https://sm.ms/api/v2/delete/%s";
+    private static final String DELETE_API_V2 = "https://sm.ms/api/v2/delete/%s";
 
-    private final static String SUCCESS_CODE = "success";
+    private static final String SUCCESS_CODE = "success";
 
     private final RestTemplate httpsRestTemplate;
 
