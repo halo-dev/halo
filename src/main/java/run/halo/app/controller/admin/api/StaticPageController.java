@@ -32,7 +32,7 @@ import java.util.List;
 @RequestMapping("/api/admin/static_page")
 public class StaticPageController {
 
-    private final static String DEPLOY_API = "https://api.netlify.com/api/v1/sites/%s/deploys";
+    private static final String DEPLOY_API = "https://api.netlify.com/api/v1/sites/%s/deploys";
 
     private final OptionService optionService;
 

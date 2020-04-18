@@ -24,7 +24,7 @@ import java.nio.file.Path;
 @Component
 public class NetlifyStaticDeployHandler implements StaticDeployHandler {
 
-    private final static String DEPLOY_API = "https://api.netlify.com/api/v1/sites/%s/deploys";
+    private static final String DEPLOY_API = "https://api.netlify.com/api/v1/sites/%s/deploys";
 
     private final OptionService optionService;
 

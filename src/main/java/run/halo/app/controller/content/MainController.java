@@ -27,12 +27,12 @@ public class MainController {
     /**
      * Index redirect uri.
      */
-    private final static String INDEX_REDIRECT_URI = "index.html";
+    private static final String INDEX_REDIRECT_URI = "index.html";
 
     /**
      * Install redirect uri.
      */
-    private final static String INSTALL_REDIRECT_URI = INDEX_REDIRECT_URI + "#install";
+    private static final String INSTALL_REDIRECT_URI = INDEX_REDIRECT_URI + "#install";
 
     private final UserService userService;
 

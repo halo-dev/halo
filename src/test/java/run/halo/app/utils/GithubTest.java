@@ -29,9 +29,9 @@ public class GithubTest {
 
     private final Path tempPath;
 
-    private final static String API_URL = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
+    private static final String API_URL = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
 
-    private final static String HALO_ADMIN_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
+    private static final String HALO_ADMIN_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
 
     private final RestTemplate restTemplate;
 

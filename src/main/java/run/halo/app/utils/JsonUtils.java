@@ -23,7 +23,7 @@ public class JsonUtils {
     /**
      * Default json mapper.
      */
-    public final static ObjectMapper DEFAULT_JSON_MAPPER = createDefaultJsonMapper();
+    public static final ObjectMapper DEFAULT_JSON_MAPPER = createDefaultJsonMapper();
 
     private JsonUtils() {
     }
