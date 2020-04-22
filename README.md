@@ -34,6 +34,8 @@ PS：实在不想写这个声明（影响 README 的美观），但是就目前�
 
 ### 下载最新的 Halo 安装包
 
+> 其他地址：https://halo.run/archives/download.html
+
 ```bash
 curl -L https://github.com/halo-dev/halo/releases/download/v1.3.2/halo-1.3.2.jar --output halo-latest.jar
 ```
