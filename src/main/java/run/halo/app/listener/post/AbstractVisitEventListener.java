@@ -20,7 +20,7 @@ import java.util.concurrent.*;
  */
 @Slf4j
 public abstract class AbstractVisitEventListener {
-    private int visit_id = 1;
+    private int visitId = 1;
 
     private final Map<Integer, BlockingQueue<Integer>> visitQueueMap;
 
@@ -117,10 +117,9 @@ public abstract class AbstractVisitEventListener {
                     visit.setCreateTime(date);
                     visit.setUpdateTime(date);
                     visit.setPostId(postId);
-                    visit.setVisitId(visit_id);
+                    visit.setVisitId(visitId);
                     visitService.create(visit);
-                    visit_id ++;
-                    System.out.println(visitService.countVisitToday());
+                    visitId += 1;
 
                     log.debug("Increased visits for post id: [{}]", postId);
                 } catch (InterruptedException e) {

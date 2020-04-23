@@ -23,7 +23,7 @@ import java.util.Optional;
 public class VisitServiceImpl extends AbstractCrudService<Visit, Integer> implements VisitService {
     private final VisitRepository visitRepository;
 
-    public VisitServiceImpl(VisitRepository visitRepository){
+    public VisitServiceImpl(VisitRepository visitRepository) {
         super(visitRepository);
         this.visitRepository = visitRepository;
     }
@@ -37,7 +37,7 @@ public class VisitServiceImpl extends AbstractCrudService<Visit, Integer> implem
     }
 
     @Override
-    public long countVisitToday(){
+    public long countVisitToday() {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DATE);
         int month = cal.get(Calendar.MONTH);
@@ -46,7 +46,7 @@ public class VisitServiceImpl extends AbstractCrudService<Visit, Integer> implem
     }
 
     @Override
-    public long countVisitYesterday(){
+    public long countVisitYesterday() {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DATE);
         int month = cal.get(Calendar.MONTH);
@@ -54,13 +54,13 @@ public class VisitServiceImpl extends AbstractCrudService<Visit, Integer> implem
         int maxDay = 0;
         if (month - 1 == 1 || month - 1 == 3 || month - 1 == 5 || month - 1 == 7 || month - 1 == 8 || month - 1 == 10 || month - 1 == 12)
             maxDay = 31;
-        else if(month - 1 == 4 || month - 1 == 6 || month - 1 == 9 || month - 1 == 11)
+        else if (month - 1 == 4 || month - 1 == 6 || month - 1 == 9 || month - 1 == 11)
             maxDay = 30;
         else {
-            if(year % 4 != 0) maxDay = 28;
+            if (year % 4 != 0) maxDay = 28;
             else maxDay = 29;
         }
-        if(day - 1 != 0)
+        if (day - 1 != 0)
             return Optional.ofNullable(visitRepository.countVisitYesterday1(day,month + 1,year)).orElse(0L);
         else
             return Optional.ofNullable(visitRepository.countVisitYesterday2(day,month + 1,year)).orElse(0L);
