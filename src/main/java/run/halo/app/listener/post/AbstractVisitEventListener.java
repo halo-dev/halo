@@ -4,8 +4,11 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import run.halo.app.event.post.AbstractVisitEvent;
+import run.halo.app.model.entity.Visit;
+import run.halo.app.service.VisitService;
 import run.halo.app.service.base.BasePostService;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -17,6 +20,7 @@ import java.util.concurrent.*;
  */
 @Slf4j
 public abstract class AbstractVisitEventListener {
+    private int visit_id = 1;
 
     private final Map<Integer, BlockingQueue<Integer>> visitQueueMap;
 
@@ -24,10 +28,13 @@ public abstract class AbstractVisitEventListener {
 
     private final BasePostService basePostService;
 
+    private final VisitService visitService;
+
     private final ExecutorService executor;
 
-    protected AbstractVisitEventListener(BasePostService basePostService) {
+    protected AbstractVisitEventListener(BasePostService basePostService, VisitService visitService) {
         this.basePostService = basePostService;
+        this.visitService = visitService;
 
         int initCapacity = 8;
 
@@ -105,6 +112,15 @@ public abstract class AbstractVisitEventListener {
 
                     // Increase the visit
                     basePostService.increaseVisit(postId);
+                    Visit visit = new Visit();
+                    Date date = new Date();
+                    visit.setCreateTime(date);
+                    visit.setUpdateTime(date);
+                    visit.setPostId(postId);
+                    visit.setVisitId(visit_id);
+                    visitService.create(visit);
+                    visit_id ++;
+                    System.out.println(visitService.countVisitToday());
 
                     log.debug("Increased visits for post id: [{}]", postId);
                 } catch (InterruptedException e) {

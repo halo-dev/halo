@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.service.SheetService;
+import run.halo.app.service.VisitService;
 
 /**
  * Sheet visit event listener.
@@ -15,8 +16,8 @@ import run.halo.app.service.SheetService;
 @Component
 public class SheetVisitEventListener extends AbstractVisitEventListener {
 
-    protected SheetVisitEventListener(SheetService sheetService) {
-        super(sheetService);
+    protected SheetVisitEventListener(SheetService sheetService, VisitService visitService) {
+        super(sheetService, visitService);
     }
 
     @Async

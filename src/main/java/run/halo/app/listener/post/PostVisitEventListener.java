@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.service.PostService;
+import run.halo.app.service.VisitService;
 
 /**
  * Visit event listener.
@@ -15,8 +16,8 @@ import run.halo.app.service.PostService;
 @Component
 public class PostVisitEventListener extends AbstractVisitEventListener {
 
-    public PostVisitEventListener(PostService postService) {
-        super(postService);
+    public PostVisitEventListener(PostService postService, VisitService visitService) {
+        super(postService,visitService);
     }
 
     @Async
