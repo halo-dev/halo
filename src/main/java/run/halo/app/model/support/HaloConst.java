@@ -19,8 +19,6 @@ public class HaloConst {
      */
     public final static String USER_HOME = System.getProperties().getProperty("user.home");
 
-    public final static String ENV_HALO_HOME = System.getenv("HALO_HOME");
-
     /**
      * Temporary directory.
      */
