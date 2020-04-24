@@ -26,7 +26,7 @@
 
 另外，写给想自己拉代码编译运行的同学：
 
-> 目前我们的开发分支即 master，肯定会有很多小问题，不要运行不起来就跑过来吐槽什么代码开源不完整之类的，多找找自己的原因。同时建议下载最新 release 版本的代码，或者在 master 分支执行 `git checkout v1.3.1`。
+> 目前我们的开发分支即 master，肯定会有很多小问题，不要运行不起来就跑过来吐槽什么代码开源不完整之类的，多找找自己的原因。同时建议下载最新 release 版本的代码，或者在 master 分支执行 `git checkout v1.3.2`。
 
 PS：实在不想写这个声明（影响 README 的美观），但是就目前来看，写在 README 上是有必要的，因为大部分遇到问题的人都不会去仔细阅读文档。
 
@@ -34,14 +34,16 @@ PS：实在不想写这个声明（影响 README 的美观），但是就目前�
 
 ### 下载最新的 Halo 安装包
 
+> 其他地址：https://halo.run/archives/download.html
+
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.3.1/halo-1.3.1.jar --output halo-latest.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.3.2/halo-1.3.2.jar --output halo-latest.jar
 ```
 
 或者
 
 ```bash
-wget https://github.com/halo-dev/halo/releases/download/v1.3.1/halo-1.3.1.jar -O halo-latest.jar
+wget https://github.com/halo-dev/halo/releases/download/v1.3.2/halo-1.3.2.jar -O halo-latest.jar
 ```
 
 ### 启动 Halo
