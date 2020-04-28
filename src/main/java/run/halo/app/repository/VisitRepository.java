@@ -15,7 +15,7 @@ import run.halo.app.repository.base.BaseRepository;
 public interface VisitRepository extends BaseRepository<Visit, Integer> {
 
     /**
-     * Counts visits today. (Need to be overridden)
+     * Counts visits today.
      *
      * @return total visits
      */
@@ -23,7 +23,7 @@ public interface VisitRepository extends BaseRepository<Visit, Integer> {
     Long countVisitToday(@Param("day") Integer day, @Param("month") Integer month, @Param("year") Integer year);
 
     /**
-     * Counts visits yesterday method 1. (Need to be overridden)
+     * Counts visits yesterday method 1.
      *
      * @return total visits
      */
@@ -31,7 +31,7 @@ public interface VisitRepository extends BaseRepository<Visit, Integer> {
     Long countVisitYesterday1(@Param("day") Integer day, @Param("month") Integer month, @Param("year") Integer year);
 
     /**
-     * Counts visits yesterday method 2. (Need to be overridden)
+     * Counts visits yesterday method 2.
      *
      * @return total visits
      */
@@ -39,7 +39,7 @@ public interface VisitRepository extends BaseRepository<Visit, Integer> {
     Long countVisitYesterday2(@Param("day") Integer day, @Param("month") Integer month, @Param("year") Integer year);
 
     /**
-     * Counts visits this month. (Need to be overridden)
+     * Counts visits this month.
      *
      * @return total visits
      */
@@ -47,7 +47,7 @@ public interface VisitRepository extends BaseRepository<Visit, Integer> {
     Long countVisitThisMonth(@Param("month") Integer month, @Param("year") Integer year);
 
     /**
-     * Counts visits this year. (Need to be overridden)
+     * Counts visits this year.
      *
      * @return total visits
      */

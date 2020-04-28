@@ -10,7 +10,6 @@ import run.halo.app.service.base.CrudService;
  * @author chao19991005
  * @date 2020-04-21
  */
-@Transactional(readOnly = true)
 public interface VisitService extends CrudService<Visit, Integer> {
 
     /**
@@ -23,21 +22,21 @@ public interface VisitService extends CrudService<Visit, Integer> {
     /**
      * Counts visit yesterday.
      *
-     * @return today's visit
+     * @return yesterdays's visit
      */
     long countVisitYesterday();
 
     /**
-     * Counts visit yesterday.
+     * Counts visit this month.
      *
-     * @return today's visit
+     * @return this month's visit
      */
     long countVisitThisMonth();
 
     /**
-     * Counts visit yesterday.
+     * Counts visit this year.
      *
-     * @return today's visit
+     * @return this years's visit
      */
     long countVisitThisYear();
 }

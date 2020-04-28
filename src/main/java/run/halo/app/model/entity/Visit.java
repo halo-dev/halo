@@ -38,21 +38,4 @@ public class Visit extends BaseEntity {
     @Column(name = "post_id")
     private Integer postId;
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) {
-//            return true;
-//        }
-//        if (o == null || getClass() != o.getClass()) {
-//            return false;
-//        }
-//        Visit visit = (Visit) o;
-//        return Objects.equals(postId, visit.postId) &&
-//                Objects.equals(visitId, visit.visitId);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(postId, visitId);
-//    }
 }

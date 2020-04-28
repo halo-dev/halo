@@ -113,9 +113,6 @@ public abstract class AbstractVisitEventListener {
                     // Increase the visit
                     basePostService.increaseVisit(postId);
                     Visit visit = new Visit();
-                    Date date = new Date();
-                    visit.setCreateTime(date);
-                    visit.setUpdateTime(date);
                     visit.setPostId(postId);
                     visit.setVisitId(visitId);
                     visitService.create(visit);

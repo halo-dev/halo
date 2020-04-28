@@ -40,30 +40,23 @@ public class VisitServiceImpl extends AbstractCrudService<Visit, Integer> implem
     public long countVisitToday() {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DATE);
-        int month = cal.get(Calendar.MONTH);
+        int month = cal.get(Calendar.MONTH) + 1;
         int year = cal.get(Calendar.YEAR);
-        return Optional.ofNullable(visitRepository.countVisitToday(day,month + 1,year)).orElse(0L);
+        return Optional.ofNullable(visitRepository.countVisitToday(day, month, year)).orElse(0L);
     }
 
     @Override
     public long countVisitYesterday() {
         Calendar cal = Calendar.getInstance();
         int day = cal.get(Calendar.DATE);
-        int month = cal.get(Calendar.MONTH);
+        int month = cal.get(Calendar.MONTH) + 1;
         int year = cal.get(Calendar.YEAR);
-        int maxDay = 0;
-        if (month - 1 == 1 || month - 1 == 3 || month - 1 == 5 || month - 1 == 7 || month - 1 == 8 || month - 1 == 10 || month - 1 == 12)
-            maxDay = 31;
-        else if (month - 1 == 4 || month - 1 == 6 || month - 1 == 9 || month - 1 == 11)
-            maxDay = 30;
-        else {
-            if (year % 4 != 0) maxDay = 28;
-            else maxDay = 29;
-        }
+        cal.set(Calendar.MONTH, month - 2);
+        int maxDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
         if (day - 1 != 0)
-            return Optional.ofNullable(visitRepository.countVisitYesterday1(day,month + 1,year)).orElse(0L);
+            return Optional.ofNullable(visitRepository.countVisitYesterday1(day, month, year)).orElse(0L);
         else
-            return Optional.ofNullable(visitRepository.countVisitYesterday2(day,month + 1,year)).orElse(0L);
+            return Optional.ofNullable(visitRepository.countVisitYesterday2(maxDay, month, year)).orElse(0L);
     }
 
     @Override
@@ -71,7 +64,7 @@ public class VisitServiceImpl extends AbstractCrudService<Visit, Integer> implem
         Calendar cal = Calendar.getInstance();
         int month = cal.get(Calendar.MONTH);
         int year = cal.get(Calendar.YEAR);
-        return Optional.ofNullable(visitRepository.countVisitThisMonth(month + 1,year)).orElse(0L);
+        return Optional.ofNullable(visitRepository.countVisitThisMonth(month, year)).orElse(0L);
     }
 
     @Override
