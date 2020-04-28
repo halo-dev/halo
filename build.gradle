@@ -59,7 +59,7 @@ ext {
     baiduSdkVersion =  "0.10.106"
     qcloudSdkVersion =  "5.6.21"
     swaggerVersion =  "2.9.2"
-    commonsLangVersion =  "3.9"
+    commonsLangVersion =  "3.10"
     httpclientVersion =  "4.5.12"
     dataformatYamlVersion =  "2.11.0"
     jgitVersion =  "5.7.0.202003110725-r"
