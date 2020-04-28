@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class ValidationUtils {
 
-    private static Validator VALIDATOR;
+    private static volatile Validator VALIDATOR;
 
     private ValidationUtils() {
     }
@@ -33,8 +33,10 @@ public class ValidationUtils {
     public static Validator getValidatorOrCreate() {
         if (VALIDATOR == null) {
             synchronized (ValidationUtils.class) {
-                // Init the validation
-                VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
+                if (VALIDATOR == null) {
+                    // Init the validation
+                    VALIDATOR = Validation.buildDefaultValidatorFactory().getValidator();
+                }
             }
         }
 

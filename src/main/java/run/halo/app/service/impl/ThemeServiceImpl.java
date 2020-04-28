@@ -81,12 +81,12 @@ public class ThemeServiceImpl implements ThemeService {
     /**
      * Activated theme id.
      */
-    private String activatedThemeId;
+    private volatile String activatedThemeId;
 
     /**
      * Activated theme property.
      */
-    private ThemeProperty activatedTheme;
+    private volatile ThemeProperty activatedTheme;
 
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
