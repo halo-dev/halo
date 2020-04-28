@@ -15,7 +15,7 @@
     "filepond": "^4.13.0",
     "filepond-plugin-image-preview": "^4.6.1",
     "halo-editor": "^2.8.2",
-    "marked": "^0.8.0",
+    "marked": "^1.0.0",
     "moment": "^2.24.0",
     "verte": "^0.0.12",
     "vue": "^2.6.11",
