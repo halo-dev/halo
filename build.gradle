@@ -71,7 +71,7 @@ ext {
     levelDbVersion =  "0.12"
     jsonVersion =  "20190722"
     fastJsonVersion =  "1.2.67"
-    annotationsVersion = "3.0.1"
+    annotationsVersion = "3.0.1u2"
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
 }
