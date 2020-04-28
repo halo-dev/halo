@@ -22,9 +22,9 @@ public class VisitRepositoryImplTest {
         long yesterday = visitService.countVisitYesterday();
         long month = visitService.countVisitThisMonth();
         long year = visitService.countVisitThisYear();
-        System.out.println(today);
-        System.out.println(yesterday);
-        System.out.println(month);
-        System.out.println(year);
+        log.debug(String.valueOf(today));
+        log.debug(String.valueOf(yesterday));
+        log.debug(String.valueOf(month));
+        log.debug(String.valueOf(year));
     }
 }
