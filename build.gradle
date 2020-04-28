@@ -57,7 +57,7 @@ ext {
     qiniuSdkVersion =  "7.2.28"
     aliyunSdkVersion =  "3.9.1"
     baiduSdkVersion =  "0.10.106"
-    qcloudSdkVersion =  "5.6.21"
+    qcloudSdkVersion =  "5.6.22"
     swaggerVersion =  "2.9.2"
     commonsLangVersion =  "3.9"
     httpclientVersion =  "4.5.12"
