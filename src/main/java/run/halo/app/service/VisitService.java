@@ -1,6 +1,5 @@
 package run.halo.app.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.model.entity.Visit;
 import run.halo.app.service.base.CrudService;
 

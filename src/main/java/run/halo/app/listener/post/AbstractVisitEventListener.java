@@ -8,7 +8,6 @@ import run.halo.app.model.entity.Visit;
 import run.halo.app.service.VisitService;
 import run.halo.app.service.base.BasePostService;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.*;
 
