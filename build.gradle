@@ -61,7 +61,7 @@ ext {
     swaggerVersion =  "2.9.2"
     commonsLangVersion =  "3.9"
     httpclientVersion =  "4.5.12"
-    dataformatYamlVersion =  "2.10.3"
+    dataformatYamlVersion =  "2.11.0"
     jgitVersion =  "5.7.0.202003110725-r"
     flexmarkVersion =  "0.61.20"
     thumbnailatorVersion =  "0.4.11"
