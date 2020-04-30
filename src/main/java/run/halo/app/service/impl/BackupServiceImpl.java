@@ -38,6 +38,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -190,17 +191,10 @@ public class BackupServiceImpl implements BackupService {
         // Build backup dto
         try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
-                .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
-                .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
-                .sorted((leftBackup, rightBackup) -> {
-                    // Sort the result
-                    if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
-                        return 1;
-                    } else if (leftBackup.getUpdateTime() > rightBackup.getUpdateTime()) {
-                        return -1;
-                    }
-                    return 0;
-                }).collect(Collectors.toList());
+                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
+                    .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
+                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
         }
@@ -315,17 +309,10 @@ public class BackupServiceImpl implements BackupService {
 
         try (Stream<Path> subPathStream = Files.list(exportedDataParentPath)) {
             return subPathStream
-                .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
-                .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
-                .sorted((leftBackup, rightBackup) -> {
-                    // Sort the result
-                    if (leftBackup.getUpdateTime() < rightBackup.getUpdateTime()) {
-                        return 1;
-                    } else if (leftBackup.getUpdateTime() > rightBackup.getUpdateTime()) {
-                        return -1;
-                    }
-                    return 0;
-                }).collect(Collectors.toList());
+                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
+                    .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
+                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch exported data", e);
         }
