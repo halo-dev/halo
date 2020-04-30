@@ -42,18 +42,32 @@ public class DateTimeUtils {
      * 标准日期格式：HH:mm
      */
     public final static String NORM_TIME_PATTERN = "HH:mm";
+
     /**
      * 标准日期格式 {@link DateTimeFormatter} HH:mm
      */
     public static final DateTimeFormatter NORM_TIME_FORMATTER = DateTimeFormatter.ofPattern(NORM_TIME_PATTERN);
+
     /**
      * 标准日期时间格式，精确到秒 {@link DateTimeFormatter}：yyyy-MM-dd HH:mm:ss
      */
     public static final DateTimeFormatter NORM_DATETIME_FORMATTER = DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN);
+
+    /**
+     * 横线分隔日期时间格式：yyyy-MM-dd-HH-mm-ss-
+     */
+    public final static String HORIZONTAL_LINE_PATTERN = "yyyy-MM-dd-HH-mm-ss-";
+
+    /**
+     * 横线分隔日期时间格式，精确到秒 {@link DateTimeFormatter}：yyyy-MM-dd-HH-mm-ss-
+     */
+    public static final DateTimeFormatter HORIZONTAL_LINE_DATETIME_FORMATTER = DateTimeFormatter.ofPattern(HORIZONTAL_LINE_PATTERN);
+
     /**
      * 上海时区格式
      */
     public static final String CTT = ZoneId.SHORT_IDS.get("CTT");
+
     /**
      * 上海时区
      */

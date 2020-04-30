@@ -26,6 +26,7 @@ import run.halo.app.model.entity.*;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.*;
+import run.halo.app.utils.DateTimeUtils;
 import run.halo.app.utils.HaloUtils;
 
 import java.io.IOException;
@@ -36,7 +37,6 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -143,9 +143,9 @@ public class BackupServiceImpl implements BackupService {
      */
     public static String sanitizeFilename(final String unSanitized) {
         return unSanitized.
-            replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
-            replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
-            replaceAll("\\s", "");
+                replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
+                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
+                replaceAll("\\s", "");
     }
 
     @Override
@@ -165,8 +165,8 @@ public class BackupServiceImpl implements BackupService {
         try {
             // Create zip path for halo zip
             String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
-                IdUtil.simpleUUID().hashCode() + ".zip";
+                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                    IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
             Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
 
@@ -285,7 +285,7 @@ public class BackupServiceImpl implements BackupService {
 
         try {
             String haloDataFileName = HaloConst.HALO_DATA_EXPORT_PREFIX +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
+                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
                     IdUtil.simpleUUID().hashCode() + ".json";
 
             Path haloDataPath = Files.createFile(Paths.get(haloProperties.getDataExportDir(), haloDataFileName));
@@ -452,9 +452,9 @@ public class BackupServiceImpl implements BackupService {
 
         // Build full url
         return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), backupUri)
-            + "?"
-            + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
-            + "=" + oneTimeToken;
+                + "?"
+                + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
+                + "=" + oneTimeToken;
     }
 
 }
