@@ -26,7 +26,6 @@ import run.halo.app.model.entity.*;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.*;
-import run.halo.app.utils.DateTimeUtils;
 import run.halo.app.utils.HaloUtils;
 
 import java.io.IOException;
@@ -286,7 +285,7 @@ public class BackupServiceImpl implements BackupService {
 
         try {
             String haloDataFileName = HaloConst.HALO_DATA_EXPORT_PREFIX +
-                    LocalDateTime.now().format(DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
                     IdUtil.simpleUUID().hashCode() + ".json";
 
             Path haloDataPath = Files.createFile(Paths.get(haloProperties.getDataExportDir(), haloDataFileName));
