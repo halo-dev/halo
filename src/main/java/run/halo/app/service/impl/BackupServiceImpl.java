@@ -26,6 +26,7 @@ import run.halo.app.model.entity.*;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.*;
+import run.halo.app.utils.DateTimeUtils;
 import run.halo.app.utils.HaloUtils;
 
 import java.io.IOException;
@@ -193,7 +194,7 @@ public class BackupServiceImpl implements BackupService {
             return subPathStream
                     .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
                     .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
-                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime))
+                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
                     .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
@@ -285,8 +286,8 @@ public class BackupServiceImpl implements BackupService {
 
         try {
             String haloDataFileName = HaloConst.HALO_DATA_EXPORT_PREFIX +
-                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss-")) +
-                IdUtil.simpleUUID().hashCode() + ".json";
+                    LocalDateTime.now().format(DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                    IdUtil.simpleUUID().hashCode() + ".json";
 
             Path haloDataPath = Files.createFile(Paths.get(haloProperties.getDataExportDir(), haloDataFileName));
 
@@ -311,7 +312,7 @@ public class BackupServiceImpl implements BackupService {
             return subPathStream
                     .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
                     .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
-                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime))
+                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
                     .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch exported data", e);
