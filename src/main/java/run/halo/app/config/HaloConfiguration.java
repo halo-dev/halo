@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.cache.InMemoryCacheStore;
 import run.halo.app.cache.LevelCacheStore;
+import run.halo.app.cache.RedisCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.utils.HttpClientUtils;
@@ -63,7 +64,9 @@ public class HaloConfiguration {
             case "level":
                 stringCacheStore = new LevelCacheStore();
                 break;
-
+            case "redis":
+                stringCacheStore = new RedisCacheStore(this.haloProperties);
+                break;
             case "memory":
             default:
                 //memory or default

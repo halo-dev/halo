@@ -72,6 +72,7 @@ ext {
     jsonVersion =  "20190722"
     fastJsonVersion =  "1.2.68"
     annotationsVersion = "3.0.1u2"
+    jedisVersion= '3.2.0'
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
 }
@@ -81,6 +82,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-undertow"
+    implementation "redis.clients:jedis:$jedisVersion"
     implementation "org.springframework.boot:spring-boot-starter-freemarker"
     implementation "com.sun.mail:jakarta.mail"
 

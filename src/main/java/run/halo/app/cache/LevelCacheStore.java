@@ -116,18 +116,6 @@ public class LevelCacheStore extends AbstractStringCacheStore {
         return new String(bytes, Charset.defaultCharset());
     }
 
-    private Optional<CacheWrapper<String>> jsonToCacheWrapper(String json) {
-        Assert.hasText(json, "json value must not be null");
-        CacheWrapper<String> cacheWrapper = null;
-        try {
-            cacheWrapper = JsonUtils.jsonToObject(json, CacheWrapper.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-            log.debug("erro json to wrapper value bytes: [{}]", json, e);
-        }
-        return Optional.ofNullable(cacheWrapper);
-    }
-
     private class CacheExpiryCleaner extends TimerTask {
 
         @Override
