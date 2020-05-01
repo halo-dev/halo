@@ -42,6 +42,7 @@ bootJar {
 }
 
 ext {
+    DruidDataSource = '1.1.21'
     ohMyEmailVersion = '0.0.4'
     hutoolVersion = '5.0.3'
     upyunSdkVersion = '4.0.1'
@@ -63,6 +64,7 @@ ext {
 }
 
 dependencies {
+    implementation "com.alibaba:druid-spring-boot-starter:$DruidDataSource"
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
