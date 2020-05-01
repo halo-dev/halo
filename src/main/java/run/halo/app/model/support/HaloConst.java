@@ -143,5 +143,4 @@ public class HaloConst {
      * Version constant.
      */
     public static String HALO_VERSION = null;
-
 }
