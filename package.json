@@ -43,7 +43,7 @@
     "babel-jest": "^25.4.0",
     "babel-plugin-import": "^1.11.2",
     "eslint": "^5.16.0",
-    "eslint-plugin-html": "^5.0.5",
+    "eslint-plugin-html": "^6.0.2",
     "eslint-plugin-vue": "^6.2.2",
     "generate-asset-webpack-plugin": "^0.3.0",
     "less": "^3.10.0",
