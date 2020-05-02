@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import run.halo.app.event.post.AbstractVisitEvent;
 import run.halo.app.service.base.BasePostService;
+import run.halo.app.utils.PairUtils;
 
 import java.util.Map;
 import java.util.concurrent.*;
-import com.sun.tools.javac.util.Pair;
 
 /**
  * Abstract visit event listener.
@@ -21,7 +21,7 @@ public abstract class AbstractVisitEventListener {
 
     private final Map<Integer, BlockingQueue<Integer>> visitQueueMap;
 
-    private final Map<Pair<Integer, String>, PostVisitTask> visitTaskMap;
+    private final Map<PairUtils<Integer, String>, PostVisitTask> visitTaskMap;
 
     private final Map<Integer, IpRecorder> visitIpMap;
 
@@ -64,7 +64,7 @@ public abstract class AbstractVisitEventListener {
         // Get request ip address
         String ip = event.getIp();
 
-        Pair<Integer, String> pair = new Pair<>(id, ip);
+        PairUtils<Integer, String> pair = new PairUtils<>(id, ip);
         log.debug("Received a visit event, post id: [{}], request ip address: [{}]", id, ip);
 
         // Get post visit queue
@@ -79,9 +79,9 @@ public abstract class AbstractVisitEventListener {
     }
 
 
-    private PostVisitTask createPostVisitTask(Pair<Integer, String> pair) {
-        int postId = pair.fst;
-        String requestIp = pair.snd;
+    private PostVisitTask createPostVisitTask(PairUtils<Integer, String> pair) {
+        int postId = pair.getFirst();
+        String requestIp = pair.getLast();
 
         // Create new post visit task
         PostVisitTask postVisitTask = new PostVisitTask(postId, requestIp, this.visitIpMap.get(postId));
