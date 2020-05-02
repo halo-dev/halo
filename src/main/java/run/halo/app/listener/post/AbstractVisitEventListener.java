@@ -8,6 +8,7 @@ import run.halo.app.service.base.BasePostService;
 
 import java.util.Map;
 import java.util.concurrent.*;
+import com.sun.tools.javac.util.Pair;
 
 /**
  * Abstract visit event listener.
@@ -20,16 +21,20 @@ public abstract class AbstractVisitEventListener {
 
     private final Map<Integer, BlockingQueue<Integer>> visitQueueMap;
 
-    private final Map<Integer, PostVisitTask> visitTaskMap;
+    private final Map<Pair<Integer, String>, PostVisitTask> visitTaskMap;
+
+    private final Map<Integer, IpRecorder> visitIpMap;
 
     private final BasePostService basePostService;
 
     private final ExecutorService executor;
 
+    private int initCapacity;
+
     protected AbstractVisitEventListener(BasePostService basePostService) {
         this.basePostService = basePostService;
 
-        int initCapacity = 8;
+        this.initCapacity = 8;
 
         long count = basePostService.count();
 
@@ -39,6 +44,7 @@ public abstract class AbstractVisitEventListener {
 
         visitQueueMap = new ConcurrentHashMap<>(initCapacity << 1);
         visitTaskMap = new ConcurrentHashMap<>(initCapacity << 1);
+        visitIpMap = new ConcurrentHashMap<>(initCapacity << 1);
 
         this.executor = Executors.newCachedThreadPool();
     }
@@ -55,31 +61,45 @@ public abstract class AbstractVisitEventListener {
         // Get post id
         Integer id = event.getId();
 
-        log.debug("Received a visit event, post id: [{}]", id);
+        // Get request ip address
+        String ip = event.getIp();
+
+        Pair<Integer, String> pair = new Pair<>(id, ip);
+        log.debug("Received a visit event, post id: [{}], request ip address: [{}]", id, ip);
 
         // Get post visit queue
         BlockingQueue<Integer> postVisitQueue = visitQueueMap.computeIfAbsent(id, this::createEmptyQueue);
 
-        visitTaskMap.computeIfAbsent(id, this::createPostVisitTask);
+        visitIpMap.computeIfAbsent(id, this::createIpMap);
+
+        visitTaskMap.computeIfAbsent(pair, this::createPostVisitTask);
 
         // Put a visit for the post
         postVisitQueue.put(id);
     }
 
 
-    private PostVisitTask createPostVisitTask(Integer postId) {
+    private PostVisitTask createPostVisitTask(Pair<Integer, String> pair) {
+        int postId = pair.fst;
+        String requestIp = pair.snd;
+
         // Create new post visit task
-        PostVisitTask postVisitTask = new PostVisitTask(postId);
+        PostVisitTask postVisitTask = new PostVisitTask(postId, requestIp, this.visitIpMap.get(postId));
         // Start a post visit task
         executor.execute(postVisitTask);
 
-        log.debug("Created a new post visit task for post id: [{}]", postId);
+        log.debug("Created a new post visit task for post id: [{}], from ip address: [{}]", postId, requestIp);
         return postVisitTask;
     }
 
     private BlockingQueue<Integer> createEmptyQueue(Integer postId) {
         // Create a new queue
         return new LinkedBlockingQueue<>();
+    }
+
+    private IpRecorder createIpMap(Integer postId) {
+        // Create a new IpRecorder
+        return new IpRecorder(postId, this.initCapacity);
     }
 
 
@@ -90,8 +110,14 @@ public abstract class AbstractVisitEventListener {
 
         private final Integer id;
 
-        private PostVisitTask(Integer id) {
+        private final String ip;
+
+        private IpRecorder ipRecorder;
+
+        private PostVisitTask(Integer id, String ip, IpRecorder ipRecorder) {
             this.id = id;
+            this.ip = ip;
+            this.ipRecorder = ipRecorder;
         }
 
         @Override
@@ -101,12 +127,14 @@ public abstract class AbstractVisitEventListener {
                     BlockingQueue<Integer> postVisitQueue = visitQueueMap.get(id);
                     Integer postId = postVisitQueue.take();
 
-                    log.debug("Took a new visit for post id: [{}]", postId);
+                    log.debug("Took a new visit for post id: [{}], from ip address [{}]", postId, ip);
 
-                    // Increase the visit
-                    basePostService.increaseVisit(postId);
+                    // If the ip is not null and hasn't appeared before, increase the visit
+                    if (ip != null && !ipRecorder.checkIp(this.ip)) {
+                        basePostService.increaseVisit(postId);
 
-                    log.debug("Increased visits for post id: [{}]", postId);
+                        log.debug("Increased visits for post id: [{}], from ip address [{}]", postId, ip);
+                    }
                 } catch (InterruptedException e) {
                     log.debug("Post visit task: " + Thread.currentThread().getName() + " was interrupted", e);
                     // Ignore this exception
@@ -114,6 +142,30 @@ public abstract class AbstractVisitEventListener {
             }
 
             log.debug("Thread: [{}] has been interrupted", Thread.currentThread().getName());
+        }
+    }
+
+    /**
+     *  Ip recorder
+     */
+    private class IpRecorder {
+
+        private final Integer id;
+
+        private final Map<String, Boolean> ipMap;
+
+        private IpRecorder(int id, int initCapacity) {
+            this.id = id;
+            this.ipMap = new ConcurrentHashMap<>(initCapacity << 1);
+        }
+
+        protected boolean checkIp(String ip) {
+            if (this.ipMap.get(ip) == null) {
+                ipMap.put(ip, true);
+                return false;
+            } else {
+                return true;
+            }
         }
     }
 }

@@ -250,9 +250,10 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Publish a post visit event.
      *
+     * @param requestIp requestIp could be null (index)
      * @param postId postId must not be null
      */
-    void publishVisitEvent(@NonNull Integer postId);
+    void publishVisitEvent(String requestIp, @NonNull Integer postId);
 
     /**
      * Gets pre && next post.

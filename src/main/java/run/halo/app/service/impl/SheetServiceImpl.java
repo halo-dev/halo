@@ -266,8 +266,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
-    public void publishVisitEvent(Integer sheetId) {
-        eventPublisher.publishEvent(new SheetVisitEvent(this, sheetId));
+    public void publishVisitEvent(String requestIp, Integer sheetId) {
+        eventPublisher.publishEvent(new SheetVisitEvent(this, requestIp, sheetId));
     }
 
     @Override

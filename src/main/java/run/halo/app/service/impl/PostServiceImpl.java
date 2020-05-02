@@ -786,8 +786,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public void publishVisitEvent(Integer postId) {
-        eventPublisher.publishEvent(new PostVisitEvent(this, postId));
+    public void publishVisitEvent(String requestIp, Integer postId) {
+        eventPublisher.publishEvent(new PostVisitEvent(this, requestIp, postId));
     }
 
     @Override

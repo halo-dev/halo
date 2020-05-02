@@ -53,12 +53,13 @@ public class SheetModel {
     /**
      * Sheet content.
      *
+     * @param requestIp request ip address
      * @param sheet sheet
      * @param token token
      * @param model model
      * @return template name
      */
-    public String content(Sheet sheet, String token, Model model) {
+    public String content(String requestIp, Sheet sheet, String token, Model model) {
 
         if (StringUtils.isEmpty(token)) {
             sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getSlug());
@@ -76,7 +77,7 @@ public class SheetModel {
             }
         }
 
-        sheetService.publishVisitEvent(sheet.getId());
+        sheetService.publishVisitEvent(requestIp, sheet.getId());
 
         SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
 

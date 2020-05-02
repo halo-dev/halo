@@ -54,7 +54,7 @@ public class ContentIndexController {
 
         if (PostPermalinkType.ID.equals(permalinkType) && !Objects.isNull(p)) {
             Post post = postService.getById(p);
-            return postModel.content(post, token, model);
+            return postModel.content(null, post, token, model);
         }
 
         return this.index(model, 1);

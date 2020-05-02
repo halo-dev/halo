@@ -17,6 +17,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
+import run.halo.app.utils.ServletUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -119,13 +120,14 @@ public class ContentContentController {
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
+        String requestIp = ServletUtils.getRequestIp();
 
         if (postPermalinkType.equals(PostPermalinkType.DEFAULT) && optionService.getArchivesPrefix().equals(prefix)) {
             Post post = postService.getBySlug(slug);
-            return postModel.content(post, token, model);
+            return postModel.content(requestIp, post, token, model);
         } else if (optionService.getSheetPrefix().equals(prefix)) {
             Sheet sheet = sheetService.getBySlug(slug);
-            return sheetModel.content(sheet, token, model);
+            return sheetModel.content(requestIp, sheet, token, model);
         } else if (optionService.getCategoriesPrefix().equals(prefix)) {
             return categoryModel.listPost(model, slug, 1);
         } else if (optionService.getTagsPrefix().equals(prefix)) {
@@ -156,9 +158,11 @@ public class ContentContentController {
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
+        String requestIp = ServletUtils.getRequestIp();
+
         if (postPermalinkType.equals(PostPermalinkType.DATE)) {
             Post post = postService.getBy(year, month, slug);
-            return postModel.content(post, token, model);
+            return postModel.content(requestIp, post, token, model);
         } else {
             throw new NotFoundException("Not Found");
         }
@@ -172,9 +176,11 @@ public class ContentContentController {
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
+        String requestIp = ServletUtils.getRequestIp();
+
         if (postPermalinkType.equals(PostPermalinkType.DAY)) {
             Post post = postService.getBy(year, month, day, slug);
-            return postModel.content(post, token, model);
+            return postModel.content(requestIp, post, token, model);
         } else {
             throw new NotFoundException("Not Found");
         }

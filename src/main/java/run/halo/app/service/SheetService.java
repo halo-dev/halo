@@ -128,7 +128,8 @@ public interface SheetService extends BasePostService<Sheet> {
     /**
      * Publish a sheet visit event.
      *
+     * @param requestIp requestIp must not be null
      * @param sheetId sheetId must not be null
      */
-    void publishVisitEvent(@NonNull Integer sheetId);
+    void publishVisitEvent(@NonNull String requestIp, @NonNull Integer sheetId);
 }

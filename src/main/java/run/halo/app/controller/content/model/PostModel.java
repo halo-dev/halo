@@ -72,7 +72,7 @@ public class PostModel {
         this.cacheStore = cacheStore;
     }
 
-    public String content(Post post, String token, Model model) {
+    public String content(String requestIp, Post post, String token, Model model) {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
             model.addAttribute("slug", post.getSlug());
@@ -94,7 +94,7 @@ public class PostModel {
             }
         }
 
-        postService.publishVisitEvent(post.getId());
+        postService.publishVisitEvent(requestIp, post.getId());
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
         adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
