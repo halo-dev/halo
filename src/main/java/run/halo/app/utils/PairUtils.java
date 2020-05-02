@@ -15,7 +15,10 @@ public class PairUtils<V, K> {
 
     private K last;
 
-    public PairUtils() {}
+    public PairUtils() {
+        this.first = null;
+        this.last  = null;
+    }
 
     public PairUtils(V first, K last) {
         this.first = first;
