@@ -111,7 +111,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRenameFile() throws IOException{
+    public void testRenameFile() throws IOException {
         // Create a temp folder
         Path tempDirectory = Files.createTempDirectory("halo-test");
 
@@ -138,7 +138,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRenameFolder() throws IOException{
+    public void testRenameFolder() throws IOException {
         // Create a temp folder
         Path tempDirectory = Files.createTempDirectory("halo-test");
 
@@ -160,7 +160,7 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testRenameRepeat() throws IOException{
+    public void testRenameRepeat() throws IOException {
         // Create a temp folder
         Path tempDirectory = Files.createTempDirectory("halo-test");
 
