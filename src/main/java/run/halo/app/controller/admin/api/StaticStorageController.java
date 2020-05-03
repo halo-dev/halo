@@ -49,4 +49,11 @@ public class StaticStorageController {
                        @RequestPart("file") MultipartFile file) {
         staticStorageService.upload(basePath, file);
     }
+
+    @PostMapping("rename")
+    @ApiOperation("Renames static file")
+    public void rename(String basePath,
+                       String newName) {
+        staticStorageService.rename(basePath, newName);
+    }
 }
