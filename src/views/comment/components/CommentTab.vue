@@ -415,7 +415,7 @@
           <a-input
             type="textarea"
             :autoSize="{ minRows: 8 }"
-            v-model="replyComment.content"
+            v-model.trim="replyComment.content"
           />
         </a-form-item>
       </a-form>
