@@ -93,7 +93,7 @@ public class PostModel {
                 post.setFormatContent(post.getOriginalContent());
             }
             // visit decrease 1
-            postService.increaseVisit(-1L, post.getId());
+            // postService.increaseVisit(-1L, post.getId());
         }
 
         postService.publishVisitEvent(post.getId());
