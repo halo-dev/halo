@@ -21,6 +21,7 @@ import run.halo.app.utils.FileUtils;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -167,6 +168,7 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
 
     @Override
     public void rename(String basePath, String newName) {
+        Assert.notNull(basePath, "Base path must not be null");
         Assert.notNull(newName, "New name must not be null");
 
         Path pathToRename;
@@ -179,12 +181,26 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
 
         try {
             FileUtils.rename(pathToRename, newName);
+            onChange();
         } catch (FileAlreadyExistsException e) {
             throw new FileOperationException("该路径下名称 " + newName + " 已存在");
         } catch (IOException e) {
             throw new FileOperationException("重命名 " + pathToRename.toString() + " 失败");
         }
 }
+
+    @Override
+    public void save(String basePath, String content) {
+        Assert.notNull(basePath, "Base path must not be null");
+
+        Path path = Paths.get(staticDir.toString(), basePath);
+
+        try {
+            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new ServiceException("保存内容失败 " + path, e);
+        }
+    }
 
     private void onChange() {
         eventPublisher.publishEvent(new StaticStorageChangedEvent(this, staticDir));

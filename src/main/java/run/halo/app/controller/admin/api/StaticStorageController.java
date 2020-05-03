@@ -7,6 +7,7 @@ import run.halo.app.model.support.StaticFile;
 import run.halo.app.service.StaticStorageService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Static storage controller.
@@ -55,5 +56,11 @@ public class StaticStorageController {
     public void rename(String basePath,
                        String newName) {
         staticStorageService.rename(basePath, newName);
+    }
+
+    @PutMapping("save")
+    @ApiOperation("Save static file")
+    public void save(@RequestBody Map<String, String> data) {
+        staticStorageService.save(data.get("basePath"), data.get("content"));
     }
 }
