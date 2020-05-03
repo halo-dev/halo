@@ -8,6 +8,7 @@ import run.halo.app.model.support.HaloConst;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -107,5 +108,91 @@ public class FileUtilsTest {
             String bufString = new String(buffer);
             log.debug("Buffer String: [{}]", bufString);
         }
+    }
+
+    @Test
+    public void testRenameFile() throws IOException{
+        // Create a temp folder
+        Path tempDirectory = Files.createTempDirectory("halo-test");
+
+        Path testPath = tempDirectory.resolve("test/test");
+        Path filePath = tempDirectory.resolve("test/test/test.file");
+
+        // Create a temp file and folder
+        Files.createDirectories(testPath);
+        Files.createFile(filePath);
+
+        // Write content to the temp file
+        String content = "Test Content!\n";
+        Files.write(filePath, content.getBytes());
+
+        // Rename temp file
+        FileUtils.rename(filePath, "newName");
+        Path newPath = filePath.resolveSibling("newName");
+
+        Assert.assertFalse(Files.exists(filePath));
+        Assert.assertTrue(Files.isRegularFile(newPath));
+        Assert.assertEquals(new String(Files.readAllBytes(newPath)), content);
+
+        FileUtils.deleteFolder(tempDirectory);
+    }
+
+    @Test
+    public void testRenameFolder() throws IOException{
+        // Create a temp folder
+        Path tempDirectory = Files.createTempDirectory("halo-test");
+
+        Path testPath = tempDirectory.resolve("test/test");
+        Path filePath = tempDirectory.resolve("test/test.file");
+
+        // Create a temp file and folder
+        Files.createDirectories(testPath);
+        Files.createFile(filePath);
+
+        // Rename temp folder
+        FileUtils.rename(tempDirectory.resolve("test"), "newName");
+        Path newPath = tempDirectory.resolve("newName");
+
+        Assert.assertTrue(Files.isDirectory(newPath));
+        Assert.assertTrue(Files.isRegularFile(newPath.resolve("test.file")));
+
+        FileUtils.deleteFolder(tempDirectory);
+    }
+
+    @Test
+    public void testRenameRepeat() throws IOException{
+        // Create a temp folder
+        Path tempDirectory = Files.createTempDirectory("halo-test");
+
+        Path testPathOne = tempDirectory.resolve("test/testOne");
+        Path testPathTwo = tempDirectory.resolve("test/testTwo");
+        Path filePathOne = tempDirectory.resolve("test/testOne.file");
+        Path filePathTwo = tempDirectory.resolve("test/testTwo.file");
+
+        // Create temp files and folders
+        Files.createDirectories(testPathOne);
+        Files.createDirectories(testPathTwo);
+        Files.createFile(filePathOne);
+        Files.createFile(filePathTwo);
+
+        try {
+            FileUtils.rename(testPathOne, "testTwo");
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof FileAlreadyExistsException);
+        }
+
+        try {
+            FileUtils.rename(filePathOne, "testTwo.file");
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof FileAlreadyExistsException);
+        }
+
+        try {
+            FileUtils.rename(filePathOne, "testOne");
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof FileAlreadyExistsException);
+        }
+
+        FileUtils.deleteFolder(tempDirectory);
     }
 }
