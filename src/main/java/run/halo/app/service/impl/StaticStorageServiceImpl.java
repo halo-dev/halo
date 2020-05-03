@@ -187,7 +187,7 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
         } catch (IOException e) {
             throw new FileOperationException("重命名 " + pathToRename.toString() + " 失败");
         }
-}
+    }
 
     @Override
     public void save(String basePath, String content) {
