@@ -189,9 +189,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     @Override
     @Transactional
     public void increaseVisit(long visits, Integer postId) {
-        Assert.isTrue(visits > 0, "Visits to increase must not be less than 1");
+        // allow -1 to decrease for visiting to drafts
+        Assert.isTrue(visits > 0 || visits == -1L, "Visits to increase must not be less than 1");
         Assert.notNull(postId, "Post id must not be null");
-
         long affectedRows = basePostRepository.updateVisit(visits, postId);
 
         if (affectedRows != 1) {

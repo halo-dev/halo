@@ -8,11 +8,13 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.utils.DateTimeUtils;
 import run.halo.app.utils.SlugUtils;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -95,6 +97,15 @@ public class PostParam implements InputConverter<Post> {
         if (null == editorType) {
             editorType = PostEditorType.MARKDOWN;
         }
+
+        LocalDateTime now = LocalDateTime.now();
+        Date nowDate = new Date(DateTimeUtils.toEpochMilli(now));
+        // 这里我注意到可以编辑发布的时间到未来的日期，但是好像并不支持“未来发布”
+        // if(nowDate.after(this.createTime)){
+        //    this.createTime=nowDate;
+        // }
+        // 如果实际上支持“未来发布”，那么应当注释掉下面这一行
+        this.createTime = nowDate;
 
         InputConverter.super.update(post);
     }
