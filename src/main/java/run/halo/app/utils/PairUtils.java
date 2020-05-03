@@ -1,14 +1,11 @@
 package run.halo.app.utils;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Pair utilities.
  *
  * @author KristenLawrence
  * @date 20-5-3
  */
-@Slf4j
 public class PairUtils<V, K> {
 
     private V first;

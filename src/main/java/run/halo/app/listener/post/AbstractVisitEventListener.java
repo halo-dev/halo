@@ -159,6 +159,11 @@ public abstract class AbstractVisitEventListener {
             this.ipMap = new ConcurrentHashMap<>(initCapacity << 1);
         }
 
+        /**
+         * Check if the ip address has already visited before
+         * @param ip ip address
+         * @return whether the ip visited before
+         */
         protected boolean checkIp(String ip) {
             if (this.ipMap.get(ip) == null) {
                 ipMap.put(ip, true);

@@ -72,6 +72,15 @@ public class PostModel {
         this.cacheStore = cacheStore;
     }
 
+    /**
+     * Post content.
+     *
+     * @param requestIp request ip address
+     * @param post post
+     * @param token token
+     * @param model model
+     * @return template name
+     */
     public String content(String requestIp, Post post, String token, Model model) {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
