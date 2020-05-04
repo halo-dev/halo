@@ -3,11 +3,11 @@ package run.halo.app.controller.admin.api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.model.params.StaticContentParam;
 import run.halo.app.model.support.StaticFile;
 import run.halo.app.service.StaticStorageService;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Static storage controller.
@@ -58,9 +58,9 @@ public class StaticStorageController {
         staticStorageService.rename(basePath, newName);
     }
 
-    @PutMapping("save")
+    @PutMapping("files")
     @ApiOperation("Save static file")
-    public void save(@RequestBody Map<String, String> data) {
-        staticStorageService.save(data.get("basePath"), data.get("content"));
+    public void save(@RequestBody StaticContentParam param) {
+        staticStorageService.save(param.getPath(), param.getContent());
     }
 }

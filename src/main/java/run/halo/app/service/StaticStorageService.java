@@ -62,8 +62,8 @@ public interface StaticStorageService {
     /**
      * Save static file.
      *
-     * @param basePath base path must not be null
+     * @param path path must not be null
      * @param content saved content
      */
-    void save(@NonNull String basePath, String content);
+    void save(@NonNull String path, String content);
 }

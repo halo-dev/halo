@@ -190,13 +190,21 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
     }
 
     @Override
-    public void save(String basePath, String content) {
-        Assert.notNull(basePath, "Base path must not be null");
+    public void save(String path, String content) {
+        Assert.notNull(path, "Path must not be null");
 
-        Path path = Paths.get(staticDir.toString(), basePath);
+        Path savePath = Paths.get(staticDir.toString(), path);
+
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), savePath.toString());
+
+        // check if file exist
+        if (!Files.isRegularFile(savePath)) {
+            throw new FileOperationException("路径 " + path + " 不合法");
+        }
 
         try {
-            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+            Files.write(savePath, content.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new ServiceException("保存内容失败 " + path, e);
         }

@@ -88,11 +88,11 @@ public class FileUtils {
         Assert.notNull(newName, "New name must not be null");
 
         Path newPath = pathToRename.resolveSibling(newName);
-        log.info("Rename [{}] to [{}]", pathToRename.toString(), newPath.toString());
+        log.info("Rename [{}] to [{}]", pathToRename, newPath);
 
         Files.move(pathToRename, newPath);
 
-        log.info("Rename [{}] successfully", pathToRename.toString());
+        log.info("Rename [{}] successfully", pathToRename);
     }
 
     /**
