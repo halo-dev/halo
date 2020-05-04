@@ -51,7 +51,19 @@ public class SheetModel {
     }
 
     /**
-     * Sheet content.
+     * Sheet content (without ip address).
+     *
+     * @param sheet sheet
+     * @param token token
+     * @param model model
+     * @return template name
+     */
+    public String content(Sheet sheet, String token, Model model) {
+        return content(null, sheet, token, model);
+    }
+
+    /**
+     * Sheet content (with ip address)
      *
      * @param requestIp request ip address
      * @param sheet sheet

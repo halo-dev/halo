@@ -18,4 +18,8 @@ public class SheetVisitEvent extends AbstractVisitEvent {
     public SheetVisitEvent(Object source, String requestIp, Integer sheetId) {
         super(source, requestIp, sheetId);
     }
+
+    public SheetVisitEvent(Object source, Integer sheetId) {
+        super(source, sheetId);
+    }
 }

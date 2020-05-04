@@ -126,10 +126,17 @@ public interface SheetService extends BasePostService<Sheet> {
     SheetDetailVO convertToDetailVo(@NonNull Sheet sheet);
 
     /**
-     * Publish a sheet visit event.
+     * Publish a sheet visit event (without ip address).
      *
-     * @param requestIp requestIp must not be null
      * @param sheetId sheetId must not be null
      */
-    void publishVisitEvent(@NonNull String requestIp, @NonNull Integer sheetId);
+    void publishVisitEvent(@NonNull Integer sheetId);
+
+    /**
+     * Publish a sheet visit event (with ip address).
+     *
+     * @param requestIp requestIp could be null
+     * @param sheetId sheetId must not be null
+     */
+    void publishVisitEvent(String requestIp, @NonNull Integer sheetId);
 }

@@ -114,6 +114,12 @@ public abstract class AbstractVisitEventListener {
 
         private IpRecorder ipRecorder;
 
+        private PostVisitTask(Integer id) {
+            this.id = id;
+            this.ip = null;
+            this.ipRecorder = null;
+        }
+
         private PostVisitTask(Integer id, String ip, IpRecorder ipRecorder) {
             this.id = id;
             this.ip = ip;
@@ -129,8 +135,8 @@ public abstract class AbstractVisitEventListener {
 
                     log.debug("Took a new visit for post id: [{}], from ip address [{}]", postId, ip);
 
-                    // If the ip is not null and hasn't appeared before, increase the visit
-                    if (ip != null && !ipRecorder.checkIp(this.ip)) {
+                    // If the ip and ipRecorder are not null and this ip hasn't appeared before, increase the visit
+                    if (ip != null && ipRecorder != null && !ipRecorder.checkIp(this.ip)) {
                         basePostService.increaseVisit(postId);
 
                         log.debug("Increased visits for post id: [{}], from ip address [{}]", postId, ip);

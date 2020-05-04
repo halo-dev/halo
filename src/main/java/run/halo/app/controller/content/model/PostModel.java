@@ -73,7 +73,19 @@ public class PostModel {
     }
 
     /**
-     * Post content.
+     * Post content (without ip address).
+     *
+     * @param post post
+     * @param token token
+     * @param model model
+     * @return template name
+     */
+    public String content(Post post, String token, Model model) {
+        return content(null, post, token, model);
+    }
+
+    /**
+     * Post content (with ip address).
      *
      * @param requestIp request ip address
      * @param post post

@@ -248,7 +248,14 @@ public interface PostService extends BasePostService<Post> {
     Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
 
     /**
-     * Publish a post visit event.
+     * Publish a post visit event (without ip address).
+     *
+     * @param postId postId must not be null
+     */
+    void publishVisitEvent(@NonNull Integer postId);
+
+    /**
+     * Publish a post visit event (with ip address).
      *
      * @param requestIp requestIp could be null (index)
      * @param postId postId must not be null

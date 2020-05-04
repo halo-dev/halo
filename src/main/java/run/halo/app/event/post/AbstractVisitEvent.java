@@ -32,6 +32,15 @@ public abstract class AbstractVisitEvent extends ApplicationEvent {
         this.requestIp = requestIp;
     }
 
+    public AbstractVisitEvent(@NonNull Object source, @NonNull Integer id) {
+        super(source);
+
+        Assert.notNull(id, "Id must not be null");
+        this.id = id;
+
+        this.requestIp = null;
+    }
+
     @NonNull
     public Integer getId() {
         return id;
