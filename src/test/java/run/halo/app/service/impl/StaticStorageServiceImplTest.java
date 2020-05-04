@@ -14,7 +14,7 @@ import run.halo.app.exception.ForbiddenException;
 import java.nio.file.Path;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = Application.class) //AccountPlatApplication 为启动类
+@SpringBootTest(classes = Application.class)
 public class StaticStorageServiceImplTest {
 
     @Autowired

@@ -3,7 +3,7 @@ package run.halo.app.model.params;
 import lombok.Data;
 
 /**
- * Theme content param.
+ * Static content param.
  *
  * @author Holldean
  * @date 2020-05-04
