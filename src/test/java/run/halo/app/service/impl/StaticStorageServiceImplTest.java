@@ -1,20 +1,16 @@
 package run.halo.app.service.impl;
 
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import run.halo.app.Application;
+import org.springframework.test.context.junit4.SpringRunner;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.ForbiddenException;
 
-import java.nio.file.Path;
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = Application.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class StaticStorageServiceImplTest {
 
     @Autowired
