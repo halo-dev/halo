@@ -406,6 +406,72 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     }
 
     @Override
+    @Transactional
+    public POST updateDisallowComment(Boolean disallowComment, Integer postId) {
+        Assert.notNull(disallowComment, "Post disallowComment must not be null");
+        Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
+
+        // Get post
+        POST post = getById(postId);
+
+        if (!disallowComment.equals(post.getDisallowComment())) {
+            // Update post
+            int updatedRows = basePostRepository.updateDisallowComment(disallowComment, postId);
+            if (updatedRows != 1) {
+                throw new ServiceException("Failed to update post disallowComment of post with id " + postId);
+            }
+
+            post.setDisallowComment(disallowComment);
+        }
+
+        return post;
+    }
+
+    @Override
+    @Transactional
+    public List<POST> updateDisallowCommentByIds(List<Integer> ids, Boolean disallowComment) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(id -> {
+            return updateDisallowComment(disallowComment, id);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public POST updateTopPriority(Integer topPriority, Integer postId) {
+        Assert.notNull(topPriority, "Post topPriority must not be null");
+        Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
+
+        // Get post
+        POST post = getById(postId);
+
+        if (!topPriority.equals(post.getTopPriority())) {
+            // Update post
+            int updatedRows = basePostRepository.updateTopPriority(topPriority, postId);
+            if (updatedRows != 1) {
+                throw new ServiceException("Failed to update post topPriority of post with id " + postId);
+            }
+
+            post.setTopPriority(topPriority);
+        }
+
+        return post;
+    }
+
+    @Override
+    @Transactional
+    public List<POST> updateTopPriorityByIds(List<Integer> ids, Integer topPriority) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(id -> {
+            return updateTopPriority(topPriority, id);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public List<BasePostDetailDTO> replaceUrl(String oldUrl, String newUrl) {
         List<POST> posts = listAll();
         List<POST> replaced = new ArrayList<>();

@@ -300,6 +300,46 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     List<POST> updateStatusByIds(@NonNull List<Integer> ids, @NonNull PostStatus status);
 
     /**
+     * Updates post disallowComment.
+     *
+     * @param disallowComment post disallowComment must not be null
+     * @param postId          post id must not be null
+     * @return updated post
+     */
+    @NonNull
+    POST updateDisallowComment(@NonNull Boolean disallowComment, @NonNull Integer postId);
+
+    /**
+     * Updates post disallowComment by ids.
+     *
+     * @param ids             post ids must not be null
+     * @param disallowComment post disallowComment must not be null
+     * @return updated posts
+     */
+    @NonNull
+    List<POST> updateDisallowCommentByIds(@NonNull List<Integer> ids, @NonNull Boolean disallowComment);
+
+    /**
+     * Updates post topPriority.
+     *
+     * @param topPriority post topPriority must not be null
+     * @param postId      post id must not be null
+     * @return updated post
+     */
+    @NonNull
+    POST updateTopPriority(@NonNull Integer topPriority, @NonNull Integer postId);
+
+    /**
+     * Updates post topPriority by ids.
+     *
+     * @param ids         post ids must not be null
+     * @param topPriority post topPriority must not be null
+     * @return updated posts
+     */
+    @NonNull
+    List<POST> updateTopPriorityByIds(@NonNull List<Integer> ids, @NonNull Integer topPriority);
+
+    /**
      * Replace post blog url in batch.
      *
      * @param oldUrl old blog url.

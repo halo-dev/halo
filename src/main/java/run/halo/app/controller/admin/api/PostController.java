@@ -139,6 +139,20 @@ public class PostController {
         return postService.updateStatusByIds(ids, status);
     }
 
+    @PutMapping("disallow_comment/{disallow_comment}")
+    @ApiOperation("Updates post disallowComment in batch")
+    public List<Post> updateDisallowCommentInBatch(@PathVariable(name = "disallow_comment") Boolean disallowComment,
+                                                   @RequestBody List<Integer> ids) {
+        return postService.updateDisallowCommentByIds(ids, disallowComment);
+    }
+
+    @PutMapping("top_priority/{top_priority}")
+    @ApiOperation("Updates post topPriority in batch")
+    public List<Post> updateTopPriorityInBatch(@PathVariable(name = "top_priority") Integer topPriority,
+                                               @RequestBody List<Integer> ids) {
+        return postService.updateTopPriorityByIds(ids, topPriority);
+    }
+
     @PutMapping("{postId:\\d+}/status/draft/content")
     @ApiOperation("Updates draft")
     public BasePostDetailDTO updateDraftBy(

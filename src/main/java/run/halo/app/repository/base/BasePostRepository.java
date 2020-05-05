@@ -189,6 +189,28 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     int updateStatus(@Param("status") @NonNull PostStatus status, @Param("postId") @NonNull Integer postId);
 
     /**
+     * Updates post disallowComment by post id.
+     *
+     * @param disallowComment post disallowComment must not be null.
+     * @param postId          post id must not be null.
+     * @return updated rows.
+     */
+    @Modifying
+    @Query("update BasePost p set p.disallowComment = :disallowComment where p.id = :postId")
+    int updateDisallowComment(@Param("disallowComment") @NonNull Boolean disallowComment, @Param("postId") @NonNull Integer postId);
+
+    /**
+     * Updates post topPriority by post id.
+     *
+     * @param topPriority post topPriority must not be null.
+     * @param postId      post id must not be null.
+     * @return updated rows.
+     */
+    @Modifying
+    @Query("update BasePost p set p.topPriority = :topPriority where p.id = :postId")
+    int updateTopPriority(@Param("topPriority") @NonNull Integer topPriority, @Param("postId") @NonNull Integer postId);
+
+    /**
      * Updates post format content by post id.
      *
      * @param formatContent format content must not be null.
