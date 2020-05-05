@@ -16,6 +16,7 @@ import run.halo.app.service.SheetMetaService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
+import run.halo.app.utils.ServletUtils;
 
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class SheetModel {
     }
 
     /**
-     * Sheet content (without ip address).
+     * Sheet content.
      *
      * @param sheet sheet
      * @param token token
@@ -59,19 +60,6 @@ public class SheetModel {
      * @return template name
      */
     public String content(Sheet sheet, String token, Model model) {
-        return content(null, sheet, token, model);
-    }
-
-    /**
-     * Sheet content (with ip address)
-     *
-     * @param requestIp request ip address
-     * @param sheet sheet
-     * @param token token
-     * @param model model
-     * @return template name
-     */
-    public String content(String requestIp, Sheet sheet, String token, Model model) {
 
         if (StringUtils.isEmpty(token)) {
             sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getSlug());
@@ -89,7 +77,7 @@ public class SheetModel {
             }
         }
 
-        sheetService.publishVisitEvent(requestIp, sheet.getId());
+        sheetService.publishVisitEvent(ServletUtils.getRequestIp(), sheet.getId());
 
         SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
 

@@ -13,7 +13,7 @@ public class PairTest {
 
     @Test
     public void getSetTest() {
-        PairUtils<Integer, String> pair = new PairUtils<>(100, "127.0.0.1");
+        Pair<Integer, String> pair = new Pair<>(100, "127.0.0.1");
 
         pair.setFirst(200);
         Assert.assertEquals(200, (int) pair.getFirst());
@@ -24,11 +24,19 @@ public class PairTest {
 
     @Test
     public void equalTest() {
-        PairUtils<Integer, String> pair1 = new PairUtils<>(100, "127.0.0.1");
-        PairUtils<Integer, String> pair2 = new PairUtils<>(100, "127.0.0.1");
+        Pair<Integer, String> pair1 = new Pair<>(100, "127.0.0.1");
+        Pair<Integer, String> pair2 = new Pair<>(100, "127.0.0.1");
 
         Assert.assertEquals(pair1.hashCode(), pair2.hashCode());
+        Assert.assertEquals(pair1, pair2);
+    }
 
+    @Test
+    public void nullTest() {
+        Pair<String, String> pair1 = new Pair<>(null, null);
+        Pair<String, String> pair2 = new Pair<>(null, null);
+
+        Assert.assertEquals(pair1.hashCode(), pair2.hashCode());
         Assert.assertEquals(pair1, pair2);
     }
 }

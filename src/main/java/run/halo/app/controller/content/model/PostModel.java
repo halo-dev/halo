@@ -21,6 +21,7 @@ import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
+import run.halo.app.utils.ServletUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,7 +74,7 @@ public class PostModel {
     }
 
     /**
-     * Post content (without ip address).
+     * Post content.
      *
      * @param post post
      * @param token token
@@ -81,19 +82,6 @@ public class PostModel {
      * @return template name
      */
     public String content(Post post, String token, Model model) {
-        return content(null, post, token, model);
-    }
-
-    /**
-     * Post content (with ip address).
-     *
-     * @param requestIp request ip address
-     * @param post post
-     * @param token token
-     * @param model model
-     * @return template name
-     */
-    public String content(String requestIp, Post post, String token, Model model) {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
             model.addAttribute("slug", post.getSlug());
@@ -115,7 +103,7 @@ public class PostModel {
             }
         }
 
-        postService.publishVisitEvent(requestIp, post.getId());
+        postService.publishVisitEvent(ServletUtils.getRequestIp(), post.getId());
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
         adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));

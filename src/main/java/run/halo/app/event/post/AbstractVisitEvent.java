@@ -2,6 +2,7 @@ package run.halo.app.event.post;
 
 import org.springframework.context.ApplicationEvent;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -17,13 +18,13 @@ public abstract class AbstractVisitEvent extends ApplicationEvent {
     private final String requestIp;
 
     /**
-     * Create a new ApplicationEvent.
+     * Create a new ApplicationEvent (with ip).
      *
      * @param source the object on which the event initially occurred (never {@code null})
      * @param requestIp the ip address of visitor, could be null (index)
-     * @param id     id
+     * @param id     id of post/sheet
      */
-    public AbstractVisitEvent(@NonNull Object source, String requestIp, @NonNull Integer id) {
+    public AbstractVisitEvent(@NonNull Object source, @Nullable String requestIp, @NonNull Integer id) {
         super(source);
 
         Assert.notNull(id, "Id must not be null");
@@ -32,6 +33,12 @@ public abstract class AbstractVisitEvent extends ApplicationEvent {
         this.requestIp = requestIp;
     }
 
+    /**
+     * Create a new ApplicationEvent (without ip).
+     *
+     * @param source the object on which the event initially occurred (never {@code null})
+     * @param id     id of post/sheet
+     */
     public AbstractVisitEvent(@NonNull Object source, @NonNull Integer id) {
         super(source);
 
@@ -46,6 +53,7 @@ public abstract class AbstractVisitEvent extends ApplicationEvent {
         return id;
     }
 
+    @Nullable
     public String getIp() {
         return requestIp;
     }

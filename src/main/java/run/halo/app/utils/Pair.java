@@ -1,23 +1,25 @@
 package run.halo.app.utils;
 
+import java.util.Objects;
+
 /**
- * Pair utilities.
+ * Pair class.
  *
  * @author KristenLawrence
  * @date 20-5-3
  */
-public class PairUtils<V, K> {
+public class Pair<V, K> {
 
     private V first;
 
     private K last;
 
-    public PairUtils() {
+    public Pair() {
         this.first = null;
         this.last  = null;
     }
 
-    public PairUtils(V first, K last) {
+    public Pair(V first, K last) {
         this.first = first;
         this.last = last;
     }
@@ -39,18 +41,16 @@ public class PairUtils<V, K> {
     }
 
     @Override
-    public int hashCode() {
-        return first.hashCode() + last.hashCode();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Pair<?, ?> pair = (Pair<?, ?>) o;
+        return Objects.equals(first, pair.first) &&
+            Objects.equals(last, pair.last);
     }
-    
+
     @Override
-    public boolean equals(Object object) {
-        if (!(object instanceof PairUtils)) {
-            return false;
-        }
-        
-        PairUtils<V, K> pair = (PairUtils<V,K>) object;
-        
-        return pair.first.equals(first) && pair.last.equals(last);
+    public int hashCode() {
+        return Objects.hash(first, last);
     }
 }

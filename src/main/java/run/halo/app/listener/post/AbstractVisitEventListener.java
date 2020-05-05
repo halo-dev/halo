@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import run.halo.app.event.post.AbstractVisitEvent;
 import run.halo.app.service.base.BasePostService;
-import run.halo.app.utils.PairUtils;
+import run.halo.app.utils.Pair;
 
 import java.util.Map;
 import java.util.concurrent.*;
@@ -21,7 +21,7 @@ public abstract class AbstractVisitEventListener {
 
     private final Map<Integer, BlockingQueue<Integer>> visitQueueMap;
 
-    private final Map<PairUtils<Integer, String>, PostVisitTask> visitTaskMap;
+    private final Map<Pair<Integer, String>, PostVisitTask> visitTaskMap;
 
     private final Map<Integer, IpRecorder> visitIpMap;
 
@@ -64,7 +64,7 @@ public abstract class AbstractVisitEventListener {
         // Get request ip address
         String ip = event.getIp();
 
-        PairUtils<Integer, String> pair = new PairUtils<>(id, ip);
+        Pair<Integer, String> pair = new Pair<>(id, ip);
         log.debug("Received a visit event, post id: [{}], request ip address: [{}]", id, ip);
 
         // Get post visit queue
@@ -79,7 +79,7 @@ public abstract class AbstractVisitEventListener {
     }
 
 
-    private PostVisitTask createPostVisitTask(PairUtils<Integer, String> pair) {
+    private PostVisitTask createPostVisitTask(Pair<Integer, String> pair) {
         int postId = pair.getFirst();
         String requestIp = pair.getLast();
 
@@ -136,7 +136,7 @@ public abstract class AbstractVisitEventListener {
                     log.debug("Took a new visit for post id: [{}], from ip address [{}]", postId, ip);
 
                     // If the ip and ipRecorder are not null and this ip hasn't appeared before, increase the visit
-                    if (ip != null && ipRecorder != null && !ipRecorder.checkIp(this.ip)) {
+                    if (ip != null && ipRecorder != null && !ipRecorder.putIp(this.ip)) {
                         basePostService.increaseVisit(postId);
 
                         log.debug("Increased visits for post id: [{}], from ip address [{}]", postId, ip);
@@ -168,9 +168,9 @@ public abstract class AbstractVisitEventListener {
         /**
          * Check if the ip address has already visited before
          * @param ip ip address
-         * @return whether the ip visited before
+         * @return whether successfully put the ip into ipMap
          */
-        protected boolean checkIp(String ip) {
+        protected boolean putIp(String ip) {
             if (this.ipMap.get(ip) == null) {
                 ipMap.put(ip, true);
                 return false;
