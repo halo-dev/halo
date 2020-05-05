@@ -96,6 +96,10 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
         Assert.notNull(relativePath, "Relative path must not be null");
 
         Path path = Paths.get(staticDir.toString(), relativePath);
+
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), path.toString());
+
         log.debug(path.toString());
 
         try {
@@ -126,6 +130,9 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
             path = Paths.get(staticDir.toString(), basePath, folderName);
         }
 
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), path.toString());
+
         if (path.toFile().exists()) {
             throw new FileOperationException("目录 " + path.toString() + " 已存在").setErrorData(path);
         }
@@ -153,6 +160,9 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
             uploadPath = Paths.get(staticDir.toString(), basePath, file.getOriginalFilename());
         }
 
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), uploadPath.toString());
+
         if (uploadPath.toFile().exists()) {
             throw new FileOperationException("文件 " + file.getOriginalFilename() + " 已存在").setErrorData(uploadPath);
         }
@@ -178,6 +188,9 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
         }
 
         pathToRename = Paths.get(staticDir.toString(), basePath);
+
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), pathToRename.toString());
 
         try {
             FileUtils.rename(pathToRename, newName);
