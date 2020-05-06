@@ -26,6 +26,7 @@ import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.params.PostSettingParam;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.*;
 import run.halo.app.repository.PostRepository;
@@ -162,6 +163,41 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             eventPublisher.publishEvent(logEvent);
         }
         return updatedPost;
+    }
+
+    @Override
+    public Post updateSettingBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds) {
+        update(postToUpdate, tagIds, categoryIds);
+        return postToUpdate;
+    }
+
+    @Override
+    public List<Post> updateSettingByIds(List<Integer> ids, PostSettingParam postSettingParam) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+
+        // if the value of setting is null, then use default setting
+        boolean disallowCommentDefault = postSettingParam.getDisallowComment() == null;
+        boolean topPriorityDefault = postSettingParam.getTopPriority() == null;
+        boolean passwordDefault = postSettingParam.getPassword() == null;
+
+        return ids.stream().map(id -> {
+            Post postToUpdate = getById(id);
+
+            if (disallowCommentDefault) {
+                postSettingParam.setDisallowComment(postToUpdate.getDisallowComment());
+            }
+            if (topPriorityDefault) {
+                postSettingParam.setTopPriority(postToUpdate.getTopPriority());
+            }
+            if (passwordDefault) {
+                postSettingParam.setPassword(postToUpdate.getPassword());
+            }
+            postSettingParam.update(postToUpdate);
+
+            return updateSettingBy(postToUpdate, postSettingParam.getTagIds(), postSettingParam.getCategoryIds());
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -783,6 +819,52 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Convert to post detail vo
         return convertTo(post, tags, categories, postMetaList);
+    }
+
+    private void update(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds) {
+        Assert.notNull(post, "Post must not be null");
+
+        // change status by password
+        if (StringUtils.isNotEmpty(post.getPassword())) {
+            post.setStatus(PostStatus.INTIMATE);
+        } else {
+            post.setStatus(PostStatus.PUBLISHED);
+        }
+
+        // Set edit time
+        post.setEditTime(DateUtils.now());
+
+        // update post
+        post = super.update(post);
+
+        // if not null, then update tags
+        if (tagIds != null) {
+            postTagService.removeByPostId(post.getId());
+
+            // List all tags
+            List<Tag> tags = tagService.listAllByIds(tagIds);
+
+            // Create post tags
+            List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(),
+                    ServiceUtils.fetchProperty(tags, Tag::getId));
+
+            log.debug("Created post tags: [{}]", postTags);
+        }
+
+        // if not null, then update categories
+        if (categoryIds != null) {
+            postCategoryService.removeByPostId(post.getId());
+
+            // List all categories
+            List<Category> categories = categoryService.listAllByIds(categoryIds);
+
+            // Create post categories
+            List<PostCategory> postCategories = postCategoryService
+                    .mergeOrCreateByIfAbsent(post.getId(),
+                            ServiceUtils.fetchProperty(categories, Category::getId));
+
+            log.debug("Created post categories: [{}]", postCategories);
+        }
     }
 
     @Override

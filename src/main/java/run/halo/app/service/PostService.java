@@ -8,6 +8,7 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.params.PostSettingParam;
 import run.halo.app.model.vo.*;
 import run.halo.app.service.base.BasePostService;
 
@@ -83,6 +84,27 @@ public interface PostService extends BasePostService<Post> {
      */
     @NonNull
     PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> metas, boolean autoSave);
+
+    /**
+     * Updates post by post setting param.
+     *
+     * @param postToUpdate post to update must not be null
+     * @param tagIds       tag id set
+     * @param categoryIds  category id set
+     * @return updated post
+     */
+    @NonNull
+    Post updateSettingBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds);
+
+    /**
+     * Updates posts by post ids and post setting param.
+     *
+     * @param ids              post of ids to update must not be null
+     * @param postSettingParam post setting param must not be null
+     * @return updated posts
+     */
+    @NonNull
+    List<Post> updateSettingByIds(List<Integer> ids, PostSettingParam postSettingParam);
 
     /**
      * Gets post by post status and slug.

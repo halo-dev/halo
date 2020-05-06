@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
@@ -16,6 +17,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
+import run.halo.app.model.params.PostSettingParam;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
@@ -24,8 +26,10 @@ import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -95,6 +99,18 @@ public class PostController {
         return postService.convertToDetailVo(post);
     }
 
+    @PostMapping("posts")
+    @ApiOperation("Gets posts by ids")
+    public List<PostDetailVO> getByIds(@RequestBody List<Integer> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(id -> {
+            Post post = postService.getById(id);
+            return postService.convertToDetailVo(post);
+        }).collect(Collectors.toList());
+    }
+
     @PutMapping("{postId:\\d+}/likes")
     @ApiOperation("Likes a post")
     public void likes(@PathVariable("postId") Integer postId) {
@@ -151,6 +167,12 @@ public class PostController {
     public List<Post> updateTopPriorityInBatch(@PathVariable(name = "top_priority") Integer topPriority,
                                                @RequestBody List<Integer> ids) {
         return postService.updateTopPriorityByIds(ids, topPriority);
+    }
+
+    @PutMapping("setting")
+    @ApiOperation("Updates post setting in batch")
+    public List<Post> updateSettingInBatch(@RequestBody PostSettingParam postSettingParam) {
+        return postService.updateSettingByIds(postSettingParam.getIds(), postSettingParam);
     }
 
     @PutMapping("{postId:\\d+}/status/draft/content")
