@@ -166,12 +166,14 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
+    @Transactional
     public Post updateSettingBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds) {
         update(postToUpdate, tagIds, categoryIds);
         return postToUpdate;
     }
 
     @Override
+    @Transactional
     public List<Post> updateSettingByIds(List<Integer> ids, PostSettingParam postSettingParam) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();

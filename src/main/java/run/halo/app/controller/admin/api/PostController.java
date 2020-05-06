@@ -99,9 +99,9 @@ public class PostController {
         return postService.convertToDetailVo(post);
     }
 
-    @PostMapping("posts")
+    @GetMapping("posts")
     @ApiOperation("Gets posts by ids")
-    public List<PostDetailVO> getByIds(@RequestBody List<Integer> ids) {
+    public List<PostDetailVO> getByIds(@RequestParam(name = "ids", required = true) List<Integer> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
