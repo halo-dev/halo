@@ -41,7 +41,7 @@ public class GitUtils {
 
     static final String releaseApiPattern="https://api.github.com/repos/%s/releases/latest";
 
-    static final String zipFile="tarball_url";
+    static final String zipFile="zipball_url";
 
     private GitUtils() {
         // Config packed git MMAP
@@ -99,9 +99,9 @@ public class GitUtils {
         }
     }
 
-    public static String getLastestRelease(@NonNull String repoUrl) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public static String getLastestRelease(@NonNull String uri) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate restTemplate=new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
-        String apiUrl=String.format(releaseApiPattern, StringUtils.removeStartIgnoreCase(repoUrl, prefix));
+        String apiUrl=String.format(releaseApiPattern, StringUtils.removeStartIgnoreCase(uri, prefix));
         ResponseEntity<Map> responseEntity = restTemplate.getForEntity(apiUrl, Map.class);
         Map<String, Object> map=(Map<String, Object>)responseEntity.getBody();
         return (String) map.get(zipFile);
@@ -127,14 +127,14 @@ public class GitUtils {
         return branches;
     }
 
-    public static String accessThemeProperty(@NonNull String repoUrl) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        return accessThemeProperty(repoUrl, "master");
+    public static String accessThemeProperty(@NonNull String uri) throws IOException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        return accessThemeProperty(uri, "master");
     }
 
-    public static String accessThemeProperty(@NonNull String repoUrl, @NonNull String branchName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
+    public static String accessThemeProperty(@NonNull String uri, @NonNull String branchName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
         RestTemplate restTemplate=new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
         for(String propertyPathName: ThemeService.THEME_PROPERTY_FILE_NAMES){
-            String apiUrl=String.format(contentApiPattern,StringUtils.removeStartIgnoreCase(repoUrl,prefix),propertyPathName, branchName);
+            String apiUrl=String.format(contentApiPattern,StringUtils.removeStartIgnoreCase(uri,prefix),propertyPathName, branchName);
             ResponseEntity<Map> responseEntity = restTemplate.getForEntity(apiUrl, Map.class);
             if (responseEntity.getStatusCode()== HttpStatus.OK){
                 Map<String,Object> map=(Map<String, Object>)responseEntity.getBody();

@@ -298,12 +298,28 @@ public interface ThemeService {
     @NonNull
     ThemeProperty fetch(@NonNull String uri);
 
+    /**
+     * Fetches the latest release
+     * @param uri theme remote uri must not be null
+     * @return theme property
+     */
     @NonNull
     ThemeProperty fetchLatestRelease(@NonNull String uri);
 
+    /**
+     * Fetches all the branches info(not download/clone)
+     * @param uri theme remote uri must not be null
+     * @return list of theme properties
+     */
     @NonNull
     List<ThemeProperty> fetchBranches(@NonNull String uri);
 
+    /**
+     * Fetches a specific branch (clone)
+     * @param uri
+     * @param branchName
+     * @return theme property
+     */
     @NonNull
     ThemeProperty fetchBranch(@NonNull String uri, @NonNull String branchName);
 

@@ -38,6 +38,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -583,11 +584,18 @@ public class ThemeServiceImpl implements ThemeService {
         try{
             tmpPath = FileUtils.createTempDirectory();
             Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
-            downloadZipAndUnzip(uri, themeTmpPath);
+            String zipUrl=GitUtils.getLastestRelease(uri);
+            downloadZipAndUnzip(zipUrl, themeTmpPath);
             return add(themeTmpPath);
         } catch (IOException e) {
             throw new ServiceException("主题拉取失败 " + uri, e);
-        }finally {
+        } catch (NoSuchAlgorithmException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        } catch (KeyStoreException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        } catch (KeyManagementException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        } finally {
             FileUtils.deleteFolderQuietly(tmpPath);
         }
     }
@@ -595,13 +603,14 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public List<ThemeProperty> fetchBranches(String uri){
         Assert.hasText(uri, "Theme remote uri must not be blank");
-        List<String> branches=GitUtils.getAllBranches(uri);
+        String repoUrl=StringUtils.appendIfMissingIgnoreCase(uri, ".git",".git");
+        List<String> branches=GitUtils.getAllBranches(repoUrl);
         List<ThemeProperty> themeProperties = new ArrayList<>();
         try {
             for (String branch : branches) {
                 String propertyContent = GitUtils.accessThemeProperty(uri, branch);
                 ThemeProperty themeProperty=themePropertyResolver.resolve(propertyContent);
-
+                themeProperty.setBranch(branch);
                 themeProperties.add(themeProperty);
             }
         } catch (IOException e) {
@@ -613,7 +622,7 @@ public class ThemeServiceImpl implements ThemeService {
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }
-        return null;
+        return themeProperties;
     }
 
     @Override
@@ -803,7 +812,6 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         log.debug("Downloaded [{}]", zipUrl);
-
         // Unzip it
         FileUtils.unzip(downloadResponse.getBody(), targetPath);
     }
