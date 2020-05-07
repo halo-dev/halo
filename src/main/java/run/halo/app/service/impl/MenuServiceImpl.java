@@ -13,6 +13,7 @@ import run.halo.app.model.vo.MenuTeamVO;
 import run.halo.app.model.vo.MenuVO;
 import run.halo.app.repository.MenuRepository;
 import run.halo.app.service.MenuService;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
@@ -30,9 +31,12 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
 
     private final MenuRepository menuRepository;
 
-    public MenuServiceImpl(MenuRepository menuRepository) {
+    private final OptionService optionService;
+
+    public MenuServiceImpl(MenuRepository menuRepository, OptionService optionService) {
         super(menuRepository);
         this.menuRepository = menuRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -211,8 +215,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         }
 
         return menus.stream()
-            .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
-            .collect(Collectors.toList());
+                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+                .collect(Collectors.toList());
     }
 
     private void nameMustNotExist(@NonNull Menu menu) {
@@ -231,5 +235,26 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         if (exist) {
             throw new AlreadyExistsException("菜单 " + menu.getName() + " 已存在");
         }
+    }
+
+    @Override
+    public List<Menu> listAll() {
+        List<Menu> list = super.listAll();
+        list.forEach(menu -> {
+            StringBuilder fullPath = new StringBuilder();
+            if (optionService.isEnabledAbsolutePath()) {
+                String blogBaseUrl = optionService.getBlogBaseUrl();
+                String contextPath = blogBaseUrl.substring(blogBaseUrl.indexOf("//") + 2);
+                if (contextPath.indexOf("/") != -1) {
+                    contextPath = contextPath.substring(contextPath.indexOf("/"));
+                } else {
+                    contextPath = "";
+                }
+                fullPath.append(contextPath);
+            }
+            fullPath.append(menu.getUrl());
+            menu.setUrl(fullPath.toString());
+        });
+        return list;
     }
 }
