@@ -45,8 +45,6 @@ import static run.halo.app.utils.HaloUtils.*;
  */
 @Slf4j
 @Configuration
-@ComponentScan(basePackages = "run.halo.app.controller")
-@PropertySource(value = "classpath:application.yaml", ignoreResourceNotFound = true, encoding = "UTF-8")
 public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
 
     private static final String FILE_PROTOCOL = "file:///";
