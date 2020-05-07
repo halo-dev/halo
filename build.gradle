@@ -52,7 +52,7 @@ processResources {
 }
 
 ext {
-    hutoolVersion =  "5.3.2"
+    hutoolVersion =  "5.3.3"
     upyunSdkVersion =  "4.2.0"
     qiniuSdkVersion =  "7.2.28"
     aliyunSdkVersion =  "3.9.1"
