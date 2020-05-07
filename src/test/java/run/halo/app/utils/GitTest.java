@@ -7,15 +7,15 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 /**
@@ -78,6 +78,24 @@ public class GitTest {
         git.pull().call();
         git.clean().call();
         git.close();
+    }
+
+    @Test
+    public void getAllBranchesTest() {
+        List<String> branches=GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
+        Assert.assertNotNull(branches);
+    }
+
+    @Test
+    public void getLatestReleaseTest() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        String zipUri = GitUtils.getLastestRelease("https://github.com/halo-dev/halo-theme-hux");
+        Assert.assertNotNull(zipUri);
+    }
+
+    @Test
+    public void accessThemePropertyTest() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
+        String themeProperty = GitUtils.accessThemeProperty("https://github.com/halo-dev/halo-theme-hux");
+        Assert.assertNotNull(themeProperty);
     }
 
     private Git cloneRepository() throws GitAPIException {

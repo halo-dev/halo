@@ -298,6 +298,15 @@ public interface ThemeService {
     @NonNull
     ThemeProperty fetch(@NonNull String uri);
 
+    @NonNull
+    ThemeProperty fetchLatestRelease(@NonNull String uri);
+
+    @NonNull
+    List<ThemeProperty> fetchBranches(@NonNull String uri);
+
+    @NonNull
+    ThemeProperty fetchBranch(@NonNull String uri, @NonNull String branchName);
+
     /**
      * Reloads themes
      */

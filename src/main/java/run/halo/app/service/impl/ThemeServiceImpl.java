@@ -44,6 +44,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -542,6 +545,75 @@ public class ThemeServiceImpl implements ThemeService {
         } finally {
             FileUtils.deleteFolderQuietly(tmpPath);
         }
+    }
+
+    @Override
+    public ThemeProperty fetchBranch(String uri, String branchName){
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+
+        Path tmpPath = null;
+
+        try {
+            // Create temp path
+            tmpPath = FileUtils.createTempDirectory();
+            // Create temp path
+            Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
+
+            if (StringUtils.endsWithIgnoreCase(uri, ".zip")) {
+                downloadZipAndUnzip(uri, themeTmpPath);
+            } else {
+                uri = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
+                // Clone from git
+                GitUtils.cloneFromGit(uri, themeTmpPath, branchName);
+            }
+
+            return add(themeTmpPath);
+        } catch (IOException | GitAPIException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        } finally {
+            FileUtils.deleteFolderQuietly(tmpPath);
+        }
+    }
+
+    @Override
+    public ThemeProperty fetchLatestRelease(@NonNull String uri){
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+
+        Path tmpPath = null;
+        try{
+            tmpPath = FileUtils.createTempDirectory();
+            Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
+            downloadZipAndUnzip(uri, themeTmpPath);
+            return add(themeTmpPath);
+        } catch (IOException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        }finally {
+            FileUtils.deleteFolderQuietly(tmpPath);
+        }
+    }
+
+    @Override
+    public List<ThemeProperty> fetchBranches(String uri){
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+        List<String> branches=GitUtils.getAllBranches(uri);
+        List<ThemeProperty> themeProperties = new ArrayList<>();
+        try {
+            for (String branch : branches) {
+                String propertyContent = GitUtils.accessThemeProperty(uri, branch);
+                ThemeProperty themeProperty=themePropertyResolver.resolve(propertyContent);
+
+                themeProperties.add(themeProperty);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
