@@ -9,10 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
-import run.halo.app.model.entity.Category;
-import run.halo.app.model.entity.Post;
-import run.halo.app.model.entity.PostMeta;
-import run.halo.app.model.entity.Tag;
+import run.halo.app.model.entity.*;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
@@ -20,6 +17,7 @@ import run.halo.app.model.vo.AdjacentPostVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
+import run.halo.app.service.impl.PostVisitIpServiceImpl;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServletUtils;
 
@@ -61,7 +59,8 @@ public class PostModel {
                      PostTagService postTagService,
                      TagService tagService,
                      OptionService optionService,
-                     AbstractStringCacheStore cacheStore) {
+                     AbstractStringCacheStore cacheStore,
+                     PostVisitIpServiceImpl postVisitIpService) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;

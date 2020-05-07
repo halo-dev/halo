@@ -23,18 +23,14 @@ public abstract class AbstractVisitEventListener {
 
     private final Map<Pair<Integer, String>, PostVisitTask> visitTaskMap;
 
-    private final Map<Integer, IpRecorder> visitIpMap;
-
     private final BasePostService basePostService;
 
     private final ExecutorService executor;
 
-    private int initCapacity;
-
     protected AbstractVisitEventListener(BasePostService basePostService) {
         this.basePostService = basePostService;
 
-        this.initCapacity = 8;
+        int initCapacity = 8;
 
         long count = basePostService.count();
 
@@ -44,7 +40,6 @@ public abstract class AbstractVisitEventListener {
 
         visitQueueMap = new ConcurrentHashMap<>(initCapacity << 1);
         visitTaskMap = new ConcurrentHashMap<>(initCapacity << 1);
-        visitIpMap = new ConcurrentHashMap<>(initCapacity << 1);
 
         this.executor = Executors.newCachedThreadPool();
     }
@@ -70,8 +65,6 @@ public abstract class AbstractVisitEventListener {
         // Get post visit queue
         BlockingQueue<Integer> postVisitQueue = visitQueueMap.computeIfAbsent(id, this::createEmptyQueue);
 
-        visitIpMap.computeIfAbsent(id, this::createIpMap);
-
         visitTaskMap.computeIfAbsent(pair, this::createPostVisitTask);
 
         // Put a visit for the post
@@ -84,7 +77,7 @@ public abstract class AbstractVisitEventListener {
         String requestIp = pair.getLast();
 
         // Create new post visit task
-        PostVisitTask postVisitTask = new PostVisitTask(postId, requestIp, this.visitIpMap.get(postId));
+        PostVisitTask postVisitTask = new PostVisitTask(postId, requestIp);
         // Start a post visit task
         executor.execute(postVisitTask);
 
@@ -97,10 +90,14 @@ public abstract class AbstractVisitEventListener {
         return new LinkedBlockingQueue<>();
     }
 
-    private IpRecorder createIpMap(Integer postId) {
-        // Create a new IpRecorder
-        return new IpRecorder(postId, this.initCapacity);
-    }
+    /**
+     * Check ip record by post id and request ip.
+     *
+     * @param postId post id
+     * @param requestIp request ip
+     * @return whether ip has appeared previously
+     */
+    abstract boolean checkIpRecord(Integer postId, String requestIp);
 
 
     /**
@@ -112,18 +109,9 @@ public abstract class AbstractVisitEventListener {
 
         private final String ip;
 
-        private IpRecorder ipRecorder;
-
-        private PostVisitTask(Integer id) {
-            this.id = id;
-            this.ip = null;
-            this.ipRecorder = null;
-        }
-
-        private PostVisitTask(Integer id, String ip, IpRecorder ipRecorder) {
+        private PostVisitTask(Integer id, String ip) {
             this.id = id;
             this.ip = ip;
-            this.ipRecorder = ipRecorder;
         }
 
         @Override
@@ -135,8 +123,9 @@ public abstract class AbstractVisitEventListener {
 
                     log.debug("Took a new visit for post id: [{}], from ip address [{}]", postId, ip);
 
-                    // If the ip and ipRecorder are not null and this ip hasn't appeared before, increase the visit
-                    if (ip != null && ipRecorder != null && !ipRecorder.putIp(this.ip)) {
+                    // If the ip is not null and this ip hasn't appeared before, increase the visit
+                    if (this.ip != null && !checkIpRecord(postId, this.ip)) {
+
                         basePostService.increaseVisit(postId);
 
                         log.debug("Increased visits for post id: [{}], from ip address [{}]", postId, ip);
@@ -148,35 +137,6 @@ public abstract class AbstractVisitEventListener {
             }
 
             log.debug("Thread: [{}] has been interrupted", Thread.currentThread().getName());
-        }
-    }
-
-    /**
-     *  Ip recorder
-     */
-    private class IpRecorder {
-
-        private final Integer id;
-
-        private final Map<String, Boolean> ipMap;
-
-        private IpRecorder(int id, int initCapacity) {
-            this.id = id;
-            this.ipMap = new ConcurrentHashMap<>(initCapacity << 1);
-        }
-
-        /**
-         * Check if the ip address has already visited before
-         * @param ip ip address
-         * @return whether successfully put the ip into ipMap
-         */
-        protected boolean putIp(String ip) {
-            if (this.ipMap.get(ip) == null) {
-                ipMap.put(ip, true);
-                return false;
-            } else {
-                return true;
-            }
         }
     }
 }
