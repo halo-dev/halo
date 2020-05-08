@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.conn.HttpHostConnectException;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
