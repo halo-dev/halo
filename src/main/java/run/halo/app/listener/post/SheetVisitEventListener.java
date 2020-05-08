@@ -38,7 +38,7 @@ public class SheetVisitEventListener extends AbstractVisitEventListener {
      * @return whether ip has appeared previously
      */
     @Override
-    boolean checkIpRecord(Integer sheetId, String requestIp) {
+    public boolean checkIpRecord(Integer sheetId, String requestIp) {
         boolean appeared = sheetVisitIpService.checkIpRecordByPostIdAndIp(sheetId, requestIp);
         if (!appeared) {
             SheetVisitIp visitIp = new SheetVisitIp();

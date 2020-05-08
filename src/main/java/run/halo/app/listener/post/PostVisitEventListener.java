@@ -38,7 +38,7 @@ public class PostVisitEventListener extends AbstractVisitEventListener {
      * @return whether ip has appeared previously
      */
     @Override
-    boolean checkIpRecord(Integer postId, String requestIp) {
+    public boolean checkIpRecord(Integer postId, String requestIp) {
         boolean appeared = postVisitIpService.checkIpRecordByPostIdAndIp(postId, requestIp);
         if (!appeared) {
             PostVisitIp visitIp = new PostVisitIp();
