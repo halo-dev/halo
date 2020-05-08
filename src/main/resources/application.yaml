@@ -25,11 +25,11 @@ spring:
       settings:
         web-allow-others: false
       path: /h2-console
-      enabled: true
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     open-in-view: false
   flyway:
     enabled: false
@@ -46,7 +46,7 @@ management:
         include: ['httptrace', 'metrics','env','logfile','health']
 logging:
   level:
-    run.halo.app: DEBUG
+    run.halo.app: INFO
   file:
     path: \${user.home}/.halo/logs
 
