@@ -102,12 +102,12 @@ public interface ThemeService {
     /**
      * Branch file name
      */
-    String BRANCH_FILE="branch.txt";
+    String BRANCH_FILE = "branch.txt";
 
     /**
      * Key to access the tag name which is in the http response
      */
-    String TAG_KEY="tag_name";
+    String TAG_KEY = "tag_name";
 
     /**
      * Get theme property by theme id.

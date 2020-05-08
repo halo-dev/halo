@@ -1,16 +1,13 @@
 package run.halo.app.utils;
 
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +20,6 @@ import run.halo.app.service.ThemeService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -38,11 +34,11 @@ import java.util.*;
 @Slf4j
 public class GitUtils {
 
-    static final String prefix="https://github.com/";
+    static final String PREFIX = "https://github.com/";
 
-    static final String contentApiPattern="https://api.github.com/repos/%s/contents/%s?ref=%s";
+    static final String CONTENTAPIPATTERN = "https://api.github.com/repos/%s/contents/%s?ref=%s";
 
-    static final String releaseApiPattern="https://api.github.com/repos/%s/releases/latest";
+    static final String RELEASEAPIPATTERN = "https://api.github.com/repos/%s/releases/latest";
 
     private GitUtils() {
         // Config packed git MMAP
@@ -88,35 +84,35 @@ public class GitUtils {
         Assert.notNull(targetPath, "Target path must not be null");
 
         Git git = null;
-        try{
+        try {
             git = Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(targetPath.toFile())
-                    .setBranchesToClone(Arrays.asList("refs/heads/"+branchName))
-                    .setBranch("refs/heads/"+branchName)
+                    .setBranchesToClone(Arrays.asList("refs/heads/" + branchName))
+                    .setBranch("refs/heads/" + branchName)
                     .call();
-        }finally {
+        } finally {
             closeQuietly(git);
         }
     }
 
     public static Map<String, Object> getLastestRelease(@NonNull String uri) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        RestTemplate restTemplate=new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
-        String apiUrl=String.format(releaseApiPattern, StringUtils.removeStartIgnoreCase(uri, prefix));
+        RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
+        String apiUrl = String.format(RELEASEAPIPATTERN, StringUtils.removeStartIgnoreCase(uri, PREFIX));
         ResponseEntity<Map> responseEntity = restTemplate.getForEntity(apiUrl, Map.class);
-        Map<String, Object> map=(Map<String, Object>)responseEntity.getBody();
+        Map<String, Object> map = (Map<String, Object>)responseEntity.getBody();
         return map;
     }
 
     public static List<String> getAllBranches(@NonNull String repoUrl) {
-        List<String> branches=new ArrayList<String>();
-        try{
+        List<String> branches = new ArrayList<String>();
+        try {
             Collection<Ref> refs = Git.lsRemoteRepository()
                     .setHeads(true)
                     .setRemote(repoUrl)
                     .call();
-            for (Ref ref : refs){
-                branches.add(ref.getName().substring(ref.getName().lastIndexOf("/")+1, ref.getName().length()));
+            for (Ref ref : refs) {
+                branches.add(ref.getName().substring(ref.getName().lastIndexOf("/") + 1, ref.getName().length()));
             }
         } catch (InvalidRemoteException e) {
             log.warn("Git url is not valid");
@@ -133,14 +129,14 @@ public class GitUtils {
     }
 
     public static String accessThemeProperty(@NonNull String uri, @NonNull String branchName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        RestTemplate restTemplate=new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
-        for(String propertyPathName: ThemeService.THEME_PROPERTY_FILE_NAMES){
-            String apiUrl=String.format(contentApiPattern,StringUtils.removeStartIgnoreCase(uri,prefix),propertyPathName, branchName);
+        RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
+        for (String propertyPathName: ThemeService.THEME_PROPERTY_FILE_NAMES) {
+            String apiUrl = String.format(CONTENTAPIPATTERN,StringUtils.removeStartIgnoreCase(uri,PREFIX),propertyPathName, branchName);
             ResponseEntity<Map> responseEntity = restTemplate.getForEntity(apiUrl, Map.class);
-            if (responseEntity.getStatusCode()== HttpStatus.OK){
-                Map<String,Object> map=(Map<String, Object>)responseEntity.getBody();
-                String encodedContent=(String) map.get("content");
-                Base64.Decoder decoder=Base64.getDecoder();
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                Map<String,Object> map = (Map<String, Object>)responseEntity.getBody();
+                String encodedContent = (String) map.get("content");
+                Base64.Decoder decoder = Base64.getDecoder();
                 return new String(decoder.decode(encodedContent.replaceAll("\r|\n","")),StandardCharsets.UTF_8);
             }
         }

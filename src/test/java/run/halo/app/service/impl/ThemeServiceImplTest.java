@@ -3,6 +3,7 @@ package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ public class ThemeServiceImplTest {
     private ThemeServiceImpl themeService;
 
     @Test
+    @Ignore
     public void fetch(){
         ThemeProperty themeProperty = themeService.fetch("https://github.com/halo-dev/halo-theme-pinghsu");
         Assert.assertNotNull(themeProperty);
@@ -38,18 +40,21 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchBranchTest(){
         ThemeProperty themeProperty = themeService.fetchBranch("https://github.com/halo-dev/halo-theme-casper", "master");
         Assert.assertNotNull(themeProperty);
     }
 
     @Test
+    @Ignore
     public void fetchLatestReleaseTest(){
         ThemeProperty themeProperty = themeService.fetchLatestRelease("https://github.com/halo-dev/halo-theme-next");
         Assert.assertNotNull(themeProperty);
     }
 
     @Test
+    @Ignore
     public void updateTest(){
         ThemeProperty themeProperty = themeService.update("caicai_anatole");
         Assert.assertNotNull(themeProperty);

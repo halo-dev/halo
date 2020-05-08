@@ -9,7 +9,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.RemoteConfig;
@@ -39,8 +38,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -551,7 +548,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public ThemeProperty fetchBranch(String uri, String branchName){
+    public ThemeProperty fetchBranch(String uri, String branchName) {
         Assert.hasText(uri, "Theme remote uri must not be blank");
 
         Path tmpPath = null;
@@ -574,14 +571,14 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public ThemeProperty fetchLatestRelease(@NonNull String uri){
+    public ThemeProperty fetchLatestRelease(@NonNull String uri) {
         Assert.hasText(uri, "Theme remote uri must not be blank");
 
         Path tmpPath = null;
-        try{
+        try {
             tmpPath = FileUtils.createTempDirectory();
             Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
-            String zipUrl= (String) GitUtils.getLastestRelease(uri).get(ZIP_FILE_KEY);
+            String zipUrl = (String) GitUtils.getLastestRelease(uri).get(ZIP_FILE_KEY);
             downloadZipAndUnzip(zipUrl, themeTmpPath);
             return add(themeTmpPath);
         } catch (IOException e) {
@@ -598,15 +595,15 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public List<ThemeProperty> fetchBranches(String uri){
+    public List<ThemeProperty> fetchBranches(String uri) {
         Assert.hasText(uri, "Theme remote uri must not be blank");
-        String repoUrl=StringUtils.appendIfMissingIgnoreCase(uri, ".git",".git");
-        List<String> branches=GitUtils.getAllBranches(repoUrl);
+        String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git",".git");
+        List<String> branches = GitUtils.getAllBranches(repoUrl);
         List<ThemeProperty> themeProperties = new ArrayList<>();
         try {
             for (String branch : branches) {
                 String propertyContent = GitUtils.accessThemeProperty(uri, branch);
-                ThemeProperty themeProperty=themePropertyResolver.resolve(propertyContent);
+                ThemeProperty themeProperty = themePropertyResolver.resolve(propertyContent);
                 themeProperty.setBranch(branch);
                 themeProperties.add(themeProperty);
             }
@@ -638,7 +635,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         } catch (ThemeNotSupportException e) {
             throw (ThemeNotSupportException) e;
-        }catch (ThemeUpdateException e){
+        } catch (ThemeUpdateException e) {
             throw new ThemeUpdateException("主题更新失败！您与主题作者可能同时更改了同一个文件，您也可以尝试删除主题并重新拉取最新的主题", e).setErrorData(themeId);
         } catch (IOException e) {
             e.printStackTrace();

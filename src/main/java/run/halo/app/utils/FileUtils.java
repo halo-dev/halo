@@ -114,16 +114,16 @@ public class FileUtils {
 
             zipEntry = zis.getNextEntry();
         }
-        File targetDir=targetPath.toFile();
-        List<File> files= Arrays.asList(targetDir.listFiles());
+        File targetDir = targetPath.toFile();
+        List<File> files = Arrays.asList(targetDir.listFiles());
         // if zip file has root file
-        if (files.size()==1 && files.get(0).isDirectory()){
-            String rootPath=files.get(0).toPath().toString();
-            String rootFile=rootPath.substring(rootPath.lastIndexOf("/", rootPath.length()-1)+1,rootPath.length());
-            List<File> propertyFiles= Arrays.asList(files.get(0).listFiles());
-            for (File propertyFile : propertyFiles){
-                String filePath=propertyFile.toPath().toString();
-                String destPath=filePath.replace(rootFile, "");
+        if (files.size() == 1 && files.get(0).isDirectory()) {
+            String rootPath = files.get(0).toPath().toString();
+            String rootFile = rootPath.substring(rootPath.lastIndexOf("/", rootPath.length() - 1) + 1,rootPath.length());
+            List<File> propertyFiles = Arrays.asList(files.get(0).listFiles());
+            for (File propertyFile : propertyFiles) {
+                String filePath = propertyFile.toPath().toString();
+                String destPath = filePath.replace(rootFile, "");
                 Files.copy(propertyFile.toPath(), Paths.get(destPath));
             }
         }
