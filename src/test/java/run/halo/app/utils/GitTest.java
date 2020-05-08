@@ -83,11 +83,8 @@ public class GitTest {
 
     @Test
     public void getAllBranchesTest() {
-        List<String> branches=GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
+        List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
         Assert.assertNotNull(branches);
-        for (String branch: branches){
-            System.out.println(branch);
-        }
     }
 
     @Test

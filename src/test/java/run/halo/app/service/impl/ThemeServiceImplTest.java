@@ -25,37 +25,34 @@ public class ThemeServiceImplTest {
 
     @Test
     @Ignore
-    public void fetch(){
+    public void fetch() {
         ThemeProperty themeProperty = themeService.fetch("https://github.com/halo-dev/halo-theme-pinghsu");
         Assert.assertNotNull(themeProperty);
     }
 
     @Test
-    public void fetchBranchesTest(){
+    public void fetchBranchesTest() {
         List<ThemeProperty> themeProperties = themeService.fetchBranches("https://github.com/halo-dev/halo-theme-hux");
         Assert.assertNotNull(themeProperties);
-        for (ThemeProperty themeProperty: themeProperties){
-            System.out.println(themeProperty);
-        }
     }
 
     @Test
     @Ignore
-    public void fetchBranchTest(){
+    public void fetchBranchTest() {
         ThemeProperty themeProperty = themeService.fetchBranch("https://github.com/halo-dev/halo-theme-casper", "master");
         Assert.assertNotNull(themeProperty);
     }
 
     @Test
     @Ignore
-    public void fetchLatestReleaseTest(){
+    public void fetchLatestReleaseTest() {
         ThemeProperty themeProperty = themeService.fetchLatestRelease("https://github.com/halo-dev/halo-theme-next");
         Assert.assertNotNull(themeProperty);
     }
 
     @Test
     @Ignore
-    public void updateTest(){
+    public void updateTest() {
         ThemeProperty themeProperty = themeService.update("caicai_anatole");
         Assert.assertNotNull(themeProperty);
     }
