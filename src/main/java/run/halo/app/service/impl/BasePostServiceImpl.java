@@ -192,9 +192,16 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.isTrue(visits > 0, "Visits to increase must not be less than 1");
         Assert.notNull(postId, "Post id must not be null");
 
-        long affectedRows = basePostRepository.updateVisit(visits, postId);
+        boolean finishedIncrease;
+        if (basePostRepository.getByIdAndStatus(postId, PostStatus.DRAFT).isPresent())
+        {
+            finishedIncrease = true;
+            log.info("Post with id: [{}] is a draft and visits will not be updated", postId);
+        } else {
+            finishedIncrease = basePostRepository.updateVisit(visits, postId) == 1;
+        }
 
-        if (affectedRows != 1) {
+        if (!finishedIncrease) {
             log.error("Post with id: [{}] may not be found", postId);
             throw new BadRequestException("Failed to increase visits " + visits + " for post with id " + postId);
         }
