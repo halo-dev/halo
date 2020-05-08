@@ -3,6 +3,7 @@ package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.conn.HttpHostConnectException;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -46,6 +47,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchZipTest() throws IOException {
         ThemeProperty themeProperty = themeService.fetch("https://github.com/halo-dev/halo-theme-anatole/archive/master.zip");
         Assert.assertNotNull(themeProperty);
@@ -58,6 +60,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchBranchesWithValidURL() {
         List<ThemeProperty> themeProperties = themeService.fetchBranches("https://github.com/halo-dev/halo-theme-hux");
         Assert.assertNotNull(themeProperties);
@@ -65,14 +68,17 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchBranchesWithInvalidURL() {
         List<ThemeProperty> themeProperties = themeService.fetchBranches("https://github.com/halo-dev/halo-theme");
         Assert.assertNotNull(themeProperties);
         Assert.assertEquals(themeProperties.size(), 0);
+
     }
 
 
     @Test
+    @Ignore
     public void fetchBranchTest() throws IOException {
         ThemeProperty themeProperty = themeService.fetchBranch("https://github.com/halo-dev/halo-theme-casper", "master");
         Assert.assertNotNull(themeProperty);
@@ -85,6 +91,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchBranchNotMasterTest() throws IOException {
         String uri = "https://github.com/halo-dev/halo-theme-casper";
         List<String> branches = GitUtils.getAllBranches(uri);
@@ -102,6 +109,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchLatestReleaseTest() throws IOException {
         ThemeProperty themeProperty = themeService.fetchLatestRelease("https://github.com/halo-dev/halo-theme-next");
         Assert.assertNotNull(themeProperty);
@@ -114,6 +122,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchLatestReleaseWithInvalidURL() {
         try {
             ThemeProperty themeProperty = themeService.fetchLatestRelease("123");
@@ -123,6 +132,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void updateTest() {
         Set<ThemeProperty> set = themeService.getThemes();
         if (set.size() > 0) {
@@ -136,6 +146,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void updateWithInvalidId() {
         Set<ThemeProperty> set = themeService.getThemes();
         String themeId = HaloUtils.randomUUIDWithoutDash();
