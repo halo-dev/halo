@@ -23,6 +23,12 @@ public class ThemeServiceImplTest {
     private ThemeServiceImpl themeService;
 
     @Test
+    public void fetch(){
+        ThemeProperty themeProperty = themeService.fetch("https://github.com/halo-dev/halo-theme-pinghsu");
+        Assert.assertNotNull(themeProperty);
+    }
+
+    @Test
     public void fetchBranchesTest(){
         List<ThemeProperty> themeProperties = themeService.fetchBranches("https://github.com/halo-dev/halo-theme-hux");
         Assert.assertNotNull(themeProperties);
@@ -43,5 +49,9 @@ public class ThemeServiceImplTest {
         Assert.assertNotNull(themeProperty);
     }
 
-
+    @Test
+    public void updateTest(){
+        ThemeProperty themeProperty = themeService.update("caicai_anatole");
+        Assert.assertNotNull(themeProperty);
+    }
 }

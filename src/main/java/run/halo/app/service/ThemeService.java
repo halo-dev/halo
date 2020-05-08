@@ -87,12 +87,27 @@ public interface ThemeService {
     /**
      * Theme provider remote name.
      */
-    String THEME_PROVIDER_REMOTE_NAME = "theme-provider";
+    String THEME_PROVIDER_REMOTE_NAME = "origin";
 
     /**
      * Default remote branch name.
      */
     String DEFAULT_REMOTE_BRANCH = "master";
+
+    /**
+     * Key to access the zip file url which is in the http response
+     */
+    String ZIP_FILE_KEY = "zipball_url";
+
+    /**
+     * Branch file name
+     */
+    String BRANCH_FILE="branch.txt";
+
+    /**
+     * Key to access the tag name which is in the http response
+     */
+    String TAG_KEY="tag_name";
 
     /**
      * Get theme property by theme id.

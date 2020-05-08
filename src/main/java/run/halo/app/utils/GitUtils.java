@@ -4,11 +4,13 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import run.halo.app.service.ThemeService;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -40,8 +43,6 @@ public class GitUtils {
     static final String contentApiPattern="https://api.github.com/repos/%s/contents/%s?ref=%s";
 
     static final String releaseApiPattern="https://api.github.com/repos/%s/releases/latest";
-
-    static final String zipFile="zipball_url";
 
     private GitUtils() {
         // Config packed git MMAP
@@ -99,12 +100,12 @@ public class GitUtils {
         }
     }
 
-    public static String getLastestRelease(@NonNull String uri) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    public static Map<String, Object> getLastestRelease(@NonNull String uri) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate restTemplate=new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
         String apiUrl=String.format(releaseApiPattern, StringUtils.removeStartIgnoreCase(uri, prefix));
         ResponseEntity<Map> responseEntity = restTemplate.getForEntity(apiUrl, Map.class);
         Map<String, Object> map=(Map<String, Object>)responseEntity.getBody();
-        return (String) map.get(zipFile);
+        return map;
     }
 
     public static List<String> getAllBranches(@NonNull String repoUrl) {

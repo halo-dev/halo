@@ -17,6 +17,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Git test.
@@ -91,8 +92,8 @@ public class GitTest {
 
     @Test
     public void getLatestReleaseTest() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        String zipUri = GitUtils.getLastestRelease("https://github.com/halo-dev/halo-theme-hux");
-        Assert.assertNotNull(zipUri);
+        Map<String, Object> map = GitUtils.getLastestRelease("https://github.com/halo-dev/halo-theme-hux");
+        Assert.assertNotNull(map);
     }
 
     @Test
