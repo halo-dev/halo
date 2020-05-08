@@ -85,6 +85,14 @@ public class GitTest {
     public void getAllBranchesTest() {
         List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
         Assert.assertNotNull(branches);
+        Assert.assertNotEquals(branches.size(), 0);
+    }
+
+    @Test
+    public void getAllBranchesWithInvalidURL() {
+        List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme.git");
+        Assert.assertNotNull(branches);
+        Assert.assertEquals(branches.size(), 0);
     }
 
     @Test
@@ -94,9 +102,27 @@ public class GitTest {
     }
 
     @Test
+    public void getLatestReleaseWithInvalidURL() {
+        try {
+            Map<String, Object> map = GitUtils.getLastestRelease("https://github.com/halo-dev/halo-theme");
+            Assert.fail("Exception expected");
+        } catch (Exception e) {
+        }
+    }
+
+    @Test
     public void accessThemePropertyTest() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
         String themeProperty = GitUtils.accessThemeProperty("https://github.com/halo-dev/halo-theme-hux");
         Assert.assertNotNull(themeProperty);
+    }
+
+    @Test
+    public void accessThemePropertyWithInvalidURL() {
+        try {
+            String themeProperty = GitUtils.accessThemeProperty("https://github.com/halo-dev/halo-theme");
+            Assert.fail("Exception expected");
+        } catch (Exception e) {
+        }
     }
 
     private Git cloneRepository() throws GitAPIException {
