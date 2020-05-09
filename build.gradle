@@ -142,4 +142,10 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
+<<<<<<< Updated upstream
 }
+=======
+
+    compile 'com.maxmind.geoip2:geoip2:2.10.0'
+}
+>>>>>>> Stashed changes

@@ -1,13 +1,27 @@
 package run.halo.app.listener.post;
 
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
+import com.maxmind.geoip2.record.Country;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import run.halo.app.event.post.AbstractVisitEvent;
 import run.halo.app.service.base.BasePostService;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Abstract visit event listener.
@@ -41,6 +55,64 @@ public abstract class AbstractVisitEventListener {
         visitTaskMap = new ConcurrentHashMap<>(initCapacity << 1);
 
         this.executor = Executors.newCachedThreadPool();
+    }
+
+    private String findIp() {
+
+        String ip = "";
+        String chinaz = "http://ip.chinaz.com";
+
+        StringBuilder inputLine = new StringBuilder();
+        String read = "";
+        URL url = null;
+        HttpURLConnection urlConnection = null;
+        BufferedReader in = null;
+        try {
+            url = new URL(chinaz);
+            urlConnection = (HttpURLConnection) url.openConnection();
+            in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
+            while ((read = in.readLine()) != null) {
+                inputLine.append(read + "\r\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
+        Pattern p = Pattern.compile("\\<dd class\\=\"fz24\">(.*?)\\<\\/dd>");
+        Matcher m = p.matcher(inputLine.toString());
+        if (m.find()) {
+            String ipstr = m.group(1);
+            ip = ipstr;
+        }
+        return ip;
+    }
+
+    private String findDistrict(String ip) {
+        DatabaseReader reader;
+        File database =  new File("C:\\Users\\84167\\Documents\\GitHub\\halo\\src\\GeoLite2-City.mmdb"); // 附件下载百度云地址https://pan.baidu.com/s/1ENqTeCoMIWJMbh88nYU5gg
+        Country country = null;
+        City city = null;
+        try {
+            reader = new DatabaseReader.Builder(database).build();
+            InetAddress ipAddress = InetAddress.getByName(ip);
+            CityResponse response = reader.city(ipAddress);
+            country = response.getCountry();
+            city = response.getCity();
+        } catch (IOException | GeoIp2Exception e) {
+            e.printStackTrace();
+        }
+        assert country != null;
+        String countryName = country.getName();
+        return city.getName();
     }
 
     /**
@@ -105,6 +177,15 @@ public abstract class AbstractVisitEventListener {
 
                     // Increase the visit
                     basePostService.increaseVisit(postId);
+<<<<<<< Updated upstream
+=======
+                    Visit visit = new Visit();
+                    visit.setPostId(postId);
+                    visit.setVisitId(visitId);
+                    visit.setVisitorDistrict(findDistrict(findIp()));
+                    visitService.create(visit);
+                    visitId += 1;
+>>>>>>> Stashed changes
 
                     log.debug("Increased visits for post id: [{}]", postId);
                 } catch (InterruptedException e) {
