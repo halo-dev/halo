@@ -79,6 +79,7 @@ public class PostModel {
             return "common/template/post_password";
         }
 
+        boolean isDraft = false;
         if (StringUtils.isEmpty(token)) {
             post = postService.getBy(PostStatus.PUBLISHED, post.getSlug());
         } else {
@@ -92,11 +93,12 @@ public class PostModel {
             } else {
                 post.setFormatContent(post.getOriginalContent());
             }
-            // visit decrease 1
-            // postService.increaseVisit(-1L, post.getId());
+            isDraft = true;
         }
 
-        postService.publishVisitEvent(post.getId());
+        if (!isDraft) {
+            postService.publishVisitEvent(post.getId());
+        }
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
         adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
