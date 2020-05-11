@@ -40,14 +40,10 @@ configurations {
 }
 
 
-springBoot {
-    buildInfo()
-}
-
-// gradle 的 Property Expansion 的占位符 ${..} 与 springboot 的占位符 冲突， springboot 的需要转义 \${..}
-processResources {
-    filesMatching("application.yaml") {
-        expand(project.properties)
+bootJar {
+    manifest {
+        attributes("Implementation-Title": "Halo Application",
+                "Implementation-Version": archiveVersion)
     }
 }
 
