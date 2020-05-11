@@ -3,7 +3,6 @@ package run.halo.app.handler.migrate.support.wordpress;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import run.halo.app.handler.migrate.utils.PropertyMappingTo;
-import run.halo.app.model.entity.BasePost;
 
 import java.util.List;
 

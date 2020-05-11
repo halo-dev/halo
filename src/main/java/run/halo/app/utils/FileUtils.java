@@ -78,6 +78,24 @@ public class FileUtils {
     }
 
     /**
+     * Renames file or folder.
+     *
+     * @param pathToRename file path to rename must not be null
+     * @param newName new name must not be null
+     */
+    public static void rename(@NonNull Path pathToRename, @NonNull String newName) throws IOException {
+        Assert.notNull(pathToRename, "File path to rename must not be null");
+        Assert.notNull(newName, "New name must not be null");
+
+        Path newPath = pathToRename.resolveSibling(newName);
+        log.info("Rename [{}] to [{}]", pathToRename, newPath);
+
+        Files.move(pathToRename, newPath);
+
+        log.info("Rename [{}] successfully", pathToRename);
+    }
+
+    /**
      * Unzips content to the target path.
      *
      * @param zis        zip input stream must not be null
