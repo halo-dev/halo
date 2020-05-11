@@ -12,7 +12,7 @@
         >上传</a-button>
         <a-button
           icon="plus"
-          @click="() => (createFolderModal = true)"
+          @click="handleShowCreateFolderModal({})"
         >
           新建文件夹
         </a-button>
@@ -39,7 +39,7 @@
             slot-scope="name"
           >
             <ellipsis
-              length="64"
+              :length="64"
               tooltip
             >
               {{ name }}
@@ -91,6 +91,23 @@
                     <a href="javascript:;">删除</a>
                   </a-popconfirm>
                 </a-menu-item>
+                <a-menu-item
+                  key="3"
+                >
+                  <a
+                    href="javascript:;"
+                    @click="handleShowRenameModal(record)"
+                  >重命名</a>
+                </a-menu-item>
+                <a-menu-item
+                  key="4"
+                  v-if="record.isFile"
+                >
+                  <a
+                    href="javascript:;"
+                    @click="handleShowEditModal(record)"
+                  >编辑</a>
+                </a-menu-item>
               </a-menu>
             </a-dropdown>
           </span>
@@ -126,17 +143,78 @@
       <a-form layout="vertical">
         <a-form-item label="文件夹名：">
           <a-input
+            ref="createFoldeInput"
             v-model="createFolderName"
             @keyup.enter="handleCreateFolder"
           />
         </a-form-item>
       </a-form>
     </a-modal>
+    <a-modal
+      v-model="renameModal"
+      :afterClose="onRenameClose"
+      title="重命名"
+    >
+      <template slot="footer">
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleRename()"
+        >重命名</a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item :label="renameFile?'文件名：':'文件夹名：'">
+          <a-input
+            ref="renameModalInput"
+            v-model="renameName"
+            @keyup.enter="handleRename"
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
+    <a-modal
+      v-model="editModal"
+      title="编辑文件"
+      width="80%"
+      style="max-width: 1000px"
+      :maskClosable="false"
+      :keyboard="false"
+      :closable="false"
+    >
+      <template slot="footer">
+        <a-popconfirm
+          title="未保存的内容将会丢失，确定要退出吗？"
+          okText="确定"
+          cancelText="取消"
+          @confirm="handleEditClose"
+        >
+          <a-button>取消</a-button>
+        </a-popconfirm>
+        <a-button
+          key="submit"
+          type="primary"
+          @click="handleEditSave()"
+        >保存</a-button>
+      </template>
+      <a-form layout="vertical">
+        <a-form-item>
+          <codemirror
+            ref="editor"
+            :value="editContent"
+            :options="codemirrorOptions"
+          ></codemirror>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 <script>
+import Vue from 'vue'
 import { mapGetters } from 'vuex'
 import staticApi from '@/api/static'
+import { codemirror } from 'vue-codemirror-lite'
+const context = require.context('codemirror/mode', true, /\.js$/)
+context.keys().map(context)
 const columns = [
   {
     title: '文件名',
@@ -162,6 +240,9 @@ const columns = [
   }
 ]
 export default {
+  components: {
+    codemirror
+  },
   name: 'StaticStorage',
   data() {
     return {
@@ -172,11 +253,24 @@ export default {
       uploadVisible: false,
       selectedFile: {},
       createFolderModal: false,
-      createFolderName: ''
+      createFolderName: '',
+      renameModal: false,
+      renameName: '',
+      renameFile: false,
+      codemirrorOptions: {
+        tabSize: 4,
+        lineNumbers: true,
+        line: true
+      },
+      editModal: false,
+      editContent: '',
+      CodeMirror: null
     }
   },
   created() {
     this.loadStaticList()
+    this.CodeMirror = require('codemirror')
+    this.CodeMirror.modeURL = 'codemirror/mode/%N/%N.js'
   },
   computed: {
     ...mapGetters(['options']),
@@ -208,6 +302,49 @@ export default {
     handleShowCreateFolderModal(file) {
       this.selectedFile = file
       this.createFolderModal = true
+      const that = this
+      Vue.nextTick()
+        .then(() => {
+          that.$refs.createFoldeInput.focus()
+        })
+    },
+    handleShowRenameModal(file) {
+      this.selectedFile = file
+      this.renameName = file.name
+      this.renameFile = file.isFile
+      this.renameModal = true
+      const that = this
+      Vue.nextTick()
+        .then(() => {
+          const inputRef = that.$refs.renameModalInput
+          const tmp = inputRef.value.split('.')
+          inputRef.focus()
+          if (tmp.length <= 1) {
+            inputRef.$el.setSelectionRange(0, inputRef.value.length)
+          } else {
+            inputRef.$el.setSelectionRange(0, inputRef.value.length - tmp.pop().length - 1)
+          }
+        })
+    },
+    handleShowEditModal(file) {
+      this.selectedFile = file
+      const arr = file.name.split('.')
+      const postfix = arr[arr.length - 1]
+      staticApi.getContent(this.options.blog_url + file.relativePath).then(response => {
+        this.editContent = response.data
+        const info = this.CodeMirror.findModeByExtension(postfix)
+        if (info === undefined) {
+          this.$message.error(`不支持编辑 "${postfix}" 类型的文件`)
+        } else {
+          this.editModal = true
+          Vue.nextTick()
+            .then(() => {
+              const editor = this.$refs.editor.editor
+              editor.setOption('mode', info.mime)
+              this.CodeMirror.autoLoadMode(editor, info.mode)
+            })
+        }
+      })
     },
     handleCreateFolder() {
       staticApi.createFolder(this.selectedFile.relativePath, this.createFolderName).then(response => {
@@ -216,14 +353,36 @@ export default {
         this.loadStaticList()
       })
     },
+    handleRename() {
+      staticApi.rename(this.selectedFile.relativePath, this.renameName).then(response => {
+        this.$message.success(`重命名成功！`)
+        this.renameModal = false
+        this.loadStaticList()
+      })
+    },
+    handleEditSave() {
+      staticApi.save(this.selectedFile.relativePath, this.$refs.editor.editor.getValue()).then(response => {
+        this.$message.success(`文件保存成功！`)
+        this.editModal = false
+      })
+    },
     onCreateFolderClose() {
       this.selectedFile = {}
       this.createFolderName = ''
+    },
+    onRenameClose() {
+      this.selectedFile = {}
+      this.renameName = ''
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
       this.selectedFile = {}
       this.loadStaticList()
+    },
+    handleEditClose() {
+      this.editModal = false
+      this.selectedFile = {}
+      this.editContent = ''
     }
   }
 }

@@ -46,4 +46,33 @@ staticApi.upload = (formData, uploadProgress, cancelToken, basePath) => {
   })
 }
 
+staticApi.rename = (basePath, newName) => {
+  return service({
+    url: `${baseUrl}/rename`,
+    params: {
+      basePath: basePath,
+      newName: newName
+    },
+    method: 'post'
+  })
+}
+
+staticApi.getContent = url => {
+  return service({
+    url: `${url}`,
+    method: 'get'
+  })
+}
+
+staticApi.save = (path, content) => {
+  return service({
+    url: `${baseUrl}/files`,
+    data: {
+      path: path,
+      content: content
+    },
+    method: 'put'
+  })
+}
+
 export default staticApi
