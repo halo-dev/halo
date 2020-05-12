@@ -40,19 +40,15 @@ configurations {
 }
 
 
-springBoot {
-    buildInfo()
-}
-
-// gradle 的 Property Expansion 的占位符 ${..} 与 springboot 的占位符 冲突， springboot 的需要转义 \${..}
-processResources {
-    filesMatching("application.yaml") {
-        expand(project.properties)
+bootJar {
+    manifest {
+        attributes("Implementation-Title": "Halo Application",
+                "Implementation-Version": archiveVersion)
     }
 }
 
 ext {
-    hutoolVersion =  "5.3.2"
+    hutoolVersion =  "5.3.3"
     upyunSdkVersion =  "4.2.0"
     qiniuSdkVersion =  "7.2.28"
     aliyunSdkVersion =  "3.9.1"
@@ -63,7 +59,7 @@ ext {
     httpclientVersion =  "4.5.12"
     dataformatYamlVersion =  "2.11.0"
     jgitVersion =  "5.7.0.202003110725-r"
-    flexmarkVersion =  "0.61.24"
+    flexmarkVersion =  "0.61.26"
     thumbnailatorVersion =  "0.4.11"
     image4jVersion =  "0.7zensight1"
     flywayVersion =  "6.4.1"
@@ -72,7 +68,7 @@ ext {
     jsonVersion =  "20190722"
     fastJsonVersion =  "1.2.68"
     annotationsVersion = "3.0.1u2"
-    jedisVersion= '3.2.0'
+    jedisVersion= '3.3.0'
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
 }
