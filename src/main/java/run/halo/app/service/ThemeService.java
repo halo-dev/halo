@@ -100,11 +100,6 @@ public interface ThemeService {
     String ZIP_FILE_KEY = "zipball_url";
 
     /**
-     * Branch file name
-     */
-    String BRANCH_FILE = "branch.txt";
-
-    /**
      * Key to access the tag name which is in the http response
      */
     String TAG_KEY = "tag_name";

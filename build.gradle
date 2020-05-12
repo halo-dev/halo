@@ -75,9 +75,11 @@ ext {
     jedisVersion= '3.3.0'
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
+    githubApiVersion = "1.84"
 }
 
 dependencies {
+    implementation "org.kohsuke:github-api:$githubApiVersion"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"

@@ -13,11 +13,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Git test.
@@ -93,39 +89,6 @@ public class GitTest {
         List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme.git");
         Assert.assertNotNull(branches);
         Assert.assertEquals(branches.size(), 0);
-    }
-
-    @Test
-    @Ignore
-    public void getLatestReleaseTest() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        Map<String, Object> map = GitUtils.getLastestRelease("https://github.com/halo-dev/halo-theme-hux");
-        Assert.assertNotNull(map);
-    }
-
-    @Test
-    public void getLatestReleaseWithInvalidURL() {
-        try {
-            Map<String, Object> map = GitUtils.getLastestRelease("https://github.com/halo-dev/halo-theme");
-            Assert.fail("Exception expected");
-        } catch (Exception e) {
-        }
-    }
-
-    @Test
-    @Ignore
-    public void accessThemePropertyTest() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException {
-        String themeProperty = GitUtils.accessThemeProperty("https://github.com/halo-dev/halo-theme-hux");
-        Assert.assertNotNull(themeProperty);
-    }
-
-    @Test
-    @Ignore
-    public void accessThemePropertyWithInvalidURL() {
-        try {
-            String themeProperty = GitUtils.accessThemeProperty("https://github.com/halo-dev/halo-theme");
-            Assert.fail("Exception expected");
-        } catch (Exception e) {
-        }
     }
 
     private Git cloneRepository() throws GitAPIException {

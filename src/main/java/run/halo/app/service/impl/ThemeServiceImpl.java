@@ -577,17 +577,21 @@ public class ThemeServiceImpl implements ThemeService {
         Path tmpPath = null;
         try {
             tmpPath = FileUtils.createTempDirectory();
+
             Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
-            String zipUrl = (String) GitUtils.getLastestRelease(uri).get(ZIP_FILE_KEY);
+
+            Map<String, Object> releaseInfo = GithubUtils.getLatestRelease(uri);
+
+            if (releaseInfo == null) {
+                throw new ServiceException("主题拉取失败" + uri);
+            }
+
+            String zipUrl = (String) releaseInfo.get(ZIP_FILE_KEY);
+
             downloadZipAndUnzip(zipUrl, themeTmpPath);
+
             return add(themeTmpPath);
         } catch (IOException e) {
-            throw new ServiceException("主题拉取失败 " + uri, e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new ServiceException("主题拉取失败 " + uri, e);
-        } catch (KeyStoreException e) {
-            throw new ServiceException("主题拉取失败 " + uri, e);
-        } catch (KeyManagementException e) {
             throw new ServiceException("主题拉取失败 " + uri, e);
         } finally {
             FileUtils.deleteFolderQuietly(tmpPath);
@@ -597,24 +601,28 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public List<ThemeProperty> fetchBranches(String uri) {
         Assert.hasText(uri, "Theme remote uri must not be blank");
+
         String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git",".git");
         List<String> branches = GitUtils.getAllBranches(repoUrl);
+
         List<ThemeProperty> themeProperties = new ArrayList<>();
+
         try {
             for (String branch : branches) {
-                String propertyContent = GitUtils.accessThemeProperty(uri, branch);
+                String propertyContent = GithubUtils.accessThemeProperty(uri, branch);
+
+                if (propertyContent == null) {
+                    continue;
+                }
+
                 ThemeProperty themeProperty = themePropertyResolver.resolve(propertyContent);
+
                 themeProperty.setBranch(branch);
+
                 themeProperties.add(themeProperty);
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
+            throw new ServiceException("分支信息拉取失败");
         }
         return themeProperties;
     }
@@ -633,22 +641,11 @@ public class ThemeServiceImpl implements ThemeService {
         try {
             pullFromGit(updatingTheme);
 
-        } catch (ThemeNotSupportException e) {
-            throw (ThemeNotSupportException) e;
-        } catch (ThemeUpdateException e) {
+        } catch (Exception e) {
+            if (e instanceof ThemeNotSupportException) {
+                throw (ThemeNotSupportException) e;
+            }
             throw new ThemeUpdateException("主题更新失败！您与主题作者可能同时更改了同一个文件，您也可以尝试删除主题并重新拉取最新的主题", e).setErrorData(themeId);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
         }
 
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
@@ -789,7 +786,7 @@ public class ThemeServiceImpl implements ThemeService {
                 throw new ThemeUpdateException("拉取失败！您与主题作者可能同时更改了同一个文件");
             }
 
-            String latestTagName = (String) GitUtils.getLastestRelease(themeProperty.getRepo()).get(TAG_KEY);
+            String latestTagName = (String) GithubUtils.getLatestRelease(themeProperty.getRepo()).get(TAG_KEY);
             git.checkout().setName(latestTagName).call();
 
             // updated successfully.
