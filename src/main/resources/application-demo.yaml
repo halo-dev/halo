@@ -62,9 +62,4 @@ halo:
   auth-enabled: true
   mode: demo
   workDir: ${user.home}/halo-demo/
-  cache: level
-# use redis as cache to support halo deployment
-#  cache: redis
-#  cache-redis-nodes: ['127.0.0.1:6380', '127.0.0.1:6379']
-#  cache-redis-password: 123456
-#
+  cache: memory
