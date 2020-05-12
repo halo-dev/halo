@@ -32,6 +32,7 @@ public class ThemeServiceImplTest {
     private ThemeServiceImpl themeService;
 
     @Test
+    @Ignore
     public void fetchGitTest() throws IOException {
         ThemeProperty themeProperty = themeService.fetch("https://github.com/halo-dev/halo-theme-pinghsu");
         Assert.assertNotNull(themeProperty);
@@ -45,6 +46,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchZipTest() throws IOException {
         ThemeProperty themeProperty = themeService.fetch("https://github.com/halo-dev/halo-theme-pinghsu/archive/master.zip");
         Assert.assertNotNull(themeProperty);
@@ -71,6 +73,7 @@ public class ThemeServiceImplTest {
 
 
     @Test
+    @Ignore
     public void fetchBranchTest() throws IOException {
         ThemeProperty themeProperty = themeService.fetchBranch("https://github.com/halo-dev/halo-theme-casper", "master");
         Assert.assertNotNull(themeProperty);
@@ -83,6 +86,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchBranchNotMasterTest() throws IOException {
         String uri = "https://github.com/halo-dev/halo-theme-casper";
         List<String> branches = GitUtils.getAllBranches(uri);
@@ -100,6 +104,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchLatestReleaseTest() throws IOException {
         ThemeProperty themeProperty = themeService.fetchLatestRelease("https://github.com/halo-dev/halo-theme-casper");
         Assert.assertNotNull(themeProperty);
@@ -112,6 +117,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void fetchLatestReleaseWithInvalidURL() {
         try {
             ThemeProperty themeProperty = themeService.fetchLatestRelease("123");
@@ -121,6 +127,7 @@ public class ThemeServiceImplTest {
     }
 
     @Test
+    @Ignore
     public void updateTest() {
         Set<ThemeProperty> set = themeService.getThemes();
         if (set.size() > 0) {
