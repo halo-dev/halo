@@ -48,7 +48,7 @@ bootJar {
 }
 
 ext {
-    hutoolVersion =  "5.3.3"
+    hutoolVersion =  "5.3.5"
     upyunSdkVersion =  "4.2.0"
     qiniuSdkVersion =  "7.2.28"
     aliyunSdkVersion =  "3.9.1"
