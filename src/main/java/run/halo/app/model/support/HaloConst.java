@@ -131,15 +131,13 @@ public class HaloConst {
     public final static String ONE_TIME_TOKEN_QUERY_NAME = "ott";
     public final static String ONE_TIME_TOKEN_HEADER_NAME = "ott";
     /**
-     * Database product name.
-     */
-    public static String DATABASE_PRODUCT_NAME = null;
-
-    /**
      * Version constant. (Available in production environment)
      */
     public static final String HALO_VERSION;
-
+    /**
+     * Database product name.
+     */
+    public static String DATABASE_PRODUCT_NAME = null;
     /**
      * user_session
      */

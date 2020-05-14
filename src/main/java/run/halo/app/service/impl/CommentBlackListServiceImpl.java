@@ -59,10 +59,10 @@ public class CommentBlackListServiceImpl extends AbstractCrudService<CommentBlac
             return CommentViolationTypeEnum.FREQUENTLY;
         } else if (isPresent) {
             CommentBlackList commentBlackList = CommentBlackList
-                    .builder()
-                    .banTime(getBanTime(now, banTime))
-                    .ipAddress(ipAddress)
-                    .build();
+                .builder()
+                .banTime(getBanTime(now, banTime))
+                .ipAddress(ipAddress)
+                .build();
             super.create(commentBlackList);
             return CommentViolationTypeEnum.FREQUENTLY;
         }
@@ -73,7 +73,7 @@ public class CommentBlackListServiceImpl extends AbstractCrudService<CommentBlac
         blackList.setBanTime(getBanTime(localDateTime, banTime));
         int updateResult = commentBlackListRepository.updateByIpAddress(blackList);
         Optional.of(updateResult)
-                .filter(result -> result <= 0).ifPresent(result -> log.error("更新评论封禁时间失败"));
+            .filter(result -> result <= 0).ifPresent(result -> log.error("更新评论封禁时间失败"));
     }
 
     private Date getBanTime(LocalDateTime localDateTime, Integer banTime) {

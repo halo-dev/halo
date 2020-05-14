@@ -45,11 +45,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipInputStream;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 
@@ -64,27 +64,19 @@ import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 public class ThemeServiceImpl implements ThemeService {
 
     /**
-     * Theme work directory.
-     */
-    private final Path themeWorkDir;
-
-    private final OptionService optionService;
-
-    private final AbstractStringCacheStore cacheStore;
-
-    private final ThemeConfigResolver themeConfigResolver;
-
-    private final ThemePropertyResolver themePropertyResolver;
-
-    private final RestTemplate restTemplate;
-
-    private final ApplicationEventPublisher eventPublisher;
-
-    /**
      * in seconds.
      */
     protected static final long ACTIVATED_THEME_SYNC_INTERVAL = 5;
-
+    /**
+     * Theme work directory.
+     */
+    private final Path themeWorkDir;
+    private final OptionService optionService;
+    private final AbstractStringCacheStore cacheStore;
+    private final ThemeConfigResolver themeConfigResolver;
+    private final ThemePropertyResolver themePropertyResolver;
+    private final RestTemplate restTemplate;
+    private final ApplicationEventPublisher eventPublisher;
     /**
      * Activated theme id.
      */
