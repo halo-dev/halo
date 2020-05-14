@@ -100,12 +100,16 @@ public class PostParam implements InputConverter<Post> {
 
         LocalDateTime now = LocalDateTime.now();
         Date nowDate = new Date(DateTimeUtils.toEpochMilli(now));
-        // 这里我注意到可以编辑发布的时间到未来的日期，但是好像并不支持“未来发布”
-        // if(nowDate.after(this.createTime)){
-        //    this.createTime=nowDate;
-        // }
-        // 如果实际上支持“未来发布”，那么应当注释掉下面这一行
-        this.createTime = nowDate;
+
+        // 如果发表的时间晚于当前，修改为当前
+        if (post.getCreateTime().after(nowDate)) {
+            setCreateTime(nowDate);
+        }
+
+        // 如果原来是草稿，应该把创建时间修改为当前时间
+        if (post.getStatus().equals(PostStatus.DRAFT)) {
+            setCreateTime(nowDate);
+        }
 
         InputConverter.super.update(post);
     }
