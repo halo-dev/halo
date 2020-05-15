@@ -81,7 +81,7 @@ public class FileUtils {
      * Renames file or folder.
      *
      * @param pathToRename file path to rename must not be null
-     * @param newName new name must not be null
+     * @param newName      new name must not be null
      */
     public static void rename(@NonNull Path pathToRename, @NonNull String newName) throws IOException {
         Assert.notNull(pathToRename, "File path to rename must not be null");

@@ -82,12 +82,11 @@ class TimeBasedOneTimePasswordUtil {
      * default time-step which is part of the spec, 30 seconds is default
      */
     public static final int DEFAULT_TIME_STEP_SECONDS = 30;
+    private static final String BLOCK_OF_ZEROS;
     /**
      * set to the number of digits to control 0 prefix, set to 0 for no prefix
      */
     private static int NUM_DIGITS_OUTPUT = 6;
-
-    private static final String BLOCK_OF_ZEROS;
 
     static {
         char[] chars = new char[NUM_DIGITS_OUTPUT];
@@ -137,9 +136,9 @@ class TimeBasedOneTimePasswordUtil {
      * @return True if the authNumber matched the calculated number within the specified window.
      */
     public static boolean validateCurrentNumber(String base32Secret, int authNumber, int windowMillis)
-            throws GeneralSecurityException {
+        throws GeneralSecurityException {
         return validateCurrentNumber(base32Secret, authNumber, windowMillis, System.currentTimeMillis(),
-                DEFAULT_TIME_STEP_SECONDS);
+            DEFAULT_TIME_STEP_SECONDS);
     }
 
     /**
@@ -196,7 +195,7 @@ class TimeBasedOneTimePasswordUtil {
      * output.
      */
     public static String generateNumberString(String base32Secret, long timeMillis, int timeStepSeconds)
-            throws GeneralSecurityException {
+        throws GeneralSecurityException {
         int number = generateNumber(base32Secret, timeMillis, timeStepSeconds);
         return zeroPrepend(number, NUM_DIGITS_OUTPUT);
     }
@@ -216,7 +215,7 @@ class TimeBasedOneTimePasswordUtil {
      * @return A number which should match the user's authenticator application output.
      */
     public static int generateNumber(String base32Secret, long timeMillis, int timeStepSeconds)
-            throws GeneralSecurityException {
+        throws GeneralSecurityException {
 
         byte[] key = decodeBase32(base32Secret);
 

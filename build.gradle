@@ -52,7 +52,7 @@ ext {
     upyunSdkVersion =  "4.2.0"
     qiniuSdkVersion =  "7.2.28"
     aliyunSdkVersion =  "3.9.1"
-    baiduSdkVersion =  "0.10.106"
+    baiduSdkVersion =  "0.10.36"
     qcloudSdkVersion =  "5.6.22"
     swaggerVersion =  "2.9.2"
     commonsLangVersion =  "3.10"
@@ -65,7 +65,6 @@ ext {
     flywayVersion =  "6.4.1"
     h2Version =  "1.4.196"
     levelDbVersion =  "0.12"
-    jsonVersion =  "20190722"
     fastJsonVersion =  "1.2.68"
     annotationsVersion = "3.0.1u2"
     jedisVersion= '3.3.0'
@@ -78,7 +77,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-undertow"
-    implementation "redis.clients:jedis:$jedisVersion"
     implementation "org.springframework.boot:spring-boot-starter-freemarker"
     implementation "com.sun.mail:jakarta.mail"
 
@@ -113,18 +111,17 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-ext-superscript:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-gitlab:$flexmarkVersion"
-//    implementation "com.vladsch.flexmark:flexmark-html-parser:$flexmarkVersion"
 
     implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
 
-    implementation "org.json:json:$jsonVersion"
     implementation "com.alibaba:fastjson:$fastJsonVersion"
 
     implementation "com.google.zxing:core:$zxingVersion"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
+    implementation "redis.clients:jedis:$jedisVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly "mysql:mysql-connector-java"
 

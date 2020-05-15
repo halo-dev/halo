@@ -2,25 +2,23 @@ package run.halo.app.cache;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+import redis.clients.jedis.HostAndPort;
+import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.JedisPoolConfig;
+import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.utils.JsonUtils;
 
 import javax.annotation.PreDestroy;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.springframework.util.StringUtils;
-import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.HostAndPort;
-
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Date;
-
-import run.halo.app.config.properties.HaloProperties;
-import run.halo.app.utils.JsonUtils;
 
 /**
  * Redis cache store.
@@ -29,18 +27,21 @@ import run.halo.app.utils.JsonUtils;
  */
 @Slf4j
 public class RedisCacheStore extends AbstractStringCacheStore {
-    private volatile static JedisCluster REDIS;
-    protected HaloProperties haloProperties;
-
     /**
      * Cache container.
      */
     private final static ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER = new ConcurrentHashMap<>();
-
+    private volatile static JedisCluster REDIS;
+    protected HaloProperties haloProperties;
     /**
      * Lock.
      */
     private Lock lock = new ReentrantLock();
+
+    public RedisCacheStore(HaloProperties haloProperties) {
+        this.haloProperties = haloProperties;
+        initRedis();
+    }
 
     private void initRedis() {
         JedisPoolConfig cfg = new JedisPoolConfig();
@@ -83,20 +84,16 @@ public class RedisCacheStore extends AbstractStringCacheStore {
         return REDIS;
     }
 
-    public RedisCacheStore(HaloProperties haloProperties) {
-        this.haloProperties = haloProperties;
-        initRedis();
-    }
-
+    @NotNull
     @Override
-    Optional<CacheWrapper<String>> getInternal(String key) {
+    Optional<CacheWrapper<String>> getInternal(@NotNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
         String v = REDIS.get(key);
         return StringUtils.isEmpty(v) ? Optional.empty() : jsonToCacheWrapper(v);
     }
 
     @Override
-    void putInternal(String key, CacheWrapper<String> cacheWrapper) {
+    void putInternal(@NotNull String key, @NotNull CacheWrapper<String> cacheWrapper) {
         putInternalIfAbsent(key, cacheWrapper);
         try {
             REDIS.set(key, JsonUtils.objectToJson(cacheWrapper));
@@ -110,7 +107,7 @@ public class RedisCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
+    Boolean putInternalIfAbsent(@NotNull String key, @NotNull CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
         try {
@@ -131,7 +128,7 @@ public class RedisCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(@NotNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
         REDIS.del(key);
         log.debug("Removed key: [{}]", key);

@@ -5,9 +5,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.BadRequestException;
-import run.halo.app.model.annotation.DisableOnCondition;
 import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.MFAType;
@@ -76,7 +76,7 @@ public class UserController {
                 String mfaKey = TwoFactorAuthUtils.generateTFAKey();
                 String optAuthUrl = TwoFactorAuthUtils.generateOtpAuthUrl(user.getNickname(), mfaKey);
                 String qrImageBase64 = "data:image/png;base64," +
-                        Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 128, 128));
+                    Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 128, 128));
                 return new MultiFactorAuthVO(qrImageBase64, optAuthUrl, mfaKey, MFAType.TFA_TOTP);
             } else {
                 throw new BadRequestException("暂不支持的 MFA 认证的方式");
