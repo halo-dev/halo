@@ -114,7 +114,7 @@ public class ThemeServiceImpl implements ThemeService {
         Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() -> {
             try {
                 String newActivatedThemeId = optionService.getByPropertyOrDefault(PrimaryProperties.THEME, String.class, DEFAULT_THEME_ID);
-                if (newActivatedThemeId != activatedThemeId) {
+                if (!activatedThemeId.equals(newActivatedThemeId)) {
                     activateTheme(newActivatedThemeId);
                 }
             } catch (Exception e) {
