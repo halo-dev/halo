@@ -193,7 +193,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     @NonNull
-    public User updateMFA(@NonNull MFAType mfaType, String mfaKey,@NonNull Integer userId) {
+    public User updateMFA(@NonNull MFAType mfaType, String mfaKey, @NonNull Integer userId) {
         Assert.notNull(mfaType, "MFA Type must not be null");
 
         // get User

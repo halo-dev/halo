@@ -1,6 +1,9 @@
 package run.halo.app.model.vo;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import run.halo.app.model.enums.MFAType;
 
 /**

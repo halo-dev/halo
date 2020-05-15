@@ -1,4 +1,4 @@
-package run.halo.app.model.annotation;
+package run.halo.app.annotation;
 
 import org.springframework.core.annotation.AliasFor;
 import run.halo.app.model.enums.Mode;

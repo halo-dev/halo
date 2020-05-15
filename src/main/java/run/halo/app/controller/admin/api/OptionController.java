@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.annotation.DisableOnCondition;
+import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;

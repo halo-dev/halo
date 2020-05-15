@@ -4,8 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import run.halo.app.model.enums.Mode;
 
-import java.util.ArrayList;
 import java.time.Duration;
+import java.util.ArrayList;
 
 import static run.halo.app.model.support.HaloConst.*;
 import static run.halo.app.utils.HaloUtils.ensureSuffix;
