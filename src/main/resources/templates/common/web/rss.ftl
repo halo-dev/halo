@@ -28,7 +28,7 @@
                     <title>
                         <![CDATA[${post.title!}]]>
                     </title>
-                    <link>${post.fullPath!}</link>
+                    <link><#if !globalAbsolutePathEnabled!true>${blog_url!}</#if>${post.fullPath!}</link>
                     <description>
                         <#if (options.rss_content_type!'full') == 'full'>
                             <![CDATA[${post.formatContent!}]]>
