@@ -33,7 +33,7 @@
         <#list posts as post>
             <entry>
                 <title><![CDATA[${post.title!}]]></title>
-                <link rel="alternate" type="text/html" href="${post.fullPath!}" />
+                <link rel="alternate" type="text/html" href="<#if !globalAbsolutePathEnabled!true>${blog_url!}</#if>${post.fullPath!}" />
                 <id>tag:${blog_url!},${post.createTime?string('yyyy-MM-dd')}:${post.slug!}</id>
                 <published>${post.createTime?iso_local}</published>
                 <updated>${post.editTime?iso_local}</updated>
