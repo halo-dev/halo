@@ -17,10 +17,13 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
+import run.halo.app.service.VisitorLogService;
+import run.halo.app.utils.ServletUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,6 +57,8 @@ public class ContentContentController {
 
     private final AbstractStringCacheStore cacheStore;
 
+    private final VisitorLogService visitorLogService;
+
     public ContentContentController(PostModel postModel,
                                     SheetModel sheetModel,
                                     CategoryModel categoryModel,
@@ -64,7 +69,8 @@ public class ContentContentController {
                                     OptionService optionService,
                                     PostService postService,
                                     SheetService sheetService,
-                                    AbstractStringCacheStore cacheStore) {
+                                    AbstractStringCacheStore cacheStore,
+                                    VisitorLogService visitorLogService) {
         this.postModel = postModel;
         this.sheetModel = sheetModel;
         this.categoryModel = categoryModel;
@@ -76,11 +82,13 @@ public class ContentContentController {
         this.postService = postService;
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
+        this.visitorLogService = visitorLogService;
     }
 
     @GetMapping("{prefix}")
     public String content(@PathVariable("prefix") String prefix,
                           Model model) {
+        saveVisitorLog();
         if (optionService.getArchivesPrefix().equals(prefix)) {
             return postModel.archives(1, model);
         } else if (optionService.getCategoriesPrefix().equals(prefix)) {
@@ -102,6 +110,7 @@ public class ContentContentController {
     public String content(@PathVariable("prefix") String prefix,
                           @PathVariable(value = "page") Integer page,
                           Model model) {
+        saveVisitorLog();
         if (optionService.getArchivesPrefix().equals(prefix)) {
             return postModel.archives(page, model);
         } else if (optionService.getJournalsPrefix().equals(prefix)) {
@@ -118,6 +127,7 @@ public class ContentContentController {
                           @PathVariable("slug") String slug,
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
+        saveVisitorLog();
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
 
         if (postPermalinkType.equals(PostPermalinkType.DEFAULT) && optionService.getArchivesPrefix().equals(prefix)) {
@@ -140,6 +150,7 @@ public class ContentContentController {
                           @PathVariable("slug") String slug,
                           @PathVariable("page") Integer page,
                           Model model) {
+        saveVisitorLog();
         if (optionService.getCategoriesPrefix().equals(prefix)) {
             return categoryModel.listPost(model, slug, page);
         } else if (optionService.getTagsPrefix().equals(prefix)) {
@@ -155,6 +166,7 @@ public class ContentContentController {
                           @PathVariable("slug") String slug,
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
+        saveVisitorLog();
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
         if (postPermalinkType.equals(PostPermalinkType.DATE)) {
             Post post = postService.getBy(year, month, slug);
@@ -171,6 +183,7 @@ public class ContentContentController {
                           @PathVariable("slug") String slug,
                           @RequestParam(value = "token", required = false) String token,
                           Model model) {
+        saveVisitorLog();
         PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
         if (postPermalinkType.equals(PostPermalinkType.DAY)) {
             Post post = postService.getBy(year, month, day, slug);
@@ -212,5 +225,10 @@ public class ContentContentController {
         }
 
         return "redirect:" + redirectUrl;
+    }
+
+    private void saveVisitorLog() {
+        String ipAddress = ServletUtils.getRequestIp();
+        visitorLogService.createOrUpdate(new Date(), ipAddress);
     }
 }

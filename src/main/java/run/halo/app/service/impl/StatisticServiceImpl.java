@@ -8,7 +8,15 @@ import run.halo.app.model.dto.UserDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.projection.VisitorLogDayCountProjection;
+import run.halo.app.model.projection.VisitorLogMonthCountProjection;
+import run.halo.app.model.vo.VisitorLogRegionVo;
 import run.halo.app.service.*;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Statistic service implementation.
@@ -41,6 +49,8 @@ public class StatisticServiceImpl implements StatisticService {
 
     private final UserService userService;
 
+    private final VisitorLogService visitorLogService;
+
     public StatisticServiceImpl(PostService postService,
                                 SheetService sheetService,
                                 JournalService journalService,
@@ -51,7 +61,8 @@ public class StatisticServiceImpl implements StatisticService {
                                 LinkService linkService,
                                 CategoryService categoryService,
                                 TagService tagService,
-                                UserService userService) {
+                                UserService userService,
+                                VisitorLogService visitorLogService) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.journalService = journalService;
@@ -63,6 +74,7 @@ public class StatisticServiceImpl implements StatisticService {
         this.categoryService = categoryService;
         this.tagService = tagService;
         this.userService = userService;
+        this.visitorLogService = visitorLogService;
     }
 
     @Override
@@ -88,6 +100,29 @@ public class StatisticServiceImpl implements StatisticService {
         statisticDTO.setLinkCount(linkService.count());
         statisticDTO.setVisitCount(postService.countVisit() + sheetService.countVisit());
         statisticDTO.setLikeCount(postService.countLike() + sheetService.countLike());
+
+        List<VisitorLogDayCountProjection> countToday = visitorLogService.getVisitCountByDay(0);
+        if (!countToday.isEmpty()) {
+            statisticDTO.setVisitCountToday(countToday.get(0));
+        } else {
+            Calendar calendar = new GregorianCalendar();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            statisticDTO.setVisitCountToday(new VisitorLogDayCountProjection(calendar.getTime(), (Long) 0L));
+        }
+
+        List<VisitorLogMonthCountProjection>  countCurrentMonth = visitorLogService.getVisitCountByMonth(0);
+        if (!countCurrentMonth.isEmpty()) {
+            statisticDTO.setVisitCountCurrentMonth(countCurrentMonth.get(0));
+        } else {
+            Calendar calendar = new GregorianCalendar();
+            VisitorLogMonthCountProjection v = new VisitorLogMonthCountProjection();
+            v.setMonth(calendar.get(Calendar.MONTH) + 1);
+            v.setCount((Long) 0L);
+            statisticDTO.setVisitCountCurrentMonth(v);
+        }
         return statisticDTO;
     }
 

@@ -140,4 +140,6 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
+
+    compile group: 'org.lionsoul', name: 'ip2region', version: '1.7.2'
 }
