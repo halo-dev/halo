@@ -147,5 +147,5 @@ public class HaloConst {
     /**
      * ip2region database path.
      */
-    public static String IP2REGION_DATABASE_PATH = "/database/ip2region.db";
+    public static String IP2REGION_DATABASE_PATH = "database/ip2region.db";
 }

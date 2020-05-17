@@ -105,6 +105,10 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         registry.addResourceHandler("/themes/**")
             .addResourceLocations(workDir + "templates/themes/");
 
+        // register /database/** resource handler.
+        registry.addResourceHandler("/database/**")
+            .addResourceLocations(workDir + "database/");
+
         String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
         String adminPathPattern = ensureSuffix(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
 

@@ -29,7 +29,7 @@ public class VisitorLogDTO implements OutputConverter<VisitorLogDTO, VisitorLog>
 
     private String city;
 
-    private String ISP;
+    private String isp;
 
     private Integer count;
 

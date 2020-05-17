@@ -1,7 +1,6 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import run.halo.app.model.entity.VisitorLog;
 import run.halo.app.model.entity.id.VisitorLogId;
@@ -60,22 +59,22 @@ public class VisitorLogServiceImpl extends AbstractCrudService<VisitorLog, Visit
 
     @Override
     public void createOrUpdate(String ipAddress) {
-        VisitorLog VisitorLog = getBy(DateUtils.now(), ipAddress);
-        if (VisitorLog == null) {
-            VisitorLog = new VisitorLog(ipAddress);
+        VisitorLog visitorLog = getBy(DateUtils.now(), ipAddress);
+        if (visitorLog == null) {
+            visitorLog = new VisitorLog(ipAddress);
             try {
                 IpUtils.IpRegion region = IpUtils.getRegion(ipAddress);
-                VisitorLog.setCountry(region.getCountry());
-                VisitorLog.setProvince(region.getProvince());
-                VisitorLog.setCity(region.getCity());
-                VisitorLog.setISP(region.getISP());
+                visitorLog.setCountry(region.getCountry());
+                visitorLog.setProvince(region.getProvince());
+                visitorLog.setCity(region.getCity());
+                visitorLog.setIsp(region.getIsp());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            VisitorLog.setCount(VisitorLog.getCount() + 1);
+            visitorLog.setCount(visitorLog.getCount() + 1);
         }
-        visitorLogRepository.save(VisitorLog);
+        visitorLogRepository.save(visitorLog);
     }
 
 }

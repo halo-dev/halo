@@ -2,12 +2,14 @@ package run.halo.app.controller.content;
 
 import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.controller.content.model.*;
+import run.halo.app.event.logger.VisitorLogEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
@@ -23,7 +25,6 @@ import run.halo.app.utils.ServletUtils;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -59,6 +60,8 @@ public class ContentContentController {
 
     private final VisitorLogService visitorLogService;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     public ContentContentController(PostModel postModel,
                                     SheetModel sheetModel,
                                     CategoryModel categoryModel,
@@ -70,7 +73,8 @@ public class ContentContentController {
                                     PostService postService,
                                     SheetService sheetService,
                                     AbstractStringCacheStore cacheStore,
-                                    VisitorLogService visitorLogService) {
+                                    VisitorLogService visitorLogService,
+                                    ApplicationEventPublisher eventPublisher) {
         this.postModel = postModel;
         this.sheetModel = sheetModel;
         this.categoryModel = categoryModel;
@@ -83,6 +87,7 @@ public class ContentContentController {
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
         this.visitorLogService = visitorLogService;
+        this.eventPublisher = eventPublisher;
     }
 
     @GetMapping("{prefix}")
@@ -229,6 +234,6 @@ public class ContentContentController {
 
     private void saveVisitorLog() {
         String ipAddress = ServletUtils.getRequestIp();
-        visitorLogService.createOrUpdate(ipAddress);
+        eventPublisher.publishEvent(new VisitorLogEvent(this, ipAddress));
     }
 }

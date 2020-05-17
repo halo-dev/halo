@@ -209,4 +209,5 @@ public class VisitorLogRepositoryTest {
         Assert.assertEquals((Integer) (calendar.get(Calendar.MONTH) + 1), result.get(0).getMonth());
         calendar.setTime(today);
         Assert.assertEquals((Integer) (calendar.get(Calendar.MONTH) + 1), result.get(1).getMonth());
-    }}
+    }
+}

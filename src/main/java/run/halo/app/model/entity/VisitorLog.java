@@ -62,7 +62,7 @@ public class VisitorLog extends BaseEntity {
      * Visitor IP's ISP.
      */
     @Column(name = "isp", length = 64)
-    private String ISP;
+    private String isp;
 
     /**
      * Visitor's visits count.

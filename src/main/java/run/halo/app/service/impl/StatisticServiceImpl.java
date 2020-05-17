@@ -13,9 +13,7 @@ import run.halo.app.model.projection.VisitorLogMonthCountProjection;
 import run.halo.app.service.*;
 import run.halo.app.utils.DateUtils;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
