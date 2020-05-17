@@ -6,6 +6,7 @@ import org.lionsoul.ip2region.DbConfig;
 import org.lionsoul.ip2region.DbMakerConfigException;
 import org.lionsoul.ip2region.DbSearcher;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.lang.NonNull;
 import org.springframework.util.FileCopyUtils;
 import run.halo.app.model.support.HaloConst;
 
@@ -29,7 +30,13 @@ public class IpUtils {
         }
     }
 
-    public static IpRegion getRegion(String ipAddress) throws IOException {
+    /**
+     * Search the region in ip2region database of the ip address.
+     *
+     * @param  ipAddress ip address string
+     * @return IpRegion object describing the region
+     */
+    public static IpRegion getRegion(@NonNull String ipAddress) throws IOException {
         DataBlock dataBlock = DB_SEARCHER.memorySearch(ipAddress);
         String[] details = dataBlock.toString().split("\\|");
         return new IpRegion(dataBlock.getCityId(), details[1], details[3], details[4], details[5]);

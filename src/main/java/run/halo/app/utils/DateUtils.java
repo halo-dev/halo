@@ -90,7 +90,13 @@ public class DateUtils {
         return result;
     }
 
-    public static Date getStartTimeOfDay(Date date) {
+    /**
+     * Get the start time of a day.
+     *
+     * @param  date date instance must not be null
+     * @return date object of the start time
+     */
+    public static Date getStartTimeOfDay(@NonNull Date date) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -100,13 +106,24 @@ public class DateUtils {
         return calendar.getTime();
     }
 
-    public static int getMonth(Date date) {
+    /**
+     * Get the number of date.
+     *
+     * @param  date date instance must not be null
+     * @return the number of month, this number already plus one
+     */
+    public static int getMonth(@NonNull Date date) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         return calendar.get(Calendar.MONTH) + 1;
     }
 
-
+    /**
+     * Get the date of few days ago.
+     *
+     * @param  days the number of days
+     * @return date object of that day
+     */
     public static Date getDayAgo(int days) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(now());
@@ -115,7 +132,13 @@ public class DateUtils {
         return getStartTimeOfDay(calendar.getTime());
     }
 
-    public static Date getFistDayOfMonth(Integer months) {
+    /**
+     * Get the first day of the month few months ago.
+     *
+     * @param  months the number of months
+     * @return date object of that day
+     */
+    public static Date getFistDayOfMonth(int months) {
         Calendar calendar = Calendar.getInstance();
         // get first day of that month
         calendar.add(Calendar.MONTH, -months);
