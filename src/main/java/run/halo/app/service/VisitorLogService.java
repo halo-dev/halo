@@ -29,7 +29,7 @@ public interface VisitorLogService extends CrudService<VisitorLog, VisitorLogId>
     VisitorLog getBy(@NonNull Date accessDate, @NonNull String ipAddress);
 
     /**
-     * Gets ip count of a region from days before until now.
+     * Gets visit count of a region from days before until now.
      *
      * @param days the number of days from now to the start date.
      * @return list of data and count pair.
@@ -37,7 +37,7 @@ public interface VisitorLogService extends CrudService<VisitorLog, VisitorLogId>
     VisitorLogRegionVo getVisitCountByRegion(@NonNull Integer days);
 
     /**
-     * Gets ip count of a day from days before until now.
+     * Gets visit count of a day from days before until now.
      *
      * @param days the number of days from now to the start date.
      * @return list of data and count pair.
@@ -45,7 +45,7 @@ public interface VisitorLogService extends CrudService<VisitorLog, VisitorLogId>
     List<VisitorLogDayCountProjection> getVisitCountByDay(@NonNull Integer days);
 
     /**
-     * Gets ip count of a month.
+     * Gets visit count of a month.
      *
      * @param months the number of months from now.
      * @return list of month and count pair.
@@ -55,9 +55,8 @@ public interface VisitorLogService extends CrudService<VisitorLog, VisitorLogId>
     /**
      * Create VisitorLog or increase VisitorLog's count by one.
      *
-     * @param accessDate visitor's access date.
      * @param ipAddress  visitor's ip address.
      */
-    void createOrUpdate(@NonNull Date accessDate, @NonNull String ipAddress);
+    void createOrUpdate(String ipAddress);
 
 }

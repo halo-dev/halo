@@ -1,12 +1,11 @@
 package run.halo.app.utils;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.lionsoul.ip2region.DataBlock;
 import org.lionsoul.ip2region.DbConfig;
 import org.lionsoul.ip2region.DbMakerConfigException;
 import org.lionsoul.ip2region.DbSearcher;
-import org.springframework.beans.factory.annotation.Autowired;
+import run.halo.app.model.support.HaloConst;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,10 +14,9 @@ import java.io.IOException;
  * @author Holldean
  * @date 2020-5-12
  */
-@Slf4j
 public class IpUtils {
 
-    private static final String dbPath = IpUtils.class.getResource("/database/ip2region.db").getPath();
+    private static final String dbPath = IpUtils.class.getResource(HaloConst.IP2REGION_DATABASE_PATH).getPath();
 
     private static DbSearcher dbSearcher;
 

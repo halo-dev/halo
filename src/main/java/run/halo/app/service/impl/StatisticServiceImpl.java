@@ -10,8 +10,8 @@ import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.VisitorLogDayCountProjection;
 import run.halo.app.model.projection.VisitorLogMonthCountProjection;
-import run.halo.app.model.vo.VisitorLogRegionVo;
 import run.halo.app.service.*;
+import run.halo.app.utils.DateUtils;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -102,24 +102,19 @@ public class StatisticServiceImpl implements StatisticService {
         statisticDTO.setLikeCount(postService.countLike() + sheetService.countLike());
 
         List<VisitorLogDayCountProjection> countToday = visitorLogService.getVisitCountByDay(0);
+        Date today = DateUtils.getStartTimeOfDay(DateUtils.now());
         if (!countToday.isEmpty()) {
             statisticDTO.setVisitCountToday(countToday.get(0));
         } else {
-            Calendar calendar = new GregorianCalendar();
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
-            statisticDTO.setVisitCountToday(new VisitorLogDayCountProjection(calendar.getTime(), (Long) 0L));
+            statisticDTO.setVisitCountToday(new VisitorLogDayCountProjection(today, (Long) 0L));
         }
 
         List<VisitorLogMonthCountProjection>  countCurrentMonth = visitorLogService.getVisitCountByMonth(0);
         if (!countCurrentMonth.isEmpty()) {
             statisticDTO.setVisitCountCurrentMonth(countCurrentMonth.get(0));
         } else {
-            Calendar calendar = new GregorianCalendar();
             VisitorLogMonthCountProjection v = new VisitorLogMonthCountProjection();
-            v.setMonth(calendar.get(Calendar.MONTH) + 1);
+            v.setMonth(DateUtils.getMonth(today));
             v.setCount((Long) 0L);
             statisticDTO.setVisitCountCurrentMonth(v);
         }

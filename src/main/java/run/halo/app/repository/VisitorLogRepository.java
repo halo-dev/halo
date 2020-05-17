@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * VisitorLog repository
+ * VisitorLog repository.
  *
  * @author Holldean
  * @date 2020-05-13

@@ -229,6 +229,6 @@ public class ContentContentController {
 
     private void saveVisitorLog() {
         String ipAddress = ServletUtils.getRequestIp();
-        visitorLogService.createOrUpdate(new Date(), ipAddress);
+        visitorLogService.createOrUpdate(ipAddress);
     }
 }

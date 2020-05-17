@@ -5,6 +5,7 @@ import org.springframework.util.Assert;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -87,5 +88,38 @@ public class DateUtils {
                 result = date;
         }
         return result;
+    }
+
+    public static Date getStartTimeOfDay(Date date) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTime();
+    }
+
+    public static int getMonth(Date date) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        return calendar.get(Calendar.MONTH) + 1;
+    }
+
+
+    public static Date getDayAgo(int days) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(now());
+        // get few days ago
+        calendar.add(Calendar.DAY_OF_MONTH, -days);
+        return getStartTimeOfDay(calendar.getTime());
+    }
+
+    public static Date getFistDayOfMonth(Integer months) {
+        Calendar calendar = Calendar.getInstance();
+        // get first day of that month
+        calendar.add(Calendar.MONTH, -months);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        return getStartTimeOfDay(calendar.getTime());
     }
 }

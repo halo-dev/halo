@@ -1,7 +1,6 @@
 package run.halo.app.controller.content;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,7 +77,7 @@ public class ContentIndexController {
     public String index(Model model,
                         @PathVariable(value = "page") Integer page) {
         String ipAddress = ServletUtils.getRequestIp();
-        visitorLogService.createOrUpdate(new Date(), ipAddress);
+        visitorLogService.createOrUpdate(ipAddress);
         return postModel.list(page, model);
     }
 }

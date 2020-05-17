@@ -3,9 +3,6 @@ package run.halo.app.model.dto;
 import lombok.Data;
 import run.halo.app.model.projection.VisitorLogDayCountProjection;
 import run.halo.app.model.projection.VisitorLogMonthCountProjection;
-import run.halo.app.model.projection.VisitorLogRegionCountProjection;
-
-import java.util.List;
 
 /**
  * Statistic DTO.

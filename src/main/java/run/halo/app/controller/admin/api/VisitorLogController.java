@@ -38,9 +38,9 @@ public class VisitorLogController {
     }
 
     @GetMapping("region")
-    @ApiOperation("Count visits for map in a year")
-    public VisitorLogRegionVo countVisitsByRegion() {
-        return visitorLogService.getVisitCountByRegion(360);
+    @ApiOperation("Count visits for map")
+    public VisitorLogRegionVo countVisitsByRegion(@RequestParam(name = "days") Integer days) {
+        return visitorLogService.getVisitCountByRegion(days);
     }
 
     @GetMapping("day")

@@ -5,14 +5,15 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import run.halo.app.model.entity.id.VisitorLogId;
+import run.halo.app.utils.DateUtils;
 
 import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Log entity.
+ * VisitorLog entity.
  *
- * @author johnniang
+ * @author Holldean
  */
 @Data
 @Entity
@@ -73,10 +74,22 @@ public class VisitorLog extends BaseEntity {
     public VisitorLog() {
     }
 
+    public VisitorLog(String ipAddress) {
+        this(null, ipAddress);
+    }
+
     public VisitorLog(Date accessDate, String ipAddress) {
         super();
         this.accessDate = accessDate;
         this.ipAddress = ipAddress;
         this.count = 1;
+    }
+
+    @PrePersist
+    protected void prePersist() {
+        Date now = DateUtils.now();
+        if (accessDate == null) {
+            accessDate = now;
+        }
     }
 }

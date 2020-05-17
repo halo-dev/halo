@@ -15,5 +15,4 @@ public class VisitorLogId implements Serializable {
         this.accessDate = accessDate;
         this.ipAddress = ipAddress;
     }
-
 }
