@@ -86,7 +86,7 @@ public class VisitorLog extends BaseEntity {
     }
 
     @PrePersist
-    protected void prePersist() {
+    protected void preCheck() {
         Date now = DateUtils.now();
         if (accessDate == null) {
             accessDate = now;
