@@ -35,20 +35,6 @@ public class IpUtils {
         return new IpRegion(dataBlock.getCityId(), details[1], details[3], details[4], details[5]);
     }
 
-    public static String processProvinceName(String province) {
-        if (province.endsWith("维吾尔自治区")) {
-            return province.substring(0, province.length() - 6);
-        } else if (province.endsWith("回族自治区") || province.endsWith("特别行政区")) {
-            return province.substring(0, province.length() - 5);
-        } else if (province.endsWith("自治区")) {
-            return province.substring(0, province.length() - 3);
-        } else if (province.endsWith("省") || province.endsWith("市")) {
-            return province.substring(0, province.length() - 1);
-        } else {
-            return province;
-        }
-    }
-
     @Data
     public static class IpRegion {
         private final Integer cityId;
@@ -73,7 +59,7 @@ public class IpUtils {
             if (province.equals("0")) {
                 this.province = "";
             } else {
-                this.province = processProvinceName(province);
+                this.province = province;
             }
 
             if (city.equals("0") || city.equals("内网IP")) {
