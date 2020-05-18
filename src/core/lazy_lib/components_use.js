@@ -15,6 +15,7 @@ import {
   Divider,
   Dropdown,
   Form,
+  FormModel,
   Icon,
   Input,
   InputNumber,
@@ -67,6 +68,7 @@ Vue.use(Divider)
 Vue.use(Drawer)
 Vue.use(Dropdown)
 Vue.use(Form)
+Vue.use(FormModel)
 Vue.use(Icon)
 Vue.use(Input)
 Vue.use(InputNumber)

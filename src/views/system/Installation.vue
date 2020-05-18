@@ -29,19 +29,20 @@
             </a-steps>
             <a-divider dashed />
             <!-- Blogger info -->
-            <a-form
+            <a-form-model
+              ref="generalForm"
+              :model="installation"
+              :rules="generalRules"
               layout="horizontal"
               v-show="stepCurrent == 0"
-              :form="bloggerForm"
             >
-              <a-form-item class="animated fadeInUp">
+              <a-form-model-item
+                class="animated fadeInUp"
+                prop="username"
+              >
                 <a-input
                   v-model="installation.username"
                   placeholder="用户名"
-                  v-decorator="[
-                    'username',
-                    {rules: [{ required: true, message: '请输入用户名' }]}
-                  ]"
                 >
                   <a-icon
                     slot="prefix"
@@ -49,10 +50,11 @@
                     style="color: rgba(0,0,0,.25)"
                   />
                 </a-input>
-              </a-form-item>
-              <a-form-item
+              </a-form-model-item>
+              <a-form-model-item
                 class="animated fadeInUp"
                 :style="{'animation-delay': '0.1s'}"
+                prop="nickname"
               >
                 <a-input
                   v-model="installation.nickname"
@@ -64,18 +66,15 @@
                     style="color: rgba(0,0,0,.25)"
                   />
                 </a-input>
-              </a-form-item>
-              <a-form-item
+              </a-form-model-item>
+              <a-form-model-item
                 class="animated fadeInUp"
                 :style="{'animation-delay': '0.2s'}"
+                prop="email"
               >
                 <a-input
                   v-model="installation.email"
                   placeholder="用户邮箱"
-                  v-decorator="[
-                    'email',
-                    {rules: [{ required: true, message: '请输入邮箱' }]}
-                  ]"
                 >
                   <a-icon
                     slot="prefix"
@@ -83,19 +82,16 @@
                     style="color: rgba(0,0,0,.25)"
                   />
                 </a-input>
-              </a-form-item>
-              <a-form-item
+              </a-form-model-item>
+              <a-form-model-item
                 class="animated fadeInUp"
                 :style="{'animation-delay': '0.3s'}"
+                prop="password"
               >
                 <a-input
                   v-model="installation.password"
                   type="password"
                   placeholder="用户密码（8-100位）"
-                  v-decorator="[
-                    'password',
-                    {rules: [{ required: true, message: '请输入密码（8-100位）' },{ validator: handleValidatePassword }]}
-                  ]"
                 >
                   <a-icon
                     slot="prefix"
@@ -103,19 +99,16 @@
                     style="color: rgba(0,0,0,.25)"
                   />
                 </a-input>
-              </a-form-item>
-              <a-form-item
+              </a-form-model-item>
+              <a-form-model-item
                 class="animated fadeInUp"
                 :style="{'animation-delay': '0.4s'}"
+                prop="confirmPassword"
               >
                 <a-input
                   v-model="installation.confirmPassword"
                   type="password"
                   placeholder="确认密码"
-                  v-decorator="[
-                    'confirmPassword',
-                    {rules: [{ required: true, message: '请输入确认密码' },{ validator: handleValidateConfirmPassword }]}
-                  ]"
                 >
                   <a-icon
                     slot="prefix"
@@ -123,16 +116,22 @@
                     style="color: rgba(0,0,0,.25)"
                   />
                 </a-input>
-              </a-form-item>
-            </a-form>
+              </a-form-model-item>
+            </a-form-model>
 
             <!-- Blog info -->
 
-            <a-form
+            <a-form-model
               layout="horizontal"
               v-show="stepCurrent == 1"
+              ref="blogForm"
+              :model="installation"
+              :rules="blogRules"
             >
-              <a-form-item class="animated fadeInUp">
+              <a-form-model-item
+                class="animated fadeInUp"
+                prop="url"
+              >
                 <a-input
                   v-model="installation.url"
                   placeholder="博客地址"
@@ -143,10 +142,11 @@
                     style="color: rgba(0,0,0,.25)"
                   />
                 </a-input>
-              </a-form-item>
-              <a-form-item
+              </a-form-model-item>
+              <a-form-model-item
                 class="animated fadeInUp"
                 :style="{'animation-delay': '0.2s'}"
+                prop="title"
               >
                 <a-input
                   v-model="installation.title"
@@ -158,8 +158,8 @@
                     style="color: rgba(0,0,0,.25)"
                   />
                 </a-input>
-              </a-form-item>
-            </a-form>
+              </a-form-model-item>
+            </a-form-model>
 
             <!-- Data migration -->
             <div v-show="stepCurrent == 2">
@@ -219,12 +219,102 @@ import migrateApi from '@/api/migrate'
 
 export default {
   data() {
+    const confirmPasswordValidate = (rule, value, callback) => {
+      if (value !== this.installation.password) {
+        callback(new Error('确认密码与所输入的密码不一致'))
+      } else {
+        callback()
+      }
+    }
     return {
       installation: {},
       stepCurrent: 0,
       migrationData: null,
-      bloggerForm: this.$form.createForm(this),
-      installing: false
+      installing: false,
+
+      generalRules: {
+        username: [
+          {
+            required: true,
+            message: '用户名不能为空',
+            trigger: 'change'
+          },
+          {
+            max: 50,
+            message: '用户名的字符长度不能超过 50',
+            trigger: 'change'
+          }
+        ],
+        nickname: [
+          {
+            required: true,
+            message: '用户昵称不能为空',
+            trigger: 'change'
+          },
+          {
+            max: 255,
+            message: '用户昵称的字符长度不能超过 255',
+            trigger: 'change'
+          }
+        ],
+        email: [
+          {
+            required: true,
+            message: '电子邮件地址不能为空',
+            trigger: 'change'
+          },
+          {
+            max: 127,
+            message: '电子邮件地址的字符长度不能超过 127',
+            trigger: 'change'
+          },
+          {
+            pattern: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/g,
+            message: '电子邮件地址的格式不正确',
+            trigger: 'change'
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: '密码不能为空',
+            trigger: 'change'
+          },
+          {
+            min: 8,
+            max: 100,
+            message: '密码的字符长度必须在 8 - 100 之间',
+            trigger: 'change'
+          }
+        ],
+        confirmPassword: [
+          {
+            required: true,
+            message: '确认密码不能为空',
+            trigger: 'change'
+          },
+          {
+            validator: confirmPasswordValidate,
+            trigger: 'change'
+          }
+        ]
+      },
+      blogRules: {
+        url: [
+          {
+            required: true,
+            message: '博客地址不能为空',
+            trigger: 'change'
+          }
+        ],
+        title: [
+          {
+            required: true,
+            message: '博客标题不能为空',
+            trigger: 'change'
+          }
+        ]
+      }
     }
   },
   created() {
@@ -232,37 +322,31 @@ export default {
     this.$set(this.installation, 'url', window.location.protocol + '//' + window.location.host)
   },
   methods: {
-    handleValidateConfirmPassword(rule, value, callback) {
-      if (this.installation.confirmPassword && this.installation.password !== this.installation.confirmPassword) {
-        // eslint-disable-next-line standard/no-callback-literal
-        callback('确认密码和密码不匹配')
-      }
-      callback()
-    },
-    handleValidatePassword(rule, value, callback) {
-      if (this.installation.password.length < 8) {
-        // eslint-disable-next-line standard/no-callback-literal
-        callback('密码不能低于 8 位')
-      }
-      callback()
-    },
-    verifyIsInstall() {
-      adminApi.isInstalled().then(response => {
+    async verifyIsInstall() {
+      await adminApi.isInstalled().then(response => {
         if (response.data.data) {
           this.$router.push({ name: 'Login' })
         }
       })
     },
-    handleNextStep(e) {
-      e.preventDefault()
-      this.bloggerForm.validateFields((error, values) => {
-        this.$log.debug('error', error)
-        this.$log.debug('Received values of form: ', values)
-        if (error != null) {
-        } else {
-          this.stepCurrent++
-        }
-      })
+    handleNextStep() {
+      if (this.stepCurrent === 0) {
+        this.$refs.generalForm.validate(valid => {
+          if (valid) {
+            this.stepCurrent++
+          } else {
+            return false
+          }
+        })
+      } else if (this.stepCurrent === 1) {
+        this.$refs.blogForm.validate(valid => {
+          if (valid) {
+            this.stepCurrent++
+          } else {
+            return false
+          }
+        })
+      }
     },
     handleMigrationUpload(data) {
       this.$log.debug('Selected data', data)
@@ -287,16 +371,6 @@ export default {
         })
     },
     handleInstall() {
-      const password = this.installation.password
-      const confirmPassword = this.installation.confirmPassword
-
-      this.$log.debug('Password', password)
-      this.$log.debug('Confirm password', confirmPassword)
-
-      if (password !== confirmPassword) {
-        this.$message.error('确认密码和密码不匹配')
-        return
-      }
       this.installing = true
       if (this.migrationData) {
         const hide = this.$message.loading('数据导入中...', 0)

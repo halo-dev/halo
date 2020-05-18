@@ -9,11 +9,12 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "ant-design-vue": "^1.5.2",
+    "ant-design-vue": "^1.5.5",
     "axios": "^0.19.2",
     "enquire.js": "^2.1.6",
     "filepond": "^4.13.0",
     "filepond-plugin-image-preview": "^4.6.1",
+    "flv.js": "^1.5.0",
     "halo-editor": "^2.8.2",
     "marked": "^1.0.0",
     "moment": "^2.24.0",
@@ -27,8 +28,7 @@
     "vue-ls": "^3.2.1",
     "vue-router": "^3.1.6",
     "vuejs-logger": "^1.5.3",
-    "vuex": "^3.1.1",
-    "flv.js": "^1.5.0"
+    "vuex": "^3.1.1"
   },
   "devDependencies": {
     "@babel/polyfill": "^7.4.4",
@@ -46,8 +46,10 @@
     "eslint-plugin-html": "^6.0.2",
     "eslint-plugin-vue": "^6.2.2",
     "generate-asset-webpack-plugin": "^0.3.0",
+    "husky": "^4.2.5",
     "less": "^3.10.0",
     "less-loader": "^5.0.0",
+    "lint-staged": "^10.2.2",
     "vue-svg-component-runtime": "^1.0.1",
     "vue-svg-icon-loader": "^2.1.1",
     "vue-template-compiler": "^2.6.11"
@@ -116,6 +118,17 @@
         }
       ]
     }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,vue}": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "postcss": {
     "plugins": {
