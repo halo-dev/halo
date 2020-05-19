@@ -121,14 +121,6 @@ public interface ThemeService {
     Set<ThemeProperty> getThemes();
 
     /**
-     * Lists theme folder by absolute path.
-     *
-     * @param absolutePath absolutePath
-     * @return List<ThemeFile>
-     */
-    List<ThemeFile> listThemeFolder(@NonNull String absolutePath);
-
-    /**
      * Lists theme folder by theme name.
      *
      * @param themeId theme id
@@ -260,6 +252,14 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty getActivatedTheme();
+
+    /**
+     * Fetch activated theme property.
+     *
+     * @return activated theme property
+     */
+    @NonNull
+    Optional<ThemeProperty> fetchActivatedTheme();
 
     /**
      * Actives a theme.

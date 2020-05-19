@@ -36,6 +36,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.theme.ThemeCollector;
 import run.halo.app.utils.*;
 
 import java.io.IOException;
@@ -45,8 +46,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipInputStream;
@@ -63,10 +62,6 @@ import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 @Service
 public class ThemeServiceImpl implements ThemeService {
 
-    /**
-     * in seconds.
-     */
-    protected static final long ACTIVATED_THEME_SYNC_INTERVAL = 5;
     /**
      * Theme work directory.
      */
@@ -102,17 +97,6 @@ public class ThemeServiceImpl implements ThemeService {
 
         themeWorkDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
         this.eventPublisher = eventPublisher;
-        // check activated theme option changes every 5 seconds.
-        Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(() -> {
-            try {
-                String newActivatedThemeId = optionService.getByPropertyOrDefault(PrimaryProperties.THEME, String.class, DEFAULT_THEME_ID);
-                if (!activatedThemeId.equals(newActivatedThemeId)) {
-                    activateTheme(newActivatedThemeId);
-                }
-            } catch (Exception e) {
-                log.warn("theme option sync exception: {}", e);
-            }
-        }, ACTIVATED_THEME_SYNC_INTERVAL, ACTIVATED_THEME_SYNC_INTERVAL, TimeUnit.SECONDS);
     }
 
     @Override
@@ -134,6 +118,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    @NonNull
     public Set<ThemeProperty> getThemes() {
 
         Optional<ThemeProperty[]> themePropertiesOptional = cacheStore.getAny(THEMES_CACHE_KEY, ThemeProperty[].class);
@@ -167,17 +152,12 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public List<ThemeFile> listThemeFolder(String absolutePath) {
-        return listThemeFileTree(Paths.get(absolutePath));
-    }
-
-    @Override
     public List<ThemeFile> listThemeFolderBy(String themeId) {
         // Get the theme property
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
 
         // List theme file as tree view
-        return listThemeFolder(themeProperty.getThemePath());
+        return ThemeCollector.INSTANCE.listThemeFolder(themeProperty.getThemePath());
     }
 
     @Override
@@ -320,7 +300,8 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public List<Group> fetchConfig(String themeId) {
+    @NonNull
+    public List<Group> fetchConfig(@NonNull String themeId) {
         Assert.hasText(themeId, "Theme id must not be blank");
 
         // Get theme property
@@ -397,6 +378,11 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         return activatedTheme;
+    }
+
+    @Override
+    public Optional<ThemeProperty> fetchActivatedTheme() {
+        return Optional.empty();
     }
 
     /**
@@ -637,7 +623,9 @@ public class ThemeServiceImpl implements ThemeService {
 
             RevWalk revWalk = new RevWalk(repository);
 
-            Ref ref = repository.getAllRefs().get(Constants.HEAD);
+            Ref ref = repository.findRef(Constants.HEAD);
+
+            Assert.notNull(ref, Constants.HEAD + " ref was not found!");
 
             RevCommit lastCommit = revWalk.parseCommit(ref.getObjectId());
 
@@ -726,74 +714,6 @@ public class ThemeServiceImpl implements ThemeService {
 
         // Unzip it
         FileUtils.unzip(downloadResponse.getBody(), targetPath);
-    }
-
-    /**
-     * Lists theme files as tree view.
-     *
-     * @param topPath must not be null
-     * @return theme file tree view or null only if the top path is not a directory
-     */
-    @Nullable
-    private List<ThemeFile> listThemeFileTree(@NonNull Path topPath) {
-        Assert.notNull(topPath, "Top path must not be null");
-
-        // Check file type
-        if (!Files.isDirectory(topPath)) {
-            return null;
-        }
-
-        try (Stream<Path> pathStream = Files.list(topPath)) {
-            List<ThemeFile> themeFiles = new LinkedList<>();
-
-            pathStream.forEach(path -> {
-                // Build theme file
-                ThemeFile themeFile = new ThemeFile();
-                themeFile.setName(path.getFileName().toString());
-                themeFile.setPath(path.toString());
-                themeFile.setIsFile(Files.isRegularFile(path));
-                themeFile.setEditable(isEditable(path));
-
-                if (Files.isDirectory(path)) {
-                    themeFile.setNode(listThemeFileTree(path));
-                }
-
-                // Add to theme files
-                themeFiles.add(themeFile);
-            });
-
-            // Sort with isFile param
-            themeFiles.sort(new ThemeFile());
-
-            return themeFiles;
-        } catch (IOException e) {
-            throw new ServiceException("Failed to list sub files", e);
-        }
-    }
-
-    /**
-     * Check if the given path is editable.
-     *
-     * @param path must not be null
-     * @return true if the given path is editable; false otherwise
-     */
-    private boolean isEditable(@NonNull Path path) {
-        Assert.notNull(path, "Path must not be null");
-
-        boolean isEditable = Files.isReadable(path) && Files.isWritable(path);
-
-        if (!isEditable) {
-            return false;
-        }
-
-        // Check suffix
-        for (String suffix : CAN_EDIT_SUFFIX) {
-            if (path.toString().endsWith(suffix)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

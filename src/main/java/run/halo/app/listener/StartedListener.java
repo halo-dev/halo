@@ -67,7 +67,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        this.initThemes();
+//        this.initThemes();
         this.initDirectory();
         this.printStartInfo();
     }
