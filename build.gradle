@@ -59,7 +59,7 @@ ext {
     httpclientVersion =  "4.5.12"
     dataformatYamlVersion =  "2.11.0"
     jgitVersion =  "5.7.0.202003110725-r"
-    flexmarkVersion =  "0.61.26"
+    flexmarkVersion =  "0.61.30"
     thumbnailatorVersion =  "0.4.11"
     image4jVersion =  "0.7zensight1"
     flywayVersion =  "6.4.1"
