@@ -17,11 +17,11 @@ import java.util.stream.Stream;
 import static run.halo.app.service.ThemeService.CAN_EDIT_SUFFIX;
 
 /**
- * Theme collector.
+ * Theme file scanner.
  *
  * @author johnniang
  */
-public enum ThemeCollector {
+public enum ThemeFileScanner {
 
     INSTANCE;
 
@@ -32,12 +32,11 @@ public enum ThemeCollector {
      * @return List<ThemeFile> a list of theme files
      */
     @NonNull
-    public List<ThemeFile> listThemeFolder(@NonNull String absolutePath) {
+    public List<ThemeFile> scan(@NonNull String absolutePath) {
         Assert.hasText(absolutePath, "Absolute path must not be blank");
 
-        return listThemeFileTree(Paths.get(absolutePath));
+        return scan(Paths.get(absolutePath));
     }
-
 
     /**
      * Lists theme files as tree view.
@@ -46,7 +45,7 @@ public enum ThemeCollector {
      * @return theme file tree view
      */
     @NonNull
-    private List<ThemeFile> listThemeFileTree(@NonNull Path rootPath) {
+    private List<ThemeFile> scan(@NonNull Path rootPath) {
         Assert.notNull(rootPath, "Root path must not be null");
 
         // Check file type
@@ -66,7 +65,7 @@ public enum ThemeCollector {
                 themeFile.setEditable(isEditable(path));
 
                 if (Files.isDirectory(path)) {
-                    themeFile.setNode(listThemeFileTree(path));
+                    themeFile.setNode(scan(path));
                 }
 
                 // Add to theme files

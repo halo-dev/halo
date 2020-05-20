@@ -36,7 +36,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
-import run.halo.app.theme.ThemeCollector;
+import run.halo.app.theme.ThemeFileScanner;
 import run.halo.app.utils.*;
 
 import java.io.IOException;
@@ -120,35 +120,28 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     @NonNull
     public Set<ThemeProperty> getThemes() {
+        ThemeProperty[] themeProperties = cacheStore.getAny(THEMES_CACHE_KEY, ThemeProperty[].class).orElseGet(() -> {
+            try (Stream<Path> pathStream = Files.list(getBasePath())) {
 
-        Optional<ThemeProperty[]> themePropertiesOptional = cacheStore.getAny(THEMES_CACHE_KEY, ThemeProperty[].class);
+                // List and filter sub folders
+                List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path)).collect(Collectors.toList());
 
-        if (themePropertiesOptional.isPresent()) {
-            // Convert to theme properties
-            ThemeProperty[] themeProperties = themePropertiesOptional.get();
-            return new HashSet<>(Arrays.asList(themeProperties));
-        }
+                if (CollectionUtils.isEmpty(themePaths)) {
+                    return new ThemeProperty[0];
+                }
 
-        try (Stream<Path> pathStream = Files.list(getBasePath())) {
-
-            // List and filter sub folders
-            List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path))
-                .collect(Collectors.toList());
-
-            if (CollectionUtils.isEmpty(themePaths)) {
-                return Collections.emptySet();
+                // Get theme properties
+                ThemeProperty[] properties = themePaths.stream()
+                    .map(this::getProperty)
+                    .toArray(ThemeProperty[]::new);
+                // Cache the themes
+                cacheStore.putAny(THEMES_CACHE_KEY, properties);
+                return properties;
+            } catch (IOException e) {
+                throw new ServiceException("Failed to get themes", e);
             }
-
-            // Get theme properties
-            Set<ThemeProperty> themes = themePaths.stream().map(this::getProperty).collect(Collectors.toSet());
-
-            // Cache the themes
-            cacheStore.putAny(THEMES_CACHE_KEY, themes);
-
-            return themes;
-        } catch (IOException e) {
-            throw new ServiceException("Failed to get themes", e);
-        }
+        });
+        return new HashSet<>(Arrays.asList(themeProperties));
     }
 
     @Override
@@ -157,7 +150,7 @@ public class ThemeServiceImpl implements ThemeService {
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
 
         // List theme file as tree view
-        return ThemeCollector.INSTANCE.listThemeFolder(themeProperty.getThemePath());
+        return ThemeFileScanner.INSTANCE.scan(themeProperty.getThemePath());
     }
 
     @Override

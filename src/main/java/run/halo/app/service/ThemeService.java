@@ -30,6 +30,7 @@ public interface ThemeService {
     /**
      * Theme property file name.
      */
+    @Deprecated
     String[] THEME_PROPERTY_FILE_NAMES = {"theme.yaml", "theme.yml"};
 
 
@@ -56,6 +57,7 @@ public interface ThemeService {
     /**
      * Theme screenshots name.
      */
+    @Deprecated
     String THEME_SCREENSHOTS_NAME = "screenshot";
 
 
