@@ -352,8 +352,7 @@ public class BackupServiceImpl implements BackupService {
         String jsonContent = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);
 
         ObjectMapper mapper = JsonUtils.createDefaultJsonMapper();
-        TypeReference<HashMap<String, Object>> typeRef
-            = new TypeReference<HashMap<String, Object>>() {
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
         };
         HashMap<String, Object> data = mapper.readValue(jsonContent, typeRef);
 
