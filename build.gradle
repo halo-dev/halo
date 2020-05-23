@@ -65,7 +65,6 @@ ext {
     flywayVersion =  "6.4.1"
     h2Version =  "1.4.196"
     levelDbVersion =  "0.12"
-    fastJsonVersion =  "1.2.68"
     annotationsVersion = "3.0.1u2"
     jedisVersion= '3.3.0'
     zxingVersion = "3.4.0"
@@ -115,8 +114,6 @@ dependencies {
     implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
-
-    implementation "com.alibaba:fastjson:$fastJsonVersion"
 
     implementation "com.google.zxing:core:$zxingVersion"
 
