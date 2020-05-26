@@ -12,6 +12,7 @@ import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import run.halo.app.annotation.SensitiveConceal;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -71,6 +72,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
      * @return a list of domains
      */
     @Override
+    @SensitiveConceal
     public List<DOMAIN> findAllByIdIn(Collection<ID> ids, Sort sort) {
         Assert.notNull(ids, "The given Collection of Id's must not be null!");
         Assert.notNull(sort, "Sort info must nto be null");
@@ -93,6 +95,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
     }
 
     @Override
+    @SensitiveConceal
     public Page<DOMAIN> findAllByIdIn(Collection<ID> ids, Pageable pageable) {
         Assert.notNull(ids, "The given Collection of Id's must not be null!");
         Assert.notNull(pageable, "Page info must nto be null");
