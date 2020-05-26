@@ -23,11 +23,12 @@ public class SensitiveConcealAspect {
     public void pointCut() {
     }
 
-    private void sensitiveMask(Object comment) {
+    private Object sensitiveMask(Object comment) {
         if (comment instanceof BaseComment) {
             ((BaseComment) comment).setEmail("");
             ((BaseComment) comment).setIpAddress("");
         }
+        return comment;
     }
 
 
@@ -48,7 +49,7 @@ public class SensitiveConcealAspect {
 
         }
 
-        return result;
+        return sensitiveMask(result);
 
     }
 
