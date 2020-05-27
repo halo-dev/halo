@@ -479,6 +479,9 @@ export default {
       this.createOrUpdatePost()
     },
     handlePublishClick() {
+      if (this.selectedPost.status === 'DRAFT') {
+        this.selectedPost.createTime = new Date()
+      }
       this.selectedPost.status = 'PUBLISHED'
       this.createOrUpdatePost()
     },
