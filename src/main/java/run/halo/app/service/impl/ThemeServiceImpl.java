@@ -19,7 +19,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.cache.AbstractStringCacheStore;
@@ -37,6 +36,7 @@ import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.theme.ThemeFileScanner;
+import run.halo.app.theme.ThemePropertyScanner;
 import run.halo.app.utils.*;
 
 import java.io.IOException;
@@ -111,7 +111,7 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         // Get all themes
-        Set<ThemeProperty> themes = getThemes();
+        List<ThemeProperty> themes = getThemes();
 
         // filter and find first
         return themes.stream().filter(themeProperty -> StringUtils.equals(themeProperty.getId(), themeId)).findFirst();
@@ -119,29 +119,14 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     @NonNull
-    public Set<ThemeProperty> getThemes() {
+    public List<ThemeProperty> getThemes() {
         ThemeProperty[] themeProperties = cacheStore.getAny(THEMES_CACHE_KEY, ThemeProperty[].class).orElseGet(() -> {
-            try (Stream<Path> pathStream = Files.list(getBasePath())) {
-
-                // List and filter sub folders
-                List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path)).collect(Collectors.toList());
-
-                if (CollectionUtils.isEmpty(themePaths)) {
-                    return new ThemeProperty[0];
-                }
-
-                // Get theme properties
-                ThemeProperty[] properties = themePaths.stream()
-                    .map(this::getProperty)
-                    .toArray(ThemeProperty[]::new);
-                // Cache the themes
-                cacheStore.putAny(THEMES_CACHE_KEY, properties);
-                return properties;
-            } catch (IOException e) {
-                throw new ServiceException("Failed to get themes", e);
-            }
+            List<ThemeProperty> properties = ThemePropertyScanner.INSTANCE.scan(getBasePath());
+            // Cache the themes
+            cacheStore.putAny(THEMES_CACHE_KEY, properties);
+            return properties.toArray(new ThemeProperty[0]);
         });
-        return new HashSet<>(Arrays.asList(themeProperties));
+        return Arrays.asList(themeProperties);
     }
 
     @Override
@@ -732,82 +717,6 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     /**
-     * Gets property path of nullable.
-     *
-     * @param themePath theme path.
-     * @return an optional property path
-     */
-    @NonNull
-    private Optional<Path> getThemePropertyPathOfNullable(@NonNull Path themePath) {
-        Assert.notNull(themePath, "Theme path must not be null");
-
-        for (String propertyPathName : THEME_PROPERTY_FILE_NAMES) {
-            Path propertyPath = themePath.resolve(propertyPathName);
-
-            log.debug("Attempting to find property file: [{}]", propertyPath);
-            if (Files.exists(propertyPath) && Files.isReadable(propertyPath)) {
-                log.debug("Found property file: [{}]", propertyPath);
-                return Optional.of(propertyPath);
-            }
-        }
-
-        log.warn("Property file was not found in [{}]", themePath);
-
-        return Optional.empty();
-    }
-
-    /**
-     * Gets property path of non null.
-     *
-     * @param themePath theme path.
-     * @return property path won't be null
-     */
-    @NonNull
-    private Path getThemePropertyPath(@NonNull Path themePath) {
-        return getThemePropertyPathOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException(themePath + " 没有说明文件").setErrorData(themePath));
-    }
-
-    private Optional<ThemeProperty> getPropertyOfNullable(Path themePath) {
-        Assert.notNull(themePath, "Theme path must not be null");
-
-        Path propertyPath = getThemePropertyPath(themePath);
-
-        try {
-            // Get property content
-            String propertyContent = new String(Files.readAllBytes(propertyPath), StandardCharsets.UTF_8);
-
-            // Resolve the base properties
-            ThemeProperty themeProperty = themePropertyResolver.resolve(propertyContent);
-
-            // Resolve additional properties
-            themeProperty.setThemePath(themePath.toString());
-            themeProperty.setFolderName(themePath.getFileName().toString());
-            themeProperty.setHasOptions(hasOptions(themePath));
-            themeProperty.setActivated(false);
-
-            // Set screenshots
-            getScreenshotsFileName(themePath).ifPresent(screenshotsName ->
-                themeProperty.setScreenshots(StringUtils.join(optionService.getBlogBaseUrl(),
-                    "/themes/",
-                    FilenameUtils.getBasename(themeProperty.getThemePath()),
-                    "/",
-                    screenshotsName)));
-
-            if (StringUtils.equals(themeProperty.getId(), getActivatedThemeId())) {
-                // Set activation
-                themeProperty.setActivated(true);
-            }
-
-            return Optional.of(themeProperty);
-
-        } catch (IOException e) {
-            log.error("Failed to load theme property file", e);
-        }
-
-        return Optional.empty();
-    }
-
-    /**
      * Gets theme property.
      *
      * @param themePath must not be null
@@ -815,48 +724,8 @@ public class ThemeServiceImpl implements ThemeService {
      */
     @NonNull
     private ThemeProperty getProperty(@NonNull Path themePath) {
-        return getPropertyOfNullable(themePath).orElseThrow(() -> new ThemePropertyMissingException(themePath + " 没有说明文件").setErrorData(themePath));
+        return ThemePropertyScanner.INSTANCE.fetchThemeProperty(themePath)
+            .orElseThrow(() -> new ThemePropertyMissingException(themePath + " 没有说明文件").setErrorData(themePath));
     }
 
-    /**
-     * Gets screenshots file name.
-     *
-     * @param themePath theme path must not be null
-     * @return screenshots file name or null if the given theme path has not screenshots
-     * @throws IOException throws when listing files
-     */
-    @NonNull
-    private Optional<String> getScreenshotsFileName(@NonNull Path themePath) throws IOException {
-        Assert.notNull(themePath, "Theme path must not be null");
-
-        try (Stream<Path> pathStream = Files.list(themePath)) {
-            return pathStream.filter(path -> Files.isRegularFile(path)
-                && Files.isReadable(path)
-                && FilenameUtils.getBasename(path.toString()).equalsIgnoreCase(THEME_SCREENSHOTS_NAME))
-                .findFirst()
-                .map(path -> path.getFileName().toString());
-        }
-    }
-
-    /**
-     * Check existence of the options.
-     *
-     * @param themePath theme path must not be null
-     * @return true if it has options; false otherwise
-     */
-    private boolean hasOptions(@NonNull Path themePath) {
-        Assert.notNull(themePath, "Path must not be null");
-
-        for (String optionsName : SETTINGS_NAMES) {
-            // Resolve the options path
-            Path optionsPath = themePath.resolve(optionsName);
-
-            log.debug("Check options file for path: [{}]", optionsPath);
-
-            if (Files.exists(optionsPath)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

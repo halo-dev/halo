@@ -6,6 +6,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.ServiceException;
+import run.halo.app.handler.theme.config.ThemePropertyResolver;
+import run.halo.app.handler.theme.config.impl.YamlThemePropertyResolver;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.utils.FilenameUtils;
 
@@ -13,11 +15,14 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static run.halo.app.service.ThemeService.SETTINGS_NAMES;
 
 /**
  * Theme property scanner.
@@ -29,6 +34,8 @@ public enum ThemePropertyScanner {
 
     INSTANCE;
 
+    private final ThemePropertyResolver propertyResolver = new YamlThemePropertyResolver();
+
     /**
      * Theme property file name.
      */
@@ -39,11 +46,18 @@ public enum ThemePropertyScanner {
      */
     private static final String THEME_SCREENSHOTS_NAME = "screenshot";
 
-    public List<ThemeProperty> scan(Path themePath) {
+    /**
+     * Scan theme properties.
+     *
+     * @param themePath them path must not be null
+     * @return a list of them property
+     */
+    @NonNull
+    public List<ThemeProperty> scan(@NonNull Path themePath) {
         try (Stream<Path> pathStream = Files.list(themePath)) {
-
             // List and filter sub folders
-            List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path)).collect(Collectors.toList());
+            List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path))
+                .collect(Collectors.toList());
 
             if (CollectionUtils.isEmpty(themePaths)) {
                 return Collections.emptyList();
@@ -51,50 +65,62 @@ public enum ThemePropertyScanner {
 
             // Get theme properties
             ThemeProperty[] properties = themePaths.stream()
-                .map(this::getProperty)
+                .map(this::fetchThemeProperty)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toArray(ThemeProperty[]::new);
             // Cache the themes
-            return properties;
+            return Arrays.asList(properties);
         } catch (IOException e) {
             throw new ServiceException("Failed to get themes", e);
         }
     }
 
-    private Optional<ThemeProperty> fetchThemeProperty(Path themePath) {
+    /**
+     * Fetch theme property
+     *
+     * @param themePath theme path must not be null
+     * @return an optional theme property
+     */
+    @NonNull
+    public Optional<ThemeProperty> fetchThemeProperty(@NonNull Path themePath) {
         Assert.notNull(themePath, "Theme path must not be null");
 
-        return fetchPropertyPath(themePath).map(propertyPath -> {
-            try {
-                // Get property content
-                String propertyContent = new String(Files.readAllBytes(propertyPath), StandardCharsets.UTF_8);
+        Optional<Path> optionalPath = fetchPropertyPath(themePath);
 
-                // Resolve the base properties
-                ThemeProperty themeProperty = themePropertyResolver.resolve(propertyContent);
+        if (!optionalPath.isPresent()) {
+            return Optional.empty();
+        }
 
-                // Resolve additional properties
-                themeProperty.setThemePath(themePath.toString());
-                themeProperty.setFolderName(themePath.getFileName().toString());
-                themeProperty.setHasOptions(hasOptions(themePath));
-                themeProperty.setActivated(false);
+        Path propertyPath = optionalPath.get();
 
-                // Set screenshots
-                getScreenshotsFileName(themePath).ifPresent(screenshotsName ->
-                    themeProperty.setScreenshots(StringUtils.join(optionService.getBlogBaseUrl(),
-                        "/themes/",
-                        FilenameUtils.getBasename(themeProperty.getThemePath()),
-                        "/",
-                        screenshotsName)));
+        try {
+            // Get property content
+            String propertyContent = new String(Files.readAllBytes(propertyPath), StandardCharsets.UTF_8);
 
-                if (StringUtils.equals(themeProperty.getId(), getActivatedThemeId())) {
-                    // Set activation
-                    themeProperty.setActivated(true);
-                }
+            // Resolve the base properties
+            ThemeProperty themeProperty = propertyResolver.resolve(propertyContent);
 
-                return Optional.of(themeProperty);
-            } catch (IOException e) {
-                log.error("Failed to load theme property file", e);
-            }
-        });
+            // Resolve additional properties
+            themeProperty.setThemePath(themePath.toString());
+            themeProperty.setFolderName(themePath.getFileName().toString());
+            themeProperty.setHasOptions(hasOptions(themePath));
+            themeProperty.setActivated(false);
+
+            // Set screenshots
+            getScreenshotsFileName(themePath).ifPresent(screenshotsName ->
+                // TODO base url
+                themeProperty.setScreenshots(StringUtils.join(
+                    "/themes/",
+                    FilenameUtils.getBasename(themeProperty.getThemePath()),
+                    "/",
+                    screenshotsName)));
+
+            return Optional.of(themeProperty);
+        } catch (Exception e) {
+            log.warn("Failed to load theme property file", e);
+        }
+        return Optional.empty();
     }
 
     /**
@@ -140,5 +166,27 @@ public enum ThemePropertyScanner {
         log.warn("Property file was not found in [{}]", themePath);
 
         return Optional.empty();
+    }
+
+    /**
+     * Check existence of the options.
+     *
+     * @param themePath theme path must not be null
+     * @return true if it has options; false otherwise
+     */
+    private boolean hasOptions(@NonNull Path themePath) {
+        Assert.notNull(themePath, "Path must not be null");
+
+        for (String optionsName : SETTINGS_NAMES) {
+            // Resolve the options path
+            Path optionsPath = themePath.resolve(optionsName);
+
+            log.debug("Check options file for path: [{}]", optionsPath);
+
+            if (Files.exists(optionsPath)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

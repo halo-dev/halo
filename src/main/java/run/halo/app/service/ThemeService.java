@@ -120,7 +120,7 @@ public interface ThemeService {
      * @return set of themes
      */
     @NonNull
-    Set<ThemeProperty> getThemes();
+    List<ThemeProperty> getThemes();
 
     /**
      * Lists theme folder by theme name.
