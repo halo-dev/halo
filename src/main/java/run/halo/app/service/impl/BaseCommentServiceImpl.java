@@ -564,6 +564,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    @Deprecated
     public <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment) {
         Assert.notNull(comment, "Base comment dto must not be null");
 
@@ -592,6 +593,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    @Deprecated
     public <T extends BaseCommentDTO> List<T> filterIpAddress(List<T> comments) {
         if (CollectionUtils.isEmpty(comments)) {
             return Collections.emptyList();
@@ -603,6 +605,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    @Deprecated
     public <T extends BaseCommentDTO> Page<T> filterIpAddress(Page<T> commentPage) {
         Assert.notNull(commentPage, "Comment page must not be null");
         commentPage.forEach(this::filterIpAddress);
