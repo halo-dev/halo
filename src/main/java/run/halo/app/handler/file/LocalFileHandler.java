@@ -13,9 +13,11 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.ImageMetadataUtils;
 import run.halo.app.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -150,14 +152,15 @@ public class LocalFileHandler implements FileHandler {
                     String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
                     Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
 
-                    // Read as image
-                    BufferedImage originalImage = ImageUtils.getImageFromFile(uploadFileInputStream, extension);
+                    // Image Metadata class
+                    ImageMetadataUtils imageMetadata = new ImageMetadataUtils(uploadFileInputStream);
+
                     // Set width and height
-                    uploadResult.setWidth(originalImage.getWidth());
-                    uploadResult.setHeight(originalImage.getHeight());
+                    uploadResult.setWidth(imageMetadata.getWidth());
+                    uploadResult.setHeight(imageMetadata.getHeight());
 
                     // Generate thumbnail
-                    boolean result = generateThumbnail(originalImage, thumbnailPath, extension);
+                    boolean result = generateThumbnail(uploadPath.toFile(), thumbnailPath, extension);
                     if (result) {
                         // Set thumb path
                         uploadResult.setThumbPath(thumbnailSubFilePath);
@@ -218,8 +221,8 @@ public class LocalFileHandler implements FileHandler {
         return AttachmentType.LOCAL;
     }
 
-    private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath, String extension) {
-        Assert.notNull(originalImage, "Image must not be null");
+    private boolean generateThumbnail(File imageFile, Path thumbPath, String extension) {
+        Assert.notNull(imageFile, "Image must not be null");
         Assert.notNull(thumbPath, "Thumb path must not be null");
 
 
@@ -229,16 +232,11 @@ public class LocalFileHandler implements FileHandler {
             Files.createFile(thumbPath);
             // Convert to thumbnail and copy the thumbnail
             log.debug("Trying to generate thumbnail: [{}]", thumbPath.toString());
-            Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
+            Thumbnails.of(imageFile).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
             log.debug("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath.toString());
             result = true;
         } catch (Throwable t) {
             log.warn("Failed to generate thumbnail: " + thumbPath, t);
-        } finally {
-            // Disposes of this graphics context and releases any system resources that it is using.
-            if (originalImage != null) {
-                originalImage.getGraphics().dispose();
-            }
         }
         return result;
     }
