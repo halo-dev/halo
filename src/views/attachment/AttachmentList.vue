@@ -132,6 +132,7 @@
               :bodyStyle="{ padding: 0 }"
               hoverable
               @click="handleShowDetailDrawer(item)"
+              @contextmenu.prevent="handleContextMenu($event, item)"
             >
               <div class="attach-thumb">
                 <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
@@ -297,6 +298,46 @@ export default {
       } else {
         this.drawerVisible = true
       }
+    },
+    handleContextMenu(event, item) {
+      this.$contextmenu({
+        items: [
+          {
+            label: '复制图片链接',
+            onClick: () => {
+              const text = `${encodeURI(item.path)}`
+              this.$copyText(text)
+                .then(message => {
+                  this.$log.debug('copy', message)
+                  this.$message.success('复制成功！')
+                })
+                .catch(err => {
+                  this.$log.debug('copy.err', err)
+                  this.$message.error('复制失败！')
+                })
+            },
+            divided: true
+          },
+          {
+            label: '复制 Markdown 格式链接',
+            onClick: () => {
+              const text = `![${item.name}](${encodeURI(item.path)})`
+              this.$copyText(text)
+                .then(message => {
+                  this.$log.debug('copy', message)
+                  this.$message.success('复制成功！')
+                })
+                .catch(err => {
+                  this.$log.debug('copy.err', err)
+                  this.$message.error('复制失败！')
+                })
+            }
+          }
+        ],
+        event,
+        minWidth: 210
+      })
+      return false
     },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
