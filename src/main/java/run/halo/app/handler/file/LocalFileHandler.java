@@ -14,9 +14,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ImageMetadataUtils;
-import run.halo.app.utils.ImageUtils;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
