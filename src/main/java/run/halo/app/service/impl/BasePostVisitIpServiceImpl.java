@@ -1,7 +1,6 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import run.halo.app.model.entity.BaseVisitIp;
