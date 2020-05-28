@@ -30,14 +30,12 @@ public abstract class BasePostVisitIpServiceImpl<VISITIP extends BaseVisitIp> ex
 
     @Override
     @Transactional
-    @NotNull
     public VISITIP create(@NonNull VISITIP visitIp) {
         return super.create(visitIp);
     }
 
     @Override
     @Transactional
-    @NotNull
     public VISITIP createBy(VISITIP visitIp) {
         Assert.notNull(visitIp, "BasePostVisitIp to create must not be null");
         return create(visitIp);
