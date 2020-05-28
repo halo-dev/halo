@@ -45,7 +45,7 @@ public class ThemeController {
 
     @GetMapping
     @ApiOperation("Lists all themes")
-    public Set<ThemeProperty> listAll() {
+    public List<ThemeProperty> listAll() {
         return themeService.getThemes();
     }
 
