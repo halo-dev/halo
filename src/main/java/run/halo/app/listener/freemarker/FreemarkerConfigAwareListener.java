@@ -12,7 +12,6 @@ import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
-import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.SeoProperties;
 import run.halo.app.model.support.HaloConst;
@@ -129,21 +128,24 @@ public class FreemarkerConfigAwareListener {
         log.debug("Loaded options");
     }
 
-    private void loadThemeConfig() throws TemplateModelException {
-
+    private void loadThemeConfig() {
         // Get current activated theme.
-        ThemeProperty activatedTheme = themeService.getActivatedTheme();
+        themeService.fetchActivatedTheme().ifPresent(activatedTheme -> {
+            String themeBasePath = (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/themes/" + activatedTheme.getFolderName();
+            try {
+                configuration.setSharedVariable("theme", activatedTheme);
 
-        String themeBasePath = (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/themes/" + activatedTheme.getFolderName();
+                // TODO: It will be removed in future versions
+                configuration.setSharedVariable("static", themeBasePath);
 
-        configuration.setSharedVariable("theme", activatedTheme);
+                configuration.setSharedVariable("theme_base", themeBasePath);
 
-        // TODO: It will be removed in future versions
-        configuration.setSharedVariable("static", themeBasePath);
+                configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
+                log.debug("Loaded theme and settings");
+            } catch (TemplateModelException e) {
+                log.error("Failed to set shared variable!", e);
+            }
+        });
 
-        configuration.setSharedVariable("theme_base", themeBasePath);
-
-        configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
-        log.debug("Loaded theme and settings");
     }
 }

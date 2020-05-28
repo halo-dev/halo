@@ -100,12 +100,14 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
-    public ThemeProperty getThemeOfNonNullBy(String themeId) {
-        return getThemeBy(themeId).orElseThrow(() -> new NotFoundException("没有找到 id 为 " + themeId + " 的主题").setErrorData(themeId));
+    @NonNull
+    public ThemeProperty getThemeOfNonNullBy(@NonNull String themeId) {
+        return fetchThemePropertyBy(themeId).orElseThrow(() -> new NotFoundException("没有找到 id 为 " + themeId + " 的主题").setErrorData(themeId));
     }
 
     @Override
-    public Optional<ThemeProperty> getThemeBy(String themeId) {
+    @NonNull
+    public Optional<ThemeProperty> fetchThemePropertyBy(String themeId) {
         if (StringUtils.isBlank(themeId)) {
             return Optional.empty();
         }
@@ -194,7 +196,7 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public boolean themeExists(String themeId) {
-        return getThemeBy(themeId).isPresent();
+        return fetchThemePropertyBy(themeId).isPresent();
     }
 
     @Override
@@ -345,6 +347,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    @NonNull
     public ThemeProperty getActivatedTheme() {
         if (activatedTheme == null) {
             synchronized (this) {
@@ -359,8 +362,17 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    @NonNull
     public Optional<ThemeProperty> fetchActivatedTheme() {
-        return Optional.empty();
+        String activatedThemeId = getActivatedThemeId();
+        if (activatedTheme == null) {
+            synchronized (this) {
+                if (activatedTheme == null) {
+                    fetchThemePropertyBy(activatedThemeId).ifPresent(themeProperty -> activatedTheme = themeProperty);
+                }
+            }
+        }
+        return Optional.ofNullable(activatedTheme);
     }
 
     /**
@@ -585,7 +597,8 @@ public class ThemeServiceImpl implements ThemeService {
         }
     }
 
-    private void pullFromGit(@NonNull ThemeProperty themeProperty) throws IOException, GitAPIException, URISyntaxException {
+    private void pullFromGit(@NonNull ThemeProperty themeProperty) throws
+        IOException, GitAPIException, URISyntaxException {
         Assert.notNull(themeProperty, "Theme property must not be null");
 
         // Get branch

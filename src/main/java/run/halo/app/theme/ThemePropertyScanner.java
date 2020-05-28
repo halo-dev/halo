@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.exception.ServiceException;
 import run.halo.app.handler.theme.config.ThemePropertyResolver;
 import run.halo.app.handler.theme.config.impl.YamlThemePropertyResolver;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
@@ -54,6 +53,15 @@ public enum ThemePropertyScanner {
      */
     @NonNull
     public List<ThemeProperty> scan(@NonNull Path themePath) {
+        // create if absent
+        try {
+            if (Files.notExists(themePath)) {
+                Files.createDirectories(themePath);
+            }
+        } catch (IOException e) {
+            log.error("Failed to create directory: " + themePath, e);
+            return Collections.emptyList();
+        }
         try (Stream<Path> pathStream = Files.list(themePath)) {
             // List and filter sub folders
             List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path))
@@ -72,7 +80,8 @@ public enum ThemePropertyScanner {
             // Cache the themes
             return Arrays.asList(properties);
         } catch (IOException e) {
-            throw new ServiceException("Failed to get themes", e);
+            log.error("Failed to get themes", e);
+            return Collections.emptyList();
         }
     }
 

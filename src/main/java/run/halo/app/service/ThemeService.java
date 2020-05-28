@@ -112,7 +112,7 @@ public interface ThemeService {
      * @return a optional theme property
      */
     @NonNull
-    Optional<ThemeProperty> getThemeBy(@Nullable String themeId);
+    Optional<ThemeProperty> fetchThemePropertyBy(@Nullable String themeId);
 
     /**
      * Gets all themes
