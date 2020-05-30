@@ -47,6 +47,14 @@
         <meta name="robots" content="none">
     </#if>
     <meta name="generator" content="Halo ${version!}"/>
+    <script type="text/javascript"
+       src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$','$'], ['\(','\)']]}
+    });
+    </script>
     <@favicon />
     <@custom_head />
     <@custom_content_head />
