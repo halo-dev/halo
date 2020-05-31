@@ -6,9 +6,7 @@ import org.kohsuke.github.*;
 import run.halo.app.service.ThemeService;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 public class GithubUtils {
@@ -19,7 +17,45 @@ public class GithubUtils {
         String repoUrl = StringUtils.removeStartIgnoreCase(uri, PREFIX);
 
         try {
-            GithubRelease githubRelease = new GithubRelease(repoUrl);
+            GithubLatestRelease githubLatestRelease = new GithubLatestRelease(repoUrl);
+
+            Thread thread = new Thread(githubLatestRelease);
+
+            thread.start();
+
+            thread.join(10 * 1000);
+
+            return githubLatestRelease.result;
+        } catch (InterruptedException e) {
+        }
+
+        return null;
+    }
+
+    public static List<String> getReleases(String uri) {
+        String repoUrl = StringUtils.removeStartIgnoreCase(uri, PREFIX);
+
+        try {
+            GithubReleases githubReleases = new GithubReleases(repoUrl);
+
+            Thread thread = new Thread(githubReleases);
+
+            thread.start();
+
+            thread.join(10 * 1000);
+
+            return githubReleases.result;
+        } catch (InterruptedException e) {
+        }
+
+        return null;
+    }
+
+    public static Map<String, Object> getRelease(String uri, String tagName) {
+        String repoUrl = StringUtils.removeStartIgnoreCase(uri, PREFIX);
+
+        try {
+            GithubRelease githubRelease = new GithubRelease(repoUrl, tagName);
 
             Thread thread = new Thread(githubRelease);
 
@@ -30,7 +66,6 @@ public class GithubUtils {
             return githubRelease.result;
         } catch (InterruptedException e) {
         }
-
         return null;
     }
 
@@ -65,7 +100,123 @@ public class GithubUtils {
          */
         private String repoUrl;
 
-        public GithubRelease(String repoUrl) {
+        private String tagName;
+
+        public GithubRelease(String repoUrl, String tagName) {
+            this.repoUrl = repoUrl;
+            this.tagName = tagName;
+            result = null;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    GitHub gitHub = GitHub.connectAnonymously();
+                    GHRepository ghRepository = gitHub.getRepository(repoUrl);
+                    List<GHRelease> ghReleaseList = ghRepository.getReleases();
+
+                    if (ghReleaseList.size() == 0) {
+                        break;
+                    }
+
+                    Optional<GHRelease> res = ghReleaseList.stream()
+                            .filter(release -> StringUtils.equalsIgnoreCase(release.getTagName(), tagName))
+                            .findFirst();
+
+                    if (res.isPresent()) {
+                        GHRelease ghRelease = res.get();
+
+                        result = new HashMap<String, Object>() {
+                            {
+                                put(ThemeService.ZIP_FILE_KEY, ghRelease.getZipballUrl());
+                                put(ThemeService.TAG_KEY, ghRelease.getTagName());
+                            }
+                        };
+                    }
+
+                    break;
+
+                } catch (Exception e) {
+                    if (e instanceof HttpException) {
+                        int code = ((HttpException) e).getResponseCode();
+                        if (code != -1) {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private static class GithubReleases implements Runnable {
+
+        private List<String> result;
+
+        private String repoUrl;
+
+        public GithubReleases(String repoUrl) {
+            this.repoUrl = repoUrl;
+            result = null;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    GitHub gitHub = GitHub.connectAnonymously();
+                    GHRepository ghRepository = gitHub.getRepository(repoUrl);
+                    List<GHRelease> ghReleaseList = ghRepository.getReleases();
+
+                    result = new ArrayList<String>();
+
+                    for (GHRelease ghRelease : ghReleaseList) {
+                        result.add(ghRelease.getTagName());
+                    }
+
+                    break;
+
+                } catch (Exception e) {
+                    if (e instanceof HttpException) {
+                        int code = ((HttpException) e).getResponseCode();
+                        if (code != -1) {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private static class GithubLatestRelease implements Runnable {
+
+        /**
+         * The return result is zip url and tag name etc.
+         */
+        private HashMap<String, Object> result;
+
+        /**
+         * should be in format of "username/reponame"
+         */
+        private String repoUrl;
+
+        public GithubLatestRelease(String repoUrl) {
             this.repoUrl = repoUrl;
             result = null;
         }

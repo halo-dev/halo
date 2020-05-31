@@ -324,6 +324,12 @@ public interface ThemeService {
     @NonNull
     List<ThemeProperty> fetchBranches(@NonNull String uri);
 
+    @NonNull
+    List<ThemeProperty> fetchReleases(@NonNull String uri);
+
+    @NonNull
+    ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName);
+
     /**
      * Fetches a specific branch (clone)
      * @param uri

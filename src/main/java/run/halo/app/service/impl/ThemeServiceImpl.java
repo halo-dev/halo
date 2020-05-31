@@ -571,6 +571,35 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     @Override
+    public ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName) {
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+        Assert.hasText(tagName, "Theme remote tagName must not be blank");
+
+        Path tmpPath = null;
+        try {
+            tmpPath = FileUtils.createTempDirectory();
+
+            Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
+
+            Map<String, Object> releaseInfo = GithubUtils.getRelease(uri, tagName);
+
+            if (releaseInfo == null) {
+                throw new ServiceException("主题拉取失败" + uri);
+            }
+
+            String zipUrl = (String) releaseInfo.get(ZIP_FILE_KEY);
+
+            downloadZipAndUnzip(zipUrl, themeTmpPath);
+
+            return add(themeTmpPath);
+        } catch (IOException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        } finally {
+            FileUtils.deleteFolderQuietly(tmpPath);
+        }
+    }
+
+    @Override
     public ThemeProperty fetchLatestRelease(@NonNull String uri) {
         Assert.hasText(uri, "Theme remote uri must not be blank");
 
@@ -623,6 +652,26 @@ public class ThemeServiceImpl implements ThemeService {
             }
         } catch (IOException e) {
             throw new ServiceException("分支信息拉取失败");
+        }
+        return themeProperties;
+    }
+
+    @Override
+    public List<ThemeProperty> fetchReleases(@NonNull String uri) {
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+
+        List<String> releases = GithubUtils.getReleases(uri);
+
+        List<ThemeProperty> themeProperties = new ArrayList<>();
+
+        if (releases == null) {
+            throw new ServiceException("主题拉取失败");
+        }
+
+        for (String tagName: releases) {
+            ThemeProperty themeProperty = new ThemeProperty();
+            themeProperty.setBranch(tagName);
+            themeProperties.add(themeProperty);
         }
         return themeProperties;
     }
