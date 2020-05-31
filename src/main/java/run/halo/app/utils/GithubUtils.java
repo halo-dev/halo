@@ -8,11 +8,25 @@ import run.halo.app.service.ThemeService;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+/**
+ * GithubUtils send request to api.github.com
+ *
+ * @author bigbang019
+ * @date 2020-05-31
+ */
 @Slf4j
 public class GithubUtils {
 
+    /**
+     * The prefix need to remove
+     */
     static final String PREFIX = "https://github.com/";
 
+    /**
+     * Get latest release
+     * @param uri repository url must not be null
+     * @return the map object containning tagname and zipfile url
+     */
     public static Map<String, Object> getLatestRelease(String uri) {
         String repoUrl = StringUtils.removeStartIgnoreCase(uri, PREFIX);
 
@@ -32,6 +46,11 @@ public class GithubUtils {
         return null;
     }
 
+    /**
+     * Get release information
+     * @param uri repository url must not be null
+     * @return list of tagname of releases
+     */
     public static List<String> getReleases(String uri) {
         String repoUrl = StringUtils.removeStartIgnoreCase(uri, PREFIX);
 
@@ -51,6 +70,12 @@ public class GithubUtils {
         return null;
     }
 
+    /**
+     * Get release information
+     * @param uri repository url must not be null
+     * @param tagName tag must not be null
+     * @return the map object containning tagname and zipfile url
+     */
     public static Map<String, Object> getRelease(String uri, String tagName) {
         String repoUrl = StringUtils.removeStartIgnoreCase(uri, PREFIX);
 
@@ -69,6 +94,12 @@ public class GithubUtils {
         return null;
     }
 
+    /**
+     * Get the content of theme.yaml/theme.yml
+     * @param uri repository url must not be null
+     * @param branch branch must not be null
+     * @return content of the file
+     */
     public static String accessThemeProperty(String uri, String branch) {
         String repoUrl = StringUtils.removeStartIgnoreCase(uri, PREFIX);
 

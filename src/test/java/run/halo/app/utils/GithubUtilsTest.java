@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -30,5 +31,10 @@ public class GithubUtilsTest {
     public void accessThemePropertyWithInvalidURL() {
         String content = GithubUtils.accessThemeProperty("https://github.com/halo-dev/halo-theme-hu", "master");
         Assert.assertNull(content);
+    }
+
+    @Test
+    public void getReleasesTest() {
+        List<String> list = GithubUtils.getReleases("https://github.com/halo-dev/halo-theme-hux");
     }
 }

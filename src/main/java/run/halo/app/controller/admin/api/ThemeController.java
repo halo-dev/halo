@@ -188,15 +188,15 @@ public class ThemeController {
         return themeService.fetchReleases(uri);
     }
 
-    @GetMapping("fetchingRelease/{tagName}")
+    @GetMapping("fetchingRelease")
     @ApiOperation("Fetches a specific release")
-    public ThemeProperty fetchRelease(@RequestParam("uri") String uri, @PathVariable("tagName") String tagName) {
+    public ThemeProperty fetchRelease(@RequestParam("uri") String uri, @RequestParam("tag") String tagName) {
         return themeService.fetchRelease(uri, tagName);
     }
 
-    @GetMapping("fetchBranch/{branchName}")
+    @GetMapping("fetchBranch")
     @ApiOperation("Fetch specific branch")
-    public ThemeProperty fetchBranch(@RequestParam("uri") String uri, @PathVariable("branchName") String branchName) {
+    public ThemeProperty fetchBranch(@RequestParam("uri") String uri, @RequestParam("branch") String branchName) {
         return themeService.fetchBranch(uri, branchName);
     }
 

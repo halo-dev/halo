@@ -310,6 +310,7 @@ public interface ThemeService {
 
     /**
      * Fetches the latest release
+     *
      * @param uri theme remote uri must not be null
      * @return theme property
      */
@@ -317,23 +318,38 @@ public interface ThemeService {
     ThemeProperty fetchLatestRelease(@NonNull String uri);
 
     /**
-     * Fetches all the branches info(not download/clone)
+     * Fetches all the branches info
+     *
      * @param uri theme remote uri must not be null
      * @return list of theme properties
      */
     @NonNull
     List<ThemeProperty> fetchBranches(@NonNull String uri);
 
+    /**
+     * Fetches all the release info
+     *
+     * @param uri theme remote uri must not be null
+     * @return list of theme properties
+     */
     @NonNull
     List<ThemeProperty> fetchReleases(@NonNull String uri);
 
+    /**
+     * Fetches a specific release
+     *
+     * @param uri theme remote uri must not be null
+     * @param tagName release tag name must not be null
+     * @return theme property
+     */
     @NonNull
     ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName);
 
     /**
      * Fetches a specific branch (clone)
-     * @param uri
-     * @param branchName
+     *
+     * @param uri theme remote uri must not be null
+     * @param branchName wanted branch must not be null
      * @return theme property
      */
     @NonNull
