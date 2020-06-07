@@ -12,6 +12,7 @@ import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
@@ -21,10 +22,11 @@ import java.util.List;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Portal tag controller.
+ * Content tag controller.
  *
  * @author johnniang
- * @date 4/2/19
+ * @author ryanwang
+ * @date 2019-04-02
  */
 @RestController("ApiContentTagController")
 @RequestMapping("/api/content/tags")
@@ -55,15 +57,15 @@ public class TagController {
         return tagService.convertTo(tagService.listAll(sort));
     }
 
-    @GetMapping("{slugName}/posts")
-    @ApiOperation("Lists posts by tag slug name")
-    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slugName") String slugName,
+    @GetMapping("{slug}/posts")
+    @ApiOperation("Lists posts by tag slug")
+    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slug") String slug,
                                                @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
-        // Get tag by slug name
-        Tag tag = tagService.getBySlugNameOfNonNull(slugName);
+        // Get tag by slug
+        Tag tag = tagService.getBySlugOfNonNull(slug);
 
         // Get posts, convert and return
-        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), pageable);
+        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         return postService.convertToSimple(postPage);
     }
 }

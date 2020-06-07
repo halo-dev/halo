@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
  * Attachment params.
  *
  * @author ryanwang
- * @date : 2019/04/20
+ * @date 2019/04/20
  */
 @Data
 public class AttachmentParam implements InputConverter<Attachment> {

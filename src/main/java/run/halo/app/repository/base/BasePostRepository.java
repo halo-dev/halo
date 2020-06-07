@@ -18,7 +18,8 @@ import java.util.Optional;
  * Base post repository.
  *
  * @author johnniang
- * @date 3/22/19
+ * @author ryanwang
+ * @date 2019-03-22
  */
 public interface BasePostRepository<POST extends BasePost> extends BaseRepository<POST, Integer> {
 
@@ -90,14 +91,24 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     Page<POST> findAllByStatusAndCreateTimeAfter(@NonNull PostStatus status, @NonNull Date createTime, @NonNull Pageable pageable);
 
     /**
-     * Gets post by url and status.
+     * Gets post by slug and status.
      *
-     * @param url    url must not be blank
+     * @param slug   slug must not be blank
      * @param status status must not be null
      * @return an optional post
      */
     @NonNull
-    Optional<POST> getByUrlAndStatus(@NonNull String url, @NonNull PostStatus status);
+    Optional<POST> getBySlugAndStatus(@NonNull String slug, @NonNull PostStatus status);
+
+    /**
+     * Gets post by id and status.
+     *
+     * @param id     id must not be blank
+     * @param status status must not be null
+     * @return an optional post
+     */
+    @NonNull
+    Optional<POST> getByIdAndStatus(@NonNull Integer id, @NonNull PostStatus status);
 
 
     /**
@@ -108,17 +119,30 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      */
     long countByStatus(@NonNull PostStatus status);
 
-    boolean existsByUrl(@NonNull String title);
-
-    boolean existsByIdNotAndUrl(@NonNull Integer id, @NonNull String title);
+    /**
+     * Determine if the slug exists.
+     *
+     * @param slug slug must not be null.
+     * @return true or false.
+     */
+    boolean existsBySlug(@NonNull String slug);
 
     /**
-     * Get post by url
+     * Determine if the slug exists.
      *
-     * @param url post url
+     * @param id   post id must not be null.
+     * @param slug slug must not be null.
+     * @return true or false.
+     */
+    boolean existsByIdNotAndSlug(@NonNull Integer id, @NonNull String slug);
+
+    /**
+     * Get post by slug
+     *
+     * @param slug post slug
      * @return Optional<Post>
      */
-    Optional<POST> getByUrl(@NonNull String url);
+    Optional<POST> getBySlug(@NonNull String slug);
 
     /**
      * Updates post visits.
@@ -142,4 +166,36 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     @Query("update BasePost p set p.likes = p.likes + :likes where p.id = :postId")
     int updateLikes(@Param("likes") long likes, @Param("postId") @NonNull Integer postId);
 
+    /**
+     * Updates post original content.
+     *
+     * @param content content could be blank but disallow to be null
+     * @param postId  post id must not be null
+     * @return updated rows
+     */
+    @Modifying
+    @Query("update BasePost p set p.originalContent = :content where p.id = :postId")
+    int updateOriginalContent(@Param("content") @NonNull String content, @Param("postId") @NonNull Integer postId);
+
+    /**
+     * Updates post status by post id.
+     *
+     * @param status post status must not be null.
+     * @param postId post id must not be null.
+     * @return updated rows.
+     */
+    @Modifying
+    @Query("update BasePost p set p.status = :status where p.id = :postId")
+    int updateStatus(@Param("status") @NonNull PostStatus status, @Param("postId") @NonNull Integer postId);
+
+    /**
+     * Updates post format content by post id.
+     *
+     * @param formatContent format content must not be null.
+     * @param postId        post id must not be null.
+     * @return updated rows.
+     */
+    @Modifying
+    @Query("update BasePost p set p.formatContent = :formatContent where p.id = :postId")
+    int updateFormatContent(@Param("formatContent") @NonNull String formatContent, @Param("postId") @NonNull Integer postId);
 }

@@ -11,9 +11,11 @@ import run.halo.app.service.base.CrudService;
 import java.util.List;
 
 /**
- * Link service.
+ * Link service interface.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-14
  */
 public interface LinkService extends CrudService<Link, Integer> {
 
@@ -51,4 +53,11 @@ public interface LinkService extends CrudService<Link, Integer> {
      * @return true if exists; false otherwise
      */
     boolean existByName(String name);
+
+    /**
+     * List all link teams.
+     *
+     * @return a list of teams.
+     */
+    List<String> listAllTeams();
 }

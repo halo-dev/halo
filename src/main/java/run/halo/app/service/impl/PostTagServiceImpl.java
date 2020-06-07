@@ -6,14 +6,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.TagPostPostCountProjection;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.PostTagRepository;
 import run.halo.app.repository.TagRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
@@ -21,11 +24,14 @@ import run.halo.app.utils.ServiceUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * Post tag service implementation.
  *
  * @author johnniang
- * @date 3/19/19
+ * @author ryanwang
+ * @date 2019-03-19
  */
 @Service
 public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> implements PostTagService {
@@ -36,13 +42,17 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
     private final TagRepository tagRepository;
 
+    private final OptionService optionService;
+
     public PostTagServiceImpl(PostTagRepository postTagRepository,
                               PostRepository postRepository,
-                              TagRepository tagRepository) {
+                              TagRepository tagRepository,
+                              OptionService optionService) {
         super(postTagRepository);
         this.postTagRepository = postTagRepository;
         this.postRepository = postRepository;
         this.tagRepository = tagRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -67,11 +77,26 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
         // Find post count
         return tags.stream().map(
-                tag -> {
-                    TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
-                    tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
-                    return tagWithCountOutputDTO;
+            tag -> {
+                TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
+                tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
+
+                StringBuilder fullPath = new StringBuilder();
+
+                if (optionService.isEnabledAbsolutePath()) {
+                    fullPath.append(optionService.getBlogBaseUrl());
                 }
+
+                fullPath.append(URL_SEPARATOR)
+                    .append(optionService.getTagsPrefix())
+                    .append(URL_SEPARATOR)
+                    .append(tag.getSlug())
+                    .append(optionService.getPathSuffix());
+
+                tagWithCountOutputDTO.setFullPath(fullPath.toString());
+
+                return tagWithCountOutputDTO;
+            }
         ).collect(Collectors.toList());
     }
 
@@ -114,12 +139,47 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     }
 
     @Override
+    public List<Post> listPostsBy(Integer tagId, PostStatus status) {
+        Assert.notNull(tagId, "Tag id must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public List<Post> listPostsBy(String slug, PostStatus status) {
+        Assert.notNull(slug, "Tag slug must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        Tag tag = tagRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
+
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tag.getId(), status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
     public Page<Post> pagePostsBy(Integer tagId, Pageable pageable) {
         Assert.notNull(tagId, "Tag id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
         Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId);
+
+        return postRepository.findAllByIdIn(postIds, pageable);
+    }
+
+    @Override
+    public Page<Post> pagePostsBy(Integer tagId, PostStatus status, Pageable pageable) {
+        Assert.notNull(tagId, "Tag id must not be null");
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postTagRepository.findAllPostIdsByTagId(tagId, status);
 
         return postRepository.findAllByIdIn(postIds, pageable);
     }

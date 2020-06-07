@@ -37,8 +37,8 @@ public class TagController {
     }
 
     @GetMapping
-    @ApiOperation("Lists tag")
-    public List<? extends TagDTO> listTags(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort,
+    @ApiOperation("Lists tags")
+    public List<? extends TagDTO> listTags(@SortDefault(sort = "createTime", direction = Sort.Direction.DESC) Sort sort,
                                            @ApiParam("Return more information(post count) if it is set")
                                            @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
@@ -48,7 +48,7 @@ public class TagController {
     }
 
     @PostMapping
-    @ApiOperation("Creates tag")
+    @ApiOperation("Creates a tag")
     public TagDTO createTag(@Valid @RequestBody TagParam tagParam) {
         // Convert to tag
         Tag tag = tagParam.convertTo();
@@ -59,20 +59,14 @@ public class TagController {
         return tagService.convertTo(tagService.create(tag));
     }
 
-    /**
-     * Get tag by id
-     *
-     * @param tagId tag id
-     * @return TagDTO
-     */
     @GetMapping("{tagId:\\d+}")
-    @ApiOperation("Get tag detail by id")
+    @ApiOperation("Gets tag detail by id")
     public TagDTO getBy(@PathVariable("tagId") Integer tagId) {
         return tagService.convertTo(tagService.getById(tagId));
     }
 
     @PutMapping("{tagId:\\d+}")
-    @ApiOperation("Updates tag")
+    @ApiOperation("Updates a tag")
     public TagDTO updateBy(@PathVariable("tagId") Integer tagId,
                            @Valid @RequestBody TagParam tagParam) {
         // Get old tag
@@ -86,7 +80,7 @@ public class TagController {
     }
 
     @DeleteMapping("{tagId:\\d+}")
-    @ApiOperation("Deletes tag")
+    @ApiOperation("Deletes a tag")
     public TagDTO deletePermanently(@PathVariable("tagId") Integer tagId) {
         // Remove the tag
         Tag deletedTag = tagService.removeById(tagId);

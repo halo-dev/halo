@@ -3,8 +3,6 @@ package run.halo.app.model.dto.post;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import run.halo.app.model.enums.PostCreateFrom;
-import run.halo.app.model.enums.PostType;
 
 /**
  * Base page simple output dto.
@@ -16,21 +14,19 @@ import run.halo.app.model.enums.PostType;
 @EqualsAndHashCode(callSuper = true)
 public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
-    private PostType type;
-
     private String summary;
 
     private String thumbnail;
 
-    private Long visits = 0L;
+    private Long visits;
 
     private Boolean disallowComment;
 
+    private String password;
+
     private String template;
 
-    private Integer topPriority = 0;
+    private Integer topPriority;
 
-    private PostCreateFrom createFrom;
-
-    private Long likes = 0L;
+    private Long likes;
 }

@@ -1,8 +1,6 @@
 package run.halo.app.utils;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -34,8 +32,8 @@ public class ServiceUtils {
     @NonNull
     public static <ID, T> Set<ID> fetchProperty(final Collection<T> datas, Function<T, ID> mappingFunction) {
         return CollectionUtils.isEmpty(datas) ?
-                Collections.emptySet() :
-                datas.stream().map(mappingFunction).collect(Collectors.toSet());
+            Collections.emptySet() :
+            datas.stream().map(mappingFunction).collect(Collectors.toSet());
     }
 
     /**
@@ -101,8 +99,9 @@ public class ServiceUtils {
      * @return a map which key from list data and value is data
      */
     @NonNull
-    public static <ID, D, V> Map<ID, V> convertToMap(Collection<D> list, Function<D, ID> keyFunction, Function<D, V> valueFunction) {
-        Assert.notNull(keyFunction, "mapping function must not be null");
+    public static <ID, D, V> Map<ID, V> convertToMap(@Nullable Collection<D> list, @NonNull Function<D, ID> keyFunction, @NonNull Function<D, V> valueFunction) {
+        Assert.notNull(keyFunction, "Key function must not be null");
+        Assert.notNull(valueFunction, "Value function must not be null");
 
         if (CollectionUtils.isEmpty(list)) {
             return Collections.emptyMap();
@@ -134,6 +133,21 @@ public class ServiceUtils {
     @NonNull
     public static Pageable buildLatestPageable(int top) {
         return buildLatestPageable(top, "createTime");
+    }
+
+    /**
+     * Build empty page result.
+     *
+     * @param page page info must not be null
+     * @param <T>  target page result type
+     * @param <S>  source page result type
+     * @return empty page result
+     */
+    @NonNull
+    public static <T, S> Page<T> buildEmptyPageImpl(@NonNull Page<S> page) {
+        Assert.notNull(page, "Page result must not be null");
+
+        return new PageImpl<>(Collections.emptyList(), page.getPageable(), page.getTotalElements());
     }
 
     /**

@@ -1,22 +1,21 @@
 package run.halo.app.utils;
 
-import cn.hutool.core.io.IORuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.exception.ForbiddenException;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * File utilities.
@@ -42,11 +41,9 @@ public class FileUtils {
 
         Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
 
-            private Path current;
-
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                current = target.resolve(source.relativize(dir).toString());
+                Path current = target.resolve(source.relativize(dir).toString());
                 Files.createDirectories(current);
                 return FileVisitResult.CONTINUE;
             }
@@ -67,22 +64,43 @@ public class FileUtils {
     public static void deleteFolder(@NonNull Path deletingPath) throws IOException {
         Assert.notNull(deletingPath, "Deleting path must not be null");
 
-        log.debug("Deleting [{}]", deletingPath);
+        if (Files.notExists(deletingPath)) {
+            return;
+        }
 
-        Files.walk(deletingPath)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
+        log.info("Deleting [{}]", deletingPath);
 
-        log.debug("Deleted [{}] successfully", deletingPath);
+        // Delete folder recursively
+        org.eclipse.jgit.util.FileUtils.delete(deletingPath.toFile(),
+            org.eclipse.jgit.util.FileUtils.RECURSIVE | org.eclipse.jgit.util.FileUtils.RETRY);
+
+        log.info("Deleted [{}] successfully", deletingPath);
     }
 
     /**
-     * Unzip content to the target path.
+     * Renames file or folder.
+     *
+     * @param pathToRename file path to rename must not be null
+     * @param newName      new name must not be null
+     */
+    public static void rename(@NonNull Path pathToRename, @NonNull String newName) throws IOException {
+        Assert.notNull(pathToRename, "File path to rename must not be null");
+        Assert.notNull(newName, "New name must not be null");
+
+        Path newPath = pathToRename.resolveSibling(newName);
+        log.info("Rename [{}] to [{}]", pathToRename, newPath);
+
+        Files.move(pathToRename, newPath);
+
+        log.info("Rename [{}] successfully", pathToRename);
+    }
+
+    /**
+     * Unzips content to the target path.
      *
      * @param zis        zip input stream must not be null
      * @param targetPath target path must not be null and not empty
-     * @throws IOException
+     * @throws IOException throws when failed to access file to be unzipped
      */
     public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath) throws IOException {
         Assert.notNull(zis, "Zip input stream must not be null");
@@ -116,22 +134,109 @@ public class FileUtils {
     }
 
     /**
-     * Skips zip parent folder. (Go into base folder)
+     * Zips folder or file.
+     *
+     * @param pathToZip     file path to zip must not be null
+     * @param pathOfArchive zip file path to archive must not be null
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive) throws IOException {
+        try (OutputStream outputStream = Files.newOutputStream(pathOfArchive)) {
+            try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
+                zip(pathToZip, zipOut);
+            }
+        }
+    }
+
+    /**
+     * Zips folder or file.
+     *
+     * @param pathToZip file path to zip must not be null
+     * @param zipOut    zip output stream must not be null
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut) throws IOException {
+        // Zip file
+        zip(pathToZip, pathToZip.getFileName().toString(), zipOut);
+    }
+
+    /**
+     * Zips folder or file.
+     *
+     * @param fileToZip file path to zip must not be null
+     * @param fileName  file name must not be blank
+     * @param zipOut    zip output stream must not be null
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    private static void zip(@NonNull Path fileToZip, @NonNull String fileName, @NonNull ZipOutputStream zipOut) throws IOException {
+        if (Files.isDirectory(fileToZip)) {
+            log.debug("Try to zip folder: [{}]", fileToZip);
+            // Append with '/' if missing
+            String folderName = StringUtils.appendIfMissing(fileName, File.separator, File.separator);
+            // Create zip entry and put into zip output stream
+            zipOut.putNextEntry(new ZipEntry(folderName));
+            // Close entry for writing the next entry
+            zipOut.closeEntry();
+
+            // Iterate the sub files recursively
+            try (Stream<Path> subPathStream = Files.list(fileToZip)) {
+                // There should not use foreach for stream as internal zip method will throw IOException
+                List<Path> subFiles = subPathStream.collect(Collectors.toList());
+                for (Path subFileToZip : subFiles) {
+                    // Zip children
+                    zip(subFileToZip, folderName + subFileToZip.getFileName(), zipOut);
+                }
+            }
+        } else {
+            // Open file to be zipped
+            // Create zip entry for target file
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            // Put the entry into zip output stream
+            zipOut.putNextEntry(zipEntry);
+            // Copy file to zip output stream
+            Files.copy(fileToZip, zipOut);
+            // Close entry
+            zipOut.closeEntry();
+        }
+    }
+
+
+    /**
+     * Unzips content to the target path.
+     *
+     * @param bytes      zip bytes array must not be null
+     * @param targetPath target path must not be null and not empty
+     * @throws IOException
+     */
+    public static void unzip(@NonNull byte[] bytes, @NonNull Path targetPath) throws IOException {
+        Assert.notNull(bytes, "Zip bytes must not be null");
+
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
+        unzip(zis, targetPath);
+    }
+
+    /**
+     * Try to skip zip parent folder. (Go into base folder)
      *
      * @param unzippedPath unzipped path must not be null
      * @return path containing base files
      * @throws IOException
      */
-    public static Path skipZipParentFolder(@NonNull Path unzippedPath) throws IOException {
+    public static Path tryToSkipZipParentFolder(@NonNull Path unzippedPath) throws IOException {
         Assert.notNull(unzippedPath, "Unzipped folder must not be  null");
 
-        List<Path> childrenPath = Files.list(unzippedPath).collect(Collectors.toList());
+        // TODO May cause a latent problem.
+        try (Stream<Path> pathStream = Files.list(unzippedPath)) {
+            List<Path> childrenPath = pathStream.collect(Collectors.toList());
 
-        if (childrenPath.size() == 1 && Files.isDirectory(childrenPath.get(0))) {
-            return childrenPath.get(0);
+            Path realPath = childrenPath.get(0);
+            if (childrenPath.size() == 1 && Files.isDirectory(realPath)) {
+                // Check directory traversal
+                checkDirectoryTraversal(unzippedPath, realPath);
+                return realPath;
+            }
+            return unzippedPath;
         }
-
-        return unzippedPath;
     }
 
     /**
@@ -161,7 +266,13 @@ public class FileUtils {
     public static boolean isEmpty(@NonNull Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
 
-        return Files.list(path).count() == 0;
+        if (!Files.isDirectory(path) || Files.notExists(path)) {
+            return true;
+        }
+
+        try (Stream<Path> pathStream = Files.list(path)) {
+            return pathStream.count() == 0;
+        }
     }
 
     /**
@@ -206,11 +317,11 @@ public class FileUtils {
         Assert.notNull(parentPath, "Parent path must not be null");
         Assert.notNull(pathToCheck, "Path to check must not be null");
 
-        if (pathToCheck.startsWith(parentPath.normalize())) {
+        if (pathToCheck.normalize().startsWith(parentPath)) {
             return;
         }
 
-        throw new ForbiddenException("You cannot access " + pathToCheck).setErrorData(pathToCheck);
+        throw new ForbiddenException("你没有权限访问 " + pathToCheck).setErrorData(pathToCheck);
     }
 
     /**
@@ -261,43 +372,15 @@ public class FileUtils {
         }
     }
 
+
     /**
-     * 删除文件或者文件夹
+     * Creates temp directory.
      *
-     * @param path path
-     * @return boolean
-     * @throws IORuntimeException IORuntimeException
+     * @return temp directory path
+     * @throws IOException if an I/O error occurs or the temporary-file directory does not exist
      */
-    public static boolean del(Path path) throws IORuntimeException {
-        if (Files.notExists(path)) {
-            return true;
-        }
-        try {
-            if (Files.isDirectory(path)) {
-                Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        Files.delete(file);
-                        return FileVisitResult.CONTINUE;
-                    }
-
-                    @Override
-                    public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
-                        if (e == null) {
-                            Files.delete(dir);
-                            return FileVisitResult.CONTINUE;
-                        } else {
-                            throw e;
-                        }
-                    }
-                });
-            } else {
-                Files.delete(path);
-            }
-        } catch (IOException e) {
-            throw new IORuntimeException(e);
-        }
-        return true;
+    @NonNull
+    public static Path createTempDirectory() throws IOException {
+        return Files.createTempDirectory("halo");
     }
 }

@@ -8,31 +8,30 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostCommentParam;
-import run.halo.app.model.vo.BaseCommentVO;
-import run.halo.app.model.vo.BaseCommentWithParentVO;
-import run.halo.app.model.vo.CommentWithHasChildrenVO;
+import run.halo.app.model.vo.*;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.PostService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
- * Portal post controller.
+ * Content post controller.
  *
  * @author johnniang
- * @date 4/2/19
+ * @date 2019-04-02
  */
 @RestController("ApiContentPostController")
 @RequestMapping("/api/content/posts")
@@ -54,29 +53,37 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<BasePostSimpleDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+    public Page<PostListVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        return postService.convertToListVo(postPage);
+    }
+
+    @PostMapping(value = "search")
+    @ApiOperation("Lists posts by keyword")
+    public Page<BasePostSimpleDTO> pageBy(@RequestParam(value = "keyword") String keyword,
+                                          @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+        Page<Post> postPage = postService.pageBy(keyword, pageable);
         return postService.convertToSimple(postPage);
     }
 
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
-    public BasePostDetailDTO getBy(@PathVariable("postId") Integer postId,
-                                   @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
-                                   @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
-        BasePostDetailDTO detailDTO = postService.convertToDetail(postService.getById(postId));
+    public PostDetailVO getBy(@PathVariable("postId") Integer postId,
+                              @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+                              @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+        PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getById(postId));
 
         if (formatDisabled) {
             // Clear the format content
-            detailDTO.setFormatContent(null);
+            postDetailVO.setFormatContent(null);
         }
 
         if (sourceDisabled) {
             // Clear the original content
-            detailDTO.setOriginalContent(null);
+            postDetailVO.setOriginalContent(null);
         }
 
-        return detailDTO;
+        return postDetailVO;
     }
 
     @GetMapping("{postId:\\d+}/comments/top_view")
@@ -84,9 +91,7 @@ public class PostController {
                                                           @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                           @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
 
-        Page<CommentWithHasChildrenVO> result = postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED, PageRequest.of(page, optionService.getCommentPageSize(), sort));
-
-        return postCommentService.filterIpAddress(result);
+        return postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
 
@@ -98,9 +103,7 @@ public class PostController {
         List<PostComment> postComments = postCommentService.listChildrenBy(postId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
 
-        List<BaseCommentDTO> result = postCommentService.convertTo(postComments);
-
-        return postCommentService.filterIpAddress(result);
+        return postCommentService.convertTo(postComments);
     }
 
     @GetMapping("{postId:\\d+}/comments/tree_view")
@@ -108,8 +111,7 @@ public class PostController {
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("postId") Integer postId,
                                                 @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                 @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        Page<BaseCommentVO> result = postCommentService.pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
-        return postCommentService.filterIpAddress(result);
+        return postCommentService.pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{postId:\\d+}/comments/list_view")
@@ -118,13 +120,17 @@ public class PostController {
                                                       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                                       @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         Page<BaseCommentWithParentVO> result = postCommentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
-        return postCommentService.filterIpAddress(result);
+        return result;
     }
 
     @PostMapping("comments")
     @ApiOperation("Comments a post")
     @CacheLock(autoDelete = false, traceRequest = true)
     public BaseCommentDTO comment(@RequestBody PostCommentParam postCommentParam) {
+        postCommentService.validateCommentBlackListStatus();
+
+        // Escape content
+        postCommentParam.setContent(HtmlUtils.htmlEscape(postCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
         return postCommentService.convertTo(postCommentService.createBy(postCommentParam));
     }
 

@@ -14,14 +14,17 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
+ * Theme service interface.
+ *
  * @author ryanwang
- * @date : 2019/3/26
+ * @date 2019-03-26
  */
 public interface ThemeService {
 
     /**
      * Theme property file name.
      */
+    @Deprecated
     String THEME_PROPERTY_FILE_NAME = "theme.yaml";
 
     /**
@@ -62,14 +65,24 @@ public interface ThemeService {
     String RENDER_TEMPLATE = "themes/%s/%s";
 
     /**
+     * Render template with suffix.
+     */
+    String RENDER_TEMPLATE_SUFFIX = "themes/%s/%s.ftl";
+
+    /**
      * Theme cache key.
      */
     String THEMES_CACHE_KEY = "themes";
 
     /**
-     * Custom sheet prefix.
+     * Custom sheet template prefix.
      */
     String CUSTOM_SHEET_PREFIX = "sheet_";
+
+    /**
+     * Custom post template prefix.
+     */
+    String CUSTOM_POST_PREFIX = "post_";
 
     /**
      * Theme provider remote name.
@@ -129,7 +142,17 @@ public interface ThemeService {
      * @param themeId theme id must not be blank
      * @return a set of templates
      */
+    @Deprecated
     Set<String> listCustomTemplates(@NonNull String themeId);
+
+    /**
+     * Lists a set of custom template, such as sheet_xxx.ftl/post_xxx.ftl, and xxx will be template name
+     *
+     * @param themeId theme id must not be blank
+     * @param prefix  post_ or sheet_
+     * @return a set of templates
+     */
+    Set<String> listCustomTemplates(@NonNull String themeId, @NonNull String prefix);
 
     /**
      * Judging whether template exists under the specified theme
@@ -163,12 +186,30 @@ public interface ThemeService {
     String getTemplateContent(@NonNull String absolutePath);
 
     /**
+     * Gets template content by template absolute path and themeId.
+     *
+     * @param themeId      themeId
+     * @param absolutePath absolute path
+     * @return template content
+     */
+    String getTemplateContent(@NonNull String themeId, @NonNull String absolutePath);
+
+    /**
      * Saves template content by template absolute path.
      *
      * @param absolutePath absolute path
      * @param content      new content
      */
     void saveTemplateContent(@NonNull String absolutePath, @NonNull String content);
+
+    /**
+     * Saves template content by template absolute path and themeId.
+     *
+     * @param themeId      themeId
+     * @param absolutePath absolute path
+     * @param content      new content
+     */
+    void saveTemplateContent(@NonNull String themeId, @NonNull String absolutePath, @NonNull String content);
 
     /**
      * Deletes a theme by key.
@@ -194,6 +235,15 @@ public interface ThemeService {
      */
     @NonNull
     String render(@NonNull String pageName);
+
+    /**
+     * Renders a theme page.
+     *
+     * @param pageName must not be blank
+     * @return full path of the theme page
+     */
+    @NonNull
+    String renderWithSuffix(@NonNull String pageName);
 
     /**
      * Gets current theme id.
@@ -234,6 +284,7 @@ public interface ThemeService {
      *
      * @param themeTmpPath theme temporary path must not be null
      * @return theme property
+     * @throws IOException IOException
      */
     @NonNull
     ThemeProperty add(@NonNull Path themeTmpPath) throws IOException;
@@ -260,4 +311,13 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty update(@NonNull String themeId);
+
+    /**
+     * Updates theme by theme id.
+     *
+     * @param themeId theme id must not be blank
+     * @param file    multipart file must not be null
+     * @return theme info
+     */
+    ThemeProperty update(@NonNull String themeId, @NonNull MultipartFile file);
 }

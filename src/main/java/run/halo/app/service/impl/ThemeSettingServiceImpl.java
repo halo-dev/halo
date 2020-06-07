@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.ServiceException;
@@ -24,7 +25,7 @@ import java.util.*;
  * Theme setting service implementation.
  *
  * @author johnniang
- * @date 4/8/19
+ * @date 2019-04-08
  */
 @Slf4j
 @Service
@@ -58,11 +59,11 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         if (StringUtils.isBlank(value)) {
             // Delete it
             return themeSettingOptional
-                    .map(setting -> {
-                        themeSettingRepository.delete(setting);
-                        log.debug("Removed theme setting: [{}]", setting);
-                        return setting;
-                    }).orElse(null);
+                .map(setting -> {
+                    themeSettingRepository.delete(setting);
+                    log.debug("Removed theme setting: [{}]", setting);
+                    return setting;
+                }).orElse(null);
         }
 
         // Get config item map
@@ -73,19 +74,19 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
 
         // Update or create
         ThemeSetting themeSetting = themeSettingOptional
-                .map(setting -> {
-                    log.debug("Updating theme setting: [{}]", setting);
-                    setting.setValue(value);
-                    log.debug("Updated theme setting: [{}]", setting);
-                    return setting;
-                }).orElseGet(() -> {
-                    ThemeSetting setting = new ThemeSetting();
-                    setting.setKey(key);
-                    setting.setValue(value);
-                    setting.setThemeId(themeId);
-                    log.debug("Creating theme setting: [{}]", setting);
-                    return setting;
-                });
+            .map(setting -> {
+                log.debug("Updating theme setting: [{}]", setting);
+                setting.setValue(value);
+                log.debug("Updated theme setting: [{}]", setting);
+                return setting;
+            }).orElseGet(() -> {
+                ThemeSetting setting = new ThemeSetting();
+                setting.setKey(key);
+                setting.setValue(value);
+                setting.setThemeId(themeId);
+                log.debug("Creating theme setting: [{}]", setting);
+                return setting;
+            });
 
         // Save the theme setting
         return themeSettingRepository.save(themeSetting);
@@ -158,6 +159,25 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         });
 
         return result;
+    }
+
+    @Override
+    public List<ThemeSetting> replaceUrl(String oldUrl, String newUrl) {
+        List<ThemeSetting> themeSettings = listAll();
+        List<ThemeSetting> replaced = new ArrayList<>();
+        themeSettings.forEach(themeSetting -> {
+            if (StringUtils.isNotEmpty(themeSetting.getValue())) {
+                themeSetting.setValue(themeSetting.getValue().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(themeSetting);
+        });
+        return updateInBatch(replaced);
+    }
+
+    @Override
+    @Transactional
+    public void deleteInactivated() {
+        themeSettingRepository.deleteByThemeIdIsNot(themeService.getActivatedThemeId());
     }
 
     /**

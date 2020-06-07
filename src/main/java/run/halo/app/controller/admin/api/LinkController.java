@@ -12,11 +12,14 @@ import run.halo.app.service.LinkService;
 import javax.validation.Valid;
 import java.util.List;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 /**
  * Link Controller
  *
  * @author ryanwang
- * @date : 2019/3/21
+ * @date 2019-03-21
  */
 @RestController
 @RequestMapping("/api/admin/links")
@@ -28,30 +31,20 @@ public class LinkController {
         this.linkService = linkService;
     }
 
-    /**
-     * List all links
-     *
-     * @param sort sort
-     * @return List
-     */
     @GetMapping
-    public List<LinkDTO> listLinks(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
-        return linkService.listDtos(sort);
+    @ApiOperation("Lists links")
+    public List<LinkDTO> listLinks(@SortDefault(sort = "team", direction = DESC) Sort sort) {
+        return linkService.listDtos(sort.and(Sort.by(ASC, "priority")));
     }
 
-    /**
-     * Get link by id.
-     *
-     * @param id id
-     * @return LinkDTO
-     */
     @GetMapping("{id:\\d+}")
-    @ApiOperation("Get link detail by id")
+    @ApiOperation("Gets link detail by id")
     public LinkDTO getBy(@PathVariable("id") Integer id) {
         return new LinkDTO().convertFrom(linkService.getById(id));
     }
 
     @PostMapping
+    @ApiOperation("Creates a link")
     public LinkDTO createBy(@RequestBody @Valid LinkParam linkParam) {
         Link link = linkService.createBy(linkParam);
         return new LinkDTO().convertFrom(link);
@@ -66,14 +59,15 @@ public class LinkController {
         return new LinkDTO().convertFrom(linkService.update(link));
     }
 
-    /**
-     * Delete link by id.
-     *
-     * @param id id
-     */
     @DeleteMapping("{id:\\d+}")
     @ApiOperation("Delete link by id")
     public void deletePermanently(@PathVariable("id") Integer id) {
         linkService.removeById(id);
+    }
+
+    @GetMapping("teams")
+    @ApiOperation("Lists all link teams")
+    public List<String> teams() {
+        return linkService.listAllTeams();
     }
 }

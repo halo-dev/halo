@@ -6,9 +6,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.entity.Option;
-import run.halo.app.model.properties.QnYunProperties;
+import run.halo.app.model.properties.QiniuOssProperties;
 import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
 
@@ -35,7 +35,7 @@ public class OptionServiceImplTest {
     private OptionRepository optionRepository;
 
     @Mock
-    private StringCacheStore cacheStore;
+    private AbstractStringCacheStore cacheStore;
 
     @InjectMocks
     private OptionServiceImpl optionService;
@@ -80,7 +80,7 @@ public class OptionServiceImplTest {
     }
 
     private void getQiniuZoneTest(Zone actualZone, Option option) {
-        QnYunProperties zoneProperty = QnYunProperties.OSS_ZONE;
+        QiniuOssProperties zoneProperty = QiniuOssProperties.OSS_ZONE;
 
         // Given
 //        given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));

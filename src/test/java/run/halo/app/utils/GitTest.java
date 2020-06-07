@@ -7,14 +7,16 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Git test.
@@ -80,8 +82,8 @@ public class GitTest {
 
     private Git cloneRepository() throws GitAPIException {
         return Git.cloneRepository()
-                .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
-                .setDirectory(tempPath.toFile())
-                .call();
+            .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
+            .setDirectory(tempPath.toFile())
+            .call();
     }
 }

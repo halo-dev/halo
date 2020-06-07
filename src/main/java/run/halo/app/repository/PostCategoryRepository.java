@@ -3,9 +3,11 @@ package run.halo.app.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.PostCategory;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.repository.base.BaseRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +16,8 @@ import java.util.Set;
  * Post category repository.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-19
  */
 public interface PostCategoryRepository extends BaseRepository<PostCategory, Integer> {
 
@@ -38,13 +42,24 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
     Set<Integer> findAllPostIdsByCategoryId(@NonNull Integer categoryId);
 
     /**
+     * Finds all post ids by category id and post status.
+     *
+     * @param categoryId category id must not be null
+     * @param status     post status must not be null
+     * @return a set of post id
+     */
+    @NonNull
+    @Query("select postCategory.postId from PostCategory postCategory, Post post where postCategory.categoryId = ?1 and post.id = postCategory.postId and post.status = ?2")
+    Set<Integer> findAllPostIdsByCategoryId(@NonNull Integer categoryId, @NonNull PostStatus status);
+
+    /**
      * Finds all post categories by post id in.
      *
      * @param postIds post id collection must not be null
      * @return a list of post category
      */
     @NonNull
-    List<PostCategory> findAllByPostIdIn(@NonNull Iterable<Integer> postIds);
+    List<PostCategory> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
 
     /**
      * Finds all post categories by post id.

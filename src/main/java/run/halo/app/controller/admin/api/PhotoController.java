@@ -22,7 +22,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Photo controller
  *
  * @author ryanwang
- * @date : 2019/3/21
+ * @date 2019-03-21
  */
 @RestController
 @RequestMapping("/api/admin/photos")
@@ -34,47 +34,33 @@ public class PhotoController {
         this.photoService = photoService;
     }
 
-    /**
-     * List all photos
-     *
-     * @param sort sort
-     * @return all of photos
-     */
     @GetMapping(value = "latest")
-    public List<PhotoDTO> listPhotos(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
+    @ApiOperation("Lists latest photos")
+    public List<PhotoDTO> listPhotos(@SortDefault(sort = "createTime", direction = Sort.Direction.DESC) Sort sort) {
         return photoService.listDtos(sort);
     }
 
     @GetMapping
-    public Page<PhotoDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+    @ApiOperation("Lists photos")
+    public Page<PhotoDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
                                  PhotoQuery photoQuery) {
         return photoService.pageDtosBy(pageable, photoQuery);
     }
 
-    /**
-     * Get photo by id.
-     *
-     * @param photoId photo id
-     * @return PhotoDTO
-     */
     @GetMapping("{photoId:\\d+}")
-    @ApiOperation("Get photo detail by id")
+    @ApiOperation("Gets photo detail by id")
     public PhotoDTO getBy(@PathVariable("photoId") Integer photoId) {
         return new PhotoDTO().convertFrom(photoService.getById(photoId));
     }
 
-    /**
-     * Delete photo by id.
-     *
-     * @param photoId photo id
-     */
     @DeleteMapping("{photoId:\\d+}")
-    @ApiOperation("Delete photo by id")
+    @ApiOperation("Deletes photo by id")
     public void deletePermanently(@PathVariable("photoId") Integer photoId) {
         photoService.removeById(photoId);
     }
 
     @PostMapping
+    @ApiOperation("Creates a photo")
     public PhotoDTO createBy(@Valid @RequestBody PhotoParam photoParam) {
         return new PhotoDTO().convertFrom(photoService.createBy(photoParam));
     }
@@ -91,5 +77,11 @@ public class PhotoController {
 
         // Update menu in database
         return new PhotoDTO().convertFrom(photoService.update(photo));
+    }
+
+    @GetMapping("teams")
+    @ApiOperation("Lists all of photo teams")
+    public List<String> listTeams() {
+        return photoService.listAllTeams();
     }
 }

@@ -1,15 +1,19 @@
 package run.halo.app.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
+import org.springframework.stereotype.Component;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
 import run.halo.app.exception.ForbiddenException;
+import run.halo.app.model.properties.ApiProperties;
 import run.halo.app.model.properties.CommentProperties;
-import run.halo.app.model.properties.OtherProperties;
+import run.halo.app.security.handler.DefaultAuthenticationFailureHandler;
+import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.OptionService;
 
 import javax.servlet.FilterChain;
@@ -19,64 +23,77 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
+import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_QUERY_NAME;
+
 /**
  * Api authentication Filter
  *
  * @author johnniang
  */
 @Slf4j
+@Component
+@Order(0)
 public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
-
-    public final static String API_TOKEN_HEADER_NAME = "API-" + HttpHeaders.AUTHORIZATION;
-
-    public final static String API_TOKEN_QUERY_NAME = "api_token";
 
     private final OptionService optionService;
 
     public ApiAuthenticationFilter(HaloProperties haloProperties,
-                                   OptionService optionService) {
-        super(haloProperties, optionService);
+                                   OptionService optionService,
+                                   AbstractStringCacheStore cacheStore,
+                                   OneTimeTokenService oneTimeTokenService,
+                                   ObjectMapper objectMapper) {
+        super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.optionService = optionService;
+
+        addUrlPatterns("/api/content/**");
+
+        addExcludeUrlPatterns(
+            "/api/content/**/comments",
+            "/api/content/**/comments/**",
+            "/api/content/options/comment"
+        );
+
+        // set failure handler
+        DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
+        failureHandler.setProductionEnv(haloProperties.isProductionEnv());
+        failureHandler.setObjectMapper(objectMapper);
+        setFailureHandler(failureHandler);
     }
 
     @Override
     protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         if (!haloProperties.isAuthEnabled()) {
             filterChain.doFilter(request, response);
             return;
         }
 
         // Get api_enable from option
-        Boolean apiEnabled = optionService.getByPropertyOrDefault(OtherProperties.API_ENABLED, Boolean.class, false);
+        Boolean apiEnabled = optionService.getByPropertyOrDefault(ApiProperties.API_ENABLED, Boolean.class, false);
 
         if (!apiEnabled) {
-            getFailureHandler().onFailure(request, response, new ForbiddenException("API has been disabled by blogger currently"));
-            return;
+            throw new ForbiddenException("API has been disabled by blogger currently");
         }
 
-        // Get token
-        String token = getTokenFromRequest(request);
+        // Get access key
+        String accessKey = getTokenFromRequest(request);
 
-        if (StringUtils.isBlank(token)) {
-            // If the token is missing
-            getFailureHandler().onFailure(request, response, new AuthenticationException("Missing API token"));
-            return;
+        if (StringUtils.isBlank(accessKey)) {
+            // If the access key is missing
+            throw new AuthenticationException("Missing API access key");
         }
 
-        // Get token from option
-        Optional<String> optionalToken = optionService.getByProperty(OtherProperties.API_TOKEN, String.class);
+        // Get access key from option
+        Optional<String> optionalAccessKey = optionService.getByProperty(ApiProperties.API_ACCESS_KEY, String.class);
 
-        if (!optionalToken.isPresent()) {
-            // If the token is not set
-            getFailureHandler().onFailure(request, response, new AuthenticationException("API Token hasn't been set by blogger"));
-            return;
+        if (!optionalAccessKey.isPresent()) {
+            // If the access key is not set
+            throw new AuthenticationException("API access key hasn't been set by blogger");
         }
 
-        if (!StringUtils.equals(token, optionalToken.get())) {
-            // If the token is mismatch
-            getFailureHandler().onFailure(request, response, new AuthenticationException("Token is mismatch"));
-            return;
+        if (!StringUtils.equals(accessKey, optionalAccessKey.get())) {
+            // If the access key is mismatch
+            throw new AuthenticationException("API access key is mismatch").setErrorData(accessKey);
         }
 
         // Do filter
@@ -95,25 +112,10 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
             }
         }
         return result;
-
     }
 
     @Override
     protected String getTokenFromRequest(@NonNull HttpServletRequest request) {
-        Assert.notNull(request, "Http servlet request must not be null");
-
-        // Get from header
-        String token = request.getHeader(API_TOKEN_HEADER_NAME);
-
-        // Get from param
-        if (StringUtils.isBlank(token)) {
-            token = request.getParameter(API_TOKEN_QUERY_NAME);
-
-            log.debug("Got token from parameter: [{}: {}]", API_TOKEN_QUERY_NAME, token);
-        } else {
-            log.debug("Got token from header: [{}: {}]", API_TOKEN_HEADER_NAME, token);
-        }
-
-        return token;
+        return getTokenFromRequest(request, API_ACCESS_KEY_QUERY_NAME, API_ACCESS_KEY_HEADER_NAME);
     }
 }

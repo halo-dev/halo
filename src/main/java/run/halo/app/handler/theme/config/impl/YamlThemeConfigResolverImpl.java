@@ -22,7 +22,8 @@ import java.util.Map;
  * Theme configuration resolver.
  *
  * @author johnniang
- * @date 4/10/19
+ * @author ryanwang
+ * @date 2019-04-10
  */
 @Slf4j
 @Service
@@ -49,7 +50,7 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                     return;
                 }
 
-                Map tabMap = ((Map) tabYaml);
+                Map tabMap = (Map) tabYaml;
 
                 Group group = new Group();
 
@@ -112,10 +113,11 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 item.setName(itemMap.get("name").toString());
                 item.setLabel(itemMap.getOrDefault("label", item.getName()).toString());
                 Object dataType = itemMap.getOrDefault("data-type", itemMap.get("dataType"));
-                item.setDataType(DataType.typeOf(dataType));
                 item.setType(InputType.typeOf(itemMap.get("type")));
+                item.setDataType(item.getType().equals(InputType.SWITCH) ? DataType.BOOL : DataType.typeOf(dataType));
                 item.setDefaultValue(itemMap.get("default"));
                 item.setPlaceholder(itemMap.getOrDefault("placeholder", "").toString());
+                item.setDescription(itemMap.getOrDefault("description", "").toString());
 
                 // Handle options
                 item.setOptions(handleOptions(itemMap.get("options")));
@@ -138,10 +140,11 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 item.setName(key.toString());
                 item.setLabel(itemMap.getOrDefault("label", item.getName()).toString());
                 Object dataType = itemMap.getOrDefault("data-type", itemMap.get("dataType"));
-                item.setDataType(DataType.typeOf(dataType));
                 item.setType(InputType.typeOf(itemMap.get("type")));
+                item.setDataType(item.getType().equals(InputType.SWITCH) ? DataType.BOOL : DataType.typeOf(dataType));
                 item.setDefaultValue(itemMap.get("default"));
                 item.setPlaceholder(itemMap.getOrDefault("placeholder", "").toString());
+                item.setDescription(itemMap.getOrDefault("description", "").toString());
 
                 // Handle options
                 item.setOptions(handleOptions(itemMap.get("options")));

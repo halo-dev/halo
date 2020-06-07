@@ -21,7 +21,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Category controller.
  *
  * @author johnniang
- * @date 3/21/19
+ * @date 2019-03-21
  */
 @RestController
 @RequestMapping("/api/admin/categories")
@@ -46,8 +46,8 @@ public class CategoryController {
     @GetMapping
     @ApiOperation("Lists all categories")
     public List<? extends CategoryDTO> listAll(
-            @SortDefault(sort = "updateTime", direction = DESC) Sort sort,
-            @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
+        @SortDefault(sort = "createTime", direction = DESC) Sort sort,
+        @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
         if (more) {
             return postCategoryService.listCategoryWithPostCountDto(sort);
         }

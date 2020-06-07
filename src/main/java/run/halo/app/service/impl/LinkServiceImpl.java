@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * LinkService implementation class
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implements LinkService {
@@ -36,12 +36,6 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         this.linkRepository = linkRepository;
     }
 
-    /**
-     * List link dtos.
-     *
-     * @param sort sort
-     * @return all links
-     */
     @Override
     public List<LinkDTO> listDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
@@ -101,6 +95,11 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         return linkRepository.exists(Example.of(link));
     }
 
+    @Override
+    public List<String> listAllTeams() {
+        return linkRepository.findAllTeams();
+    }
+
     @NonNull
     private List<LinkDTO> convertTo(@Nullable List<Link> links) {
         if (CollectionUtils.isEmpty(links)) {
@@ -108,6 +107,6 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         }
 
         return links.stream().map(link -> (LinkDTO) new LinkDTO().convertFrom(link))
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 }

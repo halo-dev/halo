@@ -1,6 +1,6 @@
 package run.halo.app.utils;
 
-import io.micrometer.core.annotation.TimedSet;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.nio.file.Path;
@@ -18,8 +18,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class PathsTest {
 
-
     @Test
+    @Ignore
     public void getTest() {
         Path path = Paths.get("/home/test/", "/upload/test.txt");
         assertThat(path.toString(), equalTo("/home/test/upload/test.txt"));

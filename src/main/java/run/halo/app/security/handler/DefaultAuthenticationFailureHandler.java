@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
-import run.halo.app.exception.HaloException;
+import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.utils.ExceptionUtils;
 import run.halo.app.utils.JsonUtils;
@@ -32,7 +32,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
     }
 
     @Override
-    public void onFailure(HttpServletRequest request, HttpServletResponse response, HaloException exception) throws IOException, ServletException {
+    public void onFailure(HttpServletRequest request, HttpServletResponse response, AbstractHaloException exception) throws IOException, ServletException {
         log.warn("Handle unsuccessful authentication, ip: [{}]", ServletUtil.getClientIP(request));
         log.error("Authentication failure", exception);
 

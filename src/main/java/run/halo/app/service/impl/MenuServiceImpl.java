@@ -9,22 +9,21 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
+import run.halo.app.model.vo.MenuTeamVO;
 import run.halo.app.model.vo.MenuVO;
 import run.halo.app.repository.MenuRepository;
 import run.halo.app.service.MenuService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * MenuService implementation class
+ * MenuService implementation class.
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implements MenuService {
@@ -44,6 +43,59 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
+    public List<MenuTeamVO> listTeamVos(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+
+        // List all menus
+        List<MenuDTO> menus = listDtos(sort);
+
+        // Get teams
+        Set<String> teams = ServiceUtils.fetchProperty(menus, MenuDTO::getTeam);
+
+        // Convert to team menu list map (Key: team, value: menu list)
+        Map<String, List<MenuDTO>> teamMenuListMap = ServiceUtils.convertToListMap(teams, menus, MenuDTO::getTeam);
+
+        List<MenuTeamVO> result = new LinkedList<>();
+
+        // Wrap menu team vo list
+        teamMenuListMap.forEach((team, menuList) -> {
+            // Build menu team vo
+            MenuTeamVO menuTeamVO = new MenuTeamVO();
+            menuTeamVO.setTeam(team);
+            menuTeamVO.setMenus(menuList);
+
+            // Add it to result
+            result.add(menuTeamVO);
+        });
+
+        return result;
+    }
+
+    @Override
+    public List<MenuDTO> listByTeam(String team, Sort sort) {
+        List<Menu> menus = menuRepository.findByTeam(team, sort);
+        return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<MenuVO> listByTeamAsTree(String team, Sort sort) {
+        Assert.notNull(team, "Team must not be null");
+
+        List<Menu> menus = menuRepository.findByTeam(team, sort);
+
+        if (CollectionUtils.isEmpty(menus)) {
+            return Collections.emptyList();
+        }
+
+        MenuVO topLevelMenu = createTopLevelMenu();
+
+        concreteTree(topLevelMenu, menus);
+
+        List<MenuVO> children = topLevelMenu.getChildren();
+        return children;
+    }
+
+    @Override
     public Menu createBy(MenuParam menuParam) {
         Assert.notNull(menuParam, "Menu param must not be null");
 
@@ -51,12 +103,6 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         return create(menuParam.convertTo());
     }
 
-    /**
-     * Lists as menu tree.
-     *
-     * @param sort sort info must not be null
-     * @return a menu tree
-     */
     @Override
     public List<MenuVO> listAsTree(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
@@ -75,6 +121,18 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         concreteTree(topLevelMenu, menus);
 
         return topLevelMenu.getChildren();
+    }
+
+    @Override
+    public List<Menu> listByParentId(Integer id) {
+        Assert.notNull(id, "Menu parent id must not be null");
+
+        return menuRepository.findByParentId(id);
+    }
+
+    @Override
+    public List<String> listAllTeams() {
+        return menuRepository.findAllTeams();
     }
 
     @Override
@@ -153,8 +211,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         }
 
         return menus.stream()
-                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
-                .collect(Collectors.toList());
+            .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+            .collect(Collectors.toList());
     }
 
     private void nameMustNotExist(@NonNull Menu menu) {

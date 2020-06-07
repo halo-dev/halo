@@ -10,6 +10,7 @@ import run.halo.app.model.dto.CategoryWithPostCountDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
+import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.base.CrudService;
 
 import java.util.Collection;
@@ -21,7 +22,8 @@ import java.util.Set;
  * Post category service interface.
  *
  * @author johnniang
- * @date 3/19/19
+ * @author ryanwang
+ * @date 2019-03-19
  */
 public interface PostCategoryService extends CrudService<PostCategory, Integer> {
 
@@ -32,7 +34,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a list of category
      */
     @NonNull
-    List<Category> listCategoryBy(@NonNull Integer postId);
+    List<Category> listCategoriesBy(@NonNull Integer postId);
 
     /**
      * List category list map by post id collection.
@@ -53,7 +55,27 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     List<Post> listPostBy(@NonNull Integer categoryId);
 
     /**
-     * Pages post by category slug name.
+     * Lists post by category id and post status.
+     *
+     * @param categoryId category id must not be null
+     * @param status     post status
+     * @return a list of post
+     */
+    @NonNull
+    List<Post> listPostBy(@NonNull Integer categoryId, @NonNull PostStatus status);
+
+    /**
+     * Lists post by category slug and post status.
+     *
+     * @param slug   category slug must not be null
+     * @param status post status
+     * @return a list of post
+     */
+    @NonNull
+    List<Post> listPostBy(@NonNull String slug, @NonNull PostStatus status);
+
+    /**
+     * Pages post by category id.
      *
      * @param categoryId category id must not be null
      * @param pageable   pageable
@@ -61,6 +83,17 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      */
     @NonNull
     Page<Post> pagePostBy(@NonNull Integer categoryId, Pageable pageable);
+
+    /**
+     * Pages post by category id and post status.
+     *
+     * @param categoryId category id must not be null
+     * @param status     post status
+     * @param pageable   pageable
+     * @return page of post
+     */
+    @NonNull
+    Page<Post> pagePostBy(@NonNull Integer categoryId, @NonNull PostStatus status, Pageable pageable);
 
     /**
      * Merges or creates post categories by post id and category id set if absent.

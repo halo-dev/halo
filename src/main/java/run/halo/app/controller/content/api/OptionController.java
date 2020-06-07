@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Portal option controller.
+ * Content option controller.
  *
  * @author johnniang
- * @date 4/3/19
+ * @date 2019-04-03
  */
 @RestController("ApiContentOptionController")
 @RequestMapping("/api/content/options")
@@ -55,7 +55,7 @@ public class OptionController {
     @ApiOperation("Options for comment")
     public Map<String, Object> comment() {
         List<String> keys = new ArrayList<>();
-        keys.add("comment_gavatar_default");
+        keys.add("comment_gravatar_default");
         keys.add("comment_content_placeholder");
         return optionService.listOptions(keys);
     }

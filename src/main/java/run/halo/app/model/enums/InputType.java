@@ -6,19 +6,50 @@ import org.springframework.lang.Nullable;
  * Input type enum.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 4/10/19
  */
 public enum InputType {
 
+    /**
+     * Text input type
+     */
     TEXT,
 
+    /**
+     * Number input type
+     */
     NUMBER,
 
+    /**
+     * Radio box input type
+     */
     RADIO,
 
+    /**
+     * Select input type
+     */
     SELECT,
 
-    TEXTAREA;
+    /**
+     * Textarea input type
+     */
+    TEXTAREA,
+
+    /**
+     * Color picker input type
+     */
+    COLOR,
+
+    /**
+     * Attachment picker input type
+     */
+    ATTACHMENT,
+
+    /**
+     * Switch input type, only true or false
+     */
+    SWITCH;
 
     /**
      * Convert type to input type.

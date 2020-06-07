@@ -3,6 +3,9 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.GenericGenerator;
+import run.halo.app.model.enums.JournalType;
 
 import javax.persistence.*;
 
@@ -10,7 +13,8 @@ import javax.persistence.*;
  * Journal entity
  *
  * @author johnniang
- * @date 3/22/19
+ * @author ryanwang
+ * @date 2019-03-22
  */
 @Data
 @Entity
@@ -20,23 +24,36 @@ import javax.persistence.*;
 public class Journal extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
     private Integer id;
 
-    @Column(name = "content", columnDefinition = "varchar(1023) not null")
+    @Column(name = "source_content", nullable = false)
+    @Lob
+    private String sourceContent;
+
+    @Column(name = "content", nullable = false)
+    @Lob
     private String content;
 
-    @Column(name = "likes", columnDefinition = "bigint default 0")
+    @Column(name = "likes")
+    @ColumnDefault("0")
     private Long likes;
+
+    @Column(name = "type")
+    @ColumnDefault("1")
+    private JournalType type;
 
     @Override
     public void prePersist() {
         super.prePersist();
 
-        id = null;
-
         if (likes == null || likes < 0) {
             likes = 0L;
+        }
+
+        if (type == null) {
+            type = JournalType.PUBLIC;
         }
     }
 }
