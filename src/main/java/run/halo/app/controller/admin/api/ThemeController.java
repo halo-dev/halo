@@ -15,7 +15,6 @@ import run.halo.app.service.ThemeSettingService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Theme controller.
