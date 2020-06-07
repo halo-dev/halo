@@ -208,10 +208,10 @@ public class ContentContentController {
 
             if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
                 redirectUrl.append("&token=")
-                        .append(token);
+                    .append(token);
             } else {
                 redirectUrl.append("?token=")
-                        .append(token);
+                    .append(token);
             }
         }
 
