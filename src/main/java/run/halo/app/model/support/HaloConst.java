@@ -51,6 +51,11 @@ public class HaloConst {
     public final static String DEFAULT_THEME_ID = "caicai_anatole";
 
     /**
+     * Default error path.
+     */
+    public static final String DEFAULT_ERROR_PATH = "common/error/error";
+
+    /**
      * Path separator.
      */
     public static final String FILE_SEPARATOR = File.separator;

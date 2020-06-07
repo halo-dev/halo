@@ -103,6 +103,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated
     ThemeProperty getThemeOfNonNullBy(@NonNull String themeId);
 
     /**
@@ -128,6 +129,7 @@ public interface ThemeService {
      * @param themeId theme id
      * @return List<ThemeFile>
      */
+    @NonNull
     List<ThemeFile> listThemeFolderBy(@NonNull String themeId);
 
     /**
@@ -137,7 +139,8 @@ public interface ThemeService {
      * @return a set of templates
      */
     @Deprecated
-    Set<String> listCustomTemplates(@NonNull String themeId);
+    @NonNull
+    List<String> listCustomTemplates(@NonNull String themeId);
 
     /**
      * Lists a set of custom template, such as sheet_xxx.ftl/post_xxx.ftl, and xxx will be template name
@@ -146,7 +149,8 @@ public interface ThemeService {
      * @param prefix  post_ or sheet_
      * @return a set of templates
      */
-    Set<String> listCustomTemplates(@NonNull String themeId, @NonNull String prefix);
+    @NonNull
+    List<String> listCustomTemplates(@NonNull String themeId, @NonNull String prefix);
 
     /**
      * Judging whether template exists under the specified theme

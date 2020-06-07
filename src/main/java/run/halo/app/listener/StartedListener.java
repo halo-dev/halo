@@ -65,9 +65,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         try {
             this.migrate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Failed to migrate database!", e);
         }
-//        this.initThemes();
+        this.initThemes();
         this.initDirectory();
         this.printStartInfo();
     }
@@ -90,12 +90,12 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         log.info("Starting migrate database...");
 
         Flyway flyway = Flyway
-            .configure()
-            .locations("classpath:/migration")
-            .baselineVersion("1")
-            .baselineOnMigrate(true)
-            .dataSource(url, username, password)
-            .load();
+                .configure()
+                .locations("classpath:/migration")
+                .baselineVersion("1")
+                .baselineOnMigrate(true)
+                .dataSource(url, username, password)
+                .load();
         flyway.repair();
         flyway.migrate();
 
