@@ -13,22 +13,30 @@
           :title="title"
           :bodyStyle="{ padding: '16px' }"
         >
-          <a-form layout="horizontal">
-            <a-form-item
+          <a-form-model
+            ref="tagForm"
+            :model="tagToCreate"
+            :rules="tagRules"
+            layout="horizontal"
+          >
+            <a-form-model-item
               label="名称："
               help="* 页面上所显示的名称"
+              prop="name"
             >
               <a-input v-model="tagToCreate.name" />
-            </a-form-item>
-            <a-form-item
+            </a-form-model-item>
+            <a-form-model-item
               label="别名："
               help="* 一般为单个标签页面的标识，最好为英文"
+              prop="slug"
             >
               <a-input v-model="tagToCreate.slug" />
-            </a-form-item>
-            <a-form-item
+            </a-form-model-item>
+            <a-form-model-item
               label="封面图："
               help="* 在标签页面可展示，需要主题支持"
+              prop="thumbnail"
             >
               <a-input v-model="tagToCreate.thumbnail">
                 <a
@@ -39,12 +47,12 @@
                   <a-icon type="picture" />
                 </a>
               </a-input>
-            </a-form-item>
-            <a-form-item>
+            </a-form-model-item>
+            <a-form-model-item>
               <a-button
                 type="primary"
                 @click="handleSaveClick"
-                v-if="formType==='create'"
+                v-if="!isUpdateForm"
               >保存</a-button>
               <a-button-group v-else>
                 <a-button
@@ -53,8 +61,7 @@
                 >更新</a-button>
                 <a-button
                   type="dashed"
-                  @click="handleAddTag"
-                  v-if="formType==='update'"
+                  @click="tagToCreate = {}"
                 >返回添加</a-button>
               </a-button-group>
               <a-popconfirm
@@ -62,15 +69,15 @@
                 @confirm="handleDeleteTag(tagToCreate.id)"
                 okText="确定"
                 cancelText="取消"
-                v-if="formType==='update'"
+                v-if="isUpdateForm"
               >
                 <a-button
                   type="danger"
                   style="float:right"
                 >删除</a-button>
               </a-popconfirm>
-            </a-form-item>
-          </a-form>
+            </a-form-model-item>
+          </a-form-model>
         </a-card>
       </a-col>
       <a-col
@@ -121,10 +128,17 @@ export default {
   components: { AttachmentSelectDrawer },
   data() {
     return {
-      formType: 'create',
       tags: [],
       tagToCreate: {},
-      thumbnailDrawerVisible: false
+      thumbnailDrawerVisible: false,
+      tagRules: {
+        name: [
+          { required: true, message: '* 标签名称不能为空', trigger: ['change', 'blur'] },
+          { max: 255, message: '* 标签名称的字符长度不能超过 255', trigger: ['change', 'blur'] }
+        ],
+        slug: [{ max: 255, message: '* 标签别名的字符长度不能超过 255', trigger: ['change', 'blur'] }],
+        thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change', 'blur'] }]
+      }
     }
   },
   computed: {
@@ -133,6 +147,9 @@ export default {
         return '修改标签'
       }
       return '添加标签'
+    },
+    isUpdateForm() {
+      return this.tagToCreate.id
     }
   },
   created() {
@@ -147,43 +164,41 @@ export default {
     handleSaveClick() {
       this.createOrUpdateTag()
     },
-    handleAddTag() {
-      this.formType = 'create'
-      this.tagToCreate = {}
-    },
     handleEditTag(tag) {
       this.tagToCreate = tag
-      this.formType = 'update'
     },
     handleDeleteTag(tagId) {
-      tagApi.delete(tagId).then(response => {
-        this.$message.success('删除成功！')
-        this.loadTags()
-        this.handleAddTag()
-      })
+      tagApi
+        .delete(tagId)
+        .then(response => {
+          this.$message.success('删除成功！')
+          this.tagToCreate = {}
+        })
+        .finally(() => {
+          this.loadTags()
+        })
     },
     createOrUpdateTag() {
-      if (!this.tagToCreate.name) {
-        this.$notification['error']({
-          message: '提示',
-          description: '标签名称不能为空！'
-        })
-        return
-      }
-      if (this.tagToCreate.id) {
-        tagApi.update(this.tagToCreate.id, this.tagToCreate).then(response => {
-          this.$message.success('更新成功！')
-          this.loadTags()
-          this.tagToCreate = {}
-        })
-      } else {
-        tagApi.create(this.tagToCreate).then(response => {
-          this.$message.success('保存成功！')
-          this.loadTags()
-          this.tagToCreate = {}
-        })
-      }
-      this.handleAddTag()
+      this.$refs.tagForm.validate(valid => {
+        if (valid) {
+          if (this.tagToCreate.id) {
+            tagApi.update(this.tagToCreate.id, this.tagToCreate).then(response => {
+              this.$message.success('更新成功！')
+              this.tagToCreate = {}
+            })
+          } else {
+            tagApi
+              .create(this.tagToCreate)
+              .then(response => {
+                this.$message.success('保存成功！')
+                this.tagToCreate = {}
+              })
+              .finally(() => {
+                this.loadTags()
+              })
+          }
+        }
+      })
     },
     handleSelectThumbnail(data) {
       this.$set(this.tagToCreate, 'thumbnail', encodeURI(data.path))

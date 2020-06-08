@@ -13,28 +13,39 @@
           :title="title"
           :bodyStyle="{ padding: '16px' }"
         >
-          <a-form layout="horizontal">
-            <a-form-item
+          <a-form-model
+            ref="categoryForm"
+            :model="categoryToCreate"
+            :rules="categoryRules"
+            layout="horizontal"
+          >
+            <a-form-model-item
               label="名称："
               help="* 页面上所显示的名称"
+              prop="name"
             >
               <a-input v-model="categoryToCreate.name" />
-            </a-form-item>
-            <a-form-item
+            </a-form-model-item>
+            <a-form-model-item
               label="别名："
               help="* 一般为单个分类页面的标识，最好为英文"
+              prop="slug"
             >
               <a-input v-model="categoryToCreate.slug" />
-            </a-form-item>
-            <a-form-item label="上级目录：">
+            </a-form-model-item>
+            <a-form-model-item
+              label="上级目录："
+              prop="parentId"
+            >
               <category-select-tree
                 :categories="categories"
                 v-model="categoryToCreate.parentId"
               />
-            </a-form-item>
-            <a-form-item
+            </a-form-model-item>
+            <a-form-model-item
               label="封面图："
               help="* 在分类页面可展示，需要主题支持"
+              prop="thumbnail"
             >
               <a-input v-model="categoryToCreate.thumbnail">
                 <a
@@ -45,22 +56,23 @@
                   <a-icon type="picture" />
                 </a>
               </a-input>
-            </a-form-item>
-            <a-form-item
+            </a-form-model-item>
+            <a-form-model-item
               label="描述："
               help="* 分类描述，部分主题可显示"
+              prop="description"
             >
               <a-input
                 type="textarea"
                 v-model="categoryToCreate.description"
                 :autoSize="{ minRows: 3 }"
               />
-            </a-form-item>
-            <a-form-item>
+            </a-form-model-item>
+            <a-form-model-item>
               <a-button
                 type="primary"
                 @click="handleSaveClick"
-                v-if="formType==='create'"
+                v-if="!isUpdateForm"
               >保存</a-button>
               <a-button-group v-else>
                 <a-button
@@ -69,12 +81,11 @@
                 >更新</a-button>
                 <a-button
                   type="dashed"
-                  @click="handleAddCategory"
-                  v-if="formType==='update'"
+                  @click="categoryToCreate = {}"
                 >返回添加</a-button>
               </a-button-group>
-            </a-form-item>
-          </a-form>
+            </a-form-model-item>
+          </a-form-model>
         </a-card>
       </a-col>
       <a-col
@@ -118,7 +129,7 @@
                   <a-menu slot="overlay">
                     <a-menu-item>
                       <a
-                        href="javascript:;"
+                        href="javascript:void(0);"
                         @click="handleEditCategory(item)"
                       >编辑</a>
                     </a-menu-item>
@@ -274,13 +285,20 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      formType: 'create',
       categories: [],
       categoryToCreate: {},
       thumbnailDrawerVisible: false,
-      menu: {},
       loading: false,
-      columns
+      columns,
+      categoryRules: {
+        name: [
+          { required: true, message: '* 分类名称不能为空', trigger: ['change', 'blur'] },
+          { max: 255, message: '* 分类名称的字符长度不能超过 255', trigger: ['change', 'blur'] }
+        ],
+        slug: [{ max: 255, message: '* 分类别名的字符长度不能超过 255', trigger: ['change', 'blur'] }],
+        thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change', 'blur'] }],
+        description: [{ max: 100, message: '* 分类描述的字符长度不能超过 100', trigger: ['change', 'blur'] }]
+      }
     }
   },
   computed: {
@@ -289,6 +307,9 @@ export default {
         return '修改分类'
       }
       return '添加分类'
+    },
+    isUpdateForm() {
+      return this.categoryToCreate.id
     }
   },
   created() {
@@ -297,56 +318,68 @@ export default {
   methods: {
     loadCategories() {
       this.loading = true
-      categoryApi.listAll(true).then(response => {
-        this.categories = response.data.data
-        this.loading = false
-      })
+      categoryApi
+        .listAll(true)
+        .then(response => {
+          this.categories = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleSaveClick() {
       this.createOrUpdateCategory()
     },
-    handleAddCategory() {
-      this.formType = 'create'
-      this.categoryToCreate = {}
-    },
     handleEditCategory(category) {
       this.categoryToCreate = category
-      this.formType = 'update'
     },
     handleDeleteCategory(id) {
-      categoryApi.delete(id).then(response => {
-        this.$message.success('删除成功！')
-        this.loadCategories()
-        this.handleAddCategory()
-      })
+      categoryApi
+        .delete(id)
+        .then(response => {
+          this.$message.success('删除成功！')
+          this.categoryToCreate = {}
+        })
+        .finally(() => {
+          this.loadCategories()
+        })
     },
     createOrUpdateCategory() {
-      if (!this.categoryToCreate.name) {
-        this.$notification['error']({
-          message: '提示',
-          description: '分类名称不能为空！'
-        })
-        return
-      }
-      if (this.categoryToCreate.id) {
-        categoryApi.update(this.categoryToCreate.id, this.categoryToCreate).then(response => {
-          this.$message.success('更新成功！')
-          this.loadCategories()
-        })
-      } else {
-        categoryApi.create(this.categoryToCreate).then(response => {
-          this.$message.success('保存成功！')
-          this.loadCategories()
-        })
-      }
-      this.handleAddCategory()
+      this.$refs.categoryForm.validate(valid => {
+        if (valid) {
+          if (this.categoryToCreate.id) {
+            categoryApi
+              .update(this.categoryToCreate.id, this.categoryToCreate)
+              .then(response => {
+                this.$message.success('更新成功！')
+                this.categoryToCreate = {}
+              })
+              .finally(() => {
+                this.loadCategories()
+              })
+          } else {
+            categoryApi
+              .create(this.categoryToCreate)
+              .then(response => {
+                this.$message.success('保存成功！')
+                this.categoryToCreate = {}
+              })
+              .finally(() => {
+                this.loadCategories()
+              })
+          }
+        }
+      })
     },
     handleCategoryToMenu(category) {
-      this.menu['name'] = category.name
-      this.menu['url'] = `${category.fullPath}`
-      menuApi.create(this.menu).then(response => {
+      const menu = {
+        name: category.name,
+        url: `${category.fullPath}`
+      }
+      menuApi.create(menu).then(response => {
         this.$message.success('添加到菜单成功！')
-        this.menu = {}
       })
     },
     handleSelectThumbnail(data) {

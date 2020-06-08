@@ -234,86 +234,34 @@ export default {
 
       generalRules: {
         username: [
-          {
-            required: true,
-            message: '用户名不能为空',
-            trigger: 'change'
-          },
-          {
-            max: 50,
-            message: '用户名的字符长度不能超过 50',
-            trigger: 'change'
-          }
+          { required: true, message: '* 用户名不能为空', trigger: ['change', 'blur'] },
+          { max: 50, message: '* 用户名的字符长度不能超过 50', trigger: ['change', 'blur'] }
         ],
         nickname: [
-          {
-            required: true,
-            message: '用户昵称不能为空',
-            trigger: 'change'
-          },
-          {
-            max: 255,
-            message: '用户昵称的字符长度不能超过 255',
-            trigger: 'change'
-          }
+          { required: true, message: '* 用户昵称不能为空', trigger: ['change', 'blur'] },
+          { max: 255, message: '* 用户昵称的字符长度不能超过 255', trigger: ['change', 'blur'] }
         ],
         email: [
-          {
-            required: true,
-            message: '电子邮件地址不能为空',
-            trigger: 'change'
-          },
-          {
-            max: 127,
-            message: '电子邮件地址的字符长度不能超过 127',
-            trigger: 'change'
-          },
+          { required: true, message: '* 电子邮件地址不能为空', trigger: ['change', 'blur'] },
+          { max: 127, message: '* 电子邮件地址的字符长度不能超过 127', trigger: ['change', 'blur'] },
           {
             pattern: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/g,
-            message: '电子邮件地址的格式不正确',
-            trigger: 'change'
+            message: '* 电子邮件地址的格式不正确',
+            trigger: ['change', 'blur']
           }
         ],
         password: [
-          {
-            required: true,
-            message: '密码不能为空',
-            trigger: 'change'
-          },
-          {
-            min: 8,
-            max: 100,
-            message: '密码的字符长度必须在 8 - 100 之间',
-            trigger: 'change'
-          }
+          { required: true, message: '* 密码不能为空', trigger: ['change', 'blur'] },
+          { min: 8, max: 100, message: '* 密码的字符长度必须在 8 - 100 之间', trigger: ['change', 'blur'] }
         ],
         confirmPassword: [
-          {
-            required: true,
-            message: '确认密码不能为空',
-            trigger: 'change'
-          },
-          {
-            validator: confirmPasswordValidate,
-            trigger: 'change'
-          }
+          { required: true, message: '* 确认密码不能为空', trigger: ['change', 'blur'] },
+          { validator: confirmPasswordValidate, trigger: ['change', 'blur'] }
         ]
       },
       blogRules: {
-        url: [
-          {
-            required: true,
-            message: '博客地址不能为空',
-            trigger: 'change'
-          }
-        ],
-        title: [
-          {
-            required: true,
-            message: '博客标题不能为空',
-            trigger: 'change'
-          }
-        ]
+        url: [{ required: true, message: '* 博客地址不能为空', trigger: ['change', 'blur'] }],
+        title: [{ required: true, message: '* 博客标题不能为空', trigger: ['change', 'blur'] }]
       }
     }
   },

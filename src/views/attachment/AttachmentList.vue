@@ -275,11 +275,17 @@ export default {
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
       this.listLoading = true
-      attachmentApi.query(this.queryParam).then(response => {
-        this.attachments = response.data.data.content
-        this.pagination.total = response.data.data.total
-        this.listLoading = false
-      })
+      attachmentApi
+        .query(this.queryParam)
+        .then(response => {
+          this.attachments = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.listLoading = false
+          }, 200)
+        })
     },
     loadMediaTypes() {
       attachmentApi.getMediaTypes().then(response => {
