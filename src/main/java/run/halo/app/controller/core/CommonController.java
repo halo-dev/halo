@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.Map;
 
+import static run.halo.app.model.support.HaloConst.DEFAULT_ERROR_PATH;
+
 /**
  * Error page Controller
  *
@@ -43,15 +45,11 @@ public class CommonController extends AbstractErrorController {
 
     private static final String ERROR_TEMPLATE = "error.ftl";
 
-    private static final String DEFAULT_ERROR_PATH = "common/error/error";
-
     private static final String COULD_NOT_RESOLVE_VIEW_WITH_NAME_PREFIX = "Could not resolve view with name '";
 
     private final ThemeService themeService;
 
     private final ErrorProperties errorProperties;
-
-    private final ErrorAttributes errorAttributes;
 
     private final OptionService optionService;
 
@@ -61,7 +59,6 @@ public class CommonController extends AbstractErrorController {
                             OptionService optionService) {
         super(errorAttributes);
         this.themeService = themeService;
-        this.errorAttributes = errorAttributes;
         this.errorProperties = serverProperties.getError();
         this.optionService = optionService;
     }
@@ -166,9 +163,9 @@ public class CommonController extends AbstractErrorController {
         }
 
         Throwable throwable = (Throwable) throwableObject;
-        log.error("Captured an exception", throwable);
 
         if (throwable instanceof NestedServletException) {
+            log.error("Captured an exception", throwable);
             Throwable rootCause = ((NestedServletException) throwable).getRootCause();
             if (rootCause instanceof AbstractHaloException) {
                 AbstractHaloException haloException = (AbstractHaloException) rootCause;
@@ -177,6 +174,7 @@ public class CommonController extends AbstractErrorController {
                 request.setAttribute("javax.servlet.error.message", haloException.getMessage());
             }
         } else if (StringUtils.startsWithIgnoreCase(throwable.getMessage(), COULD_NOT_RESOLVE_VIEW_WITH_NAME_PREFIX)) {
+            log.debug("Captured an exception", throwable);
             request.setAttribute("javax.servlet.error.status_code", HttpStatus.NOT_FOUND.value());
 
             NotFoundException viewNotFound = new NotFoundException("该路径没有对应的模板");

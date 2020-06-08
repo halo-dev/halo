@@ -65,7 +65,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         try {
             this.migrate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Failed to migrate database!", e);
         }
         this.initThemes();
         this.initDirectory();

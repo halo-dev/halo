@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="alternate" type="application/rss+xml" title="atom 1.0" href="${atom_url!}">
-    <title>${error.status!} | ${error.error!}</title>
+    <title>${(error.status)!500} | ${(error.error)!'未知错误'}</title>
 
     <style type="text/css">
         body {
@@ -121,9 +121,9 @@
 <body>
 
 <div class="container">
-    <h2>${error.status!}</h2>
-    <h1 class="title">${error.error!}.</h1>
-    <p>${error.message!}</p>
+    <h2>${(error.status)!500}</h2>
+    <h1 class="title">${(error.error)!'未知错误'}.</h1>
+    <p>${(error.message)!'未知错误！可能存在的原因：未正确设置主题或主题文件缺失。'}</p>
     <div class="back-home">
         <button onclick="window.location.href='${blog_url!}'">首页</button>
     </div>

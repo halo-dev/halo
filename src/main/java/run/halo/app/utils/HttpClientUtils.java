@@ -45,9 +45,9 @@ public class HttpClientUtils {
             .build();
 
         return HttpClients.custom()
-                .setSSLContext(sslContext)
-                .setSSLHostnameVerifier(new NoopHostnameVerifier())
-                .setDefaultRequestConfig(getRequestConfig(timeout))
+            .setSSLContext(sslContext)
+            .setSSLHostnameVerifier(new NoopHostnameVerifier())
+            .setDefaultRequestConfig(getRequestConfig(timeout))
             .build();
     }
 
@@ -59,10 +59,10 @@ public class HttpClientUtils {
      */
     private static RequestConfig getRequestConfig(int timeout) {
         return RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setConnectionRequestTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build();
+            .setConnectTimeout(timeout)
+            .setConnectionRequestTimeout(timeout)
+            .setSocketTimeout(timeout)
+            .build();
     }
 
 
