@@ -68,7 +68,7 @@ ext {
     annotationsVersion = "3.0.1u2"
     jedisVersion= '3.3.0'
     zxingVersion = "3.4.0"
-    huaweiObsVersion = "3.19.7"
+    huaweiObsVersion = "3.20.4.2"
 }
 
 dependencies {
