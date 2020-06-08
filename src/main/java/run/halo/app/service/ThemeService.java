@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Theme service interface.
@@ -30,6 +29,7 @@ public interface ThemeService {
     /**
      * Theme property file name.
      */
+    @Deprecated
     String[] THEME_PROPERTY_FILE_NAMES = {"theme.yaml", "theme.yml"};
 
 
@@ -56,6 +56,7 @@ public interface ThemeService {
     /**
      * Theme screenshots name.
      */
+    @Deprecated
     String THEME_SCREENSHOTS_NAME = "screenshot";
 
 
@@ -101,6 +102,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated
     ThemeProperty getThemeOfNonNullBy(@NonNull String themeId);
 
     /**
@@ -110,7 +112,7 @@ public interface ThemeService {
      * @return a optional theme property
      */
     @NonNull
-    Optional<ThemeProperty> getThemeBy(@Nullable String themeId);
+    Optional<ThemeProperty> fetchThemePropertyBy(@Nullable String themeId);
 
     /**
      * Gets all themes
@@ -118,15 +120,7 @@ public interface ThemeService {
      * @return set of themes
      */
     @NonNull
-    Set<ThemeProperty> getThemes();
-
-    /**
-     * Lists theme folder by absolute path.
-     *
-     * @param absolutePath absolutePath
-     * @return List<ThemeFile>
-     */
-    List<ThemeFile> listThemeFolder(@NonNull String absolutePath);
+    List<ThemeProperty> getThemes();
 
     /**
      * Lists theme folder by theme name.
@@ -134,6 +128,7 @@ public interface ThemeService {
      * @param themeId theme id
      * @return List<ThemeFile>
      */
+    @NonNull
     List<ThemeFile> listThemeFolderBy(@NonNull String themeId);
 
     /**
@@ -143,7 +138,8 @@ public interface ThemeService {
      * @return a set of templates
      */
     @Deprecated
-    Set<String> listCustomTemplates(@NonNull String themeId);
+    @NonNull
+    List<String> listCustomTemplates(@NonNull String themeId);
 
     /**
      * Lists a set of custom template, such as sheet_xxx.ftl/post_xxx.ftl, and xxx will be template name
@@ -152,7 +148,8 @@ public interface ThemeService {
      * @param prefix  post_ or sheet_
      * @return a set of templates
      */
-    Set<String> listCustomTemplates(@NonNull String themeId, @NonNull String prefix);
+    @NonNull
+    List<String> listCustomTemplates(@NonNull String themeId, @NonNull String prefix);
 
     /**
      * Judging whether template exists under the specified theme
@@ -260,6 +257,14 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty getActivatedTheme();
+
+    /**
+     * Fetch activated theme property.
+     *
+     * @return activated theme property
+     */
+    @NonNull
+    Optional<ThemeProperty> fetchActivatedTheme();
 
     /**
      * Actives a theme.

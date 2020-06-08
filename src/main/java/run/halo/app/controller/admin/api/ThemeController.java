@@ -15,7 +15,6 @@ import run.halo.app.service.ThemeSettingService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Theme controller.
@@ -45,7 +44,7 @@ public class ThemeController {
 
     @GetMapping
     @ApiOperation("Lists all themes")
-    public Set<ThemeProperty> listAll() {
+    public List<ThemeProperty> listAll() {
         return themeService.getThemes();
     }
 
@@ -91,13 +90,13 @@ public class ThemeController {
 
     @GetMapping("activation/template/custom/sheet")
     @ApiOperation("Gets custom sheet templates")
-    public Set<String> customSheetTemplate() {
+    public List<String> customSheetTemplate() {
         return themeService.listCustomTemplates(themeService.getActivatedThemeId(), ThemeService.CUSTOM_SHEET_PREFIX);
     }
 
     @GetMapping("activation/template/custom/post")
     @ApiOperation("Gets custom post templates")
-    public Set<String> customPostTemplate() {
+    public List<String> customPostTemplate() {
         return themeService.listCustomTemplates(themeService.getActivatedThemeId(), ThemeService.CUSTOM_POST_PREFIX);
     }
 

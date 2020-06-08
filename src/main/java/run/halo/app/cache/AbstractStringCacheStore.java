@@ -25,7 +25,7 @@ public abstract class AbstractStringCacheStore extends AbstractCacheStore<String
             cacheWrapper = JsonUtils.jsonToObject(json, CacheWrapper.class);
         } catch (IOException e) {
             e.printStackTrace();
-            log.debug("erro json to wrapper value bytes: [{}]", json, e);
+            log.debug("Failed to convert json to wrapper value bytes: [{}]", json, e);
         }
         return Optional.ofNullable(cacheWrapper);
     }
