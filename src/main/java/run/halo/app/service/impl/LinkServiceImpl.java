@@ -15,6 +15,7 @@ import run.halo.app.model.vo.LinkTeamVO;
 import run.halo.app.repository.LinkRepository;
 import run.halo.app.service.LinkService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.ListUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.*;
@@ -98,6 +99,12 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     @Override
     public List<String> listAllTeams() {
         return linkRepository.findAllTeams();
+    }
+
+    @Override
+    public List<String> listAllByDisruption() {
+        List<Link> allLink = linkRepository.findAll();
+        return ListUtils.listDisruption(allLink);
     }
 
     @NonNull
