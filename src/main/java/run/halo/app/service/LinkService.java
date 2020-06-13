@@ -62,5 +62,5 @@ public interface LinkService extends CrudService<Link, Integer> {
     List<String> listAllTeams();
 
     @NonNull
-    List<String> listAllByDisruption();
+    List<Link> listAllByDisruption();
 }
