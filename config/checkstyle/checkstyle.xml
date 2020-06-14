@@ -12,8 +12,8 @@
     <module name="FileTabCharacter"/>
 
     <module name="RegexpSingleline">
-        <property name="format" value="System\.out"/>
-        <property name="message" value="Prohibit invoking System.out in source code !"/>
+        <property name="format" value="^.*System\.(out|err).*$"/>
+        <property name="message" value="Don't use System.out/err, use SLF4J instead."/>
     </module>
 
     <module name="FileLength">
@@ -21,7 +21,11 @@
     </module>
 
     <module name="TreeWalker">
-
+        <module name="SuppressionCommentFilter">
+            <property name="offCommentFormat" value="CS:OFF:BEGIN"/>
+            <property name="onCommentFormat" value="CS:OFF:END"/>
+            <property name="checkFormat" value=".*"/>
+        </module>
         <module name="UnusedImports">
             <property name="processJavadoc" value="true"/>
         </module>
@@ -82,7 +86,6 @@
         <module name="Indentation"/>
         <module name="MethodParamPad"/>
         <module name="ParenPad"/>
-        <module name="TypecastParenPad"/>
         <module name="TypecastParenPad"/>
 
     </module>
