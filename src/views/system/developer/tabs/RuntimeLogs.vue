@@ -61,6 +61,10 @@ export default {
   created() {
     this.loadLogs()
   },
+  updated() {
+    // 滚动条定位到底部
+    this.$el.querySelector('.CodeMirror-scroll').scrollTop = this.$el.querySelector('.CodeMirror-scroll').scrollHeight
+  },
   methods: {
     loadLogs() {
       this.loading = true
