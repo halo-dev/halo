@@ -3,6 +3,7 @@ package run.halo.app.model.support;
 import org.springframework.http.HttpHeaders;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * <pre>
@@ -139,6 +140,12 @@ public class HaloConst {
      * Version constant. (Available in production environment)
      */
     public static final String HALO_VERSION;
+
+    /**
+     * Unknown version: unknown
+     */
+    public static final String UNKNOWN_VERSION = "unknown";
+
     /**
      * Database product name.
      */
@@ -150,6 +157,6 @@ public class HaloConst {
 
     static {
         // Set version
-        HALO_VERSION = HaloConst.class.getPackage().getImplementationVersion();
+        HALO_VERSION = Optional.ofNullable(HaloConst.class.getPackage().getImplementationVersion()).orElse(UNKNOWN_VERSION);
     }
 }
