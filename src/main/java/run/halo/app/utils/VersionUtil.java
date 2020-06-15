@@ -27,7 +27,8 @@ public class VersionUtil {
             log.warn("Unknown version will be converted to {}.{}.{}.{}",
                 Integer.MAX_VALUE,
                 Integer.MAX_VALUE,
-                Integer.MAX_VALUE, Integer.MAX_VALUE);
+                Integer.MAX_VALUE,
+                Integer.MAX_VALUE);
             return new int[] {Integer.MAX_VALUE,
                 Integer.MAX_VALUE,
                 Integer.MAX_VALUE,
