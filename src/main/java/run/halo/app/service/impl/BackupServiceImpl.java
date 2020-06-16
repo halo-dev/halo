@@ -5,10 +5,13 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.pool.HikariPool;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +32,7 @@ import run.halo.app.model.entity.*;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.*;
+import run.halo.app.utils.ApplicationContextUtils;
 import run.halo.app.utils.DateTimeUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.JsonUtils;
@@ -176,15 +180,24 @@ public class BackupServiceImpl implements BackupService {
             String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
                 DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
                 IdUtil.simpleUUID().hashCode() + ".zip";
+
             // Create halo zip file
             Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
+
+            HikariDataSource ds = ApplicationContextUtils.getApplicationContext().getBean(HikariDataSource.class);
+
+            HikariPool hikariPool = (HikariPool) ReflectUtil.getFieldValue(ds, "pool");
+
+            hikariPool.shutdown();
 
             // Zip halo
             run.halo.app.utils.FileUtils.zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
 
+            ReflectUtil.setFieldValue(ds, "pool", new HikariPool(ds));
+
             // Build backup dto
             return buildBackupDto(BACKUP_RESOURCE_BASE_URI, haloZipPath);
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             throw new ServiceException("Failed to backup halo", e);
         }
     }
