@@ -57,7 +57,7 @@ public class CategoryController {
     @GetMapping("{slug}/posts")
     @ApiOperation("Lists posts by category slug")
     public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slug") String slug,
-                                               @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+                                               @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable) {
         // Get category by slug
         Category category = categoryService.getBySlugOfNonNull(slug);
 
