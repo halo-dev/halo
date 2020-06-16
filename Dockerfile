@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk8-openj9
+FROM openjdk:8u222-jre
 VOLUME /tmp
 
 ARG JAR_FILE=build/libs/halo.jar
