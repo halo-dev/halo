@@ -1,12 +1,17 @@
-FROM openjdk:9
+FROM adoptopenjdk/openjdk8-openj9:alpine
+
+RUN apk update \
+&& apk add curl bash tree tzdata\
+&& cp -r -f /usr/share/zoneinfo/Asia/Shanghai /etc/localtime\
+&& echo -ne "adoptopenjdk/openjdk8-openj9:jdk8u172-b11-nightly. (uname -rsv)\n" >> /root/.built
+
 VOLUME /tmp
 
 ARG JAR_FILE=build/libs/halo.jar
 ARG PORT=8090
-ARG TIME_ZONE=Asia/Shanghai
 
-ENV TZ=${TIME_ZONE} \
-    JAVA_OPTS="-Xms256m -Xmx256m"
+ENV LANG C.UTF-8
+ENV JAVA_OPTS="-Xms256m -Xmx256m"
 
 COPY ${JAR_FILE} halo.jar
 
