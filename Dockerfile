@@ -1,12 +1,12 @@
-FROM openjdk:8u222-jre
+FROM openjdk:9
 VOLUME /tmp
 
 ARG JAR_FILE=build/libs/halo.jar
 ARG PORT=8090
 ARG TIME_ZONE=Asia/Shanghai
 
-ENV TZ=${TIME_ZONE}
-ENV JAVA_OPTS="-Xms256m -Xmx256m"
+ENV TZ=${TIME_ZONE} \
+    JAVA_OPTS="-Xms256m -Xmx256m"
 
 COPY ${JAR_FILE} halo.jar
 
