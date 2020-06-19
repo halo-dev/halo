@@ -99,6 +99,7 @@ public class FreemarkerConfigAwareListener {
         ThemeProperty activatedTheme = themeService.getActivatedTheme();
         configuration.setSharedVariable("theme", activatedTheme);
         configuration.setSharedVariable("static", optionService.getBlogBaseUrl() + "/" + activatedTheme.getFolderName());
+        configuration.setSharedVariable("theme_base", optionService.getBlogBaseUrl() + "/" + activatedTheme.getFolderName());
         configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
         log.debug("Loaded theme and settings");
     }
