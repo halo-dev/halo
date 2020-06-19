@@ -1,177 +1,138 @@
 package run.halo.app.service.impl;
 
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.*;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.web.client.RestTemplate;
+import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.handler.theme.config.ThemeConfigResolver;
+import run.halo.app.handler.theme.config.ThemePropertyResolver;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
+import run.halo.app.service.OptionService;
+import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.GitUtils;
-import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.GithubUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("test")
-@Slf4j
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({GitUtils.class, GithubUtils.class, FileUtils.class, ThemeServiceImpl.class})
+@Ignore
 public class ThemeServiceImplTest {
 
-    @Autowired
-    private ThemeServiceImpl themeService;
+    @Mock
+    private HaloProperties haloProperties;
 
-    @Test
-    @Ignore
-    public void fetchGitTest() throws IOException {
-        ThemeProperty themeProperty = themeService.fetch("https://github.com/halo-dev/halo-theme-pinghsu");
-        Assert.assertNotNull(themeProperty);
-        Path themePath = Paths.get(themeProperty.getThemePath());
-        if (!Files.exists(themePath)) {
-            Assert.fail("fetch(clone from master) failed.");
-        } else {
-            deleteDir(themePath);
-        }
+    @Mock
+    private OptionService optionService;
 
+    @Mock
+    private AbstractStringCacheStore cacheStore;
+
+    @Mock
+    private ThemeConfigResolver themeConfigResolver;
+
+    @Mock
+    private ThemePropertyResolver themePropertyResolver;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
+    @InjectMocks
+    public ThemeServiceImpl themeService;
+
+    @Before
+    public void setUp() throws Exception {
+        //Static Method
+        PowerMockito.mockStatic(GithubUtils.class);
+        PowerMockito.mockStatic(GitUtils.class);
+        PowerMockito.mockStatic(FileUtils.class);
+
+        PowerMockito.doReturn(Arrays.asList("master", "dev")).when(GitUtils.class, "getAllBranches", Mockito.any(String.class));
+        PowerMockito.doNothing().when(GitUtils.class, "cloneFromGit", Mockito.any(String.class), Mockito.any(Path.class));
+
+        PowerMockito.doReturn("propertyContent").when(GithubUtils.class, "accessThemeProperty", Mockito.any(String.class), Mockito.any(String.class));
+
+        PowerMockito.doReturn(new File("tmpPath").toPath()).when(FileUtils.class, "createTempDirectory");
+        PowerMockito.doNothing().when(FileUtils.class, "deleteFolderQuietly", Mockito.any(Path.class));
+
+        //Method
+        themeService = PowerMockito.spy(new ThemeServiceImpl(haloProperties, optionService, cacheStore, themeConfigResolver, themePropertyResolver, restTemplate, eventPublisher));
+
+        Mockito.doReturn(new ThemeProperty()).when(themePropertyResolver).resolve(Mockito.any(String.class));
+
+        Mockito.doNothing().when(eventPublisher).publishEvent(Mockito.any(String.class));
     }
 
     @Test
-    @Ignore
-    public void fetchZipTest() throws IOException {
-        ThemeProperty themeProperty = themeService.fetch("https://github.com/halo-dev/halo-theme-pinghsu/archive/master.zip");
+    public void fetchGitTest() throws Exception {
+        String uri = "https://github.com/halo-dev/halo-theme-pinghsu";
+        PowerMockito.doNothing().when(themeService, "downloadZipAndUnzip", Mockito.any(String.class), Mockito.any(Path.class));
+        PowerMockito.doReturn(new ThemeProperty()).when(themeService, "add", Mockito.any(Path.class));
+        ThemeProperty themeProperty = themeService.fetch(uri);
         Assert.assertNotNull(themeProperty);
-        Path themePath = Paths.get(themeProperty.getThemePath());
-        if (!Files.exists(themePath)) {
-            Assert.fail("fetch(zip file) failed");
-        } else {
-            deleteDir(themePath);
-        }
     }
 
     @Test
-    public void fetchBranchesWithValidURL() {
-        List<ThemeProperty> themeProperties = themeService.fetchBranches("https://github.com/halo-dev/halo-theme-hux");
+    public void fetchZipTest() throws Exception {
+        String uri = "https://github.com/halo-dev/halo-theme-pinghsu/archive/master.zip";
+        PowerMockito.doNothing().when(themeService, "downloadZipAndUnzip", Mockito.any(String.class), Mockito.any(Path.class));
+        PowerMockito.doReturn(new ThemeProperty()).when(themeService, "add", Mockito.any(Path.class));
+        ThemeProperty themeProperty = themeService.fetch(uri);
+        Assert.assertNotNull(themeProperty);
+    }
+
+    @Test
+    public void fetchBranchesTest() {
+        String uri = "https://github.com/halo-dev/halo-theme-hux";
+
+        List<ThemeProperty> themeProperties = themeService.fetchBranches(uri);
+
         Assert.assertNotNull(themeProperties);
-    }
-
-    @Test
-    public void fetchBranchesWithInvalidURL() {
-        List<ThemeProperty> themeProperties = themeService.fetchBranches("https://github.com/halo-dev/halo-theme");
-        Assert.assertNotNull(themeProperties);
-        Assert.assertEquals(themeProperties.size(), 0);
+        Assert.assertEquals(themeProperties.size(), 2);
     }
 
 
     @Test
-    @Ignore
-    public void fetchBranchTest() throws IOException {
-        ThemeProperty themeProperty = themeService.fetchBranch("https://github.com/halo-dev/halo-theme-casper", "master");
-        Assert.assertNotNull(themeProperty);
-        Path themePath = Paths.get(themeProperty.getThemePath());
-        if (!Files.exists(themePath)) {
-            Assert.fail("fetch(branch master) failed");
-        } else {
-            deleteDir(themePath);
-        }
-    }
-
-    @Test
-    @Ignore
-    public void fetchBranchNotMasterTest() throws IOException {
+    public void fetchBranchTest() throws Exception {
         String uri = "https://github.com/halo-dev/halo-theme-casper";
-        List<String> branches = GitUtils.getAllBranches(uri);
-        Optional<String> optional = branches.stream().filter(b -> !b.equalsIgnoreCase("master")).findFirst();
-        if (optional.isPresent()) {
-            ThemeProperty themeProperty = themeService.fetchBranch(uri, optional.get());
-            Assert.assertNotNull(themeProperty);
-            Path themePath = Paths.get(themeProperty.getThemePath());
-            if (!Files.exists(themePath)) {
-                Assert.fail("fetch(branch not master) failed");
-            } else {
-                deleteDir(themePath);
-            }
-        }
-    }
-
-    @Test
-    @Ignore
-    public void fetchLatestReleaseTest() throws IOException {
-        ThemeProperty themeProperty = themeService.fetchLatestRelease("https://github.com/halo-dev/halo-theme-casper");
+        String branch = "master";
+        PowerMockito.doNothing().when(themeService, "downloadZipAndUnzip", Mockito.any(String.class), Mockito.any(Path.class));
+        PowerMockito.doReturn(new ThemeProperty()).when(themeService, "add", Mockito.any(Path.class));
+        ThemeProperty themeProperty = themeService.fetchBranch(uri, branch);
         Assert.assertNotNull(themeProperty);
-        Path themePath = Paths.get(themeProperty.getThemePath());
-        if (Files.exists(themePath)) {
-            Assert.fail("fetch(latest release) failed");
-        } else {
-            deleteDir(themePath);
-        }
     }
 
     @Test
-    @Ignore
-    public void fetchLatestReleaseWithInvalidURL() {
-        try {
-            ThemeProperty themeProperty = themeService.fetchLatestRelease("123");
-            Assert.fail("Exception Expected");
-        } catch (Exception e) {
-        }
+    public void fetchLatestReleaseTest() throws Exception {
+        String uri = "https://github.com/halo-dev/halo-theme-casper";
+        PowerMockito.doNothing().when(themeService, "downloadZipAndUnzip", Mockito.any(String.class), Mockito.any(Path.class));
+        PowerMockito.doReturn(new ThemeProperty()).when(themeService, "add", Mockito.any(Path.class));
+        ThemeProperty themeProperty = themeService.fetchLatestRelease(uri);
+        Assert.assertNotNull(themeProperty);
     }
 
     @Test
-    @Ignore
-    public void updateTest() {
-        Set<ThemeProperty> set = themeService.getThemes();
-        if (set.size() > 0) {
-            ThemeProperty themeProperty = themeService.update(set.stream().findFirst().get().getId());
-            Assert.assertNotNull(themeProperty);
-            Path themePath = Paths.get(themeProperty.getThemePath());
-            if (!Files.exists(themePath)) {
-                Assert.fail("update fail: theme folder missing");
-            }
-        }
-    }
-
-    @Test
-    @Ignore
-    public void updateWithInvalidId() {
-        Set<ThemeProperty> set = themeService.getThemes();
-        String themeId = HaloUtils.randomUUIDWithoutDash();
-        AtomicInteger has = new AtomicInteger();
-        while (true) {
-            set.stream().filter(themeProperty -> StringUtils.equalsIgnoreCase(themeId, themeProperty.getId())).mapToInt(themeProperty -> 1).forEach(has::set);
-            if (has.get() == 0) break;
-        }
-        try {
-            ThemeProperty themeProperty = themeService.update(themeId);
-            Assert.fail("Exception expected.");
-        } catch (Exception e) {
-        }
-    }
-
-
-    private static void deleteDir(Path path) throws IOException {
-        if (Files.isDirectory(path)) {
-            Arrays.asList(path.toFile().listFiles()).stream().forEach(file -> {
-                if (file.isDirectory()) {
-                    try {
-                        deleteDir(file.toPath());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    file.delete();
-                }
-            });
-        }
-        Files.deleteIfExists(path);
+    public void updateTest() throws Exception {
+        PowerMockito.doNothing().when(themeService, "downloadZipAndUnzip", Mockito.any(String.class), Mockito.any(Path.class));
+        PowerMockito.doReturn(new ThemeProperty()).when(themeService, "add", Mockito.any(Path.class));
+        PowerMockito.doNothing().when(themeService, "pullFromGit", Mockito.any(ThemeProperty.class));
+        PowerMockito.doReturn(new ThemeProperty()).when(themeService, "getThemeOfNonNullBy", Mockito.any(String.class));
+        ThemeProperty themeProperty = themeService.update("String");
+        Assert.assertNotNull(themeProperty);
     }
 }

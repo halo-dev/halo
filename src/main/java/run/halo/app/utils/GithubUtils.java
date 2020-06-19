@@ -41,6 +41,7 @@ public class GithubUtils {
 
             return githubLatestRelease.result;
         } catch (InterruptedException e) {
+            log.warn("Interrupted", e);
         }
 
         return null;
@@ -65,6 +66,7 @@ public class GithubUtils {
 
             return githubReleases.result;
         } catch (InterruptedException e) {
+            log.warn("Interrupted", e);
         }
 
         return null;
@@ -90,6 +92,7 @@ public class GithubUtils {
 
             return githubRelease.result;
         } catch (InterruptedException e) {
+            log.warn("Interrupted", e);
         }
         return null;
     }
@@ -114,6 +117,7 @@ public class GithubUtils {
 
             return githubFile.result;
         } catch (InterruptedException e) {
+            log.warn("Interrupted", e);
         }
 
         return null;

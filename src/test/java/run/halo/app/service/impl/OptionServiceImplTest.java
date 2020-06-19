@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.properties.QiniuOssProperties;

@@ -76,6 +76,8 @@ ext {
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
     githubApiVersion = "1.84"
+    powermockVersion = "1.6.6"
+    mockitoVersion = "1.10.19"
 }
 
 dependencies {
@@ -143,5 +145,13 @@ dependencies {
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 
+    testCompile group: 'org.mockito', name: 'mockito-all', version: "$mockitoVersion"
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito', version: "$powermockVersion"
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: "$powermockVersion"
+
     developmentOnly "org.springframework.boot:spring-boot-devtools"
+}
+
+test {
+    useJUnitPlatform()
 }

@@ -24,12 +24,6 @@ import java.util.*;
 @Slf4j
 public class GitUtils {
 
-    static final String PREFIX = "https://github.com/";
-
-    static final String CONTENTAPIPATTERN = "https://api.github.com/repos/%s/contents/%s?ref=%s";
-
-    static final String RELEASEAPIPATTERN = "https://api.github.com/repos/%s/releases/latest";
-
     private GitUtils() {
         // Config packed git MMAP
         WindowCacheConfig config = new WindowCacheConfig();
@@ -97,11 +91,11 @@ public class GitUtils {
                 branches.add(ref.getName().substring(ref.getName().lastIndexOf("/") + 1, ref.getName().length()));
             }
         } catch (InvalidRemoteException e) {
-            log.warn("Git url is not valid");
+            log.warn("Git url is not valid", e);
         } catch (TransportException e) {
-            log.warn("Transport exception");
+            log.warn("Transport exception", e);
         } catch (GitAPIException e) {
-            log.warn("Git api exception");
+            log.warn("Git api exception", e);
         }
         return branches;
     }
