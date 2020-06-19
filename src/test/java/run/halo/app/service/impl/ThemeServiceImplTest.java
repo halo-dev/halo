@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.*;
@@ -28,7 +27,6 @@ import java.util.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({GitUtils.class, GithubUtils.class, FileUtils.class, ThemeServiceImpl.class})
-@Ignore
 public class ThemeServiceImplTest {
 
     @Mock
