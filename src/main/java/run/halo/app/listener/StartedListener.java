@@ -65,7 +65,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         try {
             this.migrate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            log.error("Failed to migrate database!", e);
         }
         this.initThemes();
         this.initDirectory();
@@ -74,7 +74,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
 
     private void printStartInfo() {
         String blogUrl = optionService.getBlogBaseUrl();
-
         log.info(AnsiOutput.toString(AnsiColor.BRIGHT_BLUE, "Halo started at         ", blogUrl));
         log.info(AnsiOutput.toString(AnsiColor.BRIGHT_BLUE, "Halo admin started at   ", blogUrl, "/", haloProperties.getAdminPath()));
         if (!haloProperties.isDocDisabled()) {
@@ -149,7 +148,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
                 log.debug("Skipped copying theme folder due to existence of theme folder");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Initialize internal theme to user path error", e);
+            log.error("Initialize internal theme to user path error!", e);
         }
     }
 
@@ -188,7 +187,6 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
                 Files.createDirectories(dataExportPath);
                 log.info("Created data export directory: [{}]", dataExportPath);
             }
-
         } catch (IOException ie) {
             throw new RuntimeException("Failed to initialize directories", ie);
         }

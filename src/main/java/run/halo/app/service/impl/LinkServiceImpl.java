@@ -100,6 +100,13 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         return linkRepository.findAllTeams();
     }
 
+    @Override
+    public List<Link> listAllByDisruption() {
+        List<Link> allLink = linkRepository.findAll();
+        Collections.shuffle(allLink);
+        return allLink;
+    }
+
     @NonNull
     private List<LinkDTO> convertTo(@Nullable List<Link> links) {
         if (CollectionUtils.isEmpty(links)) {

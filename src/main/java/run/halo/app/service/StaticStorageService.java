@@ -50,4 +50,20 @@ public interface StaticStorageService {
      * @param file     file must not be null.
      */
     void upload(String basePath, @NonNull MultipartFile file);
+
+    /**
+     * Rename static file or folder.
+     *
+     * @param basePath base path must not be null
+     * @param newName  new name must not be null
+     */
+    void rename(@NonNull String basePath, @NonNull String newName);
+
+    /**
+     * Save static file.
+     *
+     * @param path    path must not be null
+     * @param content saved content
+     */
+    void save(@NonNull String path, String content);
 }

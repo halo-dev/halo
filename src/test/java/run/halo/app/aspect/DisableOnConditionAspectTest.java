@@ -1,4 +1,4 @@
-package run.halo.app.handler.aspect;
+package run.halo.app.aspect;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

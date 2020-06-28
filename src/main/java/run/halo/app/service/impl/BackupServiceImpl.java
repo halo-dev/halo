@@ -5,7 +5,10 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.IdUtil;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,8 +31,10 @@ import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.service.*;
 import run.halo.app.utils.DateTimeUtils;
 import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.JsonUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -37,9 +42,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,6 +62,12 @@ public class BackupServiceImpl implements BackupService {
     private static final String DATA_EXPORT_BASE_URI = "/api/admin/backups/data";
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+    private static final Type MAP_TYPE = new TypeToken<Map<String, ?>>() {
+    }.getType();
+
+    private static final Type JSON_OBJECT_TYPE = new TypeToken<List<JsonObject>>() {
+    }.getType();
 
     private final AttachmentService attachmentService;
 
@@ -143,9 +152,9 @@ public class BackupServiceImpl implements BackupService {
      */
     public static String sanitizeFilename(final String unSanitized) {
         return unSanitized.
-                replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
-                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
-                replaceAll("\\s", "");
+            replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
+            replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
+            replaceAll("\\s", "");
     }
 
     @Override
@@ -165,8 +174,8 @@ public class BackupServiceImpl implements BackupService {
         try {
             // Create zip path for halo zip
             String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
-                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                    IdUtil.simpleUUID().hashCode() + ".zip";
+                DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
             Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
 
@@ -191,10 +200,10 @@ public class BackupServiceImpl implements BackupService {
         // Build backup dto
         try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
-                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
-                    .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
-                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
-                    .collect(Collectors.toList());
+                .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
+                .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
+                .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
+                .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
         }
@@ -258,7 +267,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public BackupDTO exportData() {
-        JSONObject data = new JSONObject();
+        Map<String, Object> data = new HashMap<>();
         data.put("version", HaloConst.HALO_VERSION);
         data.put("export_date", DateUtil.now());
         data.put("attachments", attachmentService.listAll());
@@ -285,13 +294,13 @@ public class BackupServiceImpl implements BackupService {
 
         try {
             String haloDataFileName = HaloConst.HALO_DATA_EXPORT_PREFIX +
-                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                    IdUtil.simpleUUID().hashCode() + ".json";
+                DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                IdUtil.simpleUUID().hashCode() + ".json";
 
             Path haloDataPath = Files.createFile(Paths.get(haloProperties.getDataExportDir(), haloDataFileName));
 
             FileWriter fileWriter = new FileWriter(haloDataPath.toFile(), CharsetUtil.UTF_8);
-            fileWriter.write(data.toJSONString());
+            fileWriter.write(JsonUtils.objectToJson(data));
 
             return buildBackupDto(DATA_EXPORT_BASE_URI, haloDataPath);
         } catch (IOException e) {
@@ -309,10 +318,10 @@ public class BackupServiceImpl implements BackupService {
 
         try (Stream<Path> subPathStream = Files.list(exportedDataParentPath)) {
             return subPathStream
-                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
-                    .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
-                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
-                    .collect(Collectors.toList());
+                .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
+                .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
+                .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
+                .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch exported data", e);
         }
@@ -342,68 +351,71 @@ public class BackupServiceImpl implements BackupService {
     public void importData(MultipartFile file) throws IOException {
         String jsonContent = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);
 
-        JSONObject data = JSONObject.parseObject(jsonContent);
+        ObjectMapper mapper = JsonUtils.createDefaultJsonMapper();
+        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+        };
+        HashMap<String, Object> data = mapper.readValue(jsonContent, typeRef);
 
-        List<Attachment> attachments = data.getJSONArray("attachments").toJavaList(Attachment.class);
+        List<Attachment> attachments = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("attachments")), Attachment[].class));
         attachmentService.createInBatch(attachments);
 
-        List<Category> categories = data.getJSONArray("categories").toJavaList(Category.class);
+        List<Category> categories = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("categories")), Category[].class));
         categoryService.createInBatch(categories);
 
-        List<Tag> tags = data.getJSONArray("tags").toJavaList(Tag.class);
+        List<Tag> tags = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("tags")), Tag[].class));
         tagService.createInBatch(tags);
 
-        List<CommentBlackList> commentBlackList = data.getJSONArray("comment_black_list").toJavaList(CommentBlackList.class);
+        List<CommentBlackList> commentBlackList = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("comment_black_list")), CommentBlackList[].class));
         commentBlackListService.createInBatch(commentBlackList);
 
-        List<Journal> journals = data.getJSONArray("journals").toJavaList(Journal.class);
+        List<Journal> journals = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("journals")), Journal[].class));
         journalService.createInBatch(journals);
 
-        List<JournalComment> journalComments = data.getJSONArray("journal_comments").toJavaList(JournalComment.class);
+        List<JournalComment> journalComments = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("journal_comments")), JournalComment[].class));
         journalCommentService.createInBatch(journalComments);
 
-        List<Link> links = data.getJSONArray("links").toJavaList(Link.class);
+        List<Link> links = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("links")), Link[].class));
         linkService.createInBatch(links);
 
-        List<Log> logs = data.getJSONArray("logs").toJavaList(Log.class);
+        List<Log> logs = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("logs")), Log[].class));
         logService.createInBatch(logs);
 
-        List<Menu> menus = data.getJSONArray("menus").toJavaList(Menu.class);
+        List<Menu> menus = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("menus")), Menu[].class));
         menuService.createInBatch(menus);
 
-        List<Option> options = data.getJSONArray("options").toJavaList(Option.class);
+        List<Option> options = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("options")), Option[].class));
         optionService.createInBatch(options);
 
         eventPublisher.publishEvent(new OptionUpdatedEvent(this));
 
-        List<Photo> photos = data.getJSONArray("photos").toJavaList(Photo.class);
+        List<Photo> photos = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("photos")), Photo[].class));
         photoService.createInBatch(photos);
 
-        List<Post> posts = data.getJSONArray("posts").toJavaList(Post.class);
+        List<Post> posts = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("posts")), Post[].class));
         postService.createInBatch(posts);
 
-        List<PostCategory> postCategories = data.getJSONArray("post_categories").toJavaList(PostCategory.class);
+        List<PostCategory> postCategories = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("post_categories")), PostCategory[].class));
         postCategoryService.createInBatch(postCategories);
 
-        List<PostComment> postComments = data.getJSONArray("post_comments").toJavaList(PostComment.class);
+        List<PostComment> postComments = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("post_comments")), PostComment[].class));
         postCommentService.createInBatch(postComments);
 
-        List<PostMeta> postMetas = data.getJSONArray("post_metas").toJavaList(PostMeta.class);
+        List<PostMeta> postMetas = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("post_metas")), PostMeta[].class));
         postMetaService.createInBatch(postMetas);
 
-        List<PostTag> postTags = data.getJSONArray("post_tags").toJavaList(PostTag.class);
+        List<PostTag> postTags = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("post_tags")), PostTag[].class));
         postTagService.createInBatch(postTags);
 
-        List<Sheet> sheets = data.getJSONArray("sheets").toJavaList(Sheet.class);
+        List<Sheet> sheets = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("sheets")), Sheet[].class));
         sheetService.createInBatch(sheets);
 
-        List<SheetComment> sheetComments = data.getJSONArray("sheet_comments").toJavaList(SheetComment.class);
+        List<SheetComment> sheetComments = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("sheet_comments")), SheetComment[].class));
         sheetCommentService.createInBatch(sheetComments);
 
-        List<SheetMeta> sheetMetas = data.getJSONArray("sheet_metas").toJavaList(SheetMeta.class);
+        List<SheetMeta> sheetMetas = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("sheet_metas")), SheetMeta[].class));
         sheetMetaService.createInBatch(sheetMetas);
 
-        List<ThemeSetting> themeSettings = data.getJSONArray("theme_settings").toJavaList(ThemeSetting.class);
+        List<ThemeSetting> themeSettings = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("theme_settings")), ThemeSetting[].class));
         themeSettingService.createInBatch(themeSettings);
 
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
@@ -452,9 +464,9 @@ public class BackupServiceImpl implements BackupService {
 
         // Build full url
         return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), backupUri)
-                + "?"
-                + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
-                + "=" + oneTimeToken;
+            + "?"
+            + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
+            + "=" + oneTimeToken;
     }
 
 }

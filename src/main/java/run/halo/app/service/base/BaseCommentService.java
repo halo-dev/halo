@@ -287,6 +287,7 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      *
      * @param comment comment dto must not be null
      */
+    @Deprecated
     <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment);
 
     /**
@@ -294,6 +295,7 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      *
      * @param comments comment dto list
      */
+    @Deprecated
     <T extends BaseCommentDTO> List<T> filterIpAddress(@Nullable List<T> comments);
 
     /**
@@ -301,6 +303,7 @@ public interface BaseCommentService<COMMENT extends BaseComment> extends CrudSer
      *
      * @param commentPage comment page
      */
+    @Deprecated
     <T extends BaseCommentDTO> Page<T> filterIpAddress(@NonNull Page<T> commentPage);
 
     /**

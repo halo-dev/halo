@@ -21,6 +21,8 @@ import run.halo.app.utils.FileUtils;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -97,6 +99,10 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
         Assert.notNull(relativePath, "Relative path must not be null");
 
         Path path = Paths.get(staticDir.toString(), relativePath);
+
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), path.toString());
+
         log.debug(path.toString());
 
         try {
@@ -127,6 +133,9 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
             path = Paths.get(staticDir.toString(), basePath, folderName);
         }
 
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), path.toString());
+
         if (path.toFile().exists()) {
             throw new FileOperationException("目录 " + path.toString() + " 已存在").setErrorData(path);
         }
@@ -154,6 +163,9 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
             uploadPath = Paths.get(staticDir.toString(), basePath, file.getOriginalFilename());
         }
 
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), uploadPath.toString());
+
         if (uploadPath.toFile().exists()) {
             throw new FileOperationException("文件 " + file.getOriginalFilename() + " 已存在").setErrorData(uploadPath);
         }
@@ -164,6 +176,53 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
             onChange();
         } catch (IOException e) {
             throw new ServiceException("上传文件失败").setErrorData(uploadPath);
+        }
+    }
+
+    @Override
+    public void rename(String basePath, String newName) {
+        Assert.notNull(basePath, "Base path must not be null");
+        Assert.notNull(newName, "New name must not be null");
+
+        Path pathToRename;
+
+        if (StringUtils.startsWith(newName, API_FOLDER_NAME)) {
+            throw new FileOperationException("重命名名称 " + newName + " 不合法");
+        }
+
+        pathToRename = Paths.get(staticDir.toString(), basePath);
+
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), pathToRename.toString());
+
+        try {
+            FileUtils.rename(pathToRename, newName);
+            onChange();
+        } catch (FileAlreadyExistsException e) {
+            throw new FileOperationException("该路径下名称 " + newName + " 已存在");
+        } catch (IOException e) {
+            throw new FileOperationException("重命名 " + pathToRename.toString() + " 失败");
+        }
+    }
+
+    @Override
+    public void save(String path, String content) {
+        Assert.notNull(path, "Path must not be null");
+
+        Path savePath = Paths.get(staticDir.toString(), path);
+
+        // check if the path is valid (not outside staticDir)
+        FileUtils.checkDirectoryTraversal(staticDir.toString(), savePath.toString());
+
+        // check if file exist
+        if (!Files.isRegularFile(savePath)) {
+            throw new FileOperationException("路径 " + path + " 不合法");
+        }
+
+        try {
+            Files.write(savePath, content.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new ServiceException("保存内容失败 " + path, e);
         }
     }
 

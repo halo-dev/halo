@@ -141,7 +141,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
         <#if posts?? && posts?size gt 0>
             <#list posts as post>
                 <li>
-                    <div class="T1 pull-left"><a href="${post.fullPath!}" title="${post.title!}">${post.title!} | ${blog_title!}</a></div>
+                    <div class="T1 pull-left"><a href="<#if !globalAbsolutePathEnabled!true>${blog_url!}</#if>${post.fullPath!}" title="${post.title!}">${post.title!} | ${blog_title!}</a></div>
                     <div class="T2 pull-right">${post.createTime?string('yyyy-MM-dd')}</div>
                     <div class="T3 pull-right">daily</div>
                     <div class="T4 pull-right">0.6</div>
@@ -158,7 +158,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             <#if categories?? && categories?size gt 0>
                 <#list categories as category>
                     <li>
-                        <div class="T1 pull-left"><a href="${category.fullPath!}" title="${category.name}">${category.name} | ${blog_title!}</a></div>
+                        <div class="T1 pull-left"><a href="<#if !globalAbsolutePathEnabled!true>${blog_url!}</#if>${category.fullPath!}" title="${category.name}">${category.name} | ${blog_title!}</a></div>
                         <div class="T2 pull-right">${category.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>
@@ -176,7 +176,7 @@ see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/
             <#if tags?? && tags?size gt 0>
                 <#list tags as tag>
                     <li>
-                        <div class="T1 pull-left"><a href="${tag.fullPath!}" title="${tag.name}">${tag.name} | ${blog_title!}</a></div>
+                        <div class="T1 pull-left"><a href="<#if !globalAbsolutePathEnabled!true>${blog_url!}</#if>${tag.fullPath!}" title="${tag.name}">${tag.name} | ${blog_title!}</a></div>
                         <div class="T2 pull-right">${tag.createTime?string('yyyy-MM-dd')}</div>
                         <div class="T3 pull-right">daily</div>
                         <div class="T4 pull-right">0.6</div>

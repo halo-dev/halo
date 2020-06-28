@@ -47,7 +47,7 @@ public class HttpClientUtils {
         return HttpClients.custom()
             .setSSLContext(sslContext)
             .setSSLHostnameVerifier(new NoopHostnameVerifier())
-            .setDefaultRequestConfig(getReqeustConfig(timeout))
+            .setDefaultRequestConfig(getRequestConfig(timeout))
             .build();
     }
 
@@ -57,7 +57,7 @@ public class HttpClientUtils {
      * @param timeout connection timeout (ms)
      * @return request config
      */
-    private static RequestConfig getReqeustConfig(int timeout) {
+    private static RequestConfig getRequestConfig(int timeout) {
         return RequestConfig.custom()
             .setConnectTimeout(timeout)
             .setConnectionRequestTimeout(timeout)

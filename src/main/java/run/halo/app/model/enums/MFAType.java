@@ -24,12 +24,12 @@ public enum MFAType implements ValueEnum<Integer> {
         this.value = value;
     }
 
+    public static boolean useMFA(MFAType mfaType) {
+        return mfaType != null && MFAType.NONE != mfaType;
+    }
+
     @Override
     public Integer getValue() {
         return value;
-    }
-
-    public static boolean useMFA(MFAType mfaType) {
-        return mfaType != null && MFAType.NONE != mfaType;
     }
 }

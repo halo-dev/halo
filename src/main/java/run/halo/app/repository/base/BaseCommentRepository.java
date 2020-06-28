@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import run.halo.app.annotation.SensitiveConceal;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.projection.CommentChildrenCountProjection;
@@ -33,6 +34,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a page of comment
      */
     @NonNull
+    @SensitiveConceal
     Page<COMMENT> findAllByStatus(@Nullable CommentStatus status, @NonNull Pageable pageable);
 
 
@@ -43,6 +45,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
+    @SensitiveConceal
     List<COMMENT> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
 
     /**
@@ -52,6 +55,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
+    @SensitiveConceal
     List<COMMENT> findAllByPostId(@NonNull Integer postId);
 
     /**
@@ -109,6 +113,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
+    @SensitiveConceal
     List<COMMENT> findAllByPostIdAndStatus(Integer postId, CommentStatus status);
 
     /**
@@ -120,6 +125,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a page of comment
      */
     @NonNull
+    @SensitiveConceal
     Page<COMMENT> findAllByPostIdAndStatus(Integer postId, CommentStatus status, Pageable pageable);
 
     /**
@@ -131,6 +137,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
+    @SensitiveConceal
     List<COMMENT> findAllByPostIdAndStatusAndParentId(@NonNull Integer postId, @NonNull CommentStatus status, @NonNull Long parentId);
 
     /**
@@ -141,6 +148,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
+    @SensitiveConceal
     List<COMMENT> findAllByPostIdAndParentId(@NonNull Integer postId, @NonNull Long parentId);
 
     /**
@@ -151,6 +159,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment
      */
     @NonNull
+    @SensitiveConceal
     List<COMMENT> findAllByStatusAndParentIdIn(@NonNull CommentStatus status, @NonNull Collection<Long> parentIds);
 
     /**
@@ -159,6 +168,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @param parentIds parent id collection must not be null
      * @return a list of comment
      */
+    @SensitiveConceal
     List<COMMENT> findAllByParentIdIn(@NonNull Collection<Long> parentIds);
 
     /**
@@ -171,6 +181,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a page of comment
      */
     @NonNull
+    @SensitiveConceal
     Page<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status, Long parentId, Pageable pageable);
 
 

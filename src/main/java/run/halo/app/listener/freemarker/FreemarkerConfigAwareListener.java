@@ -12,7 +12,6 @@ import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
-import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.SeoProperties;
 import run.halo.app.model.support.HaloConst;
@@ -101,22 +100,24 @@ public class FreemarkerConfigAwareListener {
 
     private void loadOptionsConfig() throws TemplateModelException {
 
-        String context = optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() + "/" : "/";
+        final String blogBaseUrl = optionService.getBlogBaseUrl();
+        final String context = optionService.isEnabledAbsolutePath() ? blogBaseUrl + "/" : "/";
 
         configuration.setSharedVariable("options", optionService.listOptions());
         configuration.setSharedVariable("context", context);
         configuration.setSharedVariable("version", HaloConst.HALO_VERSION);
 
+        configuration.setSharedVariable("globalAbsolutePathEnabled", optionService.isEnabledAbsolutePath());
         configuration.setSharedVariable("blog_title", optionService.getBlogTitle());
-        configuration.setSharedVariable("blog_url", optionService.getBlogBaseUrl());
+        configuration.setSharedVariable("blog_url", blogBaseUrl);
         configuration.setSharedVariable("blog_logo", optionService.getByPropertyOrDefault(BlogProperties.BLOG_LOGO, String.class, BlogProperties.BLOG_LOGO.defaultValue()));
         configuration.setSharedVariable("seo_keywords", optionService.getByPropertyOrDefault(SeoProperties.KEYWORDS, String.class, SeoProperties.KEYWORDS.defaultValue()));
         configuration.setSharedVariable("seo_description", optionService.getByPropertyOrDefault(SeoProperties.DESCRIPTION, String.class, SeoProperties.DESCRIPTION.defaultValue()));
 
-        configuration.setSharedVariable("rss_url", optionService.getBlogBaseUrl() + "/rss.xml");
-        configuration.setSharedVariable("atom_url", optionService.getBlogBaseUrl() + "/atom.xml");
-        configuration.setSharedVariable("sitemap_xml_url", optionService.getBlogBaseUrl() + "/sitemap.xml");
-        configuration.setSharedVariable("sitemap_html_url", optionService.getBlogBaseUrl() + "/sitemap.html");
+        configuration.setSharedVariable("rss_url", blogBaseUrl + "/rss.xml");
+        configuration.setSharedVariable("atom_url", blogBaseUrl + "/atom.xml");
+        configuration.setSharedVariable("sitemap_xml_url", blogBaseUrl + "/sitemap.xml");
+        configuration.setSharedVariable("sitemap_html_url", blogBaseUrl + "/sitemap.html");
         configuration.setSharedVariable("links_url", context + optionService.getLinksPrefix());
         configuration.setSharedVariable("photos_url", context + optionService.getPhotosPrefix());
         configuration.setSharedVariable("journals_url", context + optionService.getJournalsPrefix());
@@ -127,21 +128,24 @@ public class FreemarkerConfigAwareListener {
         log.debug("Loaded options");
     }
 
-    private void loadThemeConfig() throws TemplateModelException {
-
+    private void loadThemeConfig() {
         // Get current activated theme.
-        ThemeProperty activatedTheme = themeService.getActivatedTheme();
+        themeService.fetchActivatedTheme().ifPresent(activatedTheme -> {
+            String themeBasePath = (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/themes/" + activatedTheme.getFolderName();
+            try {
+                configuration.setSharedVariable("theme", activatedTheme);
 
-        String themeBasePath = (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/themes/" + activatedTheme.getFolderName();
+                // TODO: It will be removed in future versions
+                configuration.setSharedVariable("static", themeBasePath);
 
-        configuration.setSharedVariable("theme", activatedTheme);
+                configuration.setSharedVariable("theme_base", themeBasePath);
 
-        // TODO: It will be removed in future versions
-        configuration.setSharedVariable("static", themeBasePath);
+                configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
+                log.debug("Loaded theme and settings");
+            } catch (TemplateModelException e) {
+                log.error("Failed to set shared variable!", e);
+            }
+        });
 
-        configuration.setSharedVariable("theme_base", themeBasePath);
-
-        configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
-        log.debug("Loaded theme and settings");
     }
 }
