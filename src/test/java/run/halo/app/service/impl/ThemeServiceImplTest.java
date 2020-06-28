@@ -14,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.handler.theme.config.ThemeConfigResolver;
-import run.halo.app.handler.theme.config.ThemePropertyResolver;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FileUtils;
@@ -42,9 +41,6 @@ public class ThemeServiceImplTest {
     private ThemeConfigResolver themeConfigResolver;
 
     @Mock
-    private ThemePropertyResolver themePropertyResolver;
-
-    @Mock
     private RestTemplate restTemplate;
 
     @Mock
@@ -69,9 +65,7 @@ public class ThemeServiceImplTest {
         PowerMockito.doNothing().when(FileUtils.class, "deleteFolderQuietly", Mockito.any(Path.class));
 
         //Method
-        themeService = PowerMockito.spy(new ThemeServiceImpl(haloProperties, optionService, cacheStore, themeConfigResolver, themePropertyResolver, restTemplate, eventPublisher));
-
-        Mockito.doReturn(new ThemeProperty()).when(themePropertyResolver).resolve(Mockito.any(String.class));
+        themeService = PowerMockito.spy(new ThemeServiceImpl(haloProperties, optionService, cacheStore, themeConfigResolver, restTemplate, eventPublisher));
 
         Mockito.doNothing().when(eventPublisher).publishEvent(Mockito.any(String.class));
     }

@@ -44,9 +44,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -598,23 +595,12 @@ public class ThemeServiceImpl implements ThemeService {
 
         List<ThemeProperty> themeProperties = new ArrayList<>();
 
-        try {
-            for (String branch : branches) {
-                String propertyContent = GithubUtils.accessThemeProperty(uri, branch);
+        branches.forEach(branch -> {
+            ThemeProperty themeProperty = new ThemeProperty();
+            themeProperty.setBranch(branch);
+            themeProperties.add(themeProperty);
+        });
 
-                if (propertyContent == null) {
-                    continue;
-                }
-
-                ThemeProperty themeProperty = themePropertyResolver.resolve(propertyContent);
-
-                themeProperty.setBranch(branch);
-
-                themeProperties.add(themeProperty);
-            }
-        } catch (IOException e) {
-            throw new ServiceException("分支信息拉取失败");
-        }
         return themeProperties;
     }
 
@@ -630,11 +616,12 @@ public class ThemeServiceImpl implements ThemeService {
             throw new ServiceException("主题拉取失败");
         }
 
-        for (String tagName: releases) {
+        releases.forEach(tagName -> {
             ThemeProperty themeProperty = new ThemeProperty();
             themeProperty.setBranch(tagName);
             themeProperties.add(themeProperty);
-        }
+        });
+
         return themeProperties;
     }
 
