@@ -88,12 +88,22 @@ public interface ThemeService {
     /**
      * Theme provider remote name.
      */
-    String THEME_PROVIDER_REMOTE_NAME = "theme-provider";
+    String THEME_PROVIDER_REMOTE_NAME = "origin";
 
     /**
      * Default remote branch name.
      */
     String DEFAULT_REMOTE_BRANCH = "master";
+
+    /**
+     * Key to access the zip file url which is in the http response
+     */
+    String ZIP_FILE_KEY = "zipball_url";
+
+    /**
+     * Key to access the tag name which is in the http response
+     */
+    String TAG_KEY = "tag_name";
 
     /**
      * Get theme property by theme id.
@@ -302,6 +312,53 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty fetch(@NonNull String uri);
+
+    /**
+     * Fetches the latest release
+     *
+     * @param uri theme remote uri must not be null
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty fetchLatestRelease(@NonNull String uri);
+
+    /**
+     * Fetches all the branches info
+     *
+     * @param uri theme remote uri must not be null
+     * @return list of theme properties
+     */
+    @NonNull
+    List<ThemeProperty> fetchBranches(@NonNull String uri);
+
+    /**
+     * Fetches all the release info
+     *
+     * @param uri theme remote uri must not be null
+     * @return list of theme properties
+     */
+    @NonNull
+    List<ThemeProperty> fetchReleases(@NonNull String uri);
+
+    /**
+     * Fetches a specific release
+     *
+     * @param uri theme remote uri must not be null
+     * @param tagName release tag name must not be null
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName);
+
+    /**
+     * Fetches a specific branch (clone)
+     *
+     * @param uri theme remote uri must not be null
+     * @param branchName wanted branch must not be null
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty fetchBranch(@NonNull String uri, @NonNull String branchName);
 
     /**
      * Reloads themes

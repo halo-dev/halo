@@ -7,10 +7,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -78,6 +75,21 @@ public class GitTest {
         git.pull().call();
         git.clean().call();
         git.close();
+    }
+
+    @Test
+    @Ignore
+    public void getAllBranchesTest() {
+        List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
+        Assert.assertNotNull(branches);
+    }
+
+    @Test
+    @Ignore
+    public void getAllBranchesWithInvalidURL() {
+        List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme.git");
+        Assert.assertNotNull(branches);
+        Assert.assertEquals(branches.size(), 0);
     }
 
     private Git cloneRepository() throws GitAPIException {

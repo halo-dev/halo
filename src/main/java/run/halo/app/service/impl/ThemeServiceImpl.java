@@ -493,9 +493,9 @@ public class ThemeServiceImpl implements ThemeService {
             if (StringUtils.endsWithIgnoreCase(uri, ".zip")) {
                 downloadZipAndUnzip(uri, themeTmpPath);
             } else {
-                uri = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
+                String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
                 // Clone from git
-                GitUtils.cloneFromGit(uri, themeTmpPath);
+                GitUtils.cloneFromGit(repoUrl, themeTmpPath);
             }
 
             return add(themeTmpPath);
@@ -504,6 +504,125 @@ public class ThemeServiceImpl implements ThemeService {
         } finally {
             FileUtils.deleteFolderQuietly(tmpPath);
         }
+    }
+
+    @Override
+    public ThemeProperty fetchBranch(String uri, String branchName) {
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+
+        Path tmpPath = null;
+
+        try {
+            // Create temp path
+            tmpPath = FileUtils.createTempDirectory();
+            // Create temp path
+            Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
+
+            String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
+            GitUtils.cloneFromGit(repoUrl, themeTmpPath, branchName);
+
+            return add(themeTmpPath);
+        } catch (IOException | GitAPIException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        } finally {
+            FileUtils.deleteFolderQuietly(tmpPath);
+        }
+    }
+
+    @Override
+    public ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName) {
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+        Assert.hasText(tagName, "Theme remote tagName must not be blank");
+
+        Path tmpPath = null;
+        try {
+            tmpPath = FileUtils.createTempDirectory();
+
+            Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
+
+            Map<String, Object> releaseInfo = GithubUtils.getRelease(uri, tagName);
+
+            if (releaseInfo == null) {
+                throw new ServiceException("主题拉取失败" + uri);
+            }
+
+            String zipUrl = (String) releaseInfo.get(ZIP_FILE_KEY);
+
+            downloadZipAndUnzip(zipUrl, themeTmpPath);
+
+            return add(themeTmpPath);
+        } catch (IOException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        } finally {
+            FileUtils.deleteFolderQuietly(tmpPath);
+        }
+    }
+
+    @Override
+    public ThemeProperty fetchLatestRelease(@NonNull String uri) {
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+
+        Path tmpPath = null;
+        try {
+            tmpPath = FileUtils.createTempDirectory();
+
+            Path themeTmpPath = tmpPath.resolve(HaloUtils.randomUUIDWithoutDash());
+
+            Map<String, Object> releaseInfo = GithubUtils.getLatestRelease(uri);
+
+            if (releaseInfo == null) {
+                throw new ServiceException("主题拉取失败" + uri);
+            }
+
+            String zipUrl = (String) releaseInfo.get(ZIP_FILE_KEY);
+
+            downloadZipAndUnzip(zipUrl, themeTmpPath);
+
+            return add(themeTmpPath);
+        } catch (IOException e) {
+            throw new ServiceException("主题拉取失败 " + uri, e);
+        } finally {
+            FileUtils.deleteFolderQuietly(tmpPath);
+        }
+    }
+
+    @Override
+    public List<ThemeProperty> fetchBranches(String uri) {
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+
+        String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git",".git");
+        List<String> branches = GitUtils.getAllBranches(repoUrl);
+
+        List<ThemeProperty> themeProperties = new ArrayList<>();
+
+        branches.forEach(branch -> {
+            ThemeProperty themeProperty = new ThemeProperty();
+            themeProperty.setBranch(branch);
+            themeProperties.add(themeProperty);
+        });
+
+        return themeProperties;
+    }
+
+    @Override
+    public List<ThemeProperty> fetchReleases(@NonNull String uri) {
+        Assert.hasText(uri, "Theme remote uri must not be blank");
+
+        List<String> releases = GithubUtils.getReleases(uri);
+
+        List<ThemeProperty> themeProperties = new ArrayList<>();
+
+        if (releases == null) {
+            throw new ServiceException("主题拉取失败");
+        }
+
+        releases.forEach(tagName -> {
+            ThemeProperty themeProperty = new ThemeProperty();
+            themeProperty.setBranch(tagName);
+            themeProperties.add(themeProperty);
+        });
+
+        return themeProperties;
     }
 
     @Override
@@ -519,6 +638,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             pullFromGit(updatingTheme);
+
         } catch (Exception e) {
             if (e instanceof ThemeNotSupportException) {
                 throw (ThemeNotSupportException) e;
@@ -597,7 +717,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         // Get branch
         String branch = StringUtils.isBlank(themeProperty.getBranch()) ?
-            DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
+                DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
 
         Git git = null;
 
@@ -605,6 +725,13 @@ public class ThemeServiceImpl implements ThemeService {
             git = GitUtils.openOrInit(Paths.get(themeProperty.getThemePath()));
 
             Repository repository = git.getRepository();
+
+            // Add all changes
+            git.add()
+                    .addFilepattern(".")
+                    .call();
+            // Commit the changes
+            git.commit().setMessage("Commit by halo automatically").call();
 
             RevWalk revWalk = new RevWalk(repository);
 
@@ -617,38 +744,31 @@ public class ThemeServiceImpl implements ThemeService {
             // Force to set remote name
             git.remoteRemove().setRemoteName(THEME_PROVIDER_REMOTE_NAME).call();
             RemoteConfig remoteConfig = git.remoteAdd()
-                .setName(THEME_PROVIDER_REMOTE_NAME)
-                .setUri(new URIish(themeProperty.getRepo()))
-                .call();
-
-            // Add all changes
-            git.add()
-                .addFilepattern(".")
-                .call();
-            // Commit the changes
-            git.commit().setMessage("Commit by halo automatically").call();
+                    .setName(THEME_PROVIDER_REMOTE_NAME)
+                    .setUri(new URIish(themeProperty.getRepo()))
+                    .call();
 
             // Check out to specified branch
             if (!StringUtils.equalsIgnoreCase(branch, git.getRepository().getBranch())) {
                 boolean present = git.branchList()
-                    .call()
-                    .stream()
-                    .map(Ref::getName)
-                    .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branch));
+                        .call()
+                        .stream()
+                        .map(Ref::getName)
+                        .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branch));
 
                 git.checkout()
-                    .setCreateBranch(true)
-                    .setForced(!present)
-                    .setName(branch)
-                    .call();
+                        .setCreateBranch(true)
+                        .setForced(!present)
+                        .setName(branch)
+                        .call();
             }
 
             // Pull with rebasing
             PullResult pullResult = git.pull()
-                .setRemote(remoteConfig.getName())
-                .setRemoteBranchName(branch)
-                .setRebase(true)
-                .call();
+                    .setRemote(remoteConfig.getName())
+                    .setRemoteBranchName(branch)
+                    .setRebase(true)
+                    .call();
 
             if (!pullResult.isSuccessful()) {
                 log.debug("Rebase result: [{}]", pullResult.getRebaseResult());
@@ -657,6 +777,9 @@ public class ThemeServiceImpl implements ThemeService {
                 throw new ThemeUpdateException("拉取失败！您与主题作者可能同时更改了同一个文件");
             }
 
+            String latestTagName = (String) GithubUtils.getLatestRelease(themeProperty.getRepo()).get(TAG_KEY);
+            git.checkout().setName(latestTagName).call();
+
             // updated successfully.
             ThemeProperty updatedThemeProperty = getProperty(Paths.get(themeProperty.getThemePath()));
 
@@ -664,9 +787,9 @@ public class ThemeServiceImpl implements ThemeService {
             if (StringUtils.isNotEmpty(updatedThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, updatedThemeProperty.getRequire())) {
                 // reset theme version
                 git.reset()
-                    .setMode(ResetCommand.ResetType.HARD)
-                    .setRef(lastCommit.getName())
-                    .call();
+                        .setMode(ResetCommand.ResetType.HARD)
+                        .setRef(lastCommit.getName())
+                        .call();
                 throw new ThemeNotSupportException("新版本主题仅支持 Halo " + updatedThemeProperty.getRequire() + " 以上的版本");
             }
         } finally {
@@ -696,7 +819,6 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         log.debug("Downloaded [{}]", zipUrl);
-
         // Unzip it
         FileUtils.unzip(downloadResponse.getBody(), targetPath);
     }

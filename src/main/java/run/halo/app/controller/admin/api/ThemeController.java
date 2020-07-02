@@ -175,10 +175,39 @@ public class ThemeController {
         return themeService.fetch(uri);
     }
 
+    @PostMapping("fetchingBranches")
+    @ApiOperation("Fetches all branches")
+    public List<ThemeProperty> fetchBranches(@RequestParam("uri") String uri) {
+        return themeService.fetchBranches(uri);
+    }
+
+    @PostMapping("fetchingReleases")
+    @ApiOperation("Fetches all releases")
+    public List<ThemeProperty> fetchReleases(@RequestParam("uri") String uri) {
+        return themeService.fetchReleases(uri);
+    }
+
+    @GetMapping("fetchingRelease")
+    @ApiOperation("Fetches a specific release")
+    public ThemeProperty fetchRelease(@RequestParam("uri") String uri, @RequestParam("tag") String tagName) {
+        return themeService.fetchRelease(uri, tagName);
+    }
+
+    @GetMapping("fetchBranch")
+    @ApiOperation("Fetch specific branch")
+    public ThemeProperty fetchBranch(@RequestParam("uri") String uri, @RequestParam("branch") String branchName) {
+        return themeService.fetchBranch(uri, branchName);
+    }
+
+    @GetMapping("fetchLatestRelease")
+    @ApiOperation("Fetch latest release")
+    public ThemeProperty fetchLatestRelease(@RequestParam("uri") String uri) {
+        return themeService.fetchLatestRelease(uri);
+    }
+
     @PutMapping("fetching/{themeId}")
     @ApiOperation("Upgrades theme by remote")
     public ThemeProperty updateThemeByFetching(@PathVariable("themeId") String themeId) {
-
         return themeService.update(themeId);
     }
 
