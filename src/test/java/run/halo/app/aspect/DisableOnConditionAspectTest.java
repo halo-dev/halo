@@ -3,9 +3,12 @@ package run.halo.app.aspect;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,14 +34,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class DisableOnConditionAspectTest {
 
     static final String REQUEST_URI = "/api/admin/test/disableOnCondition";
+
     @Autowired
     MockMvc mvc;
-    @Autowired
+
+    @SpyBean
     OptionService optionService;
 
     @BeforeEach
     void setUp() {
-        optionService.saveProperty(PrimaryProperties.IS_INSTALLED, "true");
+        MockitoAnnotations.initMocks(this);
+        Assertions.assertNotNull(optionService);
+        Mockito.doReturn(true).when(optionService).getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
     }
 
     @Test()
