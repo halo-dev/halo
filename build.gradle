@@ -62,7 +62,7 @@ ext {
     flexmarkVersion =  "0.62.0"
     thumbnailatorVersion =  "0.4.11"
     image4jVersion =  "0.7zensight1"
-    flywayVersion =  "6.4.1"
+    flywayVersion =  "6.5.0"
     h2Version =  "1.4.196"
     levelDbVersion =  "0.12"
     annotationsVersion = "3.0.1u2"
