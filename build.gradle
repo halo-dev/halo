@@ -50,7 +50,7 @@ bootJar {
 ext {
     hutoolVersion =  "5.3.8"
     upyunSdkVersion =  "4.2.0"
-    qiniuSdkVersion =  "7.2.28"
+    qiniuSdkVersion =  "7.2.29"
     aliyunSdkVersion =  "3.9.1"
     baiduSdkVersion =  "0.10.36"
     qcloudSdkVersion =  "5.6.25"
