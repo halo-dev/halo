@@ -22,8 +22,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class OneTimeTokenTest {
 
     static final String REQUEST_URI = "/api/admin/counts";
+
     @Autowired
     MockMvc mvc;
+
     @Autowired
     OneTimeTokenService oneTimeTokenService;
 

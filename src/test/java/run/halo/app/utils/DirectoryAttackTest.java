@@ -1,12 +1,13 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import run.halo.app.exception.ForbiddenException;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Directory attack test.
@@ -15,12 +16,12 @@ import java.nio.file.Paths;
  * @date 4/9/19
  */
 @Slf4j
-public class DirectoryAttackTest {
+class DirectoryAttackTest {
 
-    private String userHome = System.getProperty("user.home");
+    String userHome = System.getProperty("user.home");
 
     @Test
-    public void compareDirectoryFailureTest() {
+    void compareDirectoryFailureTest() {
 
         Path workDirPath = Paths.get(userHome + "/halo-test/");
 
@@ -29,12 +30,12 @@ public class DirectoryAttackTest {
         log.debug("Work directory path: [{}]", workDirPath);
         log.debug("Test path: [{}]", testPath);
 
-        Assert.assertFalse(testPath.startsWith(workDirPath));
-        Assert.assertFalse(workDirPath.startsWith(testPath));
+        assertFalse(testPath.startsWith(workDirPath));
+        assertFalse(workDirPath.startsWith(testPath));
     }
 
     @Test
-    public void compareDirectorySuccessfullyTest() {
+    void compareDirectorySuccessfullyTest() {
         Path workDirPath = Paths.get(userHome + "/halo-test/");
 
         Path testPath = Paths.get(userHome + "/halo-test/test.txt");
@@ -42,13 +43,13 @@ public class DirectoryAttackTest {
         log.debug("Work directory path: [{}]", workDirPath);
         log.debug("Test path: [{}]", testPath);
 
-        Assert.assertTrue(testPath.startsWith(workDirPath));
-        Assert.assertFalse(workDirPath.startsWith(testPath));
+        assertTrue(testPath.startsWith(workDirPath));
+        assertFalse(workDirPath.startsWith(testPath));
     }
 
 
     @Test
-    public void compareDirectorySuccessfullyTest2() {
+    void compareDirectorySuccessfullyTest2() {
         Path workDirPath = Paths.get(userHome + "/../../etc/").normalize();
 
         Path testPath = Paths.get("/etc/passwd");
@@ -56,12 +57,12 @@ public class DirectoryAttackTest {
         log.debug("Work directory path: [{}]", workDirPath);
         log.debug("Test path: [{}]", testPath);
 
-        Assert.assertTrue(testPath.startsWith(workDirPath));
-        Assert.assertFalse(workDirPath.startsWith(testPath));
+        assertTrue(testPath.startsWith(workDirPath));
+        assertFalse(workDirPath.startsWith(testPath));
     }
 
     @Test
-    public void getRealPathTest() {
+    void getRealPathTest() {
         String pathname = "/home/test/../../etc/";
         Path path = Paths.get(pathname);
 
@@ -72,12 +73,13 @@ public class DirectoryAttackTest {
     }
 
     @Test
-    public void traversalTestWhenSuccess() {
+    void traversalTestWhenSuccess() {
         FileUtils.checkDirectoryTraversal("/etc/", "/etc/halo/halo/../test");
     }
 
-    @Test(expected = ForbiddenException.class)
-    public void traversalTestWhenFailure() {
-        FileUtils.checkDirectoryTraversal("/etc/", "/etc/../tmp");
+    @Test
+    void traversalTestWhenFailure() {
+        assertThrows(ForbiddenException.class,
+            () -> FileUtils.checkDirectoryTraversal("/etc/", "/etc/../tmp"));
     }
 }

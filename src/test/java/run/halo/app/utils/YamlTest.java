@@ -1,14 +1,13 @@
 package run.halo.app.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import run.halo.app.handler.theme.config.impl.YamlThemeConfigResolverImpl;
 import run.halo.app.handler.theme.config.support.Group;
 
 import java.io.IOException;
 import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Yaml test.
@@ -16,12 +15,12 @@ import static org.junit.Assert.assertThat;
  * @author johnniang
  * @date 4/8/19
  */
-public class YamlTest {
+class YamlTest {
 
-    private final YamlThemeConfigResolverImpl resolver = new YamlThemeConfigResolverImpl();
+    final YamlThemeConfigResolverImpl resolver = new YamlThemeConfigResolverImpl();
 
     @Test
-    public void readYamlTest() throws IOException {
+    void readYamlTest() throws IOException {
 
         String yaml = "sns:\n" +
             "  label: 社交资料设置\n" +
@@ -64,13 +63,13 @@ public class YamlTest {
 
         List<Group> groups = resolver.resolve(yaml);
 
-        assertThat(groups.size(), equalTo(2));
-        assertThat(groups.get(0).getItems().size(), equalTo(3));
-        assertThat(groups.get(1).getItems().size(), equalTo(2));
+        assertEquals(2, groups.size());
+        assertEquals(3, groups.get(0).getItems().size());
+        assertEquals(2, groups.get(1).getItems().size());
     }
 
     @Test
-    public void readAnotherYamlTest() throws IOException {
+    void readAnotherYamlTest() throws IOException {
         String yaml = "sns:\n" +
             "  label: 社交资料设置\n" +
             "  items:\n" +
@@ -120,13 +119,13 @@ public class YamlTest {
 
         List<Group> groups = resolver.resolve(yaml);
 
-        assertThat(groups.size(), equalTo(2));
-        assertThat(groups.get(0).getItems().size(), equalTo(4));
-        assertThat(groups.get(1).getItems().size(), equalTo(3));
+        assertEquals(2, groups.size());
+        assertEquals(4, groups.get(0).getItems().size());
+        assertEquals(3, groups.get(1).getItems().size());
     }
 
     @Test
-    public void convertYamlTest() throws IOException {
+    void convertYamlTest() throws IOException {
         String yaml = "- name: sns\n" +
             "  label: 社交资料设置\n" +
             "  items:\n" +
@@ -175,10 +174,10 @@ public class YamlTest {
 
         List<Group> groups = resolver.resolve(yaml);
 
-        assertThat(groups.size(), equalTo(2));
-        assertThat(groups.get(0).getItems().size(), equalTo(4));
-        assertThat(groups.get(1).getItems().size(), equalTo(3));
-        assertThat(groups.get(0).getItems().get(0).getOptions().size(), equalTo(2));
+        assertEquals(2, groups.size());
+        assertEquals(4, groups.get(0).getItems().size());
+        assertEquals(3, groups.get(1).getItems().size());
+        assertEquals(2, groups.get(0).getItems().get(0).getOptions().size());
     }
 
 }

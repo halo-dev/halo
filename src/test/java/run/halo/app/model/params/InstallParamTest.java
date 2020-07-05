@@ -1,7 +1,7 @@
 package run.halo.app.model.params;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import run.halo.app.model.support.CreateCheck;
 
 import javax.validation.ConstraintViolation;
@@ -9,38 +9,39 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.util.Set;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author johnniang
  * @date 19-6-1
  */
 @Slf4j
-public class InstallParamTest {
+class InstallParamTest {
 
-    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
-    public void createCheckTest() {
+    void createCheckTest() {
         InstallParam installParam = new InstallParam();
 
         Set<ConstraintViolation<InstallParam>> constraintViolations = validator.validate(installParam, CreateCheck.class);
-        assertThat(constraintViolations.size(), equalTo(4));
+        assertEquals(4, constraintViolations.size());
+
         printMessage(constraintViolations);
 
         installParam.setEmail("test");
         constraintViolations = validator.validate(installParam, CreateCheck.class);
-        assertThat(constraintViolations.size(), equalTo(4));
+        assertEquals(4, constraintViolations.size());
+
         printMessage(constraintViolations);
 
         installParam.setEmail("test@test.com");
         constraintViolations = validator.validate(installParam, CreateCheck.class);
-        assertThat(constraintViolations.size(), equalTo(3));
+        assertEquals(3, constraintViolations.size());
         printMessage(constraintViolations);
     }
 
-    private void printMessage(Set<ConstraintViolation<InstallParam>> constraintViolations) {
+    void printMessage(Set<ConstraintViolation<InstallParam>> constraintViolations) {
         if (constraintViolations == null) {
             return;
         }
