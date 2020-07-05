@@ -1,7 +1,7 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,10 +13,10 @@ import java.net.URISyntaxException;
  * @date 3/26/19
  */
 @Slf4j
-public class URITest {
+class URITest {
 
     @Test
-    public void createURITest() throws URISyntaxException {
+    void createURITest() throws URISyntaxException {
         String homeDir = System.getProperty("user.home");
         URI uri = new URI(homeDir);
         log.debug("[{}]", uri);

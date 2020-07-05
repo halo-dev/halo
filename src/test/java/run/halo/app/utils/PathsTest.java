@@ -1,14 +1,13 @@
 package run.halo.app.utils;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Paths test.
@@ -16,21 +15,21 @@ import static org.junit.Assert.assertTrue;
  * @author johnniang
  * @date 3/27/19
  */
-public class PathsTest {
+class PathsTest {
 
     @Test
-    @Ignore
-    public void getTest() {
+    @Disabled("Due to platform dependent")
+    void getTest() {
         Path path = Paths.get("/home/test/", "/upload/test.txt");
-        assertThat(path.toString(), equalTo("/home/test/upload/test.txt"));
-        assertThat(path.getParent().toString(), equalTo("/home/test/upload"));
-        assertThat(path.getFileName().toString(), equalTo("test.txt"));
+        assertEquals("/home/test/upload/test.txt", path.toString());
+        assertEquals("/home/test/upload", path.getParent().toString());
+        assertEquals("test.txt", path.getFileName().toString());
     }
 
     @Test
-    public void startWithTest() {
+    void startWithTest() {
         Path path = Paths.get("/test/test.txt");
-        assertThat(path.getFileName().toString(), equalTo("test.txt"));
+        assertEquals("test.txt", path.getFileName().toString());
         boolean isStartWith = FilenameUtils.getBasename(path.toString()).equalsIgnoreCase("test");
         assertTrue(isStartWith);
     }

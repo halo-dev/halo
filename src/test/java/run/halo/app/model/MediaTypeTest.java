@@ -1,36 +1,34 @@
 package run.halo.app.model;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author johnniang
  * @date 3/26/19
  */
 @Slf4j
-public class MediaTypeTest {
+class MediaTypeTest {
 
     @Test
-    public void toStringTest() {
+    void toStringTest() {
         MediaType mediaType = MediaType.IMAGE_GIF;
 
-        assertThat(mediaType.toString(), equalTo("image/gif"));
+        assertEquals("image/gif", mediaType.toString());
     }
 
     @Test
-    public void parseTest() {
+    void parseTest() {
         MediaType mediaType = MediaType.valueOf("image/gif");
 
-        assertNotNull(mediaType);
-        assertThat(mediaType, equalTo(MediaType.IMAGE_GIF));
+        assertEquals(MediaType.IMAGE_GIF, mediaType);
     }
 
     @Test
-    public void includesTest() {
+    void includesTest() {
         MediaType mediaType = MediaType.valueOf("image/*");
         boolean isInclude = mediaType.includes(MediaType.IMAGE_GIF);
         assertTrue(isInclude);

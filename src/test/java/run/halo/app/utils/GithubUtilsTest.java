@@ -2,45 +2,42 @@ package run.halo.app.utils;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 @Slf4j
-public class GithubUtilsTest {
+@Disabled("Dut to time-consumption")
+class GithubUtilsTest {
 
     @Test
-    @Ignore
-    public void getLatestReleasesWithValidURL() {
+    void getLatestReleasesWithValidURL() {
         Map<String, Object> map = GithubUtils.getLatestRelease("https://github.com/halo-dev/halo-theme-hux");
     }
 
     @Test
-    @Ignore
-    public void getLatestReleasesWithInvalidURL() {
+    void getLatestReleasesWithInvalidURL() {
         Map<String, Object> map = GithubUtils.getLatestRelease("https://github.com/halo-dev/halo-theme-hu");
-        Assert.assertNull(map);
+        assertNull(map);
     }
 
     @Test
-    @Ignore
-    public void accessThemePropertyWithValidURL() {
+    void accessThemePropertyWithValidURL() {
         String content = GithubUtils.accessThemeProperty("https://github.com/halo-dev/halo-theme-hux", "master");
     }
 
     @Test
-    @Ignore
-    public void accessThemePropertyWithInvalidURL() {
+    void accessThemePropertyWithInvalidURL() {
         String content = GithubUtils.accessThemeProperty("https://github.com/halo-dev/halo-theme-hu", "master");
-        Assert.assertNull(content);
+        assertNull(content);
     }
 
     @Test
-    @Ignore
-    public void getReleasesTest() {
+    void getReleasesTest() {
         List<String> list = GithubUtils.getReleases("https://github.com/halo-dev/halo-theme-hux");
     }
 }
