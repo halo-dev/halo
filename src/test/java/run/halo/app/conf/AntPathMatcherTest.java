@@ -1,24 +1,26 @@
 package run.halo.app.conf;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.AntPathMatcher;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Ant path matcher test.
  *
  * @author johnniang
  */
-public class AntPathMatcherTest {
+class AntPathMatcherTest {
 
-    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Test
-    public void matchTest() {
-        Assert.assertFalse(pathMatcher.match("/admin/?*/**", "/admin"));
-        Assert.assertFalse(pathMatcher.match("/admin/?*/**", "/admin/"));
+    void matchTest() {
+        assertFalse(pathMatcher.match("/admin/?*/**", "/admin"));
+        assertFalse(pathMatcher.match("/admin/?*/**", "/admin/"));
 
-        Assert.assertTrue(pathMatcher.match("/admin/?*/**", "/admin/index.html"));
-        Assert.assertTrue(pathMatcher.match("/admin/?*/**", "/admin/index.html/more"));
+        assertTrue(pathMatcher.match("/admin/?*/**", "/admin/index.html"));
+        assertTrue(pathMatcher.match("/admin/?*/**", "/admin/index.html/more"));
     }
 }

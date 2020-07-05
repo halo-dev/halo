@@ -26,6 +26,7 @@ configurations {
     implementation {
         exclude module: "spring-boot-starter-tomcat"
         exclude module: "slf4j-log4j12"
+        exclude module: 'junit'
     }
     compileOnly {
         extendsFrom annotationProcessor
@@ -120,7 +121,6 @@ dependencies {
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly "mysql:mysql-connector-java"
 
-
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
 
@@ -130,12 +130,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: "$powermockApiMockito2"
-    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: "$powermockVersion"
+//    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: "$powermockApiMockito2"
+//    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: "$powermockVersion"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
-}
-
-test {
-    useJUnitPlatform()
 }

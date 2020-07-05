@@ -1,9 +1,8 @@
 package run.halo.app.utils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Filename utilities test.
@@ -11,18 +10,18 @@ import static org.junit.Assert.assertThat;
  * @author johnniang
  * @date 3/26/19
  */
-public class FilenameUtilsTest {
+class FilenameUtilsTest {
 
     // a/b/c.txt --> c.txt
     // a.txt     --> a.txt
     // a/b/c     --> c
     // a/b/c/    --> ""
     @Test
-    public void getBasename() {
-        assertThat(FilenameUtils.getBasename("a/b/c.txt"), equalTo("c"));
-        assertThat(FilenameUtils.getBasename("a.txt"), equalTo("a"));
-        assertThat(FilenameUtils.getBasename("a/b/c"), equalTo("c"));
-        assertThat(FilenameUtils.getBasename("a/b/c/"), equalTo(""));
+    void getBasename() {
+        assertEquals("c", FilenameUtils.getBasename("a/b/c.txt"));
+        assertEquals("a", FilenameUtils.getBasename("a.txt"));
+        assertEquals("c", FilenameUtils.getBasename("a/b/c"));
+        assertEquals("", FilenameUtils.getBasename("a/b/c/"));
     }
 
     // foo.txt      --> "txt"
@@ -30,11 +29,11 @@ public class FilenameUtilsTest {
     // a/b.txt/c    --> ""
     // a/b/c        --> ""
     @Test
-    public void getExtension() {
-        assertThat(FilenameUtils.getExtension("foo.txt"), equalTo("txt"));
-        assertThat(FilenameUtils.getExtension("a/b/c.jpg"), equalTo("jpg"));
-        assertThat(FilenameUtils.getExtension("a/b.txt/c"), equalTo(""));
-        assertThat(FilenameUtils.getExtension("a/b/c"), equalTo(""));
-        assertThat(FilenameUtils.getExtension("a/b/c/"), equalTo(""));
+    void getExtension() {
+        assertEquals("txt", FilenameUtils.getExtension("foo.txt"));
+        assertEquals("jpg", FilenameUtils.getExtension("a/b/c.jpg"));
+        assertEquals("", FilenameUtils.getExtension("a/b.txt/c"));
+        assertEquals("", FilenameUtils.getExtension("a/b/c"));
+        assertEquals("", FilenameUtils.getExtension("a/b/c/"));
     }
 }

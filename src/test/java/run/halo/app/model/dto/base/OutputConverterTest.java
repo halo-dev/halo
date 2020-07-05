@@ -1,35 +1,34 @@
 package run.halo.app.model.dto.base;
 
 import lombok.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Output converter test.
  *
  * @author johnniang
  */
-public class OutputConverterTest {
+class OutputConverterTest {
 
     @Test
-    public void convertFromTest() {
+    void convertFromTest() {
         TestDomain domain = new TestDomain("test_domain_name", 10);
 
         TestOutputDTO testOutputDTO = new TestOutputDTO().convertFrom(domain);
 
-        assertThat(testOutputDTO.getName(), equalTo("test_domain_name"));
+        assertEquals("test_domain_name", testOutputDTO.getName());
     }
 
     @Test
-    public void convertFromSubTest() {
+    void convertFromSubTest() {
         TestDomain domain = new TestDomain("test_domain_name", 10);
 
         SubTestOutputDTO subTestOutputDTO = new SubTestOutputDTO().convertFrom(domain);
 
-        assertThat(subTestOutputDTO.getName(), equalTo("test_domain_name"));
-        assertThat(subTestOutputDTO.getAge(), equalTo(10));
+        assertEquals("test_domain_name", subTestOutputDTO.getName());
+        assertEquals(10, subTestOutputDTO.getAge());
     }
 
     @Data
@@ -37,7 +36,7 @@ public class OutputConverterTest {
     @EqualsAndHashCode
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class TestDomain {
+    static class TestDomain {
 
         private String name;
 
@@ -49,7 +48,7 @@ public class OutputConverterTest {
     @EqualsAndHashCode
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class TestOutputDTO implements OutputConverter<TestOutputDTO, TestDomain> {
+    static class TestOutputDTO implements OutputConverter<TestOutputDTO, TestDomain> {
 
         private String name;
     }
@@ -59,7 +58,7 @@ public class OutputConverterTest {
     @EqualsAndHashCode(callSuper = true)
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SubTestOutputDTO extends TestOutputDTO {
+    static class SubTestOutputDTO extends TestOutputDTO {
         private Integer age;
     }
 }

@@ -1,7 +1,7 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import run.halo.app.model.params.BaseCommentParam;
 import run.halo.app.model.params.JournalCommentParam;
 
@@ -15,10 +15,10 @@ import java.lang.reflect.Type;
  * @date 19-4-25
  */
 @Slf4j
-public class ReflectionUtilsTest {
+class ReflectionUtilsTest {
 
     @Test
-    public void getBaseCommentParamParameterizedTypeTest() {
+    void getBaseCommentParamParameterizedTypeTest() {
         Class<JournalCommentParam> paramClass = JournalCommentParam.class;
 
         log.debug(paramClass.getTypeName());

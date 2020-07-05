@@ -1,7 +1,7 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Two-Factor Auth Test
@@ -10,10 +10,10 @@ import org.junit.Test;
  * @date 2020-04-03 10:10 上午
  */
 @Slf4j
-public class TwoFactorAuthUtilsTest {
+class TwoFactorAuthUtilsTest {
 
     @Test
-    public void checkTFACodeTest() {
+    void checkTFACodeTest() {
         // generate new key
         final String key = TwoFactorAuthUtils.generateTFAKey();
         // generate url
