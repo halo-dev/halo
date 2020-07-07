@@ -187,7 +187,7 @@ public class LocalFileHandler implements FileHandler {
 
         // Delete the file key
         try {
-            Files.delete(path);
+            Files.deleteIfExists(path);
         } catch (IOException e) {
             throw new FileOperationException("附件 " + key + " 删除失败", e);
         }
