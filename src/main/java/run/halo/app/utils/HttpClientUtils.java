@@ -55,7 +55,6 @@ public class HttpClientUtils {
 
         return httpClientBuilder
             .setSSLContext(sslContext)
-            .setProxy(HttpHost.create("http://127.0.0.1:58591"))
             .setSSLHostnameVerifier(new NoopHostnameVerifier())
             .setDefaultRequestConfig(getRequestConfig(timeout))
             .build();
