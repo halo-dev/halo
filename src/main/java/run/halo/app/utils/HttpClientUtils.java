@@ -1,9 +1,13 @@
 package run.halo.app.utils;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.lang.NonNull;
@@ -44,8 +48,15 @@ public class HttpClientUtils {
             .loadTrustMaterial(null, (certificate, authType) -> true)
             .build();
 
-        return HttpClients.custom()
+        final HttpClientBuilder httpClientBuilder = HttpClients.custom();
+        final String httpProxy = System.getenv("http_proxy");
+        if(StringUtils.isNotBlank(httpProxy)){
+            httpClientBuilder.setProxy(HttpHost.create(httpProxy));
+        }
+
+        return httpClientBuilder
             .setSSLContext(sslContext)
+            .setProxy(HttpHost.create("http://127.0.0.1:58591"))
             .setSSLHostnameVerifier(new NoopHostnameVerifier())
             .setDefaultRequestConfig(getRequestConfig(timeout))
             .build();
