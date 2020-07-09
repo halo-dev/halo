@@ -68,6 +68,10 @@ ext {
     powermockApiMockito2 = "2.0.7"
 }
 
+test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation "org.kohsuke:github-api:$githubApiVersion"
     implementation "org.springframework.boot:spring-boot-starter-actuator"

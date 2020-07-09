@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import cn.hutool.core.lang.Tuple;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -63,54 +64,67 @@ public class HttpClientUtils {
 
     /**
      * resolve system proxy config
+     *
      * @param httpClientBuilder the httpClientBuilder
      * @return the argument
      */
     private static HttpClientBuilder resolveProxySetting(final HttpClientBuilder httpClientBuilder) {
-        final String httpProxy = System.getenv("http_proxy");
-        if (StringUtils.isNotBlank(httpProxy)) {
-            final HttpHost httpHost;
-            if (httpProxy.contains("@")) {
-                //with username and password
-                final String[] usernamePasswordHost = httpProxy.split("@");
-                if (usernamePasswordHost.length != 2) {
-                    throw new IllegalArgumentException("illegal http_proxy format the supported format is username:password@scheme://proxy_hostname:proxy_port or scheme://proxy_hostname:proxy_port");
-                }
-                final String[] usernamePassword = usernamePasswordHost[0].split(":");
-                if (usernamePassword.length != 2) {
-                    throw new IllegalArgumentException("illegal http_proxy format the supported format is username:password@scheme://proxy_hostname:proxy_port or scheme://proxy_hostname:proxy_port");
-                }
-                final String host = usernamePasswordHost[1];
-                httpHost = HttpHost.create(host);
-                final String username;
-                final String password;
-                try {
-                    username = URLDecoder.decode(usernamePassword[0], StandardCharsets.UTF_8.displayName());
-                    password = URLDecoder.decode(usernamePassword[1], StandardCharsets.UTF_8.displayName());
-                } catch (UnsupportedEncodingException e) {
-                    //this will not be happen
-                    throw new Error("panic");
-                }
-                int port = httpHost.getPort();
-                if (port == -1) {
-                    if (host.startsWith("http://")) {
-                        port = 80;
-                    }
-                    if (host.startsWith("https://")) {
-                        port = 443;
-                    }
-                }
-
-                final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(new AuthScope(httpHost.getHostName(), port),
-                        new UsernamePasswordCredentials(username, password));
-                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-            } else {
-                httpHost = HttpHost.create(httpProxy);
-            }
+        final String httpProxyEnv = System.getenv("http_proxy");
+        if (StringUtils.isNotBlank(httpProxyEnv)) {
+            final Tuple httpProxy = resolveHttpProxy(httpProxyEnv);
+            final HttpHost httpHost = HttpHost.create(httpProxy.get(0));
             httpClientBuilder.setProxy(httpHost);
+            if (httpProxy.getMembers().length == 3) {
+                //set proxy credentials
+                final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                credentialsProvider.setCredentials(new AuthScope(httpHost.getHostName(), httpHost.getPort()),
+                        new UsernamePasswordCredentials(httpProxy.get(1), httpProxy.get(2)));
+                httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+            }
         }
         return httpClientBuilder;
+    }
+
+    /**
+     * @param httpProxy http proxy env values
+     * @return resolved http proxy values; first is host(@nonNull), second is username(@nullable), third is password(@nullable)
+     */
+    private static Tuple resolveHttpProxy(final String httpProxy) {
+        if (httpProxy.contains("@")) {
+            //with username and password
+            final String[] usernamePasswordHost = httpProxy.split("@");
+            if (usernamePasswordHost.length != 2) {
+                throw new IllegalArgumentException("illegal http_proxy format the supported format is username:password@scheme://proxy_hostname:proxy_port or scheme://proxy_hostname:proxy_port");
+            }
+            final String[] usernamePassword = usernamePasswordHost[0].split(":");
+            if (usernamePassword.length != 2) {
+                throw new IllegalArgumentException("illegal http_proxy format the supported format is username:password@scheme://proxy_hostname:proxy_port or scheme://proxy_hostname:proxy_port");
+            }
+            final String host = usernamePasswordHost[1];
+            HttpHost httpHost = HttpHost.create(host);
+            final String username;
+            final String password;
+            try {
+                username = URLDecoder.decode(usernamePassword[0], StandardCharsets.UTF_8.displayName());
+                password = URLDecoder.decode(usernamePassword[1], StandardCharsets.UTF_8.displayName());
+            } catch (UnsupportedEncodingException e) {
+                //this will not be happen
+                throw new Error("panic");
+            }
+            int port = httpHost.getPort();
+            if (port == -1) {
+                if (host.startsWith("http://")) {
+                    port = 80;
+                }
+                if (host.startsWith("https://")) {
+                    port = 443;
+                }
+            }
+            final String hostUrl = httpHost.getSchemeName() + "://" + httpHost.getHostName() + ":" + port;
+            return new Tuple(hostUrl, username, password);
+        } else {
+            return new Tuple(httpProxy);
+        }
     }
 
     /**
