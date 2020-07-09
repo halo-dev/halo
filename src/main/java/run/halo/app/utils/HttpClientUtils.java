@@ -61,6 +61,11 @@ public class HttpClientUtils {
                 .build();
     }
 
+    /**
+     * resolve system proxy config
+     * @param httpClientBuilder the httpClientBuilder
+     * @return the argument
+     */
     private static HttpClientBuilder resolveProxySetting(final HttpClientBuilder httpClientBuilder) {
         final String httpProxy = System.getenv("http_proxy");
         if (StringUtils.isNotBlank(httpProxy)) {
