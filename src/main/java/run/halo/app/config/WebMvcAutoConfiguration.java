@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.SortHandlerMethodArgumentResolver;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.http.CacheControl;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -31,6 +32,7 @@ import run.halo.app.security.resolver.AuthenticationArgumentResolver;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 import static run.halo.app.utils.HaloUtils.*;
@@ -105,6 +107,7 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         String adminPathPattern = ensureSuffix(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
 
         registry.addResourceHandler(uploadUrlPattern)
+            .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
             .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler(adminPathPattern)
             .addResourceLocations("classpath:/admin/");
