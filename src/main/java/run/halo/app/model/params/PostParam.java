@@ -16,6 +16,7 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Post param.
@@ -71,7 +72,7 @@ public class PostParam implements InputConverter<Post> {
 
     @Override
     public Post convertTo() {
-        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(title) : SlugUtils.slug(slug);
+        slug = StringUtils.isBlank(slug) ? SlugUtils.slug(UUID.randomUUID().toString().replaceAll("-", "")) : SlugUtils.slug(slug);
 
         if (null == thumbnail) {
             thumbnail = "";
