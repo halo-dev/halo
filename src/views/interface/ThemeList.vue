@@ -181,7 +181,10 @@
             tab="远程拉取"
             key="2"
           >
-            <a-form layout="vertical">
+            <a-form
+              v-if="!fetchBranches"
+              layout="vertical"
+            >
               <a-form-item label="远程地址：">
                 <a-input v-model="fetchingUrl" />
               </a-form-item>
@@ -190,9 +193,64 @@
                   type="primary"
                   @click="handleFetching"
                   :loading="fetchButtonLoading"
-                >下载</a-button>
+                >获取</a-button>
               </a-form-item>
             </a-form>
+            <a-tabs
+              v-else
+            >
+              <a-tab-pane
+                tab="稳定版"
+                key="1"
+              >
+                <a-form layout="vertical">
+                  <a-form-item>
+                    <a-select
+                      style="width: 120px"
+                      @change="onSelectChange"
+                    >
+                      <a-select-option
+                        v-for="(item, index) in releases"
+                        :key="index"
+                        :value="index"
+                      >{{ item.branch }}</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item>
+                    <a-button
+                      type="primary"
+                      @click="handleReleaseFetching"
+                    >下载</a-button>
+                  </a-form-item>
+                </a-form>
+              </a-tab-pane>
+              <a-tab-pane
+                tab="开发版"
+                key="2"
+              >
+                <a-form layout="vertical">
+                  <a-form-item>
+                    <a-select
+                      style="width: 120px"
+                      @change="onSelectChange"
+                    >
+                      <a-select-option
+                        v-for="(item, index) in branches"
+                        :key="index"
+                        :value="index"
+                      >{{ item.branch }}</a-select-option>
+                    </a-select>
+                  </a-form-item>
+                  <a-form-item>
+                    <a-button
+                      type="primary"
+                      @click="handleBranchFetching"
+                    >下载</a-button>
+                  </a-form-item>
+                </a-form>
+              </a-tab-pane>
+            </a-tabs>
+
             <a-alert
               type="info"
               closable
@@ -245,9 +303,13 @@ export default {
       uploadThemeVisible: false,
       uploadNewThemeVisible: false,
       fetchButtonLoading: false,
+      fetchBranches: false,
       themes: [],
+      branches: [],
+      releases: [],
       themeSettingVisible: false,
       selectedTheme: {},
+      selectedBranch: null,
       fetchingUrl: null,
       uploadHandler: themeApi.upload,
       updateByUploadHandler: themeApi.updateByUpload,
@@ -316,6 +378,9 @@ export default {
       if (this.uploadNewThemeVisible) {
         this.uploadNewThemeVisible = false
       }
+      if (this.fetchBranches) {
+        this.fetchBranches = false
+      }
       this.loadThemes()
     },
     handleEditClick(theme) {
@@ -334,14 +399,36 @@ export default {
       }
       this.fetchButtonLoading = true
       themeApi
-        .fetching(this.fetchingUrl)
+        .fetchingBranches(this.fetchingUrl)
         .then(response => {
-          this.$message.success('拉取成功！')
-          this.uploadThemeVisible = false
-          this.loadThemes()
+          this.branches = response.data.data
+          this.fetchBranches = true
+        })
+      themeApi
+        .fetchingReleases(this.fetchingUrl)
+        .then(response => {
+          this.releases = response.data.data
         })
         .finally(() => {
           this.fetchButtonLoading = false
+        })
+    },
+    handleBranchFetching() {
+      themeApi
+        .fetchingBranch(this.fetchingUrl, this.branches[this.selectedBranch].branch)
+        .then(response => {
+          this.$message.success('拉取成功')
+          this.uploadThemeVisible = false
+          this.loadThemes()
+        })
+    },
+    handleReleaseFetching() {
+      themeApi
+        .fetchingRelease(this.fetchingUrl, this.releases[this.selectedBranch].branch)
+        .then(response => {
+          this.$message.success('拉取成功')
+          this.uploadThemeVisible = false
+          this.loadThemes()
         })
     },
     handleReload() {
@@ -382,12 +469,21 @@ export default {
         onCancel() {}
       })
     },
+    onSelectChange(value) {
+      this.selectedBranch = value
+    },
     onThemeUploadClose() {
       if (this.uploadThemeVisible) {
         this.$refs.upload.handleClearFileList()
       }
       if (this.uploadNewThemeVisible) {
         this.$refs.updateByupload.handleClearFileList()
+      }
+      if (this.fetchBranches) {
+        this.fetchBranches = false
+      }
+      if (this.selectedBranch) {
+        this.selectedBranch = null
       }
       this.loadThemes()
     },
