@@ -5,8 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 
-public class HttpClientUtilsTest {
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class HttpClientUtilsTest {
 
     @Test
     void resolveHttpProxyTest() throws Exception {
@@ -14,19 +16,16 @@ public class HttpClientUtilsTest {
         resolveHttpProxy.setAccessible(true);
 
         Tuple result = (Tuple) resolveHttpProxy.invoke(null, "http://127.0.0.1");
-        assert result.get(0).equals("http://127.0.0.1");
+        assertEquals(result.get(0), "http://127.0.0.1");
 
         result = (Tuple) resolveHttpProxy.invoke(null, "https://127.0.0.1");
-        assert result.get(0).equals("https://127.0.0.1");
+        assertEquals(result.get(0), "https://127.0.0.1");
 
         result = (Tuple) resolveHttpProxy.invoke(null, "https://127.0.0.1:123");
-        assert result.get(0).equals("https://127.0.0.1:123");
+        assertEquals(result.get(0), "https://127.0.0.1:123");
 
         result = (Tuple) resolveHttpProxy.invoke(null, "u:p@https://127.0.0.1:123");
-        assert result.get(0).equals("https://127.0.0.1:123");
-        assert result.get(1).equals("u");
-        assert result.get(2).equals("p");
-
+        assertArrayEquals(result.getMembers(), new Object[]{"https://127.0.0.1:123", "u", "p"});
     }
 
 }
