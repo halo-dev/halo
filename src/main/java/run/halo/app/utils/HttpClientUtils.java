@@ -17,12 +17,11 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.lang.NonNull;
 
 import javax.net.ssl.SSLContext;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Http client utilities.
@@ -90,40 +89,32 @@ public class HttpClientUtils {
      * @return resolved http proxy values; first is host(@nonNull), second is username(@nullable), third is password(@nullable)
      */
     private static Tuple resolveHttpProxy(final String httpProxy) {
-        if (httpProxy.contains("@")) {
-            //with username and password
-            final String[] usernamePasswordHost = httpProxy.split("@");
-            if (usernamePasswordHost.length != 2) {
-                throw new IllegalArgumentException("illegal http_proxy format the supported format is username:password@scheme://proxy_hostname:proxy_port or scheme://proxy_hostname:proxy_port");
+        final URI proxyUri = URI.create(httpProxy);
+        int port = proxyUri.getPort();
+        if (port == -1) {
+            if (Objects.equals("http", proxyUri.getScheme())) {
+                port = 80;
             }
-            final String[] usernamePassword = usernamePasswordHost[0].split(":");
-            if (usernamePassword.length != 2) {
-                throw new IllegalArgumentException("illegal http_proxy format the supported format is username:password@scheme://proxy_hostname:proxy_port or scheme://proxy_hostname:proxy_port");
+            if (Objects.equals("https", proxyUri.getScheme())) {
+                port = 443;
             }
-            final String host = usernamePasswordHost[1];
-            HttpHost httpHost = HttpHost.create(host);
+        }
+        final String hostUrl = proxyUri.getScheme() + "://" + proxyUri.getHost() + ":" + port;
+        final String usernamePassword = proxyUri.getUserInfo();
+        if (StringUtils.isNotBlank(usernamePassword)) {
             final String username;
             final String password;
-            try {
-                username = URLDecoder.decode(usernamePassword[0], StandardCharsets.UTF_8.displayName());
-                password = URLDecoder.decode(usernamePassword[1], StandardCharsets.UTF_8.displayName());
-            } catch (UnsupportedEncodingException e) {
-                //this will not be happen
-                throw new Error("panic");
+            final int atColon = usernamePassword.indexOf(':');
+            if (atColon >= 0) {
+                username = usernamePassword.substring(0, atColon);
+                password = usernamePassword.substring(atColon + 1);
+            } else {
+                username = usernamePassword;
+                password = null;
             }
-            int port = httpHost.getPort();
-            if (port == -1) {
-                if (host.startsWith("http://")) {
-                    port = 80;
-                }
-                if (host.startsWith("https://")) {
-                    port = 443;
-                }
-            }
-            final String hostUrl = httpHost.getSchemeName() + "://" + httpHost.getHostName() + ":" + port;
             return new Tuple(hostUrl, username, password);
         } else {
-            return new Tuple(httpProxy);
+            return new Tuple(hostUrl);
         }
     }
 
