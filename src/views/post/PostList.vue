@@ -27,6 +27,7 @@
                   v-model="queryParam.status"
                   placeholder="请选择文章状态"
                   @change="handleQuery()"
+                  allowClear
                 >
                   <a-select-option
                     v-for="status in Object.keys(postStatus)"
@@ -45,6 +46,8 @@
                   v-model="queryParam.categoryId"
                   placeholder="请选择分类"
                   @change="handleQuery()"
+                  :loading="categoriesLoading"
+                  allowClear
                 >
                   <a-select-option
                     v-for="category in categories"
@@ -513,11 +516,11 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import PostSettingDrawer from './components/PostSettingDrawer'
 import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
-import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import TagSelect from './components/TagSelect'
 import CategoryTree from './components/CategoryTree'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
+
 const columns = [
   {
     title: '标题',
@@ -570,7 +573,6 @@ const columns = [
 export default {
   name: 'PostList',
   components: {
-    AttachmentSelectDrawer,
     TagSelect,
     CategoryTree,
     PostSettingDrawer,
@@ -606,6 +608,7 @@ export default {
       ],
       posts: [],
       postsLoading: false,
+      categoriesLoading: false,
       postSettingVisible: false,
       postCommentVisible: false,
       selectedPost: {},
@@ -665,16 +668,30 @@ export default {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      postApi.query(this.queryParam).then(response => {
-        this.posts = response.data.data.content
-        this.pagination.total = response.data.data.total
-        this.postsLoading = false
-      })
+      postApi
+        .query(this.queryParam)
+        .then(response => {
+          this.posts = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.postsLoading = false
+          }, 200)
+        })
     },
     loadCategories() {
-      categoryApi.listAll(true).then(response => {
-        this.categories = response.data.data
-      })
+      this.categoriesLoading = true
+      categoryApi
+        .listAll(true)
+        .then(response => {
+          this.categories = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.categoriesLoading = false
+          }, 200)
+        })
     },
     handleEditClick(post) {
       this.$router.push({ name: 'PostEdit', query: { postId: post.id } })

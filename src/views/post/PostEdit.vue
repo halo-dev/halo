@@ -74,7 +74,7 @@ import moment from 'moment'
 import PostSettingDrawer from './components/PostSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
-import MarkdownEditor from '@/components/editor/MarkdownEditor'
+import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 // import RichTextEditor from '@/components/editor/RichTextEditor'
 
 import postApi from '@/api/post'

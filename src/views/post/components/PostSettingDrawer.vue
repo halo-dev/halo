@@ -309,7 +309,6 @@ import moment from 'moment'
 import CategoryTree from './CategoryTree'
 import CategorySelectTree from './CategorySelectTree'
 import TagSelect from './TagSelect'
-import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import { mapGetters } from 'vuex'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
@@ -320,8 +319,7 @@ export default {
   components: {
     CategoryTree,
     CategorySelectTree,
-    TagSelect,
-    AttachmentSelectDrawer
+    TagSelect
   },
   data() {
     return {

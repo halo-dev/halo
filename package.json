@@ -9,7 +9,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "ant-design-vue": "^1.6.2",
+    "ant-design-vue": "^1.6.3",
     "axios": "^0.19.2",
     "enquire.js": "^2.1.6",
     "filepond": "^4.18.0",

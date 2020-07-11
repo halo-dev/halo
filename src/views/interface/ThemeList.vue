@@ -196,9 +196,7 @@
                 >获取</a-button>
               </a-form-item>
             </a-form>
-            <a-tabs
-              v-else
-            >
+            <a-tabs v-else>
               <a-tab-pane
                 tab="稳定版"
                 key="1"
@@ -341,10 +339,16 @@ export default {
   methods: {
     loadThemes() {
       this.themeLoading = true
-      themeApi.listAll().then(response => {
-        this.themes = response.data.data
-        this.themeLoading = false
-      })
+      themeApi
+        .listAll()
+        .then(response => {
+          this.themes = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.themeLoading = false
+          }, 200)
+        })
     },
 
     activeTheme(themeId) {
@@ -398,12 +402,10 @@ export default {
         return
       }
       this.fetchButtonLoading = true
-      themeApi
-        .fetchingBranches(this.fetchingUrl)
-        .then(response => {
-          this.branches = response.data.data
-          this.fetchBranches = true
-        })
+      themeApi.fetchingBranches(this.fetchingUrl).then(response => {
+        this.branches = response.data.data
+        this.fetchBranches = true
+      })
       themeApi
         .fetchingReleases(this.fetchingUrl)
         .then(response => {
@@ -414,22 +416,18 @@ export default {
         })
     },
     handleBranchFetching() {
-      themeApi
-        .fetchingBranch(this.fetchingUrl, this.branches[this.selectedBranch].branch)
-        .then(response => {
-          this.$message.success('拉取成功')
-          this.uploadThemeVisible = false
-          this.loadThemes()
-        })
+      themeApi.fetchingBranch(this.fetchingUrl, this.branches[this.selectedBranch].branch).then(response => {
+        this.$message.success('拉取成功')
+        this.uploadThemeVisible = false
+        this.loadThemes()
+      })
     },
     handleReleaseFetching() {
-      themeApi
-        .fetchingRelease(this.fetchingUrl, this.releases[this.selectedBranch].branch)
-        .then(response => {
-          this.$message.success('拉取成功')
-          this.uploadThemeVisible = false
-          this.loadThemes()
-        })
+      themeApi.fetchingRelease(this.fetchingUrl, this.releases[this.selectedBranch].branch).then(response => {
+        this.$message.success('拉取成功')
+        this.uploadThemeVisible = false
+        this.loadThemes()
+      })
     },
     handleReload() {
       themeApi.reload().then(response => {

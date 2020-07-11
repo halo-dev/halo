@@ -249,7 +249,6 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import CategorySelectTree from './components/CategorySelectTree'
-import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import categoryApi from '@/api/category'
 import menuApi from '@/api/menu'
 
@@ -281,7 +280,7 @@ const columns = [
   }
 ]
 export default {
-  components: { CategorySelectTree, AttachmentSelectDrawer },
+  components: { CategorySelectTree },
   mixins: [mixin, mixinDevice],
   data() {
     return {

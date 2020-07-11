@@ -27,6 +27,7 @@
                   v-model="queryParam.type"
                   placeholder="请选择类型"
                   @change="handleQuery()"
+                  allowClear
                 >
                   <a-select-option
                     v-for="item in Object.keys(optionType)"
@@ -224,7 +225,7 @@ export default {
         size: 10,
         sort: null,
         keyword: null,
-        status: null
+        type: null
       },
       optionToStage: {},
       loading: false,

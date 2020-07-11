@@ -65,12 +65,8 @@
 </template>
 
 <script>
-import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 export default {
   name: 'GeneralTab',
-  components: {
-    AttachmentSelectDrawer
-  },
   props: {
     options: {
       type: Object,

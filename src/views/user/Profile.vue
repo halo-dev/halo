@@ -234,7 +234,7 @@
       :keyboard="false"
       :centered="true"
       :destroyOnClose="true"
-      :width="300"
+      :width="400"
     >
       <a-form v-if="mfaUsed">
         <a-form-item extra="* 需要验证两步验证码">
@@ -255,8 +255,11 @@
       <a-form v-else>
         <a-form-item
           label="1. 请扫描二维码或导入 key"
-          :extra="`MFAKey:${mfaParam.mfaKey}`"
+          :help="`MFAKey:${mfaParam.mfaKey}`"
         >
+          <template slot="extra">
+            <span style="color:red">* 建议保存此二维码或 MFAKey，验证设备丢失将无法找回，只能通过重置密码关闭二步验证。</span>
+          </template>
           <img
             width="100%"
             :src="mfaParam.qrImage"
@@ -281,19 +284,15 @@
 </template>
 
 <script>
-import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 import userApi from '@/api/user'
 import statisticsApi from '@/api/statistics'
 import { mapMutations, mapGetters } from 'vuex'
 import MD5 from 'md5.js'
 
 export default {
-  components: {
-    AttachmentSelectDrawer
-  },
   data() {
     return {
-      statisticsLoading: true,
+      statisticsLoading: false,
       attachmentDrawerVisible: false,
       user: {},
       statistics: {},
@@ -348,12 +347,17 @@ export default {
   methods: {
     ...mapMutations({ setUser: 'SET_USER' }),
     getStatistics() {
-      statisticsApi.statisticsWithUser().then(response => {
-        this.user = response.data.data.user
-        this.statistics = response.data.data
-        this.statisticsLoading = false
-        this.mfaParam.mfaType = this.user.mfaType && this.user.mfaType
-      })
+      this.statisticsLoading = true
+      statisticsApi
+        .statisticsWithUser()
+        .then(response => {
+          this.user = response.data.data.user
+          this.statistics = response.data.data
+          this.mfaParam.mfaType = this.user.mfaType && this.user.mfaType
+        })
+        .finally(() => {
+          this.statisticsLoading = false
+        }, 200)
     },
     handleUpdatePassword() {
       // Check confirm password

@@ -16,9 +16,7 @@
       >
         <template slot="actions">
           <span>
-            <router-link
-              :to="{name:item.routeName}"
-            >
+            <router-link :to="{name:item.routeName}">
               <a-icon type="edit" />
             </router-link>
           </span>
@@ -83,9 +81,7 @@
         slot="action"
         slot-scope="text, record"
       >
-        <router-link
-          :to="{name:record.routeName}"
-        >
+        <router-link :to="{name:record.routeName}">
           <a href="javascript:void(0);">管理</a>
         </router-link>
         <a-divider type="vertical" />
@@ -144,10 +140,16 @@ export default {
   methods: {
     loadIndependentSheets() {
       this.loading = true
-      sheetApi.listIndependent().then(response => {
-        this.independentSheets = response.data.data
-        this.loading = false
-      })
+      sheetApi
+        .listIndependent()
+        .then(response => {
+          this.independentSheets = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     }
   }
 }

@@ -138,7 +138,10 @@
         >保存</a-button>
       </template>
       <a-form layout="vertical">
-        <a-form-item label="页面标题：" help="* 需要主题进行适配">
+        <a-form-item
+          label="页面标题："
+          help="* 需要主题进行适配"
+        >
           <a-input v-model="options.photos_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
@@ -330,14 +333,10 @@
 <script>
 import { mapActions } from 'vuex'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import photoApi from '@/api/photo'
 import optionApi from '@/api/option'
 
 export default {
-  components: {
-    AttachmentSelectDrawer
-  },
   mixins: [mixin, mixinDevice],
   data() {
     return {

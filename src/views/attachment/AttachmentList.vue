@@ -35,6 +35,8 @@
                     <a-select
                       v-model="queryParam.attachmentType"
                       @change="handleQuery()"
+                      :loading="typesLoading"
+                      allowClear
                     >
                       <a-select-option
                         v-for="item in types"
@@ -54,6 +56,8 @@
                     <a-select
                       v-model="queryParam.mediaType"
                       @change="handleQuery()"
+                      :loading="mediaTypesLoading"
+                      allowClear
                     >
                       <a-select-option
                         v-for="(item, index) in mediaTypes"
@@ -219,7 +223,9 @@ export default {
       selectAttachment: {},
       attachments: [],
       mediaTypes: [],
+      mediaTypesLoading: false,
       types: [],
+      typesLoading: false,
       editable: false,
       pagination: {
         page: 1,
@@ -288,14 +294,30 @@ export default {
         })
     },
     loadMediaTypes() {
-      attachmentApi.getMediaTypes().then(response => {
-        this.mediaTypes = response.data.data
-      })
+      this.mediaTypesLoading = true
+      attachmentApi
+        .getMediaTypes()
+        .then(response => {
+          this.mediaTypes = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.mediaTypesLoading = false
+          }, 200)
+        })
     },
     loadTypes() {
-      attachmentApi.getTypes().then(response => {
-        this.types = response.data.data
-      })
+      this.typesLoading = true
+      attachmentApi
+        .getTypes()
+        .then(response => {
+          this.types = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.typesLoading = false
+          }, 200)
+        })
     },
     handleShowDetailDrawer(attachment) {
       this.selectAttachment = attachment

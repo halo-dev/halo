@@ -26,8 +26,11 @@
               :title="isLatest?'当前为最新版本':'有新版本'"
             >
               <template slot="content">
-                <p>{{ `当前版本：${environments.version}，` }}{{ isLatest?`已经是最新版本。`:`新版本：${latestData.name}，你可以点击下方按钮查看详情。` }}</p>
-                <a-button type="dashed" :href="latestData.html_url" target="_blank">查看详情</a-button>
+                <p>{{ versionMessage }}</p>
+                <a-button
+                  type="dashed"
+                  @click="handleShowVersionContent"
+                >查看详情</a-button>
               </template>
               <a-button
                 :loading="checking"
@@ -90,17 +93,30 @@
           </a-card>
         </a-card>
       </a-col>
+
+      <a-col :span="24">
+      </a-col>
     </a-row>
+
+    <a-modal
+      :title="versionContentModalTitle"
+      :visible="versionContentVisible"
+      ok-text="查看更多"
+      @cancel="versionContentVisible=false"
+      @ok="handleOpenVersionUrl"
+    >
+      <div v-html="versionContent"></div>
+    </a-modal>
   </div>
 </template>
 
 <script>
 import adminApi from '@/api/admin'
 import axios from 'axios'
+import marked from 'marked'
 export default {
   data() {
     return {
-      adminVersion: this.VERSION,
       environments: {},
       contributors: [
         {
@@ -128,35 +144,38 @@ export default {
       contributorsLoading: true,
       checking: false,
       isLatest: false,
-      latestData: {}
+      latestData: {},
+      versionContentVisible: false
+    }
+  },
+  computed: {
+    versionMessage() {
+      return `当前版本：${this.environments.version}，${
+        this.isLatest ? '已经是最新版本。' : `新版本：${this.latestData.name}，你可以点击下方按钮查看详情。`
+      }`
+    },
+    versionContent() {
+      if (this.latestData && this.latestData.body) {
+        return marked(this.latestData.body)
+      } else {
+        return '暂无内容'
+      }
+    },
+    versionContentModalTitle() {
+      return `${this.latestData.name} 更新内容`
     }
   },
   created() {
     this.getEnvironments()
     this.fetchContributors()
-    this.checkServerUpdate()
-    // this.checkAdminUpdate()
   },
   methods: {
-    getEnvironments() {
-      adminApi.environments().then(response => {
+    async getEnvironments() {
+      await adminApi.environments().then(response => {
         this.environments = response.data.data
       })
+      this.checkServerUpdate()
     },
-    // confirmUpdate() {
-    //   this.updating = true
-    //   adminApi
-    //     .updateAdminAssets()
-    //     .then(response => {
-    //       this.$notification.success({
-    //         message: '更新成功',
-    //         description: '请刷新后体验最新版本！'
-    //       })
-    //     })
-    //     .finally(() => {
-    //       this.updating = false
-    //     })
-    // },
     handleCopyEnvironments() {
       const text = `版本：${this.environments.version}
 数据库：${this.environments.database}
@@ -172,22 +191,26 @@ User Agent：${navigator.userAgent}`
           this.$message.error('复制失败！')
         })
     },
-    async fetchContributors() {
-      this.contributorsLoading = true
+    fetchContributors() {
       const _this = this
+      _this.contributorsLoading = true
       axios
         .get('https://api.github.com/repos/halo-dev/halo/contributors')
         .then(response => {
           _this.contributors = response.data
-          this.contributorsLoading = false
         })
         .catch(function(error) {
           console.error('Fetch contributors error', error)
         })
+        .finally(() => {
+          setTimeout(() => {
+            _this.contributorsLoading = false
+          }, 200)
+        })
     },
-    async checkServerUpdate() {
+    checkServerUpdate() {
       const _this = this
-      this.checking = true
+      _this.checking = true
       axios
         .get('https://api.github.com/repos/halo-dev/halo/releases/latest')
         .then(response => {
@@ -202,11 +225,9 @@ User Agent：${navigator.userAgent}`
             _this.isLatest = true
             return
           }
-          _this.isLatest = false
           const title = '新版本提醒'
           const content = '检测到 Halo 新版本：' + data.name + '，点击下方按钮查看最新版本。'
-          const url = data.html_url
-          this.$notification.open({
+          _this.$notification.open({
             message: title,
             description: content,
             icon: <a-icon type="smile" style="color: #108ee9" />,
@@ -219,7 +240,7 @@ User Agent：${navigator.userAgent}`
                     size: 'small'
                   },
                   on: {
-                    click: () => window.open(url, '_blank')
+                    click: () => this.handleShowVersionContent()
                   }
                 },
                 '去看看'
@@ -231,51 +252,17 @@ User Agent：${navigator.userAgent}`
           console.error('Check update fail', error)
         })
         .finally(() => {
-          this.checking = false
+          setTimeout(() => {
+            this.checking = false
+          }, 200)
         })
     },
-    // async checkAdminUpdate() {
-    //   const _this = this
-
-    //   axios
-    //     .get('https://api.github.com/repos/halo-dev/halo-admin/releases/latest')
-    //     .then(response => {
-    //       const data = response.data
-    //       if (data.draft || data.prerelease) {
-    //         return
-    //       }
-    //       const current = _this.calculateIntValue(_this.adminVersion)
-    //       const latest = _this.calculateIntValue(data.name)
-    //       if (current >= latest) {
-    //         return
-    //       }
-    //       const title = '新版本提醒'
-    //       const content = '检测到 Admin 新版本：' + data.name + '，点击下方按钮可直接更新为最新版本。'
-    //       this.$notification.open({
-    //         message: title,
-    //         description: content,
-    //         icon: <a-icon type="smile" style="color: #108ee9" />,
-    //         btn: h => {
-    //           return h(
-    //             'a-button',
-    //             {
-    //               props: {
-    //                 type: 'primary',
-    //                 size: 'small'
-    //               },
-    //               on: {
-    //                 click: () => _this.confirmUpdate()
-    //               }
-    //             },
-    //             '点击更新'
-    //           )
-    //         }
-    //       })
-    //     })
-    //     .catch(function(error) {
-    //       console.error('Check update fail', error)
-    //     })
-    // },
+    handleShowVersionContent() {
+      this.versionContentVisible = true
+    },
+    handleOpenVersionUrl() {
+      window.open(this.latestData.html_url, '_blank')
+    },
     calculateIntValue(version) {
       version = version.replace(/v/g, '')
       const ss = version.split('.')

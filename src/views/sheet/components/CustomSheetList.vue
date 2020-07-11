@@ -440,11 +440,17 @@ export default {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      sheetApi.list(this.queryParam).then(response => {
-        this.sheets = response.data.data.content
-        this.pagination.total = response.data.data.total
-        this.loading = false
-      })
+      sheetApi
+        .list(this.queryParam)
+        .then(response => {
+          this.sheets = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleEditClick(sheet) {
       this.$router.push({ name: 'SheetEdit', query: { sheetId: sheet.id } })

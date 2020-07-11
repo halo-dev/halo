@@ -69,7 +69,7 @@ import moment from 'moment'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
-import MarkdownEditor from '@/components/editor/MarkdownEditor'
+import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 // import RichTextEditor from '@/components/editor/RichTextEditor'
 
 import sheetApi from '@/api/sheet'

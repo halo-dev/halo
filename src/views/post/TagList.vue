@@ -122,10 +122,8 @@
 
 <script>
 import tagApi from '@/api/tag'
-import AttachmentSelectDrawer from '../attachment/components/AttachmentSelectDrawer'
 
 export default {
-  components: { AttachmentSelectDrawer },
   data() {
     return {
       tags: [],

@@ -231,6 +231,7 @@
       <a-button
         type="primary"
         @click="handleSaveSettings"
+        :loading="saving"
       >保存</a-button>
     </footer-tool-bar>
   </a-drawer>
@@ -238,7 +239,6 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters } from 'vuex'
-import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
 import Verte from 'verte'
 import 'verte/dist/verte.css'
@@ -247,7 +247,6 @@ export default {
   name: 'ThemeSetting',
   mixins: [mixin, mixinDevice],
   components: {
-    AttachmentSelectDrawer,
     FooterToolBar,
     Verte
   },
@@ -267,7 +266,8 @@ export default {
       },
       viewMode: false,
       formColValue: 12,
-      clientHeight: document.documentElement.clientHeight
+      clientHeight: document.documentElement.clientHeight,
+      saving: false
     }
   },
   model: {
@@ -320,12 +320,20 @@ export default {
       })
     },
     handleSaveSettings() {
-      themeApi.saveSettings(this.selectedTheme.id, this.themeSettings).then(response => {
-        this.$message.success('保存成功！')
-        if (this.viewMode) {
-          document.getElementById('themeViewIframe').contentWindow.location.reload(true)
-        }
-      })
+      this.saving = true
+      themeApi
+        .saveSettings(this.selectedTheme.id, this.themeSettings)
+        .then(response => {
+          this.$message.success('保存成功！')
+          if (this.viewMode) {
+            document.getElementById('themeViewIframe').contentWindow.location.reload(true)
+          }
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.saving = false
+          }, 200)
+        })
     },
     onClose() {
       this.$emit('close', false)

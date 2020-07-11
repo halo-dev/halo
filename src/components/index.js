@@ -1,14 +1,15 @@
 import Vue from 'vue'
 
-// pro components
 import Ellipsis from '@/components/Ellipsis'
 import FooterToolbar from '@/components/FooterToolbar'
 import FilePondUpload from '@/components/Upload/FilePondUpload'
+import AttachmentSelectDrawer from './Attachment/AttachmentSelectDrawer'
 
 const _components = {
   Ellipsis,
   FooterToolbar,
-  FilePondUpload
+  FilePondUpload,
+  AttachmentSelectDrawer
 }
 
 const components = {}

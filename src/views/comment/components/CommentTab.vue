@@ -27,6 +27,7 @@
                   v-model="queryParam.status"
                   placeholder="请选择评论状态"
                   @change="handleQuery()"
+                  allowClear
                 >
                   <a-select-option
                     v-for="status in Object.keys(commentStatus)"
@@ -574,11 +575,17 @@ export default {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      commentApi.queryComment(this.type, this.queryParam).then(response => {
-        this.comments = response.data.data.content
-        this.pagination.total = response.data.data.total
-        this.loading = false
-      })
+      commentApi
+        .queryComment(this.type, this.queryParam)
+        .then(response => {
+          this.comments = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleQuery() {
       this.handleClearRowKeys()

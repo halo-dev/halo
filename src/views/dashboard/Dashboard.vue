@@ -288,9 +288,9 @@ export default {
   data() {
     return {
       logType: logApi.logType,
-      activityLoading: true,
-      writeLoading: true,
-      logLoading: true,
+      activityLoading: false,
+      writeLoading: false,
+      logLoading: false,
       statisticsLoading: true,
       logListDrawerVisible: false,
       latestPosts: [],
@@ -340,23 +340,44 @@ export default {
   },
   methods: {
     async listLatestPosts() {
-      postApi.listLatest(5).then(response => {
-        this.latestPosts = response.data.data
-        this.activityLoading = false
-      })
+      this.activityLoading = true
+      postApi
+        .listLatest(5)
+        .then(response => {
+          this.latestPosts = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.activityLoading = false
+          }, 200)
+        })
     },
     async listLatestLogs() {
-      logApi.listLatest(5).then(response => {
-        this.latestLogs = response.data.data
-        this.logLoading = false
-        this.writeLoading = false
-      })
+      this.logLoading = true
+      this.writeLoading = true
+      logApi
+        .listLatest(5)
+        .then(response => {
+          this.latestLogs = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.logLoading = false
+            this.writeLoading = false
+          }, 200)
+        })
     },
     async getStatistics() {
-      statisticsApi.statistics().then(response => {
-        this.statisticsData = response.data.data
-        this.statisticsLoading = false
-      })
+      statisticsApi
+        .statistics()
+        .then(response => {
+          this.statisticsData = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.statisticsLoading = false
+          }, 200)
+        })
     },
     handleEditPostClick(post) {
       this.$router.push({ name: 'PostEdit', query: { postId: post.id } })

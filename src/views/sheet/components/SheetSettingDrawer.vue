@@ -216,16 +216,12 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import moment from 'moment'
-import AttachmentSelectDrawer from '../../attachment/components/AttachmentSelectDrawer'
 import { mapGetters } from 'vuex'
 import themeApi from '@/api/theme'
 import sheetApi from '@/api/sheet'
 export default {
   name: 'SheetSettingDrawer',
   mixins: [mixin, mixinDevice],
-  components: {
-    AttachmentSelectDrawer
-  },
   data() {
     return {
       thumbDrawerVisible: false,
