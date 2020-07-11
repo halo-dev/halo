@@ -13,86 +13,105 @@
           :title="title"
           :bodyStyle="{ padding: '16px' }"
         >
-          <a-form layout="horizontal">
-            <a-form-item
+          <a-form-model
+            ref="menuForm"
+            :model="form.model"
+            :rules="form.rules"
+            layout="horizontal"
+          >
+            <a-form-model-item
               label="名称："
               help="* 页面上所显示的名称"
+              prop="name"
             >
-              <a-input v-model="menuToCreate.name" />
-            </a-form-item>
-            <a-form-item
+              <a-input v-model="form.model.name" />
+            </a-form-model-item>
+            <a-form-model-item
               label="地址："
               help="* 菜单的地址"
+              prop="url"
             >
-              <a-input v-model="menuToCreate.url" />
-            </a-form-item>
-            <a-form-item label="上级菜单：">
+              <a-input v-model="form.model.url" />
+            </a-form-model-item>
+            <a-form-model-item
+              label="上级菜单："
+              prop="parentId"
+            >
               <menu-select-tree
-                :menus="menus"
-                v-model="menuToCreate.parentId"
+                :menus="table.data"
+                v-model="form.model.parentId"
               />
-            </a-form-item>
-            <a-form-item label="排序编号：">
-              <a-input
-                type="number"
-                v-model="menuToCreate.priority"
+            </a-form-model-item>
+            <a-form-model-item
+              label="排序编号："
+              prop="priority"
+            >
+              <a-input-number
+                v-model="form.model.priority"
+                :min="0"
+                style="width:100%"
               />
-            </a-form-item>
-            <a-form-item
+            </a-form-model-item>
+            <a-form-model-item
+              v-show="form.moreField"
               label="图标："
               help="* 请根据主题的支持选填"
-              :style="{ display: fieldExpand ? 'block' : 'none' }"
+              prop="icon"
             >
-              <a-input v-model="menuToCreate.icon" />
-            </a-form-item>
-            <a-form-item
+              <a-input v-model="form.model.icon" />
+            </a-form-model-item>
+            <a-form-model-item
+              v-show="form.moreField"
               label="分组："
-              :style="{ display: fieldExpand ? 'block' : 'none' }"
+              prop="team"
             >
               <a-auto-complete
-                :dataSource="teams"
-                v-model="menuToCreate.team"
+                :dataSource="teams.data"
+                v-model="form.model.team"
                 allowClear
               />
-            </a-form-item>
-            <a-form-item
+            </a-form-model-item>
+            <a-form-model-item
+              v-show="form.moreField"
               label="打开方式："
-              :style="{ display: fieldExpand ? 'block' : 'none' }"
+              prop="target"
             >
               <a-select
                 defaultValue="_self"
-                v-model="menuToCreate.target"
+                v-model="form.model.target"
               >
                 <a-select-option value="_self">当前窗口</a-select-option>
                 <a-select-option value="_blank">新窗口</a-select-option>
               </a-select>
-            </a-form-item>
-            <a-form-item>
+            </a-form-model-item>
+            <a-form-model-item>
               <a-button
                 type="primary"
-                @click="handleSaveClick"
-                v-if="formType==='create'"
+                @click="handleCreateOrUpdateMenu"
+                v-if="!isUpdateMode"
+                :loading="form.saving"
               >保存</a-button>
               <a-button-group v-else>
                 <a-button
                   type="primary"
-                  @click="handleSaveClick"
+                  @click="handleCreateOrUpdateMenu"
+                  :loading="form.saving"
                 >更新</a-button>
                 <a-button
                   type="dashed"
-                  @click="handleAddMenu"
-                  v-if="formType==='update'"
+                  @click="form.model = {}"
+                  v-if="isUpdateMode"
                 >返回添加</a-button>
               </a-button-group>
               <a
                 :style="{ marginLeft: '8px'}"
-                @click="toggleExpand"
+                @click="form.moreField = !form.moreField"
               >
                 更多选项
-                <a-icon :type="fieldExpand ? 'up' : 'down'" />
+                <a-icon :type="form.moreField ? 'up' : 'down'" />
               </a>
-            </a-form-item>
-          </a-form>
+            </a-form-model-item>
+          </a-form-model>
         </a-card>
       </a-col>
       <a-col
@@ -113,8 +132,8 @@
             itemLayout="vertical"
             size="large"
             :pagination="false"
-            :dataSource="menus"
-            :loading="loading"
+            :dataSource="table.data"
+            :loading="table.loading"
           >
             <a-list-item
               slot="renderItem"
@@ -133,7 +152,7 @@
                     <a-menu-item>
                       <a
                         href="javascript:;"
-                        @click="handleEditMenu(item)"
+                        @click="form.model = item"
                       >编辑</a>
                     </a-menu-item>
                     <a-menu-item>
@@ -146,7 +165,6 @@
                         <a href="javascript:;">删除</a>
                       </a-popconfirm>
                     </a-menu-item>
-
                   </a-menu>
                 </a-dropdown>
               </template>
@@ -171,9 +189,9 @@
           <!-- Desktop -->
           <a-table
             v-else
-            :columns="columns"
-            :dataSource="menus"
-            :loading="loading"
+            :columns="table.columns"
+            :dataSource="table.data"
+            :loading="table.loading"
             :rowKey="menu => menu.id"
             :scrollToFirstRowOnChange="true"
           >
@@ -183,7 +201,7 @@
             >
               <a
                 href="javascript:;"
-                @click="handleEditMenu(record)"
+                @click="form.model = record"
               >编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
@@ -238,92 +256,116 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      formType: 'create',
-      loading: false,
-      columns,
-      menus: [],
-      menuToCreate: {
-        target: '_self'
+      table: {
+        columns,
+        data: [],
+        loading: false
       },
-      fieldExpand: false,
-      teams: []
+      form: {
+        model: {
+          target: '_self'
+        },
+        saving: false,
+        rules: {
+          name: [
+            { required: true, message: '* 菜单名称不能为空', trigger: ['change', 'blur'] },
+            { max: 50, message: '* 菜单名称的字符长度不能超过 50', trigger: ['change', 'blur'] }
+          ],
+          url: [
+            { required: true, message: '* 菜单地址不能为空', trigger: ['change', 'blur'] },
+            { max: 1023, message: '* 菜单地址的字符长度不能超过 1023', trigger: ['change', 'blur'] }
+          ],
+          icon: [{ max: 50, message: '* 菜单图标的字符长度不能超过 50', trigger: ['change', 'blur'] }],
+          team: [{ max: 255, message: '* 菜单分组的字符长度不能超过 255', trigger: ['change', 'blur'] }]
+        },
+        moreField: false
+      },
+      teams: {
+        data: []
+      }
     }
   },
   computed: {
     title() {
-      if (this.menuToCreate.id) {
+      if (this.isUpdateMode) {
         return '修改菜单'
       }
       return '添加菜单'
+    },
+    isUpdateMode() {
+      return !!this.form.model.id
     }
   },
   created() {
-    this.loadMenus()
-    this.loadTeams()
+    this.handleListMenus()
+    this.handleListTeams()
   },
   methods: {
-    loadMenus() {
-      this.loading = true
-      menuApi.listTree().then(response => {
-        this.menus = response.data.data
-        this.loading = false
-      })
+    handleListMenus() {
+      this.table.loading = true
+      menuApi
+        .listTree()
+        .then(response => {
+          this.table.data = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.table.loading = false
+          }, 200)
+        })
     },
-    loadTeams() {
+    handleListTeams() {
       menuApi.listTeams().then(response => {
-        this.teams = response.data.data
+        this.teams.data = response.data.data
       })
-    },
-    handleSaveClick() {
-      this.createOrUpdateMenu()
-    },
-    handleAddMenu() {
-      this.formType = 'create'
-      this.menuToCreate = {}
-    },
-    handleEditMenu(menu) {
-      this.menuToCreate = menu
-      this.formType = 'update'
     },
     handleDeleteMenu(id) {
-      menuApi.delete(id).then(response => {
-        this.$message.success('删除成功！')
-        this.loadMenus()
-        this.loadTeams()
+      menuApi
+        .delete(id)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.handleListMenus()
+          this.handleListTeams()
+        })
+    },
+    handleCreateOrUpdateMenu() {
+      const _this = this
+      _this.$refs.menuForm.validate(valid => {
+        if (valid) {
+          _this.form.saving = true
+          if (_this.isUpdateMode) {
+            menuApi
+              .update(_this.form.model.id, _this.form.model)
+              .then(response => {
+                _this.$message.success('更新成功！')
+                _this.form.model = { target: '_self' }
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 200)
+                _this.handleListMenus()
+                _this.handleListTeams()
+              })
+          } else {
+            menuApi
+              .create(_this.form.model)
+              .then(response => {
+                _this.$message.success('保存成功！')
+                _this.form.model = { target: '_self' }
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 200)
+                _this.handleListMenus()
+                _this.handleListTeams()
+              })
+          }
+        }
       })
-    },
-    createOrUpdateMenu() {
-      if (!this.menuToCreate.name) {
-        this.$notification['error']({
-          message: '提示',
-          description: '菜单名称不能为空！'
-        })
-        return
-      }
-      if (!this.menuToCreate.url) {
-        this.$notification['error']({
-          message: '提示',
-          description: '菜单地址不能为空！'
-        })
-        return
-      }
-      if (this.menuToCreate.id) {
-        menuApi.update(this.menuToCreate.id, this.menuToCreate).then(response => {
-          this.$message.success('更新成功！')
-          this.loadMenus()
-          this.loadTeams()
-        })
-      } else {
-        menuApi.create(this.menuToCreate).then(response => {
-          this.$message.success('保存成功！')
-          this.loadMenus()
-          this.loadTeams()
-        })
-      }
-      this.handleAddMenu()
-    },
-    toggleExpand() {
-      this.fieldExpand = !this.fieldExpand
     }
   }
 }

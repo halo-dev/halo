@@ -13,15 +13,24 @@
           :title="title"
           :bodyStyle="{ padding: '16px' }"
         >
-          <a-form layout="horizontal">
-            <a-form-item label="网站名称：">
-              <a-input v-model="link.name" />
-            </a-form-item>
-            <a-form-item
+          <a-form-model
+            ref="linkForm"
+            :model="form.model"
+            :rules="form.rules"
+            layout="horizontal"
+          >
+            <a-form-model-item
+              label="网站名称："
+              prop="name"
+            >
+              <a-input v-model="form.model.name" />
+            </a-form-model-item>
+            <a-form-model-item
               label="网站地址："
               help="* 需要加上 http://"
+              prop="url"
             >
-              <a-input v-model="link.url">
+              <a-input v-model="form.model.url">
                 <!-- <a
                   href="javascript:void(0);"
                   slot="addonAfter"
@@ -30,49 +39,64 @@
                   <a-icon type="sync" />
                 </a> -->
               </a-input>
-            </a-form-item>
-            <a-form-item label="Logo：">
-              <a-input v-model="link.logo" />
-            </a-form-item>
-            <a-form-item label="分组：">
+            </a-form-model-item>
+            <a-form-model-item
+              label="Logo："
+              prop="logo"
+            >
+              <a-input v-model="form.model.logo" />
+            </a-form-model-item>
+            <a-form-model-item
+              label="分组："
+              prop="team"
+            >
               <a-auto-complete
                 :dataSource="teams"
-                v-model="link.team"
+                v-model="form.model.team"
                 allowClear
               />
-            </a-form-item>
-            <a-form-item label="排序编号：">
-              <a-input
-                type="number"
-                v-model="link.priority"
+            </a-form-model-item>
+            <a-form-model-item
+              label="排序编号："
+              prop="priority"
+            >
+              <a-input-number
+                :min="0"
+                v-model="form.model.priority"
+                style="width:100%"
               />
-            </a-form-item>
-            <a-form-item label="描述：">
+            </a-form-model-item>
+            <a-form-model-item
+              label="描述："
+              prop="description"
+            >
               <a-input
                 type="textarea"
                 :autoSize="{ minRows: 5 }"
-                v-model="link.description"
+                v-model="form.model.description"
               />
-            </a-form-item>
-            <a-form-item>
+            </a-form-model-item>
+            <a-form-model-item>
               <a-button
                 type="primary"
-                @click="handleSaveClick"
-                v-if="formType==='create'"
+                @click="handleCreateOrUpdateLink"
+                v-if="!isUpdateMode"
+                :loading="form.saving"
               >保存</a-button>
               <a-button-group v-else>
                 <a-button
                   type="primary"
-                  @click="handleSaveClick"
+                  @click="handleCreateOrUpdateLink"
+                  :loading="form.saving"
                 >更新</a-button>
                 <a-button
                   type="dashed"
-                  @click="handleAddLink"
-                  v-if="formType==='update'"
+                  @click="form.model = {}"
+                  v-if="isUpdateMode"
                 >返回添加</a-button>
               </a-button-group>
-            </a-form-item>
-          </a-form>
+            </a-form-model-item>
+          </a-form-model>
         </a-card>
       </a-col>
       <a-col
@@ -92,8 +116,8 @@
             v-if="isMobile()"
             itemLayout="vertical"
             size="large"
-            :dataSource="links"
-            :loading="loading"
+            :dataSource="table.data"
+            :loading="table.loading"
           >
             <a-list-item
               slot="renderItem"
@@ -111,8 +135,8 @@
                   <a-menu slot="overlay">
                     <a-menu-item>
                       <a
-                        href="javascript:;"
-                        @click="handleEditLink(item.id)"
+                        href="javascript:void(0);"
+                        @click="form.model = item"
                       >编辑</a>
                     </a-menu-item>
                     <a-menu-item>
@@ -153,9 +177,9 @@
           <!-- Desktop -->
           <a-table
             v-else
-            :columns="columns"
-            :dataSource="links"
-            :loading="loading"
+            :columns="table.columns"
+            :dataSource="table.data"
+            :loading="table.loading"
             :rowKey="link => link.id"
             :scrollToFirstRowOnChange="true"
           >
@@ -179,8 +203,8 @@
               slot-scope="text, record"
             >
               <a
-                href="javascript:;"
-                @click="handleEditLink(record.id)"
+                href="javascript:void(0);"
+                @click="form.model = record"
               >编辑</a>
               <a-divider type="vertical" />
               <a-popconfirm
@@ -202,13 +226,13 @@
         shape="circle"
         icon="setting"
         size="large"
-        @click="optionFormVisible=true"
+        @click="optionsModal.visible=true"
       ></a-button>
     </div>
     <a-modal
-      v-model="optionFormVisible"
+      v-model="optionsModal.visible"
       title="页面设置"
-      :afterClose="onOptionFormClose"
+      :afterClose="() => optionsModal.visible = false"
     >
       <template slot="footer">
         <a-button
@@ -218,8 +242,11 @@
         >保存</a-button>
       </template>
       <a-form layout="vertical">
-        <a-form-item label="页面标题：" help="* 需要主题进行适配">
-          <a-input v-model="options.links_title" />
+        <a-form-item
+          label="页面标题："
+          help="* 需要主题进行适配"
+        >
+          <a-input v-model="optionsModal.data.links_title" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -263,114 +290,141 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      formType: 'create',
-      optionFormVisible: false,
-      data: [],
-      loading: false,
-      columns,
-      links: [],
-      link: {},
-      teams: [],
-      options: []
+      table: {
+        columns,
+        data: [],
+        loading: false
+      },
+      form: {
+        model: {},
+        saving: false,
+        rules: {
+          name: [
+            { required: true, message: '* 友情链接名称不能为空', trigger: ['change', 'blur'] },
+            { max: 255, message: '* 友情链接名称的字符长度不能超过 255', trigger: ['change', 'blur'] }
+          ],
+          url: [
+            { required: true, message: '* 友情链接地址不能为空', trigger: ['change', 'blur'] },
+            { max: 1023, message: '* 友情链接地址的字符长度不能超过 1023', trigger: ['change', 'blur'] },
+            { type: 'url', message: '* 友情链接地址格式有误', trigger: ['change', 'blur'] }
+          ],
+          logo: [{ max: 1023, message: '* 友情链接 Logo 的字符长度不能超过 1023', trigger: ['change', 'blur'] }],
+          description: [{ max: 255, message: '* 友情链接描述的字符长度不能超过 255', trigger: ['change', 'blur'] }],
+          team: [{ max: 255, message: '* 友情链接分组的字符长度 255', trigger: ['change', 'blur'] }]
+        }
+      },
+      optionsModal: {
+        visible: false,
+        data: []
+      },
+      teams: []
     }
   },
   computed: {
     title() {
-      if (this.link.id) {
+      if (this.isUpdateMode) {
         return '修改友情链接'
       }
       return '添加友情链接'
+    },
+    isUpdateMode() {
+      return !!this.form.model.id
     }
   },
   created() {
-    this.loadLinks()
-    this.loadTeams()
-    this.loadFormOptions()
+    this.handleListLinks()
+    this.handleListLinkTeams()
+    this.handleListOptions()
   },
   methods: {
     ...mapActions(['loadOptions']),
-    loadLinks() {
-      this.loading = true
-      linkApi.listAll().then(response => {
-        this.links = response.data.data
-        this.loading = false
-      })
+    handleListLinks() {
+      this.table.loading = true
+      linkApi
+        .listAll()
+        .then(response => {
+          this.table.data = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.table.loading = false
+          }, 200)
+        })
     },
-    loadTeams() {
+    handleListLinkTeams() {
       linkApi.listTeams().then(response => {
         this.teams = response.data.data
       })
     },
-    loadFormOptions() {
+    handleListOptions() {
       optionApi.listAll().then(response => {
-        this.options = response.data.data
-      })
-    },
-    handleSaveClick() {
-      this.createOrUpdateLink()
-    },
-    handleAddLink() {
-      this.formType = 'create'
-      this.link = {}
-    },
-    handleEditLink(id) {
-      linkApi.get(id).then(response => {
-        this.link = response.data.data
-        this.formType = 'update'
+        this.optionsModal.data = response.data.data
       })
     },
     handleDeleteLink(id) {
-      linkApi.delete(id).then(response => {
-        this.$message.success('删除成功！')
-        this.loadLinks()
-        this.loadTeams()
-      })
+      linkApi
+        .delete(id)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.handleListLinks()
+          this.handleListLinkTeams()
+        })
     },
     handleParseUrl() {
-      linkApi.getByParse(this.link.url).then(response => {
-        this.link = response.data.data
+      linkApi.getByParse(this.form.model.url).then(response => {
+        this.form.model = response.data.data
       })
     },
-    createOrUpdateLink() {
-      if (!this.link.name) {
-        this.$notification['error']({
-          message: '提示',
-          description: '网站名称不能为空！'
-        })
-        return
-      }
-      if (!this.link.url) {
-        this.$notification['error']({
-          message: '提示',
-          description: '网站地址不能为空！'
-        })
-        return
-      }
-      if (this.link.id) {
-        linkApi.update(this.link.id, this.link).then(response => {
-          this.$message.success('更新成功！')
-          this.loadLinks()
-          this.loadTeams()
-        })
-      } else {
-        linkApi.create(this.link).then(response => {
-          this.$message.success('保存成功！')
-          this.loadLinks()
-          this.loadTeams()
-        })
-      }
-      this.handleAddLink()
+    handleCreateOrUpdateLink() {
+      const _this = this
+      _this.$refs.linkForm.validate(valid => {
+        if (valid) {
+          _this.form.saving = true
+          if (_this.isUpdateMode) {
+            linkApi
+              .update(_this.form.model.id, _this.form.model)
+              .then(response => {
+                _this.$message.success('更新成功！')
+                _this.form.model = {}
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 200)
+                _this.handleListLinks()
+                _this.handleListLinkTeams()
+              })
+          } else {
+            linkApi
+              .create(_this.form.model)
+              .then(response => {
+                _this.$message.success('保存成功！')
+                _this.form.model = {}
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 200)
+                _this.handleListLinks()
+                _this.handleListLinkTeams()
+              })
+          }
+        }
+      })
     },
     handleSaveOptions() {
-      optionApi.save(this.options).then(response => {
-        this.loadFormOptions()
-        this.loadOptions()
-        this.$message.success('保存成功！')
-        this.optionFormVisible = false
-      })
-    },
-    onOptionFormClose() {
-      this.optionFormVisible = false
+      optionApi
+        .save(this.optionsModal.data)
+        .then(response => {
+          this.$message.success('保存成功！')
+          this.optionsModal.visible = false
+        })
+        .finally(() => {
+          this.handleListOptions()
+          this.loadOptions()
+        })
     }
   }
 }

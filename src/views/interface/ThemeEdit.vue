@@ -22,6 +22,7 @@
                 type="primary"
                 @click="handlerSaveContent"
                 :disabled="buttonDisabled"
+                :loading="saving"
               >保存</a-button>
             </a-form-item>
           </a-form>
@@ -88,7 +89,8 @@ export default {
       file: {},
       content: '',
       themes: [],
-      selectedTheme: {}
+      selectedTheme: {},
+      saving: false
     }
   },
   created() {
@@ -150,9 +152,17 @@ export default {
       })
     },
     handlerSaveContent() {
-      themeApi.saveContent(this.selectedTheme.id, this.file.path, this.content).then(response => {
-        this.$message.success('保存成功！')
-      })
+      this.saving = true
+      themeApi
+        .saveContent(this.selectedTheme.id, this.file.path, this.content)
+        .then(response => {
+          this.$message.success('保存成功！')
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.saving = false
+          }, 200)
+        })
     }
   }
 }

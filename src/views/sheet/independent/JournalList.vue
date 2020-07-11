@@ -65,7 +65,7 @@
           </div>
           <a-divider />
           <div style="margin-top:15px">
-            <a-empty v-if="journals.length==0" />
+            <a-empty v-if="!listLoading && journals.length==0" />
             <a-list
               v-else
               itemLayout="vertical"
@@ -179,7 +179,10 @@
         >保存</a-button>
       </template>
       <a-form layout="vertical">
-        <a-form-item label="页面标题：" help="* 需要主题进行适配">
+        <a-form-item
+          label="页面标题："
+          help="* 需要主题进行适配"
+        >
           <a-input v-model="options.journals_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
@@ -250,7 +253,6 @@ import AttachmentDrawer from '../../attachment/components/AttachmentDrawer'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import { mapGetters, mapActions } from 'vuex'
 import journalApi from '@/api/journal'
-import journalCommentApi from '@/api/journalComment'
 import optionApi from '@/api/option'
 export default {
   mixins: [mixin, mixinDevice],
@@ -299,11 +301,17 @@ export default {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      journalApi.query(this.queryParam).then(response => {
-        this.journals = response.data.data.content
-        this.pagination.total = response.data.data.total
-        this.listLoading = false
-      })
+      journalApi
+        .query(this.queryParam)
+        .then(response => {
+          this.journals = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.listLoading = false
+          }, 200)
+        })
     },
     loadFormOptions() {
       optionApi.listAll().then(response => {
@@ -333,12 +341,6 @@ export default {
     handleShowJournalComments(journal) {
       this.journal = journal
       this.journalCommentVisible = true
-    },
-    handleCommentDelete(comment) {
-      journalCommentApi.delete(comment.id).then(response => {
-        this.$message.success('删除成功！')
-        this.handleCommentShow(this.journal)
-      })
     },
     createOrUpdateJournal() {
       this.journal.type = this.isPublic ? 'PUBLIC' : 'INTIMATE'

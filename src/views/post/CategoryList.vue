@@ -15,8 +15,8 @@
         >
           <a-form-model
             ref="categoryForm"
-            :model="categoryToCreate"
-            :rules="categoryRules"
+            :model="form.model"
+            :rules="form.rules"
             layout="horizontal"
           >
             <a-form-model-item
@@ -24,22 +24,22 @@
               help="* 页面上所显示的名称"
               prop="name"
             >
-              <a-input v-model="categoryToCreate.name" />
+              <a-input v-model="form.model.name" />
             </a-form-model-item>
             <a-form-model-item
               label="别名："
               help="* 一般为单个分类页面的标识，最好为英文"
               prop="slug"
             >
-              <a-input v-model="categoryToCreate.slug" />
+              <a-input v-model="form.model.slug" />
             </a-form-model-item>
             <a-form-model-item
               label="上级目录："
               prop="parentId"
             >
               <category-select-tree
-                :categories="categories"
-                v-model="categoryToCreate.parentId"
+                :categories="table.data"
+                v-model="form.model.parentId"
               />
             </a-form-model-item>
             <a-form-model-item
@@ -47,11 +47,11 @@
               help="* 在分类页面可展示，需要主题支持"
               prop="thumbnail"
             >
-              <a-input v-model="categoryToCreate.thumbnail">
+              <a-input v-model="form.model.thumbnail">
                 <a
                   href="javascript:void(0);"
                   slot="addonAfter"
-                  @click="thumbnailDrawerVisible = true"
+                  @click="thumbnailDrawer.visible = true"
                 >
                   <a-icon type="picture" />
                 </a>
@@ -59,29 +59,31 @@
             </a-form-model-item>
             <a-form-model-item
               label="描述："
-              help="* 分类描述，部分主题可显示"
+              help="* 分类描述，需要主题支持"
               prop="description"
             >
               <a-input
                 type="textarea"
-                v-model="categoryToCreate.description"
+                v-model="form.model.description"
                 :autoSize="{ minRows: 3 }"
               />
             </a-form-model-item>
             <a-form-model-item>
               <a-button
                 type="primary"
-                @click="handleSaveClick"
-                v-if="!isUpdateForm"
+                @click="handleCreateOrUpdateCategory"
+                v-if="!isUpdateMode"
+                :loading="form.saving"
               >保存</a-button>
               <a-button-group v-else>
                 <a-button
                   type="primary"
-                  @click="handleSaveClick"
+                  @click="handleCreateOrUpdateCategory"
+                  :loading="form.saving"
                 >更新</a-button>
                 <a-button
                   type="dashed"
-                  @click="categoryToCreate = {}"
+                  @click="form.model = {}"
                 >返回添加</a-button>
               </a-button-group>
             </a-form-model-item>
@@ -106,8 +108,8 @@
             itemLayout="vertical"
             size="large"
             :pagination="false"
-            :dataSource="categories"
-            :loading="loading"
+            :dataSource="table.data"
+            :loading="table.loading"
           >
             <a-list-item
               slot="renderItem"
@@ -130,13 +132,13 @@
                     <a-menu-item>
                       <a
                         href="javascript:void(0);"
-                        @click="handleEditCategory(item)"
+                        @click="form.model = item"
                       >编辑</a>
                     </a-menu-item>
                     <a-menu-item>
                       <a-popconfirm
                         :title="'你确定要添加【' + item.name + '】到菜单？'"
-                        @confirm="handleCategoryToMenu(item)"
+                        @confirm="handleCreateMenuByCategory(item)"
                         okText="确定"
                         cancelText="取消"
                       >
@@ -176,10 +178,10 @@
           <!-- Desktop -->
           <a-table
             v-else
-            :columns="columns"
-            :dataSource="categories"
+            :columns="table.columns"
+            :dataSource="table.data"
             :rowKey="record => record.id"
-            :loading="loading"
+            :loading="table.loading"
             :scrollToFirstRowOnChange="true"
           >
             <span
@@ -200,8 +202,8 @@
               slot-scope="text, record"
             >
               <a
-                href="javascript:;"
-                @click="handleEditCategory(record)"
+                href="javascript:void(0);"
+                @click="form.model = record"
               >编辑</a>
               <a-divider type="vertical" />
               <a-dropdown :trigger="['click']">
@@ -213,7 +215,7 @@
                   <a-menu-item key="1">
                     <a-popconfirm
                       :title="'你确定要添加【' + record.name + '】到菜单？'"
-                      @confirm="handleCategoryToMenu(record)"
+                      @confirm="handleCreateMenuByCategory(record)"
                       okText="确定"
                       cancelText="取消"
                     >
@@ -239,7 +241,7 @@
     </a-row>
 
     <AttachmentSelectDrawer
-      v-model="thumbnailDrawerVisible"
+      v-model="thumbnailDrawer.visible"
       @listenToSelect="handleSelectThumbnail"
       title="选择封面图"
     />
@@ -279,100 +281,114 @@ const columns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
+
 export default {
   components: { CategorySelectTree },
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      categories: [],
-      categoryToCreate: {},
-      thumbnailDrawerVisible: false,
-      loading: false,
-      columns,
-      categoryRules: {
-        name: [
-          { required: true, message: '* 分类名称不能为空', trigger: ['change', 'blur'] },
-          { max: 255, message: '* 分类名称的字符长度不能超过 255', trigger: ['change', 'blur'] }
-        ],
-        slug: [{ max: 255, message: '* 分类别名的字符长度不能超过 255', trigger: ['change', 'blur'] }],
-        thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change', 'blur'] }],
-        description: [{ max: 100, message: '* 分类描述的字符长度不能超过 100', trigger: ['change', 'blur'] }]
+      table: {
+        columns,
+        data: [],
+        loading: false
+      },
+      form: {
+        model: {},
+        saving: false,
+        rules: {
+          name: [
+            { required: true, message: '* 分类名称不能为空', trigger: ['change', 'blur'] },
+            { max: 255, message: '* 分类名称的字符长度不能超过 255', trigger: ['change', 'blur'] }
+          ],
+          slug: [{ max: 255, message: '* 分类别名的字符长度不能超过 255', trigger: ['change', 'blur'] }],
+          thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change', 'blur'] }],
+          description: [{ max: 100, message: '* 分类描述的字符长度不能超过 100', trigger: ['change', 'blur'] }]
+        }
+      },
+      thumbnailDrawer: {
+        visible: false
       }
     }
   },
   computed: {
     title() {
-      if (this.categoryToCreate.id) {
+      if (this.isUpdateMode) {
         return '修改分类'
       }
       return '添加分类'
     },
-    isUpdateForm() {
-      return this.categoryToCreate.id
+    isUpdateMode() {
+      return !!this.form.model.id
     }
   },
   created() {
-    this.loadCategories()
+    this.handleListCategories()
   },
   methods: {
-    loadCategories() {
-      this.loading = true
+    handleListCategories() {
+      this.table.loading = true
       categoryApi
         .listAll(true)
         .then(response => {
-          this.categories = response.data.data
+          this.table.data = response.data.data
         })
         .finally(() => {
           setTimeout(() => {
-            this.loading = false
+            this.table.loading = false
           }, 200)
         })
-    },
-    handleSaveClick() {
-      this.createOrUpdateCategory()
-    },
-    handleEditCategory(category) {
-      this.categoryToCreate = category
     },
     handleDeleteCategory(id) {
       categoryApi
         .delete(id)
         .then(response => {
           this.$message.success('删除成功！')
-          this.categoryToCreate = {}
+          this.form.model = {}
         })
         .finally(() => {
-          this.loadCategories()
+          this.handleListCategories()
         })
     },
-    createOrUpdateCategory() {
-      this.$refs.categoryForm.validate(valid => {
+
+    /**
+     * Create or update a category.
+     */
+    handleCreateOrUpdateCategory() {
+      const _this = this
+      _this.$refs.categoryForm.validate(valid => {
         if (valid) {
-          if (this.categoryToCreate.id) {
+          _this.form.saving = true
+          if (_this.isUpdateMode) {
             categoryApi
-              .update(this.categoryToCreate.id, this.categoryToCreate)
+              .update(_this.form.model.id, _this.form.model)
               .then(response => {
-                this.$message.success('更新成功！')
-                this.categoryToCreate = {}
+                _this.$message.success('更新成功！')
+                _this.form.model = {}
               })
               .finally(() => {
-                this.loadCategories()
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 200)
+                _this.handleListCategories()
               })
           } else {
             categoryApi
-              .create(this.categoryToCreate)
+              .create(this.form.model)
               .then(response => {
-                this.$message.success('保存成功！')
-                this.categoryToCreate = {}
+                _this.$message.success('保存成功！')
+                _this.form.model = {}
               })
               .finally(() => {
-                this.loadCategories()
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 200)
+                _this.handleListCategories()
               })
           }
         }
       })
     },
-    handleCategoryToMenu(category) {
+    handleCreateMenuByCategory(category) {
       const menu = {
         name: category.name,
         url: `${category.fullPath}`
@@ -382,8 +398,8 @@ export default {
       })
     },
     handleSelectThumbnail(data) {
-      this.$set(this.categoryToCreate, 'thumbnail', encodeURI(data.path))
-      this.thumbnailDrawerVisible = false
+      this.$set(this.form.model, 'thumbnail', encodeURI(data.path))
+      this.thumbnailDrawer.visible = false
     },
     handleQueryCategoryPosts(category) {
       this.$router.push({ name: 'PostList', query: { categoryId: category.id } })
