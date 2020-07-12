@@ -155,7 +155,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                                  Set<PostMeta> metas, boolean autoSave) {
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
-        postToUpdate.setWordCount((long) postToUpdate.getFormatContent().trim().length());
+        postToUpdate.setWordCount((long) postToUpdate.getOriginalContent().trim().length());
         PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds, metas);
         if (!autoSave) {
             // Log the creation
