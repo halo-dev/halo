@@ -53,6 +53,7 @@ import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
  * @author ryanwang
  * @author guqing
  * @author evanwang
+ * @author coor.top
  * @date 2019-03-14
  */
 @Slf4j
@@ -154,6 +155,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                                  Set<PostMeta> metas, boolean autoSave) {
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
+        postToUpdate.setWordCount((long) postToUpdate.getFormatContent().trim().length());
         PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds, metas);
         if (!autoSave) {
             // Log the creation
@@ -551,6 +553,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             postListVO.setFullPath(buildFullPath(post));
 
+            postListVO.setWordCount(post.getWordCount());
+
             return postListVO;
         });
     }
@@ -608,6 +612,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
             postListVO.setFullPath(buildFullPath(post));
+
+            postListVO.setWordCount(post.getWordCount());
 
             return postListVO;
         }).collect(Collectors.toList());
@@ -749,6 +755,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds,
                                         Set<Integer> categoryIds, Set<PostMeta> metas) {
         Assert.notNull(post, "Post param must not be null");
+
+        post.setWordCount((long) post.getOriginalContent().trim().length());
 
         // Create or update post
         post = super.createOrUpdateBy(post);
