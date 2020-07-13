@@ -7,7 +7,7 @@
         :md="10"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="mb-3"
       >
         <a-card
           :title="title"
@@ -104,7 +104,7 @@
                 >返回添加</a-button>
               </a-button-group>
               <a
-                :style="{ marginLeft: '8px'}"
+                class="ml-2"
                 @click="form.moreField = !form.moreField"
               >
                 更多选项
@@ -120,7 +120,7 @@
         :md="14"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="pb-3"
       >
         <a-card
           title="所有菜单"

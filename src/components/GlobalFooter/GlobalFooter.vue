@@ -1,7 +1,7 @@
 <template>
   <div
-    class="footer"
-    style="padding: 0 16px;margin: 48px 0 0;text-align: center;"
+    class="footer text-center"
+    style="padding: 0 16px;margin: 48px 0 0;"
   >
     <div
       class="copyright"
@@ -9,7 +9,7 @@
     >
       Proudly power by
       <router-link :to="{ name:'About' }">
-        <a href="javascript:void(0);">Halo</a>
+        Halo
       </router-link>
     </div>
   </div>
@@ -17,12 +17,6 @@
 
 <script>
 export default {
-  name: 'GlobalFooter',
-  data() {
-    return {}
-  }
+  name: 'GlobalFooter'
 }
 </script>
-
-<style lang="less" scoped>
-</style>

@@ -64,12 +64,10 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
+                  class="mr-2"
                   @click="handleQuery()"
                 >查询</a-button>
-                <a-button
-                  style="margin-left: 8px;"
-                  @click="handleResetParam()"
-                >重置</a-button>
+                <a-button @click="handleResetParam()">重置</a-button>
               </span>
             </a-col>
           </a-row>
@@ -130,14 +128,13 @@
               </a>
             </a-menu-item>
           </a-menu>
-          <a-button style="margin-left: 8px;">
+          <a-button class="ml-2">
             批量操作
             <a-icon type="down" />
           </a-button>
         </a-dropdown>
       </div>
-      <div style="margin-top:15px">
-
+      <div class="mt-4">
         <!-- Mobile -->
         <a-list
           v-if="isMobile()"
@@ -242,7 +239,7 @@
                   v-if="item.status=='PUBLISHED' || item.status == 'INTIMATE'"
                   :href="item.fullPath"
                   target="_blank"
-                  style="text-decoration: none;"
+                  class="no-underline"
                 >
                   <a-tooltip
                     placement="top"
@@ -252,7 +249,7 @@
                 <a
                   v-else-if="item.status=='DRAFT'"
                   href="javascript:void(0)"
-                  style="text-decoration: none;"
+                  class="no-underline"
                   @click="handlePreview(item.id)"
                 >
                   <a-tooltip
@@ -263,7 +260,7 @@
                 <a
                   v-else
                   href="javascript:void(0);"
-                  style="text-decoration: none;"
+                  class="no-underline"
                   disabled
                 >
                   {{ item.title }}
@@ -323,7 +320,7 @@
               v-if="record.status=='PUBLISHED' || record.status == 'INTIMATE'"
               :href="record.fullPath"
               target="_blank"
-              style="text-decoration: none;"
+              class="no-underline"
             >
               <a-tooltip
                 placement="top"
@@ -333,7 +330,7 @@
             <a
               v-else-if="record.status=='DRAFT'"
               href="javascript:void(0)"
-              style="text-decoration: none;"
+              class="no-underline"
               @click="handlePreview(record.id)"
             >
               <a-tooltip
@@ -344,7 +341,7 @@
             <a
               v-else
               href="javascript:void(0);"
-              style="text-decoration: none;"
+              class="no-underline"
               disabled
             >
               {{ text }}
@@ -625,8 +622,8 @@ export default {
     }
   },
   created() {
-    this.loadPosts()
-    this.loadCategories()
+    this.handleListPosts()
+    this.handleListCategories()
   },
   destroyed: function() {
     if (this.postSettingVisible) {
@@ -662,8 +659,10 @@ export default {
     }
   },
   methods: {
-    loadPosts() {
-      this.postsLoading = true
+    handleListPosts(enableLoading = true) {
+      if (enableLoading) {
+        this.postsLoading = true
+      }
       // Set from pagination
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -680,7 +679,7 @@ export default {
           }, 200)
         })
     },
-    loadCategories() {
+    handleListCategories() {
       this.categoriesLoading = true
       categoryApi
         .listAll(true)
@@ -712,7 +711,7 @@ export default {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.page = page
       this.pagination.size = pageSize
-      this.loadPosts()
+      this.handleListPosts()
     },
     handleResetParam() {
       this.queryParam.keyword = null
@@ -726,38 +725,54 @@ export default {
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleEditStatusClick(postId, status) {
-      postApi.updateStatus(postId, status).then(response => {
-        this.$message.success('操作成功！')
-        this.loadPosts()
-      })
+      postApi
+        .updateStatus(postId, status)
+        .then(response => {
+          this.$message.success('操作成功！')
+        })
+        .finally(() => {
+          this.handleListPosts()
+        })
     },
     handleDeleteClick(postId) {
-      postApi.delete(postId).then(response => {
-        this.$message.success('删除成功！')
-        this.loadPosts()
-      })
+      postApi
+        .delete(postId)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.handleListPosts()
+        })
     },
     handleEditStatusMore(status) {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.info('请至少选择一项！')
         return
       }
-      postApi.updateStatusInBatch(this.selectedRowKeys, status).then(response => {
-        this.$log.debug(`postId: ${this.selectedRowKeys}, status: ${status}`)
-        this.selectedRowKeys = []
-        this.loadPosts()
-      })
+      postApi
+        .updateStatusInBatch(this.selectedRowKeys, status)
+        .then(response => {
+          this.$log.debug(`postId: ${this.selectedRowKeys}, status: ${status}`)
+          this.selectedRowKeys = []
+        })
+        .finally(() => {
+          this.handleListPosts()
+        })
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.info('请至少选择一项！')
         return
       }
-      postApi.deleteInBatch(this.selectedRowKeys).then(response => {
-        this.$log.debug(`delete: ${this.selectedRowKeys}`)
-        this.selectedRowKeys = []
-        this.loadPosts()
-      })
+      postApi
+        .deleteInBatch(this.selectedRowKeys)
+        .then(response => {
+          this.$log.debug(`delete: ${this.selectedRowKeys}`)
+          this.selectedRowKeys = []
+        })
+        .finally(() => {
+          this.handleListPosts()
+        })
     },
     handleShowPostSettings(post) {
       postApi.get(post.id).then(response => {
@@ -787,14 +802,14 @@ export default {
       this.postSettingVisible = false
       this.selectedPost = {}
       setTimeout(() => {
-        this.loadPosts()
+        this.handleListPosts(false)
       }, 500)
     },
     onPostCommentsClose() {
       this.postCommentVisible = false
       this.selectedPost = {}
       setTimeout(() => {
-        this.loadPosts()
+        this.handleListPosts(false)
       }, 500)
     },
     onRefreshPostFromSetting(post) {

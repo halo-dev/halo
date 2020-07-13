@@ -7,7 +7,7 @@
         :md="10"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="pb-3"
       >
         <a-card
           :title="title"
@@ -105,7 +105,7 @@
         :md="14"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="pb-3"
       >
         <a-card
           title="所有友情链接"

@@ -45,12 +45,10 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
+                  class="mr-2"
                   @click="handleQuery()"
                 >查询</a-button>
-                <a-button
-                  style="margin-left: 8px;"
-                  @click="handleResetParam()"
-                >重置</a-button>
+                <a-button @click="handleResetParam()">重置</a-button>
               </span>
             </a-col>
           </a-row>
@@ -100,7 +98,7 @@
           </a-button>
         </a-dropdown>
       </div>
-      <div style="margin-top:15px">
+      <div class="mt-4">
         <!-- Mobile -->
         <a-list
           v-if="isMobile()"
@@ -558,7 +556,7 @@ export default {
     }
   },
   created() {
-    this.loadComments()
+    this.handleListComments()
   },
   computed: {
     formattedComments() {
@@ -570,7 +568,7 @@ export default {
     }
   },
   methods: {
-    loadComments() {
+    handleListComments() {
       this.loading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -592,16 +590,24 @@ export default {
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleEditStatusClick(commentId, status) {
-      commentApi.updateStatus(this.type, commentId, status).then(response => {
-        this.$message.success('操作成功！')
-        this.loadComments()
-      })
+      commentApi
+        .updateStatus(this.type, commentId, status)
+        .then(response => {
+          this.$message.success('操作成功！')
+        })
+        .finally(() => {
+          this.handleListComments()
+        })
     },
     handleDeleteClick(commentId) {
-      commentApi.delete(this.type, commentId).then(response => {
-        this.$message.success('删除成功！')
-        this.loadComments()
-      })
+      commentApi
+        .delete(this.type, commentId)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.handleListComments()
+        })
     },
     handleReplyAndPassClick(comment) {
       this.handleReplyClick(comment)
@@ -625,19 +631,23 @@ export default {
         })
         return
       }
-      commentApi.create(this.type, this.replyComment).then(response => {
-        this.$message.success('回复成功！')
-        this.replyComment = {}
-        this.selectedComment = {}
-        this.replyCommentVisible = false
-        this.loadComments()
-      })
+      commentApi
+        .create(this.type, this.replyComment)
+        .then(response => {
+          this.$message.success('回复成功！')
+          this.replyComment = {}
+          this.selectedComment = {}
+          this.replyCommentVisible = false
+        })
+        .finally(() => {
+          this.handleListComments()
+        })
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.page = page
       this.pagination.size = pageSize
-      this.loadComments()
+      this.handleListComments()
     },
     handleResetParam() {
       this.queryParam.keyword = null
@@ -650,22 +660,30 @@ export default {
         this.$message.info('请至少选择一项！')
         return
       }
-      commentApi.updateStatusInBatch(this.type, this.selectedRowKeys, status).then(response => {
-        this.$log.debug(`commentIds: ${this.selectedRowKeys}, status: ${status}`)
-        this.selectedRowKeys = []
-        this.loadComments()
-      })
+      commentApi
+        .updateStatusInBatch(this.type, this.selectedRowKeys, status)
+        .then(response => {
+          this.$log.debug(`commentIds: ${this.selectedRowKeys}, status: ${status}`)
+          this.selectedRowKeys = []
+        })
+        .finally(() => {
+          this.handleListComments()
+        })
     },
     handleDeleteMore() {
       if (this.selectedRowKeys.length <= 0) {
         this.$message.info('请至少选择一项！')
         return
       }
-      commentApi.deleteInBatch(this.type, this.selectedRowKeys).then(response => {
-        this.$log.debug(`delete: ${this.selectedRowKeys}`)
-        this.selectedRowKeys = []
-        this.loadComments()
-      })
+      commentApi
+        .deleteInBatch(this.type, this.selectedRowKeys)
+        .then(response => {
+          this.$log.debug(`delete: ${this.selectedRowKeys}`)
+          this.selectedRowKeys = []
+        })
+        .finally(() => {
+          this.handleListComments()
+        })
     },
     handleClearRowKeys() {
       this.selectedRowKeys = []

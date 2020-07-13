@@ -4,7 +4,7 @@
       <a-col
         :lg="10"
         :md="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="pb-3"
       >
         <a-card
           :bordered="false"
@@ -63,7 +63,7 @@
       <a-col
         :lg="14"
         :md="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="pb-3"
       >
         <a-card
           :bodyStyle="{ padding: '0' }"
@@ -258,7 +258,7 @@
           :help="`MFAKey:${mfaParam.mfaKey}`"
         >
           <template slot="extra">
-            <span style="color:red">* 建议保存此二维码或 MFAKey，验证设备丢失将无法找回，只能通过重置密码关闭二步验证。</span>
+            <span class="text-red-600">* 建议保存此二维码或 MFAKey，验证设备丢失将无法找回，只能通过重置密码关闭二步验证。</span>
           </template>
           <img
             width="100%"
@@ -332,7 +332,7 @@ export default {
     }
   },
   created() {
-    this.getStatistics()
+    this.handleLoadStatistics()
   },
   watch: {
     mfaType(value) {
@@ -346,7 +346,7 @@ export default {
   },
   methods: {
     ...mapMutations({ setUser: 'SET_USER' }),
-    getStatistics() {
+    handleLoadStatistics() {
       this.statisticsLoading = true
       statisticsApi
         .statisticsWithUser()
@@ -356,8 +356,10 @@ export default {
           this.mfaParam.mfaType = this.user.mfaType && this.user.mfaType
         })
         .finally(() => {
-          this.statisticsLoading = false
-        }, 200)
+          setTimeout(() => {
+            this.statisticsLoading = false
+          }, 200)
+        })
     },
     handleUpdatePassword() {
       // Check confirm password

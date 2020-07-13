@@ -49,14 +49,9 @@ export default {
       formdata.append('file', $file)
       attachmentApi.upload(formdata).then(response => {
         var responseObject = response.data
-
-        if (responseObject.status === 200) {
-          var HaloEditor = this.$refs.md
-          HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
-          this.$message.success('图片上传成功！')
-        } else {
-          this.$message.error('图片上传失败：' + responseObject.message)
-        }
+        var HaloEditor = this.$refs.md
+        HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
+        this.$message.success('图片上传成功！')
       })
     },
     handleSaveDraft() {

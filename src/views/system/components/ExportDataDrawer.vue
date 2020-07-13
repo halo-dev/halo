@@ -22,6 +22,7 @@
           itemLayout="vertical"
           size="small"
           :dataSource="files"
+          :loading="loading"
         >
           <a-list-item
             slot="renderItem"
@@ -49,13 +50,6 @@
               <p slot="description">{{ file.updateTime | timeAgo }}/{{ file.fileSize | fileSizeFormat }}</p>
             </a-list-item-meta>
           </a-list-item>
-          <div
-            v-if="loading"
-            class="loading-container"
-            style="position: absolute;bottom: 40px; width: 100%;text-align: center;"
-          >
-            <a-spin />
-          </div>
         </a-list>
       </a-col>
     </a-row>
@@ -64,7 +58,7 @@
       <a-button
         type="primary"
         icon="download"
-        style="marginRight: 8px"
+        class="mr-2"
         :loading="backuping"
         @click="handleExportClick"
       >备份</a-button>
@@ -72,7 +66,7 @@
         type="dashed"
         icon="reload"
         :loading="loading"
-        @click="handleFilesRefreshClick"
+        @click="handleListBackups"
       >刷新</a-button>
     </div>
   </a-drawer>
@@ -105,19 +99,23 @@ export default {
   watch: {
     visible: function(newValue, oldValue) {
       if (newValue) {
-        this.listFiles()
+        this.handleListBackups()
       }
     }
   },
   methods: {
-    listFiles() {
+    handleListBackups() {
       this.loading = true
       backupApi
         .listExportedData()
         .then(response => {
           this.files = response.data.data
         })
-        .finally(() => (this.loading = false))
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleExportClick() {
       this.backuping = true
@@ -125,10 +123,12 @@ export default {
         .exportData()
         .then(response => {
           this.$message.success('导出成功！')
-          this.listFiles()
         })
         .finally(() => {
-          this.backuping = false
+          setTimeout(() => {
+            this.backuping = false
+          }, 200)
+          this.handleListBackups()
         })
     },
     handleFileDeleteClick(filename) {
@@ -137,12 +137,13 @@ export default {
         .deleteExportedData(filename)
         .then(response => {
           this.$message.success('删除成功！')
-          this.listFiles()
         })
-        .finally(() => (this.deleting = false))
-    },
-    handleFilesRefreshClick() {
-      this.listFiles()
+        .finally(() => {
+          setTimeout(() => {
+            this.deleting = false
+          }, 200)
+          this.handleListBackups()
+        })
     },
     onClose() {
       this.$emit('close', false)

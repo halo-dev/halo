@@ -103,15 +103,21 @@ export default {
     }
   },
   created() {
-    this.loadComments()
+    this.handleListTargetComments()
   },
   methods: {
-    loadComments() {
+    handleListTargetComments() {
       this.loading = true
-      commentApi.latestComment(this.type, 5, 'PUBLISHED').then(response => {
-        this.comments = response.data.data
-        this.loading = false
-      })
+      commentApi
+        .latestComment(this.type, 5, 'PUBLISHED')
+        .then(response => {
+          this.comments = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handlePostPreview(postId) {
       postApi.preview(postId).then(response => {

@@ -8,115 +8,112 @@
     @close="onClose"
     :visible="visible"
   >
-    <a-skeleton
-      active
-      :loading="settingLoading"
-      :paragraph="{ rows: 18 }"
-    >
-      <div class="post-setting-drawer-content">
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">基本设置</h3>
-          <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
-              <a-form-item
-                label="页面标题："
-                v-if="needTitle"
+    <div class="post-setting-drawer-content">
+      <div class="mb-4">
+        <h3 class="post-setting-drawer-title">基本设置</h3>
+        <div class="post-setting-drawer-item">
+          <a-form layout="vertical">
+            <a-form-item
+              label="页面标题："
+              v-if="needTitle"
+            >
+              <a-input v-model="selectedSheet.title" />
+            </a-form-item>
+            <a-form-item
+              label="页面别名："
+              :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.slug ? selectedSheet.slug : '{slug}')+(options.path_suffix?options.path_suffix:'')"
+            >
+              <a-input v-model="selectedSheet.slug" />
+            </a-form-item>
+            <a-form-item label="发表时间：">
+              <a-date-picker
+                showTime
+                :defaultValue="pickerDefaultValue"
+                format="YYYY-MM-DD HH:mm:ss"
+                placeholder="选择页面发表时间"
+                @change="onSheetDateChange"
+                @ok="onSheetDateOk"
+              />
+            </a-form-item>
+            <a-form-item label="开启评论：">
+              <a-radio-group
+                v-model="selectedSheet.disallowComment"
+                :defaultValue="false"
               >
-                <a-input v-model="selectedSheet.title" />
-              </a-form-item>
-              <a-form-item
-                label="页面别名："
-                :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.slug ? selectedSheet.slug : '{slug}')+(options.path_suffix?options.path_suffix:'')"
+                <a-radio :value="false">开启</a-radio>
+                <a-radio :value="true">关闭</a-radio>
+              </a-radio-group>
+            </a-form-item>
+            <a-form-item
+              label="自定义模板："
+              v-if="customTpls.length>0"
+            >
+              <a-select
+                v-model="selectedSheet.template"
+                :loading="customTplsLoading"
               >
-                <a-input v-model="selectedSheet.slug" />
-              </a-form-item>
-              <a-form-item label="发表时间：">
-                <a-date-picker
-                  showTime
-                  :defaultValue="pickerDefaultValue"
-                  format="YYYY-MM-DD HH:mm:ss"
-                  placeholder="选择页面发表时间"
-                  @change="onSheetDateChange"
-                  @ok="onSheetDateOk"
-                />
-              </a-form-item>
-              <a-form-item label="开启评论：">
-                <a-radio-group
-                  v-model="selectedSheet.disallowComment"
-                  :defaultValue="false"
-                >
-                  <a-radio :value="false">开启</a-radio>
-                  <a-radio :value="true">关闭</a-radio>
-                </a-radio-group>
-              </a-form-item>
-              <a-form-item
-                label="自定义模板："
-                v-if="customTpls.length>0"
-              >
-                <a-select v-model="selectedSheet.template">
-                  <a-select-option
-                    key=""
-                    value=""
-                  >无</a-select-option>
-                  <a-select-option
-                    v-for="tpl in customTpls"
-                    :key="tpl"
-                    :value="tpl"
-                  >{{ tpl }}</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-form>
-          </div>
+                <a-select-option
+                  key=""
+                  value=""
+                >无</a-select-option>
+                <a-select-option
+                  v-for="tpl in customTpls"
+                  :key="tpl"
+                  :value="tpl"
+                >{{ tpl }}</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-form>
         </div>
-        <a-divider />
+      </div>
+      <a-divider />
 
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">摘要</h3>
-          <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
+      <div class="mb-4">
+        <h3 class="post-setting-drawer-title">摘要</h3>
+        <div class="post-setting-drawer-item">
+          <a-form layout="vertical">
+            <a-form-item>
+              <a-input
+                type="textarea"
+                :autoSize="{ minRows: 5 }"
+                v-model="selectedSheet.summary"
+                placeholder="不填写则会自动生成"
+              />
+            </a-form-item>
+          </a-form>
+        </div>
+      </div>
+      <a-divider />
+
+      <div class="mb-4">
+        <h3 class="post-setting-drawer-title">封面图</h3>
+        <div class="post-setting-drawer-item">
+          <div class="sheet-thumb">
+            <img
+              class="img"
+              :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
+              @click="thumbDrawerVisible = true"
+            >
+
+            <a-form layout="vertial">
               <a-form-item>
                 <a-input
-                  type="textarea"
-                  :autoSize="{ minRows: 5 }"
-                  v-model="selectedSheet.summary"
-                  placeholder="不填写则会自动生成"
-                />
+                  v-model="selectedSheet.thumbnail"
+                  placeholder="点击封面图选择图片，或者输入外部链接"
+                ></a-input>
               </a-form-item>
             </a-form>
+
+            <a-button
+              class="sheet-thumb-remove"
+              type="dashed"
+              @click="selectedSheet.thumbnail = null"
+            >移除</a-button>
           </div>
         </div>
-        <a-divider />
-
-        <div :style="{ marginBottom: '16px' }">
-          <h3 class="post-setting-drawer-title">封面图</h3>
-          <div class="post-setting-drawer-item">
-            <div class="sheet-thumb">
-              <img
-                class="img"
-                :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
-                @click="thumbDrawerVisible = true"
-              >
-
-              <a-form layout="vertial">
-                <a-form-item>
-                  <a-input
-                    v-model="selectedSheet.thumbnail"
-                    placeholder="点击封面图选择图片，或者输入外部链接"
-                  ></a-input>
-                </a-form-item>
-              </a-form>
-
-              <a-button
-                class="sheet-thumb-remove"
-                type="dashed"
-                @click="handlerRemoveThumb"
-              >移除</a-button>
-            </div>
-          </div>
-        </div>
-        <a-divider class="divider-transparent" />
       </div>
-    </a-skeleton>
+      <a-divider class="divider-transparent" />
+    </div>
     <AttachmentSelectDrawer
       v-model="thumbDrawerVisible"
       @listenToSelect="handleSelectSheetThumb"
@@ -129,11 +126,11 @@
       placement="right"
       closable
       destroyOnClose
-      @close="onAdvancedClose"
+      @close="advancedVisible = false"
       :visible="advancedVisible"
     >
       <div class="post-setting-drawer-content">
-        <div :style="{ marginBottom: '16px' }">
+        <div class="mb-4">
           <h3 class="post-setting-drawer-title">SEO 设置</h3>
           <div class="post-setting-drawer-item">
             <a-form layout="vertical">
@@ -155,7 +152,7 @@
           </div>
         </div>
         <a-divider />
-        <div :style="{ marginBottom: '16px' }">
+        <div class="mb-4">
           <h3 class="post-setting-drawer-title">元数据</h3>
           <a-form layout="vertical">
             <a-form-item
@@ -195,13 +192,13 @@
 
     <div class="bottom-control">
       <a-button
-        style="marginRight: 8px"
+        class="mr-2"
         type="dashed"
         @click="advancedVisible = true"
       >高级</a-button>
       <a-button
         v-if="saveDraftButton"
-        style="marginRight: 8px"
+        class="mr-2"
         @click="handleDraftClick"
         :loading="draftSaving"
       >保存草稿</a-button>
@@ -226,7 +223,7 @@ export default {
     return {
       thumbDrawerVisible: false,
       advancedVisible: false,
-      settingLoading: true,
+      customTplsLoading: false,
       selectedSheet: this.sheet,
       customTpls: [],
       saving: false,
@@ -258,10 +255,6 @@ export default {
       default: true
     }
   },
-  created() {
-    this.loadSkeleton()
-    this.loadCustomTpls()
-  },
   watch: {
     sheet(val) {
       this.selectedSheet = val
@@ -274,8 +267,8 @@ export default {
     },
     visible: function(newValue, oldValue) {
       if (newValue) {
-        this.loadSkeleton()
-        this.loadPresetMetasField()
+        this.handleListCustomTpls()
+        this.handleListPresetMetasField()
       }
     }
   },
@@ -293,13 +286,7 @@ export default {
     ...mapGetters(['options'])
   },
   methods: {
-    loadSkeleton() {
-      this.settingLoading = true
-      setTimeout(() => {
-        this.settingLoading = false
-      }, 500)
-    },
-    loadPresetMetasField() {
+    handleListPresetMetasField() {
       if (this.metas.length <= 0) {
         themeApi.getActivatedTheme().then(response => {
           const fields = response.data.data.sheetMetaField
@@ -314,17 +301,22 @@ export default {
         })
       }
     },
-    loadCustomTpls() {
-      themeApi.customSheetTpls().then(response => {
-        this.customTpls = response.data.data
-      })
+    handleListCustomTpls() {
+      this.customTplsLoading = true
+      themeApi
+        .customSheetTpls()
+        .then(response => {
+          this.customTpls = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.customTplsLoading = false
+          }, 200)
+        })
     },
     handleSelectSheetThumb(data) {
       this.selectedSheet.thumbnail = encodeURI(data.path)
       this.thumbDrawerVisible = false
-    },
-    handlerRemoveThumb() {
-      this.selectedSheet.thumbnail = null
     },
     handlePublishClick() {
       this.selectedSheet.status = 'PUBLISHED'
@@ -364,8 +356,10 @@ export default {
             this.$router.push({ name: 'SheetList', query: { activeKey: 'custom' } })
           })
           .finally(() => {
-            this.saving = false
-            this.draftSaving = false
+            setTimeout(() => {
+              this.saving = false
+              this.draftSaving = false
+            }, 200)
           })
       } else {
         sheetApi
@@ -384,16 +378,15 @@ export default {
             this.selectedSheet = response.data.data
           })
           .finally(() => {
-            this.saving = false
-            this.draftSaving = false
+            setTimeout(() => {
+              this.saving = false
+              this.draftSaving = false
+            }, 200)
           })
       }
     },
     onClose() {
       this.$emit('close', false)
-    },
-    onAdvancedClose() {
-      this.advancedVisible = false
     },
     onSheetDateChange(value, dateString) {
       this.selectedSheet.createTime = value.valueOf()

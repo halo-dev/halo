@@ -21,7 +21,7 @@
               :title="item.name"
               :bodyStyle="{ padding: 0 }"
             >
-              <div class="theme-thumb">
+              <div class="theme-screenshot">
                 <img
                   :alt="item.name"
                   :src="item.screenshots || '/images/placeholder.jpg'"
@@ -106,13 +106,13 @@
       </a-col>
     </a-row>
 
-    <ThemeSetting
+    <ThemeSettingDrawer
       :theme="selectedTheme"
-      v-if="themeSettingVisible"
+      v-model="themeSettingVisible"
       @close="onThemeSettingsClose"
     />
 
-    <div class="upload-button">
+    <div style="position: fixed;bottom: 30px;right: 30px;">
       <a-dropdown
         placement="topLeft"
         :trigger="['click']"
@@ -289,11 +289,11 @@
 </template>
 
 <script>
-import ThemeSetting from './components/ThemeSetting'
+import ThemeSettingDrawer from './components/ThemeSettingDrawer'
 import themeApi from '@/api/theme'
 export default {
   components: {
-    ThemeSetting
+    ThemeSettingDrawer
   },
   data() {
     return {
@@ -323,7 +323,7 @@ export default {
     }
   },
   created() {
-    this.loadThemes()
+    this.handleListThemes()
   },
   destroyed: function() {
     if (this.themeSettingVisible) {
@@ -337,7 +337,7 @@ export default {
     next()
   },
   methods: {
-    loadThemes() {
+    handleListThemes() {
       this.themeLoading = true
       themeApi
         .listAll()
@@ -350,12 +350,15 @@ export default {
           }, 200)
         })
     },
-
     activeTheme(themeId) {
-      themeApi.active(themeId).then(response => {
-        this.$message.success('设置成功！')
-        this.loadThemes()
-      })
+      themeApi
+        .active(themeId)
+        .then(response => {
+          this.$message.success('设置成功！')
+        })
+        .finally(() => {
+          this.handleListThemes()
+        })
     },
     handleUpdateTheme(themeId) {
       const hide = this.$message.loading('更新中...', 0)
@@ -363,17 +366,21 @@ export default {
         .update(themeId)
         .then(response => {
           this.$message.success('更新成功！')
-          this.loadThemes()
         })
         .finally(() => {
           hide()
+          this.handleListThemes()
         })
     },
     handleDeleteTheme(themeId) {
-      themeApi.delete(themeId).then(response => {
-        this.$message.success('删除成功！')
-        this.loadThemes()
-      })
+      themeApi
+        .delete(themeId)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.handleListThemes()
+        })
     },
     handleUploadSuccess() {
       if (this.uploadThemeVisible) {
@@ -385,7 +392,7 @@ export default {
       if (this.fetchBranches) {
         this.fetchBranches = false
       }
-      this.loadThemes()
+      this.handleListThemes()
     },
     handleEditClick(theme) {
       this.settingDrawer(theme)
@@ -412,28 +419,42 @@ export default {
           this.releases = response.data.data
         })
         .finally(() => {
-          this.fetchButtonLoading = false
+          setTimeout(() => {
+            this.fetchButtonLoading = false
+          }, 200)
         })
     },
     handleBranchFetching() {
-      themeApi.fetchingBranch(this.fetchingUrl, this.branches[this.selectedBranch].branch).then(response => {
-        this.$message.success('拉取成功')
-        this.uploadThemeVisible = false
-        this.loadThemes()
-      })
+      themeApi
+        .fetchingBranch(this.fetchingUrl, this.branches[this.selectedBranch].branch)
+        .then(response => {
+          this.$message.success('拉取成功')
+          this.uploadThemeVisible = false
+        })
+        .finally(() => {
+          this.handleListThemes()
+        })
     },
     handleReleaseFetching() {
-      themeApi.fetchingRelease(this.fetchingUrl, this.releases[this.selectedBranch].branch).then(response => {
-        this.$message.success('拉取成功')
-        this.uploadThemeVisible = false
-        this.loadThemes()
-      })
+      themeApi
+        .fetchingRelease(this.fetchingUrl, this.releases[this.selectedBranch].branch)
+        .then(response => {
+          this.$message.success('拉取成功')
+          this.uploadThemeVisible = false
+        })
+        .finally(() => {
+          this.handleListThemes()
+        })
     },
     handleReload() {
-      themeApi.reload().then(response => {
-        this.loadThemes()
-        this.$message.success('刷新成功！')
-      })
+      themeApi
+        .reload()
+        .then(response => {
+          this.$message.success('刷新成功！')
+        })
+        .finally(() => {
+          this.handleListThemes()
+        })
     },
     handleShowUpdateNewThemeModal(item) {
       this.prepareUpdateTheme = item
@@ -444,13 +465,13 @@ export default {
       this.themeSettingVisible = true
     },
     handleConfirmDelete(item) {
-      const that = this
+      const _this = this
       this.$confirm({
         title: '提示',
         maskClosable: true,
         content: '确定删除【' + item.name + '】主题？',
         onOk() {
-          that.handleDeleteTheme(item.id)
+          _this.handleDeleteTheme(item.id)
         },
         onCancel() {}
       })
@@ -483,7 +504,7 @@ export default {
       if (this.selectedBranch) {
         this.selectedBranch = null
       }
-      this.loadThemes()
+      this.handleListThemes()
     },
     onThemeSettingsClose() {
       this.themeSettingVisible = false
@@ -492,41 +513,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less">
-@keyframes scaleDraw {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(1.3);
-  }
-  50% {
-    transform: scale(1);
-  }
-  75% {
-    transform: scale(1.3);
-  }
-}
-
-.upload-button {
-  -webkit-animation: scaleDraw 4s ease-in-out infinite;
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-}
-.theme-thumb {
-  width: 100%;
-  margin: 0 auto;
-  position: relative;
-  padding-bottom: 56%;
-  overflow: hidden;
-  img {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-}
-</style>

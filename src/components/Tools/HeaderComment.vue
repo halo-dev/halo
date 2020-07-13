@@ -9,75 +9,79 @@
     title="待审核评论"
   >
     <template slot="content">
-      <a-spin :spinning="loading">
-        <div class="custom-tab-wrapper">
-          <a-tabs>
-            <a-tab-pane
-              tab="文章"
-              key="1"
+      <div class="custom-tab-wrapper">
+        <a-tabs
+          v-model="activeKey"
+          @change="handleTabsChanged"
+        >
+          <a-tab-pane
+            tab="文章"
+            key="post"
+          >
+            <a-list
+              :loading="postCommentsLoading"
+              :dataSource="converttedPostComments"
             >
-              <a-list :dataSource="converttedPostComments">
-                <a-list-item
-                  slot="renderItem"
-                  slot-scope="item"
-                >
-                  <a-list-item-meta>
-                    <a-avatar
-                      style="background-color: white"
-                      slot="avatar"
-                      :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
-                      size="large"
-                    />
-                    <template slot="title">
-                      <a
-                        :href="item.authorUrl"
-                        target="_blank"
-                      >{{ item.author }}</a>：<span v-html="item.content"></span>
-                    </template>
-                    <template slot="description">
-                      {{ item.createTime | timeAgo }}
-                    </template>
-                  </a-list-item-meta>
-                </a-list-item>
-              </a-list>
-            </a-tab-pane>
-            <a-tab-pane
-              tab="页面"
-              key="2"
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item"
+              >
+                <a-list-item-meta>
+                  <a-avatar
+                    class="bg-white"
+                    slot="avatar"
+                    :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
+                    size="large"
+                  />
+                  <template slot="title">
+                    <a
+                      :href="item.authorUrl"
+                      target="_blank"
+                    >{{ item.author }}</a>：<span v-html="item.content"></span>
+                  </template>
+                  <template slot="description">
+                    {{ item.createTime | timeAgo }}
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </a-tab-pane>
+          <a-tab-pane
+            tab="页面"
+            key="sheet"
+          >
+            <a-list
+              :loading="sheetCommentsLoading"
+              :dataSource="converttedSheetComments"
             >
-              <a-list :dataSource="converttedSheetComments">
-                <a-list-item
-                  slot="renderItem"
-                  slot-scope="item"
-                >
-                  <a-list-item-meta>
-                    <a-avatar
-                      style="background-color: white"
-                      slot="avatar"
-                      :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
-                      size="large"
-                    />
-                    <template slot="title">
-                      <a
-                        :href="item.authorUrl"
-                        target="_blank"
-                      >{{ item.author }}</a>：<span v-html="item.content"></span>
-                    </template>
-                    <template slot="description">
-                      {{ item.createTime | timeAgo }}
-                    </template>
-                  </a-list-item-meta>
-                </a-list-item>
-              </a-list>
-            </a-tab-pane>
-          </a-tabs>
-        </div>
-      </a-spin>
+              <a-list-item
+                slot="renderItem"
+                slot-scope="item"
+              >
+                <a-list-item-meta>
+                  <a-avatar
+                    class="bg-white"
+                    slot="avatar"
+                    :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
+                    size="large"
+                  />
+                  <template slot="title">
+                    <a
+                      :href="item.authorUrl"
+                      target="_blank"
+                    >{{ item.author }}</a>：<span v-html="item.content"></span>
+                  </template>
+                  <template slot="description">
+                    {{ item.createTime | timeAgo }}
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </a-tab-pane>
+        </a-tabs>
+      </div>
     </template>
-    <span
-      @click="fetchComment"
-      class="header-comment"
-    >
+    <span class="header-comment">
       <a-badge
         dot
         v-if="postComments.length > 0 || sheetComments.length > 0"
@@ -99,14 +103,13 @@ export default {
   name: 'HeaderComment',
   data() {
     return {
-      loading: false,
+      activeKey: 'post',
       visible: false,
       postComments: [],
-      sheetComments: []
+      postCommentsLoading: false,
+      sheetComments: [],
+      sheetCommentsLoading: false
     }
-  },
-  created() {
-    this.getComment()
   },
   computed: {
     converttedPostComments() {
@@ -122,25 +125,58 @@ export default {
       })
     }
   },
-  methods: {
-    fetchComment() {
-      if (!this.visible) {
-        this.loading = true
-        this.getComment()
-      } else {
-        this.loading = false
+  created() {
+    this.handleListPostAuditingComments(false)
+    this.handleListSheetAuditingComments(false)
+  },
+  watch: {
+    visible(value) {
+      if (value) {
+        if (this.activeKey === 'post') {
+          this.handleListPostAuditingComments(false)
+        } else if (this.activeKey === 'sheet') {
+          this.handleListSheetAuditingComments(false)
+        }
       }
-      this.visible = !this.visible
+    }
+  },
+  methods: {
+    handleListPostAuditingComments(enableLoading = true) {
+      if (enableLoading) {
+        this.postCommentsLoading = true
+      }
+      commentApi
+        .latestComment('posts', 5, 'AUDITING')
+        .then(response => {
+          this.postComments = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.postCommentsLoading = false
+          }, 200)
+        })
     },
-    getComment() {
-      commentApi.latestComment('posts', 5, 'AUDITING').then(response => {
-        this.postComments = response.data.data
-        this.loading = false
-      })
-      commentApi.latestComment('sheets', 5, 'AUDITING').then(response => {
-        this.sheetComments = response.data.data
-        this.loading = false
-      })
+    handleListSheetAuditingComments(enableLoading = true) {
+      if (enableLoading) {
+        this.sheetCommentsLoading = true
+      }
+      commentApi
+        .latestComment('sheets', 5, 'AUDITING')
+        .then(response => {
+          this.sheetComments = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.sheetCommentsLoading = false
+          }, 200)
+        })
+    },
+    handleTabsChanged(activeKey) {
+      if (activeKey === 'post') {
+        this.handleListPostAuditingComments()
+      } else if (activeKey === 'sheet') {
+        this.handleListSheetAuditingComments()
+      }
     }
   }
 }

@@ -4,7 +4,7 @@
       type="flex"
       justify="center"
       align="middle"
-      style="height: 100vh;"
+      class="h-screen"
     >
       <a-col
         :xl="8"
@@ -312,10 +312,12 @@ export default {
           this.$message.success('安装成功！')
           setTimeout(() => {
             this.$router.push({ name: 'Login' })
-          }, 300)
+          }, 200)
         })
         .finally(() => {
-          this.installing = false
+          setTimeout(() => {
+            this.installing = false
+          }, 200)
         })
     },
     handleInstall() {

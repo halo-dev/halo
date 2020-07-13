@@ -1,6 +1,5 @@
 <template>
   <a-card
-    :loading="loading"
     :body-style="{ padding: '24px' }"
     :bordered="false"
   >
@@ -44,11 +43,6 @@ export default {
       type: Number,
       required: false,
       default: 0
-    },
-    loading: {
-      type: Boolean,
-      required: false,
-      default: false
     }
   },
   data() {

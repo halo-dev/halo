@@ -7,16 +7,12 @@
     />
     <a-form layout="vertical">
       <a-form-item>
-        <a-skeleton
-          active
-          :loading="loading"
-          :paragraph="{rows: 12}"
-        >
+        <a-spin :spinning="loading">
           <codemirror
             v-model="content"
             :options="codemirrorOptions"
           ></codemirror>
-        </a-skeleton>
+        </a-spin>
       </a-form-item>
       <a-form-item>
         <a-popconfirm
@@ -27,7 +23,7 @@
         >
           <a-button
             type="primary"
-            style="margin-right: 8px;"
+            class="mr-2"
           >保存</a-button>
         </a-popconfirm>
         <a-popconfirm
@@ -69,16 +65,26 @@ export default {
   methods: {
     loadConfig() {
       this.loading = true
-      adminApi.getApplicationConfig().then(response => {
-        this.content = response.data.data
-        this.loading = false
-      })
+      adminApi
+        .getApplicationConfig()
+        .then(response => {
+          this.content = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleUpdateConfig() {
-      adminApi.updateApplicationConfig(this.content).then(response => {
-        this.$message.success(`配置保存成功！`)
-        this.loadConfig()
-      })
+      adminApi
+        .updateApplicationConfig(this.content)
+        .then(response => {
+          this.$message.success(`配置保存成功！`)
+        })
+        .finally(() => {
+          this.loadConfig()
+        })
     },
     handleRestartApplication() {
       adminApi.restartApplication().then(response => {

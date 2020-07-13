@@ -7,7 +7,7 @@
         :md="10"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="pb-3"
       >
         <a-card
           :title="title"
@@ -75,7 +75,7 @@
               >
                 <a-button
                   type="danger"
-                  style="float:right"
+                  class="float-right"
                 >删除</a-button>
               </a-popconfirm>
             </a-form-model-item>
@@ -88,7 +88,7 @@
         :md="14"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="pb-3"
       >
         <a-card
           title="所有标签"

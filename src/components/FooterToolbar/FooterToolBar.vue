@@ -1,9 +1,9 @@
 <template>
   <div :class="prefixCls">
-    <div style="float: left">
+    <div class="float-left">
       <slot name="extra">{{ extra }}</slot>
     </div>
-    <div style="float: right">
+    <div class="float-right">
       <slot></slot>
     </div>
   </div>

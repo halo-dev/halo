@@ -12,129 +12,116 @@
       align="middle"
     >
       <a-col :span="24">
-        <a-skeleton
-          active
-          :loading="detailLoading"
-          :paragraph="{rows: 8}"
-        >
-          <div class="attach-detail-img">
-            <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
-            <a
-              :href="attachment.path"
-              target="_blank"
+        <div class="attach-detail-img">
+          <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
+          <a
+            :href="attachment.path"
+            target="_blank"
+          >
+            <img
+              :src="attachment.path"
+              v-show="photoPreviewVisible"
+              class="w-full"
+              loading="lazy"
             >
-              <img
-                :src="attachment.path"
-                v-show="photoPreviewVisible"
-                style="width: 100%;"
-                loading="lazy"
-              >
-            </a>
-            <d-player
-              ref="player"
-              :options="videoOptions"
-              v-show="videoPreviewVisible"
-              class="video-player-box"
-              style="width: 100%;"
-            >
-            </d-player>
-          </div>
-        </a-skeleton>
+          </a>
+          <d-player
+            ref="player"
+            :options="videoOptions"
+            v-show="videoPreviewVisible"
+            class="video-player-box w-full"
+          >
+          </d-player>
+        </div>
       </a-col>
       <a-divider />
       <a-col :span="24">
-        <a-skeleton
-          active
-          :loading="detailLoading"
-          :paragraph="{rows: 8}"
-        >
-          <a-list itemLayout="horizontal">
-            <a-list-item>
-              <a-list-item-meta>
-                <template
-                  slot="description"
-                  v-if="editable"
-                >
-                  <a-input
-                    v-model="attachment.name"
-                    @blur="doUpdateAttachment"
+        <a-list itemLayout="horizontal">
+          <a-list-item>
+            <a-list-item-meta>
+              <template
+                slot="description"
+                v-if="editable"
+              >
+                <a-input
+                  v-model="attachment.name"
+                  @blur="doUpdateAttachment"
+                />
+              </template>
+              <template
+                slot="description"
+                v-else
+              >{{ attachment.name }}</template>
+              <span slot="title">
+                附件名：
+                <a href="javascript:void(0);">
+                  <a-icon
+                    type="edit"
+                    @click="editable = !editable"
                   />
-                </template>
-                <template
-                  slot="description"
-                  v-else
-                >{{ attachment.name }}</template>
-                <span slot="title">
-                  附件名：
-                  <a href="javascript:void(0);">
-                    <a-icon
-                      type="edit"
-                      @click="handleEditName"
-                    />
-                  </a>
-                </span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta :description="attachment.mediaType">
-                <span slot="title">附件类型：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta :description="attachment.typeProperty">
-                <span slot="title">存储位置：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta>
-                <template slot="description">
-                  {{ attachment.size | fileSizeFormat }}
-                </template>
-                <span slot="title">附件大小：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item v-if="photoPreviewVisible">
-              <a-list-item-meta :description="attachment.height+'x'+attachment.width">
-                <span slot="title">图片尺寸：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta>
-                <template slot="description">
-                  {{ attachment.createTime | moment }}
-                </template>
-                <span slot="title">上传日期：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta :description="attachment.path">
-                <span slot="title">
-                  普通链接：
-                  <a
-                    href="javascript:void(0);"
-                    @click="handleCopyNormalLink"
-                  >
-                    <a-icon type="copy" />
-                  </a>
-                </span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item v-if="photoPreviewVisible">
-              <a-list-item-meta>
-                <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
-                <span slot="title">
-                  Markdown 格式：
-                  <a
-                    href="javascript:void(0);"
-                    @click="handleCopyMarkdownLink"
-                  >
-                    <a-icon type="copy" />
-                  </a>
-                </span>
-              </a-list-item-meta>
-            </a-list-item>
-          </a-list>
-        </a-skeleton>
+                </a>
+              </span>
+            </a-list-item-meta>
+          </a-list-item>
+          <a-list-item>
+            <a-list-item-meta :description="attachment.mediaType">
+              <span slot="title">附件类型：</span>
+            </a-list-item-meta>
+          </a-list-item>
+          <a-list-item>
+            <a-list-item-meta :description="attachment.typeProperty">
+              <span slot="title">存储位置：</span>
+            </a-list-item-meta>
+          </a-list-item>
+          <a-list-item>
+            <a-list-item-meta>
+              <template slot="description">
+                {{ attachment.size | fileSizeFormat }}
+              </template>
+              <span slot="title">附件大小：</span>
+            </a-list-item-meta>
+          </a-list-item>
+          <a-list-item v-if="photoPreviewVisible">
+            <a-list-item-meta :description="attachment.height+'x'+attachment.width">
+              <span slot="title">图片尺寸：</span>
+            </a-list-item-meta>
+          </a-list-item>
+          <a-list-item>
+            <a-list-item-meta>
+              <template slot="description">
+                {{ attachment.createTime | moment }}
+              </template>
+              <span slot="title">上传日期：</span>
+            </a-list-item-meta>
+          </a-list-item>
+          <a-list-item>
+            <a-list-item-meta :description="attachment.path">
+              <span slot="title">
+                普通链接：
+                <a
+                  href="javascript:void(0);"
+                  @click="handleCopyNormalLink"
+                >
+                  <a-icon type="copy" />
+                </a>
+              </span>
+            </a-list-item-meta>
+          </a-list-item>
+          <a-list-item v-if="photoPreviewVisible">
+            <a-list-item-meta>
+              <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
+              <span slot="title">
+                Markdown 格式：
+                <a
+                  href="javascript:void(0);"
+                  @click="handleCopyMarkdownLink"
+                >
+                  <a-icon type="copy" />
+                </a>
+              </span>
+            </a-list-item-meta>
+          </a-list-item>
+        </a-list>
       </a-col>
     </a-row>
     <a-divider class="divider-transparent" />
@@ -148,7 +135,7 @@
       >
         <a-button
           type="dashed"
-          style="marginRight: 8px"
+          class="mr-2"
         >添加到图库</a-button>
       </a-popconfirm>
       <a-popconfirm
@@ -180,7 +167,6 @@ export default {
   },
   data() {
     return {
-      detailLoading: true,
       editable: false,
       photo: {},
       photoPreviewVisible: false,
@@ -220,36 +206,19 @@ export default {
     this.player = this.$refs.player
   },
   watch: {
-    visible: function(newValue, oldValue) {
-      this.$log.debug('old value', oldValue)
-      this.$log.debug('new value', newValue)
-      if (newValue) {
-        this.loadSkeleton()
-      }
-    },
     attachment: function(newValue, oldValue) {
       if (newValue) {
-        var attachment = newValue
-        this.handleJudgeMediaType(attachment)
+        this.handleJudgeMediaType(newValue)
       }
     }
   },
   methods: {
-    loadSkeleton() {
-      this.detailLoading = true
-      setTimeout(() => {
-        this.detailLoading = false
-      }, 500)
-    },
     handleDeleteAttachment() {
       attachmentApi.delete(this.attachment.id).then(response => {
         this.$message.success('删除成功！')
         this.$emit('delete', this.attachment)
         this.onClose()
       })
-    },
-    handleEditName() {
-      this.editable = !this.editable
     },
     doUpdateAttachment() {
       if (!this.attachment.name) {

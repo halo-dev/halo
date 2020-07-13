@@ -45,12 +45,10 @@
               <span class="table-page-search-submitButtons">
                 <a-button
                   type="primary"
+                  class="mr-2"
                   @click="handleQuery()"
                 >查询</a-button>
-                <a-button
-                  style="margin-left: 8px;"
-                  @click="handleResetParam()"
-                >重置</a-button>
+                <a-button @click="handleResetParam()">重置</a-button>
               </span>
             </a-col>
           </a-row>
@@ -63,7 +61,7 @@
           @click="formVisible=true"
         >新增</a-button>
       </div>
-      <div style="margin-top:15px">
+      <div class="mt-4">
         <a-table
           :rowKey="option => option.id"
           :columns="columns"
@@ -244,30 +242,40 @@ export default {
     }
   },
   created() {
-    this.loadOptionsList()
+    this.hanldeListOptions()
   },
   methods: {
     ...mapActions(['loadOptions']),
-    loadOptionsList() {
+    hanldeListOptions() {
       this.loading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      optionApi.query(this.queryParam).then(response => {
-        this.options = response.data.data.content
-        this.pagination.total = response.data.data.total
-        this.loading = false
-      })
+      optionApi
+        .query(this.queryParam)
+        .then(response => {
+          this.options = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleQuery() {
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleDeleteOption(id) {
-      optionApi.delete(id).then(response => {
-        this.$message.success('删除成功！')
-        this.loadOptionsList()
-        this.loadOptions()
-      })
+      optionApi
+        .delete(id)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.hanldeListOptions()
+          this.loadOptions()
+        })
     },
     handleEditOption(option) {
       this.optionToStage = option
@@ -277,7 +285,7 @@ export default {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.page = page
       this.pagination.size = pageSize
-      this.loadOptionsList()
+      this.hanldeListOptions()
     },
     handleResetParam() {
       this.queryParam.keyword = null
@@ -304,22 +312,30 @@ export default {
         return
       }
       if (this.optionToStage.id) {
-        optionApi.update(this.optionToStage.id, this.optionToStage).then(response => {
-          this.$message.success('更新成功！')
-          this.loadOptionsList()
-          this.loadOptions()
-          this.optionToStage = {}
-          this.formVisible = false
-        })
+        optionApi
+          .update(this.optionToStage.id, this.optionToStage)
+          .then(response => {
+            this.$message.success('更新成功！')
+            this.optionToStage = {}
+            this.formVisible = false
+          })
+          .finally(() => {
+            this.hanldeListOptions()
+            this.loadOptions()
+          })
       } else {
         this.optionToStage.type = this.optionType.CUSTOM.value
-        optionApi.create(this.optionToStage).then(response => {
-          this.$message.success('保存成功！')
-          this.loadOptionsList()
-          this.loadOptions()
-          this.optionToStage = {}
-          this.formVisible = false
-        })
+        optionApi
+          .create(this.optionToStage)
+          .then(response => {
+            this.$message.success('保存成功！')
+            this.optionToStage = {}
+            this.formVisible = false
+          })
+          .finally(() => {
+            this.hanldeListOptions()
+            this.loadOptions()
+          })
       }
     }
   }

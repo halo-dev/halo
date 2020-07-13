@@ -6,6 +6,7 @@ import Contextmenu from 'vue-contextmenujs'
 import store from './store/'
 import './logger'
 
+import '@/assets/css/tailwind.css'
 import './core/lazy_use'
 import './permission'
 import '@/utils/filter' // global filter

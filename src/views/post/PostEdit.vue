@@ -2,7 +2,7 @@
   <div>
     <a-row :gutter="12">
       <a-col :span="24">
-        <div style="margin-bottom: 16px">
+        <div class="mb-4">
           <a-input
             v-model="postToStage.title"
             size="large"
@@ -32,7 +32,7 @@
       :categoryIds="selectedCategoryIds"
       :metas="selectedMetas"
       :visible="postSettingVisible"
-      @close="onPostSettingsClose"
+      @close="postSettingVisible = false"
       @onRefreshPost="onRefreshPostFromSetting"
       @onRefreshTagIds="onRefreshTagIdsFromSetting"
       @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
@@ -45,23 +45,23 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="danger"
+        class="mr-2"
         @click="handleSaveDraft(false)"
         :loading="draftSaving"
       >保存草稿</a-button>
       <a-button
         @click="handlePreview"
-        style="margin-left: 8px;"
+        class="mr-2"
         :loading="previewSaving"
       >预览</a-button>
       <a-button
         type="primary"
-        @click="handleShowPostSetting"
-        style="margin-left: 8px;"
+        @click="postSettingVisible = true"
+        class="mr-2"
       >发布</a-button>
       <a-button
         type="dashed"
         @click="attachmentDrawerVisible = true"
-        style="margin-left: 8px;"
       >附件库</a-button>
     </footer-tool-bar>
   </div>
@@ -194,7 +194,9 @@ export default {
               this.$message.success('保存草稿成功！')
             })
             .finally(() => {
-              this.draftSaving = false
+              setTimeout(() => {
+                this.draftSaving = false
+              }, 200)
             })
         } else {
           postApi
@@ -205,7 +207,9 @@ export default {
               this.postToStage = response.data.data
             })
             .finally(() => {
-              this.draftSaving = false
+              setTimeout(() => {
+                this.draftSaving = false
+              }, 200)
             })
         }
       } else {
@@ -218,12 +222,11 @@ export default {
             this.postToStage = response.data.data
           })
           .finally(() => {
-            this.draftSaving = false
+            setTimeout(() => {
+              this.draftSaving = false
+            }, 200)
           })
       }
-    },
-    handleShowPostSetting() {
-      this.postSettingVisible = true
     },
     handlePreview() {
       this.postToStage.status = 'DRAFT'
@@ -241,7 +244,9 @@ export default {
               window.open(response.data, '_blank')
             })
             .finally(() => {
-              this.previewSaving = false
+              setTimeout(() => {
+                this.previewSaving = false
+              }, 200)
             })
         })
       } else {
@@ -255,17 +260,15 @@ export default {
               window.open(response.data, '_blank')
             })
             .finally(() => {
-              this.previewSaving = false
+              setTimeout(() => {
+                this.previewSaving = false
+              }, 200)
             })
         })
       }
     },
     onContentChange(val) {
       this.postToStage.originalContent = val
-    },
-    // 关闭文章设置抽屉
-    onPostSettingsClose() {
-      this.postSettingVisible = false
     },
     onRefreshPostFromSetting(post) {
       this.postToStage = post

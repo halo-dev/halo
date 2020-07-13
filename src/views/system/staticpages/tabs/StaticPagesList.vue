@@ -27,7 +27,7 @@
           刷新
         </a-button>
       </div>
-      <div style="margin-top:15px">
+      <div class="mt-4">
         <a-table
           :rowKey="record => record.id"
           :columns="columns"

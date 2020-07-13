@@ -9,7 +9,7 @@
           :md="12"
           :sm="24"
           :xs="24"
-          :style="{ marginBottom: '12px' }"
+          class="pb-3"
         >
           <a-card
             :bordered="false"
@@ -21,7 +21,7 @@
             <p style="min-height: 50px;">点击进入开发者选项页面</p>
             <a-button
               type="primary"
-              style="float:right"
+              class="float-right"
               @click="handleToDeveloperOptions()"
             >进入</a-button>
           </a-card>
@@ -55,7 +55,7 @@
           :md="12"
           :sm="24"
           :xs="24"
-          :style="{ marginBottom: '12px' }"
+          class="mb-3"
         >
           <a-card
             :bordered="false"
@@ -66,7 +66,7 @@
             </div>
             <p style="min-height: 50px;">支持备份全站数据和数据导出，支持下载到本地</p>
 
-            <a-dropdown style="float:right">
+            <a-dropdown class="float-right">
               <a-menu slot="overlay">
                 <a-menu-item
                   key="1"
@@ -81,7 +81,7 @@
                   数据导出
                 </a-menu-item>
               </a-menu>
-              <a-button style="margin-left: 8px"> 备份
+              <a-button class="ml-2"> 备份
                 <a-icon type="down" />
               </a-button>
             </a-dropdown>
@@ -93,7 +93,7 @@
           :md="12"
           :sm="24"
           :xs="24"
-          :style="{ marginBottom: '12px' }"
+          class="pb-3"
         >
           <a-card
             :bordered="false"
@@ -105,8 +105,8 @@
             <p style="min-height: 50px;">支持 Hexo/Jekyll 文章导入并解析元数据</p>
             <a-button
               type="primary"
-              style="float:right"
-              @click="handleImportMarkdown"
+              class="float-right"
+              @click="markdownUpload = true"
             >导入</a-button>
           </a-card>
         </a-col>
@@ -152,9 +152,6 @@ export default {
     ...mapGetters(['options'])
   },
   methods: {
-    handleImportMarkdown() {
-      this.markdownUpload = true
-    },
     handleChange(info) {
       const status = info.file.status
       if (status !== 'uploading') {

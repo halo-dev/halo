@@ -2,7 +2,7 @@
   <div>
     <a-row :gutter="12">
       <a-col :span="24">
-        <div style="margin-bottom: 16px">
+        <div class="mb-4">
           <a-input
             v-model="sheetToStage.title"
             size="large"
@@ -30,7 +30,7 @@
       :sheet="sheetToStage"
       :metas="selectedMetas"
       :visible="sheetSettingVisible"
-      @close="onSheetSettingsClose"
+      @close="sheetSettingVisible = false"
       @onRefreshSheet="onRefreshSheetFromSetting"
       @onRefreshSheetMetas="onRefreshSheetMetasFromSetting"
       @onSaved="onSaved"
@@ -40,22 +40,22 @@
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
       <a-button
         type="danger"
+        class="mr-2"
         @click="handleSaveDraft(false)"
         :loading="draftSaving"
       >保存草稿</a-button>
       <a-button
         @click="handlePreview"
-        style="margin-left: 8px;"
+        class="mr-2"
         :loading="previewSaving"
       >预览</a-button>
       <a-button
         type="primary"
-        style="margin-left: 8px;"
-        @click="handleShowSheetSetting"
+        class="mr-2"
+        @click="sheetSettingVisible = true"
       >发布</a-button>
       <a-button
         type="dashed"
-        style="margin-left: 8px;"
         @click="attachmentDrawerVisible = true"
       >附件库</a-button>
     </footer-tool-bar>
@@ -184,7 +184,9 @@ export default {
               this.$message.success('保存草稿成功！')
             })
             .finally(() => {
-              this.draftSaving = false
+              setTimeout(() => {
+                this.draftSaving = false
+              }, 200)
             })
         } else {
           sheetApi
@@ -195,7 +197,9 @@ export default {
               this.sheetToStage = response.data.data
             })
             .finally(() => {
-              this.draftSaving = false
+              setTimeout(() => {
+                this.draftSaving = false
+              }, 200)
             })
         }
       } else {
@@ -207,12 +211,11 @@ export default {
             this.sheetToStage = response.data.data
           })
           .finally(() => {
-            this.draftSaving = false
+            setTimeout(() => {
+              this.draftSaving = false
+            }, 200)
           })
       }
-    },
-    handleShowSheetSetting() {
-      this.sheetSettingVisible = true
     },
     handlePreview() {
       this.sheetToStage.status = 'DRAFT'
@@ -229,7 +232,9 @@ export default {
               window.open(response.data, '_blank')
             })
             .finally(() => {
-              this.previewSaving = false
+              setTimeout(() => {
+                this.previewSaving = false
+              }, 200)
             })
         })
       } else {
@@ -242,16 +247,15 @@ export default {
               window.open(response.data, '_blank')
             })
             .finally(() => {
-              this.previewSaving = false
+              setTimeout(() => {
+                this.previewSaving = false
+              }, 200)
             })
         })
       }
     },
     onContentChange(val) {
       this.sheetToStage.originalContent = val
-    },
-    onSheetSettingsClose() {
-      this.sheetSettingVisible = false
     },
     onRefreshSheetFromSetting(sheet) {
       this.sheetToStage = sheet

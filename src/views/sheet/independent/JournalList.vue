@@ -45,12 +45,10 @@
                   <span class="table-page-search-submitButtons">
                     <a-button
                       type="primary"
+                      class="mr-2"
                       @click="handleQuery()"
                     >查询</a-button>
-                    <a-button
-                      style="margin-left: 8px;"
-                      @click="resetParam()"
-                    >重置</a-button>
+                    <a-button @click="resetParam()">重置</a-button>
                   </span>
                 </a-col>
               </a-row>
@@ -64,7 +62,7 @@
             >写日志</a-button>
           </div>
           <a-divider />
-          <div style="margin-top:15px">
+          <div class="mt-4">
             <a-empty v-if="!listLoading && journals.length==0" />
             <a-list
               v-else
@@ -169,7 +167,7 @@
     <a-modal
       v-model="optionFormVisible"
       title="页面设置"
-      :afterClose="onOptionFormClose"
+      :afterClose="() => optionFormVisible = false"
     >
       <template slot="footer">
         <a-button
@@ -288,15 +286,15 @@ export default {
     }
   },
   created() {
-    this.loadJournals()
-    this.loadFormOptions()
+    this.hanldeListJournals()
+    this.hanldeListOptions()
   },
   computed: {
     ...mapGetters(['user'])
   },
   methods: {
     ...mapActions(['loadOptions']),
-    loadJournals() {
+    hanldeListJournals() {
       this.listLoading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -313,7 +311,7 @@ export default {
           }, 200)
         })
     },
-    loadFormOptions() {
+    hanldeListOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
       })
@@ -333,10 +331,14 @@ export default {
       this.visible = true
     },
     handleDelete(id) {
-      journalApi.delete(id).then(response => {
-        this.$message.success('删除成功！')
-        this.loadJournals()
-      })
+      journalApi
+        .delete(id)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.hanldeListJournals()
+        })
     },
     handleShowJournalComments(journal) {
       this.journal = journal
@@ -354,17 +356,25 @@ export default {
       }
 
       if (this.journal.id) {
-        journalApi.update(this.journal.id, this.journal).then(response => {
-          this.$message.success('更新成功！')
-          this.loadJournals()
-          this.isPublic = true
-        })
+        journalApi
+          .update(this.journal.id, this.journal)
+          .then(response => {
+            this.$message.success('更新成功！')
+            this.isPublic = true
+          })
+          .finally(() => {
+            this.hanldeListJournals()
+          })
       } else {
-        journalApi.create(this.journal).then(response => {
-          this.$message.success('发表成功！')
-          this.loadJournals()
-          this.isPublic = true
-        })
+        journalApi
+          .create(this.journal)
+          .then(response => {
+            this.$message.success('发表成功！')
+            this.isPublic = true
+          })
+          .finally(() => {
+            this.hanldeListJournals()
+          })
       }
       this.visible = false
     },
@@ -372,7 +382,7 @@ export default {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.page = page
       this.pagination.size = pageSize
-      this.loadJournals()
+      this.hanldeListJournals()
     },
     onJournalCommentsClose() {
       this.journal = {}
@@ -384,15 +394,16 @@ export default {
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleSaveOptions() {
-      optionApi.save(this.options).then(response => {
-        this.loadFormOptions()
-        this.loadOptions()
-        this.$message.success('保存成功！')
-        this.optionFormVisible = false
-      })
-    },
-    onOptionFormClose() {
-      this.optionFormVisible = false
+      optionApi
+        .save(this.options)
+        .then(response => {
+          this.$message.success('保存成功！')
+          this.optionFormVisible = false
+        })
+        .finally(() => {
+          this.hanldeListOptions()
+          this.loadOptions()
+        })
     }
   }
 }

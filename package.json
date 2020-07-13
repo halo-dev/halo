@@ -51,6 +51,7 @@
     "less": "^3.11.3",
     "less-loader": "^5.0.0",
     "lint-staged": "^10.2.11",
+    "tailwindcss": "^1.4.6",
     "vue-svg-component-runtime": "^1.0.1",
     "vue-svg-icon-loader": "^2.1.1",
     "vue-template-compiler": "^2.6.11"
@@ -130,11 +131,6 @@
       "eslint --fix",
       "git add"
     ]
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
   },
   "browserslist": [
     "> 1%",

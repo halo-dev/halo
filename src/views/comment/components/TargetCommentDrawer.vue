@@ -28,16 +28,18 @@
       </a-col>
       <a-divider />
       <a-col :span="24">
-        <a-empty v-if="comments.length == 0" />
-        <TargetCommentTree
-          v-else
-          v-for="(comment, index) in comments"
-          :key="index"
-          :comment="comment"
-          @reply="handleCommentReply"
-          @delete="handleCommentDelete"
-          @editStatus="handleEditStatusClick"
-        />
+        <a-spin :spinning="loading">
+          <a-empty v-if="comments.length == 0" />
+          <TargetCommentTree
+            v-else
+            v-for="(comment, index) in comments"
+            :key="index"
+            :comment="comment"
+            @reply="handleCommentReply"
+            @delete="handleCommentDelete"
+            @editStatus="handleEditStatusClick"
+          />
+        </a-spin>
       </a-col>
     </a-row>
     <a-divider />
@@ -120,6 +122,7 @@ export default {
   data() {
     return {
       comments: [],
+      loading: false,
       selectedComment: {},
       replyComment: {},
       replyCommentVisible: false,
@@ -170,24 +173,32 @@ export default {
       this.$log.debug('old value', oldValue)
       this.$log.debug('new value', newValue)
       if (newValue) {
-        this.loadComments()
+        this.handleListComments()
       }
     }
   },
   methods: {
-    loadComments() {
+    handleListComments() {
+      this.loading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      commentApi.commentTree(this.target, this.id, this.queryParam).then(response => {
-        this.comments = response.data.data.content
-        this.pagination.total = response.data.data.total
-      })
+      commentApi
+        .commentTree(this.target, this.id, this.queryParam)
+        .then(response => {
+          this.comments = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handlePaginationChange(page, pageSize) {
       this.pagination.page = page
       this.pagination.size = pageSize
-      this.loadComments()
+      this.handleListComments()
     },
     handleCommentReply(comment) {
       this.selectedComment = comment
@@ -207,26 +218,38 @@ export default {
         })
         return
       }
-      commentApi.create(this.target, this.replyComment).then(response => {
-        this.$message.success('回复成功！')
-        this.replyComment = {}
-        this.selectedComment = {}
-        this.replyCommentVisible = false
-        this.commentVisible = false
-        this.loadComments()
-      })
+      commentApi
+        .create(this.target, this.replyComment)
+        .then(response => {
+          this.$message.success('回复成功！')
+          this.replyComment = {}
+          this.selectedComment = {}
+          this.replyCommentVisible = false
+          this.commentVisible = false
+        })
+        .finally(() => {
+          this.handleListComments()
+        })
     },
     handleEditStatusClick(comment, status) {
-      commentApi.updateStatus(this.target, comment.id, status).then(response => {
-        this.$message.success('操作成功！')
-        this.loadComments()
-      })
+      commentApi
+        .updateStatus(this.target, comment.id, status)
+        .then(response => {
+          this.$message.success('操作成功！')
+        })
+        .finally(() => {
+          this.handleListComments()
+        })
     },
     handleCommentDelete(comment) {
-      commentApi.delete(this.target, comment.id).then(response => {
-        this.$message.success('删除成功！')
-        this.loadComments()
-      })
+      commentApi
+        .delete(this.target, comment.id)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.handleListComments()
+        })
     },
     onReplyClose() {
       this.replyComment = {}

@@ -29,7 +29,7 @@ logApi.clear = () => {
   })
 }
 
-logApi.logType = {
+logApi.logTypes = {
   BLOG_INITIALIZED: {
     value: 0,
     text: '博客初始化'

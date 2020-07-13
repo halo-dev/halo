@@ -10,7 +10,7 @@
       :visible="layoutSetting"
     >
       <div class="setting-drawer-index-content">
-        <div :style="{ marginBottom: '24px' }">
+        <div class="mb-6">
           <h3 class="setting-drawer-index-title">整体风格设置</h3>
           <div class="setting-drawer-index-blockChecbox">
             <a-tooltip>
@@ -53,9 +53,9 @@
           </div>
         </div>
         <a-divider />
-        <div :style="{ marginBottom: '24px' }">
+        <div class="mb-6">
           <h3 class="setting-drawer-index-title">主题色</h3>
-          <div style="height: 20px">
+          <div class="h-5">
             <a-tooltip
               class="setting-drawer-theme-color-colorBlock"
               v-for="(item, index) in colorList"
@@ -75,7 +75,7 @@
           </div>
         </div>
         <a-divider />
-        <div :style="{ marginBottom: '24px' }">
+        <div class="mb-6">
           <h3 class="setting-drawer-index-title">导航模式</h3>
 
           <div class="setting-drawer-index-blockChecbox">
@@ -113,7 +113,7 @@
           </div>
         </div>
         <a-divider />
-        <div :style="{ marginTop: '24px' }">
+        <div class="mt-6">
           <a-list :split="false">
             <a-list-item>
               <a-tooltip slot="actions">

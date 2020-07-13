@@ -1,6 +1,6 @@
 <template>
   <a-locale-provider :locale="locale">
-    <div id="app">
+    <div id="app" class="h-full">
       <router-view />
     </div>
   </a-locale-provider>
@@ -38,9 +38,3 @@ export default {
   }
 }
 </script>
-
-<style>
-#app {
-  height: 100%;
-}
-</style>

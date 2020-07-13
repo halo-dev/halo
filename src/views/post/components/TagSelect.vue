@@ -2,7 +2,7 @@
   <div>
     <a-select
       v-model="selectedTagNames"
-      style="width: 100%"
+      class="w-full"
       allowClear
       mode="tags"
       placeholder="选择或输入标签"
@@ -41,7 +41,7 @@ export default {
     }
   },
   created() {
-    this.loadTags()
+    this.handleListTags()
   },
   watch: {
     tags(newValue, oldValue) {
@@ -68,7 +68,7 @@ export default {
     }
   },
   methods: {
-    loadTags(callback) {
+    handleListTags(callback) {
       tagApi.listAll(true).then(response => {
         this.tags = response.data.data
         if (callback) {
@@ -93,7 +93,7 @@ export default {
 
       axios.all(createPromises).then(
         axios.spread(() => {
-          this.loadTags(() => {
+          this.handleListTags(() => {
             this.$log.debug('Tag name map', this.tagNameMap)
             // Get all tag id
             const tagIds = this.selectedTagNames.map(tagName => this.tagNameMap[tagName].id)

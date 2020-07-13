@@ -24,12 +24,8 @@
         type="flex"
         align="middle"
       >
-        <a-skeleton
-          active
-          :loading="skeletonLoading"
-          :paragraph="{ rows: 18 }"
-        >
-          <a-col :span="24">
+        <a-col :span="24">
+          <a-spin :spinning="loading">
             <a-empty v-if="formattedDatas.length==0" />
             <div
               v-else
@@ -46,8 +42,8 @@
                 loading="lazy"
               >
             </div>
-          </a-col>
-        </a-skeleton>
+          </a-spin>
+        </a-col>
       </a-row>
       <a-divider />
       <div class="page-wrapper">
@@ -63,12 +59,12 @@
         v-model="detailVisible"
         v-if="selectedAttachment"
         :attachment="selectedAttachment"
-        @delete="handleDelete"
+        @delete="loadAttachments"
       />
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-button
-          @click="handleShowUploadModal"
+          @click="uploadVisible = true"
           type="primary"
         >上传附件</a-button>
       </div>
@@ -117,7 +113,7 @@ export default {
       detailVisible: false,
       attachmentDrawerVisible: false,
       uploadVisible: false,
-      skeletonLoading: true,
+      loading: true,
       pagination: {
         page: 1,
         size: 12,
@@ -144,23 +140,13 @@ export default {
     }
   },
   watch: {
-    visible: function(newValue, oldValue) {
-      if (newValue) {
-        this.loadSkeleton()
+    visible(value) {
+      if (value) {
         this.loadAttachments()
       }
     }
   },
   methods: {
-    loadSkeleton() {
-      this.skeletonLoading = true
-      setTimeout(() => {
-        this.skeletonLoading = false
-      }, 500)
-    },
-    handleShowUploadModal() {
-      this.uploadVisible = true
-    },
     handleShowDetailDrawer(attachment) {
       this.selectedAttachment = attachment
       this.$log.debug('Show detail of', attachment)
@@ -208,13 +194,21 @@ export default {
       return false
     },
     loadAttachments() {
+      this.loading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      attachmentApi.query(this.queryParam).then(response => {
-        this.attachments = response.data.data.content
-        this.pagination.total = response.data.data.total
-      })
+      attachmentApi
+        .query(this.queryParam)
+        .then(response => {
+          this.attachments = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleQuery() {
       this.handlePaginationChange(1, this.pagination.size)
@@ -226,11 +220,7 @@ export default {
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
-      this.loadSkeleton()
       this.handlePaginationChange(1, this.pagination.size)
-    },
-    handleDelete() {
-      this.loadAttachments()
     },
     handleJudgeMediaType(attachment) {
       var mediaType = attachment.mediaType

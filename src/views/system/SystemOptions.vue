@@ -130,7 +130,7 @@
           shape="circle"
           :icon="`${advancedOptions?'setting':'thunderbolt'}`"
           size="large"
-          @click="handleAdvancedOptions()"
+          @click="advancedOptions = !advancedOptions"
         ></a-button>
       </a-tooltip>
     </div>
@@ -170,14 +170,11 @@ export default {
     }
   },
   created() {
-    this.loadFormOptions()
+    this.hanldeListOptions()
   },
   methods: {
     ...mapActions(['loadUser', 'loadOptions']),
-    handleAdvancedOptions() {
-      this.advancedOptions = !this.advancedOptions
-    },
-    loadFormOptions() {
+    hanldeListOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
       })
@@ -186,12 +183,16 @@ export default {
       this.options = val
     },
     onSaveOptions() {
-      optionApi.save(this.options).then(response => {
-        this.loadFormOptions()
-        this.loadOptions()
-        this.loadUser()
-        this.$message.success('保存成功！')
-      })
+      optionApi
+        .save(this.options)
+        .then(response => {
+          this.$message.success('保存成功！')
+        })
+        .finally(() => {
+          this.hanldeListOptions()
+          this.loadOptions()
+          this.loadUser()
+        })
     }
   }
 }

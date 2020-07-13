@@ -7,7 +7,7 @@
         :md="10"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '12px' }"
+        class="pb-3"
       >
         <a-card
           :title="title"
@@ -96,7 +96,7 @@
         :md="14"
         :sm="24"
         :xs="24"
-        :style="{ 'padding-bottom': '1rem' }"
+        class="pb-3"
       >
         <a-card
           title="分类列表"
@@ -187,7 +187,7 @@
             <span
               slot="postCount"
               slot-scope="text,record"
-              style="cursor: pointer;"
+              class="cursor-pointer"
               @click="handleQueryCategoryPosts(record)"
             >
               <a-badge

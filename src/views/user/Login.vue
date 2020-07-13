@@ -277,7 +277,7 @@ export default {
         .finally(() => {
           setTimeout(() => {
             this.landing = false
-          }, 500)
+          }, 200)
         })
     },
     loginSuccess() {

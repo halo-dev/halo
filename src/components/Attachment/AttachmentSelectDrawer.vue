@@ -24,12 +24,8 @@
         type="flex"
         align="middle"
       >
-        <a-skeleton
-          active
-          :loading="skeletonLoading"
-          :paragraph="{ rows: 18 }"
-        >
-          <a-col :span="24">
+        <a-col :span="24">
+          <a-spin :spinning="loading">
             <a-empty v-if="attachments.length==0" />
             <div
               v-else
@@ -45,8 +41,8 @@
                 loading="lazy"
               >
             </div>
-          </a-col>
-        </a-skeleton>
+          </a-spin>
+        </a-col>
       </a-row>
       <a-divider />
       <div class="page-wrapper">
@@ -61,7 +57,7 @@
       <div class="bottom-control">
         <a-button
           type="dashed"
-          style="marginRight: 8px"
+          class="mr-2"
           v-if="isChooseAvatar"
           @click="handleSelectGravatar"
         >使用 Gravatar</a-button>
@@ -123,7 +119,7 @@ export default {
   data() {
     return {
       uploadVisible: false,
-      skeletonLoading: true,
+      loading: true,
       pagination: {
         page: 1,
         size: 12,
@@ -143,29 +139,30 @@ export default {
   watch: {
     visible: function(newValue, oldValue) {
       if (newValue) {
-        this.loadSkeleton()
-        this.loadAttachments()
+        this.handleListAttachments()
       }
     }
   },
   methods: {
-    loadSkeleton() {
-      this.skeletonLoading = true
-      setTimeout(() => {
-        this.skeletonLoading = false
-      }, 500)
-    },
     handleShowUploadModal() {
       this.uploadVisible = true
     },
-    loadAttachments() {
+    handleListAttachments() {
+      this.loading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      attachmentApi.query(this.queryParam).then(response => {
-        this.attachments = response.data.data.content
-        this.pagination.total = response.data.data.total
-      })
+      attachmentApi
+        .query(this.queryParam)
+        .then(response => {
+          this.attachments = response.data.data.content
+          this.pagination.total = response.data.data.total
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleQuery() {
       this.handlePaginationChange(1, this.pagination.size)
@@ -179,11 +176,10 @@ export default {
     handlePaginationChange(page, pageSize) {
       this.pagination.page = page
       this.pagination.size = pageSize
-      this.loadAttachments()
+      this.handleListAttachments()
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
-      this.loadSkeleton()
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleJudgeMediaType(attachment) {

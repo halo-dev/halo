@@ -18,14 +18,13 @@
         </a-button>
         <a-button
           icon="sync"
-          @click="loadStaticList"
+          @click="handleListStatics"
           :loading="loading"
-          :disabled="loading"
         >
           刷新
         </a-button>
       </div>
-      <div style="margin-top:15px">
+      <div class="mt-4">
         <a-table
           :rowKey="record => record.id"
           :columns="columns"
@@ -91,9 +90,7 @@
                     <a href="javascript:;">删除</a>
                   </a-popconfirm>
                 </a-menu-item>
-                <a-menu-item
-                  key="3"
-                >
+                <a-menu-item key="3">
                   <a
                     href="javascript:;"
                     @click="handleShowRenameModal(record)"
@@ -268,7 +265,7 @@ export default {
     }
   },
   created() {
-    this.loadStaticList()
+    this.handleListStatics()
     this.CodeMirror = require('codemirror')
     this.CodeMirror.modeURL = 'codemirror/mode/%N/%N.js'
   },
@@ -277,23 +274,33 @@ export default {
     sortedStatics() {
       const data = this.statics.slice(0)
       return data.sort(function(a, b) {
-        return b.createTime - a.createTime
+        return a.isFile - b.isFile
       })
     }
   },
   methods: {
-    loadStaticList() {
+    handleListStatics() {
       this.loading = true
-      staticApi.list().then(response => {
-        this.statics = response.data.data
-        this.loading = false
-      })
+      staticApi
+        .list()
+        .then(response => {
+          this.statics = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleDelete(path) {
-      staticApi.delete(path).then(response => {
-        this.$message.success(`删除成功！`)
-        this.loadStaticList()
-      })
+      staticApi
+        .delete(path)
+        .then(response => {
+          this.$message.success(`删除成功！`)
+        })
+        .finally(() => {
+          this.handleListStatics()
+        })
     },
     handleUpload(file) {
       this.selectedFile = file
@@ -303,10 +310,9 @@ export default {
       this.selectedFile = file
       this.createFolderModal = true
       const that = this
-      Vue.nextTick()
-        .then(() => {
-          that.$refs.createFoldeInput.focus()
-        })
+      Vue.nextTick().then(() => {
+        that.$refs.createFoldeInput.focus()
+      })
     },
     handleShowRenameModal(file) {
       this.selectedFile = file
@@ -314,17 +320,16 @@ export default {
       this.renameFile = file.isFile
       this.renameModal = true
       const that = this
-      Vue.nextTick()
-        .then(() => {
-          const inputRef = that.$refs.renameModalInput
-          const tmp = inputRef.value.split('.')
-          inputRef.focus()
-          if (tmp.length <= 1) {
-            inputRef.$el.setSelectionRange(0, inputRef.value.length)
-          } else {
-            inputRef.$el.setSelectionRange(0, inputRef.value.length - tmp.pop().length - 1)
-          }
-        })
+      Vue.nextTick().then(() => {
+        const inputRef = that.$refs.renameModalInput
+        const tmp = inputRef.value.split('.')
+        inputRef.focus()
+        if (tmp.length <= 1) {
+          inputRef.$el.setSelectionRange(0, inputRef.value.length)
+        } else {
+          inputRef.$el.setSelectionRange(0, inputRef.value.length - tmp.pop().length - 1)
+        }
+      })
     },
     handleShowEditModal(file) {
       this.selectedFile = file
@@ -337,28 +342,35 @@ export default {
           this.$message.error(`不支持编辑 "${postfix}" 类型的文件`)
         } else {
           this.editModal = true
-          Vue.nextTick()
-            .then(() => {
-              const editor = this.$refs.editor.editor
-              editor.setOption('mode', info.mime)
-              this.CodeMirror.autoLoadMode(editor, info.mode)
-            })
+          Vue.nextTick().then(() => {
+            const editor = this.$refs.editor.editor
+            editor.setOption('mode', info.mime)
+            this.CodeMirror.autoLoadMode(editor, info.mode)
+          })
         }
       })
     },
     handleCreateFolder() {
-      staticApi.createFolder(this.selectedFile.relativePath, this.createFolderName).then(response => {
-        this.$message.success(`创建文件夹成功！`)
-        this.createFolderModal = false
-        this.loadStaticList()
-      })
+      staticApi
+        .createFolder(this.selectedFile.relativePath, this.createFolderName)
+        .then(response => {
+          this.$message.success(`创建文件夹成功！`)
+          this.createFolderModal = false
+        })
+        .finally(() => {
+          this.handleListStatics()
+        })
     },
     handleRename() {
-      staticApi.rename(this.selectedFile.relativePath, this.renameName).then(response => {
-        this.$message.success(`重命名成功！`)
-        this.renameModal = false
-        this.loadStaticList()
-      })
+      staticApi
+        .rename(this.selectedFile.relativePath, this.renameName)
+        .then(response => {
+          this.$message.success(`重命名成功！`)
+          this.renameModal = false
+        })
+        .finally(() => {
+          this.handleListStatics()
+        })
     },
     handleEditSave() {
       staticApi.save(this.selectedFile.relativePath, this.$refs.editor.editor.getValue()).then(response => {
@@ -377,7 +389,7 @@ export default {
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
       this.selectedFile = {}
-      this.loadStaticList()
+      this.handleListStatics()
     },
     handleEditClose() {
       this.editModal = false

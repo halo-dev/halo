@@ -1,22 +1,19 @@
 <template>
   <a-form layout="vertical">
     <a-form-item>
-      <a-skeleton
-        active
-        :loading="loading"
-        :paragraph="{rows: 12}"
-      >
+      <a-spin :spinning="loading">
         <codemirror
           v-model="logContent"
           :options="codemirrorOptions"
         ></codemirror>
-      </a-skeleton>
+      </a-spin>
     </a-form-item>
     <a-form-item>
       <a-select
         defaultValue="200"
+        v-model="logLines"
+        @change="handleLoadLogsLines"
         style="margin-right: 8px;width: 100px"
-        @change="handleLinesChange"
       >
         <a-select-option value="200">200 行</a-select-option>
         <a-select-option value="500">500 行</a-select-option>
@@ -25,8 +22,8 @@
       </a-select>
       <a-button
         type="primary"
-        style="margin-right: 8px;"
-        @click="loadLogs()"
+        class="mr-2"
+        @click="handleLoadLogsLines()"
       >刷新</a-button>
       <a-button
         type="dashed"
@@ -54,24 +51,30 @@ export default {
         line: true
       },
       logContent: '',
-      loading: true,
+      loading: false,
       logLines: 200
     }
   },
   created() {
-    this.loadLogs()
+    this.handleLoadLogsLines()
   },
   updated() {
     // 滚动条定位到底部
     this.$el.querySelector('.CodeMirror-scroll').scrollTop = this.$el.querySelector('.CodeMirror-scroll').scrollHeight
   },
   methods: {
-    loadLogs() {
+    handleLoadLogsLines() {
       this.loading = true
-      adminApi.getLogFiles(this.logLines).then(response => {
-        this.logContent = response.data.data
-        this.loading = false
-      })
+      adminApi
+        .getLogFiles(this.logLines)
+        .then(response => {
+          this.logContent = response.data.data
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.loading = false
+          }, 200)
+        })
     },
     handleDownloadLogFile() {
       const hide = this.$message.loading('下载中...', 0)
@@ -95,9 +98,6 @@ export default {
         .finally(() => {
           hide()
         })
-    },
-    handleLinesChange(value) {
-      this.logLines = value
     }
   }
 }

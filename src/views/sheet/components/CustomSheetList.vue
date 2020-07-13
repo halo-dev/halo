@@ -107,7 +107,7 @@
               v-if="item.status=='PUBLISHED'"
               :href="item.fullPath"
               target="_blank"
-              style="text-decoration: none;"
+              class="no-underline"
             >
               <a-tooltip
                 placement="top"
@@ -117,7 +117,7 @@
             <a
               v-else-if="item.status=='DRAFT'"
               href="javascript:void(0)"
-              style="text-decoration: none;"
+              class="no-underline"
               @click="handlePreview(item.id)"
             >
               <a-tooltip
@@ -128,7 +128,7 @@
             <a
               v-else
               href="javascript:void(0);"
-              style="text-decoration: none;"
+              class="no-underline"
               disabled
             >
               {{ item.title }}
@@ -160,7 +160,7 @@
           v-if="record.status=='PUBLISHED'"
           :href="record.fullPath"
           target="_blank"
-          style="text-decoration: none;"
+          class="no-underline"
         >
           <a-tooltip
             placement="top"
@@ -170,7 +170,7 @@
         <a
           v-else-if="record.status=='DRAFT'"
           href="javascript:void(0)"
-          style="text-decoration: none;"
+          class="no-underline"
           @click="handlePreview(record.id)"
         >
           <a-tooltip
@@ -181,7 +181,7 @@
         <a
           v-else
           href="javascript:void(0);"
-          style="text-decoration: none;"
+          class="no-underline"
           disabled
         >
           {{ text }}
@@ -202,7 +202,7 @@
         slot="commentCount"
         slot-scope="text,record"
         @click="handleShowSheetComments(record)"
-        style="cursor: pointer;"
+        class="cursor-pointer"
       >
         <a-badge
           :count="record.commentCount"
@@ -421,7 +421,7 @@ export default {
     }
   },
   created() {
-    this.loadSheets()
+    this.handleListSheets()
   },
   destroyed: function() {
     if (this.sheetSettingVisible) {
@@ -435,8 +435,10 @@ export default {
     next()
   },
   methods: {
-    loadSheets() {
-      this.loading = true
+    handleListSheets(enableLoading = true) {
+      if (enableLoading) {
+        this.loading = true
+      }
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
@@ -456,16 +458,24 @@ export default {
       this.$router.push({ name: 'SheetEdit', query: { sheetId: sheet.id } })
     },
     handleEditStatusClick(sheetId, status) {
-      sheetApi.updateStatus(sheetId, status).then(response => {
-        this.$message.success('操作成功！')
-        this.loadSheets()
-      })
+      sheetApi
+        .updateStatus(sheetId, status)
+        .then(response => {
+          this.$message.success('操作成功！')
+        })
+        .finally(() => {
+          this.handleListSheets()
+        })
     },
     handleDeleteClick(sheetId) {
-      sheetApi.delete(sheetId).then(response => {
-        this.$message.success('删除成功！')
-        this.loadSheets()
-      })
+      sheetApi
+        .delete(sheetId)
+        .then(response => {
+          this.$message.success('删除成功！')
+        })
+        .finally(() => {
+          this.handleListSheets()
+        })
     },
     handleSheetToMenu(sheet) {
       this.menu['name'] = sheet.title
@@ -497,20 +507,20 @@ export default {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
       this.pagination.page = page
       this.pagination.size = pageSize
-      this.loadSheets()
+      this.handleListSheets()
     },
     onSheetSettingsClose() {
       this.sheetSettingVisible = false
       this.selectedSheet = {}
       setTimeout(() => {
-        this.loadSheets()
+        this.handleListSheets(false)
       }, 500)
     },
     onSheetCommentsClose() {
       this.sheetCommentVisible = false
       this.selectedSheet = {}
       setTimeout(() => {
-        this.loadSheets()
+        this.handleListSheets(false)
       }, 500)
     },
     onRefreshSheetFromSetting(sheet) {

@@ -7,10 +7,9 @@
         :md="12"
         :sm="12"
         :xs="12"
-        :style="{ marginBottom: '12px' }"
+        class="mb-3"
       >
         <analysis-card
-          :loading="statisticsLoading"
           title="文章"
           :number="statisticsData.postCount"
         >
@@ -18,7 +17,14 @@
             :to="{ name:'PostEdit' }"
             slot="action"
           >
-            <a-icon type="plus" />
+            <a-icon
+              v-if="statisticsLoading"
+              type="loading"
+            />
+            <a-icon
+              v-else
+              type="plus"
+            />
           </router-link>
         </analysis-card>
       </a-col>
@@ -28,10 +34,9 @@
         :md="12"
         :sm="12"
         :xs="12"
-        :style="{ marginBottom: '12px' }"
+        class="mb-3"
       >
         <analysis-card
-          :loading="statisticsLoading"
           title="评论"
           :number="statisticsData.commentCount"
         >
@@ -39,7 +44,14 @@
             :to="{ name:'Comments' }"
             slot="action"
           >
-            <a-icon type="unordered-list" />
+            <a-icon
+              v-if="statisticsLoading"
+              type="loading"
+            />
+            <a-icon
+              v-else
+              type="unordered-list"
+            />
           </router-link>
         </analysis-card>
       </a-col>
@@ -49,10 +61,9 @@
         :md="12"
         :sm="12"
         :xs="12"
-        :style="{ marginBottom: '12px' }"
+        class="mb-3"
       >
         <analysis-card
-          :loading="statisticsLoading"
           title="阅读量"
           :number="statisticsData.visitCount"
         >
@@ -61,7 +72,14 @@
               文章阅读共 {{ statisticsData.visitCount }} 次
             </template>
             <a href="javascript:void(0);">
-              <a-icon type="info-circle-o" />
+              <a-icon
+                v-if="statisticsLoading"
+                type="loading"
+              />
+              <a-icon
+                v-else
+                type="info-circle-o"
+              />
             </a>
           </a-tooltip>
         </analysis-card>
@@ -72,17 +90,23 @@
         :md="12"
         :sm="12"
         :xs="12"
-        :style="{ marginBottom: '12px' }"
+        class="mb-3"
       >
         <analysis-card
-          :loading="statisticsLoading"
           title="建立天数"
           :number="statisticsData.establishDays"
         >
           <a-tooltip slot="action">
             <template slot="title">博客建立于 {{ statisticsData.birthday | moment }}</template>
             <a href="javascript:void(0);">
-              <a-icon type="info-circle-o" />
+              <a-icon
+                v-if="statisticsLoading"
+                type="loading"
+              />
+              <a-icon
+                v-else
+                type="info-circle-o"
+              />
             </a>
           </a-tooltip>
         </analysis-card>
@@ -95,10 +119,9 @@
         :md="12"
         :sm="24"
         :xs="24"
-        :style="{ marginBottom: '12px' }"
+        class="mb-3"
       >
         <a-card
-          :loading="activityLoading"
           :bordered="false"
           title="新动态"
           :bodyStyle="{ padding: 0 }"
@@ -109,7 +132,10 @@
                 key="1"
                 tab="最近文章"
               >
-                <a-list :dataSource="latestPosts">
+                <a-list
+                  :loading="activityLoading"
+                  :dataSource="latestPosts"
+                >
                   <a-list-item
                     slot="renderItem"
                     slot-scope="item, index"
@@ -178,11 +204,10 @@
         :md="12"
         :sm="24"
         :xs="24"
-        :style="{ marginBottom: '12px' }"
+        class="mb-3"
       >
         <a-card
           :bordered="false"
-          :loading="writeLoading"
           :bodyStyle="{ padding: '16px' }"
         >
           <template slot="title">
@@ -218,10 +243,9 @@
         :md="12"
         :sm="24"
         :xs="24"
-        :style="{ marginBottom: '12px' }"
+        class="mb-3"
       >
         <a-card
-          :loading="logLoading"
           :bordered="false"
           :bodyStyle="{ padding: '16px' }"
         >
@@ -239,7 +263,10 @@
               </a>
             </a-tooltip>
           </template>
-          <a-list :dataSource="formattedLogDatas">
+          <a-list
+            :dataSource="formattedLogDatas"
+            :loading="logLoading"
+          >
             <a-list-item
               slot="renderItem"
               slot-scope="item, index"
@@ -287,9 +314,8 @@ export default {
   },
   data() {
     return {
-      logType: logApi.logType,
+      logTypes: logApi.logTypes,
       activityLoading: false,
-      writeLoading: false,
       logLoading: false,
       statisticsLoading: true,
       logListDrawerVisible: false,
@@ -303,14 +329,14 @@ export default {
     }
   },
   created() {
-    this.getStatistics()
-    this.listLatestPosts()
-    this.listLatestLogs()
+    this.handleLoadStatistics()
+    this.handleListLatestPosts()
+    this.handleListLatestLogs()
   },
   computed: {
     formattedLogDatas() {
       return this.latestLogs.map(log => {
-        log.type = this.logType[log.type].text
+        log.type = this.logTypes[log.type].text
         return log
       })
     }
@@ -323,7 +349,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.interval = setInterval(() => {
-        vm.getStatistics()
+        vm.handleLoadStatistics()
       }, 5000)
     })
   },
@@ -339,7 +365,7 @@ export default {
     next()
   },
   methods: {
-    async listLatestPosts() {
+    handleListLatestPosts() {
       this.activityLoading = true
       postApi
         .listLatest(5)
@@ -352,9 +378,8 @@ export default {
           }, 200)
         })
     },
-    async listLatestLogs() {
+    handleListLatestLogs() {
       this.logLoading = true
-      this.writeLoading = true
       logApi
         .listLatest(5)
         .then(response => {
@@ -363,11 +388,10 @@ export default {
         .finally(() => {
           setTimeout(() => {
             this.logLoading = false
-            this.writeLoading = false
           }, 200)
         })
     },
-    async getStatistics() {
+    handleLoadStatistics() {
       statisticsApi
         .statistics()
         .then(response => {
@@ -402,6 +426,7 @@ export default {
     },
     handleLogListClose() {
       this.logListDrawerVisible = false
+      this.handleListLatestLogs()
     }
   }
 }

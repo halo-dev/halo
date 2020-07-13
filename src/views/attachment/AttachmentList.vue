@@ -7,7 +7,7 @@
     >
       <a-col
         :span="24"
-        style="padding-bottom: 12px;"
+        class="pb-3"
       >
         <a-card
           :bordered="false"
@@ -76,21 +76,16 @@
                   <span class="table-page-search-submitButtons">
                     <a-button
                       type="primary"
+                      class="mr-2"
                       @click="handleQuery()"
                     >查询</a-button>
-                    <a-button
-                      style="margin-left: 8px;"
-                      @click="handleResetParam()"
-                    >重置</a-button>
+                    <a-button @click="handleResetParam()">重置</a-button>
                   </span>
                 </a-col>
               </a-row>
             </a-form>
           </div>
-          <div
-            class="table-operator"
-            style="margin-bottom: 0;"
-          >
+          <div class="table-operator mb-0">
             <a-button
               type="primary"
               icon="cloud-upload"
@@ -146,7 +141,7 @@
                   loading="lazy"
                 />
               </div>
-              <a-card-meta style="padding: 0.8rem;">
+              <a-card-meta class="p-3">
                 <ellipsis
                   :length="isMobile() ? 12 : 16"
                   tooltip
@@ -194,7 +189,7 @@
       v-if="selectAttachment"
       :attachment="selectAttachment"
       :addToPhoto="true"
-      @delete="loadAttachments()"
+      @delete="handleListAttachments()"
     />
   </page-view>
 </template>
@@ -259,9 +254,9 @@ export default {
     }
   },
   created() {
-    this.loadAttachments()
-    this.loadMediaTypes()
-    this.loadTypes()
+    this.handleListAttachments()
+    this.handleListMediaTypes()
+    this.handleListTypes()
   },
   destroyed: function() {
     if (this.drawerVisible) {
@@ -276,11 +271,11 @@ export default {
   },
   methods: {
     ...mapGetters(['color']),
-    loadAttachments() {
+    handleListAttachments() {
+      this.listLoading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      this.listLoading = true
       attachmentApi
         .query(this.queryParam)
         .then(response => {
@@ -293,7 +288,7 @@ export default {
           }, 200)
         })
     },
-    loadMediaTypes() {
+    handleListMediaTypes() {
       this.mediaTypesLoading = true
       attachmentApi
         .getMediaTypes()
@@ -306,7 +301,7 @@ export default {
           }, 200)
         })
     },
-    loadTypes() {
+    handleListTypes() {
       this.typesLoading = true
       attachmentApi
         .getTypes()
@@ -371,15 +366,15 @@ export default {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
       this.pagination.page = page
       this.pagination.size = size
-      this.loadAttachments()
+      this.handleListAttachments()
     },
     handleResetParam() {
       this.queryParam.keyword = null
       this.queryParam.mediaType = null
       this.queryParam.attachmentType = null
       this.handlePaginationChange(1, this.pagination.size)
-      this.loadMediaTypes()
-      this.loadTypes()
+      this.handleListMediaTypes()
+      this.handleListTypes()
     },
     handleQuery() {
       this.handlePaginationChange(1, this.pagination.size)
@@ -387,8 +382,8 @@ export default {
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
       this.handlePaginationChange(1, this.pagination.size)
-      this.loadMediaTypes()
-      this.loadTypes()
+      this.handleListMediaTypes()
+      this.handleListTypes()
     },
     handleJudgeMediaType(attachment) {
       var mediaType = attachment.mediaType
@@ -448,11 +443,15 @@ export default {
         title: '确定要批量删除选中的附件吗?',
         content: '一旦删除不可恢复，请谨慎操作',
         onOk() {
-          attachmentApi.deleteInBatch(that.batchSelectedAttachments).then(res => {
-            that.handleCancelMultipleSelection()
-            that.loadAttachments()
-            that.$message.success('删除成功')
-          })
+          attachmentApi
+            .deleteInBatch(that.batchSelectedAttachments)
+            .then(res => {
+              that.handleCancelMultipleSelection()
+              that.$message.success('删除成功')
+            })
+            .finally(() => {
+              that.handleListAttachments()
+            })
         },
         onCancel() {}
       })

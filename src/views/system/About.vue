@@ -40,7 +40,7 @@
               ></a-button>
             </a-popover>
 
-            <ul style="margin: 0;padding: 0;list-style: none;">
+            <ul class="m-0 p-0 list-none">
               <li>版本：{{ environments.version }}</li>
               <li>数据库：{{ environments.database }}</li>
               <li>运行模式：{{ environments.mode }}</li>
@@ -50,19 +50,19 @@
             <a
               href="https://github.com/halo-dev"
               target="_blank"
-              style="margin-right: 10px;"
+              class="mr-3"
             >开源组织
               <a-icon type="link" /></a>
             <a
               href="https://halo.run"
               target="_blank"
-              style="margin-right: 10px;"
+              class="mr-3"
             >用户文档
               <a-icon type="link" /></a>
             <a
               href="https://bbs.halo.run"
               target="_blank"
-              style="margin-right: 10px;"
+              class="mr-3"
             >在线社区
               <a-icon type="link" /></a>
           </a-card>
@@ -104,6 +104,7 @@
       ok-text="查看更多"
       @cancel="versionContentVisible=false"
       @ok="handleOpenVersionUrl"
+      :width="620"
     >
       <div v-html="versionContent"></div>
     </a-modal>
