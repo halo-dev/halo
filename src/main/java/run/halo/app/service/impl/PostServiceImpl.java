@@ -155,7 +155,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                                  Set<PostMeta> metas, boolean autoSave) {
         // Set edit time
         postToUpdate.setEditTime(DateUtils.now());
-        postToUpdate.setWordCount((long) postToUpdate.getOriginalContent().trim().length());
         PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds, metas);
         if (!autoSave) {
             // Log the creation
@@ -755,8 +754,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds,
                                         Set<Integer> categoryIds, Set<PostMeta> metas) {
         Assert.notNull(post, "Post param must not be null");
-
-        post.setWordCount((long) post.getOriginalContent().trim().length());
 
         // Create or update post
         post = super.createOrUpdateBy(post);

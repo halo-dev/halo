@@ -155,7 +155,7 @@ public class BasePost extends BaseEntity {
     /**
      * Content word count
      */
-    @Column(name = "content_word_count")
+    @Column(name = "word_count")
     @ColumnDefault("0")
     private Long wordCount;
 
