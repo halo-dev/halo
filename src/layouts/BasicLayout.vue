@@ -156,15 +156,6 @@ export default {
 <style lang="less">
 @import url('../components/global.less');
 
-/*
- * The following styles are auto-applied to elements with
- * transition="page-transition" when their visibility is toggled
- * by Vue.js.
- *
- * You can easily play with the page transition by editing
- * these styles.
- */
-
 .page-transition-enter {
   opacity: 0;
 }

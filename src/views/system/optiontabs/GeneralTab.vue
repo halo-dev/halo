@@ -1,65 +1,79 @@
 <template>
   <div>
-    <a-form
+    <a-form-model
+      ref="generalOptionsForm"
+      :model="options"
+      :rules="rules"
       layout="vertical"
       :wrapperCol="wrapperCol"
     >
-      <a-form-item label="博客标题：">
+      <a-form-model-item
+        label="博客标题："
+        prop="blog_title"
+      >
         <a-input v-model="options.blog_title" />
-      </a-form-item>
-      <a-form-item label="博客地址：">
+      </a-form-model-item>
+      <a-form-model-item
+        label="博客地址："
+        prop="blog_url"
+      >
         <a-input
           v-model="options.blog_url"
           placeholder="如：https://halo.run"
         />
-      </a-form-item>
-      <a-form-item label="Logo：">
+      </a-form-model-item>
+      <a-form-model-item
+        label="Logo："
+        prop="blog_logo"
+      >
         <a-input v-model="options.blog_logo">
           <a
             href="javascript:void(0);"
             slot="addonAfter"
-            @click="logoDrawerVisible = true"
+            @click="handleShowLogoSelector"
           >
             <a-icon type="picture" />
           </a>
         </a-input>
-      </a-form-item>
-      <a-form-item label="Favicon：">
+      </a-form-model-item>
+      <a-form-model-item
+        label="Favicon："
+        prop="blog_favicon"
+      >
         <a-input v-model="options.blog_favicon">
           <a
             href="javascript:void(0);"
             slot="addonAfter"
-            @click="faviconDrawerVisible = true"
+            @click="handleShowFaviconSelector"
           >
             <a-icon type="picture" />
           </a>
         </a-input>
-      </a-form-item>
-      <a-form-item label="页脚信息：">
+      </a-form-model-item>
+      <a-form-model-item
+        label="页脚信息："
+        prop="blog_footer_info"
+      >
         <a-input
           type="textarea"
           :autoSize="{ minRows: 5 }"
           v-model="options.blog_footer_info"
           placeholder="支持 HTML 格式的文本"
         />
-      </a-form-item>
-      <a-form-item>
+      </a-form-model-item>
+      <a-form-model-item>
         <a-button
           type="primary"
           @click="handleSaveOptions"
+          :loading="saving"
         >保存</a-button>
-      </a-form-item>
-    </a-form>
+      </a-form-model-item>
+    </a-form-model>
 
     <AttachmentSelectDrawer
-      v-model="logoDrawerVisible"
-      @listenToSelect="handleSelectLogo"
-      title="选择 Logo"
-    />
-    <AttachmentSelectDrawer
-      v-model="faviconDrawerVisible"
-      @listenToSelect="handleSelectFavicon"
-      title="选择 Favicon"
+      v-model="attachmentSelector.visible"
+      @listenToSelect="handleSelectAttachment"
+      :title="attachmentSelectorTitle"
     />
   </div>
 </template>
@@ -71,6 +85,10 @@ export default {
     options: {
       type: Object,
       required: true
+    },
+    saving: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -81,24 +99,49 @@ export default {
         sm: { span: 12 },
         xs: { span: 24 }
       },
-      logoDrawerVisible: false,
-      faviconDrawerVisible: false
+      attachmentSelector: {
+        visible: false,
+        field: ''
+      },
+      rules: {
+        blog_title: [
+          { required: true, message: '* 博客标题不能为空', trigger: ['change', 'blur'] },
+          { max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }
+        ],
+        blog_url: [
+          { required: true, message: '* 博客地址不能为空', trigger: ['change', 'blur'] },
+          { max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }
+        ],
+        blog_logo: [
+          { type: 'url', message: '* 链接格式不正确', trigger: ['change', 'blur'] },
+          { max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }
+        ],
+        blog_favicon: [
+          { type: 'url', message: '* 链接格式不正确', trigger: ['change', 'blur'] },
+          { max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }
+        ],
+        blog_footer_info: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }]
+      }
+    }
+  },
+  computed: {
+    attachmentSelectorTitle() {
+      if (this.attachmentSelector.field === 'blog_logo') {
+        return '选择 Logo'
+      } else if (this.attachmentSelector.field === 'blog_favicon') {
+        return '选择 Favicon'
+      }
+      return ''
     }
   },
   destroyed: function() {
-    if (this.faviconDrawerVisible) {
-      this.faviconDrawerVisible = false
-    }
-    if (this.logoDrawerVisible) {
-      this.logoDrawerVisible = false
+    if (this.attachmentSelector.visible) {
+      this.attachmentSelector.visible = false
     }
   },
   beforeRouteLeave(to, from, next) {
-    if (this.faviconDrawerVisible) {
-      this.faviconDrawerVisible = false
-    }
-    if (this.logoDrawerVisible) {
-      this.logoDrawerVisible = false
+    if (this.attachmentSelector.visible) {
+      this.attachmentSelector.visible = false
     }
     next()
   },
@@ -109,30 +152,24 @@ export default {
   },
   methods: {
     handleSaveOptions() {
-      if (!this.options.blog_title) {
-        this.$notification['error']({
-          message: '提示',
-          description: '博客标题不能为空！'
-        })
-        return
-      }
-
-      if (!this.options.blog_url) {
-        this.$notification['error']({
-          message: '提示',
-          description: '博客地址不能为空！'
-        })
-        return
-      }
-      this.$emit('onSave')
+      const _this = this
+      _this.$refs.generalOptionsForm.validate(valid => {
+        if (valid) {
+          this.$emit('onSave')
+        }
+      })
     },
-    handleSelectLogo(data) {
-      this.$set(this.options, 'blog_logo', encodeURI(data.path))
-      this.logoDrawerVisible = false
+    handleShowLogoSelector() {
+      this.attachmentSelector.field = 'blog_logo'
+      this.attachmentSelector.visible = true
     },
-    handleSelectFavicon(data) {
-      this.$set(this.options, 'blog_favicon', encodeURI(data.path))
-      this.faviconDrawerVisible = false
+    handleShowFaviconSelector() {
+      this.attachmentSelector.field = 'blog_favicon'
+      this.attachmentSelector.visible = true
+    },
+    handleSelectAttachment(attachment) {
+      this.$set(this.options, this.attachmentSelector.field, encodeURI(attachment.path))
+      this.attachmentSelector.visible = false
     }
   }
 }

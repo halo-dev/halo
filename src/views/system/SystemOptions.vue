@@ -16,6 +16,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
             <a-tab-pane key="seo">
@@ -26,6 +27,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
             <a-tab-pane key="post">
@@ -36,6 +38,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
             <a-tab-pane key="comment">
@@ -46,6 +49,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
             <a-tab-pane key="attachment">
@@ -56,6 +60,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
             <a-tab-pane key="smtp">
@@ -66,6 +71,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
             <a-tab-pane key="other">
@@ -76,6 +82,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
           </a-tabs>
@@ -93,6 +100,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
             <a-tab-pane key="api">
@@ -103,6 +111,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
             <a-tab-pane key="advanced-other">
@@ -113,6 +122,7 @@
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
+                :saving="saving"
               />
             </a-tab-pane>
           </a-tabs>
@@ -166,14 +176,15 @@ export default {
   data() {
     return {
       options: {},
-      advancedOptions: false
+      advancedOptions: false,
+      saving: false
     }
   },
   created() {
     this.hanldeListOptions()
   },
   methods: {
-    ...mapActions(['loadUser', 'loadOptions']),
+    ...mapActions(['refreshUserCache', 'refreshOptionsCache']),
     hanldeListOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
@@ -183,15 +194,19 @@ export default {
       this.options = val
     },
     onSaveOptions() {
+      this.saving = true
       optionApi
         .save(this.options)
         .then(response => {
           this.$message.success('保存成功！')
         })
         .finally(() => {
+          setTimeout(() => {
+            this.saving = false
+          }, 400)
           this.hanldeListOptions()
-          this.loadOptions()
-          this.loadUser()
+          this.refreshOptionsCache()
+          this.refreshUserCache()
         })
     }
   }

@@ -5,71 +5,76 @@
         tab="发信设置"
         key="smtpoptions"
       >
-        <a-form
+        <a-form-model
+          ref="smtpOptionsForm"
+          :model="options"
+          :rules="rules"
           layout="vertical"
           :wrapperCol="wrapperCol"
         >
-          <a-form-item label="是否启用：">
+          <a-form-model-item label="是否启用：">
             <a-switch v-model="options.email_enabled" />
-          </a-form-item>
-          <a-form-item label="SMTP 地址：">
+          </a-form-model-item>
+          <a-form-model-item label="SMTP 地址：">
             <a-input v-model="options.email_host" />
-          </a-form-item>
-          <a-form-item label="发送协议：">
+          </a-form-model-item>
+          <a-form-model-item label="发送协议：">
             <a-input v-model="options.email_protocol" />
-          </a-form-item>
-          <a-form-item label="SSL 端口：">
+          </a-form-model-item>
+          <a-form-model-item label="SSL 端口：">
             <a-input v-model="options.email_ssl_port" />
-          </a-form-item>
-          <a-form-item label="邮箱账号：">
+          </a-form-model-item>
+          <a-form-model-item label="邮箱账号：">
             <a-input v-model="options.email_username" />
-          </a-form-item>
-          <a-form-item label="邮箱密码：">
+          </a-form-model-item>
+          <a-form-model-item label="邮箱密码：">
             <a-input-password
               v-model="options.email_password"
               placeholder="部分邮箱可能是授权码"
               autocomplete="new-password"
             />
-          </a-form-item>
-          <a-form-item label="发件人：">
+          </a-form-model-item>
+          <a-form-model-item label="发件人：">
             <a-input v-model="options.email_from_name" />
-          </a-form-item>
-          <a-form-item>
+          </a-form-model-item>
+          <a-form-model-item>
             <a-button
               type="primary"
               @click="handleSaveOptions"
+              :loading="saving"
             >保存</a-button>
-          </a-form-item>
-        </a-form>
+          </a-form-model-item>
+        </a-form-model>
       </a-tab-pane>
       <a-tab-pane
         tab="发送测试"
         key="smtptest"
       >
-        <a-form
+        <a-form-model
           layout="vertical"
           :wrapperCol="wrapperCol"
         >
-          <a-form-item label="收件人：">
+          <a-form-model-item label="收件人：">
             <a-input v-model="mailParam.to" />
-          </a-form-item>
-          <a-form-item label="主题：">
+          </a-form-model-item>
+          <a-form-model-item label="主题：">
             <a-input v-model="mailParam.subject" />
-          </a-form-item>
-          <a-form-item label="内容：">
+          </a-form-model-item>
+          <a-form-model-item label="内容：">
             <a-input
               type="textarea"
               :autoSize="{ minRows: 5 }"
               v-model="mailParam.content"
             />
-          </a-form-item>
-          <a-form-item>
+          </a-form-model-item>
+          <a-form-model-item>
             <a-button
               type="primary"
               @click="handleTestMailClick"
+              :loading="sending"
             >发送</a-button>
-          </a-form-item>
-        </a-form>
+          </a-form-model-item>
+        </a-form-model>
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -82,6 +87,10 @@ export default {
     options: {
       type: Object,
       required: true
+    },
+    saving: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -92,7 +101,9 @@ export default {
         sm: { span: 12 },
         xs: { span: 24 }
       },
-      mailParam: {}
+      mailParam: {},
+      sending: false,
+      rules: {}
     }
   },
   watch: {
@@ -147,7 +158,12 @@ export default {
           return
         }
       }
-      this.$emit('onSave')
+      const _this = this
+      _this.$refs.smtpOptionsForm.validate(valid => {
+        if (valid) {
+          this.$emit('onSave')
+        }
+      })
     },
     handleTestMailClick() {
       if (!this.mailParam.to) {
@@ -171,9 +187,17 @@ export default {
         })
         return
       }
-      mailApi.testMail(this.mailParam).then(response => {
-        this.$message.info(response.data.message)
-      })
+      this.sending = true
+      mailApi
+        .testMail(this.mailParam)
+        .then(response => {
+          this.$message.info(response.data.message)
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.sending = false
+          }, 400)
+        })
     }
   }
 }

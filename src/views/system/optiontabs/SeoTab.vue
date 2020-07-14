@@ -1,32 +1,45 @@
 <template>
   <div>
-    <a-form
+    <a-form-model
+      ref="seoOptionsForm"
+      :model="options"
+      :rules="rules"
       layout="vertical"
       :wrapperCol="wrapperCol"
     >
-      <a-form-item label="屏蔽搜索引擎：">
+      <a-form-model-item
+        label="屏蔽搜索引擎："
+        prop="seo_spider_disabled"
+      >
         <a-switch v-model="options.seo_spider_disabled" />
-      </a-form-item>
-      <a-form-item label="关键词：">
+      </a-form-model-item>
+      <a-form-model-item
+        label="关键词："
+        prop="seo_keywords"
+      >
         <a-input
           v-model="options.seo_keywords"
           placeholder="多个关键词以英文状态下的逗号隔开"
         />
-      </a-form-item>
-      <a-form-item label="博客描述：">
+      </a-form-model-item>
+      <a-form-model-item
+        label="博客描述："
+        prop="seo_description"
+      >
         <a-input
           type="textarea"
           :autoSize="{ minRows: 5 }"
           v-model="options.seo_description"
         />
-      </a-form-item>
-      <a-form-item>
+      </a-form-model-item>
+      <a-form-model-item>
         <a-button
           type="primary"
           @click="handleSaveOptions"
+          :loading="saving"
         >保存</a-button>
-      </a-form-item>
-    </a-form>
+      </a-form-model-item>
+    </a-form-model>
   </div>
 </template>
 <script>
@@ -36,6 +49,10 @@ export default {
     options: {
       type: Object,
       required: true
+    },
+    saving: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -45,6 +62,10 @@ export default {
         lg: { span: 8 },
         sm: { span: 12 },
         xs: { span: 24 }
+      },
+      rules: {
+        seo_keywords: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }],
+        seo_description: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }]
       }
     }
   },
@@ -55,7 +76,12 @@ export default {
   },
   methods: {
     handleSaveOptions() {
-      this.$emit('onSave')
+      const _this = this
+      _this.$refs.seoOptionsForm.validate(valid => {
+        if (valid) {
+          this.$emit('onSave')
+        }
+      })
     }
   }
 }

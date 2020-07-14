@@ -368,7 +368,7 @@ export default {
               .finally(() => {
                 setTimeout(() => {
                   _this.form.saving = false
-                }, 200)
+                }, 400)
                 _this.handleListCategories()
               })
           } else {
@@ -381,7 +381,7 @@ export default {
               .finally(() => {
                 setTimeout(() => {
                   _this.form.saving = false
-                }, 200)
+                }, 400)
                 _this.handleListCategories()
               })
           }

@@ -34,7 +34,7 @@ export default {
     this.loadFormOptions()
   },
   methods: {
-    ...mapActions(['loadOptions']),
+    ...mapActions(['refreshOptionsCache']),
     loadFormOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
@@ -43,7 +43,7 @@ export default {
     handleSaveOptions() {
       optionApi.save(this.options).then(response => {
         this.loadFormOptions()
-        this.loadOptions()
+        this.refreshOptionsCache()
         this.$message.success('保存成功！')
         if (!this.options.developer_mode) {
           this.$router.push({ name: 'ToolList' })

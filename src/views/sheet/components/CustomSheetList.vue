@@ -314,6 +314,7 @@
         showSizeChanger
         @showSizeChange="handlePaginationChange"
         @change="handlePaginationChange"
+        showLessItems
       />
     </div>
     <SheetSettingDrawer

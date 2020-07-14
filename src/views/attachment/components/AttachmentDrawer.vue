@@ -7,6 +7,7 @@
       :visible="visible"
       destroyOnClose
       @close="onClose"
+      :afterVisibleChange="handleAfterVisibleChanged"
     >
       <a-row
         type="flex"
@@ -52,6 +53,7 @@
           :total="pagination.total"
           :defaultPageSize="pagination.size"
           @change="handlePaginationChange"
+          showLessItems
         ></a-pagination>
       </div>
 
@@ -59,7 +61,7 @@
         v-model="detailVisible"
         v-if="selectedAttachment"
         :attachment="selectedAttachment"
-        @delete="loadAttachments"
+        @delete="handleListAttachments"
       />
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
@@ -139,13 +141,6 @@ export default {
       })
     }
   },
-  watch: {
-    visible(value) {
-      if (value) {
-        this.loadAttachments()
-      }
-    }
-  },
   methods: {
     handleShowDetailDrawer(attachment) {
       this.selectedAttachment = attachment
@@ -193,7 +188,7 @@ export default {
       })
       return false
     },
-    loadAttachments() {
+    handleListAttachments() {
       this.loading = true
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
@@ -216,11 +211,16 @@ export default {
     handlePaginationChange(page, pageSize) {
       this.pagination.page = page
       this.pagination.size = pageSize
-      this.loadAttachments()
+      this.handleListAttachments()
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
       this.handlePaginationChange(1, this.pagination.size)
+    },
+    handleAfterVisibleChanged(visible) {
+      if (visible) {
+        this.handleListAttachments()
+      }
     },
     handleJudgeMediaType(attachment) {
       var mediaType = attachment.mediaType

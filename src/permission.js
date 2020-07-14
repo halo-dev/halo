@@ -21,7 +21,7 @@ router.beforeEach((to, from, next) => {
     // TODO Get installation status
 
     if (!store.getters.options) {
-      store.dispatch('loadOptions').then()
+      store.dispatch('refreshOptionsCache').then()
     }
 
     next()

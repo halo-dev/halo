@@ -170,6 +170,7 @@
         showSizeChanger
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
+        showLessItems
       />
     </div>
     <a-modal

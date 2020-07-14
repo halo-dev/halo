@@ -26,7 +26,7 @@ const user = {
     }
   },
   actions: {
-    loadUser({
+    refreshUserCache({
       commit
     }) {
       return new Promise((resolve, reject) => {

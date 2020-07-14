@@ -26,7 +26,7 @@ const option = {
     }
   },
   actions: {
-    loadOptions({
+    refreshOptionsCache({
       commit
     }) {
       return new Promise((resolve, reject) => {

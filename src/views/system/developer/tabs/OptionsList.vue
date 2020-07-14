@@ -127,6 +127,7 @@
             showSizeChanger
             @showSizeChange="handlePaginationChange"
             @change="handlePaginationChange"
+            showLessItems
           />
         </div>
       </div>
@@ -245,7 +246,7 @@ export default {
     this.hanldeListOptions()
   },
   methods: {
-    ...mapActions(['loadOptions']),
+    ...mapActions(['refreshOptionsCache']),
     hanldeListOptions() {
       this.loading = true
       this.queryParam.page = this.pagination.page - 1
@@ -274,7 +275,7 @@ export default {
         })
         .finally(() => {
           this.hanldeListOptions()
-          this.loadOptions()
+          this.refreshOptionsCache()
         })
     },
     handleEditOption(option) {
@@ -321,7 +322,7 @@ export default {
           })
           .finally(() => {
             this.hanldeListOptions()
-            this.loadOptions()
+            this.refreshOptionsCache()
           })
       } else {
         this.optionToStage.type = this.optionType.CUSTOM.value
@@ -334,7 +335,7 @@ export default {
           })
           .finally(() => {
             this.hanldeListOptions()
-            this.loadOptions()
+            this.refreshOptionsCache()
           })
       }
     }

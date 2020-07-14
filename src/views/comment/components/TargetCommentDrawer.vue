@@ -6,6 +6,7 @@
     :visible="visible"
     destroyOnClose
     @close="onClose"
+    :afterVisibleChange="handleAfterVisibleChanged"
   >
     <a-row
       type="flex"
@@ -49,6 +50,7 @@
         :total="pagination.total"
         :defaultPageSize="pagination.size"
         @change="handlePaginationChange"
+        showLessItems
       ></a-pagination>
     </div>
     <a-divider class="divider-transparent" />
@@ -168,15 +170,6 @@ export default {
       default: 0
     }
   },
-  watch: {
-    visible(newValue, oldValue) {
-      this.$log.debug('old value', oldValue)
-      this.$log.debug('new value', newValue)
-      if (newValue) {
-        this.handleListComments()
-      }
-    }
-  },
   methods: {
     handleListComments() {
       this.loading = true
@@ -268,6 +261,11 @@ export default {
         sort: ''
       }
       this.$emit('close', false)
+    },
+    handleAfterVisibleChanged(visible) {
+      if (visible) {
+        this.handleListComments()
+      }
     }
   }
 }

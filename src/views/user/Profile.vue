@@ -10,41 +10,50 @@
           :bordered="false"
           :bodyStyle="{ padding: '16px' }"
         >
-          <div class="profile-center-avatarHolder">
+          <div class="text-center mb-6">
             <a-tooltip
               placement="right"
               :trigger="['hover']"
               title="点击可修改头像"
             >
-              <template slot="title">
-                <span>prompt text</span>
-              </template>
-              <div class="avatar">
-                <img
-                  :src="user.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
-                  @click="attachmentDrawerVisible = true"
-                >
-              </div>
+              <a-avatar
+                :size="104"
+                :src="user.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
+                @click="attachmentDrawerVisible = true"
+                class="cursor-pointer"
+              />
             </a-tooltip>
-            <div class="username">{{ user.nickname }}</div>
-            <div class="bio">{{ user.description }}</div>
+            <div
+              class="text-xl leading-5 font-medium mt-4 mb-1"
+              style="color: rgba(0, 0, 0, 0.85);"
+            >{{ user.nickname }}</div>
+            <div>{{ user.description }}</div>
           </div>
-          <div class="profile-center-detail">
-            <p>
-              <a-icon type="link" /><a
+          <div>
+            <p class="mb-3">
+              <a-icon
+                type="link"
+                class="mr-3"
+              /><a
                 :href="options.blog_url"
                 target="method"
               >{{ options.blog_url }}</a>
             </p>
-            <p>
-              <a-icon type="mail" />{{ user.email }}
+            <p class="mb-3">
+              <a-icon
+                type="mail"
+                class="mr-3"
+              />{{ user.email }}
             </p>
-            <p>
-              <a-icon type="calendar" />{{ statistics.establishDays || 0 }} 天
+            <p class="mb-3">
+              <a-icon
+                type="calendar"
+                class="mr-3"
+              />{{ statistics.establishDays || 0 }} 天
             </p>
           </div>
           <a-divider />
-          <div class="general-profile">
+          <div>
             <a-list
               :loading="statisticsLoading"
               itemLayout="horizontal"
@@ -456,49 +465,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less" scoped>
-.profile-center-avatarHolder {
-  text-align: center;
-  margin-bottom: 24px;
-
-  & > .avatar {
-    margin: 0 auto;
-    width: 104px;
-    height: 104px;
-    margin-bottom: 20px;
-    border-radius: 50%;
-    overflow: hidden;
-    cursor: pointer;
-
-    img {
-      height: 100%;
-      width: 100%;
-    }
-  }
-
-  .username {
-    color: rgba(0, 0, 0, 0.85);
-    font-size: 20px;
-    line-height: 28px;
-    font-weight: 500;
-    margin-bottom: 4px;
-  }
-}
-
-.profile-center-detail {
-  p {
-    margin-bottom: 8px;
-    padding-left: 26px;
-    position: relative;
-  }
-
-  i {
-    position: absolute;
-    height: 14px;
-    width: 14px;
-    left: 0;
-    top: 4px;
-  }
-}
-</style>

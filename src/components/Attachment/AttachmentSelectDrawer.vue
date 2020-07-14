@@ -7,6 +7,7 @@
       :visible="visible"
       destroyOnClose
       @close="onClose"
+      :afterVisibleChange="handleAfterVisibleChanged"
     >
       <a-row
         type="flex"
@@ -51,6 +52,7 @@
           :total="pagination.total"
           :defaultPageSize="pagination.size"
           @change="handlePaginationChange"
+          showLessItems
         ></a-pagination>
       </div>
       <a-divider class="divider-transparent" />
@@ -136,13 +138,6 @@ export default {
       uploadHandler: attachmentApi.upload
     }
   },
-  watch: {
-    visible: function(newValue, oldValue) {
-      if (newValue) {
-        this.handleListAttachments()
-      }
-    }
-  },
   methods: {
     handleShowUploadModal() {
       this.uploadVisible = true
@@ -181,6 +176,11 @@ export default {
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
       this.handlePaginationChange(1, this.pagination.size)
+    },
+    handleAfterVisibleChanged(visible) {
+      if (visible) {
+        this.handleListAttachments()
+      }
     },
     handleJudgeMediaType(attachment) {
       var mediaType = attachment.mediaType

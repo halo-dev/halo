@@ -186,7 +186,7 @@ export default {
             .finally(() => {
               setTimeout(() => {
                 this.draftSaving = false
-              }, 200)
+              }, 400)
             })
         } else {
           sheetApi
@@ -199,7 +199,7 @@ export default {
             .finally(() => {
               setTimeout(() => {
                 this.draftSaving = false
-              }, 200)
+              }, 400)
             })
         }
       } else {
@@ -234,7 +234,7 @@ export default {
             .finally(() => {
               setTimeout(() => {
                 this.previewSaving = false
-              }, 200)
+              }, 400)
             })
         })
       } else {
@@ -249,7 +249,7 @@ export default {
             .finally(() => {
               setTimeout(() => {
                 this.previewSaving = false
-              }, 200)
+              }, 400)
             })
         })
       }

@@ -192,7 +192,7 @@ export default {
         .finally(() => {
           setTimeout(() => {
             this.saving = false
-          }, 200)
+          }, 400)
         })
     }
   }

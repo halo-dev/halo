@@ -7,6 +7,7 @@
     destroyOnClose
     @close="onClose"
     :visible="visible"
+    :afterVisibleChange="handleAfterVisibleChanged"
   >
     <a-row
       :gutter="12"
@@ -56,11 +57,13 @@
         style="padding-bottom: 50px;"
       >
         <a-spin :spinning="settingLoading">
-          <div class="card-container">
+          <div
+            class="card-container"
+            v-if="themeConfigurations.length>0"
+          >
             <a-tabs
               type="card"
               defaultActiveKey="0"
-              v-if="themeConfigurations.length>0"
             >
               <a-tab-pane
                 v-for="(group, index) in themeConfigurations"
@@ -159,12 +162,11 @@
                 </a-form>
               </a-tab-pane>
             </a-tabs>
-            <a-alert
-              message="当前主题暂无设置选项"
-              banner
-              v-if="themeConfigurations.length <=0 && !settingLoading"
-            />
           </div>
+          <a-empty
+            v-if="themeConfigurations.length <=0 && !settingLoading"
+            description="当前主题暂无设置选项"
+          />
         </a-spin>
       </a-col>
 
@@ -245,7 +247,7 @@ export default {
       attachmentDrawerVisible: false,
       themeConfigurations: [],
       themeSettings: [],
-      settingLoading: false,
+      settingLoading: true,
       selectedField: '',
       wrapperCol: {
         xl: { span: 12 },
@@ -273,13 +275,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    }
-  },
-  watch: {
-    visible(value) {
-      if (value) {
-        this.handleFetchConfiguration()
-      }
     }
   },
   computed: {
@@ -324,7 +319,7 @@ export default {
         .finally(() => {
           setTimeout(() => {
             this.saving = false
-          }, 200)
+          }, 400)
         })
     },
     onClose() {
@@ -338,6 +333,15 @@ export default {
       this.$set(this.themeSettings, this.selectedField, encodeURI(data.path))
       // this.themeSettings[this.selectedField] = encodeURI(data.path)
       this.attachmentDrawerVisible = false
+    },
+    handleAfterVisibleChanged(visible) {
+      if (visible) {
+        this.handleFetchConfiguration()
+      } else {
+        this.themeConfigurations = []
+        this.themeSettings = []
+        this.settingLoading = true
+      }
     },
     toggleViewMode() {
       this.viewMode = !this.viewMode

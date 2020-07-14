@@ -478,6 +478,7 @@
             showSizeChanger
             @showSizeChange="handlePaginationChange"
             @change="handlePaginationChange"
+            showLessItems
           />
         </div>
       </div>
@@ -719,6 +720,7 @@ export default {
       this.queryParam.status = null
       this.handleClearRowKeys()
       this.handlePaginationChange(1, this.pagination.size)
+      this.handleListCategories()
     },
     handleQuery() {
       this.handleClearRowKeys()

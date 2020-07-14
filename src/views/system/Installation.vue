@@ -317,7 +317,7 @@ export default {
         .finally(() => {
           setTimeout(() => {
             this.installing = false
-          }, 200)
+          }, 400)
         })
     },
     handleInstall() {

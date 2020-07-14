@@ -345,7 +345,7 @@ export default {
               .finally(() => {
                 setTimeout(() => {
                   _this.form.saving = false
-                }, 200)
+                }, 400)
                 _this.handleListMenus()
                 _this.handleListTeams()
               })
@@ -359,7 +359,7 @@ export default {
               .finally(() => {
                 setTimeout(() => {
                   _this.form.saving = false
-                }, 200)
+                }, 400)
                 _this.handleListMenus()
                 _this.handleListTeams()
               })

@@ -7,6 +7,7 @@
     destroyOnClose
     @close="onClose"
     :visible="visible"
+    :afterVisibleChange="handleAfterVisibleChanged"
   >
     <div class="post-setting-drawer-content">
       <div class="mb-4">
@@ -384,13 +385,6 @@ export default {
     },
     selectedMetas(val) {
       this.$emit('onRefreshPostMetas', val)
-    },
-    visible: function(newValue, oldValue) {
-      if (newValue) {
-        this.handleListCategories()
-        this.handleListPresetMetasField()
-        this.handleListCustomTpls()
-      }
     }
   },
   computed: {
@@ -409,6 +403,13 @@ export default {
     ...mapGetters(['options'])
   },
   methods: {
+    handleAfterVisibleChanged(visible) {
+      if (visible) {
+        this.handleListCategories()
+        this.handleListPresetMetasField()
+        this.handleListCustomTpls()
+      }
+    },
     handleListCategories() {
       categoryApi.listAll().then(response => {
         this.categories = response.data.data
@@ -506,7 +507,7 @@ export default {
             setTimeout(() => {
               this.saving = false
               this.draftSaving = false
-            }, 200)
+            }, 400)
           })
       } else {
         // Create the post
@@ -529,7 +530,7 @@ export default {
             setTimeout(() => {
               this.saving = false
               this.draftSaving = false
-            }, 200)
+            }, 400)
           })
       }
     },

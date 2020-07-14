@@ -337,7 +337,7 @@ export default {
     this.handleListOptions()
   },
   methods: {
-    ...mapActions(['loadOptions']),
+    ...mapActions(['refreshOptionsCache']),
     handleListLinks() {
       this.table.loading = true
       linkApi
@@ -392,7 +392,7 @@ export default {
               .finally(() => {
                 setTimeout(() => {
                   _this.form.saving = false
-                }, 200)
+                }, 400)
                 _this.handleListLinks()
                 _this.handleListLinkTeams()
               })
@@ -406,7 +406,7 @@ export default {
               .finally(() => {
                 setTimeout(() => {
                   _this.form.saving = false
-                }, 200)
+                }, 400)
                 _this.handleListLinks()
                 _this.handleListLinkTeams()
               })
@@ -423,7 +423,7 @@ export default {
         })
         .finally(() => {
           this.handleListOptions()
-          this.loadOptions()
+          this.refreshOptionsCache()
         })
     }
   }

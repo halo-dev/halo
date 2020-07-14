@@ -7,6 +7,7 @@
       :visible="visible"
       destroyOnClose
       @close="onClose"
+      :afterVisibleChange="handleAfterVisibleChanged"
     >
       <a-row
         type="flex"
@@ -42,6 +43,7 @@
               showSizeChanger
               @showSizeChange="handlePaginationChange"
               @change="handlePaginationChange"
+              showLessItems
             />
           </div>
         </a-col>
@@ -100,13 +102,6 @@ export default {
       })
     }
   },
-  watch: {
-    visible(value) {
-      if (value) {
-        this.handleListLogs()
-      }
-    }
-  },
   methods: {
     handleListLogs() {
       this.loading = true
@@ -143,6 +138,11 @@ export default {
     },
     onClose() {
       this.$emit('close', false)
+    },
+    handleAfterVisibleChanged(visible) {
+      if (visible) {
+        this.handleListLogs()
+      }
     }
   }
 }

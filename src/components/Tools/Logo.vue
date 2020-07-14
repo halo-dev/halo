@@ -30,12 +30,12 @@ export default {
     ...mapGetters(['options'])
   },
   methods: {
-    ...mapActions(['loadOptions']),
+    ...mapActions(['refreshOptionsCache']),
     onLogoClick() {
       this.clickCount++
       if (this.clickCount === 10) {
         optionApi.save(this.optionsToCreate).then(response => {
-          this.loadOptions()
+          this.refreshOptionsCache()
           this.$message.success(`开发者选项已启用！`)
           this.clickCount = 0
           this.$router.push({ name: 'ToolList' })

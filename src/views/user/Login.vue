@@ -218,7 +218,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['login', 'loadUser', 'loadOptions']),
+    ...mapActions(['login', 'refreshUserCache', 'refreshOptionsCache']),
     ...mapMutations({
       setApiUrl: 'SET_API_URL',
       restoreApiUrl: 'RESTORE_API_URL'
@@ -277,13 +277,13 @@ export default {
         .finally(() => {
           setTimeout(() => {
             this.landing = false
-          }, 200)
+          }, 400)
         })
     },
     loginSuccess() {
       // Cache the user info
-      this.loadUser()
-      this.loadOptions()
+      this.refreshUserCache()
+      this.refreshOptionsCache()
       if (this.$route.query.redirect) {
         this.$router.replace(this.$route.query.redirect)
       } else {

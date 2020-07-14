@@ -196,7 +196,7 @@ export default {
             .finally(() => {
               setTimeout(() => {
                 this.draftSaving = false
-              }, 200)
+              }, 400)
             })
         } else {
           postApi
@@ -209,7 +209,7 @@ export default {
             .finally(() => {
               setTimeout(() => {
                 this.draftSaving = false
-              }, 200)
+              }, 400)
             })
         }
       } else {
@@ -246,7 +246,7 @@ export default {
             .finally(() => {
               setTimeout(() => {
                 this.previewSaving = false
-              }, 200)
+              }, 400)
             })
         })
       } else {
@@ -262,7 +262,7 @@ export default {
             .finally(() => {
               setTimeout(() => {
                 this.previewSaving = false
-              }, 200)
+              }, 400)
             })
         })
       }

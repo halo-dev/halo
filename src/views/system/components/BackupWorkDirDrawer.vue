@@ -6,6 +6,7 @@
     :visible="visible"
     destroyOnClose
     @close="onClose"
+    :afterVisibleChange="handleAfterVisibleChanged"
   >
     <a-row
       type="flex"
@@ -33,8 +34,8 @@
               type="link"
               style="color: red"
               icon="delete"
-              :loading="deleting"
-              @click="handleBackupDeleteClick(backup.filename)"
+              :loading="backup.deleting"
+              @click="handleBackupDeleteClick(backup)"
             >删除</a-button>
             <a-list-item-meta>
               <a
@@ -81,7 +82,6 @@ export default {
     return {
       backuping: false,
       loading: false,
-      deleting: false,
       backups: []
     }
   },
@@ -96,14 +96,12 @@ export default {
       default: true
     }
   },
-  watch: {
-    visible: function(newValue, oldValue) {
-      if (newValue) {
+  methods: {
+    handleAfterVisibleChanged(visible) {
+      if (visible) {
         this.handleListBackups()
       }
-    }
-  },
-  methods: {
+    },
     handleListBackups() {
       this.loading = true
       backupApi
@@ -127,21 +125,21 @@ export default {
         .finally(() => {
           setTimeout(() => {
             this.backuping = false
-          }, 200)
+          }, 400)
           this.handleListBackups()
         })
     },
-    handleBackupDeleteClick(filename) {
-      this.deleting = true
+    handleBackupDeleteClick(backup) {
+      backup.deleting = true
       backupApi
-        .deleteWorkDirBackup(filename)
+        .deleteWorkDirBackup(backup.filename)
         .then(response => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
           setTimeout(() => {
-            this.deleting = false
-          }, 200)
+            backup.deleting = false
+          }, 400)
           this.handleListBackups()
         })
     },

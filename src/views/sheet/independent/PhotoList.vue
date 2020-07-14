@@ -109,6 +109,7 @@
         showSizeChanger
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
+        showLessItems
       />
     </div>
     <div style="position: fixed;bottom: 30px;right: 30px;">
@@ -140,9 +141,9 @@
           <a-input v-model="options.photos_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
-          <a-input
-            type="number"
+          <a-input-number
             v-model="options.photos_page_size"
+            style="width:100%"
           />
         </a-form-item>
       </a-form>
@@ -353,7 +354,7 @@ export default {
     this.hanldeListOptions()
   },
   methods: {
-    ...mapActions(['loadOptions']),
+    ...mapActions(['refreshOptionsCache']),
     hanldeListPhotos() {
       this.listLoading = true
       this.queryParam.page = this.pagination.page - 1
@@ -463,7 +464,7 @@ export default {
         })
         .finally(() => {
           this.hanldeListOptions()
-          this.loadOptions()
+          this.refreshOptionsCache()
         })
     }
   }

@@ -421,7 +421,7 @@ export default {
         .finally(() => {
           setTimeout(() => {
             this.fetchButtonLoading = false
-          }, 200)
+          }, 400)
         })
     },
     handleBranchFetching() {

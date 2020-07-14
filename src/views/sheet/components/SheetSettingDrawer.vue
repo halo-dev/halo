@@ -7,6 +7,7 @@
     destroyOnClose
     @close="onClose"
     :visible="visible"
+    :afterVisibleChange="handleAfterVisibleChanged"
   >
     <div class="post-setting-drawer-content">
       <div class="mb-4">
@@ -264,12 +265,6 @@ export default {
     },
     selectedMetas(val) {
       this.$emit('onRefreshSheetMetas', val)
-    },
-    visible: function(newValue, oldValue) {
-      if (newValue) {
-        this.handleListCustomTpls()
-        this.handleListPresetMetasField()
-      }
     }
   },
   computed: {
@@ -286,6 +281,12 @@ export default {
     ...mapGetters(['options'])
   },
   methods: {
+    handleAfterVisibleChanged(visible) {
+      if (visible) {
+        this.handleListCustomTpls()
+        this.handleListPresetMetasField()
+      }
+    },
     handleListPresetMetasField() {
       if (this.metas.length <= 0) {
         themeApi.getActivatedTheme().then(response => {
@@ -359,7 +360,7 @@ export default {
             setTimeout(() => {
               this.saving = false
               this.draftSaving = false
-            }, 200)
+            }, 400)
           })
       } else {
         sheetApi
@@ -381,7 +382,7 @@ export default {
             setTimeout(() => {
               this.saving = false
               this.draftSaving = false
-            }, 200)
+            }, 400)
           })
       }
     },
