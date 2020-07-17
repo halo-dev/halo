@@ -17,6 +17,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
             <a-tab-pane key="seo">
@@ -28,6 +30,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
             <a-tab-pane key="post">
@@ -39,6 +43,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
             <a-tab-pane key="comment">
@@ -50,6 +56,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
             <a-tab-pane key="attachment">
@@ -61,6 +69,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
             <a-tab-pane key="smtp">
@@ -72,6 +82,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
             <a-tab-pane key="other">
@@ -83,6 +95,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
           </a-tabs>
@@ -101,6 +115,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
             <a-tab-pane key="api">
@@ -112,6 +128,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
             <a-tab-pane key="advanced-other">
@@ -123,6 +141,8 @@
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
+                :errored="errored"
+                @callback="errored=false"
               />
             </a-tab-pane>
           </a-tabs>
@@ -177,7 +197,8 @@ export default {
     return {
       options: {},
       advancedOptions: false,
-      saving: false
+      saving: false,
+      errored: false
     }
   },
   created() {
@@ -197,8 +218,8 @@ export default {
       this.saving = true
       optionApi
         .save(this.options)
-        .then(response => {
-          this.$message.success('保存成功！')
+        .catch(() => {
+          this.errored = true
         })
         .finally(() => {
           setTimeout(() => {

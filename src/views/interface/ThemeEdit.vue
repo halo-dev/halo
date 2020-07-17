@@ -55,12 +55,16 @@
               ></codemirror>
             </a-form-item>
             <a-form-item>
-              <a-button
-                type="primary"
+              <ReactiveButton
                 @click="handlerSaveContent"
-                :disabled="buttonDisabled"
+                @callback="saveErrored=false"
                 :loading="saving"
-              >保存</a-button>
+                :errored="saveErrored"
+                :disabled="buttonDisabled"
+                text="保存"
+                loadedText="保存成功"
+                erroredText="保存失败"
+              ></ReactiveButton>
             </a-form-item>
           </a-form>
         </a-card>
@@ -95,7 +99,8 @@ export default {
       themes: [],
       themesLoading: false,
       selectedTheme: {},
-      saving: false
+      saving: false,
+      saveErrored: false
     }
   },
   created() {
@@ -186,8 +191,8 @@ export default {
       this.saving = true
       themeApi
         .saveContent(this.selectedTheme.id, this.file.path, this.content)
-        .then(response => {
-          this.$message.success('保存成功！')
+        .catch(() => {
+          this.saveErrored = true
         })
         .finally(() => {
           setTimeout(() => {

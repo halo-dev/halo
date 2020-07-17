@@ -220,11 +220,16 @@
         @click="toggleViewMode"
         class="mr-2"
       >预览模式</a-button>
-      <a-button
+      <ReactiveButton
         type="primary"
         @click="handleSaveSettings"
+        @callback="saveErrored=false"
         :loading="saving"
-      >保存</a-button>
+        :errored="saveErrored"
+        text="保存"
+        loadedText="保存成功"
+        erroredText="保存失败"
+      ></ReactiveButton>
     </footer-tool-bar>
   </a-drawer>
 </template>
@@ -258,7 +263,8 @@ export default {
       viewMode: false,
       formColValue: 12,
       clientHeight: document.documentElement.clientHeight,
-      saving: false
+      saving: false,
+      saveErrored: false
     }
   },
   model: {
@@ -311,10 +317,12 @@ export default {
       themeApi
         .saveSettings(this.theme.id, this.themeSettings)
         .then(response => {
-          this.$message.success('保存成功！')
           if (this.viewMode) {
             document.getElementById('themeViewIframe').contentWindow.location.reload(true)
           }
+        })
+        .catch(() => {
+          this.saveErrored = true
         })
         .finally(() => {
           setTimeout(() => {

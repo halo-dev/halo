@@ -206,36 +206,7 @@
         :xs="24"
         class="mb-3"
       >
-        <a-card
-          :bordered="false"
-          :bodyStyle="{ padding: '16px' }"
-        >
-          <template slot="title">
-            速记
-            <a-tooltip
-              slot="action"
-              title="内容将保存到页面/所有页面/日志页面"
-            >
-              <a-icon type="info-circle-o" />
-            </a-tooltip>
-          </template>
-          <a-form layout="vertical">
-            <a-form-item>
-              <a-input
-                type="textarea"
-                :autoSize="{ minRows: 8 }"
-                v-model="journal.sourceContent"
-                placeholder="写点什么吧..."
-              />
-            </a-form-item>
-            <a-form-item>
-              <a-button
-                type="primary"
-                @click="handleCreateJournalClick"
-              >保存</a-button>
-            </a-form-item>
-          </a-form>
-        </a-card>
+        <JournalPublishCard />
       </a-col>
       <a-col
         :xl="8"
@@ -295,6 +266,7 @@
 <script>
 import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
+import JournalPublishCard from './components/JournalPublishCard'
 import RecentCommentTab from './components/RecentCommentTab'
 import LogListDrawer from './components/LogListDrawer'
 import countTo from 'vue-count-to'
@@ -302,12 +274,12 @@ import countTo from 'vue-count-to'
 import postApi from '@/api/post'
 import logApi from '@/api/log'
 import statisticsApi from '@/api/statistics'
-import journalApi from '@/api/journal'
 export default {
   name: 'Dashboard',
   components: {
     PageView,
     AnalysisCard,
+    JournalPublishCard,
     RecentCommentTab,
     countTo,
     LogListDrawer
@@ -402,22 +374,6 @@ export default {
             this.statisticsLoading = false
           }, 200)
         })
-    },
-    handleEditPostClick(post) {
-      this.$router.push({ name: 'PostEdit', query: { postId: post.id } })
-    },
-    handleCreateJournalClick() {
-      if (!this.journal.sourceContent) {
-        this.$notification['error']({
-          message: '提示',
-          description: '内容不能为空！'
-        })
-        return
-      }
-      journalApi.create(this.journal).then(response => {
-        this.$message.success('发表成功！')
-        this.journal = {}
-      })
     },
     handlePostPreview(postId) {
       postApi.preview(postId).then(response => {

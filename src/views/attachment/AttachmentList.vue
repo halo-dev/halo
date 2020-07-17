@@ -327,7 +327,7 @@ export default {
       this.$contextmenu({
         items: [
           {
-            label: '复制图片链接',
+            label: `${this.handleJudgeMediaType(item) ? '复制图片链接' : '复制文件链接'}`,
             onClick: () => {
               const text = `${encodeURI(item.path)}`
               this.$copyText(text)
@@ -343,6 +343,7 @@ export default {
             divided: true
           },
           {
+            disabled: !this.handleJudgeMediaType(item),
             label: '复制 Markdown 格式链接',
             onClick: () => {
               const text = `![${item.name}](${encodeURI(item.path)})`

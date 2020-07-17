@@ -14,7 +14,7 @@
         align="middle"
       >
         <a-input-search
-          placeholder="搜索附件"
+          placeholder="搜索"
           v-model="queryParam.keyword"
           @search="handleQuery()"
           enterButton

@@ -22,7 +22,7 @@
             </a-form-item>
             <a-form-item
               label="页面别名："
-              :help="options.blog_url+'/'+options.sheet_prefix+'/'+ (selectedSheet.slug ? selectedSheet.slug : '{slug}')+(options.path_suffix?options.path_suffix:'')"
+              :help="fullPath"
             >
               <a-input v-model="selectedSheet.slug" />
             </a-form-item>
@@ -197,17 +197,27 @@
         type="dashed"
         @click="advancedVisible = true"
       >高级</a-button>
-      <a-button
+      <ReactiveButton
+        type="danger"
         v-if="saveDraftButton"
         class="mr-2"
         @click="handleDraftClick"
+        @callback="handleSavedCallback"
         :loading="draftSaving"
-      >保存草稿</a-button>
-      <a-button
-        type="primary"
+        :errored="draftSavedErrored"
+        text="保存草稿"
+        loadedText="保存成功"
+        erroredText="保存失败"
+      ></ReactiveButton>
+      <ReactiveButton
         @click="handlePublishClick"
+        @callback="handleSavedCallback"
         :loading="saving"
-      >{{ selectedSheet.id?'保存':'发布' }}</a-button>
+        :errored="savedErrored"
+        :text="`${selectedSheet.id?'保存':'发布'}`"
+        :loadedText="`${selectedSheet.id?'保存':'发布'}成功`"
+        :erroredText="`${selectedSheet.id?'保存':'发布'}失败`"
+      ></ReactiveButton>
     </div>
   </a-drawer>
 </template>
@@ -228,7 +238,9 @@ export default {
       selectedSheet: this.sheet,
       customTpls: [],
       saving: false,
-      draftSaving: false
+      savedErrored: false,
+      draftSaving: false,
+      draftSavedErrored: false
     }
   },
   props: {
@@ -268,6 +280,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['options']),
     selectedMetas() {
       return this.metas
     },
@@ -278,7 +291,12 @@ export default {
       }
       return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
     },
-    ...mapGetters(['options'])
+    fullPath() {
+      const blogUrl = this.options.blog_url
+      const sheetPrefix = this.options.sheet_prefix
+      const pathSuffix = this.options.path_suffix ? this.options.path_suffix : ''
+      return `${blogUrl}/${sheetPrefix}/${this.selectedSheet.slug ? this.selectedSheet.slug : '{slug}'}${pathSuffix}`
+    }
   },
   methods: {
     handleAfterVisibleChanged(visible) {
@@ -344,17 +362,12 @@ export default {
       if (this.selectedSheet.id) {
         sheetApi
           .update(this.selectedSheet.id, this.selectedSheet, false)
-          .then(response => {
-            this.$log.debug('Updated sheet', response.data.data)
-
+          .catch(() => {
             if (this.selectedSheet.status === 'DRAFT') {
-              this.$message.success('草稿保存成功！')
+              this.draftSavedErrored = true
             } else {
-              this.$message.success('页面更新成功！')
+              this.savedErrored = true
             }
-
-            this.$emit('onSaved', true)
-            this.$router.push({ name: 'SheetList', query: { activeKey: 'custom' } })
           })
           .finally(() => {
             setTimeout(() => {
@@ -365,17 +378,14 @@ export default {
       } else {
         sheetApi
           .create(this.selectedSheet, false)
-          .then(response => {
-            this.$log.debug('Created sheet', response.data.data)
-
+          .catch(() => {
             if (this.selectedSheet.status === 'DRAFT') {
-              this.$message.success('草稿保存成功！')
+              this.draftSavedErrored = true
             } else {
-              this.$message.success('页面发布成功！')
+              this.savedErrored = true
             }
-
-            this.$emit('onSaved', true)
-            this.$router.push({ name: 'SheetList', query: { activeKey: 'custom' } })
+          })
+          .then(response => {
             this.selectedSheet = response.data.data
           })
           .finally(() => {
@@ -384,6 +394,15 @@ export default {
               this.draftSaving = false
             }, 400)
           })
+      }
+    },
+    handleSavedCallback() {
+      if (this.draftSavedErrored || this.savedErrored) {
+        this.draftSavedErrored = false
+        this.savedErrored = false
+      } else {
+        this.$emit('onSaved', true)
+        this.$router.push({ name: 'SheetList', query: { activeKey: 'custom' } })
       }
     },
     onClose() {

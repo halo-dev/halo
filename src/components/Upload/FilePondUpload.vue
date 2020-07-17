@@ -7,9 +7,9 @@
       :allow-multiple="multiple"
       :allowRevert="false"
       :accepted-file-types="accept"
-      :maxParallelUploads="loadOptions?options.attachment_upload_max_parallel_uploads:1"
-      :allowImagePreview="loadOptions?options.attachment_upload_image_preview_enable:false"
-      :maxFiles="loadOptions?options.attachment_upload_max_files:1"
+      :maxParallelUploads="maxParallelUploads"
+      :allowImagePreview="allowImagePreview"
+      :maxFiles="maxFiles"
       labelFileProcessing="上传中"
       labelFileProcessingComplete="上传完成"
       labelFileProcessingAborted="取消上传"
@@ -77,6 +77,27 @@ export default {
       default: true
     }
   },
+  computed: {
+    ...mapGetters(['options']),
+    maxParallelUploads() {
+      if (this.options && this.options.length > 0) {
+        return this.options.attachment_upload_max_parallel_uploads
+      }
+      return 1
+    },
+    allowImagePreview() {
+      if (this.options && this.options.length > 0) {
+        return this.options.attachment_upload_image_preview_enable
+      }
+      return false
+    },
+    maxFiles() {
+      if (this.options && this.options.length > 0) {
+        return this.options.attachment_upload_max_files
+      }
+      return 1
+    }
+  },
   data: function() {
     return {
       server: {
@@ -119,9 +140,6 @@ export default {
       },
       fileList: []
     }
-  },
-  computed: {
-    ...mapGetters(['options'])
   },
   methods: {
     handleFilePondInit() {

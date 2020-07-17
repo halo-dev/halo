@@ -56,13 +56,18 @@
     </a-row>
     <a-divider class="divider-transparent" />
     <div class="bottom-control">
-      <a-button
+      <ReactiveButton
         type="primary"
-        icon="download"
         class="mr-2"
-        :loading="backuping"
+        icon="download"
         @click="handleBackupClick"
-      >备份</a-button>
+        @callback="handleBackupedCallback"
+        :loading="backuping"
+        :errored="backupErrored"
+        text="备份"
+        loadedText="备份成功"
+        erroredText="备份失败"
+      ></ReactiveButton>
       <a-button
         type="dashed"
         icon="reload"
@@ -82,6 +87,7 @@ export default {
     return {
       backuping: false,
       loading: false,
+      backupErrored: false,
       backups: []
     }
   },
@@ -119,29 +125,30 @@ export default {
       this.backuping = true
       backupApi
         .backupWorkDir()
-        .then(response => {
-          this.$message.success('备份成功！')
+        .catch(() => {
+          this.backupErrored = true
         })
         .finally(() => {
           setTimeout(() => {
             this.backuping = false
           }, 400)
-          this.handleListBackups()
         })
+    },
+    handleBackupedCallback() {
+      if (this.backupErrored) {
+        this.backupErrored = false
+      } else {
+        this.handleListBackups()
+      }
     },
     handleBackupDeleteClick(backup) {
       backup.deleting = true
-      backupApi
-        .deleteWorkDirBackup(backup.filename)
-        .then(response => {
-          this.$message.success('删除成功！')
-        })
-        .finally(() => {
-          setTimeout(() => {
-            backup.deleting = false
-          }, 400)
-          this.handleListBackups()
-        })
+      backupApi.deleteWorkDirBackup(backup.filename).finally(() => {
+        setTimeout(() => {
+          backup.deleting = false
+        }, 400)
+        this.handleListBackups()
+      })
     },
     onClose() {
       this.$emit('close', false)

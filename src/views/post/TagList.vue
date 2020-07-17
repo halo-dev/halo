@@ -49,18 +49,28 @@
               </a-input>
             </a-form-model-item>
             <a-form-model-item>
-              <a-button
+              <ReactiveButton
+                v-if="!isUpdateMode"
                 type="primary"
                 @click="handleCreateOrUpdateTag"
-                v-if="!isUpdateMode"
+                @callback="handleSavedCallback"
                 :loading="form.saving"
-              >保存</a-button>
+                :errored="form.errored"
+                text="保存"
+                loadedText="保存成功"
+                erroredText="保存失败"
+              ></ReactiveButton>
               <a-button-group v-else>
-                <a-button
+                <ReactiveButton
                   type="primary"
                   @click="handleCreateOrUpdateTag"
+                  @callback="handleSavedCallback"
                   :loading="form.saving"
-                >更新</a-button>
+                  :errored="form.errored"
+                  text="更新"
+                  loadedText="更新成功"
+                  erroredText="更新失败"
+                ></ReactiveButton>
                 <a-button
                   type="dashed"
                   @click="form.model = {}"
@@ -137,6 +147,7 @@ export default {
       form: {
         model: {},
         saving: false,
+        errored: false,
         rules: {
           name: [
             { required: true, message: '* 标签名称不能为空', trigger: ['change', 'blur'] },
@@ -180,15 +191,10 @@ export default {
         })
     },
     handleDeleteTag(tagId) {
-      tagApi
-        .delete(tagId)
-        .then(response => {
-          this.$message.success('删除成功！')
-          this.form.model = {}
-        })
-        .finally(() => {
-          this.handleListTags()
-        })
+      tagApi.delete(tagId).finally(() => {
+        this.form.model = {}
+        this.handleListTags()
+      })
     },
     handleCreateOrUpdateTag() {
       const _this = this
@@ -198,32 +204,37 @@ export default {
           if (_this.isUpdateMode) {
             tagApi
               .update(_this.form.model.id, _this.form.model)
-              .then(response => {
-                _this.$message.success('更新成功！')
-                _this.form.model = {}
+              .catch(() => {
+                this.form.errored = true
               })
               .finally(() => {
                 setTimeout(() => {
                   _this.form.saving = false
                 }, 400)
-                _this.handleListTags()
               })
           } else {
             tagApi
               .create(_this.form.model)
-              .then(response => {
-                _this.$message.success('保存成功！')
-                _this.form.model = {}
+              .catch(() => {
+                this.form.errored = true
               })
               .finally(() => {
                 setTimeout(() => {
                   _this.form.saving = false
                 }, 400)
-                _this.handleListTags()
               })
           }
         }
       })
+    },
+    handleSavedCallback() {
+      const _this = this
+      if (_this.form.errored) {
+        _this.form.errored = false
+      } else {
+        _this.form.model = {}
+        _this.handleListTags()
+      }
     },
     handleSelectThumbnail(data) {
       this.$set(this.form.model, 'thumbnail', encodeURI(data.path))

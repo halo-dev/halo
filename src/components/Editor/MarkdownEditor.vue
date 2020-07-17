@@ -51,7 +51,6 @@ export default {
         var responseObject = response.data
         var HaloEditor = this.$refs.md
         HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
-        this.$message.success('图片上传成功！')
       })
     },
     handleSaveDraft() {

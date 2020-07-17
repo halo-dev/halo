@@ -402,23 +402,31 @@
       destroyOnClose
     >
       <template slot="footer">
-        <a-button
-          key="submit"
+        <ReactiveButton
           type="primary"
           @click="handleCreateClick"
-        >
-          回复
-        </a-button>
+          @callback="handleRepliedCallback"
+          :loading="replying"
+          :errored="replyErrored"
+          text="回复"
+          loadedText="回复成功"
+          erroredText="回复失败"
+        ></ReactiveButton>
       </template>
-      <a-form layout="vertical">
-        <a-form-item>
+      <a-form-model
+        ref="replyCommentForm"
+        :model="replyComment"
+        :rules="replyCommentRules"
+        layout="vertical"
+      >
+        <a-form-model-item prop="content">
           <a-input
             type="textarea"
             :autoSize="{ minRows: 8 }"
             v-model.trim="replyComment.content"
           />
-        </a-form-item>
-      </a-form>
+        </a-form-model-item>
+      </a-form-model>
     </a-modal>
     <!-- <CommentDetail
       v-model="commentDetailVisible"
@@ -551,9 +559,14 @@ export default {
       comments: [],
       selectedComment: {},
       replyComment: {},
+      replyCommentRules: {
+        content: [{ required: true, message: '* 内容不能为空', trigger: ['change', 'blur'] }]
+      },
       loading: false,
       commentStatus: commentApi.commentStatus,
-      commentDetailVisible: false
+      commentDetailVisible: false,
+      replying: false,
+      replyErrored: false
     }
   },
   created() {
@@ -625,24 +638,32 @@ export default {
       }
     },
     handleCreateClick() {
-      if (!this.replyComment.content) {
-        this.$notification['error']({
-          message: '提示',
-          description: '评论内容不能为空！'
-        })
-        return
+      const _this = this
+      _this.$refs.replyCommentForm.validate(valid => {
+        if (valid) {
+          _this.replying = true
+          commentApi
+            .create(_this.type, _this.replyComment)
+            .catch(() => {
+              _this.replyErrored = true
+            })
+            .finally(() => {
+              setTimeout(() => {
+                _this.replying = false
+              }, 400)
+            })
+        }
+      })
+    },
+    handleRepliedCallback() {
+      if (this.replyErrored) {
+        this.replyErrored = false
+      } else {
+        this.replyComment = {}
+        this.selectedComment = {}
+        this.replyCommentVisible = false
+        this.handleListComments()
       }
-      commentApi
-        .create(this.type, this.replyComment)
-        .then(response => {
-          this.$message.success('回复成功！')
-          this.replyComment = {}
-          this.selectedComment = {}
-          this.replyCommentVisible = false
-        })
-        .finally(() => {
-          this.handleListComments()
-        })
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)

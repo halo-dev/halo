@@ -40,3 +40,7 @@ export function timeAgo(time) {
 export function isObject(value) {
   return value && typeof value === 'object' && value.constructor === Object
 }
+
+export function datetimeFormat(value, pattern = 'YYYY-MM-DD HH:mm') {
+  return moment(value).format(pattern)
+}

@@ -41,7 +41,7 @@
                 </div>
                 <div
                   v-else
-                  @click="handleActivateClick(item)"
+                  @click="handleActiveTheme(item)"
                 >
                   <a-icon
                     type="lock"
@@ -350,15 +350,10 @@ export default {
           }, 200)
         })
     },
-    activeTheme(themeId) {
-      themeApi
-        .active(themeId)
-        .then(response => {
-          this.$message.success('设置成功！')
-        })
-        .finally(() => {
-          this.handleListThemes()
-        })
+    handleActiveTheme(theme) {
+      themeApi.active(theme.id).finally(() => {
+        this.handleListThemes()
+      })
     },
     handleUpdateTheme(themeId) {
       const hide = this.$message.loading('更新中...', 0)
@@ -396,9 +391,6 @@ export default {
     },
     handleEditClick(theme) {
       this.settingDrawer(theme)
-    },
-    handleActivateClick(theme) {
-      this.activeTheme(theme.id)
     },
     handleFetching() {
       if (!this.fetchingUrl) {
@@ -447,14 +439,9 @@ export default {
         })
     },
     handleReload() {
-      themeApi
-        .reload()
-        .then(response => {
-          this.$message.success('刷新成功！')
-        })
-        .finally(() => {
-          this.handleListThemes()
-        })
+      themeApi.reload().finally(() => {
+        this.handleListThemes()
+      })
     },
     handleShowUpdateNewThemeModal(item) {
       this.prepareUpdateTheme = item

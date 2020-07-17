@@ -43,12 +43,17 @@
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
 
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
-      <a-button
+      <ReactiveButton
         type="danger"
         class="mr-2"
         @click="handleSaveDraft(false)"
+        @callback="draftSavederrored = false"
         :loading="draftSaving"
-      >保存草稿</a-button>
+        :errored="draftSavederrored"
+        text="保存草稿"
+        loadedText="保存成功"
+        erroredText="保存失败"
+      ></ReactiveButton>
       <a-button
         @click="handlePreview"
         class="mr-2"
@@ -98,7 +103,8 @@ export default {
       isSaved: false,
       contentChanges: 0,
       draftSaving: false,
-      previewSaving: false
+      previewSaving: false,
+      draftSavederrored: false
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -190,8 +196,8 @@ export default {
         if (draftOnly) {
           postApi
             .updateDraft(this.postToStage.id, this.postToStage.originalContent)
-            .then(response => {
-              this.$message.success('保存草稿成功！')
+            .catch(() => {
+              this.draftSavederrored = true
             })
             .finally(() => {
               setTimeout(() => {
@@ -201,9 +207,10 @@ export default {
         } else {
           postApi
             .update(this.postToStage.id, this.postToStage, false)
+            .catch(() => {
+              this.draftSavederrored = true
+            })
             .then(response => {
-              this.$log.debug('Updated post', response.data.data)
-              this.$message.success('保存草稿成功！')
               this.postToStage = response.data.data
             })
             .finally(() => {
@@ -216,15 +223,16 @@ export default {
         // Create the post
         postApi
           .create(this.postToStage, false)
+          .catch(() => {
+            this.draftSavederrored = true
+          })
           .then(response => {
-            this.$log.debug('Created post', response.data.data)
-            this.$message.success('保存草稿成功！')
             this.postToStage = response.data.data
           })
           .finally(() => {
             setTimeout(() => {
               this.draftSaving = false
-            }, 200)
+            }, 400)
           })
       }
     },

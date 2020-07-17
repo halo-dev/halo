@@ -38,12 +38,17 @@
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
-      <a-button
+      <ReactiveButton
         type="danger"
         class="mr-2"
         @click="handleSaveDraft(false)"
+        @callback="draftSavederrored = false"
         :loading="draftSaving"
-      >保存草稿</a-button>
+        :errored="draftSavederrored"
+        text="保存草稿"
+        loadedText="保存成功"
+        erroredText="保存失败"
+      ></ReactiveButton>
       <a-button
         @click="handlePreview"
         class="mr-2"
@@ -91,6 +96,7 @@ export default {
       isSaved: false,
       contentChanges: 0,
       draftSaving: false,
+      draftSavederrored: false,
       previewSaving: false
     }
   },
@@ -180,8 +186,8 @@ export default {
         if (draftOnly) {
           sheetApi
             .updateDraft(this.sheetToStage.id, this.sheetToStage.originalContent)
-            .then(response => {
-              this.$message.success('保存草稿成功！')
+            .catch(() => {
+              this.draftSavederrored = true
             })
             .finally(() => {
               setTimeout(() => {
@@ -191,9 +197,10 @@ export default {
         } else {
           sheetApi
             .update(this.sheetToStage.id, this.sheetToStage, false)
+            .catch(() => {
+              this.draftSavederrored = true
+            })
             .then(response => {
-              this.$log.debug('Updated sheet', response.data.data)
-              this.$message.success('保存草稿成功！')
               this.sheetToStage = response.data.data
             })
             .finally(() => {
@@ -205,15 +212,16 @@ export default {
       } else {
         sheetApi
           .create(this.sheetToStage, false)
+          .catch(() => {
+            this.draftSavederrored = true
+          })
           .then(response => {
-            this.$log.debug('Created sheet', response.data.data)
-            this.$message.success('保存草稿成功！')
             this.sheetToStage = response.data.data
           })
           .finally(() => {
             setTimeout(() => {
               this.draftSaving = false
-            }, 200)
+            }, 400)
           })
       }
     },
