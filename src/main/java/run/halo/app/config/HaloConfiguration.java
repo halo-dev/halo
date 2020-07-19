@@ -68,7 +68,7 @@ public class HaloConfiguration {
                 break;
 
         }
-        log.info("halo cache store load impl : [{}]", stringCacheStore.getClass());
+        log.info("Halo cache store load impl : [{}]", stringCacheStore.getClass());
         return stringCacheStore;
 
     }

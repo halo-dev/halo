@@ -37,7 +37,7 @@ spring:
     multipart:
       max-file-size: 10240MB
       max-request-size: 10240MB
-      location: ${java.io.tmpdir}
+      location: /tmp/run.halo.app
 management:
   endpoints:
     web:
