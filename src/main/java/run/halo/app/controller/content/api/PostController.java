@@ -83,6 +83,8 @@ public class PostController {
             postDetailVO.setOriginalContent(null);
         }
 
+        postService.publishVisitEvent(postDetailVO.getId());
+
         return postDetailVO;
     }
 

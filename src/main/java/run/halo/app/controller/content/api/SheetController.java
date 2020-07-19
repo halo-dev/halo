@@ -73,6 +73,8 @@ public class SheetController {
             sheetDetailVO.setOriginalContent(null);
         }
 
+        sheetService.publishVisitEvent(sheetDetailVO.getId());
+
         return sheetDetailVO;
     }
 
