@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -318,8 +319,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        // remove frontMatter
+        markdown = MarkdownUtils.removeFrontMatter(markdown);
 
         PostParam post = new PostParam();
+        post.setStatus(null);
 
         List<String> elementValue;
 
@@ -331,6 +335,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             for (String key : frontMatter.keySet()) {
                 elementValue = frontMatter.get(key);
                 for (String ele : elementValue) {
+                    ele = StrUtil.strip(ele, "[", "]");
+                    ele = StrUtil.strip(ele, "\"");
+                    if ("".equals(ele)) {
+                        continue;
+                    }
                     switch (key) {
                         case "title":
                             post.setTitle(ele);

@@ -27,6 +27,8 @@ import run.halo.app.model.support.HaloConst;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Markdown utils.
@@ -121,5 +123,22 @@ public class MarkdownUtils {
         Node document = PARSER.parse(markdown);
         visitor.visit(document);
         return visitor.getData();
+    }
+
+    private static final Pattern FRONT_MATTER = Pattern.compile("^---[\\s\\S]*?---");
+
+    /**
+     * remove front matter
+     *
+     * @param markdown markdown
+     * @return markdown
+     */
+    public static String removeFrontMatter(String markdown) {
+        markdown = markdown.trim();
+        Matcher matcher = FRONT_MATTER.matcher(markdown);
+        if (matcher.find()) {
+            return markdown.replace(matcher.group(), "");
+        }
+        return markdown;
     }
 }
