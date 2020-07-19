@@ -23,7 +23,7 @@ public class HaloConst {
     /**
      * Temporary directory.
      */
-    public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");
+    public final static String TEMP_DIR = "/tmp/run.halo.app";
 
     public final static String PROTOCOL_HTTPS = "https://";
 
