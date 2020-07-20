@@ -534,7 +534,7 @@ public class StaticPageServiceImpl implements StaticPageService {
      * Generate tags/{slug}/index.html and tags/{slug}/{page}/index.html.
      *
      * @param page     current page
-     * @param category current category
+     * @param tag      current tag
      * @throws IOException       IOException
      * @throws TemplateException TemplateException
      */
