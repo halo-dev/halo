@@ -65,16 +65,17 @@ public class PostController {
 
 
     /**
-     *  increase cache visits (HeHui)
+     * increase cache visits (HeHui)
+     *
      * @param data
      * @data 2020-07-21 19:18
      */
-    private void increaseVisits(List<Post> data){
+    private void increaseVisits(List<Post> data) {
         List<Integer> ids = data.stream().mapToInt(Post::getId).boxed().collect(Collectors.toList());
         Optional<Map<Integer, Long>> optional = read.getReads(ids);
-        if(optional.isPresent()){
+        if (optional.isPresent()) {
             Map<Integer, Long> readMap = optional.get();
-            data.forEach(v->{
+            data.forEach(v -> {
                 Long increase = readMap.getOrDefault(v.getId(), 0L);
                 v.setVisits((v.getVisits() == null ? 0 : v.getVisits()) + increase);
 
@@ -90,7 +91,7 @@ public class PostController {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
 
 
-        if(!postPage.isEmpty()){
+        if (!postPage.isEmpty()) {
             increaseVisits(postPage.getContent());
         }
 
@@ -114,7 +115,7 @@ public class PostController {
                                                           @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> posts = postService.pageBy(status, pageable);
 
-        if(!posts.isEmpty()){
+        if (!posts.isEmpty()) {
             increaseVisits(posts.getContent());
         }
         if (more) {
