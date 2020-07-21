@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @see AbstractStringCacheStore
  */
 @Slf4j
-public class LocalCacheRead<POST extends BasePost>  extends ReadAbstract<Long,Integer>{
+public class LocalCacheRead<POST extends BasePost> extends ReadAbstract<Long, Integer> {
 
     private final AbstractStringCacheStore stringCacheStore;
 
@@ -29,14 +29,14 @@ public class LocalCacheRead<POST extends BasePost>  extends ReadAbstract<Long,In
     /**
      * build
      *
-     * @param maxRead     maximum number of readings
-     * @param jobSeconds  timing seconds
+     * @param maxRead          maximum number of readings
+     * @param jobSeconds       timing seconds
      * @param stringCacheStore local cache impl
-     * @param basePostService used to build {@link VisitReadStorage}
+     * @param basePostService  used to build {@link VisitReadStorage}
      * @param cacheKey
      */
-    public LocalCacheRead(long maxRead, int jobSeconds,AbstractStringCacheStore stringCacheStore,BasePostService basePostService,String cacheKey) {
-        super(maxRead, jobSeconds, new VisitReadStorage(basePostService,cacheKey));
+    public LocalCacheRead(long maxRead, int jobSeconds, AbstractStringCacheStore stringCacheStore, BasePostService basePostService, String cacheKey) {
+        super(maxRead, jobSeconds, new VisitReadStorage(basePostService, cacheKey));
         this.stringCacheStore = stringCacheStore;
         this.cacheKey = cacheKey;
     }
@@ -52,18 +52,16 @@ public class LocalCacheRead<POST extends BasePost>  extends ReadAbstract<Long,In
     @Override
     protected Optional<Long> increase(Integer key, Long n) {
         Map<Integer, Long> cache = getCache();
-        if(cache == null){
+        if (cache == null) {
             cache = new HashMap<>(128);
         }
-        Long oldNum = cache.getOrDefault(key,0L);
-        cache.put(key,oldNum + n);
+        Long oldNum = cache.getOrDefault(key, 0L);
+        cache.put(key, oldNum + n);
 
-        stringCacheStore.putAny(cacheKey,cache);
+        stringCacheStore.putAny(cacheKey, cache);
 
         return Optional.ofNullable(oldNum + n);
     }
-
-
 
 
     /**
@@ -75,15 +73,15 @@ public class LocalCacheRead<POST extends BasePost>  extends ReadAbstract<Long,In
     @Override
     protected void reduce(Integer key, Long n) {
         Map<Integer, Long> cache = getCache();
-        if(MapUtil.isNotEmpty(cache)){
+        if (MapUtil.isNotEmpty(cache)) {
             Long num = cache.get(key);
-            if(num != null){
-                if(num <= n){
+            if (num != null) {
+                if (num <= n) {
                     cache.remove(key);
-                }else{
-                    cache.put(key,num - n);
+                } else {
+                    cache.put(key, num - n);
                 }
-                stringCacheStore.putAny(cacheKey,cache);
+                stringCacheStore.putAny(cacheKey, cache);
             }
         }
     }
@@ -118,8 +116,6 @@ public class LocalCacheRead<POST extends BasePost>  extends ReadAbstract<Long,In
     }
 
 
-
-
     /**
      * find more info increase
      *
@@ -129,65 +125,55 @@ public class LocalCacheRead<POST extends BasePost>  extends ReadAbstract<Long,In
     @Override
     public Optional<Map<Integer, Long>> getReads(List<Integer> keys) {
         Map<Integer, Long> map = getCache();
-        if(MapUtil.isNotEmpty(map)){
-            Optional.ofNullable(map.entrySet().stream().filter(v->keys.contains(v.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        if (MapUtil.isNotEmpty(map)) {
+            Optional.ofNullable(map.entrySet().stream().filter(v -> keys.contains(v.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         }
         return Optional.empty();
     }
 
 
-
-
-
-
     /**
-     *  get cache
+     * get cache
+     *
      * @return
      */
-    private Map<Integer, Long> getCache(){
+    private Map<Integer, Long> getCache() {
         Optional<Map> optional = stringCacheStore.getAny(cacheKey, Map.class);
-        if(optional.isPresent()){
-            Map<String,Integer> map = optional.get();
-            return map.entrySet().stream().collect(Collectors.toMap(v->Integer.valueOf(v.getKey()), i->Long.valueOf(i.getValue())));
+        if (optional.isPresent()) {
+            Map<String, Integer> map = optional.get();
+            return map.entrySet().stream().collect(Collectors.toMap(v -> Integer.valueOf(v.getKey()), i -> Long.valueOf(i.getValue())));
         }
         return null;
     }
 
 
-
-
-
-
-
-
     /**
-     *  visit read update
+     * visit read update
      */
-    static class VisitReadStorage implements ReadStorage<Long,Integer> {
+    static class VisitReadStorage implements ReadStorage<Long, Integer> {
         private BasePostService postService;
         private String name;
 
-        VisitReadStorage(BasePostService basePostService, String name){
+        VisitReadStorage(BasePostService basePostService, String name) {
             this.postService = basePostService;
             this.name = name;
         }
 
 
-
         @Override
         public void increase(Integer posId, Long n) {
-            postService.increaseVisit(n.longValue(),posId);
-            log.info("{} 新增阅读数:{},postId:{}",name,n,posId);
+            postService.increaseVisit(n.longValue(), posId);
+            log.info("{} 新增阅读数:{},postId:{}", name, n, posId);
 
         }
 
         @Override
         public void increase(Map<Integer, Long> map) {
-            log.info("{}: 定时清除阅读数",name);
+            log.info("{}: 定时清除阅读数", name);
             try {
                 postService.increaseListVisit(map);
-            }catch (Exception e){
-                log.error("{} 定时清除阅读数异常:", name,e);
+            } catch (Exception e) {
+                log.error("{} 定时清除阅读数异常:", name, e);
             }
         }
     }

@@ -107,7 +107,7 @@ public class PostModel {
          *  increase cache visits
          */
         Optional<Long> readOptional = this.read.getRead(post.getId());
-        if(readOptional.isPresent()){
+        if (readOptional.isPresent()) {
             post.setVisits((post.getVisits() == null ? 0 : post.getVisits()) + readOptional.get());
         }
 
@@ -157,15 +157,15 @@ public class PostModel {
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
 
-        if(!posts.isEmpty()){
+        if (!posts.isEmpty()) {
             /**
              *  increase cache visits
              */
             List<Integer> ids = posts.getContent().stream().mapToInt(PostListVO::getId).boxed().collect(Collectors.toList());
             Optional<Map<Integer, Long>> optional = read.getReads(ids);
-            if(optional.isPresent()){
+            if (optional.isPresent()) {
                 Map<Integer, Long> readMap = optional.get();
-                posts.getContent().forEach(v->{
+                posts.getContent().forEach(v -> {
                     Long increase = readMap.getOrDefault(v.getId(), 0L);
                     v.setVisits((v.getVisits() == null ? 0 : v.getVisits()) + increase);
 

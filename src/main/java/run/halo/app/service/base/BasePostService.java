@@ -169,7 +169,8 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
 
 
     /**
-     *  batch increase visit
+     * batch increase visit
+     *
      * @param map
      */
     void increaseListVisit(Map<Integer, Long> map);

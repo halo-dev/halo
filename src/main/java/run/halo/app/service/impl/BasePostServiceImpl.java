@@ -4,13 +4,11 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.PageUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -37,10 +35,7 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import javax.persistence.Entity;
 import java.lang.reflect.ParameterizedType;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -65,7 +60,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
     private JdbcTemplate jdbcTemplate;
 
-    private  String table;
+    private String table;
 
     private final Pattern summaryPattern = Pattern.compile("\\s*|\t|\r|\n");
 
@@ -81,13 +76,13 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
          *  get table name
          */
         ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
-        Class<POST> clazz =  (Class<POST>) pt.getActualTypeArguments()[0];
-        if(clazz.isAssignableFrom(Post.class)){
+        Class<POST> clazz = (Class<POST>) pt.getActualTypeArguments()[0];
+        if (clazz.isAssignableFrom(Post.class)) {
             table = "posts";
-        }else if(clazz.isAssignableFrom(Sheet.class)){
+        } else if (clazz.isAssignableFrom(Sheet.class)) {
             table = "sheet";
         }
-        // Why entity name not table name ?
+        // why entity name not table name ?
         //table  = clazz.getAnnotation(Entity.class).name().toLowerCase();
     }
 
@@ -235,23 +230,24 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
     /**
      * batch increase visit
-     * @date 2020-07-21 17:38:12
+     *
      * @param map
+     * @date 2020-07-21 17:38:12
      */
     @Transactional
     @Override
     public void increaseListVisit(Map<Integer, Long> map) {
-        if(map.size() <= 500){
+        if (map.size() <= 500) {
             this.batchIncreaseVisit(map);
-        }else{
+        } else {
             List<Map.Entry<Integer, Long>> mapList = map.entrySet().stream().collect(Collectors.toList());
 
             List<Integer> ids = mapList.stream().mapToInt(Map.Entry::getKey).boxed().collect(Collectors.toList());
             Map<Integer, List<Map.Entry<Integer, Long>>> maps = mapList.stream().collect(Collectors.groupingBy(v -> PageUtil.totalPage(ids.indexOf(v.getKey()) + 1, 500)));
 
-            maps.forEach((k,v)->{
+            maps.forEach((k, v) -> {
                 this.batchIncreaseVisit(v.stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-                if(k > 0 && k % 4 == 0){
+                if (k > 0 && k % 4 == 0) {
                     ThreadUtil.sleep(500);
                 }
             });
@@ -260,11 +256,12 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
 
     /**
-     *  batch increase visit (HeHui)
-     * @date 2020-07-21 17:38:32
+     * batch increase visit (HeHui)
+     *
      * @param map
+     * @date 2020-07-21 17:38:32
      */
-    private void batchIncreaseVisit(Map<Integer, Long> map){
+    private void batchIncreaseVisit(Map<Integer, Long> map) {
 
         /**
          * That's not the way I want to write it, Concubine could not write it Jpa batch update list methods
@@ -273,16 +270,16 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         StringBuilder sql = new StringBuilder("update ").append(table).append(" set visits= case id");
 
-        map.forEach((k,v)->{
+        map.forEach((k, v) -> {
             sql.append(" when ").append(k).append(" then visits + ").append(v);
         });
         sql.append(" end ");
 
         sql.append("where id in ( ");
         List<Integer> ids = map.keySet().stream().collect(Collectors.toList());
-        ids.forEach(v->{
+        ids.forEach(v -> {
             sql.append(v);
-            if(ids.indexOf(v) < (ids.size() - 1)){
+            if (ids.indexOf(v) < (ids.size() - 1)) {
                 sql.append(" , ");
             }
         });
@@ -290,7 +287,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         jdbcTemplate.execute(sql.toString());
     }
-
 
 
     @Override

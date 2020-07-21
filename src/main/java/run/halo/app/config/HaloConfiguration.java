@@ -79,14 +79,15 @@ public class HaloConfiguration {
 
 
     /**
-     *  read cache
+     * read cache
+     *
      * @param stringCacheStore
      * @param postService
      * @return
      */
     @Bean
     @Primary
-    public LocalCacheRead<Post> postLocalCacheRead(AbstractStringCacheStore stringCacheStore, PostService postService){
-        return new LocalCacheRead<Post>(haloProperties.getReadMaxCache(),haloProperties.getReadJobSeconds(),stringCacheStore,postService,haloProperties.getReadCachePrefix()+"post");
+    public LocalCacheRead<Post> postLocalCacheRead(AbstractStringCacheStore stringCacheStore, PostService postService) {
+        return new LocalCacheRead<Post>(haloProperties.getReadMaxCache(), haloProperties.getReadJobSeconds(), stringCacheStore, postService, haloProperties.getReadCachePrefix() + "post");
     }
 }
