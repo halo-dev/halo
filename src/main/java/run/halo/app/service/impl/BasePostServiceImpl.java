@@ -231,6 +231,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
 
+        String originalContent = post.getOriginalContent();
+        originalContent = run.halo.app.utils.StringUtils.htmlToString(originalContent);
+
+        post.setWordCount((long) originalContent.length());
+
         // Render content
         if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
