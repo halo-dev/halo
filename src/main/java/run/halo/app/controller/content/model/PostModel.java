@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
+import run.halo.app.handler.read.impl.LocalCacheRead;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
@@ -23,6 +24,8 @@ import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +55,8 @@ public class PostModel {
 
     private final AbstractStringCacheStore cacheStore;
 
+    private final LocalCacheRead<Post> read;
+
     public PostModel(PostService postService,
                      ThemeService themeService,
                      PostCategoryService postCategoryService,
@@ -60,7 +65,8 @@ public class PostModel {
                      PostTagService postTagService,
                      TagService tagService,
                      OptionService optionService,
-                     AbstractStringCacheStore cacheStore) {
+                     AbstractStringCacheStore cacheStore,
+                     LocalCacheRead<Post> read) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -70,6 +76,7 @@ public class PostModel {
         this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
+        this.read = read;
     }
 
     public String content(Post post, String token, Model model) {
@@ -95,6 +102,15 @@ public class PostModel {
         }
 
         postService.publishVisitEvent(post.getId());
+
+        /**
+         *  increase cache visits
+         */
+        Optional<Long> readOptional = this.read.getRead(post.getId());
+        if(readOptional.isPresent()){
+            post.setVisits((post.getVisits() == null ? 0 : post.getVisits()) + readOptional.get());
+        }
+
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
         adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
@@ -139,6 +155,23 @@ public class PostModel {
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
+
+
+        if(!posts.isEmpty()){
+            /**
+             *  increase cache visits
+             */
+            List<Integer> ids = posts.getContent().stream().mapToInt(PostListVO::getId).boxed().collect(Collectors.toList());
+            Optional<Map<Integer, Long>> optional = read.getReads(ids);
+            if(optional.isPresent()){
+                Map<Integer, Long> readMap = optional.get();
+                posts.getContent().forEach(v->{
+                    Long increase = readMap.getOrDefault(v.getId(), 0L);
+                    v.setVisits((v.getVisits() == null ? 0 : v.getVisits()) + increase);
+
+                });
+            }
+        }
 
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);

@@ -52,3 +52,4 @@ logging:
 
 halo:
   download-timeout: 5m
+  read-job-seconds: 120

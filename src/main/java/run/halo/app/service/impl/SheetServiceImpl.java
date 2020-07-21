@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -61,8 +62,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
                             SheetCommentService sheetCommentService,
                             SheetMetaService sheetMetaService,
                             ThemeService themeService,
-                            OptionService optionService) {
-        super(sheetRepository, optionService);
+                            OptionService optionService,
+                            JdbcTemplate jdbcTemplate) {
+        super(sheetRepository, optionService,jdbcTemplate);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;

@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -87,8 +88,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                            PostCategoryService postCategoryService,
                            PostCommentService postCommentService,
                            ApplicationEventPublisher eventPublisher,
-                           PostMetaService postMetaService) {
-        super(basePostRepository, optionService);
+                           PostMetaService postMetaService,
+                           JdbcTemplate jdbcTemplate) {
+        super(basePostRepository, optionService,jdbcTemplate);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;

@@ -12,6 +12,7 @@ import run.halo.app.model.enums.PostStatus;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -166,6 +167,14 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     void increaseVisit(long visits, @NonNull Integer postId);
 
+
+    /**
+     *  batch increase visit
+     * @param map
+     */
+    void increaseListVisit(Map<Integer, Long> map);
+
+
     /**
      * Increase post likes.
      *
@@ -316,4 +325,6 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return description
      */
     String generateDescription(@NonNull String content);
+
+
 }

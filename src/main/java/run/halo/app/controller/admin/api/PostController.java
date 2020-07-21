@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.handler.read.impl.LocalCacheRead;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -25,7 +26,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -47,12 +51,35 @@ public class PostController {
 
     private final OptionService optionService;
 
+    private final LocalCacheRead<Post> read;
+
     public PostController(PostService postService,
                           AbstractStringCacheStore cacheStore,
-                          OptionService optionService) {
+                          OptionService optionService,
+                          LocalCacheRead<Post> read) {
         this.postService = postService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
+        this.read = read;
+    }
+
+
+    /**
+     *  increase cache visits (HeHui)
+     * @param data
+     * @data 2020-07-21 19:18
+     */
+    private void increaseVisits(List<Post> data){
+        List<Integer> ids = data.stream().mapToInt(Post::getId).boxed().collect(Collectors.toList());
+        Optional<Map<Integer, Long>> optional = read.getReads(ids);
+        if(optional.isPresent()){
+            Map<Integer, Long> readMap = optional.get();
+            data.forEach(v->{
+                Long increase = readMap.getOrDefault(v.getId(), 0L);
+                v.setVisits((v.getVisits() == null ? 0 : v.getVisits()) + increase);
+
+            });
+        }
     }
 
     @GetMapping
@@ -61,6 +88,12 @@ public class PostController {
                                                     PostQuery postQuery,
                                                     @RequestParam(value = "more", defaultValue = "true") Boolean more) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
+
+
+        if(!postPage.isEmpty()){
+            increaseVisits(postPage.getContent());
+        }
+
         if (more) {
             return postService.convertToListVo(postPage);
         }
@@ -81,6 +114,9 @@ public class PostController {
                                                           @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> posts = postService.pageBy(status, pageable);
 
+        if(!posts.isEmpty()){
+            increaseVisits(posts.getContent());
+        }
         if (more) {
             return postService.convertToListVo(posts);
         }

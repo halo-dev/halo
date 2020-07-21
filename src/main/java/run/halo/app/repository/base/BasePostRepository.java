@@ -12,6 +12,7 @@ import run.halo.app.model.enums.PostStatus;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -154,6 +155,8 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     @Modifying
     @Query("update BasePost p set p.visits = p.visits + :visits where p.id = :postId")
     int updateVisit(@Param("visits") long visits, @Param("postId") @NonNull Integer postId);
+
+
 
     /**
      * Updates post likes.

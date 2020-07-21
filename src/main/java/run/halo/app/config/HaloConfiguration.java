@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.client.RestTemplate;
@@ -16,6 +17,9 @@ import run.halo.app.cache.InMemoryCacheStore;
 import run.halo.app.cache.LevelCacheStore;
 import run.halo.app.cache.RedisCacheStore;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.handler.read.impl.LocalCacheRead;
+import run.halo.app.model.entity.Post;
+import run.halo.app.service.PostService;
 import run.halo.app.utils.HttpClientUtils;
 
 import java.security.KeyManagementException;
@@ -71,5 +75,18 @@ public class HaloConfiguration {
         log.info("Halo cache store load impl : [{}]", stringCacheStore.getClass());
         return stringCacheStore;
 
+    }
+
+
+    /**
+     *  read cache
+     * @param stringCacheStore
+     * @param postService
+     * @return
+     */
+    @Bean
+    @Primary
+    public LocalCacheRead<Post> postLocalCacheRead(AbstractStringCacheStore stringCacheStore, PostService postService){
+        return new LocalCacheRead<Post>(haloProperties.getReadMaxCache(),haloProperties.getReadJobSeconds(),stringCacheStore,postService,haloProperties.getReadCachePrefix()+"post");
     }
 }
