@@ -16,6 +16,7 @@ import java.util.Date;
  *
  * @author johnniang
  * @author ryanwang
+ * @author coor.top
  */
 @Data
 @Entity(name = "BasePost")
@@ -151,6 +152,13 @@ public class BasePost extends BaseEntity {
     @Column(name = "meta_description", length = 1023)
     private String metaDescription;
 
+    /**
+     * Content word count
+     */
+    @Column(name = "word_count")
+    @ColumnDefault("0")
+    private Long wordCount;
+
     @Override
     public void prePersist() {
         super.prePersist();
@@ -205,6 +213,10 @@ public class BasePost extends BaseEntity {
 
         if (editorType == null) {
             editorType = PostEditorType.MARKDOWN;
+        }
+
+        if (wordCount == null || wordCount < 0) {
+            wordCount = 0L;
         }
     }
 
