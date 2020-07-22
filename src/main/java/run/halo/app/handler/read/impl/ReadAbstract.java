@@ -3,7 +3,6 @@ package run.halo.app.handler.read.impl;
 import run.halo.app.handler.read.Read;
 import run.halo.app.handler.read.ReadStorage;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;

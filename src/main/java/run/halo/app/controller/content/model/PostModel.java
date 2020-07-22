@@ -24,7 +24,6 @@ import run.halo.app.service.*;
 import run.halo.app.utils.MarkdownUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
