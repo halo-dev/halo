@@ -75,12 +75,13 @@ public abstract class ReadAbstract<T extends Number, ID> implements Read<T, ID> 
      * task
      */
     protected void perform() {
-        if (isRead.get() > 0) {
+        if (isRead.updateAndGet(r -> {
+            return r > 0 ? -1 : 0;
+        }) == -1) {
             this.getAll().ifPresent(data -> {
                 readStorage.increase(data);
                 this.clear();
             });
-            isRead.getAndSet(0);
         }
     }
 
@@ -95,7 +96,9 @@ public abstract class ReadAbstract<T extends Number, ID> implements Read<T, ID> 
     @Override
     public void read(ID key, T n, String clientID) {
         //TODO is clientID not null ?
-        isRead.incrementAndGet();
+        isRead.updateAndGet(r -> {
+            return r == -1 ? 1 : (r + 1);
+        });
 
         Optional<T> optional = this.increase(key, n);
         /**
@@ -142,4 +145,7 @@ public abstract class ReadAbstract<T extends Number, ID> implements Read<T, ID> 
      * clear all
      */
     protected abstract void clear();
+
+
+
 }
