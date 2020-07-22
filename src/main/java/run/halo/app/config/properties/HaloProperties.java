@@ -87,21 +87,18 @@ public class HaloProperties {
     /**
      * cache prefix
      *
-     * @date 2020-07-21 17:53:11
      */
     private String readCachePrefix = "halo:read:";
 
     /**
      * maximum number of readings
      *
-     * @date 2020-07-21 17:53:11
      */
     private long readMaxCache = 100L;
 
     /**
      * read timing seconds
      *
-     * @date 2020-07-21 17:53:11
      */
     private int readJobSeconds = 300;
 

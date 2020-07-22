@@ -71,16 +71,10 @@ public class PostController {
      * @data 2020-07-21 19:18
      */
     private void increaseVisits(List<Post> data) {
-        List<Integer> ids = data.stream().mapToInt(Post::getId).boxed().collect(Collectors.toList());
-        Optional<Map<Integer, Long>> optional = read.getReads(ids);
-        if (optional.isPresent()) {
-            Map<Integer, Long> readMap = optional.get();
-            data.forEach(v -> {
-                Long increase = readMap.getOrDefault(v.getId(), 0L);
-                v.setVisits((v.getVisits() == null ? 0 : v.getVisits()) + increase);
-
-            });
-        }
+        List<Integer> ids = data.stream().mapToInt(Post::getId).distinct().boxed().collect(Collectors.toList());
+        read.getReads(ids).ifPresent(readMap ->
+                        data.forEach(v ->
+                            v.setVisits((v.getVisits() == null ? 0 : v.getVisits()) + readMap.getOrDefault(v.getId(), 0L))));
     }
 
     @GetMapping

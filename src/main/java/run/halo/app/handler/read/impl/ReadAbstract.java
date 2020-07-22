@@ -39,7 +39,7 @@ public abstract class ReadAbstract<T extends Number, ID> implements Read<T, ID> 
     /**
      * record
      */
-    private AtomicInteger isRead = new AtomicInteger(0);
+    private final AtomicInteger isRead = new AtomicInteger(0);
 
 
     /**
@@ -77,20 +77,12 @@ public abstract class ReadAbstract<T extends Number, ID> implements Read<T, ID> 
      */
     protected void perform() {
         if (isRead.get() > 0) {
-            Optional<Map<ID, T>> optional = this.getAll();
-            if (optional.isPresent() && !optional.get().isEmpty()) {
-                /**
-                 * The following this.clear() will clear the data if it is not created
-                 */
-                Map<ID, T> temp = new HashMap<>(optional.get().size());
-                temp.putAll(optional.get());
-                readStorage.increase(temp);
-
+            this.getAll().ifPresent(data -> {
+                readStorage.increase(data);
                 this.clear();
-            }
+            });
             isRead.getAndSet(0);
         }
-
     }
 
 

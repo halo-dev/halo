@@ -93,7 +93,14 @@ public class LocalCacheRead<POST extends BasePost> extends ReadAbstract<Long, In
      */
     @Override
     protected Optional<Map<Integer, Long>> getAll() {
-        return Optional.ofNullable(getCache());
+        /**
+         * The following this.clear() will clear the data if it is not created
+         */
+        Map<Integer, Long> cache = getCache();
+        if (cache == null || cache.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(new HashMap<>(cache));
     }
 
     /**

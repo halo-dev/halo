@@ -161,16 +161,10 @@ public class PostModel {
             /**
              *  increase cache visits
              */
-            List<Integer> ids = posts.getContent().stream().mapToInt(PostListVO::getId).boxed().collect(Collectors.toList());
-            Optional<Map<Integer, Long>> optional = read.getReads(ids);
-            if (optional.isPresent()) {
-                Map<Integer, Long> readMap = optional.get();
-                posts.getContent().forEach(v -> {
-                    Long increase = readMap.getOrDefault(v.getId(), 0L);
-                    v.setVisits((v.getVisits() == null ? 0 : v.getVisits()) + increase);
-
-                });
-            }
+            List<Integer> ids = posts.getContent().stream().mapToInt(PostListVO::getId).distinct().boxed().collect(Collectors.toList());
+            read.getReads(ids).ifPresent(readMap ->
+                posts.getContent().forEach(v ->
+                    v.setVisits((v.getVisits() == null ? 0 : v.getVisits()) + readMap.getOrDefault(v.getId(), 0L))));
         }
 
         model.addAttribute("is_index", true);
