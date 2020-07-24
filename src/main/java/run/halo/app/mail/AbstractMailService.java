@@ -33,7 +33,6 @@ public abstract class AbstractMailService implements MailService {
     private JavaMailSender cachedMailSender;
     private MailProperties cachedMailProperties;
     private String cachedFromName;
-    @Nullable
     private ExecutorService executorService;
 
     protected AbstractMailService(OptionService optionService) {
@@ -41,14 +40,14 @@ public abstract class AbstractMailService implements MailService {
     }
 
     @NonNull
-    public ExecutorService getExecutorService() {
+    public synchronized ExecutorService getExecutorService() {
         if (this.executorService == null) {
             this.executorService = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
         }
         return executorService;
     }
 
-    public void setExecutorService(ExecutorService executorService) {
+    public void setExecutorService(@NonNull ExecutorService executorService) {
         this.executorService = executorService;
     }
 
@@ -73,12 +72,7 @@ public abstract class AbstractMailService implements MailService {
      *
      * @param callback mime message callback.
      */
-    protected void sendMailTemplate(@Nullable Callback callback) {
-        if (callback == null) {
-            log.info("Callback is null, skip to send email");
-            return;
-        }
-
+    protected void sendMailTemplate(@NonNull Callback callback) {
         // check if mail is enable
         Boolean emailEnabled = optionService.getByPropertyOrDefault(EmailProperties.ENABLED, Boolean.class);
 
@@ -121,11 +115,10 @@ public abstract class AbstractMailService implements MailService {
      * @param callback   callback message handler
      * @param tryToAsync if the send procedure should try to asynchronous
      */
-    protected void sendMailTemplate(boolean tryToAsync, @Nullable Callback callback) {
-        ExecutorService executorService = getExecutorService();
-        if (tryToAsync && executorService != null) {
+    protected void sendMailTemplate(boolean tryToAsync, @NonNull Callback callback) {
+        if (tryToAsync) {
             // send mail asynchronously
-            executorService.execute(() -> sendMailTemplate(callback));
+            getExecutorService().execute(() -> sendMailTemplate(callback));
         } else {
             // send mail synchronously
             sendMailTemplate(callback);
