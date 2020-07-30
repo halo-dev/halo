@@ -3,6 +3,7 @@ package run.halo.app.model.support;
 import org.springframework.http.HttpHeaders;
 
 import java.io.File;
+import java.util.Optional;
 
 /**
  * <pre>
@@ -22,7 +23,7 @@ public class HaloConst {
     /**
      * Temporary directory.
      */
-    public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");
+    public final static String TEMP_DIR = "/tmp/run.halo.app";
 
     public final static String PROTOCOL_HTTPS = "https://";
 
@@ -49,6 +50,11 @@ public class HaloConst {
      * Default theme name.
      */
     public final static String DEFAULT_THEME_ID = "caicai_anatole";
+
+    /**
+     * Default error path.
+     */
+    public static final String DEFAULT_ERROR_PATH = "common/error/error";
 
     /**
      * Path separator.
@@ -134,6 +140,12 @@ public class HaloConst {
      * Version constant. (Available in production environment)
      */
     public static final String HALO_VERSION;
+
+    /**
+     * Unknown version: unknown
+     */
+    public static final String UNKNOWN_VERSION = "unknown";
+
     /**
      * Database product name.
      */
@@ -145,6 +157,6 @@ public class HaloConst {
 
     static {
         // Set version
-        HALO_VERSION = HaloConst.class.getPackage().getImplementationVersion();
+        HALO_VERSION = Optional.ofNullable(HaloConst.class.getPackage().getImplementationVersion()).orElse(UNKNOWN_VERSION);
     }
 }

@@ -69,7 +69,9 @@ public class CategoryModel {
         final Category category = categoryService.getBySlugOfNonNull(slug);
         CategoryDTO categoryDTO = categoryService.convertTo(category);
 
-        final Pageable pageable = PageRequest.of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "createTime"));
+        final Pageable pageable = PageRequest.of(page - 1,
+            optionService.getArchivesPageSize(),
+            Sort.by(DESC, "topPriority", "createTime"));
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 

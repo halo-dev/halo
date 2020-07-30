@@ -33,7 +33,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    public BaseResponse<?> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
             baseResponse = handleBaseException(e.getCause());
@@ -44,7 +44,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+    public BaseResponse<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setMessage(String.format("请求字段缺失, 类型为 %s，名称为 %s", e.getParameterType(), e.getParameterName()));
         return baseResponse;
@@ -52,7 +52,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse handleConstraintViolationException(ConstraintViolationException e) {
+    public BaseResponse<?> handleConstraintViolationException(ConstraintViolationException e) {
         BaseResponse<Map<String, String>> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         baseResponse.setMessage("字段验证错误，请完善后重试！");
@@ -62,7 +62,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public BaseResponse<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         BaseResponse<Map<String, String>> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         baseResponse.setMessage("字段验证错误，请完善后重试！");
@@ -73,7 +73,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    public BaseResponse<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         return baseResponse;
@@ -81,7 +81,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    public BaseResponse handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
+    public BaseResponse<?> handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
         return baseResponse;
@@ -89,7 +89,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public BaseResponse<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         baseResponse.setMessage("缺失请求主体");
@@ -98,7 +98,7 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.BAD_GATEWAY)
-    public BaseResponse handleNoHandlerFoundException(NoHandlerFoundException e) {
+    public BaseResponse<?> handleNoHandlerFoundException(NoHandlerFoundException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         HttpStatus status = HttpStatus.BAD_GATEWAY;
         baseResponse.setStatus(status.value());
@@ -107,7 +107,7 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(AbstractHaloException.class)
-    public ResponseEntity<BaseResponse> handleHaloException(AbstractHaloException e) {
+    public ResponseEntity<BaseResponse<?>> handleHaloException(AbstractHaloException e) {
         BaseResponse<Object> baseResponse = handleBaseException(e);
         baseResponse.setStatus(e.getStatus().value());
         baseResponse.setData(e.getErrorData());
@@ -116,8 +116,8 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public BaseResponse handleGlobalException(Exception e) {
-        BaseResponse baseResponse = handleBaseException(e);
+    public BaseResponse<?> handleGlobalException(Exception e) {
+        BaseResponse<?> baseResponse = handleBaseException(e);
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         baseResponse.setStatus(status.value());
         baseResponse.setMessage(status.getReasonPhrase());
@@ -127,13 +127,14 @@ public class ControllerExceptionHandler {
     private <T> BaseResponse<T> handleBaseException(Throwable t) {
         Assert.notNull(t, "Throwable must not be null");
 
-        log.error("Captured an exception", t);
-
         BaseResponse<T> baseResponse = new BaseResponse<>();
         baseResponse.setMessage(t.getMessage());
 
         if (log.isDebugEnabled()) {
+            log.error("Captured an exception:", t);
             baseResponse.setDevMessage(ExceptionUtils.getStackTrace(t));
+        } else {
+            log.error("Captured an exception: [{}]", t.getMessage());
         }
 
         return baseResponse;

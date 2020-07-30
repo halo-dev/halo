@@ -83,19 +83,23 @@ public class ContentContentController {
                           Model model) {
         if (optionService.getArchivesPrefix().equals(prefix)) {
             return postModel.archives(1, model);
-        } else if (optionService.getCategoriesPrefix().equals(prefix)) {
-            return categoryModel.list(model);
-        } else if (optionService.getTagsPrefix().equals(prefix)) {
-            return tagModel.list(model);
-        } else if (optionService.getJournalsPrefix().equals(prefix)) {
-            return journalModel.list(1, model);
-        } else if (optionService.getPhotosPrefix().equals(prefix)) {
-            return photoModel.list(1, model);
-        } else if (optionService.getLinksPrefix().equals(prefix)) {
-            return linkModel.list(model);
-        } else {
-            throw new NotFoundException("Not Found");
         }
+        if (optionService.getCategoriesPrefix().equals(prefix)) {
+            return categoryModel.list(model);
+        }
+        if (optionService.getTagsPrefix().equals(prefix)) {
+            return tagModel.list(model);
+        }
+        if (optionService.getJournalsPrefix().equals(prefix)) {
+            return journalModel.list(1, model);
+        }
+        if (optionService.getPhotosPrefix().equals(prefix)) {
+            return photoModel.list(1, model);
+        }
+        if (optionService.getLinksPrefix().equals(prefix)) {
+            return linkModel.list(model);
+        }
+        return null;
     }
 
     @GetMapping("{prefix}/page/{page:\\d+}")

@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -53,6 +54,7 @@ import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
  * @author ryanwang
  * @author guqing
  * @author evanwang
+ * @author coor.top
  * @date 2019-03-14
  */
 @Slf4j
@@ -318,8 +320,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Gets frontMatter
         Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        // remove frontMatter
+        markdown = MarkdownUtils.removeFrontMatter(markdown);
 
         PostParam post = new PostParam();
+        post.setStatus(null);
 
         List<String> elementValue;
 
@@ -331,6 +336,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             for (String key : frontMatter.keySet()) {
                 elementValue = frontMatter.get(key);
                 for (String ele : elementValue) {
+                    ele = StrUtil.strip(ele, "[", "]");
+                    ele = StrUtil.strip(ele, "\"");
+                    if ("".equals(ele)) {
+                        continue;
+                    }
                     switch (key) {
                         case "title":
                             post.setTitle(ele);
@@ -551,6 +561,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             postListVO.setFullPath(buildFullPath(post));
 
+            postListVO.setWordCount(post.getWordCount());
+
             return postListVO;
         });
     }
@@ -608,6 +620,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
             postListVO.setFullPath(buildFullPath(post));
+
+            postListVO.setWordCount(post.getWordCount());
 
             return postListVO;
         }).collect(Collectors.toList());

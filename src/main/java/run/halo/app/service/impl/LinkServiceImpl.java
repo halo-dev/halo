@@ -73,6 +73,23 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
+    public List<LinkTeamVO> listTeamVosByRandom(Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+        List<LinkDTO> links = listDtos(sort);
+        Set<String> teams = ServiceUtils.fetchProperty(links, LinkDTO::getTeam);
+        Map<String, List<LinkDTO>> teamLinkListMap = ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
+        List<LinkTeamVO> result = new LinkedList<>();
+        teamLinkListMap.forEach((team, linkList) -> {
+            LinkTeamVO linkTeamVO = new LinkTeamVO();
+            linkTeamVO.setTeam(team);
+            Collections.shuffle(linkList);
+            linkTeamVO.setLinks(linkList);
+            result.add(linkTeamVO);
+        });
+        return result;
+    }
+
+    @Override
     public Link createBy(LinkParam linkParam) {
         Assert.notNull(linkParam, "Link param must not be null");
 
@@ -100,6 +117,13 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         return linkRepository.findAllTeams();
     }
 
+    @Override
+    public List<Link> listAllByRandom() {
+        List<Link> allLink = linkRepository.findAll();
+        Collections.shuffle(allLink);
+        return allLink;
+    }
+
     @NonNull
     private List<LinkDTO> convertTo(@Nullable List<Link> links) {
         if (CollectionUtils.isEmpty(links)) {
@@ -107,6 +131,6 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         }
 
         return links.stream().map(link -> (LinkDTO) new LinkDTO().convertFrom(link))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 }

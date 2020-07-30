@@ -1,10 +1,8 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
-import org.junit.Test;
-
-import static org.hamcrest.Matchers.equalTo;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author johnniang
@@ -17,14 +15,14 @@ public class SlugUtilsTest {
     public void makeSlugTest() {
         String slugResult = SlugUtils.slugify("Hello World");
 
-        Assert.assertThat(slugResult, equalTo("hello-world"));
+        Assertions.assertEquals("hello-world", slugResult);
     }
 
     @Test
     public void slugTest() {
         String slug = SlugUtils.slug("一二三四 +/~!@#$%^&*()_+ - hello-world");
 
-        Assert.assertThat(slug, equalTo("一二三四-hello-world"));
+        Assertions.assertEquals("一二三四-hello-world", slug);
     }
 
     @Test

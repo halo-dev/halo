@@ -38,6 +38,15 @@ public interface LinkService extends CrudService<Link, Integer> {
     List<LinkTeamVO> listTeamVos(@NonNull Sort sort);
 
     /**
+     * Lists link team vos by random
+     *
+     * @param sort
+     * @return a list of link team vo by random
+     */
+    @NonNull
+    List<LinkTeamVO> listTeamVosByRandom(@NonNull Sort sort);
+
+    /**
      * Creates link by link param.
      *
      * @param linkParam must not be null
@@ -60,4 +69,12 @@ public interface LinkService extends CrudService<Link, Integer> {
      * @return a list of teams.
      */
     List<String> listAllTeams();
+
+    /**
+     * List all link teams by random
+     *
+     * @return a list of teams by random
+     */
+    @NonNull
+    List<Link> listAllByRandom();
 }

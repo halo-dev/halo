@@ -2,13 +2,12 @@ package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Halo utilities test.
@@ -18,116 +17,114 @@ import static org.junit.Assert.assertThat;
  * @date 2019-03-29
  */
 @Slf4j
-public class HaloUtilsTest {
+class HaloUtilsTest {
 
     @Test
-    public void timeFormatTest() {
+    void timeFormatTest() {
         long seconds = 0;
         String timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("0 second"));
+        assertEquals("0 second", timeFormat);
 
         seconds = -1;
         timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("0 second"));
+        assertEquals("0 second", timeFormat);
 
         seconds = 30;
         timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("30 seconds"));
+        assertEquals("30 seconds", timeFormat);
 
         seconds = 60;
         timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("1 minute"));
+        assertEquals("1 minute", timeFormat);
 
         seconds = 120;
         timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("2 minutes"));
+        assertEquals("2 minutes", timeFormat);
 
         seconds = 3600;
         timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("1 hour"));
+        assertEquals("1 hour", timeFormat);
 
         seconds = 7200;
         timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("2 hours"));
+        assertEquals("2 hours", timeFormat);
 
         seconds = 7200 + 30;
         timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("2 hours, 30 seconds"));
+        assertEquals("2 hours, 30 seconds", timeFormat);
 
         seconds = 7200 + 60 + 30;
         timeFormat = HaloUtils.timeFormat(seconds);
-        assertThat(timeFormat, equalTo("2 hours, 1 minute, 30 seconds"));
-
-
+        assertEquals("2 hours, 1 minute, 30 seconds", timeFormat);
     }
 
     @Test
-    public void pluralizeTest() {
+    void pluralizeTest() {
 
         String label = "chance";
         String pluralLabel = "chances";
 
         String pluralizedFormat = HaloUtils.pluralize(1, label, pluralLabel);
-        assertThat(pluralizedFormat, equalTo("1 chance"));
+        assertEquals("1 chance", pluralizedFormat);
+
 
         pluralizedFormat = HaloUtils.pluralize(2, label, pluralLabel);
-        assertThat(pluralizedFormat, equalTo("2 chances"));
+        assertEquals("2 chances", pluralizedFormat);
 
         pluralizedFormat = HaloUtils.pluralize(0, label, pluralLabel);
-        assertThat(pluralizedFormat, equalTo("no chances"));
+        assertEquals("no chances", pluralizedFormat);
 
         // Test random positive time
         IntStream.range(0, 10000).forEach(i -> {
             long time = RandomUtils.nextLong(2, Long.MAX_VALUE);
             String result = HaloUtils.pluralize(time, label, pluralLabel);
-            assertThat(result, equalTo(time + " " + pluralLabel));
+            assertEquals(time + " " + pluralLabel, result);
         });
 
         // Test random negative time
         IntStream.range(0, 10000).forEach(i -> {
             long time = (-1) * RandomUtils.nextLong();
             String result = HaloUtils.pluralize(time, label, pluralLabel);
-            assertThat(result, equalTo("no " + pluralLabel));
+            assertEquals("no " + pluralLabel, result);
         });
-
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void pluralizeLabelExceptionTest() {
-        HaloUtils.pluralize(1, null, null);
     }
 
     @Test
-    public void desensitizeSuccessTest() {
+    void pluralizeLabelExceptionTest() {
+        assertThrows(IllegalArgumentException.class, () -> HaloUtils.pluralize(1, null, null));
+    }
+
+    @Test
+    void desensitizeSuccessTest() {
         String plainText = "12345678";
 
         String desensitization = HaloUtils.desensitize(plainText, 1, 1);
-        assertThat(desensitization, equalTo("1******8"));
+        assertEquals("1******8", desensitization);
 
         desensitization = HaloUtils.desensitize(plainText, 2, 3);
-        assertThat(desensitization, equalTo("12***678"));
+        assertEquals("12***678", desensitization);
 
         desensitization = HaloUtils.desensitize(plainText, 2, 6);
-        assertThat(desensitization, equalTo("12345678"));
+        assertEquals("12345678", desensitization);
 
         desensitization = HaloUtils.desensitize(plainText, 2, 7);
-        assertThat(desensitization, equalTo("12345678"));
+        assertEquals("12345678", desensitization);
 
         desensitization = HaloUtils.desensitize(plainText, 0, 0);
-        assertThat(desensitization, equalTo("********"));
+        assertEquals("********", desensitization);
 
         desensitization = HaloUtils.desensitize(plainText, -1, -1);
-        assertThat(desensitization, equalTo("********"));
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void desensitizeFailureTest() {
-        String plainText = " ";
-        HaloUtils.desensitize(plainText, 1, 1);
+        assertEquals("********", desensitization);
     }
 
     @Test
-    public void compositeHttpUrl() {
+    void desensitizeFailureTest() {
+        String plainText = " ";
+        assertThrows(IllegalArgumentException.class, () -> HaloUtils.desensitize(plainText, 1, 1));
+    }
+
+    @Test
+    void compositeHttpUrl() {
         String url = HaloUtils.compositeHttpUrl("https://halo.run", "path1", "path2");
         assertEquals("https://halo.run/path1/path2", url);
 
@@ -145,7 +142,7 @@ public class HaloUtilsTest {
     }
 
     @Test
-    public void normalizeUrl() {
+    void normalizeUrl() {
         assertEquals("/2019/2/2/avatar.jpg", HaloUtils.normalizeUrl("/2019/2/2/avatar.jpg"));
 
         assertEquals("http://cn.gravatar.com/avatar?d=mm", HaloUtils.normalizeUrl("//cn.gravatar.com/avatar?d=mm"));

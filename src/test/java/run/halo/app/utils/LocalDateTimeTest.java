@@ -12,10 +12,10 @@ import java.time.format.DateTimeFormatter;
  * @author johnniang
  */
 @Slf4j
-public class LocalDateTimeTest {
+class LocalDateTimeTest {
 
     @Test
-    public void dateTimeToStringTest() {
+    void dateTimeToStringTest() {
         LocalDateTime dateTime = LocalDateTime.now();
         log.debug(dateTime.toString());
         log.debug(dateTime.toLocalDate().toString());

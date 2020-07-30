@@ -1,13 +1,12 @@
 package run.halo.app.cache;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * InMemoryCacheStoreTest.
@@ -15,37 +14,37 @@ import static org.junit.Assert.*;
  * @author johnniang
  * @date 3/28/19
  */
-public class InMemoryCacheStoreTest {
+class InMemoryCacheStoreTest {
 
-    private InMemoryCacheStore cacheStore;
+    InMemoryCacheStore cacheStore;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         cacheStore = new InMemoryCacheStore();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void putNullValueTest() {
+    @Test
+    void putNullValueTest() {
         String key = "test_key";
 
-        cacheStore.put(key, null);
+        assertThrows(IllegalArgumentException.class, () -> cacheStore.put(key, null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void putNullKeyTest() {
+    @Test
+    void putNullKeyTest() {
         String value = "test_value";
 
-        cacheStore.put(null, value);
+        assertThrows(IllegalArgumentException.class, () -> cacheStore.put(null, value));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void getByNullKeyTest() {
-        cacheStore.get(null);
+    @Test
+    void getByNullKeyTest() {
+        assertThrows(IllegalArgumentException.class, () -> cacheStore.get(null));
     }
 
 
     @Test
-    public void getNullTest() {
+    void getNullTest() {
         String key = "test_key";
 
         Optional<String> valueOptional = cacheStore.get(key);
@@ -54,7 +53,7 @@ public class InMemoryCacheStoreTest {
     }
 
     @Test
-    public void expirationTest() throws InterruptedException {
+    void expirationTest() throws InterruptedException {
         String key = "test_key";
         String value = "test_value";
         cacheStore.put(key, value, 500, TimeUnit.MILLISECONDS);
@@ -62,7 +61,7 @@ public class InMemoryCacheStoreTest {
         Optional<String> valueOptional = cacheStore.get(key);
 
         assertTrue(valueOptional.isPresent());
-        assertThat(valueOptional.get(), equalTo(value));
+        assertEquals(value, valueOptional.get());
 
         TimeUnit.SECONDS.sleep(1L);
 
@@ -72,7 +71,7 @@ public class InMemoryCacheStoreTest {
     }
 
     @Test
-    public void deleteTest() {
+    void deleteTest() {
         String key = "test_key";
         String value = "test_value";
 
@@ -84,7 +83,7 @@ public class InMemoryCacheStoreTest {
 
         // Assert
         assertTrue(valueOptional.isPresent());
-        assertThat(valueOptional.get(), equalTo(value));
+        assertEquals(value, valueOptional.get());
 
         // Delete the cache
         cacheStore.delete(key);

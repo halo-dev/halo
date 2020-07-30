@@ -44,7 +44,7 @@ public class ContentFeedController {
 
     private final static String UTF_8_SUFFIX = ";charset=UTF-8";
 
-    private final static String XML_INVAID_CHAR = "[\\x00-\\x1F\\x7F]";
+    private final static String XML_INVALID_CHAR = "[\\x00-\\x1F\\x7F]";
 
     private final static String XML_MEDIA_TYPE = MediaType.APPLICATION_XML_VALUE + UTF_8_SUFFIX;
 
@@ -210,8 +210,8 @@ public class ContentFeedController {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVAID_CHAR, ""));
-            postDetailVO.setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVAID_CHAR, ""));
+            postDetailVO.setFormatContent(RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
+            postDetailVO.setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });
         return posts.getContent();
     }
@@ -230,8 +230,8 @@ public class ContentFeedController {
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVAID_CHAR, ""));
-            postDetailVO.setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVAID_CHAR, ""));
+            postDetailVO.setFormatContent(RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
+            postDetailVO.setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });
         return posts.getContent();
     }

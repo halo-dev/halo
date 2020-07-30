@@ -1,7 +1,7 @@
 package run.halo.app.model.properties;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -10,10 +10,10 @@ import java.util.Map;
  * @date 19-4-25
  */
 @Slf4j
-public class PropertyEnumTest {
+class PropertyEnumTest {
 
     @Test
-    public void getValuePropertyMapTest() {
+    void getValuePropertyMapTest() {
         Map<String, PropertyEnum> result = PropertyEnum.getValuePropertyEnumMap();
 
         log.debug(result.toString());

@@ -4,9 +4,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.Application;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.LoginPreCheckDTO;
 import run.halo.app.model.dto.StatisticDTO;
@@ -131,8 +131,9 @@ public class AdminController {
     @PostMapping(value = {"halo/restart", "spring/restart"})
     @ApiOperation("Restarts halo server")
     @DisableOnCondition
+    @Deprecated
     public void restartApplication() {
-        Application.restart();
+        throw new BadRequestException("此前的重启方案存在性能问题，故暂不支持重启功能！");
     }
 
     @GetMapping(value = "halo/logfile")
