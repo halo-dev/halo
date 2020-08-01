@@ -70,6 +70,17 @@ public class MarkdownUtils {
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
 
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
+    private static final Pattern FRONT_MATTER = Pattern.compile("^---[\\s\\S]*?---");
+
+//    /**
+//     * Render html document to markdown document.
+//     *
+//     * @param html html document
+//     * @return markdown document
+//     */
+//    public static String renderMarkdown(String html) {
+//        return FlexmarkHtmlParser.parse(html);
+//    }
 
     /**
      * Render Markdown content
@@ -102,16 +113,6 @@ public class MarkdownUtils {
         return RENDERER.render(document);
     }
 
-//    /**
-//     * Render html document to markdown document.
-//     *
-//     * @param html html document
-//     * @return markdown document
-//     */
-//    public static String renderMarkdown(String html) {
-//        return FlexmarkHtmlParser.parse(html);
-//    }
-
     /**
      * Get front-matter
      *
@@ -124,8 +125,6 @@ public class MarkdownUtils {
         visitor.visit(document);
         return visitor.getData();
     }
-
-    private static final Pattern FRONT_MATTER = Pattern.compile("^---[\\s\\S]*?---");
 
     /**
      * remove front matter
