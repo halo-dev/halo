@@ -47,8 +47,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     private final FileHandlers fileHandlers;
 
     public AttachmentServiceImpl(AttachmentRepository attachmentRepository,
-                                 OptionService optionService,
-                                 FileHandlers fileHandlers) {
+            OptionService optionService,
+            FileHandlers fileHandlers) {
         super(attachmentRepository);
         this.attachmentRepository = attachmentRepository;
         this.optionService = optionService;

@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -36,7 +37,7 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
 
     @Override
     @Transactional
-    public List<META> createOrUpdateByPostId(Integer postId, Set<META> metas) {
+    public List<META> createOrUpdateByPostId(@NotNull Integer postId, Set<META> metas) {
         Assert.notNull(postId, "Post id must not be null");
 
         // firstly remove post metas by post id
@@ -57,13 +58,13 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
     }
 
     @Override
-    public List<META> removeByPostId(Integer postId) {
+    public List<META> removeByPostId(@NotNull Integer postId) {
         Assert.notNull(postId, "Post id must not be null of removeByPostId");
         return baseMetaRepository.deleteByPostId(postId);
     }
 
     @Override
-    public Map<Integer, List<META>> listPostMetaAsMap(Set<Integer> postIds) {
+    public Map<Integer, List<META>> listPostMetaAsMap(@NotNull Set<Integer> postIds) {
         Assert.notNull(postIds, "Post ids must not be null");
         if (CollectionUtils.isEmpty(postIds)) {
             return Collections.emptyMap();
@@ -80,19 +81,19 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
 
         // Foreach and collect
         metas.forEach(meta -> postMetaListMap.computeIfAbsent(meta.getPostId(), postId -> new LinkedList<>())
-            .add(postMetaMap.get(meta.getId())));
+                .add(postMetaMap.get(meta.getId())));
 
         return postMetaListMap;
     }
 
     @Override
-    public List<META> listBy(Integer postId) {
+    public @NotNull List<META> listBy(@NotNull Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
         return baseMetaRepository.findAllByPostId(postId);
     }
 
     @Override
-    public META create(META meta) {
+    public @NotNull META create(@NotNull META meta) {
         Assert.notNull(meta, "Domain must not be null");
 
         // Check post id
@@ -105,7 +106,7 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
     }
 
     @Override
-    public META createBy(BaseMetaParam<META> metaParam) {
+    public @NotNull META createBy(@NotNull BaseMetaParam<META> metaParam) {
         Assert.notNull(metaParam, "Meta param must not be null");
         return create(metaParam.convertTo());
     }
@@ -117,20 +118,20 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
 
 
     @Override
-    public BaseMetaDTO convertTo(META postMeta) {
+    public @NotNull BaseMetaDTO convertTo(@NotNull META postMeta) {
         Assert.notNull(postMeta, "Category must not be null");
 
         return new BaseMetaDTO().convertFrom(postMeta);
     }
 
     @Override
-    public List<BaseMetaDTO> convertTo(List<META> postMetaList) {
+    public @NotNull List<BaseMetaDTO> convertTo(@NotNull List<META> postMetaList) {
         if (CollectionUtils.isEmpty(postMetaList)) {
             return Collections.emptyList();
         }
 
         return postMetaList.stream()
-            .map(this::convertTo)
-            .collect(Collectors.toList());
+                .map(this::convertTo)
+                .collect(Collectors.toList());
     }
 }

@@ -90,8 +90,8 @@ public class LevelCacheStore extends AbstractStringCacheStore {
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
         try {
             LEVEL_DB.put(
-                stringToBytes(key),
-                stringToBytes(JsonUtils.objectToJson(cacheWrapper))
+                    stringToBytes(key),
+                    stringToBytes(JsonUtils.objectToJson(cacheWrapper))
             );
             return true;
         } catch (JsonProcessingException e) {
@@ -136,8 +136,8 @@ public class LevelCacheStore extends AbstractStringCacheStore {
                 if (stringCacheWrapper.isPresent()) {
                     //get expireat time
                     long expireAtTime = stringCacheWrapper.map(CacheWrapper::getExpireAt)
-                        .map(Date::getTime)
-                        .orElse(0L);
+                            .map(Date::getTime)
+                            .orElse(0L);
                     //if expire
                     if (expireAtTime != 0 && currentTimeMillis > expireAtTime) {
                         writeBatch.delete(next.getKey());

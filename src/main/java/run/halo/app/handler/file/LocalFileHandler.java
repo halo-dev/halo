@@ -60,7 +60,7 @@ public class LocalFileHandler implements FileHandler {
     ReentrantLock lock = new ReentrantLock();
 
     public LocalFileHandler(OptionService optionService,
-                            HaloProperties haloProperties) {
+            HaloProperties haloProperties) {
         this.optionService = optionService;
 
         // Get work dir

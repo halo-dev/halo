@@ -46,8 +46,8 @@ public class SheetController {
     private final OptionService optionService;
 
     public SheetController(SheetService sheetService,
-                           AbstractStringCacheStore cacheStore,
-                           OptionService optionService) {
+            AbstractStringCacheStore cacheStore,
+            OptionService optionService) {
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
@@ -76,7 +76,7 @@ public class SheetController {
     @PostMapping
     @ApiOperation("Creates a sheet")
     public SheetDetailVO createBy(@RequestBody @Valid SheetParam sheetParam,
-                                  @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+            @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         Sheet sheet = sheetService.createBy(sheetParam.convertTo(), sheetParam.getSheetMetas(), autoSave);
         return sheetService.convertToDetailVo(sheet);
     }
@@ -84,9 +84,9 @@ public class SheetController {
     @PutMapping("{sheetId:\\d+}")
     @ApiOperation("Updates a sheet")
     public SheetDetailVO updateBy(
-        @PathVariable("sheetId") Integer sheetId,
-        @RequestBody @Valid SheetParam sheetParam,
-        @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+            @PathVariable("sheetId") Integer sheetId,
+            @RequestBody @Valid SheetParam sheetParam,
+            @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         Sheet sheetToUpdate = sheetService.getById(sheetId);
 
         sheetParam.update(sheetToUpdate);
@@ -99,8 +99,8 @@ public class SheetController {
     @PutMapping("{sheetId:\\d+}/{status}")
     @ApiOperation("Updates a sheet")
     public void updateStatusBy(
-        @PathVariable("sheetId") Integer sheetId,
-        @PathVariable("status") PostStatus status) {
+            @PathVariable("sheetId") Integer sheetId,
+            @PathVariable("status") PostStatus status) {
         Sheet sheet = sheetService.getById(sheetId);
 
         // Set status
@@ -113,8 +113,8 @@ public class SheetController {
     @PutMapping("{sheetId:\\d+}/status/draft/content")
     @ApiOperation("Updates draft")
     public BasePostDetailDTO updateDraftBy(
-        @PathVariable("sheetId") Integer sheetId,
-        @RequestBody PostContentParam contentParam) {
+            @PathVariable("sheetId") Integer sheetId,
+            @RequestBody PostContentParam contentParam) {
         // Update draft content
         Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(), sheetId);
 
@@ -149,8 +149,8 @@ public class SheetController {
         }
 
         previewUrl.append(sheetMinimalDTO.getFullPath())
-            .append("?token=")
-            .append(token);
+                .append("?token=")
+                .append(token);
 
         // build preview post url and return
         return previewUrl.toString();

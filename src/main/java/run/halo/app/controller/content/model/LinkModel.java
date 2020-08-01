@@ -17,7 +17,7 @@ public class LinkModel {
     private final OptionService optionService;
 
     public LinkModel(ThemeService themeService,
-                     OptionService optionService) {
+            OptionService optionService) {
         this.themeService = themeService;
         this.optionService = optionService;
     }

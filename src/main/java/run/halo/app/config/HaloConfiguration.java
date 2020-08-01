@@ -43,10 +43,10 @@ public class HaloConfiguration {
 
     @Bean
     public RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
-        throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate httpsRestTemplate = builder.build();
         httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
-            (int) haloProperties.getDownloadTimeout().toMillis())));
+                (int) haloProperties.getDownloadTimeout().toMillis())));
         return httpsRestTemplate;
     }
 

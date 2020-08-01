@@ -19,8 +19,8 @@ import java.util.Objects;
 @ToString(callSuper = true)
 @RequiredArgsConstructor
 @Entity
-@Table(name = "post_categories",
-    indexes = {@Index(name = "post_categories_post_id", columnList = "post_id"),
+@Table(name = "post_categories", indexes = {
+        @Index(name = "post_categories_post_id", columnList = "post_id"),
         @Index(name = "post_categories_category_id", columnList = "category_id")})
 public class PostCategory extends BaseEntity {
 
@@ -51,7 +51,7 @@ public class PostCategory extends BaseEntity {
         }
         PostCategory that = (PostCategory) o;
         return categoryId.equals(that.categoryId) &&
-            postId.equals(that.postId);
+                postId.equals(that.postId);
     }
 
     @Override

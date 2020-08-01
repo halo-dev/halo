@@ -1,5 +1,6 @@
 package run.halo.app.core;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,15 +24,18 @@ import run.halo.app.model.support.BaseResponse;
 public class CommonResultControllerAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
-    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+    public boolean supports(MethodParameter returnType, @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
         return AbstractJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
     @Override
     @NonNull
-    public final Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType,
-                                        MediaType contentType, Class<? extends HttpMessageConverter<?>> converterType,
-                                        ServerHttpRequest request, ServerHttpResponse response) {
+    public final Object beforeBodyWrite(@Nullable Object body,
+            @NotNull MethodParameter returnType,
+            @NotNull MediaType contentType,
+            @NotNull Class<? extends HttpMessageConverter<?>> converterType,
+            @NotNull ServerHttpRequest request,
+            @NotNull ServerHttpResponse response) {
         MappingJacksonValue container = getOrCreateContainer(body);
         // The contain body will never be null
         beforeBodyWriteInternal(container, contentType, returnType, request, response);
@@ -47,16 +51,16 @@ public class CommonResultControllerAdvice implements ResponseBodyAdvice<Object> 
     }
 
     private void beforeBodyWriteInternal(MappingJacksonValue bodyContainer,
-                                         MediaType contentType,
-                                         MethodParameter returnType,
-                                         ServerHttpRequest request,
-                                         ServerHttpResponse response) {
+            MediaType contentType,
+            MethodParameter returnType,
+            ServerHttpRequest request,
+            ServerHttpResponse response) {
         // Get return body
         Object returnBody = bodyContainer.getValue();
 
         if (returnBody instanceof BaseResponse) {
             // If the return body is instance of BaseResponse
-            BaseResponse<?> baseResponse = (BaseResponse) returnBody;
+            BaseResponse<?> baseResponse = (BaseResponse<?>) returnBody;
             response.setStatusCode(HttpStatus.resolve(baseResponse.getStatus()));
             return;
         }
