@@ -343,7 +343,7 @@ public interface ThemeService {
     /**
      * Fetches a specific release
      *
-     * @param uri theme remote uri must not be null
+     * @param uri     theme remote uri must not be null
      * @param tagName release tag name must not be null
      * @return theme property
      */
@@ -353,7 +353,7 @@ public interface ThemeService {
     /**
      * Fetches a specific branch (clone)
      *
-     * @param uri theme remote uri must not be null
+     * @param uri        theme remote uri must not be null
      * @param branchName wanted branch must not be null
      * @return theme property
      */

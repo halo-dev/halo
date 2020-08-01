@@ -86,7 +86,7 @@ class TimeBasedOneTimePasswordUtil {
     /**
      * set to the number of digits to control 0 prefix, set to 0 for no prefix
      */
-    private static int NUM_DIGITS_OUTPUT = 6;
+    private static final int NUM_DIGITS_OUTPUT = 6;
 
     static {
         char[] chars = new char[NUM_DIGITS_OUTPUT];

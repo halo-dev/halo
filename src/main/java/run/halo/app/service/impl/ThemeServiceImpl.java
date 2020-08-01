@@ -78,18 +78,18 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final AtomicReference<String> activeThemeId = new AtomicReference<>();
+
     /**
      * Activated theme id.
      */
     @Nullable
     private volatile String activatedThemeId;
-
+    
     /**
      * Activated theme property.
      */
     private volatile ThemeProperty activatedTheme;
-
-    private final AtomicReference<String> activeThemeId = new AtomicReference<>();
 
     public ThemeServiceImpl(HaloProperties haloProperties,
                             OptionService optionService,
@@ -358,12 +358,6 @@ public class ThemeServiceImpl implements ThemeService {
         return activatedTheme;
     }
 
-    @Override
-    @NonNull
-    public Optional<ThemeProperty> fetchActivatedTheme() {
-        return fetchThemePropertyBy(getActivatedThemeId());
-    }
-
     /**
      * Sets activated theme.
      *
@@ -372,6 +366,12 @@ public class ThemeServiceImpl implements ThemeService {
     private void setActivatedTheme(@Nullable ThemeProperty activatedTheme) {
         this.activatedTheme = activatedTheme;
         this.activatedThemeId = Optional.ofNullable(activatedTheme).map(ThemeProperty::getId).orElse(null);
+    }
+
+    @Override
+    @NonNull
+    public Optional<ThemeProperty> fetchActivatedTheme() {
+        return fetchThemePropertyBy(getActivatedThemeId());
     }
 
     @Override
@@ -590,7 +590,7 @@ public class ThemeServiceImpl implements ThemeService {
     public List<ThemeProperty> fetchBranches(String uri) {
         Assert.hasText(uri, "Theme remote uri must not be blank");
 
-        String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git",".git");
+        String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
         List<String> branches = GitUtils.getAllBranches(repoUrl);
 
         List<ThemeProperty> themeProperties = new ArrayList<>();
@@ -717,7 +717,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         // Get branch
         String branch = StringUtils.isBlank(themeProperty.getBranch()) ?
-                DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
+            DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
 
         Git git = null;
 
@@ -728,8 +728,8 @@ public class ThemeServiceImpl implements ThemeService {
 
             // Add all changes
             git.add()
-                    .addFilepattern(".")
-                    .call();
+                .addFilepattern(".")
+                .call();
             // Commit the changes
             git.commit().setMessage("Commit by halo automatically").call();
 
@@ -744,31 +744,31 @@ public class ThemeServiceImpl implements ThemeService {
             // Force to set remote name
             git.remoteRemove().setRemoteName(THEME_PROVIDER_REMOTE_NAME).call();
             RemoteConfig remoteConfig = git.remoteAdd()
-                    .setName(THEME_PROVIDER_REMOTE_NAME)
-                    .setUri(new URIish(themeProperty.getRepo()))
-                    .call();
+                .setName(THEME_PROVIDER_REMOTE_NAME)
+                .setUri(new URIish(themeProperty.getRepo()))
+                .call();
 
             // Check out to specified branch
             if (!StringUtils.equalsIgnoreCase(branch, git.getRepository().getBranch())) {
                 boolean present = git.branchList()
-                        .call()
-                        .stream()
-                        .map(Ref::getName)
-                        .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branch));
+                    .call()
+                    .stream()
+                    .map(Ref::getName)
+                    .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branch));
 
                 git.checkout()
-                        .setCreateBranch(true)
-                        .setForced(!present)
-                        .setName(branch)
-                        .call();
+                    .setCreateBranch(true)
+                    .setForced(!present)
+                    .setName(branch)
+                    .call();
             }
 
             // Pull with rebasing
             PullResult pullResult = git.pull()
-                    .setRemote(remoteConfig.getName())
-                    .setRemoteBranchName(branch)
-                    .setRebase(true)
-                    .call();
+                .setRemote(remoteConfig.getName())
+                .setRemoteBranchName(branch)
+                .setRebase(true)
+                .call();
 
             if (!pullResult.isSuccessful()) {
                 log.debug("Rebase result: [{}]", pullResult.getRebaseResult());
@@ -787,9 +787,9 @@ public class ThemeServiceImpl implements ThemeService {
             if (StringUtils.isNotEmpty(updatedThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, updatedThemeProperty.getRequire())) {
                 // reset theme version
                 git.reset()
-                        .setMode(ResetCommand.ResetType.HARD)
-                        .setRef(lastCommit.getName())
-                        .call();
+                    .setMode(ResetCommand.ResetType.HARD)
+                    .setRef(lastCommit.getName())
+                    .call();
                 throw new ThemeNotSupportException("新版本主题仅支持 Halo " + updatedThemeProperty.getRequire() + " 以上的版本");
             }
         } finally {

@@ -16,7 +16,6 @@ import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.model.vo.AdjacentPostVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
@@ -96,9 +95,8 @@ public class PostModel {
 
         postService.publishVisitEvent(post.getId());
 
-        AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
-        adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
-        adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
+        postService.getPrevPost(post).ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
+        postService.getNextPost(post).ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());

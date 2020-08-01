@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,7 +27,10 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.properties.PostProperties;
-import run.halo.app.model.vo.*;
+import run.halo.app.model.vo.ArchiveMonthVO;
+import run.halo.app.model.vo.ArchiveYearVO;
+import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.base.BasePostRepository;
 import run.halo.app.service.*;
@@ -561,8 +563,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             postListVO.setFullPath(buildFullPath(post));
 
-            postListVO.setWordCount(post.getWordCount());
-
             return postListVO;
         });
     }
@@ -620,8 +620,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
             postListVO.setFullPath(buildFullPath(post));
-
-            postListVO.setWordCount(post.getWordCount());
 
             return postListVO;
         }).collect(Collectors.toList());
@@ -805,75 +803,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public @NotNull AdjacentPostVO getAdjacentPosts(Post currentPost) {
-        Assert.notNull(currentPost, "Post must not be null");
-
-        // get pageable post list
-        List<Post> postList = new ArrayList<>();
-        // init fist page && default page size
-        int page = 1;
-        int defaultPageSize = 500;
-        boolean needNext = true;
-
-        // get custom sort type
-        Sort sort = getPostDefaultSort();
-        Pageable pageable = null;
-        PostStatus postStatus = PostStatus.PUBLISHED;
-        long totalCount = countByStatus(postStatus);
-
-        while (needNext && totalCount > postList.size()) {
-            pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, defaultPageSize, sort);
-
-            Page<Post> postPage = pageBy(postStatus, pageable);
-            List<Post> pageablePostList = postPage.getContent();
-            if (pageablePostList.size() == 0) {
-                break;
-            }
-            postList.addAll(postPage.getContent());
-            if (postList.stream().filter(it -> it.getId().equals(currentPost.getId())).count() == 1
-                && !postList.stream().reduce((first, second) -> second).get().getId()
-                .equals(currentPost.getId())) {
-                // contains the post && the post is not in the end
-                needNext = false;
-            }
-
-            page++;
-        }
-
-        if (CollectionUtils.isEmpty(postList)) {
-            // if post list is empty, return empty object
-            return AdjacentPostVO.builder().build();
-        }
-
-        // get current post index in post list
-        List<Integer> idList = postList.stream().map(Post::getId).collect(Collectors.toList());
-        int index = idList.indexOf(currentPost.getId());
-
-        if (index == -1) {
-            // if not found, return empty object
-            return AdjacentPostVO.builder().build();
-        }
-
-        AdjacentPostVO adjacentPostVO = new AdjacentPostVO();
-
-        // setup pre
-        if (index > 0) {
-            adjacentPostVO.setPrevPost(postList.get(index - 1));
-        }
-        // setup next
-        if (index < postList.size() - 1) {
-            adjacentPostVO.setNextPost(postList.get(index + 1));
-        }
-
-        return adjacentPostVO;
-    }
-
-    @Override
     public @NotNull Sort getPostDefaultSort() {
         String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
             .toString();
-        return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort)).and(Sort.by(DESC, "id"));
+        return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort).and(Sort.by(DESC, "id")));
     }
 
     private String buildFullPath(Post post) {
