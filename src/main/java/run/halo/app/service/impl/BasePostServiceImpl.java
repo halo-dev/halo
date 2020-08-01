@@ -255,7 +255,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(post, "Post must not be null");
 
         String originalContent = post.getOriginalContent();
-        originalContent = run.halo.app.utils.StringUtils.htmlToString(originalContent);
+        originalContent = HaloUtils.cleanHtmlTag(originalContent);
 
         post.setWordCount((long) originalContent.length());
 

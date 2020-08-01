@@ -563,8 +563,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             postListVO.setFullPath(buildFullPath(post));
 
-            postListVO.setWordCount(post.getWordCount());
-
             return postListVO;
         });
     }
@@ -622,8 +620,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
             postListVO.setFullPath(buildFullPath(post));
-
-            postListVO.setWordCount(post.getWordCount());
 
             return postListVO;
         }).collect(Collectors.toList());
