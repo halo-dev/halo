@@ -806,7 +806,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     public @NotNull Sort getPostDefaultSort() {
         String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
             .toString();
-        return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort));
+        return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort).and(Sort.by(DESC, "id")));
     }
 
     private String buildFullPath(Post post) {

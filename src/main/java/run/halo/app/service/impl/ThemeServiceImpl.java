@@ -77,12 +77,15 @@ public class ThemeServiceImpl implements ThemeService {
     private final RestTemplate restTemplate;
 
     private final ApplicationEventPublisher eventPublisher;
+
     private final AtomicReference<String> activeThemeId = new AtomicReference<>();
+
     /**
      * Activated theme id.
      */
     @Nullable
     private volatile String activatedThemeId;
+    
     /**
      * Activated theme property.
      */

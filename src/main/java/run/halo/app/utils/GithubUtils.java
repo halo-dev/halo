@@ -133,7 +133,12 @@ public class GithubUtils {
          * should be in format of "username/reponame"
          */
         private final String repoUrl;
+
+        /**
+         * repository tag name
+         */
         private final String tagName;
+
         /**
          * The return result is zip url and tag name etc.
          */
