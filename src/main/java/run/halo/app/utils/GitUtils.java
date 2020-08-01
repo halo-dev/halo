@@ -13,7 +13,10 @@ import org.springframework.util.Assert;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Git utilities.
@@ -70,11 +73,11 @@ public class GitUtils {
         Git git = null;
         try {
             git = Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setDirectory(targetPath.toFile())
-                    .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
-                    .setBranch("refs/heads/" + branchName)
-                    .call();
+                .setURI(repoUrl)
+                .setDirectory(targetPath.toFile())
+                .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
+                .setBranch("refs/heads/" + branchName)
+                .call();
         } finally {
             closeQuietly(git);
         }
@@ -84,9 +87,9 @@ public class GitUtils {
         List<String> branches = new ArrayList<>();
         try {
             Collection<Ref> refs = Git.lsRemoteRepository()
-                    .setHeads(true)
-                    .setRemote(repoUrl)
-                    .call();
+                .setHeads(true)
+                .setRemote(repoUrl)
+                .call();
             for (Ref ref : refs) {
                 branches.add(ref.getName().substring(ref.getName().lastIndexOf("/") + 1));
             }

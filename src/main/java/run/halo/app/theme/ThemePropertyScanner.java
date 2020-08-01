@@ -34,17 +34,15 @@ public enum ThemePropertyScanner {
 
     INSTANCE;
 
-    private final ThemePropertyResolver propertyResolver = new YamlThemePropertyResolver();
-
     /**
      * Theme property file name.
      */
     private static final String[] THEME_PROPERTY_FILE_NAMES = {"theme.yaml", "theme.yml"};
-
     /**
      * Theme screenshots name.
      */
     private static final String THEME_SCREENSHOTS_NAME = "screenshot";
+    private final ThemePropertyResolver propertyResolver = new YamlThemePropertyResolver();
 
     /**
      * Scan theme properties.

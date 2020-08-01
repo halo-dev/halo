@@ -30,7 +30,10 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -114,35 +117,55 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
 
     @Override
-    public List<POST> listPrevPosts(Date date, int size) {
-        Assert.notNull(date, "Date must not be null");
+    public List<POST> listPrevPosts(POST post, int size) {
+        Assert.notNull(post, "Post must not be null");
 
-        return basePostRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED,
-            date,
-            PageRequest.of(0, size, Sort.by(ASC, "createTime")))
-            .getContent();
+        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
+
+        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(ASC, indexSort));
+
+        switch (indexSort) {
+            case "createTime":
+                return basePostRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED, post.getCreateTime(), pageRequest).getContent();
+            case "editTime":
+                return basePostRepository.findAllByStatusAndEditTimeAfter(PostStatus.PUBLISHED, post.getEditTime(), pageRequest).getContent();
+            case "visits":
+                return basePostRepository.findAllByStatusAndVisitsAfter(PostStatus.PUBLISHED, post.getVisits(), pageRequest).getContent();
+            default:
+                return Collections.emptyList();
+        }
     }
 
     @Override
-    public List<POST> listNextPosts(Date date, int size) {
-        Assert.notNull(date, "Date must not be null");
+    public List<POST> listNextPosts(POST post, int size) {
+        Assert.notNull(post, "Post must not be null");
 
-        return basePostRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED,
-            date,
-            PageRequest.of(0, size, Sort.by(DESC, "createTime")))
-            .getContent();
+        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
+
+        PageRequest pageRequest = PageRequest.of(0, size, Sort.by(DESC, indexSort));
+
+        switch (indexSort) {
+            case "createTime":
+                return basePostRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED, post.getCreateTime(), pageRequest).getContent();
+            case "editTime":
+                return basePostRepository.findAllByStatusAndEditTimeBefore(PostStatus.PUBLISHED, post.getEditTime(), pageRequest).getContent();
+            case "visits":
+                return basePostRepository.findAllByStatusAndVisitsBefore(PostStatus.PUBLISHED, post.getVisits(), pageRequest).getContent();
+            default:
+                return Collections.emptyList();
+        }
     }
 
     @Override
-    public Optional<POST> getPrevPost(Date date) {
-        List<POST> posts = listPrevPosts(date, 1);
+    public Optional<POST> getPrevPost(POST post) {
+        List<POST> posts = listPrevPosts(post, 1);
 
         return CollectionUtils.isEmpty(posts) ? Optional.empty() : Optional.of(posts.get(0));
     }
 
     @Override
-    public Optional<POST> getNextPost(Date date) {
-        List<POST> posts = listNextPosts(date, 1);
+    public Optional<POST> getNextPost(POST post) {
+        List<POST> posts = listNextPosts(post, 1);
 
         return CollectionUtils.isEmpty(posts) ? Optional.empty() : Optional.of(posts.get(0));
     }
