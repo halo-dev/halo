@@ -52,7 +52,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
     private final OptionService optionService;
 
-    private final Pattern summaryPattern = Pattern.compile("\\s*|\t|\r|\n");
+    private final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
                                OptionService optionService) {
