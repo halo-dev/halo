@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import run.halo.app.model.support.HaloConst;
@@ -22,7 +23,7 @@ import java.util.regex.Pattern;
 @ToString
 @EqualsAndHashCode
 @Slf4j
-public class Version {
+public class Version implements Comparable<Version> {
 
     /**
      * Regex expression.
@@ -120,6 +121,27 @@ public class Version {
                 Long.parseLong(patch),
                 PreRelease.of(preRelease),
                 StringUtils.isNotBlank(preReleaseMajor) ? Long.parseLong(preReleaseMajor) : null));
+    }
+
+    @Override
+    public int compareTo(@NotNull Version anotherVersion) {
+        // compare major
+        int majorCompare = Long.compare(major, anotherVersion.major);
+        if (majorCompare != 0) {
+            return majorCompare;
+        }
+        // compare minor
+        int minorCompare = Long.compare(minor, anotherVersion.minor);
+        if (minorCompare != 0) {
+            return minorCompare;
+        }
+        // compare patch
+        int patchCompare = Long.compare(patch, anotherVersion.patch);
+        if (patchCompare != 0) {
+            return patchCompare;
+        }
+        // if all the major, minor and patch are the same, then compare pre release number
+        return Long.compare(preReleaseMajor, anotherVersion.preReleaseMajor);
     }
 
     /**

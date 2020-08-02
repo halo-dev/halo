@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.lang.NonNull;
 import run.halo.app.model.support.HaloConst;
 
 import java.util.Optional;
@@ -136,5 +137,45 @@ class VersionTest {
         Optional<Version> unknownVersionOpt = Version.resolve(HaloConst.UNKNOWN_VERSION);
         assertTrue(unknownVersionOpt.isPresent());
         assertEquals(new Version(0, 0, 0), unknownVersionOpt.get());
+    }
+
+    @Test
+    void compareTest() {
+        Version leftVersion = getVersion("1.2.3");
+        // compare with own
+        assertEquals(0, leftVersion.compareTo(leftVersion));
+
+        // compare with others
+        Version rightVersion = getVersion("1.2.4");
+        assertTrue(leftVersion.compareTo(rightVersion) < 0);
+
+        rightVersion = getVersion("1.3.3");
+        assertTrue(leftVersion.compareTo(rightVersion) < 0);
+
+        rightVersion = getVersion("2.2.3");
+        assertTrue(leftVersion.compareTo(rightVersion) < 0);
+
+        rightVersion = getVersion("0.2.3");
+        assertTrue(leftVersion.compareTo(rightVersion) > 0);
+
+        rightVersion = getVersion("1.1.3");
+        assertTrue(leftVersion.compareTo(rightVersion) > 0);
+
+        rightVersion = getVersion("1.2.2");
+        assertTrue(leftVersion.compareTo(rightVersion) > 0);
+
+        rightVersion = getVersion("1.2.3-alpha.0");
+        assertTrue(leftVersion.compareTo(rightVersion) > 0);
+
+        rightVersion = getVersion("1.2.4-alpha.0");
+        assertTrue(leftVersion.compareTo(rightVersion) < 0);
+
+        // compare with unkown version
+        assertTrue(leftVersion.compareTo(getVersion(HaloConst.UNKNOWN_VERSION)) > 0);
+    }
+
+    @NonNull
+    Version getVersion(String version) {
+        return Version.resolve(version).orElseThrow(() -> new IllegalArgumentException("Invalid version"));
     }
 }
