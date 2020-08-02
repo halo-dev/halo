@@ -16,7 +16,7 @@ class VersionUtilTest {
     void compareVersion() {
         assertTrue(VersionUtil.compareVersion("1.2.0", "1.1.1"));
         assertTrue(VersionUtil.compareVersion("1.2.1", "1.2.0"));
-        assertTrue(VersionUtil.compareVersion("1.2.0", "1.1.1.0"));
+        assertTrue(VersionUtil.compareVersion("1.2.0", "1.1.1"));
         assertTrue(VersionUtil.compareVersion("1.2.0", "0.4.4"));
         assertFalse(VersionUtil.compareVersion("1.1.1", "1.2.0"));
         assertFalse(VersionUtil.compareVersion("0.0.1", "1.2.0"));
@@ -29,7 +29,7 @@ class VersionUtilTest {
                 RandomStringUtils.randomNumeric(1),
                 RandomStringUtils.randomNumeric(2),
                 RandomStringUtils.randomNumeric(3));
-        assertTrue(VersionUtil.compareVersion(HaloConst.UNKNOWN_VERSION, randomVersion));
+        assertFalse(VersionUtil.compareVersion(HaloConst.UNKNOWN_VERSION, randomVersion));
     }
 
     @Test

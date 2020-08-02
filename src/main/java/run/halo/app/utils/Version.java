@@ -43,6 +43,11 @@ public class Version implements Comparable<Version> {
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     /**
+     * Empty version.
+     */
+    private static final Version EMPTY_VERSION = new Version(0, 0, 0);
+
+    /**
      * Major number.
      */
     private final long major;
@@ -76,15 +81,38 @@ public class Version implements Comparable<Version> {
     }
 
     public Version(long major, long minor, long patch, @Nullable PreRelease preRelease, @Nullable Long preReleaseMajor) {
+        if (major < 0) {
+            major = 0L;
+        }
+        if (minor < 0L) {
+            minor = 0;
+        }
+        if (patch < 0) {
+            minor = 0L;
+        }
         this.major = major;
         this.minor = minor;
         this.patch = patch;
         this.preRelease = preRelease;
         if (preRelease != null) {
-            this.preReleaseMajor = preReleaseMajor == null ? Integer.MAX_VALUE : preReleaseMajor;
+            preReleaseMajor = preReleaseMajor == null ? Integer.MAX_VALUE : preReleaseMajor;
+            if (preReleaseMajor < 0) {
+                preReleaseMajor = 0L;
+            }
+            this.preReleaseMajor = preReleaseMajor;
         } else {
             this.preReleaseMajor = Integer.MAX_VALUE;
         }
+    }
+
+    /**
+     * Empty version.
+     *
+     * @return empty version
+     */
+    @NonNull
+    public static Version emptyVersion() {
+        return EMPTY_VERSION;
     }
 
     /**
