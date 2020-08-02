@@ -29,8 +29,8 @@ public class JournalModel {
     private final ThemeService themeService;
 
     public JournalModel(JournalService journalService,
-                        OptionService optionService,
-                        ThemeService themeService) {
+            OptionService optionService,
+            ThemeService themeService) {
         this.journalService = journalService;
         this.optionService = optionService;
         this.themeService = themeService;

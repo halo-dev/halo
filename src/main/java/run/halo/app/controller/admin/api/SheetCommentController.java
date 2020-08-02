@@ -40,7 +40,7 @@ public class SheetCommentController {
     private final OptionService optionService;
 
     public SheetCommentController(SheetCommentService sheetCommentService,
-                                  OptionService optionService) {
+            OptionService optionService) {
         this.sheetCommentService = sheetCommentService;
         this.optionService = optionService;
     }
@@ -48,7 +48,7 @@ public class SheetCommentController {
     @GetMapping
     @ApiOperation("Lists sheet comments")
     public Page<SheetCommentWithSheetVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-                                                CommentQuery commentQuery) {
+            CommentQuery commentQuery) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageBy(commentQuery, pageable);
         return sheetCommentService.convertToWithSheetVo(sheetCommentPage);
     }
@@ -56,7 +56,7 @@ public class SheetCommentController {
     @GetMapping("latest")
     @ApiOperation("Lists latest sheet comments")
     public List<SheetCommentWithSheetVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
-                                                    @RequestParam(name = "status", required = false) CommentStatus status) {
+            @RequestParam(name = "status", required = false) CommentStatus status) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageLatest(top, status);
         return sheetCommentService.convertToWithSheetVo(sheetCommentPage.getContent());
     }
@@ -64,16 +64,16 @@ public class SheetCommentController {
     @GetMapping("{sheetId:\\d+}/tree_view")
     @ApiOperation("Lists sheet comments with tree view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("sheetId") Integer sheetId,
-                                               @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return sheetCommentService.pageVosAllBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{sheetId:\\d+}/list_view")
     @ApiOperation("Lists sheet comment with list view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
-                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return sheetCommentService.pageWithParentVoBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
@@ -87,7 +87,7 @@ public class SheetCommentController {
     @PutMapping("{commentId:\\d+}/status/{status}")
     @ApiOperation("Updates sheet comment status")
     public BaseCommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
-                                         @PathVariable("status") CommentStatus status) {
+            @PathVariable("status") CommentStatus status) {
         // Update comment status
         SheetComment updatedSheetComment = sheetCommentService.updateStatus(commentId, status);
         return sheetCommentService.convertTo(updatedSheetComment);
@@ -96,7 +96,7 @@ public class SheetCommentController {
     @PutMapping("status/{status}")
     @ApiOperation("Updates sheet comment status in batch")
     public List<BaseCommentDTO> updateStatusInBatch(@PathVariable(name = "status") CommentStatus status,
-                                                    @RequestBody List<Long> ids) {
+            @RequestBody List<Long> ids) {
         List<SheetComment> comments = sheetCommentService.updateStatusByIds(ids, status);
         return sheetCommentService.convertTo(comments);
     }
@@ -125,7 +125,7 @@ public class SheetCommentController {
     @PutMapping("{commentId:\\d+}")
     @ApiOperation("Updates a sheet comment")
     public BaseCommentDTO updateBy(@Valid @RequestBody SheetCommentParam commentParam,
-                                   @PathVariable("commentId") Long commentId) {
+            @PathVariable("commentId") Long commentId) {
         SheetComment commentToUpdate = sheetCommentService.getById(commentId);
 
         commentParam.update(commentToUpdate);

@@ -31,12 +31,15 @@ public class RedisCacheStore extends AbstractStringCacheStore {
      * Cache container.
      */
     private final static ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER = new ConcurrentHashMap<>();
+
     private volatile static JedisCluster REDIS;
-    protected HaloProperties haloProperties;
+
     /**
      * Lock.
      */
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
+
+    protected HaloProperties haloProperties;
 
     public RedisCacheStore(HaloProperties haloProperties) {
         this.haloProperties = haloProperties;

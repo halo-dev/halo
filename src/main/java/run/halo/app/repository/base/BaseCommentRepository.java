@@ -65,9 +65,9 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of comment count
      */
     @Query("select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), comment.postId) " +
-        "from BaseComment comment " +
-        "where comment.postId in ?1 " +
-        "group by comment.postId")
+            "from BaseComment comment " +
+            "where comment.postId in ?1 " +
+            "group by comment.postId")
     @NonNull
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
@@ -192,9 +192,9 @@ public interface BaseCommentRepository<COMMENT extends BaseComment> extends Base
      * @return a list of CommentChildrenCountProjection
      */
     @Query("select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment.id), comment.parentId) " +
-        "from BaseComment comment " +
-        "where comment.parentId in ?1 " +
-        "group by comment.parentId")
+            "from BaseComment comment " +
+            "where comment.parentId in ?1 " +
+            "group by comment.parentId")
     @NonNull
     List<CommentChildrenCountProjection> findDirectChildrenCount(@NonNull Collection<Long> commentIds);
 }

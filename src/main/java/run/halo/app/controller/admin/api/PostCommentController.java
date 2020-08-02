@@ -40,7 +40,7 @@ public class PostCommentController {
     private final OptionService optionService;
 
     public PostCommentController(PostCommentService postCommentService,
-                                 OptionService optionService) {
+            OptionService optionService) {
         this.postCommentService = postCommentService;
         this.optionService = optionService;
     }
@@ -48,7 +48,7 @@ public class PostCommentController {
     @GetMapping
     @ApiOperation("Lists post comments")
     public Page<PostCommentWithPostVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-                                              CommentQuery commentQuery) {
+            CommentQuery commentQuery) {
         Page<PostComment> commentPage = postCommentService.pageBy(commentQuery, pageable);
         return postCommentService.convertToWithPostVo(commentPage);
     }
@@ -56,7 +56,7 @@ public class PostCommentController {
     @GetMapping("latest")
     @ApiOperation("Pages post latest comments")
     public List<PostCommentWithPostVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
-                                                  @RequestParam(name = "status", required = false) CommentStatus status) {
+            @RequestParam(name = "status", required = false) CommentStatus status) {
         // Get latest comment
         List<PostComment> content = postCommentService.pageLatest(top, status).getContent();
 
@@ -67,16 +67,16 @@ public class PostCommentController {
     @GetMapping("{postId:\\d+}/tree_view")
     @ApiOperation("Lists post comments with tree view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("postId") Integer postId,
-                                               @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return postCommentService.pageVosAllBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{postId:\\d+}/list_view")
     @ApiOperation("Lists post comment with list view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
-                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return postCommentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
@@ -90,7 +90,7 @@ public class PostCommentController {
     @PutMapping("{commentId:\\d+}/status/{status}")
     @ApiOperation("Updates post comment status")
     public BaseCommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
-                                         @PathVariable("status") CommentStatus status) {
+            @PathVariable("status") CommentStatus status) {
         // Update comment status
         PostComment updatedPostComment = postCommentService.updateStatus(commentId, status);
         return postCommentService.convertTo(updatedPostComment);
@@ -99,7 +99,7 @@ public class PostCommentController {
     @PutMapping("status/{status}")
     @ApiOperation("Updates post comment status in batch")
     public List<BaseCommentDTO> updateStatusInBatch(@PathVariable(name = "status") CommentStatus status,
-                                                    @RequestBody List<Long> ids) {
+            @RequestBody List<Long> ids) {
         List<PostComment> comments = postCommentService.updateStatusByIds(ids, status);
         return postCommentService.convertTo(comments);
     }
@@ -127,7 +127,7 @@ public class PostCommentController {
     @PutMapping("{commentId:\\d+}")
     @ApiOperation("Updates a post comment")
     public BaseCommentDTO updateBy(@Valid @RequestBody PostCommentParam commentParam,
-                                   @PathVariable("commentId") Long commentId) {
+            @PathVariable("commentId") Long commentId) {
         PostComment commentToUpdate = postCommentService.getById(commentId);
 
         commentParam.update(commentToUpdate);

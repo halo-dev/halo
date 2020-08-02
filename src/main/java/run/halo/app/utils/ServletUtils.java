@@ -28,9 +28,9 @@ public class ServletUtils {
     @NonNull
     public static Optional<HttpServletRequest> getCurrentRequest() {
         return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-            .filter(requestAttributes -> requestAttributes instanceof ServletRequestAttributes)
-            .map(requestAttributes -> (ServletRequestAttributes) requestAttributes)
-            .map(ServletRequestAttributes::getRequest);
+                .filter(requestAttributes -> requestAttributes instanceof ServletRequestAttributes)
+                .map(requestAttributes -> (ServletRequestAttributes) requestAttributes)
+                .map(ServletRequestAttributes::getRequest);
     }
 
     /**

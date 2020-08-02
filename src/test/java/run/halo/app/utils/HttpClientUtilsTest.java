@@ -25,10 +25,10 @@ public class HttpClientUtilsTest {
         assertEquals(result.get(0), "https://127.0.0.1:123");
 
         result = (Tuple) resolveHttpProxy.invoke(null, "https://u:p@127.0.0.1:123");
-        assertArrayEquals(result.getMembers(), new Object[]{"https://127.0.0.1:123", "u", "p"});
+        assertArrayEquals(result.getMembers(), new Object[] {"https://127.0.0.1:123", "u", "p"});
 
         result = (Tuple) resolveHttpProxy.invoke(null, "https://u@127.0.0.1");
-        assertArrayEquals(result.getMembers(), new Object[]{"https://127.0.0.1:443", "u", null});
+        assertArrayEquals(result.getMembers(), new Object[] {"https://127.0.0.1:443", "u", null});
     }
 
 }

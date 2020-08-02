@@ -78,6 +78,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final AtomicReference<String> activeThemeId = new AtomicReference<>();
+
     /**
      * Activated theme id.
      */
@@ -89,14 +91,12 @@ public class ThemeServiceImpl implements ThemeService {
      */
     private volatile ThemeProperty activatedTheme;
 
-    private final AtomicReference<String> activeThemeId = new AtomicReference<>();
-
     public ThemeServiceImpl(HaloProperties haloProperties,
-                            OptionService optionService,
-                            AbstractStringCacheStore cacheStore,
-                            ThemeConfigResolver themeConfigResolver,
-                            RestTemplate restTemplate,
-                            ApplicationEventPublisher eventPublisher) {
+            OptionService optionService,
+            AbstractStringCacheStore cacheStore,
+            ThemeConfigResolver themeConfigResolver,
+            RestTemplate restTemplate,
+            ApplicationEventPublisher eventPublisher) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
         this.themeConfigResolver = themeConfigResolver;
@@ -124,8 +124,8 @@ public class ThemeServiceImpl implements ThemeService {
 
         // filter and find first
         return themes.stream()
-            .filter(themeProperty -> StringUtils.equals(themeProperty.getId(), themeId))
-            .findFirst();
+                .filter(themeProperty -> StringUtils.equals(themeProperty.getId(), themeId))
+                .findFirst();
     }
 
     @Override
@@ -144,8 +144,8 @@ public class ThemeServiceImpl implements ThemeService {
     @NonNull
     public List<ThemeFile> listThemeFolderBy(@NonNull String themeId) {
         return fetchThemePropertyBy(themeId)
-            .map(themeProperty -> ThemeFileScanner.INSTANCE.scan(themeProperty.getThemePath()))
-            .orElse(Collections.emptyList());
+                .map(themeProperty -> ThemeFileScanner.INSTANCE.scan(themeProperty.getThemePath()))
+                .orElse(Collections.emptyList());
     }
 
     @Override
@@ -162,14 +162,14 @@ public class ThemeServiceImpl implements ThemeService {
             Path themePath = Paths.get(themeProperty.getThemePath());
             try (Stream<Path> pathStream = Files.list(themePath)) {
                 return pathStream.filter(path -> StringUtils.startsWithIgnoreCase(path.getFileName().toString(), prefix))
-                    .map(path -> {
-                        // Remove prefix
-                        String customTemplate = StringUtils.removeStartIgnoreCase(path.getFileName().toString(), prefix);
-                        // Remove suffix
-                        return StringUtils.removeEndIgnoreCase(customTemplate, HaloConst.SUFFIX_FTL);
-                    })
-                    .distinct()
-                    .collect(Collectors.toList());
+                        .map(path -> {
+                            // Remove prefix
+                            String customTemplate = StringUtils.removeStartIgnoreCase(path.getFileName().toString(), prefix);
+                            // Remove suffix
+                            return StringUtils.removeEndIgnoreCase(customTemplate, HaloConst.SUFFIX_FTL);
+                        })
+                        .distinct()
+                        .collect(Collectors.toList());
             } catch (Exception e) {
                 throw new ServiceException("Failed to list files of path " + themePath, e);
             }
@@ -319,8 +319,8 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public String render(String pageName) {
         return fetchActivatedTheme()
-            .map(themeProperty -> String.format(RENDER_TEMPLATE, themeProperty.getFolderName(), pageName))
-            .orElse(DEFAULT_ERROR_PATH);
+                .map(themeProperty -> String.format(RENDER_TEMPLATE, themeProperty.getFolderName(), pageName))
+                .orElse(DEFAULT_ERROR_PATH);
     }
 
     @Override
@@ -358,12 +358,6 @@ public class ThemeServiceImpl implements ThemeService {
         return activatedTheme;
     }
 
-    @Override
-    @NonNull
-    public Optional<ThemeProperty> fetchActivatedTheme() {
-        return fetchThemePropertyBy(getActivatedThemeId());
-    }
-
     /**
      * Sets activated theme.
      *
@@ -372,6 +366,12 @@ public class ThemeServiceImpl implements ThemeService {
     private void setActivatedTheme(@Nullable ThemeProperty activatedTheme) {
         this.activatedTheme = activatedTheme;
         this.activatedThemeId = Optional.ofNullable(activatedTheme).map(ThemeProperty::getId).orElse(null);
+    }
+
+    @Override
+    @NonNull
+    public Optional<ThemeProperty> fetchActivatedTheme() {
+        return fetchThemePropertyBy(getActivatedThemeId());
     }
 
     @Override
@@ -453,7 +453,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         // Check theme existence
         boolean isExist = getThemes().stream()
-            .anyMatch(themeProperty -> themeProperty.getId().equalsIgnoreCase(tmpThemeProperty.getId()));
+                .anyMatch(themeProperty -> themeProperty.getId().equalsIgnoreCase(tmpThemeProperty.getId()));
 
         if (isExist) {
             throw new AlreadyExistsException("当前安装的主题已存在");
@@ -590,7 +590,7 @@ public class ThemeServiceImpl implements ThemeService {
     public List<ThemeProperty> fetchBranches(String uri) {
         Assert.hasText(uri, "Theme remote uri must not be blank");
 
-        String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git",".git");
+        String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
         List<String> branches = GitUtils.getAllBranches(repoUrl);
 
         List<ThemeProperty> themeProperties = new ArrayList<>();
@@ -712,7 +712,7 @@ public class ThemeServiceImpl implements ThemeService {
     }
 
     private void pullFromGit(@NonNull ThemeProperty themeProperty) throws
-        IOException, GitAPIException, URISyntaxException {
+            IOException, GitAPIException, URISyntaxException {
         Assert.notNull(themeProperty, "Theme property must not be null");
 
         // Get branch
@@ -854,7 +854,7 @@ public class ThemeServiceImpl implements ThemeService {
     @NonNull
     private ThemeProperty getProperty(@NonNull Path themePath) {
         return ThemePropertyScanner.INSTANCE.fetchThemeProperty(themePath)
-            .orElseThrow(() -> new ThemePropertyMissingException(themePath + " 没有说明文件").setErrorData(themePath));
+                .orElseThrow(() -> new ThemePropertyMissingException(themePath + " 没有说明文件").setErrorData(themePath));
     }
 
 }

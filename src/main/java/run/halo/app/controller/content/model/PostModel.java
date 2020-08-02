@@ -17,7 +17,6 @@ import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
-import run.halo.app.model.vo.AdjacentPostVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
@@ -57,15 +56,15 @@ public class PostModel {
     private final LocalCacheRead<Post> read;
 
     public PostModel(PostService postService,
-                     ThemeService themeService,
-                     PostCategoryService postCategoryService,
-                     CategoryService categoryService,
-                     PostMetaService postMetaService,
-                     PostTagService postTagService,
-                     TagService tagService,
-                     OptionService optionService,
-                     AbstractStringCacheStore cacheStore,
-                     LocalCacheRead<Post> read) {
+            ThemeService themeService,
+            PostCategoryService postCategoryService,
+            CategoryService categoryService,
+            PostMetaService postMetaService,
+            PostTagService postTagService,
+            TagService tagService,
+            OptionService optionService,
+            AbstractStringCacheStore cacheStore,
+            LocalCacheRead<Post> read) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -102,14 +101,11 @@ public class PostModel {
 
         postService.publishVisitEvent(post.getId());
 
-        /**
-         *  increase cache visits
-         */
+        // increase cache visits
         Optional<Long> readOptional = this.read.getRead(post.getId());
         if (readOptional.isPresent()) {
             post.setVisits((post.getVisits() == null ? 0 : post.getVisits()) + readOptional.get());
         }
-
 
         AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
         adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
@@ -140,7 +136,7 @@ public class PostModel {
         model.addAttribute("metas", postMetaService.convertToMap(metas));
 
         if (themeService.templateExists(
-            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+                ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 
@@ -150,7 +146,7 @@ public class PostModel {
     public String list(Integer page, Model model) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
-            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
@@ -176,7 +172,7 @@ public class PostModel {
     public String archives(Integer page, Model model) {
         int pageSize = optionService.getArchivesPageSize();
         Pageable pageable = PageRequest
-            .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+                .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
 

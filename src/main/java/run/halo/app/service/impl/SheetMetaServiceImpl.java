@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.SheetMeta;
@@ -24,15 +25,15 @@ public class SheetMetaServiceImpl extends BaseMetaServiceImpl<SheetMeta> impleme
     private final SheetRepository sheetRepository;
 
     public SheetMetaServiceImpl(SheetMetaRepository sheetMetaRepository,
-                                SheetRepository sheetRepository) {
+            SheetRepository sheetRepository) {
         super(sheetMetaRepository);
         this.sheetMetaRepository = sheetMetaRepository;
         this.sheetRepository = sheetRepository;
     }
 
     @Override
-    public void validateTarget(Integer sheetId) {
+    public void validateTarget(@NotNull Integer sheetId) {
         sheetRepository.findById(sheetId)
-            .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
+                .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
     }
 }

@@ -45,9 +45,9 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
     private final OptionService optionService;
 
     public PostTagServiceImpl(PostTagRepository postTagRepository,
-                              PostRepository postRepository,
-                              TagRepository tagRepository,
-                              OptionService optionService) {
+            PostRepository postRepository,
+            TagRepository tagRepository,
+            OptionService optionService) {
         super(postTagRepository);
         this.postTagRepository = postTagRepository;
         this.postRepository = postRepository;
@@ -77,26 +77,26 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer> im
 
         // Find post count
         return tags.stream().map(
-            tag -> {
-                TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
-                tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
+                tag -> {
+                    TagWithPostCountDTO tagWithCountOutputDTO = new TagWithPostCountDTO().convertFrom(tag);
+                    tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
 
-                StringBuilder fullPath = new StringBuilder();
+                    StringBuilder fullPath = new StringBuilder();
 
-                if (optionService.isEnabledAbsolutePath()) {
-                    fullPath.append(optionService.getBlogBaseUrl());
+                    if (optionService.isEnabledAbsolutePath()) {
+                        fullPath.append(optionService.getBlogBaseUrl());
+                    }
+
+                    fullPath.append(URL_SEPARATOR)
+                            .append(optionService.getTagsPrefix())
+                            .append(URL_SEPARATOR)
+                            .append(tag.getSlug())
+                            .append(optionService.getPathSuffix());
+
+                    tagWithCountOutputDTO.setFullPath(fullPath.toString());
+
+                    return tagWithCountOutputDTO;
                 }
-
-                fullPath.append(URL_SEPARATOR)
-                    .append(optionService.getTagsPrefix())
-                    .append(URL_SEPARATOR)
-                    .append(tag.getSlug())
-                    .append(optionService.getPathSuffix());
-
-                tagWithCountOutputDTO.setFullPath(fullPath.toString());
-
-                return tagWithCountOutputDTO;
-            }
         ).collect(Collectors.toList());
     }
 

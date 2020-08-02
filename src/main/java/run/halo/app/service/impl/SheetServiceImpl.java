@@ -58,13 +58,13 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     private final OptionService optionService;
 
     public SheetServiceImpl(SheetRepository sheetRepository,
-                            ApplicationEventPublisher eventPublisher,
-                            SheetCommentService sheetCommentService,
-                            SheetMetaService sheetMetaService,
-                            ThemeService themeService,
-                            OptionService optionService,
-                            JdbcTemplate jdbcTemplate) {
-        super(sheetRepository, optionService,jdbcTemplate);
+            ApplicationEventPublisher eventPublisher,
+            SheetCommentService sheetCommentService,
+            SheetMetaService sheetMetaService,
+            ThemeService themeService,
+            OptionService optionService,
+            JdbcTemplate jdbcTemplate) {
+        super(sheetRepository, optionService, jdbcTemplate);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;
@@ -297,8 +297,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
 
         return sheets.stream()
-            .map(this::convertToMinimal)
-            .collect(Collectors.toList());
+                .map(this::convertToMinimal)
+                .collect(Collectors.toList());
     }
 
     @NonNull
@@ -353,10 +353,10 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
 
         fullPath.append(URL_SEPARATOR)
-            .append(optionService.getSheetPrefix())
-            .append(URL_SEPARATOR)
-            .append(sheet.getSlug())
-            .append(optionService.getPathSuffix());
+                .append(optionService.getSheetPrefix())
+                .append(URL_SEPARATOR)
+                .append(sheet.getSlug())
+                .append(optionService.getPathSuffix());
 
         return fullPath.toString();
     }

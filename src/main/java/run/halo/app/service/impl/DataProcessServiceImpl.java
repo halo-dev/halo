@@ -31,14 +31,14 @@ public class DataProcessServiceImpl implements DataProcessService {
     private final ThemeSettingService themeSettingService;
 
     public DataProcessServiceImpl(PostService postService,
-                                  SheetService sheetService,
-                                  PostCommentService postCommentService,
-                                  SheetCommentService sheetCommentService,
-                                  JournalCommentService journalCommentService,
-                                  AttachmentService attachmentService,
-                                  OptionService optionService,
-                                  PhotoService photoService,
-                                  ThemeSettingService themeSettingService) {
+            SheetService sheetService,
+            PostCommentService postCommentService,
+            SheetCommentService sheetCommentService,
+            JournalCommentService journalCommentService,
+            AttachmentService attachmentService,
+            OptionService optionService,
+            PhotoService photoService,
+            ThemeSettingService themeSettingService) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.postCommentService = postCommentService;

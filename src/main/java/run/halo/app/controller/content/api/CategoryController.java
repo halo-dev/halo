@@ -37,8 +37,8 @@ public class CategoryController {
     private final PostService postService;
 
     public CategoryController(CategoryService categoryService,
-                              PostCategoryService postCategoryService,
-                              PostService postService) {
+            PostCategoryService postCategoryService,
+            PostService postService) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
         this.postService = postService;
@@ -47,7 +47,7 @@ public class CategoryController {
     @GetMapping
     @ApiOperation("Lists categories")
     public List<? extends CategoryDTO> listCategories(@SortDefault(sort = "updateTime", direction = DESC) Sort sort,
-                                                      @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
+            @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postCategoryService.listCategoryWithPostCountDto(sort);
         }
@@ -57,7 +57,7 @@ public class CategoryController {
     @GetMapping("{slug}/posts")
     @ApiOperation("Lists posts by category slug")
     public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slug") String slug,
-                                               @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable) {
+            @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable) {
         // Get category by slug
         Category category = categoryService.getBySlugOfNonNull(slug);
 

@@ -31,7 +31,7 @@ public class TagController {
     private final PostTagService postTagService;
 
     public TagController(TagService tagService,
-                         PostTagService postTagService) {
+            PostTagService postTagService) {
         this.tagService = tagService;
         this.postTagService = postTagService;
     }
@@ -39,8 +39,8 @@ public class TagController {
     @GetMapping
     @ApiOperation("Lists tags")
     public List<? extends TagDTO> listTags(@SortDefault(sort = "createTime", direction = Sort.Direction.DESC) Sort sort,
-                                           @ApiParam("Return more information(post count) if it is set")
-                                           @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
+            @ApiParam("Return more information(post count) if it is set")
+            @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postTagService.listTagWithCountDtos(sort);
         }
@@ -68,7 +68,7 @@ public class TagController {
     @PutMapping("{tagId:\\d+}")
     @ApiOperation("Updates a tag")
     public TagDTO updateBy(@PathVariable("tagId") Integer tagId,
-                           @Valid @RequestBody TagParam tagParam) {
+            @Valid @RequestBody TagParam tagParam) {
         // Get old tag
         Tag tag = tagService.getById(tagId);
 

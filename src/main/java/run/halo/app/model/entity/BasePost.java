@@ -16,11 +16,12 @@ import java.util.Date;
  *
  * @author johnniang
  * @author ryanwang
+ * @author coor.top
  */
 @Data
 @Entity(name = "BasePost")
-@Table(name = "posts",
-    indexes = {@Index(name = "posts_type_status", columnList = "type, status"),
+@Table(name = "posts", indexes = {
+        @Index(name = "posts_type_status", columnList = "type, status"),
         @Index(name = "posts_create_time", columnList = "create_time")})
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")
 @ToString(callSuper = true)
@@ -151,6 +152,13 @@ public class BasePost extends BaseEntity {
     @Column(name = "meta_description", length = 1023)
     private String metaDescription;
 
+    /**
+     * Content word count
+     */
+    @Column(name = "word_count")
+    @ColumnDefault("0")
+    private Long wordCount;
+
     @Override
     public void prePersist() {
         super.prePersist();
@@ -205,6 +213,10 @@ public class BasePost extends BaseEntity {
 
         if (editorType == null) {
             editorType = PostEditorType.MARKDOWN;
+        }
+
+        if (wordCount == null || wordCount < 0) {
+            wordCount = 0L;
         }
     }
 

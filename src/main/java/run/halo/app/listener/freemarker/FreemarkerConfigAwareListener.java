@@ -42,10 +42,10 @@ public class FreemarkerConfigAwareListener {
     private final UserService userService;
 
     public FreemarkerConfigAwareListener(OptionService optionService,
-                                         Configuration configuration,
-                                         ThemeService themeService,
-                                         ThemeSettingService themeSettingService,
-                                         UserService userService) {
+            Configuration configuration,
+            ThemeService themeService,
+            ThemeSettingService themeSettingService,
+            UserService userService) {
         this.optionService = optionService;
         this.configuration = configuration;
         this.themeService = themeService;

@@ -16,8 +16,8 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "photos",
-    indexes = {@Index(name = "photos_team", columnList = "team"),
+@Table(name = "photos", indexes = {
+        @Index(name = "photos_team", columnList = "team"),
         @Index(name = "photos_create_time", columnList = "create_time")})
 @ToString
 @EqualsAndHashCode(callSuper = true)

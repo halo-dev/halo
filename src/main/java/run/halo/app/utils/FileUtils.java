@@ -73,7 +73,7 @@ public class FileUtils {
 
         // Delete folder recursively
         org.eclipse.jgit.util.FileUtils.delete(deletingPath.toFile(),
-            org.eclipse.jgit.util.FileUtils.RECURSIVE | org.eclipse.jgit.util.FileUtils.RETRY);
+                org.eclipse.jgit.util.FileUtils.RECURSIVE | org.eclipse.jgit.util.FileUtils.RETRY);
 
         log.info("Deleted [{}] successfully", deletingPath);
     }
@@ -137,8 +137,8 @@ public class FileUtils {
         // if zip file has root file
         if (files.size() == 1 && files.get(0).isDirectory()) {
             String rootPath = files.get(0).toPath().toString();
-            String rootFile = rootPath.substring(rootPath.lastIndexOf("/", rootPath.length() - 1) + 1,rootPath.length());
-            List<File> propertyFiles = Arrays.asList(files.get(0).listFiles());
+            String rootFile = rootPath.substring(rootPath.lastIndexOf("/") + 1);
+            File[] propertyFiles = files.get(0).listFiles();
             for (File propertyFile : propertyFiles) {
                 String filePath = propertyFile.toPath().toString();
                 String destPath = filePath.replace(rootFile, "");

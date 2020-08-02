@@ -37,7 +37,7 @@ public class JournalController {
     @GetMapping
     @ApiOperation("Lists journals")
     public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-                                               JournalQuery journalQuery) {
+            JournalQuery journalQuery) {
         Page<Journal> journalPage = journalService.pageBy(journalQuery, pageable);
         return journalService.convertToCmtCountDto(journalPage);
     }
@@ -59,7 +59,7 @@ public class JournalController {
     @PutMapping("{id:\\d+}")
     @ApiOperation("Updates a Journal")
     public JournalDTO updateBy(@PathVariable("id") Integer id,
-                               @RequestBody @Valid JournalParam journalParam) {
+            @RequestBody @Valid JournalParam journalParam) {
         Journal journal = journalService.getById(id);
         journalParam.update(journal);
         Journal updatedJournal = journalService.updateBy(journal);

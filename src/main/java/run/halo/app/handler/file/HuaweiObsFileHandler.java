@@ -4,6 +4,7 @@ import com.obs.services.ObsClient;
 import com.obs.services.model.PutObjectResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -39,7 +40,7 @@ public class HuaweiObsFileHandler implements FileHandler {
     }
 
     @Override
-    public UploadResult upload(MultipartFile file) {
+    public @NotNull UploadResult upload(@NotNull MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
@@ -60,12 +61,12 @@ public class HuaweiObsFileHandler implements FileHandler {
 
         if (StringUtils.isNotEmpty(domain)) {
             basePath.append(domain)
-                .append(URL_SEPARATOR);
+                    .append(URL_SEPARATOR);
         } else {
             basePath.append(bucketName)
-                .append(".")
-                .append(endPoint)
-                .append(URL_SEPARATOR);
+                    .append(".")
+                    .append(endPoint)
+                    .append(URL_SEPARATOR);
         }
 
         try {
@@ -76,14 +77,14 @@ public class HuaweiObsFileHandler implements FileHandler {
 
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                    .append(URL_SEPARATOR);
+                        .append(URL_SEPARATOR);
             }
 
             upFilePath.append(basename)
-                .append("_")
-                .append(timestamp)
-                .append(".")
-                .append(extension);
+                    .append("_")
+                    .append(timestamp)
+                    .append(".")
+                    .append(extension);
 
             String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
 
@@ -131,7 +132,7 @@ public class HuaweiObsFileHandler implements FileHandler {
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(@NotNull String key) {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config

@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import org.springframework.lang.NonNull;
+
 /**
  * Sheet properties.
  *
@@ -56,6 +58,7 @@ public enum SheetProperties implements PropertyEnum {
     }
 
     @Override
+    @NonNull
     public String defaultValue() {
         return defaultValue;
     }

@@ -245,7 +245,7 @@ public class HaloUtils {
         Assert.hasText(originalUrl, "Original Url must not be blank");
 
         if (StringUtils.startsWithAny(originalUrl, URL_SEPARATOR, HaloConst.PROTOCOL_HTTPS, HaloConst.PROTOCOL_HTTP)
-            && !StringUtils.startsWith(originalUrl, "//")) {
+                && !StringUtils.startsWith(originalUrl, "//")) {
             return originalUrl;
         }
 

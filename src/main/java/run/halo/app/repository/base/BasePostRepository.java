@@ -91,6 +91,50 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     Page<POST> findAllByStatusAndCreateTimeAfter(@NonNull PostStatus status, @NonNull Date createTime, @NonNull Pageable pageable);
 
     /**
+     * Finds all post by status and edit time before.
+     *
+     * @param status   status must not be null
+     * @param editTime edit time must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<POST> findAllByStatusAndEditTimeBefore(@NonNull PostStatus status, @NonNull Date editTime, @NonNull Pageable pageable);
+
+    /**
+     * Finds all post by status and edit time after.
+     *
+     * @param status   status must not be null
+     * @param editTime edit time must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<POST> findAllByStatusAndEditTimeAfter(@NonNull PostStatus status, @NonNull Date editTime, @NonNull Pageable pageable);
+
+    /**
+     * Finds all post by status and visits before.
+     *
+     * @param status   status must not be null
+     * @param visits   visits must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<POST> findAllByStatusAndVisitsBefore(@NonNull PostStatus status, @NonNull Long visits, @NonNull Pageable pageable);
+
+    /**
+     * Finds all post by status and visits after.
+     *
+     * @param status   status must not be null
+     * @param visits   visits must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<POST> findAllByStatusAndVisitsAfter(@NonNull PostStatus status, @NonNull Long visits, @NonNull Pageable pageable);
+
+    /**
      * Gets post by slug and status.
      *
      * @param slug   slug must not be blank

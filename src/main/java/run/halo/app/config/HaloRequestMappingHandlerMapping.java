@@ -77,16 +77,16 @@ public class HaloRequestMappingHandlerMapping extends RequestMappingHandlerMappi
                 blackPatterns.clear();
                 initBlackPatterns();
                 rootPathStream.forEach(rootPath -> {
-                        if (Files.isDirectory(rootPath)) {
-                            String directoryPattern = "/" + rootPath.getFileName().toString() + "/**";
-                            blackPatterns.add(directoryPattern);
-                            log.debug("Exclude for folder path pattern: [{}]", directoryPattern);
-                        } else {
-                            String pathPattern = "/" + rootPath.getFileName().toString();
-                            blackPatterns.add(pathPattern);
-                            log.debug("Exclude for file path pattern: [{}]", pathPattern);
+                            if (Files.isDirectory(rootPath)) {
+                                String directoryPattern = "/" + rootPath.getFileName().toString() + "/**";
+                                blackPatterns.add(directoryPattern);
+                                log.debug("Exclude for folder path pattern: [{}]", directoryPattern);
+                            } else {
+                                String pathPattern = "/" + rootPath.getFileName().toString();
+                                blackPatterns.add(pathPattern);
+                                log.debug("Exclude for file path pattern: [{}]", pathPattern);
+                            }
                         }
-                    }
                 );
             }
         } catch (IOException e) {
