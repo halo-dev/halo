@@ -40,21 +40,21 @@ public class StaticStorageController {
     @PostMapping
     @ApiOperation("Creates a folder")
     public void createFolder(String basePath,
-                             @RequestParam("folderName") String folderName) {
+            @RequestParam("folderName") String folderName) {
         staticStorageService.createFolder(basePath, folderName);
     }
 
     @PostMapping("upload")
     @ApiOperation("Uploads static file")
     public void upload(String basePath,
-                       @RequestPart("file") MultipartFile file) {
+            @RequestPart("file") MultipartFile file) {
         staticStorageService.upload(basePath, file);
     }
 
     @PostMapping("rename")
     @ApiOperation("Renames static file")
     public void rename(String basePath,
-                       String newName) {
+            String newName) {
         staticStorageService.rename(basePath, newName);
     }
 

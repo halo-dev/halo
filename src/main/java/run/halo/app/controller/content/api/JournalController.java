@@ -48,8 +48,8 @@ public class JournalController {
     private final OptionService optionService;
 
     public JournalController(JournalService journalService,
-                             JournalCommentService journalCommentService,
-                             OptionService optionService) {
+            JournalCommentService journalCommentService,
+            OptionService optionService) {
         this.journalService = journalService;
         this.journalCommentService = journalCommentService;
         this.optionService = optionService;
@@ -71,15 +71,15 @@ public class JournalController {
 
     @GetMapping("{journalId:\\d+}/comments/top_view")
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("journalId") Integer journalId,
-                                                          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                          @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return journalCommentService.pageTopCommentsBy(journalId, CommentStatus.PUBLISHED, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{journalId:\\d+}/comments/{commentParentId:\\d+}/children")
     public List<BaseCommentDTO> listChildrenBy(@PathVariable("journalId") Integer journalId,
-                                               @PathVariable("commentParentId") Long commentParentId,
-                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @PathVariable("commentParentId") Long commentParentId,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         // Find all children comments
         List<JournalComment> postComments = journalCommentService.listChildrenBy(journalId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
@@ -89,16 +89,16 @@ public class JournalController {
     @GetMapping("{journalId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("journalId") Integer journalId,
-                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return journalCommentService.pageVosBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{journalId:\\d+}/comments/list_view")
     @ApiOperation("Lists comment with list view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("journalId") Integer journalId,
-                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return journalCommentService.pageWithParentVoBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 

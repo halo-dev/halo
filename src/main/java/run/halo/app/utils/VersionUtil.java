@@ -25,14 +25,14 @@ public class VersionUtil {
 
         if (Objects.equals(version, HaloConst.UNKNOWN_VERSION)) {
             log.warn("Unknown version will be converted to {}.{}.{}.{}",
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE);
+                    Integer.MAX_VALUE,
+                    Integer.MAX_VALUE,
+                    Integer.MAX_VALUE,
+                    Integer.MAX_VALUE);
             return new int[] {Integer.MAX_VALUE,
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE};
+                    Integer.MAX_VALUE,
+                    Integer.MAX_VALUE,
+                    Integer.MAX_VALUE};
         }
 
         int[] canonicalVersion = new int[] {1, 1, 0, 0};

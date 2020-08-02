@@ -36,7 +36,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     private final OptionService optionService;
 
     public TagServiceImpl(TagRepository tagRepository,
-                          OptionService optionService) {
+            OptionService optionService) {
         super(tagRepository);
         this.tagRepository = tagRepository;
         this.optionService = optionService;
@@ -87,10 +87,10 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         }
 
         fullPath.append(URL_SEPARATOR)
-            .append(optionService.getTagsPrefix())
-            .append(URL_SEPARATOR)
-            .append(tag.getSlug())
-            .append(optionService.getPathSuffix());
+                .append(optionService.getTagsPrefix())
+                .append(URL_SEPARATOR)
+                .append(tag.getSlug())
+                .append(optionService.getPathSuffix());
 
         tagDTO.setFullPath(fullPath.toString());
 
@@ -104,7 +104,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         }
 
         return tags.stream()
-            .map(this::convertTo)
-            .collect(Collectors.toList());
+                .map(this::convertTo)
+                .collect(Collectors.toList());
     }
 }

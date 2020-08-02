@@ -30,9 +30,9 @@ public class PostTagDirective implements TemplateDirectiveModel {
     private final PostCategoryService postCategoryService;
 
     public PostTagDirective(Configuration configuration,
-                            PostService postService,
-                            PostTagService postTagService,
-                            PostCategoryService postCategoryService) {
+            PostService postService,
+            PostTagService postTagService,
+            PostCategoryService postCategoryService) {
         this.postService = postService;
         this.postTagService = postTagService;
         this.postCategoryService = postCategoryService;

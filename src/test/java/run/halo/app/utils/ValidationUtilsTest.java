@@ -29,7 +29,7 @@ class ValidationUtilsTest {
         validateObjectAssert(violations);
 
         ConstraintViolationException exception = assertThrows(ConstraintViolationException.class,
-            () -> ValidationUtils.validate(car));
+                () -> ValidationUtils.validate(car));
         validateObjectAssert(exception.getConstraintViolations());
     }
 
@@ -43,11 +43,11 @@ class ValidationUtilsTest {
     @Test
     void validateListTest() {
         List<Car> cars = Arrays.asList(new Car(""),
-            new Car("car name"),
-            new Car(null));
+                new Car("car name"),
+                new Car(null));
 
         ConstraintViolationException exception = assertThrows(ConstraintViolationException.class,
-            () -> ValidationUtils.validate(cars));
+                () -> ValidationUtils.validate(cars));
 
         validateIteratorTest(exception.getConstraintViolations());
     }

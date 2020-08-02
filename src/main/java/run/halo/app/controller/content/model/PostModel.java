@@ -52,14 +52,14 @@ public class PostModel {
     private final AbstractStringCacheStore cacheStore;
 
     public PostModel(PostService postService,
-                     ThemeService themeService,
-                     PostCategoryService postCategoryService,
-                     CategoryService categoryService,
-                     PostMetaService postMetaService,
-                     PostTagService postTagService,
-                     TagService tagService,
-                     OptionService optionService,
-                     AbstractStringCacheStore cacheStore) {
+            ThemeService themeService,
+            PostCategoryService postCategoryService,
+            CategoryService categoryService,
+            PostMetaService postMetaService,
+            PostTagService postTagService,
+            TagService tagService,
+            OptionService optionService,
+            AbstractStringCacheStore cacheStore) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -123,7 +123,7 @@ public class PostModel {
         model.addAttribute("metas", postMetaService.convertToMap(metas));
 
         if (themeService.templateExists(
-            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+                ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 
@@ -133,7 +133,7 @@ public class PostModel {
     public String list(Integer page, Model model) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
-            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
@@ -148,7 +148,7 @@ public class PostModel {
     public String archives(Integer page, Model model) {
         int pageSize = optionService.getArchivesPageSize();
         Pageable pageable = PageRequest
-            .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+                .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
 

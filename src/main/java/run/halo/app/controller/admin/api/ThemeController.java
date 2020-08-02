@@ -31,7 +31,7 @@ public class ThemeController {
     private final ThemeSettingService themeSettingService;
 
     public ThemeController(ThemeService themeService,
-                           ThemeSettingService themeSettingService) {
+            ThemeSettingService themeSettingService) {
         this.themeService = themeService;
         this.themeSettingService = themeSettingService;
     }
@@ -69,7 +69,7 @@ public class ThemeController {
     @GetMapping("{themeId}/files/content")
     @ApiOperation("Gets template content by theme id")
     public BaseResponse<String> getContentBy(@PathVariable("themeId") String themeId,
-                                             @RequestParam(name = "path") String path) {
+            @RequestParam(name = "path") String path) {
         return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(themeId, path));
     }
 
@@ -84,7 +84,7 @@ public class ThemeController {
     @ApiOperation("Updates template content by theme id")
     @DisableOnCondition
     public void updateContentBy(@PathVariable("themeId") String themeId,
-                                @RequestBody ThemeContentParam param) {
+            @RequestBody ThemeContentParam param) {
         themeService.saveTemplateContent(themeId, param.getPath(), param.getContent());
     }
 
@@ -145,7 +145,7 @@ public class ThemeController {
     @PostMapping("{themeId}/settings")
     @ApiOperation("Saves theme settings")
     public void saveSettingsBy(@PathVariable("themeId") String themeId,
-                               @RequestBody Map<String, Object> settings) {
+            @RequestBody Map<String, Object> settings) {
         themeSettingService.save(settings, themeId);
     }
 
@@ -165,7 +165,7 @@ public class ThemeController {
     @PutMapping("upload/{themeId}")
     @ApiOperation("Upgrades theme by file")
     public ThemeProperty updateThemeByUpload(@PathVariable("themeId") String themeId,
-                                             @RequestPart("file") MultipartFile file) {
+            @RequestPart("file") MultipartFile file) {
         return themeService.update(themeId, file);
     }
 

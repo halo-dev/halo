@@ -64,7 +64,7 @@ public enum ThemePropertyScanner {
         try (Stream<Path> pathStream = Files.list(themePath)) {
             // List and filter sub folders
             List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path))
-                .collect(Collectors.toList());
+                    .collect(Collectors.toList());
 
             if (CollectionUtils.isEmpty(themePaths)) {
                 return Collections.emptyList();
@@ -72,15 +72,15 @@ public enum ThemePropertyScanner {
 
             // Get theme properties
             ThemeProperty[] properties = themePaths.stream()
-                .map(this::fetchThemeProperty)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .peek(themeProperty -> {
-                    if (StringUtils.equals(activeThemeId, themeProperty.getId())) {
-                        themeProperty.setActivated(true);
-                    }
-                })
-                .toArray(ThemeProperty[]::new);
+                    .map(this::fetchThemeProperty)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .peek(themeProperty -> {
+                        if (StringUtils.equals(activeThemeId, themeProperty.getId())) {
+                            themeProperty.setActivated(true);
+                        }
+                    })
+                    .toArray(ThemeProperty[]::new);
             // Cache the themes
             return Arrays.asList(properties);
         } catch (IOException e) {
@@ -121,10 +121,7 @@ public enum ThemePropertyScanner {
             themeProperty.setActivated(false);
 
             // Set screenshots
-            getScreenshotsFileName(themePath).ifPresent(screenshotsName ->
-                // TODO base url
-                themeProperty.setScreenshots(StringUtils.join(
-                    "/themes/",
+            getScreenshotsFileName(themePath).ifPresent(screenshotsName -> themeProperty.setScreenshots(StringUtils.join("/themes/",
                     FilenameUtils.getBasename(themeProperty.getThemePath()),
                     "/",
                     screenshotsName)));
@@ -149,10 +146,10 @@ public enum ThemePropertyScanner {
 
         try (Stream<Path> pathStream = Files.list(themePath)) {
             return pathStream.filter(path -> Files.isRegularFile(path)
-                && Files.isReadable(path)
-                && FilenameUtils.getBasename(path.toString()).equalsIgnoreCase(THEME_SCREENSHOTS_NAME))
-                .findFirst()
-                .map(path -> path.getFileName().toString());
+                    && Files.isReadable(path)
+                    && FilenameUtils.getBasename(path.toString()).equalsIgnoreCase(THEME_SCREENSHOTS_NAME))
+                    .findFirst()
+                    .map(path -> path.getFileName().toString());
         }
     }
 

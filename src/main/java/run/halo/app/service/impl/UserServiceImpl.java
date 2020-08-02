@@ -47,8 +47,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     private final ApplicationEventPublisher eventPublisher;
 
     public UserServiceImpl(UserRepository userRepository,
-                           AbstractStringCacheStore stringCacheStore,
-                           ApplicationEventPublisher eventPublisher) {
+            AbstractStringCacheStore stringCacheStore,
+            ApplicationEventPublisher eventPublisher) {
         super(userRepository);
         this.userRepository = userRepository;
         this.stringCacheStore = stringCacheStore;

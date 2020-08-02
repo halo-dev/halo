@@ -90,37 +90,37 @@ public class JsonUtils {
         return objectMapper.readValue(json, type);
     }
 
-//    /**
-//     * Converts input stream to object specified type.
-//     *
-//     * @param inputStream input stream must not be null
-//     * @param type        object type must not be null
-//     * @param <T>         target object type
-//     * @return object specified type
-//     * @throws IOException throws when fail to convert
-//     */
-//    @NonNull
-//    public static <T> T inputStreamToObject(@NonNull InputStream inputStream, @NonNull Class<T> type) throws IOException {
-//        return inputStreamToObject(inputStream, type, null);
-//    }
-//
-//    /**
-//     * Converts input stream to object specified type.
-//     *
-//     * @param inputStream  input stream must not be null
-//     * @param type         object type must not be null
-//     * @param objectMapper object mapper must not be null
-//     * @param <T>          target object type
-//     * @return object specified type
-//     * @throws IOException throws when fail to convert
-//     */
-//    @NonNull
-//    public static <T> T inputStreamToObject(@NonNull InputStream inputStream, @NonNull Class<T> type, @NonNull ObjectMapper objectMapper) throws IOException {
-//        Assert.notNull(inputStream, "Input stream must not be null");
-//
-//        String json = IOUtils.toString(inputStream);
-//        return jsonToObject(json, type, objectMapper);
-//    }
+    //    /**
+    //     * Converts input stream to object specified type.
+    //     *
+    //     * @param inputStream input stream must not be null
+    //     * @param type        object type must not be null
+    //     * @param <T>         target object type
+    //     * @return object specified type
+    //     * @throws IOException throws when fail to convert
+    //     */
+    //    @NonNull
+    //    public static <T> T inputStreamToObject(@NonNull InputStream inputStream, @NonNull Class<T> type) throws IOException {
+    //        return inputStreamToObject(inputStream, type, null);
+    //    }
+    //
+    //    /**
+    //     * Converts input stream to object specified type.
+    //     *
+    //     * @param inputStream  input stream must not be null
+    //     * @param type         object type must not be null
+    //     * @param objectMapper object mapper must not be null
+    //     * @param <T>          target object type
+    //     * @return object specified type
+    //     * @throws IOException throws when fail to convert
+    //     */
+    //    @NonNull
+    //    public static <T> T inputStreamToObject(@NonNull InputStream inputStream, @NonNull Class<T> type, @NonNull ObjectMapper objectMapper) throws IOException {
+    //        Assert.notNull(inputStream, "Input stream must not be null");
+    //
+    //        String json = IOUtils.toString(inputStream);
+    //        return jsonToObject(json, type, objectMapper);
+    //    }
 
     /**
      * Converts object to json format.

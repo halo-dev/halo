@@ -38,7 +38,7 @@ public class JournalCommentController {
     private final OptionService optionService;
 
     public JournalCommentController(JournalCommentService journalCommentService,
-                                    OptionService optionService) {
+            OptionService optionService) {
         this.journalCommentService = journalCommentService;
         this.optionService = optionService;
     }
@@ -46,7 +46,7 @@ public class JournalCommentController {
     @GetMapping
     @ApiOperation("Lists journal comments")
     public Page<JournalCommentWithJournalVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-                                                    CommentQuery commentQuery) {
+            CommentQuery commentQuery) {
         Page<JournalComment> journalCommentPage = journalCommentService.pageBy(commentQuery, pageable);
 
         return journalCommentService.convertToWithJournalVo(journalCommentPage);
@@ -55,7 +55,7 @@ public class JournalCommentController {
     @GetMapping("latest")
     @ApiOperation("Lists latest journal comments")
     public List<JournalCommentWithJournalVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
-                                                        @RequestParam(name = "status", required = false) CommentStatus status) {
+            @RequestParam(name = "status", required = false) CommentStatus status) {
         List<JournalComment> latestComments = journalCommentService.pageLatest(top, status).getContent();
         return journalCommentService.convertToWithJournalVo(latestComments);
     }
@@ -63,16 +63,16 @@ public class JournalCommentController {
     @GetMapping("{journalId:\\d+}/tree_view")
     @ApiOperation("Lists comments with tree view")
     public Page<BaseCommentVO> listCommentTree(@PathVariable("journalId") Integer journalId,
-                                               @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return journalCommentService.pageVosAllBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{journalId:\\d+}/list_view")
     @ApiOperation("Lists comment with list view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("journalId") Integer journalId,
-                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return journalCommentService.pageWithParentVoBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
@@ -86,7 +86,7 @@ public class JournalCommentController {
     @PutMapping("{commentId:\\d+}/status/{status}")
     @ApiOperation("Updates comment status")
     public BaseCommentDTO updateStatusBy(@PathVariable("commentId") Long commentId,
-                                         @PathVariable("status") CommentStatus status) {
+            @PathVariable("status") CommentStatus status) {
         // Update comment status
         JournalComment updatedJournalComment = journalCommentService.updateStatus(commentId, status);
         return journalCommentService.convertTo(updatedJournalComment);

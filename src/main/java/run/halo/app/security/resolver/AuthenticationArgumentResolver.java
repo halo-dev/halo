@@ -32,8 +32,8 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
     public boolean supportsParameter(MethodParameter parameter) {
         Class<?> parameterType = parameter.getParameterType();
         return Authentication.class.isAssignableFrom(parameterType)
-            || UserDetail.class.isAssignableFrom(parameterType)
-            || User.class.isAssignableFrom(parameterType);
+                || UserDetail.class.isAssignableFrom(parameterType)
+                || User.class.isAssignableFrom(parameterType);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
         Class<?> parameterType = parameter.getParameterType();
 
         Authentication authentication = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-            .orElseThrow(() -> new AuthenticationException("You haven't signed in yet"));
+                .orElseThrow(() -> new AuthenticationException("You haven't signed in yet"));
 
         if (Authentication.class.isAssignableFrom(parameterType)) {
             return authentication;

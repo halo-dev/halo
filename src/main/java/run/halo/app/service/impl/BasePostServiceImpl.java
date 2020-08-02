@@ -58,7 +58,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     private final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
-                               OptionService optionService) {
+            OptionService optionService) {
         super(basePostRepository);
         this.basePostRepository = basePostRepository;
         this.optionService = optionService;
@@ -313,8 +313,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return posts.stream()
-            .map(this::convertToMinimal)
-            .collect(Collectors.toList());
+                .map(this::convertToMinimal)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -345,8 +345,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return posts.stream()
-            .map(this::convertToSimple)
-            .collect(Collectors.toList());
+                .map(this::convertToSimple)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -44,7 +44,7 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
     private final JournalCommentService journalCommentService;
 
     public JournalServiceImpl(JournalRepository journalRepository,
-                              JournalCommentService journalCommentService) {
+            JournalCommentService journalCommentService) {
         super(journalRepository);
         this.journalRepository = journalRepository;
         this.journalCommentService = journalCommentService;
@@ -119,13 +119,13 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
         Map<Integer, Long> journalCommentCountMap = journalCommentService.countByPostIds(journalIds);
 
         return journals.stream()
-            .map(journal -> {
-                JournalWithCmtCountDTO journalWithCmtCountDTO = new JournalWithCmtCountDTO().convertFrom(journal);
-                // Set comment count
-                journalWithCmtCountDTO.setCommentCount(journalCommentCountMap.getOrDefault(journal.getId(), 0L));
-                return journalWithCmtCountDTO;
-            })
-            .collect(Collectors.toList());
+                .map(journal -> {
+                    JournalWithCmtCountDTO journalWithCmtCountDTO = new JournalWithCmtCountDTO().convertFrom(journal);
+                    // Set comment count
+                    journalWithCmtCountDTO.setCommentCount(journalCommentCountMap.getOrDefault(journal.getId(), 0L));
+                    return journalWithCmtCountDTO;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

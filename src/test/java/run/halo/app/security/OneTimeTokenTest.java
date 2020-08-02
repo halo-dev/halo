@@ -32,10 +32,10 @@ class OneTimeTokenTest {
     @Test
     void provideNonExistOneTimeTokenTest() throws Exception {
         mvc.perform(get(REQUEST_URI + "?ott={ott}", "one-time-token-value"))
-            .andDo(print())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status", is(HttpStatus.BAD_REQUEST.value())));
     }
 
     @Test
@@ -44,8 +44,8 @@ class OneTimeTokenTest {
         String ott = oneTimeTokenService.create(REQUEST_URI);
 
         mvc.perform(get(REQUEST_URI + "?ott={ott}", ott))
-            .andDo(print())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

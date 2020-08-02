@@ -38,8 +38,8 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
     private final Configuration configuration;
 
     public ThemeSettingServiceImpl(ThemeSettingRepository themeSettingRepository,
-                                   ThemeService themeService,
-                                   Configuration configuration) {
+            ThemeService themeService,
+            Configuration configuration) {
         super(themeSettingRepository);
         this.themeSettingRepository = themeSettingRepository;
         this.themeService = themeService;
@@ -59,11 +59,11 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         if (StringUtils.isBlank(value)) {
             // Delete it
             return themeSettingOptional
-                .map(setting -> {
-                    themeSettingRepository.delete(setting);
-                    log.debug("Removed theme setting: [{}]", setting);
-                    return setting;
-                }).orElse(null);
+                    .map(setting -> {
+                        themeSettingRepository.delete(setting);
+                        log.debug("Removed theme setting: [{}]", setting);
+                        return setting;
+                    }).orElse(null);
         }
 
         // Get config item map
@@ -74,19 +74,19 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
 
         // Update or create
         ThemeSetting themeSetting = themeSettingOptional
-            .map(setting -> {
-                log.debug("Updating theme setting: [{}]", setting);
-                setting.setValue(value);
-                log.debug("Updated theme setting: [{}]", setting);
-                return setting;
-            }).orElseGet(() -> {
-                ThemeSetting setting = new ThemeSetting();
-                setting.setKey(key);
-                setting.setValue(value);
-                setting.setThemeId(themeId);
-                log.debug("Creating theme setting: [{}]", setting);
-                return setting;
-            });
+                .map(setting -> {
+                    log.debug("Updating theme setting: [{}]", setting);
+                    setting.setValue(value);
+                    log.debug("Updated theme setting: [{}]", setting);
+                    return setting;
+                }).orElseGet(() -> {
+                    ThemeSetting setting = new ThemeSetting();
+                    setting.setKey(key);
+                    setting.setValue(value);
+                    setting.setThemeId(themeId);
+                    log.debug("Creating theme setting: [{}]", setting);
+                    return setting;
+                });
 
         // Save the theme setting
         return themeSettingRepository.save(themeSetting);

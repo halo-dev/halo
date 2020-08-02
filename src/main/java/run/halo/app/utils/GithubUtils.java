@@ -68,7 +68,7 @@ public class GithubUtils {
 
             return githubReleases.result;
         } catch (InterruptedException e) {
-            log.warn("Interrupted", e);
+            log.warn("Getting releases from github interrupted", e);
         }
 
         return null;
@@ -163,8 +163,8 @@ public class GithubUtils {
                     }
 
                     Optional<GHRelease> res = ghReleaseList.stream()
-                        .filter(release -> StringUtils.equalsIgnoreCase(release.getTagName(), tagName))
-                        .findFirst();
+                            .filter(release -> StringUtils.equalsIgnoreCase(release.getTagName(), tagName))
+                            .findFirst();
 
                     if (res.isPresent()) {
                         GHRelease ghRelease = res.get();
@@ -217,7 +217,7 @@ public class GithubUtils {
                     GHRepository ghRepository = gitHub.getRepository(repoUrl);
                     List<GHRelease> ghReleaseList = ghRepository.getReleases();
 
-                    result = new ArrayList<String>();
+                    result = new ArrayList<>();
 
                     for (GHRelease ghRelease : ghReleaseList) {
                         result.add(ghRelease.getTagName());
@@ -226,6 +226,9 @@ public class GithubUtils {
                     break;
 
                 } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Failed to react with github.", e);
+                    }
                     if (e instanceof HttpException) {
                         int code = ((HttpException) e).getResponseCode();
                         if (code != -1) {

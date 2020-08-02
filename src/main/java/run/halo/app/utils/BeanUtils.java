@@ -69,8 +69,8 @@ public class BeanUtils {
 
         // Transform in batch
         return sources.stream()
-            .map(source -> transformFrom(source, targetClass))
-            .collect(Collectors.toList());
+                .map(source -> transformFrom(source, targetClass))
+                .collect(Collectors.toList());
     }
 
     /**

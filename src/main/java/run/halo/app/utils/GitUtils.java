@@ -44,9 +44,9 @@ public class GitUtils {
         Git git = null;
         try {
             git = Git.cloneRepository()
-                .setURI(repoUrl)
-                .setDirectory(targetPath.toFile())
-                .call();
+                    .setURI(repoUrl)
+                    .setDirectory(targetPath.toFile())
+                    .call();
             log.debug("Cloned git repo [{}] successfully", repoUrl);
         } finally {
             closeQuietly(git);
@@ -73,11 +73,11 @@ public class GitUtils {
         Git git = null;
         try {
             git = Git.cloneRepository()
-                .setURI(repoUrl)
-                .setDirectory(targetPath.toFile())
-                .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
-                .setBranch("refs/heads/" + branchName)
-                .call();
+                    .setURI(repoUrl)
+                    .setDirectory(targetPath.toFile())
+                    .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
+                    .setBranch("refs/heads/" + branchName)
+                    .call();
         } finally {
             closeQuietly(git);
         }
@@ -87,9 +87,9 @@ public class GitUtils {
         List<String> branches = new ArrayList<>();
         try {
             Collection<Ref> refs = Git.lsRemoteRepository()
-                .setHeads(true)
-                .setRemote(repoUrl)
-                .call();
+                    .setHeads(true)
+                    .setRemote(repoUrl)
+                    .call();
             for (Ref ref : refs) {
                 branches.add(ref.getName().substring(ref.getName().lastIndexOf("/") + 1));
             }
