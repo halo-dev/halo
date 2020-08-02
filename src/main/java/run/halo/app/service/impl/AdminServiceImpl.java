@@ -97,19 +97,19 @@ public class AdminServiceImpl implements AdminService {
     private final ApplicationEventPublisher eventPublisher;
 
     public AdminServiceImpl(PostService postService,
-                            SheetService sheetService,
-                            AttachmentService attachmentService,
-                            PostCommentService postCommentService,
-                            SheetCommentService sheetCommentService,
-                            JournalCommentService journalCommentService,
-                            OptionService optionService,
-                            UserService userService,
-                            LinkService linkService,
-                            MailService mailService,
-                            AbstractStringCacheStore cacheStore,
-                            RestTemplate restTemplate,
-                            HaloProperties haloProperties,
-                            ApplicationEventPublisher eventPublisher) {
+            SheetService sheetService,
+            AttachmentService attachmentService,
+            PostCommentService postCommentService,
+            SheetCommentService sheetCommentService,
+            JournalCommentService journalCommentService,
+            OptionService optionService,
+            UserService userService,
+            LinkService linkService,
+            MailService mailService,
+            AbstractStringCacheStore cacheStore,
+            RestTemplate restTemplate,
+            HaloProperties haloProperties,
+            ApplicationEventPublisher eventPublisher) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.attachmentService = attachmentService;
@@ -141,7 +141,7 @@ public class AdminServiceImpl implements AdminService {
         try {
             // Get user by username or email
             user = Validator.isEmail(username) ?
-                userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
+                    userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
         } catch (NotFoundException e) {
             log.error("Failed to find user by name: " + username);
             eventPublisher.publishEvent(new LogEvent(this, loginParam.getUsername(), LogType.LOGIN_FAILED, loginParam.getUsername()));
@@ -327,14 +327,14 @@ public class AdminServiceImpl implements AdminService {
         Assert.hasText(refreshToken, "Refresh token must not be blank");
 
         Integer userId = cacheStore.getAny(SecurityUtils.buildTokenRefreshKey(refreshToken), Integer.class)
-            .orElseThrow(() -> new BadRequestException("登录状态已失效，请重新登录").setErrorData(refreshToken));
+                .orElseThrow(() -> new BadRequestException("登录状态已失效，请重新登录").setErrorData(refreshToken));
 
         // Get user info
         User user = userService.getById(userId);
 
         // Remove all token
         cacheStore.getAny(SecurityUtils.buildAccessTokenKey(user), String.class)
-            .ifPresent(accessToken -> cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken)));
+                .ifPresent(accessToken -> cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken)));
         cacheStore.delete(SecurityUtils.buildTokenRefreshKey(refreshToken));
         cacheStore.delete(SecurityUtils.buildAccessTokenKey(user));
         cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
@@ -362,9 +362,9 @@ public class AdminServiceImpl implements AdminService {
         try {
             List<?> assets = (List<?>) assetsObject;
             Map assetMap = (Map) assets.stream()
-                .filter(assetPredicate())
-                .findFirst()
-                .orElseThrow(() -> new ServiceException("Halo admin 最新版暂无资源文件，请稍后再试"));
+                    .filter(assetPredicate())
+                    .findFirst()
+                    .orElseThrow(() -> new ServiceException("Halo admin 最新版暂无资源文件，请稍后再试"));
 
             Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");
             // Download the assets
@@ -383,7 +383,7 @@ public class AdminServiceImpl implements AdminService {
 
             // Create temp folder
             Path assetTempPath = FileUtils.createTempDirectory()
-                .resolve(assetMap.getOrDefault("name", "halo-admin-latest.zip").toString());
+                    .resolve(assetMap.getOrDefault("name", "halo-admin-latest.zip").toString());
 
             // Unzip
             FileUtils.unzip(downloadResponseEntity.getBody(), assetTempPath);
@@ -538,7 +538,7 @@ public class AdminServiceImpl implements AdminService {
 
         linesArray.forEach(line -> {
             result.append(line)
-                .append(StringUtils.LF);
+                    .append(StringUtils.LF);
         });
 
         return result.toString();
@@ -551,7 +551,7 @@ public class AdminServiceImpl implements AdminService {
         boolean useMFA = true;
         try {
             final User user = Validator.isEmail(username) ?
-                userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
+                    userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
             useMFA = MFAType.useMFA(user.getMfaType());
         } catch (NotFoundException e) {
             log.error("Failed to find user by name: " + username, e);

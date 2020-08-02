@@ -32,8 +32,8 @@ public class ContentIndexController {
     private final PostModel postModel;
 
     public ContentIndexController(PostService postService,
-                                  OptionService optionService,
-                                  PostModel postModel) {
+            OptionService optionService,
+            PostModel postModel) {
         this.postService = postService;
         this.optionService = optionService;
         this.postModel = postModel;
@@ -69,7 +69,7 @@ public class ContentIndexController {
      */
     @GetMapping(value = "page/{page}")
     public String index(Model model,
-                        @PathVariable(value = "page") Integer page) {
+            @PathVariable(value = "page") Integer page) {
         return postModel.list(page, model);
     }
 }

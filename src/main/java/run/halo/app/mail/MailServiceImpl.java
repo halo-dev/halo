@@ -27,7 +27,7 @@ public class MailServiceImpl extends AbstractMailService implements ApplicationL
     private final FreeMarkerConfigurer freeMarker;
 
     public MailServiceImpl(FreeMarkerConfigurer freeMarker,
-                           OptionService optionService) {
+            OptionService optionService) {
         super(optionService);
         this.freeMarker = freeMarker;
     }

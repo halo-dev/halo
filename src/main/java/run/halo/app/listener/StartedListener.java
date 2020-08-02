@@ -89,12 +89,12 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         log.info("Starting migrate database...");
 
         Flyway flyway = Flyway
-            .configure()
-            .locations("classpath:/migration")
-            .baselineVersion("1")
-            .baselineOnMigrate(true)
-            .dataSource(url, username, password)
-            .load();
+                .configure()
+                .locations("classpath:/migration")
+                .baselineVersion("1")
+                .baselineOnMigrate(true)
+                .dataSource(url, username, password)
+                .load();
         flyway.repair();
         flyway.migrate();
 

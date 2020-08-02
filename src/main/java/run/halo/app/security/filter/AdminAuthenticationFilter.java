@@ -45,11 +45,11 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
     private final UserService userService;
 
     public AdminAuthenticationFilter(AbstractStringCacheStore cacheStore,
-                                     UserService userService,
-                                     HaloProperties haloProperties,
-                                     OptionService optionService,
-                                     OneTimeTokenService oneTimeTokenService,
-                                     ObjectMapper objectMapper) {
+            UserService userService,
+            HaloProperties haloProperties,
+            OptionService optionService,
+            OneTimeTokenService oneTimeTokenService,
+            ObjectMapper objectMapper) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.userService = userService;
         this.haloProperties = haloProperties;
@@ -57,14 +57,14 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         addUrlPatterns("/api/admin/**", "/api/content/comments");
 
         addExcludeUrlPatterns(
-            "/api/admin/login",
-            "/api/admin/refresh/*",
-            "/api/admin/installations",
-            "/api/admin/migrations/halo",
-            "/api/admin/is_installed",
-            "/api/admin/password/code",
-            "/api/admin/password/reset",
-            "/api/admin/login/precheck"
+                "/api/admin/login",
+                "/api/admin/refresh/*",
+                "/api/admin/installations",
+                "/api/admin/migrations/halo",
+                "/api/admin/is_installed",
+                "/api/admin/password/code",
+                "/api/admin/password/reset",
+                "/api/admin/login/precheck"
         );
 
         // set failure handler
@@ -82,7 +82,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         if (!haloProperties.isAuthEnabled()) {
             // Set security
             userService.getCurrentUser().ifPresent(user ->
-                SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
+                    SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(user)))));
 
             // Do filter
             filterChain.doFilter(request, response);

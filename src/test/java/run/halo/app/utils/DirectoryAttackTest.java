@@ -80,6 +80,6 @@ class DirectoryAttackTest {
     @Test
     void traversalTestWhenFailure() {
         assertThrows(ForbiddenException.class,
-            () -> FileUtils.checkDirectoryTraversal("/etc/", "/etc/../tmp"));
+                () -> FileUtils.checkDirectoryTraversal("/etc/", "/etc/../tmp"));
     }
 }

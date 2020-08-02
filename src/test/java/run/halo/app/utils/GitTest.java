@@ -41,9 +41,7 @@ class GitTest {
 
     @Test
     void openFailureTest() {
-        Assertions.assertThrows(RepositoryNotFoundException.class, () -> {
-            Git.open(tempPath.toFile());
-        });
+        Assertions.assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
     }
 
     @Test
@@ -99,8 +97,8 @@ class GitTest {
 
     Git cloneRepository() throws GitAPIException {
         return Git.cloneRepository()
-            .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
-            .setDirectory(tempPath.toFile())
-            .call();
+                .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
+                .setDirectory(tempPath.toFile())
+                .call();
     }
 }

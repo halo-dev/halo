@@ -40,10 +40,10 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     private final SheetRepository sheetRepository;
 
     public SheetCommentServiceImpl(SheetCommentRepository sheetCommentRepository,
-                                   OptionService optionService,
-                                   UserService userService,
-                                   ApplicationEventPublisher eventPublisher,
-                                   SheetRepository sheetRepository) {
+            OptionService optionService,
+            UserService userService,
+            ApplicationEventPublisher eventPublisher,
+            SheetRepository sheetRepository) {
         super(sheetCommentRepository, optionService, userService, eventPublisher);
         this.sheetRepository = sheetRepository;
     }
@@ -51,7 +51,7 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     @Override
     public void validateTarget(Integer sheetId) {
         Sheet sheet = sheetRepository.findById(sheetId)
-            .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
+                .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
 
         if (sheet.getDisallowComment()) {
             throw new BadRequestException("该页面已被禁止评论").setErrorData(sheetId);
@@ -80,16 +80,16 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
         Map<Integer, Sheet> sheetMap = ServiceUtils.convertToMap(sheetRepository.findAllById(sheetIds), Sheet::getId);
 
         return sheetComments.stream()
-            .filter(comment -> sheetMap.containsKey(comment.getPostId()))
-            .map(comment -> {
-                SheetCommentWithSheetVO sheetCmtWithPostVO = new SheetCommentWithSheetVO().convertFrom(comment);
+                .filter(comment -> sheetMap.containsKey(comment.getPostId()))
+                .map(comment -> {
+                    SheetCommentWithSheetVO sheetCmtWithPostVO = new SheetCommentWithSheetVO().convertFrom(comment);
 
-                BasePostMinimalDTO postMinimalDTO = new BasePostMinimalDTO().convertFrom(sheetMap.get(comment.getPostId()));
+                    BasePostMinimalDTO postMinimalDTO = new BasePostMinimalDTO().convertFrom(sheetMap.get(comment.getPostId()));
 
-                sheetCmtWithPostVO.setSheet(buildSheetFullPath(postMinimalDTO));
-                return sheetCmtWithPostVO;
-            })
-            .collect(Collectors.toList());
+                    sheetCmtWithPostVO.setSheet(buildSheetFullPath(postMinimalDTO));
+                    return sheetCmtWithPostVO;
+                })
+                .collect(Collectors.toList());
     }
 
     private BasePostMinimalDTO buildSheetFullPath(BasePostMinimalDTO basePostMinimalDTO) {
@@ -100,10 +100,10 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
         }
 
         fullPath.append(URL_SEPARATOR)
-            .append(optionService.getSheetPrefix())
-            .append(URL_SEPARATOR)
-            .append(basePostMinimalDTO.getSlug())
-            .append(optionService.getPathSuffix());
+                .append(optionService.getSheetPrefix())
+                .append(URL_SEPARATOR)
+                .append(basePostMinimalDTO.getSlug())
+                .append(optionService.getPathSuffix());
 
         basePostMinimalDTO.setFullPath(fullPath.toString());
         return basePostMinimalDTO;

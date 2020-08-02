@@ -113,8 +113,8 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         TypedQuery<Long> countQuery = getCountQuery(specification, getDomainClass()).setParameter(specification.parameter, ids);
 
         return pageable.isUnpaged() ?
-            new PageImpl<>(query.getResultList())
-            : readPage(query, getDomainClass(), pageable, countQuery);
+                new PageImpl<>(query.getResultList())
+                : readPage(query, getDomainClass(), pageable, countQuery);
     }
 
     /**
@@ -146,7 +146,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         }
 
         return PageableExecutionUtils.getPage(query.getResultList(), pageable,
-            () -> executeCountQuery(countQuery));
+                () -> executeCountQuery(countQuery));
     }
 
     private static final class ByIdsSpecification<T> implements Specification<T> {

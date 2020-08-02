@@ -46,9 +46,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     private final OptionService optionService;
 
     public PostCategoryServiceImpl(PostCategoryRepository postCategoryRepository,
-                                   PostRepository postRepository,
-                                   CategoryRepository categoryRepository,
-                                   OptionService optionService) {
+            PostRepository postRepository,
+            CategoryRepository categoryRepository,
+            OptionService optionService) {
         super(postCategoryRepository);
         this.postCategoryRepository = postCategoryRepository;
         this.postRepository = postRepository;
@@ -89,7 +89,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Foreach and collect
         postCategories.forEach(postCategory -> categoryListMap.computeIfAbsent(postCategory.getPostId(), postId -> new LinkedList<>())
-            .add(categoryMap.get(postCategory.getCategoryId())));
+                .add(categoryMap.get(postCategory.getCategoryId())));
 
         return categoryListMap;
     }
@@ -243,28 +243,28 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
         // Convert and return
         return categories.stream()
-            .map(category -> {
-                // Create category post count dto
-                CategoryWithPostCountDTO categoryWithPostCountDTO = new CategoryWithPostCountDTO().convertFrom(category);
-                // Set post count
-                categoryWithPostCountDTO.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+                .map(category -> {
+                    // Create category post count dto
+                    CategoryWithPostCountDTO categoryWithPostCountDTO = new CategoryWithPostCountDTO().convertFrom(category);
+                    // Set post count
+                    categoryWithPostCountDTO.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
 
-                StringBuilder fullPath = new StringBuilder();
+                    StringBuilder fullPath = new StringBuilder();
 
-                if (optionService.isEnabledAbsolutePath()) {
-                    fullPath.append(optionService.getBlogBaseUrl());
-                }
+                    if (optionService.isEnabledAbsolutePath()) {
+                        fullPath.append(optionService.getBlogBaseUrl());
+                    }
 
-                fullPath.append(URL_SEPARATOR)
-                    .append(optionService.getCategoriesPrefix())
-                    .append(URL_SEPARATOR)
-                    .append(category.getSlug())
-                    .append(optionService.getPathSuffix());
+                    fullPath.append(URL_SEPARATOR)
+                            .append(optionService.getCategoriesPrefix())
+                            .append(URL_SEPARATOR)
+                            .append(category.getSlug())
+                            .append(optionService.getPathSuffix());
 
-                categoryWithPostCountDTO.setFullPath(fullPath.toString());
+                    categoryWithPostCountDTO.setFullPath(fullPath.toString());
 
-                return categoryWithPostCountDTO;
-            })
-            .collect(Collectors.toList());
+                    return categoryWithPostCountDTO;
+                })
+                .collect(Collectors.toList());
     }
 }

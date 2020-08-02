@@ -27,9 +27,9 @@ public interface ValueEnum<T> {
         Assert.isTrue(enumType.isEnum(), "type must be an enum type");
 
         return Stream.of(enumType.getEnumConstants())
-            .filter(item -> item.getValue().equals(value))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("unknown database value: " + value));
+                .filter(item -> item.getValue().equals(value))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("unknown database value: " + value));
     }
 
     /**

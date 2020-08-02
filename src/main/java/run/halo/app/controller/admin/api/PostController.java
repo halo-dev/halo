@@ -48,8 +48,8 @@ public class PostController {
     private final OptionService optionService;
 
     public PostController(PostService postService,
-                          AbstractStringCacheStore cacheStore,
-                          OptionService optionService) {
+            AbstractStringCacheStore cacheStore,
+            OptionService optionService) {
         this.postService = postService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
@@ -58,8 +58,8 @@ public class PostController {
     @GetMapping
     @ApiOperation("Lists posts")
     public Page<? extends BasePostSimpleDTO> pageBy(@PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
-                                                    PostQuery postQuery,
-                                                    @RequestParam(value = "more", defaultValue = "true") Boolean more) {
+            PostQuery postQuery,
+            @RequestParam(value = "more", defaultValue = "true") Boolean more) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         if (more) {
             return postService.convertToListVo(postPage);
@@ -77,8 +77,8 @@ public class PostController {
     @GetMapping("status/{status}")
     @ApiOperation("Gets a page of post by post status")
     public Page<? extends BasePostSimpleDTO> pageByStatus(@PathVariable(name = "status") PostStatus status,
-                                                          @RequestParam(value = "more", required = false, defaultValue = "false") Boolean more,
-                                                          @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+            @RequestParam(value = "more", required = false, defaultValue = "false") Boolean more,
+            @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> posts = postService.pageBy(status, pageable);
 
         if (more) {
@@ -104,7 +104,7 @@ public class PostController {
     @PostMapping
     @ApiOperation("Creates a post")
     public PostDetailVO createBy(@Valid @RequestBody PostParam postParam,
-                                 @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+            @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Convert to
         Post post = postParam.convertTo();
         return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
@@ -113,8 +113,8 @@ public class PostController {
     @PutMapping("{postId:\\d+}")
     @ApiOperation("Updates a post")
     public PostDetailVO updateBy(@Valid @RequestBody PostParam postParam,
-                                 @PathVariable("postId") Integer postId,
-                                 @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+            @PathVariable("postId") Integer postId,
+            @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Get the post info
         Post postToUpdate = postService.getById(postId);
 
@@ -125,8 +125,8 @@ public class PostController {
     @PutMapping("{postId:\\d+}/status/{status}")
     @ApiOperation("Updates post status")
     public BasePostMinimalDTO updateStatusBy(
-        @PathVariable("postId") Integer postId,
-        @PathVariable("status") PostStatus status) {
+            @PathVariable("postId") Integer postId,
+            @PathVariable("status") PostStatus status) {
         Post post = postService.updateStatus(status, postId);
 
         return new BasePostMinimalDTO().convertFrom(post);
@@ -135,15 +135,15 @@ public class PostController {
     @PutMapping("status/{status}")
     @ApiOperation("Updates post status in batch")
     public List<Post> updateStatusInBatch(@PathVariable(name = "status") PostStatus status,
-                                          @RequestBody List<Integer> ids) {
+            @RequestBody List<Integer> ids) {
         return postService.updateStatusByIds(ids, status);
     }
 
     @PutMapping("{postId:\\d+}/status/draft/content")
     @ApiOperation("Updates draft")
     public BasePostDetailDTO updateDraftBy(
-        @PathVariable("postId") Integer postId,
-        @RequestBody PostContentParam contentParam) {
+            @PathVariable("postId") Integer postId,
+            @RequestBody PostContentParam contentParam) {
         // Update draft content
         Post post = postService.updateDraftContent(contentParam.getContent(), postId);
 
@@ -186,10 +186,10 @@ public class PostController {
 
         if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
             previewUrl.append("&token=")
-                .append(token);
+                    .append(token);
         } else {
             previewUrl.append("?token=")
-                .append(token);
+                    .append(token);
         }
 
         // build preview post url and return

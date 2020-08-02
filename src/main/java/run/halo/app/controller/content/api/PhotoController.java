@@ -45,7 +45,7 @@ public class PhotoController {
 
     @GetMapping
     public Page<PhotoDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-                                 PhotoQuery photoQuery) {
+            PhotoQuery photoQuery) {
         return photoService.pageDtosBy(pageable, photoQuery);
     }
 }

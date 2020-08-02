@@ -19,9 +19,9 @@ public class DateTimeUtils {
      * 标准日期格式 {@link DateTimeFormatter}：yyyyMMddHHmmssSSS
      */
     public static final DateTimeFormatter PURE_DATETIME_MS_FORMATTER = new DateTimeFormatterBuilder()
-        .appendPattern(PURE_DATETIME_PATTERN)
-        .appendValue(ChronoField.MILLI_OF_SECOND, 3)
-        .toFormatter();
+            .appendPattern(PURE_DATETIME_PATTERN)
+            .appendValue(ChronoField.MILLI_OF_SECOND, 3)
+            .toFormatter();
     /**
      * 标准日期格式 {@link DateTimeFormatter}：yyyyMMdd
      */

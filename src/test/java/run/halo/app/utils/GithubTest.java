@@ -58,8 +58,8 @@ class GithubTest {
                 Object name = aAssetMap.getOrDefault("name", "");
                 return name.toString().matches(HALO_ADMIN_REGEX);
             })
-                .findFirst()
-                .orElseThrow(() -> new BadRequestException("Halo admin has no assets available"));
+                    .findFirst()
+                    .orElseThrow(() -> new BadRequestException("Halo admin has no assets available"));
 
             Object name = assetMap.getOrDefault("name", "");
             Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");

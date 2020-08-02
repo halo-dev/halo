@@ -19,8 +19,8 @@ import javax.persistence.*;
  */
 @Data
 @Entity(name = "BaseComment")
-@Table(name = "comments",
-    indexes = {@Index(name = "comments_post_id", columnList = "post_id"),
+@Table(name = "comments", indexes = {
+        @Index(name = "comments_post_id", columnList = "post_id"),
         @Index(name = "comments_type_status", columnList = "type, status"),
         @Index(name = "comments_parent_id", columnList = "parent_id")})
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")

@@ -53,8 +53,8 @@ class DisableOnConditionAspectTest {
         Throwable t = null;
         try {
             mvc.perform(get(REQUEST_URI + "/no"))
-                .andDo(print())
-                .andReturn();
+                    .andDo(print())
+                    .andReturn();
         } catch (NestedServletException nse) {
             t = nse;
         }
@@ -68,8 +68,8 @@ class DisableOnConditionAspectTest {
     @Test
     void ableAccessTest() throws Exception {
         mvc.perform(get(REQUEST_URI + "/yes"))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())));
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())));
     }
 }

@@ -59,10 +59,10 @@ public class ContentFeedController {
     private final FreeMarkerConfigurer freeMarker;
 
     public ContentFeedController(PostService postService,
-                                 CategoryService categoryService,
-                                 PostCategoryService postCategoryService,
-                                 OptionService optionService,
-                                 FreeMarkerConfigurer freeMarker) {
+            CategoryService categoryService,
+            PostCategoryService postCategoryService,
+            OptionService optionService,
+            FreeMarkerConfigurer freeMarker) {
         this.postService = postService;
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
@@ -153,7 +153,7 @@ public class ContentFeedController {
     @GetMapping(value = {"sitemap", "sitemap.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
     public String sitemapXml(Model model,
-                             @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC) Pageable pageable) throws IOException, TemplateException {
+            @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC) Pageable pageable) throws IOException, TemplateException {
         model.addAttribute("posts", buildPosts(pageable));
         Template template = freeMarker.getConfiguration().getTemplate("common/web/sitemap_xml.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
@@ -167,7 +167,7 @@ public class ContentFeedController {
      */
     @GetMapping(value = "sitemap.html")
     public String sitemapHtml(Model model,
-                              @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC) Pageable pageable) {
+            @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC) Pageable pageable) {
         model.addAttribute("posts", buildPosts(pageable));
         return "common/web/sitemap_html";
     }

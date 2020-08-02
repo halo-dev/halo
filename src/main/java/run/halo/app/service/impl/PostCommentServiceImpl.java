@@ -51,11 +51,11 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     private final CommentBlackListService commentBlackListService;
 
     public PostCommentServiceImpl(PostCommentRepository postCommentRepository,
-                                  PostRepository postRepository,
-                                  UserService userService,
-                                  OptionService optionService,
-                                  CommentBlackListService commentBlackListService,
-                                  ApplicationEventPublisher eventPublisher) {
+            PostRepository postRepository,
+            UserService userService,
+            OptionService optionService,
+            CommentBlackListService commentBlackListService,
+            ApplicationEventPublisher eventPublisher) {
         super(postCommentRepository, optionService, userService, eventPublisher);
         this.postRepository = postRepository;
         this.commentBlackListService = commentBlackListService;
@@ -93,17 +93,17 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
         Map<Integer, Post> postMap = ServiceUtils.convertToMap(postRepository.findAllById(postIds), Post::getId);
 
         return postComments.stream()
-            .filter(comment -> postMap.containsKey(comment.getPostId()))
-            .map(comment -> {
-                // Convert to vo
-                PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
+                .filter(comment -> postMap.containsKey(comment.getPostId()))
+                .map(comment -> {
+                    // Convert to vo
+                    PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
 
-                BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId()));
+                    BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId()));
 
-                postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
+                    postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
 
-                return postCommentWithPostVO;
-            }).collect(Collectors.toList());
+                    return postCommentWithPostVO;
+                }).collect(Collectors.toList());
     }
 
     private BasePostMinimalDTO buildPostFullPath(BasePostMinimalDTO post) {
@@ -131,28 +131,28 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
 
         if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
             fullPath.append(archivesPrefix)
-                .append(URL_SEPARATOR)
-                .append(post.getSlug())
-                .append(pathSuffix);
+                    .append(URL_SEPARATOR)
+                    .append(post.getSlug())
+                    .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.ID)) {
             fullPath.append("?p=")
-                .append(post.getId());
+                    .append(post.getId());
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
-                .append(URL_SEPARATOR)
-                .append(monthString)
-                .append(URL_SEPARATOR)
-                .append(post.getSlug())
-                .append(pathSuffix);
+                    .append(URL_SEPARATOR)
+                    .append(monthString)
+                    .append(URL_SEPARATOR)
+                    .append(post.getSlug())
+                    .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
             fullPath.append(DateUtil.year(post.getCreateTime()))
-                .append(URL_SEPARATOR)
-                .append(monthString)
-                .append(URL_SEPARATOR)
-                .append(dayString)
-                .append(URL_SEPARATOR)
-                .append(post.getSlug())
-                .append(pathSuffix);
+                    .append(URL_SEPARATOR)
+                    .append(monthString)
+                    .append(URL_SEPARATOR)
+                    .append(dayString)
+                    .append(URL_SEPARATOR)
+                    .append(post.getSlug())
+                    .append(pathSuffix);
         }
 
         post.setFullPath(fullPath.toString());
@@ -163,7 +163,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     @Override
     public void validateTarget(Integer postId) {
         Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
 
         if (post.getDisallowComment()) {
             throw new BadRequestException("该文章已经被禁止评论").setErrorData(postId);

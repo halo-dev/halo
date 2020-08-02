@@ -32,8 +32,8 @@ public class ServiceUtils {
     @NonNull
     public static <ID, T> Set<ID> fetchProperty(final Collection<T> datas, Function<T, ID> mappingFunction) {
         return CollectionUtils.isEmpty(datas) ?
-            Collections.emptySet() :
-            datas.stream().map(mappingFunction).collect(Collectors.toSet());
+                Collections.emptySet() :
+                datas.stream().map(mappingFunction).collect(Collectors.toSet());
     }
 
     /**

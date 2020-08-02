@@ -15,8 +15,8 @@ import javax.persistence.*;
  */
 @Data
 @Entity
-@Table(name = "theme_settings",
-    indexes = {@Index(name = "theme_settings_setting_key", columnList = "setting_key"),
+@Table(name = "theme_settings", indexes = {
+        @Index(name = "theme_settings_setting_key", columnList = "setting_key"),
         @Index(name = "theme_settings_theme_id", columnList = "theme_id")})
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)

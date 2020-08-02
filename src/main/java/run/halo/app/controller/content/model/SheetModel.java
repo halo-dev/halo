@@ -39,10 +39,10 @@ public class SheetModel {
     private final OptionService optionService;
 
     public SheetModel(SheetService sheetService,
-                      SheetMetaService sheetMetaService,
-                      AbstractStringCacheStore cacheStore,
-                      ThemeService themeService,
-                      OptionService optionService) {
+            SheetMetaService sheetMetaService,
+            AbstractStringCacheStore cacheStore,
+            ThemeService themeService,
+            OptionService optionService) {
         this.sheetService = sheetService;
         this.sheetMetaService = sheetMetaService;
         this.cacheStore = cacheStore;
