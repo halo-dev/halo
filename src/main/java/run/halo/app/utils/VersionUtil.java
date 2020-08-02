@@ -100,4 +100,5 @@ public class VersionUtil {
     public static boolean compareVersion(String current, String require) {
         return compare(current, require) >= 0;
     }
+
 }
