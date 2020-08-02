@@ -107,9 +107,8 @@ public class PostModel {
             post.setVisits((post.getVisits() == null ? 0 : post.getVisits()) + readOptional.get());
         }
 
-        AdjacentPostVO adjacentPostVO = postService.getAdjacentPosts(post);
-        adjacentPostVO.getOptionalPrevPost().ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
-        adjacentPostVO.getOptionalNextPost().ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
+        postService.getPrevPost(post).ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
+        postService.getNextPost(post).ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
