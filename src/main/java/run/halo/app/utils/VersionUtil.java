@@ -8,9 +8,12 @@ import java.util.Objects;
 import java.util.StringTokenizer;
 
 /**
+ * Version utility.
+ *
  * @author ryanwang
+ * @author johnniang
  * @date 2020-02-03
- * @see "com.sun.xml.internal.ws.util.VersionUtil"
+ * @date 2020-08-03
  */
 @Slf4j
 public class VersionUtil {
@@ -20,6 +23,7 @@ public class VersionUtil {
     private VersionUtil() {
     }
 
+    @Deprecated
     public static int[] getCanonicalVersion(String version) {
         Assert.hasText(version, "Version must not be blank");
 
@@ -66,6 +70,7 @@ public class VersionUtil {
         return canonicalVersion;
     }
 
+    @Deprecated
     public static int compare(String version1, String version2) {
         log.debug("Comparing version [{}] with [{}]", version1, version2);
 
@@ -98,6 +103,9 @@ public class VersionUtil {
      * @return true or false.
      */
     public static boolean compareVersion(String current, String require) {
-        return compare(current, require) >= 0;
+        Version leftVersion = Version.resolve(current).orElse(Version.emptyVersion());
+        Version rightVersion = Version.resolve(require).orElse(Version.emptyVersion());
+        return leftVersion.compareTo(rightVersion) >= 0;
     }
+
 }

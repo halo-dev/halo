@@ -80,7 +80,7 @@
         <!--whitespace-->
         <module name="GenericWhitespace"/>
         <module name="NoWhitespaceBefore"/>
-        <module name="NoWhitespaceAfter"/>
+        <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround">
             <property name="allowEmptyConstructors" value="true"/>
             <property name="allowEmptyMethods" value="true"/>
