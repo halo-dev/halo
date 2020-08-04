@@ -97,6 +97,8 @@
 </template>
 <script>
 import marked from 'marked'
+import { decodeHTML } from '@/utils/util'
+
 export default {
   name: 'TargetCommentTree',
   props: {
@@ -111,7 +113,7 @@ export default {
       return `//cn.gravatar.com/avatar/${this.comment.gravatarMd5}/?s=256&d=mp`
     },
     content() {
-      return marked(this.comment.content)
+      return marked(decodeHTML(this.comment.content))
     }
   },
   methods: {

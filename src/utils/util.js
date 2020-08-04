@@ -44,3 +44,12 @@ export function isObject(value) {
 export function datetimeFormat(value, pattern = 'YYYY-MM-DD HH:mm') {
   return moment(value).format(pattern)
 }
+
+// decode html tag
+export function decodeHTML(html) {
+  let elem = document.createElement('div')
+  elem.innerHTML = html
+  const output = elem.innerText || elem.textContent
+  elem = null
+  return output
+}
