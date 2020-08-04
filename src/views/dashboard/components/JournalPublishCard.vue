@@ -9,7 +9,7 @@
         slot="action"
         title="内容将保存到页面/所有页面/日志页面"
       >
-        <a-icon type="info-circle-o" />
+        <a-icon type="info-circle-o" class="cursor-pointer"/>
       </a-tooltip>
     </template>
     <a-form-model
@@ -52,7 +52,7 @@ export default {
       form: {
         model: {},
         rules: {
-          sourceContent: [{ required: true, message: '* 内容不能为空', trigger: ['change', 'blur'] }]
+          sourceContent: [{ required: true, message: '* 内容不能为空', trigger: ['change'] }]
         },
         saving: false,
         errored: false
