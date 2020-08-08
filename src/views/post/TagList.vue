@@ -150,11 +150,11 @@ export default {
         errored: false,
         rules: {
           name: [
-            { required: true, message: '* 标签名称不能为空', trigger: ['change', 'blur'] },
-            { max: 255, message: '* 标签名称的字符长度不能超过 255', trigger: ['change', 'blur'] }
+            { required: true, message: '* 标签名称不能为空', trigger: ['change'] },
+            { max: 255, message: '* 标签名称的字符长度不能超过 255', trigger: ['change'] }
           ],
-          slug: [{ max: 255, message: '* 标签别名的字符长度不能超过 255', trigger: ['change', 'blur'] }],
-          thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change', 'blur'] }]
+          slug: [{ max: 255, message: '* 标签别名的字符长度不能超过 255', trigger: ['change'] }],
+          thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change'] }]
         }
       },
       thumbnailDrawer: {

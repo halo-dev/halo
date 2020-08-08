@@ -562,7 +562,7 @@ export default {
       selectedComment: {},
       replyComment: {},
       replyCommentRules: {
-        content: [{ required: true, message: '* 内容不能为空', trigger: ['change', 'blur'] }]
+        content: [{ required: true, message: '* 内容不能为空', trigger: ['change'] }]
       },
       loading: false,
       commentStatus: commentApi.commentStatus,

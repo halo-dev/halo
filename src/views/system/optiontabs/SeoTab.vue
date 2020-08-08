@@ -73,8 +73,8 @@ export default {
         xs: { span: 24 }
       },
       rules: {
-        seo_keywords: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }],
-        seo_description: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change', 'blur'] }]
+        seo_keywords: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change'] }],
+        seo_description: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change'] }]
       }
     }
   },

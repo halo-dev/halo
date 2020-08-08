@@ -308,12 +308,12 @@ export default {
         errored: false,
         rules: {
           name: [
-            { required: true, message: '* 分类名称不能为空', trigger: ['change', 'blur'] },
-            { max: 255, message: '* 分类名称的字符长度不能超过 255', trigger: ['change', 'blur'] }
+            { required: true, message: '* 分类名称不能为空', trigger: ['change'] },
+            { max: 255, message: '* 分类名称的字符长度不能超过 255', trigger: ['change'] }
           ],
-          slug: [{ max: 255, message: '* 分类别名的字符长度不能超过 255', trigger: ['change', 'blur'] }],
-          thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change', 'blur'] }],
-          description: [{ max: 100, message: '* 分类描述的字符长度不能超过 100', trigger: ['change', 'blur'] }]
+          slug: [{ max: 255, message: '* 分类别名的字符长度不能超过 255', trigger: ['change'] }],
+          thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change'] }],
+          description: [{ max: 100, message: '* 分类描述的字符长度不能超过 100', trigger: ['change'] }]
         }
       },
       thumbnailDrawer: {

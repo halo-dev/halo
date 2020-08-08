@@ -279,15 +279,15 @@ export default {
         errored: false,
         rules: {
           name: [
-            { required: true, message: '* 菜单名称不能为空', trigger: ['change', 'blur'] },
-            { max: 50, message: '* 菜单名称的字符长度不能超过 50', trigger: ['change', 'blur'] }
+            { required: true, message: '* 菜单名称不能为空', trigger: ['change'] },
+            { max: 50, message: '* 菜单名称的字符长度不能超过 50', trigger: ['change'] }
           ],
           url: [
-            { required: true, message: '* 菜单地址不能为空', trigger: ['change', 'blur'] },
-            { max: 1023, message: '* 菜单地址的字符长度不能超过 1023', trigger: ['change', 'blur'] }
+            { required: true, message: '* 菜单地址不能为空', trigger: ['change'] },
+            { max: 1023, message: '* 菜单地址的字符长度不能超过 1023', trigger: ['change'] }
           ],
-          icon: [{ max: 50, message: '* 菜单图标的字符长度不能超过 50', trigger: ['change', 'blur'] }],
-          team: [{ max: 255, message: '* 菜单分组的字符长度不能超过 255', trigger: ['change', 'blur'] }]
+          icon: [{ max: 50, message: '* 菜单图标的字符长度不能超过 50', trigger: ['change'] }],
+          team: [{ max: 255, message: '* 菜单分组的字符长度不能超过 255', trigger: ['change'] }]
         },
         moreField: false
       },

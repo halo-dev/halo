@@ -387,19 +387,19 @@ export default {
         errored: false,
         rules: {
           username: [
-            { required: true, message: '* 用户名不能为空', trigger: ['change', 'blur'] },
-            { max: 50, message: '* 用户名的字符长度不能超过 50', trigger: ['change', 'blur'] }
+            { required: true, message: '* 用户名不能为空', trigger: ['change'] },
+            { max: 50, message: '* 用户名的字符长度不能超过 50', trigger: ['change'] }
           ],
           nickname: [
-            { required: true, message: '* 用户昵称不能为空', trigger: ['change', 'blur'] },
-            { max: 255, message: '* 用户昵称的字符长度不能超过 255', trigger: ['change', 'blur'] }
+            { required: true, message: '* 用户昵称不能为空', trigger: ['change'] },
+            { max: 255, message: '* 用户昵称的字符长度不能超过 255', trigger: ['change'] }
           ],
           email: [
-            { required: true, message: '* 电子邮箱地址不能为空', trigger: ['change', 'blur'] },
-            { type: 'email', message: '* 电子邮箱地址格式不正确', trigger: ['change', 'blur'] },
-            { max: 127, message: '* 电子邮箱的字符长度不能超过 255', trigger: ['change', 'blur'] }
+            { required: true, message: '* 电子邮箱地址不能为空', trigger: ['change'] },
+            { type: 'email', message: '* 电子邮箱地址格式不正确', trigger: ['change'] },
+            { max: 127, message: '* 电子邮箱的字符长度不能超过 255', trigger: ['change'] }
           ],
-          description: [{ max: 1023, message: '* 个人说明的字符长度不能超过 1023', trigger: ['change', 'blur'] }]
+          description: [{ max: 1023, message: '* 个人说明的字符长度不能超过 1023', trigger: ['change'] }]
         }
       },
       statistics: {
@@ -416,16 +416,16 @@ export default {
         errored: false,
         rules: {
           oldPassword: [
-            { required: true, message: '* 原密码不能为空', trigger: ['change', 'blur'] },
+            { required: true, message: '* 原密码不能为空', trigger: ['change'] },
             { max: 100, min: 8, message: '* 密码的字符长度必须在 8 - 100 之间', trigger: ['blur'] }
           ],
           newPassword: [
-            { required: true, message: '* 新密码不能为空', trigger: ['change', 'blur'] },
-            { max: 100, min: 8, message: '* 密码的字符长度必须在 8 - 100 之间', trigger: ['change', 'blur'] }
+            { required: true, message: '* 新密码不能为空', trigger: ['change'] },
+            { max: 100, min: 8, message: '* 密码的字符长度必须在 8 - 100 之间', trigger: ['change'] }
           ],
           confirmPassword: [
-            { required: true, message: '* 确认密码不能为空', trigger: ['change', 'blur'] },
-            { validator: validateConfirmPassword, trigger: ['change', 'blur'] }
+            { required: true, message: '* 确认密码不能为空', trigger: ['change'] },
+            { validator: validateConfirmPassword, trigger: ['change'] }
           ]
         }
       },
@@ -444,7 +444,7 @@ export default {
           checked: false
         },
         rules: {
-          authcode: [{ required: true, message: '* 两步验证码不能为空', trigger: ['change', 'blur'] }]
+          authcode: [{ required: true, message: '* 两步验证码不能为空', trigger: ['change'] }]
         },
         saving: false,
         errored: false

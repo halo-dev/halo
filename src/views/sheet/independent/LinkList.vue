@@ -311,17 +311,17 @@ export default {
         errored: false,
         rules: {
           name: [
-            { required: true, message: '* 友情链接名称不能为空', trigger: ['change', 'blur'] },
-            { max: 255, message: '* 友情链接名称的字符长度不能超过 255', trigger: ['change', 'blur'] }
+            { required: true, message: '* 友情链接名称不能为空', trigger: ['change'] },
+            { max: 255, message: '* 友情链接名称的字符长度不能超过 255', trigger: ['change'] }
           ],
           url: [
-            { required: true, message: '* 友情链接地址不能为空', trigger: ['change', 'blur'] },
-            { max: 1023, message: '* 友情链接地址的字符长度不能超过 1023', trigger: ['change', 'blur'] },
-            { type: 'url', message: '* 友情链接地址格式有误', trigger: ['change', 'blur'] }
+            { required: true, message: '* 友情链接地址不能为空', trigger: ['change'] },
+            { max: 1023, message: '* 友情链接地址的字符长度不能超过 1023', trigger: ['change'] },
+            { type: 'url', message: '* 友情链接地址格式有误', trigger: ['change'] }
           ],
-          logo: [{ max: 1023, message: '* 友情链接 Logo 的字符长度不能超过 1023', trigger: ['change', 'blur'] }],
-          description: [{ max: 255, message: '* 友情链接描述的字符长度不能超过 255', trigger: ['change', 'blur'] }],
-          team: [{ max: 255, message: '* 友情链接分组的字符长度 255', trigger: ['change', 'blur'] }]
+          logo: [{ max: 1023, message: '* 友情链接 Logo 的字符长度不能超过 1023', trigger: ['change'] }],
+          description: [{ max: 255, message: '* 友情链接描述的字符长度不能超过 255', trigger: ['change'] }],
+          team: [{ max: 255, message: '* 友情链接分组的字符长度 255', trigger: ['change'] }]
         }
       },
       optionsModal: {
