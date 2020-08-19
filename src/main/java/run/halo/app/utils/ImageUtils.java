@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.image4j.codec.ico.ICODecoder;
+import run.halo.app.exception.ImageFormatException;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -24,7 +25,11 @@ public class ImageUtils {
         log.debug("Current File type is : [{}]", extension);
 
         if (EXTENSION_ICO.equals(extension)) {
-            return ICODecoder.read(is).get(0);
+            try {
+                return ICODecoder.read(is).get(0);
+            } catch (IOException e) {
+                throw new ImageFormatException("ico 文件已损坏", e);
+            }
         } else {
             return ImageIO.read(is);
         }
