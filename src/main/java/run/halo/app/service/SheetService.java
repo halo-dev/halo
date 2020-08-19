@@ -2,13 +2,16 @@ package run.halo.app.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
-import run.halo.app.model.dto.InternalSheetDTO;
+import run.halo.app.model.dto.IndependentSheetDTO;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.base.BasePostService;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Sheet service interface.
@@ -30,6 +33,16 @@ public interface SheetService extends BasePostService<Sheet> {
     Sheet createBy(@NonNull Sheet sheet, boolean autoSave);
 
     /**
+     * Creates a sheet.
+     *
+     * @param sheet    sheet must not be null
+     * @param metas    sheet metas
+     * @param autoSave autoSave
+     * @return created sheet
+     */
+    Sheet createBy(@NonNull Sheet sheet, Set<SheetMeta> metas, boolean autoSave);
+
+    /**
      * Updates a sheet.
      *
      * @param sheet    sheet must not be null
@@ -40,14 +53,24 @@ public interface SheetService extends BasePostService<Sheet> {
     Sheet updateBy(@NonNull Sheet sheet, boolean autoSave);
 
     /**
+     * Updates a sheet.
+     *
+     * @param sheet    sheet must not be null
+     * @param metas    sheet metas
+     * @param autoSave autoSave
+     * @return updated sheet
+     */
+    Sheet updateBy(@NonNull Sheet sheet, Set<SheetMeta> metas, boolean autoSave);
+
+    /**
      * Gets by url
      *
      * @param status post status must not be null
-     * @param url    post url must not be blank
+     * @param slug   post slug must not be blank
      * @return sheet
      */
     @Override
-    Sheet getBy(PostStatus status, String url);
+    Sheet getBy(PostStatus status, String slug);
 
     /**
      * Import sheet from markdown document.
@@ -77,12 +100,12 @@ public interface SheetService extends BasePostService<Sheet> {
     String exportMarkdown(@NonNull Sheet sheet);
 
     /**
-     * List internal sheets.
+     * List independent sheets.
      *
-     * @return list of internal sheets
+     * @return list of independent sheets
      */
     @NonNull
-    List<InternalSheetDTO> listInternal();
+    List<IndependentSheetDTO> listIndependentSheets();
 
     /**
      * Converts to list dto page.
@@ -92,4 +115,20 @@ public interface SheetService extends BasePostService<Sheet> {
      */
     @NonNull
     Page<SheetListVO> convertToListVo(@NonNull Page<Sheet> sheetPage);
+
+    /**
+     * Converts to detail vo.
+     *
+     * @param sheet sheet must not be null
+     * @return sheet detail vo
+     */
+    @NonNull
+    SheetDetailVO convertToDetailVo(@NonNull Sheet sheet);
+
+    /**
+     * Publish a sheet visit event.
+     *
+     * @param sheetId sheetId must not be null
+     */
+    void publishVisitEvent(@NonNull Integer sheetId);
 }

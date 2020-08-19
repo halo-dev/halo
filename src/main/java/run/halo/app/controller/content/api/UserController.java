@@ -8,10 +8,10 @@ import run.halo.app.model.dto.UserDTO;
 import run.halo.app.service.UserService;
 
 /**
- * Portal user controller.
+ * Content user controller.
  *
  * @author johnniang
- * @date 4/3/19
+ * @date 2019-04-03
  */
 @RestController("ApiContentUserController")
 @RequestMapping("/api/content/users")

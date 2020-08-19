@@ -1,32 +1,39 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostComment;
-import run.halo.app.model.params.CommentQuery;
+import run.halo.app.model.enums.CommentViolationTypeEnum;
+import run.halo.app.model.enums.PostPermalinkType;
+import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.repository.PostCommentRepository;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.service.CommentBlackListService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.ServiceUtils;
+import run.halo.app.utils.ServletUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * PostCommentService implementation class
@@ -39,18 +46,19 @@ import java.util.stream.Collectors;
 @Service
 public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> implements PostCommentService {
 
-    private final PostCommentRepository postCommentRepository;
-
     private final PostRepository postRepository;
 
+    private final CommentBlackListService commentBlackListService;
+
     public PostCommentServiceImpl(PostCommentRepository postCommentRepository,
-                                  PostRepository postRepository,
-                                  UserService userService,
-                                  OptionService optionService,
-                                  ApplicationEventPublisher eventPublisher) {
+            PostRepository postRepository,
+            UserService userService,
+            OptionService optionService,
+            CommentBlackListService commentBlackListService,
+            ApplicationEventPublisher eventPublisher) {
         super(postCommentRepository, optionService, userService, eventPublisher);
-        this.postCommentRepository = postCommentRepository;
         this.postRepository = postRepository;
+        this.commentBlackListService = commentBlackListService;
     }
 
     @Override
@@ -65,7 +73,10 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
     public PostCommentWithPostVO convertToWithPostVo(PostComment comment) {
         Assert.notNull(comment, "PostComment must not be null");
         PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
-        postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postRepository.getOne(comment.getPostId())));
+
+        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(postRepository.getOne(comment.getPostId()));
+
+        postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
         return postCommentWithPostVO;
     }
 
@@ -87,18 +98,66 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
                     // Convert to vo
                     PostCommentWithPostVO postCommentWithPostVO = new PostCommentWithPostVO().convertFrom(comment);
 
-                    // Get post and set to the vo
-                    postCommentWithPostVO.setPost(new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId())));
+                    BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId()));
+
+                    postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
 
                     return postCommentWithPostVO;
                 }).collect(Collectors.toList());
     }
 
-    @Override
-    public Page<PostCommentWithPostVO> pageTreeBy(CommentQuery commentQuery, Pageable pageable) {
-        Page<PostComment> postCommentPage = pageBy(commentQuery, pageable);
+    private BasePostMinimalDTO buildPostFullPath(BasePostMinimalDTO post) {
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
 
-        return null;
+        String pathSuffix = optionService.getPathSuffix();
+
+        String archivesPrefix = optionService.getArchivesPrefix();
+
+        int month = DateUtil.month(post.getCreateTime()) + 1;
+
+        String monthString = month < 10 ? "0" + month : String.valueOf(month);
+
+        int day = DateUtil.dayOfMonth(post.getCreateTime());
+
+        String dayString = day < 10 ? "0" + day : String.valueOf(day);
+
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append(URL_SEPARATOR);
+
+        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+            fullPath.append(archivesPrefix)
+                    .append(URL_SEPARATOR)
+                    .append(post.getSlug())
+                    .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID)) {
+            fullPath.append("?p=")
+                    .append(post.getId());
+        } else if (permalinkType.equals(PostPermalinkType.DATE)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                    .append(URL_SEPARATOR)
+                    .append(monthString)
+                    .append(URL_SEPARATOR)
+                    .append(post.getSlug())
+                    .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.DAY)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
+                    .append(URL_SEPARATOR)
+                    .append(monthString)
+                    .append(URL_SEPARATOR)
+                    .append(dayString)
+                    .append(URL_SEPARATOR)
+                    .append(post.getSlug())
+                    .append(pathSuffix);
+        }
+
+        post.setFullPath(fullPath.toString());
+
+        return post;
     }
 
     @Override
@@ -110,4 +169,14 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
             throw new BadRequestException("该文章已经被禁止评论").setErrorData(postId);
         }
     }
+
+    @Override
+    public void validateCommentBlackListStatus() {
+        CommentViolationTypeEnum banStatus = commentBlackListService.commentsBanStatus(ServletUtils.getRequestIp());
+        Integer banTime = optionService.getByPropertyOrDefault(CommentProperties.COMMENT_BAN_TIME, Integer.class, 10);
+        if (banStatus == CommentViolationTypeEnum.FREQUENTLY) {
+            throw new ForbiddenException(String.format("您的评论过于频繁，请%s分钟之后再试。", banTime));
+        }
+    }
+
 }

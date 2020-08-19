@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -37,14 +38,14 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public List<LinkDTO> listDtos(Sort sort) {
+    public @NotNull List<LinkDTO> listDtos(@NotNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
     }
 
     @Override
-    public List<LinkTeamVO> listTeamVos(Sort sort) {
+    public @NotNull List<LinkTeamVO> listTeamVos(@NotNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all links
@@ -73,7 +74,24 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public Link createBy(LinkParam linkParam) {
+    public @NotNull List<LinkTeamVO> listTeamVosByRandom(@NotNull Sort sort) {
+        Assert.notNull(sort, "Sort info must not be null");
+        List<LinkDTO> links = listDtos(sort);
+        Set<String> teams = ServiceUtils.fetchProperty(links, LinkDTO::getTeam);
+        Map<String, List<LinkDTO>> teamLinkListMap = ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
+        List<LinkTeamVO> result = new LinkedList<>();
+        teamLinkListMap.forEach((team, linkList) -> {
+            LinkTeamVO linkTeamVO = new LinkTeamVO();
+            linkTeamVO.setTeam(team);
+            Collections.shuffle(linkList);
+            linkTeamVO.setLinks(linkList);
+            result.add(linkTeamVO);
+        });
+        return result;
+    }
+
+    @Override
+    public @NotNull Link createBy(@NotNull LinkParam linkParam) {
         Assert.notNull(linkParam, "Link param must not be null");
 
         // Check the name
@@ -93,6 +111,18 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         link.setName(name);
 
         return linkRepository.exists(Example.of(link));
+    }
+
+    @Override
+    public List<String> listAllTeams() {
+        return linkRepository.findAllTeams();
+    }
+
+    @Override
+    public @NotNull List<Link> listAllByRandom() {
+        List<Link> allLink = linkRepository.findAll();
+        Collections.shuffle(allLink);
+        return allLink;
     }
 
     @NonNull

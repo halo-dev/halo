@@ -10,7 +10,7 @@ import java.util.List;
  * Theme config resolver interface.
  *
  * @author johnniang
- * @date 4/10/19
+ * @date 2019-04-10
  */
 public interface ThemeConfigResolver {
 

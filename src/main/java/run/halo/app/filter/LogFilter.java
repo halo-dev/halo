@@ -2,6 +2,9 @@ package run.halo.app.filter;
 
 import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -16,6 +19,8 @@ import java.io.IOException;
  * @author johnniang
  */
 @Slf4j
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 9)
 public class LogFilter extends OncePerRequestFilter {
 
     @Override
@@ -32,7 +37,7 @@ public class LogFilter extends OncePerRequestFilter {
         // Do filter
         filterChain.doFilter(request, response);
 
-        log.debug("Ending   url: [{}], method: [{}], ip: [{}], status: [{}], usage: [{}] ms", request.getRequestURL(), request.getMethod(), remoteAddr, response.getStatus(), (System.currentTimeMillis() - startTime));
+        log.debug("Ending   url: [{}], method: [{}], ip: [{}], status: [{}], usage: [{}] ms", request.getRequestURL(), request.getMethod(), remoteAddr, response.getStatus(), System.currentTimeMillis() - startTime);
         log.debug("");
     }
 }

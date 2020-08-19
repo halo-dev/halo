@@ -15,9 +15,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.comment.CommentNewEvent;
-import run.halo.app.event.comment.CommentPassEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.User;
@@ -47,10 +47,13 @@ import javax.persistence.criteria.Predicate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 /**
  * Base comment service implementation.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-04-24
  */
 @Slf4j
@@ -62,8 +65,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     private final BaseCommentRepository<COMMENT> baseCommentRepository;
 
     public BaseCommentServiceImpl(BaseCommentRepository<COMMENT> baseCommentRepository,
-                                  OptionService optionService,
-                                  UserService userService, ApplicationEventPublisher eventPublisher) {
+            OptionService optionService,
+            UserService userService, ApplicationEventPublisher eventPublisher) {
         super(baseCommentRepository);
         this.baseCommentRepository = baseCommentRepository;
         this.optionService = optionService;
@@ -110,19 +113,27 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
-    public Page<BaseCommentVO> pageVosBy(Integer postId, Pageable pageable) {
+    public Page<BaseCommentVO> pageVosAllBy(Integer postId, Pageable pageable) {
         Assert.notNull(postId, "Post id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
         log.debug("Getting comment tree view of post: [{}], page info: [{}]", postId, pageable);
 
         // List all the top comments (Caution: This list will be cleared)
-        List<COMMENT> comments = baseCommentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED);
+        List<COMMENT> comments = baseCommentRepository.findAllByPostId(postId);
 
-        Comparator<BaseCommentVO> commentVOComparator = buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime")));
+        return pageVosBy(comments, pageable);
+    }
+
+    @Override
+    public Page<BaseCommentVO> pageVosBy(List<COMMENT> comments, Pageable pageable) {
+        Assert.notNull(comments, "Comments must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        Comparator<BaseCommentVO> commentComparator = buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime")));
 
         // Convert to vo
-        List<BaseCommentVO> topComments = convertToVo(comments, commentVOComparator);
+        List<BaseCommentVO> topComments = convertToVo(comments, commentComparator);
 
         List<BaseCommentVO> pageContent;
 
@@ -144,7 +155,19 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         }
 
         return new CommentPage<>(pageContent, pageable, topComments.size(), comments.size());
+    }
 
+    @Override
+    public Page<BaseCommentVO> pageVosBy(Integer postId, Pageable pageable) {
+        Assert.notNull(postId, "Post id must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        log.debug("Getting comment tree view of post: [{}], page info: [{}]", postId, pageable);
+
+        // List all the top comments (Caution: This list will be cleared)
+        List<COMMENT> comments = baseCommentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED);
+
+        return pageVosBy(comments, pageable);
     }
 
     @Override
@@ -208,6 +231,12 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         List<CommentCountProjection> commentCountProjections = baseCommentRepository.countByPostIds(postIds);
 
         return ServiceUtils.convertToMap(commentCountProjections, CommentCountProjection::getPostId, CommentCountProjection::getCount);
+    }
+
+    @Override
+    public long countByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+        return baseCommentRepository.countByPostId(postId);
     }
 
     @Override
@@ -318,14 +347,48 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
         comment.setStatus(status);
 
         // Update comment
-        COMMENT updatedComment = update(comment);
+        return update(comment);
+    }
 
-        if (CommentStatus.PUBLISHED.equals(status)) {
-            // Pass a comment
-            eventPublisher.publishEvent(new CommentPassEvent(this, commentId));
+    @Override
+    public List<COMMENT> updateStatusByIds(List<Long> ids, CommentStatus status) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(id -> {
+            return updateStatus(id, status);
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<COMMENT> removeByPostId(Integer postId) {
+        Assert.notNull(postId, "Post id must not be null");
+        return baseCommentRepository.deleteByPostId(postId);
+    }
+
+    @Override
+    public COMMENT removeById(Long id) {
+        Assert.notNull(id, "Comment id must not be null");
+
+        COMMENT comment = baseCommentRepository.findById(id).orElseThrow(() -> new NotFoundException("查询不到该评论的信息").setErrorData(id));
+
+        List<COMMENT> children = listChildrenBy(comment.getPostId(), id, Sort.by(DESC, "createTime"));
+
+        if (children.size() > 0) {
+            children.forEach(child -> {
+                super.removeById(child.getId());
+            });
         }
 
-        return updatedComment;
+        return super.removeById(id);
+    }
+
+    @Override
+    public List<COMMENT> removeByIds(Collection<Long> ids) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(this::removeById).collect(Collectors.toList());
     }
 
     @Override
@@ -477,6 +540,31 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    public List<COMMENT> listChildrenBy(Integer targetId, Long commentParentId, Sort sort) {
+        Assert.notNull(targetId, "Target id must not be null");
+        Assert.notNull(commentParentId, "Comment parent id must not be null");
+        Assert.notNull(sort, "Sort info must not be null");
+
+        // Get comments recursively
+
+        // Get direct children
+        List<COMMENT> directChildren = baseCommentRepository.findAllByPostIdAndParentId(targetId, commentParentId);
+
+        // Create result container
+        Set<COMMENT> children = new HashSet<>();
+
+        // Get children comments
+        getChildrenRecursively(directChildren, children);
+
+        // Sort children
+        List<COMMENT> childrenList = new ArrayList<>(children);
+        childrenList.sort(Comparator.comparing(BaseComment::getId));
+
+        return childrenList;
+    }
+
+    @Override
+    @Deprecated
     public <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment) {
         Assert.notNull(comment, "Base comment dto must not be null");
 
@@ -505,6 +593,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    @Deprecated
     public <T extends BaseCommentDTO> List<T> filterIpAddress(List<T> comments) {
         if (CollectionUtils.isEmpty(comments)) {
             return Collections.emptyList();
@@ -516,11 +605,26 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    @Deprecated
     public <T extends BaseCommentDTO> Page<T> filterIpAddress(Page<T> commentPage) {
         Assert.notNull(commentPage, "Comment page must not be null");
         commentPage.forEach(this::filterIpAddress);
 
         return commentPage;
+    }
+
+    @Override
+    public List<BaseCommentDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<COMMENT> comments = listAll();
+        List<COMMENT> replaced = new ArrayList<>();
+        comments.forEach(comment -> {
+            if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
+                comment.setAuthorUrl(comment.getAuthorUrl().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(comment);
+        });
+        List<COMMENT> updated = updateInBatch(replaced);
+        return convertTo(updated);
     }
 
     /**
@@ -552,6 +656,32 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     /**
+     * Get children comments recursively.
+     *
+     * @param topComments top comment list
+     * @param children    children result must not be null
+     */
+    private void getChildrenRecursively(@Nullable List<COMMENT> topComments, @NonNull Set<COMMENT> children) {
+        Assert.notNull(children, "Children comment set must not be null");
+
+        if (CollectionUtils.isEmpty(topComments)) {
+            return;
+        }
+
+        // Convert comment id set
+        Set<Long> commentIds = ServiceUtils.fetchProperty(topComments, COMMENT::getId);
+
+        // Get direct children
+        List<COMMENT> directChildren = baseCommentRepository.findAllByParentIdIn(commentIds);
+
+        // Recursively invoke
+        getChildrenRecursively(directChildren, children);
+
+        // Add direct children to children result
+        children.addAll(topComments);
+    }
+
+    /**
      * Concretes comment tree.
      *
      * @param parentComment     parent comment vo must not be null
@@ -559,8 +689,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
      * @param commentComparator comment vo comparator
      */
     protected void concreteTree(@NonNull BaseCommentVO parentComment,
-                                @Nullable Collection<COMMENT> comments,
-                                @Nullable Comparator<BaseCommentVO> commentComparator) {
+            @Nullable Collection<COMMENT> comments,
+            @Nullable Comparator<BaseCommentVO> commentComparator) {
         Assert.notNull(parentComment, "Parent comment must not be null");
 
         if (CollectionUtils.isEmpty(comments)) {

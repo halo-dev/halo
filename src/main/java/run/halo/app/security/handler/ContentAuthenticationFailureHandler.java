@@ -1,6 +1,6 @@
 package run.halo.app.security.handler;
 
-import run.halo.app.exception.HaloException;
+import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.exception.NotInstallException;
 
 import javax.servlet.ServletException;
@@ -17,7 +17,7 @@ import java.io.IOException;
 public class ContentAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Override
-    public void onFailure(HttpServletRequest request, HttpServletResponse response, HaloException exception) throws IOException, ServletException {
+    public void onFailure(HttpServletRequest request, HttpServletResponse response, AbstractHaloException exception) throws IOException, ServletException {
         if (exception instanceof NotInstallException) {
             response.sendRedirect(request.getContextPath() + "/install");
             return;

@@ -20,7 +20,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Log controller.
  *
  * @author johnniang
- * @date 3/19/19
+ * @date 2019-03-19
  */
 @RestController
 @RequestMapping("/api/admin/logs")
@@ -32,12 +32,6 @@ public class LogController {
         this.logService = logService;
     }
 
-    /**
-     * List latest logs.
-     *
-     * @param top top
-     * @return List of logs
-     */
     @GetMapping("latest")
     @ApiOperation("Pages latest logs")
     public List<LogDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
@@ -45,16 +39,14 @@ public class LogController {
     }
 
     @GetMapping
-    public Page<LogDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable) {
+    @ApiOperation("Lists logs")
+    public Page<LogDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Log> logPage = logService.listAll(pageable);
         return logPage.map(log -> new LogDTO().convertFrom(log));
     }
 
-    /**
-     * Clear all logs.
-     */
     @GetMapping("clear")
-    @ApiOperation("Clear all logs")
+    @ApiOperation("Clears all logs")
     public void clear() {
         logService.removeAll();
     }

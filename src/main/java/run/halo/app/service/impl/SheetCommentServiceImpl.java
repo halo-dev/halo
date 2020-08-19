@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 /**
  * Sheet comment service implementation.
  *
@@ -35,17 +37,14 @@ import java.util.stream.Collectors;
 @Service
 public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment> implements SheetCommentService {
 
-    private final SheetCommentRepository sheetCommentRepository;
-
     private final SheetRepository sheetRepository;
 
     public SheetCommentServiceImpl(SheetCommentRepository sheetCommentRepository,
-                                   OptionService optionService,
-                                   UserService userService,
-                                   ApplicationEventPublisher eventPublisher,
-                                   SheetRepository sheetRepository) {
+            OptionService optionService,
+            UserService userService,
+            ApplicationEventPublisher eventPublisher,
+            SheetRepository sheetRepository) {
         super(sheetCommentRepository, optionService, userService, eventPublisher);
-        this.sheetCommentRepository = sheetCommentRepository;
         this.sheetRepository = sheetRepository;
     }
 
@@ -63,7 +62,10 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     public SheetCommentWithSheetVO convertToWithSheetVo(SheetComment comment) {
         Assert.notNull(comment, "SheetComment must not be null");
         SheetCommentWithSheetVO sheetCommentWithSheetVO = new SheetCommentWithSheetVO().convertFrom(comment);
-        sheetCommentWithSheetVO.setSheet(new BasePostMinimalDTO().convertFrom(sheetRepository.getOne(comment.getPostId())));
+
+        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(sheetRepository.getOne(comment.getPostId()));
+
+        sheetCommentWithSheetVO.setSheet(buildSheetFullPath(basePostMinimalDTO));
         return sheetCommentWithSheetVO;
     }
 
@@ -81,10 +83,30 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
                 .filter(comment -> sheetMap.containsKey(comment.getPostId()))
                 .map(comment -> {
                     SheetCommentWithSheetVO sheetCmtWithPostVO = new SheetCommentWithSheetVO().convertFrom(comment);
-                    sheetCmtWithPostVO.setSheet(new BasePostMinimalDTO().convertFrom(sheetMap.get(comment.getPostId())));
+
+                    BasePostMinimalDTO postMinimalDTO = new BasePostMinimalDTO().convertFrom(sheetMap.get(comment.getPostId()));
+
+                    sheetCmtWithPostVO.setSheet(buildSheetFullPath(postMinimalDTO));
                     return sheetCmtWithPostVO;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private BasePostMinimalDTO buildSheetFullPath(BasePostMinimalDTO basePostMinimalDTO) {
+        StringBuilder fullPath = new StringBuilder();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath.append(optionService.getBlogBaseUrl());
+        }
+
+        fullPath.append(URL_SEPARATOR)
+                .append(optionService.getSheetPrefix())
+                .append(URL_SEPARATOR)
+                .append(basePostMinimalDTO.getSlug())
+                .append(optionService.getPathSuffix());
+
+        basePostMinimalDTO.setFullPath(fullPath.toString());
+        return basePostMinimalDTO;
     }
 
     @Override

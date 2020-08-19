@@ -7,7 +7,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Objects;
 
+/**
+ * @author johnniang
+ */
 @Aspect
 @Component
 @Slf4j
@@ -75,16 +82,36 @@ public class ControllerLogAop {
 
     private void printResponseLog(HttpServletRequest request, String className, String methodName, Object returnObj, long usage) throws JsonProcessingException {
         if (log.isDebugEnabled()) {
-            String returningData = null;
+            String returnData = "";
+
             if (returnObj != null) {
-                if (returnObj.getClass().isAssignableFrom(byte[].class)) {
-                    returningData = "Binary data";
+                if (returnObj instanceof ResponseEntity) {
+                    ResponseEntity responseEntity = (ResponseEntity) returnObj;
+                    if (responseEntity.getBody() instanceof Resource) {
+                        returnData = "[ BINARY DATA ]";
+                    } else {
+                        returnData = toString(responseEntity.getBody());
+                    }
                 } else {
-                    returningData = JsonUtils.objectToJson(returnObj);
+                    returnData = toString(returnObj);
                 }
+
             }
-            log.debug("{}.{} Response: [{}], usage: [{}]ms", className, methodName, returningData, usage);
+            log.debug("{}.{} Response: [{}], usage: [{}]ms", className, methodName, returnData, usage);
         }
+    }
+
+    @NonNull
+    private String toString(@NonNull Object obj) throws JsonProcessingException {
+        Assert.notNull(obj, "Return object must not be null");
+
+        String toString = "";
+        if (obj.getClass().isAssignableFrom(byte[].class) && obj instanceof Resource) {
+            toString = "[ BINARY DATA ]";
+        } else {
+            toString = JsonUtils.objectToJson(obj);
+        }
+        return toString;
     }
 }
 

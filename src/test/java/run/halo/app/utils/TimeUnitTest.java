@@ -1,6 +1,7 @@
 package run.halo.app.utils;
 
-import org.junit.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,13 +11,14 @@ import java.util.concurrent.TimeUnit;
  * @author johnniang
  * @date 19-4-29
  */
-public class TimeUnitTest {
+@Slf4j
+class TimeUnitTest {
 
     @Test
-    public void convertTest() {
-        Long millis = TimeUnit.DAYS.toMillis(30);
+    void convertTest() {
+        long millis = TimeUnit.DAYS.toMillis(30);
 
-        System.out.println(millis);
-        System.out.println(millis.intValue());
+        log.debug("" + millis);
+        log.debug("" + (int) millis);
     }
 }

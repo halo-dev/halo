@@ -6,6 +6,7 @@ import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.BaseMeta;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Base meta repository.
@@ -25,4 +26,22 @@ public interface BaseMetaRepository<META extends BaseMeta> extends BaseRepositor
      */
     @NonNull
     List<META> findAllByPostId(@NonNull Integer postId);
+
+    /**
+     * Deletes post metas by post id.
+     *
+     * @param postId post id must not be null
+     * @return a list of post meta deleted
+     */
+    @NonNull
+    List<META> deleteByPostId(@NonNull Integer postId);
+
+    /**
+     * Finds all post metas by post id.
+     *
+     * @param postIds post id must not be null
+     * @return a list of post meta
+     */
+    @NonNull
+    List<META> findAllByPostIdIn(@NonNull Set<Integer> postIds);
 }

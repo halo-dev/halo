@@ -1,21 +1,22 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.exception.ForbiddenException;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 /**
  * File utilities.
@@ -41,11 +42,9 @@ public class FileUtils {
 
         Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
 
-            private Path current;
-
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                current = target.resolve(source.relativize(dir).toString());
+                Path current = target.resolve(source.relativize(dir).toString());
                 Files.createDirectories(current);
                 return FileVisitResult.CONTINUE;
             }
@@ -80,11 +79,29 @@ public class FileUtils {
     }
 
     /**
+     * Renames file or folder.
+     *
+     * @param pathToRename file path to rename must not be null
+     * @param newName      new name must not be null
+     */
+    public static void rename(@NonNull Path pathToRename, @NonNull String newName) throws IOException {
+        Assert.notNull(pathToRename, "File path to rename must not be null");
+        Assert.notNull(newName, "New name must not be null");
+
+        Path newPath = pathToRename.resolveSibling(newName);
+        log.info("Rename [{}] to [{}]", pathToRename, newPath);
+
+        Files.move(pathToRename, newPath);
+
+        log.info("Rename [{}] successfully", pathToRename);
+    }
+
+    /**
      * Unzips content to the target path.
      *
      * @param zis        zip input stream must not be null
      * @param targetPath target path must not be null and not empty
-     * @throws IOException
+     * @throws IOException throws when failed to access file to be unzipped
      */
     public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath) throws IOException {
         Assert.notNull(zis, "Zip input stream must not be null");
@@ -114,6 +131,86 @@ public class FileUtils {
             }
 
             zipEntry = zis.getNextEntry();
+        }
+        File targetDir = targetPath.toFile();
+        List<File> files = Arrays.asList(targetDir.listFiles());
+        // if zip file has root file
+        if (files.size() == 1 && files.get(0).isDirectory()) {
+            String rootPath = files.get(0).toPath().toString();
+            String rootFile = rootPath.substring(rootPath.lastIndexOf("/") + 1);
+            File[] propertyFiles = files.get(0).listFiles();
+            for (File propertyFile : propertyFiles) {
+                String filePath = propertyFile.toPath().toString();
+                String destPath = filePath.replace(rootFile, "");
+                Files.copy(propertyFile.toPath(), Paths.get(destPath));
+            }
+        }
+    }
+
+    /**
+     * Zips folder or file.
+     *
+     * @param pathToZip     file path to zip must not be null
+     * @param pathOfArchive zip file path to archive must not be null
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive) throws IOException {
+        try (OutputStream outputStream = Files.newOutputStream(pathOfArchive)) {
+            try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
+                zip(pathToZip, zipOut);
+            }
+        }
+    }
+
+    /**
+     * Zips folder or file.
+     *
+     * @param pathToZip file path to zip must not be null
+     * @param zipOut    zip output stream must not be null
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut) throws IOException {
+        // Zip file
+        zip(pathToZip, pathToZip.getFileName().toString(), zipOut);
+    }
+
+    /**
+     * Zips folder or file.
+     *
+     * @param fileToZip file path to zip must not be null
+     * @param fileName  file name must not be blank
+     * @param zipOut    zip output stream must not be null
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    private static void zip(@NonNull Path fileToZip, @NonNull String fileName, @NonNull ZipOutputStream zipOut) throws IOException {
+        if (Files.isDirectory(fileToZip)) {
+            log.debug("Try to zip folder: [{}]", fileToZip);
+            // Append with '/' if missing
+            String folderName = StringUtils.appendIfMissing(fileName, File.separator, File.separator);
+            // Create zip entry and put into zip output stream
+            zipOut.putNextEntry(new ZipEntry(folderName));
+            // Close entry for writing the next entry
+            zipOut.closeEntry();
+
+            // Iterate the sub files recursively
+            try (Stream<Path> subPathStream = Files.list(fileToZip)) {
+                // There should not use foreach for stream as internal zip method will throw IOException
+                List<Path> subFiles = subPathStream.collect(Collectors.toList());
+                for (Path subFileToZip : subFiles) {
+                    // Zip children
+                    zip(subFileToZip, folderName + subFileToZip.getFileName(), zipOut);
+                }
+            }
+        } else {
+            // Open file to be zipped
+            // Create zip entry for target file
+            ZipEntry zipEntry = new ZipEntry(fileName);
+            // Put the entry into zip output stream
+            zipOut.putNextEntry(zipEntry);
+            // Copy file to zip output stream
+            Files.copy(fileToZip, zipOut);
+            // Close entry
+            zipOut.closeEntry();
         }
     }
 
@@ -146,8 +243,11 @@ public class FileUtils {
         try (Stream<Path> pathStream = Files.list(unzippedPath)) {
             List<Path> childrenPath = pathStream.collect(Collectors.toList());
 
-            if (childrenPath.size() == 1 && Files.isDirectory(childrenPath.get(0))) {
-                return childrenPath.get(0);
+            Path realPath = childrenPath.get(0);
+            if (childrenPath.size() == 1 && Files.isDirectory(realPath)) {
+                // Check directory traversal
+                checkDirectoryTraversal(unzippedPath, realPath);
+                return realPath;
             }
             return unzippedPath;
         }
@@ -231,7 +331,7 @@ public class FileUtils {
         Assert.notNull(parentPath, "Parent path must not be null");
         Assert.notNull(pathToCheck, "Path to check must not be null");
 
-        if (pathToCheck.startsWith(parentPath.normalize())) {
+        if (pathToCheck.normalize().startsWith(parentPath)) {
             return;
         }
 

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Theme service interface.
@@ -30,6 +29,7 @@ public interface ThemeService {
     /**
      * Theme property file name.
      */
+    @Deprecated
     String[] THEME_PROPERTY_FILE_NAMES = {"theme.yaml", "theme.yml"};
 
 
@@ -56,6 +56,7 @@ public interface ThemeService {
     /**
      * Theme screenshots name.
      */
+    @Deprecated
     String THEME_SCREENSHOTS_NAME = "screenshot";
 
 
@@ -65,24 +66,44 @@ public interface ThemeService {
     String RENDER_TEMPLATE = "themes/%s/%s";
 
     /**
+     * Render template with suffix.
+     */
+    String RENDER_TEMPLATE_SUFFIX = "themes/%s/%s.ftl";
+
+    /**
      * Theme cache key.
      */
     String THEMES_CACHE_KEY = "themes";
 
     /**
-     * Custom sheet prefix.
+     * Custom sheet template prefix.
      */
     String CUSTOM_SHEET_PREFIX = "sheet_";
 
     /**
+     * Custom post template prefix.
+     */
+    String CUSTOM_POST_PREFIX = "post_";
+
+    /**
      * Theme provider remote name.
      */
-    String THEME_PROVIDER_REMOTE_NAME = "theme-provider";
+    String THEME_PROVIDER_REMOTE_NAME = "origin";
 
     /**
      * Default remote branch name.
      */
     String DEFAULT_REMOTE_BRANCH = "master";
+
+    /**
+     * Key to access the zip file url which is in the http response
+     */
+    String ZIP_FILE_KEY = "zipball_url";
+
+    /**
+     * Key to access the tag name which is in the http response
+     */
+    String TAG_KEY = "tag_name";
 
     /**
      * Get theme property by theme id.
@@ -91,6 +112,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated
     ThemeProperty getThemeOfNonNullBy(@NonNull String themeId);
 
     /**
@@ -100,7 +122,7 @@ public interface ThemeService {
      * @return a optional theme property
      */
     @NonNull
-    Optional<ThemeProperty> getThemeBy(@Nullable String themeId);
+    Optional<ThemeProperty> fetchThemePropertyBy(@Nullable String themeId);
 
     /**
      * Gets all themes
@@ -108,15 +130,7 @@ public interface ThemeService {
      * @return set of themes
      */
     @NonNull
-    Set<ThemeProperty> getThemes();
-
-    /**
-     * Lists theme folder by absolute path.
-     *
-     * @param absolutePath absolutePath
-     * @return List<ThemeFile>
-     */
-    List<ThemeFile> listThemeFolder(@NonNull String absolutePath);
+    List<ThemeProperty> getThemes();
 
     /**
      * Lists theme folder by theme name.
@@ -124,6 +138,7 @@ public interface ThemeService {
      * @param themeId theme id
      * @return List<ThemeFile>
      */
+    @NonNull
     List<ThemeFile> listThemeFolderBy(@NonNull String themeId);
 
     /**
@@ -132,7 +147,19 @@ public interface ThemeService {
      * @param themeId theme id must not be blank
      * @return a set of templates
      */
-    Set<String> listCustomTemplates(@NonNull String themeId);
+    @Deprecated
+    @NonNull
+    List<String> listCustomTemplates(@NonNull String themeId);
+
+    /**
+     * Lists a set of custom template, such as sheet_xxx.ftl/post_xxx.ftl, and xxx will be template name
+     *
+     * @param themeId theme id must not be blank
+     * @param prefix  post_ or sheet_
+     * @return a set of templates
+     */
+    @NonNull
+    List<String> listCustomTemplates(@NonNull String themeId, @NonNull String prefix);
 
     /**
      * Judging whether template exists under the specified theme
@@ -217,6 +244,15 @@ public interface ThemeService {
     String render(@NonNull String pageName);
 
     /**
+     * Renders a theme page.
+     *
+     * @param pageName must not be blank
+     * @return full path of the theme page
+     */
+    @NonNull
+    String renderWithSuffix(@NonNull String pageName);
+
+    /**
      * Gets current theme id.
      *
      * @return current theme id
@@ -231,6 +267,14 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty getActivatedTheme();
+
+    /**
+     * Fetch activated theme property.
+     *
+     * @return activated theme property
+     */
+    @NonNull
+    Optional<ThemeProperty> fetchActivatedTheme();
 
     /**
      * Actives a theme.
@@ -268,6 +312,53 @@ public interface ThemeService {
      */
     @NonNull
     ThemeProperty fetch(@NonNull String uri);
+
+    /**
+     * Fetches the latest release
+     *
+     * @param uri theme remote uri must not be null
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty fetchLatestRelease(@NonNull String uri);
+
+    /**
+     * Fetches all the branches info
+     *
+     * @param uri theme remote uri must not be null
+     * @return list of theme properties
+     */
+    @NonNull
+    List<ThemeProperty> fetchBranches(@NonNull String uri);
+
+    /**
+     * Fetches all the release info
+     *
+     * @param uri theme remote uri must not be null
+     * @return list of theme properties
+     */
+    @NonNull
+    List<ThemeProperty> fetchReleases(@NonNull String uri);
+
+    /**
+     * Fetches a specific release
+     *
+     * @param uri     theme remote uri must not be null
+     * @param tagName release tag name must not be null
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName);
+
+    /**
+     * Fetches a specific branch (clone)
+     *
+     * @param uri        theme remote uri must not be null
+     * @param branchName wanted branch must not be null
+     * @return theme property
+     */
+    @NonNull
+    ThemeProperty fetchBranch(@NonNull String uri, @NonNull String branchName);
 
     /**
      * Reloads themes

@@ -7,14 +7,14 @@ import run.halo.app.model.enums.Mode;
  * Theme controller.
  *
  * @author ryanwang
- * @date : 2019/5/4
+ * @date 2019/5/4
  */
 @Data
 public class EnvironmentDTO {
 
     private String database;
 
-    private long startTime;
+    private Long startTime;
 
     private String version;
 

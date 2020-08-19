@@ -290,7 +290,7 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
     @Override
     public void removeInBatch(Collection<ID> ids) {
         if (CollectionUtils.isEmpty(ids)) {
-            log.warn(domainName + " id collection is empty");
+            log.debug(domainName + " id collection is empty");
             return;
         }
 
@@ -305,7 +305,7 @@ public abstract class AbstractCrudService<DOMAIN, ID> implements CrudService<DOM
     @Override
     public void removeAll(Collection<DOMAIN> domains) {
         if (CollectionUtils.isEmpty(domains)) {
-            log.warn(domainName + " collection is empty");
+            log.debug(domainName + " collection is empty");
             return;
         }
         repository.deleteInBatch(domains);

@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -36,14 +37,14 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public List<MenuDTO> listDtos(Sort sort) {
+    public @NotNull List<MenuDTO> listDtos(@NotNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
     }
 
     @Override
-    public List<MenuTeamVO> listTeamVos(Sort sort) {
+    public @NotNull List<MenuTeamVO> listTeamVos(@NotNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all menus
@@ -72,13 +73,30 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public List<MenuDTO> listByTeam(String team, Sort sort) {
+    public List<MenuDTO> listByTeam(@NotNull String team, Sort sort) {
         List<Menu> menus = menuRepository.findByTeam(team, sort);
         return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu)).collect(Collectors.toList());
     }
 
     @Override
-    public Menu createBy(MenuParam menuParam) {
+    public List<MenuVO> listByTeamAsTree(@NotNull String team, Sort sort) {
+        Assert.notNull(team, "Team must not be null");
+
+        List<Menu> menus = menuRepository.findByTeam(team, sort);
+
+        if (CollectionUtils.isEmpty(menus)) {
+            return Collections.emptyList();
+        }
+
+        MenuVO topLevelMenu = createTopLevelMenu();
+
+        concreteTree(topLevelMenu, menus);
+
+        return topLevelMenu.getChildren();
+    }
+
+    @Override
+    public @NotNull Menu createBy(@NotNull MenuParam menuParam) {
         Assert.notNull(menuParam, "Menu param must not be null");
 
         // Create an return
@@ -86,7 +104,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public List<MenuVO> listAsTree(Sort sort) {
+    public List<MenuVO> listAsTree(@NotNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all menu
@@ -106,21 +124,26 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public List<Menu> listByParentId(Integer id) {
+    public List<Menu> listByParentId(@NotNull Integer id) {
         Assert.notNull(id, "Menu parent id must not be null");
 
         return menuRepository.findByParentId(id);
     }
 
     @Override
-    public Menu create(Menu menu) {
+    public List<String> listAllTeams() {
+        return menuRepository.findAllTeams();
+    }
+
+    @Override
+    public @NotNull Menu create(@NotNull Menu menu) {
         nameMustNotExist(menu);
 
         return super.create(menu);
     }
 
     @Override
-    public Menu update(Menu menu) {
+    public @NotNull Menu update(@NotNull Menu menu) {
         nameMustNotExist(menu);
 
         return super.update(menu);

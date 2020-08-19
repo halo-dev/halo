@@ -1,24 +1,26 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.data.web.SortHandlerMethodArgumentResolver;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.http.CacheControl;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import run.halo.app.config.properties.HaloProperties;
@@ -30,27 +32,34 @@ import run.halo.app.security.resolver.AuthenticationArgumentResolver;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
-import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELATIVE_PATH;
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+import static run.halo.app.utils.HaloUtils.*;
 
 /**
- * Mvc configuration.
+ * Spring mvc configuration.
  *
  * @author ryanwang
- * @date : 2018/1/2
+ * @date 2018-01-02
  */
 @Slf4j
 @Configuration
-@EnableWebMvc
-@ComponentScan(basePackages = "run.halo.app.controller")
-@PropertySource(value = "classpath:application.yaml", ignoreResourceNotFound = true, encoding = "UTF-8")
-public class WebMvcAutoConfiguration implements WebMvcConfigurer {
+public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
 
     private static final String FILE_PROTOCOL = "file:///";
 
+    private final PageableHandlerMethodArgumentResolver pageableResolver;
+
+    private final SortHandlerMethodArgumentResolver sortResolver;
+
     private final HaloProperties haloProperties;
 
-    public WebMvcAutoConfiguration(HaloProperties haloProperties) {
+    public WebMvcAutoConfiguration(PageableHandlerMethodArgumentResolver pageableResolver,
+            SortHandlerMethodArgumentResolver sortResolver,
+            HaloProperties haloProperties) {
+        this.pageableResolver = pageableResolver;
+        this.sortResolver = sortResolver;
         this.haloProperties = haloProperties;
     }
 
@@ -58,19 +67,22 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.stream()
                 .filter(c -> c instanceof MappingJackson2HttpMessageConverter)
-                .findFirst().ifPresent(converter -> {
-            MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-            Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
-            JsonComponentModule module = new JsonComponentModule();
-            module.addSerializer(PageImpl.class, new PageJacksonSerializer());
-            ObjectMapper objectMapper = builder.modules(module).build();
-            mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
-        });
+                .findFirst()
+                .ifPresent(converter -> {
+                    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
+                    Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
+                    JsonComponentModule module = new JsonComponentModule();
+                    module.addSerializer(PageImpl.class, new PageJacksonSerializer());
+                    ObjectMapper objectMapper = builder.modules(module).build();
+                    mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+                });
     }
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new AuthenticationArgumentResolver());
+        resolvers.add(pageableResolver);
+        resolvers.add(sortResolver);
     }
 
     /**
@@ -80,18 +92,24 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String workDir = FILE_PROTOCOL + haloProperties.getWorkDir();
+        String workDir = FILE_PROTOCOL + ensureSuffix(haloProperties.getWorkDir(), FILE_SEPARATOR);
+
+        // register /** resource handler.
         registry.addResourceHandler("/**")
-                .addResourceLocations(workDir + "templates/themes/")
-                .addResourceLocations(workDir + "templates/admin/")
                 .addResourceLocations("classpath:/admin/")
                 .addResourceLocations(workDir + "static/");
-        registry.addResourceHandler("/upload/**")
+
+        // register /themes/** resource handler.
+        registry.addResourceHandler("/themes/**")
+                .addResourceLocations(workDir + "templates/themes/");
+
+        String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
+        String adminPathPattern = ensureSuffix(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
+
+        registry.addResourceHandler(uploadUrlPattern)
+                .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
                 .addResourceLocations(workDir + "upload/");
-        registry.addResourceHandler("/backup/**")
-                .addResourceLocations(workDir + "backup/");
-        registry.addResourceHandler("/admin/**")
-                .addResourceLocations(workDir + HALO_ADMIN_RELATIVE_PATH)
+        registry.addResourceHandler(adminPathPattern)
                 .addResourceLocations("classpath:/admin/");
 
         if (!haloProperties.isDocDisabled()) {
@@ -102,6 +120,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
                     .addResourceLocations("classpath:/META-INF/resources/webjars/");
         }
     }
+
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
@@ -126,6 +145,9 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 
         // Predefine configuration
         freemarker.template.Configuration configuration = configurer.createConfiguration();
+
+        configuration.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
+
         if (haloProperties.isProductionEnv()) {
             configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         }
@@ -153,4 +175,10 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         resolver.setContentType("text/html; charset=UTF-8");
         registry.viewResolver(resolver);
     }
+
+    @Override
+    protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
+        return new HaloRequestMappingHandlerMapping(haloProperties);
+    }
+
 }

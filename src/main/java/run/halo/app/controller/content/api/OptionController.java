@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Portal option controller.
+ * Content option controller.
  *
  * @author johnniang
- * @date 4/3/19
+ * @date 2019-04-03
  */
 @RestController("ApiContentOptionController")
 @RequestMapping("/api/content/options")

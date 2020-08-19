@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  * @author ryanwang
- * @date : 2019/3/21
+ * @date 2019-03-21
  */
 @Data
 public class PhotoDTO implements OutputConverter<PhotoDTO, Photo> {

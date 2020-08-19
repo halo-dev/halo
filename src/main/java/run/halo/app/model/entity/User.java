@@ -3,6 +3,8 @@ package run.halo.app.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
+import run.halo.app.model.enums.MFAType;
 import run.halo.app.utils.DateUtils;
 
 import javax.persistence.*;
@@ -12,7 +14,7 @@ import java.util.Date;
  * User entity
  *
  * @author ryanwang
- * @date : 2019-03-12
+ * @date 2019-03-12
  */
 @Data
 @Entity
@@ -29,52 +31,62 @@ public class User extends BaseEntity {
     /**
      * User name.
      */
-    @Column(name = "username", columnDefinition = "varchar(50) not null")
+    @Column(name = "username", length = 50, nullable = false)
     private String username;
 
     /**
      * User nick name,used to display on page.
      */
-    @Column(name = "nickname", columnDefinition = "varchar(255) not null")
+    @Column(name = "nickname", nullable = false)
     private String nickname;
 
     /**
      * Password.
      */
-    @Column(name = "password", columnDefinition = "varchar(255) not null")
+    @Column(name = "password", nullable = false)
     private String password;
 
     /**
      * User email.
      */
-    @Column(name = "email", columnDefinition = "varchar(127) default ''")
+    @Column(name = "email", length = 127)
     private String email;
 
     /**
      * User avatar.
      */
-    @Column(name = "avatar", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "avatar", length = 1023)
     private String avatar;
 
     /**
      * User description.
      */
-    @Column(name = "description", columnDefinition = "varchar(1023) default ''")
+    @Column(name = "description", length = 1023)
     private String description;
 
     /**
      * Expire time.
      */
-    @Column(name = "expire_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Column(name = "expire_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date expireTime;
 
+    /**
+     * mfa type (current: tfa)
+     */
+    @Column(name = "mfa_type", nullable = false)
+    @ColumnDefault("0")
+    private MFAType mfaType;
+
+    /**
+     * two factor auth key
+     */
+    @Column(name = "mfa_key", length = 64)
+    private String mfaKey;
 
     @Override
     public void prePersist() {
         super.prePersist();
-
-        id = null;
 
         if (email == null) {
             email = "";

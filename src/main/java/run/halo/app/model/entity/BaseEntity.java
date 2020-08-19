@@ -23,26 +23,19 @@ public class BaseEntity {
     /**
      * Create time.
      */
-    @Column(name = "create_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Column(name = "create_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createTime;
 
     /**
      * Update time.
      */
-    @Column(name = "update_time", columnDefinition = "timestamp default CURRENT_TIMESTAMP")
+    @Column(name = "update_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateTime;
 
-    /**
-     * Delete flag.
-     */
-    @Column(name = "deleted", columnDefinition = "TINYINT default 0")
-    private Boolean deleted = false;
-
     @PrePersist
     protected void prePersist() {
-        deleted = false;
         Date now = DateUtils.now();
         if (createTime == null) {
             createTime = now;
