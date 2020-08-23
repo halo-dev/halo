@@ -80,19 +80,19 @@ export default {
   computed: {
     ...mapGetters(['options']),
     maxParallelUploads() {
-      if (this.options && this.options.length > 0) {
+      if (this.options) {
         return this.options.attachment_upload_max_parallel_uploads
       }
       return 1
     },
     allowImagePreview() {
-      if (this.options && this.options.length > 0) {
+      if (this.options) {
         return this.options.attachment_upload_image_preview_enable
       }
       return false
     },
     maxFiles() {
-      if (this.options && this.options.length > 0) {
+      if (this.options) {
         return this.options.attachment_upload_max_files
       }
       return 1
@@ -110,7 +110,7 @@ export default {
 
           this.uploadHandler(
             formData,
-            progressEvent => {
+            (progressEvent) => {
               if (progressEvent.total > 0) {
                 progress(progressEvent.lengthComputable, progressEvent.loaded, progressEvent.total)
               }
@@ -119,12 +119,12 @@ export default {
             this.filed,
             file
           )
-            .then(response => {
+            .then((response) => {
               load(response)
               this.$log.debug('Uploaded successfully', response)
               this.$emit('success', response, file)
             })
-            .catch(failure => {
+            .catch((failure) => {
               this.$log.debug('Failed to upload file', failure)
               this.$emit('failure', failure, file)
               error()
