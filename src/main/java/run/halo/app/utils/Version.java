@@ -48,6 +48,11 @@ public class Version implements Comparable<Version> {
     private static final Version EMPTY_VERSION = new Version(0, 0, 0);
 
     /**
+     * Maximum version.
+     */
+    private static final Version MAXIMUM_VERSION = new Version(Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE);
+
+    /**
      * Major number.
      */
     private final long major;
@@ -128,7 +133,7 @@ public class Version implements Comparable<Version> {
         }
         // handle unknown version
         if (StringUtils.equalsIgnoreCase(version, HaloConst.UNKNOWN_VERSION)) {
-            return Optional.of(new Version());
+            return Optional.of(MAXIMUM_VERSION);
         }
         // get matcher for version
         Matcher matcher = PATTERN.matcher(version);
