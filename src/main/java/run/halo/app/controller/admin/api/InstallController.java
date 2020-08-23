@@ -198,7 +198,7 @@ public class InstallController {
                 "\n" +
                 "- 官网：[https://halo.run](https://halo.run)\n" +
                 "- 社区：[https://bbs.halo.run](https://bbs.halo.run)\n" +
-                "- 主题仓库：[https://halo.run/s/themes](https://halo.run/s/themes)\n" +
+                "- 主题仓库：[https://halo.run/p/themes.html](https://halo.run/p/themes.html)\n" +
                 "- 开源地址：[https://github.com/halo-dev/halo](https://github.com/halo-dev/halo)\n" +
                 "\n" +
                 "在使用过程中，有任何问题都可以通过以上链接找寻答案，或者联系我们。\n" +
