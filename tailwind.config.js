@@ -151,6 +151,18 @@ module.exports = {
       '64': '16rem'
     },
     backgroundColor: theme => theme('colors'),
+    backgroundImage: {
+      none: 'none',
+      'gradient-to-t': 'linear-gradient(to top, var(--gradient-color-stops))',
+      'gradient-to-tr': 'linear-gradient(to top right, var(--gradient-color-stops))',
+      'gradient-to-r': 'linear-gradient(to right, var(--gradient-color-stops))',
+      'gradient-to-br': 'linear-gradient(to bottom right, var(--gradient-color-stops))',
+      'gradient-to-b': 'linear-gradient(to bottom, var(--gradient-color-stops))',
+      'gradient-to-bl': 'linear-gradient(to bottom left, var(--gradient-color-stops))',
+      'gradient-to-l': 'linear-gradient(to left, var(--gradient-color-stops))',
+      'gradient-to-tl': 'linear-gradient(to top left, var(--gradient-color-stops))'
+    },
+    gradientColorStops: theme => theme('colors'),
     backgroundOpacity: theme => theme('opacity'),
     backgroundPosition: {
       bottom: 'bottom',
@@ -621,6 +633,34 @@ module.exports = {
       '500': '500ms',
       '700': '700ms',
       '1000': '1000ms'
+    },
+    animation: {
+      none: 'none',
+      spin: 'spin 1s linear infinite',
+      ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+      pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+      bounce: 'bounce 1s infinite'
+    },
+    keyframes: {
+      spin: {
+        to: { transform: 'rotate(360deg)' }
+      },
+      ping: {
+        '75%, 100%': { transform: 'scale(2)', opacity: '0' }
+      },
+      pulse: {
+        '50%': { opacity: '.5' }
+      },
+      bounce: {
+        '0%, 100%': {
+          transform: 'translateY(-25%)',
+          animationTimingFunction: 'cubic-bezier(0.8,0,1,1)'
+        },
+        '50%': {
+          transform: 'none',
+          animationTimingFunction: 'cubic-bezier(0,0,0.2,1)'
+        }
+      }
     }
   },
   variants: {
@@ -630,7 +670,10 @@ module.exports = {
     alignSelf: ['responsive'],
     appearance: ['responsive'],
     backgroundAttachment: ['responsive'],
+    backgroundClip: ['responsive'],
     backgroundColor: ['responsive', 'hover', 'focus'],
+    backgroundImage: ['responsive'],
+    gradientColorStops: ['responsive', 'hover', 'focus'],
     backgroundOpacity: ['responsive', 'hover', 'focus'],
     backgroundPosition: ['responsive'],
     backgroundRepeat: ['responsive'],
@@ -643,10 +686,12 @@ module.exports = {
     borderWidth: ['responsive'],
     boxShadow: ['responsive', 'hover', 'focus'],
     boxSizing: ['responsive'],
+    container: ['responsive'],
     cursor: ['responsive'],
     display: ['responsive'],
     divideColor: ['responsive'],
     divideOpacity: ['responsive'],
+    divideStyle: ['responsive'],
     divideWidth: ['responsive'],
     fill: ['responsive'],
     flex: ['responsive'],
@@ -679,6 +724,7 @@ module.exports = {
     order: ['responsive'],
     outline: ['responsive', 'focus'],
     overflow: ['responsive'],
+    overscrollBehavior: ['responsive'],
     padding: ['responsive'],
     placeholderColor: ['responsive', 'focus'],
     placeholderOpacity: ['responsive', 'focus'],
@@ -720,7 +766,8 @@ module.exports = {
     transitionProperty: ['responsive'],
     transitionTimingFunction: ['responsive'],
     transitionDuration: ['responsive'],
-    transitionDelay: ['responsive']
+    transitionDelay: ['responsive'],
+    animation: ['responsive']
   },
   corePlugins: {},
   plugins: []
