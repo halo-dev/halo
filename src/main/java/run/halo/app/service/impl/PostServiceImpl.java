@@ -402,7 +402,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             post.setSlug(SlugUtils.slug(post.getTitle()));
         }
 
-        post.setOriginalContent(markdown);
+        post.setRawText(markdown);
 
         return createBy(post.convertTo(), tagIds, categoryIds, false);
     }

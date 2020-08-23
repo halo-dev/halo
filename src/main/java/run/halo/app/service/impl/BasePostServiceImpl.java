@@ -18,7 +18,6 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
-import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
@@ -27,7 +26,6 @@ import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BasePostService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
-import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.ArrayList;
@@ -216,8 +214,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(postId, "Post id must not be null");
 
         boolean finishedIncrease;
-        if (basePostRepository.getByIdAndStatus(postId, PostStatus.DRAFT).isPresent())
-        {
+        if (basePostRepository.getByIdAndStatus(postId, PostStatus.DRAFT).isPresent()) {
             finishedIncrease = true;
             log.info("Post with id: [{}] is a draft and visits will not be updated", postId);
         } else {
@@ -265,13 +262,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         originalContent = HaloUtils.cleanHtmlTag(originalContent);
 
         post.setWordCount((long) originalContent.length());
-
-        // Render content
-        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
-        } else {
-            post.setFormatContent(post.getOriginalContent());
-        }
 
         // if password is not empty,change status to intimate
         if (StringUtils.isNotEmpty(post.getPassword()) && post.getStatus() != PostStatus.DRAFT) {
@@ -416,7 +406,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         // Sync content
         if (PostStatus.PUBLISHED.equals(status)) {
             // If publish this post, then convert the formatted content
-            String formatContent = MarkdownUtils.renderHtml(post.getOriginalContent());
+            String formatContent = post.getStagedContent();
             int updatedRows = basePostRepository.updateFormatContent(formatContent, postId);
 
             if (updatedRows != 1) {

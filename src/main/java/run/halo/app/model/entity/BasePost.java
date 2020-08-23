@@ -74,6 +74,13 @@ public class BasePost extends BaseEntity {
     private String originalContent;
 
     /**
+     * Staged rendered content. Just for draft post.
+     */
+    @Column(name = "staged_content")
+    @Lob
+    private String stagedContent;
+
+    /**
      * Rendered content.
      */
     @Column(name = "format_content")

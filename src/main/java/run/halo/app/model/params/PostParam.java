@@ -1,5 +1,6 @@
 package run.halo.app.model.params;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
@@ -8,9 +9,9 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.SlugUtils;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -37,9 +38,20 @@ public class PostParam implements InputConverter<Post> {
     @Size(max = 255, message = "文章别名的字符长度不能超过 {max}")
     private String slug;
 
+    @Deprecated
     private PostEditorType editorType;
 
-    private String originalContent;
+    @ApiModelProperty("文章原始文本")
+    private String rawText;
+
+    @ApiModelProperty("是否由后端渲染（默认为 true），如果为 true 则会使用后端的 markdown 渲染器进行渲染")
+    private boolean renderedByServer = true;
+
+    @ApiModelProperty("文章渲染文本，仅在 renderedByServer = false 的时候有效")
+    private String renderedText;
+
+    @ApiModelProperty("渲染后的文本")
+    private String stagingContent;
 
     private String summary;
 
@@ -54,7 +66,6 @@ public class PostParam implements InputConverter<Post> {
     @Size(max = 255, message = "Length of template must not be more than {max}")
     private String template;
 
-    @Min(value = 0, message = "Post top priority must not be less than {value}")
     private Integer topPriority = 0;
 
     private Date createTime;
@@ -77,11 +88,19 @@ public class PostParam implements InputConverter<Post> {
             thumbnail = "";
         }
 
-        if (null == editorType) {
-            editorType = PostEditorType.MARKDOWN;
+        if (renderedByServer) {
+            renderedText = MarkdownUtils.renderHtml(rawText);
         }
-
-        return InputConverter.super.convertTo();
+        // copy same properties from param
+        Post post = InputConverter.super.convertTo();
+        // set raw text and rendered text
+        post.setOriginalContent(rawText);
+        post.setStagedContent(renderedText);
+        if (PostStatus.PUBLISHED.equals(status)) {
+            // if status is published, let staged content cover format content
+            post.setFormatContent(post.getStagedContent());
+        }
+        return post;
     }
 
     @Override
@@ -92,11 +111,19 @@ public class PostParam implements InputConverter<Post> {
             thumbnail = "";
         }
 
-        if (null == editorType) {
-            editorType = PostEditorType.MARKDOWN;
+        if (renderedByServer) {
+            // if rendered by server
+            renderedText = MarkdownUtils.renderHtml(rawText);
         }
-
+        // update same properties by bean utils
         InputConverter.super.update(post);
+        // set raw text and rendered text manually
+        post.setOriginalContent(rawText);
+        post.setStagedContent(renderedText);
+        if (PostStatus.PUBLISHED.equals(status)) {
+            // if status is published, let staged content cover format content
+            post.setFormatContent(post.getStagedContent());
+        }
     }
 
     public Set<PostMeta> getPostMetas() {
@@ -104,7 +131,6 @@ public class PostParam implements InputConverter<Post> {
         if (CollectionUtils.isEmpty(metas)) {
             return postMetaSet;
         }
-
         for (PostMetaParam postMetaParam : metas) {
             PostMeta postMeta = postMetaParam.convertTo();
             postMetaSet.add(postMeta);

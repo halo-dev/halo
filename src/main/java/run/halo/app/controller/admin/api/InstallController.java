@@ -155,8 +155,6 @@ public class InstallController {
         menuService.create(menuSheet.convertTo());
     }
 
-
-    @Nullable
     private void createDefaultComment(@Nullable PostDetailVO post) {
         if (post == null) {
             return;
@@ -190,7 +188,7 @@ public class InstallController {
         postParam.setSlug("hello-halo");
         postParam.setTitle("Hello Halo");
         postParam.setStatus(PostStatus.PUBLISHED);
-        postParam.setOriginalContent("## Hello Halo\n" +
+        postParam.setRawText("## Hello Halo\n" +
                 "\n" +
                 "如果你看到了这一篇文章，那么证明你已经安装成功了，感谢使用 [Halo](https://halo.run) 进行创作，希望能够使用愉快。\n" +
                 "\n" +
@@ -214,7 +212,6 @@ public class InstallController {
         return postService.createBy(postParam.convertTo(), Collections.emptySet(), categoryIds, false);
     }
 
-    @Nullable
     private void createDefaultSheet() {
         long publishedCount = sheetService.countByStatus(PostStatus.PUBLISHED);
         if (publishedCount > 0) {
