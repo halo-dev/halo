@@ -300,14 +300,14 @@ export default {
       interval: null
     }
   },
-  created() {
+  beforeMount() {
     this.handleLoadStatistics()
     this.handleListLatestPosts()
     this.handleListLatestLogs()
   },
   computed: {
     formattedLogDatas() {
-      return this.latestLogs.map(log => {
+      return this.latestLogs.map((log) => {
         log.type = this.logTypes[log.type].text
         return log
       })
@@ -319,7 +319,7 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    next(vm => {
+    next((vm) => {
       vm.interval = setInterval(() => {
         vm.handleLoadStatistics()
       }, 5000)
@@ -341,7 +341,7 @@ export default {
       this.activityLoading = true
       postApi
         .listLatest(5)
-        .then(response => {
+        .then((response) => {
           this.latestPosts = response.data.data
         })
         .finally(() => {
@@ -354,7 +354,7 @@ export default {
       this.logLoading = true
       logApi
         .listLatest(5)
-        .then(response => {
+        .then((response) => {
           this.latestLogs = response.data.data
         })
         .finally(() => {
@@ -366,8 +366,11 @@ export default {
     handleLoadStatistics() {
       statisticsApi
         .statistics()
-        .then(response => {
+        .then((response) => {
           this.statisticsData = response.data.data
+        })
+        .catch(() => {
+          clearInterval(this.interval)
         })
         .finally(() => {
           setTimeout(() => {
@@ -376,7 +379,7 @@ export default {
         })
     },
     handlePostPreview(postId) {
-      postApi.preview(postId).then(response => {
+      postApi.preview(postId).then((response) => {
         window.open(response.data, '_blank')
       })
     },
