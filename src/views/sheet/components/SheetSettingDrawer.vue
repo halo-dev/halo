@@ -222,9 +222,14 @@
   </a-drawer>
 </template>
 <script>
+
+// libs
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import moment from 'moment'
 import { mapGetters } from 'vuex'
+import pinyin from 'tiny-pinyin'
+
+// apis
 import themeApi from '@/api/theme'
 import sheetApi from '@/api/sheet'
 export default {
@@ -303,6 +308,7 @@ export default {
       if (visible) {
         this.handleListCustomTpls()
         this.handleListPresetMetasField()
+        this.handleSetPinyinSlug()
       }
     },
     handleListPresetMetasField() {
@@ -425,6 +431,13 @@ export default {
         value: '',
         key: ''
       })
+    },
+    handleSetPinyinSlug() {
+      if (this.selectedSheet.title && !this.selectedSheet.id) {
+        if (pinyin.isSupported()) {
+          this.$set(this.selectedSheet, 'slug', pinyin.convertToPinyin(this.selectedSheet.title, '-', true))
+        }
+      }
     }
   }
 }

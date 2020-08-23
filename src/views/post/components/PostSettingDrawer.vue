@@ -306,16 +306,23 @@
   </a-drawer>
 </template>
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
-import moment from 'moment'
+// components
 import CategoryTree from './CategoryTree'
 import CategorySelectTree from './CategorySelectTree'
 import TagSelect from './TagSelect'
+
+// libs
+import { mixin, mixinDevice } from '@/utils/mixin.js'
+import moment from 'moment'
+import pinyin from 'tiny-pinyin'
 import { mapGetters } from 'vuex'
+import { datetimeFormat } from '@/utils/util'
+
+// apis
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 import themeApi from '@/api/theme'
-import { datetimeFormat } from '@/utils/util'
+
 export default {
   name: 'PostSettingDrawer',
   mixins: [mixin, mixinDevice],
@@ -442,16 +449,17 @@ export default {
         this.handleListCategories()
         this.handleListPresetMetasField()
         this.handleListCustomTpls()
+        this.handleSetPinyinSlug()
       }
     },
     handleListCategories() {
-      categoryApi.listAll().then(response => {
+      categoryApi.listAll().then((response) => {
         this.categories = response.data.data
       })
     },
     handleListPresetMetasField() {
       if (this.metas.length <= 0) {
-        themeApi.getActivatedTheme().then(response => {
+        themeApi.getActivatedTheme().then((response) => {
           const fields = response.data.data.postMetaField
           if (fields && fields.length > 0) {
             for (let i = 0, len = fields.length; i < len; i++) {
@@ -465,7 +473,7 @@ export default {
       }
     },
     handleListCustomTpls() {
-      themeApi.customPostTpls().then(response => {
+      themeApi.customPostTpls().then((response) => {
         this.customTpls = response.data.data
       })
     },
@@ -483,7 +491,7 @@ export default {
       }
       categoryApi
         .create(this.categoryToCreate)
-        .then(response => {
+        .then((response) => {
           this.categoryToCreate = {}
           this.categoryFormVisible = false
         })
@@ -549,7 +557,7 @@ export default {
               this.savedErrored = true
             }
           })
-          .then(response => {
+          .then((response) => {
             this.selectedPost = response.data.data
           })
           .finally(() => {
@@ -589,6 +597,13 @@ export default {
         value: '',
         key: ''
       })
+    },
+    handleSetPinyinSlug() {
+      if (this.selectedPost.title && !this.selectedPost.id) {
+        if (pinyin.isSupported()) {
+          this.$set(this.selectedPost, 'slug', pinyin.convertToPinyin(this.selectedPost.title, '-', true))
+        }
+      }
     }
   }
 }
