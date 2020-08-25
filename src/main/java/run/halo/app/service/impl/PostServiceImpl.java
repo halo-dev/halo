@@ -1,9 +1,12 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +45,9 @@ import run.halo.app.utils.SlugUtils;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -805,6 +810,82 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
                 .toString();
         return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort).and(Sort.by(DESC, "id")));
+    }
+
+    @Override
+    public Post getPostByFullPath(@NotBlank String fullPath) {
+        URL url = URLUtil.toUrlForHttp(fullPath);
+        fullPath = url.getPath();
+        
+        PostPermalinkType permalinkType = optionService.getPostPermalinkType();
+
+        String pathSuffix = optionService.getPathSuffix();
+
+        String archivesPrefix = optionService.getArchivesPrefix();
+
+        if (optionService.isEnabledAbsolutePath()) {
+            fullPath = fullPath.replace(optionService.getBlogBaseUrl(), "");
+        }
+        if (permalinkType.equals(PostPermalinkType.DEFAULT)) {
+            String slug = fullPath.replace(archivesPrefix, "")
+                    .replace(pathSuffix, "")
+                    .replaceAll(URL_SEPARATOR, "");
+            if (Strings.isBlank(slug)) {
+                throw new NotFoundException("查询不到该页面的信息");
+            }
+           return postRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
+        }
+        if (permalinkType.equals(PostPermalinkType.ID)) {
+            String query = url.getQuery();
+            if (Strings.isBlank(query)) {
+                throw new NotFoundException("查询不到该页面的信息");
+            }
+            String id = resolveParam(query, "p");
+            if (Strings.isBlank(id) || !NumberUtil.isNumber(id)) {
+                throw new NotFoundException("查询不到该页面的信息");
+            }
+            return getById(Integer.valueOf(id));
+        }
+
+        // date type 
+        fullPath = fullPath.replace(pathSuffix, "");
+        int index = fullPath.lastIndexOf(URL_SEPARATOR);
+        if (index + 1 >= fullPath.length()) {
+            throw new NotFoundException("查询不到该页面的信息");
+        }
+        String slug = fullPath.substring(index + 1);
+        if (Strings.isBlank(slug)) {
+            throw new NotFoundException("查询不到该页面的信息");
+        }
+        return postRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
+    }
+
+    /**
+     * Get query param from query string
+     * @param query query string
+     * @param key param key
+     * @return  param value
+     */
+    private String resolveParam(String query, String key) {
+        if (Strings.isBlank(query) || Strings.isBlank(key)) {
+            return null;
+        }
+        String[] queries = query.split("&");
+        if (Objects.isNull(queries) || queries.length < 1) {
+            return null;
+        }
+        Map<String, String> keyMap = new HashMap<>(queries.length);
+        return Arrays.stream(queries)
+                .filter(Strings::isNotBlank)
+                .map(param -> {
+                    String[] params = param.split("=");
+                    keyMap.put(params[0], params[1]);
+                    return keyMap;
+                })
+                .map(map -> (map.get(key)))
+                .filter(Strings::isNotBlank)
+                .findFirst()
+                .orElse(null);
     }
 
     private String buildFullPath(Post post) {

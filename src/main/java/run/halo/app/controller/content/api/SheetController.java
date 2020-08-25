@@ -78,6 +78,28 @@ public class SheetController {
         return sheetDetailVO;
     }
 
+    @GetMapping("/slug")
+    @ApiOperation("Gets a sheet by fullPath")
+    public SheetDetailVO getBy(@RequestParam("fullPath") String fullPath,
+                               @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+                               @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheetService.getSheetByFullPath(fullPath));
+
+        if (formatDisabled) {
+            // Clear the format content
+            sheetDetailVO.setFormatContent(null);
+        }
+
+        if (sourceDisabled) {
+            // Clear the original content
+            sheetDetailVO.setOriginalContent(null);
+        }
+
+        sheetService.publishVisitEvent(sheetDetailVO.getId());
+
+        return sheetDetailVO;
+    }
+
     @GetMapping("{sheetId:\\d+}/comments/top_view")
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("sheetId") Integer sheetId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,

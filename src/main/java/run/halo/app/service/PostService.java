@@ -14,6 +14,7 @@ import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.base.BasePostService;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.List;
@@ -265,4 +266,11 @@ public interface PostService extends BasePostService<Post> {
      */
     @NotNull
     Sort getPostDefaultSort();
+
+    /**
+     * get a post by full path
+     * @param fullPath full path
+     * @return post
+     */
+    Post getPostByFullPath(@NotBlank String fullPath);
 }

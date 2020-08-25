@@ -10,6 +10,7 @@ import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.base.BasePostService;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Set;
 
@@ -131,4 +132,10 @@ public interface SheetService extends BasePostService<Sheet> {
      * @param sheetId sheetId must not be null
      */
     void publishVisitEvent(@NonNull Integer sheetId);
+
+    /**
+     * sheet full path
+     * @return sheet
+     */
+    Sheet getSheetByFullPath(@NotBlank String fullPath);
 }
