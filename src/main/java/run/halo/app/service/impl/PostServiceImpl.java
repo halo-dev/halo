@@ -847,7 +847,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             return getById(Integer.valueOf(id));
         }
 
-        // date type 
+        // date type
         fullPath = fullPath.replace(pathSuffix, "");
         int index = fullPath.lastIndexOf(URL_SEPARATOR);
         if (index + 1 >= fullPath.length()) {

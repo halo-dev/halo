@@ -81,8 +81,8 @@ public class SheetController {
     @GetMapping("/slug")
     @ApiOperation("Gets a sheet by fullPath")
     public SheetDetailVO getBy(@RequestParam("fullPath") String fullPath,
-                               @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
-                               @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+            @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+            @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
         SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheetService.getSheetByFullPath(fullPath));
 
         if (formatDisabled) {
