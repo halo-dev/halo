@@ -88,12 +88,12 @@ public class PostController {
         return postDetailVO;
     }
 
-    @GetMapping("/slug")
+    @GetMapping("{slug}/slug")
     @ApiOperation("Gets a post")
-    public PostDetailVO getBy(@RequestParam("fullPath") String fullPath,
+    public PostDetailVO getBy(@PathVariable("slug") String slug,
             @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
             @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
-        PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getPostByFullPath(fullPath));
+        PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getBySlug(slug));
 
         if (formatDisabled) {
             // Clear the format content

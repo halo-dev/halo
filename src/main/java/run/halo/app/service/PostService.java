@@ -267,10 +267,4 @@ public interface PostService extends BasePostService<Post> {
     @NotNull
     Sort getPostDefaultSort();
 
-    /**
-     * get a post by full path
-     * @param fullPath full path
-     * @return post
-     */
-    Post getPostByFullPath(@NotBlank String fullPath);
 }
