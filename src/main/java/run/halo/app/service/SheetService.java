@@ -133,9 +133,4 @@ public interface SheetService extends BasePostService<Sheet> {
      */
     void publishVisitEvent(@NonNull Integer sheetId);
 
-    /**
-     * sheet full path
-     * @return sheet
-     */
-    Sheet getSheetByFullPath(@NotBlank String fullPath);
 }

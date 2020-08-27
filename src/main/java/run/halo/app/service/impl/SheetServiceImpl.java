@@ -346,36 +346,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
     }
 
-    @Override
-    public Sheet getSheetByFullPath(String fullPath) {
-
-        URL url = URLUtil.toUrlForHttp(fullPath);
-        fullPath = url.getPath();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            String blogBaseUrl = optionService.getBlogBaseUrl();
-            fullPath = fullPath.replace(blogBaseUrl, "");
-        }
-        if (Strings.isBlank(fullPath)) {
-            throw new NotFoundException("查询不到该页面的信息");
-        }
-
-        String prefix = optionService.getSheetPrefix();
-        String suffix = optionService.getPathSuffix();
-
-        String slug =  Arrays.stream(fullPath.split(URL_SEPARATOR))
-                .filter(Strings::isNotBlank)
-                .filter(path -> !path.equals(prefix))
-                .collect(Collectors.joining(""))
-                .replaceAll(suffix, "");
-
-        if (Strings.isBlank(slug)) {
-            throw new NotFoundException("查询不到该页面的信息");
-        }
-
-        return sheetRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
-    }
-
     private String buildFullPath(Sheet sheet) {
         StringBuilder fullPath = new StringBuilder();
 
