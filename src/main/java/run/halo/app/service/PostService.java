@@ -265,4 +265,5 @@ public interface PostService extends BasePostService<Post> {
      */
     @NotNull
     Sort getPostDefaultSort();
+
 }

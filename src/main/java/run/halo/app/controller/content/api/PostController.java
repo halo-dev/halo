@@ -88,6 +88,28 @@ public class PostController {
         return postDetailVO;
     }
 
+    @GetMapping("/slug")
+    @ApiOperation("Gets a post")
+    public PostDetailVO getBy(@RequestParam("slug") String slug,
+            @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+            @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+        PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getBySlug(slug));
+
+        if (formatDisabled) {
+            // Clear the format content
+            postDetailVO.setFormatContent(null);
+        }
+
+        if (sourceDisabled) {
+            // Clear the original content
+            postDetailVO.setOriginalContent(null);
+        }
+
+        postService.publishVisitEvent(postDetailVO.getId());
+
+        return postDetailVO;
+    }
+
     @GetMapping("{postId:\\d+}/comments/top_view")
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("postId") Integer postId,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
