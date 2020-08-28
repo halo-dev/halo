@@ -32,8 +32,9 @@ public class LevelCacheStore extends AbstractStringCacheStore {
 
     private Timer timer;
 
-    @Autowired
-    private HaloProperties haloProperties;
+    public LevelCacheStore(HaloProperties haloProperties) {
+        super.haloProperties = haloProperties;
+    }
 
     @PostConstruct
     public void init() {
