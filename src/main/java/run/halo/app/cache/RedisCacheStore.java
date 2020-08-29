@@ -39,8 +39,6 @@ public class RedisCacheStore extends AbstractStringCacheStore {
      */
     private final Lock lock = new ReentrantLock();
 
-    protected HaloProperties haloProperties;
-
     public RedisCacheStore(HaloProperties haloProperties) {
         this.haloProperties = haloProperties;
         initRedis();
@@ -72,19 +70,6 @@ public class RedisCacheStore extends AbstractStringCacheStore {
         }
         REDIS = new JedisCluster(nodes, 5, 20, 3, this.haloProperties.getCacheRedisPassword(), cfg);
         log.info("Initialized cache redis cluster: {}", REDIS.getClusterNodes());
-    }
-
-    protected JedisCluster redis() {
-        if (REDIS == null) {
-            synchronized (RedisCacheStore.class) {
-                if (REDIS != null) {
-                    return REDIS;
-                }
-                initRedis();
-                return REDIS;
-            }
-        }
-        return REDIS;
     }
 
     @NotNull
