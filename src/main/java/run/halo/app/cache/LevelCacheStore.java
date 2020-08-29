@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.iq80.leveldb.*;
 import org.iq80.leveldb.impl.Iq80DBFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import run.halo.app.config.properties.HaloProperties;
