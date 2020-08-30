@@ -114,13 +114,13 @@ export default {
   },
   computed: {
     converttedPostComments() {
-      return this.postComments.map(comment => {
+      return this.postComments.map((comment) => {
         comment.content = marked(decodeHTML(comment.content))
         return comment
       })
     },
     converttedSheetComments() {
-      return this.sheetComments.map(comment => {
+      return this.sheetComments.map((comment) => {
         comment.content = marked(decodeHTML(comment.content))
         return comment
       })
@@ -148,7 +148,7 @@ export default {
       }
       commentApi
         .latestComment('posts', 5, 'AUDITING')
-        .then(response => {
+        .then((response) => {
           this.postComments = response.data.data
         })
         .finally(() => {
@@ -163,7 +163,7 @@ export default {
       }
       commentApi
         .latestComment('sheets', 5, 'AUDITING')
-        .then(response => {
+        .then((response) => {
           this.sheetComments = response.data.data
         })
         .finally(() => {

@@ -34,7 +34,7 @@ export default {
     onLogoClick() {
       this.clickCount++
       if (this.clickCount === 10) {
-        optionApi.save(this.optionsToCreate).then(response => {
+        optionApi.save(this.optionsToCreate).then((response) => {
           this.refreshOptionsCache()
           this.$message.success(`开发者选项已启用！`)
           this.clickCount = 0

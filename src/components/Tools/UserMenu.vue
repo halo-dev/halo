@@ -89,7 +89,7 @@ export default {
             .then(() => {
               window.location.reload()
             })
-            .catch(err => {
+            .catch((err) => {
               that.$message.error({
                 title: '错误',
                 description: err.message

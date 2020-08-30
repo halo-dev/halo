@@ -265,13 +265,13 @@ export default {
       }
     }
   },
-  created() {
-    this.verifyIsInstall()
+  beforeMount() {
+    this.handleVerifyIsInstall()
     this.$set(this.installation, 'url', window.location.protocol + '//' + window.location.host)
   },
   methods: {
-    async verifyIsInstall() {
-      await adminApi.isInstalled().then(response => {
+    async handleVerifyIsInstall() {
+      await adminApi.isInstalled().then((response) => {
         if (response.data.data) {
           this.$router.push({ name: 'Login' })
         }
@@ -279,7 +279,7 @@ export default {
     },
     handleNextStep() {
       if (this.stepCurrent === 0) {
-        this.$refs.generalForm.validate(valid => {
+        this.$refs.generalForm.validate((valid) => {
           if (valid) {
             this.stepCurrent++
           } else {
@@ -287,7 +287,7 @@ export default {
           }
         })
       } else if (this.stepCurrent === 1) {
-        this.$refs.blogForm.validate(valid => {
+        this.$refs.blogForm.validate((valid) => {
           if (valid) {
             this.stepCurrent++
           } else {
@@ -307,7 +307,7 @@ export default {
     install() {
       adminApi
         .install(this.installation)
-        .then(response => {
+        .then((response) => {
           this.$log.debug('Installation response', response)
           this.$message.success('安装成功！')
           setTimeout(() => {
@@ -326,7 +326,7 @@ export default {
         const hide = this.$message.loading('数据导入中...', 0)
         migrateApi
           .migrate(this.migrationData)
-          .then(response => {
+          .then((response) => {
             this.$log.debug('Migrated successfullly')
             this.$message.success('数据导入成功！')
             this.install()

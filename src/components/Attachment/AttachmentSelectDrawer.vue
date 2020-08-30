@@ -150,7 +150,7 @@ export default {
       this.queryParam.sort = this.pagination.sort
       attachmentApi
         .query(this.queryParam)
-        .then(response => {
+        .then((response) => {
           this.attachments = response.data.data.content
           this.pagination.total = response.data.data.total
         })

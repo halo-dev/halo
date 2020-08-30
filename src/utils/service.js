@@ -2,7 +2,6 @@ import axios from 'axios'
 import Vue from 'vue'
 import { message, notification } from 'ant-design-vue'
 import store from '@/store'
-import router from '@/router'
 import { isObject } from './util'
 
 const service = axios.create({
@@ -38,7 +37,8 @@ async function refreshToken(error) {
     await refreshTask
   } catch (err) {
     if (err.response && err.response.data && err.response.data.data === refreshToken) {
-      router.push({ name: 'Login' })
+      message.warning('当前登录状态已失效，请重新登录')
+      store.dispatch('ToggleLoginModal', true)
     }
     Vue.$log.error('Failed to refresh token', err)
   } finally {
@@ -124,7 +124,8 @@ service.interceptors.response.use(
           }
         } else {
           // Login
-          router.push({ name: 'Login' })
+          message.warning('当前登录状态已失效，请重新登录')
+          store.dispatch('ToggleLoginModal', true)
         }
       } else if (data.status === 403) {
         // TODO handle 403 status error

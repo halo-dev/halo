@@ -24,7 +24,8 @@ const app = {
     autoHideHeader: false,
     color: null,
     apiUrl: null,
-    layoutSetting: false
+    layoutSetting: false,
+    loginModal: false
   },
   mutations: {
     SET_API_URL: (state, apiUrl) => {
@@ -78,6 +79,9 @@ const app = {
     TOGGLE_LAYOUT_SETTING: (state, show) => {
       Vue.ls.set(LAYOUT_SETTING, show)
       state.layoutSetting = show
+    },
+    TOGGLE_LOGIN_MODAL: (state, show) => {
+      state.loginModal = show
     }
   },
   actions: {
@@ -116,6 +120,9 @@ const app = {
     },
     ToggleLayoutSetting({ commit }, show) {
       commit('TOGGLE_LAYOUT_SETTING', show)
+    },
+    ToggleLoginModal({ commit }, show) {
+      commit('TOGGLE_LOGIN_MODAL', show)
     }
   }
 }

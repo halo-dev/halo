@@ -29,27 +29,23 @@ export default {
   },
   methods: {
     getStrDom(str, fullLength) {
-      return (
-        <span>{ cutStrByFullLength(str, this.length) + (fullLength > this.length ? '...' : '') }</span>
-      )
+      return <span>{cutStrByFullLength(str, this.length) + (fullLength > this.length ? '...' : '')}</span>
     },
     getTooltip(fullStr, fullLength) {
       return (
         <Tooltip>
-          <template slot="title">{ fullStr }</template>
-          { this.getStrDom(fullStr, fullLength) }
+          <template slot="title">{fullStr}</template>
+          {this.getStrDom(fullStr, fullLength)}
         </Tooltip>
       )
     }
   },
   render() {
     const { tooltip, length } = this.$props
-    const str = this.$slots.default.map(vNode => vNode.text).join('')
+    const str = this.$slots.default.map((vNode) => vNode.text).join('')
     const fullLength = getStrFullLength(str)
     const strDom = tooltip && fullLength > length ? this.getTooltip(str, fullLength) : this.getStrDom(str, fullLength)
-    return (
-      strDom
-    )
+    return strDom
   }
 }
 </script>

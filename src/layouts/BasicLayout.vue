@@ -56,6 +56,8 @@
     </a-layout>
 
     <setting-drawer ref="drawer"></setting-drawer>
+
+    <LoginModal @success="onLoginSucceed" />
   </a-layout>
 </template>
 
@@ -71,6 +73,7 @@ import SideMenu from '@/components/Menu/SideMenu'
 import GlobalHeader from '@/components/GlobalHeader'
 import GlobalFooter from '@/components/GlobalFooter'
 import SettingDrawer from '@/components/SettingDrawer/SettingDrawer'
+import LoginModal from '@/components/Login/LoginModal'
 
 export default {
   name: 'BasicLayout',
@@ -80,7 +83,8 @@ export default {
     SideMenu,
     GlobalHeader,
     GlobalFooter,
-    SettingDrawer
+    SettingDrawer,
+    LoginModal
   },
   data() {
     return {
@@ -92,7 +96,7 @@ export default {
   computed: {
     ...mapState({
       // 动态主路由
-      mainMenu: state => state.permission.addRouters
+      mainMenu: (state) => state.permission.addRouters
     }),
     contentPaddingLeft() {
       if (!this.fixSidebar || this.isMobile()) {
@@ -110,7 +114,7 @@ export default {
     }
   },
   created() {
-    this.menus = asyncRouterMap.find(item => item.path === '/').children
+    this.menus = asyncRouterMap.find((item) => item.path === '/').children
     // this.menus = this.mainMenu.find((item) => item.path === '/').children
     this.collapsed = !this.sidebarOpened
   },
@@ -126,7 +130,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['setSidebar']),
+    ...mapActions(['setSidebar', 'ToggleLoginModal']),
     toggle() {
       this.collapsed = !this.collapsed
       this.setSidebar(!this.collapsed)
@@ -137,7 +141,7 @@ export default {
       if (this.sidebarOpened) {
         left = this.isDesktop() ? '256px' : '80px'
       } else {
-        left = (this.isMobile() && '0') || ((this.fixSidebar && '80px') || '0')
+        left = (this.isMobile() && '0') || (this.fixSidebar && '80px') || '0'
       }
       return left
     },
@@ -148,6 +152,9 @@ export default {
     },
     drawerClose() {
       this.collapsed = false
+    },
+    onLoginSucceed() {
+      this.ToggleLoginModal(false)
     }
   }
 }

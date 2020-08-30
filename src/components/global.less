@@ -30,9 +30,7 @@ body {
 
   &.mobile,
   &.tablet {
-
     .ant-layout-content {
-
       .content {
         margin: 24px 0 0;
       }
@@ -53,7 +51,6 @@ body {
     }
 
     .topmenu {
-
       /* 必须为 topmenu  才能启用流式布局 */
       &.content-width-Fluid {
         .header-index-wide {
@@ -66,10 +63,9 @@ body {
   &.mobile {
     .sidemenu {
       .ant-header-fixedHeader {
-
         &.ant-header-side-opened,
         &.ant-header-side-closed {
-          width: 100%
+          width: 100%;
         }
       }
     }
@@ -84,7 +80,7 @@ body {
     line-height: 64px;
     padding: 0 24px;
     cursor: pointer;
-    transition: color .3s;
+    transition: color 0.3s;
 
     &:hover {
       background: rgba(0, 0, 0, 0.025);
@@ -98,7 +94,7 @@ body {
       right: 0;
       z-index: 9;
       width: 100%;
-      transition: width .2s;
+      transition: width 0.2s;
 
       &.ant-header-side-opened {
         width: 100%;
@@ -136,7 +132,6 @@ body {
         max-width: unset;
       }
     }
-
   }
 
   .sidemenu {
@@ -146,14 +141,14 @@ body {
       right: 0;
       z-index: 9;
       width: 100%;
-      transition: width .2s;
+      transition: width 0.2s;
 
       &.ant-header-side-opened {
-        width: calc(100% - 256px)
+        width: calc(100% - 256px);
       }
 
       &.ant-header-side-closed {
-        width: calc(100% - 80px)
+        width: calc(100% - 80px);
       }
     }
   }
@@ -162,13 +157,12 @@ body {
     height: 64px;
     padding: 0;
     background: #fff;
-    box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+    box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
     position: relative;
   }
 
   .header,
   .top-nav-header-index {
-
     .user-wrapper {
       float: right;
       height: 100%;
@@ -177,7 +171,7 @@ body {
         cursor: pointer;
         padding: 0 18px;
         display: inline-block;
-        transition: all .3s;
+        transition: all 0.3s;
         height: 100%;
         color: rgba(0, 0, 0, 0.65);
 
@@ -188,7 +182,7 @@ body {
         .avatar {
           margin: 20px 0 20px 0;
           color: #1890ff;
-          background: hsla(0, 0%, 100%, .85);
+          background: hsla(0, 0%, 100%, 0.85);
           vertical-align: middle;
         }
 
@@ -201,7 +195,6 @@ body {
 
     &.dark {
       .user-wrapper {
-
         .action {
           color: rgba(255, 255, 255, 0.85);
 
@@ -220,11 +213,8 @@ body {
   &.mobile,
   &.tablet {
     .top-nav-header-index {
-
       .header-index-wide {
-
         .header-index-left {
-
           .trigger {
             color: rgba(255, 255, 255, 0.85);
             padding: 0 24px;
@@ -243,9 +233,7 @@ body {
       }
 
       &.light {
-
         .header-index-wide {
-
           .header-index-left {
             .trigger {
               color: rgba(0, 0, 0, 0.65);
@@ -257,14 +245,11 @@ body {
   }
 
   &.tablet {
-
     // overflow: hidden; text-overflow:ellipsis; white-space: nowrap;
     .top-nav-header-index {
-
       .header-index-wide {
-
         .header-index-left {
-          .logo>a {
+          .logo > a {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -277,13 +262,12 @@ body {
         }
       }
     }
-
   }
 
   .top-nav-header-index {
-    box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+    box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
     position: relative;
-    transition: background .3s, width .2s;
+    transition: background 0.3s, width 0.2s;
 
     .header-index-wide {
       max-width: 1200px;
@@ -310,7 +294,7 @@ body {
           height: 64px;
           position: relative;
           line-height: 64px;
-          transition: all .3s;
+          transition: all 0.3s;
           overflow: hidden;
 
           img,
@@ -373,7 +357,6 @@ body {
     height: 64px;
     padding: 0 12px 0 0;
   }
-
 }
 
 .topmenu {
@@ -404,13 +387,13 @@ body {
   }
 
   .ant-drawer-body {
-    padding: 0
+    padding: 0;
   }
 }
 
 // 菜单样式
 .sider {
-  box-shadow: 2px 0 6px rgba(0, 21, 41, .35);
+  box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
   position: relative;
   z-index: @ant-global-sider-zindex;
   min-height: 100vh;
@@ -435,7 +418,7 @@ body {
     overflow: hidden;
     line-height: 64px;
     background: #002140;
-    transition: all .3s;
+    transition: all 0.3s;
 
     img,
     svg,
@@ -477,7 +460,6 @@ body {
       border-right-color: transparent;
     }
   }
-
 }
 
 // 外置的样式控制
@@ -494,19 +476,16 @@ body {
     width: 160px;
   }
 
-  .ant-dropdown-menu-item>.anticon:first-child,
-  .ant-dropdown-menu-item>a>.anticon:first-child,
-  .ant-dropdown-menu-submenu-title>.anticon:first-child .ant-dropdown-menu-submenu-title>a>.anticon:first-child {
+  .ant-dropdown-menu-item > .anticon:first-child,
+  .ant-dropdown-menu-item > a > .anticon:first-child,
+  .ant-dropdown-menu-submenu-title > .anticon:first-child .ant-dropdown-menu-submenu-title > a > .anticon:first-child {
     min-width: 12px;
     margin-right: 8px;
   }
-
 }
 
 .table-page-search-wrapper {
-
   .ant-form-inline {
-
     .ant-form-item {
       display: flex;
       margin-bottom: 20px;
@@ -518,7 +497,7 @@ body {
         vertical-align: middle;
       }
 
-      >.ant-form-item-label {
+      > .ant-form-item-label {
         line-height: 32px;
         padding-right: 8px;
         width: auto;
@@ -536,15 +515,13 @@ body {
     margin-bottom: 24px;
     white-space: nowrap;
   }
-
 }
 
-.ant-table-thead>tr>th {
+.ant-table-thead > tr > th {
   background: #fff !important;
 }
 
 .content {
-
   .table-operator {
     margin-bottom: 18px;
 
@@ -580,17 +557,17 @@ body {
 .card-container {
   background: #f5f5f5;
 
-  &>.ant-tabs-card {
-    &>.ant-tabs-content {
+  & > .ant-tabs-card {
+    & > .ant-tabs-content {
       margin-top: -16px;
 
-      &>.ant-tabs-tabpane {
+      & > .ant-tabs-tabpane {
         background: #fff;
         padding: 16px;
       }
     }
 
-    &>.ant-tabs-bar {
+    & > .ant-tabs-bar {
       border-color: #fff;
 
       .ant-tabs-tab {
@@ -606,7 +583,6 @@ body {
     }
   }
 }
-
 
 .ant-comment {
   .ant-comment-actions {
@@ -666,7 +642,7 @@ body {
   flex-flow: row wrap;
 
   .ant-pagination-options-size-changer.ant-select {
-    margin: 0
+    margin: 0;
   }
 
   .pagination {
@@ -876,7 +852,6 @@ body {
 .ant-input-group-addon {
   line-height: initial !important;
 }
-
 
 .theme-screenshot {
   width: 100%;

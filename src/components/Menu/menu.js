@@ -103,7 +103,7 @@ export default {
     },
     renderMenuItem(menu) {
       const target = menu.meta.target || null
-      const CustomTag = target && 'a' || 'router-link'
+      const CustomTag = (target && 'a') || 'router-link'
       const props = { to: { name: menu.name } }
       const attrs = { href: menu.path, target: menu.meta.target }
       return (
@@ -135,10 +135,8 @@ export default {
         return null
       }
       const props = {}
-      typeof (icon) === 'object' ? props.component = icon : props.type = icon
-      return (
-        <Icon {... { props } }/>
-      )
+      typeof icon === 'object' ? (props.component = icon) : (props.type = icon)
+      return <Icon {...{ props }} />
     }
   },
   render() {
@@ -162,6 +160,6 @@ export default {
       return this.renderItem(item)
     })
 
-    return (<Menu {...dynamicProps}>{menuTree}</Menu>)
+    return <Menu {...dynamicProps}>{menuTree}</Menu>
   }
 }

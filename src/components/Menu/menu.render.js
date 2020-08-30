@@ -62,7 +62,7 @@ export default {
         return null
       }
       const props = {}
-      typeof (icon) === 'object' ? props.component = icon : props.type = icon
+      typeof icon === 'object' ? (props.component = icon) : (props.type = icon)
       return h(Icon, { props: { ...props } })
     },
     renderMenuItem: function(h, menu, pIndex, index) {
