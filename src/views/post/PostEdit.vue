@@ -43,31 +43,30 @@
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
 
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
-      <ReactiveButton
-        type="danger"
-        class="mr-2"
-        @click="handleSaveDraft(false)"
-        @callback="draftSavederrored = false"
-        :loading="draftSaving"
-        :errored="draftSavederrored"
-        text="保存草稿"
-        loadedText="保存成功"
-        erroredText="保存失败"
-      ></ReactiveButton>
-      <a-button
-        @click="handlePreview"
-        class="mr-2"
-        :loading="previewSaving"
-      >预览</a-button>
-      <a-button
-        type="primary"
-        @click="postSettingVisible = true"
-        class="mr-2"
-      >发布</a-button>
-      <a-button
-        type="dashed"
-        @click="attachmentDrawerVisible = true"
-      >附件库</a-button>
+      <a-space>
+        <ReactiveButton
+          type="danger"
+          @click="handleSaveDraft(false)"
+          @callback="draftSavederrored = false"
+          :loading="draftSaving"
+          :errored="draftSavederrored"
+          text="保存草稿"
+          loadedText="保存成功"
+          erroredText="保存失败"
+        ></ReactiveButton>
+        <a-button
+          @click="handlePreview"
+          :loading="previewSaving"
+        >预览</a-button>
+        <a-button
+          type="primary"
+          @click="postSettingVisible = true"
+        >发布</a-button>
+        <a-button
+          type="dashed"
+          @click="attachmentDrawerVisible = true"
+        >附件库</a-button>
+      </a-space>
     </footer-tool-bar>
   </div>
 </template>
@@ -110,9 +109,9 @@ export default {
   beforeRouteEnter(to, from, next) {
     // Get post id from query
     const postId = to.query.postId
-    next(vm => {
+    next((vm) => {
       if (postId) {
-        postApi.get(postId).then(response => {
+        postApi.get(postId).then((response) => {
           const post = response.data.data
           vm.postToStage = post
           vm.selectedTagIds = post.tagIds
@@ -148,7 +147,7 @@ export default {
     } else {
       this.$confirm({
         title: '当前页面数据未保存，确定要离开吗？',
-        content: h => <div style="color:red;">如果离开当面页面，你的数据很可能会丢失！</div>,
+        content: (h) => <div style="color:red;">如果离开当面页面，你的数据很可能会丢失！</div>,
         onOk() {
           next()
         },
@@ -210,7 +209,7 @@ export default {
             .catch(() => {
               this.draftSavederrored = true
             })
-            .then(response => {
+            .then((response) => {
               this.postToStage = response.data.data
             })
             .finally(() => {
@@ -226,7 +225,7 @@ export default {
           .catch(() => {
             this.draftSavederrored = true
           })
-          .then(response => {
+          .then((response) => {
             this.postToStage = response.data.data
           })
           .finally(() => {
@@ -244,11 +243,11 @@ export default {
       this.previewSaving = true
       if (this.postToStage.id) {
         // Update the post
-        postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
+        postApi.update(this.postToStage.id, this.postToStage, false).then((response) => {
           this.$log.debug('Updated post', response.data.data)
           postApi
             .preview(this.postToStage.id)
-            .then(response => {
+            .then((response) => {
               window.open(response.data, '_blank')
             })
             .finally(() => {
@@ -259,12 +258,12 @@ export default {
         })
       } else {
         // Create the post
-        postApi.create(this.postToStage, false).then(response => {
+        postApi.create(this.postToStage, false).then((response) => {
           this.$log.debug('Created post', response.data.data)
           this.postToStage = response.data.data
           postApi
             .preview(this.postToStage.id)
-            .then(response => {
+            .then((response) => {
               window.open(response.data, '_blank')
             })
             .finally(() => {

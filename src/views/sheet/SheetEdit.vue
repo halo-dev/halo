@@ -38,31 +38,30 @@
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
     <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
-      <ReactiveButton
-        type="danger"
-        class="mr-2"
-        @click="handleSaveDraft(false)"
-        @callback="draftSavederrored = false"
-        :loading="draftSaving"
-        :errored="draftSavederrored"
-        text="保存草稿"
-        loadedText="保存成功"
-        erroredText="保存失败"
-      ></ReactiveButton>
-      <a-button
-        @click="handlePreview"
-        class="mr-2"
-        :loading="previewSaving"
-      >预览</a-button>
-      <a-button
-        type="primary"
-        class="mr-2"
-        @click="sheetSettingVisible = true"
-      >发布</a-button>
-      <a-button
-        type="dashed"
-        @click="attachmentDrawerVisible = true"
-      >附件库</a-button>
+      <a-space>
+        <ReactiveButton
+          type="danger"
+          @click="handleSaveDraft(false)"
+          @callback="draftSavederrored = false"
+          :loading="draftSaving"
+          :errored="draftSavederrored"
+          text="保存草稿"
+          loadedText="保存成功"
+          erroredText="保存失败"
+        ></ReactiveButton>
+        <a-button
+          @click="handlePreview"
+          :loading="previewSaving"
+        >预览</a-button>
+        <a-button
+          type="primary"
+          @click="sheetSettingVisible = true"
+        >发布</a-button>
+        <a-button
+          type="dashed"
+          @click="attachmentDrawerVisible = true"
+        >附件库</a-button>
+      </a-space>
     </footer-tool-bar>
   </div>
 </template>

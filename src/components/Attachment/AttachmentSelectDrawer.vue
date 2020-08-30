@@ -57,16 +57,17 @@
       </div>
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
-        <a-button
-          type="dashed"
-          class="mr-2"
-          v-if="isChooseAvatar"
-          @click="handleSelectGravatar"
-        >使用 Gravatar</a-button>
-        <a-button
-          @click="handleShowUploadModal"
-          type="primary"
-        >上传附件</a-button>
+        <a-space>
+          <a-button
+            type="dashed"
+            v-if="isChooseAvatar"
+            @click="handleSelectGravatar"
+          >使用 Gravatar</a-button>
+          <a-button
+            @click="handleShowUploadModal"
+            type="primary"
+          >上传附件</a-button>
+        </a-space>
       </div>
     </a-drawer>
 

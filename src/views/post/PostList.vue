@@ -64,12 +64,13 @@
               :sm="24"
             >
               <span class="table-page-search-submitButtons">
-                <a-button
-                  type="primary"
-                  class="mr-2"
-                  @click="handleQuery()"
-                >查询</a-button>
-                <a-button @click="handleResetParam()">重置</a-button>
+                <a-space>
+                  <a-button
+                    type="primary"
+                    @click="handleQuery()"
+                  >查询</a-button>
+                  <a-button @click="handleResetParam()">重置</a-button>
+                </a-space>
               </span>
             </a-col>
           </a-row>

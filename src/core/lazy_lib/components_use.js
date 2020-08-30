@@ -49,7 +49,8 @@ import {
   Timeline,
   Steps,
   Empty,
-  Result
+  Result,
+  Space
 } from 'ant-design-vue'
 
 Vue.use(Anchor)
@@ -100,6 +101,7 @@ Vue.use(Timeline)
 Vue.use(Steps)
 Vue.use(Empty)
 Vue.use(Result)
+Vue.use(Space)
 
 Vue.prototype.$message = message
 Vue.prototype.$notification = notification

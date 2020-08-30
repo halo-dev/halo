@@ -9,26 +9,27 @@
       </a-spin>
     </a-form-item>
     <a-form-item>
-      <a-select
-        defaultValue="200"
-        v-model="logLines"
-        @change="handleLoadLogsLines"
-        style="margin-right: 8px;width: 100px"
-      >
-        <a-select-option value="200">200 行</a-select-option>
-        <a-select-option value="500">500 行</a-select-option>
-        <a-select-option value="800">800 行</a-select-option>
-        <a-select-option value="1000">1000 行</a-select-option>
-      </a-select>
-      <a-button
-        type="primary"
-        class="mr-2"
-        @click="handleLoadLogsLines()"
-      >刷新</a-button>
-      <a-button
-        type="dashed"
-        @click="handleDownloadLogFile()"
-      >下载</a-button>
+      <a-space>
+        <a-select
+          defaultValue="200"
+          v-model="logLines"
+          @change="handleLoadLogsLines"
+          style="width: 100px"
+        >
+          <a-select-option value="200">200 行</a-select-option>
+          <a-select-option value="500">500 行</a-select-option>
+          <a-select-option value="800">800 行</a-select-option>
+          <a-select-option value="1000">1000 行</a-select-option>
+        </a-select>
+        <a-button
+          type="primary"
+          @click="handleLoadLogsLines()"
+        >刷新</a-button>
+        <a-button
+          type="dashed"
+          @click="handleDownloadLogFile()"
+        >下载</a-button>
+      </a-space>
     </a-form-item>
   </a-form>
 </template>

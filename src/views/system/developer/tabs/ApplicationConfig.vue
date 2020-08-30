@@ -15,25 +15,26 @@
         </a-spin>
       </a-form-item>
       <a-form-item>
-        <a-popconfirm
-          :title="'修改配置文件之后需重启才能生效，是否继续？'"
-          okText="确定"
-          cancelText="取消"
-          @confirm="handleUpdateConfig()"
-        >
-          <a-button
-            type="primary"
-            class="mr-2"
-          >保存</a-button>
-        </a-popconfirm>
-        <a-popconfirm
-          :title="'你确定要重启吗？'"
-          okText="确定"
-          cancelText="取消"
-          @confirm="handleRestartApplication()"
-        >
-          <a-button type="danger">重启</a-button>
-        </a-popconfirm>
+        <a-space>
+          <a-popconfirm
+            :title="'修改配置文件之后需重启才能生效，是否继续？'"
+            okText="确定"
+            cancelText="取消"
+            @confirm="handleUpdateConfig()"
+          >
+            <a-button
+              type="primary"
+            >保存</a-button>
+          </a-popconfirm>
+          <a-popconfirm
+            :title="'你确定要重启吗？'"
+            okText="确定"
+            cancelText="取消"
+            @confirm="handleRestartApplication()"
+          >
+            <a-button type="danger">重启</a-button>
+          </a-popconfirm>
+        </a-space>
       </a-form-item>
     </a-form>
   </div>

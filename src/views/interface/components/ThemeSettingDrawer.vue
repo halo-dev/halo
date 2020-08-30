@@ -207,29 +207,29 @@
       v-if="themeConfigurations.length>0"
       class="w-full"
     >
-      <a-button
-        v-if="!this.isMobile() && theme.activated && viewMode"
-        type="primary"
-        @click="toggleViewMode"
-        class="mr-2"
-        ghost
-      >普通模式</a-button>
-      <a-button
-        v-else-if="!this.isMobile() && theme.activated && !viewMode"
-        type="dashed"
-        @click="toggleViewMode"
-        class="mr-2"
-      >预览模式</a-button>
-      <ReactiveButton
-        type="primary"
-        @click="handleSaveSettings"
-        @callback="saveErrored=false"
-        :loading="saving"
-        :errored="saveErrored"
-        text="保存"
-        loadedText="保存成功"
-        erroredText="保存失败"
-      ></ReactiveButton>
+      <a-space>
+        <a-button
+          v-if="!this.isMobile() && theme.activated && viewMode"
+          type="primary"
+          @click="toggleViewMode"
+          ghost
+        >普通模式</a-button>
+        <a-button
+          v-else-if="!this.isMobile() && theme.activated && !viewMode"
+          type="dashed"
+          @click="toggleViewMode"
+        >预览模式</a-button>
+        <ReactiveButton
+          type="primary"
+          @click="handleSaveSettings"
+          @callback="saveErrored=false"
+          :loading="saving"
+          :errored="saveErrored"
+          text="保存"
+          loadedText="保存成功"
+          erroredText="保存失败"
+        ></ReactiveButton>
+      </a-space>
     </footer-tool-bar>
   </a-drawer>
 </template>

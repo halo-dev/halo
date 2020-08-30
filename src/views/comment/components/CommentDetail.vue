@@ -98,25 +98,25 @@
     </a-row>
     <a-divider class="divider-transparent" />
     <div class="bottom-control">
-      <a-button
-        type="dashed"
-        class="mr-2"
-        @click="handleEditComment"
-        v-if="!editable"
-      >编辑</a-button>
-      <a-button
-        type="primary"
-        class="mr-2"
-        @click="handleUpdateComment"
-        v-if="editable"
-      >保存</a-button>
-      <a-popconfirm
-        title="你确定要将此评论者加入黑名单？"
-        okText="确定"
-        cancelText="取消"
-      >
-        <a-button type="danger">加入黑名单</a-button>
-      </a-popconfirm>
+      <a-space>
+        <a-button
+          type="dashed"
+          @click="handleEditComment"
+          v-if="!editable"
+        >编辑</a-button>
+        <a-button
+          type="primary"
+          @click="handleUpdateComment"
+          v-if="editable"
+        >保存</a-button>
+        <a-popconfirm
+          title="你确定要将此评论者加入黑名单？"
+          okText="确定"
+          cancelText="取消"
+        >
+          <a-button type="danger">加入黑名单</a-button>
+        </a-popconfirm>
+      </a-space>
     </div>
   </a-drawer>
 </template>

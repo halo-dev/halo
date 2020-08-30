@@ -126,34 +126,35 @@
     </a-row>
     <a-divider class="divider-transparent" />
     <div class="bottom-control">
-      <a-popconfirm
-        title="你确定要添加到图库？"
-        @confirm="handleAddToPhoto"
-        okText="确定"
-        cancelText="取消"
-        v-if="addToPhoto"
-      >
-        <a-button
-          type="dashed"
-          class="mr-2"
-        >添加到图库</a-button>
-      </a-popconfirm>
-      <a-popconfirm
-        title="你确定要删除该附件？"
-        @confirm="handleDeleteAttachment"
-        okText="确定"
-        cancelText="取消"
-      >
-        <ReactiveButton
-          type="danger"
-          @callback="handleDeletedCallback"
-          :loading="deleting"
-          :errored="deleteErrored"
-          text="删除"
-          loadedText="删除成功"
-          erroredText="删除失败"
-        ></ReactiveButton>
-      </a-popconfirm>
+      <a-space>
+        <a-popconfirm
+          title="你确定要添加到图库？"
+          @confirm="handleAddToPhoto"
+          okText="确定"
+          cancelText="取消"
+          v-if="addToPhoto"
+        >
+          <a-button
+            type="dashed"
+          >添加到图库</a-button>
+        </a-popconfirm>
+        <a-popconfirm
+          title="你确定要删除该附件？"
+          @confirm="handleDeleteAttachment"
+          okText="确定"
+          cancelText="取消"
+        >
+          <ReactiveButton
+            type="danger"
+            @callback="handleDeletedCallback"
+            :loading="deleting"
+            :errored="deleteErrored"
+            text="删除"
+            loadedText="删除成功"
+            erroredText="删除失败"
+          ></ReactiveButton>
+        </a-popconfirm>
+      </a-space>
     </div>
   </a-drawer>
 </template>

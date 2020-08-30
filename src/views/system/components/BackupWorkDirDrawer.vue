@@ -56,24 +56,25 @@
     </a-row>
     <a-divider class="divider-transparent" />
     <div class="bottom-control">
-      <ReactiveButton
-        type="primary"
-        class="mr-2"
-        icon="download"
-        @click="handleBackupClick"
-        @callback="handleBackupedCallback"
-        :loading="backuping"
-        :errored="backupErrored"
-        text="备份"
-        loadedText="备份成功"
-        erroredText="备份失败"
-      ></ReactiveButton>
-      <a-button
-        type="dashed"
-        icon="reload"
-        :loading="loading"
-        @click="handleListBackups"
-      >刷新</a-button>
+      <a-space>
+        <ReactiveButton
+          type="primary"
+          icon="download"
+          @click="handleBackupClick"
+          @callback="handleBackupedCallback"
+          :loading="backuping"
+          :errored="backupErrored"
+          text="备份"
+          loadedText="备份成功"
+          erroredText="备份失败"
+        ></ReactiveButton>
+        <a-button
+          type="dashed"
+          icon="reload"
+          :loading="loading"
+          @click="handleListBackups"
+        >刷新</a-button>
+      </a-space>
     </div>
   </a-drawer>
 </template>

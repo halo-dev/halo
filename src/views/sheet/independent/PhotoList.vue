@@ -46,12 +46,13 @@
                   :sm="24"
                 >
                   <span class="table-page-search-submitButtons">
-                    <a-button
-                      type="primary"
-                      class="mr-2"
-                      @click="handleQuery()"
-                    >查询</a-button>
-                    <a-button @click="resetParam()">重置</a-button>
+                    <a-space>
+                      <a-button
+                        type="primary"
+                        @click="handleQuery()"
+                      >查询</a-button>
+                      <a-button @click="resetParam()">重置</a-button>
+                    </a-space>
                   </span>
                 </a-col>
               </a-row>
@@ -289,26 +290,26 @@
       />
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
-        <a-button
-          type="dashed"
-          class="mr-2"
-          @click="editable = true"
-          v-if="!editable"
-        >编辑</a-button>
-        <a-button
-          type="primary"
-          class="mr-2"
-          @click="handleCreateOrUpdate"
-          v-else
-        >保存</a-button>
-        <a-popconfirm
-          title="你确定要删除该图片？"
-          okText="确定"
-          cancelText="取消"
-          @confirm="handleDeletePhoto"
-        >
-          <a-button type="danger">删除</a-button>
-        </a-popconfirm>
+        <a-space>
+          <a-button
+            type="dashed"
+            @click="editable = true"
+            v-if="!editable"
+          >编辑</a-button>
+          <a-button
+            type="primary"
+            @click="handleCreateOrUpdate"
+            v-else
+          >保存</a-button>
+          <a-popconfirm
+            title="你确定要删除该图片？"
+            okText="确定"
+            cancelText="取消"
+            @confirm="handleDeletePhoto"
+          >
+            <a-button type="danger">删除</a-button>
+          </a-popconfirm>
+        </a-space>
       </div>
     </a-drawer>
   </div>

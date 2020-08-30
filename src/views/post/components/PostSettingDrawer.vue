@@ -105,22 +105,22 @@
               />
             </a-form-item>
             <a-form-item>
-              <a-button
-                type="primary"
-                class="mr-2"
-                v-if="categoryFormVisible"
-                @click="handlerCreateCategory"
-              >保存</a-button>
-              <a-button
-                type="dashed"
-                class="mr-2"
-                v-if="!categoryFormVisible"
-                @click="categoryFormVisible = true"
-              >新增</a-button>
-              <a-button
-                v-if="categoryFormVisible"
-                @click="categoryFormVisible = false"
-              >取消</a-button>
+              <a-space>
+                <a-button
+                  type="primary"
+                  v-if="categoryFormVisible"
+                  @click="handlerCreateCategory"
+                >保存</a-button>
+                <a-button
+                  type="dashed"
+                  v-if="!categoryFormVisible"
+                  @click="categoryFormVisible = true"
+                >新增</a-button>
+                <a-button
+                  v-if="categoryFormVisible"
+                  @click="categoryFormVisible = false"
+                >取消</a-button>
+              </a-space>
             </a-form-item>
           </a-form>
         </div>
@@ -276,32 +276,32 @@
     </a-drawer>
 
     <div class="bottom-control">
-      <a-button
-        class="mr-2"
-        type="dashed"
-        @click="advancedVisible = true"
-      >高级</a-button>
-      <ReactiveButton
-        type="danger"
-        v-if="saveDraftButton"
-        class="mr-2"
-        @click="handleDraftClick"
-        @callback="handleSavedCallback"
-        :loading="draftSaving"
-        :errored="draftSavedErrored"
-        text="保存草稿"
-        loadedText="保存成功"
-        erroredText="保存失败"
-      ></ReactiveButton>
-      <ReactiveButton
-        @click="handlePublishClick"
-        @callback="handleSavedCallback"
-        :loading="saving"
-        :errored="savedErrored"
-        :text="`${selectedPost.id?'保存':'发布'}`"
-        :loadedText="`${selectedPost.id?'保存':'发布'}成功`"
-        :erroredText="`${selectedPost.id?'保存':'发布'}失败`"
-      ></ReactiveButton>
+      <a-space>
+        <a-button
+          type="dashed"
+          @click="advancedVisible = true"
+        >高级</a-button>
+        <ReactiveButton
+          type="danger"
+          v-if="saveDraftButton"
+          @click="handleDraftClick"
+          @callback="handleSavedCallback"
+          :loading="draftSaving"
+          :errored="draftSavedErrored"
+          text="保存草稿"
+          loadedText="保存成功"
+          erroredText="保存失败"
+        ></ReactiveButton>
+        <ReactiveButton
+          @click="handlePublishClick"
+          @callback="handleSavedCallback"
+          :loading="saving"
+          :errored="savedErrored"
+          :text="`${selectedPost.id?'保存':'发布'}`"
+          :loadedText="`${selectedPost.id?'保存':'发布'}成功`"
+          :erroredText="`${selectedPost.id?'保存':'发布'}失败`"
+        ></ReactiveButton>
+      </a-space>
     </div>
   </a-drawer>
 </template>
