@@ -67,10 +67,10 @@ const user = {
       commit
     }) {
       return new Promise(resolve => {
-        commit('CLEAR_TOKEN')
         adminApi
           .logout()
           .then(response => {
+            commit('CLEAR_TOKEN')
             resolve()
           })
           .catch(() => {
