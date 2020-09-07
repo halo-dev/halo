@@ -178,6 +178,9 @@ public class BackupServiceImpl implements BackupService {
                     IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
             Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
+            if (!Files.exists(haloZipPath.getParent())) {
+                Files.createDirectories(haloZipPath.getParent());
+            }
 
             // Zip halo
             run.halo.app.utils.FileUtils.zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
