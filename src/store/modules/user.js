@@ -26,6 +26,21 @@ const user = {
     }
   },
   actions: {
+    installCleanToken({
+      commit
+    }, installData) {
+      return new Promise((resolve, reject) => {
+        adminApi
+          .install(installData)
+          .then(response => {
+            commit('CLEAR_TOKEN')
+            resolve(response)
+          })
+          .catch(error => {
+            reject(error)
+          })
+      })
+    },
     refreshUserCache({
       commit
     }) {

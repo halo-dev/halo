@@ -5,13 +5,25 @@ import {
   setDocumentTitle,
   domTitle
 } from '@/utils/domUtil'
+import adminApi from '@api/admin'
 
 const whiteList = ['Login', 'Install', 'NotFound', 'ResetPassword'] // no redirect whitelist
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async(to, from, next) => {
   to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${to.meta.title} - ${domTitle}`))
   Vue.$log.debug('Token', store.getters.token)
   if (store.getters.token) {
+    if (to.name === 'Install') {
+      next()
+      return
+    }
+    const response = await adminApi.isInstalled()
+    if (!response.data.data) {
+      next({
+        name: 'Install'
+      })
+      return
+    }
     if (to.name === 'Login') {
       next({
         name: 'Dashboard'

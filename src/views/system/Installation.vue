@@ -216,6 +216,7 @@
 <script>
 import adminApi from '@/api/admin'
 import migrateApi from '@/api/migrate'
+import { mapActions } from 'vuex'
 
 export default {
   data() {
@@ -270,6 +271,7 @@ export default {
     this.$set(this.installation, 'url', window.location.protocol + '//' + window.location.host)
   },
   methods: {
+    ...mapActions(['installCleanToken']),
     async handleVerifyIsInstall() {
       await adminApi.isInstalled().then((response) => {
         if (response.data.data) {
@@ -305,8 +307,7 @@ export default {
       })
     },
     install() {
-      adminApi
-        .install(this.installation)
+      this.installCleanToken(this.installation)
         .then((response) => {
           this.$log.debug('Installation response', response)
           this.$message.success('安装成功！')
