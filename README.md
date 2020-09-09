@@ -1,3 +1,8 @@
+温馨提示： 仓库.git文件太大，push太慢，一个老套的解决方案：（这样将克隆只有一个提交历史记录的存储库。因此，您的.git文件夹将更轻）
+```    
+    git clone --depth 1 https://github.com/halo-dev/halo.git
+```
+
 <h1 align="center"><a href="https://github.com/halo-dev" target="_blank">Halo</a></h1>
 
 > Halo 是一款现代化的个人独立博客系统，给习惯写博客的同学多一个选择。
