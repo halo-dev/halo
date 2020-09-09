@@ -301,6 +301,9 @@ public class BackupServiceImpl implements BackupService {
                     IdUtil.simpleUUID().hashCode() + ".json";
 
             Path haloDataPath = Files.createFile(Paths.get(haloProperties.getDataExportDir(), haloDataFileName));
+            if (!Files.exists(haloDataPath.getParent())) {
+                Files.createDirectories(haloDataPath.getParent());
+            }
 
             FileWriter fileWriter = new FileWriter(haloDataPath.toFile(), CharsetUtil.UTF_8);
             fileWriter.write(JsonUtils.objectToJson(data));
