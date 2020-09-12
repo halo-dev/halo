@@ -18,8 +18,9 @@ import run.halo.app.service.AttachmentService;
 class FileHandlersTest {
     @Autowired
     private AttachmentService attachmentService;
+
     @Test
-    public void whenFileUploaded_thenVerifyStatus(){
+    public void whenFileUploaded_thenVerifyStatus() {
 
         MockMultipartFile file
                 = new MockMultipartFile(
@@ -64,10 +65,10 @@ class FileHandlersTest {
         AttachmentDTO attachmentDTO3 = attachmentService.convertToDto(attachmentService.upload(file3));
         AttachmentDTO attachmentDTO4 = attachmentService.convertToDto(attachmentService.upload(file4));
         AttachmentDTO attachmentDTO5 = attachmentService.convertToDto(attachmentService.upload(file5));
-        Assertions.assertEquals(attachmentDTO.getSuffix(),"tar.gz");
-        Assertions.assertEquals(attachmentDTO2.getSuffix(),"tar.gz");
-        Assertions.assertEquals(attachmentDTO3.getSuffix(),"zip");
-        Assertions.assertEquals(attachmentDTO4.getSuffix(),"zip");
-        Assertions.assertEquals(attachmentDTO5.getSuffix(),"tar.bz2");
+        Assertions.assertEquals(attachmentDTO.getSuffix(), "tar.gz");
+        Assertions.assertEquals(attachmentDTO2.getSuffix(), "tar.gz");
+        Assertions.assertEquals(attachmentDTO3.getSuffix(), "zip");
+        Assertions.assertEquals(attachmentDTO4.getSuffix(), "zip");
+        Assertions.assertEquals(attachmentDTO5.getSuffix(), "tar.bz2");
     }
 }
