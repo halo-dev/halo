@@ -177,7 +177,11 @@ public class BackupServiceImpl implements BackupService {
                     DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
                     IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
-            Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
+            Path haloZipFilePath = Paths.get(haloProperties.getBackupDir(), haloZipFileName);
+            if (!Files.exists(haloZipFilePath.getParent())) {
+                Files.createDirectories(haloZipFilePath.getParent());
+            }
+            Path haloZipPath = Files.createFile(haloZipFilePath);
 
             // Zip halo
             run.halo.app.utils.FileUtils.zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
@@ -297,7 +301,11 @@ public class BackupServiceImpl implements BackupService {
                     DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
                     IdUtil.simpleUUID().hashCode() + ".json";
 
-            Path haloDataPath = Files.createFile(Paths.get(haloProperties.getDataExportDir(), haloDataFileName));
+            Path haloDataFilePath = Paths.get(haloProperties.getDataExportDir(), haloDataFileName);
+            if (!Files.exists(haloDataFilePath.getParent())) {
+                Files.createDirectories(haloDataFilePath.getParent());
+            }
+            Path haloDataPath = Files.createFile(haloDataFilePath);
 
             FileWriter fileWriter = new FileWriter(haloDataPath.toFile(), CharsetUtil.UTF_8);
             fileWriter.write(JsonUtils.objectToJson(data));
