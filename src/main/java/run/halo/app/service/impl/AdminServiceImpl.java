@@ -95,19 +95,19 @@ public class AdminServiceImpl implements AdminService {
     private final ApplicationEventPublisher eventPublisher;
 
     public AdminServiceImpl(PostService postService,
-                            SheetService sheetService,
-                            AttachmentService attachmentService,
-                            PostCommentService postCommentService,
-                            SheetCommentService sheetCommentService,
-                            JournalCommentService journalCommentService,
-                            OptionService optionService,
-                            UserService userService,
-                            LinkService linkService,
-                            MailService mailService,
-                            AbstractStringCacheStore cacheStore,
-                            RestTemplate restTemplate,
-                            HaloProperties haloProperties,
-                            ApplicationEventPublisher eventPublisher) {
+            SheetService sheetService,
+            AttachmentService attachmentService,
+            PostCommentService postCommentService,
+            SheetCommentService sheetCommentService,
+            JournalCommentService journalCommentService,
+            OptionService optionService,
+            UserService userService,
+            LinkService linkService,
+            MailService mailService,
+            AbstractStringCacheStore cacheStore,
+            RestTemplate restTemplate,
+            HaloProperties haloProperties,
+            ApplicationEventPublisher eventPublisher) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.attachmentService = attachmentService;
