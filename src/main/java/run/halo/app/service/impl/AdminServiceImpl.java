@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.io.file.FileReader;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -45,7 +44,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -458,28 +456,6 @@ public class AdminServiceImpl implements AdminService {
         cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
 
         return token;
-    }
-
-    @Override
-    public String getApplicationConfig() {
-        File file = new File(haloProperties.getWorkDir(), APPLICATION_CONFIG_NAME);
-        if (!file.exists()) {
-            return StringUtils.EMPTY;
-        }
-        FileReader reader = new FileReader(file);
-        return reader.readString();
-    }
-
-    @Override
-    public void updateApplicationConfig(@NonNull String content) {
-        Assert.notNull(content, "Content must not be null");
-
-        Path path = Paths.get(haloProperties.getWorkDir(), APPLICATION_CONFIG_NAME);
-        try {
-            Files.write(path, content.getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            throw new ServiceException("保存配置文件失败", e);
-        }
     }
 
     @Override
