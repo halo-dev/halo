@@ -10,7 +10,10 @@
       <a-form-model-item label="API 服务：">
         <a-switch v-model="options.api_enabled" />
       </a-form-model-item>
-      <a-form-model-item label="Access key：">
+      <a-form-model-item
+        label="Access key："
+        prop="api_access_key"
+      >
         <a-input-password
           v-model="options.api_access_key"
           autocomplete="new-password"
@@ -55,8 +58,7 @@ export default {
         lg: { span: 8 },
         sm: { span: 12 },
         xs: { span: 24 }
-      },
-      rules: {}
+      }
     }
   },
   watch: {
@@ -64,22 +66,20 @@ export default {
       this.$emit('onChange', val)
     }
   },
+  computed: {
+    rules() {
+      const required = this.options.api_enabled
+      return {
+        api_access_key: [{ required: required, message: '* Access key 不能为空', trigger: ['change'] }]
+      }
+    }
+  },
   methods: {
     handleSaveOptions() {
-      // API 配置验证
-      if (this.options.api_enabled) {
-        if (!this.options.api_access_key) {
-          this.$notification['error']({
-            message: '提示',
-            description: 'Access key 不能为空！'
-          })
-          return
-        }
-      }
       const _this = this
-      _this.$refs.apiOptionsForm.validate(valid => {
+      _this.$refs.apiOptionsForm.validate((valid) => {
         if (valid) {
-          this.$emit('onSave')
+          _this.$emit('onSave')
         }
       })
     }

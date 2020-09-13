@@ -13,12 +13,14 @@
       <a-form-model-item label="最大上传文件数：">
         <a-input-number
           v-model="options.attachment_upload_max_files"
+          :min="1"
           style="width:100%"
         />
       </a-form-model-item>
       <a-form-model-item label="同时上传文件数：">
         <a-input-number
           v-model="options.attachment_upload_max_parallel_uploads"
+          :min="1"
           style="width:100%"
         />
       </a-form-model-item>

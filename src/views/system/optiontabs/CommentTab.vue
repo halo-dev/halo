@@ -44,6 +44,7 @@
       <a-form-model-item label="每页显示条数： ">
         <a-input-number
           v-model="options.comment_page_size"
+          :min="1"
           style="width:100%"
         />
       </a-form-model-item>

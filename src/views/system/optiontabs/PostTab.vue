@@ -23,12 +23,14 @@
       <a-form-model-item label="首页每页条数：">
         <a-input-number
           v-model="options.post_index_page_size"
+          :min="1"
           style="width:100%"
         />
       </a-form-model-item>
       <a-form-model-item label="归档每页条数：">
         <a-input-number
           v-model="options.post_archives_page_size"
+          :min="1"
           style="width:100%"
         />
       </a-form-model-item>
@@ -41,6 +43,7 @@
       <a-form-model-item label="RSS 内容条数：">
         <a-input-number
           v-model="options.rss_page_size"
+          :min="1"
           style="width:100%"
         />
       </a-form-model-item>
