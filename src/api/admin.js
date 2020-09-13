@@ -94,30 +94,6 @@ adminApi.updateAdminAssets = () => {
   })
 }
 
-adminApi.getApplicationConfig = () => {
-  return service({
-    url: `${baseUrl}/spring/application.yaml`,
-    method: 'get'
-  })
-}
-
-adminApi.updateApplicationConfig = content => {
-  return service({
-    url: `${baseUrl}/spring/application.yaml`,
-    params: {
-      content: content
-    },
-    method: 'put'
-  })
-}
-
-adminApi.restartApplication = () => {
-  return service({
-    url: `${baseUrl}/spring/restart`,
-    method: 'post'
-  })
-}
-
 adminApi.getLogFiles = lines => {
   return service({
     url: `${baseUrl}/halo/logfile`,

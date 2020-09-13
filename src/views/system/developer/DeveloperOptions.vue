@@ -25,12 +25,6 @@
               </span>
               <OptionsList />
             </a-tab-pane>
-            <a-tab-pane key="applicationConfig">
-              <span slot="tab">
-                <a-icon type="file-protect" />配置文件
-              </span>
-              <ApplicationConfig />
-            </a-tab-pane>
             <a-tab-pane key="staticStorage">
               <span slot="tab">
                 <a-icon type="cloud" />静态存储
@@ -62,7 +56,6 @@ import Environment from './tabs/Environment'
 import RuntimeLogs from './tabs/RuntimeLogs'
 import SettingsForm from './tabs/SettingsForm'
 import OptionsList from './tabs/OptionsList'
-import ApplicationConfig from './tabs/ApplicationConfig'
 import StaticStorage from './tabs/StaticStorage'
 export default {
   components: {
@@ -70,7 +63,6 @@ export default {
     RuntimeLogs,
     SettingsForm,
     OptionsList,
-    ApplicationConfig,
     StaticStorage
   },
   computed: {
