@@ -37,12 +37,12 @@
       @onRefreshTagIds="onRefreshTagIdsFromSetting"
       @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
       @onRefreshPostMetas="onRefreshPostMetasFromSetting"
-      @onSaved="onSaved"
+      @onSaved="handleRestoreSavedStatus"
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
 
-    <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
+    <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%' }">
       <a-space>
         <ReactiveButton
           type="danger"
@@ -99,7 +99,6 @@ export default {
       selectedTagIds: [],
       selectedCategoryIds: [],
       selectedMetas: [],
-      isSaved: false,
       contentChanges: 0,
       draftSaving: false,
       previewSaving: false,
@@ -141,8 +140,6 @@ export default {
     }
 
     if (this.contentChanges <= 1) {
-      next()
-    } else if (this.isSaved) {
       next()
     } else {
       this.$confirm({
@@ -195,6 +192,9 @@ export default {
         if (draftOnly) {
           postApi
             .updateDraft(this.postToStage.id, this.postToStage.originalContent)
+            .then((response) => {
+              this.handleRestoreSavedStatus()
+            })
             .catch(() => {
               this.draftSavederrored = true
             })
@@ -206,11 +206,12 @@ export default {
         } else {
           postApi
             .update(this.postToStage.id, this.postToStage, false)
-            .catch(() => {
-              this.draftSavederrored = true
-            })
             .then((response) => {
               this.postToStage = response.data.data
+              this.handleRestoreSavedStatus()
+            })
+            .catch(() => {
+              this.draftSavederrored = true
             })
             .finally(() => {
               setTimeout(() => {
@@ -222,11 +223,12 @@ export default {
         // Create the post
         postApi
           .create(this.postToStage, false)
-          .catch(() => {
-            this.draftSavederrored = true
-          })
           .then((response) => {
             this.postToStage = response.data.data
+            this.handleRestoreSavedStatus()
+          })
+          .catch(() => {
+            this.draftSavederrored = true
           })
           .finally(() => {
             setTimeout(() => {
@@ -249,6 +251,7 @@ export default {
             .preview(this.postToStage.id)
             .then((response) => {
               window.open(response.data, '_blank')
+              this.handleRestoreSavedStatus()
             })
             .finally(() => {
               setTimeout(() => {
@@ -265,6 +268,7 @@ export default {
             .preview(this.postToStage.id)
             .then((response) => {
               window.open(response.data, '_blank')
+              this.handleRestoreSavedStatus()
             })
             .finally(() => {
               setTimeout(() => {
@@ -273,6 +277,9 @@ export default {
             })
         })
       }
+    },
+    handleRestoreSavedStatus() {
+      this.contentChanges = 0
     },
     onContentChange(val) {
       this.postToStage.originalContent = val
@@ -288,9 +295,6 @@ export default {
     },
     onRefreshPostMetasFromSetting(metas) {
       this.selectedMetas = metas
-    },
-    onSaved(isSaved) {
-      this.isSaved = isSaved
     }
   }
 }

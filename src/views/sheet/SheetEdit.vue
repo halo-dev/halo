@@ -33,7 +33,7 @@
       @close="sheetSettingVisible = false"
       @onRefreshSheet="onRefreshSheetFromSetting"
       @onRefreshSheetMetas="onRefreshSheetMetasFromSetting"
-      @onSaved="onSaved"
+      @onSaved="handleRestoreSavedStatus"
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
@@ -92,7 +92,6 @@ export default {
       sheetSettingVisible: false,
       sheetToStage: {},
       selectedMetas: [],
-      isSaved: false,
       contentChanges: 0,
       draftSaving: false,
       draftSavederrored: false,
@@ -103,9 +102,9 @@ export default {
     // Get sheetId id from query
     const sheetId = to.query.sheetId
 
-    next(vm => {
+    next((vm) => {
       if (sheetId) {
-        sheetApi.get(sheetId).then(response => {
+        sheetApi.get(sheetId).then((response) => {
           const sheet = response.data.data
           vm.sheetToStage = sheet
           vm.selectedMetas = sheet.metas
@@ -133,12 +132,10 @@ export default {
     }
     if (this.contentChanges <= 1) {
       next()
-    } else if (this.isSaved) {
-      next()
     } else {
       this.$confirm({
         title: '当前页面数据未保存，确定要离开吗？',
-        content: h => <div style="color:red;">如果离开当面页面，你的数据很可能会丢失！</div>,
+        content: (h) => <div style="color:red;">如果离开当面页面，你的数据很可能会丢失！</div>,
         onOk() {
           next()
         },
@@ -185,6 +182,9 @@ export default {
         if (draftOnly) {
           sheetApi
             .updateDraft(this.sheetToStage.id, this.sheetToStage.originalContent)
+            .then((response) => {
+              this.handleRestoreSavedStatus()
+            })
             .catch(() => {
               this.draftSavederrored = true
             })
@@ -196,11 +196,12 @@ export default {
         } else {
           sheetApi
             .update(this.sheetToStage.id, this.sheetToStage, false)
+            .then((response) => {
+              this.sheetToStage = response.data.data
+              this.handleRestoreSavedStatus()
+            })
             .catch(() => {
               this.draftSavederrored = true
-            })
-            .then(response => {
-              this.sheetToStage = response.data.data
             })
             .finally(() => {
               setTimeout(() => {
@@ -211,11 +212,12 @@ export default {
       } else {
         sheetApi
           .create(this.sheetToStage, false)
+          .then((response) => {
+            this.sheetToStage = response.data.data
+            this.handleRestoreSavedStatus()
+          })
           .catch(() => {
             this.draftSavederrored = true
-          })
-          .then(response => {
-            this.sheetToStage = response.data.data
           })
           .finally(() => {
             setTimeout(() => {
@@ -231,12 +233,13 @@ export default {
       }
       this.previewSaving = true
       if (this.sheetToStage.id) {
-        sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
+        sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then((response) => {
           this.$log.debug('Updated sheet', response.data.data)
           sheetApi
             .preview(this.sheetToStage.id)
-            .then(response => {
+            .then((response) => {
               window.open(response.data, '_blank')
+              this.handleRestoreSavedStatus()
             })
             .finally(() => {
               setTimeout(() => {
@@ -245,13 +248,14 @@ export default {
             })
         })
       } else {
-        sheetApi.create(this.sheetToStage, false).then(response => {
+        sheetApi.create(this.sheetToStage, false).then((response) => {
           this.$log.debug('Created sheet', response.data.data)
           this.sheetToStage = response.data.data
           sheetApi
             .preview(this.sheetToStage.id)
-            .then(response => {
+            .then((response) => {
               window.open(response.data, '_blank')
+              this.handleRestoreSavedStatus()
             })
             .finally(() => {
               setTimeout(() => {
@@ -261,6 +265,9 @@ export default {
         })
       }
     },
+    handleRestoreSavedStatus() {
+      this.contentChanges = 0
+    },
     onContentChange(val) {
       this.sheetToStage.originalContent = val
     },
@@ -269,9 +276,6 @@ export default {
     },
     onRefreshSheetMetasFromSetting(metas) {
       this.selectedMetas = metas
-    },
-    onSaved(isSaved) {
-      this.isSaved = isSaved
     }
   }
 }
