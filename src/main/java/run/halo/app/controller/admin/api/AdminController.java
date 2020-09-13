@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
-import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.LoginPreCheckDTO;
 import run.halo.app.model.dto.StatisticDTO;
@@ -112,28 +111,6 @@ public class AdminController {
     @Deprecated
     public void updateAdmin() {
         adminService.updateAdminAssets();
-    }
-
-    @GetMapping("spring/application.yaml")
-    @ApiOperation("Gets application config content")
-    @DisableOnCondition
-    public BaseResponse<String> getSpringApplicationConfig() {
-        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), adminService.getApplicationConfig());
-    }
-
-    @PutMapping("spring/application.yaml")
-    @ApiOperation("Updates application config content")
-    @DisableOnCondition
-    public void updateSpringApplicationConfig(@RequestParam(name = "content") String content) {
-        adminService.updateApplicationConfig(content);
-    }
-
-    @PostMapping(value = {"halo/restart", "spring/restart"})
-    @ApiOperation("Restarts halo server")
-    @DisableOnCondition
-    @Deprecated
-    public void restartApplication() {
-        throw new BadRequestException("此前的重启方案存在性能问题，故暂不支持重启功能！");
     }
 
     @GetMapping(value = "halo/logfile")
