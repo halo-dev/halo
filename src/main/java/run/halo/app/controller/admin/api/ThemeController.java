@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.annotation.DisableOnCondition;
+import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.params.ThemeContentParam;
@@ -144,6 +145,7 @@ public class ThemeController {
 
     @PostMapping("{themeId}/settings")
     @ApiOperation("Saves theme settings")
+    @CacheLock(prefix = "save_theme_setting_by_themeId")
     public void saveSettingsBy(@PathVariable("themeId") String themeId,
             @RequestBody Map<String, Object> settings) {
         themeSettingService.save(settings, themeId);
