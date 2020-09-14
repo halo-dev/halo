@@ -1,11 +1,8 @@
 package run.halo.app.service;
 
-import freemarker.template.TemplateModelException;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.ThemeSetting;
 import run.halo.app.service.base.CrudService;
 
@@ -39,7 +36,7 @@ public interface ThemeSettingService extends CrudService<ThemeSetting, Integer> 
      * @param settings theme setting map
      * @param themeId  theme id must not be blank
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE, rollbackFor = ServiceException.class)
+    @Transactional
     void save(@Nullable Map<String, Object> settings, @NonNull String themeId);
 
     /**
