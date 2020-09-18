@@ -30,7 +30,7 @@ public abstract class BaseCommentParam<COMMENT> implements InputConverter<COMMEN
     @Size(max = 255, message = "邮箱的字符长度不能超过 {max}")
     private String email;
 
-    @Size(max = 127, message = "评论者博客链接的字符长度不能超过 {max}")
+    @Size(max = 255, message = "评论者博客链接的字符长度不能超过 {max}")
     @URL(message = "博客链接格式不正确")
     private String authorUrl;
 
