@@ -130,7 +130,8 @@
         {
           "ignoreReadBeforeAssign": false
         }
-      ]
+      ],
+      "comma-dangle": 0
     }
   },
   "husky": {

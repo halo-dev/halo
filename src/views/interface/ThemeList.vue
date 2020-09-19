@@ -1,5 +1,26 @@
 <template>
-  <div>
+  <page-view
+    :title="activatedTheme?activatedTheme.name:'无'"
+    subTitle="当前启用"
+  >
+    <template slot="extra">
+      <a-button
+        key="2"
+        icon="reload"
+        :loading="themeLoading"
+        @click="handleReload"
+      >
+        刷新
+      </a-button>
+      <a-button
+        key="1"
+        type="primary"
+        icon="plus"
+        @click="uploadThemeVisible = true"
+      >
+        安装
+      </a-button>
+    </template>
     <a-row
       :gutter="12"
       type="flex"
@@ -26,7 +47,7 @@
                   :alt="item.name"
                   :src="item.screenshots || '/images/placeholder.jpg'"
                   loading="lazy"
-                >
+                />
               </div>
               <template
                 class="ant-card-actions"
@@ -112,35 +133,6 @@
       @close="onThemeSettingsClose"
     />
 
-    <div style="position: fixed;bottom: 30px;right: 30px;">
-      <a-dropdown
-        placement="topLeft"
-        :trigger="['click']"
-      >
-        <a-button
-          type="primary"
-          shape="circle"
-          icon="plus"
-          size="large"
-        ></a-button>
-        <a-menu slot="overlay">
-          <a-menu-item>
-            <a
-              rel="noopener noreferrer"
-              href="javascript:void(0);"
-              @click="uploadThemeVisible = true"
-            >安装主题</a>
-          </a-menu-item>
-          <a-menu-item>
-            <a
-              rel="noopener noreferrer"
-              href="javascript:void(0);"
-              @click="handleReload"
-            >刷新列表</a>
-          </a-menu-item>
-        </a-menu>
-      </a-dropdown>
-    </div>
     <a-modal
       title="安装主题"
       v-model="uploadThemeVisible"
@@ -162,8 +154,7 @@
               label="点击选择主题包或将主题包拖拽到此处<br>仅支持 ZIP 格式的文件"
               :uploadHandler="uploadHandler"
               @success="handleUploadSuccess"
-            >
-            </FilePondUpload>
+            ></FilePondUpload>
             <a-alert
               type="info"
               closable
@@ -255,7 +246,7 @@
             >
               <template slot="message">
                 远程地址即主题仓库地址，使用这种方式安装的一般为开发版本，请谨慎使用。
-                <br>更多主题请访问：
+                <br />更多主题请访问：
                 <a
                   target="_blank"
                   href="https://halo.run/p/themes"
@@ -282,18 +273,20 @@
         :filed="prepareUpdateTheme.id"
         :multiple="false"
         @success="handleUploadSuccess"
-      >
-      </FilePondUpload>
+      ></FilePondUpload>
     </a-modal>
-  </div>
+  </page-view>
 </template>
 
 <script>
 import ThemeSettingDrawer from './components/ThemeSettingDrawer'
+import { PageView } from '@/layouts'
 import themeApi from '@/api/theme'
+
 export default {
   components: {
-    ThemeSettingDrawer
+    PageView,
+    ThemeSettingDrawer,
   },
   data() {
     return {
@@ -311,21 +304,24 @@ export default {
       fetchingUrl: null,
       uploadHandler: themeApi.upload,
       updateByUploadHandler: themeApi.updateByUpload,
-      prepareUpdateTheme: {}
+      prepareUpdateTheme: {},
+      activatedTheme: null,
     }
   },
   computed: {
     sortedThemes() {
       const data = this.themes.slice(0)
-      return data.sort(function(a, b) {
+      return data.sort((a, b) => {
         return b.activated - a.activated
       })
-    }
+    },
   },
   created() {
     this.handleListThemes()
+    this.handleGetActivatedTheme()
   },
   destroyed: function() {
+    this.$log.debug('Theme list destroyed.')
     if (this.themeSettingVisible) {
       this.themeSettingVisible = false
     }
@@ -337,11 +333,16 @@ export default {
     next()
   },
   methods: {
+    handleGetActivatedTheme() {
+      themeApi.getActivatedTheme().then((response) => {
+        this.activatedTheme = response.data.data
+      })
+    },
     handleListThemes() {
       this.themeLoading = true
       themeApi
         .listAll()
-        .then(response => {
+        .then((response) => {
           this.themes = response.data.data
         })
         .finally(() => {
@@ -351,15 +352,20 @@ export default {
         })
     },
     handleActiveTheme(theme) {
-      themeApi.active(theme.id).finally(() => {
-        this.handleListThemes()
-      })
+      themeApi
+        .active(theme.id)
+        .finally(() => {
+          this.handleListThemes()
+        })
+        .finally(() => {
+          this.handleGetActivatedTheme()
+        })
     },
     handleUpdateTheme(themeId) {
       const hide = this.$message.loading('更新中...', 0)
       themeApi
         .update(themeId)
-        .then(response => {
+        .then((response) => {
           this.$message.success('更新成功！')
         })
         .finally(() => {
@@ -370,7 +376,7 @@ export default {
     handleDeleteTheme(themeId) {
       themeApi
         .delete(themeId)
-        .then(response => {
+        .then((response) => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
@@ -396,18 +402,18 @@ export default {
       if (!this.fetchingUrl) {
         this.$notification['error']({
           message: '提示',
-          description: '远程地址不能为空！'
+          description: '远程地址不能为空！',
         })
         return
       }
       this.fetchButtonLoading = true
-      themeApi.fetchingBranches(this.fetchingUrl).then(response => {
+      themeApi.fetchingBranches(this.fetchingUrl).then((response) => {
         this.branches = response.data.data
         this.fetchBranches = true
       })
       themeApi
         .fetchingReleases(this.fetchingUrl)
-        .then(response => {
+        .then((response) => {
           this.releases = response.data.data
         })
         .finally(() => {
@@ -419,7 +425,7 @@ export default {
     handleBranchFetching() {
       themeApi
         .fetchingBranch(this.fetchingUrl, this.branches[this.selectedBranch].branch)
-        .then(response => {
+        .then((response) => {
           this.$message.success('拉取成功')
           this.uploadThemeVisible = false
         })
@@ -430,7 +436,7 @@ export default {
     handleReleaseFetching() {
       themeApi
         .fetchingRelease(this.fetchingUrl, this.releases[this.selectedBranch].branch)
-        .then(response => {
+        .then((response) => {
           this.$message.success('拉取成功')
           this.uploadThemeVisible = false
         })
@@ -460,7 +466,7 @@ export default {
         onOk() {
           _this.handleDeleteTheme(item.id)
         },
-        onCancel() {}
+        onCancel() {},
       })
     },
     handleConfirmUpdate(item) {
@@ -472,7 +478,7 @@ export default {
         onOk() {
           that.handleUpdateTheme(item.id)
         },
-        onCancel() {}
+        onCancel() {},
       })
     },
     onSelectChange(value) {
@@ -496,7 +502,7 @@ export default {
     onThemeSettingsClose() {
       this.themeSettingVisible = false
       this.selectedTheme = {}
-    }
-  }
+    },
+  },
 }
 </script>

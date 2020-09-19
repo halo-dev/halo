@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row :gutter="12">
       <a-col
         :xl="10"
@@ -227,73 +227,74 @@
         </a-card>
       </a-col>
     </a-row>
-  </div>
+  </page-view>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import MenuSelectTree from './components/MenuSelectTree'
+import { PageView } from '@/layouts'
 import menuApi from '@/api/menu'
 const columns = [
   {
     title: '名称',
     dataIndex: 'name',
     ellipsis: true,
-    scopedSlots: { customRender: 'name' }
+    scopedSlots: { customRender: 'name' },
   },
   {
     title: '地址',
     ellipsis: true,
-    dataIndex: 'url'
+    dataIndex: 'url',
   },
   {
     title: '分组',
     ellipsis: true,
-    dataIndex: 'team'
+    dataIndex: 'team',
   },
   {
     title: '排序',
-    dataIndex: 'priority'
+    dataIndex: 'priority',
   },
   {
     title: '操作',
     key: 'action',
-    scopedSlots: { customRender: 'action' }
-  }
+    scopedSlots: { customRender: 'action' },
+  },
 ]
 export default {
-  components: { MenuSelectTree },
+  components: { MenuSelectTree, PageView },
   mixins: [mixin, mixinDevice],
   data() {
     return {
       table: {
         columns,
         data: [],
-        loading: false
+        loading: false,
       },
       form: {
         model: {
-          target: '_self'
+          target: '_self',
         },
         saving: false,
         errored: false,
         rules: {
           name: [
             { required: true, message: '* 菜单名称不能为空', trigger: ['change'] },
-            { max: 50, message: '* 菜单名称的字符长度不能超过 50', trigger: ['change'] }
+            { max: 50, message: '* 菜单名称的字符长度不能超过 50', trigger: ['change'] },
           ],
           url: [
             { required: true, message: '* 菜单地址不能为空', trigger: ['change'] },
-            { max: 1023, message: '* 菜单地址的字符长度不能超过 1023', trigger: ['change'] }
+            { max: 1023, message: '* 菜单地址的字符长度不能超过 1023', trigger: ['change'] },
           ],
           icon: [{ max: 50, message: '* 菜单图标的字符长度不能超过 50', trigger: ['change'] }],
-          team: [{ max: 255, message: '* 菜单分组的字符长度不能超过 255', trigger: ['change'] }]
+          team: [{ max: 255, message: '* 菜单分组的字符长度不能超过 255', trigger: ['change'] }],
         },
-        moreField: false
+        moreField: false,
       },
       teams: {
-        data: []
-      }
+        data: [],
+      },
     }
   },
   computed: {
@@ -305,7 +306,7 @@ export default {
     },
     isUpdateMode() {
       return !!this.form.model.id
-    }
+    },
   },
   created() {
     this.handleListMenus()
@@ -316,7 +317,7 @@ export default {
       this.table.loading = true
       menuApi
         .listTree()
-        .then(response => {
+        .then((response) => {
           this.table.data = response.data.data
         })
         .finally(() => {
@@ -326,14 +327,14 @@ export default {
         })
     },
     handleListTeams() {
-      menuApi.listTeams().then(response => {
+      menuApi.listTeams().then((response) => {
         this.teams.data = response.data.data
       })
     },
     handleDeleteMenu(id) {
       menuApi
         .delete(id)
-        .then(response => {
+        .then((response) => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
@@ -343,7 +344,7 @@ export default {
     },
     handleCreateOrUpdateMenu() {
       const _this = this
-      _this.$refs.menuForm.validate(valid => {
+      _this.$refs.menuForm.validate((valid) => {
         if (valid) {
           _this.form.saving = true
           if (_this.isUpdateMode) {
@@ -381,7 +382,7 @@ export default {
         _this.handleListMenus()
         _this.handleListTeams()
       }
-    }
-  }
+    },
+  },
 }
 </script>

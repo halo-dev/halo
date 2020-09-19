@@ -26,6 +26,7 @@ import {
   Menu,
   Modal,
   notification,
+  PageHeader,
   Pagination,
   Popconfirm,
   Popover,
@@ -78,6 +79,7 @@ Vue.use(List)
 Vue.use(LocaleProvider)
 Vue.use(Menu)
 Vue.use(Modal)
+Vue.use(PageHeader)
 Vue.use(Pagination)
 Vue.use(Popconfirm)
 Vue.use(Popover)

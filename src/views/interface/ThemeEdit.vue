@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row :gutter="12">
       <a-col
         :xl="6"
@@ -70,18 +70,20 @@
         </a-card>
       </a-col>
     </a-row>
-  </div>
+  </page-view>
 </template>
 
 <script>
 import themeApi from '@/api/theme'
 import ThemeFile from './components/ThemeFile'
+import { PageView } from '@/layouts'
 import { codemirror } from 'vue-codemirror-lite'
 import 'codemirror/mode/htmlmixed/htmlmixed.js'
 export default {
   components: {
     codemirror,
-    ThemeFile
+    ThemeFile,
+    PageView,
   },
   data() {
     return {
@@ -90,7 +92,7 @@ export default {
         tabSize: 4,
         mode: 'text/html',
         lineNumbers: true,
-        line: true
+        line: true,
       },
       files: [],
       filesLoading: false,
@@ -100,7 +102,7 @@ export default {
       themesLoading: false,
       selectedTheme: {},
       saving: false,
-      saveErrored: false
+      saveErrored: false,
     }
   },
   created() {
@@ -110,7 +112,7 @@ export default {
   },
   methods: {
     handleGetActivatedTheme() {
-      themeApi.getActivatedTheme().then(response => {
+      themeApi.getActivatedTheme().then((response) => {
         this.selectedTheme = response.data.data
       })
     },
@@ -118,7 +120,7 @@ export default {
       this.filesLoading = true
       themeApi
         .listFilesActivated()
-        .then(response => {
+        .then((response) => {
           this.files = response.data.data
         })
         .finally(() => {
@@ -131,7 +133,7 @@ export default {
       this.themesLoading = true
       themeApi
         .listAll()
-        .then(response => {
+        .then((response) => {
           this.themes = response.data.data
         })
         .finally(() => {
@@ -145,7 +147,7 @@ export default {
       this.filesLoading = true
       themeApi
         .listFiles(themeId)
-        .then(response => {
+        .then((response) => {
           this.files = response.data.data
           this.content = ''
           this.file = {}
@@ -178,10 +180,10 @@ export default {
             _this.content = ''
             _this.file = {}
             _this.buttonDisabled = true
-          }
+          },
         })
       }
-      themeApi.getContent(this.selectedTheme.id, file.path).then(response => {
+      themeApi.getContent(this.selectedTheme.id, file.path).then((response) => {
         this.content = response.data.data
         this.file = file
         this.buttonDisabled = false
@@ -199,7 +201,7 @@ export default {
             this.saving = false
           }, 400)
         })
-    }
-  }
+    },
+  },
 }
 </script>

@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import { BasicLayout, PageView } from '@/layouts'
+import { BasicLayout, PageView, BlankLayout } from '@/layouts'
 
 export const asyncRouterMap = [
   {
@@ -116,7 +116,7 @@ export const asyncRouterMap = [
       {
         path: '/interface',
         name: 'Interface',
-        component: PageView,
+        component: BlankLayout,
         redirect: '/interface/themes',
         meta: { title: '外观', icon: 'skin' },
         children: [
