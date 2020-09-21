@@ -58,9 +58,6 @@ public class HaloConfiguration {
             case "redis":
                 stringCacheStore = new RedisCacheStore(this.haloProperties);
                 break;
-            case "hazelcast":
-                stringCacheStore = new HazelcastStore(this.haloProperties);
-                break;
             case "memory":
             default:
                 //memory or default
