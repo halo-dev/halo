@@ -208,21 +208,30 @@
           loadedText="保存成功"
           erroredText="保存失败"
         ></ReactiveButton>
-        <ReactiveButton
-          @click="handlePublishClick"
-          @callback="handleSavedCallback"
-          :loading="saving"
-          :errored="savedErrored"
-          :text="`${selectedSheet.id?'保存':'发布'}`"
-          :loadedText="`${selectedSheet.id?'保存':'发布'}成功`"
-          :erroredText="`${selectedSheet.id?'保存':'发布'}失败`"
-        ></ReactiveButton>
+
+        <a-popconfirm
+          title="是否同时更新发布时间为当前时间？"
+          ok-text="更新"
+          cancel-text="不更新"
+          @confirm="handlePublishClick(true)"
+          @cancel="handlePublishClick(false)"
+          :disabled="selectedSheet.status !== 'DRAFT'"
+        >
+          <ReactiveButton
+            @click="selectedSheet.status !== 'DRAFT'?handlePublishClick(false):()=>{}"
+            @callback="handleSavedCallback"
+            :loading="saving"
+            :errored="savedErrored"
+            :text="`${selectedSheet.id?'保存':'发布'}`"
+            :loadedText="`${selectedSheet.id?'保存':'发布'}成功`"
+            :erroredText="`${selectedSheet.id?'保存':'发布'}失败`"
+          ></ReactiveButton>
+        </a-popconfirm>
       </a-space>
     </div>
   </a-drawer>
 </template>
 <script>
-
 // libs
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import moment from 'moment'
@@ -245,33 +254,33 @@ export default {
       saving: false,
       savedErrored: false,
       draftSaving: false,
-      draftSavedErrored: false
+      draftSavedErrored: false,
     }
   },
   props: {
     sheet: {
       type: Object,
-      required: true
+      required: true,
     },
     metas: {
       type: Array,
-      required: true
+      required: true,
     },
     needTitle: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
     saveDraftButton: {
       type: Boolean,
       required: false,
-      default: true
+      default: true,
     },
     visible: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: true,
+    },
   },
   watch: {
     sheet(val) {
@@ -282,7 +291,7 @@ export default {
     },
     selectedMetas(val) {
       this.$emit('onRefreshSheetMetas', val)
-    }
+    },
   },
   computed: {
     ...mapGetters(['options']),
@@ -301,7 +310,7 @@ export default {
       const sheetPrefix = this.options.sheet_prefix
       const pathSuffix = this.options.path_suffix ? this.options.path_suffix : ''
       return `${blogUrl}/${sheetPrefix}/${this.selectedSheet.slug ? this.selectedSheet.slug : '{slug}'}${pathSuffix}`
-    }
+    },
   },
   methods: {
     handleAfterVisibleChanged(visible) {
@@ -313,13 +322,13 @@ export default {
     },
     handleListPresetMetasField() {
       if (this.metas.length <= 0) {
-        themeApi.getActivatedTheme().then(response => {
+        themeApi.getActivatedTheme().then((response) => {
           const fields = response.data.data.sheetMetaField
           if (fields && fields.length > 0) {
             for (let i = 0, len = fields.length; i < len; i++) {
               this.selectedMetas.push({
                 value: '',
-                key: fields[i]
+                key: fields[i],
               })
             }
           }
@@ -330,7 +339,7 @@ export default {
       this.customTplsLoading = true
       themeApi
         .customSheetTpls()
-        .then(response => {
+        .then((response) => {
           this.customTpls = response.data.data
         })
         .finally(() => {
@@ -343,7 +352,10 @@ export default {
       this.selectedSheet.thumbnail = encodeURI(data.path)
       this.thumbDrawerVisible = false
     },
-    handlePublishClick() {
+    handlePublishClick(refreshCreateTime = false) {
+      if (refreshCreateTime) {
+        this.selectedSheet.createTime = new Date()
+      }
       this.selectedSheet.status = 'PUBLISHED'
       this.createOrUpdateSheet()
     },
@@ -355,7 +367,7 @@ export default {
       if (!this.selectedSheet.title) {
         this.$notification['error']({
           message: '提示',
-          description: '页面标题不能为空！'
+          description: '页面标题不能为空！',
         })
         return
       }
@@ -391,7 +403,7 @@ export default {
               this.savedErrored = true
             }
           })
-          .then(response => {
+          .then((response) => {
             this.selectedSheet = response.data.data
           })
           .finally(() => {
@@ -429,7 +441,7 @@ export default {
     handleInsertSheetMeta() {
       this.selectedMetas.push({
         value: '',
-        key: ''
+        key: '',
       })
     },
     handleSetPinyinSlug() {
@@ -438,7 +450,7 @@ export default {
           this.$set(this.selectedSheet, 'slug', pinyin.convertToPinyin(this.selectedSheet.title, '-', true))
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>

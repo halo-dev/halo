@@ -292,15 +292,24 @@
           loadedText="保存成功"
           erroredText="保存失败"
         ></ReactiveButton>
-        <ReactiveButton
-          @click="handlePublishClick"
-          @callback="handleSavedCallback"
-          :loading="saving"
-          :errored="savedErrored"
-          :text="`${selectedPost.id?'保存':'发布'}`"
-          :loadedText="`${selectedPost.id?'保存':'发布'}成功`"
-          :erroredText="`${selectedPost.id?'保存':'发布'}失败`"
-        ></ReactiveButton>
+        <a-popconfirm
+          title="是否同时更新发布时间为当前时间？"
+          ok-text="更新"
+          cancel-text="不更新"
+          @confirm="handlePublishClick(true)"
+          @cancel="handlePublishClick(false)"
+          :disabled="selectedPost.status !== 'DRAFT'"
+        >
+          <ReactiveButton
+            @click="selectedPost.status !== 'DRAFT'?handlePublishClick(false):()=>{}"
+            @callback="handleSavedCallback"
+            :loading="saving"
+            :errored="savedErrored"
+            :text="`${selectedPost.id?'保存':'发布'}`"
+            :loadedText="`${selectedPost.id?'保存':'发布'}成功`"
+            :erroredText="`${selectedPost.id?'保存':'发布'}失败`"
+          ></ReactiveButton>
+        </a-popconfirm>
       </a-space>
     </div>
   </a-drawer>
@@ -329,7 +338,7 @@ export default {
   components: {
     CategoryTree,
     CategorySelectTree,
-    TagSelect
+    TagSelect,
   },
   data() {
     return {
@@ -345,41 +354,41 @@ export default {
       saving: false,
       savedErrored: false,
       draftSaving: false,
-      draftSavedErrored: false
+      draftSavedErrored: false,
     }
   },
   props: {
     post: {
       type: Object,
-      required: true
+      required: true,
     },
     tagIds: {
       type: Array,
-      required: true
+      required: true,
     },
     categoryIds: {
       type: Array,
-      required: true
+      required: true,
     },
     metas: {
       type: Array,
-      required: true
+      required: true,
     },
     needTitle: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
     saveDraftButton: {
       type: Boolean,
       required: false,
-      default: true
+      default: true,
     },
     visible: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: true,
+    },
   },
   watch: {
     post(val) {
@@ -402,7 +411,7 @@ export default {
     },
     selectedMetas(val) {
       this.$emit('onRefreshPostMetas', val)
-    }
+    },
   },
   computed: {
     ...mapGetters(['options']),
@@ -441,7 +450,7 @@ export default {
         default:
           return ''
       }
-    }
+    },
   },
   methods: {
     handleAfterVisibleChanged(visible) {
@@ -465,7 +474,7 @@ export default {
             for (let i = 0, len = fields.length; i < len; i++) {
               this.selectedMetas.push({
                 value: '',
-                key: fields[i]
+                key: fields[i],
               })
             }
           }
@@ -485,7 +494,7 @@ export default {
       if (!this.categoryToCreate.name) {
         this.$notification['error']({
           message: '提示',
-          description: '分类名称不能为空！'
+          description: '分类名称不能为空！',
         })
         return
       }
@@ -503,8 +512,8 @@ export default {
       this.selectedPost.status = 'DRAFT'
       this.createOrUpdatePost()
     },
-    handlePublishClick() {
-      if (this.selectedPost.status === 'DRAFT') {
+    handlePublishClick(refreshCreateTime = false) {
+      if (refreshCreateTime) {
         this.selectedPost.createTime = new Date()
       }
       this.selectedPost.status = 'PUBLISHED'
@@ -514,7 +523,7 @@ export default {
       if (!this.selectedPost.title) {
         this.$notification['error']({
           message: '提示',
-          description: '文章标题不能为空！'
+          description: '文章标题不能为空！',
         })
         return
       }
@@ -595,7 +604,7 @@ export default {
     handleInsertPostMeta() {
       this.selectedMetas.push({
         value: '',
-        key: ''
+        key: '',
       })
     },
     handleSetPinyinSlug() {
@@ -604,7 +613,7 @@ export default {
           this.$set(this.selectedPost, 'slug', pinyin.convertToPinyin(this.selectedPost.title, '-', true))
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>
