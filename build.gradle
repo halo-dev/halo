@@ -38,7 +38,7 @@ configurations {
 bootJar {
     manifest {
         attributes("Implementation-Title": "Halo Application",
-                "Implementation-Version": archiveVersion)
+                "Implementation-Version": version)
     }
 }
 
@@ -67,7 +67,6 @@ ext {
     githubApiVersion = "1.84"
     powermockVersion = "1.6.6"
     powermockApiMockito2 = "2.0.7"
-    hzVersion = "3.12"
 }
 
 dependencies {
@@ -119,7 +118,6 @@ dependencies {
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     implementation "redis.clients:jedis:$jedisVersion"
-    implementation "com.hazelcast:hazelcast-all:$hzVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly "mysql:mysql-connector-java"
 

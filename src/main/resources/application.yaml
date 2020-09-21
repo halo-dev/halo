@@ -52,8 +52,4 @@ logging:
 
 halo:
   download-timeout: 5m
-  cache: memory #hazelcast
-  ##hazelcast configs##
-  #hazelcastMembers: 127.0.0.1:22055 #127.0.0.1:5701 #10.4.5.100:5701,10.4.5.101:5701,10.4.5.102:5701
-  #hazelcastGroupName: tt-mps-hz-cluster #halo-hz-cluster
-  #initialBackoffSeconds: 5
+  cache: memory
