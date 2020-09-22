@@ -105,6 +105,11 @@ Vue.use(Empty)
 Vue.use(Result)
 Vue.use(Space)
 
+// message config
+message.config({
+  maxCount: 1
+})
+
 Vue.prototype.$message = message
 Vue.prototype.$notification = notification
 Vue.prototype.$info = Modal.info

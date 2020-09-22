@@ -7,8 +7,8 @@
       <a-button
         key="2"
         icon="reload"
-        :loading="themeLoading"
-        @click="handleReload"
+        :loading="list.loading"
+        @click="handleRefreshThemesCache"
       >
         刷新
       </a-button>
@@ -16,7 +16,7 @@
         key="1"
         type="primary"
         icon="plus"
-        @click="uploadThemeVisible = true"
+        @click="installModal.visible = true"
       >
         安装
       </a-button>
@@ -30,7 +30,7 @@
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 1, md: 2, lg: 4, xl: 4, xxl: 4 }"
           :dataSource="sortedThemes"
-          :loading="themeLoading"
+          :loading="list.loading"
         >
           <a-list-item
             slot="renderItem"
@@ -69,7 +69,7 @@
                     style="margin-right:3px"
                   />启用
                 </div>
-                <div @click="handleShowThemeSetting(item)">
+                <div @click="handleOpenThemeSettingDrawer(item)">
                   <a-icon
                     type="setting"
                     style="margin-right:3px"
@@ -102,7 +102,7 @@
                     <a-menu-item
                       :key="2"
                       v-if="item.repo"
-                      @click="handleConfirmUpdate(item)"
+                      @click="handleConfirmRemoteUpdate(item)"
                     >
                       <a-icon
                         type="cloud"
@@ -111,7 +111,7 @@
                     </a-menu-item>
                     <a-menu-item
                       :key="3"
-                      @click="handleShowUpdateNewThemeModal(item)"
+                      @click="handleOpenLocalUpdateModal(item)"
                     >
                       <a-icon
                         type="file"
@@ -128,18 +128,18 @@
     </a-row>
 
     <ThemeSettingDrawer
-      :theme="selectedTheme"
-      v-model="themeSettingVisible"
-      @close="onThemeSettingsClose"
+      :theme="themeSettingDrawer.selected"
+      v-model="themeSettingDrawer.visible"
+      @close="onThemeSettingsDrawerClose"
     />
 
     <a-modal
       title="安装主题"
-      v-model="uploadThemeVisible"
+      v-model="installModal.visible"
       destroyOnClose
       :footer="null"
       :bodyStyle="{ padding: '0 24px 24px' }"
-      :afterClose="onThemeUploadClose"
+      :afterClose="onThemeInstallModalClose"
     >
       <div class="custom-tab-wrapper">
         <a-tabs>
@@ -152,8 +152,8 @@
               name="file"
               accept="application/zip"
               label="点击选择主题包或将主题包拖拽到此处<br>仅支持 ZIP 格式的文件"
-              :uploadHandler="uploadHandler"
-              @success="handleUploadSuccess"
+              :uploadHandler="installModal.local.uploadHandler"
+              @success="handleUploadSucceed"
             ></FilePondUpload>
             <a-alert
               type="info"
@@ -172,84 +172,94 @@
             tab="远程拉取"
             key="2"
           >
-            <a-form
-              v-if="!fetchBranches"
+            <a-form-model
+              ref="remoteInstallForm"
+              :model="installModal.remote"
+              :rules="installModal.remote.rules"
               layout="vertical"
             >
-              <a-form-item label="远程地址：">
-                <a-input v-model="fetchingUrl" />
-              </a-form-item>
-              <a-form-item>
-                <a-button
+              <a-form-model-item
+                prop="url"
+                label="Github 仓库地址："
+              >
+                <a-input-search
+                  v-model="installModal.remote.url"
+                  enter-button="获取版本"
+                  @search="handleFetching"
+                  :loading="installModal.remote.repoFetching"
+                />
+              </a-form-model-item>
+              <a-form-model-item label="版本类型：">
+                <a-select v-model="installModal.remote.byBranchOrRelease">
+                  <a-select-option value="release">发行版</a-select-option>
+                  <a-select-option value="branch">开发版</a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item
+                label="版本："
+                v-show="installModal.remote.byBranchOrRelease ==='release'"
+              >
+                <a-select
+                  v-model="installModal.remote.selectedRelease"
+                  :loading="installModal.remote.repoFetching"
+                >
+                  <a-select-option
+                    v-for="(item, index) in installModal.remote.releases"
+                    :key="index"
+                    :value="item.branch"
+                  >{{ item.branch }}</a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item
+                label="分支："
+                v-show="installModal.remote.byBranchOrRelease ==='branch'"
+              >
+                <a-select
+                  v-model="installModal.remote.selectedBranch"
+                  :loading="installModal.remote.repoFetching"
+                >
+                  <a-select-option
+                    v-for="(item, index) in installModal.remote.branches"
+                    :key="index"
+                    :value="item.branch"
+                  >{{ item.branch }}</a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item v-show="installModal.remote.byBranchOrRelease ==='release'">
+                <ReactiveButton
+                  :disabled="!installModal.remote.selectedRelease"
                   type="primary"
-                  @click="handleFetching"
-                  :loading="fetchButtonLoading"
-                >获取</a-button>
-              </a-form-item>
-            </a-form>
-            <a-tabs v-else>
-              <a-tab-pane
-                tab="稳定版"
-                key="1"
-              >
-                <a-form layout="vertical">
-                  <a-form-item>
-                    <a-select
-                      style="width: 120px"
-                      @change="onSelectChange"
-                    >
-                      <a-select-option
-                        v-for="(item, index) in releases"
-                        :key="index"
-                        :value="index"
-                      >{{ item.branch }}</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                  <a-form-item>
-                    <a-button
-                      type="primary"
-                      @click="handleReleaseFetching"
-                    >下载</a-button>
-                  </a-form-item>
-                </a-form>
-              </a-tab-pane>
-              <a-tab-pane
-                tab="开发版"
-                key="2"
-              >
-                <a-form layout="vertical">
-                  <a-form-item>
-                    <a-select
-                      style="width: 120px"
-                      @change="onSelectChange"
-                    >
-                      <a-select-option
-                        v-for="(item, index) in branches"
-                        :key="index"
-                        :value="index"
-                      >{{ item.branch }}</a-select-option>
-                    </a-select>
-                  </a-form-item>
-                  <a-form-item>
-                    <a-button
-                      type="primary"
-                      @click="handleBranchFetching"
-                    >下载</a-button>
-                  </a-form-item>
-                </a-form>
-              </a-tab-pane>
-            </a-tabs>
-
+                  @click="handleReleaseDownloading"
+                  @callback="handleReleaseDownloadedCallback"
+                  :loading="installModal.remote.releaseDownloading"
+                  :errored="installModal.remote.releaseDownloadErrored"
+                  text="下载"
+                  loadedText="下载成功"
+                  erroredText="下载失败"
+                ></ReactiveButton>
+              </a-form-model-item>
+              <a-form-model-item v-show="installModal.remote.byBranchOrRelease ==='branch'">
+                <ReactiveButton
+                  type="primary"
+                  @click="handleBranchPulling"
+                  @callback="handleBranchPulledCallback"
+                  :loading="installModal.remote.branchPulling"
+                  :errored="installModal.remote.branchPullErrored"
+                  text="下载"
+                  loadedText="下载成功"
+                  erroredText="下载失败"
+                ></ReactiveButton>
+              </a-form-model-item>
+            </a-form-model>
             <a-alert
               type="info"
               closable
             >
               <template slot="message">
-                远程地址即主题仓库地址，使用这种方式安装的一般为开发版本，请谨慎使用。
-                <br />更多主题请访问：
+                远程地址即主题仓库地址，建议使用发行版本。更多主题请访问：
                 <a
                   target="_blank"
-                  href="https://halo.run/p/themes"
+                  href="https://halo.run/p/themes.html"
                 >https://halo.run/p/themes</a>
               </template>
             </a-alert>
@@ -259,20 +269,20 @@
     </a-modal>
     <a-modal
       title="更新主题"
-      v-model="uploadNewThemeVisible"
+      v-model="localUpdateModel.visible"
       :footer="null"
       destroyOnClose
-      :afterClose="onThemeUploadClose"
+      :afterClose="onThemeInstallModalClose"
     >
       <FilePondUpload
         ref="updateByupload"
         name="file"
         accept="application/zip"
         label="点击选择主题更新包或将主题更新包拖拽到此处<br>仅支持 ZIP 格式的文件"
-        :uploadHandler="updateByUploadHandler"
-        :filed="prepareUpdateTheme.id"
+        :uploadHandler="localUpdateModel.uploadHandler"
+        :filed="localUpdateModel.selected.id"
         :multiple="false"
-        @success="handleUploadSuccess"
+        @success="handleUploadSucceed"
       ></FilePondUpload>
     </a-modal>
   </page-view>
@@ -290,172 +300,194 @@ export default {
   },
   data() {
     return {
-      themeLoading: false,
-      uploadThemeVisible: false,
-      uploadNewThemeVisible: false,
-      fetchButtonLoading: false,
-      fetchBranches: false,
-      themes: [],
-      branches: [],
-      releases: [],
-      themeSettingVisible: false,
-      selectedTheme: {},
-      selectedBranch: null,
-      fetchingUrl: null,
-      uploadHandler: themeApi.upload,
-      updateByUploadHandler: themeApi.updateByUpload,
-      prepareUpdateTheme: {},
-      activatedTheme: null,
+      list: {
+        loading: false,
+        data: [],
+      },
+
+      installModal: {
+        visible: false,
+        local: {
+          uploadHandler: themeApi.upload,
+        },
+
+        remote: {
+          url: null,
+
+          repoFetching: false,
+          repoFetchErrored: false,
+
+          branches: [],
+          selectedBranch: null,
+          branchPulling: false,
+          branchPullErrored: false,
+
+          releases: [],
+          selectedRelease: null,
+          releaseDownloading: false,
+          releaseDownloadErrored: false,
+
+          byBranchOrRelease: 'release', // release or branch, default is release
+
+          rules: {
+            url: [{ required: true, message: '* Github 仓库地址不能为空', trigger: ['change'] }],
+          },
+        },
+      },
+
+      localUpdateModel: {
+        visible: false,
+        uploadHandler: themeApi.updateByUpload,
+        selected: {},
+      },
+
+      themeSettingDrawer: {
+        visible: false,
+        selected: {},
+      },
     }
   },
   computed: {
     sortedThemes() {
-      const data = this.themes.slice(0)
+      const data = this.list.data.slice(0)
       return data.sort((a, b) => {
         return b.activated - a.activated
       })
     },
+    activatedTheme() {
+      if (this.sortedThemes.length > 0) {
+        return this.sortedThemes[0]
+      }
+      return null
+    },
   },
-  created() {
+  beforeMount() {
     this.handleListThemes()
-    this.handleGetActivatedTheme()
   },
-  destroyed: function() {
+  destroyed() {
     this.$log.debug('Theme list destroyed.')
-    if (this.themeSettingVisible) {
-      this.themeSettingVisible = false
-    }
+    this.themeSettingDrawer.visible = false
+    this.installModal.visible = false
+    this.localUpdateModel.visible = false
   },
   beforeRouteLeave(to, from, next) {
-    if (this.themeSettingVisible) {
-      this.themeSettingVisible = false
-    }
+    this.themeSettingDrawer.visible = false
+    this.installModal.visible = false
+    this.localUpdateModel.visible = false
     next()
   },
   methods: {
-    handleGetActivatedTheme() {
-      themeApi.getActivatedTheme().then((response) => {
-        this.activatedTheme = response.data.data
-      })
-    },
     handleListThemes() {
-      this.themeLoading = true
+      this.list.loading = true
       themeApi
         .listAll()
         .then((response) => {
-          this.themes = response.data.data
+          this.list.data = response.data.data
         })
         .finally(() => {
           setTimeout(() => {
-            this.themeLoading = false
+            this.list.loading = false
           }, 200)
         })
     },
-    handleActiveTheme(theme) {
-      themeApi
-        .active(theme.id)
-        .finally(() => {
-          this.handleListThemes()
-        })
-        .finally(() => {
-          this.handleGetActivatedTheme()
-        })
-    },
-    handleUpdateTheme(themeId) {
-      const hide = this.$message.loading('更新中...', 0)
-      themeApi
-        .update(themeId)
-        .then((response) => {
-          this.$message.success('更新成功！')
-        })
-        .finally(() => {
-          hide()
-          this.handleListThemes()
-        })
-    },
-    handleDeleteTheme(themeId) {
-      themeApi
-        .delete(themeId)
-        .then((response) => {
-          this.$message.success('删除成功！')
-        })
-        .finally(() => {
-          this.handleListThemes()
-        })
-    },
-    handleUploadSuccess() {
-      if (this.uploadThemeVisible) {
-        this.uploadThemeVisible = false
-      }
-      if (this.uploadNewThemeVisible) {
-        this.uploadNewThemeVisible = false
-      }
-      if (this.fetchBranches) {
-        this.fetchBranches = false
-      }
-      this.handleListThemes()
-    },
-    handleEditClick(theme) {
-      this.settingDrawer(theme)
-    },
-    handleFetching() {
-      if (!this.fetchingUrl) {
-        this.$notification['error']({
-          message: '提示',
-          description: '远程地址不能为空！',
-        })
-        return
-      }
-      this.fetchButtonLoading = true
-      themeApi.fetchingBranches(this.fetchingUrl).then((response) => {
-        this.branches = response.data.data
-        this.fetchBranches = true
-      })
-      themeApi
-        .fetchingReleases(this.fetchingUrl)
-        .then((response) => {
-          this.releases = response.data.data
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.fetchButtonLoading = false
-          }, 400)
-        })
-    },
-    handleBranchFetching() {
-      themeApi
-        .fetchingBranch(this.fetchingUrl, this.branches[this.selectedBranch].branch)
-        .then((response) => {
-          this.$message.success('拉取成功')
-          this.uploadThemeVisible = false
-        })
-        .finally(() => {
-          this.handleListThemes()
-        })
-    },
-    handleReleaseFetching() {
-      themeApi
-        .fetchingRelease(this.fetchingUrl, this.releases[this.selectedBranch].branch)
-        .then((response) => {
-          this.$message.success('拉取成功')
-          this.uploadThemeVisible = false
-        })
-        .finally(() => {
-          this.handleListThemes()
-        })
-    },
-    handleReload() {
+    handleRefreshThemesCache() {
       themeApi.reload().finally(() => {
         this.handleListThemes()
       })
     },
-    handleShowUpdateNewThemeModal(item) {
-      this.prepareUpdateTheme = item
-      this.uploadNewThemeVisible = true
+    handleActiveTheme(theme) {
+      themeApi.active(theme.id).finally(() => {
+        this.handleListThemes()
+      })
     },
-    handleShowThemeSetting(theme) {
-      this.selectedTheme = theme
-      this.themeSettingVisible = true
+    handleDeleteTheme(themeId) {
+      themeApi.delete(themeId).finally(() => {
+        this.handleListThemes()
+      })
+    },
+    handleUploadSucceed() {
+      this.installModal.visible = false
+      this.localUpdateModel.visible = false
+      this.handleListThemes()
+    },
+    handleFetching() {
+      const _this = this
+      _this.$refs.remoteInstallForm.validate((valid) => {
+        if (valid) {
+          _this.installModal.remote.repoFetching = true
+          themeApi.fetchingBranches(_this.installModal.remote.url).then((response) => {
+            const branches = response.data.data
+            _this.installModal.remote.branches = branches
+            if (branches && branches.length > 0) {
+              _this.installModal.remote.selectedBranch = branches[0].branch
+            }
+          })
+          themeApi
+            .fetchingReleases(_this.installModal.remote.url)
+            .then((response) => {
+              const releases = response.data.data
+              _this.installModal.remote.releases = releases
+              if (releases && releases.length > 0) {
+                _this.installModal.remote.selectedRelease = releases[0].branch
+              }
+            })
+            .finally(() => {
+              setTimeout(() => {
+                _this.installModal.remote.repoFetching = false
+              }, 400)
+            })
+        }
+      })
+    },
+    handleBranchPulling() {
+      this.installModal.remote.branchPulling = true
+      themeApi
+        .fetchingBranch(this.installModal.remote.url, this.installModal.remote.selectedBranch)
+        .catch(() => {
+          this.installModal.remote.branchPullErrored = true
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.installModal.remote.branchPulling = false
+          }, 400)
+        })
+    },
+    handleBranchPulledCallback() {
+      if (this.installModal.remote.branchPullErrored) {
+        this.installModal.remote.branchPullErrored = false
+      } else {
+        this.installModal.visible = false
+        this.handleListThemes()
+      }
+    },
+    handleReleaseDownloading() {
+      this.installModal.remote.releaseDownloading = true
+      themeApi
+        .fetchingRelease(this.installModal.remote.url, this.installModal.remote.selectedRelease)
+        .catch(() => {
+          this.installModal.remote.branchPullErrored = true
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.installModal.remote.releaseDownloading = false
+          }, 400)
+        })
+    },
+    handleReleaseDownloadedCallback() {
+      if (this.installModal.remote.releaseDownloadErrored) {
+        this.installModal.remote.releaseDownloadErrored = false
+      } else {
+        this.installModal.visible = false
+        this.handleListThemes()
+      }
+    },
+    handleOpenLocalUpdateModal(item) {
+      this.localUpdateModel.selected = item
+      this.localUpdateModel.visible = true
+    },
+    handleOpenThemeSettingDrawer(theme) {
+      this.themeSettingDrawer.selected = theme
+      this.themeSettingDrawer.visible = true
     },
     handleConfirmDelete(item) {
       const _this = this
@@ -469,39 +501,45 @@ export default {
         onCancel() {},
       })
     },
-    handleConfirmUpdate(item) {
-      const that = this
-      this.$confirm({
+    handleConfirmRemoteUpdate(item) {
+      const _this = this
+      _this.$confirm({
         title: '提示',
         maskClosable: true,
         content: '确定更新【' + item.name + '】主题？',
         onOk() {
-          that.handleUpdateTheme(item.id)
+          const hide = _this.$message.loading('更新中...', 0)
+          themeApi
+            .update(item.id)
+            .then((response) => {
+              _this.$message.success('更新成功！')
+            })
+            .finally(() => {
+              hide()
+              _this.handleListThemes()
+            })
         },
         onCancel() {},
       })
     },
-    onSelectChange(value) {
-      this.selectedBranch = value
-    },
-    onThemeUploadClose() {
-      if (this.uploadThemeVisible) {
+    onThemeInstallModalClose() {
+      if (this.$refs.upload) {
         this.$refs.upload.handleClearFileList()
       }
-      if (this.uploadNewThemeVisible) {
+      if (this.$refs.updateByupload) {
         this.$refs.updateByupload.handleClearFileList()
       }
-      if (this.fetchBranches) {
-        this.fetchBranches = false
-      }
-      if (this.selectedBranch) {
-        this.selectedBranch = null
-      }
+      this.installModal.remote.branches = []
+      this.installModal.remote.selectedBranch = null
+      this.installModal.remote.releases = []
+      this.installModal.remote.selectedRelease = null
+      this.installModal.remote.url = null
+      this.installModal.remote.byBranchOrRelease = 'release'
       this.handleListThemes()
     },
-    onThemeSettingsClose() {
-      this.themeSettingVisible = false
-      this.selectedTheme = {}
+    onThemeSettingsDrawerClose() {
+      this.themeSettingDrawer.visible = false
+      this.themeSettingDrawer.selected = {}
     },
   },
 }
