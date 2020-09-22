@@ -24,10 +24,12 @@
         <a-button
           type="primary"
           @click="handleLoadLogsLines()"
+          :loading="loading"
         >刷新</a-button>
         <a-button
           type="dashed"
           @click="handleDownloadLogFile()"
+          :loading="downloading"
         >下载</a-button>
       </a-space>
     </a-form-item>
@@ -41,7 +43,7 @@ import moment from 'moment'
 export default {
   name: 'RuntimeLogs',
   components: {
-    codemirror
+    codemirror,
   },
   data() {
     return {
@@ -49,14 +51,15 @@ export default {
         tabSize: 4,
         mode: 'shell',
         lineNumbers: true,
-        line: true
+        line: true,
       },
       logContent: '',
       loading: false,
-      logLines: 200
+      logLines: 200,
+      downloading: false,
     }
   },
-  created() {
+  beforeMount() {
     this.handleLoadLogsLines()
   },
   updated() {
@@ -68,20 +71,21 @@ export default {
       this.loading = true
       adminApi
         .getLogFiles(this.logLines)
-        .then(response => {
+        .then((response) => {
           this.logContent = response.data.data
         })
         .finally(() => {
           setTimeout(() => {
             this.loading = false
-          }, 200)
+          }, 400)
         })
     },
     handleDownloadLogFile() {
       const hide = this.$message.loading('下载中...', 0)
+      this.downloading = true
       adminApi
         .getLogFiles(this.logLines)
-        .then(response => {
+        .then((response) => {
           var blob = new Blob([response.data.data])
           var downloadElement = document.createElement('a')
           var href = window.URL.createObjectURL(blob)
@@ -91,15 +95,17 @@ export default {
           downloadElement.click()
           document.body.removeChild(downloadElement)
           window.URL.revokeObjectURL(href)
-          this.$message.success('下载成功！')
         })
         .catch(() => {
           this.$message.error('下载失败！')
         })
         .finally(() => {
-          hide()
+          setTimeout(() => {
+            this.downloading = false
+            hide()
+          }, 400)
         })
-    }
-  }
+    },
+  },
 }
 </script>

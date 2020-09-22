@@ -59,7 +59,7 @@
         <a-button
           type="primary"
           icon="plus"
-          @click="formVisible=true"
+          @click="form.visible=true"
         >新增</a-button>
       </div>
       <div class="mt-4">
@@ -134,35 +134,50 @@
       </div>
     </a-card>
     <a-modal
-      v-model="formVisible"
+      v-model="form.visible"
       :title="formTitle"
       :afterClose="onFormClose"
     >
       <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="createOrUpdateOption()"
-        >保存</a-button>
+        <ReactiveButton
+          @click="handleSaveOrUpdate"
+          @callback="handleSaveOrUpdateCallback"
+          :loading="form.saving"
+          :errored="form.saveErrored"
+          text="保存"
+          loadedText="保存成功"
+          erroredText="保存失败"
+        ></ReactiveButton>
       </template>
       <a-alert
-        v-if="optionToStage.type === optionType.INTERNAL.value"
+        v-if="form.model.type === optionType.INTERNAL.value"
         message="注意：在不知道系统变量的具体用途时，请不要随意修改！"
         banner
         closable
       />
-      <a-form layout="vertical">
-        <a-form-item label="Key：">
-          <a-input v-model="optionToStage.key" />
-        </a-form-item>
-        <a-form-item label="Value：">
+      <a-form-model
+        ref="optionForm"
+        :model="form.model"
+        :rules="form.rules"
+        layout="vertical"
+      >
+        <a-form-model-item
+          prop="key"
+          label="Key："
+        >
+          <a-input v-model="form.model.key" />
+        </a-form-model-item>
+        <a-form-model-item
+          prop="value"
+          label="Value："
+        >
           <a-input
             type="textarea"
             :autoSize="{ minRows: 5 }"
-            v-model="optionToStage.value"
+            v-model="form.model.value"
           />
-        </a-form-item>
-      </a-form>
+        </a-form-model-item>
+      </a-form-model>
     </a-modal>
   </div>
 </template>
@@ -174,38 +189,38 @@ const columns = [
     title: 'Key',
     dataIndex: 'key',
     ellipsis: true,
-    scopedSlots: { customRender: 'key' }
+    scopedSlots: { customRender: 'key' },
   },
   {
     title: 'Value',
     dataIndex: 'value',
     ellipsis: true,
-    scopedSlots: { customRender: 'value' }
+    scopedSlots: { customRender: 'value' },
   },
   {
     title: '类型',
     dataIndex: 'typeProperty',
     width: '100px',
-    scopedSlots: { customRender: 'type' }
+    scopedSlots: { customRender: 'type' },
   },
   {
     title: '创建时间',
     dataIndex: 'createTime',
     width: '200px',
-    scopedSlots: { customRender: 'createTime' }
+    scopedSlots: { customRender: 'createTime' },
   },
   {
     title: '更新时间',
     dataIndex: 'updateTime',
     width: '200px',
-    scopedSlots: { customRender: 'updateTime' }
+    scopedSlots: { customRender: 'updateTime' },
   },
   {
     title: '操作',
     dataIndex: 'action',
     width: '120px',
-    scopedSlots: { customRender: 'action' }
-  }
+    scopedSlots: { customRender: 'action' },
+  },
 ]
 export default {
   name: 'OptionsList',
@@ -213,37 +228,46 @@ export default {
     return {
       optionType: optionApi.type,
       columns: columns,
-      formVisible: false,
       pagination: {
         page: 1,
         size: 10,
         sort: null,
-        total: 1
+        total: 1,
       },
       queryParam: {
         page: 0,
         size: 10,
         sort: null,
         keyword: null,
-        type: null
+        type: null,
       },
-      optionToStage: {},
       loading: false,
-      options: []
+      options: [],
+
+      form: {
+        visible: false,
+        model: {},
+        rules: {
+          key: [{ required: true, message: '* Key 不能为空', trigger: ['change'] }],
+          value: [{ required: true, message: '* Value 不能为空', trigger: ['change'] }],
+        },
+        saving: false,
+        saveErrored: false,
+      },
     }
   },
   computed: {
     formattedDatas() {
-      return this.options.map(option => {
+      return this.options.map((option) => {
         option.typeProperty = this.optionType[option.type]
         return option
       })
     },
     formTitle() {
-      return this.optionToStage.id ? '编辑' : '新增'
-    }
+      return this.form.model.id ? '编辑' : '新增'
+    },
   },
-  created() {
+  beforeMount() {
     this.hanldeListOptions()
   },
   methods: {
@@ -255,7 +279,7 @@ export default {
       this.queryParam.sort = this.pagination.sort
       optionApi
         .query(this.queryParam)
-        .then(response => {
+        .then((response) => {
           this.options = response.data.data.content
           this.pagination.total = response.data.data.total
         })
@@ -271,7 +295,7 @@ export default {
     handleDeleteOption(id) {
       optionApi
         .delete(id)
-        .then(response => {
+        .then((response) => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
@@ -280,8 +304,8 @@ export default {
         })
     },
     handleEditOption(option) {
-      this.optionToStage = option
-      this.formVisible = true
+      this.form.model = option
+      this.form.visible = true
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
@@ -295,51 +319,51 @@ export default {
       this.handlePaginationChange(1, this.pagination.size)
     },
     onFormClose() {
-      this.formVisible = false
-      this.optionToStage = {}
+      this.form.visible = false
+      this.form.model = {}
     },
-    createOrUpdateOption() {
-      if (!this.optionToStage.key) {
-        this.$notification['error']({
-          message: '提示',
-          description: 'Key 不能为空！'
-        })
-        return
-      }
-      if (!this.optionToStage.value) {
-        this.$notification['error']({
-          message: '提示',
-          description: 'Value 不能为空！'
-        })
-        return
-      }
-      if (this.optionToStage.id) {
-        optionApi
-          .update(this.optionToStage.id, this.optionToStage)
-          .then(response => {
-            this.$message.success('更新成功！')
-            this.optionToStage = {}
-            this.formVisible = false
-          })
-          .finally(() => {
-            this.hanldeListOptions()
-            this.refreshOptionsCache()
-          })
+    handleSaveOrUpdate() {
+      const _this = this
+      _this.$refs.optionForm.validate((valid) => {
+        if (valid) {
+          _this.form.saving = true
+          if (_this.form.model.id) {
+            optionApi
+              .update(_this.form.model.id, _this.form.model)
+              .catch(() => {
+                _this.form.saveErrored = true
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 400)
+              })
+          } else {
+            _this.form.model.type = _this.optionType.CUSTOM.value
+            optionApi
+              .create(_this.form.model)
+              .catch(() => {
+                _this.form.saveErrored = true
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 400)
+              })
+          }
+        }
+      })
+    },
+    handleSaveOrUpdateCallback() {
+      if (this.form.saveErrored) {
+        this.form.saveErrored = false
       } else {
-        this.optionToStage.type = this.optionType.CUSTOM.value
-        optionApi
-          .create(this.optionToStage)
-          .then(response => {
-            this.$message.success('保存成功！')
-            this.optionToStage = {}
-            this.formVisible = false
-          })
-          .finally(() => {
-            this.hanldeListOptions()
-            this.refreshOptionsCache()
-          })
+        this.form.model = {}
+        this.form.visible = false
+        this.hanldeListOptions()
+        this.refreshOptionsCache()
       }
-    }
-  }
+    },
+  },
 }
 </script>

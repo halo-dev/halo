@@ -15,7 +15,7 @@
                 >
                   <a-form-item label="关键词：">
                     <a-input
-                      v-model="queryParam.keyword"
+                      v-model="list.queryParam.keyword"
                       @keyup.enter="handleQuery()"
                     />
                   </a-form-item>
@@ -27,14 +27,14 @@
                   <a-form-item label="状态：">
                     <a-select
                       placeholder="请选择状态"
-                      v-model="queryParam.type"
+                      v-model="list.queryParam.type"
                       @change="handleQuery()"
                     >
                       <a-select-option
-                        v-for="type in Object.keys(journalType)"
+                        v-for="type in Object.keys(list.journalType)"
                         :key="type"
                         :value="type"
-                      >{{ journalType[type].text }}</a-select-option>
+                      >{{ list.journalType[type].text }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -48,7 +48,7 @@
                         type="primary"
                         @click="handleQuery()"
                       >查询</a-button>
-                      <a-button @click="resetParam()">重置</a-button>
+                      <a-button @click="handleResetParam()">重置</a-button>
                     </a-space>
                   </span>
                 </a-col>
@@ -59,18 +59,18 @@
             <a-button
               type="primary"
               icon="plus"
-              @click="handleNew"
+              @click="handleOpenPublishModal"
             >写日志</a-button>
           </div>
           <a-divider />
           <div class="mt-4">
-            <a-empty v-if="!listLoading && journals.length==0" />
+            <a-empty v-if="!list.loading && list.data.length==0" />
             <a-list
               v-else
               itemLayout="vertical"
               :pagination="false"
-              :dataSource="journals"
-              :loading="listLoading"
+              :dataSource="list.data"
+              :loading="list.loading"
             >
               <a-list-item
                 slot="renderItem"
@@ -87,7 +87,7 @@
                   <span>
                     <a
                       href="javascript:void(0);"
-                      @click="handleShowJournalComments(item)"
+                      @click="handleOpenJournalCommentsDrawer(item)"
                     >
                       <a-icon type="message" />
                       {{ item.commentCount }}
@@ -110,7 +110,7 @@
                 <template slot="extra">
                   <a
                     href="javascript:void(0);"
-                    @click="handleEdit(item)"
+                    @click="handleOpenEditModal(item)"
                   >编辑</a>
                   <a-divider type="vertical" />
                   <a-popconfirm
@@ -141,9 +141,9 @@
               <div class="page-wrapper">
                 <a-pagination
                   class="pagination"
-                  :current="pagination.page"
-                  :total="pagination.total"
-                  :defaultPageSize="pagination.size"
+                  :current="list.pagination.page"
+                  :total="list.pagination.total"
+                  :defaultPageSize="list.pagination.size"
                   :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
                   showSizeChanger
                   @showSizeChange="handlePaginationChange"
@@ -163,13 +163,13 @@
         shape="circle"
         icon="setting"
         size="large"
-        @click="optionFormVisible=true"
+        @click="optionModal.visible=true"
       ></a-button>
     </div>
     <a-modal
-      v-model="optionFormVisible"
+      v-model="optionModal.visible"
       title="页面设置"
-      :afterClose="() => optionFormVisible = false"
+      :afterClose="() => optionModal.visible = false"
     >
       <template slot="footer">
         <a-button
@@ -183,11 +183,11 @@
           label="页面标题："
           help="* 需要主题进行适配"
         >
-          <a-input v-model="options.journals_title" />
+          <a-input v-model="optionModal.options.journals_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
           <a-input-number
-            v-model="options.journals_page_size"
+            v-model="optionModal.options.journals_page_size"
             style="width:100%"
           />
         </a-form-item>
@@ -195,9 +195,9 @@
     </a-modal>
 
     <!-- 编辑日志弹窗 -->
-    <a-modal v-model="visible">
+    <a-modal v-model="form.visible">
       <template slot="title">
-        {{ title }}
+        {{ formTitle }}
         <a-tooltip
           slot="action"
           title="只能输入250字"
@@ -208,47 +208,52 @@
       <template slot="footer">
         <a-button
           type="dashed"
-          @click="attachmentDrawerVisible = true"
+          @click="attachmentDrawer.visible = true"
         >附件库</a-button>
         <ReactiveButton
           type="primary"
-          @click="createOrUpdateJournal"
-          @callback="handleSavedCallback"
-          :loading="saving"
-          :errored="errored"
+          @click="handleSaveOrUpdate"
+          @callback="handleSaveOrUpdateCallback"
+          :loading="form.saving"
+          :errored="form.saveErrored"
           text="发布"
           loadedText="发布成功"
           erroredText="发布失败"
         ></ReactiveButton>
       </template>
-      <a-form layout="vertical">
-        <a-form-item>
+      <a-form-model
+        ref="journalForm"
+        :model="form.model"
+        :rules="form.rules"
+        layout="vertical"
+      >
+        <a-form-model-item prop="sourceContent">
           <a-input
             type="textarea"
             :autoSize="{ minRows: 8 }"
-            v-model="journal.sourceContent"
+            v-model="form.model.sourceContent"
           />
-        </a-form-item>
-        <a-form-item>
+        </a-form-model-item>
+        <a-form-model-item>
           <a-switch
             checkedChildren="公开"
             unCheckedChildren="私密"
-            v-model="isPublic"
+            v-model="form.isPublic"
             defaultChecked
           />
-        </a-form-item>
-      </a-form>
+        </a-form-model-item>
+      </a-form-model>
     </a-modal>
 
     <TargetCommentDrawer
-      :visible="journalCommentVisible"
-      :description="journal.content"
+      :visible="journalCommentDrawer.visible"
+      :description="list.selected.content"
       :target="`journals`"
-      :id="journal.id"
-      @close="onJournalCommentsClose"
+      :id="list.selected.id"
+      @close="onJournalCommentsDrawerClose"
     />
 
-    <AttachmentDrawer v-model="attachmentDrawerVisible" />
+    <AttachmentDrawer v-model="attachmentDrawer.visible" />
   </div>
 </template>
 
@@ -264,166 +269,172 @@ export default {
   components: { TargetCommentDrawer, AttachmentDrawer },
   data() {
     return {
-      journalType: journalApi.journalType,
-      title: '发表',
-      listLoading: false,
-      visible: false,
-      journalCommentVisible: false,
-      attachmentDrawerVisible: false,
-      optionFormVisible: false,
-      pagination: {
-        page: 1,
-        size: 10,
-        sort: null,
-        total: 1
+      list: {
+        data: [],
+        loading: false,
+        pagination: {
+          page: 1,
+          size: 10,
+          sort: null,
+          total: 1,
+        },
+        queryParam: {
+          page: 0,
+          size: 10,
+          sort: null,
+          keyword: null,
+          type: null,
+        },
+        selected: {},
+
+        journalType: journalApi.journalType,
       },
-      queryParam: {
-        page: 0,
-        size: 10,
-        sort: null,
-        keyword: null,
-        type: null
+
+      form: {
+        model: {},
+        rules: {
+          sourceContent: [{ required: true, message: '* 内容不能为空', trigger: ['change'] }],
+        },
+        visible: false,
+        saving: false,
+        saveErrored: false,
+        isPublic: true,
       },
-      journals: [],
-      comments: [],
-      journal: {},
-      isPublic: true,
-      replyComment: {},
-      options: [],
-      saving: false,
-      errored: false
+      journalCommentDrawer: {
+        visible: false,
+      },
+      attachmentDrawer: {
+        visible: false,
+      },
+      optionModal: {
+        visible: false,
+        options: [],
+      },
     }
   },
-  created() {
+  beforeMount() {
     this.hanldeListJournals()
     this.hanldeListOptions()
   },
   computed: {
-    ...mapGetters(['user'])
+    ...mapGetters(['user']),
+    formTitle() {
+      return this.form.model.id ? '编辑' : '发表'
+    },
   },
   methods: {
     ...mapActions(['refreshOptionsCache']),
     hanldeListJournals() {
-      this.listLoading = true
-      this.queryParam.page = this.pagination.page - 1
-      this.queryParam.size = this.pagination.size
-      this.queryParam.sort = this.pagination.sort
+      this.list.loading = true
+      this.list.queryParam.page = this.list.pagination.page - 1
+      this.list.queryParam.size = this.list.pagination.size
+      this.list.queryParam.sort = this.list.pagination.sort
       journalApi
-        .query(this.queryParam)
-        .then(response => {
-          this.journals = response.data.data.content
-          this.pagination.total = response.data.data.total
+        .query(this.list.queryParam)
+        .then((response) => {
+          this.list.data = response.data.data.content
+          this.list.pagination.total = response.data.data.total
         })
         .finally(() => {
           setTimeout(() => {
-            this.listLoading = false
+            this.list.loading = false
           }, 200)
         })
     },
     hanldeListOptions() {
-      optionApi.listAll().then(response => {
-        this.options = response.data.data
+      optionApi.listAll().then((response) => {
+        this.optionModal.options = response.data.data
       })
     },
     handleQuery() {
-      this.handlePaginationChange(1, this.pagination.size)
+      this.handlePaginationChange(1, this.list.pagination.size)
     },
-    handleNew() {
-      this.title = '新建'
-      this.visible = true
-      this.journal = {}
+    handleResetParam() {
+      this.list.queryParam.keyword = null
+      this.list.queryParam.type = null
+      this.handlePaginationChange(1, this.list.pagination.size)
     },
-    handleEdit(item) {
-      this.title = '编辑'
-      this.journal = item
-      this.isPublic = item.type !== 'INTIMATE'
-      this.visible = true
+    handleOpenPublishModal() {
+      this.form.visible = true
+      this.form.model = {}
+    },
+    handleOpenEditModal(item) {
+      this.form.model = item
+      this.form.isPublic = item.type !== 'INTIMATE'
+      this.form.visible = true
     },
     handleDelete(id) {
-      journalApi
-        .delete(id)
-        .then(response => {
-          this.$message.success('删除成功！')
-        })
-        .finally(() => {
-          this.hanldeListJournals()
-        })
+      journalApi.delete(id).finally(() => {
+        this.hanldeListJournals()
+      })
     },
-    handleShowJournalComments(journal) {
-      this.journal = journal
-      this.journalCommentVisible = true
+    handleOpenJournalCommentsDrawer(journal) {
+      this.list.selected = journal
+      this.journalCommentDrawer.visible = true
     },
-    createOrUpdateJournal() {
-      this.journal.type = this.isPublic ? 'PUBLIC' : 'INTIMATE'
-
-      if (!this.journal.sourceContent) {
-        this.$notification['error']({
-          message: '提示',
-          description: '发布内容不能为空！'
-        })
-        return
-      }
-      this.saving = true
-      if (this.journal.id) {
-        journalApi
-          .update(this.journal.id, this.journal)
-          .catch(() => {
-            this.errored = true
-          })
-          .finally(() => {
-            setTimeout(() => {
-              this.saving = false
-            }, 400)
-          })
+    handleSaveOrUpdate() {
+      const _this = this
+      _this.$refs.journalForm.validate((valid) => {
+        if (valid) {
+          _this.form.model.type = _this.form.isPublic ? 'PUBLIC' : 'INTIMATE'
+          _this.form.saving = true
+          if (_this.form.model.id) {
+            journalApi
+              .update(_this.form.model.id, _this.form.model)
+              .catch(() => {
+                _this.form.saveErrored = true
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 400)
+              })
+          } else {
+            journalApi
+              .create(_this.form.model)
+              .catch(() => {
+                _this.form.saveErrored = true
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 400)
+              })
+          }
+        }
+      })
+    },
+    handleSaveOrUpdateCallback() {
+      if (this.form.saveErrored) {
+        this.form.saveErrored = false
       } else {
-        journalApi
-          .create(this.journal)
-          .catch(() => {
-            this.errored = true
-          })
-          .finally(() => {
-            setTimeout(() => {
-              this.saving = false
-            }, 400)
-          })
-      }
-    },
-    handleSavedCallback() {
-      if (this.errored) {
-        this.errored = false
-      } else {
-        this.isPublic = true
-        this.visible = false
+        this.form.isPublic = true
+        this.form.visible = false
         this.hanldeListJournals()
       }
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
-      this.pagination.page = page
-      this.pagination.size = pageSize
+      this.list.pagination.page = page
+      this.list.pagination.size = pageSize
       this.hanldeListJournals()
     },
-    onJournalCommentsClose() {
-      this.journal = {}
-      this.journalCommentVisible = false
-    },
-    resetParam() {
-      this.queryParam.keyword = null
-      this.queryParam.type = null
-      this.handlePaginationChange(1, this.pagination.size)
+    onJournalCommentsDrawerClose() {
+      this.form.model = {}
+      this.journalCommentDrawer.visible = false
     },
     handleSaveOptions() {
       optionApi
-        .save(this.options)
-        .then(response => {
+        .save(this.optionModal.options)
+        .then((response) => {
           this.$message.success('保存成功！')
-          this.optionFormVisible = false
+          this.optionModal.visible = false
         })
         .finally(() => {
           this.hanldeListOptions()
           this.refreshOptionsCache()
         })
-    }
-  }
+    },
+  },
 }
 </script>
