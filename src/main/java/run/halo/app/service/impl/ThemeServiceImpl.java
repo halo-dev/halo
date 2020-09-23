@@ -547,7 +547,10 @@ public class ThemeServiceImpl implements ThemeService {
 
             downloadZipAndUnzip(zipUrl, themeTmpPath);
 
-            return add(themeTmpPath);
+            // find root theme folder
+            Path themeRootPath = getThemeRootPath(themeTmpPath);
+            log.debug("Got theme root path: [{}]", themeRootPath);
+            return add(themeRootPath);
         } catch (IOException e) {
             throw new ServiceException("主题拉取失败 " + uri, e);
         } finally {
@@ -610,7 +613,7 @@ public class ThemeServiceImpl implements ThemeService {
         List<ThemeProperty> themeProperties = new ArrayList<>();
 
         if (releases == null) {
-            throw new ServiceException("主题拉取失败");
+            throw new ServiceException("主题拉取失败！可能原因：当前服务器无法链接到对方服务器或连接超时。");
         }
 
         releases.forEach(tagName -> {
