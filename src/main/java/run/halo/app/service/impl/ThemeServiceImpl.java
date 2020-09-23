@@ -867,7 +867,7 @@ public class ThemeServiceImpl implements ThemeService {
     @NonNull
     private Path getThemeRootPath(@NonNull Path themePath) throws IOException {
         return FileUtils.findRootPath(themePath,
-                path -> StringUtils.equalsAny(path.getFileName().toString(), "theme.yaml", "theme.yml", "settings.yaml", "settings.yml"))
-                .orElseThrow(() -> new BadRequestException("无法准确定位到主题根目录，请确认主题目录中包含 theme.yml（theme.yaml） 或 settings.yml（settings.yaml）。"));
+                path -> StringUtils.equalsAny(path.getFileName().toString(), "theme.yaml", "theme.yml"))
+                .orElseThrow(() -> new BadRequestException("无法准确定位到主题根目录，请确认主题目录中包含 theme.yml（theme.yaml）。"));
     }
 }
