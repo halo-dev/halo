@@ -10,6 +10,7 @@ import run.halo.app.exception.ForbiddenException;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,11 @@ import java.util.zip.ZipOutputStream;
  */
 @Slf4j
 public class FileUtils {
+
+    /**
+     * Ignored folders while finding root path.
+     */
+    private static final List<String> IGNORED_FOLDERS = Arrays.asList(".git");
 
     private FileUtils() {
     }
@@ -256,7 +262,12 @@ public class FileUtils {
                     return Optional.of(rootPath);
                 }
                 // add all folder into queue
-                subFolders.forEach(queue::push);
+                subFolders.forEach(e -> {
+                    // if
+                    if (!IGNORED_FOLDERS.contains(e.getFileName().toString())) {
+                        queue.push(e);
+                    }
+                });
             }
         }
         // if tests are failed completely
