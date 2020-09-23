@@ -386,10 +386,15 @@ public class AdminServiceImpl implements AdminService {
             // Unzip
             FileUtils.unzip(downloadResponseEntity.getBody(), assetTempPath);
 
+            // find root folder
+            Path adminRootPath = FileUtils.findRootPath(assetTempPath,
+                    path -> StringUtils.equalsIgnoreCase("index.html", path.getFileName().toString()))
+                    .orElseThrow(() -> new BadRequestException("无法准确定位到压缩包的根路径，请确认包含 index.html 文件。"));
+
             // Copy it to template/admin folder
-            FileUtils.copyFolder(FileUtils.tryToSkipZipParentFolder(assetTempPath), adminPath);
+            FileUtils.copyFolder(adminRootPath, adminPath);
         } catch (Throwable t) {
-            throw new ServiceException("更新 Halo admin 失败", t);
+            throw new ServiceException("更新 Halo admin 失败，" + t.getMessage(), t);
         }
     }
 
