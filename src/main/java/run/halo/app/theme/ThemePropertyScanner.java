@@ -63,7 +63,7 @@ public enum ThemePropertyScanner {
         }
         try (Stream<Path> pathStream = Files.list(themePath)) {
             // List and filter sub folders
-            List<Path> themePaths = pathStream.filter(path -> Files.isDirectory(path))
+            List<Path> themePaths = pathStream.filter(Files::isDirectory)
                     .collect(Collectors.toList());
 
             if (CollectionUtils.isEmpty(themePaths)) {

@@ -7,6 +7,7 @@ import run.halo.app.service.ThemeService;
 
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * GithubUtils send request to api.github.com
@@ -298,7 +299,7 @@ public class GithubUtils {
                 }
 
                 try {
-                    Thread.sleep(2000);
+                    TimeUnit.SECONDS.sleep(2);
                 } catch (InterruptedException e) {
                     break;
                 }
