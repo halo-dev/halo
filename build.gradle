@@ -1,12 +1,12 @@
 plugins {
-    id "org.springframework.boot" version "2.3.1.RELEASE"
-    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+    id "org.springframework.boot" version "2.3.4.RELEASE"
+    id "io.spring.dependency-management" version "1.0.10.RELEASE"
     id "checkstyle"
     id "java"
 }
 
 group = "run.halo.app"
-version = "1.4.0-beta.3"
+version = "1.4.0"
 description = "Halo, An excellent open source blog publishing application."
 
 java {
