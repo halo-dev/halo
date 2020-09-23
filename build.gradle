@@ -53,7 +53,7 @@ ext {
     commonsLangVersion = "3.10"
     httpclientVersion = "4.5.12"
     dataformatYamlVersion = "2.11.0"
-    jgitVersion = "5.7.0.202003110725-r"
+    jgitVersion = "5.9.0.202009080501-r"
     flexmarkVersion = "0.62.2"
     thumbnailatorVersion = "0.4.11"
     image4jVersion = "0.7zensight1"
