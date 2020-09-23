@@ -162,7 +162,7 @@ export const asyncRouterMap = [
       {
         path: '/system',
         name: 'System',
-        component: PageView,
+        component: BlankLayout,
         redirect: '/system/options',
         meta: { title: '系统', icon: 'setting' },
         children: [

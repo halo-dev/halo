@@ -29,11 +29,11 @@
       </a-col>
       <a-divider />
       <a-col :span="24">
-        <a-spin :spinning="loading">
-          <a-empty v-if="comments.length == 0" />
+        <a-spin :spinning="list.loading">
+          <a-empty v-if="list.data.length == 0" />
           <TargetCommentTree
             v-else
-            v-for="(comment, index) in comments"
+            v-for="(comment, index) in list.data"
             :key="index"
             :comment="comment"
             @reply="handleCommentReply"
@@ -46,9 +46,9 @@
     <a-divider />
     <div class="page-wrapper">
       <a-pagination
-        :current="pagination.page"
-        :total="pagination.total"
-        :defaultPageSize="pagination.size"
+        :current="list.pagination.page"
+        :total="list.pagination.total"
+        :defaultPageSize="list.pagination.size"
         @change="handlePaginationChange"
         showLessItems
       ></a-pagination>
@@ -57,59 +57,42 @@
     <div class="bottom-control">
       <a-button
         type="primary"
-        @click="handleComment"
+        @click="handleCommentReply({})"
       >评论</a-button>
     </div>
     <a-modal
-      v-if="selectedComment"
-      :title="'回复给：' + selectedComment.author"
-      v-model="replyCommentVisible"
-      @close="onReplyClose"
+      :title="replyModalTitle"
+      v-model="replyModal.visible"
+      @close="onReplyModalClose"
       destroyOnClose
     >
       <template slot="footer">
-        <a-button
-          key="submit"
+        <ReactiveButton
           type="primary"
-          @click="handleCreateClick"
-        >
-          回复
-        </a-button>
+          @click="handleReplyClick"
+          @callback="handleReplyCallback"
+          :loading="replyModal.saving"
+          :errored="replyModal.saveErrored"
+          text="回复"
+          loadedText="回复成功"
+          erroredText="回复失败"
+        ></ReactiveButton>
       </template>
-      <a-form layout="vertical">
-        <a-form-item>
+      <a-form-model
+        ref="replyCommentForm"
+        :model="replyModal.model"
+        :rules="replyModal.rules"
+        layout="vertical"
+      >
+        <a-form-model-item prop="content">
           <a-input
+            ref="contentInput"
             type="textarea"
             :autoSize="{ minRows: 8 }"
-            v-model="replyComment.content"
+            v-model="replyModal.model.content"
           />
-        </a-form-item>
-      </a-form>
-    </a-modal>
-    <a-modal
-      title="评论"
-      v-model="commentVisible"
-      @close="onCommentClose"
-      destroyOnClose
-    >
-      <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="handleCreateClick"
-        >
-          回复
-        </a-button>
-      </template>
-      <a-form layout="vertical">
-        <a-form-item>
-          <a-input
-            type="textarea"
-            :autoSize="{ minRows: 8 }"
-            v-model="replyComment.content"
-          />
-        </a-form-item>
-      </a-form>
+        </a-form-model-item>
+      </a-form-model>
     </a-modal>
   </a-drawer>
 </template>
@@ -123,111 +106,130 @@ export default {
   components: { TargetCommentTree },
   data() {
     return {
-      comments: [],
-      loading: false,
-      selectedComment: {},
-      replyComment: {},
-      replyCommentVisible: false,
-      commentVisible: false,
-      pagination: {
-        page: 1,
-        size: 10,
-        sort: null,
-        total: 1
+      list: {
+        data: [],
+        loading: false,
+        selected: {},
+        pagination: {
+          page: 1,
+          size: 10,
+          sort: null,
+          total: 1,
+        },
+        queryParam: {
+          page: 0,
+          size: 10,
+          sort: null,
+          keyword: null,
+        },
       },
-      queryParam: {
-        page: 0,
-        size: 10,
-        sort: null,
-        keyword: null
-      }
+      replyModal: {
+        model: {},
+        visible: false,
+        saving: false,
+        saveErrored: false,
+        rules: {
+          content: [{ required: true, message: '* 内容不能为空', trigger: ['change'] }],
+        },
+      },
     }
   },
   props: {
     visible: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
     title: {
       type: String,
       required: false,
-      default: ''
+      default: '',
     },
     description: {
       type: String,
       required: false,
-      default: ''
+      default: '',
     },
     target: {
       type: String,
       required: false,
-      default: ''
+      default: '',
     },
     id: {
       type: Number,
       required: false,
-      default: 0
-    }
+      default: 0,
+    },
+  },
+  computed: {
+    replyModalTitle() {
+      return this.list.selected.id ? `回复给：${this.list.selected.author}` : '评论'
+    },
   },
   methods: {
     handleListComments() {
-      this.loading = true
-      this.queryParam.page = this.pagination.page - 1
-      this.queryParam.size = this.pagination.size
-      this.queryParam.sort = this.pagination.sort
+      this.list.loading = true
+      this.list.queryParam.page = this.list.pagination.page - 1
+      this.list.queryParam.size = this.list.pagination.size
+      this.list.queryParam.sort = this.list.pagination.sort
       commentApi
-        .commentTree(this.target, this.id, this.queryParam)
-        .then(response => {
-          this.comments = response.data.data.content
-          this.pagination.total = response.data.data.total
+        .commentTree(this.target, this.id, this.list.queryParam)
+        .then((response) => {
+          this.list.data = response.data.data.content
+          this.list.pagination.total = response.data.data.total
         })
         .finally(() => {
           setTimeout(() => {
-            this.loading = false
+            this.list.loading = false
           }, 200)
         })
     },
     handlePaginationChange(page, pageSize) {
-      this.pagination.page = page
-      this.pagination.size = pageSize
+      this.list.pagination.page = page
+      this.list.pagination.size = pageSize
       this.handleListComments()
     },
     handleCommentReply(comment) {
-      this.selectedComment = comment
-      this.replyCommentVisible = true
-      this.replyComment.parentId = comment.id
-      this.replyComment.postId = this.id
+      this.list.selected = comment
+      this.replyModal.visible = true
+      this.replyModal.model.parentId = comment.id
+      this.replyModal.model.postId = this.id
+      this.$nextTick(() => {
+        this.$refs.contentInput.focus()
+      })
     },
-    handleComment() {
-      this.replyComment.postId = this.id
-      this.commentVisible = true
+    handleReplyClick() {
+      const _this = this
+      _this.$refs.replyCommentForm.validate((valid) => {
+        if (valid) {
+          _this.replyModal.saving = true
+          commentApi
+            .create(_this.target, _this.replyModal.model)
+            .catch(() => {
+              _this.replyModal.saveErrored = true
+            })
+            .finally(() => {
+              setTimeout(() => {
+                _this.replyModal.saving = false
+              }, 400)
+            })
+        }
+      })
     },
-    handleCreateClick() {
-      if (!this.replyComment.content) {
-        this.$notification['error']({
-          message: '提示',
-          description: '评论内容不能为空！'
-        })
-        return
+    handleReplyCallback() {
+      if (this.replyModal.saveErrored) {
+        this.replyModal.saveErrored = false
+      } else {
+        this.replyModal.model = {}
+        this.list.selected = {}
+        this.replyModal.visible = false
+        this.handleListComments()
       }
-      commentApi
-        .create(this.target, this.replyComment)
-        .then(response => {
-          this.$message.success('回复成功！')
-          this.replyComment = {}
-          this.selectedComment = {}
-          this.replyCommentVisible = false
-          this.commentVisible = false
-        })
-        .finally(() => {
-          this.handleListComments()
-        })
     },
     handleEditStatusClick(comment, status) {
       commentApi
         .updateStatus(this.target, comment.id, status)
-        .then(response => {
+        .then((response) => {
           this.$message.success('操作成功！')
         })
         .finally(() => {
@@ -237,28 +239,24 @@ export default {
     handleCommentDelete(comment) {
       commentApi
         .delete(this.target, comment.id)
-        .then(response => {
+        .then((response) => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
           this.handleListComments()
         })
     },
-    onReplyClose() {
-      this.replyComment = {}
-      this.selectedComment = {}
-      this.replyCommentVisible = false
-    },
-    onCommentClose() {
-      this.replyComment = {}
-      this.commentVisible = false
+    onReplyModalClose() {
+      this.replyModal.model = {}
+      this.list.selected = {}
+      this.replyModal.visible = false
     },
     onClose() {
-      this.comments = []
-      this.pagination = {
+      this.list.data = []
+      this.list.pagination = {
         page: 1,
         size: 10,
-        sort: ''
+        sort: '',
       }
       this.$emit('close', false)
     },
@@ -266,7 +264,7 @@ export default {
       if (visible) {
         this.handleListComments()
       }
-    }
-  }
+    },
+  },
 }
 </script>

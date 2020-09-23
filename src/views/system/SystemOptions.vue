@@ -1,5 +1,13 @@
 <template>
-  <div>
+  <page-view :title="advancedOptions?'高级选项':'基础选项'">
+    <template slot="extra">
+      <a-button
+        type="link"
+        @click="advancedOptions = !advancedOptions"
+      >
+        切换到{{ advancedOptions?'基础选项':'高级选项' }}
+      </a-button>
+    </template>
     <a-row>
       <a-col :span="24">
         <div class="card-container">
@@ -149,24 +157,10 @@
         </div>
       </a-col>
     </a-row>
-
-    <div style="position: fixed;bottom: 30px;right: 30px;">
-      <a-tooltip placement="top">
-        <template slot="title">
-          <span>{{ advancedOptions?'基础选项':'高级选项' }}</span>
-        </template>
-        <a-button
-          type="primary"
-          shape="circle"
-          :icon="`${advancedOptions?'setting':'thunderbolt'}`"
-          size="large"
-          @click="advancedOptions = !advancedOptions"
-        ></a-button>
-      </a-tooltip>
-    </div>
-  </div>
+  </page-view>
 </template>
 <script>
+import { PageView } from '@/layouts'
 import GeneralTab from './optiontabs/GeneralTab'
 import SeoTab from './optiontabs/SeoTab'
 import PostTab from './optiontabs/PostTab'
@@ -182,6 +176,7 @@ import optionApi from '@/api/option'
 import { mapActions } from 'vuex'
 export default {
   components: {
+    PageView,
     GeneralTab,
     SeoTab,
     PostTab,
@@ -191,14 +186,14 @@ export default {
     OtherTab,
     PermalinkTab,
     ApiTab,
-    AdvancedOtherTab
+    AdvancedOtherTab,
   },
   data() {
     return {
       options: {},
       advancedOptions: false,
       saving: false,
-      errored: false
+      errored: false,
     }
   },
   created() {
@@ -207,7 +202,7 @@ export default {
   methods: {
     ...mapActions(['refreshUserCache', 'refreshOptionsCache']),
     hanldeListOptions() {
-      optionApi.listAll().then(response => {
+      optionApi.listAll().then((response) => {
         this.options = response.data.data
       })
     },
@@ -229,7 +224,7 @@ export default {
           this.refreshOptionsCache()
           this.refreshUserCache()
         })
-    }
-  }
+    },
+  },
 }
 </script>

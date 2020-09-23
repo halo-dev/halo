@@ -44,6 +44,7 @@
                 v-if="editable"
               >
                 <a-input
+                  ref="nameInput"
                   v-model="attachment.name"
                   @blur="doUpdateAttachment"
                 />
@@ -57,7 +58,7 @@
                 <a href="javascript:void(0);">
                   <a-icon
                     type="edit"
-                    @click="editable = !editable"
+                    @click="handleEditName"
                   />
                 </a>
               </span>
@@ -134,9 +135,7 @@
           cancelText="取消"
           v-if="addToPhoto"
         >
-          <a-button
-            type="dashed"
-          >添加到图库</a-button>
+          <a-button type="dashed">添加到图库</a-button>
         </a-popconfirm>
         <a-popconfirm
           title="你确定要删除该附件？"
@@ -172,7 +171,7 @@ export default {
   name: 'AttachmentDetailDrawer',
   mixins: [mixin, mixinDevice],
   components: {
-    'd-player': VueDPlayer
+    'd-player': VueDPlayer,
   },
   data() {
     return {
@@ -188,30 +187,30 @@ export default {
         lang: 'zh-cn',
         video: {
           url: '',
-          type: 'auto'
-        }
-      }
+          type: 'auto',
+        },
+      },
     }
   },
   model: {
     prop: 'visible',
-    event: 'close'
+    event: 'close',
   },
   props: {
     attachment: {
       type: Object,
-      required: true
+      required: true,
     },
     addToPhoto: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
     visible: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: true,
+    },
   },
   mounted() {
     this.player = this.$refs.player
@@ -221,7 +220,7 @@ export default {
       if (newValue) {
         this.handleJudgeMediaType(newValue)
       }
-    }
+    },
   },
   methods: {
     handleDeleteAttachment() {
@@ -242,28 +241,35 @@ export default {
       this.deleteErrored = false
       this.onClose()
     },
+    handleEditName() {
+      this.editable = !this.editable
+      if (this.editable) {
+        this.$nextTick(() => {
+          this.$refs.nameInput.focus()
+        })
+      }
+    },
     doUpdateAttachment() {
       if (!this.attachment.name) {
         this.$notification['error']({
           message: '提示',
-          description: '附件名称不能为空！'
+          description: '附件名称不能为空！',
         })
         return
       }
-      attachmentApi.update(this.attachment.id, this.attachment).then(response => {
+      attachmentApi.update(this.attachment.id, this.attachment).then((response) => {
         this.$log.debug('Updated attachment', response.data.data)
-        this.$message.success('附件修改成功！')
       })
       this.editable = false
     },
     handleCopyNormalLink() {
       const text = `${encodeURI(this.attachment.path)}`
       this.$copyText(text)
-        .then(message => {
+        .then((message) => {
           this.$log.debug('copy', message)
           this.$message.success('复制成功！')
         })
-        .catch(err => {
+        .catch((err) => {
           this.$log.debug('copy.err', err)
           this.$message.error('复制失败！')
         })
@@ -271,11 +277,11 @@ export default {
     handleCopyMarkdownLink() {
       const text = `![${this.attachment.name}](${encodeURI(this.attachment.path)})`
       this.$copyText(text)
-        .then(message => {
+        .then((message) => {
           this.$log.debug('copy', message)
           this.$message.success('复制成功！')
         })
-        .catch(err => {
+        .catch((err) => {
           this.$log.debug('copy.err', err)
           this.$message.error('复制失败！')
         })
@@ -285,7 +291,7 @@ export default {
       this.photo['thumbnail'] = encodeURI(this.attachment.thumbPath)
       this.photo['url'] = encodeURI(this.attachment.path)
       this.photo['takeTime'] = new Date().getTime()
-      photoApi.create(this.photo).then(response => {
+      photoApi.create(this.photo).then((response) => {
         this.$message.success('添加成功！')
         this.photo = {}
       })
@@ -322,7 +328,7 @@ export default {
       this.$set(this, 'photoPreviewVisible', photo)
       this.$set(this, 'videoPreviewVisible', video)
       this.$set(this, 'nonsupportPreviewVisible', nonsupport)
-    }
-  }
+    },
+  },
 }
 </script>

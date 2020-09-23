@@ -59,7 +59,7 @@
         <a-button
           type="primary"
           icon="plus"
-          @click="form.visible=true"
+          @click="handleOpenFormModal"
         >新增</a-button>
       </div>
       <div class="mt-4">
@@ -105,7 +105,7 @@
           >
             <a
               href="javascript:void(0);"
-              @click="handleEditOption(record)"
+              @click="handleOpenEditFormModal(record)"
             >编辑</a>
             <a-divider type="vertical" />
             <a-popconfirm
@@ -165,7 +165,10 @@
           prop="key"
           label="Key："
         >
-          <a-input v-model="form.model.key" />
+          <a-input
+            ref="keyInput"
+            v-model="form.model.key"
+          />
         </a-form-model-item>
         <a-form-model-item
           prop="value"
@@ -303,9 +306,18 @@ export default {
           this.refreshOptionsCache()
         })
     },
-    handleEditOption(option) {
+    handleOpenFormModal() {
+      this.form.visible = true
+      this.$nextTick(() => {
+        this.$refs.keyInput.focus()
+      })
+    },
+    handleOpenEditFormModal(option) {
       this.form.model = option
       this.form.visible = true
+      this.$nextTick(() => {
+        this.$refs.keyInput.focus()
+      })
     },
     handlePaginationChange(page, pageSize) {
       this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)

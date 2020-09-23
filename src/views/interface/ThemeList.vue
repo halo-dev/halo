@@ -5,7 +5,6 @@
   >
     <template slot="extra">
       <a-button
-        key="2"
         icon="reload"
         :loading="list.loading"
         @click="handleRefreshThemesCache"
@@ -13,7 +12,6 @@
         刷新
       </a-button>
       <a-button
-        key="1"
         type="primary"
         icon="plus"
         @click="installModal.visible = true"

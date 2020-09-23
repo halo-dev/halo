@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row>
       <a-col :span="24">
         <a-card
@@ -52,19 +52,22 @@
               target="_blank"
               class="mr-3"
             >开源组织
-              <a-icon type="link" /></a>
+              <a-icon type="link" />
+            </a>
             <a
               href="https://halo.run"
               target="_blank"
               class="mr-3"
             >用户文档
-              <a-icon type="link" /></a>
+              <a-icon type="link" />
+            </a>
             <a
               href="https://bbs.halo.run"
               target="_blank"
               class="mr-3"
             >在线社区
-              <a-icon type="link" /></a>
+              <a-icon type="link" />
+            </a>
           </a-card>
 
           <a-card
@@ -108,14 +111,18 @@
     >
       <div v-html="versionContent"></div>
     </a-modal>
-  </div>
+  </page-view>
 </template>
 
 <script>
 import adminApi from '@/api/admin'
 import axios from 'axios'
 import marked from 'marked'
+import { PageView } from '@/layouts'
 export default {
+  components: {
+    PageView,
+  },
   data() {
     return {
       environments: {},
@@ -139,14 +146,14 @@ export default {
           received_events_url: '',
           type: '',
           site_admin: false,
-          contributions: 0
-        }
+          contributions: 0,
+        },
       ],
       contributorsLoading: true,
       checking: false,
       isLatest: false,
       latestData: {},
-      versionContentVisible: false
+      versionContentVisible: false,
     }
   },
   computed: {
@@ -164,7 +171,7 @@ export default {
     },
     versionContentModalTitle() {
       return `${this.latestData.name} 更新内容`
-    }
+    },
   },
   created() {
     this.getEnvironments()
@@ -172,7 +179,7 @@ export default {
   },
   methods: {
     async getEnvironments() {
-      await adminApi.environments().then(response => {
+      await adminApi.environments().then((response) => {
         this.environments = response.data.data
       })
       this.checkServerUpdate()
@@ -183,11 +190,11 @@ export default {
 运行模式：${this.environments.mode}
 User Agent：${navigator.userAgent}`
       this.$copyText(text)
-        .then(message => {
+        .then((message) => {
           this.$log.debug('copy', message)
           this.$message.success('复制成功！')
         })
-        .catch(err => {
+        .catch((err) => {
           this.$log.debug('copy.err', err)
           this.$message.error('复制失败！')
         })
@@ -197,7 +204,7 @@ User Agent：${navigator.userAgent}`
       _this.contributorsLoading = true
       axios
         .get('https://api.github.com/repos/halo-dev/halo/contributors')
-        .then(response => {
+        .then((response) => {
           _this.contributors = response.data
         })
         .catch(function(error) {
@@ -214,7 +221,7 @@ User Agent：${navigator.userAgent}`
       _this.checking = true
       axios
         .get('https://api.github.com/repos/halo-dev/halo/releases/latest')
-        .then(response => {
+        .then((response) => {
           const data = response.data
           _this.latestData = data
           if (data.draft || data.prerelease) {
@@ -232,21 +239,21 @@ User Agent：${navigator.userAgent}`
             message: title,
             description: content,
             icon: <a-icon type="smile" style="color: #108ee9" />,
-            btn: h => {
+            btn: (h) => {
               return h(
                 'a-button',
                 {
                   props: {
                     type: 'primary',
-                    size: 'small'
+                    size: 'small',
                   },
                   on: {
-                    click: () => this.handleShowVersionContent()
-                  }
+                    click: () => this.handleShowVersionContent(),
+                  },
                 },
                 '去看看'
               )
-            }
+            },
           })
         })
         .catch(function(error) {
@@ -277,7 +284,7 @@ User Agent：${navigator.userAgent}`
         return -1
       }
       return major * 1000000 + minor * 1000 + micro
-    }
-  }
+    },
+  },
 }
 </script>

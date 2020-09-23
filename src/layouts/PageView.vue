@@ -15,6 +15,11 @@
             slot="extra"
           >
           </slot>
+          <slot
+            name="footer"
+            slot="footer"
+          >
+          </slot>
         </a-page-header>
       </div>
     </div>

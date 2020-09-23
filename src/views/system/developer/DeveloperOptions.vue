@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row>
       <a-col :span="24">
         <div
@@ -48,10 +48,11 @@
         />
       </a-col>
     </a-row>
-  </div>
+  </page-view>
 </template>
 <script>
 import { mapGetters } from 'vuex'
+import { PageView } from '@/layouts'
 import Environment from './tabs/Environment'
 import RuntimeLogs from './tabs/RuntimeLogs'
 import SettingsForm from './tabs/SettingsForm'
@@ -59,14 +60,15 @@ import OptionsList from './tabs/OptionsList'
 import StaticStorage from './tabs/StaticStorage'
 export default {
   components: {
+    PageView,
     Environment,
     RuntimeLogs,
     SettingsForm,
     OptionsList,
-    StaticStorage
+    StaticStorage,
   },
   computed: {
-    ...mapGetters(['options'])
-  }
+    ...mapGetters(['options']),
+  },
 }
 </script>

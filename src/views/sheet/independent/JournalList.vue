@@ -229,6 +229,7 @@
       >
         <a-form-model-item prop="sourceContent">
           <a-input
+            ref="sourceContentInput"
             type="textarea"
             :autoSize="{ minRows: 8 }"
             v-model="form.model.sourceContent"
@@ -357,11 +358,17 @@ export default {
     handleOpenPublishModal() {
       this.form.visible = true
       this.form.model = {}
+      this.$nextTick(() => {
+        this.$refs.sourceContentInput.focus()
+      })
     },
     handleOpenEditModal(item) {
       this.form.model = item
       this.form.isPublic = item.type !== 'INTIMATE'
       this.form.visible = true
+      this.$nextTick(() => {
+        this.$refs.sourceContentInput.focus()
+      })
     },
     handleDelete(id) {
       journalApi.delete(id).finally(() => {

@@ -6,7 +6,7 @@
       :boxShadow="false"
       :toolbars="toolbars"
       :ishljs="true"
-      :autofocus="false"
+      autofocus
       @imgAdd="handleAttachmentUpload"
       @save="handleSaveDraft"
     />
@@ -20,19 +20,19 @@ import attachmentApi from '@/api/attachment'
 export default {
   name: 'MarkdownEditor',
   components: {
-    haloEditor
+    haloEditor,
   },
   props: {
     originalContent: {
       type: String,
       required: false,
-      default: ''
-    }
+      default: '',
+    },
   },
   data() {
     return {
       toolbars,
-      originalContentData: ''
+      originalContentData: '',
     }
   },
   watch: {
@@ -41,7 +41,7 @@ export default {
     },
     originalContentData(val) {
       this.$emit('onContentChange', val)
-    }
+    },
   },
   methods: {
     handleAttachmentUpload(pos, $file) {
@@ -55,7 +55,7 @@ export default {
     },
     handleSaveDraft() {
       this.$emit('onSaveDraft')
-    }
-  }
+    },
+  },
 }
 </script>

@@ -422,6 +422,7 @@
       >
         <a-form-model-item prop="content">
           <a-input
+            ref="contentInput"
             type="textarea"
             :autoSize="{ minRows: 8 }"
             v-model.trim="replyComment.content"
@@ -450,39 +451,39 @@ const postColumns = [
     dataIndex: 'author',
     width: '150px',
     ellipsis: true,
-    scopedSlots: { customRender: 'author' }
+    scopedSlots: { customRender: 'author' },
   },
   {
     title: '内容',
     dataIndex: 'content',
-    scopedSlots: { customRender: 'content' }
+    scopedSlots: { customRender: 'content' },
   },
   {
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
     width: '100px',
-    scopedSlots: { customRender: 'status' }
+    scopedSlots: { customRender: 'status' },
   },
   {
     title: '评论文章',
     dataIndex: 'post',
     width: '200px',
     ellipsis: true,
-    scopedSlots: { customRender: 'post' }
+    scopedSlots: { customRender: 'post' },
   },
   {
     title: '日期',
     dataIndex: 'createTime',
     width: '170px',
-    scopedSlots: { customRender: 'createTime' }
+    scopedSlots: { customRender: 'createTime' },
   },
   {
     title: '操作',
     dataIndex: 'action',
     width: '180px',
-    scopedSlots: { customRender: 'action' }
-  }
+    scopedSlots: { customRender: 'action' },
+  },
 ]
 const sheetColumns = [
   {
@@ -490,45 +491,45 @@ const sheetColumns = [
     dataIndex: 'author',
     width: '150px',
     ellipsis: true,
-    scopedSlots: { customRender: 'author' }
+    scopedSlots: { customRender: 'author' },
   },
   {
     title: '内容',
     dataIndex: 'content',
-    scopedSlots: { customRender: 'content' }
+    scopedSlots: { customRender: 'content' },
   },
   {
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
     width: '100px',
-    scopedSlots: { customRender: 'status' }
+    scopedSlots: { customRender: 'status' },
   },
   {
     title: '评论页面',
     dataIndex: 'sheet',
     width: '200px',
     ellipsis: true,
-    scopedSlots: { customRender: 'sheet' }
+    scopedSlots: { customRender: 'sheet' },
   },
   {
     title: '日期',
     dataIndex: 'createTime',
     width: '170px',
-    scopedSlots: { customRender: 'createTime' }
+    scopedSlots: { customRender: 'createTime' },
   },
   {
     title: '操作',
     dataIndex: 'action',
     width: '180px',
-    scopedSlots: { customRender: 'action' }
-  }
+    scopedSlots: { customRender: 'action' },
+  },
 ]
 export default {
   name: 'CommentTab',
   mixins: [mixin, mixinDevice],
   components: {
-    CommentDetail
+    CommentDetail,
   },
   props: {
     type: {
@@ -537,8 +538,8 @@ export default {
       default: 'posts',
       validator: function(value) {
         return ['posts', 'sheets', 'journals'].indexOf(value) !== -1
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -548,14 +549,14 @@ export default {
         page: 1,
         size: 10,
         sort: null,
-        total: 1
+        total: 1,
       },
       queryParam: {
         page: 0,
         size: 10,
         sort: null,
         keyword: null,
-        status: null
+        status: null,
       },
       selectedRowKeys: [],
       selectedRows: [],
@@ -563,13 +564,13 @@ export default {
       selectedComment: {},
       replyComment: {},
       replyCommentRules: {
-        content: [{ required: true, message: '* 内容不能为空', trigger: ['change'] }]
+        content: [{ required: true, message: '* 内容不能为空', trigger: ['change'] }],
       },
       loading: false,
       commentStatus: commentApi.commentStatus,
       commentDetailVisible: false,
       replying: false,
-      replyErrored: false
+      replyErrored: false,
     }
   },
   created() {
@@ -577,12 +578,12 @@ export default {
   },
   computed: {
     formattedComments() {
-      return this.comments.map(comment => {
+      return this.comments.map((comment) => {
         comment.statusProperty = this.commentStatus[comment.status]
         comment.content = marked(decodeHTML(comment.content))
         return comment
       })
-    }
+    },
   },
   methods: {
     handleListComments() {
@@ -592,7 +593,7 @@ export default {
       this.queryParam.sort = this.pagination.sort
       commentApi
         .queryComment(this.type, this.queryParam)
-        .then(response => {
+        .then((response) => {
           this.comments = response.data.data.content
           this.pagination.total = response.data.data.total
         })
@@ -609,7 +610,7 @@ export default {
     handleEditStatusClick(commentId, status) {
       commentApi
         .updateStatus(this.type, commentId, status)
-        .then(response => {
+        .then((response) => {
           this.$message.success('操作成功！')
         })
         .finally(() => {
@@ -619,7 +620,7 @@ export default {
     handleDeleteClick(commentId) {
       commentApi
         .delete(this.type, commentId)
-        .then(response => {
+        .then((response) => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
@@ -639,10 +640,13 @@ export default {
       } else {
         this.replyComment.postId = comment.sheet.id
       }
+      this.$nextTick(() => {
+        this.$refs.contentInput.focus()
+      })
     },
     handleCreateClick() {
       const _this = this
-      _this.$refs.replyCommentForm.validate(valid => {
+      _this.$refs.replyCommentForm.validate((valid) => {
         if (valid) {
           _this.replying = true
           commentApi
@@ -687,7 +691,7 @@ export default {
       }
       commentApi
         .updateStatusInBatch(this.type, this.selectedRowKeys, status)
-        .then(response => {
+        .then((response) => {
           this.$log.debug(`commentIds: ${this.selectedRowKeys}, status: ${status}`)
           this.selectedRowKeys = []
         })
@@ -702,7 +706,7 @@ export default {
       }
       commentApi
         .deleteInBatch(this.type, this.selectedRowKeys)
-        .then(response => {
+        .then((response) => {
           this.$log.debug(`delete: ${this.selectedRowKeys}`)
           this.selectedRowKeys = []
         })
@@ -726,14 +730,14 @@ export default {
       return {
         props: {
           disabled: this.queryParam.status == null || this.queryParam.status === '',
-          name: comment.author
-        }
+          name: comment.author,
+        },
       }
     },
     handleShowDetailDrawer(comment) {
       this.selectedComment = comment
       this.commentDetailVisible = true
-    }
-  }
+    },
+  },
 }
 </script>
