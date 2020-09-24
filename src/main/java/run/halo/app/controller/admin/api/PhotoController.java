@@ -43,7 +43,7 @@ public class PhotoController {
     @GetMapping
     @ApiOperation("Lists photos")
     public Page<PhotoDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-                                 PhotoQuery photoQuery) {
+            PhotoQuery photoQuery) {
         return photoService.pageDtosBy(pageable, photoQuery);
     }
 
@@ -68,7 +68,7 @@ public class PhotoController {
     @PutMapping("{photoId:\\d+}")
     @ApiOperation("Updates a photo")
     public PhotoDTO updateBy(@PathVariable("photoId") Integer photoId,
-                             @RequestBody @Valid PhotoParam photoParam) {
+            @RequestBody @Valid PhotoParam photoParam) {
         // Get the photo
         Photo photo = photoService.getById(photoId);
 

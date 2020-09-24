@@ -4,6 +4,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Example;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,8 +39,8 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
     private final Configuration configuration;
 
     public ThemeSettingServiceImpl(ThemeSettingRepository themeSettingRepository,
-                                   ThemeService themeService,
-                                   Configuration configuration) {
+            ThemeService themeService,
+            Configuration configuration) {
         super(themeSettingRepository);
         this.themeSettingRepository = themeSettingRepository;
         this.themeService = themeService;
@@ -59,11 +60,11 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         if (StringUtils.isBlank(value)) {
             // Delete it
             return themeSettingOptional
-                .map(setting -> {
-                    themeSettingRepository.delete(setting);
-                    log.debug("Removed theme setting: [{}]", setting);
-                    return setting;
-                }).orElse(null);
+                    .map(setting -> {
+                        themeSettingRepository.delete(setting);
+                        log.debug("Removed theme setting: [{}]", setting);
+                        return setting;
+                    }).orElse(null);
         }
 
         // Get config item map
@@ -74,20 +75,23 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
 
         // Update or create
         ThemeSetting themeSetting = themeSettingOptional
-            .map(setting -> {
-                log.debug("Updating theme setting: [{}]", setting);
-                setting.setValue(value);
-                log.debug("Updated theme setting: [{}]", setting);
-                return setting;
-            }).orElseGet(() -> {
-                ThemeSetting setting = new ThemeSetting();
-                setting.setKey(key);
-                setting.setValue(value);
-                setting.setThemeId(themeId);
-                log.debug("Creating theme setting: [{}]", setting);
-                return setting;
-            });
-
+                .map(setting -> {
+                    log.debug("Updating theme setting: [{}]", setting);
+                    setting.setValue(value);
+                    log.debug("Updated theme setting: [{}]", setting);
+                    return setting;
+                }).orElseGet(() -> {
+                    ThemeSetting setting = new ThemeSetting();
+                    setting.setKey(key);
+                    setting.setValue(value);
+                    setting.setThemeId(themeId);
+                    log.debug("Creating theme setting: [{}]", setting);
+                    return setting;
+                });
+        // Determine whether the data already exists
+        if (themeSettingRepository.findOne(Example.of(themeSetting)).isPresent()) {
+            return null;
+        }
         // Save the theme setting
         return themeSettingRepository.save(themeSetting);
     }

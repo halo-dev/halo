@@ -53,10 +53,10 @@ public class ControllerLogAop {
 
     private void printRequestLog(HttpServletRequest request, String clazzName, String methodName, Object[] args) throws JsonProcessingException {
         log.debug("Request URL: [{}], URI: [{}], Request Method: [{}], IP: [{}]",
-            request.getRequestURL(),
-            request.getRequestURI(),
-            request.getMethod(),
-            ServletUtil.getClientIP(request));
+                request.getRequestURL(),
+                request.getRequestURI(),
+                request.getMethod(),
+                ServletUtil.getClientIP(request));
 
         if (args == null || !log.isDebugEnabled()) {
             return;
@@ -65,10 +65,10 @@ public class ControllerLogAop {
         boolean shouldNotLog = false;
         for (Object arg : args) {
             if (arg == null ||
-                arg instanceof HttpServletRequest ||
-                arg instanceof HttpServletResponse ||
-                arg instanceof MultipartFile ||
-                arg.getClass().isAssignableFrom(MultipartFile[].class)) {
+                    arg instanceof HttpServletRequest ||
+                    arg instanceof HttpServletResponse ||
+                    arg instanceof MultipartFile ||
+                    arg.getClass().isAssignableFrom(MultipartFile[].class)) {
                 shouldNotLog = true;
                 break;
             }

@@ -39,19 +39,19 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
     private final OptionService optionService;
 
     public ApiAuthenticationFilter(HaloProperties haloProperties,
-                                   OptionService optionService,
-                                   AbstractStringCacheStore cacheStore,
-                                   OneTimeTokenService oneTimeTokenService,
-                                   ObjectMapper objectMapper) {
+            OptionService optionService,
+            AbstractStringCacheStore cacheStore,
+            OneTimeTokenService oneTimeTokenService,
+            ObjectMapper objectMapper) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.optionService = optionService;
 
         addUrlPatterns("/api/content/**");
 
         addExcludeUrlPatterns(
-            "/api/content/**/comments",
-            "/api/content/**/comments/**",
-            "/api/content/options/comment"
+                "/api/content/**/comments",
+                "/api/content/**/comments/**",
+                "/api/content/options/comment"
         );
 
         // set failure handler

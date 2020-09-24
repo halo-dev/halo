@@ -60,7 +60,7 @@ public class MenuController {
     @PutMapping("{menuId:\\d+}")
     @ApiOperation("Updates a menu")
     public MenuDTO updateBy(@PathVariable("menuId") Integer menuId,
-                            @RequestBody @Valid MenuParam menuParam) {
+            @RequestBody @Valid MenuParam menuParam) {
         // Get the menu
         Menu menu = menuService.getById(menuId);
 

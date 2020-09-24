@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.iq80.leveldb.*;
 import org.iq80.leveldb.impl.Iq80DBFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import run.halo.app.config.properties.HaloProperties;
@@ -32,8 +31,9 @@ public class LevelCacheStore extends AbstractStringCacheStore {
 
     private Timer timer;
 
-    @Autowired
-    private HaloProperties haloProperties;
+    public LevelCacheStore(HaloProperties haloProperties) {
+        super.haloProperties = haloProperties;
+    }
 
     @PostConstruct
     public void init() {
@@ -90,8 +90,8 @@ public class LevelCacheStore extends AbstractStringCacheStore {
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
         try {
             LEVEL_DB.put(
-                stringToBytes(key),
-                stringToBytes(JsonUtils.objectToJson(cacheWrapper))
+                    stringToBytes(key),
+                    stringToBytes(JsonUtils.objectToJson(cacheWrapper))
             );
             return true;
         } catch (JsonProcessingException e) {
@@ -136,8 +136,8 @@ public class LevelCacheStore extends AbstractStringCacheStore {
                 if (stringCacheWrapper.isPresent()) {
                     //get expireat time
                     long expireAtTime = stringCacheWrapper.map(CacheWrapper::getExpireAt)
-                        .map(Date::getTime)
-                        .orElse(0L);
+                            .map(Date::getTime)
+                            .orElse(0L);
                     //if expire
                     if (expireAtTime != 0 && currentTimeMillis > expireAtTime) {
                         writeBatch.delete(next.getKey());

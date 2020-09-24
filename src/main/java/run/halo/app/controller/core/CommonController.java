@@ -54,9 +54,9 @@ public class CommonController extends AbstractErrorController {
     private final OptionService optionService;
 
     public CommonController(ThemeService themeService,
-                            ErrorAttributes errorAttributes,
-                            ServerProperties serverProperties,
-                            OptionService optionService) {
+            ErrorAttributes errorAttributes,
+            ServerProperties serverProperties,
+            OptionService optionService) {
         super(errorAttributes);
         this.themeService = themeService;
         this.errorProperties = serverProperties.getError();
@@ -72,10 +72,10 @@ public class CommonController extends AbstractErrorController {
     @GetMapping
     public String handleError(HttpServletRequest request, HttpServletResponse response, Model model) {
         log.error("Request URL: [{}], URI: [{}], Request Method: [{}], IP: [{}]",
-            request.getRequestURL(),
-            request.getRequestURI(),
-            request.getMethod(),
-            ServletUtil.getClientIP(request));
+                request.getRequestURL(),
+                request.getRequestURI(),
+                request.getMethod(),
+                ServletUtil.getClientIP(request));
 
         handleCustomException(request);
 
@@ -83,7 +83,7 @@ public class CommonController extends AbstractErrorController {
         model.addAttribute("error", errorDetail);
         model.addAttribute("meta_keywords", optionService.getSeoKeywords());
         model.addAttribute("meta_description", optionService.getSeoDescription());
-
+        model.addAttribute("message", HttpStatus.valueOf(optionService.getSeoKeywords()).value());
         log.debug("Error detail: [{}]", errorDetail);
 
         HttpStatus status = getStatus(request);
@@ -142,9 +142,9 @@ public class CommonController extends AbstractErrorController {
 
         StringBuilder path = new StringBuilder();
         path.append("themes/")
-            .append(themeService.getActivatedTheme().getFolderName())
-            .append('/')
-            .append(FilenameUtils.getBasename(template));
+                .append(themeService.getActivatedTheme().getFolderName())
+                .append('/')
+                .append(FilenameUtils.getBasename(template));
 
         return path.toString();
     }

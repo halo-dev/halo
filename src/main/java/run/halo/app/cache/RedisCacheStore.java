@@ -31,12 +31,13 @@ public class RedisCacheStore extends AbstractStringCacheStore {
      * Cache container.
      */
     private final static ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER = new ConcurrentHashMap<>();
+
     private volatile static JedisCluster REDIS;
-    protected HaloProperties haloProperties;
+
     /**
      * Lock.
      */
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     public RedisCacheStore(HaloProperties haloProperties) {
         this.haloProperties = haloProperties;
@@ -69,19 +70,6 @@ public class RedisCacheStore extends AbstractStringCacheStore {
         }
         REDIS = new JedisCluster(nodes, 5, 20, 3, this.haloProperties.getCacheRedisPassword(), cfg);
         log.info("Initialized cache redis cluster: {}", REDIS.getClusterNodes());
-    }
-
-    protected JedisCluster redis() {
-        if (REDIS == null) {
-            synchronized (RedisCacheStore.class) {
-                if (REDIS != null) {
-                    return REDIS;
-                }
-                initRedis();
-                return REDIS;
-            }
-        }
-        return REDIS;
     }
 
     @NotNull

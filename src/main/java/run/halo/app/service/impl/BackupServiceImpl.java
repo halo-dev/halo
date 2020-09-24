@@ -152,9 +152,9 @@ public class BackupServiceImpl implements BackupService {
      */
     public static String sanitizeFilename(final String unSanitized) {
         return unSanitized.
-            replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
-            replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
-            replaceAll("\\s", "");
+                replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
+                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
+                replaceAll("\\s", "");
     }
 
     @Override
@@ -174,10 +174,14 @@ public class BackupServiceImpl implements BackupService {
         try {
             // Create zip path for halo zip
             String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
-                DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                IdUtil.simpleUUID().hashCode() + ".zip";
+                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                    IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
-            Path haloZipPath = Files.createFile(Paths.get(haloProperties.getBackupDir(), haloZipFileName));
+            Path haloZipFilePath = Paths.get(haloProperties.getBackupDir(), haloZipFileName);
+            if (!Files.exists(haloZipFilePath.getParent())) {
+                Files.createDirectories(haloZipFilePath.getParent());
+            }
+            Path haloZipPath = Files.createFile(haloZipFilePath);
 
             // Zip halo
             run.halo.app.utils.FileUtils.zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
@@ -200,10 +204,10 @@ public class BackupServiceImpl implements BackupService {
         // Build backup dto
         try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
-                .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
-                .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
-                .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
-                .collect(Collectors.toList());
+                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
+                    .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
+                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
         }
@@ -294,10 +298,14 @@ public class BackupServiceImpl implements BackupService {
 
         try {
             String haloDataFileName = HaloConst.HALO_DATA_EXPORT_PREFIX +
-                DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                IdUtil.simpleUUID().hashCode() + ".json";
+                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                    IdUtil.simpleUUID().hashCode() + ".json";
 
-            Path haloDataPath = Files.createFile(Paths.get(haloProperties.getDataExportDir(), haloDataFileName));
+            Path haloDataFilePath = Paths.get(haloProperties.getDataExportDir(), haloDataFileName);
+            if (!Files.exists(haloDataFilePath.getParent())) {
+                Files.createDirectories(haloDataFilePath.getParent());
+            }
+            Path haloDataPath = Files.createFile(haloDataFilePath);
 
             FileWriter fileWriter = new FileWriter(haloDataPath.toFile(), CharsetUtil.UTF_8);
             fileWriter.write(JsonUtils.objectToJson(data));
@@ -318,10 +326,10 @@ public class BackupServiceImpl implements BackupService {
 
         try (Stream<Path> subPathStream = Files.list(exportedDataParentPath)) {
             return subPathStream
-                .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
-                .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
-                .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
-                .collect(Collectors.toList());
+                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
+                    .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
+                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch exported data", e);
         }
@@ -464,9 +472,9 @@ public class BackupServiceImpl implements BackupService {
 
         // Build full url
         return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), backupUri)
-            + "?"
-            + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
-            + "=" + oneTimeToken;
+                + "?"
+                + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
+                + "=" + oneTimeToken;
     }
 
 }

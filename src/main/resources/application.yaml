@@ -52,3 +52,4 @@ logging:
 
 halo:
   download-timeout: 5m
+  cache: memory

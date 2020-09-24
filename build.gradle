@@ -1,12 +1,12 @@
 plugins {
-    id "org.springframework.boot" version "2.3.1.RELEASE"
-    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+    id "org.springframework.boot" version "2.3.4.RELEASE"
+    id "io.spring.dependency-management" version "1.0.10.RELEASE"
     id "checkstyle"
     id "java"
 }
 
 group = "run.halo.app"
-version = "1.4.0-beta.1"
+version = "1.4.0"
 description = "Halo, An excellent open source blog publishing application."
 
 java {
@@ -38,7 +38,7 @@ configurations {
 bootJar {
     manifest {
         attributes("Implementation-Title": "Halo Application",
-                "Implementation-Version": archiveVersion)
+                "Implementation-Version": version)
     }
 }
 
@@ -53,7 +53,7 @@ ext {
     commonsLangVersion = "3.10"
     httpclientVersion = "4.5.12"
     dataformatYamlVersion = "2.11.0"
-    jgitVersion = "5.7.0.202003110725-r"
+    jgitVersion = "5.9.0.202009080501-r"
     flexmarkVersion = "0.62.2"
     thumbnailatorVersion = "0.4.11"
     image4jVersion = "0.7zensight1"

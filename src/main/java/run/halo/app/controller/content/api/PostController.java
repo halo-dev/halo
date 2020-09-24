@@ -44,8 +44,8 @@ public class PostController {
     private final OptionService optionService;
 
     public PostController(PostService postService,
-                          PostCommentService postCommentService,
-                          OptionService optionService) {
+            PostCommentService postCommentService,
+            OptionService optionService) {
         this.postService = postService;
         this.postCommentService = postCommentService;
         this.optionService = optionService;
@@ -61,7 +61,7 @@ public class PostController {
     @PostMapping(value = "search")
     @ApiOperation("Lists posts by keyword")
     public Page<BasePostSimpleDTO> pageBy(@RequestParam(value = "keyword") String keyword,
-                                          @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+            @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> postPage = postService.pageBy(keyword, pageable);
         return postService.convertToSimple(postPage);
     }
@@ -69,9 +69,31 @@ public class PostController {
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId,
-                              @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
-                              @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+            @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+            @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
         PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getById(postId));
+
+        if (formatDisabled) {
+            // Clear the format content
+            postDetailVO.setFormatContent(null);
+        }
+
+        if (sourceDisabled) {
+            // Clear the original content
+            postDetailVO.setOriginalContent(null);
+        }
+
+        postService.publishVisitEvent(postDetailVO.getId());
+
+        return postDetailVO;
+    }
+
+    @GetMapping("/slug")
+    @ApiOperation("Gets a post")
+    public PostDetailVO getBy(@RequestParam("slug") String slug,
+            @RequestParam(value = "formatDisabled", required = false, defaultValue = "true") Boolean formatDisabled,
+            @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false") Boolean sourceDisabled) {
+        PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getBySlug(slug));
 
         if (formatDisabled) {
             // Clear the format content
@@ -90,8 +112,8 @@ public class PostController {
 
     @GetMapping("{postId:\\d+}/comments/top_view")
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("postId") Integer postId,
-                                                          @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                          @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
 
         return postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
@@ -99,8 +121,8 @@ public class PostController {
 
     @GetMapping("{postId:\\d+}/comments/{commentParentId:\\d+}/children")
     public List<BaseCommentDTO> listChildrenBy(@PathVariable("postId") Integer postId,
-                                               @PathVariable("commentParentId") Long commentParentId,
-                                               @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @PathVariable("commentParentId") Long commentParentId,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         // Find all children comments
         List<PostComment> postComments = postCommentService.listChildrenBy(postId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
@@ -111,16 +133,16 @@ public class PostController {
     @GetMapping("{postId:\\d+}/comments/tree_view")
     @ApiOperation("Lists comments with tree view")
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("postId") Integer postId,
-                                                @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return postCommentService.pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
     @GetMapping("{postId:\\d+}/comments/list_view")
     @ApiOperation("Lists comment with list view")
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("postId") Integer postId,
-                                                      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                                                      @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         Page<BaseCommentWithParentVO> result = postCommentService.pageWithParentVoBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
         return result;
     }

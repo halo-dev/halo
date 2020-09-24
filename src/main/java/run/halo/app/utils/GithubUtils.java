@@ -7,6 +7,7 @@ import run.halo.app.service.ThemeService;
 
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * GithubUtils send request to api.github.com
@@ -24,6 +25,7 @@ public class GithubUtils {
 
     /**
      * Get latest release
+     *
      * @param uri repository url must not be null
      * @return the map object containning tagname and zipfile url
      */
@@ -49,6 +51,7 @@ public class GithubUtils {
 
     /**
      * Get release information
+     *
      * @param uri repository url must not be null
      * @return list of tagname of releases
      */
@@ -66,7 +69,7 @@ public class GithubUtils {
 
             return githubReleases.result;
         } catch (InterruptedException e) {
-            log.warn("Interrupted", e);
+            log.warn("Getting releases from github interrupted", e);
         }
 
         return null;
@@ -74,7 +77,8 @@ public class GithubUtils {
 
     /**
      * Get release information
-     * @param uri repository url must not be null
+     *
+     * @param uri     repository url must not be null
      * @param tagName tag must not be null
      * @return the map object containning tagname and zipfile url
      */
@@ -99,7 +103,8 @@ public class GithubUtils {
 
     /**
      * Get the content of theme.yaml/theme.yml
-     * @param uri repository url must not be null
+     *
+     * @param uri    repository url must not be null
      * @param branch branch must not be null
      * @return content of the file
      */
@@ -110,7 +115,7 @@ public class GithubUtils {
             GithubFile githubFile = new GithubFile(repoUrl, branch);
 
             Thread thread = new Thread(githubFile);
-            
+
             thread.start();
 
             thread.join(10 * 1000);
@@ -126,19 +131,22 @@ public class GithubUtils {
     private static class GithubRelease implements Runnable {
 
         /**
+         * should be in format of "username/reponame"
+         */
+        private final String repoUrl;
+
+        /**
+         * repository tag name
+         */
+        private final String tagName;
+
+        /**
          * The return result is zip url and tag name etc.
          */
         private HashMap<String, Object> result;
 
-        /**
-         * should be in format of "username/reponame"
-         */
-        private String repoUrl;
-
-        private String tagName;
-
         public GithubRelease(String repoUrl, String tagName) {
-            this.repoUrl = repoUrl;
+            this.repoUrl = StringUtils.removeEndIgnoreCase(repoUrl, ".git");
             this.tagName = tagName;
             result = null;
         }
@@ -194,13 +202,11 @@ public class GithubUtils {
 
     private static class GithubReleases implements Runnable {
 
+        private final String repoUrl;
         private List<String> result;
 
-        private String repoUrl;
-
         public GithubReleases(String repoUrl) {
-            this.repoUrl = repoUrl;
-            result = null;
+            this.repoUrl = StringUtils.removeEndIgnoreCase(repoUrl, ".git");
         }
 
         @Override
@@ -211,7 +217,7 @@ public class GithubUtils {
                     GHRepository ghRepository = gitHub.getRepository(repoUrl);
                     List<GHRelease> ghReleaseList = ghRepository.getReleases();
 
-                    result = new ArrayList<String>();
+                    result = new ArrayList<>();
 
                     for (GHRelease ghRelease : ghReleaseList) {
                         result.add(ghRelease.getTagName());
@@ -220,6 +226,9 @@ public class GithubUtils {
                     break;
 
                 } catch (Exception e) {
+                    if (log.isErrorEnabled()) {
+                        log.error("Failed to react with github.", e);
+                    }
                     if (e instanceof HttpException) {
                         int code = ((HttpException) e).getResponseCode();
                         if (code != -1) {
@@ -242,17 +251,16 @@ public class GithubUtils {
     private static class GithubLatestRelease implements Runnable {
 
         /**
+         * should be in format of "username/reponame"
+         */
+        private final String repoUrl;
+        /**
          * The return result is zip url and tag name etc.
          */
         private HashMap<String, Object> result;
 
-        /**
-         * should be in format of "username/reponame"
-         */
-        private String repoUrl;
-
         public GithubLatestRelease(String repoUrl) {
-            this.repoUrl = repoUrl;
+            this.repoUrl = StringUtils.removeEndIgnoreCase(repoUrl, ".git");
             result = null;
         }
 
@@ -290,7 +298,7 @@ public class GithubUtils {
                 }
 
                 try {
-                    Thread.sleep(2000);
+                    TimeUnit.SECONDS.sleep(2);
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -301,22 +309,20 @@ public class GithubUtils {
     private static class GithubFile implements Runnable {
 
         /**
+         * should be in format of "username/reponame"
+         */
+        private final String repoUrl;
+        /**
+         * the branch name
+         */
+        private final String branch;
+        /**
          * result is file content
          */
         private String result;
 
-        /**
-         * should be in format of "username/reponame"
-         */
-        private String repoUrl;
-
-        /**
-         * the branch name
-         */
-        private String branch;
-
         public GithubFile(String repoUrl, String branch) {
-            this.repoUrl = repoUrl;
+            this.repoUrl = StringUtils.removeEndIgnoreCase(repoUrl, ".git");
             this.branch = branch;
             result = null;
         }

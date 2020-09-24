@@ -86,7 +86,7 @@ class OptionServiceImplTest {
         QiniuOssProperties zoneProperty = QiniuOssProperties.OSS_ZONE;
 
         // Given
-//        given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
+        // given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
         Map<String, Object> optionMap = new HashMap<>(1);
         optionMap.put(zoneProperty.getValue(), Optional.ofNullable(option).map(Option::getValue).orElse(null));
         given(cacheStore.getAny(OptionService.OPTIONS_KEY, Map.class)).willReturn(Optional.of(optionMap));

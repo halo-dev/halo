@@ -45,8 +45,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     private final OptionService optionService;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository,
-                               PostCategoryService postCategoryService,
-                               OptionService optionService) {
+            PostCategoryService postCategoryService,
+            OptionService optionService) {
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
         this.postCategoryService = postCategoryService;
@@ -115,8 +115,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
         // Get children for removing after
         List<Category> children = categories.stream()
-            .filter(category -> Objects.equal(parentCategory.getId(), category.getParentId()))
-            .collect(Collectors.toList());
+                .filter(category -> Objects.equal(parentCategory.getId(), category.getParentId()))
+                .collect(Collectors.toList());
 
         children.forEach(category -> {
             // Convert to child category vo
@@ -133,10 +133,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
             }
 
             fullPath.append(URL_SEPARATOR)
-                .append(optionService.getCategoriesPrefix())
-                .append(URL_SEPARATOR)
-                .append(child.getSlug())
-                .append(optionService.getPathSuffix());
+                    .append(optionService.getCategoriesPrefix())
+                    .append(URL_SEPARATOR)
+                    .append(child.getSlug())
+                    .append(optionService.getPathSuffix());
 
             child.setFullPath(fullPath.toString());
 
@@ -219,10 +219,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         }
 
         fullPath.append(URL_SEPARATOR)
-            .append(optionService.getCategoriesPrefix())
-            .append(URL_SEPARATOR)
-            .append(category.getSlug())
-            .append(optionService.getPathSuffix());
+                .append(optionService.getCategoriesPrefix())
+                .append(URL_SEPARATOR)
+                .append(category.getSlug())
+                .append(optionService.getPathSuffix());
 
         categoryDTO.setFullPath(fullPath.toString());
 
@@ -236,7 +236,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         }
 
         return categories.stream()
-            .map(this::convertTo)
-            .collect(Collectors.toList());
+                .map(this::convertTo)
+                .collect(Collectors.toList());
     }
 }

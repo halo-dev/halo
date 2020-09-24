@@ -8,7 +8,10 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
-import run.halo.app.model.vo.*;
+import run.halo.app.model.vo.ArchiveMonthVO;
+import run.halo.app.model.vo.ArchiveYearVO;
+import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.base.BasePostService;
 
 import javax.validation.constraints.NotNull;
@@ -255,16 +258,6 @@ public interface PostService extends BasePostService<Post> {
     void publishVisitEvent(@NonNull Integer postId);
 
     /**
-     * Gets pre && next post.
-     *
-     * @param currentPost post must not be null
-     * @return AdjacentPostVO. it contains prevPost and nextPost.
-     * AdjacentPostVO will not be null. But prevPost and nextPost may be null.
-     */
-    @NotNull
-    AdjacentPostVO getAdjacentPosts(Post currentPost);
-
-    /**
      * Get Post Pageable default sort
      *
      * @return
@@ -272,4 +265,5 @@ public interface PostService extends BasePostService<Post> {
      */
     @NotNull
     Sort getPostDefaultSort();
+
 }

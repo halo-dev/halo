@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -23,23 +24,23 @@ class BeanUtilsTest {
         TestA a = new TestA(1, 2);
 
         TestC c = BeanUtils.transformFrom(a, TestC.class);
-        assertEquals(a.getA(), c.getA());
+        assertEquals(a.getA(), Objects.requireNonNull(c).getA());
         assertEquals(a.getB(), c.getB());
 
         TestB b = BeanUtils.transformFrom(a, TestB.class);
-        assertEquals(a.getB(), b.getB());
+        assertEquals(a.getB(), Objects.requireNonNull(b).getB());
         assertNull(b.getC());
 
         TestD d = new TestD(a);
         TestE e = BeanUtils.transformFrom(d, TestE.class);
-        assertEquals(d.getA().getA(), e.getA().getA());
+        assertEquals(d.getA().getA(), Objects.requireNonNull(e).getA().getA());
     }
 
     @Test
     void transformFromInBatch() {
         TestA[] as = {
-            new TestA(1, 2),
-            new TestA(3, 4)
+                new TestA(1, 2),
+                new TestA(3, 4)
         };
 
         List<TestA> aList = Arrays.asList(as);

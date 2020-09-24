@@ -57,10 +57,10 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     private final HaloProperties haloProperties;
 
     public OptionServiceImpl(HaloProperties haloProperties,
-                             OptionRepository optionRepository,
-                             ApplicationContext applicationContext,
-                             AbstractStringCacheStore cacheStore,
-                             ApplicationEventPublisher eventPublisher) {
+            OptionRepository optionRepository,
+            ApplicationContext applicationContext,
+            AbstractStringCacheStore cacheStore,
+            ApplicationEventPublisher eventPublisher) {
         super(optionRepository);
         this.haloProperties = haloProperties;
         this.optionRepository = optionRepository;
@@ -192,17 +192,17 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
 
             // Add default property
             propertyEnumMap.keySet()
-                .stream()
-                .filter(key -> !keys.contains(key))
-                .forEach(key -> {
-                    PropertyEnum propertyEnum = propertyEnumMap.get(key);
+                    .stream()
+                    .filter(key -> !keys.contains(key))
+                    .forEach(key -> {
+                        PropertyEnum propertyEnum = propertyEnumMap.get(key);
 
-                    if (StringUtils.isBlank(propertyEnum.defaultValue())) {
-                        return;
-                    }
+                        if (StringUtils.isBlank(propertyEnum.defaultValue())) {
+                            return;
+                        }
 
-                    result.put(key, PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
-                });
+                        result.put(key, PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
+                    });
 
             // Cache the result
             cacheStore.putAny(OPTIONS_KEY, result);
@@ -222,8 +222,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
         Map<String, Object> result = new HashMap<>(keys.size());
 
         keys.stream()
-            .filter(optionMap::containsKey)
-            .forEach(key -> result.put(key, optionMap.get(key)));
+                .filter(optionMap::containsKey)
+                .forEach(key -> result.put(key, optionMap.get(key)));
 
         return result;
     }

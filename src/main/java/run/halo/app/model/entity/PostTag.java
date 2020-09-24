@@ -20,8 +20,8 @@ import java.util.Objects;
 @ToString(callSuper = true)
 @RequiredArgsConstructor
 @Entity
-@Table(name = "post_tags",
-    indexes = {@Index(name = "post_tags_post_id", columnList = "post_id"),
+@Table(name = "post_tags", indexes = {
+        @Index(name = "post_tags_post_id", columnList = "post_id"),
         @Index(name = "post_tags_tag_id", columnList = "tag_id")})
 public class PostTag extends BaseEntity {
 
@@ -52,7 +52,7 @@ public class PostTag extends BaseEntity {
         }
         PostTag postTag = (PostTag) o;
         return Objects.equals(postId, postTag.postId) &&
-            Objects.equals(tagId, postTag.tagId);
+                Objects.equals(tagId, postTag.tagId);
     }
 
     @Override

@@ -42,16 +42,16 @@ public class StatisticServiceImpl implements StatisticService {
     private final UserService userService;
 
     public StatisticServiceImpl(PostService postService,
-                                SheetService sheetService,
-                                JournalService journalService,
-                                PostCommentService postCommentService,
-                                SheetCommentService sheetCommentService,
-                                JournalCommentService journalCommentService,
-                                OptionService optionService,
-                                LinkService linkService,
-                                CategoryService categoryService,
-                                TagService tagService,
-                                UserService userService) {
+            SheetService sheetService,
+            JournalService journalService,
+            PostCommentService postCommentService,
+            SheetCommentService sheetCommentService,
+            JournalCommentService journalCommentService,
+            OptionService optionService,
+            LinkService linkService,
+            CategoryService categoryService,
+            TagService tagService,
+            UserService userService) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.journalService = journalService;

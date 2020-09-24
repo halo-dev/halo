@@ -27,7 +27,7 @@ public class MigrateController {
     private final OptionService optionService;
 
     public MigrateController(MigrateService migrateService,
-                             OptionService optionService) {
+            OptionService optionService) {
         this.migrateService = migrateService;
         this.optionService = optionService;
     }
@@ -41,15 +41,15 @@ public class MigrateController {
         migrateService.migrate(file, MigrateType.HALO);
     }
 
-//    @PostMapping("wordpress")
-//    @ApiOperation("Migrate from WordPress")
-//    public void migrateWordPress(@RequestPart("file") MultipartFile file) {
-//        migrateService.migrate(file, MigrateType.WORDPRESS);
-//    }
-//
-//    @PostMapping("cnblogs")
-//    @ApiOperation("Migrate from cnblogs")
-//    public void migrateCnBlogs(@RequestPart("file") MultipartFile file) {
-//        migrateService.migrate(file, MigrateType.CNBLOGS);
-//    }
+    //    @PostMapping("wordpress")
+    //    @ApiOperation("Migrate from WordPress")
+    //    public void migrateWordPress(@RequestPart("file") MultipartFile file) {
+    //        migrateService.migrate(file, MigrateType.WORDPRESS);
+    //    }
+    //
+    //    @PostMapping("cnblogs")
+    //    @ApiOperation("Migrate from cnblogs")
+    //    public void migrateCnBlogs(@RequestPart("file") MultipartFile file) {
+    //        migrateService.migrate(file, MigrateType.CNBLOGS);
+    //    }
 }
