@@ -83,7 +83,6 @@ public class CommonController extends AbstractErrorController {
         model.addAttribute("error", errorDetail);
         model.addAttribute("meta_keywords", optionService.getSeoKeywords());
         model.addAttribute("meta_description", optionService.getSeoDescription());
-        model.addAttribute("message", HttpStatus.valueOf(optionService.getSeoKeywords()).value());
         log.debug("Error detail: [{}]", errorDetail);
 
         HttpStatus status = getStatus(request);
