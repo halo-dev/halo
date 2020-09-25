@@ -238,6 +238,7 @@
               </a-form-model-item>
               <a-form-model-item v-show="installModal.remote.byBranchOrRelease ==='branch'">
                 <ReactiveButton
+                  :disabled="!installModal.remote.selectedBranch"
                   type="primary"
                   @click="handleBranchPulling"
                   @callback="handleBranchPulledCallback"

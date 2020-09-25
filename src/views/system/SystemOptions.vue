@@ -4,6 +4,7 @@
       <a-button
         type="link"
         @click="advancedOptions = !advancedOptions"
+        style="padding:0"
       >
         切换到{{ advancedOptions?'基础选项':'高级选项' }}
       </a-button>
