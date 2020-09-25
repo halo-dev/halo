@@ -322,10 +322,9 @@ import TagSelect from './TagSelect'
 
 // libs
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import moment from 'moment'
+import { datetimeFormat } from '@/utils/datetime'
 import pinyin from 'tiny-pinyin'
 import { mapGetters } from 'vuex'
-import { datetimeFormat } from '@/utils/util'
 
 // apis
 import categoryApi from '@/api/category'
@@ -421,9 +420,9 @@ export default {
     pickerDefaultValue() {
       if (this.selectedPost.createTime) {
         var date = new Date(this.selectedPost.createTime)
-        return moment(date, 'YYYY-MM-DD HH:mm:ss')
+        return datetimeFormat(date, 'YYYY-MM-DD HH:mm:ss')
       }
-      return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
+      return datetimeFormat(new Date(), 'YYYY-MM-DD HH:mm:ss')
     },
     fullPath() {
       const permalinkType = this.options.post_permalink_type

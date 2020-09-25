@@ -1,10 +1,10 @@
 import Vue from 'vue'
-import moment from 'moment'
-import 'moment/locale/zh-cn'
-import {
-  timeAgo
-} from '@/utils/util'
-moment.locale('zh-cn')
+
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+
+import { timeAgo } from '@/utils/datetime'
+dayjs.locale('zh-cn')
 
 Vue.filter('NumberFormat', function(value) {
   if (!value) {
@@ -14,20 +14,16 @@ Vue.filter('NumberFormat', function(value) {
   return intPartFormat
 })
 
-Vue.filter('dayjs', function(dataStr, pattern = 'YYYY-MM-DD HH:mm') {
-  return moment(dataStr).format(pattern)
-})
-
 Vue.filter('moment', function(dataStr, pattern = 'YYYY-MM-DD HH:mm') {
-  return moment(dataStr).format(pattern)
+  return dayjs(dataStr).format(pattern)
 })
 
 Vue.filter('moment_post_date', function(dataStr, pattern = '/YYYY/MM/') {
-  return moment(dataStr).format(pattern)
+  return dayjs(dataStr).format(pattern)
 })
 
 Vue.filter('moment_post_day', function(dataStr, pattern = '/YYYY/MM/DD/') {
-  return moment(dataStr).format(pattern)
+  return dayjs(dataStr).format(pattern)
 })
 
 Vue.filter('timeAgo', timeAgo)

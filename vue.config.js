@@ -1,5 +1,4 @@
 const path = require('path')
-const webpack = require('webpack')
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -8,11 +7,6 @@ function resolve(dir) {
 // vue.config.js
 module.exports = {
   publicPath: process.env.PUBLIC_PATH,
-  configureWebpack: {
-    plugins: [
-      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
-    ]
-  },
 
   chainWebpack: (config) => {
     config.resolve.alias

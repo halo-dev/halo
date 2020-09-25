@@ -234,7 +234,7 @@
 <script>
 // libs
 import { mixin, mixinDevice } from '@/utils/mixin.js'
-import moment from 'moment'
+import { datetimeFormat } from '@/utils/datetime'
 import { mapGetters } from 'vuex'
 import pinyin from 'tiny-pinyin'
 
@@ -301,9 +301,9 @@ export default {
     pickerDefaultValue() {
       if (this.selectedSheet.createTime) {
         var date = new Date(this.selectedSheet.createTime)
-        return moment(date, 'YYYY-MM-DD HH:mm:ss')
+        return datetimeFormat(date, 'YYYY-MM-DD HH:mm:ss')
       }
-      return moment(new Date(), 'YYYY-MM-DD HH:mm:ss')
+      return datetimeFormat(new Date(), 'YYYY-MM-DD HH:mm:ss')
     },
     fullPath() {
       const blogUrl = this.options.blog_url

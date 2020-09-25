@@ -69,7 +69,7 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 // import { mapGetters } from 'vuex'
-import moment from 'moment'
+import { datetimeFormat } from '@/utils/datetime'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
@@ -175,7 +175,7 @@ export default {
       this.$log.debug('Draft only: ' + draftOnly)
       this.sheetToStage.status = 'DRAFT'
       if (!this.sheetToStage.title) {
-        this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
+        this.sheetToStage.title = datetimeFormat(new Date(), 'YYYY-MM-DD-HH-mm-ss')
       }
       this.draftSaving = true
       if (this.sheetToStage.id) {
@@ -229,7 +229,7 @@ export default {
     handlePreview() {
       this.sheetToStage.status = 'DRAFT'
       if (!this.sheetToStage.title) {
-        this.sheetToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
+        this.sheetToStage.title = datetimeFormat(new Date(), 'YYYY-MM-DD-HH-mm-ss')
       }
       this.previewSaving = true
       if (this.sheetToStage.id) {

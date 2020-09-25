@@ -39,7 +39,7 @@
 import { codemirror } from 'vue-codemirror-lite'
 import 'codemirror/mode/shell/shell.js'
 import adminApi from '@/api/admin'
-import moment from 'moment'
+import { datetimeFormat } from '@/utils/datetime'
 export default {
   name: 'RuntimeLogs',
   components: {
@@ -90,7 +90,7 @@ export default {
           var downloadElement = document.createElement('a')
           var href = window.URL.createObjectURL(blob)
           downloadElement.href = href
-          downloadElement.download = 'halo-log-' + moment(new Date(), 'YYYY-MM-DD-HH-mm-ss') + '.log'
+          downloadElement.download = 'halo-log-' + datetimeFormat(new Date(), 'YYYY-MM-DD-HH-mm-ss') + '.log'
           document.body.appendChild(downloadElement)
           downloadElement.click()
           document.body.removeChild(downloadElement)

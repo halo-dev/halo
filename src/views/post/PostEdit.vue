@@ -74,7 +74,8 @@
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 // import { mapGetters } from 'vuex'
-import moment from 'moment'
+import { datetimeFormat } from '@/utils/datetime'
+
 import PostSettingDrawer from './components/PostSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
@@ -88,7 +89,7 @@ export default {
     PostSettingDrawer,
     FooterToolBar,
     AttachmentDrawer,
-    MarkdownEditor
+    MarkdownEditor,
     // RichTextEditor
   },
   data() {
@@ -102,7 +103,7 @@ export default {
       contentChanges: 0,
       draftSaving: false,
       previewSaving: false,
-      draftSavederrored: false
+      draftSavederrored: false,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -150,7 +151,7 @@ export default {
         },
         onCancel() {
           next(false)
-        }
+        },
       })
     }
   },
@@ -171,12 +172,12 @@ export default {
       if (newValue) {
         this.contentChanges++
       }
-    }
+    },
   },
   computed: {
     temporaryContent() {
       return this.postToStage.originalContent
-    }
+    },
     // ...mapGetters(['options'])
   },
   methods: {
@@ -184,7 +185,7 @@ export default {
       this.$log.debug('Draft only: ' + draftOnly)
       this.postToStage.status = 'DRAFT'
       if (!this.postToStage.title) {
-        this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
+        this.postToStage.title = datetimeFormat(new Date(), 'YYYY-MM-DD-HH-mm-ss')
       }
       this.draftSaving = true
       if (this.postToStage.id) {
@@ -240,7 +241,7 @@ export default {
     handlePreview() {
       this.postToStage.status = 'DRAFT'
       if (!this.postToStage.title) {
-        this.postToStage.title = moment(new Date()).format('YYYY-MM-DD-HH-mm-ss')
+        this.postToStage.title = datetimeFormat(new Date(), 'YYYY-MM-DD-HH-mm-ss')
       }
       this.previewSaving = true
       if (this.postToStage.id) {
@@ -295,7 +296,7 @@ export default {
     },
     onRefreshPostMetasFromSetting(metas) {
       this.selectedMetas = metas
-    }
-  }
+    },
+  },
 }
 </script>
