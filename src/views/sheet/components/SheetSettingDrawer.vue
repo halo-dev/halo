@@ -208,25 +208,15 @@
           loadedText="保存成功"
           erroredText="保存失败"
         ></ReactiveButton>
-
-        <a-popconfirm
-          title="是否同时更新发布时间为当前时间？"
-          ok-text="更新"
-          cancel-text="不更新"
-          @confirm="handlePublishClick(true)"
-          @cancel="handlePublishClick(false)"
-          :disabled="selectedSheet.status !== 'DRAFT'"
-        >
-          <ReactiveButton
-            @click="selectedSheet.status !== 'DRAFT'?handlePublishClick(false):()=>{}"
-            @callback="handleSavedCallback"
-            :loading="saving"
-            :errored="savedErrored"
-            :text="`${selectedSheet.id?'保存':'发布'}`"
-            :loadedText="`${selectedSheet.id?'保存':'发布'}成功`"
-            :erroredText="`${selectedSheet.id?'保存':'发布'}失败`"
-          ></ReactiveButton>
-        </a-popconfirm>
+        <ReactiveButton
+          @click="handlePublishClick()"
+          @callback="handleSavedCallback"
+          :loading="saving"
+          :errored="savedErrored"
+          :text="`${selectedSheet.id?'保存':'发布'}`"
+          :loadedText="`${selectedSheet.id?'保存':'发布'}成功`"
+          :erroredText="`${selectedSheet.id?'保存':'发布'}失败`"
+        ></ReactiveButton>
       </a-space>
     </div>
   </a-drawer>
@@ -352,10 +342,7 @@ export default {
       this.selectedSheet.thumbnail = encodeURI(data.path)
       this.thumbDrawerVisible = false
     },
-    handlePublishClick(refreshCreateTime = false) {
-      if (refreshCreateTime) {
-        this.selectedSheet.createTime = new Date()
-      }
+    handlePublishClick() {
       this.selectedSheet.status = 'PUBLISHED'
       this.createOrUpdateSheet()
     },

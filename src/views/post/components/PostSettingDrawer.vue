@@ -292,24 +292,15 @@
           loadedText="保存成功"
           erroredText="保存失败"
         ></ReactiveButton>
-        <a-popconfirm
-          title="是否同时更新发布时间为当前时间？"
-          ok-text="更新"
-          cancel-text="不更新"
-          @confirm="handlePublishClick(true)"
-          @cancel="handlePublishClick(false)"
-          :disabled="selectedPost.status !== 'DRAFT'"
-        >
-          <ReactiveButton
-            @click="selectedPost.status !== 'DRAFT'?handlePublishClick(false):()=>{}"
-            @callback="handleSavedCallback"
-            :loading="saving"
-            :errored="savedErrored"
-            :text="`${selectedPost.id?'保存':'发布'}`"
-            :loadedText="`${selectedPost.id?'保存':'发布'}成功`"
-            :erroredText="`${selectedPost.id?'保存':'发布'}失败`"
-          ></ReactiveButton>
-        </a-popconfirm>
+        <ReactiveButton
+          @click="handlePublishClick()"
+          @callback="handleSavedCallback"
+          :loading="saving"
+          :errored="savedErrored"
+          :text="`${selectedPost.id?'保存':'发布'}`"
+          :loadedText="`${selectedPost.id?'保存':'发布'}成功`"
+          :erroredText="`${selectedPost.id?'保存':'发布'}失败`"
+        ></ReactiveButton>
       </a-space>
     </div>
   </a-drawer>
@@ -511,10 +502,7 @@ export default {
       this.selectedPost.status = 'DRAFT'
       this.createOrUpdatePost()
     },
-    handlePublishClick(refreshCreateTime = false) {
-      if (refreshCreateTime) {
-        this.selectedPost.createTime = new Date()
-      }
+    handlePublishClick() {
       this.selectedPost.status = 'PUBLISHED'
       this.createOrUpdatePost()
     },
