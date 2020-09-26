@@ -21,7 +21,7 @@
                   :sm="24"
                 >
                   <a-form-item label="关键词：">
-                    <a-input v-model="queryParam.keyword" />
+                    <a-input v-model="list.queryParam.keyword" />
                   </a-form-item>
                 </a-col>
                 <a-col
@@ -30,11 +30,11 @@
                 >
                   <a-form-item label="分组：">
                     <a-select
-                      v-model="queryParam.team"
+                      v-model="list.queryParam.team"
                       @change="handleQuery()"
                     >
                       <a-select-option
-                        v-for="(item,index) in teams"
+                        v-for="(item,index) in computedTeams"
                         :key="index"
                         :value="item"
                       >{{ item }}</a-select-option>
@@ -51,7 +51,7 @@
                         type="primary"
                         @click="handleQuery()"
                       >查询</a-button>
-                      <a-button @click="resetParam()">重置</a-button>
+                      <a-button @click="handleResetParam()">重置</a-button>
                     </a-space>
                   </span>
                 </a-col>
@@ -62,7 +62,7 @@
             <a-button
               type="primary"
               icon="plus"
-              @click="handleAddClick"
+              @click="form.visible = true"
             >添加</a-button>
           </div>
         </a-card>
@@ -70,8 +70,8 @@
       <a-col :span="24">
         <a-list
           :grid="{ gutter: 12, xs: 2, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
-          :dataSource="photos"
-          :loading="listLoading"
+          :dataSource="list.data"
+          :loading="list.loading"
         >
           <a-list-item
             slot="renderItem"
@@ -81,7 +81,7 @@
             <a-card
               :bodyStyle="{ padding: 0 }"
               hoverable
-              @click="showDrawer(item)"
+              @click="handleOpenEditForm(item)"
             >
               <div class="photo-thumb">
                 <img
@@ -103,9 +103,9 @@
     </a-row>
     <div class="page-wrapper">
       <a-pagination
-        :current="pagination.page"
-        :total="pagination.total"
-        :defaultPageSize="pagination.size"
+        :current="list.pagination.page"
+        :total="list.pagination.total"
+        :defaultPageSize="list.pagination.size"
         :pageSizeOptions="['18', '36', '54','72','90','108']"
         showSizeChanger
         @change="handlePaginationChange"
@@ -150,167 +150,127 @@
       </a-form>
     </a-modal>
     <a-drawer
-      title="图片详情"
+      :title="`图片${form.model.id?'修改':'添加'}`"
       :width="isMobile()?'100%':'480'"
       closable
-      :visible="drawerVisible"
+      :visible="form.visible"
       destroyOnClose
       @close="onDrawerClose"
     >
-      <a-row
-        type="flex"
-        align="middle"
+      <a-form-model
+        ref="photoForm"
+        :model="form.model"
+        :rules="form.rules"
+        layout="vertical"
       >
-        <a-col :span="24">
-          <div class="photo-detail-img">
+        <a-form-model-item
+          prop="url"
+          label="图片地址："
+        >
+          <div class="pb-2">
             <img
-              :src="photo.url || '/images/placeholder.jpg'"
-              @click="showThumbDrawer"
-              class="w-full"
+              :src="form.model.url || '/images/placeholder.jpg'"
+              @click="attachmentSelectDrawer.visible = true"
+              class="w-full cursor-pointer"
+              style="border-radius:4px"
             >
           </div>
-        </a-col>
-        <a-divider style="margin: 24px 0 12px 0;" />
-
-        <a-col :span="24">
-          <a-list itemLayout="horizontal">
-            <a-list-item>
-              <a-list-item-meta>
-                <template
-                  slot="description"
-                  v-if="editable"
-                >
-                  <a-input v-model="photo.thumbnail" />
-                </template>
-                <template
-                  slot="description"
-                  v-else
-                >{{ photo.thumbnail }}</template>
-                <span slot="title">
-                  缩略图地址：
-                </span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta>
-                <template
-                  slot="description"
-                  v-if="editable"
-                >
-                  <a-input v-model="photo.name" />
-                </template>
-                <template
-                  slot="description"
-                  v-else
-                >{{ photo.name }}</template>
-                <span slot="title">
-                  图片名称：
-                </span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta>
-                <template
-                  slot="description"
-                  v-if="editable"
-                >
-                  <a-date-picker
-                    v-model="photo.takeTime"
-                    style="width:100%"
-                  />
-                </template>
-                <span
-                  slot="description"
-                  v-else
-                >{{ photo.takeTime | moment }}</span>
-                <span slot="title">拍摄日期：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta>
-                <template
-                  slot="description"
-                  v-if="editable"
-                >
-                  <a-input v-model="photo.location" />
-                </template>
-                <span
-                  slot="description"
-                  v-else
-                >{{ photo.location || '无' }}</span>
-                <span slot="title">拍摄地点：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta>
-                <template
-                  slot="description"
-                  v-if="editable"
-                >
-                  <a-auto-complete
-                    :dataSource="teams"
-                    v-model="photo.team"
-                    allowClear
-                    style="width:100%"
-                  />
-                </template>
-                <span
-                  slot="description"
-                  v-else
-                >{{ photo.team || '无' }}</span>
-                <span slot="title">分组：</span>
-              </a-list-item-meta>
-            </a-list-item>
-            <a-list-item>
-              <a-list-item-meta>
-                <template
-                  slot="description"
-                  v-if="editable"
-                >
-                  <a-input
-                    v-model="photo.description"
-                    type="textarea"
-                    :autoSize="{ minRows: 5 }"
-                  />
-                </template>
-                <span
-                  slot="description"
-                  v-else
-                >{{ photo.description || '无' }}</span>
-                <span slot="title">描述：</span>
-              </a-list-item-meta>
-            </a-list-item>
-          </a-list>
-        </a-col>
-      </a-row>
-      <AttachmentSelectDrawer
-        v-model="thumDrawerVisible"
-        @listenToSelect="selectPhotoThumb"
-        :drawerWidth="480"
-      />
+          <a-input
+            v-model="form.model.url"
+            placeholder="点击封面图选择图片，或者输入外部链接"
+          />
+        </a-form-model-item>
+        <a-form-model-item
+          prop="thumbnail"
+          label="缩略图地址："
+        >
+          <a-input v-model="form.model.thumbnail" />
+        </a-form-model-item>
+        <a-form-model-item
+          prop="name"
+          label="图片名称："
+        >
+          <a-input v-model="form.model.name" />
+        </a-form-model-item>
+        <a-form-model-item
+          prop="takeTime"
+          label="拍摄日期："
+        >
+          <a-date-picker
+            showTime
+            :defaultValue="takeTimeDefaultValue"
+            format="YYYY-MM-DD HH:mm:ss"
+            style="width:100%"
+            @change="onTakeTimeChange"
+            @ok="onTakeTimeSelect"
+          />
+        </a-form-model-item>
+        <a-form-model-item
+          prop="location"
+          label="拍摄地点："
+        >
+          <a-input v-model="form.model.location" />
+        </a-form-model-item>
+        <a-form-model-item
+          prop="team"
+          label="分组："
+        >
+          <a-auto-complete
+            :dataSource="computedTeams"
+            v-model="form.model.team"
+            allowClear
+            style="width:100%"
+          />
+        </a-form-model-item>
+        <a-form-model-item
+          prop="description"
+          label="描述："
+        >
+          <a-input
+            v-model="form.model.description"
+            type="textarea"
+            :autoSize="{ minRows: 5 }"
+          />
+        </a-form-model-item>
+      </a-form-model>
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-space>
-          <a-button
-            type="dashed"
-            @click="editable = true"
-            v-if="!editable"
-          >编辑</a-button>
-          <a-button
-            type="primary"
+          <ReactiveButton
             @click="handleCreateOrUpdate"
-            v-else
-          >保存</a-button>
+            @callback="handleCreateOrUpdateCallback"
+            :loading="form.saving"
+            :errored="form.saveErrored"
+            :text="`${form.model.id?'修改':'添加'}`"
+            :loadedText="`${form.model.id?'修改':'添加'}成功`"
+            :erroredText="`${form.model.id?'修改':'添加'}失败`"
+          ></ReactiveButton>
           <a-popconfirm
             title="你确定要删除该图片？"
             okText="确定"
             cancelText="取消"
-            @confirm="handleDeletePhoto"
+            @confirm="handleDelete"
+            v-if="form.model.id"
           >
-            <a-button type="danger">删除</a-button>
+            <ReactiveButton
+              type="danger"
+              @click="() => {}"
+              @callback="handleDeleteCallback"
+              :loading="form.deleting"
+              :errored="form.deleteErrored"
+              text="删除"
+              loadedText="删除成功"
+              erroredText="删除失败"
+            ></ReactiveButton>
           </a-popconfirm>
         </a-space>
       </div>
+
+      <AttachmentSelectDrawer
+        v-model="attachmentSelectDrawer.visible"
+        @listenToSelect="handleAttachmentSelected"
+        :drawerWidth="480"
+      />
     </a-drawer>
   </div>
 </template>
@@ -320,33 +280,51 @@ import { mapActions } from 'vuex'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import photoApi from '@/api/photo'
 import optionApi from '@/api/option'
+import { datetimeFormat } from '@/utils/datetime'
 
 export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      drawerVisible: false,
-      listLoading: true,
-      thumDrawerVisible: false,
+      list: {
+        data: [],
+        loading: false,
+        pagination: {
+          page: 1,
+          size: 18,
+          sort: null,
+          total: 1,
+        },
+        queryParam: {
+          page: 0,
+          size: 18,
+          sort: null,
+          keyword: null,
+          team: null,
+        },
+      },
+
+      form: {
+        model: {},
+        visible: false,
+        rules: {
+          url: [{ required: true, message: '* 图片地址不能为空', trigger: ['change'] }],
+          thumbnail: [{ required: true, message: '* 缩略图地址不能为空', trigger: ['change'] }],
+          name: [{ required: true, message: '* 图片名称不能为空', trigger: ['change'] }],
+        },
+        saving: false,
+        saveErrored: false,
+        deleting: false,
+        deleteErrored: false,
+      },
+
+      attachmentSelectDrawer: {
+        visible: false,
+      },
+
       optionFormVisible: false,
-      photo: {},
-      photos: [],
       teams: [],
-      editable: false,
-      pagination: {
-        page: 1,
-        size: 18,
-        sort: null,
-        total: 1
-      },
-      queryParam: {
-        page: 0,
-        size: 18,
-        sort: null,
-        keyword: null,
-        team: null
-      },
-      options: []
+      options: [],
     }
   },
   created() {
@@ -354,112 +332,145 @@ export default {
     this.hanldeListPhotoTeams()
     this.hanldeListOptions()
   },
+  computed: {
+    takeTimeDefaultValue() {
+      if (this.form.model.takeTime) {
+        var date = new Date(this.form.model.takeTime)
+        return datetimeFormat(date, 'YYYY-MM-DD HH:mm:ss')
+      }
+      return datetimeFormat(new Date(), 'YYYY-MM-DD HH:mm:ss')
+    },
+    computedTeams() {
+      return this.teams.filter((item) => {
+        return item !== ''
+      })
+    },
+  },
   methods: {
     ...mapActions(['refreshOptionsCache']),
     hanldeListPhotos() {
-      this.listLoading = true
-      this.queryParam.page = this.pagination.page - 1
-      this.queryParam.size = this.pagination.size
-      this.queryParam.sort = this.pagination.sort
+      this.list.loading = true
+      this.list.queryParam.page = this.list.pagination.page - 1
+      this.list.queryParam.size = this.list.pagination.size
+      this.list.queryParam.sort = this.list.pagination.sort
       photoApi
-        .query(this.queryParam)
-        .then(response => {
-          this.photos = response.data.data.content
-          this.pagination.total = response.data.data.total
+        .query(this.list.queryParam)
+        .then((response) => {
+          this.list.data = response.data.data.content
+          this.list.pagination.total = response.data.data.total
         })
         .finally(() => {
           setTimeout(() => {
-            this.listLoading = false
+            this.list.loading = false
           }, 200)
         })
     },
+    handleQuery() {
+      this.handlePaginationChange(1, this.list.pagination.size)
+    },
     hanldeListOptions() {
-      optionApi.listAll().then(response => {
+      optionApi.listAll().then((response) => {
         this.options = response.data.data
       })
     },
-    handleQuery() {
-      this.handlePaginationChange(1, this.pagination.size)
-    },
     hanldeListPhotoTeams() {
-      photoApi.listTeams().then(response => {
+      photoApi.listTeams().then((response) => {
         this.teams = response.data.data
       })
     },
     handleCreateOrUpdate() {
-      if (this.photo.id) {
-        photoApi
-          .update(this.photo.id, this.photo)
-          .then(response => {
-            this.$message.success('照片更新成功！')
-          })
-          .finally(() => {
-            this.hanldeListPhotos()
-            this.hanldeListPhotoTeams()
-          })
-      } else {
-        photoApi
-          .create(this.photo)
-          .then(response => {
-            this.photo = response.data.data
-            this.$message.success('照片添加成功！')
-          })
-          .finally(() => {
-            this.hanldeListPhotos()
-            this.hanldeListPhotoTeams()
-          })
-      }
-      this.editable = false
+      const _this = this
+      _this.$refs.photoForm.validate((valid) => {
+        if (valid) {
+          _this.form.saving = true
+          if (_this.form.model.id) {
+            photoApi
+              .update(_this.form.model.id, _this.form.model)
+              .catch(() => {
+                _this.form.saveErrored = true
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 400)
+              })
+          } else {
+            photoApi
+              .create(_this.form.model)
+              .catch(() => {
+                _this.form.saveErrored = true
+              })
+              .finally(() => {
+                setTimeout(() => {
+                  _this.form.saving = false
+                }, 400)
+              })
+          }
+        }
+      })
     },
-    showDrawer(photo) {
-      this.photo = photo
-      this.drawerVisible = true
+    handleCreateOrUpdateCallback() {
+      if (this.form.saveErrored) {
+        this.form.saveErrored = false
+      } else {
+        this.form.model = {}
+        this.form.visible = false
+        this.hanldeListPhotos()
+        this.hanldeListPhotoTeams()
+      }
+    },
+    handleOpenEditForm(photo) {
+      this.form.model = photo
+      this.form.visible = true
     },
     handlePaginationChange(page, size) {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
-      this.pagination.page = page
-      this.pagination.size = size
+      this.list.pagination.page = page
+      this.list.pagination.size = size
       this.hanldeListPhotos()
     },
-    handleAddClick() {
-      this.editable = true
-      this.drawerVisible = true
-    },
-    handleDeletePhoto() {
+    handleDelete() {
+      this.form.deleting = true
       photoApi
-        .delete(this.photo.id)
-        .then(response => {
-          this.$message.success('删除成功！')
-          this.onDrawerClose()
+        .delete(this.form.model.id)
+        .catch(() => {
+          this.form.deleteErrored = true
         })
         .finally(() => {
-          this.hanldeListPhotos()
-          this.hanldeListPhotoTeams()
+          setTimeout(() => {
+            this.form.deleting = false
+          }, 400)
         })
     },
-    showThumbDrawer() {
-      this.thumDrawerVisible = true
+    handleDeleteCallback() {
+      if (this.form.deleteErrored) {
+        this.form.deleteErrored = false
+      } else {
+        this.form.model = {}
+        this.form.visible = false
+        this.hanldeListPhotos()
+        this.hanldeListPhotoTeams()
+      }
     },
-    selectPhotoThumb(data) {
-      this.photo.url = encodeURI(data.path)
-      this.photo.thumbnail = encodeURI(data.thumbPath)
-      this.thumDrawerVisible = false
+    handleAttachmentSelected(data) {
+      this.form.model.url = encodeURI(data.path)
+      this.form.model.thumbnail = encodeURI(data.thumbPath)
+      this.attachmentSelectDrawer.visible = false
     },
-    resetParam() {
-      this.queryParam.keyword = null
-      this.queryParam.team = null
-      this.handlePaginationChange(1, this.pagination.size)
+    handleResetParam() {
+      this.list.queryParam.keyword = null
+      this.list.queryParam.team = null
+      this.handlePaginationChange(1, this.list.pagination.size)
       this.hanldeListPhotoTeams()
     },
     onDrawerClose() {
-      this.drawerVisible = false
-      this.photo = {}
-      this.editable = false
+      this.form.visible = false
+      this.form.model = {}
     },
     handleSaveOptions() {
       optionApi
         .save(this.options)
-        .then(response => {
+        .then((response) => {
           this.$message.success('保存成功！')
           this.optionFormVisible = false
         })
@@ -467,7 +478,13 @@ export default {
           this.hanldeListOptions()
           this.refreshOptionsCache()
         })
-    }
-  }
+    },
+    onTakeTimeChange(value, dateString) {
+      this.form.model.takeTime = value.valueOf()
+    },
+    onTakeTimeSelect(value) {
+      this.form.model.takeTime = value.valueOf()
+    },
+  },
 }
 </script>

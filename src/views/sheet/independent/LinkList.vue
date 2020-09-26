@@ -51,7 +51,7 @@
               prop="team"
             >
               <a-auto-complete
-                :dataSource="teams"
+                :dataSource="computedTeams"
                 v-model="form.model.team"
                 allowClear
               />
@@ -273,28 +273,28 @@ const columns = [
     title: '名称',
     dataIndex: 'name',
     ellipsis: true,
-    scopedSlots: { customRender: 'name' }
+    scopedSlots: { customRender: 'name' },
   },
   {
     title: '网址',
     dataIndex: 'url',
     ellipsis: true,
-    scopedSlots: { customRender: 'url' }
+    scopedSlots: { customRender: 'url' },
   },
   {
     title: '分组',
     ellipsis: true,
-    dataIndex: 'team'
+    dataIndex: 'team',
   },
   {
     title: '排序',
-    dataIndex: 'priority'
+    dataIndex: 'priority',
   },
   {
     title: '操作',
     key: 'action',
-    scopedSlots: { customRender: 'action' }
-  }
+    scopedSlots: { customRender: 'action' },
+  },
 ]
 export default {
   mixins: [mixin, mixinDevice],
@@ -303,7 +303,7 @@ export default {
       table: {
         columns,
         data: [],
-        loading: false
+        loading: false,
       },
       form: {
         model: {},
@@ -312,23 +312,23 @@ export default {
         rules: {
           name: [
             { required: true, message: '* 友情链接名称不能为空', trigger: ['change'] },
-            { max: 255, message: '* 友情链接名称的字符长度不能超过 255', trigger: ['change'] }
+            { max: 255, message: '* 友情链接名称的字符长度不能超过 255', trigger: ['change'] },
           ],
           url: [
             { required: true, message: '* 友情链接地址不能为空', trigger: ['change'] },
             { max: 1023, message: '* 友情链接地址的字符长度不能超过 1023', trigger: ['change'] },
-            { type: 'url', message: '* 友情链接地址格式有误', trigger: ['change'] }
+            { type: 'url', message: '* 友情链接地址格式有误', trigger: ['change'] },
           ],
           logo: [{ max: 1023, message: '* 友情链接 Logo 的字符长度不能超过 1023', trigger: ['change'] }],
           description: [{ max: 255, message: '* 友情链接描述的字符长度不能超过 255', trigger: ['change'] }],
-          team: [{ max: 255, message: '* 友情链接分组的字符长度 255', trigger: ['change'] }]
-        }
+          team: [{ max: 255, message: '* 友情链接分组的字符长度 255', trigger: ['change'] }],
+        },
       },
       optionsModal: {
         visible: false,
-        data: []
+        data: [],
       },
-      teams: []
+      teams: [],
     }
   },
   computed: {
@@ -340,7 +340,12 @@ export default {
     },
     isUpdateMode() {
       return !!this.form.model.id
-    }
+    },
+    computedTeams() {
+      return this.teams.filter((item) => {
+        return item !== ''
+      })
+    },
   },
   created() {
     this.handleListLinks()
@@ -353,7 +358,7 @@ export default {
       this.table.loading = true
       linkApi
         .listAll()
-        .then(response => {
+        .then((response) => {
           this.table.data = response.data.data
         })
         .finally(() => {
@@ -363,19 +368,19 @@ export default {
         })
     },
     handleListLinkTeams() {
-      linkApi.listTeams().then(response => {
+      linkApi.listTeams().then((response) => {
         this.teams = response.data.data
       })
     },
     handleListOptions() {
-      optionApi.listAll().then(response => {
+      optionApi.listAll().then((response) => {
         this.optionsModal.data = response.data.data
       })
     },
     handleDeleteLink(id) {
       linkApi
         .delete(id)
-        .then(response => {
+        .then((response) => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
@@ -384,13 +389,13 @@ export default {
         })
     },
     handleParseUrl() {
-      linkApi.getByParse(this.form.model.url).then(response => {
+      linkApi.getByParse(this.form.model.url).then((response) => {
         this.form.model = response.data.data
       })
     },
     handleCreateOrUpdateLink() {
       const _this = this
-      _this.$refs.linkForm.validate(valid => {
+      _this.$refs.linkForm.validate((valid) => {
         if (valid) {
           _this.form.saving = true
           if (_this.isUpdateMode) {
@@ -432,7 +437,7 @@ export default {
     handleSaveOptions() {
       optionApi
         .save(this.optionsModal.data)
-        .then(response => {
+        .then((response) => {
           this.$message.success('保存成功！')
           this.optionsModal.visible = false
         })
@@ -440,7 +445,7 @@ export default {
           this.handleListOptions()
           this.refreshOptionsCache()
         })
-    }
-  }
+    },
+  },
 }
 </script>

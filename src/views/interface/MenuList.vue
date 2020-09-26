@@ -66,7 +66,7 @@
               prop="team"
             >
               <a-auto-complete
-                :dataSource="teams.data"
+                :dataSource="computedTeams"
                 v-model="form.model.team"
                 allowClear
               />
@@ -306,6 +306,11 @@ export default {
     },
     isUpdateMode() {
       return !!this.form.model.id
+    },
+    computedTeams() {
+      return this.teams.data.filter((item) => {
+        return item !== ''
+      })
     },
   },
   created() {
