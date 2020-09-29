@@ -20,4 +20,8 @@ public interface LinkRepository extends BaseRepository<Link, Integer> {
      */
     @Query(value = "select distinct a.team from Link a")
     List<String> findAllTeams();
+
+    boolean existsByNameAndIdNot(String name, Integer id);
+
+    boolean existsByUrlAndIdNot(String url, Integer id);
 }
