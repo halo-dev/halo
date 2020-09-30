@@ -185,6 +185,18 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
+    @NonNull
+    @Override
+    public Post getBy(@NonNull Integer year, @NonNull String slug) {
+        Assert.notNull(year, "Post create year must not be null");
+        Assert.notNull(slug, "Post slug must not be null");
+
+        Optional<Post> postOptional = postRepository.findBy(year, slug);
+
+        return postOptional
+                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
+    }
+
     @Override
     public Post getBy(Integer year, Integer month, String slug, PostStatus status) {
         Assert.notNull(year, "Post create year must not be null");
@@ -852,6 +864,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     .append(monthString)
                     .append(URL_SEPARATOR)
                     .append(dayString)
+                    .append(URL_SEPARATOR)
+                    .append(post.getSlug())
+                    .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.YEAR)) {
+            fullPath.append(DateUtil.year(post.getCreateTime()))
                     .append(URL_SEPARATOR)
                     .append(post.getSlug())
                     .append(pathSuffix);
