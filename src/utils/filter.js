@@ -22,6 +22,10 @@ Vue.filter('moment_post_date', function(dataStr, pattern = '/YYYY/MM/') {
   return dayjs(dataStr).format(pattern)
 })
 
+Vue.filter('moment_post_year', function(dataStr, pattern = '/YYYY/') {
+  return dayjs(dataStr).format(pattern)
+})
+
 Vue.filter('moment_post_day', function(dataStr, pattern = '/YYYY/MM/DD/') {
   return dayjs(dataStr).format(pattern)
 })

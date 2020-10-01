@@ -130,6 +130,10 @@ postApi.permalinkType = {
     type: 'DEFAULT',
     text: '默认'
   },
+  YEAR: {
+    type: 'YEAR',
+    text: '年份型'
+  },
   DATE: {
     type: 'DATE',
     text: '年月型'

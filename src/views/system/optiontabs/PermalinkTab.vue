@@ -10,6 +10,7 @@
       <a-form-model-item label="文章固定链接类型：">
         <template slot="help">
           <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/{slug}{{ options.path_suffix }}</span>
+          <span v-else-if="options.post_permalink_type === 'YEAR'">{{ options.blog_url }}{{ new Date() | moment_post_year }}{slug}{{ options.path_suffix }}</span>
           <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ new Date() | moment_post_date }}{slug}{{ options.path_suffix }}</span>
           <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}{{ new Date() | moment_post_day }}{slug}{{ options.path_suffix }}</span>
           <span v-else-if="options.post_permalink_type === 'ID'">{{ options.blog_url }}/?p={id}</span>

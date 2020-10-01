@@ -425,6 +425,11 @@ export default {
           return `${blogUrl}/${archivesPrefix}/${
             this.selectedPost.slug ? this.selectedPost.slug : '{slug}'
           }${pathSuffix}`
+        case 'YEAR':
+          return `${blogUrl}${datetimeFormat(
+            this.selectedPost.createTime ? this.selectedPost.createTime : new Date(),
+            '/YYYY/'
+          )}${this.selectedPost.slug ? this.selectedPost.slug : '{slug}'}${pathSuffix}`
         case 'DATE':
           return `${blogUrl}${datetimeFormat(
             this.selectedPost.createTime ? this.selectedPost.createTime : new Date(),
