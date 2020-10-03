@@ -1,0 +1,137 @@
+plugins {
+    id "org.springframework.boot" version "2.3.4.RELEASE"
+    id "io.spring.dependency-management" version "1.0.10.RELEASE"
+    id "checkstyle"
+    id "java"
+}
+
+group = "run.halo.app"
+version = "1.4.1"
+description = "Halo, An excellent open source blog publishing application."
+
+java {
+    archivesBaseName = "halo"
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url "https://maven.aliyun.com/nexus/content/groups/public"
+    }
+    mavenCentral()
+    jcenter()
+}
+
+configurations {
+    implementation {
+        exclude module: "spring-boot-starter-tomcat"
+        exclude module: "slf4j-log4j12"
+        exclude module: 'junit'
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+
+bootJar {
+    manifest {
+        attributes("Implementation-Title": "Halo Application",
+                "Implementation-Version": version)
+    }
+}
+
+ext {
+    hutoolVersion = "5.3.8"
+    upyunSdkVersion = "4.2.0"
+    qiniuSdkVersion = "7.2.29"
+    aliyunSdkVersion = "3.9.1"
+    baiduSdkVersion = "0.10.36"
+    qcloudSdkVersion = "5.6.25"
+    swaggerVersion = "2.9.2"
+    commonsLangVersion = "3.10"
+    httpclientVersion = "4.5.12"
+    dataformatYamlVersion = "2.11.0"
+    jgitVersion = "5.9.0.202009080501-r"
+    flexmarkVersion = "0.62.2"
+    thumbnailatorVersion = "0.4.11"
+    image4jVersion = "0.7zensight1"
+    flywayVersion = "6.5.0"
+    h2Version = "1.4.196"
+    levelDbVersion = "0.12"
+    annotationsVersion = "3.0.1u2"
+    jedisVersion = "3.3.0"
+    zxingVersion = "3.4.0"
+    huaweiObsVersion = "3.19.7"
+    githubApiVersion = "1.84"
+    powermockVersion = "1.6.6"
+    powermockApiMockito2 = "2.0.7"
+}
+
+dependencies {
+    implementation "org.kohsuke:github-api:$githubApiVersion"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-jetty"
+    implementation "org.springframework.boot:spring-boot-starter-freemarker"
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    implementation "com.sun.mail:jakarta.mail"
+    implementation "cn.hutool:hutool-core:$hutoolVersion"
+    implementation "cn.hutool:hutool-crypto:$hutoolVersion"
+    implementation "cn.hutool:hutool-extra:$hutoolVersion"
+    implementation "com.upyun:java-sdk:$upyunSdkVersion"
+    implementation "com.qiniu:qiniu-java-sdk:$qiniuSdkVersion"
+    implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"
+    implementation "com.baidubce:bce-java-sdk:$baiduSdkVersion"
+    implementation "com.qcloud:cos_api:$qcloudSdkVersion"
+    implementation "com.huaweicloud:esdk-obs-java:$huaweiObsVersion"
+    implementation "io.springfox:springfox-swagger2:$swaggerVersion"
+    implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
+    implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
+    implementation "org.apache.httpcomponents:httpclient:$httpclientVersion"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$dataformatYamlVersion"
+    implementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
+    implementation "com.google.code.findbugs:annotations:$annotationsVersion"
+
+    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-autolink:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-emoji:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-escaped-character:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gfm-tasklist:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-ins:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-media-tags:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-tables:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-superscript:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gitlab:$flexmarkVersion"
+
+    implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
+    implementation "net.sf.image4j:image4j:$image4jVersion"
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
+    implementation "com.google.zxing:core:$zxingVersion"
+
+    implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
+    implementation "redis.clients:jedis:$jedisVersion"
+    runtimeOnly "com.h2database:h2:$h2Version"
+    runtimeOnly "mysql:mysql-connector-java"
+
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
+
+    testCompileOnly "org.projectlombok:lombok"
+    testAnnotationProcessor "org.projectlombok:lombok"
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+//    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: "$powermockApiMockito2"
+//    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: "$powermockVersion"
+
+    developmentOnly "org.springframework.boot:spring-boot-devtools"
+}

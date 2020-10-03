@@ -1,0 +1,3 @@
+[submodule "default-theme"]
+	path = src/main/resources/templates/themes/anatole
+	url = https://github.com/halo-dev/halo-theme-anatole

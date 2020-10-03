@@ -1,47 +1,54 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"
-     xmlns:content="http://purl.org/rss/1.0/modules/content/"
-     xmlns:wfw="http://wellformedweb.org/CommentAPI/"
-     xmlns:dc="http://purl.org/dc/elements/1.1/"
-     xmlns:atom="http://www.w3.org/2005/Atom"
-     xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
-     xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
-    <channel>
-        <title>${options.blog_title!}</title>
-        <atom:link href="${options.blog_url!}/atom.xml" rel="self" type="application/rss+xml"/>
-        <link>${options.blog_url!}</link>
-        <description>${user.userDesc!}</description>
-        <language>zh-CN</language>
-        <sy:updatePeriod>hourly</sy:updatePeriod>
-        <sy:updateFrequency>1</sy:updateFrequency>
-        <generator>https://github.com/ruibaby/halo</generator>
-    </channel>
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <#if category??>
+        <title type="text">分类：${category.name!} - ${blog_title!}</title>
+    <#else>
+        <title type="text">${blog_title!}</title>
+    </#if>
+    <#if category??>
+        <#if category.description?? && category.description!=''>
+            <subtitle type="text">${category.description!}</subtitle>
+        </#if>
+    <#else>
+        <#if user.description?? && user.description!=''>
+            <subtitle type="text">${user.description!}</subtitle>
+        </#if>
+    </#if>
+    <updated>${.now?iso_local}</updated>
+    <#if category??>
+        <id>${category.fullPath!}</id>
+    <#else>
+        <id>${blog_url!}</id>
+    </#if>
+    <#if category??>
+        <link rel="alternate" type="text/html" href="${category.fullPath!}" />
+        <link rel="self" type="application/atom+xml" href="${blog_url!}/feed/categories/${category.slug}.xml" />
+    <#else>
+        <link rel="alternate" type="text/html" href="${blog_url!}" />
+        <link rel="self" type="application/atom+xml" href="${atom_url!}" />
+    </#if>
+    <rights>Copyright © ${.now?string('yyyy')}, ${blog_title!}</rights>
+    <generator uri="https://halo.run/" version="${version!}">Halo</generator>
     <#if posts?? && posts?size gt 0>
         <#list posts as post>
-            <item>
-                <title>${post.postTitle!}</title>
-                <link>${options.blog_url!}/archives/${post.postUrl!}</link>
-                <comments>${options.blog_url!}/archives/${post.postUrl!}#comments</comments>
-                <pubDate>${post.postDate}</pubDate>
-                <dc:creator><![CDATA[${user.userDisplayName!}]]></dc:creator>
-
-                <#if post.categories?? && post.categories?size gt 0>
-                    <#list post.categories as cate>
-                        <category><![CDATA[${cate.cateName!}]]></category>
-                    </#list>
-                </#if>
-                <description>
-                    <![CDATA[
-                        ${post.postSummary!}
-                    ]]>
-                </description>
-                <content:encoded>
-                    <![CDATA[
-                        ${post.postContent!}
-                    ]]>
-                </content:encoded>
-                <slash:comments>${post.comments?size}</slash:comments>
-            </item>
+            <entry>
+                <title><![CDATA[${post.title!}]]></title>
+                <link rel="alternate" type="text/html" href="<#if !globalAbsolutePathEnabled!true>${blog_url!}</#if>${post.fullPath!}" />
+                <id>tag:${blog_url!},${post.createTime?string('yyyy-MM-dd')}:${post.slug!}</id>
+                <published>${post.createTime?iso_local}</published>
+                <updated>${post.editTime?iso_local}</updated>
+                <author>
+                    <name>${user.nickname!}</name>
+                    <uri>${blog_url!}</uri>
+                </author>
+                <content type="html">
+                    <#if (options.rss_content_type!'full') == 'full'>
+                        <![CDATA[${post.formatContent!}]]>
+                    <#else>
+                        <![CDATA[${post.summary!}]]>
+                    </#if>
+                </content>
+            </entry>
         </#list>
     </#if>
-</rss>
+</feed>

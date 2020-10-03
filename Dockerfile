@@ -1,17 +1,16 @@
-FROM maven:3-jdk-8-alpine
-LABEL maintainer="Ryan Wang<i@ryanc.cc>"
+FROM adoptopenjdk/openjdk8-openj9
+VOLUME /tmp
 
-WORKDIR /opt/halo
-ADD . /tmp
-ENV TZ=Asia/Shanghai \
-DB_USER="admin" \
-DB_PASSWORD="123456"
+ARG JAR_FILE=build/libs/halo.jar
+ARG PORT=8090
+ARG TIME_ZONE=Asia/Shanghai
 
-RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
+ENV TZ=${TIME_ZONE}
+ENV JVM_XMS="256m"
+ENV JVM_XMX="256m"
 
-RUN cd /tmp && mvn package -Pci && mv target/dist/halo/* /opt/halo/ \
-    && rm -rf /tmp/* && rm -rf ~/.m2
+COPY ${JAR_FILE} halo.jar
 
-EXPOSE 8090
+EXPOSE ${PORT}
 
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/opt/halo/halo-latest.jar","--spring.datasource.username=${DB_USER}","--spring.datasource.password=${DB_PASSWORD}"]
+ENTRYPOINT java -Xms${JVM_XMS} -Xmx${JVM_XMX} -Djava.security.egd=file:/dev/./urandom -server -jar halo.jar

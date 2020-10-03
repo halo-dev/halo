@@ -1,0 +1,41 @@
+server:
+  port: 8090
+
+  # Response data gzip.
+  compression:
+    enabled: false
+spring:
+  datasource:
+
+    # H2 database configuration.
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:~/.halo/db/halo
+    username: admin
+    password: 123456
+
+    # MySQL database configuration.
+  #    driver-class-name: com.mysql.cj.jdbc.Driver
+  #    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+  #    username: root
+  #    password: 123456
+
+  # H2 database console configuration.
+  h2:
+    console:
+      settings:
+        web-allow-others: false
+      path: /h2-console
+      enabled: false
+
+halo:
+
+  # Your admin client path is https://your-domain/{admin-path}
+  admin-path: admin
+
+  # memory, level, redis
+  cache: memory
+
+  # if cache = redis, you need to set the following options
+#  cache-redis-nodes: ['127.0.0.1:6380', '127.0.0.1:6379']
+#  cache-redis-password: 123456
+

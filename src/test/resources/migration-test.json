@@ -1,0 +1,207 @@
+{
+  "attachments": [
+    {
+      "attachPath": "/upload/2018/4/avatar.jpeg",
+      "attachCreated": 1524883947683,
+      "attachType": "image/jpeg",
+      "attachSuffix": ".jpeg",
+      "attachName": "avatar.jpeg",
+      "attachId": 59,
+      "attachSmallPath": "/upload/2018/4/avatar_small.jpeg"
+    }
+  ],
+  "options": {
+    "mail_from_name": "Ryan0up'S Blog"
+  },
+  "links": [
+    {
+      "linkId": 76,
+      "linkUrl": "http://slogc.cc",
+      "linkPic": "http://www.gravatar.com/avatar/c8d4e2c9e04f1a117b4eacf107ab941d?s=256&d=identicon",
+      "linkDesc": "基佬～",
+      "linkName": "SNAIL Blog"
+    }
+  ],
+  "galleries": [
+    {
+      "galleryThumbnailUrl": "https://cdn.ryanc.cc/img/blog/gallery/Photo_1.jpeg",
+      "galleryId": 166,
+      "galleryName": "长江",
+      "galleryDate": "2016-04-28",
+      "galleryLocation": "重庆",
+      "galleryDesc": "长江",
+      "galleryUrl": "https://cdn.ryanc.cc/img/blog/gallery/Photo_1.jpeg"
+    }
+  ],
+  "menus": [
+    {
+      "menuTarget": "_self",
+      "menuUrl": "/p/about",
+      "menuIcon": "",
+      "menuId": 360,
+      "menuName": "About",
+      "menuSort": 5
+    }
+  ],
+  "posts": [
+    {
+      "postUrl": "spring-boot-with-docker",
+      "postType": "post",
+      "postContent": "<blockquote>\n<p>Docker 这个词在近两年也算是一个热门词汇了，越来越多的小伙伴选择使用 Docker 来部署自己的项目。今天我将介绍一下如何使用 Docker 来部署Spring Boot 项目。</p>\n</blockquote>\n<h2>前言</h2>\n<p>最开始想使用 Docker 来部署 Spring Boot 应用的时候，到网上搜索了很多相关的内容，从构建 Docker 镜像到应用部署，相关教程都差不多，没什么意思，Dockerfile 大多都是都是像下面这种：</p>\n<pre><code class=\"language-docker\">FROM openjdk:8-jdk-alpine\nADD demo.jar app.jar\nENTRYPOINT [&quot;java&quot;,&quot;-Djava.security.egd=file:/dev/./urandom&quot;,&quot;-jar&quot;,&quot;/app.jar&quot;]\n</code></pre>\n<p>不是说这种不行，只是灵活性太差了，示例太简单，而且每次都需要手动构建，而且还得先把项目打包成 Jar 包，十分繁琐，如果是想要部署到服务器上，还得在服务器上打包成镜像，太过于繁琐，不适合运用到生产环境。</p>\n<h2>实际操作</h2>\n<p>假设我们现在有这么几个需求：</p>\n<ol>\n<li>实现自动构建，我们自己不需要将项目打包成 Jar 包。</li>\n<li>项目有图片上传功能，</li>\n</ol>\n",
+      "postUpdate": 1546096272752,
+      "postStatus": 1,
+      "postId": 6000,
+      "allowComment": 1,
+      "postSummary": "Docker这个词在近两年也算是一个热门词汇了，越来越多的小伙伴选择使用Docker来部署自己的项目。今天我将介绍一下如何使用Docker来部署SpringBoot项目。前言最开始想使用Docker来部署SpringBoot应用的时候，到网上搜索了很多相关的内容，从构建Docker镜像到应用部署，相",
+      "tags": [
+        {
+          "tagId": 5192,
+          "tagName": "Docker",
+          "tagUrl": "docker"
+        },
+        {
+          "tagId": 12,
+          "tagName": "SpringBoot",
+          "tagUrl": "springboot"
+        },
+        {
+          "tagId": 11,
+          "tagName": "Java",
+          "tagUrl": "java"
+        },
+        {
+          "tagId": 34,
+          "tagName": "maven",
+          "tagUrl": "maven"
+        }
+      ],
+      "postViews": 0,
+      "postThumbnail": "/static/halo-frontend/images/thumbnail/thumbnail-5.jpg",
+      "postDate": 1546089840000,
+      "postTitle": "Spring Boot 和 Docker",
+      "postContentMd": "> Docker 这个词在近两年也算是一个热门词汇了，越来越多的小伙伴选择使用 Docker 来部署自己的项目。今天我将介绍一下如何使用 Docker 来部署Spring Boot 项目。\n\n## 前言\n最开始想使用 Docker 来部署 Spring Boot 应用的时候，到网上搜索了很多相关的内容，从构建 Docker 镜像到应用部署，相关教程都差不多，没什么意思，Dockerfile 大多都是都是像下面这种：\n```docker\nFROM openjdk:8-jdk-alpine\nADD demo.jar app.jar\nENTRYPOINT [\"java\",\"-Djava.security.egd=file:/dev/./urandom\",\"-jar\",\"/app.jar\"]\n```\n不是说这种不行，只是灵活性太差了，示例太简单，而且每次都需要手动构建，而且还得先把项目打包成 Jar 包，十分繁琐，如果是想要部署到服务器上，还得在服务器上打包成镜像，太过于繁琐，不适合运用到生产环境。\n\n## 实际操作\n假设我们现在有这么几个需求：\n1. 实现自动构建，我们自己不需要将项目打包成 Jar 包。\n2. 项目有图片上传功能，",
+      "categories": [
+        {
+          "cateUrl": "study-notes",
+          "cateDesc": "学习笔记",
+          "cateId": 9,
+          "cateName": "学习笔记"
+        }
+      ]
+    },
+    {
+      "postUrl": "1551432643915",
+      "postType": "post",
+      "postContent": "",
+      "postUpdate": 1551432662994,
+      "postStatus": 1,
+      "postId": 6555,
+      "allowComment": 1,
+      "postSummary": "",
+      "postViews": 0,
+      "postThumbnail": "https://ryanc.cc/static/halo-frontend/images/thumbnail/thumbnail-5.jpg",
+      "postDate": 1551432662994,
+      "postTitle": "小米 MIX3 体验",
+      "postContentMd": "",
+      "postPassword": ""
+    },
+    {
+      "postUrl": "springboot-study-jpa",
+      "comments": [
+        {
+          "commentParent": 0,
+          "commentAuthorIp": "*.*.*.*",
+          "commentAuthor": "RYAN0UP",
+          "commentId": 711,
+          "commentAuthorUrl": "https://ryanc.cc",
+          "commentAuthorAvatarMd5": "7cc7f29278071bd4dce995612d428834",
+          "commentAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36",
+          "commentContent": "测试测试",
+          "isAdmin": 0,
+          "commentAuthorEmail": "i@ryanc.cc",
+          "commentStatus": 0
+        },
+        {
+          "commentParent": 711,
+          "commentAuthorIp": "*.*.*.*",
+          "commentAuthor": "RYAN0UP",
+          "commentId": 714,
+          "commentAuthorUrl": "https://ryanc.cc",
+          "commentAuthorAvatarMd5": "7cc7f29278071bd4dce995612d428834",
+          "commentAgent": "Mozilla/5.0 (Linux; Android 7.1.1; OS105 Build/NMF26X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.126 Mobile Safari/537.36",
+          "commentContent": "<a href='#comment-id-711'>@RYAN0UP</a> 测试成功",
+          "isAdmin": 1,
+          "commentAuthorEmail": "i@ryanc.cc",
+          "commentStatus": 0
+        },
+        {
+          "commentParent": 714,
+          "commentAuthorIp": "*.*.*.*",
+          "commentAuthor": "买了外卖",
+          "commentId": 5038,
+          "commentAuthorUrl": "",
+          "commentAgent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3432.0 Safari/537.36",
+          "commentContent": "<a href='#comment-id-714'>@RYAN0UP</a> 测试失败咯",
+          "isAdmin": 0,
+          "commentAuthorEmail": "",
+          "commentStatus": 0
+        },
+        {
+          "commentParent": 5038,
+          "commentAuthorIp": "*.*.*.*",
+          "commentAuthor": "RYAN0UP",
+          "commentId": 5040,
+          "commentAuthorUrl": "https://ryanc.cc",
+          "commentAuthorAvatarMd5": "7cc7f29278071bd4dce995612d428834",
+          "commentAgent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.81 Safari/537.36",
+          "commentContent": "<a href='#comment-id-5038'>@买了外卖</a> 丫的再在我网站做测试，拉你黑名单",
+          "isAdmin": 1,
+          "commentAuthorEmail": "i@ryanc.cc",
+          "commentStatus": 0
+        }
+      ],
+      "postType": "post",
+      "postContent": "<blockquote>\n<p>前面学习了一个简单的Spring Boot框架的搭建，以及配置文件的基础部分，今天来记录一下最近所学操作数据库的一个工具<code>JPA</code>，这个JPA可以让你基本不需要写SQL语句就可以执行增删改查的操作。当然了，如果涉及到比较复杂的操作的话，也可以使用原生的SQL语句。</p>\n</blockquote>\n<h2 id=\"h2-u5F15u5165u4F9Du8D56\"><a name=\"引入依赖\" class=\"reference-link\"></a><span class=\"header-link octicon octicon-link\"></span>引入依赖</h2><p>首先要使用JPA的话，肯定是需要引入依赖的，既然要使用JPA操作数据库的话，数据库的驱动依赖也是必不可少的。对数据库的操作无非增删改查，为了方便演示，这里还需要引入一个模板引擎来渲染页面，模板引擎有很多种，这里选择freemarker。</p>\n<p><img src=\"https://cdn.ryanc.cc/img/blog/thumbnails/springboot-study-jpa/springboot-study-jpa-1.png\" alt=\"\"></p>\n<pre><code class=\"lang-xml\">&lt;!-- JPA依赖 --&gt;\n&lt;dependency&gt;\n  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;\n  &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;\n&lt;/dependency&gt;\n&lt;!-- freemarker依赖 --&gt;\n&lt;dependency&gt;\n  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;\n  &lt;artifactId&gt;spring-boot-starter-freemarker&lt;/artifactId&gt;\n&lt;/dependency&gt;\n&lt;dependency&gt;\n  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;\n  &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;\n&lt;/dependency&gt;\n&lt;!-- MySQL依赖 --&gt;\n&lt;dependency&gt;\n  &lt;groupId&gt;mysql&lt;/groupId&gt;\n  &lt;artifactId&gt;mysql-connector-java&lt;/artifactId&gt;\n  &lt;scope&gt;runtime&lt;/scope&gt;\n&lt;/dependency&gt;\n&lt;dependency&gt;\n  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;\n  &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;\n  &lt;scope&gt;test&lt;/scope&gt;\n&lt;/dependency&gt;\n</code></pre>\n<h2 id=\"h2-u51C6u5907u6570u636E\"><a name=\"准备数据\" class=\"reference-link\"></a><span class=\"header-link octicon octicon-link\"></span>准备数据</h2><ol>\n<li>这里我们是用的是MySQL，先建一个简单的数据表吧。</li></ol>\n<pre><code class=\"lang-sql\">CREATE DATABASE jpadb;\nUSE jpadb;\nCREATE TABLE superhero\n(\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  name VARCHAR(20) NOT NULL ,\n  sex CHAR(2) NOT NULL ,\n  age int NOT NULL ,\n  skill VARCHAR(50) NOT NULL\n)CHARSET utf8;\n</code></pre>\n<p>然后随便插入几条数据，备用。</p>\n<ol start=\"2\">\n<li>建立对应的实体类</li></ol>\n<pre><code class=\"lang-java\">@Entity\n@Table(name = &quot;superhero&quot;) //这里需要指定我们刚刚建好的数据表，因为JPA会自动帮助键表\npublic class SuperHero {\n    @Id\n    @GeneratedValue //自增注解\n    private Integer id;\n    private String name;\n    private String sex;\n    private Integer age;\n    private String skill;\n      //省略get和set方法\n}\n</code></pre>\n<h2 id=\"h2--repository-\"><a name=\"建立Repository接口\" class=\"reference-link\"></a><span class=\"header-link octicon octicon-link\"></span>建立Repository接口</h2><p>新建一个类<code>SuperHeroRepository</code>，使用JPA的关键就是这个Repository接口，使用它可以方便的对实体类进行访问。</p>\n<pre><code class=\"lang-java\">public interface SuperHeroRepository extends JpaRepository&lt;SuperHero,Integer&gt; {}\n</code></pre>\n<p>像上面这样就好了？对，目前是这样的！</p>\n<h2 id=\"h2-service-\"><a name=\"Service层\" class=\"reference-link\"></a><span class=\"header-link octicon octicon-link\"></span>Service层</h2><p>哈哈，现在就可以使用Service对数据库进行操作啦！</p>\n<pre><code class=\"lang-java\">//Service注解，必须写！不然Controller使用Service的时候运行会报错。\n@Service\npublic class SuperHeroService {\n      //@Autowired，自动注入，用过SSM的都知道，这里可以自动注入\n    @Autowired\n    private SuperHeroRepository superHeroRepository;\n\n    /**\n     * 查询所有超级英雄\n     * @return List\n     */\n    public List&lt;SuperHero&gt; findAll(){\n        return superHeroRepository.findAll();\n    }\n}\n</code></pre>\n<p>现在就可以查询<code>superhero</code>表中所有的超级英雄，并且findAll方法返回的数据类型就是List，非常方便！</p>\n<h2 id=\"h2-controller-\"><a name=\"Controller处理并渲染页面\" class=\"reference-link\"></a><span class=\"header-link octicon octicon-link\"></span>Controller处理并渲染页面</h2><p>Service层写好之后，就可以使用Controller来处理并渲染页面了。这里要注入Service类同样可以使用自动注入。</p>\n<pre><code class=\"lang-java\">@Controller\npublic class IndexController {\n      //自动注入\n      @Autowired\n    private SuperHeroService superHeroService;\n\n      //设置请求路径为/heros\n    @GetMapping(value = &quot;/heros&quot;)\n    public String index(Model model){\n          //调用service层的findAll方法查询所有数据\n        List&lt;SuperHero&gt; superHeroList = superHeroService.findAll();\n          //使用Model对象保存数据\n        model.addAttribute(&quot;superHeroList&quot;,superHeroList);\n          //返回freemarker模板的名称，所以需要在templates文件夹下建立index.ftl文件\n        return &quot;index&quot;;\n    }\n}\n</code></pre>\n<pre><code class=\"lang-html\">&lt;!-- index.ftl --&gt;\n&lt;!DOCTYPE html&gt;\n&lt;html lang=&quot;zh&quot;&gt;\n    &lt;head&gt;\n        &lt;meta charset=&quot;UTF-8&quot;&gt;\n        &lt;title&gt;Title&lt;/title&gt;\n    &lt;/head&gt;\n    &lt;body&gt;\n        &lt;table&gt;\n            &lt;tr&gt;\n                &lt;th&gt;编号&lt;/th&gt;\n                &lt;th&gt;名字&lt;/th&gt;\n                &lt;th&gt;性别&lt;/th&gt;\n                &lt;th&gt;年龄&lt;/th&gt;\n                &lt;th&gt;技能&lt;/th&gt;\n            &lt;/tr&gt;\n              &lt;!-- 这是freemarker的循环语法，可以自行去了解 --&gt;\n            &lt;#list superHeroList as superHero&gt;\n                &lt;tr&gt;\n                    &lt;td&gt;${superHero.id}&lt;/td&gt;\n                    &lt;td&gt;${superHero.name}&lt;/td&gt;\n                    &lt;td&gt;${superHero.sex}&lt;/td&gt;\n                    &lt;td&gt;${superHero.age}&lt;/td&gt;\n                    &lt;td&gt;${superHero.skill}&lt;/td&gt;\n                &lt;/tr&gt;\n            &lt;/#list&gt;\n        &lt;/table&gt;\n    &lt;/body&gt;\n&lt;/html&gt;\n</code></pre>\n<p>好啦，现在所有代码就写完啦！但是似乎还忘了什么，对的，application.yaml还没配置。</p>\n<pre><code class=\"lang-yaml\"># 指定访问端口 默认是8080\nserver:\n  port: 8090\n\nspring:\n# 配置数据源，主要有classname，url，username，password\n  datasource:\n    driver-class-name: com.mysql.jdbc.Driver\n    url: jdbc:mysql://localhost:3306/jpadb\n    username: root\n    password:  123456\n# jpa配置\n  jpa:\n      # 是否在控制台显示sql语句\n    show-sql: true\n    hibernate:\n    # 这个就比较关键了，如果想让它自动建表的话，可以写create和update，但是create每次运行项目的时候，都会重建一次，update则不会，只会更新数据表接口，数据还在。\n      ddl-auto: update\n</code></pre>\n<p>好了，一个简单的查询就做好了，访问<code>localhost:8090</code>就可以看到下面的表格啦！</p>\n<p><img src=\"https://cdn.ryanc.cc/img/blog/thumbnails/springboot-study-jpa/springboot-study-jpa-2.png\" alt=\"\"></p>\n",
+      "postUpdate": 1556110800048,
+      "postStatus": 0,
+      "postId": 23,
+      "allowComment": 1,
+      "postSummary": "前面学习了一个简单的SpringBoot框架的搭建，以及配置文件的基础部分，今天来记录一下最近所学操作数据库的一个工具JPA，这个JPA可以让你基本不需要写SQL语句就可以执行增删改查的操作。当然了，如果涉及到比较复杂的操作的话，也可以使用原生的SQL语句。引入依赖首先要使用JPA的话，肯定是需要引",
+      "tags": [
+        {
+          "tagId": 11,
+          "tagName": "Java",
+          "tagUrl": "java"
+        },
+        {
+          "tagId": 12,
+          "tagName": "SpringBoot",
+          "tagUrl": "springboot"
+        },
+        {
+          "tagId": 34,
+          "tagName": "maven",
+          "tagUrl": "maven"
+        },
+        {
+          "tagId": 20,
+          "tagName": "sql",
+          "tagUrl": "sql"
+        }
+      ],
+      "postViews": 701,
+      "postThumbnail": "/static/halo-frontend/images/thumbnail/thumbnail-9.jpg",
+      "postDate": 1513996216749,
+      "postTitle": "Spring Boot学习笔记（三）之JPA",
+      "postContentMd": "> 前面学习了一个简单的Spring Boot框架的搭建，以及配置文件的基础部分，今天来记录一下最近所学操作数据库的一个工具`JPA`，这个JPA可以让你基本不需要写SQL语句就可以执行增删改查的操作。当然了，如果涉及到比较复杂的操作的话，也可以使用原生的SQL语句。\n\n## 引入依赖\n\n首先要使用JPA的话，肯定是需要引入依赖的，既然要使用JPA操作数据库的话，数据库的驱动依赖也是必不可少的。对数据库的操作无非增删改查，为了方便演示，这里还需要引入一个模板引擎来渲染页面，模板引擎有很多种，这里选择freemarker。\n\n![](https://cdn.ryanc.cc/img/blog/thumbnails/springboot-study-jpa/springboot-study-jpa-1.png)\n\n\n\n```xml\n<!-- JPA依赖 -->\n<dependency>\n  <groupId>org.springframework.boot</groupId>\n  <artifactId>spring-boot-starter-data-jpa</artifactId>\n</dependency>\n<!-- freemarker依赖 -->\n<dependency>\n  <groupId>org.springframework.boot</groupId>\n  <artifactId>spring-boot-starter-freemarker</artifactId>\n</dependency>\n<dependency>\n  <groupId>org.springframework.boot</groupId>\n  <artifactId>spring-boot-starter-web</artifactId>\n</dependency>\n<!-- MySQL依赖 -->\n<dependency>\n  <groupId>mysql</groupId>\n  <artifactId>mysql-connector-java</artifactId>\n  <scope>runtime</scope>\n</dependency>\n<dependency>\n  <groupId>org.springframework.boot</groupId>\n  <artifactId>spring-boot-starter-test</artifactId>\n  <scope>test</scope>\n</dependency>\n```\n\n## 准备数据\n\n1. 这里我们是用的是MySQL，先建一个简单的数据表吧。\n\n```sql\nCREATE DATABASE jpadb;\nUSE jpadb;\nCREATE TABLE superhero\n(\n  id INT PRIMARY KEY AUTO_INCREMENT,\n  name VARCHAR(20) NOT NULL ,\n  sex CHAR(2) NOT NULL ,\n  age int NOT NULL ,\n  skill VARCHAR(50) NOT NULL\n)CHARSET utf8;\n```\n\n然后随便插入几条数据，备用。\n\n2. 建立对应的实体类\n\n```java\n@Entity\n@Table(name = \"superhero\") //这里需要指定我们刚刚建好的数据表，因为JPA会自动帮助键表\npublic class SuperHero {\n    @Id\n    @GeneratedValue //自增注解\n    private Integer id;\n    private String name;\n    private String sex;\n    private Integer age;\n    private String skill;\n      //省略get和set方法\n}\n```\n\n## 建立Repository接口\n\n新建一个类`SuperHeroRepository`，使用JPA的关键就是这个Repository接口，使用它可以方便的对实体类进行访问。\n\n```java\npublic interface SuperHeroRepository extends JpaRepository<SuperHero,Integer> {}\n```\n\n像上面这样就好了？对，目前是这样的！\n\n## Service层\n\n哈哈，现在就可以使用Service对数据库进行操作啦！\n\n```java\n//Service注解，必须写！不然Controller使用Service的时候运行会报错。\n@Service\npublic class SuperHeroService {\n      //@Autowired，自动注入，用过SSM的都知道，这里可以自动注入\n    @Autowired\n    private SuperHeroRepository superHeroRepository;\n\n    /**\n     * 查询所有超级英雄\n     * @return List\n     */\n    public List<SuperHero> findAll(){\n        return superHeroRepository.findAll();\n    }\n}\n```\n\n现在就可以查询`superhero`表中所有的超级英雄，并且findAll方法返回的数据类型就是List，非常方便！\n\n## Controller处理并渲染页面\n\nService层写好之后，就可以使用Controller来处理并渲染页面了。这里要注入Service类同样可以使用自动注入。\n\n```java\n@Controller\npublic class IndexController {\n      //自动注入\n      @Autowired\n    private SuperHeroService superHeroService;\n\n      //设置请求路径为/heros\n    @GetMapping(value = \"/heros\")\n    public String index(Model model){\n          //调用service层的findAll方法查询所有数据\n        List<SuperHero> superHeroList = superHeroService.findAll();\n          //使用Model对象保存数据\n        model.addAttribute(\"superHeroList\",superHeroList);\n          //返回freemarker模板的名称，所以需要在templates文件夹下建立index.ftl文件\n        return \"index\";\n    }\n}\n```\n\n```html\n<!-- index.ftl -->\n<!DOCTYPE html>\n<html lang=\"zh\">\n    <head>\n        <meta charset=\"UTF-8\">\n        <title>Title</title>\n    </head>\n    <body>\n        <table>\n            <tr>\n                <th>编号</th>\n                <th>名字</th>\n                <th>性别</th>\n                <th>年龄</th>\n                <th>技能</th>\n            </tr>\n              <!-- 这是freemarker的循环语法，可以自行去了解 -->\n            <#list superHeroList as superHero>\n                <tr>\n                    <td>${superHero.id}</td>\n                    <td>${superHero.name}</td>\n                    <td>${superHero.sex}</td>\n                    <td>${superHero.age}</td>\n                    <td>${superHero.skill}</td>\n                </tr>\n            </#list>\n        </table>\n    </body>\n</html>\n```\n\n好啦，现在所有代码就写完啦！但是似乎还忘了什么，对的，application.yaml还没配置。\n\n```yaml\n# 指定访问端口 默认是8080\nserver:\n  port: 8090\n\nspring:\n# 配置数据源，主要有classname，url，username，password\n  datasource:\n    driver-class-name: com.mysql.jdbc.Driver\n    url: jdbc:mysql://localhost:3306/jpadb\n    username: root\n    password:  123456\n# jpa配置\n  jpa:\n      # 是否在控制台显示sql语句\n    show-sql: true\n    hibernate:\n    # 这个就比较关键了，如果想让它自动建表的话，可以写create和update，但是create每次运行项目的时候，都会重建一次，update则不会，只会更新数据表接口，数据还在。\n      ddl-auto: update\n```\n\n好了，一个简单的查询就做好了，访问`localhost:8090`就可以看到下面的表格啦！\n\n![](https://cdn.ryanc.cc/img/blog/thumbnails/springboot-study-jpa/springboot-study-jpa-2.png)\n\n",
+      "categories": [
+        {
+          "cateUrl": "study-notes",
+          "cateDesc": "学习笔记",
+          "cateId": 9,
+          "cateName": "学习笔记"
+        }
+      ]
+    }
+  ]
+}
