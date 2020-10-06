@@ -46,7 +46,12 @@ public enum AttachmentType implements ValueEnum<Integer> {
     /**
      * 华为云
      */
-    HUAWEIOBS(7);
+    HUAWEIOBS(7),
+
+    /**
+     * MINIO
+     */
+    MINIO(8);
 
     private final Integer value;
 
