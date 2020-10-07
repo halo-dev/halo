@@ -117,6 +117,10 @@ attachmentApi.type = {
   HUAWEIOBS: {
     type: 'HUAWEIOBS',
     text: '华为云'
+  },
+  MINIO: {
+    type: 'MINIO',
+    text: 'MinIO'
   }
 }
 
