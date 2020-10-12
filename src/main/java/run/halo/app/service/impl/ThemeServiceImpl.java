@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,6 +33,7 @@ import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
+import run.halo.app.repository.ThemeSettingRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.theme.ThemeFileScanner;
@@ -77,6 +79,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final ThemeSettingRepository themeSettingRepository;
+
     /**
      * Activated theme id.
      */
@@ -93,7 +97,8 @@ public class ThemeServiceImpl implements ThemeService {
             AbstractStringCacheStore cacheStore,
             ThemeConfigResolver themeConfigResolver,
             RestTemplate restTemplate,
-            ApplicationEventPublisher eventPublisher) {
+            ApplicationEventPublisher eventPublisher,
+            ThemeSettingRepository themeSettingRepository) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
         this.themeConfigResolver = themeConfigResolver;
@@ -101,6 +106,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         themeWorkDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
         this.eventPublisher = eventPublisher;
+        this.themeSettingRepository = themeSettingRepository;
     }
 
     @Override
@@ -255,8 +261,9 @@ public class ThemeServiceImpl implements ThemeService {
         }
     }
 
+    @Transactional
     @Override
-    public void deleteTheme(@NonNull String themeId) {
+    public void deleteTheme(@NonNull String themeId, @NonNull Boolean deleteSettings) {
         // Get the theme property
         ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
 
@@ -268,6 +275,10 @@ public class ThemeServiceImpl implements ThemeService {
         try {
             // Delete the folder
             FileUtils.deleteFolder(Paths.get(themeProperty.getThemePath()));
+            if (deleteSettings) {
+                // Delete theme settings
+                themeSettingRepository.deleteByThemeId(themeId);
+            }
             // Delete theme cache
             eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
         } catch (Exception e) {
