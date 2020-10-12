@@ -90,7 +90,7 @@
                     <a-menu-item
                       :key="1"
                       :disabled="item.activated"
-                      @click="handleConfirmDelete(item)"
+                      @click="handleOpenThemeDeleteModal(item)"
                     >
                       <a-icon
                         type="delete"
@@ -284,6 +284,21 @@
         @success="handleUploadSucceed"
       ></FilePondUpload>
     </a-modal>
+    <a-modal
+      title="提示"
+      v-model="themeDeleteModal.visible"
+      :width=416
+      :closable=false
+      destroyOnClose
+      @ok="handleDeleteTheme(themeDeleteModal.selected.id, themeDeleteModal.deleteSettings)"
+      @cancel="themeDeleteModal.visible = false"
+      :afterClose="onThemeDeleteModalClose"
+    >
+      <p>确定删除【{{ themeDeleteModal.selected.name }}】主题？</p>
+      <a-checkbox v-model="themeDeleteModal.deleteSettings">
+        同时删除主题配置
+      </a-checkbox>
+    </a-modal>
   </page-view>
 </template>
 
@@ -340,6 +355,12 @@ export default {
         selected: {},
       },
 
+      themeDeleteModal: {
+        visible: false,
+        deleteSettings: false,
+        selected: {}
+      },
+
       themeSettingDrawer: {
         visible: false,
         selected: {},
@@ -368,11 +389,13 @@ export default {
     this.themeSettingDrawer.visible = false
     this.installModal.visible = false
     this.localUpdateModel.visible = false
+    this.themeDeleteModal.visible = false
   },
   beforeRouteLeave(to, from, next) {
     this.themeSettingDrawer.visible = false
     this.installModal.visible = false
     this.localUpdateModel.visible = false
+    this.themeDeleteModal.visible = false
     next()
   },
   methods: {
@@ -399,8 +422,9 @@ export default {
         this.handleListThemes()
       })
     },
-    handleDeleteTheme(themeId) {
-      themeApi.delete(themeId).finally(() => {
+    handleDeleteTheme(themeId, deleteSettings) {
+      themeApi.delete(themeId, deleteSettings).finally(() => {
+        this.themeDeleteModal.visible = false
         this.handleListThemes()
       })
     },
@@ -488,17 +512,9 @@ export default {
       this.themeSettingDrawer.selected = theme
       this.themeSettingDrawer.visible = true
     },
-    handleConfirmDelete(item) {
-      const _this = this
-      this.$confirm({
-        title: '提示',
-        maskClosable: true,
-        content: '确定删除【' + item.name + '】主题？',
-        onOk() {
-          _this.handleDeleteTheme(item.id)
-        },
-        onCancel() {},
-      })
+    handleOpenThemeDeleteModal(item) {
+      this.themeDeleteModal.visible = true
+      this.themeDeleteModal.selected = item
     },
     handleConfirmRemoteUpdate(item) {
       const _this = this
@@ -540,6 +556,11 @@ export default {
       this.themeSettingDrawer.visible = false
       this.themeSettingDrawer.selected = {}
     },
+    onThemeDeleteModalClose() {
+      this.themeDeleteModal.visible = false
+      this.themeDeleteModal.deleteSettings = false
+      this.themeDeleteModal.selected = {}
+    }
   },
 }
 </script>

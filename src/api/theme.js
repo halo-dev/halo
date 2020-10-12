@@ -61,9 +61,12 @@ themeApi.update = themeId => {
   })
 }
 
-themeApi.delete = key => {
+themeApi.delete = (key, deleteSettings) => {
   return service({
     url: `${baseUrl}/${key}`,
+    params: {
+      deleteSettings: deleteSettings
+    },
     method: 'delete'
   })
 }
