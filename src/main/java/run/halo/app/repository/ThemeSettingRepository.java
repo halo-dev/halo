@@ -49,4 +49,6 @@ public interface ThemeSettingRepository extends BaseRepository<ThemeSetting, Int
      * @param activatedThemeId activated theme id.
      */
     void deleteByThemeIdIsNot(@NonNull String activatedThemeId);
+
+    void deleteByThemeId(String themeId);
 }
