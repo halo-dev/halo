@@ -221,9 +221,10 @@ public interface ThemeService {
     /**
      * Deletes a theme by key.
      *
-     * @param themeId theme id must not be blank
+     * @param themeId        theme id must not be blank
+     * @param deleteSettings whether all settings of the specified theme should be deleted.
      */
-    void deleteTheme(@NonNull String themeId);
+    void deleteTheme(@NonNull String themeId, @NonNull Boolean deleteSettings);
 
     /**
      * Fetches theme configuration.
