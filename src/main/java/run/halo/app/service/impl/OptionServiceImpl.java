@@ -293,7 +293,18 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     public Optional<Object> getByKey(String key) {
         Assert.hasText(key, "Option key must not be blank");
 
-        return Optional.ofNullable(listOptions().get(key));
+        Optional<Option> optionalOption = optionRepository.findByKey(key);
+        if (!optionalOption.isPresent()) {
+            return Optional.empty();
+        }
+
+        Option option = optionalOption.get();
+        PropertyEnum propertyEnum = propertyEnumMap.get(key);
+        if (propertyEnum == null) {
+            return Optional.of(option.getValue());
+        }
+
+        return Optional.of(PropertyEnum.convertTo(option.getValue(), propertyEnum));
     }
 
     @Override
