@@ -13,7 +13,4 @@ import javax.persistence.Converter;
 @Converter(autoApply = true)
 public class PostStatusConverter extends AbstractConverter<PostStatus, Integer> {
 
-    public PostStatusConverter() {
-        super(PostStatus.class);
-    }
 }

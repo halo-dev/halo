@@ -13,8 +13,4 @@ import javax.persistence.Converter;
 @Converter(autoApply = true)
 public class CommentStatusConverter extends AbstractConverter<CommentStatus, Integer> {
 
-    public CommentStatusConverter() {
-        super(CommentStatus.class);
-    }
-
 }
