@@ -63,6 +63,8 @@ public class PostParam implements InputConverter<Post> {
 
     private String metaDescription;
 
+    private Set<Integer> emailIds;
+
     private Set<Integer> tagIds;
 
     private Set<Integer> categoryIds;

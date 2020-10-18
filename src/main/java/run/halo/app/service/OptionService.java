@@ -442,6 +442,13 @@ public interface OptionService extends CrudService<Option, Integer> {
     String getTagsPrefix();
 
     /**
+     * Get tags custom prefix.
+     *
+     * @return tags prefix.
+     */
+    String getEmailPrefix();
+
+    /**
      * Get custom path suffix.
      *
      * @return path suffix.

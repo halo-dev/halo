@@ -28,6 +28,12 @@ public enum PermalinkProperties implements PropertyEnum {
     TAGS_PREFIX("tags_prefix", String.class, "tags"),
 
     /**
+     * Emails prefix
+     * such as: /emails or /emails/${slug}
+     */
+    EMAILS_PREFIX("emails_prefix", String.class, "emails"),
+
+    /**
      * Archives prefix.
      * such as: /archives
      */

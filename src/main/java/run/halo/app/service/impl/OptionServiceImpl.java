@@ -554,6 +554,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     }
 
     @Override
+    public String getEmailPrefix() {
+        return getByPropertyOrDefault(PermalinkProperties.EMAILS_PREFIX, String.class, PermalinkProperties.EMAILS_PREFIX.defaultValue());
+    }
+
+    @Override
     public String getPathSuffix() {
         return getByPropertyOrDefault(PermalinkProperties.PATH_SUFFIX, String.class, PermalinkProperties.PATH_SUFFIX.defaultValue());
     }

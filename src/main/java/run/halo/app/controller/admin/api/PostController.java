@@ -17,6 +17,8 @@ import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostEmailDetailVO;
+import run.halo.app.model.vo.PostEmailVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
@@ -120,6 +122,24 @@ public class PostController {
 
         postParam.update(postToUpdate);
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
+    }
+
+    @GetMapping("/emails/{postId:\\d+}")
+    @ApiOperation("list a post email")
+    public PostEmailVO getByEmail(@PathVariable("postId") Integer postId) {
+        PostEmailVO postEmailVO =  postService.getPostEmailByPostId(postId);
+        return postEmailVO;
+    }
+
+    @PutMapping("/emails/{postId:\\d+}")
+    @ApiOperation("Updates a post")
+    public PostEmailDetailVO updateByEmail(@RequestBody PostParam postParam,
+                                       @PathVariable("postId") Integer postId,
+                                       @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+        // Get the post info
+        Post postToUpdate = postService.getById(postId);
+
+        return postService.updateBy(postToUpdate, postParam.getEmailIds(), autoSave);
     }
 
     @PutMapping("{postId:\\d+}/status/{status}")

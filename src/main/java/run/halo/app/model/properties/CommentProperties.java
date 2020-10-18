@@ -25,6 +25,11 @@ public enum CommentProperties implements PropertyEnum {
     NEW_NOTICE("comment_new_notice", Boolean.class, "false"),
 
     /**
+     * email share notification.
+     */
+    EMAIL_SHARE("email_share", Boolean.class, "false"),
+
+    /**
      * Reply to the email to notify the author.
      */
     REPLY_NOTICE("comment_reply_notice", Boolean.class, "false"),

@@ -15,9 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.event.logger.LogEvent;
+import run.halo.app.event.post.PostEmailShareEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.dto.EmailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.*;
@@ -30,6 +33,8 @@ import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostEmailDetailVO;
+import run.halo.app.model.vo.PostEmailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.base.BasePostRepository;
@@ -67,6 +72,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final TagService tagService;
 
+    private final EmailService emailService;
+
+    private final PostEmailService postEmailService;
+
     private final CategoryService categoryService;
 
     private final PostTagService postTagService;
@@ -82,20 +91,22 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private final OptionService optionService;
 
     public PostServiceImpl(BasePostRepository<Post> basePostRepository,
-            OptionService optionService,
-            PostRepository postRepository,
-            TagService tagService,
-            CategoryService categoryService,
-            PostTagService postTagService,
-            PostCategoryService postCategoryService,
-            PostCommentService postCommentService,
-            ApplicationEventPublisher eventPublisher,
-            PostMetaService postMetaService) {
+                           OptionService optionService,
+                           PostRepository postRepository,
+                           TagService tagService,
+                           EmailService emailService, CategoryService categoryService,
+                           PostTagService postTagService,
+                           PostEmailService postEmailService, PostCategoryService postCategoryService,
+                           PostCommentService postCommentService,
+                           ApplicationEventPublisher eventPublisher,
+                           PostMetaService postMetaService) {
         super(basePostRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;
+        this.emailService = emailService;
         this.categoryService = categoryService;
         this.postTagService = postTagService;
+        this.postEmailService = postEmailService;
         this.postCategoryService = postCategoryService;
         this.postCommentService = postCommentService;
         this.eventPublisher = eventPublisher;
@@ -128,7 +139,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     @Transactional
     public PostDetailVO createBy(Post postToCreate, Set<Integer> tagIds, Set<Integer> categoryIds,
-            Set<PostMeta> metas, boolean autoSave) {
+                                 Set<PostMeta> metas, boolean autoSave) {
         PostDetailVO createdPost = createOrUpdate(postToCreate, tagIds, categoryIds, metas);
         if (!autoSave) {
             // Log the creation
@@ -165,6 +176,27 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     LogType.POST_EDITED, updatedPost.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
+        return updatedPost;
+    }
+
+    /**
+     * Updates post by post, email id set.
+     *
+     * @param postToUpdate post to update must not be null
+     * @param emailIds     email id set
+     * @param autoSave     autoSave
+     * @return updated post
+     */
+    @Override
+    public PostEmailDetailVO updateBy(Post postToUpdate, Set<Integer> emailIds, boolean autoSave) {
+        // Set edit time
+        postToUpdate.setEditTime(DateUtils.now());
+        PostEmailDetailVO updatedPost = createOrUpdate(postToUpdate,emailIds);
+
+        // send email
+        List<EmailDTO> emails = updatedPost.getEmails();
+        eventPublisher.publishEvent(new PostEmailShareEvent(this, updatedPost.getId(), emails));
+
         return updatedPost;
     }
 
@@ -464,6 +496,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     public PostDetailVO convertToDetailVo(Post post) {
+        // List emails
+        List<Email> emails = postEmailService.listEmailsBy(post.getId());
         // List tags
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         // List categories
@@ -471,7 +505,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // List metas
         List<PostMeta> metas = postMetaService.listBy(post.getId());
         // Convert to detail vo
-        return convertTo(post, tags, categories, metas);
+        return convertTo(post, emails, tags, categories, metas);
     }
 
     @Override
@@ -714,6 +748,79 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     /**
+     * Converts to post detail vo.
+     *
+     * @param post         post must not be null
+     * @param tags         tags
+     * @param categories   categories
+     * @param postMetaList postMetaList
+     * @return post detail vo
+     */
+    @NonNull
+    private PostDetailVO convertTo(@NonNull Post post, @Nullable List<Email> emails, @Nullable List<Tag> tags,
+                                   @Nullable List<Category> categories, List<PostMeta> postMetaList) {
+        Assert.notNull(post, "Post must not be null");
+
+        // Convert to base detail vo
+        PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
+
+        if (StringUtils.isBlank(postDetailVO.getSummary())) {
+            postDetailVO.setSummary(generateSummary(post.getFormatContent()));
+        }
+
+        // Extract ids
+        Set<Integer> emailIds = ServiceUtils.fetchProperty(emails, Email::getId);
+        Set<Integer> tagIds = ServiceUtils.fetchProperty(tags, Tag::getId);
+        Set<Integer> categoryIds = ServiceUtils.fetchProperty(categories, Category::getId);
+        Set<Long> metaIds = ServiceUtils.fetchProperty(postMetaList, PostMeta::getId);
+
+        // Get post email ids
+        postDetailVO.setEmailIds(emailIds);
+        postDetailVO.setEmails(emailService.convertTo(emails));
+
+        // Get post tag ids
+        postDetailVO.setTagIds(tagIds);
+        postDetailVO.setTags(tagService.convertTo(tags));
+
+        // Get post category ids
+        postDetailVO.setCategoryIds(categoryIds);
+        postDetailVO.setCategories(categoryService.convertTo(categories));
+
+        // Get post meta ids
+        postDetailVO.setMetaIds(metaIds);
+        postDetailVO.setMetas(postMetaService.convertTo(postMetaList));
+
+        postDetailVO.setCommentCount(postCommentService.countByPostId(post.getId()));
+
+        postDetailVO.setFullPath(buildFullPath(post));
+
+        return postDetailVO;
+    }
+
+    /**
+     * Converts to post detail vo.
+     *
+     * @param post   post must not be null
+     * @param emails emails
+     * @return post detail vo
+     */
+    @NonNull
+    private PostEmailDetailVO convertTo(@NonNull Post post, @Nullable List<Email> emails) {
+        Assert.notNull(post, "Post must not be null");
+
+        // Convert to base detail vo
+        PostEmailDetailVO postDetailVO = new PostEmailDetailVO().convertFrom(post);
+
+        // Get post email ids
+        Set<Integer> emailIds = ServiceUtils.fetchProperty(emails, Email::getId);
+
+        postDetailVO.setEmailIds(emailIds);
+        postDetailVO.setEmails(emailService.convertTo(emails));
+
+        return postDetailVO;
+    }
+
+    /**
      * Build specification by post query.
      *
      * @param postQuery post query must not be null
@@ -795,6 +902,24 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return convertTo(post, tags, categories, postMetaList);
     }
 
+    private PostEmailDetailVO createOrUpdate(@NonNull Post post, Set<Integer> emailIds) {
+        Assert.notNull(post, "Post param must not be null");
+
+        // postEmailService.removeByPostId(post.getId());
+
+        // List all emails
+        List<Email> emails = emailService.listAllByIds(emailIds);
+
+        List<PostEmail> postEmails = postEmailService.mergeOrCreateByIfAbsent(post.getId(), emails);
+
+        log.debug("Created post emails: [{}]", postEmails);
+
+        postEmailService.createInBatch(postEmails);
+
+        // Convert to post detail vo
+        return convertTo(post, emails);
+    }
+
     @Override
     public void publishVisitEvent(Integer postId) {
         eventPublisher.publishEvent(new PostVisitEvent(this, postId));
@@ -805,6 +930,19 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT)
                 .toString();
         return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort).and(Sort.by(DESC, "id")));
+    }
+
+    @Override
+    public @NotNull PostEmailVO getPostEmailByPostId(Integer postId) {
+        Assert.notNull(postId, "postId must not be null");
+        PostEmailVO postEmailVO = new PostEmailVO();
+        List<PostEmail> postEmails = postEmailService.listByPostId(postId);
+        Set<Integer> emailIds = ServiceUtils.fetchProperty(postEmails, PostEmail::getEmailId);
+
+        List<Email> emails = emailService.listAllByIds(emailIds);
+
+        postEmailVO.setEmails(emailService.convertTo(emails));
+        return postEmailVO;
     }
 
     private String buildFullPath(Post post) {

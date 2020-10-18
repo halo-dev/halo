@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.dto.BaseMetaDTO;
 import run.halo.app.model.dto.CategoryDTO;
+import run.halo.app.model.dto.EmailDTO;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 
@@ -22,6 +23,10 @@ import java.util.Set;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class PostDetailVO extends BasePostDetailDTO {
+
+    private Set<Integer> emailIds;
+
+    private List<EmailDTO> emails;
 
     private Set<Integer> tagIds;
 

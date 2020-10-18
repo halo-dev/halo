@@ -11,6 +11,8 @@ import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostEmailDetailVO;
+import run.halo.app.model.vo.PostEmailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.base.BasePostService;
 
@@ -86,6 +88,17 @@ public interface PostService extends BasePostService<Post> {
      */
     @NonNull
     PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> metas, boolean autoSave);
+
+    /**
+     * Updates post by post, email id set.
+     *
+     * @param postToUpdate post to update must not be null
+     * @param emailIds     email id set
+     * @param autoSave     autoSave
+     * @return updated post
+     */
+    @NonNull
+    PostEmailDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> emailIds, boolean autoSave);
 
     /**
      * Gets post by post status and slug.
@@ -266,4 +279,6 @@ public interface PostService extends BasePostService<Post> {
     @NotNull
     Sort getPostDefaultSort();
 
+    @NotNull
+    PostEmailVO getPostEmailByPostId(@NonNull Integer postId);
 }
