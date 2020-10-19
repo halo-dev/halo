@@ -6,6 +6,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import run.halo.app.repository.base.BaseRepositoryImpl;
 
 /**
@@ -16,6 +17,7 @@ import run.halo.app.repository.base.BaseRepositoryImpl;
  */
 @SpringBootApplication
 @EnableAsync
+@EnableScheduling
 @EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass = BaseRepositoryImpl.class)
 public class Application extends SpringBootServletInitializer {
 
