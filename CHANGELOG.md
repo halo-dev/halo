@@ -1,5 +1,16 @@
 # CHANGELOG
 
+# 1.4.1
+
+## Change
+
+- 重构图库管理，并支持使用外链。halo-dev/halo-admin#258
+
+## Fixed
+
+- 修复在导航模式一的状态下，内容边距异常的问题。halo-dev/halo-admin#254
+- 修复 404 页面显示异常的问题。#1083
+
 # 1.4.0
 
 ## Feature

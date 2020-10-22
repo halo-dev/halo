@@ -2,6 +2,7 @@ package run.halo.app.controller.content;
 
 import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -126,6 +127,9 @@ public class ContentContentController {
 
         if (postPermalinkType.equals(PostPermalinkType.DEFAULT) && optionService.getArchivesPrefix().equals(prefix)) {
             Post post = postService.getBySlug(slug);
+            return postModel.content(post, token, model);
+        } else if (postPermalinkType.equals(PostPermalinkType.YEAR) && prefix.length() == 4 && StringUtils.isNumeric(prefix)) {
+            Post post = postService.getBy(Integer.parseInt(prefix), slug);
             return postModel.content(post, token, model);
         } else if (optionService.getSheetPrefix().equals(prefix)) {
             Sheet sheet = sheetService.getBySlug(slug);

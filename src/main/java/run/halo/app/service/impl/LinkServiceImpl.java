@@ -101,7 +101,37 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
             throw new AlreadyExistsException("友情链接 " + linkParam.getName() + " 已存在").setErrorData(linkParam.getName());
         }
 
+        // Check the url
+        exist = existByUrl(linkParam.getUrl());
+
+        if (exist) {
+            throw new AlreadyExistsException("友情链接 " + linkParam.getUrl() + " 已存在").setErrorData(linkParam.getUrl());
+        }
+
         return create(linkParam.convertTo());
+    }
+
+    @Override
+    public @NotNull Link updateBy(Integer id, @NotNull LinkParam linkParam) {
+        Assert.notNull(id, "Id must not be null");
+        Assert.notNull(linkParam, "Link param must not be null");
+
+        // Check the name
+        boolean exist = linkRepository.existsByNameAndIdNot(linkParam.getName(), id);
+        if (exist) {
+            throw new AlreadyExistsException("友情链接 " + linkParam.getName() + " 已存在").setErrorData(linkParam.getName());
+        }
+
+        // Check the url
+        exist = linkRepository.existsByUrlAndIdNot(linkParam.getUrl(), id);
+        if (exist) {
+            throw new AlreadyExistsException("友情链接 " + linkParam.getUrl() + " 已存在").setErrorData(linkParam.getUrl());
+        }
+
+        Link link = getById(id);
+        linkParam.update(link);
+
+        return update(link);
     }
 
     @Override
@@ -109,6 +139,15 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         Assert.hasText(name, "Link name must not be blank");
         Link link = new Link();
         link.setName(name);
+
+        return linkRepository.exists(Example.of(link));
+    }
+
+    @Override
+    public boolean existByUrl(String url) {
+        Assert.hasText(url, "Link url must not be blank");
+        Link link = new Link();
+        link.setUrl(url);
 
         return linkRepository.exists(Example.of(link));
     }

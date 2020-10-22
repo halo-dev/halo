@@ -154,8 +154,9 @@ public class ThemeController {
     @DeleteMapping("{themeId}")
     @ApiOperation("Deletes a theme")
     @DisableOnCondition
-    public void deleteBy(@PathVariable("themeId") String themeId) {
-        themeService.deleteTheme(themeId);
+    public void deleteBy(@PathVariable("themeId") String themeId,
+            @RequestParam(value = "deleteSettings", defaultValue = "false") Boolean deleteSettings) {
+        themeService.deleteTheme(themeId, deleteSettings);
     }
 
     @PostMapping("upload")

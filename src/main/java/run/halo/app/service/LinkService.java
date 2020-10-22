@@ -56,12 +56,31 @@ public interface LinkService extends CrudService<Link, Integer> {
     Link createBy(@NonNull LinkParam linkParam);
 
     /**
+     * Updates link by link param.
+     *
+     *
+     * @param id must not be null
+     * @param linkParam must not be null
+     * @return updated link
+     */
+    @NonNull
+    Link updateBy(Integer id, @NonNull LinkParam linkParam);
+
+    /**
      * Exists by link name.
      *
      * @param name must not be blank
      * @return true if exists; false otherwise
      */
     boolean existByName(String name);
+
+    /**
+     * Exists by link url.
+     *
+     * @param url must not be blank
+     * @return true if exists; false otherwise
+     */
+    boolean existByUrl(String url);
 
     /**
      * List all link teams.

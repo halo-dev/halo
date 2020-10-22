@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "run.halo.app"
-version = "1.4.0"
+version = "1.4.1"
 description = "Halo, An excellent open source blog publishing application."
 
 java {
@@ -49,6 +49,7 @@ ext {
     aliyunSdkVersion = "3.9.1"
     baiduSdkVersion = "0.10.36"
     qcloudSdkVersion = "5.6.25"
+    minioSdkVersion = "7.1.4"
     swaggerVersion = "2.9.2"
     commonsLangVersion = "3.10"
     httpclientVersion = "4.5.12"
@@ -88,6 +89,7 @@ dependencies {
     implementation "com.baidubce:bce-java-sdk:$baiduSdkVersion"
     implementation "com.qcloud:cos_api:$qcloudSdkVersion"
     implementation "com.huaweicloud:esdk-obs-java:$huaweiObsVersion"
+    implementation "io.minio:minio:$minioSdkVersion"
     implementation "io.springfox:springfox-swagger2:$swaggerVersion"
     implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"

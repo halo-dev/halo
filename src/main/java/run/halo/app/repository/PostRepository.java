@@ -49,6 +49,17 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month, @Param("slug") String slug);
 
     /**
+     * Find by post year and slug.
+     *
+     * @param year  post create year
+     * @param slug  post slug
+     * @return a optional of post
+     */
+    @Query("select post from Post post where year(post.createTime) = :year and post.slug = :slug")
+    Optional<Post> findBy(@Param("year") Integer year, @Param("slug") String slug);
+
+
+    /**
      * Find by post year and month and slug and status.
      *
      * @param year   post create year

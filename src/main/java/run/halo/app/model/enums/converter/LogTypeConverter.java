@@ -13,7 +13,4 @@ import javax.persistence.Converter;
 @Converter(autoApply = true)
 public class LogTypeConverter extends AbstractConverter<LogType, Integer> {
 
-    public LogTypeConverter() {
-        super(LogType.class);
-    }
 }
