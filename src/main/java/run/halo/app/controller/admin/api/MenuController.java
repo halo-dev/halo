@@ -5,6 +5,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.MenuDTO;
+import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
 import run.halo.app.model.vo.MenuVO;
@@ -12,6 +13,7 @@ import run.halo.app.service.MenuService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -40,9 +42,15 @@ public class MenuController {
     }
 
     @GetMapping("tree_view")
-    @ApiOperation("Lists categories as tree")
+    @ApiOperation("Lists menus as tree")
     public List<MenuVO> listAsTree(@SortDefault(sort = "team", direction = DESC) Sort sort) {
         return menuService.listAsTree(sort.and(Sort.by(ASC, "priority")));
+    }
+
+    @GetMapping("team/tree_view")
+    @ApiOperation("Lists menus as tree by team")
+    public List<MenuVO> listDefaultsAsTreeByTeam(@SortDefault(sort = "priority", direction = ASC) Sort sort, @RequestParam(name = "team") String team) {
+        return menuService.listByTeamAsTree(team, sort);
     }
 
     @GetMapping("{menuId:\\d+}")
@@ -57,10 +65,18 @@ public class MenuController {
         return new MenuDTO().convertFrom(menuService.createBy(menuParam));
     }
 
+    @PutMapping("/batch")
+    public void updateBatchBy(@RequestBody @Valid List<MenuParam> menuParams) {
+        List<Menu> menus = menuParams
+                .stream()
+                .map(InputConverter::convertTo)
+                .collect(Collectors.toList());
+        menuService.updateInBatch(menus);
+    }
+
     @PutMapping("{menuId:\\d+}")
     @ApiOperation("Updates a menu")
-    public MenuDTO updateBy(@PathVariable("menuId") Integer menuId,
-            @RequestBody @Valid MenuParam menuParam) {
+    public MenuDTO updateBy(@PathVariable("menuId") Integer menuId, @RequestBody @Valid MenuParam menuParam) {
         // Get the menu
         Menu menu = menuService.getById(menuId);
 
