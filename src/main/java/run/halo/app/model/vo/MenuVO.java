@@ -17,5 +17,5 @@ import java.util.List;
 @ToString(callSuper = true)
 public class MenuVO extends MenuDTO {
 
-    private List<MenuVO> children = new LinkedList<>();;
+    private List<MenuVO> children = new LinkedList<>();
 }
