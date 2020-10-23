@@ -43,8 +43,6 @@ spring:
       max-request-size: 10240MB
   cache:
     type: none
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration
 management:
   endpoints:
     web:
