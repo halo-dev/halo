@@ -1,10 +1,7 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.AttachmentGroupDTO;
 import run.halo.app.model.entity.AttachmentGroup;
 import run.halo.app.model.params.AttachmentGroupParam;
@@ -34,5 +31,17 @@ public class AttachmentGroupController {
         AttachmentGroup attachmentGroup = attachmentGroupParam.convertTo();
         attachmentGroupService.create(attachmentGroup);
         return new AttachmentGroupDTO().convertFrom(attachmentGroup);
+    }
+
+    @PutMapping("{id:\\d+}")
+    @ApiOperation("Updates a attachment group")
+    public AttachmentGroupDTO updateBy(@PathVariable Integer id,
+                                       @RequestBody @Valid AttachmentGroupParam attachmentGroupParam) {
+        AttachmentGroup attachmentGroupToUpdate = attachmentGroupService.getById(id);
+        attachmentGroupParam.update(attachmentGroupToUpdate);
+
+        attachmentGroupService.update(attachmentGroupToUpdate);
+
+        return new AttachmentGroupDTO().convertFrom(attachmentGroupToUpdate);
     }
 }
