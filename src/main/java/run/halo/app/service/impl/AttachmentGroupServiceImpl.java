@@ -1,15 +1,19 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.model.dto.AttachmentDTO;
+import run.halo.app.model.dto.AttachmentGroupDTO;
+import run.halo.app.model.dto.AttachmentViewDTO;
+import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.entity.AttachmentGroup;
 import run.halo.app.repository.AttachmentGroupRepository;
 import run.halo.app.service.AttachmentGroupService;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.base.AbstractCrudService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +33,7 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
     private final AttachmentService attachmentService;
 
     public AttachmentGroupServiceImpl(AttachmentGroupRepository attachmentGroupRepository,
-                                      AttachmentService attachmentService) {
+            AttachmentService attachmentService) {
         super(attachmentGroupRepository);
         this.attachmentGroupRepository = attachmentGroupRepository;
         this.attachmentService = attachmentService;
@@ -43,6 +47,26 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
         attachmentService.removeByGroupIdsPermanently(groupIdsToDelete);
         // remove attachment group by ids
         removeInBatch(groupIdsToDelete);
+    }
+    @NonNull
+    @Override
+    public AttachmentViewDTO listBy(@NonNull Integer groupId) {
+        // List attachments and groups by groupId
+        List<AttachmentGroup> attachmentGroups = attachmentGroupRepository.findByParentId(groupId);
+        List<Attachment> attachments = attachmentService.listByGroupId(groupId);
+
+        List<AttachmentGroupDTO> attachmentGroupDtoList = attachmentGroups.stream()
+                .map(attachmentGroup -> (AttachmentGroupDTO)new AttachmentGroupDTO().convertFrom(attachmentGroup))
+                .collect(Collectors.toList());
+
+        List<AttachmentDTO> attachmentDtoList = attachments.stream()
+                .map(attachment -> (AttachmentDTO)new AttachmentDTO().convertFrom(attachment))
+                .collect(Collectors.toList());
+
+        AttachmentViewDTO attachmentViewDTO = new AttachmentViewDTO();
+        attachmentViewDTO.setGroups(attachmentGroupDtoList);
+        attachmentViewDTO.setAttachments(attachmentDtoList);
+        return attachmentViewDTO;
     }
 
     private List<Integer> listGroupIdsRecursivelyByParentIds(List<Integer> groupIds) {

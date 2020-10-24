@@ -99,4 +99,11 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @return replaced attachments.
      */
     List<Attachment> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
+
+    /**
+     * list by attachment group id
+     * @param groupId attachment id
+     * @return list of attachment
+     */
+    List<Attachment> listByGroupId(@NonNull Integer groupId);
 }

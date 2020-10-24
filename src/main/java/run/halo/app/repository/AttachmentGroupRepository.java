@@ -20,4 +20,11 @@ public interface AttachmentGroupRepository extends BaseRepository<AttachmentGrou
      * @return attachment groups of parent id in group ids
      */
     List<AttachmentGroup> findByParentIdIn(List<Integer> groupIds);
+
+    /**
+     * List attachment groups by parent id
+     * @param parentId groups parent id
+     * @return attachment groups of parent equal to parentId
+     */
+    List<AttachmentGroup> findByParentId(Integer parentId);
 }
