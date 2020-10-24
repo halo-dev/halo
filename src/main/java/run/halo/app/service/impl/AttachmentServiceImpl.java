@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
  *
  * @author ryanwang
  * @author johnniang
+ * @author guqing
  * @date 2019-03-14
  */
 @Slf4j
@@ -148,6 +149,12 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         }
 
         return ids.stream().map(this::removePermanently).collect(Collectors.toList());
+    }
+
+    @Override
+    public void removeByGroupIdsPermanently(@NonNull List<Integer> groupIds) {
+        List<Integer> attachmentIds = attachmentRepository.findByGroupIdIn(groupIds);
+        removePermanently(attachmentIds);
     }
 
     @Override

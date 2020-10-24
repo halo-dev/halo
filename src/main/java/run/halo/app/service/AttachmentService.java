@@ -19,6 +19,7 @@ import java.util.List;
  * Attachment service.
  *
  * @author johnniang
+ * @author guqing
  * @date 2019-03-14
  */
 public interface AttachmentService extends CrudService<Attachment, Integer> {
@@ -60,6 +61,12 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      */
     @NonNull
     List<Attachment> removePermanently(@NonNull Collection<Integer> ids);
+
+    /**
+     *  Removes attachment permanently in batch by attachment group ids.
+     * @param groupIds attachment group ids
+     */
+    void removeByGroupIdsPermanently(@NonNull List<Integer> groupIds);
 
     /**
      * Converts to attachment output dto.

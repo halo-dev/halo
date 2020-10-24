@@ -14,6 +14,7 @@ import java.util.List;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-03
  */
 public interface AttachmentRepository extends BaseRepository<Attachment, Integer>, JpaSpecificationExecutor<Attachment> {
@@ -41,4 +42,11 @@ public interface AttachmentRepository extends BaseRepository<Attachment, Integer
      * @return count of the given path
      */
     long countByPath(@NonNull String path);
+
+    /**
+     * Find All attachments that group id in groupIds
+     * @param groupIds attachment group ids
+     * @return attachment id that group id in groupIds
+     */
+    List<Integer> findByGroupIdIn(List<Integer> groupIds);
 }

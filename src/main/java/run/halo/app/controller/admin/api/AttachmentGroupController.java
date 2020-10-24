@@ -8,6 +8,7 @@ import run.halo.app.model.params.AttachmentGroupParam;
 import run.halo.app.service.AttachmentGroupService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Attachment group controller.
@@ -43,5 +44,11 @@ public class AttachmentGroupController {
         attachmentGroupService.update(attachmentGroupToUpdate);
 
         return new AttachmentGroupDTO().convertFrom(attachmentGroupToUpdate);
+    }
+
+    @DeleteMapping
+    @ApiOperation("Recursively delete attachment groups and attachments by group ids")
+    public void deletePermanently(@RequestBody List<Integer> groupIds) {
+        attachmentGroupService.removeGroupAndAttachmentBy(groupIds);
     }
 }
