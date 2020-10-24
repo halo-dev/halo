@@ -9,7 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 /**
- * Attachment group entity
+ * Attachment group entity.
  * @author guqing
  * @date 2020-10-24
  */
