@@ -92,6 +92,13 @@ public class Attachment extends BaseEntity {
     @ColumnDefault("0")
     private AttachmentType type;
 
+    /**
+     * Attachment Group Id.
+     * To be compatible with the original data, the default value is null instead of 0.
+     */
+    @Column(name = "group_id")
+    private Integer groupId;
+
     @Override
     public void prePersist() {
         super.prePersist();
