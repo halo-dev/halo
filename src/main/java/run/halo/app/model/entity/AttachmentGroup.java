@@ -36,4 +36,11 @@ public class AttachmentGroup extends BaseEntity {
      */
     @Column(name = "name", nullable = false)
     private String name;
+
+    @Override
+    public void prePersist() {
+        if (parentId == null) {
+            parentId = 0;
+        }
+    }
 }

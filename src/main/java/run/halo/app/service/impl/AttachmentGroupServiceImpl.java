@@ -56,11 +56,11 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
         List<Attachment> attachments = attachmentService.listByGroupId(groupId);
 
         List<AttachmentGroupDTO> attachmentGroupDtoList = attachmentGroups.stream()
-                .map(attachmentGroup -> (AttachmentGroupDTO)new AttachmentGroupDTO().convertFrom(attachmentGroup))
+                .map(attachmentGroup -> (AttachmentGroupDTO) new AttachmentGroupDTO().convertFrom(attachmentGroup))
                 .collect(Collectors.toList());
 
         List<AttachmentDTO> attachmentDtoList = attachments.stream()
-                .map(attachment -> (AttachmentDTO)new AttachmentDTO().convertFrom(attachment))
+                .map(attachmentService::convertToDto)
                 .collect(Collectors.toList());
 
         AttachmentViewDTO attachmentViewDTO = new AttachmentViewDTO();

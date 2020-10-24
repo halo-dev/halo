@@ -210,7 +210,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
 
     @Override
     public List<Attachment> listByGroupId(@NonNull Integer groupId) {
-        if(groupId.equals(0)) {
+        if (groupId.equals(0)) {
             return attachmentRepository.findByGroupIdIsNull();
         }
         return attachmentRepository.findByGroupId(groupId);

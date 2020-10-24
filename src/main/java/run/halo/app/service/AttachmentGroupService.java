@@ -1,11 +1,8 @@
 package run.halo.app.service;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.AttachmentViewDTO;
 import run.halo.app.model.entity.AttachmentGroup;
-import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.base.CrudService;
 
 import java.util.List;

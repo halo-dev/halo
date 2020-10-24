@@ -1,21 +1,15 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.AttachmentGroupDTO;
 import run.halo.app.model.dto.AttachmentViewDTO;
 import run.halo.app.model.entity.AttachmentGroup;
 import run.halo.app.model.params.AttachmentGroupParam;
-import run.halo.app.model.params.AttachmentQuery;
 import run.halo.app.service.AttachmentGroupService;
 
 import javax.validation.Valid;
 import java.util.List;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Attachment group controller.
@@ -33,6 +27,8 @@ public class AttachmentGroupController {
         this.attachmentGroupService = attachmentGroupService;
     }
 
+    @GetMapping
+    @ApiOperation("List all attachment groups")
     public AttachmentViewDTO listBy(@RequestParam(defaultValue = "0") Integer parentId) {
         return attachmentGroupService.listBy(parentId);
     }
