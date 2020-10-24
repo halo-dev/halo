@@ -5,6 +5,7 @@ import run.halo.app.service.base.CrudService;
 
 /**
  * Attachment group service.
+ *
  * @author guqing
  * @date 2020-10-24
  */
