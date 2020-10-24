@@ -15,6 +15,7 @@ import run.halo.app.service.AttachmentGroupService;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.base.AbstractCrudService;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,10 +57,12 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
         List<Attachment> attachments = attachmentService.listByGroupId(groupId);
 
         List<AttachmentGroupDTO> attachmentGroupDtoList = attachmentGroups.stream()
+                .sorted(Comparator.comparing(AttachmentGroup::getCreateTime).reversed())
                 .map(attachmentGroup -> (AttachmentGroupDTO) new AttachmentGroupDTO().convertFrom(attachmentGroup))
                 .collect(Collectors.toList());
 
         List<AttachmentDTO> attachmentDtoList = attachments.stream()
+                .sorted(Comparator.comparing(Attachment::getCreateTime).reversed())
                 .map(attachmentService::convertToDto)
                 .collect(Collectors.toList());
 

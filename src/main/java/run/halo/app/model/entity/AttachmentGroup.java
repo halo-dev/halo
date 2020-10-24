@@ -39,6 +39,8 @@ public class AttachmentGroup extends BaseEntity {
 
     @Override
     public void prePersist() {
+        super.prePersist();
+
         if (parentId == null) {
             parentId = 0;
         }
