@@ -27,10 +27,10 @@ public class AttachmentGroupController {
         this.attachmentGroupService = attachmentGroupService;
     }
 
-    @GetMapping
+    @GetMapping("/{groupId:\\d+}")
     @ApiOperation("List all attachment groups")
-    public AttachmentViewDTO listBy(@RequestParam(defaultValue = "0") Integer parentId) {
-        return attachmentGroupService.listBy(parentId);
+    public AttachmentViewDTO listBy(@PathVariable Integer groupId) {
+        return attachmentGroupService.listBy(groupId);
     }
 
     @PostMapping
