@@ -174,7 +174,8 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         MultipartConfigElement multipartConfigElement = multipartProperties.createMultipartConfig();
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
         resolver.setDefaultEncoding("UTF-8");
-        resolver.setMaxUploadSize(multipartConfigElement.getMaxFileSize());
+        resolver.setMaxUploadSize(multipartConfigElement.getMaxRequestSize());
+        resolver.setMaxUploadSizePerFile(multipartConfigElement.getMaxFileSize());
         return resolver;
     }
 

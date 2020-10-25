@@ -6,9 +6,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.util.NestedServletException;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.AuthenticationException;
+import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.entity.User;
 import run.halo.app.security.authentication.AuthenticationImpl;
 import run.halo.app.security.context.SecurityContextHolder;
@@ -113,7 +116,15 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
 
         // Do filter
-        filterChain.doFilter(request, response);
+        try{
+            filterChain.doFilter(request, response);
+        }
+        catch (NestedServletException nestedServletEx){
+            if(nestedServletEx.getRootCause() instanceof MaxUploadSizeExceededException)
+                throw new FileOperationException("文件大小超过最大限制");
+            else
+                throw nestedServletEx;
+        }
     }
 
     @Override
