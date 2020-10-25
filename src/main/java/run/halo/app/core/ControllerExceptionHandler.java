@@ -13,6 +13,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.model.support.BaseResponse;
@@ -104,6 +105,15 @@ public class ControllerExceptionHandler {
         baseResponse.setStatus(status.value());
         baseResponse.setMessage(status.getReasonPhrase());
         return baseResponse;
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseResponse<?> handleUploadSizeExceededException(MaxUploadSizeExceededException e) {
+        BaseResponse<Object> response = handleBaseException(e);
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.setMessage("当前请求超出最大限制：" + e.getMaxUploadSize() + " bytes");
+        return response;
     }
 
     @ExceptionHandler(AbstractHaloException.class)
