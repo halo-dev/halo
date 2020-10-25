@@ -53,6 +53,26 @@
           style="width:100%"
         />
       </a-form-model-item>
+      <a-form-model-item label="自动清理回收站文章：">
+        <a-switch v-model="options.recycled_post_cleaning_enabled" />
+      </a-form-model-item>
+      <a-form-model-item
+        v-show="options.recycled_post_cleaning_enabled"
+        label="回收站文章保留时长：">
+        <a-input-group compact>
+          <a-input-number
+            v-model="options.recycled_post_retention_time"
+            :min="1"
+            :precision="0"
+            style="width: 70%"/>
+          <a-select
+            v-model="options.recycled_post_retention_timeunit"
+            style="width: 30%">
+            <a-select-option value="DAY">天</a-select-option>
+            <a-select-option value="HOUR">小时</a-select-option>
+          </a-select>
+        </a-input-group>
+      </a-form-model-item>
       <a-form-model-item>
         <ReactiveButton
           type="primary"
