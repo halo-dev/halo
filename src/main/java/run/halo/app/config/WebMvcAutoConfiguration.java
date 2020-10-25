@@ -176,6 +176,10 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         resolver.setDefaultEncoding("UTF-8");
         resolver.setMaxUploadSize(multipartConfigElement.getMaxRequestSize());
         resolver.setMaxUploadSizePerFile(multipartConfigElement.getMaxFileSize());
+
+        //lazy multipart parsing, throwing parse exceptions once the application attempts to obtain multipart files
+        resolver.setResolveLazily(true);
+
         return resolver;
     }
 
