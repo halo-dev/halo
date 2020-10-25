@@ -120,7 +120,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
             filterChain.doFilter(request, response);
         }
         catch (NestedServletException nestedServletEx){
-            if(nestedServletEx.getRootCause() instanceof MaxUploadSizeExceededException) {
+            if (nestedServletEx.getRootCause() instanceof MaxUploadSizeExceededException) {
                 throw new FileOperationException("文件大小超过最大限制");
             }
             else
