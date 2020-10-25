@@ -116,15 +116,14 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(userDetail)));
 
         // Do filter
-        try{
+        try {
             filterChain.doFilter(request, response);
-        }
-        catch (NestedServletException nestedServletEx){
+        } catch (NestedServletException nestedServletEx) {
             if (nestedServletEx.getRootCause() instanceof MaxUploadSizeExceededException) {
                 throw new FileOperationException("文件大小超过最大限制");
-            }
-            else
+            } else {
                 throw nestedServletEx;
+            }
         }
     }
 
