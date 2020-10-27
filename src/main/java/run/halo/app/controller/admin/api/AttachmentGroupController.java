@@ -37,7 +37,7 @@ public class AttachmentGroupController {
     @ApiOperation("Creates a attachment group")
     public AttachmentGroupDTO createBy(@RequestBody @Valid AttachmentGroupParam attachmentGroupParam) {
         AttachmentGroup attachmentGroup = attachmentGroupParam.convertTo();
-        attachmentGroupService.create(attachmentGroup);
+        attachmentGroupService.createBy(attachmentGroup);
         return new AttachmentGroupDTO().convertFrom(attachmentGroup);
     }
 

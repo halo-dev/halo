@@ -5,6 +5,7 @@ import run.halo.app.model.entity.AttachmentGroup;
 import run.halo.app.repository.base.BaseRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Attachment group repository
@@ -23,8 +24,18 @@ public interface AttachmentGroupRepository extends BaseRepository<AttachmentGrou
 
     /**
      * List attachment groups by parent id
+     *
      * @param parentId groups parent id
      * @return attachment groups of parent equal to parentId
      */
     List<AttachmentGroup> findByParentId(Integer parentId);
+
+    /**
+     * Find one by name and parent id
+     *
+     * @param name attachment name
+     * @param parentId attachment parent group id
+     * @return a attachment group optional
+     */
+    Optional<AttachmentGroup> findByNameAndParentId(String name, Integer parentId);
 }

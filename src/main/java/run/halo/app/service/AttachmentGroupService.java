@@ -22,11 +22,20 @@ public interface AttachmentGroupService extends CrudService<AttachmentGroup, Int
     void removeGroupAndAttachmentBy(List<Integer> groupIds);
 
     /**
-     * list attachments and groups output dto.
+     * List attachments and groups output dto.
      *
-     * @param groupId         attachment group id
+     * @param groupId attachment group id
      * @return a list of attachments and attachment groups output dto
      */
     @NonNull
     AttachmentViewDTO listBy(@NonNull Integer groupId);
+
+    /**
+     * Create attachment.
+     * Fast return if a group with the same name exists at the same level
+     *
+     * @param attachmentGroup attachment group param
+     * @return persistent attachment group object
+     */
+    AttachmentGroup createBy(AttachmentGroup attachmentGroup);
 }

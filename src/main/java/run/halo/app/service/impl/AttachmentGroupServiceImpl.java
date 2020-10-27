@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +15,11 @@ import run.halo.app.repository.AttachmentGroupRepository;
 import run.halo.app.service.AttachmentGroupService;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.base.AbstractCrudService;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +37,7 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
     private final AttachmentService attachmentService;
 
     public AttachmentGroupServiceImpl(AttachmentGroupRepository attachmentGroupRepository,
-            AttachmentService attachmentService) {
+                                      AttachmentService attachmentService) {
         super(attachmentGroupRepository);
         this.attachmentGroupRepository = attachmentGroupRepository;
         this.attachmentService = attachmentService;
@@ -49,6 +52,7 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
         // remove attachment group by ids
         removeInBatch(groupIdsToDelete);
     }
+
     @NonNull
     @Override
     public AttachmentViewDTO listBy(@NonNull Integer groupId) {
@@ -70,6 +74,17 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
         attachmentViewDTO.setGroups(attachmentGroupDtoList);
         attachmentViewDTO.setAttachments(attachmentDtoList);
         return attachmentViewDTO;
+    }
+
+    @Override
+    public AttachmentGroup createBy(AttachmentGroup attachmentGroup) {
+        Optional<AttachmentGroup> groupOptional = attachmentGroupRepository
+                .findByNameAndParentId(attachmentGroup.getName(), attachmentGroup.getParentId());
+        if (groupOptional.isPresent()) {
+            return groupOptional.get();
+        }
+        this.create(attachmentGroup);
+        return attachmentGroup;
     }
 
     private List<Integer> listGroupIdsRecursivelyByParentIds(List<Integer> groupIds) {
