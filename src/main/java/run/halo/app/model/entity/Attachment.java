@@ -127,5 +127,9 @@ public class Attachment extends BaseEntity {
         if (type == null) {
             type = AttachmentType.LOCAL;
         }
+
+        if(groupId == 0) {
+            groupId = null;
+        }
     }
 }

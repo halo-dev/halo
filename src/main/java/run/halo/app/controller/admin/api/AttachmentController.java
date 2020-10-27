@@ -17,6 +17,7 @@ import run.halo.app.service.AttachmentService;
 import javax.validation.Valid;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -56,6 +57,20 @@ public class AttachmentController {
         Attachment attachment = attachmentService.getById(attachmentId);
         attachmentParam.update(attachment);
         return new AttachmentDTO().convertFrom(attachmentService.update(attachment));
+    }
+
+    @PutMapping("/move/{groupId:\\d+}")
+    public List<AttachmentDTO> updateByIdInBatch(@PathVariable Integer groupId,
+                 @RequestBody List<Integer> attachmentIds) {
+        List<Attachment> attachments = attachmentService.listAllByIds(attachmentIds);
+        List<AttachmentDTO> result = attachments.stream().map(attachment -> {
+            // set group id and convert to dto
+            attachment.setGroupId(groupId);
+            return attachmentService.convertToDto(attachment);
+        }).collect(Collectors.toList());
+        // update in batch
+        attachmentService.updateInBatch(attachments);
+        return result;
     }
 
     @DeleteMapping("{id:\\d+}")
