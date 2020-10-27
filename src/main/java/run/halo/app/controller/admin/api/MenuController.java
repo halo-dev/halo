@@ -65,13 +65,15 @@ public class MenuController {
         return new MenuDTO().convertFrom(menuService.createBy(menuParam));
     }
 
-    @PutMapping("/batch")
-    public void updateBatchBy(@RequestBody @Valid List<MenuParam> menuParams) {
+    @PostMapping("/batch")
+    public List<MenuDTO> createBatchBy(@RequestBody @Valid List<MenuParam> menuParams) {
         List<Menu> menus = menuParams
                 .stream()
                 .map(InputConverter::convertTo)
                 .collect(Collectors.toList());
-        menuService.updateInBatch(menus);
+        return menuService.createInBatch(menus).stream()
+                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+                .collect(Collectors.toList());
     }
 
     @PutMapping("{menuId:\\d+}")
@@ -85,6 +87,17 @@ public class MenuController {
 
         // Update menu in database
         return new MenuDTO().convertFrom(menuService.update(menu));
+    }
+
+    @PutMapping("/batch")
+    public List<MenuDTO> updateBatchBy(@RequestBody @Valid List<MenuParam> menuParams) {
+        List<Menu> menus = menuParams
+                .stream()
+                .map(InputConverter::convertTo)
+                .collect(Collectors.toList());
+        return menuService.updateInBatch(menus).stream()
+                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping("{menuId:\\d+}")
