@@ -63,7 +63,8 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
     List<Attachment> removePermanently(@NonNull Collection<Integer> ids);
 
     /**
-     *  Removes attachment permanently in batch by attachment group ids.
+     * Removes attachment permanently in batch by attachment group ids.
+     *
      * @param groupIds attachment group ids
      */
     void removeByGroupIdsPermanently(@NonNull List<Integer> groupIds);
@@ -102,6 +103,7 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
 
     /**
      * list by attachment group id
+     *
      * @param groupId attachment id
      * @return list of attachment
      */

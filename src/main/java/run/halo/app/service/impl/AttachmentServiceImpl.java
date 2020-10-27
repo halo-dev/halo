@@ -24,6 +24,7 @@ import run.halo.app.service.AttachmentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.ServiceUtils;
 
 import javax.persistence.criteria.Predicate;
 import java.util.*;
@@ -153,7 +154,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
 
     @Override
     public void removeByGroupIdsPermanently(@NonNull List<Integer> groupIds) {
-        List<Integer> attachmentIds = attachmentRepository.findByGroupIdIn(groupIds);
+        List<Attachment> attachments = attachmentRepository.findByGroupIdIn(groupIds);
+        Set<Integer> attachmentIds = ServiceUtils.fetchProperty(attachments, Attachment::getId);
         removePermanently(attachmentIds);
     }
 

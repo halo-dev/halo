@@ -45,19 +45,22 @@ public interface AttachmentRepository extends BaseRepository<Attachment, Integer
 
     /**
      * Find all attachments that group id in groupIds
+     *
      * @param groupIds attachment group ids
      * @return attachment id that group id in groupIds
      */
-    List<Integer> findByGroupIdIn(List<Integer> groupIds);
+    List<Attachment> findByGroupIdIn(List<Integer> groupIds);
 
     /**
      * Find all attachments that group id is null
+     *
      * @return a list of attachment
      */
     List<Attachment> findByGroupIdIsNull();
 
     /**
      * Find all attachments that group id equals groupId
+     *
      * @param groupId attachment group id
      * @return a list of attachment
      */

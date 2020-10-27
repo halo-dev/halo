@@ -56,6 +56,7 @@ public class AttachmentGroupController {
     @DeleteMapping
     @ApiOperation("Recursively delete attachment groups and attachments by group ids")
     public void deletePermanently(@RequestBody List<Integer> groupIds) {
+        System.out.println(groupIds);
         attachmentGroupService.removeGroupAndAttachmentBy(groupIds);
     }
 }

@@ -8,6 +8,7 @@ import org.hibernate.annotations.GenericGenerator;
 import run.halo.app.model.enums.AttachmentType;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  * Attachment entity
@@ -127,8 +128,7 @@ public class Attachment extends BaseEntity {
         if (type == null) {
             type = AttachmentType.LOCAL;
         }
-
-        if(groupId == 0) {
+        if(Objects.equals(0, groupId)) {
             groupId = null;
         }
     }
