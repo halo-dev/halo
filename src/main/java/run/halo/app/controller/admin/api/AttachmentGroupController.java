@@ -37,13 +37,7 @@ public class AttachmentGroupController {
     @GetMapping("/parent/{parentId:\\d+}")
     public List<AttachmentGroupDTO> listByParent(@PathVariable Integer parentId) {
         List<AttachmentGroup> attachmentGroups = attachmentGroupService.listByParentId(parentId);
-        return attachmentGroups.stream()
-                .map(attachmentGroup -> {
-                    AttachmentGroupDTO attachmentGroupDTO = new AttachmentGroupDTO();
-                    attachmentGroupDTO.convertFrom(attachmentGroup);
-                    return attachmentGroupDTO;
-                })
-                .collect(Collectors.toList());
+        return convertTo(attachmentGroups);
     }
 
     @PostMapping
@@ -66,10 +60,25 @@ public class AttachmentGroupController {
         return new AttachmentGroupDTO().convertFrom(attachmentGroupToUpdate);
     }
 
+    @PutMapping("/move/{parentId:\\d+}")
+    public List<AttachmentGroupDTO> moveTo(@PathVariable Integer parentId, @RequestBody List<Integer> ids) {
+        List<AttachmentGroup> attachmentGroups = attachmentGroupService.batchMoveTo(ids, parentId);
+        return convertTo(attachmentGroups);
+    }
+
     @DeleteMapping
     @ApiOperation("Recursively delete attachment groups and attachments by group ids")
     public void deletePermanently(@RequestBody List<Integer> groupIds) {
-        System.out.println(groupIds);
         attachmentGroupService.removeGroupAndAttachmentBy(groupIds);
+    }
+
+    private List<AttachmentGroupDTO> convertTo(List<AttachmentGroup> attachmentGroups) {
+        return attachmentGroups.stream()
+                .map(attachmentGroup -> {
+                    AttachmentGroupDTO attachmentGroupDTO = new AttachmentGroupDTO();
+                    attachmentGroupDTO.convertFrom(attachmentGroup);
+                    return attachmentGroupDTO;
+                })
+                .collect(Collectors.toList());
     }
 }

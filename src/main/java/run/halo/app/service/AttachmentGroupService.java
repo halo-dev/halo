@@ -46,4 +46,13 @@ public interface AttachmentGroupService extends CrudService<AttachmentGroup, Int
      * @return attachment groups of parent id is parentId
      */
     List<AttachmentGroup> listByParentId(Integer parentId);
+
+    /**
+     * Move groups of id in ids to a group that id equals parentId
+     *
+     * @param ids      moved group ids
+     * @param parentId target group id
+     * @return a group list of id in ids,does not contain child attachments and groups
+     */
+    List<AttachmentGroup> batchMoveTo(List<Integer> ids, Integer parentId);
 }

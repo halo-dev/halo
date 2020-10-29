@@ -6,6 +6,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.dto.AttachmentGroupDTO;
 import run.halo.app.model.dto.AttachmentViewDTO;
@@ -16,10 +17,7 @@ import run.halo.app.service.AttachmentGroupService;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.base.AbstractCrudService;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -77,6 +75,7 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public AttachmentGroup createBy(AttachmentGroup attachmentGroup) {
         Optional<AttachmentGroup> groupOptional = attachmentGroupRepository
                 .findByNameAndParentId(attachmentGroup.getName(), attachmentGroup.getParentId());
@@ -90,6 +89,29 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
     @Override
     public List<AttachmentGroup> listByParentId(Integer parentId) {
         return attachmentGroupRepository.findByParentId(parentId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<AttachmentGroup> batchMoveTo(List<Integer> ids, Integer parentId) {
+        List<Integer> groupIdsToBeMoved = listGroupIdsRecursivelyByParentIds(ids);
+        if (groupIdsToBeMoved.contains(parentId)) {
+            throw new UnsupportedOperationException("不能将目录移动到自身或其子目录下");
+        }
+
+        List<AttachmentGroup> attachmentGroups = listAllByIds(groupIdsToBeMoved);
+
+        List<AttachmentGroup> result = new LinkedList<>();
+        attachmentGroups.forEach(attachmentGroup -> {
+            attachmentGroup.setParentId(parentId);
+            // update
+            this.update(attachmentGroup);
+            // collect result
+            if (ids.contains(attachmentGroup.getId())) {
+                result.add(attachmentGroup);
+            }
+        });
+        return result;
     }
 
     private List<Integer> listGroupIdsRecursivelyByParentIds(List<Integer> groupIds) {

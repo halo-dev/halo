@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -49,8 +50,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     private final FileHandlers fileHandlers;
 
     public AttachmentServiceImpl(AttachmentRepository attachmentRepository,
-            OptionService optionService,
-            FileHandlers fileHandlers) {
+                                 OptionService optionService,
+                                 FileHandlers fileHandlers) {
         super(attachmentRepository);
         this.attachmentRepository = attachmentRepository;
         this.optionService = optionService;
