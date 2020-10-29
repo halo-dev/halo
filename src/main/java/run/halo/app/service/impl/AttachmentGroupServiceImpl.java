@@ -1,12 +1,11 @@
 package run.halo.app.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.dto.AttachmentGroupDTO;
 import run.halo.app.model.dto.AttachmentViewDTO;
@@ -96,7 +95,7 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
     public List<AttachmentGroup> batchMoveTo(List<Integer> ids, Integer parentId) {
         List<Integer> groupIdsToBeMoved = listGroupIdsRecursivelyByParentIds(ids);
         if (groupIdsToBeMoved.contains(parentId)) {
-            throw new UnsupportedOperationException("不能将目录移动到自身或其子目录下");
+            throw new BadRequestException("不能将目录移动到自身或其子目录下");
         }
 
         List<AttachmentGroup> attachmentGroups = listAllByIds(groupIdsToBeMoved);
