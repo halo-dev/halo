@@ -16,4 +16,6 @@ public class AttachmentGroupDTO implements OutputConverter<AttachmentGroupDTO, A
     private Integer id;
 
     private String name;
+
+    private Integer parentId;
 }

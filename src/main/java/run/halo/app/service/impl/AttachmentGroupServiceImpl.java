@@ -87,6 +87,11 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
         return attachmentGroup;
     }
 
+    @Override
+    public List<AttachmentGroup> listByParentId(Integer parentId) {
+        return attachmentGroupRepository.findByParentId(parentId);
+    }
+
     private List<Integer> listGroupIdsRecursivelyByParentIds(List<Integer> groupIds) {
         List<Integer> list = new ArrayList<>();
         listGroupIdsRecursivelyByParentIds(groupIds, list);

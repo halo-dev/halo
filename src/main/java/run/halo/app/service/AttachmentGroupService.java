@@ -38,4 +38,12 @@ public interface AttachmentGroupService extends CrudService<AttachmentGroup, Int
      * @return persistent attachment group object
      */
     AttachmentGroup createBy(AttachmentGroup attachmentGroup);
+
+    /**
+     * List attachment group by parent id
+     *
+     * @param parentId group parent id
+     * @return attachment groups of parent id is parentId
+     */
+    List<AttachmentGroup> listByParentId(Integer parentId);
 }

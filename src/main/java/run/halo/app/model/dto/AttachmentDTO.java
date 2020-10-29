@@ -18,6 +18,8 @@ public class AttachmentDTO implements OutputConverter<AttachmentDTO, Attachment>
 
     private Integer id;
 
+    private Integer groupId;
+
     private String name;
 
     private String path;

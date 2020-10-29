@@ -10,6 +10,7 @@ import run.halo.app.service.AttachmentGroupService;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Attachment group controller.
@@ -33,6 +34,18 @@ public class AttachmentGroupController {
         return attachmentGroupService.listBy(groupId);
     }
 
+    @GetMapping("/parent/{parentId:\\d+}")
+    public List<AttachmentGroupDTO> listByParent(@PathVariable Integer parentId) {
+        List<AttachmentGroup> attachmentGroups = attachmentGroupService.listByParentId(parentId);
+        return attachmentGroups.stream()
+                .map(attachmentGroup -> {
+                    AttachmentGroupDTO attachmentGroupDTO = new AttachmentGroupDTO();
+                    attachmentGroupDTO.convertFrom(attachmentGroup);
+                    return attachmentGroupDTO;
+                })
+                .collect(Collectors.toList());
+    }
+
     @PostMapping
     @ApiOperation("Creates a attachment group")
     public AttachmentGroupDTO createBy(@RequestBody @Valid AttachmentGroupParam attachmentGroupParam) {
@@ -44,7 +57,7 @@ public class AttachmentGroupController {
     @PutMapping("{id:\\d+}")
     @ApiOperation("Updates a attachment group")
     public AttachmentGroupDTO updateBy(@PathVariable Integer id,
-            @RequestBody @Valid AttachmentGroupParam attachmentGroupParam) {
+                                       @RequestBody @Valid AttachmentGroupParam attachmentGroupParam) {
         AttachmentGroup attachmentGroupToUpdate = attachmentGroupService.getById(id);
         attachmentGroupParam.update(attachmentGroupToUpdate);
 
