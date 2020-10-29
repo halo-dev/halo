@@ -113,6 +113,15 @@ public class MenuController {
         return new MenuDTO().convertFrom(menuService.removeById(menuId));
     }
 
+    @DeleteMapping("/batch")
+    public List<MenuDTO> deleteBatchBy(@RequestBody List<Integer> menuIds) {
+        List<Menu> menus = menuService.listAllByIds(menuIds);
+        menuService.removeInBatch(menuIds);
+        return menus.stream()
+                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+                .collect(Collectors.toList());
+    }
+
     @GetMapping("teams")
     @ApiOperation("Lists all menu teams")
     public List<String> teams() {
