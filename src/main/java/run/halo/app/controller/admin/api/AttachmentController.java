@@ -61,7 +61,7 @@ public class AttachmentController {
 
     @PutMapping("/move/{groupId:\\d+}")
     public List<AttachmentDTO> updateByIdInBatch(@PathVariable Integer groupId,
-                 @RequestBody List<Integer> attachmentIds) {
+            @RequestBody List<Integer> attachmentIds) {
         List<Attachment> attachments = attachmentService.listAllByIds(attachmentIds);
         List<AttachmentDTO> result = attachments.stream().map(attachment -> {
             // set group id and convert to dto

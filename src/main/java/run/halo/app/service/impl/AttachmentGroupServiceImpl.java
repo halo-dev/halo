@@ -34,7 +34,7 @@ public class AttachmentGroupServiceImpl extends AbstractCrudService<AttachmentGr
     private final AttachmentService attachmentService;
 
     public AttachmentGroupServiceImpl(AttachmentGroupRepository attachmentGroupRepository,
-                                      AttachmentService attachmentService) {
+            AttachmentService attachmentService) {
         super(attachmentGroupRepository);
         this.attachmentGroupRepository = attachmentGroupRepository;
         this.attachmentService = attachmentService;

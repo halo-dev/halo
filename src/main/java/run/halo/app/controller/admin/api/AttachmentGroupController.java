@@ -51,7 +51,7 @@ public class AttachmentGroupController {
     @PutMapping("{id:\\d+}")
     @ApiOperation("Updates a attachment group")
     public AttachmentGroupDTO updateBy(@PathVariable Integer id,
-                                       @RequestBody @Valid AttachmentGroupParam attachmentGroupParam) {
+            @RequestBody @Valid AttachmentGroupParam attachmentGroupParam) {
         AttachmentGroup attachmentGroupToUpdate = attachmentGroupService.getById(id);
         attachmentGroupParam.update(attachmentGroupToUpdate);
 
