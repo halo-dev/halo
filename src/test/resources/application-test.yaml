@@ -1,5 +1,4 @@
 server:
-  port: 18090
   forward-headers-strategy: native
   compression:
     enabled: false
@@ -13,25 +12,9 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: jdbc:h2:mem:halo-test
-
-    # H2 Database 配置
-    #    driver-class-name: org.h2.Driver
-    #    url: jdbc:h2:file:~/halo-test/db/halo
-    #    username: admin
-    #    password: 123456
-
-    # MySQL 配置
-  #  driver-class-name: com.mysql.cj.jdbc.Driver
-  #  url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-  #  username: root
-  #  password: 123456
-
   h2:
     console:
-      settings:
-        web-allow-others: true
-      path: /h2-console
-      enabled: true
+      enabled: false
   jpa:
     hibernate:
       ddl-auto: create-drop
