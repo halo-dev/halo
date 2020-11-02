@@ -4,8 +4,10 @@ import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.MenuService;
+import run.halo.app.service.OptionService;
 
 import java.io.IOException;
 import java.util.Map;
@@ -25,8 +27,11 @@ public class MenuTagDirective implements TemplateDirectiveModel {
 
     private final MenuService menuService;
 
-    public MenuTagDirective(Configuration configuration, MenuService menuService) {
+    private final OptionService optionService;
+
+    public MenuTagDirective(Configuration configuration, MenuService menuService, OptionService optionService) {
         this.menuService = menuService;
+        this.optionService = optionService;
         configuration.setSharedVariable("menuTag", this);
     }
 
@@ -38,10 +43,12 @@ public class MenuTagDirective implements TemplateDirectiveModel {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
-                    env.setVariable("menus", builder.build().wrap(menuService.listAll()));
+                    String listTeam = optionService.getByPropertyOrDefault(PrimaryProperties.DEFAULT_MENU_TEAM, String.class, "");
+                    env.setVariable("menus", builder.build().wrap(menuService.listByTeam(listTeam, Sort.by(DESC, "priority"))));
                     break;
                 case "tree":
-                    env.setVariable("menus", builder.build().wrap(menuService.listAsTree(Sort.by(DESC, "priority"))));
+                    String treeTeam = optionService.getByPropertyOrDefault(PrimaryProperties.DEFAULT_MENU_TEAM, String.class, "");
+                    env.setVariable("menus", builder.build().wrap(menuService.listByTeamAsTree(treeTeam, Sort.by(DESC, "priority"))));
                     break;
                 case "listTeams":
                     env.setVariable("teams", builder.build().wrap(menuService.listTeamVos(Sort.by(DESC, "priority"))));
@@ -51,8 +58,8 @@ public class MenuTagDirective implements TemplateDirectiveModel {
                     env.setVariable("menus", builder.build().wrap(menuService.listByTeam(team, Sort.by(DESC, "priority"))));
                     break;
                 case "treeByTeam":
-                    String treeTeam = params.get("team").toString();
-                    env.setVariable("menus", builder.build().wrap(menuService.listByTeamAsTree(treeTeam, Sort.by(DESC, "priority"))));
+                    String treeTeamParam = params.get("team").toString();
+                    env.setVariable("menus", builder.build().wrap(menuService.listByTeamAsTree(treeTeamParam, Sort.by(DESC, "priority"))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(menuService.count()));

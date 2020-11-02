@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.dto.MenuDTO;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,5 +17,5 @@ import java.util.List;
 @ToString(callSuper = true)
 public class MenuVO extends MenuDTO {
 
-    private List<MenuVO> children;
+    private List<MenuVO> children = new LinkedList<>();
 }
