@@ -12,37 +12,37 @@ export default {
   props: {
     type: {
       type: String,
-      default: 'primary'
+      default: 'primary',
     },
     icon: {
       type: String,
-      default: null
+      default: null,
     },
     loading: {
       type: Boolean,
-      default: false
+      default: false,
     },
     errored: {
       type: Boolean,
-      default: false
+      default: false,
     },
     text: {
       type: String,
-      default: ''
+      default: '',
     },
     loadedText: {
       type: String,
-      default: ''
+      default: '',
     },
     erroredText: {
       type: String,
-      default: ''
-    }
+      default: '',
+    },
   },
   data() {
     return {
       loaded: false,
-      hasError: false
+      hasError: false,
     }
   },
   watch: {
@@ -56,9 +56,9 @@ export default {
           this.loaded = false
           this.hasError = false
           this.$emit('callback')
-        }, 800)
+        }, 400)
       }
-    }
+    },
   },
   computed: {
     computedType() {
@@ -78,12 +78,12 @@ export default {
         return this.hasError ? this.erroredText : this.loadedText
       }
       return this.text
-    }
+    },
   },
   methods: {
     handleClick() {
       this.$emit('click')
-    }
-  }
+    },
+  },
 }
 </script>

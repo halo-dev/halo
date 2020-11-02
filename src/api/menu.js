@@ -18,6 +18,16 @@ menuApi.listTree = () => {
   })
 }
 
+menuApi.listTreeByTeam = team => {
+  return service({
+    url: `${baseUrl}/team/tree_view`,
+    params: {
+      team: team
+    },
+    method: 'get'
+  })
+}
+
 menuApi.create = menu => {
   return service({
     url: baseUrl,
@@ -26,9 +36,33 @@ menuApi.create = menu => {
   })
 }
 
+menuApi.createBatch = menus => {
+  return service({
+    url: `${baseUrl}/batch`,
+    data: menus,
+    method: 'post'
+  })
+}
+
+menuApi.updateBatch = menus => {
+  return service({
+    url: `${baseUrl}/batch`,
+    data: menus,
+    method: 'put'
+  })
+}
+
 menuApi.delete = menuId => {
   return service({
     url: `${baseUrl}/${menuId}`,
+    method: 'delete'
+  })
+}
+
+menuApi.deleteBatch = menuIds => {
+  return service({
+    url: `${baseUrl}/batch`,
+    data: menuIds,
     method: 'delete'
   })
 }

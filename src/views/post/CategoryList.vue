@@ -147,16 +147,6 @@
                     </a-menu-item>
                     <a-menu-item>
                       <a-popconfirm
-                        :title="'你确定要添加【' + item.name + '】到菜单？'"
-                        @confirm="handleCreateMenuByCategory(item)"
-                        okText="确定"
-                        cancelText="取消"
-                      >
-                        <a href="javascript:void(0);">添加到菜单</a>
-                      </a-popconfirm>
-                    </a-menu-item>
-                    <a-menu-item>
-                      <a-popconfirm
                         :title="'你确定要删除【' + item.name + '】分类？'"
                         @confirm="handleDeleteCategory(item.id)"
                         okText="确定"
@@ -216,34 +206,14 @@
                 @click="form.model = record"
               >编辑</a>
               <a-divider type="vertical" />
-              <a-dropdown :trigger="['click']">
-                <a
-                  href="javascript:void(0);"
-                  class="ant-dropdown-link"
-                >更多</a>
-                <a-menu slot="overlay">
-                  <a-menu-item key="1">
-                    <a-popconfirm
-                      :title="'你确定要添加【' + record.name + '】到菜单？'"
-                      @confirm="handleCreateMenuByCategory(record)"
-                      okText="确定"
-                      cancelText="取消"
-                    >
-                      <a href="javascript:void(0);">添加到菜单</a>
-                    </a-popconfirm>
-                  </a-menu-item>
-                  <a-menu-item key="2">
-                    <a-popconfirm
-                      :title="'你确定要删除【' + record.name + '】分类？'"
-                      @confirm="handleDeleteCategory(record.id)"
-                      okText="确定"
-                      cancelText="取消"
-                    >
-                      <a href="javascript:void(0);">删除</a>
-                    </a-popconfirm>
-                  </a-menu-item>
-                </a-menu>
-              </a-dropdown>
+              <a-popconfirm
+                :title="'你确定要删除【' + record.name + '】分类？'"
+                @confirm="handleDeleteCategory(record.id)"
+                okText="确定"
+                cancelText="取消"
+              >
+                <a href="javascript:void(0);">删除</a>
+              </a-popconfirm>
             </span>
           </a-table>
         </a-card>
@@ -262,34 +232,33 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import CategorySelectTree from './components/CategorySelectTree'
 import categoryApi from '@/api/category'
-import menuApi from '@/api/menu'
 
 const columns = [
   {
     title: '名称',
     ellipsis: true,
-    dataIndex: 'name'
+    dataIndex: 'name',
   },
   {
     title: '别名',
     ellipsis: true,
-    dataIndex: 'slug'
+    dataIndex: 'slug',
   },
   {
     title: '描述',
     ellipsis: true,
-    dataIndex: 'description'
+    dataIndex: 'description',
   },
   {
     title: '文章数',
     dataIndex: 'postCount',
-    scopedSlots: { customRender: 'postCount' }
+    scopedSlots: { customRender: 'postCount' },
   },
   {
     title: '操作',
     key: 'action',
-    scopedSlots: { customRender: 'action' }
-  }
+    scopedSlots: { customRender: 'action' },
+  },
 ]
 
 export default {
@@ -300,7 +269,7 @@ export default {
       table: {
         columns,
         data: [],
-        loading: false
+        loading: false,
       },
       form: {
         model: {},
@@ -309,16 +278,16 @@ export default {
         rules: {
           name: [
             { required: true, message: '* 分类名称不能为空', trigger: ['change'] },
-            { max: 255, message: '* 分类名称的字符长度不能超过 255', trigger: ['change'] }
+            { max: 255, message: '* 分类名称的字符长度不能超过 255', trigger: ['change'] },
           ],
           slug: [{ max: 255, message: '* 分类别名的字符长度不能超过 255', trigger: ['change'] }],
           thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change'] }],
-          description: [{ max: 100, message: '* 分类描述的字符长度不能超过 100', trigger: ['change'] }]
-        }
+          description: [{ max: 100, message: '* 分类描述的字符长度不能超过 100', trigger: ['change'] }],
+        },
       },
       thumbnailDrawer: {
-        visible: false
-      }
+        visible: false,
+      },
     }
   },
   computed: {
@@ -330,7 +299,7 @@ export default {
     },
     isUpdateMode() {
       return !!this.form.model.id
-    }
+    },
   },
   created() {
     this.handleListCategories()
@@ -340,7 +309,7 @@ export default {
       this.table.loading = true
       categoryApi
         .listAll(true)
-        .then(response => {
+        .then((response) => {
           this.table.data = response.data.data
         })
         .finally(() => {
@@ -352,7 +321,7 @@ export default {
     handleDeleteCategory(id) {
       categoryApi
         .delete(id)
-        .then(response => {
+        .then((response) => {
           this.$message.success('删除成功！')
           this.form.model = {}
         })
@@ -366,7 +335,7 @@ export default {
      */
     handleCreateOrUpdateCategory() {
       const _this = this
-      _this.$refs.categoryForm.validate(valid => {
+      _this.$refs.categoryForm.validate((valid) => {
         if (valid) {
           _this.form.saving = true
           if (_this.isUpdateMode) {
@@ -404,22 +373,13 @@ export default {
         _this.handleListCategories()
       }
     },
-    handleCreateMenuByCategory(category) {
-      const menu = {
-        name: category.name,
-        url: `${category.fullPath}`
-      }
-      menuApi.create(menu).then(response => {
-        this.$message.success('添加到菜单成功！')
-      })
-    },
     handleSelectThumbnail(data) {
       this.$set(this.form.model, 'thumbnail', encodeURI(data.path))
       this.thumbnailDrawer.visible = false
     },
     handleQueryCategoryPosts(category) {
       this.$router.push({ name: 'PostList', query: { categoryId: category.id } })
-    }
-  }
+    },
+  },
 }
 </script>

@@ -20,7 +20,7 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "ant-design-vue": "^1.6.5",
+    "ant-design-vue": "^1.7.1",
     "axios": "^0.19.2",
     "dayjs": "^1.8.36",
     "enquire.js": "^2.1.6",
@@ -40,6 +40,7 @@
     "vue-filepond": "^6.0.3",
     "vue-ls": "^3.2.1",
     "vue-router": "^3.4.3",
+    "vuedraggable": "^2.24.2",
     "vuejs-logger": "^1.5.4",
     "vuex": "^3.5.1"
   },

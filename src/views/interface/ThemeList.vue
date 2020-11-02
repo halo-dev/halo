@@ -287,8 +287,8 @@
     <a-modal
       title="提示"
       v-model="themeDeleteModal.visible"
-      :width=416
-      :closable=false
+      :width="416"
+      :closable="false"
       destroyOnClose
       @ok="handleDeleteTheme(themeDeleteModal.selected.id, themeDeleteModal.deleteSettings)"
       @cancel="themeDeleteModal.visible = false"

@@ -1,7 +1,5 @@
 import Vue from 'vue'
-import {
-  OPTIONS
-} from '@/store/mutation-types'
+import { OPTIONS } from '@/store/mutation-types'
 import optionApi from '@/api/option'
 const keys = [
   'blog_url',
@@ -13,7 +11,8 @@ const keys = [
   'post_permalink_type',
   'archives_prefix',
   'path_suffix',
-  'default_editor'
+  'default_editor',
+  'default_menu_team'
 ]
 const option = {
   state: {
@@ -26,9 +25,7 @@ const option = {
     }
   },
   actions: {
-    refreshOptionsCache({
-      commit
-    }) {
+    refreshOptionsCache({ commit }) {
       return new Promise((resolve, reject) => {
         optionApi
           .listAllByKeys(keys)

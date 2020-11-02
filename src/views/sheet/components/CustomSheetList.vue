@@ -68,16 +68,6 @@
                 </a-popconfirm>
               </a-menu-item>
               <a-menu-item>
-                <a-popconfirm
-                  :title="'你确定要添加【' + item.title + '】到菜单？'"
-                  @confirm="handleSheetToMenu(item)"
-                  okText="确定"
-                  cancelText="取消"
-                >
-                  <a href="javascript:void(0);">添加到菜单</a>
-                </a-popconfirm>
-              </a-menu-item>
-              <a-menu-item>
                 <a
                   rel="noopener noreferrer"
                   href="javascript:void(0);"
@@ -278,30 +268,10 @@
           <a href="javascript:;">删除</a>
         </a-popconfirm>
         <a-divider type="vertical" />
-        <a-dropdown :trigger="['click']">
-          <a
-            href="javascript:void(0);"
-            class="ant-dropdown-link"
-          >更多</a>
-          <a-menu slot="overlay">
-            <a-menu-item key="1">
-              <a
-                href="javascript:void(0);"
-                @click="handleShowSheetSettings(sheet)"
-              >设置</a>
-            </a-menu-item>
-            <a-menu-item key="2">
-              <a-popconfirm
-                :title="'你确定要添加【' + sheet.title + '】到菜单？'"
-                @confirm="handleSheetToMenu(sheet)"
-                okText="确定"
-                cancelText="取消"
-              >
-                <a href="javascript:void(0);">添加到菜单</a>
-              </a-popconfirm>
-            </a-menu-item>
-          </a-menu>
-        </a-dropdown>
+        <a
+          href="javascript:void(0);"
+          @click="handleShowSheetSettings(sheet)"
+        >设置</a>
       </span>
     </a-table>
     <div class="page-wrapper">
@@ -343,48 +313,47 @@ import { mixin, mixinDevice } from '@/utils/mixin.js'
 import SheetSettingDrawer from './SheetSettingDrawer'
 import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
 import sheetApi from '@/api/sheet'
-import menuApi from '@/api/menu'
 
 const customColumns = [
   {
     title: '标题',
     dataIndex: 'title',
     ellipsis: true,
-    scopedSlots: { customRender: 'sheetTitle' }
+    scopedSlots: { customRender: 'sheetTitle' },
   },
   {
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
-    scopedSlots: { customRender: 'status' }
+    scopedSlots: { customRender: 'status' },
   },
   {
     title: '评论量',
     dataIndex: 'commentCount',
-    scopedSlots: { customRender: 'commentCount' }
+    scopedSlots: { customRender: 'commentCount' },
   },
   {
     title: '访问量',
     dataIndex: 'visits',
-    scopedSlots: { customRender: 'visits' }
+    scopedSlots: { customRender: 'visits' },
   },
   {
     title: '发布时间',
     dataIndex: 'createTime',
-    scopedSlots: { customRender: 'createTime' }
+    scopedSlots: { customRender: 'createTime' },
   },
   {
     title: '操作',
     width: '180px',
-    scopedSlots: { customRender: 'action' }
-  }
+    scopedSlots: { customRender: 'action' },
+  },
 ]
 export default {
   name: 'CustomSheetList',
   mixins: [mixin, mixinDevice],
   components: {
     SheetSettingDrawer,
-    TargetCommentDrawer
+    TargetCommentDrawer,
   },
   data() {
     return {
@@ -392,7 +361,7 @@ export default {
         page: 1,
         size: 10,
         sort: null,
-        total: 1
+        total: 1,
       },
       queryParam: {
         page: 0,
@@ -400,7 +369,7 @@ export default {
         sort: null,
         keyword: null,
         categoryId: null,
-        status: null
+        status: null,
       },
       loading: false,
       sheetStatus: sheetApi.sheetStatus,
@@ -410,21 +379,21 @@ export default {
       sheetSettingVisible: false,
       sheetCommentVisible: false,
       sheets: [],
-      menu: {}
+      menu: {},
     }
   },
   computed: {
     formattedSheets() {
-      return this.sheets.map(sheet => {
+      return this.sheets.map((sheet) => {
         sheet.statusProperty = this.sheetStatus[sheet.status]
         return sheet
       })
-    }
+    },
   },
   created() {
     this.handleListSheets()
   },
-  destroyed: function() {
+  destroyed() {
     if (this.sheetSettingVisible) {
       this.sheetSettingVisible = false
     }
@@ -445,7 +414,7 @@ export default {
       this.queryParam.sort = this.pagination.sort
       sheetApi
         .list(this.queryParam)
-        .then(response => {
+        .then((response) => {
           this.sheets = response.data.data.content
           this.pagination.total = response.data.data.total
         })
@@ -461,7 +430,7 @@ export default {
     handleEditStatusClick(sheetId, status) {
       sheetApi
         .updateStatus(sheetId, status)
-        .then(response => {
+        .then((response) => {
           this.$message.success('操作成功！')
         })
         .finally(() => {
@@ -471,36 +440,28 @@ export default {
     handleDeleteClick(sheetId) {
       sheetApi
         .delete(sheetId)
-        .then(response => {
+        .then((response) => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
           this.handleListSheets()
         })
     },
-    handleSheetToMenu(sheet) {
-      this.menu['name'] = sheet.title
-      this.menu['url'] = `${sheet.fullPath}`
-      menuApi.create(this.menu).then(response => {
-        this.$message.success('添加到菜单成功！')
-        this.menu = {}
-      })
-    },
     handleShowSheetSettings(sheet) {
-      sheetApi.get(sheet.id).then(response => {
+      sheetApi.get(sheet.id).then((response) => {
         this.selectedSheet = response.data.data
         this.selectedMetas = this.selectedSheet.metas
         this.sheetSettingVisible = true
       })
     },
     handleShowSheetComments(sheet) {
-      sheetApi.get(sheet.id).then(response => {
+      sheetApi.get(sheet.id).then((response) => {
         this.selectedSheet = response.data.data
         this.sheetCommentVisible = true
       })
     },
     handlePreview(sheetId) {
-      sheetApi.preview(sheetId).then(response => {
+      sheetApi.preview(sheetId).then((response) => {
         window.open(response.data, '_blank')
       })
     },
@@ -529,7 +490,7 @@ export default {
     },
     onRefreshSheetMetasFromSetting(metas) {
       this.selectedMetas = metas
-    }
-  }
+    },
+  },
 }
 </script>
