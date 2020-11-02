@@ -20,6 +20,8 @@ import javax.validation.constraints.Size;
 @ToString
 public class MenuParam implements InputConverter<Menu> {
 
+    private Integer id;
+
     @NotBlank(message = "菜单名称不能为空")
     @Size(max = 50, message = "菜单名称的字符长度不能超过 {max}")
     private String name;
