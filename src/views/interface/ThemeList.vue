@@ -1,6 +1,6 @@
 <template>
   <page-view
-    :title="activatedTheme?activatedTheme.name:'无'"
+    :title="activatedTheme ? activatedTheme.name : '无'"
     subTitle="当前启用"
   >
     <template slot="extra">
@@ -195,7 +195,7 @@
               </a-form-model-item>
               <a-form-model-item
                 label="版本："
-                v-show="installModal.remote.byBranchOrRelease ==='release'"
+                v-show="installModal.remote.byBranchOrRelease === 'release'"
               >
                 <a-select
                   v-model="installModal.remote.selectedRelease"
@@ -210,7 +210,7 @@
               </a-form-model-item>
               <a-form-model-item
                 label="分支："
-                v-show="installModal.remote.byBranchOrRelease ==='branch'"
+                v-show="installModal.remote.byBranchOrRelease === 'branch'"
               >
                 <a-select
                   v-model="installModal.remote.selectedBranch"
@@ -223,7 +223,7 @@
                   >{{ item.branch }}</a-select-option>
                 </a-select>
               </a-form-model-item>
-              <a-form-model-item v-show="installModal.remote.byBranchOrRelease ==='release'">
+              <a-form-model-item v-show="installModal.remote.byBranchOrRelease === 'release'">
                 <ReactiveButton
                   :disabled="!installModal.remote.selectedRelease"
                   type="primary"
@@ -236,7 +236,7 @@
                   erroredText="下载失败"
                 ></ReactiveButton>
               </a-form-model-item>
-              <a-form-model-item v-show="installModal.remote.byBranchOrRelease ==='branch'">
+              <a-form-model-item v-show="installModal.remote.byBranchOrRelease === 'branch'">
                 <ReactiveButton
                   :disabled="!installModal.remote.selectedBranch"
                   type="primary"
@@ -290,10 +290,22 @@
       :width="416"
       :closable="false"
       destroyOnClose
-      @ok="handleDeleteTheme(themeDeleteModal.selected.id, themeDeleteModal.deleteSettings)"
-      @cancel="themeDeleteModal.visible = false"
       :afterClose="onThemeDeleteModalClose"
     >
+      <template slot="footer">
+        <a-button @click="themeDeleteModal.visible = false">
+          取消
+        </a-button>
+        <ReactiveButton
+          @click="handleDeleteTheme(themeDeleteModal.selected.id, themeDeleteModal.deleteSettings)"
+          @callback="handleDeleteThemeCallback"
+          :loading="themeDeleteModal.deleting"
+          :errored="themeDeleteModal.deleteErrored"
+          text="确定"
+          loadedText="删除成功"
+          erroredText="删除失败"
+        ></ReactiveButton>
+      </template>
       <p>确定删除【{{ themeDeleteModal.selected.name }}】主题？</p>
       <a-checkbox v-model="themeDeleteModal.deleteSettings">
         同时删除主题配置
@@ -358,7 +370,9 @@ export default {
       themeDeleteModal: {
         visible: false,
         deleteSettings: false,
-        selected: {}
+        selected: {},
+        deleting: false,
+        deleteErrored: false,
       },
 
       themeSettingDrawer: {
@@ -423,10 +437,25 @@ export default {
       })
     },
     handleDeleteTheme(themeId, deleteSettings) {
-      themeApi.delete(themeId, deleteSettings).finally(() => {
+      this.themeDeleteModal.deleting = true
+      themeApi
+        .delete(themeId, deleteSettings)
+        .catch(() => {
+          this.themeDeleteModal.deleteErrored = false
+        })
+        .finally(() => {
+          setTimeout(() => {
+            this.themeDeleteModal.deleting = false
+          }, 400)
+        })
+    },
+    handleDeleteThemeCallback() {
+      if (this.themeDeleteModal.deleteErrored) {
+        this.themeDeleteModal.deleteErrored = false
+      } else {
         this.themeDeleteModal.visible = false
         this.handleListThemes()
-      })
+      }
     },
     handleUploadSucceed() {
       this.installModal.visible = false
@@ -560,7 +589,7 @@ export default {
       this.themeDeleteModal.visible = false
       this.themeDeleteModal.deleteSettings = false
       this.themeDeleteModal.selected = {}
-    }
+    },
   },
 }
 </script>
