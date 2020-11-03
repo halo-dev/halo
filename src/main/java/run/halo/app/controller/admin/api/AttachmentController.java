@@ -59,7 +59,7 @@ public class AttachmentController {
         return new AttachmentDTO().convertFrom(attachmentService.update(attachment));
     }
 
-    @PutMapping("/move/{groupId:\\d+}")
+    @PutMapping("/groups/{groupId:\\d+}/move")
     public List<AttachmentDTO> updateByIdInBatch(@PathVariable Integer groupId,
             @RequestBody List<Integer> attachmentIds) {
         List<Attachment> attachments = attachmentService.listAllByIds(attachmentIds);
