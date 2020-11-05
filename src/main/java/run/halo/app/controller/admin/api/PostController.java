@@ -2,6 +2,7 @@ package run.halo.app.controller.admin.api;
 
 import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -117,6 +118,10 @@ public class PostController {
             @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
         // Get the post info
         Post postToUpdate = postService.getById(postId);
+        // Clean up old summary when original content changed
+        if (!postToUpdate.getOriginalContent().equals(postParam.getOriginalContent())) {
+            postToUpdate.setSummary(StringUtils.EMPTY);
+        }
 
         postParam.update(postToUpdate);
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(), postParam.getPostMetas(), autoSave);
