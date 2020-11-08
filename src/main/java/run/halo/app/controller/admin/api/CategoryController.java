@@ -21,7 +21,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
  * Category controller.
  *
  * @author johnniang
- * @date 3/21/19
+ * @date 2019-03-21
  */
 @RestController
 @RequestMapping("/api/admin/categories")
@@ -32,7 +32,7 @@ public class CategoryController {
     private final PostCategoryService postCategoryService;
 
     public CategoryController(CategoryService categoryService,
-                              PostCategoryService postCategoryService) {
+            PostCategoryService postCategoryService) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
     }
@@ -46,7 +46,7 @@ public class CategoryController {
     @GetMapping
     @ApiOperation("Lists all categories")
     public List<? extends CategoryDTO> listAll(
-            @SortDefault(sort = "updateTime", direction = DESC) Sort sort,
+            @SortDefault(sort = "createTime", direction = DESC) Sort sort,
             @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
         if (more) {
             return postCategoryService.listCategoryWithPostCountDto(sort);
@@ -74,7 +74,7 @@ public class CategoryController {
     @PutMapping("{categoryId:\\d+}")
     @ApiOperation("Updates category")
     public CategoryDTO updateBy(@PathVariable("categoryId") Integer categoryId,
-                                @RequestBody @Valid CategoryParam categoryParam) {
+            @RequestBody @Valid CategoryParam categoryParam) {
         Category categoryToUpdate = categoryService.getById(categoryId);
         categoryParam.update(categoryToUpdate);
         return categoryService.convertTo(categoryService.update(categoryToUpdate));

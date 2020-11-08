@@ -7,6 +7,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.repository.base.BaseRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
      * @return a list of post category
      */
     @NonNull
-    List<PostCategory> findAllByPostIdIn(@NonNull Iterable<Integer> postIds);
+    List<PostCategory> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
 
     /**
      * Finds all post categories by post id.

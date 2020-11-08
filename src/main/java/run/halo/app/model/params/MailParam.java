@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
  * Journal query params.
  *
  * @author ryanwang
- * @date : 2019/05/07
+ * @date 2019/05/07
  */
 @Data
 public class MailParam {

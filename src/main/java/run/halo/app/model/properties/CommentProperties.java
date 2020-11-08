@@ -9,23 +9,49 @@ package run.halo.app.model.properties;
  */
 public enum CommentProperties implements PropertyEnum {
 
+    /**
+     * The default gravatar type.
+     */
     GRAVATAR_DEFAULT("comment_gravatar_default", String.class, "mm"),
 
+    /**
+     * Does it need to be checked.
+     */
     NEW_NEED_CHECK("comment_new_need_check", Boolean.class, "true"),
 
+    /**
+     * New mail notification.
+     */
     NEW_NOTICE("comment_new_notice", Boolean.class, "false"),
 
-    PASS_NOTICE("comment_pass_notice", Boolean.class, "false"),
-
+    /**
+     * Reply to the email to notify the author.
+     */
     REPLY_NOTICE("comment_reply_notice", Boolean.class, "false"),
 
+    /**
+     * Whether to enable comment api.
+     */
     API_ENABLED("comment_api_enabled", Boolean.class, "true"),
 
+    /**
+     * Comment list page size.
+     */
     PAGE_SIZE("comment_page_size", Integer.class, "10"),
 
+    /**
+     * Placeholder for comment content input.
+     */
     CONTENT_PLACEHOLDER("comment_content_placeholder", String.class, ""),
 
-    INTERNAL_PLUGIN_JS("comment_internal_plugin_js", String.class, "//cdn.jsdelivr.net/gh/halo-dev/halo-comment@latest/dist/halo-comment.min.js");
+    /**
+     * Dependent comment js.
+     */
+    INTERNAL_PLUGIN_JS("comment_internal_plugin_js", String.class, "//cdn.jsdelivr.net/npm/halo-comment@latest/dist/halo-comment.min.js"),
+
+    COMMENT_BAN_TIME("comment_ban_time", Integer.class, "10"),
+
+    COMMENT_RANGE("comment_range", Integer.class, "30");
 
     private final String value;
 

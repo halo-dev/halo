@@ -1,7 +1,8 @@
 package run.halo.app.utils;
 
 import cn.hutool.crypto.digest.BCrypt;
-import org.junit.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 
 /**
  * BCrypt test.
@@ -9,11 +10,12 @@ import org.junit.Test;
  * @author johnniang
  * @date 3/28/19
  */
-public class BcryptTest {
+@Slf4j
+class BcryptTest {
 
     @Test
-    public void cryptTest() {
+    void cryptTest() {
         String cryptPassword = BCrypt.hashpw("opentest", BCrypt.gensalt());
-        System.out.println("Crypt password: " + cryptPassword);
+        log.debug("Crypt password: [{}]", cryptPassword);
     }
 }

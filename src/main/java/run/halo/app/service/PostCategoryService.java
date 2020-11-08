@@ -65,7 +65,17 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     List<Post> listPostBy(@NonNull Integer categoryId, @NonNull PostStatus status);
 
     /**
-     * Pages post by category slug name.
+     * Lists post by category slug and post status.
+     *
+     * @param slug   category slug must not be null
+     * @param status post status
+     * @return a list of post
+     */
+    @NonNull
+    List<Post> listPostBy(@NonNull String slug, @NonNull PostStatus status);
+
+    /**
+     * Pages post by category id.
      *
      * @param categoryId category id must not be null
      * @param pageable   pageable
@@ -75,7 +85,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     Page<Post> pagePostBy(@NonNull Integer categoryId, Pageable pageable);
 
     /**
-     * Pages post by category slug name and post status.
+     * Pages post by category id and post status.
      *
      * @param categoryId category id must not be null
      * @param status     post status

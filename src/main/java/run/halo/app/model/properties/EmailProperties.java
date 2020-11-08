@@ -8,18 +8,39 @@ package run.halo.app.model.properties;
  */
 public enum EmailProperties implements PropertyEnum {
 
+    /**
+     * Email sender host
+     */
     HOST("email_host", String.class, ""),
 
+    /**
+     * Email sender protocol
+     */
     PROTOCOL("email_protocol", String.class, "smtp"),
 
+    /**
+     * SSL port
+     */
     SSL_PORT("email_ssl_port", Integer.class, "465"),
 
+    /**
+     * Email Sender username
+     */
     USERNAME("email_username", String.class, ""),
 
+    /**
+     * Email Sender password
+     */
     PASSWORD("email_password", String.class, ""),
 
+    /**
+     * Email Sender name
+     */
     FROM_NAME("email_from_name", String.class, ""),
 
+    /**
+     * Is enabled email sender
+     */
     ENABLED("email_enabled", Boolean.class, "false");
 
     private final String value;

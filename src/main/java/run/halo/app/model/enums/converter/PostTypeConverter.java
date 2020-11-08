@@ -14,7 +14,4 @@ import javax.persistence.Converter;
 @Deprecated
 public class PostTypeConverter extends AbstractConverter<PostType, Integer> {
 
-    public PostTypeConverter() {
-        super(PostType.class);
-    }
 }

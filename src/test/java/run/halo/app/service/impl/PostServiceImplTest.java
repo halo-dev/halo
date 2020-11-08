@@ -1,17 +1,14 @@
 package run.halo.app.service.impl;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ActiveProfiles("dev")
-public class PostServiceImplTest {
+@Slf4j
+@Disabled("Due to spring boot context needed")
+class PostServiceImplTest {
 
     String standardMdContent = "---\n" +
             "title: springfox-swagger2配置成功但无法访问/swagger-ui.html\n" +
@@ -35,17 +32,17 @@ public class PostServiceImplTest {
             "以下将讲解关系型数据的关系描述。仅仅是作为总结。";
 
     @Autowired
-    private PostServiceImpl postService;
+    PostServiceImpl postService;
 
     @Test
-    @Ignore
-    public void getContent() {
+    void getContent() {
         String exportMarkdown = postService.exportMarkdown(18);
-        System.out.println(exportMarkdown);
+        log.debug(exportMarkdown);
     }
 
     @Test
-    public void markdownImportTest() {
+    @Transactional
+    void markdownImportTest() {
         postService.importMarkdown(standardMdContent, "standard");
         postService.importMarkdown(nonStandardMdContent, "nonStandard");
     }

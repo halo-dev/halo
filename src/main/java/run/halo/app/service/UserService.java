@@ -5,6 +5,7 @@ import org.springframework.lang.Nullable;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.User;
+import run.halo.app.model.enums.MFAType;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.service.base.CrudService;
 
@@ -133,4 +134,16 @@ public interface UserService extends CrudService<User, Integer> {
      * @return boolean
      */
     boolean verifyUser(@NonNull String username, @NonNull String password);
+
+    /**
+     * Updates user Multi-Factor Auth.
+     *
+     * @param mfaType Multi-Factor Auth Type.
+     * @param mfaKey  Multi-Factor Auth Key.
+     * @param userId  user id must not be null
+     * @return updated user detail
+     */
+    @NonNull
+    User updateMFA(@NonNull MFAType mfaType, String mfaKey, @NonNull Integer userId);
+
 }

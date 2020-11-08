@@ -2,7 +2,9 @@ package run.halo.app.handler.theme;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.junit.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 
 import java.io.IOException;
@@ -11,12 +13,16 @@ import java.io.IOException;
  * @author johnniang
  * @date 4/11/19
  */
-public class YamlThemePropertyResolverTest {
+@Slf4j
+class YamlThemePropertyResolverTest {
 
-    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+    final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     @Test
-    public void directResolveTest() throws IOException {
+    void directResolveTest() throws IOException {
+        ThemeProperty themeProperty = new ThemeProperty();
+        themeProperty.setId("viosey_material");
+
         String yaml = "id: viosey_material\n" +
                 "name: Material\n" +
                 "author:\n" +
@@ -27,8 +33,9 @@ public class YamlThemePropertyResolverTest {
                 "website: https://github.com/viosey/hexo-theme-material\n" +
                 "version: 1.0";
 
-        ThemeProperty themeProperty = yamlMapper.readValue(yaml, ThemeProperty.class);
+        ThemeProperty themePropertyResult = yamlMapper.readValue(yaml, ThemeProperty.class);
+        log.debug("[{}]", themeProperty);
 
-        System.out.println(themeProperty);
+        Assertions.assertEquals(themeProperty, themePropertyResult);
     }
 }

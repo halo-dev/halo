@@ -13,6 +13,8 @@ import java.util.Date;
  * Base comment output dto.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-20
  */
 @Data
 @ToString
@@ -40,6 +42,8 @@ public class BaseCommentDTO implements OutputConverter<BaseCommentDTO, BaseComme
     private Long parentId;
 
     private Boolean isAdmin;
+
+    private Boolean allowNotification;
 
     private Date createTime;
 

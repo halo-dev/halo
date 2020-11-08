@@ -38,9 +38,9 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
     private final JournalRepository journalRepository;
 
     public JournalCommentServiceImpl(JournalCommentRepository journalCommentRepository,
-                                     OptionService optionService,
-                                     UserService userService,
-                                     ApplicationEventPublisher eventPublisher, JournalRepository journalRepository) {
+            OptionService optionService,
+            UserService userService,
+            ApplicationEventPublisher eventPublisher, JournalRepository journalRepository) {
         super(journalCommentRepository, optionService, userService, eventPublisher);
         this.journalCommentRepository = journalCommentRepository;
         this.journalRepository = journalRepository;

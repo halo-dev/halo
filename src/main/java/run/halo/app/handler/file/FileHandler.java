@@ -16,7 +16,7 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
  * File handler interface.
  *
  * @author johnniang
- * @date 3/27/19
+ * @date 2019-03-27
  */
 public interface FileHandler {
 
@@ -74,10 +74,9 @@ public interface FileHandler {
     void delete(@NonNull String key);
 
     /**
-     * Checks if the given type is supported.
+     * Get attachment type is supported.
      *
-     * @param type attachment type
-     * @return true if supported; false or else
+     * @return attachment type
      */
-    boolean supportType(@Nullable AttachmentType type);
+    AttachmentType getAttachmentType();
 }

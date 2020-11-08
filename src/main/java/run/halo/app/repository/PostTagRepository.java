@@ -7,6 +7,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.TagPostPostCountProjection;
 import run.halo.app.repository.base.BaseRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -76,7 +77,7 @@ public interface PostTagRepository extends BaseRepository<PostTag, Integer> {
      * @return a list of post tags
      */
     @NonNull
-    List<PostTag> findAllByPostIdIn(@NonNull Iterable<Integer> postIds);
+    List<PostTag> findAllByPostIdIn(@NonNull Collection<Integer> postIds);
 
     /**
      * Deletes post tags by post id.
@@ -104,7 +105,7 @@ public interface PostTagRepository extends BaseRepository<PostTag, Integer> {
      */
     @Query("select new run.halo.app.model.projection.TagPostPostCountProjection(count(pt.postId), pt.tagId) from PostTag pt where pt.tagId in ?1 group by pt.tagId")
     @NonNull
-    List<TagPostPostCountProjection> findPostCountByTagIds(@NonNull Iterable<Integer> tagIds);
+    List<TagPostPostCountProjection> findPostCountByTagIds(@NonNull Collection<Integer> tagIds);
 
     /**
      * Finds post count of tag.

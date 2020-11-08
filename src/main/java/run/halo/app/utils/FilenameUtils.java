@@ -5,6 +5,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Filename utilities.
@@ -34,7 +36,7 @@ public class FilenameUtils {
         int separatorLastIndex = StringUtils.lastIndexOf(filename, File.separatorChar);
 
         if (separatorLastIndex == filename.length() - 1) {
-            return "";
+            return StringUtils.EMPTY;
         }
 
         if (separatorLastIndex >= 0 && separatorLastIndex < filename.length() - 1) {
@@ -43,6 +45,14 @@ public class FilenameUtils {
 
         // Find last dot
         int dotLastIndex = StringUtils.lastIndexOf(filename, '.');
+
+        String[] split = filename.split("\\.");
+
+        List<String> extList = Arrays.asList("gz", "bz2");
+
+        if (extList.contains(split[split.length - 1]) && split.length >= 3) {
+            return filename.substring(0, filename.substring(0, dotLastIndex).lastIndexOf('.'));
+        }
 
         if (dotLastIndex < 0) {
             return filename;
@@ -70,7 +80,7 @@ public class FilenameUtils {
         int separatorLastIndex = StringUtils.lastIndexOf(filename, File.separatorChar);
 
         if (separatorLastIndex == filename.length() - 1) {
-            return "";
+            return StringUtils.EMPTY;
         }
 
         if (separatorLastIndex >= 0 && separatorLastIndex < filename.length() - 1) {
@@ -81,7 +91,15 @@ public class FilenameUtils {
         int dotLastIndex = StringUtils.lastIndexOf(filename, '.');
 
         if (dotLastIndex < 0) {
-            return "";
+            return StringUtils.EMPTY;
+        }
+
+        String[] split = filename.split("\\.");
+
+        List<String> extList = Arrays.asList("gz", "bz2");
+
+        if (extList.contains(split[split.length - 1]) && split.length >= 3) {
+            return filename.substring(filename.substring(0, dotLastIndex).lastIndexOf('.') + 1);
         }
 
         return filename.substring(dotLastIndex + 1);

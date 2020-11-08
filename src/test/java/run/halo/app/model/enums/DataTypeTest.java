@@ -1,9 +1,9 @@
 package run.halo.app.model.enums;
 
-import org.junit.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Data type test.
@@ -11,12 +11,12 @@ import static org.junit.Assert.*;
  * @author johnniang
  * @date 19-4-21
  */
-public class DataTypeTest {
+@Slf4j
+class DataTypeTest {
 
     @Test
-    public void typeOf() {
+    void typeOf() {
         DataType type = DataType.typeOf("bool");
-        System.out.println(type);
-        assertThat(type, equalTo(DataType.BOOL));
+        assertEquals(DataType.BOOL, type);
     }
 }

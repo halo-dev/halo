@@ -1,6 +1,7 @@
 package run.halo.app.utils;
 
-import org.junit.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -10,14 +11,15 @@ import java.net.UnknownHostException;
  *
  * @author johnniang
  */
-public class InetAddressTest {
+@Slf4j
+class InetAddressTest {
 
     @Test
-    public void getMachaineAddressTest() throws UnknownHostException {
+    void getMachineAddressTest() throws UnknownHostException {
         InetAddress localHost = InetAddress.getLocalHost();
-        System.out.println("Localhost: " + localHost.getHostAddress());
+        log.debug("Localhost: " + localHost.getHostAddress());
 
         InetAddress loopbackAddress = InetAddress.getLoopbackAddress();
-        System.out.println("Loopback: " + loopbackAddress.getHostAddress());
+        log.debug("Loopback: " + loopbackAddress.getHostAddress());
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
  *
  * @author johnniang
  */
-public class AuthenticationException extends HaloException {
+public class AuthenticationException extends AbstractHaloException {
 
     public AuthenticationException(String message) {
         super(message);

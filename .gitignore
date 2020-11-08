@@ -42,19 +42,19 @@ nbdist/
 *.project
 *.factorypath
 
-# Compiled class file
+### Compiled class file
 *.class
 
-# Log file
+### Log file
 *.log
 
-# BlueJ files
+### BlueJ files
 *.ctxt
 
-# Mobile Tools for Java (J2ME)
+### Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+### Package Files
 *.war
 *.nar
 *.ear
@@ -64,3 +64,8 @@ nbdist/
 
 ### VSCode
 .vscode
+
+### Local file
+application-local.yml
+application-local.yaml
+application-local.properties

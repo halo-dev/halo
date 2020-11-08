@@ -4,11 +4,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import run.halo.app.model.entity.User;
 
-import static run.halo.app.security.filter.AdminAuthenticationFilter.TOKEN_ACCESS_CACHE_PREFIX;
-import static run.halo.app.security.filter.AdminAuthenticationFilter.TOKEN_REFRESH_CACHE_PREFIX;
-import static run.halo.app.service.AdminService.ACCESS_TOKEN_CACHE_PREFIX;
-import static run.halo.app.service.AdminService.REFRESH_TOKEN_CACHE_PREFIX;
-
 /**
  * Security utilities.
  *
@@ -16,6 +11,20 @@ import static run.halo.app.service.AdminService.REFRESH_TOKEN_CACHE_PREFIX;
  * @date 19-4-29
  */
 public class SecurityUtils {
+
+    /**
+     * Access token cache prefix.
+     */
+    private final static String TOKEN_ACCESS_CACHE_PREFIX = "halo.admin.access.token.";
+
+    /**
+     * Refresh token cache prefix.
+     */
+    private final static String TOKEN_REFRESH_CACHE_PREFIX = "halo.admin.refresh.token.";
+
+    private final static String ACCESS_TOKEN_CACHE_PREFIX = "halo.admin.access_token.";
+
+    private final static String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";
 
     private SecurityUtils() {
     }
@@ -47,4 +56,5 @@ public class SecurityUtils {
 
         return TOKEN_REFRESH_CACHE_PREFIX + refreshToken;
     }
+
 }

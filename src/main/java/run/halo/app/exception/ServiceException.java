@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
  *
  * @author johnniang
  */
-public class ServiceException extends HaloException {
+public class ServiceException extends AbstractHaloException {
 
     public ServiceException(String message) {
         super(message);

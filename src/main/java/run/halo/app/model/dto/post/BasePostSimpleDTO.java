@@ -3,7 +3,6 @@ package run.halo.app.model.dto.post;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import run.halo.app.model.enums.PostCreateFrom;
 
 /**
  * Base page simple output dto.
@@ -19,7 +18,7 @@ public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
     private String thumbnail;
 
-    private Long visits = 0L;
+    private Long visits;
 
     private Boolean disallowComment;
 
@@ -27,9 +26,13 @@ public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
     private String template;
 
-    private Integer topPriority = 0;
+    private Integer topPriority;
 
-    private PostCreateFrom createFrom;
+    private Long likes;
 
-    private Long likes = 0L;
+    private Long wordCount;
+
+    public boolean isTopped() {
+        return this.topPriority != null && this.topPriority > 0;
+    }
 }

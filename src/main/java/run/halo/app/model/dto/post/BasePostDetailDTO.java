@@ -17,4 +17,6 @@ public class BasePostDetailDTO extends BasePostSimpleDTO {
     private String originalContent;
 
     private String formatContent;
+
+    private Long commentCount;
 }

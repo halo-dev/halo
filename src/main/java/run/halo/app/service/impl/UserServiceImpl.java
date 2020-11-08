@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
@@ -17,6 +17,7 @@ import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.LogType;
+import run.halo.app.model.enums.MFAType;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.repository.UserRepository;
 import run.halo.app.service.UserService;
@@ -41,13 +42,13 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     private final UserRepository userRepository;
 
-    private final StringCacheStore stringCacheStore;
+    private final AbstractStringCacheStore stringCacheStore;
 
     private final ApplicationEventPublisher eventPublisher;
 
     public UserServiceImpl(UserRepository userRepository,
-                           StringCacheStore stringCacheStore,
-                           ApplicationEventPublisher eventPublisher) {
+            AbstractStringCacheStore stringCacheStore,
+            ApplicationEventPublisher eventPublisher) {
         super(userRepository);
         this.userRepository = userRepository;
         this.stringCacheStore = stringCacheStore;
@@ -75,7 +76,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     public User getByUsernameOfNonNull(String username) {
-        return getByUsername(username).orElseThrow(() -> new NotFoundException("The username dose not exist").setErrorData(username));
+        return getByUsername(username).orElseThrow(() -> new NotFoundException("The username does not exist").setErrorData(username));
     }
 
     @Override
@@ -85,7 +86,7 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     public User getByEmailOfNonNull(String email) {
-        return getByEmail(email).orElseThrow(() -> new NotFoundException("The email dose not exist").setErrorData(email));
+        return getByEmail(email).orElseThrow(() -> new NotFoundException("The email does not exist").setErrorData(email));
     }
 
     @Override
@@ -180,11 +181,32 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         Assert.hasText(plainPassword, "Plain password must not be blank");
 
         user.setPassword(BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
+        user.setMfaType(MFAType.NONE);
+        user.setMfaKey(null);
     }
 
     @Override
     public boolean verifyUser(String username, String password) {
         User user = getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         return user.getUsername().equals(username) && user.getEmail().equals(password);
+    }
+
+    @Override
+    @NonNull
+    public User updateMFA(@NonNull MFAType mfaType, String mfaKey, @NonNull Integer userId) {
+        Assert.notNull(mfaType, "MFA Type must not be null");
+
+        // get User
+        User user = getById(userId);
+        // set MFA
+        user.setMfaType(mfaType);
+        user.setMfaKey((MFAType.NONE == mfaType) ? null : mfaKey);
+        // Update this user
+        User updatedUser = update(user);
+        // Log it
+        eventPublisher.publishEvent(new LogEvent(this, updatedUser.getId().toString(), LogType.MFA_UPDATED, "MFA Type:" + mfaType));
+
+        return updatedUser;
+
     }
 }

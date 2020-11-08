@@ -31,12 +31,12 @@ public interface CategoryRepository extends BaseRepository<Category, Integer> {
     long countById(@NonNull Integer id);
 
     /**
-     * Get category by slug name
+     * Get category by slug
      *
-     * @param slugName slug name
+     * @param slug slug
      * @return Optional of Category
      */
-    Optional<Category> getBySlugName(@NonNull String slugName);
+    Optional<Category> getBySlug(@NonNull String slug);
 
     /**
      * Get category by name.
@@ -48,6 +48,7 @@ public interface CategoryRepository extends BaseRepository<Category, Integer> {
 
     /**
      * List categories by parent id.
+     *
      * @param id parent id.
      * @return list of category
      */

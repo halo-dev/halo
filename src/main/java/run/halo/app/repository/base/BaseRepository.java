@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.NonNull;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,6 +16,8 @@ import java.util.List;
  * @param <DOMAIN> doamin type
  * @param <ID>     id type
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-15
  */
 @NoRepositoryBean
 public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
@@ -27,7 +30,7 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
      * @return a list of domains
      */
     @NonNull
-    List<DOMAIN> findAllByIdIn(@NonNull Iterable<ID> ids, @NonNull Sort sort);
+    List<DOMAIN> findAllByIdIn(@NonNull Collection<ID> ids, @NonNull Sort sort);
 
     /**
      * Finds all domain by domain id list.
@@ -37,7 +40,7 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
      * @return a list of domains
      */
     @NonNull
-    Page<DOMAIN> findAllByIdIn(@NonNull Iterable<ID> ids, @NonNull Pageable pageable);
+    Page<DOMAIN> findAllByIdIn(@NonNull Collection<ID> ids, @NonNull Pageable pageable);
 
     /**
      * Deletes by id list.
@@ -45,6 +48,6 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
      * @param ids id list of domain must not be null
      * @return number of rows affected
      */
-    long deleteByIdIn(@NonNull Iterable<ID> ids);
+    long deleteByIdIn(@NonNull Collection<ID> ids);
 
 }
