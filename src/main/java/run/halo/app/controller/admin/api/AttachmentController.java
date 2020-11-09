@@ -12,6 +12,7 @@ import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.params.AttachmentParam;
 import run.halo.app.model.params.AttachmentQuery;
+import run.halo.app.service.AttachmentHandlerCovertService;
 import run.halo.app.service.AttachmentService;
 
 import javax.validation.Valid;
@@ -31,14 +32,16 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class AttachmentController {
 
     private final AttachmentService attachmentService;
+    private final AttachmentHandlerCovertService attachmentHandlerCovertService;
 
-    public AttachmentController(AttachmentService attachmentService) {
+    public AttachmentController(AttachmentService attachmentService, AttachmentHandlerCovertService attachmentHandlerCovertService) {
         this.attachmentService = attachmentService;
+        this.attachmentHandlerCovertService = attachmentHandlerCovertService;
     }
 
     @GetMapping
     public Page<AttachmentDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-            AttachmentQuery attachmentQuery) {
+                                      AttachmentQuery attachmentQuery) {
         return attachmentService.pageDtosBy(pageable, attachmentQuery);
     }
 
@@ -52,7 +55,7 @@ public class AttachmentController {
     @PutMapping("{attachmentId:\\d+}")
     @ApiOperation("Updates a attachment")
     public AttachmentDTO updateBy(@PathVariable("attachmentId") Integer attachmentId,
-            @RequestBody @Valid AttachmentParam attachmentParam) {
+                                  @RequestBody @Valid AttachmentParam attachmentParam) {
         Attachment attachment = attachmentService.getById(attachmentId);
         attachmentParam.update(attachment);
         return new AttachmentDTO().convertFrom(attachmentService.update(attachment));
@@ -101,5 +104,17 @@ public class AttachmentController {
     @ApiOperation("Lists all of types.")
     public List<AttachmentType> listTypes() {
         return attachmentService.listAllType();
+    }
+
+    @PutMapping("covert_by_attachment")
+    @ApiOperation("Covert attachments to current Handler by attachment")
+    public void covertByAttachment() {
+        attachmentHandlerCovertService.covertByAttachment();
+    }
+
+    @PutMapping("covert_by_post")
+    @ApiOperation("Covert attachments to current Handler by post")
+    public void covertByPost() {
+        attachmentHandlerCovertService.covertByPost();
     }
 }
