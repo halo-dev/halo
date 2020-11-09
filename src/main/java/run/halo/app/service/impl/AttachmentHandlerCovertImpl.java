@@ -52,23 +52,19 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
         for (Attachment oldAttachment : oldAttachments) {
             String oldAttachmentPath = oldAttachment.getPath();
-            File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, oldAttachment.getName()));
-            if (tmpAttachment.exists()) {
-                try {
+            try {
+                File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, oldAttachment.getName()));
+                if (tmpAttachment.exists()) {
                     String newAttachmentPath = uploadFile(tmpAttachment);
                     for (Post post : posts) {
                         postService.update(AttachmentUtils.replacePostContent(post, oldAttachmentPath, newAttachmentPath));
                     }
                     attachmentService.remove(oldAttachment);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (!tmpAttachment.delete()) {
-                        log.warn("Failed to delete temporary files: {} ", tmpAttachment.getPath());
-                    }
+                } else {
+                    log.warn("Can not download or copy file: {}", oldAttachmentPath);
                 }
-            } else {
-                log.warn("Can not download or copy file: {}", oldAttachmentPath);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -79,55 +75,50 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             String oc = post.getOriginalContent();
             Matcher m = AttachmentUtils.getUrlPattern().matcher(oc);
             while (m.find()) {
-                File tmpAttachment = new File(getTmpAttachmentPath(m.group(), AttachmentUtils.getBaseNameFromUrl(m.group())));
-                if (tmpAttachment.exists()) {
-                    try {
+                try {
+                    File tmpAttachment = new File(getTmpAttachmentPath(m.group(), AttachmentUtils.getBaseNameFromUrl(m.group())));
+                    if (tmpAttachment.exists()) {
                         String newAttachmentPath = uploadFile(tmpAttachment);
                         post.setOriginalContent(oc.replaceAll(m.group(), newAttachmentPath));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (!tmpAttachment.delete()) {
-                            log.warn("Failed to delete temporary files: {} ", tmpAttachment.getPath());
-                        }
+                    } else {
+                        log.warn("Can not download file: {}", m.group());
                     }
-                } else {
-                    log.warn("Can not download file: {}", m.group());
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
             postService.update(post);
         }
     }
 
-    private String getTmpAttachmentPath(String urlStr, String fileBaseName) {
-
-        try {
-            if (fileBaseName.split("\\.").length < 2) {
-                fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
-            }
-            String tmpAttachmentPath = workDir + ATTACHMENT_TMP_DIR + fileBaseName;
-
-            if (urlStr.startsWith("http")) {
-                AttachmentUtils.downloadFile(urlStr, tmpAttachmentPath);
-            } else {
-                String oldAttachmentPath = URLDecoder.decode(workDir + urlStr, "utf-8");
-                File oldFile = new File(oldAttachmentPath);
-                if (oldFile.exists()) {
-                    FileUtils.copyFile(oldFile, new File(tmpAttachmentPath));
-                }
-            }
-            return tmpAttachmentPath;
-        } catch (IOException e) {
-            e.printStackTrace();
+    private String getTmpAttachmentPath(String urlStr, String fileBaseName) throws IOException {
+        if (fileBaseName.split("\\.").length < 2) {
+            fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
         }
+        String tmpAttachmentPath = workDir + ATTACHMENT_TMP_DIR + fileBaseName;
 
-        return "";
+        if (urlStr.startsWith("http")) {
+            AttachmentUtils.downloadFile(urlStr, tmpAttachmentPath);
+        } else {
+            String oldAttachmentPath = URLDecoder.decode(workDir + urlStr, "utf-8");
+            File oldAttachment = new File(oldAttachmentPath);
+            if (oldAttachment.exists()) {
+                FileUtils.copyFile(oldAttachment, new File(tmpAttachmentPath));
+            }
+        }
+        return tmpAttachmentPath;
+
     }
 
-
     private String uploadFile(File tmpAttachment) throws IOException {
-        MultipartFile multipartFile = AttachmentUtils.getMultipartFile(tmpAttachment);
-        Attachment attachment = attachmentService.upload(multipartFile);
-        return attachment.getPath();
+        try {
+            MultipartFile multipartFile = AttachmentUtils.getMultipartFile(tmpAttachment);
+            Attachment attachment = attachmentService.upload(multipartFile);
+            return attachment.getPath();
+        } finally {
+            if (!tmpAttachment.delete()) {
+                log.warn("Failed to delete temporary files: {} ", tmpAttachment.getPath());
+            }
+        }
     }
 }
