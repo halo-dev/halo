@@ -40,8 +40,7 @@ public class AttachmentController {
     }
 
     @GetMapping
-    public Page<AttachmentDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-                                      AttachmentQuery attachmentQuery) {
+    public Page<AttachmentDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable, AttachmentQuery attachmentQuery) {
         return attachmentService.pageDtosBy(pageable, attachmentQuery);
     }
 
@@ -54,8 +53,7 @@ public class AttachmentController {
 
     @PutMapping("{attachmentId:\\d+}")
     @ApiOperation("Updates a attachment")
-    public AttachmentDTO updateBy(@PathVariable("attachmentId") Integer attachmentId,
-                                  @RequestBody @Valid AttachmentParam attachmentParam) {
+    public AttachmentDTO updateBy(@PathVariable("attachmentId") Integer attachmentId, @RequestBody @Valid AttachmentParam attachmentParam) {
         Attachment attachment = attachmentService.getById(attachmentId);
         attachmentParam.update(attachment);
         return new AttachmentDTO().convertFrom(attachmentService.update(attachment));
