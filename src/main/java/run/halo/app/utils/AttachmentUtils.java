@@ -14,6 +14,12 @@ import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Attachment Covert utilities.
+ *
+ * @author xcp
+ * @date 2020-11-07
+ */
 public class AttachmentUtils {
 
     private static final int FILE_NAME_LIMIT = 64;
@@ -32,7 +38,7 @@ public class AttachmentUtils {
      * Covert File to MultipartFile
      *
      * @param file need to covert
-     * @return multipartFile new multipartFile
+     * @return new multipartFile
      * @throws IOException covert failed
      */
     public static MultipartFile getMultipartFile(File file) throws IOException {
@@ -102,7 +108,7 @@ public class AttachmentUtils {
      * return 你好你 (When FILE_NAME_LIMIT=3, default 64)
      *
      * @param url Extracted url
-     * @return FileBaseName
+     * @return File Base Name
      */
     public static String getBaseNameFromUrl(String url) {
         String fileBaseName = FilenameUtils.getBasename(url);
@@ -117,7 +123,13 @@ public class AttachmentUtils {
         return fileBaseName;
     }
 
-
+    /**
+     * Replace all oldAttachmentPath in the post with newAttachmentPath
+     * @param post post
+     * @param oldAttachmentPath old Attachment Path
+     * @param newAttachmentPath new Attachment Path
+     * @return new post
+     */
     public static Post replacePostContent(Post post, String oldAttachmentPath, String newAttachmentPath) {
         Matcher m = URL_PATTERN.matcher(post.getOriginalContent());
         StringBuilder strBuilder = new StringBuilder();

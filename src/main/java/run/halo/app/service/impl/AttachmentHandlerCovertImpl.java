@@ -20,6 +20,13 @@ import java.net.URLDecoder;
 import java.util.List;
 import java.util.regex.Matcher;
 
+/**
+ * Attachment Handler Covert implementation.
+ *
+ * @author xcp
+ * @date 2020-11-07
+ */
+
 @Slf4j
 @Service
 public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertService {

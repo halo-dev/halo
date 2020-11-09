@@ -1,5 +1,11 @@
 package run.halo.app.service;
 
+/**
+ * Attachment Handler Covert Service.
+ *
+ * @author xcp
+ * @date 2020-11-07
+ */
 public interface AttachmentHandlerCovertService {
 
 
