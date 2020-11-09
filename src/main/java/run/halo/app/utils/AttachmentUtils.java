@@ -18,14 +18,14 @@ public class AttachmentUtils {
 
     private static final int FILE_NAME_LIMIT = 64;
 
-    private static final Pattern r = Pattern.compile("(?<=!\\[.*]\\()(.+)(?=\\))");
+    private static final Pattern URL_PATTERN = Pattern.compile("(?<=!\\[.*]\\()(.+)(?=\\))");
 
     private AttachmentUtils() {
 
     }
 
-    public static Pattern getPattern() {
-        return r;
+    public static Pattern getUrlPattern() {
+        return URL_PATTERN;
     }
 
     /**
@@ -38,12 +38,11 @@ public class AttachmentUtils {
     public static MultipartFile getMultipartFile(File file) throws IOException {
         MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
         DiskFileItem item = new DiskFileItem(
-                "file"
-                , mimeTypesMap.getContentType(file)
-                , true
-                , file.getName()
-                , (int) file.length()
-                , file.getParentFile()
+                "file",
+                mimeTypesMap.getContentType(file),
+                true, file.getName(),
+                (int) file.length(),
+                file.getParentFile()
         );
 
         try (OutputStream os = item.getOutputStream()) {
@@ -120,7 +119,7 @@ public class AttachmentUtils {
 
 
     public static Post replacePostContent(Post post, String oldAttachmentPath, String newAttachmentPath) {
-        Matcher m = r.matcher(post.getOriginalContent());
+        Matcher m = URL_PATTERN.matcher(post.getOriginalContent());
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(post.getOriginalContent());
         while (m.find()) {

@@ -70,7 +70,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         List<Post> posts = postService.listAll();
         for (Post post : posts) {
             String oc = post.getOriginalContent();
-            Matcher m = AttachmentUtils.getPattern().matcher(oc);
+            Matcher m = AttachmentUtils.getUrlPattern().matcher(oc);
             while (m.find()) {
                 File tmpAttachment = new File(getTmpAttachmentPath(m.group(), AttachmentUtils.getBaseNameFromUrl(m.group())));
                 if (tmpAttachment.exists()) {
