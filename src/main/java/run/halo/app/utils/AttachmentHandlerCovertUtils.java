@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Attachment Covert utilities.
+ * Attachment Handler Covert utilities.
  *
  * @author xcp
  * @date 2020-11-07
@@ -28,12 +28,13 @@ import java.util.regex.Pattern;
 public class AttachmentHandlerCovertUtils {
 
     /**
-     * file name length limit, maximum file name length without extension.
+     * file name length limit, maximum file name length without extension,
+     * only works when downloading attachments from the Internet.
      */
     private static final int FILE_NAME_LIMIT = 64;
 
     /**
-     * Match the image link in md.
+     * Extract the image link in markdown.
      */
     private static final Pattern URL_PATTERN = Pattern.compile("(?<=!\\[.*]\\()(.+)(?=\\))");
 
@@ -64,16 +65,6 @@ public class AttachmentHandlerCovertUtils {
         return new CommonsMultipartFile(item);
     }
 
-    public static byte[] readInputStream(InputStream inStream) throws IOException {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = inStream.read(buffer)) != -1) {
-            outStream.write(buffer, 0, len);
-        }
-        inStream.close();
-        return outStream.toByteArray();
-    }
 
     /**
      * Download File form url.
@@ -96,6 +87,17 @@ public class AttachmentHandlerCovertUtils {
             }
         }
         conn.disconnect();
+    }
+
+    public static byte[] readInputStream(InputStream inStream) throws IOException {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len;
+        while ((len = inStream.read(buffer)) != -1) {
+            outStream.write(buffer, 0, len);
+        }
+        inStream.close();
+        return outStream.toByteArray();
     }
 
     /**
@@ -132,7 +134,7 @@ public class AttachmentHandlerCovertUtils {
 
 
     /**
-     * StringBuilder replace all.
+     * replaceAll of StringBuilder, like String.replaceAll.
      *
      * @param stringBuilder stringBuilder
      * @param oldStr        old string
