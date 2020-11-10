@@ -12,6 +12,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -182,11 +183,17 @@ public class AttachmentHandlerCovertUtils {
      * @param oldAttachments old attachments
      * @return Map<String, Integer> (attachment_path,attachment_id)
      */
-    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments) {
+    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments, Integer attachmentTypeId) {
         Map<String, Integer> map = new HashMap<>();
         for (Attachment attachment : oldAttachments) {
-            map.put(attachment.getPath(), attachment.getId());
+            if (-1 == attachmentTypeId || attachment.getType().getValue().equals(attachmentTypeId)) {
+                map.put(attachment.getPath(), attachment.getId());
+            }
         }
         return map;
+    }
+
+    public static String encodeFileBaseName(String url) throws UnsupportedEncodingException {
+        return url.substring(0, url.lastIndexOf("/") + 1) + URLEncoder.encode(url.substring(url.lastIndexOf("/") + 1), "utf-8");
     }
 }

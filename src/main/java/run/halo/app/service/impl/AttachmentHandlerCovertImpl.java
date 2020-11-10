@@ -20,6 +20,7 @@ import run.halo.app.utils.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.text.MessageFormat;
@@ -45,9 +46,6 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
     private final String workDir;
 
-    private static final String ATTACHMENT_TMP_DIR = "attachment_tmp/";
-
-
     public AttachmentHandlerCovertImpl(PostService postService, AttachmentService attachmentService, HaloProperties haloProperties) {
         this.postService = postService;
         this.attachmentService = attachmentService;
@@ -55,13 +53,13 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     @Async
-    public Future<String> covertAttachmentHandler(Boolean uploadAll) {
+    public Future<String> covertHandlerByPosts(Integer attachmentTypeId, Boolean uploadAllInAttachments, Boolean uploadAllInPost) {
         StopWatch stopWatch = DateUtil.createStopWatch("Covert Attachment Handler");
         stopWatch.start();
         log.info("---------- Start covert attachment handler, about a few to tens of minutes: {} ----------",
                 DateUtil.now());
         try {
-            doCovertAttachmentHandler(uploadAll);
+            doCovertHandlerByPosts(attachmentTypeId, uploadAllInAttachments, uploadAllInPost);
             stopWatch.stop();
             String res = MessageFormat.format(
                     "Covert attachment handler has finished: {0}\n{1}",
@@ -76,45 +74,43 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
 
-    public void doCovertAttachmentHandler(Boolean uploadAll) throws IOException {
+    public void doCovertHandlerByPosts(Integer attachmentTypeId, Boolean uploadAllInAttachments, Boolean uploadAllInPost) throws IOException {
         List<Post> posts = postService.listAll();
         Map<String, List<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(posts);
-
         List<Attachment> oldAttachments = attachmentService.listAll();
-        Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils.getPathInAttachment(oldAttachments);
-
+        Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils.getPathInAttachment(oldAttachments, attachmentTypeId);
         Iterator<Map.Entry<String, List<Integer>>> pathInPostsIterator = pathInPosts.entrySet().iterator();
         StringBuilder stringBuilder = new StringBuilder();
-
         while (pathInPostsIterator.hasNext()) {
             Map.Entry<String, List<Integer>> pathInPostEntry = pathInPostsIterator.next();
             Iterator<Map.Entry<String, Integer>> pathInAttachmentsIterator = pathInAttachments.entrySet().iterator();
             while (pathInAttachmentsIterator.hasNext()) {
                 Map.Entry<String, Integer> pathInAttachmentEntry = pathInAttachmentsIterator.next();
-                if (pathInPostEntry.getKey().contains(pathInAttachmentEntry.getKey())) {
+                if (Boolean.TRUE.equals(attachmentInPost(pathInPostEntry.getKey(), pathInAttachmentEntry.getKey()))) {
                     Attachment oldAttachment = attachmentService.getById(pathInAttachmentEntry.getValue());
                     updatePostAttachment(
                             pathInPostEntry.getKey(),
                             oldAttachment.getName(),
                             pathInPostEntry.getValue(),
                             stringBuilder);
-                    attachmentService.remove(oldAttachment);
                     pathInAttachmentsIterator.remove();
                 }
             }
             pathInPostsIterator.remove();
         }
 
-        for (Map.Entry<String, Integer> pathInAttachmentEntry : pathInAttachments.entrySet()) {
-            String newAttachmentPath = uploadFile(
-                    pathInAttachmentEntry.getKey(),
-                    attachmentService.getById(pathInAttachmentEntry.getValue()).getName());
-            if ("".equals(newAttachmentPath)) {
-                log.warn("Can not upload file: {}", pathInAttachmentEntry.getKey());
+        if (Boolean.TRUE.equals(uploadAllInAttachments)) {
+            for (Map.Entry<String, Integer> pathInAttachmentEntry : pathInAttachments.entrySet()) {
+                String newAttachmentPath = uploadFile(
+                        pathInAttachmentEntry.getKey(),
+                        attachmentService.getById(pathInAttachmentEntry.getValue()).getName());
+                if ("".equals(newAttachmentPath)) {
+                    log.warn("Can not upload file: {}", pathInAttachmentEntry.getKey());
+                }
             }
         }
 
-        if (Boolean.TRUE.equals(uploadAll)) {
+        if (Boolean.TRUE.equals(uploadAllInPost)) {
             for (Map.Entry<String, List<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
                 updatePostAttachment(
                         pathInPostEntry.getKey(),
@@ -123,6 +119,11 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                         stringBuilder);
             }
         }
+    }
+
+
+    private Boolean attachmentInPost(String pathInPost, String pathInAttachment) throws UnsupportedEncodingException {
+        return pathInPost.contains(pathInAttachment) || pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment));
     }
 
     public void updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
@@ -143,14 +144,17 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         if (fileBaseName.split("\\.").length < 2) {
             fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
         }
-        String tmpAttachmentPath = workDir + ATTACHMENT_TMP_DIR + fileBaseName;
+        String tmpAttachmentPath = FileUtils.getTempDirectoryPath() + fileBaseName;
 
         if (urlStr.startsWith("http")) {
-            AttachmentHandlerCovertUtils.downloadFile(urlStr, tmpAttachmentPath);
+            AttachmentHandlerCovertUtils.downloadFile(
+                    AttachmentHandlerCovertUtils.encodeFileBaseName(urlStr),
+                    tmpAttachmentPath);
         } else {
             String oldAttachmentPath = URLDecoder.decode(workDir + urlStr, "utf-8");
             File oldAttachment = new File(oldAttachmentPath);
             if (oldAttachment.exists()) {
+
                 FileUtils.copyFile(oldAttachment, new File(tmpAttachmentPath));
             }
         }
@@ -168,7 +172,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 log.warn("Can not download file: {}", oldAttachmentPath);
             }
         } finally {
-            Files.delete(tmpAttachment.toPath());
+            Files.deleteIfExists(tmpAttachment.toPath());
         }
         return "";
     }

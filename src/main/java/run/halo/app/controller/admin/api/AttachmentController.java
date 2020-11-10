@@ -108,10 +108,12 @@ public class AttachmentController {
         return attachmentService.listAllType();
     }
 
-    @PutMapping("covert_attachment_handler/{upload_all}")
+    @PutMapping("covert_attachment_handler")
     @ApiOperation("Covert all attachments to current Handler.")
     public Future<String> covertByAttachment(
-            @PathVariable(name = "upload_all", required = false) Boolean uploadAll) {
-        return attachmentHandlerCovertService.covertAttachmentHandler(uploadAll);
+            @RequestParam(name = "attachmentType", required = false, defaultValue = "-1") Integer attachmentTypeId,
+            @RequestParam(name = "uploadAllInAttachments", required = false, defaultValue = "false") Boolean uploadAllInAttachments,
+            @RequestParam(name = "uploadAllInPost", required = false, defaultValue = "false") Boolean uploadAllInPost) {
+        return attachmentHandlerCovertService.covertHandlerByPosts(attachmentTypeId, uploadAllInAttachments, uploadAllInPost);
     }
 }

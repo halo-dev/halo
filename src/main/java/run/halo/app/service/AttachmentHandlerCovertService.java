@@ -15,5 +15,5 @@ public interface AttachmentHandlerCovertService {
      * @param uploadAll default = false
      * @return AsyncResult<String>
      */
-    Future<String> covertAttachmentHandler(Boolean uploadAll);
+    Future<String> covertHandlerByPosts(Integer attachmentTypeId, Boolean uploadAllInAttachments, Boolean uploadAllInPost);
 }
