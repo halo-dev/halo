@@ -28,12 +28,12 @@ import java.util.regex.Pattern;
 public class AttachmentUtils {
 
     /**
-     * file name length limit, maximum file name length without extension
+     * file name length limit, maximum file name length without extension.
      */
     private static final int FILE_NAME_LIMIT = 64;
 
     /**
-     * Match the image link in md
+     * Match the image link in md.
      */
     private static final Pattern URL_PATTERN = Pattern.compile("(?<=!\\[.*]\\()(.+)(?=\\))");
 
@@ -42,7 +42,7 @@ public class AttachmentUtils {
     }
 
     /**
-     * Covert File to MultipartFile
+     * Covert File to MultipartFile.
      *
      * @param file need to covert
      * @return new multipartFile
@@ -76,7 +76,7 @@ public class AttachmentUtils {
     }
 
     /**
-     * Download File form url
+     * Download File form url.
      *
      * @param urlStr       download url
      * @param downloadPath the path to save file
@@ -130,22 +130,14 @@ public class AttachmentUtils {
         return fileBaseName;
     }
 
-    /**
-     * Replace all oldAttachmentPath in the post with newAttachmentPath
-     *
-     * @param stringBuilder     stringBuilder
-     * @param oldAttachmentPath old Attachment Path
-     * @param newAttachmentPath new Attachment Path
-     */
-    public static void replacePostContent(StringBuilder stringBuilder, String oldAttachmentPath, String newAttachmentPath) {
-        Matcher m = URL_PATTERN.matcher(stringBuilder.toString());
-        while (m.find()) {
-            if (m.group().contains(oldAttachmentPath)) {
-                strBuilderReplaceAll(stringBuilder, m.group(), newAttachmentPath);
-            }
-        }
-    }
 
+    /**
+     * StringBuilder replace all.
+     *
+     * @param stringBuilder stringBuilder
+     * @param oldStr        old string
+     * @param newStr        new string
+     */
     public static void strBuilderReplaceAll(StringBuilder stringBuilder, String oldStr, String newStr) {
         int index = stringBuilder.indexOf(oldStr);
         while (index != -1 && !oldStr.equals(newStr)) {
@@ -155,7 +147,14 @@ public class AttachmentUtils {
         }
     }
 
-
+    /**
+     * Extract all image links in the posts,
+     * the key is image_path,
+     * the value is list of post_id containing the image_path.
+     *
+     * @param posts all posts
+     * @return Map<String, List < Integer>> (image_path, list of post_id)
+     */
     public static Map<String, List<Integer>> getPathInPost(List<Post> posts) {
         Map<String, List<Integer>> map = new HashMap<>();
         for (Post post : posts) {
@@ -173,7 +172,14 @@ public class AttachmentUtils {
         return map;
     }
 
-
+    /**
+     * Extract the path of all attachments,
+     * the ket is attachment_path,
+     * the value is attachment_id.
+     *
+     * @param oldAttachments old attachments
+     * @return Map<String, Integer> (attachment_path,attachment_id)
+     */
     public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments) {
         Map<String, Integer> map = new HashMap<>();
         for (Attachment attachment : oldAttachments) {
