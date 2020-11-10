@@ -109,7 +109,7 @@ public class AttachmentController {
     }
 
     @PutMapping("covert_attachment_handler/{upload_all}")
-    @ApiOperation("Covert attachments to current Handler by attachment")
+    @ApiOperation("Covert all attachments to current Handler.")
     public Future<String> covertByAttachment(
             @PathVariable(name = "upload_all", required = false) Boolean uploadAll) {
         return attachmentHandlerCovertService.covertAttachmentHandler(uploadAll);
