@@ -18,6 +18,7 @@ import run.halo.app.service.AttachmentService;
 import javax.validation.Valid;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Future;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -104,15 +105,10 @@ public class AttachmentController {
         return attachmentService.listAllType();
     }
 
-    @PutMapping("covert_by_attachment")
+    @PutMapping("covert_attachment_handler/{upload_all}")
     @ApiOperation("Covert attachments to current Handler by attachment")
-    public void covertByAttachment() {
-        attachmentHandlerCovertService.covertByAttachment();
-    }
-
-    @PutMapping("covert_by_post")
-    @ApiOperation("Covert attachments to current Handler by post")
-    public void covertByPost() {
-        attachmentHandlerCovertService.covertByPost();
+    public Future<String> covertByAttachment(
+            @PathVariable(name = "upload_all", required = false) Boolean uploadAll) {
+        return attachmentHandlerCovertService.covertAttachmentHandler(uploadAll);
     }
 }

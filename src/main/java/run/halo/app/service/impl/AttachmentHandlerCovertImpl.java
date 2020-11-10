@@ -1,7 +1,11 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.StopWatch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
@@ -17,8 +21,11 @@ import run.halo.app.utils.FilenameUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * Attachment Handler Covert implementation.
@@ -46,48 +53,80 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         this.workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
     }
 
-    public void covertByAttachment() {
-        List<Attachment> oldAttachments = attachmentService.listAll();
-        List<Post> posts = postService.listAll();
+    @Async
+    public Future<String> covertAttachmentHandler(Boolean uploadAll) {
+        StopWatch stopWatch = DateUtil.createStopWatch("covertAttachmentHandler");
+        stopWatch.start();
+        log.info("---------- Start covert attachment handler, about a few to tens of minutes: {} ----------",
+                DateUtil.now());
 
-        for (Attachment oldAttachment : oldAttachments) {
-            String oldAttachmentPath = oldAttachment.getPath();
-            try {
-                File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, oldAttachment.getName()));
-                if (tmpAttachment.exists()) {
-                    String newAttachmentPath = uploadFile(tmpAttachment);
-                    for (Post post : posts) {
-                        postService.update(AttachmentUtils.replacePostContent(post, oldAttachmentPath, newAttachmentPath));
-                    }
+        List<Post> posts = postService.listAll();
+        Map<String, List<Integer>> pathInPosts = AttachmentUtils.getPathInPost(posts);
+
+        List<Attachment> oldAttachments = attachmentService.listAll();
+        Map<String, Integer> pathInAttachments = AttachmentUtils.getPathInAttachment(oldAttachments);
+
+        Iterator<Map.Entry<String, List<Integer>>> pathInPostsIterator = pathInPosts.entrySet().iterator();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        while (pathInPostsIterator.hasNext()) {
+            Map.Entry<String, List<Integer>> pathInPostEntry = pathInPostsIterator.next();
+            Iterator<Map.Entry<String, Integer>> pathInAttachmentsIterator = pathInAttachments.entrySet().iterator();
+            while (pathInAttachmentsIterator.hasNext()) {
+                Map.Entry<String, Integer> pathInAttachmentEntry = pathInAttachmentsIterator.next();
+                if (pathInPostEntry.getKey().contains(pathInAttachmentEntry.getKey())) {
+                    Attachment oldAttachment = attachmentService.getById(pathInAttachmentEntry.getValue());
+                    updatePostAttachment(
+                            pathInPostEntry.getKey(),
+                            oldAttachment.getName(),
+                            pathInPostEntry.getValue(),
+                            stringBuilder);
                     attachmentService.remove(oldAttachment);
-                } else {
-                    log.warn("Can not download or copy file: {}", oldAttachmentPath);
+                    pathInAttachmentsIterator.remove();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            }
+            pathInPostsIterator.remove();
+        }
+
+        for (Map.Entry<String, Integer> pathInAttachmentEntry : pathInAttachments.entrySet()) {
+            String newAttachmentPath = uploadFile(
+                    pathInAttachmentEntry.getKey(),
+                    attachmentService.getById(pathInAttachmentEntry.getValue()).getName());
+            if ("".equals(newAttachmentPath)) {
+                log.warn("Can not upload file: {}", pathInAttachmentEntry.getKey());
             }
         }
+
+        if (Boolean.TRUE.equals(uploadAll)) {
+            for (Map.Entry<String, List<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
+                updatePostAttachment(
+                        pathInPostEntry.getKey(),
+                        AttachmentUtils.getBaseNameFromUrl(pathInPostEntry.getKey()),
+                        pathInPostEntry.getValue(),
+                        stringBuilder);
+            }
+        }
+
+        stopWatch.stop();
+        String res = MessageFormat.format(
+                "Covert attachment handler has finished: {0}\n{1}",
+                DateUtil.now(),
+                stopWatch.prettyPrint());
+        log.info(res);
+        return new AsyncResult<>(res);
     }
 
-    public void covertByPost() {
-        List<Post> posts = postService.listAll();
-        for (Post post : posts) {
-            String oc = post.getOriginalContent();
-            Matcher m = AttachmentUtils.getUrlPattern().matcher(oc);
-            while (m.find()) {
-                try {
-                    File tmpAttachment = new File(getTmpAttachmentPath(m.group(), AttachmentUtils.getBaseNameFromUrl(m.group())));
-                    if (tmpAttachment.exists()) {
-                        String newAttachmentPath = uploadFile(tmpAttachment);
-                        post.setOriginalContent(oc.replaceAll(m.group(), newAttachmentPath));
-                    } else {
-                        log.warn("Can not download file: {}", m.group());
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+    public void updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) {
+        String newAttachmentPath = uploadFile(oldAttachmentPath, fileBaseName);
+        if (!"".equals(newAttachmentPath)) {
+            for (Integer postId : pathInPosts) {
+                Post post = postService.getById(postId);
+                stringBuilder.append(post.getOriginalContent());
+                AttachmentUtils.strBuilderReplaceAll(stringBuilder, oldAttachmentPath, newAttachmentPath);
+                post.setOriginalContent(stringBuilder.toString());
+                stringBuilder.delete(0, stringBuilder.length());
+                postService.createOrUpdateBy(post);
             }
-            postService.update(post);
         }
     }
 
@@ -107,18 +146,26 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             }
         }
         return tmpAttachmentPath;
-
     }
 
-    private String uploadFile(File tmpAttachment) throws IOException {
+    private String uploadFile(String oldAttachmentPath, String fileBaseName) {
+        File tmpAttachment = null;
         try {
-            MultipartFile multipartFile = AttachmentUtils.getMultipartFile(tmpAttachment);
-            Attachment attachment = attachmentService.upload(multipartFile);
-            return attachment.getPath();
+            tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
+            if (tmpAttachment.exists()) {
+                MultipartFile multipartFile = AttachmentUtils.getMultipartFile(tmpAttachment);
+                Attachment attachment = attachmentService.upload(multipartFile);
+                return attachment.getPath();
+            } else {
+                log.warn("Can not download file: {}", oldAttachmentPath);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
-            if (!tmpAttachment.delete()) {
+            if (null != tmpAttachment && !tmpAttachment.delete()) {
                 log.warn("Failed to delete temporary files: {} ", tmpAttachment.getPath());
             }
         }
+        return "";
     }
 }

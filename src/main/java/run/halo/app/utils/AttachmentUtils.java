@@ -4,6 +4,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
+import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.entity.Post;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -11,6 +12,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,16 +27,18 @@ import java.util.regex.Pattern;
  */
 public class AttachmentUtils {
 
+    /**
+     * file name length limit, maximum file name length without extension
+     */
     private static final int FILE_NAME_LIMIT = 64;
 
+    /**
+     * Match the image link in md
+     */
     private static final Pattern URL_PATTERN = Pattern.compile("(?<=!\\[.*]\\()(.+)(?=\\))");
 
     private AttachmentUtils() {
 
-    }
-
-    public static Pattern getUrlPattern() {
-        return URL_PATTERN;
     }
 
     /**
@@ -125,29 +132,53 @@ public class AttachmentUtils {
 
     /**
      * Replace all oldAttachmentPath in the post with newAttachmentPath
-     * @param post post
+     *
+     * @param stringBuilder     stringBuilder
      * @param oldAttachmentPath old Attachment Path
      * @param newAttachmentPath new Attachment Path
-     * @return new post
      */
-    public static Post replacePostContent(Post post, String oldAttachmentPath, String newAttachmentPath) {
-        Matcher m = URL_PATTERN.matcher(post.getOriginalContent());
-        StringBuilder strBuilder = new StringBuilder();
-        strBuilder.append(post.getOriginalContent());
+    public static void replacePostContent(StringBuilder stringBuilder, String oldAttachmentPath, String newAttachmentPath) {
+        Matcher m = URL_PATTERN.matcher(stringBuilder.toString());
         while (m.find()) {
             if (m.group().contains(oldAttachmentPath)) {
-                int index = strBuilder.indexOf(m.group());
-                while (index != -1) {
-                    strBuilder.replace(index, index + m.group().length(), newAttachmentPath);
-                    index += newAttachmentPath.length();
-                    index = strBuilder.indexOf(m.group(), index);
-                }
+                strBuilderReplaceAll(stringBuilder, m.group(), newAttachmentPath);
             }
         }
-        post.setOriginalContent(strBuilder.toString());
-        strBuilder.delete(0, strBuilder.length());
-        return post;
+    }
+
+    public static void strBuilderReplaceAll(StringBuilder stringBuilder, String oldStr, String newStr) {
+        int index = stringBuilder.indexOf(oldStr);
+        while (index != -1 && !oldStr.equals(newStr)) {
+            stringBuilder.replace(index, index + oldStr.length(), newStr);
+            index += newStr.length();
+            index = stringBuilder.indexOf(oldStr, index);
+        }
     }
 
 
+    public static Map<String, List<Integer>> getPathInPost(List<Post> posts) {
+        Map<String, List<Integer>> map = new HashMap<>();
+        for (Post post : posts) {
+            Matcher m = URL_PATTERN.matcher(post.getOriginalContent());
+            while (m.find()) {
+                if (null != map.get(m.group())) {
+                    map.get(m.group()).add(post.getId());
+                } else {
+                    List<Integer> list = new ArrayList<>();
+                    list.add(post.getId());
+                    map.put(m.group(), list);
+                }
+            }
+        }
+        return map;
+    }
+
+
+    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments) {
+        Map<String, Integer> map = new HashMap<>();
+        for (Attachment attachment : oldAttachments) {
+            map.put(attachment.getPath(), attachment.getId());
+        }
+        return map;
+    }
 }
