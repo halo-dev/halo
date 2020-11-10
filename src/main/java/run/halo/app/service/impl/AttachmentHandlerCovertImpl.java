@@ -21,6 +21,7 @@ import run.halo.app.utils.FilenameUtils;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -55,11 +56,27 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
     @Async
     public Future<String> covertAttachmentHandler(Boolean uploadAll) {
-        StopWatch stopWatch = DateUtil.createStopWatch("covertAttachmentHandler");
+        StopWatch stopWatch = DateUtil.createStopWatch("Covert Attachment Handler");
         stopWatch.start();
         log.info("---------- Start covert attachment handler, about a few to tens of minutes: {} ----------",
                 DateUtil.now());
+        try {
+            doCovertAttachmentHandler(uploadAll);
+            stopWatch.stop();
+            String res = MessageFormat.format(
+                    "Covert attachment handler has finished: {0}\n{1}",
+                    DateUtil.now(),
+                    stopWatch.prettyPrint());
+            log.info(res);
+            return new AsyncResult<>(res);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new AsyncResult<>("Covert attachment handler Failed!");
+    }
 
+
+    public void doCovertAttachmentHandler(Boolean uploadAll) throws IOException {
         List<Post> posts = postService.listAll();
         Map<String, List<Integer>> pathInPosts = AttachmentUtils.getPathInPost(posts);
 
@@ -106,17 +123,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                         stringBuilder);
             }
         }
-
-        stopWatch.stop();
-        String res = MessageFormat.format(
-                "Covert attachment handler has finished: {0}\n{1}",
-                DateUtil.now(),
-                stopWatch.prettyPrint());
-        log.info(res);
-        return new AsyncResult<>(res);
     }
 
-    public void updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) {
+    public void updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
         String newAttachmentPath = uploadFile(oldAttachmentPath, fileBaseName);
         if (!"".equals(newAttachmentPath)) {
             for (Integer postId : pathInPosts) {
@@ -148,10 +157,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         return tmpAttachmentPath;
     }
 
-    private String uploadFile(String oldAttachmentPath, String fileBaseName) {
-        File tmpAttachment = null;
+    private String uploadFile(String oldAttachmentPath, String fileBaseName) throws IOException {
+        File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
         try {
-            tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
             if (tmpAttachment.exists()) {
                 MultipartFile multipartFile = AttachmentUtils.getMultipartFile(tmpAttachment);
                 Attachment attachment = attachmentService.upload(multipartFile);
@@ -159,12 +167,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             } else {
                 log.warn("Can not download file: {}", oldAttachmentPath);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
-            if (null != tmpAttachment && !tmpAttachment.delete()) {
-                log.warn("Failed to delete temporary files: {} ", tmpAttachment.getPath());
-            }
+            Files.delete(tmpAttachment.toPath());
         }
         return "";
     }
