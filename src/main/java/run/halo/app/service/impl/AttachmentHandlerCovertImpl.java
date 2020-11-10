@@ -15,7 +15,7 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.service.AttachmentHandlerCovertService;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.PostService;
-import run.halo.app.utils.AttachmentUtils;
+import run.halo.app.utils.AttachmentHandlerCovertUtils;
 import run.halo.app.utils.FilenameUtils;
 
 import java.io.File;
@@ -78,10 +78,10 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
     public void doCovertAttachmentHandler(Boolean uploadAll) throws IOException {
         List<Post> posts = postService.listAll();
-        Map<String, List<Integer>> pathInPosts = AttachmentUtils.getPathInPost(posts);
+        Map<String, List<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(posts);
 
         List<Attachment> oldAttachments = attachmentService.listAll();
-        Map<String, Integer> pathInAttachments = AttachmentUtils.getPathInAttachment(oldAttachments);
+        Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils.getPathInAttachment(oldAttachments);
 
         Iterator<Map.Entry<String, List<Integer>>> pathInPostsIterator = pathInPosts.entrySet().iterator();
         StringBuilder stringBuilder = new StringBuilder();
@@ -118,7 +118,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             for (Map.Entry<String, List<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
                 updatePostAttachment(
                         pathInPostEntry.getKey(),
-                        AttachmentUtils.getBaseNameFromUrl(pathInPostEntry.getKey()),
+                        AttachmentHandlerCovertUtils.getBaseNameFromUrl(pathInPostEntry.getKey()),
                         pathInPostEntry.getValue(),
                         stringBuilder);
             }
@@ -131,7 +131,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             for (Integer postId : pathInPosts) {
                 Post post = postService.getById(postId);
                 stringBuilder.append(post.getOriginalContent());
-                AttachmentUtils.strBuilderReplaceAll(stringBuilder, oldAttachmentPath, newAttachmentPath);
+                AttachmentHandlerCovertUtils.strBuilderReplaceAll(stringBuilder, oldAttachmentPath, newAttachmentPath);
                 post.setOriginalContent(stringBuilder.toString());
                 stringBuilder.delete(0, stringBuilder.length());
                 postService.createOrUpdateBy(post);
@@ -146,7 +146,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         String tmpAttachmentPath = workDir + ATTACHMENT_TMP_DIR + fileBaseName;
 
         if (urlStr.startsWith("http")) {
-            AttachmentUtils.downloadFile(urlStr, tmpAttachmentPath);
+            AttachmentHandlerCovertUtils.downloadFile(urlStr, tmpAttachmentPath);
         } else {
             String oldAttachmentPath = URLDecoder.decode(workDir + urlStr, "utf-8");
             File oldAttachment = new File(oldAttachmentPath);
@@ -161,7 +161,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
         try {
             if (tmpAttachment.exists()) {
-                MultipartFile multipartFile = AttachmentUtils.getMultipartFile(tmpAttachment);
+                MultipartFile multipartFile = AttachmentHandlerCovertUtils.getMultipartFile(tmpAttachment);
                 Attachment attachment = attachmentService.upload(multipartFile);
                 return attachment.getPath();
             } else {

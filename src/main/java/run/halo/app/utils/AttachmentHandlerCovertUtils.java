@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  * @author xcp
  * @date 2020-11-07
  */
-public class AttachmentUtils {
+public class AttachmentHandlerCovertUtils {
 
     /**
      * file name length limit, maximum file name length without extension.
@@ -37,7 +37,7 @@ public class AttachmentUtils {
      */
     private static final Pattern URL_PATTERN = Pattern.compile("(?<=!\\[.*]\\()(.+)(?=\\))");
 
-    private AttachmentUtils() {
+    private AttachmentHandlerCovertUtils() {
 
     }
 
