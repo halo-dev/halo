@@ -35,15 +35,17 @@ public class AttachmentController {
     private final AttachmentService attachmentService;
     private final AttachmentHandlerCovertService attachmentHandlerCovertService;
 
-    public AttachmentController(AttachmentService attachmentService,
-                                AttachmentHandlerCovertService attachmentHandlerCovertService) {
+    public AttachmentController(
+            AttachmentService attachmentService,
+            AttachmentHandlerCovertService attachmentHandlerCovertService) {
         this.attachmentService = attachmentService;
         this.attachmentHandlerCovertService = attachmentHandlerCovertService;
     }
 
     @GetMapping
-    public Page<AttachmentDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
-                                      AttachmentQuery attachmentQuery) {
+    public Page<AttachmentDTO> pageBy(
+            @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
+            AttachmentQuery attachmentQuery) {
         return attachmentService.pageDtosBy(pageable, attachmentQuery);
     }
 
@@ -56,8 +58,9 @@ public class AttachmentController {
 
     @PutMapping("{attachmentId:\\d+}")
     @ApiOperation("Updates a attachment")
-    public AttachmentDTO updateBy(@PathVariable("attachmentId") Integer attachmentId,
-                                  @RequestBody @Valid AttachmentParam attachmentParam) {
+    public AttachmentDTO updateBy(
+            @PathVariable("attachmentId") Integer attachmentId,
+            @RequestBody @Valid AttachmentParam attachmentParam) {
         Attachment attachment = attachmentService.getById(attachmentId);
         attachmentParam.update(attachment);
         return new AttachmentDTO().convertFrom(attachmentService.update(attachment));
@@ -110,7 +113,7 @@ public class AttachmentController {
 
     @PutMapping("covert_attachment_handler")
     @ApiOperation("Covert all attachments to current Handler.")
-    public Future<String> covertByAttachment(
+    public Future<String> covertAttachmentHandler(
             @RequestParam(name = "sourceAttachmentTypeId", required = false, defaultValue = "-1") Integer sourceAttachmentTypeId,
             @RequestParam(name = "deleteOldAttachment", required = false, defaultValue = "false") Boolean deleteOldAttachment,
             @RequestParam(name = "uploadAllInAttachment", required = false, defaultValue = "false") Boolean uploadAllInAttachment,

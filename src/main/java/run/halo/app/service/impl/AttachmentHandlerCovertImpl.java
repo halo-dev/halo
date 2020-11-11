@@ -83,10 +83,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             Boolean deleteOldAttachment,
             Boolean uploadAllInAttachment,
             Boolean uploadAllInPost) throws IOException {
-        List<Post> posts = postService.listAll();
-        Map<String, List<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(posts);
-        List<Attachment> oldAttachments = attachmentService.listAll();
-        Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils.getPathInAttachment(oldAttachments, attachmentTypeId);
+        Map<String, List<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(postService.listAll());
+        Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils.getPathInAttachment(attachmentService.listAll(), attachmentTypeId);
         Iterator<Map.Entry<String, List<Integer>>> pathInPostsIterator = pathInPosts.entrySet().iterator();
         StringBuilder stringBuilder = new StringBuilder();
         while (pathInPostsIterator.hasNext()) {
@@ -102,7 +100,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                             pathInPostEntry.getValue(),
                             stringBuilder);
                     if (Boolean.TRUE.equals(deleteOldAttachment)) {
-                        attachmentService.remove(oldAttachment);
+                        attachmentService.removePermanently(pathInAttachmentEntry.getValue());
                     }
                     pathInAttachmentsIterator.remove();
                 }
@@ -118,6 +116,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 if ("".equals(newAttachmentPath)) {
                     log.warn("Can not upload file: {}", pathInAttachmentEntry.getKey());
                 }
+                if (Boolean.TRUE.equals(deleteOldAttachment)) {
+                    attachmentService.removePermanently(pathInAttachmentEntry.getValue());
+                }
             }
         }
 
@@ -131,7 +132,6 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             }
         }
     }
-
 
     private Boolean attachmentInPost(String pathInPost, String pathInAttachment) throws UnsupportedEncodingException {
         return pathInPost.contains(pathInAttachment) || pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment));
