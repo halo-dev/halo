@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.StopWatch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -58,21 +59,26 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             Boolean deleteOldAttachment,
             Boolean uploadAllInAttachment,
             Boolean uploadAllInPost) {
+        String taskParams = MessageFormat.format("sourceAttachmentTypeId: {0}, deleteOldAttachment: {1}, uploadAllInAttachment: {2}, uploadAllInPost: {3}",
+                sourceAttachmentTypeId,
+                deleteOldAttachment,
+                uploadAllInAttachment,
+                uploadAllInPost);
         StopWatch stopWatch = DateUtil.createStopWatch("Covert Attachment Handler");
-        stopWatch.start();
-        log.info("---------- Start covert attachment handler, about a few to tens of minutes: {} ----------",
-                DateUtil.now());
+        log.info("Start covert attachment handler: sourceAttachmentTypeId: " + taskParams);
+
+        stopWatch.start(taskParams);
         try {
             doCovertHandlerByPosts(sourceAttachmentTypeId, deleteOldAttachment, uploadAllInAttachment, uploadAllInPost);
             stopWatch.stop();
             String res = MessageFormat.format(
-                    "Covert attachment handler has finished: {0}\n{1}",
-                    DateUtil.now(),
-                    stopWatch.prettyPrint());
+                    "Covert attachment handler has finished!\n{0}", stopWatch.prettyPrint());
             log.info(res);
             return new AsyncResult<>(res);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            stopWatch.stop();
         }
         return new AsyncResult<>("Covert attachment handler Failed!");
     }
@@ -94,13 +100,13 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 Map.Entry<String, Integer> pathInAttachmentEntry = pathInAttachmentsIterator.next();
                 if (Boolean.TRUE.equals(attachmentInPost(pathInPostEntry.getKey(), pathInAttachmentEntry.getKey()))) {
                     Attachment oldAttachment = attachmentService.getById(pathInAttachmentEntry.getValue());
-                    updatePostAttachment(
+                    Boolean f = updatePostAttachment(
                             pathInPostEntry.getKey(),
                             oldAttachment.getName(),
                             pathInPostEntry.getValue(),
                             stringBuilder);
-                    if (Boolean.TRUE.equals(deleteOldAttachment)) {
-                        attachmentService.removePermanently(pathInAttachmentEntry.getValue());
+                    if (Boolean.TRUE.equals(f) && Boolean.TRUE.equals(deleteOldAttachment)) {
+                        doDeleteAttachment(pathInAttachmentEntry.getValue());
                     }
                     pathInAttachmentsIterator.remove();
                 }
@@ -113,11 +119,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 String newAttachmentPath = uploadFile(
                         pathInAttachmentEntry.getKey(),
                         attachmentService.getById(pathInAttachmentEntry.getValue()).getName());
-                if ("".equals(newAttachmentPath)) {
-                    log.warn("Can not upload file: {}", pathInAttachmentEntry.getKey());
-                }
-                if (Boolean.TRUE.equals(deleteOldAttachment)) {
-                    attachmentService.removePermanently(pathInAttachmentEntry.getValue());
+                if (!StringUtils.EMPTY.equals(newAttachmentPath) && Boolean.TRUE.equals(deleteOldAttachment)) {
+                    doDeleteAttachment(pathInAttachmentEntry.getValue());
                 }
             }
         }
@@ -137,9 +140,17 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         return pathInPost.contains(pathInAttachment) || pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment));
     }
 
-    public void updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
+    private void doDeleteAttachment(Integer attachmentId) {
+        try {
+            attachmentService.removePermanently(attachmentId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Boolean updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
         String newAttachmentPath = uploadFile(oldAttachmentPath, fileBaseName);
-        if (!"".equals(newAttachmentPath)) {
+        if (!StringUtils.EMPTY.equals(newAttachmentPath)) {
             for (Integer postId : pathInPosts) {
                 Post post = postService.getById(postId);
                 stringBuilder.append(post.getOriginalContent());
@@ -148,11 +159,13 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 stringBuilder.delete(0, stringBuilder.length());
                 postService.createOrUpdateBy(post);
             }
+            return true;
         }
+        return false;
     }
 
     private String getTmpAttachmentPath(String urlStr, String fileBaseName) throws IOException {
-        if (fileBaseName.split("\\.").length < 2) {
+        if (!FilenameUtils.getExtension(urlStr).equals(FilenameUtils.getExtension(fileBaseName))) {
             fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
         }
         String tmpAttachmentPath = FileUtils.getTempDirectoryPath() + fileBaseName;
@@ -165,7 +178,6 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             String oldAttachmentPath = URLDecoder.decode(workDir + urlStr, "utf-8");
             File oldAttachment = new File(oldAttachmentPath);
             if (oldAttachment.exists()) {
-
                 FileUtils.copyFile(oldAttachment, new File(tmpAttachmentPath));
             }
         }
@@ -182,9 +194,12 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             } else {
                 log.warn("Can not download file: {}", oldAttachmentPath);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             Files.deleteIfExists(tmpAttachment.toPath());
         }
-        return "";
+        log.warn("Can not upload file: {}", oldAttachmentPath);
+        return StringUtils.EMPTY;
     }
 }
