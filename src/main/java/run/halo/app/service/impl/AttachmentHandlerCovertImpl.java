@@ -53,13 +53,17 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     @Async
-    public Future<String> covertHandlerByPosts(Integer attachmentTypeId, Boolean uploadAllInAttachments, Boolean uploadAllInPost) {
+    public Future<String> covertHandlerByPosts(
+            Integer sourceAttachmentTypeId,
+            Boolean deleteOldAttachment,
+            Boolean uploadAllInAttachment,
+            Boolean uploadAllInPost) {
         StopWatch stopWatch = DateUtil.createStopWatch("Covert Attachment Handler");
         stopWatch.start();
         log.info("---------- Start covert attachment handler, about a few to tens of minutes: {} ----------",
                 DateUtil.now());
         try {
-            doCovertHandlerByPosts(attachmentTypeId, uploadAllInAttachments, uploadAllInPost);
+            doCovertHandlerByPosts(sourceAttachmentTypeId, deleteOldAttachment, uploadAllInAttachment, uploadAllInPost);
             stopWatch.stop();
             String res = MessageFormat.format(
                     "Covert attachment handler has finished: {0}\n{1}",
@@ -74,7 +78,11 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
 
-    public void doCovertHandlerByPosts(Integer attachmentTypeId, Boolean uploadAllInAttachments, Boolean uploadAllInPost) throws IOException {
+    public void doCovertHandlerByPosts(
+            Integer attachmentTypeId,
+            Boolean deleteOldAttachment,
+            Boolean uploadAllInAttachment,
+            Boolean uploadAllInPost) throws IOException {
         List<Post> posts = postService.listAll();
         Map<String, List<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(posts);
         List<Attachment> oldAttachments = attachmentService.listAll();
@@ -93,13 +101,16 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                             oldAttachment.getName(),
                             pathInPostEntry.getValue(),
                             stringBuilder);
+                    if (Boolean.TRUE.equals(deleteOldAttachment)) {
+                        attachmentService.remove(oldAttachment);
+                    }
                     pathInAttachmentsIterator.remove();
                 }
             }
             pathInPostsIterator.remove();
         }
 
-        if (Boolean.TRUE.equals(uploadAllInAttachments)) {
+        if (Boolean.TRUE.equals(uploadAllInAttachment)) {
             for (Map.Entry<String, Integer> pathInAttachmentEntry : pathInAttachments.entrySet()) {
                 String newAttachmentPath = uploadFile(
                         pathInAttachmentEntry.getKey(),
