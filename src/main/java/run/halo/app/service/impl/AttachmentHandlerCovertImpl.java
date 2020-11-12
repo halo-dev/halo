@@ -76,6 +76,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             log.info(res);
             return new AsyncResult<>(res);
         } catch (Exception e) {
+            log.info(e.toString());
             e.printStackTrace();
             return new AsyncResult<>("Covert attachment handler Failed!" + e.toString());
         }
@@ -146,6 +147,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         try {
             attachmentService.removePermanently(attachmentId);
         } catch (Exception e) {
+            log.info("Delete File Failed: " + e.toString());
             e.printStackTrace();
         }
     }
@@ -202,7 +204,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 log.warn("Can not download file: {}", oldAttachmentPath);
             }
         } catch (Exception e) {
-            log.warn("Can not upload file: {}", oldAttachmentPath);
+            log.warn("Can not upload file: {}\n{}", oldAttachmentPath, e.toString());
             e.printStackTrace();
         } finally {
             Files.deleteIfExists(tmpAttachment.toPath());

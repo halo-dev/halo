@@ -122,13 +122,11 @@ public class AttachmentHandlerCovertUtils {
      * @param url Extracted url
      * @return File Base Name
      */
-    public static String getBaseNameFromUrl(String url) {
+    public static String getBaseNameFromUrl(String url) throws UnsupportedEncodingException {
         String fileBaseName = FilenameUtils.getBasename(url);
-        try {
-            fileBaseName = URLDecoder.decode(fileBaseName, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+
+        fileBaseName = URLDecoder.decode(fileBaseName, "utf-8");
+
         if (fileBaseName.length() > FILE_NAME_LIMIT) {
             fileBaseName = fileBaseName.substring(0, FILE_NAME_LIMIT);
         }
@@ -209,6 +207,8 @@ public class AttachmentHandlerCovertUtils {
     }
 
     public static String encodeFileBaseName(String url) throws UnsupportedEncodingException {
-        return url.substring(0, url.lastIndexOf("/") + 1) + URLEncoder.encode(url.substring(url.lastIndexOf("/") + 1), "utf-8");
+        return url.substring(0, url.lastIndexOf("/") + 1)
+                + URLEncoder.encode(url.substring(url.lastIndexOf("/") + 1), "utf-8")
+                .replaceAll("\\+", "%20");
     }
 }
