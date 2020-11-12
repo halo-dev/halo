@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.StopWatch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +53,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         this.workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
     }
 
+    @Async
     public Future<String> covertHandlerByPosts(
             Integer sourceAttachmentTypeId,
             Boolean deleteOldAttachment,
@@ -73,6 +76,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             log.info(res);
             return new AsyncResult<>(res);
         } catch (IOException e) {
+            log.info("ERROR:" + e.toString());
             e.printStackTrace();
         }
         return new AsyncResult<>("Covert attachment handler Failed!");
@@ -171,14 +175,14 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         if (!FilenameUtils.getExtension(urlStr).equals(FilenameUtils.getExtension(fileBaseName))) {
             fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
         }
-        String tmpAttachmentPath = FileUtils.getTempDirectoryPath() + fileBaseName;
+        String tmpAttachmentPath = String.valueOf(Paths.get(FileUtils.getTempDirectoryPath(), fileBaseName));
 
         if (urlStr.startsWith("http")) {
             AttachmentHandlerCovertUtils.downloadFile(
                     AttachmentHandlerCovertUtils.encodeFileBaseName(urlStr),
                     tmpAttachmentPath);
         } else {
-            String oldAttachmentPath = URLDecoder.decode(workDir + urlStr, "utf-8");
+            String oldAttachmentPath = URLDecoder.decode(String.valueOf(Paths.get(workDir, urlStr)), "utf-8");
             File oldAttachment = new File(oldAttachmentPath);
             File tmpAttachment = new File(tmpAttachmentPath);
             if (oldAttachment.exists()) {
