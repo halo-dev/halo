@@ -7,12 +7,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.entity.Post;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,10 +51,12 @@ public class AttachmentHandlerCovertUtils {
      * @throws IOException covert failed
      */
     public static MultipartFile getMultipartFile(File file) throws IOException {
-        MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
+        String url = file.getAbsolutePath();
+        FileNameMap fileNameMap = URLConnection.getFileNameMap();
+        String mime = fileNameMap.getContentTypeFor("file://" + url);
         DiskFileItem item = new DiskFileItem(
                 "file",
-                mimeTypesMap.getContentType(file),
+                mime,
                 true, file.getName(),
                 (int) file.length(),
                 file.getParentFile()

@@ -179,8 +179,10 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         } else {
             String oldAttachmentPath = URLDecoder.decode(workDir + urlStr, "utf-8");
             File oldAttachment = new File(oldAttachmentPath);
+            File tmpAttachment = new File(tmpAttachmentPath);
             if (oldAttachment.exists()) {
-                FileUtils.copyFile(oldAttachment, new File(tmpAttachmentPath));
+                FileUtils.copyFile(oldAttachment, tmpAttachment);
+                FileUtils.waitFor(tmpAttachment, 100);
             }
         }
         return tmpAttachmentPath;
