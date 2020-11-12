@@ -79,11 +79,12 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
 
-    public void doCovertHandlerByPosts(
+    private void doCovertHandlerByPosts(
             Integer attachmentTypeId,
             Boolean deleteOldAttachment,
             Boolean uploadAllInAttachment,
             Boolean uploadAllInPost) throws IOException {
+
         Map<String, List<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(postService.listAll());
         Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils.getPathInAttachment(attachmentService.listAll(), attachmentTypeId);
         Iterator<Map.Entry<String, List<Integer>>> pathInPostsIterator = pathInPosts.entrySet().iterator();
@@ -146,7 +147,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         }
     }
 
-    public Boolean updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
+    private Boolean updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
         Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
         if (null != newAttachment) {
             String newAttachmentPath = attachmentService.convertToDto(newAttachment).getPath();
