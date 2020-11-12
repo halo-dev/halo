@@ -75,11 +75,10 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                     "Covert attachment handler has finished!\n{0}", stopWatch.prettyPrint());
             log.info(res);
             return new AsyncResult<>(res);
-        } catch (IOException e) {
-            log.info("ERROR:" + e.toString());
+        } catch (Exception e) {
             e.printStackTrace();
+            return new AsyncResult<>("Covert attachment handler Failed!" + e.toString());
         }
-        return new AsyncResult<>("Covert attachment handler Failed!");
     }
 
 

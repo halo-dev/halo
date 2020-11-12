@@ -209,6 +209,6 @@ public class AttachmentHandlerCovertUtils {
     }
 
     public static String encodeFileBaseName(String url) throws UnsupportedEncodingException {
-        return url.substring(0, url.lastIndexOf(File.pathSeparator) + 1) + URLEncoder.encode(url.substring(url.lastIndexOf(File.pathSeparator) + 1), "utf-8");
+        return url.substring(0, url.lastIndexOf("/") + 1) + URLEncoder.encode(url.substring(url.lastIndexOf("/") + 1), "utf-8");
     }
 }
