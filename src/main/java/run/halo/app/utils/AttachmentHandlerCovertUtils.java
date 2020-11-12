@@ -37,7 +37,11 @@ public class AttachmentHandlerCovertUtils {
     /**
      * Extract the image link in markdown.
      */
-    private static final Pattern URL_PATTERN = Pattern.compile("(?<=!\\[.*]\\()(.+)(?=\\))");
+
+
+    private static final Pattern PICTURE_MD_JDK_8 = Pattern.compile("!\\[.*]\\(.+\\)");
+
+    private static final Pattern URL_MD = Pattern.compile("(?<=]\\()(.+)(?=\\))");
 
     private AttachmentHandlerCovertUtils() {
 
@@ -159,16 +163,29 @@ public class AttachmentHandlerCovertUtils {
      * @return Map<String, List < Integer>> (image_path, list of post_id)
      */
     public static Map<String, List<Integer>> getPathInPost(List<Post> posts) {
+        Matcher m;
+        Matcher m2;
         Map<String, List<Integer>> map = new HashMap<>();
         for (Post post : posts) {
-            Matcher m = URL_PATTERN.matcher(post.getOriginalContent());
+            m = PICTURE_MD_JDK_8.matcher(post.getOriginalContent());
             while (m.find()) {
-                if (null != map.get(m.group())) {
-                    map.get(m.group()).add(post.getId());
+                m2 = URL_MD.matcher(m.group());
+                if (m2.find() && null != map.get(m2.group())) {
+                    map.get(m2.group()).add(post.getId());
                 } else {
                     List<Integer> list = new ArrayList<>();
                     list.add(post.getId());
-                    map.put(m.group(), list);
+                    map.put(m2.group(), list);
+                }
+            }
+
+            if (null != post.getThumbnail()) {
+                if (null != map.get(post.getThumbnail())) {
+                    map.get(post.getThumbnail()).add(post.getId());
+                } else {
+                    List<Integer> list = new ArrayList<>();
+                    list.add(post.getId());
+                    map.put(post.getThumbnail(), list);
                 }
             }
         }

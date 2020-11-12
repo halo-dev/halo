@@ -4,8 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.StopWatch;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,7 +51,6 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         this.workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
     }
 
-    @Async
     public Future<String> covertHandlerByPosts(
             Integer sourceAttachmentTypeId,
             Boolean deleteOldAttachment,
@@ -77,8 +74,6 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             return new AsyncResult<>(res);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            stopWatch.stop();
         }
         return new AsyncResult<>("Covert attachment handler Failed!");
     }
@@ -116,10 +111,10 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
         if (Boolean.TRUE.equals(uploadAllInAttachment)) {
             for (Map.Entry<String, Integer> pathInAttachmentEntry : pathInAttachments.entrySet()) {
-                String newAttachmentPath = uploadFile(
+                Attachment newAttachment = uploadFile(
                         pathInAttachmentEntry.getKey(),
                         attachmentService.getById(pathInAttachmentEntry.getValue()).getName());
-                if (!StringUtils.EMPTY.equals(newAttachmentPath) && Boolean.TRUE.equals(deleteOldAttachment)) {
+                if (null != newAttachment && Boolean.TRUE.equals(deleteOldAttachment)) {
                     doDeleteAttachment(pathInAttachmentEntry.getValue());
                 }
             }
@@ -137,6 +132,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     private Boolean attachmentInPost(String pathInPost, String pathInAttachment) throws UnsupportedEncodingException {
+        if (null == pathInPost || null == pathInAttachment) {
+            return false;
+        }
         return pathInPost.contains(pathInAttachment) || pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment));
     }
 
@@ -149,14 +147,18 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     public Boolean updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
-        String newAttachmentPath = uploadFile(oldAttachmentPath, fileBaseName);
-        if (!StringUtils.EMPTY.equals(newAttachmentPath)) {
+        Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
+        if (null != newAttachment) {
+            String newAttachmentPath = attachmentService.convertToDto(newAttachment).getPath();
             for (Integer postId : pathInPosts) {
                 Post post = postService.getById(postId);
                 stringBuilder.append(post.getOriginalContent());
                 AttachmentHandlerCovertUtils.strBuilderReplaceAll(stringBuilder, oldAttachmentPath, newAttachmentPath);
                 post.setOriginalContent(stringBuilder.toString());
                 stringBuilder.delete(0, stringBuilder.length());
+                if (Boolean.TRUE.equals(attachmentInPost(post.getThumbnail(), oldAttachmentPath))) {
+                    post.setThumbnail(newAttachmentPath);
+                }
                 postService.createOrUpdateBy(post);
             }
             return true;
@@ -184,22 +186,21 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         return tmpAttachmentPath;
     }
 
-    private String uploadFile(String oldAttachmentPath, String fileBaseName) throws IOException {
+    private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) throws IOException {
         File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
         try {
             if (tmpAttachment.exists()) {
                 MultipartFile multipartFile = AttachmentHandlerCovertUtils.getMultipartFile(tmpAttachment);
-                Attachment attachment = attachmentService.upload(multipartFile);
-                return attachment.getPath();
+                return attachmentService.upload(multipartFile);
             } else {
                 log.warn("Can not download file: {}", oldAttachmentPath);
             }
         } catch (Exception e) {
+            log.warn("Can not upload file: {}", oldAttachmentPath);
             e.printStackTrace();
         } finally {
             Files.deleteIfExists(tmpAttachment.toPath());
         }
-        log.warn("Can not upload file: {}", oldAttachmentPath);
-        return StringUtils.EMPTY;
+        return null;
     }
 }
