@@ -18,6 +18,7 @@ import java.util.Optional;
  * Base post repository.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 2019-03-22
  */
 public interface BasePostRepository<POST extends BasePost> extends BaseRepository<POST, Integer> {
@@ -90,14 +91,68 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     Page<POST> findAllByStatusAndCreateTimeAfter(@NonNull PostStatus status, @NonNull Date createTime, @NonNull Pageable pageable);
 
     /**
-     * Gets post by url and status.
+     * Finds all post by status and edit time before.
      *
-     * @param url    url must not be blank
+     * @param status   status must not be null
+     * @param editTime edit time must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<POST> findAllByStatusAndEditTimeBefore(@NonNull PostStatus status, @NonNull Date editTime, @NonNull Pageable pageable);
+
+    /**
+     * Finds all post by status and edit time after.
+     *
+     * @param status   status must not be null
+     * @param editTime edit time must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<POST> findAllByStatusAndEditTimeAfter(@NonNull PostStatus status, @NonNull Date editTime, @NonNull Pageable pageable);
+
+    /**
+     * Finds all post by status and visits before.
+     *
+     * @param status   status must not be null
+     * @param visits   visits must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<POST> findAllByStatusAndVisitsBefore(@NonNull PostStatus status, @NonNull Long visits, @NonNull Pageable pageable);
+
+    /**
+     * Finds all post by status and visits after.
+     *
+     * @param status   status must not be null
+     * @param visits   visits must not be null
+     * @param pageable page info must not be null
+     * @return a page of post
+     */
+    @NonNull
+    Page<POST> findAllByStatusAndVisitsAfter(@NonNull PostStatus status, @NonNull Long visits, @NonNull Pageable pageable);
+
+    /**
+     * Gets post by slug and status.
+     *
+     * @param slug   slug must not be blank
      * @param status status must not be null
      * @return an optional post
      */
     @NonNull
-    Optional<POST> getByUrlAndStatus(@NonNull String url, @NonNull PostStatus status);
+    Optional<POST> getBySlugAndStatus(@NonNull String slug, @NonNull PostStatus status);
+
+    /**
+     * Gets post by id and status.
+     *
+     * @param id     id must not be blank
+     * @param status status must not be null
+     * @return an optional post
+     */
+    @NonNull
+    Optional<POST> getByIdAndStatus(@NonNull Integer id, @NonNull PostStatus status);
 
 
     /**
@@ -109,29 +164,29 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     long countByStatus(@NonNull PostStatus status);
 
     /**
-     * Determine if the url exists.
+     * Determine if the slug exists.
      *
-     * @param url url must not be null.
+     * @param slug slug must not be null.
      * @return true or false.
      */
-    boolean existsByUrl(@NonNull String url);
+    boolean existsBySlug(@NonNull String slug);
 
     /**
-     * Determine if the url exists.
+     * Determine if the slug exists.
      *
-     * @param id  post id must not be null.
-     * @param url url must not be null.
+     * @param id   post id must not be null.
+     * @param slug slug must not be null.
      * @return true or false.
      */
-    boolean existsByIdNotAndUrl(@NonNull Integer id, @NonNull String url);
+    boolean existsByIdNotAndSlug(@NonNull Integer id, @NonNull String slug);
 
     /**
-     * Get post by url
+     * Get post by slug
      *
-     * @param url post url
+     * @param slug post slug
      * @return Optional<Post>
      */
-    Optional<POST> getByUrl(@NonNull String url);
+    Optional<POST> getBySlug(@NonNull String slug);
 
     /**
      * Updates post visits.

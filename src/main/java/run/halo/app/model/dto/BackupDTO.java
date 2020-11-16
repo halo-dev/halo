@@ -9,9 +9,6 @@ import lombok.Data;
 @Data
 public class BackupDTO {
 
-    @Deprecated
-    private String downloadUrl;
-
     private String downloadLink;
 
     private String filename;

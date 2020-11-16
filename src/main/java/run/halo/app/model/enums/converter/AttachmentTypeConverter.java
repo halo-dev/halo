@@ -13,7 +13,4 @@ import javax.persistence.Converter;
 @Converter(autoApply = true)
 public class AttachmentTypeConverter extends AbstractConverter<AttachmentType, Integer> {
 
-    public AttachmentTypeConverter() {
-        super(AttachmentType.class);
-    }
 }

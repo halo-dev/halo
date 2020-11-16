@@ -19,12 +19,6 @@ import java.util.List;
  */
 public interface LinkService extends CrudService<Link, Integer> {
 
-    String META_NAME = "name";
-
-    String META_DESCRIPTION = "description";
-
-    String META_CONTENT = "content";
-
     /**
      * List link dtos.
      *
@@ -44,6 +38,15 @@ public interface LinkService extends CrudService<Link, Integer> {
     List<LinkTeamVO> listTeamVos(@NonNull Sort sort);
 
     /**
+     * Lists link team vos by random
+     *
+     * @param sort
+     * @return a list of link team vo by random
+     */
+    @NonNull
+    List<LinkTeamVO> listTeamVosByRandom(@NonNull Sort sort);
+
+    /**
      * Creates link by link param.
      *
      * @param linkParam must not be null
@@ -51,6 +54,17 @@ public interface LinkService extends CrudService<Link, Integer> {
      */
     @NonNull
     Link createBy(@NonNull LinkParam linkParam);
+
+    /**
+     * Updates link by link param.
+     *
+     *
+     * @param id must not be null
+     * @param linkParam must not be null
+     * @return updated link
+     */
+    @NonNull
+    Link updateBy(Integer id, @NonNull LinkParam linkParam);
 
     /**
      * Exists by link name.
@@ -61,6 +75,14 @@ public interface LinkService extends CrudService<Link, Integer> {
     boolean existByName(String name);
 
     /**
+     * Exists by link url.
+     *
+     * @param url must not be blank
+     * @return true if exists; false otherwise
+     */
+    boolean existByUrl(String url);
+
+    /**
      * List all link teams.
      *
      * @return a list of teams.
@@ -68,10 +90,10 @@ public interface LinkService extends CrudService<Link, Integer> {
     List<String> listAllTeams();
 
     /**
-     * Get link by parse url.
+     * List all link teams by random
      *
-     * @param url url must not be null
-     * @return link dto
+     * @return a list of teams by random
      */
-    LinkDTO getByParse(@NonNull String url);
+    @NonNull
+    List<Link> listAllByRandom();
 }

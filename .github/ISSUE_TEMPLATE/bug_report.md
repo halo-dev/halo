@@ -19,7 +19,7 @@ assignees: ''
   - 我已经安装了最新版的 Halo
   - 我已经搜索了已有的 Issues 列表中有关的信息
   - 我已经搜索了论坛中有关的信息：https://bbs.halo.run
-  - 我已经阅读了 Halo 的 FAQ：https://halo.run/guide/faq.html
+  - 我已经阅读了 Halo 的 FAQ：https://halo.run/archives/other-faq
 -->
 
 ## 我的环境

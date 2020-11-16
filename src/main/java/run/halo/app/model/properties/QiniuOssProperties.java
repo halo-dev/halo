@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.support.HaloConst;
+
 /**
  * Qiniu oss properties.
  *
@@ -32,7 +34,7 @@ public enum QiniuOssProperties implements PropertyEnum {
     /**
      * Qiniu oss domain protocol.
      */
-    OSS_PROTOCOL("oss_qiniu_domain_protocol", String.class, "https://"),
+    OSS_PROTOCOL("oss_qiniu_domain_protocol", String.class, HaloConst.PROTOCOL_HTTPS),
 
     /**
      * Qiniu oss domain.

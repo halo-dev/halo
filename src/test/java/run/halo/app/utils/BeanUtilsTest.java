@@ -3,40 +3,41 @@ package run.halo.app.utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * BeanUtils test.
  *
  * @author johnniang
  */
-public class BeanUtilsTest {
+class BeanUtilsTest {
 
     @Test
-    public void transformFrom() {
+    void transformFrom() {
         TestA a = new TestA(1, 2);
 
         TestC c = BeanUtils.transformFrom(a, TestC.class);
-        assertEquals(a.getA(), c.getA());
+        assertEquals(a.getA(), Objects.requireNonNull(c).getA());
         assertEquals(a.getB(), c.getB());
 
         TestB b = BeanUtils.transformFrom(a, TestB.class);
-        assertEquals(a.getB(), b.getB());
+        assertEquals(a.getB(), Objects.requireNonNull(b).getB());
         assertNull(b.getC());
 
         TestD d = new TestD(a);
         TestE e = BeanUtils.transformFrom(d, TestE.class);
-        assertEquals(d.getA().getA(), e.getA().getA());
+        assertEquals(d.getA().getA(), Objects.requireNonNull(e).getA().getA());
     }
 
     @Test
-    public void transformFromInBatch() {
+    void transformFromInBatch() {
         TestA[] as = {
                 new TestA(1, 2),
                 new TestA(3, 4)
@@ -60,7 +61,7 @@ public class BeanUtilsTest {
     }
 
     @Test
-    public void updateProperties() {
+    void updateProperties() {
         TestA a = new TestA(1, 2);
         TestB b = new TestB(3, 4);
         TestC c = new TestC(5, 6);

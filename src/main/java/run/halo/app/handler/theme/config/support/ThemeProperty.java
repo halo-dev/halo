@@ -55,6 +55,11 @@ public class ThemeProperty {
     private String version;
 
     /**
+     * Require halo version.
+     */
+    private String require;
+
+    /**
      * Theme author.
      */
     private Author author;

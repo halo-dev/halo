@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.support.HaloConst;
+
 /**
  * Tencent cos properties.
  *
@@ -12,7 +14,7 @@ public enum TencentCosProperties implements PropertyEnum {
     /**
      * Tencent cos domain protocol.
      */
-    COS_PROTOCOL("cos_tencent_domain_protocol", String.class, "https://"),
+    COS_PROTOCOL("cos_tencent_domain_protocol", String.class, HaloConst.PROTOCOL_HTTPS),
 
     /**
      * Tencent cos domain.

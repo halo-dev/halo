@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface StaticStorageService {
 
+    String API_FOLDER_NAME = "api";
+
     /**
      * Static folder location.
      */
@@ -47,5 +49,21 @@ public interface StaticStorageService {
      * @param basePath base path
      * @param file     file must not be null.
      */
-    void update(String basePath, @NonNull MultipartFile file);
+    void upload(String basePath, @NonNull MultipartFile file);
+
+    /**
+     * Rename static file or folder.
+     *
+     * @param basePath base path must not be null
+     * @param newName  new name must not be null
+     */
+    void rename(@NonNull String basePath, @NonNull String newName);
+
+    /**
+     * Save static file.
+     *
+     * @param path    path must not be null
+     * @param content saved content
+     */
+    void save(@NonNull String path, String content);
 }

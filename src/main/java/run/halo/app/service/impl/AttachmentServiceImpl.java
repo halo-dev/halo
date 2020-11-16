@@ -47,8 +47,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     private final FileHandlers fileHandlers;
 
     public AttachmentServiceImpl(AttachmentRepository attachmentRepository,
-                                 OptionService optionService,
-                                 FileHandlers fileHandlers) {
+            OptionService optionService,
+            FileHandlers fileHandlers) {
         super(attachmentRepository);
         this.attachmentRepository = attachmentRepository;
         this.optionService = optionService;
@@ -157,13 +157,15 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         // Get blog base url
         String blogBaseUrl = optionService.getBlogBaseUrl();
 
+        Boolean enabledAbsolutePath = optionService.isEnabledAbsolutePath();
+
         // Convert to output dto
         AttachmentDTO attachmentDTO = new AttachmentDTO().convertFrom(attachment);
 
         if (Objects.equals(attachmentDTO.getType(), AttachmentType.LOCAL)) {
             // Append blog base url to path and thumbnail
-            String fullPath = StringUtils.join(blogBaseUrl, "/", attachmentDTO.getPath());
-            String fullThumbPath = StringUtils.join(blogBaseUrl, "/", attachmentDTO.getThumbPath());
+            String fullPath = StringUtils.join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getPath());
+            String fullThumbPath = StringUtils.join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getThumbPath());
 
             // Set full path and full thumb path
             attachmentDTO.setPath(fullPath);
@@ -181,6 +183,22 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     @Override
     public List<AttachmentType> listAllType() {
         return attachmentRepository.findAllType();
+    }
+
+    @Override
+    public List<Attachment> replaceUrl(String oldUrl, String newUrl) {
+        List<Attachment> attachments = listAll();
+        List<Attachment> replaced = new ArrayList<>();
+        attachments.forEach(attachment -> {
+            if (StringUtils.isNotEmpty(attachment.getPath())) {
+                attachment.setPath(attachment.getPath().replaceAll(oldUrl, newUrl));
+            }
+            if (StringUtils.isNotEmpty(attachment.getThumbPath())) {
+                attachment.setThumbPath(attachment.getThumbPath().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(attachment);
+        });
+        return updateInBatch(replaced);
     }
 
     @Override
@@ -215,6 +233,6 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
      */
     @NonNull
     private AttachmentType getAttachmentType() {
-        return optionService.getEnumByPropertyOrDefault(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.class, AttachmentType.LOCAL);
+        return Objects.requireNonNull(optionService.getEnumByPropertyOrDefault(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.class, AttachmentType.LOCAL));
     }
 }

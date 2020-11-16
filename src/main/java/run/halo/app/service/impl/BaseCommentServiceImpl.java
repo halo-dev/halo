@@ -65,8 +65,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     private final BaseCommentRepository<COMMENT> baseCommentRepository;
 
     public BaseCommentServiceImpl(BaseCommentRepository<COMMENT> baseCommentRepository,
-                                  OptionService optionService,
-                                  UserService userService, ApplicationEventPublisher eventPublisher) {
+            OptionService optionService,
+            UserService userService, ApplicationEventPublisher eventPublisher) {
         super(baseCommentRepository);
         this.baseCommentRepository = baseCommentRepository;
         this.optionService = optionService;
@@ -564,6 +564,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    @Deprecated
     public <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment) {
         Assert.notNull(comment, "Base comment dto must not be null");
 
@@ -592,6 +593,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    @Deprecated
     public <T extends BaseCommentDTO> List<T> filterIpAddress(List<T> comments) {
         if (CollectionUtils.isEmpty(comments)) {
             return Collections.emptyList();
@@ -603,11 +605,26 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
     }
 
     @Override
+    @Deprecated
     public <T extends BaseCommentDTO> Page<T> filterIpAddress(Page<T> commentPage) {
         Assert.notNull(commentPage, "Comment page must not be null");
         commentPage.forEach(this::filterIpAddress);
 
         return commentPage;
+    }
+
+    @Override
+    public List<BaseCommentDTO> replaceUrl(String oldUrl, String newUrl) {
+        List<COMMENT> comments = listAll();
+        List<COMMENT> replaced = new ArrayList<>();
+        comments.forEach(comment -> {
+            if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
+                comment.setAuthorUrl(comment.getAuthorUrl().replaceAll(oldUrl, newUrl));
+            }
+            replaced.add(comment);
+        });
+        List<COMMENT> updated = updateInBatch(replaced);
+        return convertTo(updated);
     }
 
     /**
@@ -672,8 +689,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment> extend
      * @param commentComparator comment vo comparator
      */
     protected void concreteTree(@NonNull BaseCommentVO parentComment,
-                                @Nullable Collection<COMMENT> comments,
-                                @Nullable Comparator<BaseCommentVO> commentComparator) {
+            @Nullable Collection<COMMENT> comments,
+            @Nullable Comparator<BaseCommentVO> commentComparator) {
         Assert.notNull(parentComment, "Parent comment must not be null");
 
         if (CollectionUtils.isEmpty(comments)) {

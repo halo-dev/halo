@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.utils.DateUtils;
 
 import java.util.Date;
@@ -18,6 +19,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
+
+    protected HaloProperties haloProperties;
 
     /**
      * Get cache wrapper by key.

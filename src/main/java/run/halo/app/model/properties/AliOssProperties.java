@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.support.HaloConst;
+
 /**
  * Ali yun oss properties.
  *
@@ -12,7 +14,7 @@ public enum AliOssProperties implements PropertyEnum {
     /**
      * Aliyun oss domain protocol
      */
-    OSS_PROTOCOL("oss_ali_domain_protocol", String.class, "https://"),
+    OSS_PROTOCOL("oss_ali_domain_protocol", String.class, HaloConst.PROTOCOL_HTTPS),
 
     /**
      * Aliyun oss domain

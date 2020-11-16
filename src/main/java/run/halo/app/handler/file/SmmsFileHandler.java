@@ -1,8 +1,8 @@
 package run.halo.app.handler.file;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -17,6 +17,7 @@ import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.properties.SmmsProperties;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
@@ -53,8 +54,10 @@ public class SmmsFileHandler implements FileHandler {
 
     private final OptionService optionService;
 
+    private final HttpHeaders headers = new HttpHeaders();
+
     public SmmsFileHandler(RestTemplate httpsRestTemplate,
-                           OptionService optionService) {
+            OptionService optionService) {
         this.httpsRestTemplate = httpsRestTemplate;
         this.optionService = optionService;
 
@@ -78,10 +81,9 @@ public class SmmsFileHandler implements FileHandler {
             throw new FileOperationException("不支持的文件类型，仅支持 \"jpeg, jpg, png, gif, bmp\" 格式的图片");
         }
 
-        HttpHeaders headers = new HttpHeaders();
+        setHeaders();
         // Set content type
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.set(HttpHeaders.AUTHORIZATION, apiSecretToken);
 
         LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
@@ -114,7 +116,7 @@ public class SmmsFileHandler implements FileHandler {
             throw new FileOperationException(smmsResponse == null ? "SM.MS 服务返回内容为空" : smmsResponse.getMessage()).setErrorData(smmsResponse);
         }
 
-        if (smmsResponse.getSuccess()) {
+        if (!smmsResponse.getSuccess()) {
             throw new FileOperationException("上传请求失败：" + smmsResponse.getMessage()).setErrorData(smmsResponse);
         }
 
@@ -123,7 +125,7 @@ public class SmmsFileHandler implements FileHandler {
 
         // Build result
         UploadResult result = new UploadResult();
-        result.setFilename(FilenameUtils.getBasename(file.getOriginalFilename()));
+        result.setFilename(FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename())));
         result.setSuffix(FilenameUtils.getExtension(file.getOriginalFilename()));
         result.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
 
@@ -146,8 +148,7 @@ public class SmmsFileHandler implements FileHandler {
         // Build delete url
         String url = String.format(DELETE_API_V2, key);
 
-        // Set user agent manually
-        HttpHeaders headers = new HttpHeaders();
+        setHeaders();
 
         // Delete the file
         ResponseEntity<String> responseEntity = httpsRestTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(null, headers), String.class);
@@ -164,8 +165,8 @@ public class SmmsFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.SMMS.equals(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.SMMS;
     }
 
     /**
@@ -178,8 +179,15 @@ public class SmmsFileHandler implements FileHandler {
         return smmsResponse != null && smmsResponse.getCode().equals(SUCCESS_CODE);
     }
 
+    /**
+     * Set headers.
+     */
+    private void setHeaders() {
+        headers.set(HttpHeaders.USER_AGENT, "Halo/" + HaloConst.HALO_VERSION);
+        headers.set(HttpHeaders.AUTHORIZATION, optionService.getByPropertyOfNonNull(SmmsProperties.SMMS_API_SECRET_TOKEN).toString());
+    }
+
     @Data
-    @ToString
     @NoArgsConstructor
     private static class SmmsResponse {
 
@@ -191,11 +199,11 @@ public class SmmsFileHandler implements FileHandler {
 
         private SmmsResponseData data;
 
-        private String RequestId;
+        @JsonProperty("RequestId")
+        private String requestId;
     }
 
     @Data
-    @ToString(callSuper = true)
     @NoArgsConstructor
     private static class SmmsResponseData {
 

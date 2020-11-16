@@ -42,16 +42,16 @@ public class StatisticServiceImpl implements StatisticService {
     private final UserService userService;
 
     public StatisticServiceImpl(PostService postService,
-                                SheetService sheetService,
-                                JournalService journalService,
-                                PostCommentService postCommentService,
-                                SheetCommentService sheetCommentService,
-                                JournalCommentService journalCommentService,
-                                OptionService optionService,
-                                LinkService linkService,
-                                CategoryService categoryService,
-                                TagService tagService,
-                                UserService userService) {
+            SheetService sheetService,
+            JournalService journalService,
+            PostCommentService postCommentService,
+            SheetCommentService sheetCommentService,
+            JournalCommentService journalCommentService,
+            OptionService optionService,
+            LinkService linkService,
+            CategoryService categoryService,
+            TagService tagService,
+            UserService userService) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.journalService = journalService;
@@ -68,7 +68,7 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public StatisticDTO getStatistic() {
         StatisticDTO statisticDTO = new StatisticDTO();
-        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED) + sheetService.countByStatus(PostStatus.PUBLISHED));
+        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
 
         // Handle comment count
         long postCommentCount = postCommentService.countByStatus(CommentStatus.PUBLISHED);

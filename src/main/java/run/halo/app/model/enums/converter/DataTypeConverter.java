@@ -13,7 +13,4 @@ import javax.persistence.Converter;
 @Converter(autoApply = true)
 public class DataTypeConverter extends AbstractConverter<DataType, Integer> {
 
-    public DataTypeConverter() {
-        super(DataType.class);
-    }
 }

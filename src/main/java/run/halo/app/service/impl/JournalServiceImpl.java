@@ -44,7 +44,7 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
     private final JournalCommentService journalCommentService;
 
     public JournalServiceImpl(JournalRepository journalRepository,
-                              JournalCommentService journalCommentService) {
+            JournalCommentService journalCommentService) {
         super(journalRepository);
         this.journalRepository = journalRepository;
         this.journalCommentService = journalCommentService;

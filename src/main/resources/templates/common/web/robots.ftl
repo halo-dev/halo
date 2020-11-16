@@ -3,6 +3,6 @@ User-agent: *
 Disallow: /
 <#else>
 User-agent: *
-Sitemap: ${context!}/sitemap.xml
-Sitemap: ${context!}/sitemap.html
+Sitemap: ${sitemap_xml_url!}
+Sitemap: ${sitemap_html_url!}
 </#if>

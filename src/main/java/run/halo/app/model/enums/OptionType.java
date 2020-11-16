@@ -18,7 +18,7 @@ public enum OptionType implements ValueEnum<Integer> {
      */
     CUSTOM(1);
 
-    private Integer value;
+    private final Integer value;
 
     OptionType(Integer value) {
         this.value = value;

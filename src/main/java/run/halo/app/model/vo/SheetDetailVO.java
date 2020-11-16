@@ -20,7 +20,7 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class SheetDetailVO extends BasePostDetailDTO {
 
-    private Set<Long> sheetMetaIds;
+    private Set<Long> metaIds;
 
-    private List<BaseMetaDTO> sheetMetas;
+    private List<BaseMetaDTO> metas;
 }

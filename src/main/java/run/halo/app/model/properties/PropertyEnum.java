@@ -19,6 +19,7 @@ import java.util.Map;
  */
 public interface PropertyEnum extends ValueEnum<String> {
 
+
     /**
      * Converts to value with corresponding type
      *
@@ -125,19 +126,20 @@ public interface PropertyEnum extends ValueEnum<String> {
      * @return true if supports; false else
      */
     static boolean isSupportedType(Class<?> type) {
-        return type != null && (
-                type.isAssignableFrom(String.class)
-                        || type.isAssignableFrom(Number.class)
-                        || type.isAssignableFrom(Integer.class)
-                        || type.isAssignableFrom(Long.class)
-                        || type.isAssignableFrom(Boolean.class)
-                        || type.isAssignableFrom(Short.class)
-                        || type.isAssignableFrom(Byte.class)
-                        || type.isAssignableFrom(Double.class)
-                        || type.isAssignableFrom(Float.class)
-                        || type.isAssignableFrom(Enum.class)
-                        || type.isAssignableFrom(ValueEnum.class)
-        );
+        if (type == null) {
+            return false;
+        }
+        return type.isAssignableFrom(String.class)
+                || type.isAssignableFrom(Number.class)
+                || type.isAssignableFrom(Integer.class)
+                || type.isAssignableFrom(Long.class)
+                || type.isAssignableFrom(Boolean.class)
+                || type.isAssignableFrom(Short.class)
+                || type.isAssignableFrom(Byte.class)
+                || type.isAssignableFrom(Double.class)
+                || type.isAssignableFrom(Float.class)
+                || type.isAssignableFrom(Enum.class)
+                || type.isAssignableFrom(ValueEnum.class);
     }
 
     static Map<String, PropertyEnum> getValuePropertyEnumMap() {
@@ -150,11 +152,13 @@ public interface PropertyEnum extends ValueEnum<String> {
         propertyEnumClasses.add(EmailProperties.class);
         propertyEnumClasses.add(OtherProperties.class);
         propertyEnumClasses.add(PostProperties.class);
+        propertyEnumClasses.add(SheetProperties.class);
         propertyEnumClasses.add(PrimaryProperties.class);
         propertyEnumClasses.add(QiniuOssProperties.class);
         propertyEnumClasses.add(SeoProperties.class);
         propertyEnumClasses.add(UpOssProperties.class);
         propertyEnumClasses.add(ApiProperties.class);
+        propertyEnumClasses.add(PermalinkProperties.class);
 
         Map<String, PropertyEnum> result = new HashMap<>();
 
@@ -181,5 +185,26 @@ public interface PropertyEnum extends ValueEnum<String> {
      *
      * @return default value
      */
+    @Nullable
     String defaultValue();
+
+    /**
+     * Default value with given type.
+     *
+     * @param propertyType property type must not be null
+     * @param <T>          property type
+     * @return default value with given type
+     */
+    @Nullable
+    default <T> T defaultValue(Class<T> propertyType) {
+        // Get default value
+        String defaultValue = defaultValue();
+        if (defaultValue == null) {
+            return null;
+        }
+
+        // Convert to the given type
+        return PropertyEnum.convertTo(defaultValue, propertyType);
+    }
+
 }

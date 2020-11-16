@@ -83,4 +83,13 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
      * @return list of type.
      */
     List<AttachmentType> listAllType();
+
+    /**
+     * Replace attachment url in batch.
+     *
+     * @param oldUrl old blog url.
+     * @param newUrl new blog url.
+     * @return replaced attachments.
+     */
+    List<Attachment> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
 }

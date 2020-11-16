@@ -1,10 +1,12 @@
 package run.halo.app.utils;
 
+import cn.hutool.core.util.URLUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import run.halo.app.model.support.HaloConst;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -17,7 +19,7 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
  *
  * @author ryanwang
  * @author johnniang
- * @date 2017/12/22
+ * @date 2017-12-22
  */
 @Slf4j
 public class HaloUtils {
@@ -233,19 +235,21 @@ public class HaloUtils {
     }
 
     /**
-     * Normalize url.
+     * Normalize url
      *
-     * @param url url must not be blank
-     * @return normalized url
+     * @param originalUrl original url
+     * @return normalized url.
      */
     @NonNull
-    public static String normalizeUrl(@NonNull String url) {
-        Assert.hasText(url, "Url must not be blank");
+    public static String normalizeUrl(@NonNull String originalUrl) {
+        Assert.hasText(originalUrl, "Original Url must not be blank");
 
-        StringUtils.removeEnd(url, "html");
-        StringUtils.removeEnd(url, "htm");
+        if (StringUtils.startsWithAny(originalUrl, URL_SEPARATOR, HaloConst.PROTOCOL_HTTPS, HaloConst.PROTOCOL_HTTP)
+                && !StringUtils.startsWith(originalUrl, "//")) {
+            return originalUrl;
+        }
 
-        return SlugUtils.slugify(url);
+        return URLUtil.normalize(originalUrl);
     }
 
     /**
@@ -270,6 +274,9 @@ public class HaloUtils {
      * @return text before cleaned
      */
     public static String cleanHtmlTag(String content) {
-        return content.replaceAll(RE_HTML_MARK, "");
+        if (StringUtils.isEmpty(content)) {
+            return StringUtils.EMPTY;
+        }
+        return content.replaceAll(RE_HTML_MARK, StringUtils.EMPTY);
     }
 }

@@ -16,6 +16,8 @@ import java.util.List;
 @ToString
 public class StaticFile implements Comparator<StaticFile> {
 
+    private String id;
+
     private String name;
 
     private String path;

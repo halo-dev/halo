@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.enums.PostEditorType;
+
 /**
  * Other properties.
  *
@@ -22,7 +24,17 @@ public enum OtherProperties implements PropertyEnum {
     /**
      * Statistics platform code,such as Google Analytics.
      */
-    STATISTICS_CODE("blog_statistics_code", String.class, "");
+    STATISTICS_CODE("blog_statistics_code", String.class, ""),
+
+    /**
+     * Global absolute path enabled.
+     */
+    GLOBAL_ABSOLUTE_PATH_ENABLED("global_absolute_path_enabled", Boolean.class, "true"),
+
+    /**
+     * Default post editor.
+     */
+    DEFAULT_EDITOR("default_editor", PostEditorType.class, PostEditorType.MARKDOWN.name());
 
     private final String value;
 

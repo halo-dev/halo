@@ -169,7 +169,7 @@ public class SwaggerConfiguration {
                 .description("Documentation for Halo API")
                 .version(HALO_VERSION)
                 .termsOfServiceUrl("https://github.com/halo-dev")
-                .contact(new Contact("halo-dev", "https://github.com/halo-dev/halo/issues", "i#ryanc.cc"))
+                .contact(new Contact("halo-dev", "https://github.com/halo-dev/halo/issues", "hi@halo.run"))
                 .license("GNU General Public License v3.0")
                 .licenseUrl("https://github.com/halo-dev/halo/blob/master/LICENSE")
                 .build();

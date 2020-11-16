@@ -2,7 +2,7 @@ package run.halo.app.listener.theme;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import run.halo.app.cache.StringCacheStore;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
 import run.halo.app.service.ThemeService;
@@ -16,9 +16,9 @@ import run.halo.app.service.ThemeService;
 @Component
 public class ThemeUpdatedListener {
 
-    private final StringCacheStore cacheStore;
+    private final AbstractStringCacheStore cacheStore;
 
-    public ThemeUpdatedListener(StringCacheStore cacheStore) {
+    public ThemeUpdatedListener(AbstractStringCacheStore cacheStore) {
         this.cacheStore = cacheStore;
     }
 

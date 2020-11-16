@@ -31,9 +31,9 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         Class<?> parameterType = parameter.getParameterType();
-        return (Authentication.class.isAssignableFrom(parameterType) ||
-                UserDetail.class.isAssignableFrom(parameterType) ||
-                User.class.isAssignableFrom(parameterType));
+        return Authentication.class.isAssignableFrom(parameterType)
+                || UserDetail.class.isAssignableFrom(parameterType)
+                || User.class.isAssignableFrom(parameterType);
     }
 
     @Override

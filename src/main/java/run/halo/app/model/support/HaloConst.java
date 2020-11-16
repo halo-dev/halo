@@ -3,7 +3,7 @@ package run.halo.app.model.support;
 import org.springframework.http.HttpHeaders;
 
 import java.io.File;
-import java.time.Duration;
+import java.util.Optional;
 
 /**
  * <pre>
@@ -23,7 +23,13 @@ public class HaloConst {
     /**
      * Temporary directory.
      */
-    public final static String TEMP_DIR = System.getProperties().getProperty("java.io.tmpdir");
+    public final static String TEMP_DIR = "/tmp/run.halo.app";
+
+    public final static String PROTOCOL_HTTPS = "https://";
+
+    public final static String PROTOCOL_HTTP = "http://";
+
+    public final static String URL_SEPARATOR = "/";
 
     /**
      * Halo backup prefix.
@@ -31,25 +37,33 @@ public class HaloConst {
     public final static String HALO_BACKUP_PREFIX = "halo-backup-";
 
     /**
+     * Halo data export prefix.
+     */
+    public final static String HALO_DATA_EXPORT_PREFIX = "halo-data-export-";
+
+    /**
+     * Static pages pack prefix.
+     */
+    public final static String STATIC_PAGE_PACK_PREFIX = "static-pages-";
+
+    /**
      * Default theme name.
      */
     public final static String DEFAULT_THEME_ID = "caicai_anatole";
 
     /**
-     * Version constant. (Available in production environment)
+     * Default error path.
      */
-    public static final String HALO_VERSION;
+    public static final String DEFAULT_ERROR_PATH = "common/error/error";
 
     /**
      * Path separator.
      */
     public static final String FILE_SEPARATOR = File.separator;
-
     /**
      * Suffix of freemarker template file
      */
     public static final String SUFFIX_FTL = ".ftl";
-
     /**
      * Custom freemarker tag method key.
      */
@@ -120,7 +134,22 @@ public class HaloConst {
      * Content api token param name
      */
     public final static String API_ACCESS_KEY_QUERY_NAME = "api_access_key";
-    public final static Duration TEMP_TOKEN_EXPIRATION = Duration.ofDays(7);
+    public final static String ONE_TIME_TOKEN_QUERY_NAME = "ott";
+    public final static String ONE_TIME_TOKEN_HEADER_NAME = "ott";
+    /**
+     * Version constant. (Available in production environment)
+     */
+    public static final String HALO_VERSION;
+
+    /**
+     * Unknown version: unknown
+     */
+    public static final String UNKNOWN_VERSION = "unknown";
+
+    /**
+     * Database product name.
+     */
+    public static String DATABASE_PRODUCT_NAME = null;
     /**
      * user_session
      */
@@ -128,6 +157,6 @@ public class HaloConst {
 
     static {
         // Set version
-        HALO_VERSION = HaloConst.class.getPackage().getImplementationVersion();
+        HALO_VERSION = Optional.ofNullable(HaloConst.class.getPackage().getImplementationVersion()).orElse(UNKNOWN_VERSION);
     }
 }

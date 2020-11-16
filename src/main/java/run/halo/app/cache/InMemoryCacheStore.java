@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author johnniang
  */
 @Slf4j
-public class InMemoryCacheStore extends StringCacheStore {
+public class InMemoryCacheStore extends AbstractStringCacheStore {
 
     /**
      * Cleaner schedule period. (ms)
@@ -34,7 +34,7 @@ public class InMemoryCacheStore extends StringCacheStore {
     /**
      * Lock.
      */
-    private Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     public InMemoryCacheStore() {
         // Run a cache store cleaner

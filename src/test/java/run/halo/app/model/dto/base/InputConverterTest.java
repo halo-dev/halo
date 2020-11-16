@@ -1,47 +1,47 @@
 package run.halo.app.model.dto.base;
 
 import lombok.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class InputConverterTest {
+class InputConverterTest {
 
     @Test
-    public void convertToTest() {
+    void convertToTest() {
         TestInputDTO inputDTO = new TestInputDTO("test_name");
 
         TestDomain domain = inputDTO.convertTo();
-        assertThat(domain.getName(), equalTo("test_name"));
+
+        assertEquals("test_name", domain.getName());
         assertNull(domain.getAge());
     }
 
     @Test
-    public void updateTest() {
+    void updateTest() {
         TestInputDTO inputDTO = new TestInputDTO("test_input_dto_name");
 
         TestDomain domain = new TestDomain("test_domain_name", 10);
 
         inputDTO.update(domain);
 
-        assertThat(domain.getName(), equalTo("test_input_dto_name"));
-        assertThat(domain.getAge(), equalTo(10));
+        assertEquals("test_input_dto_name", domain.getName());
+        assertEquals(10, domain.getAge());
     }
 
     @Test
-    public void subConvertToTest() {
+    void subConvertToTest() {
         SubTestInputDTO subTestInputDTO = new SubTestInputDTO();
         subTestInputDTO.setName("test_name");
         subTestInputDTO.setAge(10);
 
         TestDomain domain = subTestInputDTO.convertTo();
 
-        assertThat(domain.getName(), equalTo("test_name"));
-        assertThat(domain.getAge(), equalTo(10));
+        assertEquals("test_name", domain.getName());
+        assertEquals(10, domain.getAge());
     }
 
     @Data
@@ -61,7 +61,7 @@ public class InputConverterTest {
     @EqualsAndHashCode
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class TestInputDTO implements InputConverter<TestDomain>, Serializable {
+    static class TestInputDTO implements InputConverter<TestDomain>, Serializable {
 
         private String name;
     }
@@ -71,7 +71,7 @@ public class InputConverterTest {
     @EqualsAndHashCode(callSuper = true)
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SubTestInputDTO extends TestInputDTO {
+    static class SubTestInputDTO extends TestInputDTO {
 
         private Integer age;
     }

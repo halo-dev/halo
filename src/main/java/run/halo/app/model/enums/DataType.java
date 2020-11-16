@@ -23,7 +23,7 @@ public enum DataType implements ValueEnum<Integer> {
 
     BOOL(3);
 
-    private Integer value;
+    private final Integer value;
 
     DataType(Integer value) {
         this.value = value;

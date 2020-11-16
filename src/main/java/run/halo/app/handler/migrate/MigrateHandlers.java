@@ -31,7 +31,7 @@ public class MigrateHandlers {
 
     public MigrateHandlers(ApplicationContext applicationContext) {
         // Add all migrate handler
-        addFileHandlers(applicationContext.getBeansOfType(MigrateHandler.class).values());
+        addMigrateHandlers(applicationContext.getBeansOfType(MigrateHandler.class).values());
     }
 
     @NonNull
@@ -56,7 +56,7 @@ public class MigrateHandlers {
      * @return current migrate handlers
      */
     @NonNull
-    private MigrateHandlers addFileHandlers(@Nullable Collection<MigrateHandler> migrateHandlers) {
+    private MigrateHandlers addMigrateHandlers(@Nullable Collection<MigrateHandler> migrateHandlers) {
         if (!CollectionUtils.isEmpty(migrateHandlers)) {
             this.migrateHandlers.addAll(migrateHandlers);
         }

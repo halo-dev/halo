@@ -1,10 +1,13 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.enums.TimeUnit;
+
 /**
  * Post properties.
  *
  * @author johnniang
- * @date 4/1/19
+ * @author ryanwang
+ * @date 2019-04-01
  */
 public enum PostProperties implements PropertyEnum {
 
@@ -29,9 +32,29 @@ public enum PostProperties implements PropertyEnum {
     INDEX_PAGE_SIZE("post_index_page_size", Integer.class, "10"),
 
     /**
+     * Archives page size.
+     */
+    ARCHIVES_PAGE_SIZE("post_archives_page_size", Integer.class, "10"),
+
+    /**
      * Post index sort.
      */
-    INDEX_SORT("post_index_sort", String.class, "createTime");
+    INDEX_SORT("post_index_sort", String.class, "createTime"),
+
+    /**
+     * Enable auto cleaning recycled post.
+     */
+    RECYCLED_POST_CLEANING_ENABLED("recycled_post_cleaning_enabled", Boolean.class, "false"),
+
+    /**
+     * Recycled post retention time
+     */
+    RECYCLED_POST_RETENTION_TIME("recycled_post_retention_time", Integer.class, "30"),
+
+    /**
+     * Recycled post retention time unit.
+     */
+    RECYCLED_POST_RETENTION_TIMEUNIT("recycled_post_retention_timeunit", TimeUnit.class, TimeUnit.DAY.name());
 
     private final String value;
 

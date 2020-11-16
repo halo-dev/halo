@@ -6,6 +6,7 @@ import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.PutObjectResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -18,8 +19,10 @@ import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
-import java.awt.image.BufferedImage;
+import javax.imageio.ImageReader;
 import java.util.Objects;
+
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Ali oss file handler.
@@ -39,7 +42,7 @@ public class AliOssFileHandler implements FileHandler {
     }
 
     @Override
-    public UploadResult upload(MultipartFile file) {
+    public @NotNull UploadResult upload(@NotNull MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
@@ -60,23 +63,23 @@ public class AliOssFileHandler implements FileHandler {
 
         if (StringUtils.isNotEmpty(domain)) {
             basePath.append(domain)
-                    .append("/");
+                    .append(URL_SEPARATOR);
         } else {
             basePath.append(bucketName)
                     .append(".")
                     .append(endPoint)
-                    .append("/");
+                    .append(URL_SEPARATOR);
         }
 
         try {
-            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             StringBuilder upFilePath = new StringBuilder();
 
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
-                        .append("/");
+                        .append(URL_SEPARATOR);
             }
 
             upFilePath.append(basename)
@@ -106,9 +109,10 @@ public class AliOssFileHandler implements FileHandler {
 
             // Handle thumbnail
             if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                BufferedImage image = ImageUtils.getImageFromFile(file.getInputStream(), extension);
-                uploadResult.setWidth(image.getWidth());
-                uploadResult.setHeight(image.getHeight());
+                ImageReader image = ImageUtils.getImageReaderFromFile(file.getInputStream(), extension);
+                assert image != null;
+                uploadResult.setWidth(image.getWidth(0));
+                uploadResult.setHeight(image.getHeight(0));
                 if (ImageUtils.EXTENSION_ICO.equals(extension)) {
                     uploadResult.setThumbPath(filePath);
                 } else {
@@ -116,23 +120,17 @@ public class AliOssFileHandler implements FileHandler {
                 }
             }
 
+            log.info("Uploaded file: [{}] successfully", file.getOriginalFilename());
             return uploadResult;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ", e).setErrorData(file.getOriginalFilename());
         } finally {
             ossClient.shutdown();
         }
-
-        // Build result
-        UploadResult result = new UploadResult();
-
-        log.info("File: [{}] uploaded successfully", file.getOriginalFilename());
-
-        return result;
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(@NotNull String key) {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
@@ -154,7 +152,8 @@ public class AliOssFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean supportType(AttachmentType type) {
-        return AttachmentType.ALIOSS.equals(type);
+    public AttachmentType getAttachmentType() {
+        return AttachmentType.ALIOSS;
     }
+
 }

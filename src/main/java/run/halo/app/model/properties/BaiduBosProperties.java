@@ -1,5 +1,7 @@
 package run.halo.app.model.properties;
 
+import run.halo.app.model.support.HaloConst;
+
 /**
  * Baidu bos properties.
  *
@@ -12,7 +14,7 @@ public enum BaiduBosProperties implements PropertyEnum {
     /**
      * Baidu bos domain protocol.
      */
-    BOS_PROTOCOL("bos_baidu_domain_protocol", String.class, "https://"),
+    BOS_PROTOCOL("bos_baidu_domain_protocol", String.class, HaloConst.PROTOCOL_HTTPS),
 
     /**
      * Baidu bos domain.

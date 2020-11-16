@@ -16,12 +16,15 @@ import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.repository.PostCategoryRepository;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Post category service implementation.
@@ -40,13 +43,17 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
     private final CategoryRepository categoryRepository;
 
+    private final OptionService optionService;
+
     public PostCategoryServiceImpl(PostCategoryRepository postCategoryRepository,
-                                   PostRepository postRepository,
-                                   CategoryRepository categoryRepository) {
+            PostRepository postRepository,
+            CategoryRepository categoryRepository,
+            OptionService optionService) {
         super(postCategoryRepository);
         this.postCategoryRepository = postCategoryRepository;
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
+        this.optionService = optionService;
     }
 
     @Override
@@ -113,7 +120,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(slug, "Category slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Category category = categoryRepository.getBySlugName(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+        Category category = categoryRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
 
         Set<Integer> postsIds = postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
 
@@ -241,6 +248,21 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
                     CategoryWithPostCountDTO categoryWithPostCountDTO = new CategoryWithPostCountDTO().convertFrom(category);
                     // Set post count
                     categoryWithPostCountDTO.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+
+                    StringBuilder fullPath = new StringBuilder();
+
+                    if (optionService.isEnabledAbsolutePath()) {
+                        fullPath.append(optionService.getBlogBaseUrl());
+                    }
+
+                    fullPath.append(URL_SEPARATOR)
+                            .append(optionService.getCategoriesPrefix())
+                            .append(URL_SEPARATOR)
+                            .append(category.getSlug())
+                            .append(optionService.getPathSuffix());
+
+                    categoryWithPostCountDTO.setFullPath(fullPath.toString());
+
                     return categoryWithPostCountDTO;
                 })
                 .collect(Collectors.toList());

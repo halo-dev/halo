@@ -21,11 +21,11 @@ public interface BaseMetaService<META extends BaseMeta> extends CrudService<META
     /**
      * Creates by post metas and post id.
      *
-     * @param postId    post id must not be null
-     * @param postMetas post metas must not be null
+     * @param postId post id must not be null
+     * @param metas  metas must not be null
      * @return a list of post meta
      */
-    List<META> createOrUpdateByPostId(@NonNull Integer postId, Set<META> postMetas);
+    List<META> createOrUpdateByPostId(@NonNull Integer postId, Set<META> metas);
 
     /**
      * Remove post metas by post id.
