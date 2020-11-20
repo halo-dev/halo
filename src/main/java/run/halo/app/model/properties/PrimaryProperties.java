@@ -28,7 +28,12 @@ public enum PrimaryProperties implements PropertyEnum {
     /**
      * developer mode.
      */
-    DEV_MODE("developer_mode", Boolean.class, "false");
+    DEV_MODE("developer_mode", Boolean.class, "false"),
+
+    /**
+     * default menu team name
+     */
+    DEFAULT_MENU_TEAM("default_menu_team", String.class, "");
 
     private final String value;
 

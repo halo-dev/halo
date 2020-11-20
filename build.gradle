@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "run.halo.app"
-version = "1.4.1"
+version = "1.4.2"
 description = "Halo, An excellent open source blog publishing application."
 
 java {
@@ -51,6 +51,7 @@ ext {
     qcloudSdkVersion = "5.6.25"
     minioSdkVersion = "7.1.4"
     swaggerVersion = "2.9.2"
+    commonsFileUploadVersion = "1.4"
     commonsLangVersion = "3.10"
     httpclientVersion = "4.5.12"
     dataformatYamlVersion = "2.11.0"
@@ -92,6 +93,7 @@ dependencies {
     implementation "io.minio:minio:$minioSdkVersion"
     implementation "io.springfox:springfox-swagger2:$swaggerVersion"
     implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
+    implementation "commons-fileupload:commons-fileupload:$commonsFileUploadVersion"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation "org.apache.httpcomponents:httpclient:$httpclientVersion"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:$dataformatYamlVersion"
@@ -136,4 +138,8 @@ dependencies {
 //    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: "$powermockVersion"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
+}
+
+test {
+    useJUnitPlatform()
 }

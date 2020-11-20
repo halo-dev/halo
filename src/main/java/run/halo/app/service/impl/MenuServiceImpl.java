@@ -137,15 +137,11 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
 
     @Override
     public @NotNull Menu create(@NotNull Menu menu) {
-        nameMustNotExist(menu);
-
         return super.create(menu);
     }
 
     @Override
     public @NotNull Menu update(@NotNull Menu menu) {
-        nameMustNotExist(menu);
-
         return super.update(menu);
     }
 
@@ -215,6 +211,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
                 .collect(Collectors.toList());
     }
 
+    @Deprecated
     private void nameMustNotExist(@NonNull Menu menu) {
         Assert.notNull(menu, "Menu must not be null");
 

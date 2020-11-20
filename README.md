@@ -20,16 +20,6 @@
 
 > [官网 & 文档](https://halo.run) | [社区](https://bbs.halo.run) | [Telegram 频道](https://t.me/halo_dev)
 
-## 声明
-
-> 本项目旨在创造一个好的产品以供人们使用（虽然现在并不是太好），并非一个所谓提供学习的项目。所以，不提供任何学习代码的帮助。也请不要在讨论群，issues，论坛发起任何有关代码学习的问题。当然，如果你是要参与代码贡献，我们非常欢迎。
-
-另外，写给想自己拉代码编译运行的同学：
-
-> 目前我们的开发分支即 master，肯定会有很多小问题，不要运行不起来就跑过来吐槽什么代码开源不完整之类的，多找找自己的原因。同时建议下载最新 release 版本的代码，或者在 master 分支执行 `git checkout v1.3.2`。
-
-PS：实在不想写这个声明（影响 README 的美观），但是就目前来看，写在 README 上是有必要的，因为大部分遇到问题的人都不会去仔细阅读文档。
-
 ## 快速开始
 
 ### 下载最新的 Halo 安装包
@@ -37,13 +27,13 @@ PS：实在不想写这个声明（影响 README 的美观），但是就目前�
 > 其他地址：https://halo.run/archives/download.html
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.3.2/halo-1.3.2.jar --output halo-latest.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar --output halo-latest.jar
 ```
 
 或者
 
 ```bash
-wget https://github.com/halo-dev/halo/releases/download/v1.3.2/halo-1.3.2.jar -O halo-latest.jar
+wget https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar -O halo-latest.jar
 ```
 
 ### 启动 Halo
@@ -82,31 +72,3 @@ java -jar halo-latest.jar
 
 - 一次性赞助：<https://sponsor.halo.run>
 - 周期性赞助：<https://afdian.net/@halo-dev>
-
-## 预览图
-
-![theme-anatole.png](https://i.loli.net/2019/09/11/OQtKEWcCe8xYBph.png)
-
-![theme-icarus.png](https://i.loli.net/2019/09/11/4lO2wNCLiqyIJmR.png)
-
-![install.png](https://i.loli.net/2019/09/11/Iu1eMzZDg6frw97.png)
-
-![admin-login.png](https://i.loli.net/2019/09/11/3CahVJAvXngwiQu.png)
-
-![admin-dashboard.png](https://i.loli.net/2019/09/11/G5R6bOweYoiZKEv.png)
-
-![admin-posts.png](https://i.loli.net/2019/09/11/uMHSeIkmC4iPzfJ.png)
-
-![admin-post-edit.png](https://i.loli.net/2019/09/11/ucDh2tOZLJGTyHX.png)
-
-![admin-post-publish.png](https://i.loli.net/2019/09/11/UwC3ecsRpAMONgq.png)
-
-![admin-post-settings.png](https://i.loli.net/2019/09/11/bxmJ7OTirtvV4Gs.png)
-
-![admin-attachment.png](https://i.loli.net/2019/09/11/B5UlX6vAgZ3bzaJ.png)
-
-![admin-profile.png](https://i.loli.net/2019/09/11/mMageUXv5EDpfJQ.png)
-
-![admin-themes.png](https://i.loli.net/2019/09/11/FVA953Ljswd4c8G.png)
-
-![admin-options.png](https://i.loli.net/2019/09/11/TK6SeMdVj1xcrDw.png)

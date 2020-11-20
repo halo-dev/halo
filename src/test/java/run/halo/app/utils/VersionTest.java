@@ -135,13 +135,12 @@ class VersionTest {
     @Test
     void unknownVersionTest() {
         Optional<Version> unknownVersionOpt = Version.resolve(HaloConst.UNKNOWN_VERSION);
-        assertTrue(unknownVersionOpt.isPresent());
-        assertEquals(new Version(0, 0, 0), unknownVersionOpt.get());
+        assertEquals(new Version(Long.MAX_VALUE, Long.MAX_VALUE, Long.MAX_VALUE), unknownVersionOpt.get());
     }
 
     @Test
     void compareTest() {
-        Version leftVersion = getVersion("1.2.3");
+        final Version leftVersion = getVersion("1.2.3");
         // compare with own
         assertEquals(0, leftVersion.compareTo(leftVersion));
 
@@ -170,8 +169,8 @@ class VersionTest {
         rightVersion = getVersion("1.2.4-alpha.0");
         assertTrue(leftVersion.compareTo(rightVersion) < 0);
 
-        // compare with unkown version
-        assertTrue(leftVersion.compareTo(getVersion(HaloConst.UNKNOWN_VERSION)) > 0);
+        // compare with unknown version
+        assertTrue(leftVersion.compareTo(getVersion(HaloConst.UNKNOWN_VERSION)) < 0);
     }
 
     @NonNull
