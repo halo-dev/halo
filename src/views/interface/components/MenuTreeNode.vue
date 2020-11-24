@@ -146,10 +146,12 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 300,
+        animation: 100,
         group: 'description',
         disabled: false,
         ghostClass: 'ghost',
+        forceFallback: true,
+        emptyInsertThreshold: 20,
       }
     },
     realValue() {

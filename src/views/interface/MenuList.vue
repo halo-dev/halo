@@ -93,7 +93,12 @@
         :xs="24"
         class="pb-3"
       >
-        <a-card :bodyStyle="{ padding: '16px' }">
+        <a-card
+          :bodyStyle="{ padding: '16px' }"
+          ref="mheader"
+          :class="{ 'card-header-fixed': headerIsFixed }"
+          :headStyle="headStyle"
+        >
           <template slot="title">
             <span>
               {{ menuListTitle }}
@@ -220,6 +225,8 @@ export default {
       menuInternalLinkSelector: {
         visible: false,
       },
+      headerIsFixed: false,
+      headStyle: {},
     }
   },
   computed: {
@@ -260,9 +267,15 @@ export default {
     defaultMenuTeam() {
       return this.options.default_menu_team ? this.options.default_menu_team : ''
     },
+    mHeaderFromTopAbs() {
+      return Math.floor(Math.abs(this.mHeaderFromTop))
+    },
   },
   created() {
     this.handleListTeams()
+  },
+  mounted() {
+    window.addEventListener('scroll', this.scrollHandle, true)
   },
   methods: {
     ...mapActions(['refreshOptionsCache']),
@@ -401,6 +414,13 @@ export default {
         this.teams.default.errored = false
       } else {
         this.refreshOptionsCache()
+      }
+    },
+
+    scrollHandle: function(e) {
+      if (this.$refs.mheader.$el !== undefined) {
+        this.headerIsFixed = this.$refs.mheader.$el.getBoundingClientRect().top < 0
+        this.$set(this.headStyle, 'width', this.$refs.mheader.$el.offsetWidth + 'px')
       }
     },
   },
