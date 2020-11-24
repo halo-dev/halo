@@ -53,6 +53,15 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         this.workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
     }
 
+    /**
+     *
+     * @param sourceAttachmentTypeId source attachment type id (e.g. 0,1,2), default = -1 (All AttachmentTypes).
+     * @param deleteOldAttachment    Whether to delete old attachments, default = false.
+     * @param uploadAllInAttachment  Whether to upload all attachments, default = false.
+     * @param uploadAllInPost        Whether to download and upload all pictures in the all posts, default = false.
+     * @return Future<String>
+     */
+
     @Async
     public Future<String> covertHandlerByPosts(
             Integer sourceAttachmentTypeId,
@@ -81,7 +90,6 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             return new AsyncResult<>("Covert attachment handler Failed!" + e.toString());
         }
     }
-
 
     private void doCovertHandlerByPosts(
             Integer attachmentTypeId,
@@ -136,6 +144,14 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         }
     }
 
+    /**
+     * Is the attachment cited in the post
+     *
+     * @param pathInPost  the path in Post
+     * @param pathInAttachment the path in Attachment library
+     * @return Is the attachment cited in the post
+     * @throws UnsupportedEncodingException url encode
+     */
     private Boolean attachmentInPost(String pathInPost, String pathInAttachment) throws UnsupportedEncodingException {
         if (null == pathInPost || null == pathInAttachment) {
             return false;
@@ -143,6 +159,10 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         return pathInPost.contains(pathInAttachment) || pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment));
     }
 
+    /**
+     * Delete the old attachment from the source handler
+     * @param attachmentId attachment id
+     */
     private void doDeleteAttachment(Integer attachmentId) {
         try {
             attachmentService.removePermanently(attachmentId);
@@ -152,6 +172,16 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         }
     }
 
+    /**
+     * Update the attachment path in the post
+     *
+     * @param oldAttachmentPath  old Attachment Path
+     * @param fileBaseName file Base Name
+     * @param pathInPosts path In Posts
+     * @param stringBuilder to update post content
+     * @return update success or not
+     * @throws IOException Attachment delete Exception
+     */
     private Boolean updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
         Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
         if (null != newAttachment) {
@@ -172,6 +202,14 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         return false;
     }
 
+    /**
+     * Download the attachment and return to the temporary file path
+     *
+     * @param urlStr attachment url
+     * @param fileBaseName file Base Name
+     * @return tmp Attachment Path
+     * @throws IOException File writing exception
+     */
     private String getTmpAttachmentPath(String urlStr, String fileBaseName) throws IOException {
         if (!FilenameUtils.getExtension(urlStr).equals(FilenameUtils.getExtension(fileBaseName))) {
             fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
@@ -194,6 +232,14 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         return tmpAttachmentPath;
     }
 
+    /**
+     * upload File to current handler
+     *
+     * @param oldAttachmentPath old Attachment Path
+     * @param fileBaseName file Base Name
+     * @return new attachment or null
+     * @throws IOException IOException
+     */
     private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) throws IOException {
         File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
         try {
