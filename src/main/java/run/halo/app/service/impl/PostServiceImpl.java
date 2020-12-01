@@ -872,6 +872,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                     .append(URL_SEPARATOR)
                     .append(post.getSlug())
                     .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID_SLUG)) {
+            fullPath.append(archivesPrefix)
+                    .append(URL_SEPARATOR)
+                    .append(post.getId())
+                    .append(pathSuffix);
         }
         return fullPath.toString();
     }
