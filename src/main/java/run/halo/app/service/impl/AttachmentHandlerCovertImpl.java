@@ -189,6 +189,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
         if (null != newAttachment) {
             String newAttachmentPath = attachmentService.convertToDto(newAttachment).getPath();
+            newAttachmentPath = AttachmentHandlerCovertUtils.encodeFileBaseName(newAttachmentPath);
             for (Integer postId : pathInPosts) {
                 Post post = postService.getById(postId);
                 stringBuilder.append(post.getOriginalContent());
@@ -241,17 +242,22 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @param oldAttachmentPath old Attachment Path
      * @param fileBaseName      file Base Name
      * @return new attachment or null
-     * @throws IOException IOException
      */
-    private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) throws IOException {
-        File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
+    private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) {
         try {
-            if (tmpAttachment.exists()) {
-                MultipartFile multipartFile = AttachmentHandlerCovertUtils.getMultipartFile(tmpAttachment);
-                return attachmentService.upload(multipartFile);
-            } else {
-                log.warn("Can not download file: {}", oldAttachmentPath);
-            }
+            File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
+            return uploadAttachment(tmpAttachment, oldAttachmentPath);
+        } catch (IOException e) {
+            log.warn("Can not download file: {}", oldAttachmentPath);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Attachment uploadAttachment(File tmpAttachment, String oldAttachmentPath) throws IOException {
+        try {
+            MultipartFile multipartFile = AttachmentHandlerCovertUtils.getMultipartFile(tmpAttachment);
+            return attachmentService.upload(multipartFile);
         } catch (Exception e) {
             log.warn("Can not upload file: {}\n{}", oldAttachmentPath, e.toString());
             e.printStackTrace();
