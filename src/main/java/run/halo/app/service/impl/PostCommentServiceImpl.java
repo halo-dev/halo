@@ -158,6 +158,11 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment> 
                     .append(URL_SEPARATOR)
                     .append(post.getSlug())
                     .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID_SLUG)) {
+            fullPath.append(archivesPrefix)
+                    .append(URL_SEPARATOR)
+                    .append(post.getId())
+                    .append(pathSuffix);
         }
 
         post.setFullPath(fullPath.toString());
