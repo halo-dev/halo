@@ -442,6 +442,8 @@ export default {
           )}${this.selectedPost.slug ? this.selectedPost.slug : '{slug}'}${pathSuffix}`
         case 'ID':
           return `${blogUrl}/?p=${this.selectedPost.id ? this.selectedPost.id : '{id}'}`
+        case 'ID_SLUG':
+          return `${blogUrl}/${archivesPrefix}/${this.selectedPost.id ? this.selectedPost.id : '{id}'}${pathSuffix}`
         default:
           return ''
       }

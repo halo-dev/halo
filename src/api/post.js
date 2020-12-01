@@ -145,6 +145,10 @@ postApi.permalinkType = {
   ID: {
     type: 'ID',
     text: 'ID 型'
+  },
+  ID_SLUG: {
+    type: 'ID_SLUG',
+    text: 'ID 别名型'
   }
 }
 export default postApi
