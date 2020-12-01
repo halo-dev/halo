@@ -38,25 +38,25 @@ public class AttachmentHandlerCovertUtils {
     private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 
-    private static final BitSet dontNeedEncoding;
+    private static final BitSet DONT_NEED_ENCODING;
 
     static {
-        dontNeedEncoding = new BitSet(256);
+        DONT_NEED_ENCODING = new BitSet(256);
         int i;
         for (i = 'a'; i <= 'z'; i++) {
-            dontNeedEncoding.set(i);
+            DONT_NEED_ENCODING.set(i);
         }
         for (i = 'A'; i <= 'Z'; i++) {
-            dontNeedEncoding.set(i);
+            DONT_NEED_ENCODING.set(i);
         }
         for (i = '0'; i <= '9'; i++) {
-            dontNeedEncoding.set(i);
+            DONT_NEED_ENCODING.set(i);
         }
-        dontNeedEncoding.set('+');
-        dontNeedEncoding.set('-');
-        dontNeedEncoding.set('_');
-        dontNeedEncoding.set('.');
-        dontNeedEncoding.set('*');
+        DONT_NEED_ENCODING.set('+');
+        DONT_NEED_ENCODING.set('-');
+        DONT_NEED_ENCODING.set('_');
+        DONT_NEED_ENCODING.set('.');
+        DONT_NEED_ENCODING.set('*');
     }
 
     private AttachmentHandlerCovertUtils() {
@@ -228,7 +228,6 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
-     *
      * @param url urlString
      * @return urlString, conforming to the url specification
      * @throws UnsupportedEncodingException default utf-8
@@ -239,7 +238,7 @@ public class AttachmentHandlerCovertUtils {
         if (hasUrlEncoded(fileName)) {
             return url;
         } else {
-            return baseUrl + URLEncoder.encode(fileName, CHARACTER_SET_JDK8).replaceAll("\\+", "%20");
+            return baseUrl + URLEncoder.encode(fileName, CHARACTER_SET_JDK8).replace("+", "%20");
         }
     }
 
@@ -253,7 +252,7 @@ public class AttachmentHandlerCovertUtils {
         boolean needEncode = false;
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
-            if (dontNeedEncoding.get((int) c)) {
+            if (DONT_NEED_ENCODING.get((int) c)) {
                 continue;
             }
             if (c == '%' && (i + 2) < str.length()) {
