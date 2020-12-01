@@ -1,5 +1,7 @@
 package run.halo.app.service;
 
+import run.halo.app.model.enums.AttachmentType;
+
 import java.util.concurrent.Future;
 
 public interface AttachmentHandlerCovertService {
@@ -23,7 +25,7 @@ public interface AttachmentHandlerCovertService {
      * @return AsyncResult<String>
      */
     Future<String> covertHandlerByPosts(
-            Integer sourceAttachmentTypeId,
+            AttachmentType sourceAttachmentTypeId,
             Boolean deleteOldAttachment,
             Boolean uploadAllInAttachment,
             Boolean uploadAllInPost);

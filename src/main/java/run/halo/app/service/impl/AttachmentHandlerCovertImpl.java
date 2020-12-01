@@ -12,6 +12,7 @@ import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.handler.file.FileHandler;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.service.AttachmentHandlerCovertService;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.PostService;
@@ -47,6 +48,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
     private final String workDir;
 
+    private static final String CHARACTER_SET_JDK8 = "utf-8";
+
     public AttachmentHandlerCovertImpl(PostService postService, AttachmentService attachmentService, HaloProperties haloProperties) {
         this.postService = postService;
         this.attachmentService = attachmentService;
@@ -54,7 +57,6 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     /**
-     *
      * @param sourceAttachmentTypeId source attachment type id (e.g. 0,1,2), default = -1 (All AttachmentTypes).
      * @param deleteOldAttachment    Whether to delete old attachments, default = false.
      * @param uploadAllInAttachment  Whether to upload all attachments, default = false.
@@ -64,7 +66,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
     @Async
     public Future<String> covertHandlerByPosts(
-            Integer sourceAttachmentTypeId,
+            AttachmentType sourceAttachmentTypeId,
             Boolean deleteOldAttachment,
             Boolean uploadAllInAttachment,
             Boolean uploadAllInPost) {
@@ -92,7 +94,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     private void doCovertHandlerByPosts(
-            Integer attachmentTypeId,
+            AttachmentType attachmentTypeId,
             Boolean deleteOldAttachment,
             Boolean uploadAllInAttachment,
             Boolean uploadAllInPost) throws IOException {
@@ -147,7 +149,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     /**
      * Is the attachment cited in the post
      *
-     * @param pathInPost  the path in Post
+     * @param pathInPost       the path in Post
      * @param pathInAttachment the path in Attachment library
      * @return Is the attachment cited in the post
      * @throws UnsupportedEncodingException url encode
@@ -161,6 +163,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
     /**
      * Delete the old attachment from the source handler
+     *
      * @param attachmentId attachment id
      */
     private void doDeleteAttachment(Integer attachmentId) {
@@ -175,10 +178,10 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     /**
      * Update the attachment path in the post
      *
-     * @param oldAttachmentPath  old Attachment Path
-     * @param fileBaseName file Base Name
-     * @param pathInPosts path In Posts
-     * @param stringBuilder to update post content
+     * @param oldAttachmentPath old Attachment Path
+     * @param fileBaseName      file Base Name
+     * @param pathInPosts       path In Posts
+     * @param stringBuilder     to update post content
      * @return update success or not
      * @throws IOException Attachment delete Exception
      */
@@ -205,7 +208,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     /**
      * Download the attachment and return to the temporary file path
      *
-     * @param urlStr attachment url
+     * @param urlStr       attachment url
      * @param fileBaseName file Base Name
      * @return tmp Attachment Path
      * @throws IOException File writing exception
@@ -221,7 +224,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                     AttachmentHandlerCovertUtils.encodeFileBaseName(urlStr),
                     tmpAttachmentPath);
         } else {
-            String oldAttachmentPath = URLDecoder.decode(String.valueOf(Paths.get(workDir, urlStr)), "utf-8");
+            String oldAttachmentPath = URLDecoder.decode(String.valueOf(Paths.get(workDir, urlStr)), CHARACTER_SET_JDK8);
             File oldAttachment = new File(oldAttachmentPath);
             File tmpAttachment = new File(tmpAttachmentPath);
             if (oldAttachment.exists()) {
@@ -236,7 +239,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * upload File to current handler
      *
      * @param oldAttachmentPath old Attachment Path
-     * @param fileBaseName file Base Name
+     * @param fileBaseName      file Base Name
      * @return new attachment or null
      * @throws IOException IOException
      */

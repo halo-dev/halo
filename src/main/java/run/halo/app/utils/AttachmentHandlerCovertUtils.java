@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.AttachmentType;
 
 import java.io.*;
 import java.net.*;
@@ -33,11 +34,12 @@ public class AttachmentHandlerCovertUtils {
     /**
      * Extract the image link in markdown.
      */
-
-
-    private static final Pattern PICTURE_MD_JDK_8 = Pattern.compile("!\\[.*]\\(.+\\)");
-
+    private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("!\\[.*]\\(.+\\)");
     private static final Pattern URL_MD = Pattern.compile("(?<=]\\()(.+)(?=\\))");
+
+    private static final Integer CONNECT_TIME_OUT = 10 * 1000; // 建立链接超时
+    private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
+    private static final String CHARACTER_SET_JDK8 = "utf-8";
 
     private AttachmentHandlerCovertUtils() {
 
@@ -80,7 +82,8 @@ public class AttachmentHandlerCovertUtils {
         URL url = new URL(urlStr);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setConnectTimeout(5 * 1000);
+        conn.setConnectTimeout(CONNECT_TIME_OUT); // 建立链接超时
+        conn.setReadTimeout(READ_TIME_OUT); // 下载超时
         if (conn.getResponseCode() == 200) {
             InputStream inStream = conn.getInputStream();
             byte[] data = readInputStream(inStream);
@@ -125,7 +128,7 @@ public class AttachmentHandlerCovertUtils {
     public static String getBaseNameFromUrl(String url) throws UnsupportedEncodingException {
         String fileBaseName = FilenameUtils.getBasename(url);
 
-        fileBaseName = URLDecoder.decode(fileBaseName, "utf-8");
+        fileBaseName = URLDecoder.decode(fileBaseName, CHARACTER_SET_JDK8);
 
         if (fileBaseName.length() > FILE_NAME_LIMIT) {
             fileBaseName = fileBaseName.substring(0, FILE_NAME_LIMIT);
@@ -163,7 +166,7 @@ public class AttachmentHandlerCovertUtils {
         Matcher m2;
         Map<String, List<Integer>> map = new HashMap<>();
         for (Post post : posts) {
-            m = PICTURE_MD_JDK_8.matcher(post.getOriginalContent());
+            m = PICTURE_MD_JDK8.matcher(post.getOriginalContent());
             while (m.find()) {
                 m2 = URL_MD.matcher(m.group());
                 if (m2.find() && null != map.get(m2.group())) {
@@ -196,10 +199,10 @@ public class AttachmentHandlerCovertUtils {
      * @param oldAttachments old attachments
      * @return Map<String, Integer> (attachment_path,attachment_id)
      */
-    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments, Integer attachmentTypeId) {
+    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments, AttachmentType attachmentTypeId) {
         Map<String, Integer> map = new HashMap<>();
         for (Attachment attachment : oldAttachments) {
-            if (-1 == attachmentTypeId || attachment.getType().getValue().equals(attachmentTypeId)) {
+            if (attachment.getType() == attachmentTypeId) {
                 map.put(attachment.getPath(), attachment.getId());
             }
         }
@@ -208,7 +211,7 @@ public class AttachmentHandlerCovertUtils {
 
     public static String encodeFileBaseName(String url) throws UnsupportedEncodingException {
         return url.substring(0, url.lastIndexOf("/") + 1)
-                + URLEncoder.encode(url.substring(url.lastIndexOf("/") + 1), "utf-8")
+                + URLEncoder.encode(url.substring(url.lastIndexOf("/") + 1), CHARACTER_SET_JDK8)
                 .replaceAll("\\+", "%20");
     }
 }
