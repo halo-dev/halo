@@ -111,4 +111,10 @@ public class JournalController {
         journalCommentParam.setContent(HtmlUtils.htmlEscape(journalCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
         return journalCommentService.convertTo(journalCommentService.createBy(journalCommentParam));
     }
+
+    @PostMapping("{id:\\d+}/likes")
+    @ApiOperation("Likes a journal")
+    public void like(@PathVariable("id") Integer id) {
+        journalService.increaseLike(id);
+    }
 }
