@@ -1,6 +1,7 @@
 package run.halo.app.model.properties;
 
 import run.halo.app.model.enums.PostPermalinkType;
+import run.halo.app.model.enums.SheetPermalinkType;
 
 /**
  * Permalink properties enum.
@@ -14,6 +15,11 @@ public enum PermalinkProperties implements PropertyEnum {
      * Post Permalink type.
      */
     POST_PERMALINK_TYPE("post_permalink_type", PostPermalinkType.class, PostPermalinkType.DEFAULT.name()),
+
+    /**
+     * Sheet Permalink type.
+     */
+    SHEET_PERMALINK_TYPE("sheet_permalink_type", SheetPermalinkType.class, SheetPermalinkType.SECONDARY.name()),
 
     /**
      * Categories prefix

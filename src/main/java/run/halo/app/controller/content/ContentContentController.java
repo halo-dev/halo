@@ -15,6 +15,7 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.enums.SheetPermalinkType;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
@@ -81,7 +82,12 @@ public class ContentContentController {
 
     @GetMapping("{prefix}")
     public String content(@PathVariable("prefix") String prefix,
+            @RequestParam(value = "token", required = false) String token,
             Model model) {
+        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.ROOT)) {
+            Sheet sheet = sheetService.getBySlug(prefix);
+            return sheetModel.content(sheet, token, model);
+        }
         if (optionService.getArchivesPrefix().equals(prefix)) {
             return postModel.archives(1, model);
         }
@@ -139,7 +145,7 @@ public class ContentContentController {
             }
         }
 
-        if (optionService.getSheetPrefix().equals(prefix)) {
+        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.SECONDARY) && optionService.getSheetPrefix().equals(prefix)) {
             Sheet sheet = sheetService.getBySlug(slug);
             return sheetModel.content(sheet, token, model);
         }
