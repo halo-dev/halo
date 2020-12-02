@@ -94,4 +94,19 @@ public interface JournalService extends CrudService<Journal, Integer> {
      */
     @NonNull
     Page<JournalWithCmtCountDTO> convertToCmtCountDto(@NonNull Page<Journal> journalPage);
+
+    /**
+     * Increases journal likes(1).
+     *
+     * @param id id must not be null
+     */
+    void increaseLike(@NonNull Integer id);
+
+    /**
+     * Increase journal likes.
+     *
+     * @param likes likes must not be less than 1
+     * @param id    id must not be null
+     */
+    void increaseLike(long likes, @NonNull Integer id);
 }
