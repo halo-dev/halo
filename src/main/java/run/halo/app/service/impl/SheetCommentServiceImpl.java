@@ -11,6 +11,7 @@ import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
+import run.halo.app.model.enums.SheetPermalinkType;
 import run.halo.app.model.vo.SheetCommentWithSheetVO;
 import run.halo.app.repository.SheetCommentRepository;
 import run.halo.app.repository.SheetRepository;
@@ -95,15 +96,23 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     private BasePostMinimalDTO buildSheetFullPath(BasePostMinimalDTO basePostMinimalDTO) {
         StringBuilder fullPath = new StringBuilder();
 
+        SheetPermalinkType permalinkType = optionService.getSheetPermalinkType();
+
         if (optionService.isEnabledAbsolutePath()) {
             fullPath.append(optionService.getBlogBaseUrl());
         }
 
-        fullPath.append(URL_SEPARATOR)
-                .append(optionService.getSheetPrefix())
-                .append(URL_SEPARATOR)
-                .append(basePostMinimalDTO.getSlug())
-                .append(optionService.getPathSuffix());
+        if (permalinkType.equals(SheetPermalinkType.SECONDARY)) {
+            fullPath.append(URL_SEPARATOR)
+                    .append(optionService.getSheetPrefix())
+                    .append(URL_SEPARATOR)
+                    .append(basePostMinimalDTO.getSlug())
+                    .append(optionService.getPathSuffix());
+        } else if (permalinkType.equals(SheetPermalinkType.ROOT)) {
+            fullPath.append(URL_SEPARATOR)
+                    .append(basePostMinimalDTO.getSlug())
+                    .append(optionService.getPathSuffix());
+        }
 
         basePostMinimalDTO.setFullPath(fullPath.toString());
         return basePostMinimalDTO;
