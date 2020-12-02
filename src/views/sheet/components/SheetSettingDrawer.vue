@@ -296,10 +296,20 @@ export default {
       return datetimeFormat(new Date(), 'YYYY-MM-DD HH:mm:ss')
     },
     fullPath() {
+      const permalinkType = this.options.sheet_permalink_type
       const blogUrl = this.options.blog_url
       const sheetPrefix = this.options.sheet_prefix
       const pathSuffix = this.options.path_suffix ? this.options.path_suffix : ''
-      return `${blogUrl}/${sheetPrefix}/${this.selectedSheet.slug ? this.selectedSheet.slug : '{slug}'}${pathSuffix}`
+      switch (permalinkType) {
+        case 'SECONDARY':
+          return `${blogUrl}/${sheetPrefix}/${
+            this.selectedSheet.slug ? this.selectedSheet.slug : '{slug}'
+          }${pathSuffix}`
+        case 'ROOT':
+          return `${blogUrl}/${this.selectedSheet.slug ? this.selectedSheet.slug : '{slug}'}${pathSuffix}`
+        default:
+          return ''
+      }
     },
   },
   methods: {
