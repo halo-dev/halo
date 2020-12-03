@@ -25,6 +25,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -155,10 +157,21 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @throws UnsupportedEncodingException url encode
      */
     private Boolean attachmentInPost(String pathInPost, String pathInAttachment) throws UnsupportedEncodingException {
+
         if (null == pathInPost || null == pathInAttachment) {
             return false;
         }
-        return pathInPost.contains(pathInAttachment) || pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment));
+
+        if (pathInPost.contains(pathInAttachment)) {
+            return true;
+        }
+
+        if (pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment))) {
+            return true;
+        }
+
+        return AttachmentHandlerCovertUtils.encodeFileBaseName(pathInPost)
+                .contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment));
     }
 
     /**
@@ -214,7 +227,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return tmp Attachment Path
      * @throws IOException File writing exception
      */
-    private String getTmpAttachmentPath(String urlStr, String fileBaseName) throws IOException {
+    private String getTmpAttachmentPath(String urlStr, String fileBaseName) throws IOException, NoSuchAlgorithmException, KeyManagementException {
         if (!FilenameUtils.getExtension(urlStr).equals(FilenameUtils.getExtension(fileBaseName))) {
             fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
         }
@@ -246,24 +259,20 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) {
         try {
             File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
-            return uploadAttachment(tmpAttachment, oldAttachmentPath);
-        } catch (IOException e) {
-            log.warn("Can not download file: {}", oldAttachmentPath);
+            return uploadAttachment(tmpAttachment);
+        } catch (Exception e) {
+            log.warn("Can not download or upload file: {}\n{}", oldAttachmentPath, e.toString());
             e.printStackTrace();
         }
         return null;
     }
 
-    private Attachment uploadAttachment(File tmpAttachment, String oldAttachmentPath) throws IOException {
+    private Attachment uploadAttachment(File tmpAttachment) throws IOException {
         try {
             MultipartFile multipartFile = AttachmentHandlerCovertUtils.getMultipartFile(tmpAttachment);
             return attachmentService.upload(multipartFile);
-        } catch (Exception e) {
-            log.warn("Can not upload file: {}\n{}", oldAttachmentPath, e.toString());
-            e.printStackTrace();
         } finally {
             Files.deleteIfExists(tmpAttachment.toPath());
         }
-        return null;
     }
 }

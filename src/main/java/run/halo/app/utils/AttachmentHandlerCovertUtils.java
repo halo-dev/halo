@@ -10,7 +10,10 @@ import run.halo.app.model.enums.AttachmentType;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,38 +32,18 @@ public class AttachmentHandlerCovertUtils {
     private static final int FILE_NAME_LIMIT = 64;
 
     /**
-     * Extract the image link in markdown.
+     * Extract the image link in markdown. 要求url具有扩展名
+     * {0,1000} 图片标题长度为0-1000
+     * {1,1000} 图片Url长度为1-1000
+     * {1,100} 图片扩展名长度为1-100
      */
-    private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("!\\[.*]\\(.+\\)");
-    private static final Pattern URL_MD = Pattern.compile("(?<=]\\()(.+)(?=\\))");
+    private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,100})(?=\\))");
 
     private static final Integer CONNECT_TIME_OUT = 10 * 1000; // 建立链接超时
     private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 
-    private static final BitSet DONT_NEED_ENCODING;
-
-    static {
-        DONT_NEED_ENCODING = new BitSet(256);
-        int i;
-        for (i = 'a'; i <= 'z'; i++) {
-            DONT_NEED_ENCODING.set(i);
-        }
-        for (i = 'A'; i <= 'Z'; i++) {
-            DONT_NEED_ENCODING.set(i);
-        }
-        for (i = '0'; i <= '9'; i++) {
-            DONT_NEED_ENCODING.set(i);
-        }
-        DONT_NEED_ENCODING.set('+');
-        DONT_NEED_ENCODING.set('-');
-        DONT_NEED_ENCODING.set('_');
-        DONT_NEED_ENCODING.set('.');
-        DONT_NEED_ENCODING.set('*');
-    }
-
     private AttachmentHandlerCovertUtils() {
-
     }
 
     /**
@@ -98,19 +81,18 @@ public class AttachmentHandlerCovertUtils {
      */
     public static void downloadFile(String urlStr, String downloadPath) throws IOException {
         URL url = new URL(urlStr);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
+        URLConnection conn = url.openConnection();
         conn.setConnectTimeout(CONNECT_TIME_OUT); // 建立链接超时
         conn.setReadTimeout(READ_TIME_OUT); // 下载超时
-        if (conn.getResponseCode() == 200) {
-            InputStream inStream = conn.getInputStream();
-            byte[] data = readInputStream(inStream);
-            File tmpAttachment = new File(downloadPath);
-            try (FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
-                outStream.write(data);
-            }
+        conn.setRequestProperty("User-Agent", "Mozilla");
+        conn.setRequestProperty("Accept","image/gif,image/jpeg,image/png,image/svg+xml");
+        InputStream inStream = conn.getInputStream();
+        byte[] data = readInputStream(inStream);
+        File tmpAttachment = new File(downloadPath);
+        try (FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
+            outStream.write(data);
         }
-        conn.disconnect();
+
     }
 
     public static byte[] readInputStream(InputStream inStream) throws IOException {
@@ -181,18 +163,16 @@ public class AttachmentHandlerCovertUtils {
      */
     public static Map<String, List<Integer>> getPathInPost(List<Post> posts) {
         Matcher m;
-        Matcher m2;
         Map<String, List<Integer>> map = new HashMap<>();
         for (Post post : posts) {
             m = PICTURE_MD_JDK8.matcher(post.getOriginalContent());
             while (m.find()) {
-                m2 = URL_MD.matcher(m.group());
-                if (m2.find() && null != map.get(m2.group())) {
-                    map.get(m2.group()).add(post.getId());
+                if (null != map.get(m.group())) {
+                    map.get(m.group()).add(post.getId());
                 } else {
                     List<Integer> list = new ArrayList<>();
                     list.add(post.getId());
-                    map.put(m2.group(), list);
+                    map.put(m.group(), list);
                 }
             }
 
@@ -235,40 +215,7 @@ public class AttachmentHandlerCovertUtils {
     public static String encodeFileBaseName(String url) throws UnsupportedEncodingException {
         String baseUrl = url.substring(0, url.lastIndexOf("/") + 1);
         String fileName = url.substring(url.lastIndexOf("/") + 1);
-        if (hasUrlEncoded(fileName)) {
-            return url;
-        } else {
-            return baseUrl + URLEncoder.encode(fileName, CHARACTER_SET_JDK8).replace("+", "%20");
-        }
-    }
-
-    /**
-     * Determine whether the String conforms to the Url specification
-     *
-     * @param str urlString
-     * @return Boolean
-     */
-    public static boolean hasUrlEncoded(String str) {
-        boolean needEncode = false;
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (DONT_NEED_ENCODING.get((int) c)) {
-                continue;
-            }
-            if (c == '%' && (i + 2) < str.length()) {
-                char c1 = str.charAt(++i);
-                char c2 = str.charAt(++i);
-                if (isDigit16Char(c1) && isDigit16Char(c2)) {
-                    continue;
-                }
-            }
-            needEncode = true;
-            break;
-        }
-        return !needEncode;
-    }
-
-    private static boolean isDigit16Char(char c) {
-        return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F');
+        fileName = URLDecoder.decode(fileName, CHARACTER_SET_JDK8);
+        return baseUrl + URLEncoder.encode(fileName, CHARACTER_SET_JDK8).replace("+", "%20");
     }
 }
