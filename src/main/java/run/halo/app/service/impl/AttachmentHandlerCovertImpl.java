@@ -50,30 +50,29 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 
-    public AttachmentHandlerCovertImpl(PostService postService,
-                                       AttachmentService attachmentService,
-                                       HaloProperties haloProperties) {
+    public AttachmentHandlerCovertImpl(
+            PostService postService, AttachmentService attachmentService, HaloProperties haloProperties) {
         this.postService = postService;
         this.attachmentService = attachmentService;
         this.workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
     }
 
     /**
-     * @param sourceAttachmentTypeId source attachment type id (e.g. 0,1,2), default = -1 (All AttachmentTypes).
-     * @param deleteOldAttachment    Whether to delete old attachments, default = false.
-     * @param uploadAllInAttachment  Whether to upload all attachments, default = false.
-     * @param uploadAllInPost        Whether to download and upload all pictures in the all posts, default = false.
+     * @param sourceAttachmentType  source attachment type id (e.g. 0,1,2), default = -1 (All AttachmentTypes).
+     * @param deleteOldAttachment   Whether to delete old attachments, default = false.
+     * @param uploadAllInAttachment Whether to upload all attachments, default = false.
+     * @param uploadAllInPost       Whether to download and upload all pictures in the all posts, default = false.
      * @return Future<String>
      */
 
     @Async
     public Future<String> covertHandlerByPosts(
-            AttachmentType sourceAttachmentTypeId,
-            Boolean deleteOldAttachment,
-            Boolean uploadAllInAttachment,
-            Boolean uploadAllInPost) {
-        String taskParams = MessageFormat.format("sourceAttachmentTypeId: {0}, deleteOldAttachment: {1}, uploadAllInAttachment: {2}, uploadAllInPost: {3}",
-                sourceAttachmentTypeId,
+            AttachmentType sourceAttachmentType, Boolean deleteOldAttachment,
+            Boolean uploadAllInAttachment, Boolean uploadAllInPost) {
+
+        String taskParams = MessageFormat.format(
+                "sourceAttachmentTypeId: {0}, deleteOldAttachment: {1}, uploadAllInAttachment: {2}, uploadAllInPost: {3}",
+                sourceAttachmentType,
                 deleteOldAttachment,
                 uploadAllInAttachment,
                 uploadAllInPost);
@@ -82,7 +81,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
         stopWatch.start(taskParams);
         try {
-            doCovertHandlerByPosts(sourceAttachmentTypeId, deleteOldAttachment, uploadAllInAttachment, uploadAllInPost);
+            doCovertHandlerByPosts(sourceAttachmentType, deleteOldAttachment, uploadAllInAttachment, uploadAllInPost);
             stopWatch.stop();
             String res = MessageFormat.format(
                     "Covert attachment handler has finished!\n{0}", stopWatch.prettyPrint());
@@ -98,13 +97,14 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     private void doCovertHandlerByPosts(
-            AttachmentType attachmentTypeId,
+            AttachmentType attachmentType,
             Boolean deleteOldAttachment,
             Boolean uploadAllInAttachment,
             Boolean uploadAllInPost) throws IOException {
 
         Map<String, List<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(postService.listAll());
-        Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils.getPathInAttachment(attachmentService.listAll(), attachmentTypeId);
+        Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils
+                .getPathInAttachment(attachmentService.listAll(), attachmentType);
         Iterator<Map.Entry<String, List<Integer>>> pathInPostsIterator = pathInPosts.entrySet().iterator();
         StringBuilder stringBuilder = new StringBuilder();
         while (pathInPostsIterator.hasNext()) {
@@ -148,8 +148,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         }
     }
 
-    private void doUploadAllInPost(Map<String, List<Integer>> pathInPosts,
-                                   StringBuilder stringBuilder) throws IOException {
+    private void doUploadAllInPost(
+            Map<String, List<Integer>> pathInPosts, StringBuilder stringBuilder) throws IOException {
+
         for (Map.Entry<String, List<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
             updatePostAttachment(
                     pathInPostEntry.getKey(),
@@ -209,8 +210,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return update success or not
      * @throws IOException Attachment delete Exception
      */
-    private Boolean updatePostAttachment(String oldAttachmentPath, String fileBaseName,
-                                         List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
+    private Boolean updatePostAttachment(
+            String oldAttachmentPath, String fileBaseName,
+            List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
         Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
         if (null != newAttachment) {
             String newAttachmentPath = attachmentService.convertToDto(newAttachment).getPath();

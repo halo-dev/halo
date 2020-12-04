@@ -197,10 +197,10 @@ public class AttachmentHandlerCovertUtils {
      * @param oldAttachments old attachments
      * @return Map<String, Integer> (attachment_path,attachment_id)
      */
-    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments, AttachmentType attachmentTypeId) {
+    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments, AttachmentType attachmentType) {
         Map<String, Integer> map = new HashMap<>();
         for (Attachment attachment : oldAttachments) {
-            if (attachment.getType() == attachmentTypeId) {
+            if (attachment.getType() == attachmentType) {
                 map.put(attachment.getPath(), attachment.getId());
             }
         }
