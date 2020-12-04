@@ -32,10 +32,10 @@ public class AttachmentHandlerCovertUtils {
     private static final int FILE_NAME_LIMIT = 64;
 
     /**
-     * Extract the image link in markdown. 要求url具有扩展名
-     * {0,1000} 图片标题长度为0-1000
-     * {1,1000} 图片Url长度为1-1000
-     * {1,100} 图片扩展名长度为1-100
+     * Extract the image link in markdown. Require url to have extension
+     * {0,1000} Image title length is 0-1000
+     * {1,1000} Image Url length is 1-1000
+     * {1,100} Image extension length is 1-100
      */
     private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,100})(?=\\))");
 

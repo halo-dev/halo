@@ -50,7 +50,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 
-    public AttachmentHandlerCovertImpl(PostService postService, AttachmentService attachmentService, HaloProperties haloProperties) {
+    public AttachmentHandlerCovertImpl(PostService postService,
+                                       AttachmentService attachmentService,
+                                       HaloProperties haloProperties) {
         this.postService = postService;
         this.attachmentService = attachmentService;
         this.workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
@@ -87,9 +89,11 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             log.info(res);
             return new AsyncResult<>(res);
         } catch (Exception e) {
-            log.info(e.toString());
+            String res = MessageFormat.format(
+                    "Covert attachment handler Failed!\n{0}", e.toString());
+            log.info(res);
             e.printStackTrace();
-            return new AsyncResult<>("Covert attachment handler Failed!" + e.toString());
+            return new AsyncResult<>(res);
         }
     }
 
@@ -144,7 +148,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         }
     }
 
-    private void doUploadAllInPost(Map<String, List<Integer>> pathInPosts, StringBuilder stringBuilder) throws IOException {
+    private void doUploadAllInPost(Map<String, List<Integer>> pathInPosts,
+                                   StringBuilder stringBuilder) throws IOException {
         for (Map.Entry<String, List<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
             updatePostAttachment(
                     pathInPostEntry.getKey(),
@@ -204,7 +209,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return update success or not
      * @throws IOException Attachment delete Exception
      */
-    private Boolean updatePostAttachment(String oldAttachmentPath, String fileBaseName, List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
+    private Boolean updatePostAttachment(String oldAttachmentPath, String fileBaseName,
+                                         List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
         Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
         if (null != newAttachment) {
             String newAttachmentPath = attachmentService.convertToDto(newAttachment).getPath();
