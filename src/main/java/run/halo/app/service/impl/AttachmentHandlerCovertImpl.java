@@ -25,8 +25,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -227,7 +225,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return tmp Attachment Path
      * @throws IOException File writing exception
      */
-    private String getTmpAttachmentPath(String urlStr, String fileBaseName) throws IOException, NoSuchAlgorithmException, KeyManagementException {
+    private String getTmpAttachmentPath(String urlStr, String fileBaseName) throws IOException {
         if (!FilenameUtils.getExtension(urlStr).equals(FilenameUtils.getExtension(fileBaseName))) {
             fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
         }

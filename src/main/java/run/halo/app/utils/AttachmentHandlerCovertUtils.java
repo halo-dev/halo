@@ -85,7 +85,7 @@ public class AttachmentHandlerCovertUtils {
         conn.setConnectTimeout(CONNECT_TIME_OUT); // 建立链接超时
         conn.setReadTimeout(READ_TIME_OUT); // 下载超时
         conn.setRequestProperty("User-Agent", "Mozilla");
-        conn.setRequestProperty("Accept","image/gif,image/jpeg,image/png,image/svg+xml");
+        conn.setRequestProperty("Accept", "image/gif,image/jpeg,image/png,image/svg+xml");
         InputStream inStream = conn.getInputStream();
         byte[] data = readInputStream(inStream);
         File tmpAttachment = new File(downloadPath);
