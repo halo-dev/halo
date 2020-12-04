@@ -125,24 +125,32 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         }
 
         if (Boolean.TRUE.equals(uploadAllInAttachment)) {
-            for (Map.Entry<String, Integer> pathInAttachmentEntry : pathInAttachments.entrySet()) {
-                Attachment newAttachment = uploadFile(
-                        pathInAttachmentEntry.getKey(),
-                        attachmentService.getById(pathInAttachmentEntry.getValue()).getName());
-                if (null != newAttachment && Boolean.TRUE.equals(deleteOldAttachment)) {
-                    doDeleteAttachment(pathInAttachmentEntry.getValue());
-                }
-            }
+            doUploadAllInAttachment(pathInAttachments, deleteOldAttachment);
         }
 
         if (Boolean.TRUE.equals(uploadAllInPost)) {
-            for (Map.Entry<String, List<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
-                updatePostAttachment(
-                        pathInPostEntry.getKey(),
-                        AttachmentHandlerCovertUtils.getBaseNameFromUrl(pathInPostEntry.getKey()),
-                        pathInPostEntry.getValue(),
-                        stringBuilder);
+            doUploadAllInPost(pathInPosts, stringBuilder);
+        }
+    }
+
+    private void doUploadAllInAttachment(Map<String, Integer> pathInAttachments, Boolean deleteOldAttachment) {
+        for (Map.Entry<String, Integer> pathInAttachmentEntry : pathInAttachments.entrySet()) {
+            Attachment newAttachment = uploadFile(
+                    pathInAttachmentEntry.getKey(),
+                    attachmentService.getById(pathInAttachmentEntry.getValue()).getName());
+            if (null != newAttachment && Boolean.TRUE.equals(deleteOldAttachment)) {
+                doDeleteAttachment(pathInAttachmentEntry.getValue());
             }
+        }
+    }
+
+    private void doUploadAllInPost(Map<String, List<Integer>> pathInPosts, StringBuilder stringBuilder) throws IOException {
+        for (Map.Entry<String, List<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
+            updatePostAttachment(
+                    pathInPostEntry.getKey(),
+                    AttachmentHandlerCovertUtils.getBaseNameFromUrl(pathInPostEntry.getKey()),
+                    pathInPostEntry.getValue(),
+                    stringBuilder);
         }
     }
 
