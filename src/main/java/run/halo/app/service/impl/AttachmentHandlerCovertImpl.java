@@ -178,12 +178,12 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             return true;
         }
 
-        if (pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment))) {
+        if (pathInPost.contains(AttachmentHandlerCovertUtils.encodeFileBaseName(false, pathInAttachment))) {
             return true;
         }
 
-        return AttachmentHandlerCovertUtils.encodeFileBaseName(pathInPost)
-                .contains(AttachmentHandlerCovertUtils.encodeFileBaseName(pathInAttachment));
+        return AttachmentHandlerCovertUtils.encodeFileBaseName(true, pathInPost)
+                .contains(AttachmentHandlerCovertUtils.encodeFileBaseName(false, pathInAttachment));
     }
 
     /**
@@ -216,7 +216,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
         if (null != newAttachment) {
             String newAttachmentPath = attachmentService.convertToDto(newAttachment).getPath();
-            newAttachmentPath = AttachmentHandlerCovertUtils.encodeFileBaseName(newAttachmentPath);
+            newAttachmentPath = AttachmentHandlerCovertUtils.encodeFileBaseName(false, newAttachmentPath);
             for (Integer postId : pathInPosts) {
                 Post post = postService.getById(postId);
                 stringBuilder.append(post.getOriginalContent());
@@ -239,27 +239,40 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @param urlStr       attachment url
      * @param fileBaseName file Base Name
      * @return tmp Attachment Path
-     * @throws IOException File writing exception
      */
-    private String getTmpAttachmentPath(String urlStr, String fileBaseName) throws IOException {
+    private String getTmpAttachmentPath(String urlStr, String fileBaseName) {
+
         if (!FilenameUtils.getExtension(urlStr).equals(FilenameUtils.getExtension(fileBaseName))) {
             fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
         }
+
         String tmpAttachmentPath = String.valueOf(Paths.get(FileUtils.getTempDirectoryPath(), fileBaseName));
 
-        if (urlStr.startsWith("http")) {
-            AttachmentHandlerCovertUtils.downloadFile(
-                    AttachmentHandlerCovertUtils.encodeFileBaseName(urlStr),
-                    tmpAttachmentPath);
-        } else {
-            String oldAttachmentPath = URLDecoder.decode(String.valueOf(Paths.get(workDir, urlStr)), CHARACTER_SET_JDK8);
-            File oldAttachment = new File(oldAttachmentPath);
-            File tmpAttachment = new File(tmpAttachmentPath);
-            if (oldAttachment.exists()) {
-                FileUtils.copyFile(oldAttachment, tmpAttachment);
-                FileUtils.waitFor(tmpAttachment, 100);
+        String eStr = "IOException caught in download by http: ";
+        try {
+            if (urlStr.startsWith("http")) {
+                try {
+                    AttachmentHandlerCovertUtils.downloadFile(urlStr, tmpAttachmentPath);
+                } catch (IOException e) {
+                    eStr += e.toString();
+                    AttachmentHandlerCovertUtils.downloadFile(
+                            AttachmentHandlerCovertUtils.encodeFileBaseName(false, urlStr),
+                            tmpAttachmentPath);
+                }
+            } else {
+                String oldAttachmentPath = URLDecoder.decode(String.valueOf(Paths.get(workDir, urlStr)), CHARACTER_SET_JDK8);
+                File oldAttachment = new File(oldAttachmentPath);
+                File tmpAttachment = new File(tmpAttachmentPath);
+                if (oldAttachment.exists()) {
+                    FileUtils.copyFile(oldAttachment, tmpAttachment);
+                    FileUtils.waitFor(tmpAttachment, 100);
+                }
             }
+        } catch (IOException e) {
+            eStr += "\n IOException caught in (download by https) or (copy files): " + e.toString();
+            log.warn("Can not download file: {}\n{}", urlStr, eStr);
         }
+
         return tmpAttachmentPath;
     }
 
@@ -271,11 +284,11 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return new attachment or null
      */
     private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) {
+        File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
         try {
-            File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
             return uploadAttachment(tmpAttachment);
         } catch (Exception e) {
-            log.warn("Can not download or upload file: {}\n{}", oldAttachmentPath, e.toString());
+            log.warn("Can not upload file: {}\n{}", tmpAttachment.getPath(), e.toString());
             e.printStackTrace();
         }
         return null;
