@@ -114,14 +114,14 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             Iterator<Map.Entry<String, Integer>> pathInAttachmentsIterator = pathInAttachments.entrySet().iterator();
             while (pathInAttachmentsIterator.hasNext()) {
                 Map.Entry<String, Integer> pathInAttachmentEntry = pathInAttachmentsIterator.next();
-                if (Boolean.TRUE.equals(attachmentInPost(pathInPostEntry.getKey(), pathInAttachmentEntry.getKey()))) {
+                if (attachmentInPost(pathInPostEntry.getKey(), pathInAttachmentEntry.getKey())) {
                     Attachment oldAttachment = attachmentService.getById(pathInAttachmentEntry.getValue());
-                    Boolean f = updatePostAttachment(
+                    boolean f = updatePostAttachment(
                             pathInPostEntry.getKey(),
                             oldAttachment.getName(),
                             pathInPostEntry.getValue(),
                             stringBuilder);
-                    if (Boolean.TRUE.equals(f) && Boolean.TRUE.equals(deleteOldAttachment)) {
+                    if (f && Boolean.TRUE.equals(deleteOldAttachment)) {
                         doDeleteAttachment(pathInAttachmentEntry.getValue());
                     }
                     pathInAttachmentsIterator.remove();
@@ -171,7 +171,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return Is the attachment cited in the post
      * @throws UnsupportedEncodingException url encode
      */
-    private Boolean attachmentInPost(String pathInPost, String pathInAttachment) throws UnsupportedEncodingException {
+    private boolean attachmentInPost(String pathInPost, String pathInAttachment) throws UnsupportedEncodingException {
 
         if (null == pathInPost || null == pathInAttachment) {
             return false;
@@ -213,7 +213,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return update success or not
      * @throws IOException Attachment delete Exception
      */
-    private Boolean updatePostAttachment(
+    private boolean updatePostAttachment(
             String oldAttachmentPath, String fileBaseName,
             List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
         Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
@@ -226,7 +226,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 AttachmentHandlerCovertUtils.strBuilderReplaceAll(stringBuilder, oldAttachmentPath, newAttachmentPath);
                 post.setOriginalContent(stringBuilder.toString());
                 stringBuilder.delete(0, stringBuilder.length());
-                if (Boolean.TRUE.equals(attachmentInPost(post.getThumbnail(), oldAttachmentPath))) {
+                if (attachmentInPost(post.getThumbnail(), oldAttachmentPath)) {
                     post.setThumbnail(newAttachmentPath);
                 }
                 postService.createOrUpdateBy(post);
