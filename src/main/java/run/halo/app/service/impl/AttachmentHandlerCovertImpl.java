@@ -17,7 +17,6 @@ import run.halo.app.service.AttachmentHandlerCovertService;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.PostService;
 import run.halo.app.utils.AttachmentHandlerCovertUtils;
-import run.halo.app.utils.FilenameUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +48,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     private final String workDir;
 
     private static final String CHARACTER_SET_JDK8 = "utf-8";
-    private static final String[] IMAGE_FORMATS = ".jpg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg".split(",");
+
 
     public AttachmentHandlerCovertImpl(
             PostService postService, AttachmentService attachmentService,
@@ -126,9 +125,10 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                         doDeleteAttachment(pathInAttachmentEntry.getValue());
                     }
                     pathInAttachmentsIterator.remove();
+                    pathInPostsIterator.remove();
+                    break;
                 }
             }
-            pathInPostsIterator.remove();
         }
 
         if (Boolean.TRUE.equals(uploadAllInAttachment)) {
@@ -245,8 +245,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      */
     private String getTmpAttachmentPath(String urlStr, String fileBaseName) {
 
-        if (!FilenameUtils.getExtension(urlStr).equals(FilenameUtils.getExtension(fileBaseName))) {
-            fileBaseName = fileBaseName + "." + FilenameUtils.getExtension(urlStr);
+        if (!AttachmentHandlerCovertUtils.getImageExtension(urlStr)
+                .equals(AttachmentHandlerCovertUtils.getImageExtension(fileBaseName))) {
+            fileBaseName = fileBaseName + "." + AttachmentHandlerCovertUtils.getImageExtension(urlStr);
         }
 
         String tmpAttachmentPath = String.valueOf(Paths.get(FileUtils.getTempDirectoryPath(), fileBaseName));
@@ -287,20 +288,11 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return new attachment or null
      */
     private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) {
-        int lastI = -1;
-        String extension = "";
-        for (String imageFormat : IMAGE_FORMATS) {
-            int tmpI = oldAttachmentPath.lastIndexOf(imageFormat);
-            if (tmpI > lastI) {
-                lastI = tmpI;
-                extension = imageFormat;
-            }
-        }
-        if (lastI != -1) {
-            oldAttachmentPath = oldAttachmentPath.substring(0, lastI) + extension;
-        }
 
-        File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
+        File tmpAttachment = new File(
+                getTmpAttachmentPath(AttachmentHandlerCovertUtils.splitStyleRule(oldAttachmentPath), fileBaseName)
+        );
+
         try {
             return uploadAttachment(tmpAttachment);
         } catch (Exception e) {

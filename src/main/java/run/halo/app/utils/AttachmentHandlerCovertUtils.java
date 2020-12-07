@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import run.halo.app.model.entity.Attachment;
@@ -10,7 +11,10 @@ import run.halo.app.model.enums.AttachmentType;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +43,8 @@ public class AttachmentHandlerCovertUtils {
     private static final Integer CONNECT_TIME_OUT = 5 * 1000; // 建立链接超时
     private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
     private static final String CHARACTER_SET_JDK8 = "utf-8";
+
+    private static final String[] IMAGE_FORMATS = ".jpg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg".split(",");
 
     private AttachmentHandlerCovertUtils() {
     }
@@ -110,27 +116,45 @@ public class AttachmentHandlerCovertUtils {
      * http://test.com/test.png
      * return test
      * <p>
-     * http://test.com/test.png
+     * http://test.com/test.png-stylerule
      * return tes (When FILE_NAME_LIMIT=3, default 64)
      * <p>
      * http://test.com/你好你好.png
      * return 你好你 (When FILE_NAME_LIMIT=3, default 64)
      * <p>
-     * http://test.com/%E4%BD%A0%E5%A5%BD%E4%BD%A0%E5%A5%BD.png
+     * http://test.com/%E4%BD%A0%E5%A5%BD%E4%BD%A0%E5%A5%BD.png-stylerule
      * return 你好你 (When FILE_NAME_LIMIT=3, default 64)
      *
      * @param url Extracted url
      * @return File Base Name
      */
     public static String getBaseNameFromUrl(String url) throws UnsupportedEncodingException {
-        String fileBaseName = FilenameUtils.getBasename(url);
+        int separatorLastIndex = StringUtils.lastIndexOf(url, '/');
+        int dotLastIndex = StringUtils.lastIndexOf(url, '.');
 
-        fileBaseName = URLDecoder.decode(fileBaseName, CHARACTER_SET_JDK8);
+        if (separatorLastIndex != -1 && separatorLastIndex < url.length() - 1 && dotLastIndex > separatorLastIndex) {
 
-        if (fileBaseName.length() > FILE_NAME_LIMIT) {
-            fileBaseName = fileBaseName.substring(0, FILE_NAME_LIMIT);
+            String fileBaseName = splitStyleRule(url.substring(separatorLastIndex + 1, dotLastIndex));
+            fileBaseName = URLDecoder.decode(fileBaseName, CHARACTER_SET_JDK8);
+
+            if (fileBaseName.length() > FILE_NAME_LIMIT) {
+                fileBaseName = fileBaseName.substring(0, FILE_NAME_LIMIT);
+            }
+            return fileBaseName;
         }
-        return fileBaseName;
+
+        return StringUtils.EMPTY;
+    }
+
+    public static String getImageExtension(String url) {
+        int lastI = -1;
+        for (String imageFormat : IMAGE_FORMATS) {
+            int tmpI = url.lastIndexOf(imageFormat);
+            if (tmpI > lastI) {
+                lastI = tmpI;
+            }
+        }
+        return url.substring(lastI + 1);
     }
 
 
@@ -163,7 +187,7 @@ public class AttachmentHandlerCovertUtils {
         Map<String, List<Integer>> map = new HashMap<>();
         for (Post post : posts) {
             m = PICTURE_MD_JDK8.matcher(post.getOriginalContent());
-            while (m.find()) {
+            while (m.find() && !"".equals(m.group())) {
                 if (null != map.get(m.group())) {
                     map.get(m.group()).add(post.getId());
                 } else {
@@ -173,7 +197,7 @@ public class AttachmentHandlerCovertUtils {
                 }
             }
 
-            if (null != post.getThumbnail()) {
+            if (null != post.getThumbnail() && !"".equals(post.getThumbnail())) {
                 if (null != map.get(post.getThumbnail())) {
                     map.get(post.getThumbnail()).add(post.getId());
                 } else {
@@ -188,7 +212,7 @@ public class AttachmentHandlerCovertUtils {
 
     /**
      * Extract the path of all attachments,
-     * the ket is attachment_path,
+     * the key is attachment_path,
      * the value is attachment_id.
      *
      * @param oldAttachments old attachments
@@ -217,5 +241,22 @@ public class AttachmentHandlerCovertUtils {
         }
 
         return baseUrl + URLEncoder.encode(fileName, CHARACTER_SET_JDK8).replace("+", "%20");
+    }
+
+
+    public static String splitStyleRule(String url) {
+        int lastI = -1;
+        String extension = "";
+        for (String imageFormat : IMAGE_FORMATS) {
+            int tmpI = url.lastIndexOf(imageFormat);
+            if (tmpI > lastI) {
+                lastI = tmpI;
+                extension = imageFormat;
+            }
+        }
+        if (lastI != -1) {
+            url = url.substring(0, lastI) + extension;
+        }
+        return url;
     }
 }
