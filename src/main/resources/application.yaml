@@ -50,6 +50,10 @@ logging:
   file:
     path: ${user.home}/.halo/logs
 
+springfox:
+  documentation:
+    enabled: false
+
 halo:
   download-timeout: 5m
   cache: memory

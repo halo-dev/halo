@@ -55,6 +55,10 @@ logging:
   file:
     path: ${user.home}/halo-demo/logs
 
+springfox:
+  documentation:
+    enabled: true
+
 halo:
   download-timeout: 5m
   doc-disabled: false

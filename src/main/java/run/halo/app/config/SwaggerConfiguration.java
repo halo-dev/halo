@@ -3,6 +3,7 @@ package run.halo.app.config;
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -21,9 +22,7 @@ import springfox.documentation.service.*;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.SecurityConfiguration;
-import springfox.documentation.swagger.web.SecurityConfigurationBuilder;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import springfox.documentation.swagger.web.*;
 
 import java.lang.reflect.Type;
 import java.time.temporal.Temporal;
@@ -39,9 +38,12 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
  *
  * @author johnniang
  */
-@EnableSwagger2
-@Configuration
 @Slf4j
+@Configuration
+@ConditionalOnProperty(
+        value = "springfox.documentation.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class SwaggerConfiguration {
 
     private final HaloProperties haloProperties;
@@ -60,16 +62,11 @@ public class SwaggerConfiguration {
 
     @Bean
     public Docket haloDefaultApi() {
-        if (haloProperties.isDocDisabled()) {
-            log.debug("Doc has been disabled");
-        }
-
         return buildApiDocket("run.halo.app.content.api",
                 "run.halo.app.controller.content.api",
                 "/api/content/**")
                 .securitySchemes(contentApiKeys())
-                .securityContexts(contentSecurityContext())
-                .enable(!haloProperties.isDocDisabled());
+                .securityContexts(contentSecurityContext());
     }
 
     @Bean
@@ -82,8 +79,7 @@ public class SwaggerConfiguration {
                 "run.halo.app.controller.admin",
                 "/api/admin/**")
                 .securitySchemes(adminApiKeys())
-                .securityContexts(adminSecurityContext())
-                .enable(!haloProperties.isDocDisabled());
+                .securityContexts(adminSecurityContext());
     }
 
     @Bean
@@ -96,6 +92,27 @@ public class SwaggerConfiguration {
                 .scopeSeparator(",")
                 .additionalQueryStringParams(null)
                 .useBasicAuthenticationWithAccessCodeGrant(false)
+                .build();
+    }
+
+    @Bean
+    UiConfiguration uiConfig() {
+        return UiConfigurationBuilder.builder()
+                .deepLinking(true)
+                .displayOperationId(false)
+                .defaultModelsExpandDepth(1)
+                .defaultModelExpandDepth(1)
+                .defaultModelRendering(ModelRendering.EXAMPLE)
+                .displayRequestDuration(false)
+                .docExpansion(DocExpansion.NONE)
+                .filter(false)
+                .maxDisplayedTags(null)
+                .operationsSorter(OperationsSorter.ALPHA)
+                .showExtensions(false)
+                .showCommonExtensions(false)
+                .tagsSorter(TagsSorter.ALPHA)
+                .supportedSubmitMethods(UiConfiguration.Constants.DEFAULT_SUBMIT_METHODS)
+                .validatorUrl(null)
                 .build();
     }
 
@@ -119,7 +136,7 @@ public class SwaggerConfiguration {
                 .directModelSubstitute(Temporal.class, String.class);
     }
 
-    private List<ApiKey> adminApiKeys() {
+    private List<SecurityScheme> adminApiKeys() {
         return Arrays.asList(
                 new ApiKey("Token from header", ADMIN_TOKEN_HEADER_NAME, In.HEADER.name()),
                 new ApiKey("Token from query", ADMIN_TOKEN_QUERY_NAME, In.QUERY.name())
@@ -135,7 +152,7 @@ public class SwaggerConfiguration {
         );
     }
 
-    private List<ApiKey> contentApiKeys() {
+    private List<SecurityScheme> contentApiKeys() {
         return Arrays.asList(
                 new ApiKey("Access key from header", API_ACCESS_KEY_HEADER_NAME, In.HEADER.name()),
                 new ApiKey("Access key from query", API_ACCESS_KEY_QUERY_NAME, In.QUERY.name())

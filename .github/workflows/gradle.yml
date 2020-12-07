@@ -13,10 +13,10 @@ jobs:
       - uses: actions/checkout@v1
         with:
           submodules: true
-      - name: Set up JDK 1.8
+      - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 11
       - name: Cache Gradle
         id: cache-gradle
         uses: actions/cache@v1
