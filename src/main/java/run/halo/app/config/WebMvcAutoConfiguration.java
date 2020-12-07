@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +26,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
@@ -54,7 +55,7 @@ import static run.halo.app.utils.HaloUtils.*;
 @Configuration
 @EnableConfigurationProperties(MultipartProperties.class)
 @ImportAutoConfiguration(exclude = MultipartAutoConfiguration.class)
-public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
+public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 
     private static final String FILE_PROTOCOL = "file:///";
 
@@ -70,6 +71,66 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         this.pageableResolver = pageableResolver;
         this.sortResolver = sortResolver;
         this.haloProperties = haloProperties;
+    }
+
+    /**
+     * Configuring freemarker template file path.
+     *
+     * @return new FreeMarkerConfigurer
+     */
+    @Bean
+    FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties) throws IOException, TemplateException {
+        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
+        configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
+        configurer.setDefaultEncoding("UTF-8");
+
+        Properties properties = new Properties();
+        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common,/common/macro/global_macro.ftl as global");
+
+        configurer.setFreemarkerSettings(properties);
+
+        // Predefine configuration
+        freemarker.template.Configuration configuration = configurer.createConfiguration();
+
+        configuration.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
+
+        if (haloProperties.isProductionEnv()) {
+            configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+        }
+
+        // Set predefined freemarker configuration
+        configurer.setConfiguration(configuration);
+
+        return configurer;
+    }
+
+    /**
+     * Configuring multipartResolver for large file upload..
+     *
+     * @return new multipartResolver
+     */
+    @Bean(name = "multipartResolver")
+    MultipartResolver multipartResolver(MultipartProperties multipartProperties) {
+        MultipartConfigElement multipartConfigElement = multipartProperties.createMultipartConfig();
+        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+        resolver.setDefaultEncoding("UTF-8");
+        resolver.setMaxUploadSize(multipartConfigElement.getMaxRequestSize());
+        resolver.setMaxUploadSizePerFile(multipartConfigElement.getMaxFileSize());
+
+        //lazy multipart parsing, throwing parse exceptions once the application attempts to obtain multipart files
+        resolver.setResolveLazily(true);
+
+        return resolver;
+    }
+
+    @Bean
+    WebMvcRegistrations webMvcRegistrations() {
+        return new WebMvcRegistrations() {
+            @Override
+            public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
+                return new HaloRequestMappingHandlerMapping(haloProperties);
+            }
+        };
     }
 
     @Override
@@ -121,69 +182,17 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         registry.addResourceHandler(adminPathPattern)
                 .addResourceLocations("classpath:/admin/");
 
-        if (!haloProperties.isDocDisabled()) {
-            // If doc is enable
-            registry.addResourceHandler("swagger-ui.html")
-                    .addResourceLocations("classpath:/META-INF/resources/");
-            registry.addResourceHandler("/webjars/**")
-                    .addResourceLocations("classpath:/META-INF/resources/webjars/");
-        }
+        // If doc is enable
+        registry.addResourceHandler("swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverterFactory(new StringToEnumConverterFactory());
-    }
-
-    /**
-     * Configuring freemarker template file path.
-     *
-     * @return new FreeMarkerConfigurer
-     */
-    @Bean
-    public FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties) throws IOException, TemplateException {
-        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
-        configurer.setDefaultEncoding("UTF-8");
-
-        Properties properties = new Properties();
-        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common,/common/macro/global_macro.ftl as global");
-
-        configurer.setFreemarkerSettings(properties);
-
-        // Predefine configuration
-        freemarker.template.Configuration configuration = configurer.createConfiguration();
-
-        configuration.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
-
-        if (haloProperties.isProductionEnv()) {
-            configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        }
-
-        // Set predefined freemarker configuration
-        configurer.setConfiguration(configuration);
-
-        return configurer;
-    }
-
-    /**
-     * Configuring multipartResolver for large file upload..
-     *
-     * @return new multipartResolver
-     */
-    @Bean(name = "multipartResolver")
-    public MultipartResolver multipartResolver(MultipartProperties multipartProperties) {
-        MultipartConfigElement multipartConfigElement = multipartProperties.createMultipartConfig();
-        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-        resolver.setDefaultEncoding("UTF-8");
-        resolver.setMaxUploadSize(multipartConfigElement.getMaxRequestSize());
-        resolver.setMaxUploadSizePerFile(multipartConfigElement.getMaxFileSize());
-
-        //lazy multipart parsing, throwing parse exceptions once the application attempts to obtain multipart files
-        resolver.setResolveLazily(true);
-
-        return resolver;
     }
 
     /**
@@ -202,11 +211,6 @@ public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
         resolver.setSuffix(HaloConst.SUFFIX_FTL);
         resolver.setContentType("text/html; charset=UTF-8");
         registry.viewResolver(resolver);
-    }
-
-    @Override
-    protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
-        return new HaloRequestMappingHandlerMapping(haloProperties);
     }
 
 }
