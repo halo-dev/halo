@@ -36,7 +36,7 @@ public class AttachmentHandlerCovertUtils {
      */
     private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,100})(?=\\))");
 
-    private static final Integer CONNECT_TIME_OUT = 10 * 1000; // 建立链接超时
+    private static final Integer CONNECT_TIME_OUT = 5 * 1000; // 建立链接超时
     private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 

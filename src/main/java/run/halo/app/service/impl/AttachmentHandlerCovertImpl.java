@@ -287,11 +287,17 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return new attachment or null
      */
     private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) {
+        int lastI = -1;
+        String extension = "";
         for (String imageFormat : IMAGE_FORMATS) {
-            if (oldAttachmentPath.lastIndexOf(imageFormat) != -1) {
-                oldAttachmentPath = oldAttachmentPath.substring(0, oldAttachmentPath.lastIndexOf(imageFormat)) + imageFormat;
-                break;
+            int tmpI = oldAttachmentPath.lastIndexOf(imageFormat);
+            if (tmpI > lastI) {
+                lastI = tmpI;
+                extension = imageFormat;
             }
+        }
+        if (lastI != -1) {
+            oldAttachmentPath = oldAttachmentPath.substring(0, lastI) + extension;
         }
 
         File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
