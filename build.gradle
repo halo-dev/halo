@@ -1,5 +1,5 @@
 plugins {
-    id "org.springframework.boot" version "2.3.4.RELEASE"
+    id "org.springframework.boot" version "2.4.0"
     id "io.spring.dependency-management" version "1.0.10.RELEASE"
     id "checkstyle"
     id "java"
@@ -11,7 +11,7 @@ description = "Halo, An excellent open source blog publishing application."
 
 java {
     archivesBaseName = "halo"
-    sourceCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
 }
 
 repositories {
@@ -50,7 +50,7 @@ ext {
     baiduSdkVersion = "0.10.36"
     qcloudSdkVersion = "5.6.25"
     minioSdkVersion = "7.1.4"
-    swaggerVersion = "2.9.2"
+    swaggerVersion = "3.0.0"
     commonsFileUploadVersion = "1.4"
     commonsLangVersion = "3.10"
     httpclientVersion = "4.5.12"
@@ -91,8 +91,7 @@ dependencies {
     implementation "com.qcloud:cos_api:$qcloudSdkVersion"
     implementation "com.huaweicloud:esdk-obs-java:$huaweiObsVersion"
     implementation "io.minio:minio:$minioSdkVersion"
-    implementation "io.springfox:springfox-swagger2:$swaggerVersion"
-    implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
+    implementation "io.springfox:springfox-boot-starter:$swaggerVersion"
     implementation "commons-fileupload:commons-fileupload:$commonsFileUploadVersion"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation "org.apache.httpcomponents:httpclient:$httpclientVersion"

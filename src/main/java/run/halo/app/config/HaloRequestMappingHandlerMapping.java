@@ -25,7 +25,8 @@ import static run.halo.app.utils.HaloUtils.ensureBoth;
  * @date 2020-03-24
  */
 @Slf4j
-public class HaloRequestMappingHandlerMapping extends RequestMappingHandlerMapping implements ApplicationListener<StaticStorageChangedEvent> {
+public class HaloRequestMappingHandlerMapping extends RequestMappingHandlerMapping
+        implements ApplicationListener<StaticStorageChangedEvent> {
 
     private final Set<String> blackPatterns = new HashSet<>(16);
 
@@ -63,6 +64,7 @@ public class HaloRequestMappingHandlerMapping extends RequestMappingHandlerMappi
         blackPatterns.add("/assets/**");
         blackPatterns.add("/color.less");
         blackPatterns.add("/swagger-ui.html");
+        blackPatterns.add("/swagger-ui/**");
         blackPatterns.add("/csrf");
         blackPatterns.add("/webjars/**");
         blackPatterns.add(uploadUrlPattern);
@@ -93,4 +95,5 @@ public class HaloRequestMappingHandlerMapping extends RequestMappingHandlerMappi
             log.error("Failed to refresh static directory mapping", e);
         }
     }
+
 }
