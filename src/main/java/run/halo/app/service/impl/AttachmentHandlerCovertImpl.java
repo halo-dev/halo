@@ -248,13 +248,13 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
 
         String tmpAttachmentPath = String.valueOf(Paths.get(FileUtils.getTempDirectoryPath(), fileBaseName));
 
-        String eStr = "IOException caught in download by http: ";
         try {
             if (urlStr.startsWith("http")) {
                 try {
                     AttachmentHandlerCovertUtils.downloadFile(urlStr, tmpAttachmentPath);
                 } catch (IOException e) {
-                    eStr += e.toString();
+                    log.warn("Download Failed: {}. Try to URLEncode.", urlStr);
+                    e.printStackTrace();
                     AttachmentHandlerCovertUtils.downloadFile(
                             AttachmentHandlerCovertUtils.encodeFileBaseName(false, urlStr),
                             tmpAttachmentPath);
@@ -269,8 +269,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 }
             }
         } catch (IOException e) {
-            eStr += "\n IOException caught in (download by https) or (copy files): " + e.toString();
-            log.warn("Can not download file: {}\n{}", urlStr, eStr);
+            log.warn("Download Failed: {}", urlStr);
+            e.printStackTrace();
         }
 
         return tmpAttachmentPath;

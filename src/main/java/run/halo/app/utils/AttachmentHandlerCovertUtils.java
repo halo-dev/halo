@@ -40,27 +40,6 @@ public class AttachmentHandlerCovertUtils {
     private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 
-    private static final BitSet DONT_NEED_ENCODING;
-
-    static {
-        DONT_NEED_ENCODING = new BitSet(256);
-        int i;
-        for (i = 'a'; i <= 'z'; i++) {
-            DONT_NEED_ENCODING.set(i);
-        }
-        for (i = 'A'; i <= 'Z'; i++) {
-            DONT_NEED_ENCODING.set(i);
-        }
-        for (i = '0'; i <= '9'; i++) {
-            DONT_NEED_ENCODING.set(i);
-        }
-        DONT_NEED_ENCODING.set('+');
-        DONT_NEED_ENCODING.set('-');
-        DONT_NEED_ENCODING.set('_');
-        DONT_NEED_ENCODING.set('.');
-        DONT_NEED_ENCODING.set('*');
-    }
-
     private AttachmentHandlerCovertUtils() {
     }
 
@@ -233,40 +212,10 @@ public class AttachmentHandlerCovertUtils {
     public static String encodeFileBaseName(Boolean needDecode, String url) throws UnsupportedEncodingException {
         String baseUrl = url.substring(0, url.lastIndexOf("/") + 1);
         String fileName = url.substring(url.lastIndexOf("/") + 1);
-        if (needDecode) {
+        if (Boolean.TRUE.equals(needDecode)) {
             fileName = URLDecoder.decode(fileName, CHARACTER_SET_JDK8);
         }
 
         return baseUrl + URLEncoder.encode(fileName, CHARACTER_SET_JDK8).replace("+", "%20");
-    }
-
-    /**
-     * Determine whether the String conforms to the Url specification
-     *
-     * @param str urlString
-     * @return Boolean
-     */
-    public static boolean hasUrlEncoded(String str) {
-        boolean needEncode = false;
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (DONT_NEED_ENCODING.get(c)) {
-                continue;
-            }
-            if (c == '%' && (i + 2) < str.length()) {
-                char c1 = str.charAt(++i);
-                char c2 = str.charAt(++i);
-                if (isDigit16Char(c1) && isDigit16Char(c2)) {
-                    continue;
-                }
-            }
-            needEncode = true;
-            break;
-        }
-        return !needEncode;
-    }
-
-    private static boolean isDigit16Char(char c) {
-        return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F');
     }
 }
