@@ -240,7 +240,12 @@ public class AttachmentHandlerCovertUtils {
         return baseUrl + URLEncoder.encode(fileName, CHARACTER_SET_JDK8).replace("+", "%20");
     }
 
-
+    /**
+     * 切掉图片处理策略，用来下载原图
+     *
+     * @param url 带图片处理策略的url
+     * @return 原图url
+     */
     public static String splitStyleRule(String url) {
         int lastI = -1;
         String extension = "";
