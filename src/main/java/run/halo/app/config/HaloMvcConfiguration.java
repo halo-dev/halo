@@ -5,6 +5,7 @@ import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
@@ -25,6 +26,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -46,7 +48,7 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 import static run.halo.app.utils.HaloUtils.*;
 
 /**
- * Spring mvc configuration.
+ * Halo mvc configuration.
  *
  * @author ryanwang
  * @date 2018-01-02
@@ -55,9 +57,12 @@ import static run.halo.app.utils.HaloUtils.*;
 @Configuration
 @EnableConfigurationProperties(MultipartProperties.class)
 @ImportAutoConfiguration(exclude = MultipartAutoConfiguration.class)
-public class WebMvcAutoConfiguration implements WebMvcConfigurer {
+public class HaloMvcConfiguration implements WebMvcConfigurer {
 
     private static final String FILE_PROTOCOL = "file:///";
+
+    @Value("${springfox.documentation.swagger-ui.base-url:}")
+    private String swaggerBaseUrl;
 
     private final PageableHandlerMethodArgumentResolver pageableResolver;
 
@@ -65,7 +70,7 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
 
     private final HaloProperties haloProperties;
 
-    public WebMvcAutoConfiguration(PageableHandlerMethodArgumentResolver pageableResolver,
+    public HaloMvcConfiguration(PageableHandlerMethodArgumentResolver pageableResolver,
             SortHandlerMethodArgumentResolver sortResolver,
             HaloProperties haloProperties) {
         this.pageableResolver = pageableResolver;
@@ -153,6 +158,13 @@ public class WebMvcAutoConfiguration implements WebMvcConfigurer {
         resolvers.add(new AuthenticationArgumentResolver());
         resolvers.add(pageableResolver);
         resolvers.add(sortResolver);
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        // for backward compatibility
+        registry.addViewController("/swagger-ui.html")
+                .setViewName("redirect:" + swaggerBaseUrl + "/swagger-ui/");
     }
 
     /**
