@@ -60,6 +60,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     /**
+     * 方法入口
+     *
      * @param sourceAttachmentType  source attachment type id (e.g. 0,1,2), default = -1 (All AttachmentTypes).
      * @param deleteOldAttachment   Whether to delete old attachments, default = false.
      * @param uploadAllInAttachment Whether to upload all attachments, default = false.
@@ -164,6 +166,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     /**
+     * 判断附件是否被post引用
+     * <p>
      * Is the attachment cited in the post
      *
      * @param pathInPost       the path in Post
@@ -190,6 +194,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     /**
+     * 删除源handler的旧附件
+     * <p>
      * Delete the old attachment from the source handler
      *
      * @param attachmentId attachment id
@@ -204,6 +210,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     /**
+     * 更新post和post缩略图中的图片链接
+     * <p>
      * Update the attachment path in the post
      *
      * @param oldAttachmentPath old Attachment Path
@@ -237,6 +245,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     /**
+     * 下载图片并返回临时路径
+     * <p>
      * Download the attachment and return to the temporary file path
      *
      * @param urlStr       attachment url
@@ -281,6 +291,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     /**
+     * 将图片上传到当前handler
+     * <p>
      * upload File to current handler
      *
      * @param oldAttachmentPath old Attachment Path

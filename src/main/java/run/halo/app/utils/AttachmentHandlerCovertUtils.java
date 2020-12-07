@@ -27,23 +27,29 @@ import java.util.regex.Pattern;
 public class AttachmentHandlerCovertUtils {
 
     /**
+     * 文件名长度限制，只在从网络上抓取图片时使用
+     * <p>
      * file name length limit, maximum file name length without extension,
      * only works when downloading attachments from the Internet.
      */
     private static final int FILE_NAME_LIMIT = 64;
 
     /**
+     * 匹配并且提取post的md源码中的图片链接
+     * <p>
      * Extract the image link in markdown. Require url to have extension
+     * <p>
      * {0,1000} Image title length is 0-1000
      * {1,1000} Image Url length is 1-1000
      * {1,200} Image extension + style rule length is 1-200
      */
     private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,200})(?=\\))");
 
-    private static final Integer CONNECT_TIME_OUT = 5 * 1000; // 建立链接超时
-    private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
+    private static final Integer CONNECT_TIME_OUT = 5 * 1000; // 建立链接超时 毫秒
+    private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时 毫秒
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 
+    // 图片链接应该为以下后缀或以下后缀 + style rule
     private static final String[] IMAGE_FORMATS = ".jpg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg".split(",");
 
     private AttachmentHandlerCovertUtils() {
@@ -156,7 +162,7 @@ public class AttachmentHandlerCovertUtils {
 
 
     /**
-     * replaceAll of StringBuilder, like String.replaceAll.
+     * replaceAll of StringBuilder, like "String.replaceAll".
      *
      * @param stringBuilder stringBuilder
      * @param oldStr        old string
@@ -172,6 +178,9 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
+     * 提取所有post中的所有图片链接，并且组装为map。
+     * key为图片的url， value为post id 列表。
+     * <p>
      * Extract all image links in the posts,
      * the key is image_path,
      * the value is list of post_id containing the image_path.
@@ -208,7 +217,10 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
-     * Extract the path of all attachments,
+     * 提取源handler的附件并组装为map。
+     * key为附件的url，value为附件id
+     * <p>
+     * Extract the path of source attachmentType,
      * the key is attachment_path,
      * the value is attachment_id.
      *
@@ -226,6 +238,8 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
+     * encode url中的文件名，必要时进行decode再encode
+     *
      * @param url urlString
      * @return urlString, conforming to the url specification
      * @throws UnsupportedEncodingException default utf-8
@@ -242,6 +256,8 @@ public class AttachmentHandlerCovertUtils {
 
     /**
      * 切掉图片处理策略，用来下载原图
+     * <p>
+     * split Style Rule to download Original image
      *
      * @param url 带图片处理策略的url
      * @return 原图url
