@@ -36,9 +36,9 @@ public class AttachmentHandlerCovertUtils {
      * Extract the image link in markdown. Require url to have extension
      * {0,1000} Image title length is 0-1000
      * {1,1000} Image Url length is 1-1000
-     * {1,100} Image extension length is 1-100
+     * {1,200} Image extension + style rule length is 1-200
      */
-    private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,100})(?=\\))");
+    private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,200})(?=\\))");
 
     private static final Integer CONNECT_TIME_OUT = 5 * 1000; // 建立链接超时
     private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
