@@ -5,6 +5,8 @@ import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jackson.JsonComponentModule;
@@ -51,6 +53,7 @@ import static run.halo.app.utils.HaloUtils.*;
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(MultipartProperties.class)
+@ImportAutoConfiguration(exclude = MultipartAutoConfiguration.class)
 public class WebMvcAutoConfiguration extends WebMvcConfigurationSupport {
 
     private static final String FILE_PROTOCOL = "file:///";
