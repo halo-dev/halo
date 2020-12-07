@@ -3,6 +3,7 @@ package run.halo.app.config;
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -39,6 +40,10 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
  */
 @Slf4j
 @Configuration
+@ConditionalOnProperty(
+        value = "springfox.documentation.enabled",
+        havingValue = "true",
+        matchIfMissing = true)
 public class SwaggerConfiguration {
 
     private final HaloProperties haloProperties;
@@ -61,8 +66,7 @@ public class SwaggerConfiguration {
                 "run.halo.app.controller.content.api",
                 "/api/content/**")
                 .securitySchemes(contentApiKeys())
-                .securityContexts(contentSecurityContext())
-                .enable(!haloProperties.isDocDisabled());
+                .securityContexts(contentSecurityContext());
     }
 
     @Bean
@@ -75,8 +79,7 @@ public class SwaggerConfiguration {
                 "run.halo.app.controller.admin",
                 "/api/admin/**")
                 .securitySchemes(adminApiKeys())
-                .securityContexts(adminSecurityContext())
-                .enable(!haloProperties.isDocDisabled());
+                .securityContexts(adminSecurityContext());
     }
 
     @Bean
