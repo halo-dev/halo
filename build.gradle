@@ -1,5 +1,5 @@
 plugins {
-    id "org.springframework.boot" version "2.3.4.RELEASE"
+    id "org.springframework.boot" version "2.4.0"
     id "io.spring.dependency-management" version "1.0.10.RELEASE"
     id "checkstyle"
     id "java"
@@ -11,7 +11,7 @@ description = "Halo, An excellent open source blog publishing application."
 
 java {
     archivesBaseName = "halo"
-    sourceCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
 }
 
 repositories {
