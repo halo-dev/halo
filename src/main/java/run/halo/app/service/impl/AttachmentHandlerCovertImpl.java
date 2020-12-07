@@ -49,11 +49,14 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     private final String workDir;
 
     private static final String CHARACTER_SET_JDK8 = "utf-8";
+    private static final String[] IMAGE_FORMATS = ".jpg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg".split(",");
 
     public AttachmentHandlerCovertImpl(
-            PostService postService, AttachmentService attachmentService, HaloProperties haloProperties) {
+            PostService postService, AttachmentService attachmentService,
+            HaloProperties haloProperties) {
         this.postService = postService;
         this.attachmentService = attachmentService;
+
         this.workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
     }
 
@@ -284,6 +287,13 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @return new attachment or null
      */
     private Attachment uploadFile(String oldAttachmentPath, String fileBaseName) {
+        for (String imageFormat : IMAGE_FORMATS) {
+            if (oldAttachmentPath.lastIndexOf(imageFormat) != -1) {
+                oldAttachmentPath = oldAttachmentPath.substring(0, oldAttachmentPath.lastIndexOf(imageFormat)) + imageFormat;
+                break;
+            }
+        }
+
         File tmpAttachment = new File(getTmpAttachmentPath(oldAttachmentPath, fileBaseName));
         try {
             return uploadAttachment(tmpAttachment);
