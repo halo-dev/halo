@@ -265,13 +265,21 @@ public class AttachmentHandlerCovertUtils {
         return url;
     }
 
+    /**
+     * 提取md源码中的图片链接
+     * <p>
+     * Extract image links in markdown source code
+     *
+     * @param md post.getOriginalContent
+     * @return image url in post
+     */
     public static List<String> getImageUrl(String md) {
         ArrayList<String> urls = new ArrayList<>();
         int i = md.indexOf("![");
         while (i != -1 && i < md.length()) {
             int nextI = md.indexOf("![", i + 2);
-            int p = searchSquareBracket(i, nextI, md);
-            String url = searchParentheses(p, nextI, md);
+            int p = searchSquareBrackets(i, nextI, md);
+            String url = searchSoundBrackets(p, nextI, md);
             if (null != url) {
                 urls.add(url);
             }
@@ -280,7 +288,7 @@ public class AttachmentHandlerCovertUtils {
         return urls;
     }
 
-    private static int searchSquareBracket(int i, int nextI, String md) {
+    private static int searchSquareBrackets(int i, int nextI, String md) {
         int p = i + 2;
         int m = 0;
         while ((p < nextI || nextI == -1) && p < md.length()) {
@@ -298,7 +306,7 @@ public class AttachmentHandlerCovertUtils {
         return p;
     }
 
-    private static String searchParentheses(int p, int nextI, String md) {
+    private static String searchSoundBrackets(int p, int nextI, String md) {
         p++;
         int s = -1;
         int e = -1;
