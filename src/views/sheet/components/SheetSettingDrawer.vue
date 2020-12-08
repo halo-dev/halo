@@ -444,7 +444,19 @@ export default {
     handleSetPinyinSlug() {
       if (this.selectedSheet.title && !this.selectedSheet.id) {
         if (pinyin.isSupported()) {
-          this.$set(this.selectedSheet, 'slug', pinyin.convertToPinyin(this.selectedSheet.title, '-', true))
+          let result = ''
+          const tokens = pinyin.parse(this.selectedSheet.title)
+          let lastToken
+          tokens.forEach((token, i) => {
+            if (token.type === 2) {
+              const target = token.target ? token.target.toLowerCase() : ''
+              result += result && !/\n|\s/.test(lastToken.target) ? '-' + target : target
+            } else {
+              result += (lastToken && lastToken.type === 2 ? '-' : '') + token.target
+            }
+            lastToken = token
+          })
+          this.$set(this.selectedSheet, 'slug', result)
         }
       }
     },

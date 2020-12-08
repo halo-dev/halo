@@ -602,9 +602,21 @@ export default {
       })
     },
     handleSetPinyinSlug() {
-      if (this.selectedPost.title && !this.selectedPost.id) {
+      if (this.selectedPost.title && this.selectedPost.title !== '' && !this.selectedPost.id) {
         if (pinyin.isSupported()) {
-          this.$set(this.selectedPost, 'slug', pinyin.convertToPinyin(this.selectedPost.title, '-', true))
+          let result = ''
+          const tokens = pinyin.parse(this.selectedPost.title)
+          let lastToken
+          tokens.forEach((token, i) => {
+            if (token.type === 2) {
+              const target = token.target ? token.target.toLowerCase() : ''
+              result += result && !/\n|\s/.test(lastToken.target) ? '-' + target : target
+            } else {
+              result += (lastToken && lastToken.type === 2 ? '-' : '') + token.target
+            }
+            lastToken = token
+          })
+          this.$set(this.selectedPost, 'slug', result)
         }
       }
     },
