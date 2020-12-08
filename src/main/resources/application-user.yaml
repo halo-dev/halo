@@ -34,8 +34,3 @@ halo:
 
   # memory, level, redis
   cache: memory
-
-  # if cache = redis, you need to set the following options
-#  cache-redis-nodes: ['127.0.0.1:6380', '127.0.0.1:6379']
-#  cache-redis-password: 123456
-

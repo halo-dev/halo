@@ -63,7 +63,6 @@ ext {
     h2Version = "1.4.196"
     levelDbVersion = "0.12"
     annotationsVersion = "3.0.1u2"
-    jedisVersion = "3.3.0"
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
     githubApiVersion = "1.84"
@@ -120,7 +119,6 @@ dependencies {
     implementation "com.google.zxing:core:$zxingVersion"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
-    implementation "redis.clients:jedis:$jedisVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly "mysql:mysql-connector-java"
 
@@ -133,8 +131,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-//    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: "$powermockApiMockito2"
-//    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: "$powermockVersion"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
 }
