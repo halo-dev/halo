@@ -66,8 +66,6 @@ ext {
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
     githubApiVersion = "1.84"
-    powermockVersion = "1.6.6"
-    powermockApiMockito2 = "2.0.7"
 }
 
 dependencies {
