@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Attachment Handler Covert utilities.
@@ -34,22 +32,11 @@ public class AttachmentHandlerCovertUtils {
      */
     private static final int FILE_NAME_LIMIT = 64;
 
-    /**
-     * 匹配并且提取post的md源码中的图片链接
-     * <p>
-     * Extract the image link in markdown. Require url to have extension
-     * <p>
-     * {0,1000} Image title length is 0-1000
-     * {1,1000} Image Url length is 1-1000
-     * {1,200} Image extension + style rule length is 1-200
-     */
-    private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,200})(?=\\))");
-
     private static final Integer CONNECT_TIME_OUT = 5 * 1000; // 建立链接超时 毫秒
     private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时 毫秒
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 
-    // 图片链接应该为以下后缀或以下后缀 + style rule
+    // 图片链接应该为以下后缀或以下后缀 + style-rule
     private static final String[] IMAGE_FORMATS = ".jpg,.jpeg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg,.emf".split(",");
 
     private AttachmentHandlerCovertUtils() {
@@ -189,17 +176,17 @@ public class AttachmentHandlerCovertUtils {
      * @return Map<String, List < Integer>> (image_path, list of post_id)
      */
     public static Map<String, List<Integer>> getPathInPost(List<Post> posts) {
-        Matcher m;
+
         Map<String, List<Integer>> map = new HashMap<>();
         for (Post post : posts) {
-            m = PICTURE_MD_JDK8.matcher(post.getOriginalContent());
-            while (m.find() && !"".equals(m.group())) {
-                if (null != map.get(m.group())) {
-                    map.get(m.group()).add(post.getId());
+            List<String> urls = getImageUrl(post.getOriginalContent());
+            for (String url : urls) {
+                if (null != map.get(url)) {
+                    map.get(url).add(post.getId());
                 } else {
                     List<Integer> list = new ArrayList<>();
                     list.add(post.getId());
-                    map.put(m.group(), list);
+                    map.put(url, list);
                 }
             }
 
@@ -276,5 +263,68 @@ public class AttachmentHandlerCovertUtils {
             url = url.substring(0, lastI) + extension;
         }
         return url;
+    }
+
+    public static List<String> getImageUrl(String md) {
+        ArrayList<String> urls = new ArrayList<>();
+        int i = md.indexOf("![");
+        while (i != -1 && i < md.length()) {
+            int nextI = md.indexOf("![", i + 2);
+            int p = searchSquareBracket(i, nextI, md);
+            String url = searchParentheses(p, nextI, md);
+            if (null != url) {
+                urls.add(url);
+            }
+            i = nextI;
+        }
+        return urls;
+    }
+
+    private static int searchSquareBracket(int i, int nextI, String md) {
+        int p = i + 2;
+        int m = 0;
+        while ((p < nextI || nextI == -1) && p < md.length()) {
+            if (md.charAt(p) == '[') {
+                m++;
+            } else if (md.charAt(p) == ']') {
+                if (m == 0) {
+                    break;
+                } else {
+                    m--;
+                }
+            }
+            p++;
+        }
+        return p;
+    }
+
+    private static String searchParentheses(int p, int nextI, String md) {
+        p++;
+        int s = -1;
+        int e = -1;
+        int m = 0;
+        if ((p < nextI || nextI == -1) && p < md.length() && md.charAt(p) == '(') {
+            p++;
+            s = p;
+            while ((p < nextI || nextI == -1) && p < md.length()) {
+                if (md.charAt(p) == '(') {
+                    m++;
+                } else if (md.charAt(p) == ')') {
+                    if (m == 0) {
+                        e = p;
+                        break;
+                    } else {
+                        m--;
+                    }
+                }
+                p++;
+            }
+        }
+
+        if (s != -1 && e != -1 && e > s) {
+            return md.substring(s, e);
+        }
+
+        return null;
     }
 }
