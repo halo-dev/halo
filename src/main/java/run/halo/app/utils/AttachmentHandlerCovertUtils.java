@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import run.halo.app.model.entity.Attachment;
@@ -26,22 +27,30 @@ import java.util.regex.Pattern;
 public class AttachmentHandlerCovertUtils {
 
     /**
+     * 文件名长度限制，只在从网络上抓取图片时使用
+     * <p>
      * file name length limit, maximum file name length without extension,
      * only works when downloading attachments from the Internet.
      */
     private static final int FILE_NAME_LIMIT = 64;
 
     /**
-     * Extract the image link in markdown. 要求url具有扩展名
-     * {0,1000} 图片标题长度为0-1000
-     * {1,1000} 图片Url长度为1-1000
-     * {1,100} 图片扩展名长度为1-100
+     * 匹配并且提取post的md源码中的图片链接
+     * <p>
+     * Extract the image link in markdown. Require url to have extension
+     * <p>
+     * {0,1000} Image title length is 0-1000
+     * {1,1000} Image Url length is 1-1000
+     * {1,200} Image extension + style rule length is 1-200
      */
-    private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,100})(?=\\))");
+    private static final Pattern PICTURE_MD_JDK8 = Pattern.compile("(?<=!\\[.{0,1000}]\\()([^\\[]{1,1000}\\.[^)]{1,200})(?=\\))");
 
-    private static final Integer CONNECT_TIME_OUT = 10 * 1000; // 建立链接超时
-    private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时
+    private static final Integer CONNECT_TIME_OUT = 5 * 1000; // 建立链接超时 毫秒
+    private static final Integer READ_TIME_OUT = 60 * 1000; // 下载超时 毫秒
     private static final String CHARACTER_SET_JDK8 = "utf-8";
+
+    // 图片链接应该为以下后缀或以下后缀 + style rule
+    private static final String[] IMAGE_FORMATS = ".jpg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg".split(",");
 
     private AttachmentHandlerCovertUtils() {
     }
@@ -85,7 +94,7 @@ public class AttachmentHandlerCovertUtils {
         conn.setConnectTimeout(CONNECT_TIME_OUT); // 建立链接超时
         conn.setReadTimeout(READ_TIME_OUT); // 下载超时
         conn.setRequestProperty("User-Agent", "Mozilla");
-        conn.setRequestProperty("Accept", "image/gif,image/jpeg,image/png,image/svg+xml");
+        conn.setRequestProperty("Accept", "image/*");
         InputStream inStream = conn.getInputStream();
         byte[] data = readInputStream(inStream);
         File tmpAttachment = new File(downloadPath);
@@ -113,32 +122,47 @@ public class AttachmentHandlerCovertUtils {
      * http://test.com/test.png
      * return test
      * <p>
-     * http://test.com/test.png
+     * http://test.com/test.png-stylerule
      * return tes (When FILE_NAME_LIMIT=3, default 64)
      * <p>
      * http://test.com/你好你好.png
      * return 你好你 (When FILE_NAME_LIMIT=3, default 64)
      * <p>
-     * http://test.com/%E4%BD%A0%E5%A5%BD%E4%BD%A0%E5%A5%BD.png
+     * http://test.com/%E4%BD%A0%E5%A5%BD%E4%BD%A0%E5%A5%BD.png-stylerule
      * return 你好你 (When FILE_NAME_LIMIT=3, default 64)
      *
      * @param url Extracted url
      * @return File Base Name
      */
     public static String getBaseNameFromUrl(String url) throws UnsupportedEncodingException {
-        String fileBaseName = FilenameUtils.getBasename(url);
-
-        fileBaseName = URLDecoder.decode(fileBaseName, CHARACTER_SET_JDK8);
-
-        if (fileBaseName.length() > FILE_NAME_LIMIT) {
-            fileBaseName = fileBaseName.substring(0, FILE_NAME_LIMIT);
+        url = splitStyleRule(url);
+        int separatorLastIndex = StringUtils.lastIndexOf(url, '/');
+        int dotLastIndex = StringUtils.lastIndexOf(url, '.');
+        if (separatorLastIndex != -1 && separatorLastIndex < url.length() - 1 && dotLastIndex > separatorLastIndex) {
+            String fileBaseName = url.substring(separatorLastIndex + 1, dotLastIndex);
+            fileBaseName = URLDecoder.decode(fileBaseName, CHARACTER_SET_JDK8);
+            if (fileBaseName.length() > FILE_NAME_LIMIT) {
+                fileBaseName = fileBaseName.substring(0, FILE_NAME_LIMIT);
+            }
+            return fileBaseName;
         }
-        return fileBaseName;
+        return StringUtils.EMPTY;
+    }
+
+    public static String getImageExtension(String url) {
+        int lastI = -1;
+        for (String imageFormat : IMAGE_FORMATS) {
+            int tmpI = url.lastIndexOf(imageFormat);
+            if (tmpI > lastI) {
+                lastI = tmpI;
+            }
+        }
+        return url.substring(lastI + 1);
     }
 
 
     /**
-     * replaceAll of StringBuilder, like String.replaceAll.
+     * replaceAll of StringBuilder, like "String.replaceAll".
      *
      * @param stringBuilder stringBuilder
      * @param oldStr        old string
@@ -154,6 +178,9 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
+     * 提取所有post中的所有图片链接，并且组装为map。
+     * key为图片的url， value为post id 列表。
+     * <p>
      * Extract all image links in the posts,
      * the key is image_path,
      * the value is list of post_id containing the image_path.
@@ -166,7 +193,7 @@ public class AttachmentHandlerCovertUtils {
         Map<String, List<Integer>> map = new HashMap<>();
         for (Post post : posts) {
             m = PICTURE_MD_JDK8.matcher(post.getOriginalContent());
-            while (m.find()) {
+            while (m.find() && !"".equals(m.group())) {
                 if (null != map.get(m.group())) {
                     map.get(m.group()).add(post.getId());
                 } else {
@@ -176,7 +203,7 @@ public class AttachmentHandlerCovertUtils {
                 }
             }
 
-            if (null != post.getThumbnail()) {
+            if (null != post.getThumbnail() && !"".equals(post.getThumbnail())) {
                 if (null != map.get(post.getThumbnail())) {
                     map.get(post.getThumbnail()).add(post.getId());
                 } else {
@@ -190,17 +217,20 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
-     * Extract the path of all attachments,
-     * the ket is attachment_path,
+     * 提取源handler的附件并组装为map。
+     * key为附件的url，value为附件id
+     * <p>
+     * Extract the path of source attachmentType,
+     * the key is attachment_path,
      * the value is attachment_id.
      *
      * @param oldAttachments old attachments
      * @return Map<String, Integer> (attachment_path,attachment_id)
      */
-    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments, AttachmentType attachmentTypeId) {
+    public static Map<String, Integer> getPathInAttachment(List<Attachment> oldAttachments, AttachmentType attachmentType) {
         Map<String, Integer> map = new HashMap<>();
         for (Attachment attachment : oldAttachments) {
-            if (attachment.getType() == attachmentTypeId) {
+            if (attachment.getType() == attachmentType) {
                 map.put(attachment.getPath(), attachment.getId());
             }
         }
@@ -208,14 +238,43 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
+     * encode url中的文件名，必要时进行decode再encode
+     *
      * @param url urlString
      * @return urlString, conforming to the url specification
      * @throws UnsupportedEncodingException default utf-8
      */
-    public static String encodeFileBaseName(String url) throws UnsupportedEncodingException {
+    public static String encodeFileBaseName(Boolean needDecode, String url) throws UnsupportedEncodingException {
         String baseUrl = url.substring(0, url.lastIndexOf("/") + 1);
         String fileName = url.substring(url.lastIndexOf("/") + 1);
-        fileName = URLDecoder.decode(fileName, CHARACTER_SET_JDK8);
+        if (Boolean.TRUE.equals(needDecode)) {
+            fileName = URLDecoder.decode(fileName, CHARACTER_SET_JDK8);
+        }
+
         return baseUrl + URLEncoder.encode(fileName, CHARACTER_SET_JDK8).replace("+", "%20");
+    }
+
+    /**
+     * 切掉图片处理策略，用来下载原图
+     * <p>
+     * split Style Rule to download Original image
+     *
+     * @param url 带图片处理策略的url
+     * @return 原图url
+     */
+    public static String splitStyleRule(String url) {
+        int lastI = -1;
+        String extension = "";
+        for (String imageFormat : IMAGE_FORMATS) {
+            int tmpI = url.lastIndexOf(imageFormat);
+            if (tmpI > lastI) {
+                lastI = tmpI;
+                extension = imageFormat;
+            }
+        }
+        if (lastI != -1) {
+            url = url.substring(0, lastI) + extension;
+        }
+        return url;
     }
 }

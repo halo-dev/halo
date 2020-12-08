@@ -114,12 +114,12 @@ public class AttachmentController {
     @PutMapping("covert_attachment_handler")
     @ApiOperation("Covert all attachments to current Handler.")
     public Future<String> covertAttachmentHandler(
-            @RequestParam(name = "sourceAttachmentTypeId", required = false, defaultValue = "LOCAL") AttachmentType sourceAttachmentTypeId,
+            @RequestParam(name = "sourceAttachmentType", required = false, defaultValue = "LOCAL") AttachmentType sourceAttachmentType,
             @RequestParam(name = "deleteOldAttachment", required = false, defaultValue = "false") Boolean deleteOldAttachment,
             @RequestParam(name = "uploadAllInAttachment", required = false, defaultValue = "false") Boolean uploadAllInAttachment,
             @RequestParam(name = "uploadAllInPost", required = false, defaultValue = "false") Boolean uploadAllInPost) {
         return attachmentHandlerCovertService.covertHandlerByPosts(
-                sourceAttachmentTypeId,
+                sourceAttachmentType,
                 deleteOldAttachment,
                 uploadAllInAttachment,
                 uploadAllInPost);
