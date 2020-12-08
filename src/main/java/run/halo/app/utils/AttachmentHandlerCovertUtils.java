@@ -50,7 +50,7 @@ public class AttachmentHandlerCovertUtils {
     private static final String CHARACTER_SET_JDK8 = "utf-8";
 
     // 图片链接应该为以下后缀或以下后缀 + style rule
-    private static final String[] IMAGE_FORMATS = ".jpg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg".split(",");
+    private static final String[] IMAGE_FORMATS = ".jpg,.jpeg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg,.emf".split(",");
 
     private AttachmentHandlerCovertUtils() {
     }
@@ -157,7 +157,7 @@ public class AttachmentHandlerCovertUtils {
                 lastI = tmpI;
             }
         }
-        return url.substring(lastI + 1);
+        return lastI != -1 ? url.substring(lastI + 1) : "";
     }
 
 
