@@ -20,24 +20,30 @@ import java.io.IOException;
  */
 @Slf4j
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE + 9)
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class LogFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String remoteAddr = ServletUtil.getClientIP(request);
+        final String remoteAddr = ServletUtil.getClientIP(request);
 
-        log.debug("");
-        log.debug("Starting url: [{}], method: [{}], ip: [{}]", request.getRequestURL(), request.getMethod(), remoteAddr);
+        log.debug("Starting url: [{}], method: [{}], ip: [{}]",
+                request.getRequestURL(),
+                request.getMethod(),
+                remoteAddr);
 
         // Set start time
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
 
         // Do filter
         filterChain.doFilter(request, response);
 
-        log.debug("Ending   url: [{}], method: [{}], ip: [{}], status: [{}], usage: [{}] ms", request.getRequestURL(), request.getMethod(), remoteAddr, response.getStatus(), System.currentTimeMillis() - startTime);
-        log.debug("");
+        log.debug("Ending   url: [{}], method: [{}], ip: [{}], status: [{}], usage: [{}] ms",
+                request.getRequestURL(),
+                request.getMethod(),
+                remoteAddr,
+                response.getStatus(),
+                System.currentTimeMillis() - startTime);
     }
 }

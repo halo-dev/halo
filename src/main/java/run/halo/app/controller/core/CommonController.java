@@ -1,6 +1,5 @@
 package run.halo.app.controller.core;
 
-import cn.hutool.extra.servlet.ServletUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -72,12 +71,6 @@ public class CommonController extends AbstractErrorController {
      */
     @GetMapping
     public String handleError(HttpServletRequest request, HttpServletResponse response, Model model) {
-        log.error("Request URL: [{}], URI: [{}], Request Method: [{}], IP: [{}]",
-                request.getRequestURL(),
-                request.getRequestURI(),
-                request.getMethod(),
-                ServletUtil.getClientIP(request));
-
         handleCustomException(request);
 
         ErrorAttributeOptions options = getErrorAttributeOptions(request);
@@ -168,9 +161,12 @@ public class CommonController extends AbstractErrorController {
         Throwable throwable = (Throwable) throwableObject;
 
         if (throwable instanceof NestedServletException) {
-            log.error("Captured an exception", throwable);
+            log.error("Captured an exception: [{}]", throwable.getMessage());
             Throwable rootCause = ((NestedServletException) throwable).getRootCause();
             if (rootCause instanceof AbstractHaloException) {
+                if (!(rootCause instanceof NotFoundException)) {
+                    log.error("Caused by", rootCause);
+                }
                 AbstractHaloException haloException = (AbstractHaloException) rootCause;
                 request.setAttribute("javax.servlet.error.status_code", haloException.getStatus().value());
                 request.setAttribute("javax.servlet.error.exception", rootCause);

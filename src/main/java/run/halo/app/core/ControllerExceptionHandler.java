@@ -140,11 +140,10 @@ public class ControllerExceptionHandler {
         BaseResponse<T> baseResponse = new BaseResponse<>();
         baseResponse.setMessage(t.getMessage());
 
+        log.error("Captured an exception:", t);
+
         if (log.isDebugEnabled()) {
-            log.error("Captured an exception:", t);
             baseResponse.setDevMessage(ExceptionUtils.getStackTrace(t));
-        } else {
-            log.error("Captured an exception: [{}]", t.getMessage());
         }
 
         return baseResponse;
