@@ -1,16 +1,20 @@
 import Vue from 'vue'
 import router from './router'
 import store from './store'
-import {
-  setDocumentTitle,
-  domTitle
-} from '@/utils/domUtil'
+import NProgress from 'nprogress' // progress bar
+import { setDocumentTitle, domTitle } from '@/utils/domUtil'
 import adminApi from '@api/admin'
+
+NProgress.configure({ showSpinner: false, speed: 500 })
 
 const whiteList = ['Login', 'Install', 'NotFound', 'ResetPassword'] // no redirect whitelist
 
+let progressTimer = null
 router.beforeEach(async(to, from, next) => {
-  to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${to.meta.title} - ${domTitle}`))
+  progressTimer = setTimeout(() => {
+    NProgress.start()
+  }, 250)
+  to.meta && typeof to.meta.title !== 'undefined' && setDocumentTitle(`${to.meta.title} - ${domTitle}`)
   Vue.$log.debug('Token', store.getters.token)
   if (store.getters.token) {
     if (to.name === 'Install') {
@@ -30,27 +34,28 @@ router.beforeEach(async(to, from, next) => {
       })
       return
     }
-    // TODO Get installation status
 
     if (!store.getters.options) {
       store.dispatch('refreshOptionsCache').then()
     }
-
     next()
     return
   }
 
-  // Not login
   // Check whitelist
   if (whiteList.includes(to.name)) {
     next()
     return
   }
-
   next({
     name: 'Login',
     query: {
       redirect: to.fullPath
     }
   })
+})
+
+router.afterEach(() => {
+  clearTimeout(progressTimer)
+  NProgress.done()
 })

@@ -161,7 +161,7 @@ export default {
 </script>
 
 <style lang="less">
-@import url('../components/global.less');
+@import url('../styles/global.less');
 
 .page-transition-enter {
   opacity: 0;
