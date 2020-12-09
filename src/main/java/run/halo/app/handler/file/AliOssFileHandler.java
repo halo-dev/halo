@@ -19,7 +19,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
-import javax.imageio.ImageReader;
 import java.util.Objects;
 
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
@@ -72,10 +71,10 @@ public class AliOssFileHandler implements FileHandler {
         }
 
         try {
-            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
-            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-            String timestamp = String.valueOf(System.currentTimeMillis());
-            StringBuilder upFilePath = new StringBuilder();
+            final String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
+            final String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+            final String timestamp = String.valueOf(System.currentTimeMillis());
+            final StringBuilder upFilePath = new StringBuilder();
 
             if (StringUtils.isNotEmpty(source)) {
                 upFilePath.append(source)
@@ -93,13 +92,16 @@ public class AliOssFileHandler implements FileHandler {
             log.info(basePath.toString());
 
             // Upload
-            PutObjectResult putObjectResult = ossClient.putObject(bucketName, upFilePath.toString(), file.getInputStream());
+            final PutObjectResult putObjectResult = ossClient.putObject(bucketName,
+                    upFilePath.toString(),
+                    file.getInputStream());
+
             if (putObjectResult == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ");
             }
 
             // Response result
-            UploadResult uploadResult = new UploadResult();
+            final UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
             uploadResult.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
             uploadResult.setKey(upFilePath.toString());
@@ -107,18 +109,13 @@ public class AliOssFileHandler implements FileHandler {
             uploadResult.setSuffix(extension);
             uploadResult.setSize(file.getSize());
 
-            // Handle thumbnail
-            if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                ImageReader image = ImageUtils.getImageReaderFromFile(file.getInputStream(), extension);
-                assert image != null;
-                uploadResult.setWidth(image.getWidth(0));
-                uploadResult.setHeight(image.getHeight(0));
+            handleImageMetadata(file, uploadResult, () -> {
                 if (ImageUtils.EXTENSION_ICO.equals(extension)) {
-                    uploadResult.setThumbPath(filePath);
+                    return filePath;
                 } else {
-                    uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
+                    return StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule;
                 }
-            }
+            });
 
             log.info("Uploaded file: [{}] successfully", file.getOriginalFilename());
             return uploadResult;

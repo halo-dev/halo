@@ -22,7 +22,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
-import javax.imageio.ImageReader;
 import java.util.Objects;
 
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
@@ -119,18 +118,14 @@ public class TencentCosFileHandler implements FileHandler {
             uploadResult.setSize(file.getSize());
 
             // Handle thumbnail
-            if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                ImageReader image = ImageUtils.getImageReaderFromFile(file.getInputStream(), extension);
-                assert image != null;
-                uploadResult.setWidth(image.getWidth(0));
-                uploadResult.setHeight(image.getHeight(0));
+            handleImageMetadata(file, uploadResult, () -> {
                 if (ImageUtils.EXTENSION_ICO.equals(extension)) {
                     uploadResult.setThumbPath(filePath);
+                    return filePath;
                 } else {
-                    uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
+                    return StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule;
                 }
-            }
-
+            });
             return uploadResult;
         } catch (Exception e) {
             throw new FileOperationException("附件 " + file.getOriginalFilename() + " 上传失败(腾讯云)", e);
