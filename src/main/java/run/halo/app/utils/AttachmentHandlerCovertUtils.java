@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -11,10 +12,7 @@ import run.halo.app.model.enums.AttachmentType;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Attachment Handler Covert utilities.
@@ -76,30 +74,20 @@ public class AttachmentHandlerCovertUtils {
      * @throws IOException download failed
      */
     public static void downloadFile(String urlStr, String downloadPath) throws IOException {
+
         URL url = new URL(urlStr);
         URLConnection conn = url.openConnection();
         conn.setConnectTimeout(CONNECT_TIME_OUT); // 建立链接超时
         conn.setReadTimeout(READ_TIME_OUT); // 下载超时
         conn.setRequestProperty("User-Agent", "Mozilla");
         conn.setRequestProperty("Accept", "image/*");
-        InputStream inStream = conn.getInputStream();
-        byte[] data = readInputStream(inStream);
+
         File tmpAttachment = new File(downloadPath);
-        try (FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
-            outStream.write(data);
-        }
 
-    }
+        try (InputStream inStream = conn.getInputStream(); FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
 
-    public static byte[] readInputStream(InputStream inStream) throws IOException {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = inStream.read(buffer)) != -1) {
-            outStream.write(buffer, 0, len);
+            IOUtils.copy(inStream, outStream);
         }
-        inStream.close();
-        return outStream.toByteArray();
     }
 
     /**
@@ -166,25 +154,25 @@ public class AttachmentHandlerCovertUtils {
 
     /**
      * 提取所有post中的所有图片链接，并且组装为map。
-     * key为图片的url， value为post id 列表。
+     * key为图片的url， value为post id 集合。
      * <p>
      * Extract all image links in the posts,
      * the key is image_path,
-     * the value is list of post_id containing the image_path.
+     * the value is Set of post_id containing the image_path.
      *
      * @param posts all posts
-     * @return Map<String, List < Integer>> (image_path, list of post_id)
+     * @return Map<String, Set < Integer>> (image_path, list of post_id)
      */
-    public static Map<String, List<Integer>> getPathInPost(List<Post> posts) {
+    public static Map<String, Set<Integer>> getPathInPost(List<Post> posts) {
 
-        Map<String, List<Integer>> map = new HashMap<>();
+        Map<String, Set<Integer>> map = new HashMap<>();
         for (Post post : posts) {
             List<String> urls = getImageUrl(post.getOriginalContent());
             for (String url : urls) {
                 if (null != map.get(url)) {
                     map.get(url).add(post.getId());
                 } else {
-                    List<Integer> list = new ArrayList<>();
+                    Set<Integer> list = new HashSet<>();
                     list.add(post.getId());
                     map.put(url, list);
                 }
@@ -194,7 +182,7 @@ public class AttachmentHandlerCovertUtils {
                 if (null != map.get(post.getThumbnail())) {
                     map.get(post.getThumbnail()).add(post.getId());
                 } else {
-                    List<Integer> list = new ArrayList<>();
+                    Set<Integer> list = new HashSet<>();
                     list.add(post.getId());
                     map.put(post.getThumbnail(), list);
                 }
@@ -225,7 +213,7 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
-     * encode url中的文件名，必要时进行decode再encode
+     * 编码url中的文件名，必要时先解码再编码。
      *
      * @param url urlString
      * @return urlString, conforming to the url specification
@@ -242,7 +230,7 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
-     * 切掉图片处理策略，用来下载原图
+     * 切掉url中的图片处理策略，用来下载原图。
      * <p>
      * split Style Rule to download Original image
      *
@@ -308,18 +296,18 @@ public class AttachmentHandlerCovertUtils {
 
     private static String searchSoundBrackets(int p, int nextI, String md) {
         p++;
-        int s = -1;
-        int e = -1;
+        int urlStart = -1;
+        int urlEnd = -1;
         int m = 0;
         if ((p < nextI || nextI == -1) && p < md.length() && md.charAt(p) == '(') {
             p++;
-            s = p;
+            urlStart = p;
             while ((p < nextI || nextI == -1) && p < md.length()) {
                 if (md.charAt(p) == '(') {
                     m++;
                 } else if (md.charAt(p) == ')') {
                     if (m == 0) {
-                        e = p;
+                        urlEnd = p;
                         break;
                     } else {
                         m--;
@@ -329,8 +317,8 @@ public class AttachmentHandlerCovertUtils {
             }
         }
 
-        if (s != -1 && e != -1 && e > s) {
-            return md.substring(s, e);
+        if (urlStart != -1 && urlEnd != -1 && urlEnd > urlStart) {
+            return md.substring(urlStart, urlEnd);
         }
 
         return null;
