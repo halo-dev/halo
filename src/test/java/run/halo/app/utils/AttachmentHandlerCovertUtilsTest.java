@@ -1,17 +1,12 @@
 package run.halo.app.utils;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AttachmentHandlerCovertUtilsTest {
     char[] splitChars = "~@$^&*()-_/!+={}[]|:;\"'<>,".toCharArray();
@@ -122,18 +117,5 @@ class AttachmentHandlerCovertUtilsTest {
         urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
         assertEquals(1, urls.size());
         assertEquals("b", urls.get(0));
-    }
-
-    @Test
-    void downloadFile() throws IOException {
-        String downloadPath = "https://halo.run/upload/2020/2/image-0c7a018e73f74634a534fa3ba8806628.png";
-        String tmpPath = Paths.get(FileUtils.getTempDirectoryPath(), "a.png").toString();
-        File tmpFile = new File(tmpPath);
-        try {
-            AttachmentHandlerCovertUtils.downloadFile(downloadPath, tmpPath);
-            assertTrue(tmpFile.exists());
-        } finally {
-            FileUtils.forceDeleteOnExit(tmpFile);
-        }
     }
 }
