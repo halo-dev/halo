@@ -9,6 +9,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AttachmentHandlerCovertUtilsTest {
+
     char[] splitChars = "~@$^&*()-_/!+={}[]|:;\"'<>,".toCharArray();
     String[] imageExtensions = ".jpg,.jpeg,.png,.gif,.bmp,.webp,.ico,.tiff,.tif,.svg,.emf".split(",");
 
@@ -17,7 +18,7 @@ class AttachmentHandlerCovertUtilsTest {
 
         for (char splitChar : splitChars) {
             for (String imageExtension : imageExtensions) {
-                String url = "http://te.st.com/te.st" + imageExtension + splitChar + "stylerule";
+                String url = "http://te.st.com/te.st" + imageExtension + splitChar + "styleRule";
                 assertEquals("te.st", AttachmentHandlerCovertUtils.getBaseNameFromUrl(url));
             }
         }

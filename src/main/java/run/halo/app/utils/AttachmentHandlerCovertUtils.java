@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -80,17 +81,12 @@ public class AttachmentHandlerCovertUtils {
         conn.setReadTimeout(READ_TIME_OUT); // 下载超时
         conn.setRequestProperty("User-Agent", "Mozilla");
         conn.setRequestProperty("Accept", "image/*");
-        InputStream inStream = conn.getInputStream();
 
         File tmpAttachment = new File(downloadPath);
 
-        try (FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = inStream.read(buffer)) != -1) {
-                outStream.write(buffer, 0, len);
-            }
-            inStream.close();
+        try (InputStream inStream = conn.getInputStream();
+             FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
+            IOUtils.copy(inStream, outStream);
         }
     }
 
@@ -165,7 +161,7 @@ public class AttachmentHandlerCovertUtils {
      * the value is Set of post_id containing the image_path.
      *
      * @param posts all posts
-     * @return Map<String, List < Integer>> (image_path, list of post_id)
+     * @return Map<String, Set < Integer>> (image_path, list of post_id)
      */
     public static Map<String, Set<Integer>> getPathInPost(List<Post> posts) {
 
@@ -217,7 +213,7 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
-     * encode url中的文件名，必要时进行decode再encode
+     * 编码url中的文件名，必要时先解码再编码。
      *
      * @param url urlString
      * @return urlString, conforming to the url specification
@@ -234,7 +230,7 @@ public class AttachmentHandlerCovertUtils {
     }
 
     /**
-     * 切掉图片处理策略，用来下载原图
+     * 切掉url中的图片处理策略，用来下载原图。
      * <p>
      * split Style Rule to download Original image
      *
@@ -300,18 +296,18 @@ public class AttachmentHandlerCovertUtils {
 
     private static String searchSoundBrackets(int p, int nextI, String md) {
         p++;
-        int s = -1;
-        int e = -1;
+        int urlStart = -1;
+        int urlEnd = -1;
         int m = 0;
         if ((p < nextI || nextI == -1) && p < md.length() && md.charAt(p) == '(') {
             p++;
-            s = p;
+            urlStart = p;
             while ((p < nextI || nextI == -1) && p < md.length()) {
                 if (md.charAt(p) == '(') {
                     m++;
                 } else if (md.charAt(p) == ')') {
                     if (m == 0) {
-                        e = p;
+                        urlEnd = p;
                         break;
                     } else {
                         m--;
@@ -321,8 +317,8 @@ public class AttachmentHandlerCovertUtils {
             }
         }
 
-        if (s != -1 && e != -1 && e > s) {
-            return md.substring(s, e);
+        if (urlStart != -1 && urlEnd != -1 && urlEnd > urlStart) {
+            return md.substring(urlStart, urlEnd);
         }
 
         return null;

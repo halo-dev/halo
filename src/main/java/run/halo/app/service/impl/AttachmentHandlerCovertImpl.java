@@ -62,13 +62,12 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     /**
      * 方法入口
      *
-     * @param sourceAttachmentType  source attachment type id (e.g. 0,1,2), default = -1 (All AttachmentTypes).
+     * @param sourceAttachmentType  source attachment type (e.g. LOCAL), default = LOCAL.
      * @param deleteOldAttachment   Whether to delete old attachments, default = false.
      * @param uploadAllInAttachment Whether to upload all attachments, default = false.
      * @param uploadAllInPost       Whether to download and upload all pictures in the all posts, default = false.
      * @return Future<String>
      */
-
     @Async
     public Future<String> covertHandlerByPosts(
             AttachmentType sourceAttachmentType, Boolean deleteOldAttachment,
@@ -172,7 +171,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      * @param pathInPost       the path in Post
      * @param pathInAttachment the path in Attachment library
      * @return Is the attachment cited in the post
-     * @throws UnsupportedEncodingException url encode
+     * @throws UnsupportedEncodingException url encode exception
      */
     private boolean attachmentInPost(String pathInPost, String pathInAttachment) throws UnsupportedEncodingException {
 
@@ -203,7 +202,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         try {
             attachmentService.removePermanently(attachmentId);
         } catch (Exception e) {
-            log.info("Delete File Failed: " + e);
+            log.info("Remove attachment permanently failed, Attachment Id: {}\n{}", attachmentId, e);
         }
     }
 
@@ -258,21 +257,20 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             fileBaseName = fileBaseName + "." + AttachmentHandlerCovertUtils.getImageExtension(urlStr);
         }
 
-        String tmpAttachmentPath = String.valueOf(Paths.get(FileUtils.getTempDirectoryPath(), fileBaseName));
+        String tmpAttachmentPath = Paths.get(FileUtils.getTempDirectoryPath(), fileBaseName).toString();
 
         try {
             if (urlStr.startsWith("http")) {
                 try {
                     AttachmentHandlerCovertUtils.downloadFile(urlStr, tmpAttachmentPath);
                 } catch (IOException e) {
-                    log.warn("Download Failed: {}. Try to URLEncode.", urlStr);
-                    e.printStackTrace();
+                    log.warn("Download Failed: {}.\n{}\nTry to URLEncode...", urlStr, e);
                     AttachmentHandlerCovertUtils.downloadFile(
                             AttachmentHandlerCovertUtils.encodeFileBaseName(false, urlStr),
                             tmpAttachmentPath);
                 }
             } else {
-                String oldAttachmentPath = URLDecoder.decode(String.valueOf(Paths.get(workDir, urlStr)), CHARACTER_SET_JDK8);
+                String oldAttachmentPath = URLDecoder.decode(Paths.get(workDir, urlStr).toString(), CHARACTER_SET_JDK8);
                 File oldAttachment = new File(oldAttachmentPath);
                 File tmpAttachment = new File(tmpAttachmentPath);
                 if (oldAttachment.exists()) {
