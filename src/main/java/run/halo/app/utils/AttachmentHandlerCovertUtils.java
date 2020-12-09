@@ -84,8 +84,8 @@ public class AttachmentHandlerCovertUtils {
 
         File tmpAttachment = new File(downloadPath);
 
-        try (InputStream inStream = conn.getInputStream();
-             FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
+        try (InputStream inStream = conn.getInputStream(); FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
+
             IOUtils.copy(inStream, outStream);
         }
     }
