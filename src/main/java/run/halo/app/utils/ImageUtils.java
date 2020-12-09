@@ -38,11 +38,15 @@ public class ImageUtils {
 
     @NonNull
     public static ImageReader getImageReaderFromFile(InputStream is, String formatName) throws IOException {
-        Iterator<ImageReader> readerIterator = ImageIO.getImageReadersByFormatName(formatName);
-        ImageReader reader = readerIterator.next();
-        ImageInputStream stream = ImageIO.createImageInputStream(is);
-        ImageIO.getImageReadersByFormatName(formatName);
-        reader.setInput(stream, true);
-        return reader;
+        try {
+            Iterator<ImageReader> readerIterator = ImageIO.getImageReadersByFormatName(formatName);
+            ImageReader reader = readerIterator.next();
+            ImageInputStream stream = ImageIO.createImageInputStream(is);
+            ImageIO.getImageReadersByFormatName(formatName);
+            reader.setInput(stream, true);
+            return reader;
+        } catch (Exception e) {
+            throw new IOException("Failed to read image reader.", e);
+        }
     }
 }
