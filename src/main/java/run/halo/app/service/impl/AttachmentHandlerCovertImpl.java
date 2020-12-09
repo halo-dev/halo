@@ -202,7 +202,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         try {
             attachmentService.removePermanently(attachmentId);
         } catch (Exception e) {
-            log.info("Remove attachment permanently failed, Attachment Id: {}\n{}", attachmentId, e);
+            log.warn("Remove attachment permanently failed, Attachment Id: {}\n{}", attachmentId, e);
         }
     }
 
