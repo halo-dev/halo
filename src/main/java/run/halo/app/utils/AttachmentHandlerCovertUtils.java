@@ -262,6 +262,7 @@ public class AttachmentHandlerCovertUtils {
      * @return image url in post
      */
     public static List<String> getImageUrl(String md) {
+        md = splitCodeFromMD(md);
         ArrayList<String> urls = new ArrayList<>();
         int i = md.indexOf("![");
         while (i != -1 && i < md.length()) {
@@ -274,6 +275,11 @@ public class AttachmentHandlerCovertUtils {
             i = nextI;
         }
         return urls;
+    }
+
+    private static String splitCodeFromMD(String md) {
+        return md.replaceAll("```([^`]+)```", "")
+                .replaceAll("`([^`]+)`", "");
     }
 
     private static int searchSquareBrackets(int i, int nextI, String md) {

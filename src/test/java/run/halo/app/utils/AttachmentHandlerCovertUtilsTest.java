@@ -118,5 +118,15 @@ class AttachmentHandlerCovertUtilsTest {
         urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
         assertEquals(1, urls.size());
         assertEquals("b", urls.get(0));
+
+        postMD = "```\n" +
+                "![a](b.png)\n" +
+                "```" +
+                "`![a](b.png)`" +
+                "![a](b.png)" +
+                "```";
+        urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
+        assertEquals(1, urls.size());
+        assertEquals("b.png", urls.get(0));
     }
 }
