@@ -11,10 +11,7 @@ import run.halo.app.model.enums.AttachmentType;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Attachment Handler Covert utilities.
@@ -161,25 +158,25 @@ public class AttachmentHandlerCovertUtils {
 
     /**
      * 提取所有post中的所有图片链接，并且组装为map。
-     * key为图片的url， value为post id 列表。
+     * key为图片的url， value为post id 集合。
      * <p>
      * Extract all image links in the posts,
      * the key is image_path,
-     * the value is list of post_id containing the image_path.
+     * the value is Set of post_id containing the image_path.
      *
      * @param posts all posts
      * @return Map<String, List < Integer>> (image_path, list of post_id)
      */
-    public static Map<String, List<Integer>> getPathInPost(List<Post> posts) {
+    public static Map<String, Set<Integer>> getPathInPost(List<Post> posts) {
 
-        Map<String, List<Integer>> map = new HashMap<>();
+        Map<String, Set<Integer>> map = new HashMap<>();
         for (Post post : posts) {
             List<String> urls = getImageUrl(post.getOriginalContent());
             for (String url : urls) {
                 if (null != map.get(url)) {
                     map.get(url).add(post.getId());
                 } else {
-                    List<Integer> list = new ArrayList<>();
+                    Set<Integer> list = new HashSet<>();
                     list.add(post.getId());
                     map.put(url, list);
                 }
@@ -189,7 +186,7 @@ public class AttachmentHandlerCovertUtils {
                 if (null != map.get(post.getThumbnail())) {
                     map.get(post.getThumbnail()).add(post.getId());
                 } else {
-                    List<Integer> list = new ArrayList<>();
+                    Set<Integer> list = new HashSet<>();
                     list.add(post.getId());
                     map.put(post.getThumbnail(), list);
                 }

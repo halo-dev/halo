@@ -88,14 +88,14 @@ class AttachmentHandlerCovertUtilsTest {
     @Test
     void getImageUrl() {
 
-        String postMD = "![a](b.png)";
+        String postMD = "![]()";
         List<String> urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
+        assertEquals(0, urls.size());
+
+        postMD = "![a](b.png)";
+        urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
         assertEquals(1, urls.size());
         assertEquals("b.png", urls.get(0));
-
-        postMD = "![]()";
-        urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
-        assertEquals(0, urls.size());
 
         postMD = "![](b)![](c)";
         urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
@@ -103,7 +103,7 @@ class AttachmentHandlerCovertUtilsTest {
         assertEquals("b", urls.get(0));
         assertEquals("c", urls.get(1));
 
-        postMD = "![[a]()]([]b(c))";
+        postMD = "![![[a]()]([]b(c))";
         urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
         assertEquals(1, urls.size());
         assertEquals("[]b(c)", urls.get(0));

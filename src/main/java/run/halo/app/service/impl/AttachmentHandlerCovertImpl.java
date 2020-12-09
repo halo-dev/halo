@@ -26,8 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 /**
@@ -105,13 +105,13 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             Boolean uploadAllInAttachment,
             Boolean uploadAllInPost) throws IOException {
 
-        Map<String, List<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(postService.listAll());
+        Map<String, Set<Integer>> pathInPosts = AttachmentHandlerCovertUtils.getPathInPost(postService.listAll());
         Map<String, Integer> pathInAttachments = AttachmentHandlerCovertUtils
                 .getPathInAttachment(attachmentService.listAll(), attachmentType);
-        Iterator<Map.Entry<String, List<Integer>>> pathInPostsIterator = pathInPosts.entrySet().iterator();
+        Iterator<Map.Entry<String, Set<Integer>>> pathInPostsIterator = pathInPosts.entrySet().iterator();
         StringBuilder stringBuilder = new StringBuilder();
         while (pathInPostsIterator.hasNext()) {
-            Map.Entry<String, List<Integer>> pathInPostEntry = pathInPostsIterator.next();
+            Map.Entry<String, Set<Integer>> pathInPostEntry = pathInPostsIterator.next();
             Iterator<Map.Entry<String, Integer>> pathInAttachmentsIterator = pathInAttachments.entrySet().iterator();
             while (pathInAttachmentsIterator.hasNext()) {
                 Map.Entry<String, Integer> pathInAttachmentEntry = pathInAttachmentsIterator.next();
@@ -153,9 +153,9 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
     }
 
     private void doUploadAllInPost(
-            Map<String, List<Integer>> pathInPosts, StringBuilder stringBuilder) throws IOException {
+            Map<String, Set<Integer>> pathInPosts, StringBuilder stringBuilder) throws IOException {
 
-        for (Map.Entry<String, List<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
+        for (Map.Entry<String, Set<Integer>> pathInPostEntry : pathInPosts.entrySet()) {
             updatePostAttachment(
                     pathInPostEntry.getKey(),
                     AttachmentHandlerCovertUtils.getBaseNameFromUrl(pathInPostEntry.getKey()),
@@ -221,7 +221,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
      */
     private boolean updatePostAttachment(
             String oldAttachmentPath, String fileBaseName,
-            List<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
+            Set<Integer> pathInPosts, StringBuilder stringBuilder) throws IOException {
         Attachment newAttachment = uploadFile(oldAttachmentPath, fileBaseName);
         if (null != newAttachment) {
             String newAttachmentPath = attachmentService.convertToDto(newAttachment).getPath();
