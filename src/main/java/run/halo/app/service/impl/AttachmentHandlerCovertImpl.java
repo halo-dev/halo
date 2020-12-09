@@ -93,9 +93,8 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
             return new AsyncResult<>(res);
         } catch (Exception e) {
             String res = MessageFormat.format(
-                    "Covert attachment handler Failed!\n{0}", e.toString());
-            log.info(res);
-            e.printStackTrace();
+                    "Covert attachment handler Failed!\n{0}", e);
+            log.warn(res);
             return new AsyncResult<>(res);
         }
     }
@@ -204,8 +203,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         try {
             attachmentService.removePermanently(attachmentId);
         } catch (Exception e) {
-            log.info("Delete File Failed: " + e.toString());
-            e.printStackTrace();
+            log.info("Delete File Failed: " + e);
         }
     }
 
@@ -283,8 +281,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
                 }
             }
         } catch (IOException e) {
-            log.warn("Download Failed: {}", urlStr);
-            e.printStackTrace();
+            log.warn("Download Failed: {}\n{}", urlStr, e);
         }
 
         return tmpAttachmentPath;
@@ -308,8 +305,7 @@ public class AttachmentHandlerCovertImpl implements AttachmentHandlerCovertServi
         try {
             return uploadAttachment(tmpAttachment);
         } catch (Exception e) {
-            log.warn("Can not upload file: {}\n{}", tmpAttachment.getPath(), e.toString());
-            e.printStackTrace();
+            log.warn("Can not upload file: {}\n{}", tmpAttachment.getPath(), e);
         }
         return null;
     }

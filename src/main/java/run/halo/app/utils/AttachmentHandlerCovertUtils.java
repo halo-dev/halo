@@ -76,6 +76,7 @@ public class AttachmentHandlerCovertUtils {
      * @throws IOException download failed
      */
     public static void downloadFile(String urlStr, String downloadPath) throws IOException {
+
         URL url = new URL(urlStr);
         URLConnection conn = url.openConnection();
         conn.setConnectTimeout(CONNECT_TIME_OUT); // 建立链接超时
@@ -83,23 +84,17 @@ public class AttachmentHandlerCovertUtils {
         conn.setRequestProperty("User-Agent", "Mozilla");
         conn.setRequestProperty("Accept", "image/*");
         InputStream inStream = conn.getInputStream();
-        byte[] data = readInputStream(inStream);
+
         File tmpAttachment = new File(downloadPath);
+
         try (FileOutputStream outStream = new FileOutputStream(tmpAttachment)) {
-            outStream.write(data);
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, len);
+            }
+            inStream.close();
         }
-
-    }
-
-    public static byte[] readInputStream(InputStream inStream) throws IOException {
-        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = inStream.read(buffer)) != -1) {
-            outStream.write(buffer, 0, len);
-        }
-        inStream.close();
-        return outStream.toByteArray();
     }
 
     /**
