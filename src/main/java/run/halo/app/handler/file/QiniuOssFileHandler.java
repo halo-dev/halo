@@ -31,7 +31,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static run.halo.app.handler.file.FileHandler.isImageType;
 import static run.halo.app.model.support.HaloConst.*;
 import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
@@ -129,7 +128,7 @@ public class QiniuOssFileHandler implements FileHandler {
             result.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             result.setSize(file.getSize());
 
-            if (isImageType(result.getMediaType())) {
+            if (isImageType(file)) {
                 if (ImageUtils.EXTENSION_ICO.equals(extension)) {
                     result.setThumbPath(filePath);
                 } else {

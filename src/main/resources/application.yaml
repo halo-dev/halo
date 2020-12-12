@@ -47,6 +47,7 @@ management:
 logging:
   level:
     run.halo.app: INFO
+    org.eclipse.jetty.server.HttpChannel: ERROR
   file:
     path: ${user.home}/.halo/logs
 

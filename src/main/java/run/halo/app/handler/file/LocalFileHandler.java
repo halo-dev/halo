@@ -16,7 +16,6 @@ import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ImageUtils;
 
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -55,9 +54,12 @@ public class LocalFileHandler implements FileHandler {
      * Thumbnail height.
      */
     private final static int THUMB_HEIGHT = 256;
+
     private final OptionService optionService;
+
     private final String workDir;
-    ReentrantLock lock = new ReentrantLock();
+
+    private final ReentrantLock lock = new ReentrantLock();
 
     public LocalFileHandler(OptionService optionService,
             HaloProperties haloProperties) {
@@ -139,38 +141,24 @@ public class LocalFileHandler implements FileHandler {
             uploadResult.setSize(file.getSize());
 
             // TODO refactor this: if image is svg ext. extension
-            boolean isSvg = "svg".equals(extension);
-
-            // Check file type
-            if (FileHandler.isImageType(uploadResult.getMediaType()) && !isSvg) {
-                lock.lock();
-                try (InputStream uploadFileInputStream = new FileInputStream(uploadPath.toFile())) {
-                    // Upload a thumbnail
-                    String thumbnailBasename = basename + THUMBNAIL_SUFFIX;
-                    String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
-                    Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
-
-                    // Read as image
-                    BufferedImage originalImage = ImageUtils.getImageFromFile(uploadFileInputStream, extension);
-                    // Set width and height
-                    uploadResult.setWidth(originalImage.getWidth());
-                    uploadResult.setHeight(originalImage.getHeight());
-
+            handleImageMetadata(file, uploadResult, () -> {
+                // Upload a thumbnail
+                final String thumbnailBasename = basename + THUMBNAIL_SUFFIX;
+                final String thumbnailSubFilePath = subDir + thumbnailBasename + '.' + extension;
+                final Path thumbnailPath = Paths.get(workDir + thumbnailSubFilePath);
+                try (InputStream is = file.getInputStream()) {
                     // Generate thumbnail
+                    BufferedImage originalImage = ImageUtils.getImageFromFile(is, extension);
                     boolean result = generateThumbnail(originalImage, thumbnailPath, extension);
                     if (result) {
                         // Set thumb path
-                        uploadResult.setThumbPath(thumbnailSubFilePath);
-                    } else {
-                        // If generate error
-                        uploadResult.setThumbPath(subFilePath);
+                        return thumbnailSubFilePath;
                     }
-                } finally {
-                    lock.unlock();
+                } catch (IOException e) {
+                    log.warn("Failed to open image file.", e);
                 }
-            } else {
-                uploadResult.setThumbPath(subFilePath);
-            }
+                return subFilePath;
+            });
 
             log.info("Uploaded file: [{}] to directory: [{}] successfully", file.getOriginalFilename(), uploadPath.toString());
             return uploadResult;
@@ -222,7 +210,6 @@ public class LocalFileHandler implements FileHandler {
         Assert.notNull(originalImage, "Image must not be null");
         Assert.notNull(thumbPath, "Thumb path must not be null");
 
-
         boolean result = false;
         // Create the thumbnail
         try {
@@ -230,15 +217,14 @@ public class LocalFileHandler implements FileHandler {
             // Convert to thumbnail and copy the thumbnail
             log.debug("Trying to generate thumbnail: [{}]", thumbPath.toString());
             Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true).toFile(thumbPath.toFile());
-            log.debug("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath.toString());
+            log.info("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath.toString());
             result = true;
         } catch (Throwable t) {
+            // Ignore the error
             log.warn("Failed to generate thumbnail: " + thumbPath, t);
         } finally {
             // Disposes of this graphics context and releases any system resources that it is using.
-            if (originalImage != null) {
-                originalImage.getGraphics().dispose();
-            }
+            originalImage.getGraphics().dispose();
         }
         return result;
     }
