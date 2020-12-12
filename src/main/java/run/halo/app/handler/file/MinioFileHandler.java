@@ -17,9 +17,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
-import run.halo.app.utils.ImageUtils;
 
-import javax.imageio.ImageReader;
 import java.util.Objects;
 
 
@@ -82,13 +80,7 @@ public class MinioFileHandler implements FileHandler {
             uploadResult.setSize(file.getSize());
 
             // Handle thumbnail
-            if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                ImageReader image = ImageUtils.getImageReaderFromFile(file.getInputStream(), extension);
-                assert image != null;
-                uploadResult.setWidth(image.getWidth(0));
-                uploadResult.setHeight(image.getHeight(0));
-                uploadResult.setThumbPath(filePath);
-            }
+            handleImageMetadata(file, uploadResult, () -> filePath);
 
             return uploadResult;
         } catch (Exception e) {

@@ -76,7 +76,7 @@ public class SmmsFileHandler implements FileHandler {
             throw new ServiceException("请先设置 SM.MS 的 Secret Token");
         }
 
-        if (!FileHandler.isImageType(file.getContentType())) {
+        if (!isImageType(file)) {
             log.error("Invalid extension: [{}]", file.getContentType());
             throw new FileOperationException("不支持的文件类型，仅支持 \"jpeg, jpg, png, gif, bmp\" 格式的图片");
         }

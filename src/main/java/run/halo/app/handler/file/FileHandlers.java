@@ -51,7 +51,6 @@ public class FileHandlers {
         return getSupportedType(attachmentType).upload(file);
     }
 
-
     /**
      * Deletes attachment.
      *
