@@ -59,6 +59,8 @@ public class BackupServiceImpl implements BackupService {
 
     private static final String BACKUP_RESOURCE_BASE_URI = "/api/admin/backups/work-dir";
 
+    private static final String DATA_EXPORT_MARKDOWN_BASE_URI = "/api/admin/backups/markdown-export";
+
     private static final String DATA_EXPORT_BASE_URI = "/api/admin/backups/data";
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
@@ -427,6 +429,102 @@ public class BackupServiceImpl implements BackupService {
         themeSettingService.createInBatch(themeSettings);
 
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
+    }
+
+    @Override
+    public BackupDTO exportMarkdowns() throws IOException {
+        // Query all Post data
+        List<Post> allPostList = postService.listAll();
+        Assert.notEmpty(allPostList, "当前无文章可以导出");
+
+        // Write files to the temporary directory
+        String markdownFileTempPathName = haloProperties.getBackupMarkdownDir() + IdUtil.simpleUUID().hashCode();
+        for (int i = 0; i < allPostList.size(); i++) {
+            Post post = allPostList.get(i);
+            String originalContent = post.getOriginalContent();
+            String title = post.getTitle();
+            try {
+                String markdownFileName = title + IdUtil.simpleUUID().hashCode() + ".md";
+                Path markdownFilePath = Paths.get(markdownFileTempPathName, markdownFileName);
+                if (!Files.exists(markdownFilePath.getParent())) {
+                    Files.createDirectories(markdownFilePath.getParent());
+                }
+                Path markdownDataPath = Files.createFile(markdownFilePath);
+                FileWriter fileWriter = new FileWriter(markdownDataPath.toFile(), CharsetUtil.UTF_8);
+                fileWriter.write(originalContent);
+            } catch (IOException e) {
+                throw new ServiceException("导出数据失败", e);
+            }
+        }
+
+        // Zip temporary directory to temporary file
+        try {
+            // Create zip path
+            String markdownZipFileName = HaloConst.HALO_BACKUP_MARKDOWN_PREFIX +
+                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                    IdUtil.simpleUUID().hashCode() + ".zip";
+
+            // Create zip file
+            Path markdownZipFilePath = Paths.get(haloProperties.getBackupMarkdownDir(), markdownZipFileName);
+            if (!Files.exists(markdownZipFilePath.getParent())) {
+                Files.createDirectories(markdownZipFilePath.getParent());
+            }
+            Path markdownZipPath = Files.createFile(markdownZipFilePath);
+
+            // Zip temporary directory
+            Path markdownFileTempPath = Paths.get(markdownFileTempPathName);
+            run.halo.app.utils.FileUtils.zip(markdownFileTempPath, markdownZipPath);
+
+            // Remove files in the temporary directory
+            run.halo.app.utils.FileUtils.deleteFolder(markdownFileTempPath);
+
+            // Build backup dto
+            return buildBackupDto(DATA_EXPORT_MARKDOWN_BASE_URI, markdownZipPath);
+        } catch (IOException e) {
+            throw new ServiceException("Failed to export markdowns", e);
+        }
+    }
+
+    @Override
+    public List<BackupDTO> listMarkdowns() {
+        // Ensure the parent folder exist
+        Path backupParentPath = Paths.get(haloProperties.getBackupMarkdownDir());
+        if (Files.notExists(backupParentPath)) {
+            return Collections.emptyList();
+        }
+
+        // Build backup dto
+        try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
+            return subPathStream
+                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_MARKDOWN_PREFIX))
+                    .map(backupPath -> buildBackupDto(DATA_EXPORT_MARKDOWN_BASE_URI, backupPath))
+                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new ServiceException("Failed to fetch backups", e);
+        }
+    }
+
+    @Override
+    public void deleteMarkdown(String fileName) {
+        Assert.hasText(fileName, "File name must not be blank");
+
+        Path backupRootPath = Paths.get(haloProperties.getBackupMarkdownDir());
+
+        // Get backup path
+        Path backupPath = backupRootPath.resolve(fileName);
+
+        // Check directory traversal
+        run.halo.app.utils.FileUtils.checkDirectoryTraversal(backupRootPath, backupPath);
+
+        try {
+            // Delete backup file
+            Files.delete(backupPath);
+        } catch (NoSuchFileException e) {
+            throw new NotFoundException("The file " + fileName + " was not found", e);
+        } catch (IOException e) {
+            throw new ServiceException("Failed to delete backup", e);
+        }
     }
 
     /**

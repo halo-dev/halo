@@ -91,4 +91,28 @@ public interface BackupService {
      * @throws IOException throws IOException
      */
     void importData(MultipartFile file) throws IOException;
+
+    /**
+     * Export Markdown content
+     *
+     * @return backup dto.
+     * @throws IOException throws IOException
+     */
+    @NonNull
+    BackupDTO exportMarkdowns() throws IOException;
+
+    /**
+     * list Markdown backups
+     *
+     * @return backup list
+     */
+    @NonNull
+    List<BackupDTO> listMarkdowns();
+
+    /**
+     * delete a markdown backup
+     *
+     * @param fileName
+     */
+    void deleteMarkdown(@NonNull String fileName);
 }
