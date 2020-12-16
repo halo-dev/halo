@@ -120,11 +120,10 @@ class AttachmentHandlerCovertUtilsTest {
         assertEquals("b", urls.get(0));
 
         postMD = "```\n" +
-                "![a](b.png)\n" +
-                "```" +
-                "`![a](b.png)`" +
-                "![a](b.png)" +
-                "```";
+                "![x](x.png)\n" +
+                "```\n" +
+                "`![x](x.png)` \n" +
+                "![a](b.png)";
         urls = AttachmentHandlerCovertUtils.getImageUrl(postMD);
         assertEquals(1, urls.size());
         assertEquals("b.png", urls.get(0));
