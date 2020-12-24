@@ -6,10 +6,8 @@ on:
       - '**'
       - '!**.md'
   push:
-    branches:
-      - main
-      - master
-      - 1196-refactor/ci # temporarily set
+    tags-ignore:
+      - v*
 
 jobs:
   check:

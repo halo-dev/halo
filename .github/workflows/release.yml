@@ -1,17 +1,15 @@
 name: Halo CI
 
 on:
-  pull_request:
-    paths:
-      - '**'
-      - '!**.md'
+  push:
+    tags:
+      - v*
 
 jobs:
-  halo-ci:
-    name: Halo CI
+  build_and_deploy:
     runs-on: ubuntu-latest
     # Default steps
-    defaults:
+    steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -37,14 +35,25 @@ jobs:
           key: ${{ runner.os }}-dependencies-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-dependencies-
-    steps:
       - name: Check And Test
         run: ./gradlew check
 
       - name: Build with Gradle
         run: ./gradlew build -x test
 
-      - name: Docker build for unstable version
+      - name: Upload a Release Asset
+        uses: actions/upload-release-asset@v1.0.2
+        with:
+          # The URL for uploading assets to the release
+          upload_url:
+          # The path to the asset you want to upload
+          asset_path:
+          # The name of the asset you want to upload
+          asset_name:
+          # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
+          asset_content_type:
+
+        - name: Docker build for unstable version
         run: docker info
 
       - name: Docker build for stable version
