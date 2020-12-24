@@ -50,6 +50,6 @@ jobs:
         run: ./gradlew build -x test
 
       - name: Docker build for unstable version
-        run:
+        run: docker info
       - name: Docker build for stable version
-        run:
+        run: docker info
