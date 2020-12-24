@@ -5,12 +5,6 @@ on:
     paths:
       - '**'
       - '!**.md'
-  push:
-    branches:
-      - main
-      - master
-    tags:
-      - v*
 
 jobs:
   halo-ci:

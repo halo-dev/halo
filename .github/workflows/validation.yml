@@ -1,4 +1,4 @@
-name: Halo CI
+name: Halo validation
 
 on:
   pull_request:
@@ -9,15 +9,13 @@ on:
     branches:
       - main
       - master
-    tags:
-      - v*
+      - 1196-refactor/ci # temporarily set
 
 jobs:
-  halo-ci:
-    name: Halo CI
+  check:
     runs-on: ubuntu-latest
     # Default steps
-    defaults:
+    steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
@@ -43,15 +41,5 @@ jobs:
           key: ${{ runner.os }}-dependencies-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-dependencies-
-    steps:
       - name: Check And Test
         run: ./gradlew check
-
-      - name: Build with Gradle
-        run: ./gradlew build -x test
-
-      - name: Docker build for unstable version
-        run: docker info
-
-      - name: Docker build for stable version
-        run: docker info
