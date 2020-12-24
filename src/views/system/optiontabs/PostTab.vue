@@ -20,14 +20,14 @@
           <a-select-option value="visits">点击量</a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="首页每页条数：">
+      <a-form-model-item label="首页每页文章条数：">
         <a-input-number
           v-model="options.post_index_page_size"
           :min="1"
           style="width:100%"
         />
       </a-form-model-item>
-      <a-form-model-item label="归档每页条数：">
+      <a-form-model-item label="归档页面每页文章条数：" help="* 包括标签所属文章页面、分类所属文章页面">
         <a-input-number
           v-model="options.post_archives_page_size"
           :min="1"
