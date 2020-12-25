@@ -6,8 +6,13 @@ on:
       - '**'
       - '!**.md'
   push:
+    branches:
+      - '**'
+    paths:
+      - '**'
+      - '!**.md'
     tags-ignore:
-      - v*
+      - '**'
 
 jobs:
   check:
