@@ -36,7 +36,7 @@ class PostServiceImplTest {
 
     @Test
     void getContent() {
-        String exportMarkdown = postService.exportMarkdown(18);
+        String exportMarkdown = postService.exportMarkdown(1);
         log.debug(exportMarkdown);
     }
 

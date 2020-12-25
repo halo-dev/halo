@@ -5,6 +5,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
+import run.halo.app.model.params.PostMarkdownParam;
 
 import java.io.IOException;
 import java.util.List;
@@ -95,11 +96,12 @@ public interface BackupService {
     /**
      * Export Markdown content
      *
+     * @param postMarkdownParam param
      * @return backup dto.
      * @throws IOException throws IOException
      */
     @NonNull
-    BackupDTO exportMarkdowns() throws IOException;
+    BackupDTO exportMarkdowns(PostMarkdownParam postMarkdownParam) throws IOException;
 
     /**
      * list Markdown backups

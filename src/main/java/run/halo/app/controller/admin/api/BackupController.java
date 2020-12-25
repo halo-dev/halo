@@ -12,6 +12,7 @@ import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
+import run.halo.app.model.params.PostMarkdownParam;
 import run.halo.app.service.BackupService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.util.List;
  *
  * @author johnniang
  * @author ryanwang
+ * @author Raremaa
  * @date 2019-04-26
  */
 @RestController
@@ -83,7 +85,7 @@ public class BackupController {
         backupService.deleteWorkDirBackup(filename);
     }
 
-    @PostMapping("markdown")
+    @PostMapping("markdown/import")
     @ApiOperation("Imports markdown")
     public BasePostDetailDTO backupMarkdowns(@RequestPart("file") MultipartFile file) throws IOException {
         return backupService.importMarkdown(file);
@@ -132,27 +134,27 @@ public class BackupController {
                 .body(exportDataResource);
     }
 
-    @PostMapping("markdown-export")
+    @PostMapping("markdown/export")
     @ApiOperation("Exports markdowns")
     @DisableOnCondition
-    public BackupDTO exportMarkdowns() throws IOException {
-        return backupService.exportMarkdowns();
+    public BackupDTO exportMarkdowns(@RequestBody PostMarkdownParam postMarkdownParam) throws IOException {
+        return backupService.exportMarkdowns(postMarkdownParam);
     }
 
-    @GetMapping("markdown-export")
+    @GetMapping("markdown/export")
     @ApiOperation("Gets all markdown backups")
     public List<BackupDTO> listMarkdowns() {
         return backupService.listMarkdowns();
     }
 
-    @DeleteMapping("markdown-export")
+    @DeleteMapping("markdown/export")
     @ApiOperation("Deletes a markdown backup")
     @DisableOnCondition
     public void deleteMarkdown(@RequestParam("filename") String filename) {
         backupService.deleteMarkdown(filename);
     }
 
-    @GetMapping("markdown-export/{fileName:.+}")
+    @GetMapping("markdown/export/{fileName:.+}")
     @ApiOperation("Downloads a work markdown backup file")
     @DisableOnCondition
     public ResponseEntity<Resource> downloadMarkdown(@PathVariable("fileName") String fileName, HttpServletRequest request) {
