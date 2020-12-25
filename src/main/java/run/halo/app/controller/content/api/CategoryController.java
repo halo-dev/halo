@@ -8,10 +8,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.CategoryDTO;
-import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
@@ -56,12 +56,12 @@ public class CategoryController {
 
     @GetMapping("{slug}/posts")
     @ApiOperation("Lists posts by category slug")
-    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slug") String slug,
+    public Page<PostListVO> listPostsBy(@PathVariable("slug") String slug,
             @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable) {
         // Get category by slug
         Category category = categoryService.getBySlugOfNonNull(slug);
 
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
-        return postService.convertToSimple(postPage);
+        return postService.convertToListVo(postPage);
     }
 }
