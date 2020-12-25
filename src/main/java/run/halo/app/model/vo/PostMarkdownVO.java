@@ -15,6 +15,8 @@ public class PostMarkdownVO {
 
     private String title;
 
+    private String slug;
+
     private String originalContent;
 
     private String frontMatter;
