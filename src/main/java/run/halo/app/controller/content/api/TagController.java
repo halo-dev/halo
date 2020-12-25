@@ -9,10 +9,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
 import run.halo.app.model.dto.TagDTO;
-import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
@@ -59,13 +59,13 @@ public class TagController {
 
     @GetMapping("{slug}/posts")
     @ApiOperation("Lists posts by tag slug")
-    public Page<BasePostSimpleDTO> listPostsBy(@PathVariable("slug") String slug,
+    public Page<PostListVO> listPostsBy(@PathVariable("slug") String slug,
             @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable) {
         // Get tag by slug
         Tag tag = tagService.getBySlugOfNonNull(slug);
 
         // Get posts, convert and return
         Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
-        return postService.convertToSimple(postPage);
+        return postService.convertToListVo(postPage);
     }
 }
