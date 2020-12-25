@@ -41,19 +41,37 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: true
+
+      - name: Get Name of Artifact
+          run: |
+            ARTIFACT_PATHNAME=$(ls build/libs/*.jar | head -n 1)
+            ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
+            echo ::set-env name=ARTIFACT_NAME::${ARTIFACT_NAME}
+            echo ::set-env name=ARTIFACT_PATHNAME::${ARTIFACT_PATHNAME}
+
       - name: Upload a Release Asset
         uses: actions/upload-release-asset@v1.0.2
         with:
           # The URL for uploading assets to the release
-          upload_url:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           # The path to the asset you want to upload
-          asset_path:
+          asset_path: ${{ env.ARTIFACT_PATHNAME }}
           # The name of the asset you want to upload
-          asset_name:
+          asset_name: ${{ env.ARTIFACT_NAME }}
           # The content-type of the asset you want to upload. See the supported Media Types here: https://www.iana.org/assignments/media-types/media-types.xhtml for more information
-          asset_content_type:
+          asset_content_type: application/java-archive
 
-        - name: Docker build for unstable version
+      - name: Docker build for unstable version
         run: docker info
 
       - name: Docker build for stable version
