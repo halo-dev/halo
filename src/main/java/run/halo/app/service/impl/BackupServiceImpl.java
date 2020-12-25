@@ -452,7 +452,7 @@ public class BackupServiceImpl implements BackupService {
             Boolean needFrontMatter = Optional.ofNullable(postMarkdownParam.getNeedFrontMatter()).orElse(false);
             if (needFrontMatter) {
                 // Add front-matter
-                content.append(postMarkdownVO.getFrontMatter());
+                content.append(postMarkdownVO.getFrontMatter()).append("\n");
             }
             content.append(postMarkdownVO.getOriginalContent());
             try {
