@@ -1,9 +1,9 @@
 name: Halo CI
 
 on:
-  push:
-    tags:
-      - v*
+  release:
+    types: # This configuration does not affect the page_build event above
+      - created
 
 jobs:
   build_and_deploy:
