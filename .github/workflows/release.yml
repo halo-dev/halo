@@ -75,19 +75,16 @@ jobs:
             console.log({ owner, repo, sha });
 
             const releaseId = process.env.RELEASE_ID
-            console.log(`Trying to release to: ${releaseId}`)
+            const artifactPathName = process.env.ARTIFACT_PATHNAME
+            const artifactName = process.env.ARTIFACT_NAME
+            console.log('Releasing', releaseId, artifactPathName, artifactName)
 
-            for (let file of await fs.readdir('build/libs')) {
-              // do whatever filtering you want here, I'm just uploading all the files
-              console.log('uploading', file);
-
-              await github.repos.uploadReleaseAsset({
-                owner, repo,
-                release_id: releaseId,
-                name: file,
-                data: await fs.readFile(`./${file}`)
-              });
-            }
+            await github.repos.uploadReleaseAsset({
+              owner, repo,
+              release_id: releaseId,
+              name: artifactName,
+              data: await fs.readFile(artifactPathName)
+            });
 
       - name: Docker build for unstable version
         run: docker info
