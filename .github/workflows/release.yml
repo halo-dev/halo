@@ -58,7 +58,7 @@ jobs:
           upload_url: ${{ github.event.release.upload_url }}
           asset_path: ${{ env.ARTIFACT_PATHNAME }}
           asset_name: ${{ env.ARTIFACT_NAME }}
-          asset_content_type: application/java-archive
+          asset_content_type: application/zip
 
       - name: Docker build for unstable version
         run: docker info
