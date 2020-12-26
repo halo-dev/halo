@@ -68,7 +68,7 @@
           :loading="form.logging"
           type="primary"
           :block="true"
-          @click="handleLoginClick"
+          @click="form.needAuthCode ? handleLogin() : handleLoginClick()"
         >{{ buttonName }}</a-button>
       </a-form-model-item>
     </a-form-model>
@@ -92,22 +92,22 @@ export default {
         model: {
           authcode: null,
           password: null,
-          username: null
+          username: null,
         },
         rules: {
           username: [{ required: true, message: '* 用户名/邮箱不能为空', trigger: ['change'] }],
           password: [{ required: true, message: '* 密码不能为空', trigger: ['change'] }],
-          authcode: [{ validator: authcodeValidate, trigger: ['change'] }]
+          authcode: [{ validator: authcodeValidate, trigger: ['change'] }],
         },
         needAuthCode: false,
-        logging: false
-      }
+        logging: false,
+      },
     }
   },
   computed: {
     buttonName() {
       return this.form.needAuthCode ? '验证' : '登录'
-    }
+    },
   },
   methods: {
     ...mapActions(['login', 'refreshUserCache', 'refreshOptionsCache']),
@@ -116,26 +116,22 @@ export default {
       _this.$refs.loginForm.validate((valid) => {
         if (valid) {
           _this.form.logging = true
-          if (_this.form.needAuthCode && _this.form.model.authcode) {
-            _this.handleLogin()
-          } else {
-            adminApi
-              .loginPreCheck(_this.form.model.username, _this.form.model.password)
-              .then((response) => {
-                const data = response.data.data
-                if (data && data.needMFACode) {
-                  _this.form.needAuthCode = true
-                  _this.form.model.authcode = null
-                } else {
-                  _this.handleLogin()
-                }
-              })
-              .finally(() => {
-                setTimeout(() => {
-                  _this.form.logging = false
-                }, 300)
-              })
-          }
+          adminApi
+            .loginPreCheck(_this.form.model.username, _this.form.model.password)
+            .then((response) => {
+              const data = response.data.data
+              if (data && data.needMFACode) {
+                _this.form.needAuthCode = true
+                _this.form.model.authcode = null
+              } else {
+                _this.handleLogin()
+              }
+            })
+            .finally(() => {
+              setTimeout(() => {
+                _this.form.logging = false
+              }, 300)
+            })
         }
       })
     },
@@ -156,7 +152,7 @@ export default {
             })
         }
       })
-    }
-  }
+    },
+  },
 }
 </script>
