@@ -46,15 +46,15 @@ jobs:
         run: |
           ARTIFACT_PATHNAME=$(ls build/libs/*.jar | head -n 1)
           ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
-          echo '::set-output name=ARTIFACT_NAME::$ARTIFACT_NAME'
-          echo '::set-output name=ARTIFACT_PATHNAME::$ARTIFACT_PATHNAME'
+          echo '::set-env name=ARTIFACT_NAME::${ARTIFACT_NAME}'
+          echo '::set-env name=ARTIFACT_PATHNAME::${ARTIFACT_PATHNAME}'
 
       - name: Upload a Release Asset
         uses: actions/upload-release-asset@v1.0.2
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ steps.get_artifact.outputs.ARTIFACT_PATHNAME }}
-          asset_name: ${{ steps.get_artifact.outputs.ARTIFACT_NAME }}
+          asset_path: ${{ env.ARTIFACT_PATHNAME }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/java-archive
 
       - name: Docker build for unstable version
