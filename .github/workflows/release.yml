@@ -46,8 +46,8 @@ jobs:
         run: |
           ARTIFACT_PATHNAME=$(ls build/libs/*.jar | head -n 1)
           ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
-          echo '::set-output name=ARTIFACT_NAME::${ARTIFACT_NAME}'
-          echo '::set-output name=ARTIFACT_PATHNAME::${ARTIFACT_PATHNAME}'
+          echo '::set-output name=ARTIFACT_NAME::$ARTIFACT_NAME'
+          echo '::set-output name=ARTIFACT_PATHNAME::$ARTIFACT_PATHNAME'
 
       - name: Upload a Release Asset
         uses: actions/upload-release-asset@v1.0.2
