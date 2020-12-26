@@ -35,6 +35,7 @@ jobs:
           key: ${{ runner.os }}-dependencies-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-dependencies-
+
       - name: Check And Test
         run: ./gradlew check
 
@@ -45,7 +46,9 @@ jobs:
         id: get_artifact
         run: |
           ARTIFACT_PATHNAME=$(ls build/libs/*.jar | head -n 1)
-          ARTIFACT_NAME=$(basename $ARTIFACT_PATHNAME)
+          ARTIFACT_NAME=$(basename ${ARTIFACT_PATHNAME})
+          echo "Artifact pathname: ${ARTIFACT_PATHNAME}"
+          echo "Artifact name: ${ARTIFACT_NAME}"
           echo "ARTIFACT_PATHNAME=${ARTIFACT_PATHNAME}" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
 
@@ -53,8 +56,8 @@ jobs:
         uses: actions/upload-release-asset@v1.0.2
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{ ARTIFACT_PATHNAME }}
-          asset_name: ${{ ARTIFACT_NAME }}
+          asset_path: ${{ env.ARTIFACT_PATHNAME }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/java-archive
 
       - name: Docker build for unstable version
