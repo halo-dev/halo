@@ -8,10 +8,7 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostQuery;
-import run.halo.app.model.vo.ArchiveMonthVO;
-import run.halo.app.model.vo.ArchiveYearVO;
-import run.halo.app.model.vo.PostDetailVO;
-import run.halo.app.model.vo.PostListVO;
+import run.halo.app.model.vo.*;
 import run.halo.app.service.base.BasePostService;
 
 import javax.validation.constraints.NotNull;
@@ -112,8 +109,8 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Gets post by post year and slug.
      *
-     * @param year  post create year.
-     * @param slug  post slug.
+     * @param year post create year.
+     * @param slug post slug.
      * @return post info
      */
     @NonNull
@@ -276,4 +273,12 @@ public interface PostService extends BasePostService<Post> {
     @NotNull
     Sort getPostDefaultSort();
 
+
+    /**
+     * Lists PostMarkdown vo
+     *
+     * @return a list of PostMarkdown vo
+     */
+    @NonNull
+    List<PostMarkdownVO> listPostMarkdowns();
 }
