@@ -59,6 +59,11 @@ public class HaloProperties {
     private String backupDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup" + FILE_SEPARATOR;
 
     /**
+     * Halo backup markdown directory.(Not recommended to modify this config);
+     */
+    private String backupMarkdownDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup-markdown" + FILE_SEPARATOR;
+
+    /**
      * Halo data export directory.
      */
     private String dataExportDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-data-export" + FILE_SEPARATOR;
