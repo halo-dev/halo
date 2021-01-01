@@ -18,31 +18,31 @@
 
 一个优秀的开源博客发布应用，值得一试。
 
-> [官网 & 文档](https://halo.run) | [社区](https://bbs.halo.run) | [Telegram 频道](https://t.me/halo_dev)
+> [官网](https://halo.run) | [文档](https://docs.halo.run) | [社区](https://bbs.halo.run) | [Telegram 频道](https://t.me/halo_dev)
 
 ## 快速开始
 
 ### 下载最新的 Halo 安装包
 
-> 其他地址：https://halo.run/archives/download.html
+> 其他地址：https://docs.halo.run/zh/install/downloads
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar --output halo-latest.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar --output halo.jar
 ```
 
 或者
 
 ```bash
-wget https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar -O halo-latest.jar
+wget https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar -O halo.jar
 ```
 
 ### 启动 Halo
 
 ```bash
-java -jar halo-latest.jar
+java -jar halo.jar
 ```
 
-详细部署文档请移步：<https://halo.run/archives/install-quick-start.html>
+详细部署文档请移步：<https://docs.halo.run/zh/install/index>
 
 ## 周边
 
