@@ -37,13 +37,33 @@ configurations {
 
 bootJar {
     manifest {
-        attributes("Implementation-Title": "Halo Application",
-                "Implementation-Version": archiveVersion)
+        attributes "Implementation-Title": "Halo Application",
+                "Implementation-Version": archiveVersion
     }
 }
 
 bootBuildImage {
-    imageName = "johnniang/halo"
+    // prepare data
+    def dockerRegistry = System.getenv("DOCKER_REGISTRY")
+    def dockerUsername = System.getenv("DOCKER_USERNAME")
+    def dockerToken = System.getenv("DOCKER_TOKEN")
+    assert dockerUsername != null
+    assert dockerToken != null
+    def imageNamePrefix = "${dockerUsername}"
+    if (dockerRegistry != null)
+        imageNamePrefix = "${dockerRegistry}/${dockerUsername}"
+
+    // config plugin
+    imageName = "${imageNamePrefix}/halo:${project.version}"
+    publish = true
+    docker {
+        publishRegistry {
+            username = "${dockerUsername}"
+            password = "${dockerToken}"
+            url = "https://hub.docker.com/r/${dockerUsername}/halo"
+            email = "hi@halo.run"
+        }
+    }
 }
 
 ext {
