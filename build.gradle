@@ -38,8 +38,12 @@ configurations {
 bootJar {
     manifest {
         attributes("Implementation-Title": "Halo Application",
-                "Implementation-Version": version)
+                "Implementation-Version": archiveVersion)
     }
+}
+
+bootBuildImage {
+    imageName = "johnniang/halo"
 }
 
 ext {
