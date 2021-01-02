@@ -65,6 +65,7 @@ jobs:
         run: ./gradlew check
   build:
     runs-on: ubuntu-latest
+    needs: check
     if: github.event_name == 'release'
     # Default steps
     steps:
