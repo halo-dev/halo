@@ -26,10 +26,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Download halo jar
-        uses: actions/download-artifact@v2
-        with:
-          name: halo-jar
       - name: Cache Gradle wrapper
         id: cache-gradle-wrapper
         uses: actions/cache@v2.1.3
@@ -38,6 +34,16 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-dependencies-
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v2.1.3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-dependencies-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-dependencies-
+      - name: Build with Gradle
+        run: ./gradlew build -x test
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
