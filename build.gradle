@@ -59,7 +59,7 @@ bootBuildImage {
         dockerImageName = "${dockerUsername}/halo"
     }
     if (!tagLatest) {
-        dockerImageName += ":${project.version}"
+        dockerImageName = "${dockerImageName}:${project.version}"
     }
 
     // config plugin
