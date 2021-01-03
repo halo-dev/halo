@@ -683,7 +683,7 @@ public class ThemeServiceImpl implements ThemeService {
             // Create temp directory
             tempPath = FileUtils.createTempDirectory();
 
-            String basename = FilenameUtils.getBasename(file.getOriginalFilename());
+            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
             Path themeTempPath = tempPath.resolve(basename);
 
             // Check directory traversal
@@ -704,8 +704,9 @@ public class ThemeServiceImpl implements ThemeService {
             }
 
             // Not support current halo version.
-            if (StringUtils.isNotEmpty(prepareThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, prepareThemeProperty.getRequire())) {
-                throw new ThemeNotSupportException("新版本主题仅支持 Halo " + prepareThemeProperty.getRequire() + " 以上的版本");
+            if (StringUtils.isNotEmpty(prepareThemeProperty.getRequire())
+                    && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, prepareThemeProperty.getRequire())) {
+                throw new ThemeNotSupportException("新版本主题仅支持 Halo " + prepareThemeProperty.getRequire() + " 及以上的版本，请更新 Halo 后重试。");
             }
 
             // Coping new theme files to old theme folder.
@@ -734,6 +735,7 @@ public class ThemeServiceImpl implements ThemeService {
                 DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
 
         Git git = null;
+        RevCommit lastCommit = null;
 
         try {
             git = GitUtils.openOrInit(Paths.get(themeProperty.getThemePath()));
@@ -745,7 +747,11 @@ public class ThemeServiceImpl implements ThemeService {
                     .addFilepattern(".")
                     .call();
             // Commit the changes
-            git.commit().setMessage("Commit by halo automatically").call();
+            git.commit()
+                    .setAllowEmpty(true)
+                    .setSign(false)
+                    .setMessage("Commit by halo automatically")
+                    .call();
 
             RevWalk revWalk = new RevWalk(repository);
 
@@ -753,7 +759,7 @@ public class ThemeServiceImpl implements ThemeService {
 
             Assert.notNull(ref, Constants.HEAD + " ref was not found!");
 
-            RevCommit lastCommit = revWalk.parseCommit(ref.getObjectId());
+            lastCommit = revWalk.parseCommit(ref.getObjectId());
 
             // Force to set remote name
             git.remoteRemove().setRemoteName(THEME_PROVIDER_REMOTE_NAME).call();
@@ -798,14 +804,19 @@ public class ThemeServiceImpl implements ThemeService {
             ThemeProperty updatedThemeProperty = getProperty(Paths.get(themeProperty.getThemePath()));
 
             // Not support current halo version.
-            if (StringUtils.isNotEmpty(updatedThemeProperty.getRequire()) && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, updatedThemeProperty.getRequire())) {
-                // reset theme version
+            if (StringUtils.isNotEmpty(updatedThemeProperty.getRequire())
+                    && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, updatedThemeProperty.getRequire())) {
+                throw new ThemeNotSupportException("新版本主题仅支持 Halo " + updatedThemeProperty.getRequire() + " 以上的版本");
+            }
+        } catch (Exception e) {
+            if (git != null && lastCommit != null) {
+                log.warn("Rollback theme files to [{}]", lastCommit.getFullMessage());
                 git.reset()
                         .setMode(ResetCommand.ResetType.HARD)
                         .setRef(lastCommit.getName())
                         .call();
-                throw new ThemeNotSupportException("新版本主题仅支持 Halo " + updatedThemeProperty.getRequire() + " 以上的版本");
             }
+            throw e;
         } finally {
             GitUtils.closeQuietly(git);
         }

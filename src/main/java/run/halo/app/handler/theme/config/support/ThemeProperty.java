@@ -9,6 +9,7 @@ import java.util.Set;
  * Theme property.
  *
  * @author ryanwang
+ * @author johnniang
  * @date 2019-03-22
  */
 @Data
@@ -38,6 +39,11 @@ public class ThemeProperty {
      * Theme repo url.
      */
     private String repo;
+
+    /**
+     * Theme update strategy. Default is branch.
+     */
+    private UpdateStrategy updateStrategy = UpdateStrategy.BRANCH;
 
     /**
      * Theme description.
@@ -116,8 +122,13 @@ public class ThemeProperty {
         return Objects.hash(id);
     }
 
+    /**
+     * Theme author info.
+     *
+     * @author johnniang
+     */
     @Data
-    private static class Author {
+    public static class Author {
 
         /**
          * Author name.
@@ -133,5 +144,22 @@ public class ThemeProperty {
          * Author avatar.
          */
         private String avatar;
+    }
+
+    /**
+     * Theme update strategy.
+     *
+     * @author johnniang
+     */
+    public enum UpdateStrategy {
+        /**
+         * Update from specific branch
+         */
+        BRANCH,
+
+        /**
+         * Update from latest release
+         */
+        RELEASE;
     }
 }

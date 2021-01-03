@@ -178,7 +178,7 @@ public class ThemeController {
         return themeService.fetch(uri);
     }
 
-    @PostMapping("fetchingBranches")
+    @PostMapping(value = {"fetchingBranches", "/fetching/git/branches"})
     @ApiOperation("Fetches all branches")
     public List<ThemeProperty> fetchBranches(@RequestParam("uri") String uri) {
         return themeService.fetchBranches(uri);
@@ -209,7 +209,7 @@ public class ThemeController {
     }
 
     @PutMapping("fetching/{themeId}")
-    @ApiOperation("Upgrades theme by remote")
+    @ApiOperation("Upgrades theme from remote")
     public ThemeProperty updateThemeByFetching(@PathVariable("themeId") String themeId) {
         return themeService.update(themeId);
     }
