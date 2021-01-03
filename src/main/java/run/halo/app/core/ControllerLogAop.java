@@ -32,11 +32,15 @@ import java.util.Objects;
 @Slf4j
 public class ControllerLogAop {
 
+    @Pointcut("@within(org.springframework.web.bind.annotation.RestController)")
+    public void restController() {
+    }
+
     @Pointcut("@within(org.springframework.stereotype.Controller)")
     public void controller() {
     }
 
-    @Around("controller()")
+    @Around("controller() || restController()")
     public Object controller(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         final Method method = signature.getMethod();
