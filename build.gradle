@@ -42,25 +42,32 @@ bootJar {
     }
 }
 
+bootBuildImage.doFirst {
+    // check data
+    assert System.getenv("DOCKER_USERNAME") != null
+    assert System.getenv("DOCKER_TOKEN") != null
+}
+
 bootBuildImage {
     // prepare data
-    def dockerRegistry = System.getenv("DOCKER_REGISTRY")
+    def tagLatest = Boolean.valueOf(System.getenv("TAG_LATEST"))
+    def dockerImageName = System.getenv("DOCKER_IMAGE_NAME")
     def dockerUsername = System.getenv("DOCKER_USERNAME")
     def dockerToken = System.getenv("DOCKER_TOKEN")
-    assert dockerUsername != null
-    assert dockerToken != null
-    def imageNamePrefix = "${dockerUsername}"
-    if (dockerRegistry != null)
-        imageNamePrefix = "${dockerRegistry}/${dockerUsername}"
+
+    if (dockerImageName == null) {
+        dockerImageName = "${dockerUsername}/halo"
+    }
+    if (!tagLatest) {
+        dockerImageName += ":${project.version}"
+    }
 
     // config plugin
-    imageName = "${imageNamePrefix}/halo:${project.version}"
-    publish = true
+    imageName = "${dockerImageName}"
     docker {
         publishRegistry {
             username = "${dockerUsername}"
             password = "${dockerToken}"
-            url = "https://hub.docker.com/r/${dockerUsername}/halo"
             email = "hi@halo.run"
         }
     }
