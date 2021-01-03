@@ -100,8 +100,6 @@ jobs:
       - name: Get Name of Artifact
         id: get_artifact
         run: |
-          echo "Display structure of downloaded files."
-          ls -R
           ARTIFACT_PATHNAME=$(ls build/libs/*.jar | head -n 1)
           ARTIFACT_NAME=$(basename ${ARTIFACT_PATHNAME})
           echo "Artifact pathname: ${ARTIFACT_PATHNAME}"
@@ -164,9 +162,6 @@ jobs:
         uses: docker/setup-buildx-action@v1
       - name: Build docker image
         run: |
-          echo "Display structure of downloaded files."
-          ls -R
-          PRE_RELEASE=${{ github.event.release.prerelease }}
           docker info
           docker images
           export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
@@ -175,6 +170,7 @@ jobs:
           export TAG_LATEST=false
           echo "Building and pushing with version tag."
           ./gradlew bootBuildImage -x bootJar --publishImage
+          PRE_RELEASE=${{ github.event.release.prerelease }}
           if ! $PRE_RELEASE
           then
             echo "Building and pushing with latest tag."
