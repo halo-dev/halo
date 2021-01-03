@@ -37,8 +37,39 @@ configurations {
 
 bootJar {
     manifest {
-        attributes("Implementation-Title": "Halo Application",
-                "Implementation-Version": version)
+        attributes "Implementation-Title": "Halo Application",
+                "Implementation-Version": archiveVersion
+    }
+}
+
+bootBuildImage.doFirst {
+    // check data
+    assert System.getenv("DOCKER_USERNAME") != null
+    assert System.getenv("DOCKER_TOKEN") != null
+}
+
+bootBuildImage {
+    // prepare data
+    def tagLatest = Boolean.valueOf(System.getenv("TAG_LATEST"))
+    def dockerImageName = System.getenv("DOCKER_IMAGE_NAME")
+    def dockerUsername = System.getenv("DOCKER_USERNAME")
+    def dockerToken = System.getenv("DOCKER_TOKEN")
+
+    if (dockerImageName == null) {
+        dockerImageName = "${dockerUsername}/halo"
+    }
+    if (!tagLatest) {
+        dockerImageName = "${dockerImageName}:${project.version}"
+    }
+
+    // config plugin
+    imageName = "${dockerImageName}"
+    docker {
+        publishRegistry {
+            username = "${dockerUsername}"
+            password = "${dockerToken}"
+            email = "hi@halo.run"
+        }
     }
 }
 
