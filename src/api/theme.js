@@ -118,7 +118,7 @@ themeApi.updateByUpload = (formData, uploadProgress, cancelToken, themeId) => {
     data: formData, // form data
     onUploadProgress: uploadProgress,
     cancelToken: cancelToken,
-    method: 'put'
+    method: 'post'
   })
 }
 
