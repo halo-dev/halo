@@ -65,4 +65,32 @@ backupApi.deleteExportedData = filename => {
   })
 }
 
+backupApi.exportMarkdowns = needFrontMatter => {
+  return service({
+    url: `${baseUrl}/markdown/export`,
+    method: 'post',
+    data: {
+      needFrontMatter: needFrontMatter
+    },
+    timeout: 8640000 // 24 hours
+  })
+}
+
+backupApi.listExportedMarkdowns = () => {
+  return service({
+    url: `${baseUrl}/markdown/export`,
+    method: 'get'
+  })
+}
+
+backupApi.deleteExportedMarkdown = filename => {
+  return service({
+    url: `${baseUrl}/markdown/export`,
+    params: {
+      filename: filename
+    },
+    method: 'delete'
+  })
+}
+
 export default backupApi

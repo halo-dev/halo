@@ -1,6 +1,6 @@
 <template>
   <a-drawer
-    title="整站备份"
+    title="导出文章为 Markdown 文档"
     :width="isMobile()?'100%':'480'"
     closable
     :visible="visible"
@@ -14,41 +14,41 @@
     >
       <a-col :span="24">
         <a-alert
-          message="注意：备份后生成的压缩文件存储在临时文件中，重启服务器会造成备份文件的丢失，所以请尽快下载。"
+          message="注意：导出后的数据文件存储在临时文件中，重启服务器会造成备份文件的丢失，所以请尽快下载。"
           banner
           closable
         />
-        <a-divider>历史备份</a-divider>
+        <a-divider>历史文件</a-divider>
         <a-list
           itemLayout="vertical"
           size="small"
-          :dataSource="backups"
+          :dataSource="files"
           :loading="loading"
         >
           <a-list-item
             slot="renderItem"
-            slot-scope="backup"
+            slot-scope="file"
           >
             <a-button
               slot="extra"
               type="link"
               style="color: red"
               icon="delete"
-              :loading="backup.deleting"
-              @click="handleBackupDeleteClick(backup)"
+              :loading="file.deleting"
+              @click="handleFileDeleteClick(file)"
             >删除</a-button>
             <a-list-item-meta>
               <a
                 slot="title"
-                :href="backup.downloadLink"
+                :href="file.downloadLink"
               >
                 <a-icon
                   type="schedule"
                   style="color: #52c41a"
                 />
-                {{ backup.filename }}
+                {{ file.filename }}
               </a>
-              <p slot="description">{{ backup.updateTime | timeAgo }}/{{ backup.fileSize | fileSizeFormat }}</p>
+              <p slot="description">{{ file.updateTime | timeAgo }}/{{ file.fileSize | fileSizeFormat }}</p>
             </a-list-item-meta>
           </a-list-item>
         </a-list>
@@ -57,17 +57,24 @@
     <a-divider class="divider-transparent" />
     <div class="bottom-control">
       <a-space>
-        <ReactiveButton
-          type="primary"
-          icon="download"
-          @click="handleBackupClick"
-          @callback="handleBackupedCallback"
-          :loading="backuping"
-          :errored="backupErrored"
-          text="备份"
-          loadedText="备份成功"
-          erroredText="备份失败"
-        ></ReactiveButton>
+        <a-popconfirm
+          title="是否同时为 Markdown 文档生成 Front Matter？"
+          @confirm="handleExportClick(true)"
+          @cancel="handleExportClick(false)"
+          okText="是"
+          cancelText="否"
+        >
+          <ReactiveButton
+            type="primary"
+            icon="download"
+            @callback="handleBackupedCallback"
+            :loading="backuping"
+            :errored="backupErrored"
+            text="备份"
+            loadedText="备份成功"
+            erroredText="备份失败"
+          ></ReactiveButton>
+        </a-popconfirm>
         <a-button
           type="dashed"
           icon="reload"
@@ -82,14 +89,14 @@
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import backupApi from '@/api/backup'
 export default {
-  name: 'BackupWorkDirDrawer',
+  name: 'ExportDataDrawer',
   mixins: [mixin, mixinDevice],
   data() {
     return {
       backuping: false,
       loading: false,
       backupErrored: false,
-      backups: [],
+      files: [],
     }
   },
   model: {
@@ -112,9 +119,9 @@ export default {
     handleListBackups() {
       this.loading = true
       backupApi
-        .listWorkDirBackups()
+        .listExportedMarkdowns()
         .then((response) => {
-          this.backups = response.data.data
+          this.files = response.data.data
         })
         .finally(() => {
           setTimeout(() => {
@@ -122,10 +129,10 @@ export default {
           }, 200)
         })
     },
-    handleBackupClick() {
+    handleExportClick(needFrontMatter = false) {
       this.backuping = true
       backupApi
-        .backupWorkDir()
+        .exportMarkdowns(needFrontMatter)
         .catch(() => {
           this.backupErrored = true
         })
@@ -142,11 +149,11 @@ export default {
         this.handleListBackups()
       }
     },
-    handleBackupDeleteClick(backup) {
-      backup.deleting = true
-      backupApi.deleteWorkDirBackup(backup.filename).finally(() => {
+    handleFileDeleteClick(file) {
+      file.deleting = true
+      backupApi.deleteExportedMarkdown(file.filename).finally(() => {
         setTimeout(() => {
-          backup.deleting = false
+          file.deleting = false
         }, 400)
         this.handleListBackups()
       })
