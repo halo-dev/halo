@@ -3,6 +3,7 @@ plugins {
     id "io.spring.dependency-management" version "1.0.10.RELEASE"
     id "checkstyle"
     id "java"
+    id "war"
 }
 
 group = "run.halo.app"
@@ -151,6 +152,10 @@ dependencies {
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly "mysql:mysql-connector-java"
 
+    compile "org.springframework.boot:spring-boot-starter-web"  
+    providedCompile "org.springframework.boot:spring-boot-starter-tomcat"  
+    testCompile "org.springframework.boot:spring-boot-starter-test" 
+    
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
 
