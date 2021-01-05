@@ -2,6 +2,9 @@ package run.halo.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
  * Halo main class.
@@ -10,7 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @date 2017-11-14
  */
 @SpringBootApplication
-public class Application {
+@ServletComponentScan
+public class Application extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         // Customize the spring config location
@@ -20,5 +24,10 @@ public class Application {
         // Run application
         SpringApplication.run(Application.class, args);
     }
+    
+    @Override  
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {  
+        return builder.sources(Application.class);  
+    } 
 
 }
