@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 /**
  * Abstract mail service.
@@ -48,7 +49,7 @@ public abstract class AbstractMailService implements MailService {
         return executorService;
     }
 
-    public void setExecutorService(ExecutorService executorService) {
+    public void setExecutorService(@Nullable ExecutorService executorService) {
         this.executorService = executorService;
     }
 
@@ -73,7 +74,7 @@ public abstract class AbstractMailService implements MailService {
      *
      * @param callback mime message callback.
      */
-    protected void sendMailTemplate(@Nullable Callback callback) {
+    protected void sendMailTemplate(@Nullable Consumer<MimeMessageHelper> callback) {
         if (callback == null) {
             log.info("Callback is null, skip to send email");
             return;
@@ -99,7 +100,7 @@ public abstract class AbstractMailService implements MailService {
             // set from-name
             messageHelper.setFrom(getFromAddress(mailSender));
             // handle message set separately
-            callback.handle(messageHelper);
+            callback.accept(messageHelper);
 
             // get mime message
             MimeMessage mimeMessage = messageHelper.getMimeMessage();
@@ -121,9 +122,9 @@ public abstract class AbstractMailService implements MailService {
      * @param callback   callback message handler
      * @param tryToAsync if the send procedure should try to asynchronous
      */
-    protected void sendMailTemplate(boolean tryToAsync, @Nullable Callback callback) {
+    protected void sendMailTemplate(boolean tryToAsync, @Nullable Consumer<MimeMessageHelper> callback) {
         ExecutorService executorService = getExecutorService();
-        if (tryToAsync && executorService != null) {
+        if (tryToAsync) {
             // send mail asynchronously
             executorService.execute(() -> sendMailTemplate(callback));
         } else {
@@ -222,16 +223,4 @@ public abstract class AbstractMailService implements MailService {
         log.debug("Cleared all mail caches");
     }
 
-    /**
-     * Message callback.
-     */
-    protected interface Callback {
-        /**
-         * Handle message set.
-         *
-         * @param messageHelper mime message helper
-         * @throws Exception if something goes wrong
-         */
-        void handle(@NonNull MimeMessageHelper messageHelper) throws Exception;
-    }
 }
