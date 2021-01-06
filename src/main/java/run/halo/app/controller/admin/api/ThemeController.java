@@ -180,30 +180,35 @@ public class ThemeController {
 
     @PostMapping(value = {"fetchingBranches", "/fetching/git/branches"})
     @ApiOperation("Fetches all branches")
+    @Deprecated
     public List<ThemeProperty> fetchBranches(@RequestParam("uri") String uri) {
         return themeService.fetchBranches(uri);
     }
 
     @PostMapping("fetchingReleases")
     @ApiOperation("Fetches all releases")
+    @Deprecated
     public List<ThemeProperty> fetchReleases(@RequestParam("uri") String uri) {
         return themeService.fetchReleases(uri);
     }
 
     @GetMapping("fetchingRelease")
     @ApiOperation("Fetches a specific release")
+    @Deprecated
     public ThemeProperty fetchRelease(@RequestParam("uri") String uri, @RequestParam("tag") String tagName) {
         return themeService.fetchRelease(uri, tagName);
     }
 
     @GetMapping("fetchBranch")
     @ApiOperation("Fetch specific branch")
+    @Deprecated
     public ThemeProperty fetchBranch(@RequestParam("uri") String uri, @RequestParam("branch") String branchName) {
         return themeService.fetchBranch(uri, branchName);
     }
 
     @GetMapping("fetchLatestRelease")
     @ApiOperation("Fetch latest release")
+    @Deprecated
     public ThemeProperty fetchLatestRelease(@RequestParam("uri") String uri) {
         return themeService.fetchLatestRelease(uri);
     }

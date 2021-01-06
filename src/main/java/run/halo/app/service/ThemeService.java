@@ -321,6 +321,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated
     ThemeProperty fetchLatestRelease(@NonNull String uri);
 
     /**
@@ -330,6 +331,7 @@ public interface ThemeService {
      * @return list of theme properties
      */
     @NonNull
+    @Deprecated
     List<ThemeProperty> fetchBranches(@NonNull String uri);
 
     /**
@@ -339,6 +341,7 @@ public interface ThemeService {
      * @return list of theme properties
      */
     @NonNull
+    @Deprecated
     List<ThemeProperty> fetchReleases(@NonNull String uri);
 
     /**
@@ -349,6 +352,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated
     ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName);
 
     /**
@@ -359,6 +363,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated
     ThemeProperty fetchBranch(@NonNull String uri, @NonNull String branchName);
 
     /**

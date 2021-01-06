@@ -743,9 +743,8 @@ public class ThemeServiceImpl implements ThemeService {
             Repository repository = git.getRepository();
 
             // Add all changes
-            git.add()
-                    .addFilepattern(".")
-                    .call();
+            git.add().addFilepattern(".").call();
+
             // Commit the changes
             git.commit()
                     .setAllowEmpty(true)

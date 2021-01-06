@@ -30,10 +30,15 @@ import java.util.function.Consumer;
 public abstract class AbstractMailService implements MailService {
 
     private static final int DEFAULT_POOL_SIZE = 5;
+
     protected final OptionService optionService;
+
     private JavaMailSender cachedMailSender;
+
     private MailProperties cachedMailProperties;
+
     private String cachedFromName;
+
     @Nullable
     private ExecutorService executorService;
 
