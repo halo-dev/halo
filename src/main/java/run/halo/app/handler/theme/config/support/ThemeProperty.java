@@ -33,7 +33,7 @@ public class ThemeProperty {
     /**
      * Theme remote branch.(default is master)
      */
-    private String branch;
+    private String branch = "master";
 
     /**
      * Theme repo url.

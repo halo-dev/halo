@@ -83,7 +83,7 @@ public class GitUtils {
         }
     }
 
-    public static List<String> getAllBranches(@NonNull String repoUrl) {
+    public static List<String> getAllBranchesFromRemote(@NonNull String repoUrl) {
         List<String> branches = new ArrayList<>();
         try {
             Collection<Ref> refs = Git.lsRemoteRepository()

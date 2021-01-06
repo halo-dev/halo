@@ -104,7 +104,7 @@ public class ThemeServiceImpl implements ThemeService {
         this.themeConfigResolver = themeConfigResolver;
         this.restTemplate = restTemplate;
 
-        themeWorkDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
+        this.themeWorkDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
         this.eventPublisher = eventPublisher;
         this.themeSettingRepository = themeSettingRepository;
     }
@@ -213,7 +213,7 @@ public class ThemeServiceImpl implements ThemeService {
         // Read file
         Path path = Paths.get(absolutePath);
         try {
-            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return Files.readString(path);
         } catch (IOException e) {
             throw new ServiceException("读取模板内容失败 " + absolutePath, e);
         }
@@ -227,7 +227,7 @@ public class ThemeServiceImpl implements ThemeService {
         // Read file
         Path path = Paths.get(absolutePath);
         try {
-            return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+            return Files.readString(path);
         } catch (IOException e) {
             throw new ServiceException("读取模板内容失败 " + absolutePath, e);
         }
@@ -312,7 +312,7 @@ public class ThemeServiceImpl implements ThemeService {
                 }
 
                 // Read the yaml file
-                String optionContent = new String(Files.readAllBytes(optionsPath), StandardCharsets.UTF_8);
+                String optionContent = Files.readString(optionsPath);
 
                 // Resolve it
                 return themeConfigResolver.resolve(optionContent);
@@ -602,7 +602,7 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.hasText(uri, "Theme remote uri must not be blank");
 
         String repoUrl = StringUtils.appendIfMissingIgnoreCase(uri, ".git", ".git");
-        List<String> branches = GitUtils.getAllBranches(repoUrl);
+        List<String> branches = GitUtils.getAllBranchesFromRemote(repoUrl);
 
         List<ThemeProperty> themeProperties = new ArrayList<>();
 
@@ -649,7 +649,6 @@ public class ThemeServiceImpl implements ThemeService {
 
         try {
             pullFromGit(updatingTheme);
-
         } catch (Exception e) {
             if (e instanceof ThemeNotSupportException) {
                 throw (ThemeNotSupportException) e;
@@ -728,38 +727,37 @@ public class ThemeServiceImpl implements ThemeService {
 
     private void pullFromGit(@NonNull ThemeProperty themeProperty) throws
             IOException, GitAPIException, URISyntaxException {
+        // 0. git checkout master
+        // 1. git add .
+        // 2. git commit -m "commit by halo"
+        // 3. git pull origin master --rebase
+
         Assert.notNull(themeProperty, "Theme property must not be null");
 
-        // Get branch
-        String branch = StringUtils.isBlank(themeProperty.getBranch()) ?
-                DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
+        // Get branch name
+        final String branchName = themeProperty.getBranch();
 
         Git git = null;
         RevCommit lastCommit = null;
-
         try {
             git = GitUtils.openOrInit(Paths.get(themeProperty.getThemePath()));
-
             Repository repository = git.getRepository();
+            git.checkout()
+                    .setName(branchName)
+                    .call();
 
             // Add all changes
             git.add().addFilepattern(".").call();
-
             // Commit the changes
             git.commit()
                     .setAllowEmpty(true)
                     .setSign(false)
                     .setMessage("Commit by halo automatically")
                     .call();
-
             RevWalk revWalk = new RevWalk(repository);
-
             Ref ref = repository.findRef(Constants.HEAD);
-
             Assert.notNull(ref, Constants.HEAD + " ref was not found!");
-
             lastCommit = revWalk.parseCommit(ref.getObjectId());
-
             // Force to set remote name
             git.remoteRemove().setRemoteName(THEME_PROVIDER_REMOTE_NAME).call();
             RemoteConfig remoteConfig = git.remoteAdd()
@@ -768,31 +766,30 @@ public class ThemeServiceImpl implements ThemeService {
                     .call();
 
             // Check out to specified branch
-            if (!StringUtils.equalsIgnoreCase(branch, git.getRepository().getBranch())) {
+            if (!StringUtils.equalsIgnoreCase(branchName, git.getRepository().getBranch())) {
                 boolean present = git.branchList()
                         .call()
                         .stream()
                         .map(Ref::getName)
-                        .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branch));
+                        .anyMatch(name -> StringUtils.equalsIgnoreCase(name, branchName));
 
                 git.checkout()
                         .setCreateBranch(true)
                         .setForced(!present)
-                        .setName(branch)
+                        .setName(branchName)
                         .call();
             }
 
             // Pull with rebasing
             PullResult pullResult = git.pull()
                     .setRemote(remoteConfig.getName())
-                    .setRemoteBranchName(branch)
+                    .setRemoteBranchName(branchName)
                     .setRebase(true)
                     .call();
 
             if (!pullResult.isSuccessful()) {
-                log.debug("Rebase result: [{}]", pullResult.getRebaseResult());
-                log.debug("Merge result: [{}]", pullResult.getMergeResult());
-
+                log.error("Rebase result: [{}]", pullResult.getRebaseResult());
+                log.error("Merge result: [{}]", pullResult.getMergeResult());
                 throw new ThemeUpdateException("拉取失败！您与主题作者可能同时更改了同一个文件");
             }
 
