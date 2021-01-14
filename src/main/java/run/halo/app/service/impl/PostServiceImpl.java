@@ -331,9 +331,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Assert.notNull(markdown, "Markdown document must not be null");
 
         // Gets frontMatter
-        Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatterData(markdown);
         // remove frontMatter
-        markdown = MarkdownUtils.removeFrontMatter(markdown);
+        markdown = MarkdownUtils.removeFrontMatterData(markdown);
 
         PostParam post = new PostParam();
         post.setStatus(null);
@@ -344,6 +344,27 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         Set<Integer> categoryIds = new HashSet<>();
 
+        handleFrontMatter(frontMatter, post, tagIds, categoryIds);
+
+        if (null == post.getStatus()) {
+            post.setStatus(PostStatus.PUBLISHED);
+        }
+
+        if (StringUtils.isEmpty(post.getTitle())) {
+            post.setTitle(filename);
+        }
+
+        if (StringUtils.isEmpty(post.getSlug())) {
+            post.setSlug(SlugUtils.slug(post.getTitle()));
+        }
+
+        post.setOriginalContent(markdown);
+
+        return createBy(post.convertTo(), tagIds, categoryIds, false);
+    }
+
+    private void handleFrontMatter(Map<String, List<String>> frontMatter, PostParam post, Set<Integer> tagIds, Set<Integer> categoryIds) {
+        List<String> elementValue;
         if (frontMatter.size() > 0) {
             for (String key : frontMatter.keySet()) {
                 elementValue = frontMatter.get(key);
@@ -399,22 +420,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 }
             }
         }
-
-        if (null == post.getStatus()) {
-            post.setStatus(PostStatus.PUBLISHED);
-        }
-
-        if (StringUtils.isEmpty(post.getTitle())) {
-            post.setTitle(filename);
-        }
-
-        if (StringUtils.isEmpty(post.getSlug())) {
-            post.setSlug(SlugUtils.slug(post.getTitle()));
-        }
-
-        post.setOriginalContent(markdown);
-
-        return createBy(post.convertTo(), tagIds, categoryIds, false);
     }
 
     @Override

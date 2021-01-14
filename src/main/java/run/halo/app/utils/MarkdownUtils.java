@@ -1,5 +1,8 @@
 package run.halo.app.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import com.vladsch.flexmark.ext.attributes.AttributesExtension;
 import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiExtension;
@@ -22,8 +25,18 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.apache.commons.lang3.StringUtils;
+
+import cn.hutool.core.io.IoUtil;
+import nonapi.io.github.classgraph.json.JSONUtils;
 import run.halo.app.model.support.HaloConst;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -123,6 +136,60 @@ public class MarkdownUtils {
         return visitor.getData();
     }
 
+    public static Map<String, List<String>> getFrontMatterData(String markdown) {
+        String[] split = markdown.split("---", 2);
+        Map<String, List<String>> data = null;
+        if(split.length > 1){
+            data = Maps.newHashMap();
+            String[] datas = split[0].split("\r\n|\n");
+            for (String line : datas) {
+                String[] values = line.split(":");
+                if(values.length > 1){
+                    String value = values[1].trim().replaceAll("\"|'", "");
+                    if(value.startsWith("[") && value.endsWith("]")){
+                        data.put(values[0].trim(),new Gson().fromJson(value,new ParameterizedType(){
+                            @Override
+                            public Type[] getActualTypeArguments() {
+                                return new Type[]{String.class};
+                            }
+
+                            @Override
+                            public Type getRawType() {
+                                return ArrayList.class;
+                            }
+
+                            @Override
+                            public Type getOwnerType() {
+                                return null;
+                            }
+                        }));
+                    }else{
+                        data.put(values[0].trim(),Arrays.asList(value));
+                    }
+                }
+            }
+        }
+        return data;
+    }
+
+    public static void main(String[] args) throws FileNotFoundException, JsonProcessingException {
+        File file = new File("C:\\Users\\zml\\Downloads\\Compressed\\solo-hexo-20210113155519\\solo-hexo-20210113155519\\posts\\201612\\Java判断文件编码工具类.md");
+        String markdown = IoUtil.read(new FileInputStream(file), StandardCharsets.UTF_8);
+        String[] split = markdown.split("---", 2);
+        Map<String, String> data = null;
+        if(split.length > 1){
+            data = Maps.newHashMap();
+            String[] datas = split[0].split("\r\n|\n");
+            for (String line : datas) {
+                String[] values = line.split(":");
+                if(values.length > 1){
+                    data.put(values[0].trim(),values[1].trim().replaceAll("\"|'",""));
+                }
+            }
+        }
+        System.out.println("JsonUtils.objectToJson(data) = " + JsonUtils.objectToJson(data));
+    }
+
     /**
      * remove front matter
      *
@@ -134,6 +201,21 @@ public class MarkdownUtils {
         Matcher matcher = FRONT_MATTER.matcher(markdown);
         if (matcher.find()) {
             return markdown.replace(matcher.group(), "");
+        }
+        return markdown;
+    }
+
+    /**
+     * remove front matter
+     *
+     * @param markdown markdown
+     * @return markdown
+     */
+    public static String removeFrontMatterData(String markdown) {
+        String[] split = markdown.split("---", 2);
+        Map<String, String> data = null;
+        if(split.length > 1){
+           return split[1];
         }
         return markdown;
     }
