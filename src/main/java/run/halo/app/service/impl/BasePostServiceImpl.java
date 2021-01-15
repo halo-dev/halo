@@ -216,8 +216,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.notNull(postId, "Post id must not be null");
 
         boolean finishedIncrease;
-        if (basePostRepository.getByIdAndStatus(postId, PostStatus.DRAFT).isPresent())
-        {
+        if (basePostRepository.getByIdAndStatus(postId, PostStatus.DRAFT).isPresent()) {
             finishedIncrease = true;
             log.info("Post with id: [{}] is a draft and visits will not be updated", postId);
         } else {
@@ -234,7 +233,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     @Transactional
     public void increaseLike(long likes, Integer postId) {
         Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
-        Assert.notNull(postId, "Goods id must not be null");
+        Assert.notNull(postId, "Post id must not be null");
 
         long affectedRows = basePostRepository.updateLikes(likes, postId);
 

@@ -27,10 +27,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.properties.PostProperties;
-import run.halo.app.model.vo.ArchiveMonthVO;
-import run.halo.app.model.vo.ArchiveYearVO;
-import run.halo.app.model.vo.PostDetailVO;
-import run.halo.app.model.vo.PostListVO;
+import run.halo.app.model.vo.*;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.base.BasePostRepository;
 import run.halo.app.service.*;
@@ -57,6 +54,7 @@ import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
  * @author guqing
  * @author evanwang
  * @author coor.top
+ * @author Raremaa
  * @date 2019-03-14
  */
 @Slf4j
@@ -819,6 +817,64 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return Sort.by(DESC, "topPriority").and(Sort.by(DESC, indexSort).and(Sort.by(DESC, "id")));
     }
 
+    @Override
+    public List<PostMarkdownVO> listPostMarkdowns() {
+        List<Post> allPostList = listAll();
+        List<PostMarkdownVO> result = new ArrayList(allPostList.size());
+        for (int i = 0; i < allPostList.size(); i++) {
+            Post post = allPostList.get(i);
+            result.add(convertToPostMarkdownVo(post));
+        }
+        return result;
+    }
+
+    private PostMarkdownVO convertToPostMarkdownVo(Post post) {
+        PostMarkdownVO postMarkdownVO = new PostMarkdownVO();
+
+        StringBuilder frontMatter = new StringBuilder("---\n");
+        frontMatter.append("title: ").append(post.getTitle()).append("\n");
+        frontMatter.append("date: ").append(post.getCreateTime()).append("\n");
+        frontMatter.append("updated: ").append(post.getUpdateTime()).append("\n");
+
+        //set fullPath
+        frontMatter.append("url: ").append(buildFullPath(post)).append("\n");
+
+        //set category
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
+        StringBuilder categoryContent = new StringBuilder();
+        for (int i = 0; i < categories.size(); i++) {
+            Category category = categories.get(i);
+            String categoryName = category.getName();
+            if (i == 0) {
+                categoryContent.append(categoryName);
+            } else {
+                categoryContent.append(" | ").append(categoryName);
+            }
+        }
+        frontMatter.append("categories: ").append(categoryContent.toString()).append("\n");
+
+        //set tags
+        List<Tag> tags = postTagService.listTagsBy(post.getId());
+        StringBuilder tagContent = new StringBuilder();
+        for (int i = 0; i < tags.size(); i++) {
+            Tag tag = tags.get(i);
+            String tagName = tag.getName();
+            if (i == 0) {
+                tagContent.append(tagName);
+            } else {
+                tagContent.append(" | ").append(tagName);
+            }
+        }
+        frontMatter.append("tags: ").append(tagContent.toString()).append("\n");
+
+        frontMatter.append("---\n");
+        postMarkdownVO.setFrontMatter(frontMatter.toString());
+        postMarkdownVO.setOriginalContent(post.getOriginalContent());
+        postMarkdownVO.setTitle(post.getTitle());
+        postMarkdownVO.setSlug(post.getSlug());
+        return postMarkdownVO;
+    }
+
     private String buildFullPath(Post post) {
 
         PostPermalinkType permalinkType = optionService.getPostPermalinkType();
@@ -871,6 +927,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             fullPath.append(DateUtil.year(post.getCreateTime()))
                     .append(URL_SEPARATOR)
                     .append(post.getSlug())
+                    .append(pathSuffix);
+        } else if (permalinkType.equals(PostPermalinkType.ID_SLUG)) {
+            fullPath.append(archivesPrefix)
+                    .append(URL_SEPARATOR)
+                    .append(post.getId())
                     .append(pathSuffix);
         }
         return fullPath.toString();

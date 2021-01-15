@@ -58,6 +58,10 @@ logging:
   file:
     path: ${user.home}/halo-dev/logs
 
+springfox:
+  documentation:
+    enabled: true
+
 halo:
   doc-disabled: false
   production-env: false

@@ -23,6 +23,7 @@ import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.PostPermalinkType;
+import run.halo.app.model.enums.SheetPermalinkType;
 import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.params.OptionQuery;
@@ -516,6 +517,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer> impl
     @Override
     public PostPermalinkType getPostPermalinkType() {
         return getEnumByPropertyOrDefault(PermalinkProperties.POST_PERMALINK_TYPE, PostPermalinkType.class, PostPermalinkType.DEFAULT);
+    }
+
+    @Override
+    public SheetPermalinkType getSheetPermalinkType() {
+        return getEnumByPropertyOrDefault(PermalinkProperties.SHEET_PERMALINK_TYPE, SheetPermalinkType.class, SheetPermalinkType.SECONDARY);
     }
 
     @Override

@@ -8,8 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
@@ -139,6 +141,26 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer> im
         return new PageImpl<>(journalWithCmtCountDTOS, journalPage.getPageable(), journalPage.getTotalElements());
     }
 
+    @Override
+    @Transactional
+    public void increaseLike(Integer id) {
+        increaseLike(1L, id);
+    }
+
+
+    @Override
+    @Transactional
+    public void increaseLike(long likes, Integer id) {
+        Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
+        Assert.notNull(id, "Journal id must not be null");
+
+        long affectedRows = journalRepository.updateLikes(likes, id);
+
+        if (affectedRows != 1) {
+            log.error("Journal with id: [{}] may not be found", id);
+            throw new BadRequestException("Failed to increase likes " + likes + " for journal with id " + id);
+        }
+    }
 
     /**
      * Build specification by journal query.

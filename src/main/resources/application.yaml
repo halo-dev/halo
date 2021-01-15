@@ -47,8 +47,13 @@ management:
 logging:
   level:
     run.halo.app: INFO
+    org.eclipse.jetty.server.HttpChannel: ERROR
   file:
     path: ${user.home}/.halo/logs
+
+springfox:
+  documentation:
+    enabled: false
 
 halo:
   download-timeout: 5m

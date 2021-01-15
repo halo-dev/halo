@@ -1,5 +1,5 @@
 plugins {
-    id "org.springframework.boot" version "2.3.4.RELEASE"
+    id "org.springframework.boot" version "2.4.0"
     id "io.spring.dependency-management" version "1.0.10.RELEASE"
     id "checkstyle"
     id "java"
@@ -11,7 +11,7 @@ description = "Halo, An excellent open source blog publishing application."
 
 java {
     archivesBaseName = "halo"
-    sourceCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
 }
 
 repositories {
@@ -37,8 +37,39 @@ configurations {
 
 bootJar {
     manifest {
-        attributes("Implementation-Title": "Halo Application",
-                "Implementation-Version": version)
+        attributes "Implementation-Title": "Halo Application",
+                "Implementation-Version": archiveVersion
+    }
+}
+
+bootBuildImage.doFirst {
+    // check data
+    assert System.getenv("DOCKER_USERNAME") != null
+    assert System.getenv("DOCKER_TOKEN") != null
+}
+
+bootBuildImage {
+    // prepare data
+    def tagLatest = Boolean.valueOf(System.getenv("TAG_LATEST"))
+    def dockerImageName = System.getenv("DOCKER_IMAGE_NAME")
+    def dockerUsername = System.getenv("DOCKER_USERNAME")
+    def dockerToken = System.getenv("DOCKER_TOKEN")
+
+    if (dockerImageName == null) {
+        dockerImageName = "${dockerUsername}/halo"
+    }
+    if (!tagLatest) {
+        dockerImageName = "${dockerImageName}:${project.version}"
+    }
+
+    // config plugin
+    imageName = "${dockerImageName}"
+    docker {
+        publishRegistry {
+            username = "${dockerUsername}"
+            password = "${dockerToken}"
+            email = "hi@halo.run"
+        }
     }
 }
 
@@ -50,7 +81,7 @@ ext {
     baiduSdkVersion = "0.10.36"
     qcloudSdkVersion = "5.6.25"
     minioSdkVersion = "7.1.4"
-    swaggerVersion = "2.9.2"
+    swaggerVersion = "3.0.0"
     commonsFileUploadVersion = "1.4"
     commonsLangVersion = "3.10"
     httpclientVersion = "4.5.12"
@@ -60,15 +91,12 @@ ext {
     thumbnailatorVersion = "0.4.11"
     image4jVersion = "0.7zensight1"
     flywayVersion = "6.5.0"
-    h2Version = "1.4.196"
+    h2Version = "1.4.197"
     levelDbVersion = "0.12"
     annotationsVersion = "3.0.1u2"
-    jedisVersion = "3.3.0"
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
     githubApiVersion = "1.84"
-    powermockVersion = "1.6.6"
-    powermockApiMockito2 = "2.0.7"
 }
 
 dependencies {
@@ -91,8 +119,7 @@ dependencies {
     implementation "com.qcloud:cos_api:$qcloudSdkVersion"
     implementation "com.huaweicloud:esdk-obs-java:$huaweiObsVersion"
     implementation "io.minio:minio:$minioSdkVersion"
-    implementation "io.springfox:springfox-swagger2:$swaggerVersion"
-    implementation "io.springfox:springfox-swagger-ui:$swaggerVersion"
+    implementation "io.springfox:springfox-boot-starter:$swaggerVersion"
     implementation "commons-fileupload:commons-fileupload:$commonsFileUploadVersion"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
     implementation "org.apache.httpcomponents:httpclient:$httpclientVersion"
@@ -121,7 +148,6 @@ dependencies {
     implementation "com.google.zxing:core:$zxingVersion"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
-    implementation "redis.clients:jedis:$jedisVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
     runtimeOnly "mysql:mysql-connector-java"
 
@@ -134,8 +160,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-//    testImplementation group: 'org.powermock', name: 'powermock-api-mockito2', version: "$powermockApiMockito2"
-//    testImplementation group: 'org.powermock', name: 'powermock-module-junit4', version: "$powermockVersion"
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
 }

@@ -12,6 +12,7 @@ import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
+import run.halo.app.model.params.PostMarkdownParam;
 import run.halo.app.service.BackupService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import java.util.List;
  *
  * @author johnniang
  * @author ryanwang
+ * @author Raremaa
  * @date 2019-04-26
  */
 @RestController
@@ -34,8 +36,7 @@ public class BackupController {
 
     private final HaloProperties haloProperties;
 
-    public BackupController(BackupService backupService,
-            HaloProperties haloProperties) {
+    public BackupController(BackupService backupService, HaloProperties haloProperties) {
         this.backupService = backupService;
         this.haloProperties = haloProperties;
     }
@@ -84,7 +85,7 @@ public class BackupController {
         backupService.deleteWorkDirBackup(filename);
     }
 
-    @PostMapping("markdown")
+    @PostMapping("markdown/import")
     @ApiOperation("Imports markdown")
     public BasePostDetailDTO backupMarkdowns(@RequestPart("file") MultipartFile file) throws IOException {
         return backupService.importMarkdown(file);
@@ -132,4 +133,50 @@ public class BackupController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + exportDataResource.getFilename() + "\"")
                 .body(exportDataResource);
     }
+
+    @PostMapping("markdown/export")
+    @ApiOperation("Exports markdowns")
+    @DisableOnCondition
+    public BackupDTO exportMarkdowns(@RequestBody PostMarkdownParam postMarkdownParam) throws IOException {
+        return backupService.exportMarkdowns(postMarkdownParam);
+    }
+
+    @GetMapping("markdown/export")
+    @ApiOperation("Gets all markdown backups")
+    public List<BackupDTO> listMarkdowns() {
+        return backupService.listMarkdowns();
+    }
+
+    @DeleteMapping("markdown/export")
+    @ApiOperation("Deletes a markdown backup")
+    @DisableOnCondition
+    public void deleteMarkdown(@RequestParam("filename") String filename) {
+        backupService.deleteMarkdown(filename);
+    }
+
+    @GetMapping("markdown/export/{fileName:.+}")
+    @ApiOperation("Downloads a work markdown backup file")
+    @DisableOnCondition
+    public ResponseEntity<Resource> downloadMarkdown(@PathVariable("fileName") String fileName, HttpServletRequest request) {
+        log.info("Try to download markdown backup file: [{}]", fileName);
+
+        // Load file as resource
+        Resource backupResource = backupService.loadFileAsResource(haloProperties.getBackupMarkdownDir(), fileName);
+
+        String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        // Try to determine file's content type
+        try {
+            contentType = request.getServletContext().getMimeType(backupResource.getFile().getAbsolutePath());
+        } catch (IOException e) {
+            log.warn("Could not determine file type", e);
+            // Ignore this error
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + backupResource.getFilename() + "\"")
+                .body(backupResource);
+    }
+
+
 }

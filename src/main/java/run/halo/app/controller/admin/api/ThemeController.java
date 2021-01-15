@@ -165,7 +165,7 @@ public class ThemeController {
         return themeService.upload(file);
     }
 
-    @PutMapping("upload/{themeId}")
+    @PostMapping("upload/{themeId}")
     @ApiOperation("Upgrades theme by file")
     public ThemeProperty updateThemeByUpload(@PathVariable("themeId") String themeId,
             @RequestPart("file") MultipartFile file) {

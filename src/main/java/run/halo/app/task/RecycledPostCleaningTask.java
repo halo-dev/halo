@@ -39,7 +39,7 @@ public class RecycledPostCleaningTask {
     /**
      * Clean recycled posts if RECYCLED_POST_CLEANING_ENABLED is true
      */
-    @Scheduled(cron = "0 0 */1 * * *")
+    @Scheduled(cron = "0 0 */1 * * ?")
     public synchronized void run() {
         Boolean recycledPostCleaningEnabled = optionService.getByPropertyOrDefault(PostProperties.RECYCLED_POST_CLEANING_ENABLED, Boolean.class, false);
         log.debug("{} = {}", PostProperties.RECYCLED_POST_CLEANING_ENABLED.getValue(), recycledPostCleaningEnabled);

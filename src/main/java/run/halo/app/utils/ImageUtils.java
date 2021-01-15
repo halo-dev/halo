@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import net.sf.image4j.codec.ico.ICODecoder;
+import org.springframework.lang.NonNull;
 import run.halo.app.exception.ImageFormatException;
 
 import javax.imageio.ImageIO;
@@ -35,7 +36,8 @@ public class ImageUtils {
         }
     }
 
-    public static ImageReader getImageReaderFromFile(InputStream is, String formatName) {
+    @NonNull
+    public static ImageReader getImageReaderFromFile(InputStream is, String formatName) throws IOException {
         try {
             Iterator<ImageReader> readerIterator = ImageIO.getImageReadersByFormatName(formatName);
             ImageReader reader = readerIterator.next();
@@ -43,9 +45,8 @@ public class ImageUtils {
             ImageIO.getImageReadersByFormatName(formatName);
             reader.setInput(stream, true);
             return reader;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new IOException("Failed to read image reader.", e);
         }
-        return null;
     }
 }

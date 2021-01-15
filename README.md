@@ -44,10 +44,6 @@ java -jar halo-latest.jar
 
 详细部署文档请移步：<https://halo.run/archives/install-quick-start.html>
 
-## 博客示例
-
-请移步： <https://halo.run/p/user-wall.html>。
-
 ## 周边
 
 - 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
