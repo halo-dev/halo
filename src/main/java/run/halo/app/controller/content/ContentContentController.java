@@ -106,6 +106,20 @@ public class ContentContentController {
         if (optionService.getLinksPrefix().equals(prefix)) {
             return linkModel.list(model);
         }
+
+        if (StringUtils.isNotEmpty(prefix)) {
+            PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
+            String slug = prefix;
+            if (postPermalinkType.equals(PostPermalinkType.DEFAULT)) {
+                Post post = postService.getBySlug(slug);
+                return postModel.content(post, token, model);
+            }
+            if (postPermalinkType.equals(PostPermalinkType.ID_SLUG) && StringUtils.isNumeric(slug)) {
+                Post post = postService.getById(Integer.parseInt(slug));
+                return postModel.content(post, token, model);
+            }
+        }
+
         return null;
     }
 
