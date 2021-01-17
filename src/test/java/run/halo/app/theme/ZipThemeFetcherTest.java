@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test;
  * @author johnniang
  */
 @Slf4j
-class ZipRemoteThemeFetcherTest {
+class ZipThemeFetcherTest {
 
     @Test
     @Disabled("Disabled due to time consumed")
     void fetch() {
-        var themeFetcher = new ZipRemoteThemeFetcher();
+        var themeFetcher = new ZipThemeFetcher();
         var themeProperty = themeFetcher.fetch("https://github.com/halo-dev/halo-theme-hshan/archive/master.zip");
         log.debug("{}", themeProperty);
     }

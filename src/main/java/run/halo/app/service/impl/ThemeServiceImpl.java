@@ -111,7 +111,7 @@ public class ThemeServiceImpl implements ThemeService {
         this.themeSettingRepository = themeSettingRepository;
 
         this.fetcherComposite = new ThemeFetcherComposite();
-        this.fetcherComposite.addFetcher(new ZipRemoteThemeFetcher());
+        this.fetcherComposite.addFetcher(new ZipThemeFetcher());
         this.fetcherComposite.addFetcher(new GitThemeFetcher());
     }
 

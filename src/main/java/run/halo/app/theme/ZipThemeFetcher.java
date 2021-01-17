@@ -23,11 +23,11 @@ import static run.halo.app.utils.FileUtils.unzip;
  */
 @Slf4j
 @Service
-public class ZipRemoteThemeFetcher implements ThemeFetcher {
+public class ZipThemeFetcher implements ThemeFetcher {
 
     private final HttpClient httpClient;
 
-    public ZipRemoteThemeFetcher() {
+    public ZipThemeFetcher() {
         this.httpClient = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.ALWAYS)
                 .connectTimeout(Duration.ofMinutes(5))
@@ -60,16 +60,17 @@ public class ZipRemoteThemeFetcher implements ThemeFetcher {
             var inputStream = inputStreamResponse.body();
 
             // unzip zip archive
-            var zipInputStream = new ZipInputStream(inputStream);
-            var tempDirectory = FileUtils.createTempDirectory();
-            log.info("Unzip theme to {}", tempDirectory);
-            unzip(zipInputStream, tempDirectory);
+            try (var zipInputStream = new ZipInputStream(inputStream)) {
+                var tempDirectory = FileUtils.createTempDirectory();
+                log.info("Unzip theme to {}", tempDirectory);
+                unzip(zipInputStream, tempDirectory);
 
-            // locate theme property location
-            var themePropertyPath = ThemeMetaLocator.INSTANCE.locateProperty(tempDirectory)
-                    .orElseThrow(() -> new ThemePropertyMissingException("主题配置文件缺失！请确认后重试。"));
+                // locate theme property location
+                var themePropertyPath = ThemeMetaLocator.INSTANCE.locateProperty(tempDirectory)
+                        .orElseThrow(() -> new ThemePropertyMissingException("主题配置文件缺失！请确认后重试。"));
 
-            return ThemePropertyScanner.INSTANCE.fetchThemeProperty(themePropertyPath.getParent()).orElseThrow();
+                return ThemePropertyScanner.INSTANCE.fetchThemeProperty(themePropertyPath.getParent()).orElseThrow();
+            }
         } catch (InterruptedException | IOException e) {
             throw new RuntimeException("主题拉取失败！（" + e.getMessage() + "）", e);
         }
