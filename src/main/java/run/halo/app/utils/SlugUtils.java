@@ -48,7 +48,7 @@ public class SlugUtils {
         Assert.hasText(input, "Input string must not be blank");
         String slug = input.
                 replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.\\-)]", "").
-                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
+                replaceAll("[\\?\\:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~]", "").
                 replaceAll("\\s", "")
                 .toLowerCase(Locale.ENGLISH);
         return StringUtils.isNotEmpty(slug) ? slug : String.valueOf(System.currentTimeMillis());
