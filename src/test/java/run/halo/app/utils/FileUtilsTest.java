@@ -266,4 +266,43 @@ class FileUtilsTest {
         Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory, path -> path.getFileName().toString().equals("expected_file"));
         assertFalse(rootPath.isPresent());
     }
+
+    @Test
+    void findRootPathWithLowerMaxDepth() throws IOException {
+        // build folder structure
+        // folder1
+        // file1
+        // folder2
+        //   file2
+        //   folder3
+        //     expected_file
+        // expected: folder2
+        tempDirectory = Files.createTempDirectory("halo-test");
+
+        log.info("Preparing test folder structure");
+        Path folder1 = tempDirectory.resolve("folder1");
+        Files.createDirectory(folder1);
+        Path file1 = tempDirectory.resolve("file1");
+        Files.createFile(file1);
+        Path folder2 = tempDirectory.resolve("folder2");
+        Files.createDirectory(folder2);
+        Path file2 = folder2.resolve("file2");
+        Files.createFile(file2);
+        Path folder3 = folder2.resolve("folder3");
+        Files.createDirectory(folder3);
+        Path expectedFile = folder3.resolve("expected_file");
+        Files.createFile(expectedFile);
+        log.info("Prepared test folder structure");
+
+        // find the root folder where expected file locates, and we expect folder3
+        var filePathResult = FileUtils.findPath(tempDirectory, 1, path -> path.getFileName().toString().equals("expected_file"));
+        assertFalse(filePathResult.isPresent());
+
+        filePathResult = FileUtils.findPath(tempDirectory, 2, path -> path.getFileName().toString().equals("expected_file"));
+        assertFalse(filePathResult.isPresent());
+
+        filePathResult = FileUtils.findPath(tempDirectory, 3, path -> path.getFileName().toString().equals("expected_file"));
+        assertTrue(filePathResult.isPresent());
+        assertEquals(expectedFile.toString(), filePathResult.get().toString());
+    }
 }

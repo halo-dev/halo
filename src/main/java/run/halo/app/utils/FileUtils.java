@@ -227,8 +227,26 @@ public class FileUtils {
      * @throws IOException IO exception
      */
     @NonNull
-    public static Optional<Path> findRootPath(@NonNull final Path path, @Nullable final Predicate<Path> pathPredicate) throws IOException {
-        return findPath(path, pathPredicate).map(Path::getParent);
+    public static Optional<Path> findRootPath(@NonNull final Path path, @Nullable final Predicate<Path> pathPredicate)
+            throws IOException {
+        return findRootPath(path, Integer.MAX_VALUE, pathPredicate).map(Path::getParent);
+    }
+
+    /**
+     * Find root path.
+     *
+     * @param path          super root path starter
+     * @param maxDepth      max loop depth
+     * @param pathPredicate path predicate
+     * @return empty if path is not a directory or the given path predicate is null
+     * @throws IOException IO exception
+     */
+    @NonNull
+    public static Optional<Path> findRootPath(@NonNull final Path path,
+            int maxDepth,
+            @Nullable final Predicate<Path> pathPredicate)
+            throws IOException {
+        return findPath(path, maxDepth, pathPredicate).map(Path::getParent);
     }
 
     /**
@@ -242,6 +260,23 @@ public class FileUtils {
     @NonNull
     public static Optional<Path> findPath(@NonNull final Path path, @Nullable final Predicate<Path> pathPredicate)
             throws IOException {
+        return findPath(path, Integer.MAX_VALUE, pathPredicate);
+    }
+
+    /**
+     * Find path.
+     *
+     * @param path          super root path starter
+     * @param pathPredicate path predicate
+     * @return empty if path is not a directory or the given path predicate is null
+     * @throws IOException IO exception
+     */
+    @NonNull
+    public static Optional<Path> findPath(@NonNull final Path path,
+            int maxDepth,
+            @Nullable final Predicate<Path> pathPredicate)
+            throws IOException {
+        Assert.isTrue(maxDepth > 0, "Max depth must not be less than 1");
         if (!Files.isDirectory(path) || pathPredicate == null) {
             // if the path is not a directory or the given path predicate is null, then return an empty optional
             return Optional.empty();
@@ -251,13 +286,19 @@ public class FileUtils {
 
         // the queue holds folders which may be root
         final LinkedList<Path> queue = new LinkedList<>();
+        // depth container
+        final LinkedList<Integer> depthQueue = new LinkedList<>();
+
+        // init queue
         queue.push(path);
+        depthQueue.push(1);
 
         while (!queue.isEmpty()) {
             // pop the first path as candidate root path
             final var rootPath = queue.pop();
+            final int depth = depthQueue.pop();
             if (log.isDebugEnabled()) {
-                log.debug("Peek into {}", rootPath);
+                log.debug("Peek({}) into {}", depth, rootPath);
             }
             try (final Stream<Path> childrenPaths = Files.list(rootPath)) {
                 final List<Path> subFolders = new LinkedList<>();
@@ -275,10 +316,13 @@ public class FileUtils {
                     return resultPath;
                 }
                 // put all directory into queue
-                for (Path subFolder : subFolders) {
-                    if (!Files.isHidden(subFolder)) {
-                        // skip hidden folder
-                        queue.push(subFolder);
+                if (depth < maxDepth) {
+                    for (Path subFolder : subFolders) {
+                        if (!Files.isHidden(subFolder)) {
+                            // skip hidden folder
+                            queue.push(subFolder);
+                            depthQueue.push(depth + 1);
+                        }
                     }
                 }
                 subFolders.clear();
