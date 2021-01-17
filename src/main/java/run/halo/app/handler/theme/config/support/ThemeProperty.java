@@ -152,13 +152,14 @@ public class ThemeProperty {
      * @author johnniang
      */
     public enum UpdateStrategy {
+
         /**
          * Update from specific branch
          */
         BRANCH,
 
         /**
-         * Update from latest release
+         * Update from latest release, only available if the repo is a github repo
          */
         RELEASE;
     }

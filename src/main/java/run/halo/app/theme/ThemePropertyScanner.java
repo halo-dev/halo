@@ -12,7 +12,6 @@ import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.utils.FilenameUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -38,10 +37,12 @@ public enum ThemePropertyScanner {
      * Theme property file name.
      */
     private static final String[] THEME_PROPERTY_FILE_NAMES = {"theme.yaml", "theme.yml"};
+
     /**
      * Theme screenshots name.
      */
     private static final String THEME_SCREENSHOTS_NAME = "screenshot";
+
     private final ThemePropertyResolver propertyResolver = new YamlThemePropertyResolver();
 
     /**
@@ -101,7 +102,7 @@ public enum ThemePropertyScanner {
 
         Optional<Path> optionalPath = fetchPropertyPath(themePath);
 
-        if (!optionalPath.isPresent()) {
+        if (optionalPath.isEmpty()) {
             return Optional.empty();
         }
 
@@ -109,7 +110,7 @@ public enum ThemePropertyScanner {
 
         try {
             // Get property content
-            String propertyContent = new String(Files.readAllBytes(propertyPath), StandardCharsets.UTF_8);
+            String propertyContent = Files.readString(propertyPath);
 
             // Resolve the base properties
             ThemeProperty themeProperty = propertyResolver.resolve(propertyContent);

@@ -1,0 +1,80 @@
+package run.halo.app.theme;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import run.halo.app.exception.ThemePropertyMissingException;
+import run.halo.app.handler.theme.config.ThemePropertyResolver;
+import run.halo.app.handler.theme.config.impl.YamlThemePropertyResolver;
+import run.halo.app.handler.theme.config.support.ThemeProperty;
+import run.halo.app.utils.FileUtils;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.zip.ZipInputStream;
+
+import static run.halo.app.utils.FileUtils.unzip;
+
+/**
+ * Zip theme fetcher.
+ *
+ * @author johnniang
+ */
+@Slf4j
+@Service
+public class ZipRemoteThemeFetcher implements ThemeFetcher {
+
+    private final HttpClient httpClient;
+    private final ThemePropertyResolver propertyResolver;
+
+    public ZipRemoteThemeFetcher(HttpClient httpClient) {
+        this.httpClient = httpClient;
+        this.propertyResolver = new YamlThemePropertyResolver();
+    }
+
+    @Override
+    public boolean support(Object source) {
+        if (source instanceof String) {
+            return ((String) source).endsWith(".zip");
+        }
+        return false;
+    }
+
+    @Override
+    public ThemeProperty fetch(Object source) {
+        final var themeZipLink = source.toString();
+
+        // build http request
+        final var request = HttpRequest.newBuilder()
+                .uri(URI.create(themeZipLink))
+                .timeout(Duration.ofMinutes(2))
+                .GET()
+                .build();
+        try {
+            // request from remote
+            log.info("Fetching theme from {}", themeZipLink);
+            var inputStreamResponse = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            var inputStream = inputStreamResponse.body();
+
+            // unzip zip archive
+            var zipInputStream = new ZipInputStream(inputStream);
+            var tempDirectory = FileUtils.createTempDirectory();
+            log.info("Unzip theme to {}", tempDirectory);
+            unzip(zipInputStream, tempDirectory);
+
+            // locate theme root
+            Path themePropertyPath = new ThemeRootLocator(tempDirectory)
+                    .locate()
+                    .orElseThrow(() -> new ThemePropertyMissingException("主题配置文件缺失！请确认后重试。"));
+            return propertyResolver.resolve(Files.readString(themePropertyPath));
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException("主题拉取失败！（" + e.getMessage() + "）", e);
+        }
+    }
+
+}

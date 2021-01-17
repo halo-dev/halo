@@ -8,7 +8,6 @@ import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.RemoteConfig;
@@ -731,17 +730,22 @@ public class ThemeServiceImpl implements ThemeService {
         // 1. git add .
         // 2. git commit -m "commit by halo"
         // 3. git pull origin master --rebase
-
         Assert.notNull(themeProperty, "Theme property must not be null");
 
         // Get branch name
-        final String branchName = themeProperty.getBranch();
+        final var branchName = themeProperty.getBranch();
+
+        // 1. commit latest changes
+        // 2. get last commit id
+        // 3. fetch origin/$branch
+        // 4. rebase origin/$branch into $branch
+        //
 
         Git git = null;
         RevCommit lastCommit = null;
         try {
             git = GitUtils.openOrInit(Paths.get(themeProperty.getThemePath()));
-            Repository repository = git.getRepository();
+            var repository = git.getRepository();
             git.checkout()
                     .setName(branchName)
                     .call();

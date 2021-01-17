@@ -10,10 +10,7 @@ import run.halo.app.exception.ForbiddenException;
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,11 +26,6 @@ import java.util.zip.ZipOutputStream;
  */
 @Slf4j
 public class FileUtils {
-
-    /**
-     * Ignored folders while finding root path.
-     */
-    private static final List<String> IGNORED_FOLDERS = Arrays.asList(".git");
 
     private FileUtils() {
     }
@@ -236,6 +228,20 @@ public class FileUtils {
      */
     @NonNull
     public static Optional<Path> findRootPath(@NonNull final Path path, @Nullable final Predicate<Path> pathPredicate) throws IOException {
+        return findPath(path, pathPredicate).map(Path::getParent);
+    }
+
+    /**
+     * Find path.
+     *
+     * @param path          super root path starter
+     * @param pathPredicate path predicate
+     * @return empty if path is not a directory or the given path predicate is null
+     * @throws IOException IO exception
+     */
+    @NonNull
+    public static Optional<Path> findPath(@NonNull final Path path, @Nullable final Predicate<Path> pathPredicate)
+            throws IOException {
         if (!Files.isDirectory(path) || pathPredicate == null) {
             // if the path is not a directory or the given path predicate is null, then return an empty optional
             return Optional.empty();
@@ -246,28 +252,36 @@ public class FileUtils {
         // the queue holds folders which may be root
         final LinkedList<Path> queue = new LinkedList<>();
         queue.push(path);
+
         while (!queue.isEmpty()) {
             // pop the first path as candidate root path
-            final Path rootPath = queue.pop();
+            final var rootPath = queue.pop();
+            if (log.isDebugEnabled()) {
+                log.debug("Peek into {}", rootPath);
+            }
             try (final Stream<Path> childrenPaths = Files.list(rootPath)) {
-                List<Path> subFolders = new LinkedList<>();
-                Optional<Path> matchedPath = childrenPaths.peek(child -> {
-                    if (Files.isDirectory(child)) {
-                        // collect directory
-                        subFolders.add(child);
-                    }
-                }).filter(pathPredicate).findAny();
-                if (matchedPath.isPresent()) {
-                    log.debug("Found root path: [{}]", rootPath);
-                    return Optional.of(rootPath);
+                final List<Path> subFolders = new LinkedList<>();
+                var resultPath = childrenPaths
+                        .peek(p -> {
+                            if (Files.isDirectory(p)) {
+                                subFolders.add(p);
+                            }
+                        })
+                        .filter(pathPredicate)
+                        .findFirst();
+                if (resultPath.isPresent()) {
+                    log.debug("Found path: [{}]", rootPath);
+                    queue.clear();
+                    return resultPath;
                 }
-                // add all folder into queue
-                subFolders.forEach(e -> {
-                    // if
-                    if (!IGNORED_FOLDERS.contains(e.getFileName().toString())) {
-                        queue.push(e);
+                // put all directory into queue
+                for (Path subFolder : subFolders) {
+                    if (!Files.isHidden(subFolder)) {
+                        // skip hidden folder
+                        queue.push(subFolder);
                     }
-                });
+                }
+                subFolders.clear();
             }
         }
         // if tests are failed completely

@@ -1,6 +1,7 @@
 package run.halo.app.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
@@ -29,9 +30,11 @@ public class GitUtils {
 
     private GitUtils() {
         // Config packed git MMAP
-        WindowCacheConfig config = new WindowCacheConfig();
-        config.setPackedGitMMAP(false);
-        config.install();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            WindowCacheConfig config = new WindowCacheConfig();
+            config.setPackedGitMMAP(false);
+            config.install();
+        }
     }
 
     public static void cloneFromGit(@NonNull String repoUrl, @NonNull Path targetPath) throws GitAPIException {
@@ -46,6 +49,7 @@ public class GitUtils {
             git = Git.cloneRepository()
                     .setURI(repoUrl)
                     .setDirectory(targetPath.toFile())
+                    .setCloneSubmodules(true)
                     .call();
             log.debug("Cloned git repo [{}] successfully", repoUrl);
         } finally {
@@ -76,6 +80,7 @@ public class GitUtils {
                     .setURI(repoUrl)
                     .setDirectory(targetPath.toFile())
                     .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
+                    .setCloneSubmodules(true)
                     .setBranch("refs/heads/" + branchName)
                     .call();
         } finally {
