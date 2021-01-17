@@ -166,6 +166,47 @@ public class ContentContentController {
         throw new NotFoundException("Not Found");
     }
 
+    @GetMapping("{prefix}/{year:\\d+}/{month:\\d+}/{day:\\d+}/{slug}")
+    public String content(@PathVariable("prefix") String prefix,
+                          @PathVariable("year") String year,
+                          @PathVariable("month") String month,
+                          @PathVariable("day") String day,
+            @PathVariable("slug") String slug,
+            @RequestParam(value = "token", required = false) String token,
+            Model model) {
+        PostPermalinkType postPermalinkType = optionService.getPostPermalinkType();
+        if (optionService.getArchivesPrefix().equals(prefix)) {
+            if (postPermalinkType.equals(PostPermalinkType.DEFAULT)) {
+                Post post = postService.getBySlug(year+"/"+month+"/"+day+"/"+slug);
+                return postModel.content(post, token, model);
+            }
+            if (postPermalinkType.equals(PostPermalinkType.ID_SLUG) && StringUtils.isNumeric(slug)) {
+                Post post = postService.getById(Integer.parseInt(slug));
+                return postModel.content(post, token, model);
+            }
+        }
+
+        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.SECONDARY) && optionService.getSheetPrefix().equals(prefix)) {
+            Sheet sheet = sheetService.getBySlug(slug);
+            return sheetModel.content(sheet, token, model);
+        }
+
+        if (optionService.getCategoriesPrefix().equals(prefix)) {
+            return categoryModel.listPost(model, slug, 1);
+        }
+
+        if (optionService.getTagsPrefix().equals(prefix)) {
+            return tagModel.listPost(model, slug, 1);
+        }
+
+        if (postPermalinkType.equals(PostPermalinkType.YEAR) && prefix.length() == 4 && StringUtils.isNumeric(prefix)) {
+            Post post = postService.getBy(Integer.parseInt(prefix), slug);
+            return postModel.content(post, token, model);
+        }
+
+        throw new NotFoundException("Not Found");
+    }
+
     @GetMapping("{prefix}/{slug}/page/{page:\\d+}")
     public String content(@PathVariable("prefix") String prefix,
             @PathVariable("slug") String slug,
