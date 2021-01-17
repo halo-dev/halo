@@ -44,16 +44,12 @@ public class GitUtils {
         log.debug("Trying to clone git repo [{}] to [{}]", repoUrl, targetPath);
 
         // Use try-with-resource-statement
-        Git git = null;
-        try {
-            git = Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setDirectory(targetPath.toFile())
-                    .setCloneSubmodules(true)
-                    .call();
+        try (Git ignored = Git.cloneRepository()
+                .setURI(repoUrl)
+                .setDirectory(targetPath.toFile())
+                .setCloneSubmodules(true)
+                .call()) {
             log.debug("Cloned git repo [{}] successfully", repoUrl);
-        } finally {
-            closeQuietly(git);
         }
     }
 

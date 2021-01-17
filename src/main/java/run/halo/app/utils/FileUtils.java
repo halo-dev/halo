@@ -40,7 +40,7 @@ public class FileUtils {
         Assert.notNull(source, "Source path must not be null");
         Assert.notNull(target, "Target path must not be null");
 
-        Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(source, new SimpleFileVisitor<>() {
 
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {

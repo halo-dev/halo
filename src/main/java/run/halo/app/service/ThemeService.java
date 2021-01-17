@@ -303,6 +303,7 @@ public interface ThemeService {
      * @throws IOException IOException
      */
     @NonNull
+    @Deprecated
     ThemeProperty add(@NonNull Path themeTmpPath) throws IOException;
 
     /**

@@ -52,6 +52,7 @@ public class ZipRemoteThemeFetcher implements ThemeFetcher {
                 .timeout(Duration.ofMinutes(2))
                 .GET()
                 .build();
+
         try {
             // request from remote
             log.info("Fetching theme from {}", themeZipLink);
