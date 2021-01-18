@@ -62,6 +62,11 @@ public class BaseComment extends BaseEntity {
      */
     @Column(name = "gravatar_md5", length = 127)
     private String gravatarMd5;
+    /**
+     * 头像url
+     */
+    @Column(name = "avatar", length = 500)
+    private String avatar;
 
     /**
      * Comment content.

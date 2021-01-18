@@ -34,6 +34,10 @@ public abstract class BaseCommentParam<COMMENT> implements InputConverter<COMMEN
     @URL(message = "博客链接格式不正确")
     private String authorUrl;
 
+    @Size(max = 500, message = "头像链接的字符长度不能超过 {max}")
+    @URL(message = "头像链接格式不正确")
+    private String avatar;
+
     @NotBlank(message = "评论内容不能为空")
     @Size(max = 1023, message = "评论内容的字符长度不能超过 {max}")
     private String content;
