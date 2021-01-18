@@ -31,6 +31,8 @@ public class BaseCommentDTO implements OutputConverter<BaseCommentDTO, BaseComme
 
     private String authorUrl;
 
+    private String avatar;
+
     private String gravatarMd5;
 
     private String content;
