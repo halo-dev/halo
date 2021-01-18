@@ -113,6 +113,7 @@ public class ThemeServiceImpl implements ThemeService {
         this.fetcherComposite = new ThemeFetcherComposite();
         this.fetcherComposite.addFetcher(new ZipThemeFetcher());
         this.fetcherComposite.addFetcher(new GitThemeFetcher());
+        this.fetcherComposite.addFetcher(new MultipartZipFileThemeFetcher());
     }
 
     @Override
@@ -414,40 +415,8 @@ public class ThemeServiceImpl implements ThemeService {
     public ThemeProperty upload(@NonNull MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
-        if (!StringUtils.endsWithIgnoreCase(file.getOriginalFilename(), ".zip")) {
-            throw new UnsupportedMediaTypeException("不支持的文件类型: " + file.getContentType()).setErrorData(file.getOriginalFilename());
-        }
-
-        ZipInputStream zis = null;
-        Path tempPath = null;
-
-        try {
-            // Create temp directory
-            tempPath = FileUtils.createTempDirectory();
-            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
-            Path themeTempPath = tempPath.resolve(basename);
-
-            // Check directory traversal
-            FileUtils.checkDirectoryTraversal(tempPath, themeTempPath);
-
-            // New zip input stream
-            zis = new ZipInputStream(file.getInputStream());
-
-            // Unzip to temp path
-            FileUtils.unzip(zis, themeTempPath);
-
-            Path themePath = getThemeRootPath(themeTempPath);
-
-            // Go to the base folder and add the theme into system
-            return add(themePath);
-        } catch (IOException e) {
-            throw new ServiceException("主题上传失败: " + file.getOriginalFilename(), e);
-        } finally {
-            // Close zip input stream
-            FileUtils.closeQuietly(zis);
-            // Delete folder after testing
-            deleteFolderQuietly(tempPath);
-        }
+        final var newThemeProperty = this.fetcherComposite.fetch(file);
+        return attemptAdd(newThemeProperty);
     }
 
     @NonNull
@@ -477,16 +446,22 @@ public class ThemeServiceImpl implements ThemeService {
             copyFolder(sourceThemePath, targetThemePath);
         } catch (IOException e) {
             // clear data
-            deleteFolderQuietly(sourceThemePath);
             deleteFolderQuietly(targetThemePath);
             throw new ServiceException("复制主题文件失败！", e);
+        } finally {
+            log.info("Clear temporary theme folder {}", sourceThemePath);
+            deleteFolderQuietly(sourceThemePath);
         }
 
-        log.info("Clear temporary theme folder {}", sourceThemePath);
-        deleteFolderQuietly(sourceThemePath);
 
         // or else throw should never happen
-        return ThemePropertyScanner.INSTANCE.fetchThemeProperty(targetThemePath).orElseThrow();
+        ThemeProperty themeProperty =
+            ThemePropertyScanner.INSTANCE.fetchThemeProperty(targetThemePath).orElseThrow();
+
+        // Clear theme cache
+        this.eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
+
+        return themeProperty;
     }
 
     @Override
