@@ -1,13 +1,12 @@
 package run.halo.app.theme;
 
-import org.springframework.lang.NonNull;
-import run.halo.app.exception.BadRequestException;
-import run.halo.app.handler.theme.config.support.ThemeProperty;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.lang.NonNull;
+import run.halo.app.exception.BadRequestException;
+import run.halo.app.handler.theme.config.support.ThemeProperty;
 
 /**
  * Theme fetcher composite.

@@ -1,15 +1,5 @@
 package run.halo.app.theme;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import run.halo.app.handler.theme.config.ThemePropertyResolver;
-import run.halo.app.handler.theme.config.impl.YamlThemePropertyResolver;
-import run.halo.app.handler.theme.config.support.ThemeProperty;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +9,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import run.halo.app.handler.theme.config.ThemePropertyResolver;
+import run.halo.app.handler.theme.config.impl.YamlThemePropertyResolver;
+import run.halo.app.handler.theme.config.support.ThemeProperty;
 
 /**
  * Theme property scanner.
