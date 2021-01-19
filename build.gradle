@@ -11,7 +11,7 @@ description = "Halo, An excellent open source blog publishing application."
 
 java {
     archivesBaseName = "halo"
-    sourceCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
 repositories {
@@ -166,4 +166,28 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+
+// 这里要声明一下开启jar，否则可能会跳过gradle jar的生命周期
+jar.enabled = true
+
+task copyDependencies(type: Copy) {
+    from configurations.default  // 这里采用default，因为runtime和compile不能把jar包打出来
+    into 'build/libs/lib'  // 将jar包打到lib目录下
+}
+jar.dependsOn(copyDependencies)
+
+jar {
+    manifest {
+        attributes "Implementation-Title": project.name
+        attributes "Implementation-Version": project.version
+        attributes 'Main-Class': 'run.halo.app.Application'  // main方法入口
+    }
+    archiveBaseName = "halo-mini"  // 打包名前缀
+    version = project.version  // 版本号，此处可不写，会自动取最外层声明的version
+    // 将打出的lib中的jar声明到MANIFEST文件中的ClassPath中，避免打出的jar包找不到依赖包
+    if (!configurations.default.files.isEmpty()) {
+        manifest.attributes('Class-Path': '. lib/' + configurations.default.files.collect { it.name }.join(' lib/'))
+    }
 }
