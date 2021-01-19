@@ -39,9 +39,9 @@ import run.halo.app.exception.*;
 import run.halo.app.handler.theme.config.ThemeConfigResolver;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
-import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
+import run.halo.app.repository.ThemeRepository;
 import run.halo.app.repository.ThemeSettingRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
@@ -49,7 +49,6 @@ import run.halo.app.theme.*;
 import run.halo.app.utils.*;
 
 import static run.halo.app.model.support.HaloConst.DEFAULT_ERROR_PATH;
-import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 import static run.halo.app.utils.FileUtils.copyFolder;
 import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
 import static run.halo.app.utils.VersionUtil.compareVersion;
@@ -83,6 +82,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final ThemeFetcherComposite fetcherComposite;
 
+    private final ThemeRepository themeRepository;
+
     /**
      * Activated theme id.
      */
@@ -100,7 +101,8 @@ public class ThemeServiceImpl implements ThemeService {
             ThemeConfigResolver themeConfigResolver,
             RestTemplate restTemplate,
             ApplicationEventPublisher eventPublisher,
-            ThemeSettingRepository themeSettingRepository) {
+            ThemeSettingRepository themeSettingRepository,
+            ThemeRepository themeRepository) {
         this.optionService = optionService;
         this.cacheStore = cacheStore;
         this.themeConfigResolver = themeConfigResolver;
@@ -109,6 +111,7 @@ public class ThemeServiceImpl implements ThemeService {
         this.themeWorkDir = Paths.get(haloProperties.getWorkDir(), THEME_FOLDER);
         this.eventPublisher = eventPublisher;
         this.themeSettingRepository = themeSettingRepository;
+        this.themeRepository = themeRepository;
 
         this.fetcherComposite = new ThemeFetcherComposite();
         this.fetcherComposite.addFetcher(new ZipThemeFetcher());
@@ -120,8 +123,7 @@ public class ThemeServiceImpl implements ThemeService {
     @NonNull
     public ThemeProperty getThemeOfNonNullBy(@NonNull String themeId) {
         return fetchThemePropertyBy(themeId)
-                .orElseThrow(
-                        () -> new NotFoundException(themeId + " 主题不存在或已删除！").setErrorData(themeId));
+                .orElseThrow(() -> new NotFoundException(themeId + " 主题不存在或已删除！").setErrorData(themeId));
     }
 
     @Override
@@ -176,12 +178,10 @@ public class ThemeServiceImpl implements ThemeService {
             Path themePath = Paths.get(themeProperty.getThemePath());
             try (Stream<Path> pathStream = Files.list(themePath)) {
                 return pathStream
-                        .filter(path -> StringUtils
-                                .startsWithIgnoreCase(path.getFileName().toString(), prefix))
+                        .filter(path -> StringUtils.startsWithIgnoreCase(path.getFileName().toString(), prefix))
                         .map(path -> {
                             // Remove prefix
-                            String customTemplate =
-                                    StringUtils.removeStartIgnoreCase(path.getFileName().toString(), prefix);
+                            final var customTemplate = StringUtils.removeStartIgnoreCase(path.getFileName().toString(), prefix);
                             // Remove suffix
                             return StringUtils
                                     .removeEndIgnoreCase(customTemplate, HaloConst.SUFFIX_FTL);
@@ -359,30 +359,13 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     @NonNull
     public String getActivatedThemeId() {
-        if (activatedThemeId == null) {
-            synchronized (this) {
-                if (activatedThemeId == null) {
-                    activatedThemeId = optionService.getByPropertyOrDefault(PrimaryProperties.THEME,
-                            String.class,
-                            DEFAULT_THEME_ID);
-                }
-            }
-        }
-        return activatedThemeId;
+        return themeRepository.getActivatedThemeId();
     }
 
     @Override
     @NonNull
     public ThemeProperty getActivatedTheme() {
-        if (activatedTheme == null) {
-            synchronized (this) {
-                if (activatedTheme == null) {
-                    // Get theme property
-                    activatedTheme = getThemeOfNonNullBy(getActivatedThemeId());
-                }
-            }
-        }
-        return activatedTheme;
+        return themeRepository.getActivatedThemeProperty();
     }
 
     /**
@@ -406,14 +389,8 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     @NonNull
     public ThemeProperty activateTheme(@NonNull String themeId) {
-        // Check existence of the theme
-        ThemeProperty themeProperty = getThemeOfNonNullBy(themeId);
-
-        // Save the theme to database
-        optionService.saveProperty(PrimaryProperties.THEME, themeId);
-
-        // Set activated theme
-        setActivatedTheme(themeProperty);
+        // set activated theme
+        themeRepository.setActivatedTheme(themeId);
 
         // Clear the cache
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
@@ -421,7 +398,7 @@ public class ThemeServiceImpl implements ThemeService {
         // Publish a theme activated event
         eventPublisher.publishEvent(new ThemeActivatedEvent(this));
 
-        return themeProperty;
+        return themeRepository.getActivatedThemeProperty();
     }
 
     @Override
@@ -655,7 +632,7 @@ public class ThemeServiceImpl implements ThemeService {
     public ThemeProperty update(String themeId) {
         Assert.hasText(themeId, "Theme id must not be blank");
 
-        ThemeProperty updatingTheme = getThemeOfNonNullBy(themeId);
+        final var updatingTheme = getThemeOfNonNullBy(themeId);
 
         try {
             pullFromGit(updatingTheme);

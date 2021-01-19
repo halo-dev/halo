@@ -2,6 +2,9 @@ package run.halo.app.service.impl;
 
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Region;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
@@ -16,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.AbstractStringCacheStore;
-import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
@@ -35,10 +37,6 @@ import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ValidationUtils;
 
-import javax.persistence.criteria.Predicate;
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
  * OptionService implementation class
  *
@@ -51,19 +49,20 @@ import java.util.stream.Collectors;
 public class OptionServiceImpl extends AbstractCrudService<Option, Integer> implements OptionService {
 
     private final OptionRepository optionRepository;
-    private final ApplicationContext applicationContext;
-    private final AbstractStringCacheStore cacheStore;
-    private final Map<String, PropertyEnum> propertyEnumMap;
-    private final ApplicationEventPublisher eventPublisher;
-    private final HaloProperties haloProperties;
 
-    public OptionServiceImpl(HaloProperties haloProperties,
-            OptionRepository optionRepository,
+    private final ApplicationContext applicationContext;
+
+    private final AbstractStringCacheStore cacheStore;
+
+    private final Map<String, PropertyEnum> propertyEnumMap;
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    public OptionServiceImpl(OptionRepository optionRepository,
             ApplicationContext applicationContext,
             AbstractStringCacheStore cacheStore,
             ApplicationEventPublisher eventPublisher) {
         super(optionRepository);
-        this.haloProperties = haloProperties;
         this.optionRepository = optionRepository;
         this.applicationContext = applicationContext;
         this.cacheStore = cacheStore;
