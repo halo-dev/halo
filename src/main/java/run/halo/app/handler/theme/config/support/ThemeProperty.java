@@ -36,7 +36,7 @@ public class ThemeProperty {
     private String branch = "master";
 
     /**
-     * Theme repo url.
+     * Theme git repo url.
      */
     private String repo;
 

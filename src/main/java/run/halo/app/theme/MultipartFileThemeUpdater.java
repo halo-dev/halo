@@ -1,17 +1,13 @@
 package run.halo.app.theme;
 
-import static run.halo.app.utils.FileUtils.copyFolder;
-import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
-
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.repository.ThemeRepository;
-import run.halo.app.utils.FileUtils;
 
 /**
  * Multipart file theme updater.
@@ -44,27 +40,34 @@ public class MultipartFileThemeUpdater implements ThemeUpdater {
         // fetch new theme
         final var newThemeProperty = this.fetcherComposite.fetch(this.file);
 
-        // delete old theme
-        Path backupPath = this.backup(oldThemeProperty);
+        if (!Objects.equals(oldThemeProperty.getId(), newThemeProperty.getId())) {
+            log.error("Expected theme: {}, but provided theme: {}",
+                    oldThemeProperty.getId(),
+                    newThemeProperty.getId());
+            // clear new theme folder
+            this.themeRepository.deleteTheme(newThemeProperty);
+            throw new BadRequestException("上传的主题 "
+                    + newThemeProperty.getId()
+                    + " 和当前主题的 "
+                    + oldThemeProperty.getId()
+                    + " 不一致，无法进行更新操作！");
+        }
 
-        themeRepository.deleteTheme(oldThemeProperty);
+        // backup old theme
+        final var backupPath = ThemeUpdater.backup(oldThemeProperty);
 
-        // add new theme
-        return themeRepository.attemptToAdd(newThemeProperty);
-    }
-
-    private Path backup(ThemeProperty themeProperty) throws IOException {
-        final var themePath = Paths.get(themeProperty.getThemePath());
-        Path tempDirectory = null;
         try {
-            tempDirectory = FileUtils.createTempDirectory();
-            copyFolder(themePath, tempDirectory);
-            log.info("Backup theme: {} to {} successfully!", themeProperty.getId(), tempDirectory);
-            return tempDirectory;
-        } catch (IOException e) {
-            // clear temp directory
-            deleteFolderQuietly(tempDirectory);
-            throw e;
+            // delete  old theme
+            themeRepository.deleteTheme(oldThemeProperty);
+
+            // add new theme
+            return themeRepository.attemptToAdd(newThemeProperty);
+        } catch (Throwable t) {
+            log.error("Failed to add new theme, and restoring old theme from " + backupPath, t);
+            ThemeUpdater.restore(backupPath, oldThemeProperty);
+            log.info("Restored old theme from path: {}", backupPath);
+            throw t;
         }
     }
+
 }

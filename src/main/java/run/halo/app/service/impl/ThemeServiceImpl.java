@@ -1,21 +1,12 @@
 package run.halo.app.service.impl;
 
-import static run.halo.app.model.support.HaloConst.DEFAULT_ERROR_PATH;
-import static run.halo.app.utils.FileUtils.copyFolder;
-import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
-import static run.halo.app.utils.VersionUtil.compareVersion;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +24,6 @@ import org.eclipse.jgit.transport.URIish;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -43,14 +33,7 @@ import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
-import run.halo.app.exception.AlreadyExistsException;
-import run.halo.app.exception.BadRequestException;
-import run.halo.app.exception.ForbiddenException;
-import run.halo.app.exception.NotFoundException;
-import run.halo.app.exception.ServiceException;
-import run.halo.app.exception.ThemeNotSupportException;
-import run.halo.app.exception.ThemePropertyMissingException;
-import run.halo.app.exception.ThemeUpdateException;
+import run.halo.app.exception.*;
 import run.halo.app.handler.theme.config.ThemeConfigResolver;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
@@ -60,17 +43,16 @@ import run.halo.app.repository.ThemeRepository;
 import run.halo.app.repository.ThemeSettingRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
-import run.halo.app.theme.GitThemeFetcher;
-import run.halo.app.theme.MultipartFileThemeUpdater;
-import run.halo.app.theme.MultipartZipFileThemeFetcher;
-import run.halo.app.theme.ThemeFetcherComposite;
-import run.halo.app.theme.ThemeFileScanner;
-import run.halo.app.theme.ThemePropertyScanner;
-import run.halo.app.theme.ZipThemeFetcher;
+import run.halo.app.theme.*;
 import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.GitUtils;
 import run.halo.app.utils.GithubUtils;
 import run.halo.app.utils.HaloUtils;
+
+import static run.halo.app.model.support.HaloConst.DEFAULT_ERROR_PATH;
+import static run.halo.app.utils.FileUtils.copyFolder;
+import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
+import static run.halo.app.utils.VersionUtil.compareVersion;
 
 /**
  * Theme service implementation.
@@ -102,17 +84,6 @@ public class ThemeServiceImpl implements ThemeService {
     private final ThemeFetcherComposite fetcherComposite;
 
     private final ThemeRepository themeRepository;
-
-    /**
-     * Activated theme id.
-     */
-    @Nullable
-    private volatile String activatedThemeId;
-
-    /**
-     * Activated theme property.
-     */
-    private volatile ThemeProperty activatedTheme;
 
     public ThemeServiceImpl(HaloProperties haloProperties,
             OptionService optionService,
@@ -288,7 +259,7 @@ public class ThemeServiceImpl implements ThemeService {
 
         if (themeId.equals(getActivatedThemeId())) {
             // Prevent to delete the activated theme
-            throw new BadRequestException("不能删除正在使用的主题").setErrorData(themeId);
+            throw new BadRequestException("无法删除正在使用的主题！").setErrorData(themeId);
         }
 
         try {
@@ -371,18 +342,6 @@ public class ThemeServiceImpl implements ThemeService {
         return themeRepository.getActivatedThemeProperty();
     }
 
-    /**
-     * Sets activated theme.
-     *
-     * @param activatedTheme activated theme
-     */
-    private void setActivatedTheme(@Nullable ThemeProperty activatedTheme) {
-        this.activatedTheme = activatedTheme;
-        this.activatedThemeId = Optional.ofNullable(activatedTheme)
-                .map(ThemeProperty::getId)
-                .orElse(null);
-    }
-
     @Override
     @NonNull
     public Optional<ThemeProperty> fetchActivatedTheme() {
@@ -410,58 +369,7 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.notNull(file, "Multipart file must not be null");
 
         final var newThemeProperty = this.fetcherComposite.fetch(file);
-        return attemptToAdd(newThemeProperty);
-    }
-
-    @NonNull
-    private ThemeProperty attemptToAdd(ThemeProperty newProperty) {
-        // 1. check existence
-        final var exist = getThemes().stream()
-                .anyMatch(themeProperty -> themeProperty.getId()
-                        .equalsIgnoreCase(newProperty.getId()));
-        if (exist) {
-            throw new AlreadyExistsException("当前安装的主题已存在");
-        }
-
-        // 2. check version compatibility
-        // Not support current halo version.
-        if (StringUtils.isNotEmpty(newProperty.getRequire())
-                && !compareVersion(HaloConst.HALO_VERSION, newProperty.getRequire())) {
-            throw new ThemeNotSupportException(
-                    "当前主题仅支持 Halo " + newProperty.getRequire() + " 及以上的版本");
-        }
-
-        // 3. move the temp folder into templates/themes/{theme_id}
-        Path sourceThemePath = Paths.get(newProperty.getThemePath());
-        Path targetThemePath = themeWorkDir.resolve(newProperty.getId());
-        // clear target theme folder firstly
-        deleteFolderQuietly(targetThemePath);
-
-        log.info("Copying new theme({}) from {} to {}",
-                newProperty.getId(),
-                sourceThemePath,
-                targetThemePath);
-
-        try {
-            copyFolder(sourceThemePath, targetThemePath);
-        } catch (IOException e) {
-            // clear data
-            deleteFolderQuietly(targetThemePath);
-            throw new ServiceException("复制主题文件失败！", e);
-        } finally {
-            log.info("Clear temporary theme folder {}", sourceThemePath);
-            deleteFolderQuietly(sourceThemePath);
-        }
-
-
-        // or else throw should never happen
-        final var themeProperty =
-                ThemePropertyScanner.INSTANCE.fetchThemeProperty(targetThemePath).orElseThrow();
-
-        // Clear theme cache
-        this.eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
-
-        return themeProperty;
+        return this.themeRepository.attemptToAdd(newThemeProperty);
     }
 
     @Override
@@ -517,7 +425,7 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.hasText(uri, "Theme remote uri must not be blank");
 
         final var themeProperty = fetcherComposite.fetch(uri);
-        return attemptToAdd(themeProperty);
+        return this.themeRepository.attemptToAdd(themeProperty);
     }
 
     @Override
@@ -586,7 +494,7 @@ public class ThemeServiceImpl implements ThemeService {
         String zipUrl = (String) releaseInfo.get(ZIP_FILE_KEY);
 
         final var themeProperty = this.fetcherComposite.fetch(zipUrl);
-        return attemptToAdd(themeProperty);
+        return this.themeRepository.attemptToAdd(themeProperty);
     }
 
     @Override
@@ -660,7 +568,7 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public ThemeProperty update(String themeId, MultipartFile file) {
         Assert.hasText(themeId, "Theme id must not be blank");
-        Assert.notNull(themeId, "Theme file must not be blank");
+        Assert.notNull(file, "Theme file must not be null");
 
         final var themeUpdater =
                 new MultipartFileThemeUpdater(file, fetcherComposite, themeRepository);
@@ -669,68 +577,6 @@ public class ThemeServiceImpl implements ThemeService {
         } catch (IOException e) {
             throw new ServiceException("更新主题失败：" + e.getMessage(), e);
         }
-
-        //
-        // if (!StringUtils.endsWithIgnoreCase(file.getOriginalFilename(), ".zip")) {
-        //     throw new UnsupportedMediaTypeException("不支持的文件类型: " + file.getContentType())
-        //             .setErrorData(file.getOriginalFilename());
-        // }
-        //
-        // ThemeProperty updatingTheme = getThemeOfNonNullBy(themeId);
-        //
-        // ZipInputStream zis = null;
-        // Path tempPath = null;
-        //
-        // try {
-        //     // Create temp directory
-        //     tempPath = FileUtils.createTempDirectory();
-        //
-        //     String basename =
-        //             FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename
-        //             ()));
-        //     Path themeTempPath = tempPath.resolve(basename);
-        //
-        //     // Check directory traversal
-        //     FileUtils.checkDirectoryTraversal(tempPath, themeTempPath);
-        //
-        //     // New zip input stream
-        //     zis = new ZipInputStream(file.getInputStream());
-        //
-        //     // Unzip to temp path
-        //     FileUtils.unzip(zis, themeTempPath);
-        //
-        //     Path preparePath = getThemeRootPath(themeTempPath);
-        //
-        //     ThemeProperty prepareThemeProperty = getProperty(preparePath);
-        //
-        //     if (!prepareThemeProperty.getId().equals(updatingTheme.getId())) {
-        //         throw new ServiceException("上传的主题包不是该主题的更新包: " + file.getOriginalFilename());
-        //     }
-        //
-        //     // Not support current halo version.
-        //     if (StringUtils.isNotEmpty(prepareThemeProperty.getRequire())
-        //             && !compareVersion(HaloConst.HALO_VERSION, prepareThemeProperty.getRequire
-        //             ())) {
-        //         throw new ThemeNotSupportException("新版本主题仅支持 Halo "
-        //                 + prepareThemeProperty.getRequire()
-        //                 + " 及以上的版本，请更新 Halo 后重试。");
-        //     }
-        //
-        //     // Coping new theme files to old theme folder.
-        //     copyFolder(preparePath, Paths.get(updatingTheme.getThemePath()));
-        //
-        //     eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
-        //
-        //     // Gets theme property again.
-        //     return getProperty(Paths.get(updatingTheme.getThemePath()));
-        // } catch (IOException e) {
-        //     throw new ServiceException("更新主题失败: " + file.getOriginalFilename(), e);
-        // } finally {
-        //     // Close zip input stream
-        //     FileUtils.closeQuietly(zis);
-        //     // Delete folder after testing
-        //     deleteFolderQuietly(tempPath);
-        // }
     }
 
     private void pullFromGit(@NonNull ThemeProperty themeProperty) throws

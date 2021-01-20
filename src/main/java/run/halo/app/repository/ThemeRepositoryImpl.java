@@ -1,11 +1,6 @@
 package run.halo.app.repository;
 
-import static run.halo.app.utils.FileUtils.copyFolder;
-import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
-import static run.halo.app.utils.VersionUtil.compareVersion;
-
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -27,6 +22,11 @@ import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.theme.ThemePropertyScanner;
 import run.halo.app.utils.FileUtils;
+
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static run.halo.app.utils.FileUtils.copyFolder;
+import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
+import static run.halo.app.utils.VersionUtil.compareVersion;
 
 /**
  * Theme repository implementation.
@@ -101,8 +101,8 @@ public class ThemeRepositoryImpl implements ThemeRepository {
         }
 
         // 3. move the temp folder into templates/themes/{theme_id}
-        Path sourceThemePath = Paths.get(newProperty.getThemePath());
-        Path targetThemePath = getThemeRootPath().resolve(newProperty.getId());
+        final var sourceThemePath = Paths.get(newProperty.getThemePath());
+        final var targetThemePath = getThemeRootPath().resolve(newProperty.getId() + "-" + randomAlphabetic(5));
 
         // 4. clear target theme folder firstly
         deleteFolderQuietly(targetThemePath);
