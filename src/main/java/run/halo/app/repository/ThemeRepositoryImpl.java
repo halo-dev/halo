@@ -26,6 +26,7 @@ import run.halo.app.model.entity.Option;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.theme.ThemePropertyScanner;
+import run.halo.app.utils.FileUtils;
 
 /**
  * Theme repository implementation.
@@ -137,7 +138,7 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     public void deleteTheme(ThemeProperty themeProperty) {
         final var themePath = Paths.get(themeProperty.getThemePath());
         try {
-            Files.delete(themePath);
+            FileUtils.deleteFolder(themePath);
         } catch (IOException e) {
             throw new ServiceException("Failed to delete theme path: " + themePath, e);
         }
