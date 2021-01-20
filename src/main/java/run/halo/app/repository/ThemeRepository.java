@@ -47,4 +47,32 @@ public interface ThemeRepository {
      */
     void setActivatedTheme(String themeId);
 
+    /**
+     * Attempt to add new theme.
+     *
+     * @param newThemeProperty new theme property
+     * @return theme property
+     */
+    ThemeProperty attemptToAdd(ThemeProperty newThemeProperty);
+
+    /**
+     * Delete theme by theme id.
+     *
+     * @param themeId theme id
+     */
+    void deleteTheme(String themeId);
+
+    /**
+     * Delete theme by theme property.
+     *
+     * @param themeProperty theme property
+     */
+    void deleteTheme(ThemeProperty themeProperty);
+
+    /**
+     * Check theme property compatibility
+     *
+     * @param themeProperty theme property
+     */
+    boolean checkThemePropertyCompatibility(ThemeProperty themeProperty);
 }
