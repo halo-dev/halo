@@ -43,7 +43,7 @@ public class HaloConfiguration {
 
     @Bean
     public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
-        builder.failOnEmptyBeans(false);
+        builder.failOnEmptyBeans(true);
         return builder.build();
     }
 
