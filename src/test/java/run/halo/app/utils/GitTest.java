@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
@@ -182,6 +183,21 @@ class GitTest {
         log.debug("{} | {} | {}", rebaseResult.getCurrentCommit(), rebaseResult.getConflicts(), rebaseResult.getStatus());
 
         printAllLog(oldGit);
+    }
+
+    @Test
+    @Disabled("Time consume")
+    void findTags() throws GitAPIException {
+        try (Git git = cloneRepository()) {
+            git.branchList()
+                    .setListMode(ListBranchCommand.ListMode.ALL)
+                    .call()
+                    .forEach(ref -> log.debug(ref.getName()));
+
+            git.tagList()
+                    .call()
+                    .forEach(ref -> log.debug(ref.getName()));
+        }
     }
 
     void printAllLog(Git git) throws IOException, GitAPIException {
