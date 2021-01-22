@@ -43,7 +43,7 @@ public class ThemeProperty {
     /**
      * Theme update strategy. Default is branch.
      */
-    private UpdateStrategy updateStrategy = UpdateStrategy.BRANCH;
+    private UpdateStrategy updateStrategy = UpdateStrategy.RELEASE;
 
     /**
      * Theme description.
