@@ -37,22 +37,6 @@ public class GitUtils {
         }
     }
 
-    public static void cloneFromGit(@NonNull String repoUrl, @NonNull Path targetPath) throws GitAPIException {
-        Assert.hasText(repoUrl, "Repository remote url must not be blank");
-        Assert.notNull(targetPath, "Target path must not be null");
-
-        log.debug("Trying to clone git repo [{}] to [{}]", repoUrl, targetPath);
-
-        // Use try-with-resource-statement
-        try (Git ignored = Git.cloneRepository()
-                .setURI(repoUrl)
-                .setDirectory(targetPath.toFile())
-                .setCloneSubmodules(true)
-                .call()) {
-            log.debug("Cloned git repo [{}] successfully", repoUrl);
-        }
-    }
-
     public static Git openOrInit(Path repoPath) throws IOException, GitAPIException {
         Git git;
 
