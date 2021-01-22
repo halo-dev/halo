@@ -1,22 +1,23 @@
 package run.halo.app.utils;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
-import run.halo.app.exception.ForbiddenException;
-
 import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.util.Assert;
+import run.halo.app.exception.ForbiddenException;
 
 /**
  * File utilities.
@@ -461,7 +462,7 @@ public class FileUtils {
                 FileUtils.deleteFolder(deletingPath);
             }
         } catch (IOException e) {
-            log.warn("Failed to delete " + deletingPath);
+            log.warn("Failed to delete {}", deletingPath);
         }
     }
 
@@ -474,7 +475,9 @@ public class FileUtils {
      */
     @NonNull
     public static Path createTempDirectory() throws IOException {
-        return Files.createTempDirectory("halo");
+        final var tempDirectory = Files.createTempDirectory("halo");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> deleteFolderQuietly(tempDirectory)));
+        return tempDirectory;
     }
 
 }
