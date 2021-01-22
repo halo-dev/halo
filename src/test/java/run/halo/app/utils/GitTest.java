@@ -1,13 +1,10 @@
 package run.halo.app.utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,16 +16,22 @@ import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevSort;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-import org.junit.jupiter.api.AfterEach;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ActiveProfiles;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Git test.
@@ -45,17 +48,21 @@ class GitTest {
     @BeforeEach
     void setUp() throws IOException {
         tempPath = Files.createTempDirectory("git-test");
+        final var thread = new Thread(() -> {
+            log.info("Clear temporary folder.");
+            FileUtils.deleteFolderQuietly(tempPath);
+        });
+        Runtime.getRuntime().addShutdownHook(thread);
     }
 
-    @AfterEach
+    //    @AfterEach
     void destroy() throws IOException {
         FileUtils.deleteFolder(tempPath);
     }
 
     @Test
     void openFailureTest() {
-        Assertions
-                .assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
+        Assertions.assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
     }
 
     @Test
@@ -224,16 +231,37 @@ class GitTest {
 
     @Test
     @Disabled("Time consume")
-    void findTags() throws GitAPIException {
-        try (Git git = cloneRepository()) {
+    void findTags() throws GitAPIException, IOException {
+        Git.lsRemoteRepository()
+                .setRemote("https://gitee.com/xzhuz/halo-theme-xue.git")
+                .setTags(true)
+                .setHeads(false)
+                .call()
+                .forEach(ref -> {
+                    log.info("ref: {}, object id: {}", ref.getName(), ref.getObjectId());
+                });
+
+        try (final var git = cloneRepository("https://gitee.com/xzhuz/halo-theme-xue.git")) {
             git.branchList()
                     .setListMode(ListBranchCommand.ListMode.ALL)
                     .call()
-                    .forEach(ref -> log.debug(ref.getName()));
+                    .forEach(ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
 
+            ObjectId objectId = ObjectId.fromString("51bf554e58f38cff22bb93f8e6cd8f8b72aa2d64");
+            RevWalk revWalk = new RevWalk(git.getRepository());
+            revWalk.reset();
+            revWalk.setTreeFilter(TreeFilter.ANY_DIFF);
+            revWalk.sort(RevSort.TOPO, true);
+            revWalk.sort(RevSort.COMMIT_TIME_DESC, true);
+            RevCommit revCommit = revWalk.parseCommit(objectId);
+            log.debug("Found commit: {} for object: {}", revCommit, objectId);
+            log.debug("Commit details: {} {} {}",
+                    revCommit.getName(),
+                    revCommit.getFullMessage(),
+                    new Timestamp(revCommit.getCommitTime() * 1000L));
             git.tagList()
                     .call()
-                    .forEach(ref -> log.debug(ref.getName()));
+                    .forEach(ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
         }
     }
 
@@ -245,8 +273,12 @@ class GitTest {
     }
 
     Git cloneRepository() throws GitAPIException {
+        return cloneRepository("https://github.com/halo-dev/halo-theme-pinghsu.git");
+    }
+
+    Git cloneRepository(String url) throws GitAPIException {
         return Git.cloneRepository()
-                .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
+                .setURI(url)
                 .setDirectory(tempPath.toFile())
                 .call();
     }
