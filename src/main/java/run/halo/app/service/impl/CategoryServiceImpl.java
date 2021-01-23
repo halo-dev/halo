@@ -507,6 +507,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     @Transactional
     public Category update(Category category) {
+        Category update = super.update(category);
+
         if (StrUtil.isNotBlank(category.getPassword())) {
             doEncryptPost(category);
         } else {
@@ -516,7 +518,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         // Remove authorization every time an category is updated.
         authorizationService.deleteCategoryAuthorization(category.getId());
 
-        return super.update(category);
+        return update;
     }
 
     /**
@@ -575,12 +577,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
         // Only collect unencrypted sub-categories under the category.
         collectAllChildByCategoryId(collectorList, topLevelCategory.getChildren(), category.getId(), false);
+        // Collect the currently decrypted category
+        collectorList.add(category);
 
         Optional.of(collectorList.stream().map(Category::getId).collect(Collectors.toList()))
-            .map(categoryIdList -> {
-                categoryIdList.add(category.getId());
-                return categoryIdList;
-            })
             .map(postCategoryService::listByCategoryIdList)
 
             .filter(postCategoryList -> !postCategoryList.isEmpty())
