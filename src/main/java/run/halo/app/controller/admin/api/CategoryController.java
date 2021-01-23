@@ -74,8 +74,10 @@ public class CategoryController {
 
     @PutMapping("{categoryId:\\d+}")
     @ApiOperation("Updates category")
-    public CategoryDTO updateBy(@PathVariable("categoryId") Integer categoryId,
-            @RequestBody @Valid CategoryParam categoryParam) {
+    public CategoryDTO updateBy(
+            @PathVariable("categoryId") Integer categoryId,
+            @RequestBody @Valid CategoryParam categoryParam
+    ) {
         Category categoryToUpdate = categoryService.getById(categoryId);
         categoryParam.update(categoryToUpdate);
         return categoryService.convertTo(categoryService.update(categoryToUpdate));
