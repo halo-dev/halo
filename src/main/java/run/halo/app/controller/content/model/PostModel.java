@@ -75,7 +75,10 @@ public class PostModel {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
             model.addAttribute("slug", post.getSlug());
-            return "common/template/post_password";
+            if (themeService.templateExists(HaloConst.POST_PASSWORD_TEMPLATE + HaloConst.SUFFIX_FTL)) {
+                return themeService.render(HaloConst.POST_PASSWORD_TEMPLATE);
+            }
+            return "common/template/" + HaloConst.POST_PASSWORD_TEMPLATE;
         }
 
         if (StringUtils.isEmpty(token)) {

@@ -47,11 +47,6 @@ public class HaloConst {
     public final static String HALO_DATA_EXPORT_PREFIX = "halo-data-export-";
 
     /**
-     * Static pages pack prefix.
-     */
-    public final static String STATIC_PAGE_PACK_PREFIX = "static-pages-";
-
-    /**
      * Default theme name.
      */
     public final static String DEFAULT_THEME_ID = "caicai_anatole";
@@ -65,6 +60,11 @@ public class HaloConst {
      * Path separator.
      */
     public static final String FILE_SEPARATOR = File.separator;
+
+    /**
+     * Post password template name.
+     */
+    public static final String POST_PASSWORD_TEMPLATE = "post_password";
     /**
      * Suffix of freemarker template file
      */
