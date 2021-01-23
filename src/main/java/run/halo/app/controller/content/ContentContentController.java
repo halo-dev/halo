@@ -26,7 +26,6 @@ import run.halo.app.service.SheetService;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author ryanwang
@@ -227,9 +226,9 @@ public class ContentContentController {
     @PostMapping(value = "archives/{type}/{slug:.*}/password")
     @CacheLock(traceRequest = true, expired = 2)
     public String password(
-        @PathVariable("type") String type,
-        @PathVariable("slug") String slug,
-        @RequestParam(value = "password") String password
+            @PathVariable("type") String type,
+            @PathVariable("slug") String slug,
+            @RequestParam(value = "password") String password
     ) throws UnsupportedEncodingException {
 
         String redirectUrl;

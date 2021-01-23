@@ -67,13 +67,12 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     }
 
     private String buildAccessPermissionKey() {
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder
-            .getRequestAttributes();
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder
+                .getRequestAttributes();
 
         HttpServletRequest request = requestAttributes.getRequest();
 
         return "ACCESS_PERMISSION: " + request.getSession().getId();
     }
-
 
 }

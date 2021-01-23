@@ -20,7 +20,6 @@ import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -43,10 +42,10 @@ public class CategoryController {
     private final AuthenticationService authenticationService;
 
     public CategoryController(
-        CategoryService categoryService,
-        PostCategoryService postCategoryService,
-        PostService postService,
-        AuthenticationService authenticationService
+            CategoryService categoryService,
+            PostCategoryService postCategoryService,
+            PostService postService,
+            AuthenticationService authenticationService
     ) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
@@ -67,9 +66,9 @@ public class CategoryController {
     @GetMapping("{slug}/posts")
     @ApiOperation("Lists posts by category slug")
     public Page<PostListVO> listPostsBy(
-        @PathVariable("slug") String slug,
-        @RequestParam(value = "password", required = false) String password,
-        @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable
+            @PathVariable("slug") String slug,
+            @RequestParam(value = "password", required = false) String password,
+            @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable
     ) {
         // Get category by slug
         Category category = categoryService.getBySlugOfNonNullNotEncrypt(slug);

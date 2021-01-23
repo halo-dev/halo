@@ -14,7 +14,6 @@ import run.halo.app.service.PostTagService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Freemarker custom tag of post.

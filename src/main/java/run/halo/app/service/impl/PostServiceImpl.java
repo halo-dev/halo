@@ -83,17 +83,17 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private final AuthorizationService authorizationService;
 
     public PostServiceImpl(
-        BasePostRepository<Post> basePostRepository,
-        OptionService optionService,
-        PostRepository postRepository,
-        TagService tagService,
-        CategoryService categoryService,
-        PostTagService postTagService,
-        PostCategoryService postCategoryService,
-        PostCommentService postCommentService,
-        ApplicationEventPublisher eventPublisher,
-        PostMetaService postMetaService,
-        AuthorizationService authorizationService
+            BasePostRepository<Post> basePostRepository,
+            OptionService optionService,
+            PostRepository postRepository,
+            TagService tagService,
+            CategoryService categoryService,
+            PostTagService postTagService,
+            PostCategoryService postCategoryService,
+            PostCommentService postCommentService,
+            ApplicationEventPublisher eventPublisher,
+            PostMetaService postMetaService,
+            AuthorizationService authorizationService
     ) {
         super(basePostRepository, optionService);
         this.postRepository = postRepository;
@@ -795,19 +795,19 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Create or update post
         Boolean needEncrypt = Optional.ofNullable(categoryIds)
-            .filter(CollectionUtil::isNotEmpty)
-            .map(categoryIdSet -> {
-                for (Integer categoryId : categoryIdSet) {
-                    if (categoryService.categoryHasEncrypt(categoryId)) {
-                        return true;
+                .filter(CollectionUtil::isNotEmpty)
+                .map(categoryIdSet -> {
+                    for (Integer categoryId : categoryIdSet) {
+                        if (categoryService.categoryHasEncrypt(categoryId)) {
+                            return true;
+                        }
                     }
-                }
-                return false;
-            }).orElse(Boolean.FALSE);
+                    return false;
+                }).orElse(Boolean.FALSE);
 
         // if password is not empty or parent category has encrypt, change status to intimate
         if (post.getStatus() != PostStatus.DRAFT && (
-            StringUtils.isNotEmpty(post.getPassword()) || needEncrypt
+                StringUtils.isNotEmpty(post.getPassword()) || needEncrypt
         )) {
             post.setStatus(PostStatus.INTIMATE);
         }

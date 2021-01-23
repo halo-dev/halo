@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import cn.hutool.core.util.StrUtil;
 import org.springframework.stereotype.Service;
-import run.halo.app.cache.InMemoryCacheStore;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.repository.CategoryRepository;
@@ -29,9 +28,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PostCategoryRepository postCategoryRepository;
 
     public AuthenticationServiceImpl(
-        PostCategoryRepository postCategoryRepository,
-        CategoryRepository categoryRepository,
-        AuthorizationService authorizationService
+            PostCategoryRepository postCategoryRepository,
+            CategoryRepository categoryRepository,
+            AuthorizationService authorizationService
     ) {
         this.postCategoryRepository = postCategoryRepository;
         this.categoryRepository = categoryRepository;
@@ -73,7 +72,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public boolean categoryAuthentication(Integer categoryId, String password) {
 
         Map<Integer, Category> idToCategoryMap = categoryRepository.findAll().stream()
-            .collect(Collectors.toMap(Category::getId, Function.identity()));
+                .collect(Collectors.toMap(Category::getId, Function.identity()));
 
         Set<String> accessPermissionStore = authorizationService.getAccessPermissionStore();
 
@@ -81,9 +80,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private boolean doCategoryAuthentication(
-        Map<Integer, Category> idToCategoryMap,
-        Set<String> accessPermissionStore,
-        Integer categoryId, String password
+            Map<Integer, Category> idToCategoryMap,
+            Set<String> accessPermissionStore,
+            Integer categoryId, String password
     ) {
 
         Category category = idToCategoryMap.get(categoryId);

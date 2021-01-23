@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -46,9 +45,9 @@ public class PostController {
     private final AuthorizationService authorizationService;
 
     public PostController(
-        PostService postService,
-        OptionService optionService,
-        AuthorizationService authorizationService
+            PostService postService,
+            OptionService optionService,
+            AuthorizationService authorizationService
     ) {
         this.postService = postService;
         this.optionService = optionService;

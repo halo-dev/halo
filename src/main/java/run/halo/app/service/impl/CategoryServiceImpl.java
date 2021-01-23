@@ -70,11 +70,11 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     private AuthenticationService authenticationService;
 
     public CategoryServiceImpl(
-        CategoryRepository categoryRepository,
-        PostCategoryService postCategoryService,
-        OptionService optionService,
-        AuthenticationService authenticationService,
-        AuthorizationService authorizationService
+            CategoryRepository categoryRepository,
+            PostCategoryService postCategoryService,
+            OptionService optionService,
+            AuthenticationService authenticationService,
+            AuthorizationService authorizationService
     ) {
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
@@ -283,7 +283,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         removeById(categoryId);
         // Remove post categories
         List<Integer> affectedPostIdList = postCategoryService.removeByCategoryId(categoryId)
-            .stream().map(PostCategory::getPostId).collect(Collectors.toList());
+                .stream().map(PostCategory::getPostId).collect(Collectors.toList());
 
         refreshPostStatus(affectedPostIdList);
     }
@@ -308,7 +308,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
                 post.setStatus(PostStatus.INTIMATE);
             } else {
                 List<Integer> categoryIdList = postCategoryService.listByPostId(postId)
-                    .stream().map(PostCategory::getCategoryId).collect(Collectors.toList());
+                        .stream().map(PostCategory::getCategoryId).collect(Collectors.toList());
                 for (Integer categoryId : categoryIdList) {
                     if (categoryHasEncrypt(categoryId)) {
                         post.setStatus(PostStatus.INTIMATE);
@@ -421,7 +421,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
      * @param doNotCollectEncryptedCategory true is not collect, false is collect
      */
     private void collectAllChild(
-        List<Category> collectorList, List<CategoryVO> childrenList, Boolean doNotCollectEncryptedCategory
+            List<Category> collectorList, List<CategoryVO> childrenList, Boolean doNotCollectEncryptedCategory
     ) {
         if (CollectionUtil.isEmpty(childrenList)) {
             return;
@@ -430,7 +430,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         for (CategoryVO categoryVO : childrenList) {
 
             Category category = new Category();
-            BeanUtils.updateProperties(categoryVO , category);
+            BeanUtils.updateProperties(categoryVO, category);
 
             collectorList.add(category);
 
@@ -454,10 +454,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
      * @param doNotCollectEncryptedCategory true is not collect, false is collect
      */
     private void collectAllChildByCategoryId(
-        List<Category> collectorList,
-        List<CategoryVO> childrenList,
-        Integer categoryId,
-        Boolean doNotCollectEncryptedCategory
+            List<Category> collectorList,
+            List<CategoryVO> childrenList,
+            Integer categoryId,
+            Boolean doNotCollectEncryptedCategory
     ) {
         if (CollectionUtil.isEmpty(childrenList)) {
             return;
@@ -565,7 +565,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         List<Category> allCategoryList = super.listAll();
 
         Map<Integer, Category> idToCategoryMap = allCategoryList.stream().collect(
-            Collectors.toMap(Category::getId, Function.identity()));
+                Collectors.toMap(Category::getId, Function.identity()));
 
         if (doCategoryHasEncrypt(idToCategoryMap, category.getParentId())) {
             // If the parent category is encrypted, there is no need to update the encryption status
@@ -610,7 +610,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         List<Category> allCategoryList = super.listAll();
 
         Map<Integer, Category> idToCategoryMap = allCategoryList.stream().collect(
-            Collectors.toMap(Category::getId, Function.identity()));
+                Collectors.toMap(Category::getId, Function.identity()));
 
         return doCategoryHasEncrypt(idToCategoryMap, categoryId);
     }

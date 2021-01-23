@@ -8,7 +8,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
-import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
@@ -78,7 +77,7 @@ public class PostModel {
     public String content(Post post, String token, Model model) {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) &&
-            !authenticationService.postAuthentication(post, null)) {
+                !authenticationService.postAuthentication(post, null)) {
             model.addAttribute("slug", post.getSlug());
             model.addAttribute("type", "post");
             return "common/template/post_password";

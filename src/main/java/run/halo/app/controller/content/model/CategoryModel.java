@@ -1,7 +1,5 @@
 package run.halo.app.controller.content.model;
 
-import java.util.Set;
-
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -41,9 +39,9 @@ public class CategoryModel {
     private final AuthenticationService authenticationService;
 
     public CategoryModel(
-        CategoryService categoryService, ThemeService themeService,
-        PostCategoryService postCategoryService, PostService postService,
-        OptionService optionService, AuthenticationService authenticationService
+            CategoryService categoryService, ThemeService themeService,
+            PostCategoryService postCategoryService, PostService postService,
+            OptionService optionService, AuthenticationService authenticationService
     ) {
         this.categoryService = categoryService;
         this.themeService = themeService;
@@ -91,7 +89,7 @@ public class CategoryModel {
                 optionService.getArchivesPageSize(),
                 Sort.by(DESC, "topPriority", "createTime"));
         Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), Sets
-            .immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
+                .immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         // Generate meta description.
