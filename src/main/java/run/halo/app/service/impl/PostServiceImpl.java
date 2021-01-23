@@ -852,7 +852,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Transactional
     public Post updateStatus(PostStatus status, Integer postId) {
         super.updateStatus(status, postId);
-        categoryService.refreshPostStatus(Arrays.asList(postId));
+        if (PostStatus.PUBLISHED.equals(status)) {
+            // When the update status is published, it is necessary to determine whether
+            // the post status should be converted to a intimate post
+            categoryService.refreshPostStatus(Collections.singletonList(postId));
+        }
         return getById(postId);
     }
 
