@@ -2,6 +2,7 @@ package run.halo.app.controller.content.model;
 
 import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -89,7 +90,8 @@ public class CategoryModel {
         final Pageable pageable = PageRequest.of(page - 1,
                 optionService.getArchivesPageSize(),
                 Sort.by(DESC, "topPriority", "createTime"));
-        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), Set.of(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
+        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), Sets
+            .immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         // Generate meta description.

@@ -218,7 +218,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     public Category getBySlug(String slug) {
         Optional<Category> bySlug = categoryRepository.getBySlug(slug);
-        if (bySlug.isEmpty()) {
+        if (!bySlug.isPresent()) {
             return null;
         }
 
@@ -234,7 +234,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     public Category getBySlugOfNonNull(String slug) {
         Optional<Category> bySlug = categoryRepository.getBySlug(slug);
-        if (bySlug.isEmpty()) {
+        if (!bySlug.isPresent()) {
             throw new NotFoundException("查询不到该分类的信息").setErrorData(slug);
         }
 
@@ -255,7 +255,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     public Category getByName(String name) {
         Optional<Category> byName = categoryRepository.getByName(name);
-        if (byName.isEmpty()) {
+        if (!byName.isPresent()) {
             return null;
         }
 

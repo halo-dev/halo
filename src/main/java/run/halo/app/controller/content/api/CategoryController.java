@@ -1,5 +1,6 @@
 package run.halo.app.controller.content.api;
 
+import com.google.common.collect.Sets;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,7 +79,7 @@ public class CategoryController {
         }
 
         Page<Post> postPage = postCategoryService.pagePostBy(
-            category.getId(), Set.of(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
+            category.getId(), Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
         return postService.convertToListVo(postPage);
     }
 }
