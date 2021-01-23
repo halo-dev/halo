@@ -78,7 +78,7 @@ public class CategoryController {
         }
 
         Page<Post> postPage = postCategoryService.pagePostBy(
-            category.getId(), Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
+                category.getId(), Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
         return postService.convertToListVo(postPage);
     }
 }
