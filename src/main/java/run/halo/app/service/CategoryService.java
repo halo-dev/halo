@@ -75,6 +75,14 @@ public interface CategoryService extends CrudService<Category, Integer> {
     void removeCategoryAndPostCategoryBy(Integer categoryId);
 
     /**
+     * Refresh post status, when the post is under the encryption category or is has a password,
+     * it is changed to private, otherwise it is changed to public.
+     *
+     * @param affectedPostIdList affected post id list
+     */
+    void refreshPostStatus(List<Integer> affectedPostIdList);
+
+    /**
      * List categories by parent id.
      *
      * @param id parent id.

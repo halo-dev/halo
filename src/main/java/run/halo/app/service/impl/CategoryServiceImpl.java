@@ -288,13 +288,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         refreshPostStatus(affectedPostIdList);
     }
 
-    /**
-     * Refresh post status, when the post is under the encryption category or is has a password,
-     * it is changed to private, otherwise it is changed to public.
-     *
-     * @param affectedPostIdList affected post id list
-     */
-    private void refreshPostStatus(List<Integer> affectedPostIdList) {
+    @Override
+    public void refreshPostStatus(List<Integer> affectedPostIdList) {
         if (CollectionUtil.isEmpty(affectedPostIdList)) {
             return;
         }

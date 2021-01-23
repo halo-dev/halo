@@ -806,9 +806,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 }).orElse(Boolean.FALSE);
 
         // if password is not empty or parent category has encrypt, change status to intimate
-        if (post.getStatus() != PostStatus.DRAFT && (
-                StringUtils.isNotEmpty(post.getPassword()) || needEncrypt
-        )) {
+        if (post.getStatus() != PostStatus.DRAFT &&
+                (StringUtils.isNotEmpty(post.getPassword()) || needEncrypt)
+        ) {
             post.setStatus(PostStatus.INTIMATE);
         }
 
@@ -846,6 +846,23 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Convert to post detail vo
         return convertTo(post, tags, categories, postMetaList);
+    }
+
+    @Override
+    @Transactional
+    public Post updateStatus(PostStatus status, Integer postId) {
+        super.updateStatus(status, postId);
+        categoryService.refreshPostStatus(Arrays.asList(postId));
+        return getById(postId);
+    }
+
+    @Override
+    @Transactional
+    public List<Post> updateStatusByIds(List<Integer> ids, PostStatus status) {
+        if (CollectionUtils.isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(id -> updateStatus(status, id)).collect(Collectors.toList());
     }
 
     @Override
