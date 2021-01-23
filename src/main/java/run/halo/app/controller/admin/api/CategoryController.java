@@ -49,10 +49,10 @@ public class CategoryController {
             @SortDefault(sort = "createTime", direction = DESC) Sort sort,
             @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
         if (more) {
-            return postCategoryService.listCategoryWithPostCountDto(sort);
+            return postCategoryService.listCategoryWithPostCountDto(sort, true);
         }
 
-        return categoryService.convertTo(categoryService.listAll(sort));
+        return categoryService.convertTo(categoryService.listAllNotEncrypt(sort));
     }
 
     @GetMapping("tree_view")

@@ -37,13 +37,24 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     List<Category> listCategoriesBy(@NonNull Integer postId);
 
     /**
+     * Lists category by post id.
+     *
+     * @param postId post id must not be null
+     * @param queryEncryptCategory whether to query encryption category
+     * @return a list of category
+     */
+    @NonNull
+    List<Category> listCategoriesBy(@NonNull Integer postId, @NonNull Boolean queryEncryptCategory);
+
+    /**
      * List category list map by post id collection.
      *
      * @param postIds post id collection
+     * @param queryEncryptCategory whether to query encryption category
      * @return a category list map (key: postId, value: a list of category)
      */
     @NonNull
-    Map<Integer, List<Category>> listCategoryListMap(@Nullable Collection<Integer> postIds);
+    Map<Integer, List<Category>> listCategoryListMap(@Nullable Collection<Integer> postIds, @NonNull Boolean queryEncryptCategory);
 
     /**
      * Lists post by category id.
@@ -65,6 +76,16 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     List<Post> listPostBy(@NonNull Integer categoryId, @NonNull PostStatus status);
 
     /**
+     * Lists post by category id and post status.
+     *
+     * @param categoryId category id must not be null
+     * @param status     post status
+     * @return a list of post
+     */
+    @NonNull
+    List<Post> listPostBy(@NonNull Integer categoryId, @NonNull Set<PostStatus> status);
+
+    /**
      * Lists post by category slug and post status.
      *
      * @param slug   category slug must not be null
@@ -73,6 +94,16 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      */
     @NonNull
     List<Post> listPostBy(@NonNull String slug, @NonNull PostStatus status);
+
+    /**
+     * Lists post by category slug and post status.
+     *
+     * @param slug   category slug must not be null
+     * @param status post status
+     * @return a list of post
+     */
+    @NonNull
+    List<Post> listPostBy(@NonNull String slug, @NonNull Set<PostStatus> status);
 
     /**
      * Pages post by category id.
@@ -94,6 +125,17 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      */
     @NonNull
     Page<Post> pagePostBy(@NonNull Integer categoryId, @NonNull PostStatus status, Pageable pageable);
+
+    /**
+     * Pages post by category id and post status.
+     *
+     * @param categoryId category id must not be null
+     * @param status     post status
+     * @param pageable   pageable
+     * @return page of post
+     */
+    @NonNull
+    Page<Post> pagePostBy(@NonNull Integer categoryId, @NonNull Set<PostStatus> status, Pageable pageable);
 
     /**
      * Merges or creates post categories by post id and category id set if absent.
@@ -156,8 +198,18 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * Lists category with post count.
      *
      * @param sort sort info
+     * @param queryEncryptCategory whether to query encryption category
      * @return a list of category dto
      */
     @NonNull
-    List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(@NonNull Sort sort);
+    List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(@NonNull Sort sort, @NonNull Boolean queryEncryptCategory);
+
+    /**
+     * Lists by category id.
+     *
+     * @param categoryIdList category id must not be empty
+     * @return a list of post category
+     */
+    @NonNull
+    List<PostCategory> listByCategoryIdList(@NonNull List<Integer> categoryIdList);
 }

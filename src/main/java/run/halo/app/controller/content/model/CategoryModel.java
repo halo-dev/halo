@@ -1,5 +1,7 @@
 package run.halo.app.controller.content.model;
 
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,12 +37,19 @@ public class CategoryModel {
 
     private final OptionService optionService;
 
-    public CategoryModel(CategoryService categoryService, ThemeService themeService, PostCategoryService postCategoryService, PostService postService, OptionService optionService) {
+    private final AuthenticationService authenticationService;
+
+    public CategoryModel(
+        CategoryService categoryService, ThemeService themeService,
+        PostCategoryService postCategoryService, PostService postService,
+        OptionService optionService, AuthenticationService authenticationService
+    ) {
         this.categoryService = categoryService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
         this.postService = postService;
         this.optionService = optionService;
+        this.authenticationService = authenticationService;
     }
 
     /**
@@ -65,14 +74,22 @@ public class CategoryModel {
      * @return template name
      */
     public String listPost(Model model, String slug, Integer page) {
+
         // Get category by slug
-        final Category category = categoryService.getBySlugOfNonNull(slug);
+        final Category category = categoryService.getBySlugOfNonNullNotEncrypt(slug);
+
+        if (!authenticationService.categoryAuthentication(category.getId(), null)) {
+            model.addAttribute("slug", category.getSlug());
+            model.addAttribute("type", "category");
+            return "common/template/post_password";
+        }
+
         CategoryDTO categoryDTO = categoryService.convertTo(category);
 
         final Pageable pageable = PageRequest.of(page - 1,
                 optionService.getArchivesPageSize(),
                 Sort.by(DESC, "topPriority", "createTime"));
-        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
+        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), Set.of(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         // Generate meta description.

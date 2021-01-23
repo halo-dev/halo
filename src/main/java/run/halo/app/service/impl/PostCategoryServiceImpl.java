@@ -1,5 +1,7 @@
 package run.halo.app.service.impl;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,9 +15,9 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.CategoryPostCountProjection;
-import run.halo.app.repository.CategoryRepository;
 import run.halo.app.repository.PostCategoryRepository;
 import run.halo.app.repository.PostRepository;
+import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
@@ -41,33 +43,47 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
     private final PostRepository postRepository;
 
-    private final CategoryRepository categoryRepository;
+    private CategoryService categoryService;
 
     private final OptionService optionService;
 
     public PostCategoryServiceImpl(PostCategoryRepository postCategoryRepository,
             PostRepository postRepository,
-            CategoryRepository categoryRepository,
             OptionService optionService) {
         super(postCategoryRepository);
         this.postCategoryRepository = postCategoryRepository;
         this.postRepository = postRepository;
-        this.categoryRepository = categoryRepository;
         this.optionService = optionService;
+    }
+
+    @Lazy
+    @Autowired
+    public void setCategoryService(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     @Override
     public List<Category> listCategoriesBy(Integer postId) {
+        return listCategoriesBy(postId, false);
+    }
+
+    @Override
+    public List<Category> listCategoriesBy(Integer postId, Boolean queryEncryptCategory) {
         Assert.notNull(postId, "Post id must not be null");
 
         // Find all category ids
         Set<Integer> categoryIds = postCategoryRepository.findAllCategoryIdsByPostId(postId);
 
-        return categoryRepository.findAllById(categoryIds);
+        if (queryEncryptCategory) {
+            return categoryService.listAllByIdsNotEncrypt(categoryIds);
+        } else {
+            return categoryService.listAllByIds(categoryIds);
+        }
     }
 
+
     @Override
-    public Map<Integer, List<Category>> listCategoryListMap(Collection<Integer> postIds) {
+    public Map<Integer, List<Category>> listCategoryListMap(Collection<Integer> postIds, Boolean queryEncryptCategory) {
         if (CollectionUtils.isEmpty(postIds)) {
             return Collections.emptyMap();
         }
@@ -79,7 +95,13 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Set<Integer> categoryIds = ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId);
 
         // Find all categories
-        List<Category> categories = categoryRepository.findAllById(categoryIds);
+        List<Category> categories;
+
+        if (queryEncryptCategory) {
+            categories = categoryService.listAllByIdsNotEncrypt(categoryIds);
+        } else {
+            categories = categoryService.listAllByIds(categoryIds);
+        }
 
         // Convert to category map
         Map<Integer, Category> categoryMap = ServiceUtils.convertToMap(categories, Category::getId);
@@ -116,11 +138,42 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
+    public List<Post> listPostBy(Integer categoryId, Set<PostStatus> status) {
+        Assert.notNull(categoryId, "Category id must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+
+        return postRepository.findAllById(postIds);
+    }
+
+    @Override
+    public List<Post> listPostBy(String slug, Set<PostStatus> status) {
+        Assert.notNull(slug, "Category slug must not be null");
+        Assert.notNull(status, "Post status must not be null");
+
+        Category category = categoryService.getBySlug(slug);
+
+        if (Objects.isNull(category)) {
+            throw new NotFoundException("查询不到该分类的信息").setErrorData(slug);
+        }
+
+        Set<Integer> postsIds = postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
+
+        return postRepository.findAllById(postsIds);
+    }
+
+    @Override
     public List<Post> listPostBy(String slug, PostStatus status) {
         Assert.notNull(slug, "Category slug must not be null");
         Assert.notNull(status, "Post status must not be null");
 
-        Category category = categoryRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+        Category category = categoryService.getBySlug(slug);
+
+        if (Objects.isNull(category)) {
+            throw new NotFoundException("查询不到该分类的信息").setErrorData(slug);
+        }
 
         Set<Integer> postsIds = postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
 
@@ -140,6 +193,18 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
     @Override
     public Page<Post> pagePostBy(Integer categoryId, PostStatus status, Pageable pageable) {
+        Assert.notNull(categoryId, "Category id must not be null");
+        Assert.notNull(status, "Post status must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        // Find all post ids
+        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+
+        return postRepository.findAllByIdIn(postIds, pageable);
+    }
+
+    @Override
+    public Page<Post> pagePostBy(Integer categoryId, Set<PostStatus> status, Pageable pageable) {
         Assert.notNull(categoryId, "Category id must not be null");
         Assert.notNull(status, "Post status must not be null");
         Assert.notNull(pageable, "Page info must not be null");
@@ -233,10 +298,16 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
-    public List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(Sort sort) {
+    public List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(Sort sort, Boolean queryEncryptCategory) {
         Assert.notNull(sort, "Sort info must not be null");
+        List<Category> categories;
 
-        List<Category> categories = categoryRepository.findAll(sort);
+        if (queryEncryptCategory) {
+            categories = categoryService.listAllNotEncrypt(sort);
+        } else {
+            categories = categoryService.listAll(sort);
+        }
+
 
         // Query category post count
         Map<Integer, Long> categoryPostCountMap = ServiceUtils.convertToMap(postCategoryRepository.findPostCount(), CategoryPostCountProjection::getCategoryId, CategoryPostCountProjection::getPostCount);
@@ -266,5 +337,11 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
                     return categoryWithPostCountDTO;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostCategory> listByCategoryIdList(List<Integer> categoryIdList) {
+        Assert.notEmpty(categoryIdList, "category id list not empty");
+        return postCategoryRepository.findAllByCategoryIdList(categoryIdList);
     }
 }

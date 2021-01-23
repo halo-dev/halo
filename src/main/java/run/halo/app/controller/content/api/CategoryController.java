@@ -7,16 +7,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.*;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.AuthenticationService;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -36,12 +39,18 @@ public class CategoryController {
 
     private final PostService postService;
 
-    public CategoryController(CategoryService categoryService,
-            PostCategoryService postCategoryService,
-            PostService postService) {
+    private final AuthenticationService authenticationService;
+
+    public CategoryController(
+        CategoryService categoryService,
+        PostCategoryService postCategoryService,
+        PostService postService,
+        AuthenticationService authenticationService
+    ) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
         this.postService = postService;
+        this.authenticationService = authenticationService;
     }
 
     @GetMapping
@@ -49,19 +58,27 @@ public class CategoryController {
     public List<? extends CategoryDTO> listCategories(@SortDefault(sort = "updateTime", direction = DESC) Sort sort,
             @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
-            return postCategoryService.listCategoryWithPostCountDto(sort);
+            return postCategoryService.listCategoryWithPostCountDto(sort, false);
         }
         return categoryService.convertTo(categoryService.listAll(sort));
     }
 
     @GetMapping("{slug}/posts")
     @ApiOperation("Lists posts by category slug")
-    public Page<PostListVO> listPostsBy(@PathVariable("slug") String slug,
-            @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable) {
+    public Page<PostListVO> listPostsBy(
+        @PathVariable("slug") String slug,
+        @RequestParam(value = "password", required = false) String password,
+        @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable
+    ) {
         // Get category by slug
-        Category category = categoryService.getBySlugOfNonNull(slug);
+        Category category = categoryService.getBySlugOfNonNullNotEncrypt(slug);
 
-        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
+        if (!authenticationService.categoryAuthentication(category.getId(), password)) {
+            throw new ForbiddenException("您没有该分类的访问权限");
+        }
+
+        Page<Post> postPage = postCategoryService.pagePostBy(
+            category.getId(), Set.of(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
         return postService.convertToListVo(postPage);
     }
 }

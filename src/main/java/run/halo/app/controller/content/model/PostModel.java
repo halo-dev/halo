@@ -51,6 +51,8 @@ public class PostModel {
 
     private final AbstractStringCacheStore cacheStore;
 
+    private final AuthenticationService authenticationService;
+
     public PostModel(PostService postService,
             ThemeService themeService,
             PostCategoryService postCategoryService,
@@ -59,7 +61,8 @@ public class PostModel {
             PostTagService postTagService,
             TagService tagService,
             OptionService optionService,
-            AbstractStringCacheStore cacheStore) {
+            AbstractStringCacheStore cacheStore,
+            AuthenticationService authenticationService) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -69,28 +72,24 @@ public class PostModel {
         this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
+        this.authenticationService = authenticationService;
     }
 
     public String content(Post post, String token, Model model) {
 
-        if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
+        if (post.getStatus().equals(PostStatus.INTIMATE) &&
+            !authenticationService.postAuthentication(post, null)) {
             model.addAttribute("slug", post.getSlug());
+            model.addAttribute("type", "post");
             return "common/template/post_password";
         }
 
-        if (StringUtils.isEmpty(token)) {
-            post = postService.getBy(PostStatus.PUBLISHED, post.getSlug());
+        post = postService.getById(post.getId());
+
+        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
+            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         } else {
-            // verify token
-            String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
-            if (!cachedToken.equals(token)) {
-                throw new ForbiddenException("您没有该文章的访问权限");
-            }
-            if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-                post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
-            } else {
-                post.setFormatContent(post.getOriginalContent());
-            }
+            post.setFormatContent(post.getOriginalContent());
         }
 
         postService.publishVisitEvent(post.getId());
@@ -98,7 +97,7 @@ public class PostModel {
         postService.getPrevPost(post).ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
         postService.getNextPost(post).ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
-        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId(), false);
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         List<PostMeta> metas = postMetaService.listBy(post.getId());
 

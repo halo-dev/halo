@@ -1,6 +1,5 @@
 package run.halo.app.controller.admin.api;
 
-import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,12 +10,12 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
-import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.service.AuthorizationService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 
@@ -25,7 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -43,16 +41,18 @@ public class PostController {
 
     private final PostService postService;
 
-    private final AbstractStringCacheStore cacheStore;
-
     private final OptionService optionService;
 
-    public PostController(PostService postService,
-            AbstractStringCacheStore cacheStore,
-            OptionService optionService) {
+    private final AuthorizationService authorizationService;
+
+    public PostController(
+        PostService postService,
+        OptionService optionService,
+        AuthorizationService authorizationService
+    ) {
         this.postService = postService;
-        this.cacheStore = cacheStore;
         this.optionService = optionService;
+        this.authorizationService = authorizationService;
     }
 
     @GetMapping
@@ -62,7 +62,7 @@ public class PostController {
             @RequestParam(value = "more", defaultValue = "true") Boolean more) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         if (more) {
-            return postService.convertToListVo(postPage);
+            return postService.convertToListVo(postPage, true);
         }
 
         return postService.convertToSimple(postPage);
@@ -82,7 +82,7 @@ public class PostController {
         Page<Post> posts = postService.pageBy(status, pageable);
 
         if (more) {
-            return postService.convertToListVo(posts);
+            return postService.convertToListVo(posts, true);
         }
 
         return postService.convertToSimple(posts);
@@ -92,7 +92,7 @@ public class PostController {
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId) {
         Post post = postService.getById(postId);
-        return postService.convertToDetailVo(post);
+        return postService.convertToDetailVo(post, true);
     }
 
     @PutMapping("{postId:\\d+}/likes")
@@ -171,11 +171,6 @@ public class PostController {
 
         BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
 
-        String token = IdUtil.simpleUUID();
-
-        // cache preview token
-        cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
-
         StringBuilder previewUrl = new StringBuilder();
 
         if (!optionService.isEnabledAbsolutePath()) {
@@ -183,14 +178,6 @@ public class PostController {
         }
 
         previewUrl.append(postMinimalDTO.getFullPath());
-
-        if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
-            previewUrl.append("&token=")
-                    .append(token);
-        } else {
-            previewUrl.append("?token=")
-                    .append(token);
-        }
 
         // build preview post url and return
         return previewUrl.toString();

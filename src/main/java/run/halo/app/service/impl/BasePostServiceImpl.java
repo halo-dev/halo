@@ -22,6 +22,7 @@ import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
+import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BasePostService;
@@ -270,11 +271,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         } else {
             post.setFormatContent(post.getOriginalContent());
-        }
-
-        // if password is not empty,change status to intimate
-        if (StringUtils.isNotEmpty(post.getPassword()) && post.getStatus() != PostStatus.DRAFT) {
-            post.setStatus(PostStatus.INTIMATE);
         }
 
         // Create or update post

@@ -9,6 +9,7 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.service.base.CrudService;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -36,7 +37,6 @@ public interface CategoryService extends CrudService<Category, Integer> {
      * @param slug slug
      * @return Category
      */
-    @NonNull
     Category getBySlug(@NonNull String slug);
 
     /**
@@ -47,6 +47,15 @@ public interface CategoryService extends CrudService<Category, Integer> {
      */
     @NonNull
     Category getBySlugOfNonNull(String slug);
+
+    /**
+     * Get category by slug
+     *
+     * @param slug slug
+     * @return Category
+     */
+    @NonNull
+    Category getBySlugOfNonNullNotEncrypt(String slug);
 
     /**
      * Get Category by name.
@@ -74,6 +83,24 @@ public interface CategoryService extends CrudService<Category, Integer> {
     List<Category> listByParentId(@NonNull Integer id);
 
     /**
+     * List all category not encrypt.
+     *
+     * @param sort sort
+     * @return list of category.
+     */
+    @NonNull
+    List<Category> listAllNotEncrypt(Sort sort);
+
+    /**
+     * List all by ids
+     *
+     * @param ids ids
+     * @return List
+     */
+    @NonNull
+    List<Category> listAllByIdsNotEncrypt(Collection<Integer> ids);
+
+    /**
      * Converts to category dto.
      *
      * @param category category must not be null
@@ -90,4 +117,22 @@ public interface CategoryService extends CrudService<Category, Integer> {
      */
     @NonNull
     List<CategoryDTO> convertTo(@Nullable List<Category> categories);
+
+    /**
+     * Filter encrypt category
+     *
+     * @param categories this categories is not a category list tree
+     * @return category list
+     */
+    @NonNull
+    List<Category> filterEncryptCategory(@Nullable List<Category> categories);
+
+    /**
+     * Determine whether the category is encrypted.
+     *
+     * @param categoryId category id
+     * @return whether to encrypt
+     */
+    @NonNull
+    Boolean categoryHasEncrypt(Integer categoryId);
 }

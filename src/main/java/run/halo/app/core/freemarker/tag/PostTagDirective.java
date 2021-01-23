@@ -13,6 +13,7 @@ import run.halo.app.service.PostTagService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Freemarker custom tag of post.
@@ -64,11 +65,11 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     break;
                 case "listByCategoryId":
                     Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
-                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(postCategoryService.listPostBy(categoryId, PostStatus.PUBLISHED))));
+                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(postCategoryService.listPostBy(categoryId, Set.of(PostStatus.PUBLISHED, PostStatus.INTIMATE)))));
                     break;
                 case "listByCategorySlug":
                     String categorySlug = params.get("categorySlug").toString();
-                    List<Post> posts = postCategoryService.listPostBy(categorySlug, PostStatus.PUBLISHED);
+                    List<Post> posts = postCategoryService.listPostBy(categorySlug, Set.of(PostStatus.PUBLISHED, PostStatus.INTIMATE));
                     env.setVariable("posts", builder.build().wrap(postService.convertToListVo(posts)));
                     break;
                 case "listByTagId":
