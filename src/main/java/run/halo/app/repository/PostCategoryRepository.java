@@ -1,7 +1,6 @@
 package run.halo.app.repository;
 
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.PostStatus;
@@ -121,5 +120,5 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
      */
     @Query("select pc from PostCategory pc where pc.categoryId in (?1)")
     @NonNull
-    List<PostCategory> findAllByCategoryIdList( List<Integer> categoryIdList);
+    List<PostCategory> findAllByCategoryIdList(List<Integer> categoryIdList);
 }
