@@ -1,6 +1,7 @@
 package run.halo.app.cache;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.util.Assert;
 
 import javax.annotation.PreDestroy;
@@ -43,14 +44,15 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    Optional<CacheWrapper<String>> getInternal(String key) {
+    @NotNull
+    Optional<CacheWrapper<String>> getInternal(@NotNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
 
         return Optional.ofNullable(CACHE_CONTAINER.get(key));
     }
 
     @Override
-    void putInternal(String key, CacheWrapper<String> cacheWrapper) {
+    void putInternal(@NotNull String key, @NotNull CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
@@ -61,7 +63,7 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
+    Boolean putInternalIfAbsent(@NotNull String key, @NotNull CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
@@ -87,7 +89,7 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(@NotNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
 
         CACHE_CONTAINER.remove(key);

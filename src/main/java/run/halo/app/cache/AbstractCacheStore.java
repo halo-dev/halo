@@ -1,6 +1,7 @@
 package run.halo.app.cache;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -49,7 +50,7 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
     abstract Boolean putInternalIfAbsent(@NonNull K key, @NonNull CacheWrapper<V> cacheWrapper);
 
     @Override
-    public Optional<V> get(K key) {
+    public @NotNull Optional<V> get(@NotNull K key) {
         Assert.notNull(key, "Cache key must not be blank");
 
         return getInternal(key).map(cacheWrapper -> {
@@ -70,17 +71,17 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
     }
 
     @Override
-    public void put(K key, V value, long timeout, TimeUnit timeUnit) {
+    public void put(@NotNull K key, @NotNull V value, long timeout, @NotNull TimeUnit timeUnit) {
         putInternal(key, buildCacheWrapper(value, timeout, timeUnit));
     }
 
     @Override
-    public Boolean putIfAbsent(K key, V value, long timeout, TimeUnit timeUnit) {
+    public Boolean putIfAbsent(@NotNull K key, @NotNull V value, long timeout, @NotNull TimeUnit timeUnit) {
         return putInternalIfAbsent(key, buildCacheWrapper(value, timeout, timeUnit));
     }
 
     @Override
-    public void put(K key, V value) {
+    public void put(@NotNull K key, @NotNull V value) {
         putInternal(key, buildCacheWrapper(value, 0, null));
     }
 

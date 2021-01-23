@@ -106,13 +106,6 @@ public class AdminController {
         return adminService.getEnvironments();
     }
 
-    @PutMapping("halo-admin")
-    @ApiOperation("Updates halo-admin manually")
-    @Deprecated
-    public void updateAdmin() {
-        adminService.updateAdminAssets();
-    }
-
     @GetMapping(value = "halo/logfile")
     @ApiOperation("Gets halo log file content")
     @DisableOnCondition
