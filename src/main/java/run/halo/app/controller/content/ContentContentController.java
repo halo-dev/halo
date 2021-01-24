@@ -14,6 +14,7 @@ import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.enums.SheetPermalinkType;
@@ -233,9 +234,9 @@ public class ContentContentController {
 
         String redirectUrl;
 
-        if ("post".equals(type)) {
+        if (EncryptTypeEnum.POST.getName().equals(type)) {
             redirectUrl = doAuthenticationPost(slug, password);
-        } else if ("category".equals(type)) {
+        } else if (EncryptTypeEnum.CATEGORY.getName().equals(type)) {
             redirectUrl = doAuthenticationCategory(slug, password);
         } else {
             throw new UnsupportedException("未知的加密类型");

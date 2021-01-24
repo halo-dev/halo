@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.*;
@@ -79,7 +80,7 @@ public class CategoryModel {
 
         if (!authenticationService.categoryAuthentication(category.getId(), null)) {
             model.addAttribute("slug", category.getSlug());
-            model.addAttribute("type", "category");
+            model.addAttribute("type", EncryptTypeEnum.CATEGORY.getName());
             return "common/template/post_password";
         }
 

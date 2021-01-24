@@ -12,6 +12,7 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
@@ -79,7 +80,7 @@ public class PostModel {
         if (post.getStatus().equals(PostStatus.INTIMATE) &&
                 !authenticationService.postAuthentication(post, null)) {
             model.addAttribute("slug", post.getSlug());
-            model.addAttribute("type", "post");
+            model.addAttribute("type", EncryptTypeEnum.POST.getName());
             return "common/template/post_password";
         }
 
