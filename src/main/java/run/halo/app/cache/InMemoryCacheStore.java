@@ -8,6 +8,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
 /**
@@ -43,14 +44,15 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    Optional<CacheWrapper<String>> getInternal(String key) {
+    @NonNull
+    Optional<CacheWrapper<String>> getInternal(@NonNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
 
         return Optional.ofNullable(CACHE_CONTAINER.get(key));
     }
 
     @Override
-    void putInternal(String key, CacheWrapper<String> cacheWrapper) {
+    void putInternal(@NonNull String key, @NonNull CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
@@ -62,7 +64,7 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
+    Boolean putInternalIfAbsent(@NonNull String key, @NonNull CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
 
@@ -89,7 +91,7 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(@NonNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
 
         CACHE_CONTAINER.remove(key);

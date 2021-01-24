@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -41,14 +40,14 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NotNull List<LinkDTO> listDtos(@NotNull Sort sort) {
+    public @NonNull List<LinkDTO> listDtos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
     }
 
     @Override
-    public @NotNull List<LinkTeamVO> listTeamVos(@NotNull Sort sort) {
+    public @NonNull List<LinkTeamVO> listTeamVos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all links
@@ -78,7 +77,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NotNull List<LinkTeamVO> listTeamVosByRandom(@NotNull Sort sort) {
+    public @NonNull List<LinkTeamVO> listTeamVosByRandom(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
         List<LinkDTO> links = listDtos(sort);
         Set<String> teams = ServiceUtils.fetchProperty(links, LinkDTO::getTeam);
@@ -96,7 +95,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NotNull Link createBy(@NotNull LinkParam linkParam) {
+    public @NonNull Link createBy(@NonNull LinkParam linkParam) {
         Assert.notNull(linkParam, "Link param must not be null");
 
         // Check the name
@@ -119,7 +118,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NotNull Link updateBy(Integer id, @NotNull LinkParam linkParam) {
+    public @NonNull Link updateBy(Integer id, @NonNull LinkParam linkParam) {
         Assert.notNull(id, "Id must not be null");
         Assert.notNull(linkParam, "Link param must not be null");
 
@@ -167,7 +166,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NotNull List<Link> listAllByRandom() {
+    public @NonNull List<Link> listAllByRandom() {
         List<Link> allLink = linkRepository.findAll();
         Collections.shuffle(allLink);
         return allLink;

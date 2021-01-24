@@ -187,6 +187,8 @@ public class ThemeServiceImpl implements ThemeService {
             try (Stream<Path> pathStream = Files.list(themePath)) {
                 return pathStream.filter(
                     path -> StringUtils.startsWithIgnoreCase(path.getFileName().toString(), prefix))
+                    .filter(path -> !(HaloConst.POST_PASSWORD_TEMPLATE + HaloConst.SUFFIX_FTL)
+                        .equals(path.getFileName().toString()))
                     .map(path -> {
                         // Remove prefix
                         String customTemplate = StringUtils

@@ -88,19 +88,4 @@ public class HaloProperties {
      * level
      */
     private String cache = "memory";
-
-    private List<String> cacheRedisNodes = new ArrayList<>();
-
-    private String cacheRedisPassword = "";
-
-    /**
-     * hazelcast cache store impl
-     * memory
-     * level
-     */
-    private List<String> hazelcastMembers = new ArrayList<>();
-
-    private String hazelcastGroupName;
-
-    private int initialBackoffSeconds = 5;
 }

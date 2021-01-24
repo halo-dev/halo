@@ -91,11 +91,6 @@ public interface AdminService {
     AuthToken refreshToken(@NonNull String refreshToken);
 
     /**
-     * Updates halo admin assets.
-     */
-    void updateAdminAssets();
-
-    /**
      * Get halo logs content.
      *
      * @param lines lines
