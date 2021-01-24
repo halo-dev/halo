@@ -1,14 +1,20 @@
 package run.halo.app.model.entity;
 
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import run.halo.app.model.enums.MFAType;
 import run.halo.app.utils.DateUtils;
-
-import javax.persistence.*;
-import java.util.Date;
 
 /**
  * User entity

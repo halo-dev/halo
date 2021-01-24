@@ -51,7 +51,7 @@ public enum ThemePropertyScanner {
         try (Stream<Path> pathStream = Files.list(themePath)) {
             // List and filter sub folders
             List<Path> themePaths = pathStream.filter(Files::isDirectory)
-                    .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
             if (CollectionUtils.isEmpty(themePaths)) {
                 return Collections.emptyList();
@@ -59,15 +59,15 @@ public enum ThemePropertyScanner {
 
             // Get theme properties
             ThemeProperty[] properties = themePaths.stream()
-                    .map(this::fetchThemeProperty)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .peek(themeProperty -> {
-                        if (StringUtils.equals(activeThemeId, themeProperty.getId())) {
-                            themeProperty.setActivated(true);
-                        }
-                    })
-                    .toArray(ThemeProperty[]::new);
+                .map(this::fetchThemeProperty)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .peek(themeProperty -> {
+                    if (StringUtils.equals(activeThemeId, themeProperty.getId())) {
+                        themeProperty.setActivated(true);
+                    }
+                })
+                .toArray(ThemeProperty[]::new);
             // Cache the themes
             return Arrays.asList(properties);
         } catch (IOException e) {

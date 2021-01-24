@@ -1,13 +1,12 @@
 package run.halo.app.utils;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import run.halo.app.model.params.BaseCommentParam;
 import run.halo.app.model.params.JournalCommentParam;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Objects;
 
 /**
  * Reflection utils test.
@@ -37,7 +36,8 @@ class ReflectionUtilsTest {
             log.debug(genericInterface.getClass().toString());
         }
 
-        ParameterizedType parameterizedType = ReflectionUtils.getParameterizedTypeBySuperClass(BaseCommentParam.class, paramClass);
+        ParameterizedType parameterizedType =
+            ReflectionUtils.getParameterizedTypeBySuperClass(BaseCommentParam.class, paramClass);
 
         log.debug(Objects.requireNonNull(parameterizedType).getTypeName());
         for (Type type : parameterizedType.getActualTypeArguments()) {
@@ -45,13 +45,15 @@ class ReflectionUtilsTest {
         }
 
 
-        //        ParameterizedType parameterizedType = ReflectionUtils.getParameterizedType(InputConverter.class, paramClass);
+        //        ParameterizedType parameterizedType = ReflectionUtils.getParameterizedType
+        //        (InputConverter.class, paramClass);
         //
         //        log.debug(parameterizedType.toString());
         //
         //        log.debug(parameterizedType.getActualTypeArguments()[0].toString());
         //
-        //        parameterizedType = ReflectionUtils.getParameterizedType(BaseCommentParam.class, paramClass);
+        //        parameterizedType = ReflectionUtils.getParameterizedType(BaseCommentParam
+        //        .class, paramClass);
         //
         //        log.debug(parameterizedType.toString());
         //

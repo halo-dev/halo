@@ -1,5 +1,9 @@
 package run.halo.app.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -29,9 +33,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Git test.
@@ -40,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.*;
  * @date 2020.01.21
  */
 @Slf4j
-@ActiveProfiles("test")
 class GitTest {
 
     Path tempPath;
@@ -55,14 +55,10 @@ class GitTest {
         Runtime.getRuntime().addShutdownHook(thread);
     }
 
-    //    @AfterEach
-    void destroy() throws IOException {
-        FileUtils.deleteFolder(tempPath);
-    }
-
     @Test
     void openFailureTest() {
-        Assertions.assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
+        Assertions
+            .assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
     }
 
     @Test
@@ -82,10 +78,10 @@ class GitTest {
         Git git = Git.init().setDirectory(tempPath.toFile()).call();
         git.remoteRemove().setRemoteName("theme-provider").call();
         git.remoteAdd().setName("theme-provider")
-                .setUri(new URIish("https://github.com/halo-dev/halo-theme-pinghsu.git")).call();
+            .setUri(new URIish("https://github.com/halo-dev/halo-theme-pinghsu.git")).call();
         List<RemoteConfig> remoteConfigs = git.remoteList().call();
         remoteConfigs.forEach(remoteConfig -> log
-                .debug("name: [{}], url: [{}]", remoteConfig.getName(), remoteConfig.getURIs()));
+            .debug("name: [{}], url: [{}]", remoteConfig.getName(), remoteConfig.getURIs()));
     }
 
     @Test
@@ -107,7 +103,7 @@ class GitTest {
     @Disabled("Due to time-consumption fetching")
     void getAllBranchesFromRemote() {
         List<String> branches =
-                GitUtils.getAllBranchesFromRemote("https://github.com/halo-dev/halo-theme-hux.git");
+            GitUtils.getAllBranchesFromRemote("https://github.com/halo-dev/halo-theme-hux.git");
         assertNotNull(branches);
     }
 
@@ -115,7 +111,7 @@ class GitTest {
     @Disabled("Due to time-consumption fetching")
     void getAllBranchesWithInvalidURL() {
         List<String> branches =
-                GitUtils.getAllBranchesFromRemote("https://github.com/halo-dev/halo-theme.git");
+            GitUtils.getAllBranchesFromRemote("https://github.com/halo-dev/halo-theme.git");
         assertNotNull(branches);
         assertEquals(0, branches.size());
     }
@@ -129,12 +125,12 @@ class GitTest {
             git.branchCreate().setName("main").call();
             git.branchCreate().setName("dev").call();
             Set<String> branches = git.branchList()
-                    .call()
-                    .stream()
-                    .map(ref -> {
-                        String refName = ref.getName();
-                        return refName.substring(refName.lastIndexOf('/') + 1);
-                    }).collect(Collectors.toSet());
+                .call()
+                .stream()
+                .map(ref -> {
+                    String refName = ref.getName();
+                    return refName.substring(refName.lastIndexOf('/') + 1);
+                }).collect(Collectors.toSet());
             assertTrue(branches.containsAll(Arrays.asList("main", "dev")));
         }
     }
@@ -142,10 +138,10 @@ class GitTest {
     @Test
     void getBranchesFromRemote() throws GitAPIException {
         Map<String, Ref> refMap = Git.lsRemoteRepository()
-                .setRemote("https://github.com/halo-dev/halo.git")
-                .setHeads(true)
-                .setTags(true)
-                .callAsMap();
+            .setRemote("https://github.com/halo-dev/halo.git")
+            .setHeads(true)
+            .setTags(true)
+            .callAsMap();
         refMap.forEach((name, ref) -> {
             log.debug("name: [{}], ref: [{}]", name, ref);
         });
@@ -158,16 +154,16 @@ class GitTest {
 
         // prepare one local repo
         try (final var oldGit = Git.init()
-                .setDirectory(oldRepoPath.toFile())
-                .call()) {
+            .setDirectory(oldRepoPath.toFile())
+            .call()) {
 
             final var testTextInOldRepoPath = oldRepoPath.resolve("test.txt");
             Files.writeString(testTextInOldRepoPath, "hello old git");
             oldGit.add().addFilepattern(".").call();
             oldGit.commit()
-                    .setSign(false)
-                    .setMessage("commit test.txt at old repo")
-                    .call();
+                .setSign(false)
+                .setMessage("commit test.txt at old repo")
+                .call();
 
             printAllLog(oldGit);
 
@@ -175,19 +171,19 @@ class GitTest {
             FileUtils.copyFolder(oldRepoPath, newRepoPath);
 
             try (final var newGit = Git.init()
-                    .setDirectory(newRepoPath.toFile())
-                    .call()) {
+                .setDirectory(newRepoPath.toFile())
+                .call()) {
 
                 Files.writeString(newRepoPath.resolve("test.txt"), "hello old git\nhello new git");
                 newGit.add().addFilepattern(".").call();
                 newGit.commit()
-                        .setSign(false)
-                        .setMessage("commit test.txt at new repo")
-                        .call();
+                    .setSign(false)
+                    .setMessage("commit test.txt at new repo")
+                    .call();
 
                 final var refs = newGit.branchList()
-                        .setListMode(ListBranchCommand.ListMode.ALL)
-                        .call();
+                    .setListMode(ListBranchCommand.ListMode.ALL)
+                    .call();
                 refs.forEach(ref -> {
                     log.debug("Ref in new repo: {}", ref);
                 });
@@ -197,16 +193,16 @@ class GitTest {
 
             // add new repo as old repo remote
             oldGit.remoteAdd().setName("newRepo")
-                    .setUri(new URIish(newRepoPath.toString()))
-                    .call();
+                .setUri(new URIish(newRepoPath.toString()))
+                .call();
 
             oldGit.fetch()
-                    .setRemote("newRepo")
-                    .call();
+                .setRemote("newRepo")
+                .call();
 
             final var refs = oldGit.branchList()
-                    .setListMode(ListBranchCommand.ListMode.ALL)
-                    .call();
+                .setListMode(ListBranchCommand.ListMode.ALL)
+                .call();
 
             refs.forEach(ref -> log.debug("Ref in old repo: {}", ref));
 
@@ -214,13 +210,13 @@ class GitTest {
             Assertions.assertEquals("hello old git", testTextInOldRepo);
 
             final var rebaseResult = oldGit.rebase()
-                    .setUpstream("newRepo/master")
-                    .setStrategy(MergeStrategy.THEIRS)
-                    .call();
+                .setUpstream("newRepo/master")
+                .setStrategy(MergeStrategy.THEIRS)
+                .call();
 
             log.debug("{} | {} | {}", rebaseResult.getCurrentCommit(), rebaseResult.getConflicts(),
-                    rebaseResult.getStatus());
-            Assertions.assertTrue(rebaseResult.getStatus().isSuccessful());
+                rebaseResult.getStatus());
+            assertTrue(rebaseResult.getStatus().isSuccessful());
 
             final var testTextAfterRebase = Files.readString(testTextInOldRepoPath);
             Assertions.assertEquals("hello old git\nhello new git", testTextAfterRebase);
@@ -233,19 +229,20 @@ class GitTest {
     @Disabled("Time consume")
     void findTags() throws GitAPIException, IOException {
         Git.lsRemoteRepository()
-                .setRemote("https://gitee.com/xzhuz/halo-theme-xue.git")
-                .setTags(true)
-                .setHeads(false)
-                .call()
-                .forEach(ref -> {
-                    log.info("ref: {}, object id: {}", ref.getName(), ref.getObjectId());
-                });
+            .setRemote("https://gitee.com/xzhuz/halo-theme-xue.git")
+            .setTags(true)
+            .setHeads(false)
+            .call()
+            .forEach(ref -> {
+                log.info("ref: {}, object id: {}", ref.getName(), ref.getObjectId());
+            });
 
         try (final var git = cloneRepository("https://gitee.com/xzhuz/halo-theme-xue.git")) {
             git.branchList()
-                    .setListMode(ListBranchCommand.ListMode.ALL)
-                    .call()
-                    .forEach(ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
+                .setListMode(ListBranchCommand.ListMode.ALL)
+                .call()
+                .forEach(
+                    ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
 
             ObjectId objectId = ObjectId.fromString("51bf554e58f38cff22bb93f8e6cd8f8b72aa2d64");
             RevWalk revWalk = new RevWalk(git.getRepository());
@@ -256,12 +253,13 @@ class GitTest {
             RevCommit revCommit = revWalk.parseCommit(objectId);
             log.debug("Found commit: {} for object: {}", revCommit, objectId);
             log.debug("Commit details: {} {} {}",
-                    revCommit.getName(),
-                    revCommit.getFullMessage(),
-                    new Timestamp(revCommit.getCommitTime() * 1000L));
+                revCommit.getName(),
+                revCommit.getFullMessage(),
+                new Timestamp(revCommit.getCommitTime() * 1000L));
             git.tagList()
-                    .call()
-                    .forEach(ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
+                .call()
+                .forEach(
+                    ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
         }
     }
 
@@ -278,8 +276,8 @@ class GitTest {
 
     Git cloneRepository(String url) throws GitAPIException {
         return Git.cloneRepository()
-                .setURI(url)
-                .setDirectory(tempPath.toFile())
-                .call();
+            .setURI(url)
+            .setDirectory(tempPath.toFile())
+            .call();
     }
 }

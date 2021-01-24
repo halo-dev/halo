@@ -1,12 +1,22 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.DATABASE_PRODUCT_NAME;
+
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -34,26 +44,18 @@ import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.token.AuthToken;
 import run.halo.app.security.util.SecurityUtils;
-import run.halo.app.service.*;
-import run.halo.app.utils.FileUtils;
+import run.halo.app.service.AdminService;
+import run.halo.app.service.AttachmentService;
+import run.halo.app.service.JournalCommentService;
+import run.halo.app.service.LinkService;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.PostCommentService;
+import run.halo.app.service.PostService;
+import run.halo.app.service.SheetCommentService;
+import run.halo.app.service.SheetService;
+import run.halo.app.service.UserService;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.TwoFactorAuthUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.lang.management.ManagementFactory;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-
-import static run.halo.app.model.support.HaloConst.*;
 
 /**
  * Admin service implementation.
@@ -95,19 +97,19 @@ public class AdminServiceImpl implements AdminService {
     private final ApplicationEventPublisher eventPublisher;
 
     public AdminServiceImpl(PostService postService,
-            SheetService sheetService,
-            AttachmentService attachmentService,
-            PostCommentService postCommentService,
-            SheetCommentService sheetCommentService,
-            JournalCommentService journalCommentService,
-            OptionService optionService,
-            UserService userService,
-            LinkService linkService,
-            MailService mailService,
-            AbstractStringCacheStore cacheStore,
-            RestTemplate restTemplate,
-            HaloProperties haloProperties,
-            ApplicationEventPublisher eventPublisher) {
+        SheetService sheetService,
+        AttachmentService attachmentService,
+        PostCommentService postCommentService,
+        SheetCommentService sheetCommentService,
+        JournalCommentService journalCommentService,
+        OptionService optionService,
+        UserService userService,
+        LinkService linkService,
+        MailService mailService,
+        AbstractStringCacheStore cacheStore,
+        RestTemplate restTemplate,
+        HaloProperties haloProperties,
+        ApplicationEventPublisher eventPublisher) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.attachmentService = attachmentService;
@@ -138,11 +140,14 @@ public class AdminServiceImpl implements AdminService {
 
         try {
             // Get user by username or email
-            user = Validator.isEmail(username) ?
-                    userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
+            user = Validator.isEmail(username)
+                ? userService.getByEmailOfNonNull(username) :
+                userService.getByUsernameOfNonNull(username);
         } catch (NotFoundException e) {
             log.error("Failed to find user by name: " + username);
-            eventPublisher.publishEvent(new LogEvent(this, loginParam.getUsername(), LogType.LOGIN_FAILED, loginParam.getUsername()));
+            eventPublisher.publishEvent(
+                new LogEvent(this, loginParam.getUsername(), LogType.LOGIN_FAILED,
+                    loginParam.getUsername()));
 
             throw new BadRequestException(mismatchTip);
         }
@@ -151,7 +156,9 @@ public class AdminServiceImpl implements AdminService {
 
         if (!userService.passwordMatch(user, loginParam.getPassword())) {
             // If the password is mismatch
-            eventPublisher.publishEvent(new LogEvent(this, loginParam.getUsername(), LogType.LOGIN_FAILED, loginParam.getUsername()));
+            eventPublisher.publishEvent(
+                new LogEvent(this, loginParam.getUsername(), LogType.LOGIN_FAILED,
+                    loginParam.getUsername()));
 
             throw new BadRequestException(mismatchTip);
         }
@@ -179,7 +186,8 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // Log it then login successful
-        eventPublisher.publishEvent(new LogEvent(this, user.getUsername(), LogType.LOGGED_IN, user.getNickname()));
+        eventPublisher.publishEvent(
+            new LogEvent(this, user.getUsername(), LogType.LOGGED_IN, user.getNickname()));
 
         // Generate new token
         return buildAuthToken(user);
@@ -198,19 +206,22 @@ public class AdminServiceImpl implements AdminService {
         User user = authentication.getDetail().getUser();
 
         // Clear access token
-        cacheStore.getAny(SecurityUtils.buildAccessTokenKey(user), String.class).ifPresent(accessToken -> {
-            // Delete token
-            cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken));
-            cacheStore.delete(SecurityUtils.buildAccessTokenKey(user));
-        });
+        cacheStore.getAny(SecurityUtils.buildAccessTokenKey(user), String.class)
+            .ifPresent(accessToken -> {
+                // Delete token
+                cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken));
+                cacheStore.delete(SecurityUtils.buildAccessTokenKey(user));
+            });
 
         // Clear refresh token
-        cacheStore.getAny(SecurityUtils.buildRefreshTokenKey(user), String.class).ifPresent(refreshToken -> {
-            cacheStore.delete(SecurityUtils.buildTokenRefreshKey(refreshToken));
-            cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
-        });
+        cacheStore.getAny(SecurityUtils.buildRefreshTokenKey(user), String.class)
+            .ifPresent(refreshToken -> {
+                cacheStore.delete(SecurityUtils.buildTokenRefreshKey(refreshToken));
+                cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
+            });
 
-        eventPublisher.publishEvent(new LogEvent(this, user.getUsername(), LogType.LOGGED_OUT, user.getNickname()));
+        eventPublisher.publishEvent(
+            new LogEvent(this, user.getUsername(), LogType.LOGGED_OUT, user.getNickname()));
 
         log.info("You have been logged out, looking forward to your next visit!");
     }
@@ -233,7 +244,8 @@ public class AdminServiceImpl implements AdminService {
         // Cache code.
         cacheStore.putAny("code", code, 5, TimeUnit.MINUTES);
 
-        Boolean emailEnabled = optionService.getByPropertyOrDefault(EmailProperties.ENABLED, Boolean.class, false);
+        Boolean emailEnabled =
+            optionService.getByPropertyOrDefault(EmailProperties.ENABLED, Boolean.class, false);
 
         if (!emailEnabled) {
             throw new ServiceException("未启用 SMTP 服务，无法发送邮件，但是你可以通过系统日志找到验证码");
@@ -259,12 +271,14 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // verify code
-        String code = cacheStore.getAny("code", String.class).orElseThrow(() -> new ServiceException("未获取过验证码"));
+        String code = cacheStore.getAny("code", String.class)
+            .orElseThrow(() -> new ServiceException("未获取过验证码"));
         if (!code.equals(param.getCode())) {
             throw new ServiceException("验证码不正确");
         }
 
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
+        User user =
+            userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
 
         // reset password
         userService.setPassword(user, param.getPassword());
@@ -280,7 +294,8 @@ public class AdminServiceImpl implements AdminService {
     @NonNull
     public StatisticDTO getCount() {
         StatisticDTO statisticDTO = new StatisticDTO();
-        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED) + sheetService.countByStatus(PostStatus.PUBLISHED));
+        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED)
+            + sheetService.countByStatus(PostStatus.PUBLISHED));
         statisticDTO.setAttachmentCount(attachmentService.count());
 
         // Handle comment count
@@ -324,115 +339,23 @@ public class AdminServiceImpl implements AdminService {
     public AuthToken refreshToken(@NonNull String refreshToken) {
         Assert.hasText(refreshToken, "Refresh token must not be blank");
 
-        Integer userId = cacheStore.getAny(SecurityUtils.buildTokenRefreshKey(refreshToken), Integer.class)
-                .orElseThrow(() -> new BadRequestException("登录状态已失效，请重新登录").setErrorData(refreshToken));
+        Integer userId =
+            cacheStore.getAny(SecurityUtils.buildTokenRefreshKey(refreshToken), Integer.class)
+                .orElseThrow(
+                    () -> new BadRequestException("登录状态已失效，请重新登录").setErrorData(refreshToken));
 
         // Get user info
         User user = userService.getById(userId);
 
         // Remove all token
         cacheStore.getAny(SecurityUtils.buildAccessTokenKey(user), String.class)
-                .ifPresent(accessToken -> cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken)));
+            .ifPresent(
+                accessToken -> cacheStore.delete(SecurityUtils.buildTokenAccessKey(accessToken)));
         cacheStore.delete(SecurityUtils.buildTokenRefreshKey(refreshToken));
         cacheStore.delete(SecurityUtils.buildAccessTokenKey(user));
         cacheStore.delete(SecurityUtils.buildRefreshTokenKey(user));
 
         return buildAuthToken(user);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public void updateAdminAssets() {
-        // Request github api
-        ResponseEntity<Map> responseEntity = restTemplate.getForEntity(HaloConst.HALO_ADMIN_RELEASES_LATEST, Map.class);
-
-        if (responseEntity.getStatusCode().isError() || responseEntity.getBody() == null) {
-            log.debug("Failed to request remote url: [{}]", HALO_ADMIN_RELEASES_LATEST);
-            throw new ServiceException("系统无法访问到 Github 的 API").setErrorData(HALO_ADMIN_RELEASES_LATEST);
-        }
-
-        Object assetsObject = responseEntity.getBody().get("assets");
-
-        if (!(assetsObject instanceof List)) {
-            throw new ServiceException("Github API 返回内容有误").setErrorData(assetsObject);
-        }
-
-        try {
-            List<?> assets = (List<?>) assetsObject;
-            Map assetMap = (Map) assets.stream()
-                    .filter(assetPredicate())
-                    .findFirst()
-                    .orElseThrow(() -> new ServiceException("Halo admin 最新版暂无资源文件，请稍后再试"));
-
-            Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");
-            // Download the assets
-            ResponseEntity<byte[]> downloadResponseEntity = restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
-
-            if (downloadResponseEntity.getStatusCode().isError() || downloadResponseEntity.getBody() == null) {
-                throw new ServiceException("Failed to request remote url: " + browserDownloadUrl.toString()).setErrorData(browserDownloadUrl.toString());
-            }
-
-            String adminTargetName = haloProperties.getWorkDir() + HALO_ADMIN_RELATIVE_PATH;
-
-            Path adminPath = Paths.get(adminTargetName);
-            Path adminBackupPath = Paths.get(haloProperties.getWorkDir(), HALO_ADMIN_RELATIVE_BACKUP_PATH);
-
-            backupAndClearAdminAssetsIfPresent(adminPath, adminBackupPath);
-
-            // Create temp folder
-            Path assetTempPath = FileUtils.createTempDirectory()
-                    .resolve(assetMap.getOrDefault("name", "halo-admin-latest.zip").toString());
-
-            // Unzip
-            FileUtils.unzip(downloadResponseEntity.getBody(), assetTempPath);
-
-            // find root folder
-            Path adminRootPath = FileUtils.findRootPath(assetTempPath,
-                    path -> StringUtils.equalsIgnoreCase("index.html", path.getFileName().toString()))
-                    .orElseThrow(() -> new BadRequestException("无法准确定位到压缩包的根路径，请确认包含 index.html 文件。"));
-
-            // Copy it to template/admin folder
-            FileUtils.copyFolder(adminRootPath, adminPath);
-        } catch (Throwable t) {
-            throw new ServiceException("更新 Halo admin 失败，" + t.getMessage(), t);
-        }
-    }
-
-    @NonNull
-    @SuppressWarnings("unchecked")
-    private Predicate<Object> assetPredicate() {
-        return asset -> {
-            if (!(asset instanceof Map)) {
-                return false;
-            }
-            Map aAssetMap = (Map) asset;
-            // Get content-type
-            String contentType = aAssetMap.getOrDefault("content_type", "").toString();
-
-            Object name = aAssetMap.getOrDefault("name", "");
-            return name.toString().matches(HALO_ADMIN_VERSION_REGEX) && "application/zip".equalsIgnoreCase(contentType);
-        };
-    }
-
-    private void backupAndClearAdminAssetsIfPresent(@NonNull Path sourcePath, @NonNull Path backupPath) throws IOException {
-        Assert.notNull(sourcePath, "Source path must not be null");
-        Assert.notNull(backupPath, "Backup path must not be null");
-
-        if (!FileUtils.isEmpty(sourcePath)) {
-            // Clone this assets
-            Path adminPathBackup = Paths.get(haloProperties.getWorkDir(), HALO_ADMIN_RELATIVE_BACKUP_PATH);
-
-            // Delete backup
-            FileUtils.deleteFolder(backupPath);
-
-            // Copy older assets into backup
-            FileUtils.copyFolder(sourcePath, backupPath);
-
-            // Delete older assets
-            FileUtils.deleteFolder(sourcePath);
-        } else {
-            FileUtils.createIfAbsent(sourcePath);
-        }
     }
 
     /**
@@ -453,12 +376,16 @@ public class AdminServiceImpl implements AdminService {
         token.setRefreshToken(HaloUtils.randomUUIDWithoutDash());
 
         // Cache those tokens, just for clearing
-        cacheStore.putAny(SecurityUtils.buildAccessTokenKey(user), token.getAccessToken(), ACCESS_TOKEN_EXPIRED_SECONDS, TimeUnit.SECONDS);
-        cacheStore.putAny(SecurityUtils.buildRefreshTokenKey(user), token.getRefreshToken(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
+        cacheStore.putAny(SecurityUtils.buildAccessTokenKey(user), token.getAccessToken(),
+            ACCESS_TOKEN_EXPIRED_SECONDS, TimeUnit.SECONDS);
+        cacheStore.putAny(SecurityUtils.buildRefreshTokenKey(user), token.getRefreshToken(),
+            REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
 
         // Cache those tokens with user id
-        cacheStore.putAny(SecurityUtils.buildTokenAccessKey(token.getAccessToken()), user.getId(), ACCESS_TOKEN_EXPIRED_SECONDS, TimeUnit.SECONDS);
-        cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(), REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
+        cacheStore.putAny(SecurityUtils.buildTokenAccessKey(token.getAccessToken()), user.getId(),
+            ACCESS_TOKEN_EXPIRED_SECONDS, TimeUnit.SECONDS);
+        cacheStore.putAny(SecurityUtils.buildTokenRefreshKey(token.getRefreshToken()), user.getId(),
+            REFRESH_TOKEN_EXPIRED_DAYS, TimeUnit.DAYS);
 
         return token;
     }
@@ -491,7 +418,8 @@ public class AdminServiceImpl implements AdminService {
                     randomAccessFile.seek(pos);
                     if (randomAccessFile.readByte() == '\n') {
                         String line = randomAccessFile.readLine();
-                        linesArray.add(new String(line.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+                        linesArray.add(new String(line.getBytes(StandardCharsets.ISO_8859_1),
+                            StandardCharsets.UTF_8));
                         count++;
                         if (count == lines) {
                             break;
@@ -500,7 +428,9 @@ public class AdminServiceImpl implements AdminService {
                 }
                 if (pos == 0) {
                     randomAccessFile.seek(0);
-                    linesArray.add(new String(randomAccessFile.readLine().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8));
+                    linesArray.add(new String(
+                        randomAccessFile.readLine().getBytes(StandardCharsets.ISO_8859_1),
+                        StandardCharsets.UTF_8));
                 }
             }
         } catch (Exception e) {
@@ -517,10 +447,7 @@ public class AdminServiceImpl implements AdminService {
 
         Collections.reverse(linesArray);
 
-        linesArray.forEach(line -> {
-            result.append(line)
-                    .append(StringUtils.LF);
-        });
+        linesArray.forEach(line -> result.append(line).append(StringUtils.LF));
 
         return result.toString();
     }
@@ -531,12 +458,14 @@ public class AdminServiceImpl implements AdminService {
 
         boolean useMFA = true;
         try {
-            final User user = Validator.isEmail(username) ?
-                    userService.getByEmailOfNonNull(username) : userService.getByUsernameOfNonNull(username);
+            final User user = Validator.isEmail(username)
+                ? userService.getByEmailOfNonNull(username) :
+                userService.getByUsernameOfNonNull(username);
             useMFA = MFAType.useMFA(user.getMfaType());
         } catch (NotFoundException e) {
             log.error("Failed to find user by name: " + username, e);
-            eventPublisher.publishEvent(new LogEvent(this, username, LogType.LOGIN_FAILED, username));
+            eventPublisher
+                .publishEvent(new LogEvent(this, username, LogType.LOGIN_FAILED, username));
         }
         return new LoginPreCheckDTO(useMFA);
     }

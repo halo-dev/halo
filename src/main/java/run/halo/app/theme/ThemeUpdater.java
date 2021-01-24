@@ -1,5 +1,8 @@
 package run.halo.app.theme;
 
+import static run.halo.app.utils.FileUtils.copyFolder;
+import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -7,9 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.utils.FileUtils;
-
-import static run.halo.app.utils.FileUtils.copyFolder;
-import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
 
 /**
  * Theme updater.
@@ -50,15 +50,18 @@ public interface ThemeUpdater {
         }
     }
 
-    static void restore(final Path backupPath, final ThemeProperty oldThemeProperty) throws IOException {
+    static void restore(final Path backupPath, final ThemeProperty oldThemeProperty)
+        throws IOException {
         final var targetPath = Paths.get(oldThemeProperty.getThemePath());
         log.info("Restoring backup path: {} to target path: {}", backupPath, targetPath);
         // copy backup to target path
         FileUtils.copyFolder(backupPath, targetPath);
-        log.debug("Copied backup path: {} to target path: {} successfully!", backupPath, targetPath);
+        log.debug("Copied backup path: {} to target path: {} successfully!", backupPath,
+            targetPath);
         // delete backup
         FileUtils.deleteFolderQuietly(backupPath);
         log.debug("Deleted backup path: {} successfully!", backupPath);
-        log.info("Restored backup path: {} to target path: {} successfully!", backupPath, targetPath);
+        log.info("Restored backup path: {} to target path: {} successfully!", backupPath,
+            targetPath);
     }
 }

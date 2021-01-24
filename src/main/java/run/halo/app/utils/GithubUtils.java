@@ -1,13 +1,20 @@
 package run.halo.app.utils;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.github.*;
+import org.kohsuke.github.GHContent;
+import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.HttpException;
 import run.halo.app.service.ThemeService;
-
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * GithubUtils send request to api.github.com
@@ -78,7 +85,7 @@ public class GithubUtils {
     /**
      * Get release information
      *
-     * @param uri     repository url must not be null
+     * @param uri repository url must not be null
      * @param tagName tag must not be null
      * @return the map object containning tagname and zipfile url
      */
@@ -104,7 +111,7 @@ public class GithubUtils {
     /**
      * Get the content of theme.yaml/theme.yml
      *
-     * @param uri    repository url must not be null
+     * @param uri repository url must not be null
      * @param branch branch must not be null
      * @return content of the file
      */
@@ -164,8 +171,9 @@ public class GithubUtils {
                     }
 
                     Optional<GHRelease> res = ghReleaseList.stream()
-                            .filter(release -> StringUtils.equalsIgnoreCase(release.getTagName(), tagName))
-                            .findFirst();
+                        .filter(
+                            release -> StringUtils.equalsIgnoreCase(release.getTagName(), tagName))
+                        .findFirst();
 
                     if (res.isPresent()) {
                         GHRelease ghRelease = res.get();
@@ -341,7 +349,8 @@ public class GithubUtils {
 
                         try {
                             ghContent = ghRepository.getFileContent(themePropertyFile, branch);
-                        } catch (FileNotFoundException e) {
+                        } catch (FileNotFoundException ignored) {
+                            // ignore this exception
                         }
                     }
 
@@ -366,7 +375,8 @@ public class GithubUtils {
 
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
+                    // ignore this exception
                 }
             }
         }

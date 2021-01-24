@@ -1,5 +1,11 @@
 package run.halo.app.utils;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jgit.api.Git;
@@ -11,13 +17,6 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Git utilities.
@@ -43,26 +42,29 @@ public class GitUtils {
         try {
             git = Git.open(repoPath.toFile());
         } catch (RepositoryNotFoundException e) {
-            log.warn("Git repository may not exist, we will try to initialize an empty repository: [{}]", e.getMessage());
+            log.warn(
+                "Git repository may not exist, we will try to initialize an empty repository: [{}]",
+                e.getMessage());
             git = Git.init().setDirectory(repoPath.toFile()).call();
         }
 
         return git;
     }
 
-    public static void cloneFromGit(@NonNull String repoUrl, @NonNull Path targetPath, @NonNull String branchName) throws GitAPIException {
+    public static void cloneFromGit(@NonNull String repoUrl, @NonNull Path targetPath,
+        @NonNull String branchName) throws GitAPIException {
         Assert.hasText(repoUrl, "Repository remote url must not be blank");
         Assert.notNull(targetPath, "Target path must not be null");
 
         Git git = null;
         try {
             git = Git.cloneRepository()
-                    .setURI(repoUrl)
-                    .setDirectory(targetPath.toFile())
-                    .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
-                    .setCloneSubmodules(true)
-                    .setBranch("refs/heads/" + branchName)
-                    .call();
+                .setURI(repoUrl)
+                .setDirectory(targetPath.toFile())
+                .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
+                .setCloneSubmodules(true)
+                .setBranch("refs/heads/" + branchName)
+                .call();
         } finally {
             closeQuietly(git);
         }
@@ -72,9 +74,9 @@ public class GitUtils {
         List<String> branches = new ArrayList<>();
         try {
             Collection<Ref> refs = Git.lsRemoteRepository()
-                    .setHeads(true)
-                    .setRemote(repoUrl)
-                    .call();
+                .setHeads(true)
+                .setRemote(repoUrl)
+                .call();
             for (Ref ref : refs) {
                 branches.add(ref.getName().substring(ref.getName().lastIndexOf("/") + 1));
             }

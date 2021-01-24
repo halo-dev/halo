@@ -1,13 +1,12 @@
 package run.halo.app.utils;
 
 import cn.hutool.extra.servlet.ServletUtil;
+import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Optional;
 
 /**
  * Servlet utilities.
@@ -28,9 +27,9 @@ public class ServletUtils {
     @NonNull
     public static Optional<HttpServletRequest> getCurrentRequest() {
         return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                .filter(requestAttributes -> requestAttributes instanceof ServletRequestAttributes)
-                .map(requestAttributes -> (ServletRequestAttributes) requestAttributes)
-                .map(ServletRequestAttributes::getRequest);
+            .filter(requestAttributes -> requestAttributes instanceof ServletRequestAttributes)
+            .map(requestAttributes -> (ServletRequestAttributes) requestAttributes)
+            .map(ServletRequestAttributes::getRequest);
     }
 
     /**
@@ -51,7 +50,8 @@ public class ServletUtils {
      */
     @Nullable
     public static String getHeaderIgnoreCase(String header) {
-        return getCurrentRequest().map(request -> ServletUtil.getHeaderIgnoreCase(request, header)).orElse(null);
+        return getCurrentRequest().map(request -> ServletUtil.getHeaderIgnoreCase(request, header))
+            .orElse(null);
     }
 
 }

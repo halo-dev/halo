@@ -1,5 +1,8 @@
 package run.halo.app.theme;
 
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+import static run.halo.app.utils.FileUtils.findPath;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -7,9 +10,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
-
-import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
-import static run.halo.app.utils.FileUtils.findPath;
 
 /**
  * Theme meta data locator.
@@ -25,13 +25,13 @@ public enum ThemeMetaLocator {
      * Theme property filenames.
      */
     private static final String[] THEME_PROPERTY_FILENAMES = new String[] {
-            "theme.yaml",
-            "theme.yml",
+        "theme.yaml",
+        "theme.yml",
     };
 
     private static final String[] THEME_SETTING_FILENAMES = new String[] {
-            "settings.yaml",
-            "settings.yml",
+        "settings.yaml",
+        "settings.yml",
     };
 
     /**
@@ -59,9 +59,10 @@ public enum ThemeMetaLocator {
     public Optional<Path> locateProperty(@NonNull Path path) {
         try {
             var predicate = ((Predicate<Path>)
-                    Files::isRegularFile)
-                    .and(Files::isReadable)
-                    .and(p -> equalsAnyIgnoreCase(p.getFileName().toString(), THEME_PROPERTY_FILENAMES));
+                Files::isRegularFile)
+                .and(Files::isReadable)
+                .and(
+                    p -> equalsAnyIgnoreCase(p.getFileName().toString(), THEME_PROPERTY_FILENAMES));
 
             log.debug("Locating property in path: {}", path);
             return findPath(path, 3, predicate);
@@ -79,18 +80,19 @@ public enum ThemeMetaLocator {
     @NonNull
     public Optional<Path> locateSetting(@NonNull Path path) {
         return locateThemeRoot(path).flatMap(root -> {
-                    try {
-                        var predicate = ((Predicate<Path>)
-                                Files::isRegularFile)
-                                .and(Files::isReadable)
-                                .and(p -> equalsAnyIgnoreCase(p.getFileName().toString(), THEME_SETTING_FILENAMES));
-                        log.debug("Locating setting from {}", path);
-                        return findPath(path, 3, predicate);
-                    } catch (IOException e) {
-                        log.warn("Error occurred while finding theme root path", e);
-                    }
-                    return Optional.empty();
+                try {
+                    var predicate = ((Predicate<Path>)
+                        Files::isRegularFile)
+                        .and(Files::isReadable)
+                        .and(p -> equalsAnyIgnoreCase(p.getFileName().toString(),
+                            THEME_SETTING_FILENAMES));
+                    log.debug("Locating setting from {}", path);
+                    return findPath(path, 3, predicate);
+                } catch (IOException e) {
+                    log.warn("Error occurred while finding theme root path", e);
                 }
+                return Optional.empty();
+            }
         );
     }
 
@@ -105,8 +107,8 @@ public enum ThemeMetaLocator {
         return locateThemeRoot(path).flatMap(root -> {
             try (var pathStream = Files.list(root)) {
                 var predicate = ((Predicate<Path>) Files::isRegularFile)
-                        .and(Files::isReadable)
-                        .and(p -> p.getFileName().toString().startsWith(THEME_SCREENSHOTS_NAME));
+                    .and(Files::isReadable)
+                    .and(p -> p.getFileName().toString().startsWith(THEME_SCREENSHOTS_NAME));
                 log.debug("Locating screenshot from path: {}", path);
                 return pathStream.filter(predicate).findFirst();
             } catch (IOException e) {

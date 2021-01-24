@@ -1,5 +1,7 @@
 package run.halo.app.controller.content.model;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +14,6 @@ import run.halo.app.model.properties.SheetProperties;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * @author ryanwang
@@ -29,8 +29,8 @@ public class JournalModel {
     private final ThemeService themeService;
 
     public JournalModel(JournalService journalService,
-            OptionService optionService,
-            ThemeService themeService) {
+        OptionService optionService,
+        ThemeService themeService) {
         this.journalService = journalService;
         this.optionService = optionService;
         this.themeService = themeService;
@@ -38,9 +38,12 @@ public class JournalModel {
 
     public String list(Integer page, Model model) {
 
-        int pageSize = optionService.getByPropertyOrDefault(SheetProperties.JOURNALS_PAGE_SIZE, Integer.class, Integer.parseInt(SheetProperties.JOURNALS_PAGE_SIZE.defaultValue()));
+        int pageSize = optionService
+            .getByPropertyOrDefault(SheetProperties.JOURNALS_PAGE_SIZE, Integer.class,
+                Integer.parseInt(SheetProperties.JOURNALS_PAGE_SIZE.defaultValue()));
 
-        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "createTime"));
+        Pageable pageable =
+            PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "createTime"));
 
         Page<Journal> journals = journalService.pageBy(JournalType.PUBLIC, pageable);
 

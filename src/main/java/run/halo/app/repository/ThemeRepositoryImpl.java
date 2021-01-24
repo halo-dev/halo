@@ -1,5 +1,10 @@
 package run.halo.app.repository;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static run.halo.app.utils.FileUtils.copyFolder;
+import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
+import static run.halo.app.utils.VersionUtil.compareVersion;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,11 +28,6 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.theme.ThemePropertyScanner;
 import run.halo.app.utils.FileUtils;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
-import static run.halo.app.utils.FileUtils.copyFolder;
-import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
-import static run.halo.app.utils.VersionUtil.compareVersion;
-
 /**
  * Theme repository implementation.
  *
@@ -42,7 +42,7 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     private final HaloProperties properties;
 
     public ThemeRepositoryImpl(OptionRepository optionRepository,
-            HaloProperties properties) {
+        HaloProperties properties) {
         this.optionRepository = optionRepository;
         this.properties = properties;
     }
@@ -50,8 +50,8 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     @Override
     public String getActivatedThemeId() {
         return optionRepository.findByKey(PrimaryProperties.THEME.getValue())
-                .map(Option::getValue)
-                .orElse(HaloConst.DEFAULT_THEME_ID);
+            .map(Option::getValue)
+            .orElse(HaloConst.DEFAULT_THEME_ID);
     }
 
     @Override
@@ -62,8 +62,8 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     @Override
     public Optional<ThemeProperty> fetchThemePropertyByThemeId(String themeId) {
         return listAll().stream()
-                .filter(property -> Objects.equals(themeId, property.getId()))
-                .findFirst();
+            .filter(property -> Objects.equals(themeId, property.getId()))
+            .findFirst();
     }
 
     @Override
@@ -76,12 +76,12 @@ public class ThemeRepositoryImpl implements ThemeRepository {
         Assert.hasText(themeId, "Theme id must not be blank");
 
         final var newThemeOption = optionRepository.findByKey(PrimaryProperties.THEME.getValue())
-                .map(themeOption -> {
-                    // set theme id
-                    themeOption.setValue(themeId);
-                    return themeOption;
-                })
-                .orElseGet(() -> new Option(PrimaryProperties.THEME.getValue(), themeId));
+            .map(themeOption -> {
+                // set theme id
+                themeOption.setValue(themeId);
+                return themeOption;
+            })
+            .orElseGet(() -> new Option(PrimaryProperties.THEME.getValue(), themeId));
         optionRepository.save(newThemeOption);
     }
 
@@ -97,20 +97,21 @@ public class ThemeRepositoryImpl implements ThemeRepository {
         // Not support current halo version.
         if (checkThemePropertyCompatibility(newProperty)) {
             throw new ThemeNotSupportException(
-                    "当前主题仅支持 Halo " + newProperty.getRequire() + " 及以上的版本");
+                "当前主题仅支持 Halo " + newProperty.getRequire() + " 及以上的版本");
         }
 
         // 3. move the temp folder into templates/themes/{theme_id}
         final var sourceThemePath = Paths.get(newProperty.getThemePath());
-        final var targetThemePath = getThemeRootPath().resolve(newProperty.getId() + "-" + randomAlphabetic(5));
+        final var targetThemePath =
+            getThemeRootPath().resolve(newProperty.getId() + "-" + randomAlphabetic(5));
 
         // 4. clear target theme folder firstly
         deleteFolderQuietly(targetThemePath);
 
         log.info("Copying new theme({}) from {} to {}",
-                newProperty.getId(),
-                sourceThemePath,
-                targetThemePath);
+            newProperty.getId(),
+            sourceThemePath,
+            targetThemePath);
 
         try {
             copyFolder(sourceThemePath, targetThemePath);
@@ -130,7 +131,7 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     @Override
     public void deleteTheme(String themeId) {
         final var themeProperty = fetchThemePropertyByThemeId(themeId)
-                .orElseThrow(() -> new NotFoundException("主题 ID 为 " + themeId + " 不存在或已删除！"));
+            .orElseThrow(() -> new NotFoundException("主题 ID 为 " + themeId + " 不存在或已删除！"));
         deleteTheme(themeProperty);
     }
 
@@ -149,7 +150,7 @@ public class ThemeRepositoryImpl implements ThemeRepository {
         // check version compatibility
         // Not support current halo version.
         return StringUtils.isNotEmpty(themeProperty.getRequire())
-                && !compareVersion(HaloConst.HALO_VERSION, themeProperty.getRequire());
+            && !compareVersion(HaloConst.HALO_VERSION, themeProperty.getRequire());
     }
 
     private Path getThemeRootPath() {

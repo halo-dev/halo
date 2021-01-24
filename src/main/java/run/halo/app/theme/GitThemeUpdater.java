@@ -1,5 +1,8 @@
 package run.halo.app.theme;
 
+import static run.halo.app.theme.ThemeUpdater.backup;
+import static run.halo.app.theme.ThemeUpdater.restore;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -16,9 +19,6 @@ import run.halo.app.exception.ServiceException;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.repository.ThemeRepository;
 
-import static run.halo.app.theme.ThemeUpdater.backup;
-import static run.halo.app.theme.ThemeUpdater.restore;
-
 /**
  * Update from theme property config.
  *
@@ -33,8 +33,8 @@ public class GitThemeUpdater implements ThemeUpdater {
     private final ConflictStrategy conflictStrategy;
 
     public GitThemeUpdater(ThemeRepository themeRepository,
-            ThemeFetcherComposite fetcherComposite,
-            ConflictStrategy conflictStrategy) {
+        ThemeFetcherComposite fetcherComposite,
+        ConflictStrategy conflictStrategy) {
         this.themeRepository = themeRepository;
         this.fetcherComposite = fetcherComposite;
         this.conflictStrategy = conflictStrategy;
@@ -44,7 +44,8 @@ public class GitThemeUpdater implements ThemeUpdater {
     public ThemeProperty update(String themeId) throws IOException {
         // get theme property
         final var oldThemeProperty = themeRepository.fetchThemePropertyByThemeId(themeId)
-                .orElseThrow(() -> new NotFoundException("主题 " + themeId + " 不存在或以删除！").setErrorData(themeId));
+            .orElseThrow(
+                () -> new NotFoundException("主题 " + themeId + " 不存在或以删除！").setErrorData(themeId));
 
         // get update config
         final var gitRepo = oldThemeProperty.getRepo();
@@ -73,14 +74,15 @@ public class GitThemeUpdater implements ThemeUpdater {
         }
     }
 
-    public ThemeProperty merge(ThemeProperty oldThemeProperty, ThemeProperty newThemeProperty) throws IOException {
+    public ThemeProperty merge(ThemeProperty oldThemeProperty, ThemeProperty newThemeProperty)
+        throws IOException {
         //TODO Complete merging process
         // make sure that both themes contain .git folder
         final var oldThemePath = Paths.get(oldThemeProperty.getThemePath());
         final var newThemePath = Paths.get(newThemeProperty.getThemePath());
 
-//        final var branch = oldThemeProperty.getBranch();
-//        final var updateStrategy = oldThemeProperty.getUpdateStrategy();
+        // final var branch = oldThemeProperty.getBranch();
+        // final var updateStrategy = oldThemeProperty.getUpdateStrategy();
 
         // open old git repo
         try (final var oldGit = Git.open(oldThemePath.toFile())) {
@@ -88,56 +90,57 @@ public class GitThemeUpdater implements ThemeUpdater {
             if (!oldGit.status().call().isClean()) {
                 oldGit.add().addFilepattern(".").call();
                 oldGit.commit()
-                        .setSign(false)
-                        .setAuthor("halo", "hi@halo.run")
-                        .setMessage("Committed by halo automatically.")
-                        .call();
+                    .setSign(false)
+                    .setAuthor("halo", "hi@halo.run")
+                    .setMessage("Committed by halo automatically.")
+                    .call();
             }
             // open new git repo
             try (final var newGit = Git.open(newThemePath.toFile())) {
                 newGit.fetch().setTagOpt(TagOpt.FETCH_TAGS).call();
                 // clear remote
                 final var remoteExists = oldGit.remoteList()
-                        .call()
-                        .stream().map(RemoteConfig::getName)
-                        .anyMatch(name -> name.equalsIgnoreCase("newRepo"));
+                    .call()
+                    .stream().map(RemoteConfig::getName)
+                    .anyMatch(name -> name.equalsIgnoreCase("newRepo"));
                 if (remoteExists) {
                     // remove newRepo remote
                     oldGit.remoteRemove()
-                            .setRemoteName("newRepo")
-                            .call();
+                        .setRemoteName("newRepo")
+                        .call();
                 }
 
                 // add this new git to remote for old repo
                 oldGit.remoteAdd()
-                        .setName("newRepo")
-                        .setUri(new URIish(newThemePath.toString()))
-                        .call();
+                    .setName("newRepo")
+                    .setUri(new URIish(newThemePath.toString()))
+                    .call();
 
                 // fetch remote data
                 final var branch = oldThemeProperty.getBranch();
                 final var remote = "newRepo/" + branch;
                 oldGit.fetch()
-                        .setRemote(remote)
-                        .call();
+                    .setRemote(remote)
+                    .call();
 
                 // rebase upstream
                 final var rebaseResult = oldGit.rebase()
-                        .setUpstream(remote)
-                        .setStrategy(MergeStrategy.THEIRS)
-                        .call();
+                    .setUpstream(remote)
+                    .setStrategy(MergeStrategy.THEIRS)
+                    .call();
 
                 if (!rebaseResult.getStatus().isSuccessful()
-                        && oldGit.getRepository().getRepositoryState() != RepositoryState.SAFE) {
-                    // if rebasing stopped or failed, you can get back to the original state by running it
+                    && oldGit.getRepository().getRepositoryState() != RepositoryState.SAFE) {
+                    // if rebasing stopped or failed, you can get back to the original state by
+                    // running it
                     // with setOperation(RebaseCommand.Operation.ABORT)
                     final var abortRebaseResult = oldGit.rebase()
-                            .setUpstream(remote)
-                            .setOperation(RebaseCommand.Operation.ABORT)
-                            .call();
+                        .setUpstream(remote)
+                        .setOperation(RebaseCommand.Operation.ABORT)
+                        .call();
                     log.error("Aborted rebase with state: {} : {}",
-                            abortRebaseResult.getStatus(),
-                            abortRebaseResult.getConflicts());
+                        abortRebaseResult.getStatus(),
+                        abortRebaseResult.getConflicts());
                 }
             }
         } catch (URISyntaxException | GitAPIException e) {

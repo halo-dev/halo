@@ -1,9 +1,8 @@
 package run.halo.app.model.support;
 
-import lombok.Data;
-
 import java.util.Comparator;
 import java.util.List;
+import lombok.Data;
 
 /**
  * Static page dto.

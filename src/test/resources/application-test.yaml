@@ -32,7 +32,7 @@ management:
     web:
       base-path: /api/admin/actuator
       exposure:
-        include: ['httptrace', 'metrics','env','logfile']
+        include: [ 'httptrace', 'metrics','env','logfile' ]
 logging:
   level:
     run.halo.app: DEBUG

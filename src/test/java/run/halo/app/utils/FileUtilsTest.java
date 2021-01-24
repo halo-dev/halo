@@ -1,10 +1,8 @@
 package run.halo.app.utils;
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import run.halo.app.model.support.HaloConst;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -17,8 +15,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
-
-import static org.junit.jupiter.api.Assertions.*;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import run.halo.app.model.support.HaloConst;
 
 /**
  * @author johnniang
@@ -223,7 +224,8 @@ class FileUtilsTest {
         log.info("Prepared test folder structure");
 
         // find the root folder where expected file locates, and we expect folder3
-        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory, path -> path.getFileName().toString().equals("expected_file"));
+        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory,
+            path -> path.getFileName().toString().equals("expected_file"));
         assertTrue(rootPath.isPresent());
         assertEquals(folder3.toString(), rootPath.get().toString());
     }
@@ -263,7 +265,8 @@ class FileUtilsTest {
         log.info("Prepared test folder structure");
 
         // find the root folder where file3 locates, and we expect folder3
-        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory, path -> path.getFileName().toString().equals("expected_file"));
+        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory,
+            path -> path.getFileName().toString().equals("expected_file"));
         assertFalse(rootPath.isPresent());
     }
 
@@ -295,13 +298,16 @@ class FileUtilsTest {
         log.info("Prepared test folder structure");
 
         // find the root folder where expected file locates, and we expect folder3
-        var filePathResult = FileUtils.findPath(tempDirectory, 1, path -> path.getFileName().toString().equals("expected_file"));
+        var filePathResult = FileUtils.findPath(tempDirectory, 1,
+            path -> path.getFileName().toString().equals("expected_file"));
         assertFalse(filePathResult.isPresent());
 
-        filePathResult = FileUtils.findPath(tempDirectory, 2, path -> path.getFileName().toString().equals("expected_file"));
+        filePathResult = FileUtils.findPath(tempDirectory, 2,
+            path -> path.getFileName().toString().equals("expected_file"));
         assertFalse(filePathResult.isPresent());
 
-        filePathResult = FileUtils.findPath(tempDirectory, 3, path -> path.getFileName().toString().equals("expected_file"));
+        filePathResult = FileUtils.findPath(tempDirectory, 3,
+            path -> path.getFileName().toString().equals("expected_file"));
         assertTrue(filePathResult.isPresent());
         assertEquals(expectedFile.toString(), filePathResult.get().toString());
     }

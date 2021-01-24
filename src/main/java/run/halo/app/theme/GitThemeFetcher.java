@@ -36,22 +36,23 @@ public class GitThemeFetcher implements ThemeFetcher {
             // clone from git
             log.info("Cloning git repo {} to {}", repoUrl, tempDirectory);
             try (final var ignored = Git.cloneRepository()
-                    .setTagOption(TagOpt.FETCH_TAGS)
-                    .setNoCheckout(false)
-                    .setDirectory(tempDirectory.toFile())
-                    .setCloneSubmodules(false)
-                    .setURI(repoUrl)
-                    .setRemote("upstream")
-                    .call()) {
+                .setTagOption(TagOpt.FETCH_TAGS)
+                .setNoCheckout(false)
+                .setDirectory(tempDirectory.toFile())
+                .setCloneSubmodules(false)
+                .setURI(repoUrl)
+                .setRemote("upstream")
+                .call()) {
                 log.info("Cloned git repo {} to {} successfully", repoUrl, tempDirectory);
             }
 
             // locate theme property location
             var themePropertyPath = ThemeMetaLocator.INSTANCE.locateProperty(tempDirectory)
-                    .orElseThrow(() -> new ThemePropertyMissingException("主题配置文件缺失，请确认后重试！"));
+                .orElseThrow(() -> new ThemePropertyMissingException("主题配置文件缺失，请确认后重试！"));
 
             // fetch property
-            return ThemePropertyScanner.INSTANCE.fetchThemeProperty(themePropertyPath.getParent()).orElseThrow();
+            return ThemePropertyScanner.INSTANCE.fetchThemeProperty(themePropertyPath.getParent())
+                .orElseThrow();
         } catch (IOException | GitAPIException e) {
             throw new RuntimeException("主题拉取失败！（" + e.getMessage() + "）", e);
         }

@@ -1,11 +1,10 @@
 package run.halo.app.repository;
 
+import java.util.List;
+import java.util.Optional;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.Category;
 import run.halo.app.repository.base.BaseRepository;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Category repository.

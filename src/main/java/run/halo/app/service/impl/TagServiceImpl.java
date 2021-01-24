@@ -1,5 +1,10 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +18,6 @@ import run.halo.app.repository.TagRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.TagService;
 import run.halo.app.service.base.AbstractCrudService;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * TagService implementation class.
@@ -36,7 +35,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
     private final OptionService optionService;
 
     public TagServiceImpl(TagRepository tagRepository,
-            OptionService optionService) {
+        OptionService optionService) {
         super(tagRepository);
         this.tagRepository = tagRepository;
         this.optionService = optionService;
@@ -61,7 +60,8 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
 
     @Override
     public Tag getBySlugOfNonNull(String slug) {
-        return tagRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
+        return tagRepository.getBySlug(slug)
+            .orElseThrow(() -> new NotFoundException("查询不到该标签的信息").setErrorData(slug));
     }
 
     @Override
@@ -87,10 +87,10 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         }
 
         fullPath.append(URL_SEPARATOR)
-                .append(optionService.getTagsPrefix())
-                .append(URL_SEPARATOR)
-                .append(tag.getSlug())
-                .append(optionService.getPathSuffix());
+            .append(optionService.getTagsPrefix())
+            .append(URL_SEPARATOR)
+            .append(tag.getSlug())
+            .append(optionService.getPathSuffix());
 
         tagDTO.setFullPath(fullPath.toString());
 
@@ -104,7 +104,7 @@ public class TagServiceImpl extends AbstractCrudService<Tag, Integer> implements
         }
 
         return tags.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 }

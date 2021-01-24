@@ -1,7 +1,17 @@
 package run.halo.app.utils;
 
-import java.io.*;
-import java.nio.file.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,15 +54,18 @@ public class FileUtils {
         Files.walkFileTree(source, new SimpleFileVisitor<>() {
 
             @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                throws IOException {
                 Path current = target.resolve(source.relativize(dir).toString());
                 Files.createDirectories(current);
                 return FileVisitResult.CONTINUE;
             }
 
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.copy(file, target.resolve(source.relativize(file).toString()), StandardCopyOption.REPLACE_EXISTING);
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                throws IOException {
+                Files.copy(file, target.resolve(source.relativize(file).toString()),
+                    StandardCopyOption.REPLACE_EXISTING);
                 return FileVisitResult.CONTINUE;
             }
         });
@@ -74,7 +87,7 @@ public class FileUtils {
 
         // Delete folder recursively
         org.eclipse.jgit.util.FileUtils.delete(deletingPath.toFile(),
-                org.eclipse.jgit.util.FileUtils.RECURSIVE | org.eclipse.jgit.util.FileUtils.RETRY);
+            org.eclipse.jgit.util.FileUtils.RECURSIVE | org.eclipse.jgit.util.FileUtils.RETRY);
 
         log.info("Deleted [{}] successfully", deletingPath);
     }
@@ -83,9 +96,10 @@ public class FileUtils {
      * Renames file or folder.
      *
      * @param pathToRename file path to rename must not be null
-     * @param newName      new name must not be null
+     * @param newName new name must not be null
      */
-    public static void rename(@NonNull Path pathToRename, @NonNull String newName) throws IOException {
+    public static void rename(@NonNull Path pathToRename, @NonNull String newName)
+        throws IOException {
         Assert.notNull(pathToRename, "File path to rename must not be null");
         Assert.notNull(newName, "New name must not be null");
 
@@ -100,11 +114,12 @@ public class FileUtils {
     /**
      * Unzips content to the target path.
      *
-     * @param zis        zip input stream must not be null
+     * @param zis zip input stream must not be null
      * @param targetPath target path must not be null and not empty
      * @throws IOException throws when failed to access file to be unzipped
      */
-    public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath) throws IOException {
+    public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath)
+        throws IOException {
         // 1. unzip file to folder
         // 2. return the folder path
         Assert.notNull(zis, "Zip input stream must not be null");
@@ -138,13 +153,28 @@ public class FileUtils {
     }
 
     /**
+     * Unzips content to the target path.
+     *
+     * @param bytes zip bytes array must not be null
+     * @param targetPath target path must not be null and not empty
+     * @throws IOException io exception
+     */
+    public static void unzip(@NonNull byte[] bytes, @NonNull Path targetPath) throws IOException {
+        Assert.notNull(bytes, "Zip bytes must not be null");
+
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
+        unzip(zis, targetPath);
+    }
+
+    /**
      * Zips folder or file.
      *
-     * @param pathToZip     file path to zip must not be null
+     * @param pathToZip file path to zip must not be null
      * @param pathOfArchive zip file path to archive must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
-    public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive) throws IOException {
+    public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive)
+        throws IOException {
         try (OutputStream outputStream = Files.newOutputStream(pathOfArchive)) {
             try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
                 zip(pathToZip, zipOut);
@@ -156,10 +186,11 @@ public class FileUtils {
      * Zips folder or file.
      *
      * @param pathToZip file path to zip must not be null
-     * @param zipOut    zip output stream must not be null
+     * @param zipOut zip output stream must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
-    public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut) throws IOException {
+    public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut)
+        throws IOException {
         // Zip file
         zip(pathToZip, pathToZip.getFileName().toString(), zipOut);
     }
@@ -168,15 +199,17 @@ public class FileUtils {
      * Zips folder or file.
      *
      * @param fileToZip file path to zip must not be null
-     * @param fileName  file name must not be blank
-     * @param zipOut    zip output stream must not be null
+     * @param fileName file name must not be blank
+     * @param zipOut zip output stream must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
-    private static void zip(@NonNull Path fileToZip, @NonNull String fileName, @NonNull ZipOutputStream zipOut) throws IOException {
+    private static void zip(@NonNull Path fileToZip, @NonNull String fileName,
+        @NonNull ZipOutputStream zipOut) throws IOException {
         if (Files.isDirectory(fileToZip)) {
             log.debug("Try to zip folder: [{}]", fileToZip);
             // Append with '/' if missing
-            String folderName = StringUtils.appendIfMissing(fileName, File.separator, File.separator);
+            String folderName =
+                StringUtils.appendIfMissing(fileName, File.separator, File.separator);
             // Create zip entry and put into zip output stream
             zipOut.putNextEntry(new ZipEntry(folderName));
             // Close entry for writing the next entry
@@ -184,7 +217,8 @@ public class FileUtils {
 
             // Iterate the sub files recursively
             try (Stream<Path> subPathStream = Files.list(fileToZip)) {
-                // There should not use foreach for stream as internal zip method will throw IOException
+                // There should not use foreach for stream as internal zip method will throw
+                // IOException
                 List<Path> subFiles = subPathStream.collect(Collectors.toList());
                 for (Path subFileToZip : subFiles) {
                     // Zip children
@@ -206,80 +240,69 @@ public class FileUtils {
 
 
     /**
-     * Unzips content to the target path.
-     *
-     * @param bytes      zip bytes array must not be null
-     * @param targetPath target path must not be null and not empty
-     * @throws IOException
-     */
-    public static void unzip(@NonNull byte[] bytes, @NonNull Path targetPath) throws IOException {
-        Assert.notNull(bytes, "Zip bytes must not be null");
-
-        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
-        unzip(zis, targetPath);
-    }
-
-    /**
      * Find root path.
      *
-     * @param path          super root path starter
-     * @param pathPredicate path predicate
-     * @return empty if path is not a directory or the given path predicate is null
-     * @throws IOException IO exception
-     */
-    @NonNull
-    public static Optional<Path> findRootPath(@NonNull final Path path, @Nullable final Predicate<Path> pathPredicate)
-            throws IOException {
-        return findRootPath(path, Integer.MAX_VALUE, pathPredicate).map(Path::getParent);
-    }
-
-    /**
-     * Find root path.
-     *
-     * @param path          super root path starter
-     * @param maxDepth      max loop depth
+     * @param path super root path starter
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
      */
     @NonNull
     public static Optional<Path> findRootPath(@NonNull final Path path,
-            int maxDepth,
-            @Nullable final Predicate<Path> pathPredicate)
-            throws IOException {
+        @Nullable final Predicate<Path> pathPredicate)
+        throws IOException {
+        return findRootPath(path, Integer.MAX_VALUE, pathPredicate).map(Path::getParent);
+    }
+
+    /**
+     * Find root path.
+     *
+     * @param path super root path starter
+     * @param maxDepth max loop depth
+     * @param pathPredicate path predicate
+     * @return empty if path is not a directory or the given path predicate is null
+     * @throws IOException IO exception
+     */
+    @NonNull
+    public static Optional<Path> findRootPath(@NonNull final Path path,
+        int maxDepth,
+        @Nullable final Predicate<Path> pathPredicate)
+        throws IOException {
         return findPath(path, maxDepth, pathPredicate).map(Path::getParent);
     }
 
     /**
      * Find path.
      *
-     * @param path          super root path starter
-     * @param pathPredicate path predicate
-     * @return empty if path is not a directory or the given path predicate is null
-     * @throws IOException IO exception
-     */
-    @NonNull
-    public static Optional<Path> findPath(@NonNull final Path path, @Nullable final Predicate<Path> pathPredicate)
-            throws IOException {
-        return findPath(path, Integer.MAX_VALUE, pathPredicate);
-    }
-
-    /**
-     * Find path.
-     *
-     * @param path          super root path starter
+     * @param path super root path starter
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
      */
     @NonNull
     public static Optional<Path> findPath(@NonNull final Path path,
-            int maxDepth,
-            @Nullable final Predicate<Path> pathPredicate)
-            throws IOException {
+        @Nullable final Predicate<Path> pathPredicate)
+        throws IOException {
+        return findPath(path, Integer.MAX_VALUE, pathPredicate);
+    }
+
+    /**
+     * Find path.
+     *
+     * @param path super root path starter
+     * @param pathPredicate path predicate
+     * @return empty if path is not a directory or the given path predicate is null
+     * @throws IOException IO exception
+     */
+    @NonNull
+    public static Optional<Path> findPath(@NonNull final Path path,
+        int maxDepth,
+        @Nullable final Predicate<Path> pathPredicate)
+        throws IOException {
         Assert.isTrue(maxDepth > 0, "Max depth must not be less than 1");
         if (!Files.isDirectory(path) || pathPredicate == null) {
-            // if the path is not a directory or the given path predicate is null, then return an empty optional
+            // if the path is not a directory or the given path predicate is null, then return an
+            // empty optional
             return Optional.empty();
         }
 
@@ -304,13 +327,13 @@ public class FileUtils {
             try (final Stream<Path> childrenPaths = Files.list(rootPath)) {
                 final List<Path> subFolders = new LinkedList<>();
                 var resultPath = childrenPaths
-                        .peek(p -> {
-                            if (Files.isDirectory(p)) {
-                                subFolders.add(p);
-                            }
-                        })
-                        .filter(pathPredicate)
-                        .findFirst();
+                    .peek(p -> {
+                        if (Files.isDirectory(p)) {
+                            subFolders.add(p);
+                        }
+                    })
+                    .filter(pathPredicate)
+                    .findFirst();
                 if (resultPath.isPresent()) {
                     log.debug("Found path: [{}]", rootPath);
                     queue.clear();
@@ -337,7 +360,7 @@ public class FileUtils {
      * Creates directories if absent.
      *
      * @param path path must not be null
-     * @throws IOException
+     * @throws IOException io exception
      */
     public static void createIfAbsent(@NonNull Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
@@ -355,7 +378,7 @@ public class FileUtils {
      *
      * @param path path must not be null
      * @return true if the given path is empty; false otherwise
-     * @throws IOException
+     * @throws IOException io exception
      */
     public static boolean isEmpty(@NonNull Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
@@ -373,7 +396,7 @@ public class FileUtils {
      * The given path must be empty.
      *
      * @param path path must not be null
-     * @throws IOException
+     * @throws IOException io exception
      */
     public static void ensureEmpty(@NonNull Path path) throws IOException {
         if (!isEmpty(path)) {
@@ -384,30 +407,33 @@ public class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull String parentPath, @NonNull String pathToCheck) {
+    public static void checkDirectoryTraversal(@NonNull String parentPath,
+        @NonNull String pathToCheck) {
         checkDirectoryTraversal(Paths.get(parentPath), Paths.get(pathToCheck));
     }
 
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull Path parentPath, @NonNull String pathToCheck) {
+    public static void checkDirectoryTraversal(@NonNull Path parentPath,
+        @NonNull String pathToCheck) {
         checkDirectoryTraversal(parentPath, Paths.get(pathToCheck));
     }
 
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
-    public static void checkDirectoryTraversal(@NonNull Path parentPath, @NonNull Path pathToCheck) {
+    public static void checkDirectoryTraversal(@NonNull Path parentPath,
+        @NonNull Path pathToCheck) {
         Assert.notNull(parentPath, "Parent path must not be null");
         Assert.notNull(pathToCheck, "Path to check must not be null");
 

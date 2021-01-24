@@ -1,10 +1,9 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import run.halo.app.model.support.CreateCheck;
-
-import javax.validation.constraints.NotBlank;
 
 /**
  * Install parameters.

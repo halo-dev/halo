@@ -1,12 +1,11 @@
 package run.halo.app.repository;
 
+import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.repository.base.BaseRepository;
-
-import java.util.List;
 
 /**
  * Menu repository.
@@ -28,7 +27,7 @@ public interface MenuRepository extends BaseRepository<Menu, Integer> {
     /**
      * Query if the menu name already exists by id and name.
      *
-     * @param id   id must not be null.
+     * @param id id must not be null.
      * @param name name must not be null.
      * @return true or false.
      */

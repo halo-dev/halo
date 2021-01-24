@@ -1,10 +1,9 @@
 package run.halo.app.mail;
 
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Mail properties.

@@ -1,9 +1,8 @@
 package run.halo.app.handler.theme.config.support;
 
-import lombok.Data;
-
 import java.util.Objects;
 import java.util.Set;
+import lombok.Data;
 
 /**
  * Theme property.

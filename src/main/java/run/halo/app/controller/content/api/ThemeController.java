@@ -1,14 +1,13 @@
 package run.halo.app.controller.content.api;
 
 import io.swagger.annotations.ApiOperation;
+import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
-
-import java.util.Map;
 
 /**
  * Content theme controller.
