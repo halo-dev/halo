@@ -26,7 +26,8 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     /**
      * Cache container.
      */
-    private final static ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER =
+        new ConcurrentHashMap<>();
 
     private final Timer timer;
 
@@ -56,7 +57,8 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
         // Put the cache wrapper
         CacheWrapper<String> putCacheWrapper = CACHE_CONTAINER.put(key, cacheWrapper);
 
-        log.debug("Put [{}] cache result: [{}], original cache wrapper: [{}]", key, putCacheWrapper, cacheWrapper);
+        log.debug("Put [{}] cache result: [{}], original cache wrapper: [{}]", key, putCacheWrapper,
+            cacheWrapper);
     }
 
     @Override
@@ -72,7 +74,8 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
             Optional<String> valueOptional = get(key);
 
             if (valueOptional.isPresent()) {
-                log.warn("Failed to put the cache, because the key: [{}] has been present already", key);
+                log.warn("Failed to put the cache, because the key: [{}] has been present already",
+                    key);
                 return false;
             }
 

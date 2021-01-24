@@ -85,7 +85,7 @@ public class GithubUtils {
     /**
      * Get release information
      *
-     * @param uri     repository url must not be null
+     * @param uri repository url must not be null
      * @param tagName tag must not be null
      * @return the map object containning tagname and zipfile url
      */
@@ -111,7 +111,7 @@ public class GithubUtils {
     /**
      * Get the content of theme.yaml/theme.yml
      *
-     * @param uri    repository url must not be null
+     * @param uri repository url must not be null
      * @param branch branch must not be null
      * @return content of the file
      */
@@ -171,8 +171,9 @@ public class GithubUtils {
                     }
 
                     Optional<GHRelease> res = ghReleaseList.stream()
-                            .filter(release -> StringUtils.equalsIgnoreCase(release.getTagName(), tagName))
-                            .findFirst();
+                        .filter(
+                            release -> StringUtils.equalsIgnoreCase(release.getTagName(), tagName))
+                        .findFirst();
 
                     if (res.isPresent()) {
                         GHRelease ghRelease = res.get();

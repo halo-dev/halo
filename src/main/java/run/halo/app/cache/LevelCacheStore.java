@@ -81,7 +81,8 @@ public class LevelCacheStore extends AbstractStringCacheStore {
         byte[] bytes = LEVEL_DB.get(stringToBytes(key));
         if (bytes != null) {
             String valueJson = bytesToString(bytes);
-            return StringUtils.isEmpty(valueJson) ? Optional.empty() : jsonToCacheWrapper(valueJson);
+            return StringUtils.isEmpty(valueJson) ? Optional.empty() :
+                jsonToCacheWrapper(valueJson);
         }
         return Optional.empty();
     }
@@ -97,8 +98,8 @@ public class LevelCacheStore extends AbstractStringCacheStore {
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
         try {
             LEVEL_DB.put(
-                    stringToBytes(key),
-                    stringToBytes(JsonUtils.objectToJson(cacheWrapper))
+                stringToBytes(key),
+                stringToBytes(JsonUtils.objectToJson(cacheWrapper))
             );
             return true;
         } catch (JsonProcessingException e) {
@@ -139,16 +140,19 @@ public class LevelCacheStore extends AbstractStringCacheStore {
                 }
 
                 String valueJson = bytesToString(next.getValue());
-                Optional<CacheWrapper<String>> stringCacheWrapper = StringUtils.isEmpty(valueJson) ? Optional.empty() : jsonToCacheWrapper(valueJson);
+                Optional<CacheWrapper<String>> stringCacheWrapper =
+                    StringUtils.isEmpty(valueJson) ? Optional.empty() :
+                        jsonToCacheWrapper(valueJson);
                 if (stringCacheWrapper.isPresent()) {
                     //get expireat time
                     long expireAtTime = stringCacheWrapper.map(CacheWrapper::getExpireAt)
-                            .map(Date::getTime)
-                            .orElse(0L);
+                        .map(Date::getTime)
+                        .orElse(0L);
                     //if expire
                     if (expireAtTime != 0 && currentTimeMillis > expireAtTime) {
                         writeBatch.delete(next.getKey());
-                        log.debug("deleted the cache: [{}] for expiration", bytesToString(next.getKey()));
+                        log.debug("deleted the cache: [{}] for expiration",
+                            bytesToString(next.getKey()));
                     }
                 }
             }

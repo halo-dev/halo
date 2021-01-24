@@ -12,7 +12,8 @@ import run.halo.app.repository.base.BaseRepository;
  * @author ryanwang
  * @date 2019-03-20
  */
-public interface OptionRepository extends BaseRepository<Option, Integer>, JpaSpecificationExecutor<Option> {
+public interface OptionRepository
+    extends BaseRepository<Option, Integer>, JpaSpecificationExecutor<Option> {
 
     /**
      * Query option by key

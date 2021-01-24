@@ -61,7 +61,8 @@ public abstract class AbstractVisitEventListener {
         log.debug("Received a visit event, post id: [{}]", id);
 
         // Get post visit queue
-        BlockingQueue<Integer> postVisitQueue = visitQueueMap.computeIfAbsent(id, this::createEmptyQueue);
+        BlockingQueue<Integer> postVisitQueue =
+            visitQueueMap.computeIfAbsent(id, this::createEmptyQueue);
 
         visitTaskMap.computeIfAbsent(id, this::createPostVisitTask);
 
@@ -111,7 +112,9 @@ public abstract class AbstractVisitEventListener {
 
                     log.debug("Increased visits for post id: [{}]", postId);
                 } catch (InterruptedException e) {
-                    log.debug("Post visit task: " + Thread.currentThread().getName() + " was interrupted", e);
+                    log.debug(
+                        "Post visit task: " + Thread.currentThread().getName() + " was interrupted",
+                        e);
                     // Ignore this exception
                 }
             }

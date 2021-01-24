@@ -31,8 +31,8 @@ public class ContentIndexController {
     private final PostModel postModel;
 
     public ContentIndexController(PostService postService,
-            OptionService optionService,
-            PostModel postModel) {
+        OptionService optionService,
+        PostModel postModel) {
         this.postService = postService;
         this.optionService = optionService;
         this.postModel = postModel;
@@ -42,7 +42,7 @@ public class ContentIndexController {
     /**
      * Render blog index
      *
-     * @param p     post id
+     * @param p post id
      * @param model model
      * @return template path: themes/{theme}/index.ftl
      */
@@ -63,12 +63,12 @@ public class ContentIndexController {
      * Render blog index
      *
      * @param model model
-     * @param page  current page number
+     * @param page current page number
      * @return template path: themes/{theme}/index.ftl
      */
     @GetMapping(value = "page/{page}")
     public String index(Model model,
-            @PathVariable(value = "page") Integer page) {
+        @PathVariable(value = "page") Integer page) {
         return postModel.list(page, model);
     }
 }

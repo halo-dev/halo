@@ -31,18 +31,21 @@ public class AuthenticationArgumentResolver implements HandlerMethodArgumentReso
     public boolean supportsParameter(MethodParameter parameter) {
         Class<?> parameterType = parameter.getParameterType();
         return Authentication.class.isAssignableFrom(parameterType)
-                || UserDetail.class.isAssignableFrom(parameterType)
-                || User.class.isAssignableFrom(parameterType);
+            || UserDetail.class.isAssignableFrom(parameterType)
+            || User.class.isAssignableFrom(parameterType);
     }
 
     @Override
     @Nullable
-    public Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer, NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) {
+    public Object resolveArgument(MethodParameter parameter,
+        @Nullable ModelAndViewContainer mavContainer, NativeWebRequest webRequest,
+        @Nullable WebDataBinderFactory binderFactory) {
         log.debug("Handle AuthenticationArgument");
 
         Class<?> parameterType = parameter.getParameterType();
 
-        Authentication authentication = Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+        Authentication authentication =
+            Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .orElseThrow(() -> new AuthenticationException("You haven't signed in yet"));
 
         if (Authentication.class.isAssignableFrom(parameterType)) {

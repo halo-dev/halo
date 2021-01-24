@@ -57,7 +57,6 @@ public interface LinkService extends CrudService<Link, Integer> {
     /**
      * Updates link by link param.
      *
-     *
      * @param id must not be null
      * @param linkParam must not be null
      * @return updated link

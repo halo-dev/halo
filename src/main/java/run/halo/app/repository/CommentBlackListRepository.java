@@ -30,6 +30,7 @@ public interface CommentBlackListRepository extends BaseRepository<CommentBlackL
      * @return result
      */
     @Modifying
-    @Query("UPDATE CommentBlackList SET banTime=:#{#commentBlackList.banTime} WHERE ipAddress=:#{#commentBlackList.ipAddress}")
+    @Query("UPDATE CommentBlackList SET banTime=:#{#commentBlackList.banTime} WHERE " +
+        "ipAddress=:#{#commentBlackList.ipAddress}")
     int updateByIpAddress(@Param("commentBlackList") CommentBlackList commentBlackList);
 }

@@ -57,7 +57,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         Set<String> teams = ServiceUtils.fetchProperty(menus, MenuDTO::getTeam);
 
         // Convert to team menu list map (Key: team, value: menu list)
-        Map<String, List<MenuDTO>> teamMenuListMap = ServiceUtils.convertToListMap(teams, menus, MenuDTO::getTeam);
+        Map<String, List<MenuDTO>> teamMenuListMap =
+            ServiceUtils.convertToListMap(teams, menus, MenuDTO::getTeam);
 
         List<MenuTeamVO> result = new LinkedList<>();
 
@@ -78,7 +79,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     @Override
     public List<MenuDTO> listByTeam(@NotNull String team, Sort sort) {
         List<Menu> menus = menuRepository.findByTeam(team, sort);
-        return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu)).collect(Collectors.toList());
+        return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -152,7 +154,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
      * Concrete menu tree.
      *
      * @param parentMenu parent menu vo must not be null
-     * @param menus      a list of menu
+     * @param menus a list of menu
      */
     private void concreteTree(MenuVO parentMenu, List<Menu> menus) {
         Assert.notNull(parentMenu, "Parent menu must not be null");
@@ -210,8 +212,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         }
 
         return menus.stream()
-                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
-                .collect(Collectors.toList());
+            .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+            .collect(Collectors.toList());
     }
 
     @Deprecated

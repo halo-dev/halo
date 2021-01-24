@@ -24,14 +24,16 @@ import org.hibernate.annotations.GenericGenerator;
 @Data
 @Entity(name = "BaseMeta")
 @Table(name = "metas")
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER,
+    columnDefinition = "int default 0")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BaseMeta extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
-    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support" +
+        ".CustomIdGenerator")
     private Long id;
 
     /**

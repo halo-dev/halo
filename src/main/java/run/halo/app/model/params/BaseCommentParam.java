@@ -47,6 +47,7 @@ public abstract class BaseCommentParam<COMMENT> implements InputConverter<COMMEN
 
     @Override
     public ParameterizedType parameterizedType() {
-        return ReflectionUtils.getParameterizedTypeBySuperClass(BaseCommentParam.class, this.getClass());
+        return ReflectionUtils
+            .getParameterizedTypeBySuperClass(BaseCommentParam.class, this.getClass());
     }
 }

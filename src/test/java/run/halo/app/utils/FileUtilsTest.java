@@ -223,7 +223,8 @@ class FileUtilsTest {
         log.info("Prepared test folder structure");
 
         // find the root folder where expected file locates, and we expect folder3
-        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory, path -> path.getFileName().toString().equals("expected_file"));
+        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory,
+            path -> path.getFileName().toString().equals("expected_file"));
         assertTrue(rootPath.isPresent());
         assertEquals(folder3.toString(), rootPath.get().toString());
     }
@@ -263,7 +264,8 @@ class FileUtilsTest {
         log.info("Prepared test folder structure");
 
         // find the root folder where file3 locates, and we expect folder3
-        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory, path -> path.getFileName().toString().equals("expected_file"));
+        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory,
+            path -> path.getFileName().toString().equals("expected_file"));
         assertFalse(rootPath.isPresent());
     }
 }

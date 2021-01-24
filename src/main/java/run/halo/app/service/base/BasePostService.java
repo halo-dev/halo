@@ -56,7 +56,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * Gets post by post status and slug.
      *
      * @param status post status must not be null
-     * @param slug   post slug must not be blank
+     * @param slug post slug must not be blank
      * @return post info
      */
     @NonNull
@@ -66,7 +66,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * Gets post by post status and id.
      *
      * @param status post status must not be null
-     * @param id     post id must not be blank
+     * @param id post id must not be blank
      * @return post info
      */
     @NonNull
@@ -149,7 +149,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     /**
      * Lists by status.
      *
-     * @param status   post status must not be null
+     * @param status post status must not be null
      * @param pageable page info must not be null
      * @return a page of post
      */
@@ -167,7 +167,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     /**
      * Increase post likes.
      *
-     * @param likes  likes must not be less than 1
+     * @param likes likes must not be less than 1
      * @param postId post id must not be null
      */
     void increaseLike(long likes, @NonNull Integer postId);
@@ -271,7 +271,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * Updates draft content.
      *
      * @param content draft content could be blank
-     * @param postId  post id must not be null
+     * @param postId post id must not be null
      * @return updated post
      */
     @NonNull
@@ -290,7 +290,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     /**
      * Updates post status by ids.
      *
-     * @param ids    post ids must not be null
+     * @param ids post ids must not be null
      * @param status post status must not be null
      * @return updated posts
      */

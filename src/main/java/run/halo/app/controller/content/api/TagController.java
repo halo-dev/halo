@@ -42,8 +42,8 @@ public class TagController {
     private final PostService postService;
 
     public TagController(TagService tagService,
-            PostTagService postTagService,
-            PostService postService) {
+        PostTagService postTagService,
+        PostService postService) {
         this.tagService = tagService;
         this.postTagService = postTagService;
         this.postService = postService;
@@ -51,9 +51,10 @@ public class TagController {
 
     @GetMapping
     @ApiOperation("Lists tags")
-    public List<? extends TagDTO> listTags(@SortDefault(sort = "updateTime", direction = DESC) Sort sort,
-            @ApiParam("If the param is true, post count of tag will be returned")
-            @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
+    public List<? extends TagDTO> listTags(
+        @SortDefault(sort = "updateTime", direction = DESC) Sort sort,
+        @ApiParam("If the param is true, post count of tag will be returned")
+        @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postTagService.listTagWithCountDtos(sort);
         }
@@ -63,12 +64,14 @@ public class TagController {
     @GetMapping("{slug}/posts")
     @ApiOperation("Lists posts by tag slug")
     public Page<PostListVO> listPostsBy(@PathVariable("slug") String slug,
-            @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC) Pageable pageable) {
+        @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC)
+            Pageable pageable) {
         // Get tag by slug
         Tag tag = tagService.getBySlugOfNonNull(slug);
 
         // Get posts, convert and return
-        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
+        Page<Post> postPage =
+            postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         return postService.convertToListVo(postPage);
     }
 }

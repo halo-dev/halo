@@ -16,7 +16,8 @@ import run.halo.app.model.support.CommentPage;
 public class PageJacksonSerializer extends JsonSerializer<Page> {
 
     @Override
-    public void serialize(Page page, JsonGenerator generator, SerializerProvider serializers) throws IOException {
+    public void serialize(Page page, JsonGenerator generator, SerializerProvider serializers)
+        throws IOException {
         generator.writeStartObject();
 
         generator.writeObjectField("content", page.getContent());

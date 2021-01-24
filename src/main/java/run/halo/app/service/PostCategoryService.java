@@ -57,7 +57,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * Lists post by category id and post status.
      *
      * @param categoryId category id must not be null
-     * @param status     post status
+     * @param status post status
      * @return a list of post
      */
     @NonNull
@@ -66,7 +66,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     /**
      * Lists post by category slug and post status.
      *
-     * @param slug   category slug must not be null
+     * @param slug category slug must not be null
      * @param status post status
      * @return a list of post
      */
@@ -77,7 +77,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * Pages post by category id.
      *
      * @param categoryId category id must not be null
-     * @param pageable   pageable
+     * @param pageable pageable
      * @return page of post
      */
     @NonNull
@@ -87,22 +87,24 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * Pages post by category id and post status.
      *
      * @param categoryId category id must not be null
-     * @param status     post status
-     * @param pageable   pageable
+     * @param status post status
+     * @param pageable pageable
      * @return page of post
      */
     @NonNull
-    Page<Post> pagePostBy(@NonNull Integer categoryId, @NonNull PostStatus status, Pageable pageable);
+    Page<Post> pagePostBy(@NonNull Integer categoryId, @NonNull PostStatus status,
+        Pageable pageable);
 
     /**
      * Merges or creates post categories by post id and category id set if absent.
      *
-     * @param postId      post id must not be null
+     * @param postId post id must not be null
      * @param categoryIds category id set
      * @return a list of post category
      */
     @NonNull
-    List<PostCategory> mergeOrCreateByIfAbsent(@NonNull Integer postId, @Nullable Set<Integer> categoryIds);
+    List<PostCategory> mergeOrCreateByIfAbsent(@NonNull Integer postId,
+        @Nullable Set<Integer> categoryIds);
 
     /**
      * Lists by post id.

@@ -30,6 +30,7 @@ public abstract class BaseMetaParam<META> implements InputConverter<META> {
 
     @Override
     public ParameterizedType parameterizedType() {
-        return ReflectionUtils.getParameterizedTypeBySuperClass(BaseMetaParam.class, this.getClass());
+        return ReflectionUtils
+            .getParameterizedTypeBySuperClass(BaseMetaParam.class, this.getClass());
     }
 }

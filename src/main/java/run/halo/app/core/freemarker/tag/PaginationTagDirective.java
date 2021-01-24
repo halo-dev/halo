@@ -30,14 +30,16 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
     private final OptionService optionService;
 
     public PaginationTagDirective(Configuration configuration,
-            OptionService optionService) {
+        OptionService optionService) {
         this.optionService = optionService;
         configuration.setSharedVariable("paginationTag", this);
     }
 
     @Override
-    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
-        final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
+    public void execute(Environment env, Map params, TemplateModel[] loopVars,
+        TemplateDirectiveBody body) throws TemplateException, IOException {
+        final DefaultObjectWrapperBuilder builder =
+            new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
         if (params.containsKey(HaloConst.METHOD_KEY)) {
 
             // Get params
@@ -73,15 +75,15 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                 case "index":
 
                     nextPageFullPath.append("/page/")
-                            .append(page + 2)
-                            .append(pathSuffix);
+                        .append(page + 2)
+                        .append(pathSuffix);
 
                     if (page == 1) {
                         prevPageFullPath.append(URL_SEPARATOR);
                     } else {
                         prevPageFullPath.append("/page/")
-                                .append(page)
-                                .append(pathSuffix);
+                            .append(page)
+                            .append(pathSuffix);
                     }
 
                     fullPath.append("/page/");
@@ -97,25 +99,25 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                 case "archives":
 
                     nextPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getArchivesPrefix());
+                        .append(optionService.getArchivesPrefix());
                     prevPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getArchivesPrefix());
+                        .append(optionService.getArchivesPrefix());
 
                     nextPageFullPath.append("/page/")
-                            .append(page + 2)
-                            .append(pathSuffix);
+                        .append(page + 2)
+                        .append(pathSuffix);
 
                     if (page == 1) {
                         prevPageFullPath.
-                                append(pathSuffix);
+                            append(pathSuffix);
                     } else {
                         prevPageFullPath.append("/page/")
-                                .append(page)
-                                .append(pathSuffix);
+                            .append(page)
+                            .append(pathSuffix);
                     }
 
                     fullPath.append(URL_SEPARATOR)
-                            .append(optionService.getArchivesPrefix());
+                        .append(optionService.getArchivesPrefix());
 
                     fullPath.append("/page/");
 
@@ -131,37 +133,38 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                     String keyword = params.get("keyword").toString();
 
                     nextPageFullPath.append(URL_SEPARATOR)
-                            .append("search");
+                        .append("search");
                     prevPageFullPath.append(URL_SEPARATOR)
-                            .append("search");
+                        .append("search");
 
                     nextPageFullPath.append("/page/")
-                            .append(page + 2)
-                            .append(pathSuffix)
-                            .append("?keyword=")
-                            .append(keyword);
+                        .append(page + 2)
+                        .append(pathSuffix)
+                        .append("?keyword=")
+                        .append(keyword);
 
                     if (page == 1) {
                         prevPageFullPath.append(pathSuffix)
-                                .append("?keyword=")
-                                .append(keyword);
+                            .append("?keyword=")
+                            .append(keyword);
                     } else {
                         prevPageFullPath.append("/page/")
-                                .append(page)
-                                .append(pathSuffix)
-                                .append("?keyword=")
-                                .append(keyword);
+                            .append(page)
+                            .append(pathSuffix)
+                            .append("?keyword=")
+                            .append(keyword);
                     }
 
                     fullPath.append(URL_SEPARATOR)
-                            .append("search");
+                        .append("search");
 
                     fullPath.append("/page/");
 
                     for (int current : rainbow) {
                         RainbowPage rainbowPage = new RainbowPage();
                         rainbowPage.setPage(current);
-                        rainbowPage.setFullPath(fullPath.toString() + current + pathSuffix + "?keyword=" + keyword);
+                        rainbowPage.setFullPath(
+                            fullPath.toString() + current + pathSuffix + "?keyword=" + keyword);
                         rainbowPage.setIsCurrent(page + 1 == current);
                         rainbowPages.add(rainbowPage);
                     }
@@ -170,30 +173,30 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                     String tagSlug = params.get("slug").toString();
 
                     nextPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getTagsPrefix())
-                            .append(URL_SEPARATOR)
-                            .append(tagSlug);
+                        .append(optionService.getTagsPrefix())
+                        .append(URL_SEPARATOR)
+                        .append(tagSlug);
                     prevPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getTagsPrefix())
-                            .append(URL_SEPARATOR)
-                            .append(tagSlug);
+                        .append(optionService.getTagsPrefix())
+                        .append(URL_SEPARATOR)
+                        .append(tagSlug);
 
                     nextPageFullPath.append("/page/")
-                            .append(page + 2)
-                            .append(pathSuffix);
+                        .append(page + 2)
+                        .append(pathSuffix);
 
                     if (page == 1) {
                         prevPageFullPath.append(pathSuffix);
                     } else {
                         prevPageFullPath.append("/page/")
-                                .append(page)
-                                .append(pathSuffix);
+                            .append(page)
+                            .append(pathSuffix);
                     }
 
                     fullPath.append(URL_SEPARATOR)
-                            .append(optionService.getTagsPrefix())
-                            .append(URL_SEPARATOR)
-                            .append(tagSlug);
+                        .append(optionService.getTagsPrefix())
+                        .append(URL_SEPARATOR)
+                        .append(tagSlug);
 
                     fullPath.append("/page/");
 
@@ -209,30 +212,30 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                     String categorySlug = params.get("slug").toString();
 
                     nextPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getCategoriesPrefix())
-                            .append(URL_SEPARATOR)
-                            .append(categorySlug);
+                        .append(optionService.getCategoriesPrefix())
+                        .append(URL_SEPARATOR)
+                        .append(categorySlug);
                     prevPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getCategoriesPrefix())
-                            .append(URL_SEPARATOR)
-                            .append(categorySlug);
+                        .append(optionService.getCategoriesPrefix())
+                        .append(URL_SEPARATOR)
+                        .append(categorySlug);
 
                     nextPageFullPath.append("/page/")
-                            .append(page + 2)
-                            .append(pathSuffix);
+                        .append(page + 2)
+                        .append(pathSuffix);
 
                     if (page == 1) {
                         prevPageFullPath.append(pathSuffix);
                     } else {
                         prevPageFullPath.append("/page/")
-                                .append(page)
-                                .append(pathSuffix);
+                            .append(page)
+                            .append(pathSuffix);
                     }
 
                     fullPath.append(URL_SEPARATOR)
-                            .append(optionService.getCategoriesPrefix())
-                            .append(URL_SEPARATOR)
-                            .append(categorySlug);
+                        .append(optionService.getCategoriesPrefix())
+                        .append(URL_SEPARATOR)
+                        .append(categorySlug);
 
                     fullPath.append("/page/");
 
@@ -247,24 +250,24 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                 case "photos":
 
                     nextPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getPhotosPrefix());
+                        .append(optionService.getPhotosPrefix());
                     prevPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getPhotosPrefix());
+                        .append(optionService.getPhotosPrefix());
 
                     nextPageFullPath.append("/page/")
-                            .append(page + 2)
-                            .append(pathSuffix);
+                        .append(page + 2)
+                        .append(pathSuffix);
 
                     if (page == 1) {
                         prevPageFullPath.append(pathSuffix);
                     } else {
                         prevPageFullPath.append("/page/")
-                                .append(page)
-                                .append(pathSuffix);
+                            .append(page)
+                            .append(pathSuffix);
                     }
 
                     fullPath.append(URL_SEPARATOR)
-                            .append(optionService.getPhotosPrefix());
+                        .append(optionService.getPhotosPrefix());
 
                     fullPath.append("/page/");
 
@@ -279,24 +282,24 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                 case "journals":
 
                     nextPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getJournalsPrefix());
+                        .append(optionService.getJournalsPrefix());
                     prevPageFullPath.append(URL_SEPARATOR)
-                            .append(optionService.getJournalsPrefix());
+                        .append(optionService.getJournalsPrefix());
 
                     nextPageFullPath.append("/page/")
-                            .append(page + 2)
-                            .append(pathSuffix);
+                        .append(page + 2)
+                        .append(pathSuffix);
 
                     if (page == 1) {
                         prevPageFullPath.append(pathSuffix);
                     } else {
                         prevPageFullPath.append("/page/")
-                                .append(page)
-                                .append(pathSuffix);
+                            .append(page)
+                            .append(pathSuffix);
                     }
 
                     fullPath.append(URL_SEPARATOR)
-                            .append(optionService.getJournalsPrefix());
+                        .append(optionService.getJournalsPrefix());
 
                     fullPath.append("/page/");
 

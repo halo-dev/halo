@@ -27,7 +27,7 @@ public interface MenuRepository extends BaseRepository<Menu, Integer> {
     /**
      * Query if the menu name already exists by id and name.
      *
-     * @param id   id must not be null.
+     * @param id id must not be null.
      * @param name name must not be null.
      * @return true or false.
      */

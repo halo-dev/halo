@@ -39,7 +39,8 @@ class SensitiveConcealAspectTest {
 
     @Test
     void testAdmin() {
-        SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(new User()))));
+        SecurityContextHolder.setContext(
+            new SecurityContextImpl(new AuthenticationImpl(new UserDetail(new User()))));
 
         List<PostComment> postComments = postCommentService.listBy(1);
         for (PostComment postComment : postComments) {

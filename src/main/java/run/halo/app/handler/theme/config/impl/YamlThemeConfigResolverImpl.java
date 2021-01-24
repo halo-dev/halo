@@ -113,7 +113,8 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 item.setLabel(itemMap.getOrDefault("label", item.getName()).toString());
                 Object dataType = itemMap.getOrDefault("data-type", itemMap.get("dataType"));
                 item.setType(InputType.typeOf(itemMap.get("type")));
-                item.setDataType(item.getType().equals(InputType.SWITCH) ? DataType.BOOL : DataType.typeOf(dataType));
+                item.setDataType(item.getType().equals(InputType.SWITCH) ? DataType.BOOL :
+                    DataType.typeOf(dataType));
                 item.setDefaultValue(itemMap.get("default"));
                 item.setPlaceholder(itemMap.getOrDefault("placeholder", "").toString());
                 item.setDescription(itemMap.getOrDefault("description", "").toString());
@@ -140,7 +141,8 @@ public class YamlThemeConfigResolverImpl implements ThemeConfigResolver {
                 item.setLabel(itemMap.getOrDefault("label", item.getName()).toString());
                 Object dataType = itemMap.getOrDefault("data-type", itemMap.get("dataType"));
                 item.setType(InputType.typeOf(itemMap.get("type")));
-                item.setDataType(item.getType().equals(InputType.SWITCH) ? DataType.BOOL : DataType.typeOf(dataType));
+                item.setDataType(item.getType().equals(InputType.SWITCH) ? DataType.BOOL :
+                    DataType.typeOf(dataType));
                 item.setDefaultValue(itemMap.get("default"));
                 item.setPlaceholder(itemMap.getOrDefault("placeholder", "").toString());
                 item.setDescription(itemMap.getOrDefault("description", "").toString());

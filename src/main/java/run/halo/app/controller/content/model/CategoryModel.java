@@ -39,7 +39,9 @@ public class CategoryModel {
 
     private final OptionService optionService;
 
-    public CategoryModel(CategoryService categoryService, ThemeService themeService, PostCategoryService postCategoryService, PostService postService, OptionService optionService) {
+    public CategoryModel(CategoryService categoryService, ThemeService themeService,
+        PostCategoryService postCategoryService, PostService postService,
+        OptionService optionService) {
         this.categoryService = categoryService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -64,8 +66,8 @@ public class CategoryModel {
      * List category posts.
      *
      * @param model model
-     * @param slug  slug
-     * @param page  current page
+     * @param slug slug
+     * @param page current page
      * @return template name
      */
     public String listPost(Model model, String slug, Integer page) {
@@ -74,9 +76,10 @@ public class CategoryModel {
         CategoryDTO categoryDTO = categoryService.convertTo(category);
 
         final Pageable pageable = PageRequest.of(page - 1,
-                optionService.getArchivesPageSize(),
-                Sort.by(DESC, "topPriority", "createTime"));
-        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
+            optionService.getArchivesPageSize(),
+            Sort.by(DESC, "topPriority", "createTime"));
+        Page<Post> postPage =
+            postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         // Generate meta description.

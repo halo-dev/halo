@@ -23,7 +23,8 @@ class InstallParamTest {
     void createCheckTest() {
         InstallParam installParam = new InstallParam();
 
-        Set<ConstraintViolation<InstallParam>> constraintViolations = validator.validate(installParam, CreateCheck.class);
+        Set<ConstraintViolation<InstallParam>> constraintViolations =
+            validator.validate(installParam, CreateCheck.class);
         assertEquals(4, constraintViolations.size());
 
         printMessage(constraintViolations);
@@ -47,6 +48,7 @@ class InstallParamTest {
 
         log.debug("");
 
-        constraintViolations.forEach(constraintViolation -> log.debug(constraintViolation.getMessage()));
+        constraintViolations
+            .forEach(constraintViolation -> log.debug(constraintViolation.getMessage()));
     }
 }

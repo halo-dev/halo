@@ -48,7 +48,8 @@ import run.halo.app.utils.ServiceUtils;
  * @date 2019-04-24
  */
 @Slf4j
-public abstract class BasePostServiceImpl<POST extends BasePost> extends AbstractCrudService<POST, Integer> implements BasePostService<POST> {
+public abstract class BasePostServiceImpl<POST extends BasePost>
+    extends AbstractCrudService<POST, Integer> implements BasePostService<POST> {
 
     private final BasePostRepository<POST> basePostRepository;
 
@@ -57,7 +58,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     private final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
-            OptionService optionService) {
+        OptionService optionService) {
         super(basePostRepository);
         this.basePostRepository = basePostRepository;
         this.optionService = optionService;
@@ -84,7 +85,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public POST getBySlug(String slug) {
         Assert.hasText(slug, "Slug must not be blank");
 
-        return basePostRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
+        return basePostRepository.getBySlug(slug)
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
@@ -94,7 +96,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         Optional<POST> postOptional = basePostRepository.getBySlugAndStatus(slug, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
+        return postOptional
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(slug));
     }
 
     @Override
@@ -119,17 +122,24 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public List<POST> listPrevPosts(POST post, int size) {
         Assert.notNull(post, "Post must not be null");
 
-        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
+        String indexSort =
+            optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
 
         PageRequest pageRequest = PageRequest.of(0, size, Sort.by(ASC, indexSort));
 
         switch (indexSort) {
             case "createTime":
-                return basePostRepository.findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED, post.getCreateTime(), pageRequest).getContent();
+                return basePostRepository
+                    .findAllByStatusAndCreateTimeAfter(PostStatus.PUBLISHED, post.getCreateTime(),
+                        pageRequest).getContent();
             case "editTime":
-                return basePostRepository.findAllByStatusAndEditTimeAfter(PostStatus.PUBLISHED, post.getEditTime(), pageRequest).getContent();
+                return basePostRepository
+                    .findAllByStatusAndEditTimeAfter(PostStatus.PUBLISHED, post.getEditTime(),
+                        pageRequest).getContent();
             case "visits":
-                return basePostRepository.findAllByStatusAndVisitsAfter(PostStatus.PUBLISHED, post.getVisits(), pageRequest).getContent();
+                return basePostRepository
+                    .findAllByStatusAndVisitsAfter(PostStatus.PUBLISHED, post.getVisits(),
+                        pageRequest).getContent();
             default:
                 return Collections.emptyList();
         }
@@ -139,17 +149,24 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
     public List<POST> listNextPosts(POST post, int size) {
         Assert.notNull(post, "Post must not be null");
 
-        String indexSort = optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
+        String indexSort =
+            optionService.getByPropertyOfNonNull(PostProperties.INDEX_SORT).toString();
 
         PageRequest pageRequest = PageRequest.of(0, size, Sort.by(DESC, indexSort));
 
         switch (indexSort) {
             case "createTime":
-                return basePostRepository.findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED, post.getCreateTime(), pageRequest).getContent();
+                return basePostRepository
+                    .findAllByStatusAndCreateTimeBefore(PostStatus.PUBLISHED, post.getCreateTime(),
+                        pageRequest).getContent();
             case "editTime":
-                return basePostRepository.findAllByStatusAndEditTimeBefore(PostStatus.PUBLISHED, post.getEditTime(), pageRequest).getContent();
+                return basePostRepository
+                    .findAllByStatusAndEditTimeBefore(PostStatus.PUBLISHED, post.getEditTime(),
+                        pageRequest).getContent();
             case "visits":
-                return basePostRepository.findAllByStatusAndVisitsBefore(PostStatus.PUBLISHED, post.getVisits(), pageRequest).getContent();
+                return basePostRepository
+                    .findAllByStatusAndVisitsBefore(PostStatus.PUBLISHED, post.getVisits(),
+                        pageRequest).getContent();
             default:
                 return Collections.emptyList();
         }
@@ -189,7 +206,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         Assert.isTrue(top > 0, "Top number must not be less than 0");
 
         PageRequest latestPageable = PageRequest.of(0, top, Sort.by(DESC, "createTime"));
-        return basePostRepository.findAllByStatus(PostStatus.PUBLISHED, latestPageable).getContent();
+        return basePostRepository.findAllByStatus(PostStatus.PUBLISHED, latestPageable)
+            .getContent();
     }
 
     @Override
@@ -224,7 +242,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         if (!finishedIncrease) {
             log.error("Post with id: [{}] may not be found", postId);
-            throw new BadRequestException("Failed to increase visits " + visits + " for post with id " + postId);
+            throw new BadRequestException(
+                "Failed to increase visits " + visits + " for post with id " + postId);
         }
     }
 
@@ -238,7 +257,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
 
         if (affectedRows != 1) {
             log.error("Post with id: [{}] may not be found", postId);
-            throw new BadRequestException("Failed to increase likes " + likes + " for post with id " + postId);
+            throw new BadRequestException(
+                "Failed to increase likes " + likes + " for post with id " + postId);
         }
     }
 
@@ -318,8 +338,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return posts.stream()
-                .map(this::convertToMinimal)
-                .collect(Collectors.toList());
+            .map(this::convertToMinimal)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -350,8 +370,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         }
 
         return posts.stream()
-                .map(this::convertToSimple)
-                .collect(Collectors.toList());
+            .map(this::convertToSimple)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -383,7 +403,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
             // If content is different with database, then update database
             int updatedRows = basePostRepository.updateOriginalContent(content, postId);
             if (updatedRows != 1) {
-                throw new ServiceException("Failed to update original content of post with id " + postId);
+                throw new ServiceException(
+                    "Failed to update original content of post with id " + postId);
             }
             // Set the content
             post.setOriginalContent(content);
@@ -405,7 +426,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
             // Update post
             int updatedRows = basePostRepository.updateStatus(status, postId);
             if (updatedRows != 1) {
-                throw new ServiceException("Failed to update post status of post with id " + postId);
+                throw new ServiceException(
+                    "Failed to update post status of post with id " + postId);
             }
 
             post.setStatus(status);
@@ -418,7 +440,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
             int updatedRows = basePostRepository.updateFormatContent(formatContent, postId);
 
             if (updatedRows != 1) {
-                throw new ServiceException("Failed to update post format content of post with id " + postId);
+                throw new ServiceException(
+                    "Failed to update post format content of post with id " + postId);
             }
 
             post.setFormatContent(formatContent);
@@ -468,7 +491,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         text = matcher.replaceAll("");
 
         // Get summary length
-        Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
+        Integer summaryLength =
+            optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
         return StringUtils.substring(text, 0, summaryLength);
     }
@@ -523,7 +547,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost> extends Abstrac
         text = matcher.replaceAll("");
 
         // Get summary length
-        Integer summaryLength = optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
+        Integer summaryLength =
+            optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
         return StringUtils.substring(text, 0, summaryLength);
     }

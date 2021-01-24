@@ -34,7 +34,8 @@ import run.halo.app.utils.HttpClientUtils;
 @EnableScheduling
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(HaloProperties.class)
-@EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass = BaseRepositoryImpl.class)
+@EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass =
+    BaseRepositoryImpl.class)
 public class HaloConfiguration {
 
     @Autowired
@@ -48,9 +49,10 @@ public class HaloConfiguration {
 
     @Bean
     public RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
-            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate httpsRestTemplate = builder.build();
-        httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
+        httpsRestTemplate.setRequestFactory(
+            new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
                 (int) haloProperties.getDownloadTimeout().toMillis())));
         return httpsRestTemplate;
     }

@@ -69,8 +69,9 @@ public class OptionController {
 
     @GetMapping("list_view")
     @ApiOperation("Lists all options with list view")
-    public Page<OptionSimpleDTO> listAllWithListView(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-            OptionQuery optionQuery) {
+    public Page<OptionSimpleDTO> listAllWithListView(
+        @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+        OptionQuery optionQuery) {
         return optionService.pageDtosBy(pageable, optionQuery);
     }
 
@@ -92,7 +93,7 @@ public class OptionController {
     @ApiOperation("Updates option")
     @DisableOnCondition
     public void updateBy(@PathVariable("optionId") Integer optionId,
-            @RequestBody @Valid OptionParam optionParam) {
+        @RequestBody @Valid OptionParam optionParam) {
         optionService.update(optionId, optionParam);
     }
 

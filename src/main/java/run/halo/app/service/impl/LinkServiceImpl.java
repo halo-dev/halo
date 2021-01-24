@@ -58,7 +58,8 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         Set<String> teams = ServiceUtils.fetchProperty(links, LinkDTO::getTeam);
 
         // Convert to team link list map (Key: team, value: link list)
-        Map<String, List<LinkDTO>> teamLinkListMap = ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
+        Map<String, List<LinkDTO>> teamLinkListMap =
+            ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
 
         List<LinkTeamVO> result = new LinkedList<>();
 
@@ -81,7 +82,8 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         Assert.notNull(sort, "Sort info must not be null");
         List<LinkDTO> links = listDtos(sort);
         Set<String> teams = ServiceUtils.fetchProperty(links, LinkDTO::getTeam);
-        Map<String, List<LinkDTO>> teamLinkListMap = ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
+        Map<String, List<LinkDTO>> teamLinkListMap =
+            ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
         List<LinkTeamVO> result = new LinkedList<>();
         teamLinkListMap.forEach((team, linkList) -> {
             LinkTeamVO linkTeamVO = new LinkTeamVO();
@@ -101,14 +103,16 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         boolean exist = existByName(linkParam.getName());
 
         if (exist) {
-            throw new AlreadyExistsException("友情链接 " + linkParam.getName() + " 已存在").setErrorData(linkParam.getName());
+            throw new AlreadyExistsException("友情链接 " + linkParam.getName() + " 已存在")
+                .setErrorData(linkParam.getName());
         }
 
         // Check the url
         exist = existByUrl(linkParam.getUrl());
 
         if (exist) {
-            throw new AlreadyExistsException("友情链接 " + linkParam.getUrl() + " 已存在").setErrorData(linkParam.getUrl());
+            throw new AlreadyExistsException("友情链接 " + linkParam.getUrl() + " 已存在")
+                .setErrorData(linkParam.getUrl());
         }
 
         return create(linkParam.convertTo());
@@ -122,13 +126,15 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         // Check the name
         boolean exist = linkRepository.existsByNameAndIdNot(linkParam.getName(), id);
         if (exist) {
-            throw new AlreadyExistsException("友情链接 " + linkParam.getName() + " 已存在").setErrorData(linkParam.getName());
+            throw new AlreadyExistsException("友情链接 " + linkParam.getName() + " 已存在")
+                .setErrorData(linkParam.getName());
         }
 
         // Check the url
         exist = linkRepository.existsByUrlAndIdNot(linkParam.getUrl(), id);
         if (exist) {
-            throw new AlreadyExistsException("友情链接 " + linkParam.getUrl() + " 已存在").setErrorData(linkParam.getUrl());
+            throw new AlreadyExistsException("友情链接 " + linkParam.getUrl() + " 已存在")
+                .setErrorData(linkParam.getUrl());
         }
 
         Link link = getById(id);
@@ -174,6 +180,6 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
         }
 
         return links.stream().map(link -> (LinkDTO) new LinkDTO().convertFrom(link))
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
     }
 }

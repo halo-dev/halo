@@ -39,7 +39,8 @@ public class OptionController {
 
     @GetMapping("map_view")
     @ApiOperation("Lists options with map view")
-    public Map<String, Object> listAllWithMapView(@RequestParam(value = "key", required = false) List<String> keys) {
+    public Map<String, Object> listAllWithMapView(
+        @RequestParam(value = "key", required = false) List<String> keys) {
         if (CollectionUtils.isEmpty(keys)) {
             return optionService.listOptions();
         }
@@ -50,7 +51,8 @@ public class OptionController {
     @GetMapping("keys/{key}")
     @ApiOperation("Gets option value by option key")
     public BaseResponse<Object> getBy(@PathVariable("key") String key) {
-        return BaseResponse.ok(HttpStatus.OK.getReasonPhrase(), optionService.getByKey(key).orElse(null));
+        return BaseResponse
+            .ok(HttpStatus.OK.getReasonPhrase(), optionService.getByKey(key).orElse(null));
     }
 
 

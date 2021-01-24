@@ -51,7 +51,7 @@ public interface JournalService extends CrudService<Journal, Integer> {
      * Pages journals.
      *
      * @param journalQuery journal query must not be null
-     * @param pageable     page info must not be null
+     * @param pageable page info must not be null
      * @return a page of journal
      */
     @NonNull
@@ -60,7 +60,7 @@ public interface JournalService extends CrudService<Journal, Integer> {
     /**
      * Lists by type.
      *
-     * @param type     journal type must not be null
+     * @param type journal type must not be null
      * @param pageable page info must not be null
      * @return a page of journal
      */
@@ -105,7 +105,7 @@ public interface JournalService extends CrudService<Journal, Integer> {
      * Increase journal likes.
      *
      * @param likes likes must not be less than 1
-     * @param id    id must not be null
+     * @param id id must not be null
      */
     void increaseLike(long likes, @NonNull Integer id);
 }

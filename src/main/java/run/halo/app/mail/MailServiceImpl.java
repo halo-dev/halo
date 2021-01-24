@@ -21,12 +21,13 @@ import run.halo.app.service.OptionService;
  */
 @Slf4j
 @Service
-public class MailServiceImpl extends AbstractMailService implements ApplicationListener<OptionUpdatedEvent> {
+public class MailServiceImpl extends AbstractMailService
+    implements ApplicationListener<OptionUpdatedEvent> {
 
     private final FreeMarkerConfigurer freeMarker;
 
     public MailServiceImpl(FreeMarkerConfigurer freeMarker,
-            OptionService optionService) {
+        OptionService optionService) {
         super(optionService);
         this.freeMarker = freeMarker;
     }
@@ -41,11 +42,13 @@ public class MailServiceImpl extends AbstractMailService implements ApplicationL
     }
 
     @Override
-    public void sendTemplateMail(String to, String subject, Map<String, Object> content, String templateName) {
+    public void sendTemplateMail(String to, String subject, Map<String, Object> content,
+        String templateName) {
         sendMailTemplate(true, messageHelper -> {
             // build message content with freemarker
             Template template = freeMarker.getConfiguration().getTemplate(templateName);
-            String contentResult = FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
+            String contentResult =
+                FreeMarkerTemplateUtils.processTemplateIntoString(template, content);
 
             messageHelper.setSubject(subject);
             messageHelper.setTo(to);
@@ -54,12 +57,14 @@ public class MailServiceImpl extends AbstractMailService implements ApplicationL
     }
 
     @Override
-    public void sendAttachMail(String to, String subject, Map<String, Object> content, String templateName, String attachFilePath) {
+    public void sendAttachMail(String to, String subject, Map<String, Object> content,
+        String templateName, String attachFilePath) {
         sendMailTemplate(true, messageHelper -> {
             messageHelper.setSubject(subject);
             messageHelper.setTo(to);
             Path attachmentPath = Paths.get(attachFilePath);
-            messageHelper.addAttachment(attachmentPath.getFileName().toString(), attachmentPath.toFile());
+            messageHelper
+                .addAttachment(attachmentPath.getFileName().toString(), attachmentPath.toFile());
         });
     }
 

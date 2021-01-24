@@ -12,7 +12,8 @@ public class HttpClientUtilsTest {
 
     @Test
     void resolveHttpProxyTest() throws Exception {
-        final Method resolveHttpProxy = HttpClientUtils.class.getDeclaredMethod("resolveHttpProxy", String.class);
+        final Method resolveHttpProxy =
+            HttpClientUtils.class.getDeclaredMethod("resolveHttpProxy", String.class);
         resolveHttpProxy.setAccessible(true);
 
         Tuple result = (Tuple) resolveHttpProxy.invoke(null, "http://127.0.0.1");

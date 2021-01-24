@@ -46,8 +46,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     private final ApplicationEventPublisher eventPublisher;
 
     public UserServiceImpl(UserRepository userRepository,
-            AbstractStringCacheStore stringCacheStore,
-            ApplicationEventPublisher eventPublisher) {
+        AbstractStringCacheStore stringCacheStore,
+        ApplicationEventPublisher eventPublisher) {
         super(userRepository);
         this.userRepository = userRepository;
         this.stringCacheStore = stringCacheStore;
@@ -75,7 +75,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     public User getByUsernameOfNonNull(String username) {
-        return getByUsername(username).orElseThrow(() -> new NotFoundException("The username does not exist").setErrorData(username));
+        return getByUsername(username).orElseThrow(
+            () -> new NotFoundException("The username does not exist").setErrorData(username));
     }
 
     @Override
@@ -85,7 +86,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     @Override
     public User getByEmailOfNonNull(String email) {
-        return getByEmail(email).orElseThrow(() -> new NotFoundException("The email does not exist").setErrorData(email));
+        return getByEmail(email).orElseThrow(
+            () -> new NotFoundException("The email does not exist").setErrorData(email));
     }
 
     @Override
@@ -113,7 +115,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         User updatedUser = update(user);
 
         // Log it
-        eventPublisher.publishEvent(new LogEvent(this, updatedUser.getId().toString(), LogType.PASSWORD_UPDATED, HaloUtils.desensitize(oldPassword, 2, 1)));
+        eventPublisher.publishEvent(
+            new LogEvent(this, updatedUser.getId().toString(), LogType.PASSWORD_UPDATED,
+                HaloUtils.desensitize(oldPassword, 2, 1)));
 
         return updatedUser;
     }
@@ -135,9 +139,11 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
         Date now = DateUtils.now();
         if (user.getExpireTime() != null && user.getExpireTime().after(now)) {
-            long seconds = TimeUnit.MILLISECONDS.toSeconds(user.getExpireTime().getTime() - now.getTime());
+            long seconds =
+                TimeUnit.MILLISECONDS.toSeconds(user.getExpireTime().getTime() - now.getTime());
             // If expired
-            throw new ForbiddenException("账号已被停用，请 " + HaloUtils.timeFormat(seconds) + " 后重试").setErrorData(seconds);
+            throw new ForbiddenException("账号已被停用，请 " + HaloUtils.timeFormat(seconds) + " 后重试")
+                .setErrorData(seconds);
         }
     }
 
@@ -145,7 +151,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     public boolean passwordMatch(User user, String plainPassword) {
         Assert.notNull(user, "User must not be null");
 
-        return !StringUtils.isBlank(plainPassword) && BCrypt.checkpw(plainPassword, user.getPassword());
+        return !StringUtils.isBlank(plainPassword) &&
+            BCrypt.checkpw(plainPassword, user.getPassword());
     }
 
     @Override
@@ -168,7 +175,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         User updatedUser = super.update(user);
 
         // Log it
-        eventPublisher.publishEvent(new LogEvent(this, user.getId().toString(), LogType.PROFILE_UPDATED, user.getUsername()));
+        eventPublisher.publishEvent(
+            new LogEvent(this, user.getId().toString(), LogType.PROFILE_UPDATED,
+                user.getUsername()));
         eventPublisher.publishEvent(new UserUpdatedEvent(this, user.getId()));
 
         return updatedUser;
@@ -203,7 +212,9 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
         // Update this user
         User updatedUser = update(user);
         // Log it
-        eventPublisher.publishEvent(new LogEvent(this, updatedUser.getId().toString(), LogType.MFA_UPDATED, "MFA Type:" + mfaType));
+        eventPublisher.publishEvent(
+            new LogEvent(this, updatedUser.getId().toString(), LogType.MFA_UPDATED,
+                "MFA Type:" + mfaType));
 
         return updatedUser;
 

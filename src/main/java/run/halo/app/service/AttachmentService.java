@@ -25,7 +25,7 @@ public interface AttachmentService extends CrudService<Attachment, Integer> {
     /**
      * Pages attachment output dtos.
      *
-     * @param pageable        page info must not be null
+     * @param pageable page info must not be null
      * @param attachmentQuery attachment query param.
      * @return a page of attachment output dto
      */

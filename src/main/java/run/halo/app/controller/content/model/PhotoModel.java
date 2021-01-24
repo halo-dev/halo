@@ -28,8 +28,8 @@ public class PhotoModel {
     private final OptionService optionService;
 
     public PhotoModel(PhotoService photoService,
-            ThemeService themeService,
-            OptionService optionService) {
+        ThemeService themeService,
+        OptionService optionService) {
         this.photoService = photoService;
         this.themeService = themeService;
         this.optionService = optionService;
@@ -38,10 +38,11 @@ public class PhotoModel {
     public String list(Integer page, Model model) {
 
         int pageSize = optionService.getByPropertyOrDefault(SheetProperties.PHOTOS_PAGE_SIZE,
-                Integer.class,
-                Integer.parseInt(SheetProperties.PHOTOS_PAGE_SIZE.defaultValue()));
+            Integer.class,
+            Integer.parseInt(SheetProperties.PHOTOS_PAGE_SIZE.defaultValue()));
 
-        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "createTime"));
+        Pageable pageable =
+            PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "createTime"));
 
         Page<PhotoDTO> photos = photoService.pageBy(pageable);
 

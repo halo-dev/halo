@@ -42,5 +42,6 @@ public interface SheetCommentService extends BaseCommentService<SheetComment> {
      * @return a page of sheet comments with sheet vo
      */
     @NonNull
-    Page<SheetCommentWithSheetVO> convertToWithSheetVo(@NonNull Page<SheetComment> sheetCommentPage);
+    Page<SheetCommentWithSheetVO> convertToWithSheetVo(
+        @NonNull Page<SheetComment> sheetCommentPage);
 }

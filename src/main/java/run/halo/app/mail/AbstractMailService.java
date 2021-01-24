@@ -79,11 +79,14 @@ public abstract class AbstractMailService implements MailService {
         }
 
         // check if mail is enable
-        Boolean emailEnabled = optionService.getByPropertyOrDefault(EmailProperties.ENABLED, Boolean.class);
+        Boolean emailEnabled =
+            optionService.getByPropertyOrDefault(EmailProperties.ENABLED, Boolean.class);
 
         if (!emailEnabled) {
             // If disabled
-            log.info("Email has been disabled by yourself, you can re-enable it through email settings on admin page.");
+            log.info(
+                "Email has been disabled by yourself, you can re-enable it through email settings" +
+                    " on admin page.");
             return;
         }
 
@@ -106,9 +109,9 @@ public abstract class AbstractMailService implements MailService {
             mailSender.send(mimeMessage);
 
             log.info("Sent an email to [{}] successfully, subject: [{}], sent date: [{}]",
-                    Arrays.toString(mimeMessage.getAllRecipients()),
-                    mimeMessage.getSubject(),
-                    mimeMessage.getSentDate());
+                Arrays.toString(mimeMessage.getAllRecipients()),
+                mimeMessage.getSubject(),
+                mimeMessage.getSentDate());
         } catch (Exception e) {
             throw new EmailException("邮件发送失败，请检查 SMTP 服务配置是否正确", e);
         }
@@ -117,7 +120,7 @@ public abstract class AbstractMailService implements MailService {
     /**
      * Send mail template if executor service is enable.
      *
-     * @param callback   callback message handler
+     * @param callback callback message handler
      * @param tryToAsync if the send procedure should try to asynchronous
      */
     protected void sendMailTemplate(boolean tryToAsync, @Nullable Callback callback) {
@@ -155,12 +158,14 @@ public abstract class AbstractMailService implements MailService {
      * @return from-name internet address
      * @throws UnsupportedEncodingException throws when you give a wrong character encoding
      */
-    private synchronized InternetAddress getFromAddress(@NonNull JavaMailSender javaMailSender) throws UnsupportedEncodingException {
+    private synchronized InternetAddress getFromAddress(@NonNull JavaMailSender javaMailSender)
+        throws UnsupportedEncodingException {
         Assert.notNull(javaMailSender, "Java mail sender must not be null");
 
         if (StringUtils.isBlank(this.cachedFromName)) {
             // set personal name
-            this.cachedFromName = optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME).toString();
+            this.cachedFromName =
+                optionService.getByPropertyOfNonNull(EmailProperties.FROM_NAME).toString();
         }
 
         if (javaMailSender instanceof JavaMailSenderImpl) {
@@ -169,10 +174,12 @@ public abstract class AbstractMailService implements MailService {
             String username = mailSender.getUsername();
 
             // build internet address
-            return new InternetAddress(username, this.cachedFromName, mailSender.getDefaultEncoding());
+            return new InternetAddress(username, this.cachedFromName,
+                mailSender.getDefaultEncoding());
         }
 
-        throw new UnsupportedOperationException("Unsupported java mail sender: " + javaMailSender.getClass().getName());
+        throw new UnsupportedOperationException(
+            "Unsupported java mail sender: " + javaMailSender.getClass().getName());
     }
 
     /**
@@ -187,11 +194,16 @@ public abstract class AbstractMailService implements MailService {
             MailProperties mailProperties = new MailProperties(log.isDebugEnabled());
 
             // set properties
-            mailProperties.setHost(optionService.getByPropertyOrDefault(EmailProperties.HOST, String.class));
-            mailProperties.setPort(optionService.getByPropertyOrDefault(EmailProperties.SSL_PORT, Integer.class));
-            mailProperties.setUsername(optionService.getByPropertyOrDefault(EmailProperties.USERNAME, String.class));
-            mailProperties.setPassword(optionService.getByPropertyOrDefault(EmailProperties.PASSWORD, String.class));
-            mailProperties.setProtocol(optionService.getByPropertyOrDefault(EmailProperties.PROTOCOL, String.class));
+            mailProperties
+                .setHost(optionService.getByPropertyOrDefault(EmailProperties.HOST, String.class));
+            mailProperties.setPort(
+                optionService.getByPropertyOrDefault(EmailProperties.SSL_PORT, Integer.class));
+            mailProperties.setUsername(
+                optionService.getByPropertyOrDefault(EmailProperties.USERNAME, String.class));
+            mailProperties.setPassword(
+                optionService.getByPropertyOrDefault(EmailProperties.PASSWORD, String.class));
+            mailProperties.setProtocol(
+                optionService.getByPropertyOrDefault(EmailProperties.PROTOCOL, String.class));
             this.cachedMailProperties = mailProperties;
         }
 

@@ -30,9 +30,11 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
     }
 
     @Override
-    public void onFailure(HttpServletRequest request, HttpServletResponse response, AbstractHaloException exception) throws IOException {
+    public void onFailure(HttpServletRequest request, HttpServletResponse response,
+        AbstractHaloException exception) throws IOException {
         log.warn("Handle unsuccessful authentication, ip: [{}]", ServletUtil.getClientIP(request));
-        log.error("Authentication failure: [{}], status: [{}], data: [{}]", exception.getMessage(), exception.getStatus(), exception.getErrorData());
+        log.error("Authentication failure: [{}], status: [{}], data: [{}]", exception.getMessage(),
+            exception.getStatus(), exception.getErrorData());
 
         BaseResponse<Object> errorDetail = new BaseResponse<>();
 

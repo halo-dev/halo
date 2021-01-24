@@ -15,7 +15,7 @@ import run.halo.app.exception.NotFoundException;
  * CrudService interface contains some common methods.
  *
  * @param <DOMAIN> domain type
- * @param <ID>     id type
+ * @param <ID> id type
  * @author johnniang
  */
 public interface CrudService<DOMAIN, ID> {
@@ -59,7 +59,7 @@ public interface CrudService<DOMAIN, ID> {
     /**
      * List all by ids and sort
      *
-     * @param ids  ids
+     * @param ids ids
      * @param sort sort
      * @return List
      */

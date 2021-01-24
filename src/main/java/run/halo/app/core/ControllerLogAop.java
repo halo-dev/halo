@@ -49,7 +49,8 @@ public class ControllerLogAop {
         Object[] args = joinPoint.getArgs();
 
         // Get request attribute
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes requestAttributes =
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = Objects.requireNonNull(requestAttributes).getRequest();
 
         final StopWatch watch = new StopWatch(request.getRequestURI());
@@ -71,12 +72,13 @@ public class ControllerLogAop {
         return returnObj;
     }
 
-    private void printRequestLog(HttpServletRequest request, String clazzName, String methodName, Object[] args) throws JsonProcessingException {
+    private void printRequestLog(HttpServletRequest request, String clazzName, String methodName,
+        Object[] args) throws JsonProcessingException {
         log.debug("Request URL: [{}], URI: [{}], Request Method: [{}], IP: [{}]",
-                request.getRequestURL(),
-                request.getRequestURI(),
-                request.getMethod(),
-                ServletUtil.getClientIP(request));
+            request.getRequestURL(),
+            request.getRequestURI(),
+            request.getMethod(),
+            ServletUtil.getClientIP(request));
 
         if (args == null || !log.isDebugEnabled()) {
             return;
@@ -85,10 +87,10 @@ public class ControllerLogAop {
         boolean shouldNotLog = false;
         for (Object arg : args) {
             if (arg == null ||
-                    arg instanceof HttpServletRequest ||
-                    arg instanceof HttpServletResponse ||
-                    arg instanceof MultipartFile ||
-                    arg.getClass().isAssignableFrom(MultipartFile[].class)) {
+                arg instanceof HttpServletRequest ||
+                arg instanceof HttpServletResponse ||
+                arg instanceof MultipartFile ||
+                arg.getClass().isAssignableFrom(MultipartFile[].class)) {
                 shouldNotLog = true;
                 break;
             }
@@ -100,8 +102,9 @@ public class ControllerLogAop {
         }
     }
 
-    private void printResponseLog(HttpServletRequest request, String className, String methodName, Object returnObj)
-            throws JsonProcessingException {
+    private void printResponseLog(HttpServletRequest request, String className, String methodName,
+        Object returnObj)
+        throws JsonProcessingException {
         if (log.isDebugEnabled()) {
             String returnData = "";
             if (returnObj != null) {

@@ -79,7 +79,10 @@ public class HaloConst {
     /**
      * 网易云音乐 iframe 代码
      */
-    public static final String NETEASE_MUSIC_IFRAME = "<iframe frameborder=\"no\" border=\"0\" marginwidth=\"0\" marginheight=\"0\" width=330 height=86 src=\"//music.163.com/outchain/player?type=2&id=$1&auto=1&height=66\"></iframe>";
+    public static final String NETEASE_MUSIC_IFRAME =
+        "<iframe frameborder=\"no\" border=\"0\" marginwidth=\"0\" marginheight=\"0\" width=330 " +
+            "height=86 src=\"//music.163.com/outchain/player?type=2&id=$1&auto=1&height=66" +
+            "\"></iframe>";
     /**
      * 网易云音乐短代码正则表达式
      */
@@ -91,11 +94,15 @@ public class HaloConst {
     /**
      * 哔哩哔哩视频 iframe 代码
      */
-    public static final String BILIBILI_VIDEO_IFRAME = "<iframe height=$3 width=$2 src=\"//player.bilibili.com/player.html?aid=$1\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\"> </iframe>";
+    public static final String BILIBILI_VIDEO_IFRAME =
+        "<iframe height=$3 width=$2 src=\"//player.bilibili.com/player.html?aid=$1\" " +
+            "scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" " +
+            "allowfullscreen=\"true\"> </iframe>";
     /**
      * 哔哩哔哩视频正则表达式
      */
-    public static final String BILIBILI_VIDEO_REG_PATTERN = "\\[bilibili:(\\d+)\\,(\\d+)\\,(\\d+)\\]";
+    public static final String BILIBILI_VIDEO_REG_PATTERN =
+        "\\[bilibili:(\\d+)\\,(\\d+)\\,(\\d+)\\]";
     /**
      * YouTube 视频短代码前缀
      */
@@ -103,7 +110,10 @@ public class HaloConst {
     /**
      * YouTube 视频 iframe 代码
      */
-    public static final String YOUTUBE_VIDEO_IFRAME = "<iframe width=$2 height=$3 src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" allowfullscreen></iframe>";
+    public static final String YOUTUBE_VIDEO_IFRAME =
+        "<iframe width=$2 height=$3 src=\"https://www.youtube.com/embed/$1\" frameborder=\"0\" " +
+            "allow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\" " +
+            "allowfullscreen></iframe>";
     /**
      * YouTube 视频正则表达式
      */
@@ -111,11 +121,13 @@ public class HaloConst {
     /**
      * Github Api url for halo-admin release.
      */
-    public final static String HALO_ADMIN_RELEASES_LATEST = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
+    public final static String HALO_ADMIN_RELEASES_LATEST =
+        "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
     /**
      * Halo admin version regex.
      */
-    public final static String HALO_ADMIN_VERSION_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
+    public final static String HALO_ADMIN_VERSION_REGEX =
+        "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
     public final static String HALO_ADMIN_RELATIVE_PATH = "templates/admin/";
     public final static String HALO_ADMIN_RELATIVE_BACKUP_PATH = "templates/admin-backup/";
     /**
@@ -161,6 +173,7 @@ public class HaloConst {
 
     static {
         // Set version
-        HALO_VERSION = Optional.ofNullable(HaloConst.class.getPackage().getImplementationVersion()).orElse(UNKNOWN_VERSION);
+        HALO_VERSION = Optional.ofNullable(HaloConst.class.getPackage().getImplementationVersion())
+            .orElse(UNKNOWN_VERSION);
     }
 }

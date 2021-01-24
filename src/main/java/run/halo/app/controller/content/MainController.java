@@ -40,7 +40,8 @@ public class MainController {
 
     private final HaloProperties haloProperties;
 
-    public MainController(UserService userService, OptionService optionService, HaloProperties haloProperties) {
+    public MainController(UserService userService, OptionService optionService,
+        HaloProperties haloProperties) {
         this.userService = userService;
         this.optionService = optionService;
         this.haloProperties = haloProperties;
@@ -48,7 +49,9 @@ public class MainController {
 
     @GetMapping("${halo.admin-path:admin}")
     public void admin(HttpServletResponse response) throws IOException {
-        String adminIndexRedirectUri = HaloUtils.ensureBoth(haloProperties.getAdminPath(), HaloUtils.URL_SEPARATOR) + INDEX_REDIRECT_URI;
+        String adminIndexRedirectUri =
+            HaloUtils.ensureBoth(haloProperties.getAdminPath(), HaloUtils.URL_SEPARATOR) +
+                INDEX_REDIRECT_URI;
         response.sendRedirect(adminIndexRedirectUri);
     }
 
@@ -60,13 +63,16 @@ public class MainController {
 
     @GetMapping("install")
     public void installation(HttpServletResponse response) throws IOException {
-        String installRedirectUri = StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/") + INSTALL_REDIRECT_URI;
+        String installRedirectUri =
+            StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/") +
+                INSTALL_REDIRECT_URI;
         response.sendRedirect(installRedirectUri);
     }
 
     @GetMapping("avatar")
     public void avatar(HttpServletResponse response) throws IOException {
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
+        User user =
+            userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         if (StringUtils.isNotEmpty(user.getAvatar())) {
             response.sendRedirect(HaloUtils.normalizeUrl(user.getAvatar()));
         }
@@ -74,7 +80,8 @@ public class MainController {
 
     @GetMapping("logo")
     public void logo(HttpServletResponse response) throws IOException {
-        String blogLogo = optionService.getByProperty(BlogProperties.BLOG_LOGO).orElse("").toString();
+        String blogLogo =
+            optionService.getByProperty(BlogProperties.BLOG_LOGO).orElse("").toString();
         if (StringUtils.isNotEmpty(blogLogo)) {
             response.sendRedirect(HaloUtils.normalizeUrl(blogLogo));
         }
@@ -82,7 +89,8 @@ public class MainController {
 
     @GetMapping("favicon.ico")
     public void favicon(HttpServletResponse response) throws IOException {
-        String favicon = optionService.getByProperty(BlogProperties.BLOG_FAVICON).orElse("").toString();
+        String favicon =
+            optionService.getByProperty(BlogProperties.BLOG_FAVICON).orElse("").toString();
         if (StringUtils.isNotEmpty(favicon)) {
             response.sendRedirect(HaloUtils.normalizeUrl(favicon));
         }

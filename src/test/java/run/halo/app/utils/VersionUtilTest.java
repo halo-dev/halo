@@ -27,9 +27,9 @@ class VersionUtilTest {
     void unknownVersionCompareTest() {
         // build a random version
         String randomVersion = String.join(".",
-                RandomStringUtils.randomNumeric(1),
-                RandomStringUtils.randomNumeric(2),
-                RandomStringUtils.randomNumeric(3));
+            RandomStringUtils.randomNumeric(1),
+            RandomStringUtils.randomNumeric(2),
+            RandomStringUtils.randomNumeric(3));
         assertTrue(VersionUtil.compareVersion(HaloConst.UNKNOWN_VERSION, randomVersion));
     }
 

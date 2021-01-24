@@ -23,7 +23,8 @@ public class PostMetaServiceImpl extends BaseMetaServiceImpl<PostMeta> implement
 
     private final PostRepository postRepository;
 
-    public PostMetaServiceImpl(BaseMetaRepository<PostMeta> baseMetaRepository, PostRepository postRepository) {
+    public PostMetaServiceImpl(BaseMetaRepository<PostMeta> baseMetaRepository,
+        PostRepository postRepository) {
         super(baseMetaRepository);
         this.postRepository = postRepository;
     }
@@ -31,6 +32,6 @@ public class PostMetaServiceImpl extends BaseMetaServiceImpl<PostMeta> implement
     @Override
     public void validateTarget(@NotNull Integer postId) {
         postRepository.findById(postId)
-                .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
+            .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
     }
 }

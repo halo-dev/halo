@@ -38,7 +38,8 @@ public class TagModel {
 
     private final ThemeService themeService;
 
-    public TagModel(TagService tagService, PostService postService, PostTagService postTagService, OptionService optionService, ThemeService themeService) {
+    public TagModel(TagService tagService, PostService postService, PostTagService postTagService,
+        OptionService optionService, ThemeService themeService) {
         this.tagService = tagService;
         this.postService = postService;
         this.postTagService = postTagService;
@@ -58,8 +59,10 @@ public class TagModel {
         final Tag tag = tagService.getBySlugOfNonNull(slug);
         TagDTO tagDTO = tagService.convertTo(tag);
 
-        final Pageable pageable = PageRequest.of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "createTime"));
-        Page<Post> postPage = postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
+        final Pageable pageable = PageRequest
+            .of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "createTime"));
+        Page<Post> postPage =
+            postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         model.addAttribute("is_tag", true);

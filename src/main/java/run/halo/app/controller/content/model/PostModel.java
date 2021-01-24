@@ -58,14 +58,14 @@ public class PostModel {
     private final AbstractStringCacheStore cacheStore;
 
     public PostModel(PostService postService,
-            ThemeService themeService,
-            PostCategoryService postCategoryService,
-            CategoryService categoryService,
-            PostMetaService postMetaService,
-            PostTagService postTagService,
-            TagService tagService,
-            OptionService optionService,
-            AbstractStringCacheStore cacheStore) {
+        ThemeService themeService,
+        PostCategoryService postCategoryService,
+        CategoryService categoryService,
+        PostMetaService postMetaService,
+        PostTagService postTagService,
+        TagService tagService,
+        OptionService optionService,
+        AbstractStringCacheStore cacheStore) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -88,7 +88,8 @@ public class PostModel {
             post = postService.getBy(PostStatus.PUBLISHED, post.getSlug());
         } else {
             // verify token
-            String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
+            String cachedToken = cacheStore.getAny(token, String.class)
+                .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该文章的访问权限");
             }
@@ -101,8 +102,10 @@ public class PostModel {
 
         postService.publishVisitEvent(post.getId());
 
-        postService.getPrevPost(post).ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
-        postService.getNextPost(post).ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
+        postService.getPrevPost(post).ifPresent(
+            prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
+        postService.getNextPost(post).ifPresent(
+            nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
@@ -112,14 +115,16 @@ public class PostModel {
         if (StringUtils.isNotEmpty(post.getMetaKeywords())) {
             model.addAttribute("meta_keywords", post.getMetaKeywords());
         } else {
-            model.addAttribute("meta_keywords", tags.stream().map(Tag::getName).collect(Collectors.joining(",")));
+            model.addAttribute("meta_keywords",
+                tags.stream().map(Tag::getName).collect(Collectors.joining(",")));
         }
 
         // Generate meta description.
         if (StringUtils.isNotEmpty(post.getMetaDescription())) {
             model.addAttribute("meta_description", post.getMetaDescription());
         } else {
-            model.addAttribute("meta_description", postService.generateDescription(post.getFormatContent()));
+            model.addAttribute("meta_description",
+                postService.generateDescription(post.getFormatContent()));
         }
 
         model.addAttribute("is_post", true);
@@ -129,7 +134,7 @@ public class PostModel {
         model.addAttribute("metas", postMetaService.convertToMap(metas));
 
         if (themeService.templateExists(
-                ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 
@@ -139,7 +144,7 @@ public class PostModel {
     public String list(Integer page, Model model) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
@@ -154,7 +159,7 @@ public class PostModel {
     public String archives(Integer page, Model model) {
         int pageSize = optionService.getArchivesPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+            .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
 

@@ -15,7 +15,8 @@ import run.halo.app.model.entity.BaseMeta;
  * @date 2019-08-04
  */
 @NoRepositoryBean
-public interface BaseMetaRepository<META extends BaseMeta> extends BaseRepository<META, Long>, JpaSpecificationExecutor<META> {
+public interface BaseMetaRepository<META extends BaseMeta>
+    extends BaseRepository<META, Long>, JpaSpecificationExecutor<META> {
 
     /**
      * Finds all metas by post id.

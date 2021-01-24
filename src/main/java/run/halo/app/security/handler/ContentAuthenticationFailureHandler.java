@@ -16,13 +16,15 @@ import run.halo.app.exception.NotInstallException;
 public class ContentAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Override
-    public void onFailure(HttpServletRequest request, HttpServletResponse response, AbstractHaloException exception) throws IOException, ServletException {
+    public void onFailure(HttpServletRequest request, HttpServletResponse response,
+        AbstractHaloException exception) throws IOException, ServletException {
         if (exception instanceof NotInstallException) {
             response.sendRedirect(request.getContextPath() + "/install");
             return;
         }
 
         // Forward to error
-        request.getRequestDispatcher(request.getContextPath() + "/error").forward(request, response);
+        request.getRequestDispatcher(request.getContextPath() + "/error")
+            .forward(request, response);
     }
 }

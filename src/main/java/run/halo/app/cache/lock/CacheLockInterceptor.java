@@ -54,10 +54,13 @@ public class CacheLockInterceptor {
 
         try {
             // Get from cache
-            Boolean cacheResult = cacheStore.putIfAbsent(cacheLockKey, CACHE_LOCK_VALUE, cacheLock.expired(), cacheLock.timeUnit());
+            Boolean cacheResult = cacheStore
+                .putIfAbsent(cacheLockKey, CACHE_LOCK_VALUE, cacheLock.expired(),
+                    cacheLock.timeUnit());
 
             if (cacheResult == null) {
-                throw new ServiceException("Unknown reason of cache " + cacheLockKey).setErrorData(cacheLockKey);
+                throw new ServiceException("Unknown reason of cache " + cacheLockKey)
+                    .setErrorData(cacheLockKey);
             }
 
             if (!cacheResult) {
@@ -75,7 +78,8 @@ public class CacheLockInterceptor {
         }
     }
 
-    private String buildCacheLockKey(@NonNull CacheLock cacheLock, @NonNull ProceedingJoinPoint joinPoint) {
+    private String buildCacheLockKey(@NonNull CacheLock cacheLock,
+        @NonNull ProceedingJoinPoint joinPoint) {
         Assert.notNull(cacheLock, "Cache lock must not be null");
         Assert.notNull(joinPoint, "Proceeding join point must not be null");
 

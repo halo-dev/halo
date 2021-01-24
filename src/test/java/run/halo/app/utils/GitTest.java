@@ -44,7 +44,8 @@ class GitTest {
 
     @Test
     void openFailureTest() {
-        Assertions.assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
+        Assertions
+            .assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
     }
 
     @Test
@@ -63,9 +64,11 @@ class GitTest {
     void remoteAddTest() throws GitAPIException, URISyntaxException {
         Git git = Git.init().setDirectory(tempPath.toFile()).call();
         git.remoteRemove().setRemoteName("theme-provider").call();
-        git.remoteAdd().setName("theme-provider").setUri(new URIish("https://github.com/halo-dev/halo-theme-pinghsu.git")).call();
+        git.remoteAdd().setName("theme-provider")
+            .setUri(new URIish("https://github.com/halo-dev/halo-theme-pinghsu.git")).call();
         List<RemoteConfig> remoteConfigs = git.remoteList().call();
-        remoteConfigs.forEach(remoteConfig -> log.debug("name: [{}], url: [{}]", remoteConfig.getName(), remoteConfig.getURIs()));
+        remoteConfigs.forEach(remoteConfig -> log
+            .debug("name: [{}], url: [{}]", remoteConfig.getName(), remoteConfig.getURIs()));
     }
 
     @Test
@@ -86,22 +89,24 @@ class GitTest {
     @Test
     @Disabled("Due to time-consumption fetching")
     void getAllBranchesTest() {
-        List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
+        List<String> branches =
+            GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
         assertNotNull(branches);
     }
 
     @Test
     @Disabled("Due to time-consumption fetching")
     void getAllBranchesWithInvalidURL() {
-        List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme.git");
+        List<String> branches =
+            GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme.git");
         assertNotNull(branches);
         assertEquals(0, branches.size());
     }
 
     Git cloneRepository() throws GitAPIException {
         return Git.cloneRepository()
-                .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
-                .setDirectory(tempPath.toFile())
-                .call();
+            .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
+            .setDirectory(tempPath.toFile())
+            .call();
     }
 }

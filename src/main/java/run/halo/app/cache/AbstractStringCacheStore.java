@@ -37,7 +37,8 @@ public abstract class AbstractStringCacheStore extends AbstractCacheStore<String
         }
     }
 
-    public <T> void putAny(@NonNull String key, @NonNull T value, long timeout, @NonNull TimeUnit timeUnit) {
+    public <T> void putAny(@NonNull String key, @NonNull T value, long timeout,
+        @NonNull TimeUnit timeUnit) {
         try {
             put(key, JsonUtils.objectToJson(value), timeout, timeUnit);
         } catch (JsonProcessingException e) {

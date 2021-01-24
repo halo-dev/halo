@@ -65,7 +65,7 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
     /**
      * Lists posts by tag id and post status.
      *
-     * @param tagId  tag id must not be null
+     * @param tagId tag id must not be null
      * @param status post status
      * @return a list of post
      */
@@ -75,7 +75,7 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
     /**
      * Lists posts by tag slug and post status.
      *
-     * @param slug   tag slug must not be null
+     * @param slug tag slug must not be null
      * @param status post status
      * @return a list of post
      */
@@ -85,7 +85,7 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
     /**
      * Pages posts by tag id.
      *
-     * @param tagId    must not be null
+     * @param tagId must not be null
      * @param pageable must not be null
      * @return a page of post
      */
@@ -94,8 +94,8 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
     /**
      * Pages posts by tag id and post status.
      *
-     * @param tagId    must not be null
-     * @param status   post status
+     * @param tagId must not be null
+     * @param status post status
      * @param pageable must not be null
      * @return a page of post
      */

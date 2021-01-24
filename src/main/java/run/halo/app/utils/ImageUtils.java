@@ -21,7 +21,8 @@ public class ImageUtils {
 
     public static final String EXTENSION_ICO = "ico";
 
-    public static BufferedImage getImageFromFile(InputStream is, String extension) throws IOException {
+    public static BufferedImage getImageFromFile(InputStream is, String extension)
+        throws IOException {
         log.debug("Current File type is : [{}]", extension);
 
         if (EXTENSION_ICO.equals(extension)) {
@@ -36,7 +37,8 @@ public class ImageUtils {
     }
 
     @NonNull
-    public static ImageReader getImageReaderFromFile(InputStream is, String formatName) throws IOException {
+    public static ImageReader getImageReaderFromFile(InputStream is, String formatName)
+        throws IOException {
         try {
             Iterator<ImageReader> readerIterator = ImageIO.getImageReadersByFormatName(formatName);
             ImageReader reader = readerIterator.next();

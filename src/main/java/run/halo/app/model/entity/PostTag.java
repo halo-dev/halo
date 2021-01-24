@@ -26,13 +26,14 @@ import org.hibernate.annotations.GenericGenerator;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "post_tags", indexes = {
-        @Index(name = "post_tags_post_id", columnList = "post_id"),
-        @Index(name = "post_tags_tag_id", columnList = "tag_id")})
+    @Index(name = "post_tags_post_id", columnList = "post_id"),
+    @Index(name = "post_tags_tag_id", columnList = "tag_id")})
 public class PostTag extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
-    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support" +
+        ".CustomIdGenerator")
     private Integer id;
 
     /**
@@ -57,7 +58,7 @@ public class PostTag extends BaseEntity {
         }
         PostTag postTag = (PostTag) o;
         return Objects.equals(postId, postTag.postId) &&
-                Objects.equals(tagId, postTag.tagId);
+            Objects.equals(tagId, postTag.tagId);
     }
 
     @Override

@@ -85,11 +85,12 @@ public interface UserService extends CrudService<User, Integer> {
      *
      * @param oldPassword old password must not be blank
      * @param newPassword new password must not be blank
-     * @param userId      user id must not be null
+     * @param userId user id must not be null
      * @return updated user detail
      */
     @NonNull
-    User updatePassword(@NonNull String oldPassword, @NonNull String newPassword, @NonNull Integer userId);
+    User updatePassword(@NonNull String oldPassword, @NonNull String newPassword,
+        @NonNull Integer userId);
 
     /**
      * Creates an user.
@@ -111,7 +112,7 @@ public interface UserService extends CrudService<User, Integer> {
     /**
      * Checks the password is match the user password.
      *
-     * @param user          user info must not be null
+     * @param user user info must not be null
      * @param plainPassword plain password
      * @return true if the given password is match the user password; false otherwise
      */
@@ -120,7 +121,7 @@ public interface UserService extends CrudService<User, Integer> {
     /**
      * Set user password.
      *
-     * @param user          user must not be null
+     * @param user user must not be null
      * @param plainPassword plain password must not be blank
      */
     void setPassword(@NonNull User user, @NonNull String plainPassword);
@@ -138,8 +139,8 @@ public interface UserService extends CrudService<User, Integer> {
      * Updates user Multi-Factor Auth.
      *
      * @param mfaType Multi-Factor Auth Type.
-     * @param mfaKey  Multi-Factor Auth Key.
-     * @param userId  user id must not be null
+     * @param mfaKey Multi-Factor Auth Key.
+     * @param userId user id must not be null
      * @return updated user detail
      */
     @NonNull

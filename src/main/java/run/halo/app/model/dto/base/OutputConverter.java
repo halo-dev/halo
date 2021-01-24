@@ -9,7 +9,7 @@ import org.springframework.lang.NonNull;
  *
  * <b>The implementation type must be equal to DTO type</b>
  *
- * @param <DTO>    the implementation class type
+ * @param <DTO> the implementation class type
  * @param <DOMAIN> domain type
  * @author johnniang
  */

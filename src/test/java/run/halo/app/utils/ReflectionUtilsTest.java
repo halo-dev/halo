@@ -37,7 +37,8 @@ class ReflectionUtilsTest {
             log.debug(genericInterface.getClass().toString());
         }
 
-        ParameterizedType parameterizedType = ReflectionUtils.getParameterizedTypeBySuperClass(BaseCommentParam.class, paramClass);
+        ParameterizedType parameterizedType =
+            ReflectionUtils.getParameterizedTypeBySuperClass(BaseCommentParam.class, paramClass);
 
         log.debug(Objects.requireNonNull(parameterizedType).getTypeName());
         for (Type type : parameterizedType.getActualTypeArguments()) {
@@ -45,13 +46,15 @@ class ReflectionUtilsTest {
         }
 
 
-        //        ParameterizedType parameterizedType = ReflectionUtils.getParameterizedType(InputConverter.class, paramClass);
+        //        ParameterizedType parameterizedType = ReflectionUtils.getParameterizedType
+        //        (InputConverter.class, paramClass);
         //
         //        log.debug(parameterizedType.toString());
         //
         //        log.debug(parameterizedType.getActualTypeArguments()[0].toString());
         //
-        //        parameterizedType = ReflectionUtils.getParameterizedType(BaseCommentParam.class, paramClass);
+        //        parameterizedType = ReflectionUtils.getParameterizedType(BaseCommentParam
+        //        .class, paramClass);
         //
         //        log.debug(parameterizedType.toString());
         //

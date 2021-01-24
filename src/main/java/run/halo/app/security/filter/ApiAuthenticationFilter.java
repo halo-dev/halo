@@ -38,37 +38,40 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
     private final OptionService optionService;
 
     public ApiAuthenticationFilter(HaloProperties haloProperties,
-            OptionService optionService,
-            AbstractStringCacheStore cacheStore,
-            OneTimeTokenService oneTimeTokenService,
-            ObjectMapper objectMapper) {
+        OptionService optionService,
+        AbstractStringCacheStore cacheStore,
+        OneTimeTokenService oneTimeTokenService,
+        ObjectMapper objectMapper) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
         this.optionService = optionService;
 
         addUrlPatterns("/api/content/**");
 
         addExcludeUrlPatterns(
-                "/api/content/**/comments",
-                "/api/content/**/comments/**",
-                "/api/content/options/comment"
+            "/api/content/**/comments",
+            "/api/content/**/comments/**",
+            "/api/content/options/comment"
         );
 
         // set failure handler
-        DefaultAuthenticationFailureHandler failureHandler = new DefaultAuthenticationFailureHandler();
+        DefaultAuthenticationFailureHandler failureHandler =
+            new DefaultAuthenticationFailureHandler();
         failureHandler.setProductionEnv(haloProperties.isProductionEnv());
         failureHandler.setObjectMapper(objectMapper);
         setFailureHandler(failureHandler);
     }
 
     @Override
-    protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response,
+        FilterChain filterChain) throws ServletException, IOException {
         if (!haloProperties.isAuthEnabled()) {
             filterChain.doFilter(request, response);
             return;
         }
 
         // Get api_enable from option
-        Boolean apiEnabled = optionService.getByPropertyOrDefault(ApiProperties.API_ENABLED, Boolean.class, false);
+        Boolean apiEnabled =
+            optionService.getByPropertyOrDefault(ApiProperties.API_ENABLED, Boolean.class, false);
 
         if (!apiEnabled) {
             throw new ForbiddenException("API has been disabled by blogger currently");
@@ -83,7 +86,8 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
         }
 
         // Get access key from option
-        Optional<String> optionalAccessKey = optionService.getByProperty(ApiProperties.API_ACCESS_KEY, String.class);
+        Optional<String> optionalAccessKey =
+            optionService.getByProperty(ApiProperties.API_ACCESS_KEY, String.class);
 
         if (!optionalAccessKey.isPresent()) {
             // If the access key is not set
@@ -104,7 +108,8 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
         boolean result = super.shouldNotFilter(request);
 
         if (antPathMatcher.match("/api/content/*/comments", request.getServletPath())) {
-            Boolean commentApiEnabled = optionService.getByPropertyOrDefault(CommentProperties.API_ENABLED, Boolean.class, true);
+            Boolean commentApiEnabled = optionService
+                .getByPropertyOrDefault(CommentProperties.API_ENABLED, Boolean.class, true);
             if (!commentApiEnabled) {
                 // If the comment api is disabled
                 result = false;

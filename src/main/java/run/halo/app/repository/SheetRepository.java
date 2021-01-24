@@ -36,7 +36,7 @@ public interface SheetRepository extends BasePostRepository<Sheet> {
     /**
      * Gets sheet by slug and status.
      *
-     * @param slug   slug must not be blank
+     * @param slug slug must not be blank
      * @param status status must not be null
      * @return an optional of sheet.
      */

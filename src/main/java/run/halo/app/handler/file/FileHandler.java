@@ -29,6 +29,19 @@ public interface FileHandler {
     MediaType IMAGE_TYPE = MediaType.valueOf("image/*");
 
     /**
+     * Normalize directory full name, ensure the end path separator.
+     *
+     * @param dir directory full name must not be blank
+     * @return normalized directory full name with end path separator
+     */
+    @NonNull
+    static String normalizeDirectory(@NonNull String dir) {
+        Assert.hasText(dir, "Directory full name must not be blank");
+
+        return StringUtils.appendIfMissing(dir, FILE_SEPARATOR);
+    }
+
+    /**
      * Uploads file.
      *
      * @param file multipart file must not be null
@@ -50,13 +63,13 @@ public interface FileHandler {
     }
 
     /**
-     * @param uploadResult      updated result must not be null
-     * @param file              multipart file must not be null
+     * @param uploadResult updated result must not be null
+     * @param file multipart file must not be null
      * @param thumbnailSupplier thumbnail supplier
      */
     default void handleImageMetadata(@NonNull MultipartFile file,
-            @NonNull UploadResult uploadResult,
-            @Nullable Supplier<String> thumbnailSupplier) {
+        @NonNull UploadResult uploadResult,
+        @Nullable Supplier<String> thumbnailSupplier) {
         if (isImageType(file)) {
             // Handle image
             try (InputStream is = file.getInputStream()) {
@@ -90,18 +103,5 @@ public interface FileHandler {
      * @return attachment type
      */
     AttachmentType getAttachmentType();
-
-    /**
-     * Normalize directory full name, ensure the end path separator.
-     *
-     * @param dir directory full name must not be blank
-     * @return normalized directory full name with end path separator
-     */
-    @NonNull
-    static String normalizeDirectory(@NonNull String dir) {
-        Assert.hasText(dir, "Directory full name must not be blank");
-
-        return StringUtils.appendIfMissing(dir, FILE_SEPARATOR);
-    }
 
 }

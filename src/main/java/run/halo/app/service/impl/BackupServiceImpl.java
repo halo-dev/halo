@@ -109,7 +109,8 @@ public class BackupServiceImpl implements BackupService {
 
     private static final String BACKUP_RESOURCE_BASE_URI = "/api/admin/backups/work-dir";
 
-    private static final String DATA_EXPORT_MARKDOWN_BASE_URI = "/api/admin/backups/markdown/export";
+    private static final String DATA_EXPORT_MARKDOWN_BASE_URI =
+        "/api/admin/backups/markdown/export";
 
     private static final String DATA_EXPORT_BASE_URI = "/api/admin/backups/data";
 
@@ -171,7 +172,17 @@ public class BackupServiceImpl implements BackupService {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService, CommentBlackListService commentBlackListService, JournalService journalService, JournalCommentService journalCommentService, LinkService linkService, LogService logService, MenuService menuService, OptionService optionService, PhotoService photoService, PostService postService, PostCategoryService postCategoryService, PostCommentService postCommentService, PostMetaService postMetaService, PostTagService postTagService, SheetService sheetService, SheetCommentService sheetCommentService, SheetMetaService sheetMetaService, TagService tagService, ThemeSettingService themeSettingService, UserService userService, OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties, ApplicationEventPublisher eventPublisher) {
+    public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService,
+        CommentBlackListService commentBlackListService, JournalService journalService,
+        JournalCommentService journalCommentService, LinkService linkService, LogService logService,
+        MenuService menuService, OptionService optionService, PhotoService photoService,
+        PostService postService, PostCategoryService postCategoryService,
+        PostCommentService postCommentService, PostMetaService postMetaService,
+        PostTagService postTagService, SheetService sheetService,
+        SheetCommentService sheetCommentService, SheetMetaService sheetMetaService,
+        TagService tagService, ThemeSettingService themeSettingService, UserService userService,
+        OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties,
+        ApplicationEventPublisher eventPublisher) {
         this.attachmentService = attachmentService;
         this.categoryService = categoryService;
         this.commentBlackListService = commentBlackListService;
@@ -206,9 +217,9 @@ public class BackupServiceImpl implements BackupService {
      */
     public static String sanitizeFilename(final String unSanitized) {
         return unSanitized.
-                replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
-                replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
-                replaceAll("\\s", "");
+            replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
+            replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
+            replaceAll("\\s", "");
     }
 
     @Override
@@ -228,8 +239,9 @@ public class BackupServiceImpl implements BackupService {
         try {
             // Create zip path for halo zip
             String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
-                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                    IdUtil.simpleUUID().hashCode() + ".zip";
+                DateTimeUtils
+                    .format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
             Path haloZipFilePath = Paths.get(haloProperties.getBackupDir(), haloZipFileName);
             if (!Files.exists(haloZipFilePath.getParent())) {
@@ -238,7 +250,8 @@ public class BackupServiceImpl implements BackupService {
             Path haloZipPath = Files.createFile(haloZipFilePath);
 
             // Zip halo
-            run.halo.app.utils.FileUtils.zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
+            run.halo.app.utils.FileUtils
+                .zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
 
             // Build backup dto
             return buildBackupDto(BACKUP_RESOURCE_BASE_URI, haloZipPath);
@@ -258,10 +271,12 @@ public class BackupServiceImpl implements BackupService {
         // Build backup dto
         try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
-                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_PREFIX))
-                    .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
-                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
-                    .collect(Collectors.toList());
+                .filter(backupPath -> StringUtils
+                    .startsWithIgnoreCase(backupPath.getFileName().toString(),
+                        HaloConst.HALO_BACKUP_PREFIX))
+                .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
+                .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
+                .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
         }
@@ -319,7 +334,8 @@ public class BackupServiceImpl implements BackupService {
         } catch (MalformedURLException e) {
             throw new NotFoundException("The file " + fileName + " was not found", e);
         } catch (IOException e) {
-            throw new ServiceException("Failed to create backup parent path: " + backupParentPath, e);
+            throw new ServiceException("Failed to create backup parent path: " + backupParentPath,
+                e);
         }
     }
 
@@ -352,8 +368,9 @@ public class BackupServiceImpl implements BackupService {
 
         try {
             String haloDataFileName = HaloConst.HALO_DATA_EXPORT_PREFIX +
-                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                    IdUtil.simpleUUID().hashCode() + ".json";
+                DateTimeUtils
+                    .format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                IdUtil.simpleUUID().hashCode() + ".json";
 
             Path haloDataFilePath = Paths.get(haloProperties.getDataExportDir(), haloDataFileName);
             if (!Files.exists(haloDataFilePath.getParent())) {
@@ -380,10 +397,12 @@ public class BackupServiceImpl implements BackupService {
 
         try (Stream<Path> subPathStream = Files.list(exportedDataParentPath)) {
             return subPathStream
-                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_DATA_EXPORT_PREFIX))
-                    .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
-                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
-                    .collect(Collectors.toList());
+                .filter(backupPath -> StringUtils
+                    .startsWithIgnoreCase(backupPath.getFileName().toString(),
+                        HaloConst.HALO_DATA_EXPORT_PREFIX))
+                .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
+                .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
+                .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch exported data", e);
         }
@@ -414,70 +433,96 @@ public class BackupServiceImpl implements BackupService {
         String jsonContent = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);
 
         ObjectMapper mapper = JsonUtils.createDefaultJsonMapper();
-        TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-        };
+        TypeReference<HashMap<String, Object>> typeRef =
+            new TypeReference<HashMap<String, Object>>() {
+            };
         HashMap<String, Object> data = mapper.readValue(jsonContent, typeRef);
 
-        List<Attachment> attachments = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("attachments")), Attachment[].class));
+        List<Attachment> attachments = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("attachments")), Attachment[].class));
         attachmentService.createInBatch(attachments);
 
-        List<Category> categories = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("categories")), Category[].class));
+        List<Category> categories = Arrays.asList(
+            mapper.readValue(mapper.writeValueAsString(data.get("categories")), Category[].class));
         categoryService.createInBatch(categories);
 
-        List<Tag> tags = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("tags")), Tag[].class));
+        List<Tag> tags = Arrays
+            .asList(mapper.readValue(mapper.writeValueAsString(data.get("tags")), Tag[].class));
         tagService.createInBatch(tags);
 
-        List<CommentBlackList> commentBlackList = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("comment_black_list")), CommentBlackList[].class));
+        List<CommentBlackList> commentBlackList = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("comment_black_list")),
+                CommentBlackList[].class));
         commentBlackListService.createInBatch(commentBlackList);
 
-        List<Journal> journals = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("journals")), Journal[].class));
+        List<Journal> journals = Arrays.asList(
+            mapper.readValue(mapper.writeValueAsString(data.get("journals")), Journal[].class));
         journalService.createInBatch(journals);
 
-        List<JournalComment> journalComments = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("journal_comments")), JournalComment[].class));
+        List<JournalComment> journalComments = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("journal_comments")),
+                JournalComment[].class));
         journalCommentService.createInBatch(journalComments);
 
-        List<Link> links = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("links")), Link[].class));
+        List<Link> links = Arrays
+            .asList(mapper.readValue(mapper.writeValueAsString(data.get("links")), Link[].class));
         linkService.createInBatch(links);
 
-        List<Log> logs = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("logs")), Log[].class));
+        List<Log> logs = Arrays
+            .asList(mapper.readValue(mapper.writeValueAsString(data.get("logs")), Log[].class));
         logService.createInBatch(logs);
 
-        List<Menu> menus = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("menus")), Menu[].class));
+        List<Menu> menus = Arrays
+            .asList(mapper.readValue(mapper.writeValueAsString(data.get("menus")), Menu[].class));
         menuService.createInBatch(menus);
 
-        List<Option> options = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("options")), Option[].class));
+        List<Option> options = Arrays.asList(
+            mapper.readValue(mapper.writeValueAsString(data.get("options")), Option[].class));
         optionService.createInBatch(options);
 
         eventPublisher.publishEvent(new OptionUpdatedEvent(this));
 
-        List<Photo> photos = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("photos")), Photo[].class));
+        List<Photo> photos = Arrays
+            .asList(mapper.readValue(mapper.writeValueAsString(data.get("photos")), Photo[].class));
         photoService.createInBatch(photos);
 
-        List<Post> posts = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("posts")), Post[].class));
+        List<Post> posts = Arrays
+            .asList(mapper.readValue(mapper.writeValueAsString(data.get("posts")), Post[].class));
         postService.createInBatch(posts);
 
-        List<PostCategory> postCategories = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("post_categories")), PostCategory[].class));
+        List<PostCategory> postCategories = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("post_categories")),
+                PostCategory[].class));
         postCategoryService.createInBatch(postCategories);
 
-        List<PostComment> postComments = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("post_comments")), PostComment[].class));
+        List<PostComment> postComments = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("post_comments")), PostComment[].class));
         postCommentService.createInBatch(postComments);
 
-        List<PostMeta> postMetas = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("post_metas")), PostMeta[].class));
+        List<PostMeta> postMetas = Arrays.asList(
+            mapper.readValue(mapper.writeValueAsString(data.get("post_metas")), PostMeta[].class));
         postMetaService.createInBatch(postMetas);
 
-        List<PostTag> postTags = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("post_tags")), PostTag[].class));
+        List<PostTag> postTags = Arrays.asList(
+            mapper.readValue(mapper.writeValueAsString(data.get("post_tags")), PostTag[].class));
         postTagService.createInBatch(postTags);
 
-        List<Sheet> sheets = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("sheets")), Sheet[].class));
+        List<Sheet> sheets = Arrays
+            .asList(mapper.readValue(mapper.writeValueAsString(data.get("sheets")), Sheet[].class));
         sheetService.createInBatch(sheets);
 
-        List<SheetComment> sheetComments = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("sheet_comments")), SheetComment[].class));
+        List<SheetComment> sheetComments = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("sheet_comments")),
+                SheetComment[].class));
         sheetCommentService.createInBatch(sheetComments);
 
-        List<SheetMeta> sheetMetas = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("sheet_metas")), SheetMeta[].class));
+        List<SheetMeta> sheetMetas = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("sheet_metas")), SheetMeta[].class));
         sheetMetaService.createInBatch(sheetMetas);
 
-        List<ThemeSetting> themeSettings = Arrays.asList(mapper.readValue(mapper.writeValueAsString(data.get("theme_settings")), ThemeSetting[].class));
+        List<ThemeSetting> themeSettings = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("theme_settings")),
+                ThemeSetting[].class));
         themeSettingService.createInBatch(themeSettings);
 
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
@@ -490,24 +535,28 @@ public class BackupServiceImpl implements BackupService {
         Assert.notEmpty(postMarkdownList, "当前无文章可以导出");
 
         // Write files to the temporary directory
-        String markdownFileTempPathName = haloProperties.getBackupMarkdownDir() + IdUtil.simpleUUID().hashCode();
+        String markdownFileTempPathName =
+            haloProperties.getBackupMarkdownDir() + IdUtil.simpleUUID().hashCode();
         for (int i = 0; i < postMarkdownList.size(); i++) {
             PostMarkdownVO postMarkdownVO = postMarkdownList.get(i);
             StringBuilder content = new StringBuilder();
-            Boolean needFrontMatter = Optional.ofNullable(postMarkdownParam.getNeedFrontMatter()).orElse(false);
+            Boolean needFrontMatter =
+                Optional.ofNullable(postMarkdownParam.getNeedFrontMatter()).orElse(false);
             if (needFrontMatter) {
                 // Add front-matter
                 content.append(postMarkdownVO.getFrontMatter()).append("\n");
             }
             content.append(postMarkdownVO.getOriginalContent());
             try {
-                String markdownFileName = postMarkdownVO.getTitle() + "-" + postMarkdownVO.getSlug() + ".md";
+                String markdownFileName =
+                    postMarkdownVO.getTitle() + "-" + postMarkdownVO.getSlug() + ".md";
                 Path markdownFilePath = Paths.get(markdownFileTempPathName, markdownFileName);
                 if (!Files.exists(markdownFilePath.getParent())) {
                     Files.createDirectories(markdownFilePath.getParent());
                 }
                 Path markdownDataPath = Files.createFile(markdownFilePath);
-                FileWriter fileWriter = new FileWriter(markdownDataPath.toFile(), CharsetUtil.UTF_8);
+                FileWriter fileWriter =
+                    new FileWriter(markdownDataPath.toFile(), CharsetUtil.UTF_8);
                 fileWriter.write(content.toString());
             } catch (IOException e) {
                 throw new ServiceException("导出数据失败", e);
@@ -519,11 +568,13 @@ public class BackupServiceImpl implements BackupService {
         try {
             // Create zip path
             String markdownZipFileName = HaloConst.HALO_BACKUP_MARKDOWN_PREFIX +
-                    DateTimeUtils.format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                    IdUtil.simpleUUID().hashCode() + ".zip";
+                DateTimeUtils
+                    .format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
+                IdUtil.simpleUUID().hashCode() + ".zip";
 
             // Create zip file
-            Path markdownZipFilePath = Paths.get(haloProperties.getBackupMarkdownDir(), markdownZipFileName);
+            Path markdownZipFilePath =
+                Paths.get(haloProperties.getBackupMarkdownDir(), markdownZipFileName);
             if (!Files.exists(markdownZipFilePath.getParent())) {
                 Files.createDirectories(markdownZipFilePath.getParent());
             }
@@ -536,7 +587,8 @@ public class BackupServiceImpl implements BackupService {
             run.halo.app.utils.FileUtils.zip(markdownFileTempPath, markdownZipOut);
 
             // Zip upload sub-directory
-            String uploadPathName = FileHandler.normalizeDirectory(haloProperties.getWorkDir()) + UPLOAD_SUB_DIR;
+            String uploadPathName =
+                FileHandler.normalizeDirectory(haloProperties.getWorkDir()) + UPLOAD_SUB_DIR;
             Path uploadPath = Paths.get(uploadPathName);
             if (Files.exists(uploadPath)) {
                 run.halo.app.utils.FileUtils.zip(uploadPath, markdownZipOut);
@@ -567,10 +619,12 @@ public class BackupServiceImpl implements BackupService {
         // Build backup dto
         try (Stream<Path> subPathStream = Files.list(backupParentPath)) {
             return subPathStream
-                    .filter(backupPath -> StringUtils.startsWithIgnoreCase(backupPath.getFileName().toString(), HaloConst.HALO_BACKUP_MARKDOWN_PREFIX))
-                    .map(backupPath -> buildBackupDto(DATA_EXPORT_MARKDOWN_BASE_URI, backupPath))
-                    .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
-                    .collect(Collectors.toList());
+                .filter(backupPath -> StringUtils
+                    .startsWithIgnoreCase(backupPath.getFileName().toString(),
+                        HaloConst.HALO_BACKUP_MARKDOWN_PREFIX))
+                .map(backupPath -> buildBackupDto(DATA_EXPORT_MARKDOWN_BASE_URI, backupPath))
+                .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
+                .collect(Collectors.toList());
         } catch (IOException e) {
             throw new ServiceException("Failed to fetch backups", e);
         }
@@ -641,9 +695,9 @@ public class BackupServiceImpl implements BackupService {
 
         // Build full url
         return HaloUtils.compositeHttpUrl(optionService.getBlogBaseUrl(), backupUri)
-                + "?"
-                + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
-                + "=" + oneTimeToken;
+            + "?"
+            + HaloConst.ONE_TIME_TOKEN_QUERY_NAME
+            + "=" + oneTimeToken;
     }
 
 }

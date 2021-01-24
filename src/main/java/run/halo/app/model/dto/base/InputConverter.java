@@ -24,7 +24,8 @@ public interface InputConverter<DOMAIN> {
         ParameterizedType currentType = parameterizedType();
 
         // Assert not equal
-        Objects.requireNonNull(currentType, "Cannot fetch actual type because parameterized type is null");
+        Objects.requireNonNull(currentType,
+            "Cannot fetch actual type because parameterized type is null");
 
         Class<DOMAIN> domainClass = (Class<DOMAIN>) currentType.getActualTypeArguments()[0];
 

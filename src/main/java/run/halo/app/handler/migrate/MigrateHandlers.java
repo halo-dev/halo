@@ -45,7 +45,8 @@ public class MigrateHandlers {
             }
         }
 
-        throw new FileOperationException("No available migrate handler to migrate the file").setErrorData(migrateType);
+        throw new FileOperationException("No available migrate handler to migrate the file")
+            .setErrorData(migrateType);
     }
 
     /**
@@ -55,7 +56,8 @@ public class MigrateHandlers {
      * @return current migrate handlers
      */
     @NonNull
-    private MigrateHandlers addMigrateHandlers(@Nullable Collection<MigrateHandler> migrateHandlers) {
+    private MigrateHandlers addMigrateHandlers(
+        @Nullable Collection<MigrateHandler> migrateHandlers) {
         if (!CollectionUtils.isEmpty(migrateHandlers)) {
             this.migrateHandlers.addAll(migrateHandlers);
         }

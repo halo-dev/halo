@@ -23,15 +23,16 @@ import org.hibernate.annotations.GenericGenerator;
 @Data
 @Entity
 @Table(name = "categories", indexes = {
-        @Index(name = "categories_name", columnList = "name"),
-        @Index(name = "categories_parent_id", columnList = "parent_id")})
+    @Index(name = "categories_name", columnList = "name"),
+    @Index(name = "categories_parent_id", columnList = "parent_id")})
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Category extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
-    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support" +
+        ".CustomIdGenerator")
     private Integer id;
 
     /**

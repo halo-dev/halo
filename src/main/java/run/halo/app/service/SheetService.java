@@ -24,7 +24,7 @@ public interface SheetService extends BasePostService<Sheet> {
     /**
      * Creates a sheet.
      *
-     * @param sheet    sheet must not be null
+     * @param sheet sheet must not be null
      * @param autoSave autoSave
      * @return created sheet
      */
@@ -34,8 +34,8 @@ public interface SheetService extends BasePostService<Sheet> {
     /**
      * Creates a sheet.
      *
-     * @param sheet    sheet must not be null
-     * @param metas    sheet metas
+     * @param sheet sheet must not be null
+     * @param metas sheet metas
      * @param autoSave autoSave
      * @return created sheet
      */
@@ -44,7 +44,7 @@ public interface SheetService extends BasePostService<Sheet> {
     /**
      * Updates a sheet.
      *
-     * @param sheet    sheet must not be null
+     * @param sheet sheet must not be null
      * @param autoSave autoSave
      * @return updated sheet
      */
@@ -54,8 +54,8 @@ public interface SheetService extends BasePostService<Sheet> {
     /**
      * Updates a sheet.
      *
-     * @param sheet    sheet must not be null
-     * @param metas    sheet metas
+     * @param sheet sheet must not be null
+     * @param metas sheet metas
      * @param autoSave autoSave
      * @return updated sheet
      */
@@ -65,7 +65,7 @@ public interface SheetService extends BasePostService<Sheet> {
      * Gets by url
      *
      * @param status post status must not be null
-     * @param slug   post slug must not be blank
+     * @param slug post slug must not be blank
      * @return sheet
      */
     @Override

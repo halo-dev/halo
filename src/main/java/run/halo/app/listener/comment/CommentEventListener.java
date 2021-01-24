@@ -61,7 +61,11 @@ public class CommentEventListener {
 
     private final ThemeService themeService;
 
-    public CommentEventListener(MailService mailService, OptionService optionService, PostCommentService postCommentService, SheetCommentService sheetCommentService, JournalCommentService journalCommentService, PostService postService, SheetService sheetService, JournalService journalService, UserService userService, ThemeService themeService) {
+    public CommentEventListener(MailService mailService, OptionService optionService,
+        PostCommentService postCommentService, SheetCommentService sheetCommentService,
+        JournalCommentService journalCommentService, PostService postService,
+        SheetService sheetService, JournalService journalService, UserService userService,
+        ThemeService themeService) {
         this.mailService = mailService;
         this.optionService = optionService;
         this.postCommentService = postCommentService;
@@ -82,14 +86,16 @@ public class CommentEventListener {
     @Async
     @EventListener
     public void handleCommentNewEvent(CommentNewEvent newEvent) {
-        Boolean newCommentNotice = optionService.getByPropertyOrDefault(CommentProperties.NEW_NOTICE, Boolean.class, false);
+        Boolean newCommentNotice = optionService
+            .getByPropertyOrDefault(CommentProperties.NEW_NOTICE, Boolean.class, false);
 
         if (!newCommentNotice) {
             // Skip mailing
             return;
         }
 
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
+        User user =
+            userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
 
         Map<String, Object> data = new HashMap<>();
 
@@ -103,32 +109,36 @@ public class CommentEventListener {
 
             log.debug("Got post comment: [{}]", postComment);
 
-            BasePostMinimalDTO post = postService.convertToMinimal(postService.getById(postComment.getPostId()));
+            BasePostMinimalDTO post =
+                postService.convertToMinimal(postService.getById(postComment.getPostId()));
 
-            data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() : optionService.getBlogBaseUrl() + post.getFullPath());
+            data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() :
+                optionService.getBlogBaseUrl() + post.getFullPath());
             data.put("pageTitle", post.getTitle());
             data.put("author", postComment.getAuthor());
             data.put("content", postComment.getContent());
 
             subject.append("您的博客文章《")
-                    .append(post.getTitle())
-                    .append("》有了新的评论。");
+                .append(post.getTitle())
+                .append("》有了新的评论。");
 
         } else if (newEvent.getSource() instanceof SheetCommentService) {
             SheetComment sheetComment = sheetCommentService.getById(newEvent.getCommentId());
 
             log.debug("Got sheet comment: [{}]", sheetComment);
 
-            BasePostMinimalDTO sheet = sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
+            BasePostMinimalDTO sheet =
+                sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
 
-            data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() : optionService.getBlogBaseUrl() + sheet.getFullPath());
+            data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() :
+                optionService.getBlogBaseUrl() + sheet.getFullPath());
             data.put("pageTitle", sheet.getTitle());
             data.put("author", sheetComment.getAuthor());
             data.put("content", sheetComment.getContent());
 
             subject.append("您的博客页面《")
-                    .append(sheet.getTitle())
-                    .append("》有了新的评论。");
+                .append(sheet.getTitle())
+                .append("》有了新的评论。");
         } else if (newEvent.getSource() instanceof JournalCommentService) {
             JournalComment journalComment = journalCommentService.getById(newEvent.getCommentId());
 
@@ -137,8 +147,8 @@ public class CommentEventListener {
             Journal journal = journalService.getById(journalComment.getPostId());
 
             StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
-                    .append("/")
-                    .append(optionService.getJournalsPrefix());
+                .append("/")
+                .append(optionService.getJournalsPrefix());
             data.put("pageFullPath", url.toString());
             data.put("pageTitle", journal.getCreateTime());
             data.put("author", journalComment.getAuthor());
@@ -164,7 +174,8 @@ public class CommentEventListener {
     @Async
     @EventListener
     public void handleCommentReplyEvent(CommentReplyEvent replyEvent) {
-        Boolean replyCommentNotice = optionService.getByPropertyOrDefault(CommentProperties.REPLY_NOTICE, Boolean.class, false);
+        Boolean replyCommentNotice = optionService
+            .getByPropertyOrDefault(CommentProperties.REPLY_NOTICE, Boolean.class, false);
 
         if (!replyCommentNotice) {
             // Skip mailing
@@ -189,7 +200,8 @@ public class CommentEventListener {
 
             PostComment baseComment = postCommentService.getById(postComment.getParentId());
 
-            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) &&
+                !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -199,9 +211,11 @@ public class CommentEventListener {
 
             baseAuthorEmail = baseComment.getEmail();
 
-            BasePostMinimalDTO post = postService.convertToMinimal(postService.getById(postComment.getPostId()));
+            BasePostMinimalDTO post =
+                postService.convertToMinimal(postService.getById(postComment.getPostId()));
 
-            data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() : optionService.getBlogBaseUrl() + post.getFullPath());
+            data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() :
+                optionService.getBlogBaseUrl() + post.getFullPath());
             data.put("pageTitle", post.getTitle());
             data.put("baseAuthor", baseComment.getAuthor());
             data.put("baseContent", baseComment.getContent());
@@ -209,17 +223,18 @@ public class CommentEventListener {
             data.put("replyContent", postComment.getContent());
 
             subject.append("您在【")
-                    .append(blogTitle)
-                    .append("】评论的文章《")
-                    .append(post.getTitle())
-                    .append("》有了新的评论。");
+                .append(blogTitle)
+                .append("】评论的文章《")
+                .append(post.getTitle())
+                .append("》有了新的评论。");
         } else if (replyEvent.getSource() instanceof SheetCommentService) {
 
             SheetComment sheetComment = sheetCommentService.getById(replyEvent.getCommentId());
 
             SheetComment baseComment = sheetCommentService.getById(sheetComment.getParentId());
 
-            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) &&
+                !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -229,9 +244,11 @@ public class CommentEventListener {
 
             baseAuthorEmail = baseComment.getEmail();
 
-            BasePostMinimalDTO sheet = sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
+            BasePostMinimalDTO sheet =
+                sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
 
-            data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() : optionService.getBlogBaseUrl() + sheet.getFullPath());
+            data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() :
+                optionService.getBlogBaseUrl() + sheet.getFullPath());
             data.put("pageTitle", sheet.getTitle());
             data.put("baseAuthor", baseComment.getAuthor());
             data.put("baseContent", baseComment.getContent());
@@ -239,16 +256,19 @@ public class CommentEventListener {
             data.put("replyContent", sheetComment.getContent());
 
             subject.append("您在【")
-                    .append(blogTitle)
-                    .append("】评论的页面《")
-                    .append(sheet.getTitle())
-                    .append("》有了新的评论。");
+                .append(blogTitle)
+                .append("】评论的页面《")
+                .append(sheet.getTitle())
+                .append("》有了新的评论。");
         } else if (replyEvent.getSource() instanceof JournalCommentService) {
-            JournalComment journalComment = journalCommentService.getById(replyEvent.getCommentId());
+            JournalComment journalComment =
+                journalCommentService.getById(replyEvent.getCommentId());
 
-            JournalComment baseComment = journalCommentService.getById(journalComment.getParentId());
+            JournalComment baseComment =
+                journalCommentService.getById(journalComment.getParentId());
 
-            if (StringUtils.isEmpty(baseComment.getEmail()) && !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail()) &&
+                !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -261,8 +281,8 @@ public class CommentEventListener {
             Journal journal = journalService.getById(journalComment.getPostId());
 
             StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
-                    .append("/")
-                    .append(optionService.getJournalsPrefix());
+                .append("/")
+                .append(optionService.getJournalsPrefix());
             data.put("pageFullPath", url);
             data.put("pageTitle", journal.getContent());
             data.put("baseAuthor", baseComment.getAuthor());
@@ -271,9 +291,9 @@ public class CommentEventListener {
             data.put("replyContent", journalComment.getContent());
 
             subject.append("您在【")
-                    .append(blogTitle)
-                    .append("】评论的日志")
-                    .append("有了新的评论。");
+                .append(blogTitle)
+                .append("】评论的日志")
+                .append("有了新的评论。");
         }
 
         String template = "common/mail_template/mail_reply.ftl";

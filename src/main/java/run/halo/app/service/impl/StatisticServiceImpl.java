@@ -53,16 +53,16 @@ public class StatisticServiceImpl implements StatisticService {
     private final UserService userService;
 
     public StatisticServiceImpl(PostService postService,
-            SheetService sheetService,
-            JournalService journalService,
-            PostCommentService postCommentService,
-            SheetCommentService sheetCommentService,
-            JournalCommentService journalCommentService,
-            OptionService optionService,
-            LinkService linkService,
-            CategoryService categoryService,
-            TagService tagService,
-            UserService userService) {
+        SheetService sheetService,
+        JournalService journalService,
+        PostCommentService postCommentService,
+        SheetCommentService sheetCommentService,
+        JournalCommentService journalCommentService,
+        OptionService optionService,
+        LinkService linkService,
+        CategoryService categoryService,
+        TagService tagService,
+        UserService userService) {
         this.postService = postService;
         this.sheetService = sheetService;
         this.journalService = journalService;
@@ -110,7 +110,8 @@ public class StatisticServiceImpl implements StatisticService {
         StatisticWithUserDTO statisticWithUserDTO = new StatisticWithUserDTO();
         statisticWithUserDTO.convertFrom(statisticDTO);
 
-        User user = userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
+        User user =
+            userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
         statisticWithUserDTO.setUser(new UserDTO().convertFrom(user));
 
         return statisticWithUserDTO;

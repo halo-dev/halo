@@ -27,9 +27,9 @@ public class ServletUtils {
     @NonNull
     public static Optional<HttpServletRequest> getCurrentRequest() {
         return Optional.ofNullable(RequestContextHolder.getRequestAttributes())
-                .filter(requestAttributes -> requestAttributes instanceof ServletRequestAttributes)
-                .map(requestAttributes -> (ServletRequestAttributes) requestAttributes)
-                .map(ServletRequestAttributes::getRequest);
+            .filter(requestAttributes -> requestAttributes instanceof ServletRequestAttributes)
+            .map(requestAttributes -> (ServletRequestAttributes) requestAttributes)
+            .map(ServletRequestAttributes::getRequest);
     }
 
     /**
@@ -50,7 +50,8 @@ public class ServletUtils {
      */
     @Nullable
     public static String getHeaderIgnoreCase(String header) {
-        return getCurrentRequest().map(request -> ServletUtil.getHeaderIgnoreCase(request, header)).orElse(null);
+        return getCurrentRequest().map(request -> ServletUtil.getHeaderIgnoreCase(request, header))
+            .orElse(null);
     }
 
 }

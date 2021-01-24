@@ -29,14 +29,17 @@ import run.halo.app.exception.BadRequestException;
 @Disabled("Due to time-consumption")
 class GithubTest {
 
-    final static String API_URL = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
+    final static String API_URL =
+        "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
     final static String HALO_ADMIN_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
     final Path tempPath;
     final RestTemplate restTemplate;
 
-    GithubTest() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
+    GithubTest()
+        throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException, IOException {
         tempPath = Files.createTempDirectory("git-test");
-        this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
+        this.restTemplate = new RestTemplate(
+            new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(5000)));
     }
 
     @Test
@@ -57,16 +60,18 @@ class GithubTest {
                 Object name = aAssetMap.getOrDefault("name", "");
                 return name.toString().matches(HALO_ADMIN_REGEX);
             })
-                    .findFirst()
-                    .orElseThrow(() -> new BadRequestException("Halo admin has no assets available"));
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Halo admin has no assets available"));
 
             Object name = assetMap.getOrDefault("name", "");
             Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");
             // Download the assets
-            ResponseEntity<byte[]> downloadResponseEntity = restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
+            ResponseEntity<byte[]> downloadResponseEntity =
+                restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
             log.debug("Download response entity status: " + downloadResponseEntity.getStatusCode());
 
-            Path downloadedPath = Files.write(tempPath.resolve(name.toString()), downloadResponseEntity.getBody());
+            Path downloadedPath =
+                Files.write(tempPath.resolve(name.toString()), downloadResponseEntity.getBody());
 
             log.debug("Downloaded path: " + downloadedPath.toString());
         }

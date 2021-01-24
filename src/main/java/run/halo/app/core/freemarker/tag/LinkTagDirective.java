@@ -33,8 +33,10 @@ public class LinkTagDirective implements TemplateDirectiveModel {
     }
 
     @Override
-    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
-        final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
+    public void execute(Environment env, Map params, TemplateModel[] loopVars,
+        TemplateDirectiveBody body) throws TemplateException, IOException {
+        final DefaultObjectWrapperBuilder builder =
+            new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
@@ -46,10 +48,12 @@ public class LinkTagDirective implements TemplateDirectiveModel {
                     env.setVariable("links", builder.build().wrap(linkService.listAllByRandom()));
                     break;
                 case "listTeams":
-                    env.setVariable("teams", builder.build().wrap(linkService.listTeamVos(Sort.by(DESC, "createTime"))));
+                    env.setVariable("teams",
+                        builder.build().wrap(linkService.listTeamVos(Sort.by(DESC, "createTime"))));
                     break;
                 case "listTeamsByRandom":
-                    env.setVariable("teams", builder.build().wrap(linkService.listTeamVosByRandom(Sort.by(DESC, "createTime"))));
+                    env.setVariable("teams", builder.build()
+                        .wrap(linkService.listTeamVosByRandom(Sort.by(DESC, "createTime"))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(linkService.count()));

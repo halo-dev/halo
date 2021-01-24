@@ -13,7 +13,7 @@ import org.springframework.lang.NonNull;
  * Base repository interface contains some common methods.
  *
  * @param <DOMAIN> doamin type
- * @param <ID>     id type
+ * @param <ID> id type
  * @author johnniang
  * @author ryanwang
  * @date 2019-03-15
@@ -24,7 +24,7 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
     /**
      * Finds all domain by id list.
      *
-     * @param ids  id list of domain must not be null
+     * @param ids id list of domain must not be null
      * @param sort the specified sort must not be null
      * @return a list of domains
      */
@@ -34,7 +34,7 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
     /**
      * Finds all domain by domain id list.
      *
-     * @param ids      must not be null
+     * @param ids must not be null
      * @param pageable must not be null
      * @return a list of domains
      */

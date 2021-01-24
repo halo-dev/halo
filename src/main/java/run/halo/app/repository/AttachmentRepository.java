@@ -15,7 +15,8 @@ import run.halo.app.repository.base.BaseRepository;
  * @author ryanwang
  * @date 2019-04-03
  */
-public interface AttachmentRepository extends BaseRepository<Attachment, Integer>, JpaSpecificationExecutor<Attachment> {
+public interface AttachmentRepository
+    extends BaseRepository<Attachment, Integer>, JpaSpecificationExecutor<Attachment> {
 
     /**
      * Find all attachment media type.

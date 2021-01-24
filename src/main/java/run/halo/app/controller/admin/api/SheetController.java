@@ -53,8 +53,8 @@ public class SheetController {
     private final OptionService optionService;
 
     public SheetController(SheetService sheetService,
-            AbstractStringCacheStore cacheStore,
-            OptionService optionService) {
+        AbstractStringCacheStore cacheStore,
+        OptionService optionService) {
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
@@ -69,7 +69,8 @@ public class SheetController {
 
     @GetMapping
     @ApiOperation("Gets a page of sheet")
-    public Page<SheetListVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+    public Page<SheetListVO> pageBy(
+        @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Sheet> sheetPage = sheetService.pageBy(pageable);
         return sheetService.convertToListVo(sheetPage);
     }
@@ -83,17 +84,20 @@ public class SheetController {
     @PostMapping
     @ApiOperation("Creates a sheet")
     public SheetDetailVO createBy(@RequestBody @Valid SheetParam sheetParam,
-            @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
-        Sheet sheet = sheetService.createBy(sheetParam.convertTo(), sheetParam.getSheetMetas(), autoSave);
+        @RequestParam(value = "autoSave", required = false, defaultValue = "false")
+            Boolean autoSave) {
+        Sheet sheet =
+            sheetService.createBy(sheetParam.convertTo(), sheetParam.getSheetMetas(), autoSave);
         return sheetService.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}")
     @ApiOperation("Updates a sheet")
     public SheetDetailVO updateBy(
-            @PathVariable("sheetId") Integer sheetId,
-            @RequestBody @Valid SheetParam sheetParam,
-            @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+        @PathVariable("sheetId") Integer sheetId,
+        @RequestBody @Valid SheetParam sheetParam,
+        @RequestParam(value = "autoSave", required = false, defaultValue = "false")
+            Boolean autoSave) {
         Sheet sheetToUpdate = sheetService.getById(sheetId);
 
         sheetParam.update(sheetToUpdate);
@@ -106,8 +110,8 @@ public class SheetController {
     @PutMapping("{sheetId:\\d+}/{status}")
     @ApiOperation("Updates a sheet")
     public void updateStatusBy(
-            @PathVariable("sheetId") Integer sheetId,
-            @PathVariable("status") PostStatus status) {
+        @PathVariable("sheetId") Integer sheetId,
+        @PathVariable("status") PostStatus status) {
         Sheet sheet = sheetService.getById(sheetId);
 
         // Set status
@@ -120,8 +124,8 @@ public class SheetController {
     @PutMapping("{sheetId:\\d+}/status/draft/content")
     @ApiOperation("Updates draft")
     public BasePostDetailDTO updateDraftBy(
-            @PathVariable("sheetId") Integer sheetId,
-            @RequestBody PostContentParam contentParam) {
+        @PathVariable("sheetId") Integer sheetId,
+        @RequestBody PostContentParam contentParam) {
         // Update draft content
         Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(), sheetId);
 
@@ -137,7 +141,8 @@ public class SheetController {
 
     @GetMapping("preview/{sheetId:\\d+}")
     @ApiOperation("Gets a sheet preview link")
-    public String preview(@PathVariable("sheetId") Integer sheetId) throws UnsupportedEncodingException {
+    public String preview(@PathVariable("sheetId") Integer sheetId)
+        throws UnsupportedEncodingException {
         Sheet sheet = sheetService.getById(sheetId);
 
         sheet.setSlug(URLEncoder.encode(sheet.getSlug(), StandardCharsets.UTF_8.name()));
@@ -156,8 +161,8 @@ public class SheetController {
         }
 
         previewUrl.append(sheetMinimalDTO.getFullPath())
-                .append("?token=")
-                .append(token);
+            .append("?token=")
+            .append(token);
 
         // build preview post url and return
         return previewUrl.toString();

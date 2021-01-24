@@ -45,8 +45,8 @@ public class DateUtils {
     /**
      * Adds date.
      *
-     * @param date     current date must not be null
-     * @param time     time must not be less than 1
+     * @param date current date must not be null
+     * @param time time must not be less than 1
      * @param timeUnit time unit must not be null
      * @return added date
      */
@@ -80,7 +80,8 @@ public class DateUtils {
                 result = org.apache.commons.lang3.time.DateUtils.addSeconds(date, timeIntValue);
                 break;
             case MILLISECONDS:
-                result = org.apache.commons.lang3.time.DateUtils.addMilliseconds(date, timeIntValue);
+                result =
+                    org.apache.commons.lang3.time.DateUtils.addMilliseconds(date, timeIntValue);
                 break;
             default:
                 result = date;

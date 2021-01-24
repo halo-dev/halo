@@ -16,11 +16,12 @@ public interface AuthenticationFailureHandler {
     /**
      * Calls when a user has been unsuccessfully authenticated.
      *
-     * @param request   http servlet request
-     * @param response  http servlet response
+     * @param request http servlet request
+     * @param response http servlet response
      * @param exception api exception
      * @throws IOException      io exception
      * @throws ServletException service exception
      */
-    void onFailure(HttpServletRequest request, HttpServletResponse response, AbstractHaloException exception) throws IOException, ServletException;
+    void onFailure(HttpServletRequest request, HttpServletResponse response,
+        AbstractHaloException exception) throws IOException, ServletException;
 }

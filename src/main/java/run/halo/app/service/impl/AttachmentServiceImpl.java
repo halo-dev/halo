@@ -42,7 +42,8 @@ import run.halo.app.utils.HaloUtils;
  */
 @Slf4j
 @Service
-public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integer> implements AttachmentService {
+public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integer>
+    implements AttachmentService {
 
     private final AttachmentRepository attachmentRepository;
 
@@ -51,8 +52,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     private final FileHandlers fileHandlers;
 
     public AttachmentServiceImpl(AttachmentRepository attachmentRepository,
-            OptionService optionService,
-            FileHandlers fileHandlers) {
+        OptionService optionService,
+        FileHandlers fileHandlers) {
         super(attachmentRepository);
         this.attachmentRepository = attachmentRepository;
         this.optionService = optionService;
@@ -60,11 +61,13 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     }
 
     @Override
-    public Page<AttachmentDTO> pageDtosBy(@NonNull Pageable pageable, AttachmentQuery attachmentQuery) {
+    public Page<AttachmentDTO> pageDtosBy(@NonNull Pageable pageable,
+        AttachmentQuery attachmentQuery) {
         Assert.notNull(pageable, "Page info must not be null");
 
         // List all
-        Page<Attachment> attachmentPage = attachmentRepository.findAll(buildSpecByQuery(attachmentQuery), pageable);
+        Page<Attachment> attachmentPage =
+            attachmentRepository.findAll(buildSpecByQuery(attachmentQuery), pageable);
 
         // Convert and return
         return attachmentPage.map(this::convertToDto);
@@ -78,16 +81,19 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
             List<Predicate> predicates = new LinkedList<>();
 
             if (attachmentQuery.getMediaType() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("mediaType"), attachmentQuery.getMediaType()));
+                predicates.add(
+                    criteriaBuilder.equal(root.get("mediaType"), attachmentQuery.getMediaType()));
             }
 
             if (attachmentQuery.getAttachmentType() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("type"), attachmentQuery.getAttachmentType()));
+                predicates.add(
+                    criteriaBuilder.equal(root.get("type"), attachmentQuery.getAttachmentType()));
             }
 
             if (attachmentQuery.getKeyword() != null) {
 
-                String likeCondition = String.format("%%%s%%", StringUtils.strip(attachmentQuery.getKeyword()));
+                String likeCondition =
+                    String.format("%%%s%%", StringUtils.strip(attachmentQuery.getKeyword()));
 
                 Predicate nameLike = criteriaBuilder.like(root.get("name"), likeCondition);
 
@@ -104,7 +110,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
 
         AttachmentType attachmentType = getAttachmentType();
 
-        log.debug("Starting uploading... type: [{}], file: [{}]", attachmentType, file.getOriginalFilename());
+        log.debug("Starting uploading... type: [{}], file: [{}]", attachmentType,
+            file.getOriginalFilename());
 
         // Upload file
         UploadResult uploadResult = fileHandlers.upload(file, attachmentType);
@@ -168,8 +175,10 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
 
         if (Objects.equals(attachmentDTO.getType(), AttachmentType.LOCAL)) {
             // Append blog base url to path and thumbnail
-            String fullPath = StringUtils.join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getPath());
-            String fullThumbPath = StringUtils.join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getThumbPath());
+            String fullPath = StringUtils
+                .join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getPath());
+            String fullThumbPath = StringUtils
+                .join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getThumbPath());
 
             // Set full path and full thumb path
             attachmentDTO.setPath(fullPath);
@@ -237,6 +246,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
      */
     @NonNull
     private AttachmentType getAttachmentType() {
-        return Objects.requireNonNull(optionService.getEnumByPropertyOrDefault(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.class, AttachmentType.LOCAL));
+        return Objects.requireNonNull(optionService
+            .getEnumByPropertyOrDefault(AttachmentProperties.ATTACHMENT_TYPE, AttachmentType.class,
+                AttachmentType.LOCAL));
     }
 }

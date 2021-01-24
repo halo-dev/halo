@@ -33,8 +33,10 @@ public class PhotoTagDirective implements TemplateDirectiveModel {
     }
 
     @Override
-    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
-        final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
+    public void execute(Environment env, Map params, TemplateModel[] loopVars,
+        TemplateDirectiveBody body) throws TemplateException, IOException {
+        final DefaultObjectWrapperBuilder builder =
+            new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
@@ -43,11 +45,13 @@ public class PhotoTagDirective implements TemplateDirectiveModel {
                     env.setVariable("photos", builder.build().wrap(photoService.listAll()));
                     break;
                 case "listTeams":
-                    env.setVariable("teams", builder.build().wrap(photoService.listTeamVos(Sort.by(DESC, "createTime"))));
+                    env.setVariable("teams", builder.build()
+                        .wrap(photoService.listTeamVos(Sort.by(DESC, "createTime"))));
                     break;
                 case "listByTeam":
                     String team = params.get("team").toString();
-                    env.setVariable("photos", builder.build().wrap(photoService.listByTeam(team, Sort.by(DESC, "createTime"))));
+                    env.setVariable("photos", builder.build()
+                        .wrap(photoService.listByTeam(team, Sort.by(DESC, "createTime"))));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(photoService.count()));

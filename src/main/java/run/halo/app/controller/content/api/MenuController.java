@@ -38,7 +38,8 @@ public class MenuController {
 
     @GetMapping(value = "tree_view")
     @ApiOperation("Lists menus with tree view")
-    public List<MenuVO> listMenusTree(@SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+    public List<MenuVO> listMenusTree(
+        @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         return menuService.listAsTree(sort);
     }
 }

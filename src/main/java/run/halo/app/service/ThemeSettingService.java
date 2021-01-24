@@ -20,8 +20,8 @@ public interface ThemeSettingService extends CrudService<ThemeSetting, Integer> 
     /**
      * Saves theme setting.
      *
-     * @param key     setting key must not be blank
-     * @param value   setting value
+     * @param key setting key must not be blank
+     * @param value setting value
      * @param themeId theme id must not be blank
      * @return theme setting or null if the key does not exist
      */
@@ -33,7 +33,7 @@ public interface ThemeSettingService extends CrudService<ThemeSetting, Integer> 
      * Saves theme settings.
      *
      * @param settings theme setting map
-     * @param themeId  theme id must not be blank
+     * @param themeId theme id must not be blank
      */
     @Transactional
     void save(@Nullable Map<String, Object> settings, @NonNull String themeId);

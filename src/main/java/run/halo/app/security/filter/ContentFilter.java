@@ -25,21 +25,21 @@ import run.halo.app.utils.HaloUtils;
 public class ContentFilter extends AbstractAuthenticationFilter {
 
     public ContentFilter(HaloProperties haloProperties,
-            OptionService optionService,
-            AbstractStringCacheStore cacheStore,
-            OneTimeTokenService oneTimeTokenService) {
+        OptionService optionService,
+        AbstractStringCacheStore cacheStore,
+        OneTimeTokenService oneTimeTokenService) {
         super(haloProperties, optionService, cacheStore, oneTimeTokenService);
 
         addUrlPatterns("/**");
 
         String adminPattern = HaloUtils.ensureBoth(haloProperties.getAdminPath(), "/") + "**";
         addExcludeUrlPatterns(
-                adminPattern,
-                "/api/**",
-                "/install",
-                "/version",
-                "/js/**",
-                "/css/**");
+            adminPattern,
+            "/api/**",
+            "/install",
+            "/version",
+            "/js/**",
+            "/css/**");
 
         // set failure handler
         setFailureHandler(new ContentAuthenticationFailureHandler());
@@ -51,7 +51,8 @@ public class ContentFilter extends AbstractAuthenticationFilter {
     }
 
     @Override
-    protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response,
+        FilterChain filterChain) throws ServletException, IOException {
         // Do nothing
         filterChain.doFilter(request, response);
     }

@@ -33,7 +33,7 @@ public interface PostService extends BasePostService<Post> {
      * Pages posts.
      *
      * @param postQuery post query must not be null
-     * @param pageable  page info must not be null
+     * @param pageable page info must not be null
      * @return a page of post
      */
     @NonNull
@@ -42,7 +42,7 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Pages post by keyword
      *
-     * @param keyword  keyword
+     * @param keyword keyword
      * @param pageable pageable
      * @return a page of post
      */
@@ -52,46 +52,49 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Creates post by post param.
      *
-     * @param post        post must not be null
-     * @param tagIds      tag id set
+     * @param post post must not be null
+     * @param tagIds tag id set
      * @param categoryIds category id set
-     * @param metas       metas
-     * @param autoSave    autoSave
+     * @param metas metas
+     * @param autoSave autoSave
      * @return post created
      */
     @NonNull
-    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> metas, boolean autoSave);
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds,
+        Set<PostMeta> metas, boolean autoSave);
 
     /**
      * Creates post by post param.
      *
-     * @param post        post must not be null
-     * @param tagIds      tag id set
+     * @param post post must not be null
+     * @param tagIds tag id set
      * @param categoryIds category id set
-     * @param autoSave    autoSave
+     * @param autoSave autoSave
      * @return post created
      */
     @NonNull
-    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave);
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds,
+        boolean autoSave);
 
     /**
      * Updates post by post, tag id set and category id set.
      *
      * @param postToUpdate post to update must not be null
-     * @param tagIds       tag id set
-     * @param categoryIds  category id set
-     * @param metas        metas
-     * @param autoSave     autoSave
+     * @param tagIds tag id set
+     * @param categoryIds category id set
+     * @param metas metas
+     * @param autoSave autoSave
      * @return updated post
      */
     @NonNull
-    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> metas, boolean autoSave);
+    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds,
+        Set<PostMeta> metas, boolean autoSave);
 
     /**
      * Gets post by post status and slug.
      *
      * @param status post status must not be null
-     * @param slug   post slug must not be blank
+     * @param slug post slug must not be blank
      * @return post info
      */
     @NonNull
@@ -101,9 +104,9 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Gets post by post year and month and slug.
      *
-     * @param year  post create year.
+     * @param year post create year.
      * @param month post create month.
-     * @param slug  post slug.
+     * @param slug post slug.
      * @return post info
      */
     @NonNull
@@ -122,39 +125,42 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Gets post by post year and month and slug.
      *
-     * @param year   post create year.
-     * @param month  post create month.
-     * @param slug   post slug.
-     * @param status post status.
-     * @return post info
-     */
-    @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String slug, @NonNull PostStatus status);
-
-    /**
-     * Gets post by post year and month and slug.
-     *
-     * @param year  post create year.
+     * @param year post create year.
      * @param month post create month.
-     * @param day   post create day.
-     * @param slug  post slug.
-     * @return post info
-     */
-    @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String slug);
-
-    /**
-     * Gets post by post year and month and slug.
-     *
-     * @param year   post create year.
-     * @param month  post create month.
-     * @param day    post create day.
-     * @param slug   post slug.
+     * @param slug post slug.
      * @param status post status.
      * @return post info
      */
     @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String slug, @NonNull PostStatus status);
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String slug,
+        @NonNull PostStatus status);
+
+    /**
+     * Gets post by post year and month and slug.
+     *
+     * @param year post create year.
+     * @param month post create month.
+     * @param day post create day.
+     * @param slug post slug.
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day,
+        @NonNull String slug);
+
+    /**
+     * Gets post by post year and month and slug.
+     *
+     * @param year post create year.
+     * @param month post create month.
+     * @param day post create day.
+     * @param slug post slug.
+     * @param status post status.
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day,
+        @NonNull String slug, @NonNull PostStatus status);
 
     /**
      * Removes posts in batch.
@@ -271,7 +277,8 @@ public interface PostService extends BasePostService<Post> {
      * Get Post Pageable default sort
      *
      * @return
-     * @Desc contains three parts. First, Top Priority; Second, From Custom index sort; Third, basic id sort
+     * @Desc contains three parts. First, Top Priority; Second, From Custom index sort; Third,
+     * basic id sort
      */
     @NotNull
     Sort getPostDefaultSort();

@@ -61,19 +61,15 @@ import run.halo.app.security.resolver.AuthenticationArgumentResolver;
 public class HaloMvcConfiguration implements WebMvcConfigurer {
 
     private static final String FILE_PROTOCOL = "file:///";
-
+    private final PageableHandlerMethodArgumentResolver pageableResolver;
+    private final SortHandlerMethodArgumentResolver sortResolver;
+    private final HaloProperties haloProperties;
     @Value("${springfox.documentation.swagger-ui.base-url:}")
     private String swaggerBaseUrl;
 
-    private final PageableHandlerMethodArgumentResolver pageableResolver;
-
-    private final SortHandlerMethodArgumentResolver sortResolver;
-
-    private final HaloProperties haloProperties;
-
     public HaloMvcConfiguration(PageableHandlerMethodArgumentResolver pageableResolver,
-            SortHandlerMethodArgumentResolver sortResolver,
-            HaloProperties haloProperties) {
+        SortHandlerMethodArgumentResolver sortResolver,
+        HaloProperties haloProperties) {
         this.pageableResolver = pageableResolver;
         this.sortResolver = sortResolver;
         this.haloProperties = haloProperties;
@@ -85,13 +81,17 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
      * @return new FreeMarkerConfigurer
      */
     @Bean
-    FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties) throws IOException, TemplateException {
+    FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties)
+        throws IOException, TemplateException {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer.setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/", "classpath:/templates/");
+        configurer
+            .setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/",
+                "classpath:/templates/");
         configurer.setDefaultEncoding("UTF-8");
 
         Properties properties = new Properties();
-        properties.setProperty("auto_import", "/common/macro/common_macro.ftl as common,/common/macro/global_macro.ftl as global");
+        properties.setProperty("auto_import",
+            "/common/macro/common_macro.ftl as common,/common/macro/global_macro.ftl as global");
 
         configurer.setFreemarkerSettings(properties);
 
@@ -123,7 +123,8 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
         resolver.setMaxUploadSize(multipartConfigElement.getMaxRequestSize());
         resolver.setMaxUploadSizePerFile(multipartConfigElement.getMaxFileSize());
 
-        //lazy multipart parsing, throwing parse exceptions once the application attempts to obtain multipart files
+        //lazy multipart parsing, throwing parse exceptions once the application attempts to
+        // obtain multipart files
         resolver.setResolveLazily(true);
 
         return resolver;
@@ -142,16 +143,17 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.stream()
-                .filter(c -> c instanceof MappingJackson2HttpMessageConverter)
-                .findFirst()
-                .ifPresent(converter -> {
-                    MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-                    Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
-                    JsonComponentModule module = new JsonComponentModule();
-                    module.addSerializer(PageImpl.class, new PageJacksonSerializer());
-                    ObjectMapper objectMapper = builder.modules(module).build();
-                    mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
-                });
+            .filter(c -> c instanceof MappingJackson2HttpMessageConverter)
+            .findFirst()
+            .ifPresent(converter -> {
+                MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter =
+                    (MappingJackson2HttpMessageConverter) converter;
+                Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
+                JsonComponentModule module = new JsonComponentModule();
+                module.addSerializer(PageImpl.class, new PageJacksonSerializer());
+                ObjectMapper objectMapper = builder.modules(module).build();
+                mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+            });
     }
 
     @Override
@@ -165,7 +167,7 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
     public void addViewControllers(ViewControllerRegistry registry) {
         // for backward compatibility
         registry.addViewController("/swagger-ui.html")
-                .setViewName("redirect:" + swaggerBaseUrl + "/swagger-ui/");
+            .setViewName("redirect:" + swaggerBaseUrl + "/swagger-ui/");
     }
 
     /**
@@ -179,27 +181,28 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
 
         // register /** resource handler.
         registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/admin/")
-                .addResourceLocations(workDir + "static/");
+            .addResourceLocations("classpath:/admin/")
+            .addResourceLocations(workDir + "static/");
 
         // register /themes/** resource handler.
         registry.addResourceHandler("/themes/**")
-                .addResourceLocations(workDir + "templates/themes/");
+            .addResourceLocations(workDir + "templates/themes/");
 
-        String uploadUrlPattern = ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
+        String uploadUrlPattern =
+            ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";
         String adminPathPattern = ensureSuffix(haloProperties.getAdminPath(), URL_SEPARATOR) + "**";
 
         registry.addResourceHandler(uploadUrlPattern)
-                .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
-                .addResourceLocations(workDir + "upload/");
+            .setCacheControl(CacheControl.maxAge(7L, TimeUnit.DAYS))
+            .addResourceLocations(workDir + "upload/");
         registry.addResourceHandler(adminPathPattern)
-                .addResourceLocations("classpath:/admin/");
+            .addResourceLocations("classpath:/admin/");
 
         // If doc is enable
         registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
+            .addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+            .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
 

@@ -14,20 +14,20 @@ class MarkdownUtilsTest {
     @Test
     void removeFrontMatter() {
         String markdown = "---\n" +
-                "title: \"test remove\"\n" +
-                "---";
+            "title: \"test remove\"\n" +
+            "---";
         Assert.isTrue("".equals(MarkdownUtils.removeFrontMatter(markdown)));
 
         markdown = "---\n" +
-                "title: \"test remove\"\n" +
-                "---" +
-                "test";
+            "title: \"test remove\"\n" +
+            "---" +
+            "test";
         Assert.isTrue("test".equals(MarkdownUtils.removeFrontMatter(markdown)));
 
         markdown = "---\n" +
-                "title: \"test remove\"\n" +
-                "---" +
-                "test---";
+            "title: \"test remove\"\n" +
+            "---" +
+            "test---";
         Assert.isTrue("test---".equals(MarkdownUtils.removeFrontMatter(markdown)));
     }
 }

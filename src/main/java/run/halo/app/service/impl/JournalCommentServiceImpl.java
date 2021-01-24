@@ -30,16 +30,17 @@ import run.halo.app.utils.ServiceUtils;
  * @date 2019-04-25
  */
 @Service
-public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalComment> implements JournalCommentService {
+public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalComment>
+    implements JournalCommentService {
 
     private final JournalCommentRepository journalCommentRepository;
 
     private final JournalRepository journalRepository;
 
     public JournalCommentServiceImpl(JournalCommentRepository journalCommentRepository,
-            OptionService optionService,
-            UserService userService,
-            ApplicationEventPublisher eventPublisher, JournalRepository journalRepository) {
+        OptionService optionService,
+        UserService userService,
+        ApplicationEventPublisher eventPublisher, JournalRepository journalRepository) {
         super(journalCommentRepository, optionService, userService, eventPublisher);
         this.journalCommentRepository = journalCommentRepository;
         this.journalRepository = journalRepository;
@@ -53,13 +54,15 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
     }
 
     @Override
-    public List<JournalCommentWithJournalVO> convertToWithJournalVo(List<JournalComment> journalComments) {
+    public List<JournalCommentWithJournalVO> convertToWithJournalVo(
+        List<JournalComment> journalComments) {
 
         if (CollectionUtil.isEmpty(journalComments)) {
             return Collections.emptyList();
         }
 
-        Set<Integer> journalIds = ServiceUtils.fetchProperty(journalComments, JournalComment::getPostId);
+        Set<Integer> journalIds =
+            ServiceUtils.fetchProperty(journalComments, JournalComment::getPostId);
 
         // Get all journals
         List<Journal> journals = journalRepository.findAllById(journalIds);
@@ -67,23 +70,28 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
         Map<Integer, Journal> journalMap = ServiceUtils.convertToMap(journals, Journal::getId);
 
         return journalComments.stream()
-                .filter(journalComment -> journalMap.containsKey(journalComment.getPostId()))
-                .map(journalComment -> {
-                    JournalCommentWithJournalVO journalCmtWithJournalVo = new JournalCommentWithJournalVO().convertFrom(journalComment);
-                    journalCmtWithJournalVo.setJournal(new JournalDTO().convertFrom(journalMap.get(journalComment.getPostId())));
-                    return journalCmtWithJournalVo;
-                })
-                .collect(Collectors.toList());
+            .filter(journalComment -> journalMap.containsKey(journalComment.getPostId()))
+            .map(journalComment -> {
+                JournalCommentWithJournalVO journalCmtWithJournalVo =
+                    new JournalCommentWithJournalVO().convertFrom(journalComment);
+                journalCmtWithJournalVo.setJournal(
+                    new JournalDTO().convertFrom(journalMap.get(journalComment.getPostId())));
+                return journalCmtWithJournalVo;
+            })
+            .collect(Collectors.toList());
     }
 
     @Override
-    public Page<JournalCommentWithJournalVO> convertToWithJournalVo(Page<JournalComment> journalCommentPage) {
+    public Page<JournalCommentWithJournalVO> convertToWithJournalVo(
+        Page<JournalComment> journalCommentPage) {
         Assert.notNull(journalCommentPage, "Journal comment page must not be null");
 
         // Convert the list
-        List<JournalCommentWithJournalVO> journalCmtWithJournalVOS = convertToWithJournalVo(journalCommentPage.getContent());
+        List<JournalCommentWithJournalVO> journalCmtWithJournalVOS =
+            convertToWithJournalVo(journalCommentPage.getContent());
 
         // Build and return
-        return new PageImpl<>(journalCmtWithJournalVOS, journalCommentPage.getPageable(), journalCommentPage.getTotalElements());
+        return new PageImpl<>(journalCmtWithJournalVOS, journalCommentPage.getPageable(),
+            journalCommentPage.getTotalElements());
     }
 }

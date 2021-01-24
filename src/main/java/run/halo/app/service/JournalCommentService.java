@@ -17,8 +17,10 @@ import run.halo.app.service.base.BaseCommentService;
 public interface JournalCommentService extends BaseCommentService<JournalComment> {
 
     @NonNull
-    List<JournalCommentWithJournalVO> convertToWithJournalVo(@Nullable List<JournalComment> journalComments);
+    List<JournalCommentWithJournalVO> convertToWithJournalVo(
+        @Nullable List<JournalComment> journalComments);
 
     @NonNull
-    Page<JournalCommentWithJournalVO> convertToWithJournalVo(@NonNull Page<JournalComment> journalCommentPage);
+    Page<JournalCommentWithJournalVO> convertToWithJournalVo(
+        @NonNull Page<JournalComment> journalCommentPage);
 }

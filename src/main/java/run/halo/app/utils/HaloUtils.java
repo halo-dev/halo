@@ -32,7 +32,8 @@ public class HaloUtils {
     }
 
     @NonNull
-    public static String ensureBoth(@NonNull String string, @NonNull String prefix, @NonNull String suffix) {
+    public static String ensureBoth(@NonNull String string, @NonNull String prefix,
+        @NonNull String suffix) {
         return ensureSuffix(ensurePrefix(string, prefix), suffix);
     }
 
@@ -97,7 +98,7 @@ public class HaloUtils {
      * Desensitizes the plain text.
      *
      * @param plainText plain text must not be null
-     * @param leftSize  left size
+     * @param leftSize left size
      * @param rightSize right size
      * @return desensitization
      */
@@ -188,8 +189,8 @@ public class HaloUtils {
     /**
      * Pluralize the times label format.
      *
-     * @param times       times
-     * @param label       label
+     * @param times times
+     * @param label label
      * @param pluralLabel plural label
      * @return pluralized format
      */
@@ -243,8 +244,9 @@ public class HaloUtils {
     public static String normalizeUrl(@NonNull String originalUrl) {
         Assert.hasText(originalUrl, "Original Url must not be blank");
 
-        if (StringUtils.startsWithAny(originalUrl, URL_SEPARATOR, HaloConst.PROTOCOL_HTTPS, HaloConst.PROTOCOL_HTTP)
-                && !StringUtils.startsWith(originalUrl, "//")) {
+        if (StringUtils.startsWithAny(originalUrl, URL_SEPARATOR, HaloConst.PROTOCOL_HTTPS,
+            HaloConst.PROTOCOL_HTTP)
+            && !StringUtils.startsWith(originalUrl, "//")) {
             return originalUrl;
         }
 

@@ -29,8 +29,8 @@ public class JournalModel {
     private final ThemeService themeService;
 
     public JournalModel(JournalService journalService,
-            OptionService optionService,
-            ThemeService themeService) {
+        OptionService optionService,
+        ThemeService themeService) {
         this.journalService = journalService;
         this.optionService = optionService;
         this.themeService = themeService;
@@ -38,9 +38,12 @@ public class JournalModel {
 
     public String list(Integer page, Model model) {
 
-        int pageSize = optionService.getByPropertyOrDefault(SheetProperties.JOURNALS_PAGE_SIZE, Integer.class, Integer.parseInt(SheetProperties.JOURNALS_PAGE_SIZE.defaultValue()));
+        int pageSize = optionService
+            .getByPropertyOrDefault(SheetProperties.JOURNALS_PAGE_SIZE, Integer.class,
+                Integer.parseInt(SheetProperties.JOURNALS_PAGE_SIZE.defaultValue()));
 
-        Pageable pageable = PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "createTime"));
+        Pageable pageable =
+            PageRequest.of(page >= 1 ? page - 1 : page, pageSize, Sort.by(DESC, "createTime"));
 
         Page<Journal> journals = journalService.pageBy(JournalType.PUBLIC, pageable);
 

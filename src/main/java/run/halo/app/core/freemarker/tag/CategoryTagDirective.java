@@ -33,30 +33,35 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
     private final PostCategoryService postCategoryService;
 
     public CategoryTagDirective(Configuration configuration,
-            CategoryService categoryService,
-            PostCategoryService postCategoryService) {
+        CategoryService categoryService,
+        PostCategoryService postCategoryService) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
         configuration.setSharedVariable("categoryTag", this);
     }
 
     @Override
-    public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body) throws TemplateException, IOException {
-        final DefaultObjectWrapperBuilder builder = new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
+    public void execute(Environment env, Map params, TemplateModel[] loopVars,
+        TemplateDirectiveBody body) throws TemplateException, IOException {
+        final DefaultObjectWrapperBuilder builder =
+            new DefaultObjectWrapperBuilder(Configuration.VERSION_2_3_25);
 
         if (params.containsKey(HaloConst.METHOD_KEY)) {
             String method = params.get(HaloConst.METHOD_KEY).toString();
             switch (method) {
                 case "list":
-                    env.setVariable("categories", builder.build().wrap(postCategoryService.listCategoryWithPostCountDto(Sort.by(DESC, "createTime"))));
+                    env.setVariable("categories", builder.build().wrap(postCategoryService
+                        .listCategoryWithPostCountDto(Sort.by(DESC, "createTime"))));
                     break;
                 case "tree":
-                    env.setVariable("categories", builder.build().wrap(categoryService.listAsTree(Sort.by(DESC, "createTime"))));
+                    env.setVariable("categories", builder.build()
+                        .wrap(categoryService.listAsTree(Sort.by(DESC, "createTime"))));
                     break;
                 case "listByPostId":
                     Integer postId = Integer.parseInt(params.get("postId").toString());
                     List<Category> categories = postCategoryService.listCategoriesBy(postId);
-                    env.setVariable("categories", builder.build().wrap(categoryService.convertTo(categories)));
+                    env.setVariable("categories",
+                        builder.build().wrap(categoryService.convertTo(categories)));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(categoryService.count()));
