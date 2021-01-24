@@ -42,14 +42,14 @@ wget https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar -O
 java -jar halo.jar
 ```
 
-详细部署文档请移步：<https://docs.halo.run/zh/install/index>
+详细部署文档请移步：<https://docs.halo.run/install/index>
 
 ## 周边
 
 - 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
 - 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
 - 管理 APP（已停止维护）：<https://github.com/halo-dev/halo-app>
-- 主题仓库：<https://halo.run/p/themes.html>
+- 主题仓库：<https://halo.run/themes.html>
 - 资源下载：<https://dl.halo.run>
 - WeHalo 小程序：<https://github.com/aquanlerou/WeHalo>
 
