@@ -8,27 +8,24 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ListBranchCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
-import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevSort;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -244,23 +241,16 @@ class GitTest {
                 .forEach(
                     ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
 
-            final var objectId = ObjectId.fromString("51bf554e58f38cff22bb93f8e6cd8f8b72aa2d64");
-            try (final var revWalk = new RevWalk(git.getRepository())) {
-                revWalk.reset();
-                revWalk.setTreeFilter(TreeFilter.ANY_DIFF);
-                revWalk.sort(RevSort.TOPO, true);
-                revWalk.sort(RevSort.COMMIT_TIME_DESC, true);
-                RevCommit revCommit = revWalk.parseCommit(objectId);
-                log.debug("Found commit: {} for object: {}", revCommit, objectId);
-                log.debug("Commit details: {} {} {}",
-                    revCommit.getName(),
-                    revCommit.getFullMessage(),
-                    new Timestamp(revCommit.getCommitTime() * 1000L));
-            }
-            git.tagList()
-                .call()
-                .forEach(
-                    ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
+            Pair<Ref, RevCommit> latestTagPair = GitUtils.getLatestTag(git);
+            assertNotNull(latestTagPair);
+            Ref latestTag = latestTagPair.getKey();
+            RevCommit tagCommit = latestTagPair.getValue();
+
+
+            log.debug("Latest tag: {} with commit: {} {}",
+                latestTag.getName(),
+                tagCommit.getFullMessage(),
+                new Date(tagCommit.getCommitTime() * 1000L));
         }
     }
 

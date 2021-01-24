@@ -76,6 +76,13 @@ public class GitThemeUpdater implements ThemeUpdater {
 
     public ThemeProperty merge(ThemeProperty oldThemeProperty, ThemeProperty newThemeProperty)
         throws IOException {
+        // 0. commit old repo
+        // 1. find latest tag
+        // 2. new repo checkout the tag
+        // 3. old repo checkout halo branch
+        // 4. old repo set new repo as remote
+        // 5. old repo rebase remote
+
         //TODO Complete merging process
         // make sure that both themes contain .git folder
         final var oldThemePath = Paths.get(oldThemeProperty.getThemePath());

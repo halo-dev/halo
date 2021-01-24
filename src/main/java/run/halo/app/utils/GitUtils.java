@@ -5,18 +5,28 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevSort;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Git utilities.
@@ -97,4 +107,35 @@ public class GitUtils {
         }
     }
 
+    @Nullable
+    public static Pair<Ref, RevCommit> getLatestTag(Git git) throws GitAPIException, IOException {
+        final var tags = git.tagList().call();
+        if (CollectionUtils.isEmpty(tags)) {
+            return null;
+        }
+        try (final var revWalk = new RevWalk(git.getRepository())) {
+            revWalk.reset();
+            revWalk.setTreeFilter(TreeFilter.ANY_DIFF);
+            revWalk.sort(RevSort.TOPO, true);
+            revWalk.sort(RevSort.COMMIT_TIME_DESC, true);
+
+            final var commitTagMap = new HashMap<RevCommit, Ref>(tags.size());
+
+            for (final var tag : tags) {
+                final var commit = revWalk.parseCommit(tag.getObjectId());
+                commitTagMap.put(commit, tag);
+                if (log.isDebugEnabled()) {
+                    log.debug("tag: {} with commit: {} {}", tag.getName(),
+                        commit.getFullMessage(), new Date(commit.getCommitTime() * 1000L));
+                }
+            }
+
+            return commitTagMap.keySet()
+                .stream()
+                .max(Comparator.comparing(RevCommit::getCommitTime))
+                .map(latestCommit -> {
+                    return Pair.of(commitTagMap.get(latestCommit), latestCommit);
+                }).orElse(null);
+        }
+    }
 }

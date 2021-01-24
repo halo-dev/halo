@@ -2,12 +2,16 @@ package run.halo.app.theme;
 
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.TagOpt;
 import run.halo.app.exception.ThemePropertyMissingException;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.utils.FileUtils;
+import run.halo.app.utils.GitUtils;
 
 /**
  * Git theme fetcher.
@@ -31,11 +35,11 @@ public class GitThemeFetcher implements ThemeFetcher {
 
         try {
             // create temp folder
-            var tempDirectory = FileUtils.createTempDirectory();
+            final var tempDirectory = FileUtils.createTempDirectory();
 
             // clone from git
             log.info("Cloning git repo {} to {}", repoUrl, tempDirectory);
-            try (final var ignored = Git.cloneRepository()
+            try (final var git = Git.cloneRepository()
                 .setTagOption(TagOpt.FETCH_TAGS)
                 .setNoCheckout(false)
                 .setDirectory(tempDirectory.toFile())
@@ -44,6 +48,17 @@ public class GitThemeFetcher implements ThemeFetcher {
                 .setRemote("upstream")
                 .call()) {
                 log.info("Cloned git repo {} to {} successfully", repoUrl, tempDirectory);
+
+                Pair<Ref, RevCommit> latestTag = GitUtils.getLatestTag(git);
+                final var checkoutCommand = git.checkout()
+                    .setName("halo")
+                    .setCreateBranch(true);
+                if (latestTag != null) {
+                    // checkout latest tag
+                    checkoutCommand.setStartPoint(latestTag.getValue());
+                }
+                Ref haloBranch = checkoutCommand.call();
+                log.info("Checkout branch: {}", haloBranch.getName());
             }
 
             // locate theme property location
