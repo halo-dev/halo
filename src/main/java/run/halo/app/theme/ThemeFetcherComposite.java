@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.lang.NonNull;
-import run.halo.app.exception.BadRequestException;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 
 /**
@@ -19,6 +18,11 @@ public class ThemeFetcherComposite implements ThemeFetcher {
      * Theme fetcher container.
      */
     private final List<ThemeFetcher> themeFetchers = new ArrayList<>(4);
+
+    /**
+     * Fallback theme fetcher.
+     */
+    private final ThemeFetcher fallbackFetcher = new GitThemeFetcher();
 
     public ThemeFetcherComposite addFetcher(ThemeFetcher fetcher) {
         this.themeFetchers.add(fetcher);
@@ -47,8 +51,7 @@ public class ThemeFetcherComposite implements ThemeFetcher {
 
     @Override
     public ThemeProperty fetch(Object source) {
-        final var themeFetcher = getThemeFetcher(source)
-                .orElseThrow(() -> new BadRequestException("暂不支持以此方式进行拉取主题！"));
+        final var themeFetcher = getThemeFetcher(source).orElse(fallbackFetcher);
         return themeFetcher.fetch(source);
     }
 
