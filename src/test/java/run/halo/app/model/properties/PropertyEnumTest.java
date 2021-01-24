@@ -1,9 +1,8 @@
 package run.halo.app.model.properties;
 
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
 
 /**
  * @author johnniang

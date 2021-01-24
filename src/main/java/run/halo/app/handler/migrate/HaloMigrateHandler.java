@@ -1,11 +1,10 @@
 package run.halo.app.handler.migrate;
 
+import java.io.IOException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.enums.MigrateType;
 import run.halo.app.service.BackupService;
-
-import java.io.IOException;
 
 /**
  * @author ryanwang

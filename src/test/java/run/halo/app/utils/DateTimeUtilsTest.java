@@ -1,12 +1,19 @@
 package run.halo.app.utils;
 
 
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * DateTimeUtils 测试用例
@@ -22,7 +29,8 @@ class DateTimeUtilsTest {
     void nowTest() {
         final LocalDateTime now = DateTimeUtils.now().withNano(0);
         assertNotNull(now);
-        final LocalDateTime ctt = DateTimeUtils.now(ZoneId.of(ZoneId.SHORT_IDS.get("CTT"))).withNano(0);
+        final LocalDateTime ctt =
+            DateTimeUtils.now(ZoneId.of(ZoneId.SHORT_IDS.get("CTT"))).withNano(0);
         assertNotNull(ctt);
 
         assertEquals(0, Duration.between(now, ctt).toMinutes());
@@ -49,7 +57,8 @@ class DateTimeUtilsTest {
         final String formatTime = DateTimeUtils.formatTime(time1);
         assertEquals("1020", formatTime);
 
-        final String formatTime1 = DateTimeUtils.format(time1, DateTimeFormatter.ofPattern("HH:mm"));
+        final String formatTime1 =
+            DateTimeUtils.format(time1, DateTimeFormatter.ofPattern("HH:mm"));
         assertEquals("10:20", formatTime1);
     }
 
@@ -88,7 +97,8 @@ class DateTimeUtilsTest {
         assertEquals("2020-01-09T13:55", localDateTime.toString());
 
         String time2 = "2020/1/9 13:56";
-        final LocalDateTime dateTime = DateTimeUtils.parse(time2, DateTimeFormatter.ofPattern("yyyy/M/d HH:mm"));
+        final LocalDateTime dateTime =
+            DateTimeUtils.parse(time2, DateTimeFormatter.ofPattern("yyyy/M/d HH:mm"));
         assertEquals("2020-01-09T13:56", dateTime.toString());
     }
 
@@ -130,7 +140,8 @@ class DateTimeUtilsTest {
         /*
          * 小于等于
          */
-        final boolean lessThanOrEqual = DateTimeUtils.isLessThanOrEqual(startInclusive, endInclusive);
+        final boolean lessThanOrEqual =
+            DateTimeUtils.isLessThanOrEqual(startInclusive, endInclusive);
         assertFalse(lessThanOrEqual);
 
         /*

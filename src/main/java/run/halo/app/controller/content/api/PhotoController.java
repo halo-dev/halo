@@ -1,5 +1,8 @@
 package run.halo.app.controller.content.api;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -11,10 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.PhotoDTO;
 import run.halo.app.model.params.PhotoQuery;
 import run.halo.app.service.PhotoService;
-
-import java.util.List;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Content photo controller.
@@ -39,13 +38,15 @@ public class PhotoController {
      * @return all of photos
      */
     @GetMapping(value = "latest")
-    public List<PhotoDTO> listPhotos(@SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
+    public List<PhotoDTO> listPhotos(
+        @SortDefault(sort = "updateTime", direction = Sort.Direction.DESC) Sort sort) {
         return photoService.listDtos(sort);
     }
 
     @GetMapping
-    public Page<PhotoDTO> pageBy(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-            PhotoQuery photoQuery) {
+    public Page<PhotoDTO> pageBy(
+        @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+        PhotoQuery photoQuery) {
         return photoService.pageDtosBy(pageable, photoQuery);
     }
 }

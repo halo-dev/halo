@@ -27,7 +27,7 @@ public class MigrateController {
     private final OptionService optionService;
 
     public MigrateController(MigrateService migrateService,
-            OptionService optionService) {
+        OptionService optionService) {
         this.migrateService = migrateService;
         this.optionService = optionService;
     }

@@ -1,10 +1,9 @@
 package run.halo.app.model.params;
 
-import lombok.Data;
-import run.halo.app.model.enums.MFAType;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import lombok.Data;
+import run.halo.app.model.enums.MFAType;
 
 /**
  * Multi-Factor Auth Param.

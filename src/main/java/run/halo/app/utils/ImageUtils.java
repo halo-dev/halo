@@ -1,17 +1,16 @@
 package run.halo.app.utils;
 
-import lombok.extern.slf4j.Slf4j;
-import net.sf.image4j.codec.ico.ICODecoder;
-import org.springframework.lang.NonNull;
-import run.halo.app.exception.ImageFormatException;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.image4j.codec.ico.ICODecoder;
+import org.springframework.lang.NonNull;
+import run.halo.app.exception.ImageFormatException;
 
 /**
  * @author ryanwang
@@ -22,7 +21,8 @@ public class ImageUtils {
 
     public static final String EXTENSION_ICO = "ico";
 
-    public static BufferedImage getImageFromFile(InputStream is, String extension) throws IOException {
+    public static BufferedImage getImageFromFile(InputStream is, String extension)
+        throws IOException {
         log.debug("Current File type is : [{}]", extension);
 
         if (EXTENSION_ICO.equals(extension)) {
@@ -37,7 +37,8 @@ public class ImageUtils {
     }
 
     @NonNull
-    public static ImageReader getImageReaderFromFile(InputStream is, String formatName) throws IOException {
+    public static ImageReader getImageReaderFromFile(InputStream is, String formatName)
+        throws IOException {
         try {
             Iterator<ImageReader> readerIterator = ImageIO.getImageReadersByFormatName(formatName);
             ImageReader reader = readerIterator.next();

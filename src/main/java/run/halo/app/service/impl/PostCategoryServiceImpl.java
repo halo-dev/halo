@@ -1,5 +1,15 @@
 package run.halo.app.service.impl;
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -23,11 +33,6 @@ import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
-
 /**
  * Post category service implementation.
  *
@@ -37,7 +42,8 @@ import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
  * @date 2019-03-19
  */
 @Service
-public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, Integer> implements PostCategoryService {
+public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, Integer>
+    implements PostCategoryService {
 
     private final PostCategoryRepository postCategoryRepository;
 
@@ -48,8 +54,8 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     private final OptionService optionService;
 
     public PostCategoryServiceImpl(PostCategoryRepository postCategoryRepository,
-            PostRepository postRepository,
-            OptionService optionService) {
+        PostRepository postRepository,
+        OptionService optionService) {
         super(postCategoryRepository);
         this.postCategoryRepository = postCategoryRepository;
         this.postRepository = postRepository;
@@ -92,7 +98,8 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         List<PostCategory> postCategories = postCategoryRepository.findAllByPostIdIn(postIds);
 
         // Fetch category ids
-        Set<Integer> categoryIds = ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId);
+        Set<Integer> categoryIds =
+            ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId);
 
         // Find all categories
         List<Category> categories;
@@ -110,8 +117,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Map<Integer, List<Category>> categoryListMap = new HashMap<>();
 
         // Foreach and collect
-        postCategories.forEach(postCategory -> categoryListMap.computeIfAbsent(postCategory.getPostId(), postId -> new LinkedList<>())
-                .add(categoryMap.get(postCategory.getCategoryId())));
+        postCategories.forEach(postCategory -> categoryListMap
+            .computeIfAbsent(postCategory.getPostId(), postId -> new LinkedList<>())
+            .add(categoryMap.get(postCategory.getCategoryId())));
 
         return categoryListMap;
     }
@@ -132,7 +140,8 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(status, "Post status must not be null");
 
         // Find all post ids
-        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+        Set<Integer> postIds =
+            postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
 
         return postRepository.findAllById(postIds);
     }
@@ -175,7 +184,8 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
             throw new NotFoundException("查询不到该分类的信息").setErrorData(slug);
         }
 
-        Set<Integer> postsIds = postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
+        Set<Integer> postsIds =
+            postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
 
         return postRepository.findAllById(postsIds);
     }
@@ -210,7 +220,8 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(pageable, "Page info must not be null");
 
         // Find all post ids
-        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+        Set<Integer> postIds =
+            postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
 
         return postRepository.findAllByIdIn(postIds, pageable);
     }
@@ -310,33 +321,38 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
 
         // Query category post count
-        Map<Integer, Long> categoryPostCountMap = ServiceUtils.convertToMap(postCategoryRepository.findPostCount(), CategoryPostCountProjection::getCategoryId, CategoryPostCountProjection::getPostCount);
+        Map<Integer, Long> categoryPostCountMap = ServiceUtils
+            .convertToMap(postCategoryRepository.findPostCount(),
+                CategoryPostCountProjection::getCategoryId,
+                CategoryPostCountProjection::getPostCount);
 
         // Convert and return
         return categories.stream()
-                .map(category -> {
-                    // Create category post count dto
-                    CategoryWithPostCountDTO categoryWithPostCountDTO = new CategoryWithPostCountDTO().convertFrom(category);
-                    // Set post count
-                    categoryWithPostCountDTO.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+            .map(category -> {
+                // Create category post count dto
+                CategoryWithPostCountDTO categoryWithPostCountDTO =
+                    new CategoryWithPostCountDTO().convertFrom(category);
+                // Set post count
+                categoryWithPostCountDTO
+                    .setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
 
-                    StringBuilder fullPath = new StringBuilder();
+                StringBuilder fullPath = new StringBuilder();
 
-                    if (optionService.isEnabledAbsolutePath()) {
-                        fullPath.append(optionService.getBlogBaseUrl());
-                    }
+                if (optionService.isEnabledAbsolutePath()) {
+                    fullPath.append(optionService.getBlogBaseUrl());
+                }
 
-                    fullPath.append(URL_SEPARATOR)
-                            .append(optionService.getCategoriesPrefix())
-                            .append(URL_SEPARATOR)
-                            .append(category.getSlug())
-                            .append(optionService.getPathSuffix());
+                fullPath.append(URL_SEPARATOR)
+                    .append(optionService.getCategoriesPrefix())
+                    .append(URL_SEPARATOR)
+                    .append(category.getSlug())
+                    .append(optionService.getPathSuffix());
 
-                    categoryWithPostCountDTO.setFullPath(fullPath.toString());
+                categoryWithPostCountDTO.setFullPath(fullPath.toString());
 
-                    return categoryWithPostCountDTO;
-                })
-                .collect(Collectors.toList());
+                return categoryWithPostCountDTO;
+            })
+            .collect(Collectors.toList());
     }
 
     @Override

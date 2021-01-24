@@ -1,13 +1,12 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.utils.SlugUtils;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Tag param.

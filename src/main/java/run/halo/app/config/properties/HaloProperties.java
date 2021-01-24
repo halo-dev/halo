@@ -1,15 +1,16 @@
 package run.halo.app.config.properties;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import run.halo.app.model.enums.Mode;
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+import static run.halo.app.model.support.HaloConst.TEMP_DIR;
+import static run.halo.app.model.support.HaloConst.USER_HOME;
+import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-
-import static run.halo.app.model.support.HaloConst.*;
-import static run.halo.app.utils.HaloUtils.ensureSuffix;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import run.halo.app.model.enums.Mode;
 
 
 /**
@@ -56,17 +57,20 @@ public class HaloProperties {
     /**
      * Halo backup directory.(Not recommended to modify this config);
      */
-    private String backupDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup" + FILE_SEPARATOR;
+    private String backupDir =
+        ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup" + FILE_SEPARATOR;
 
     /**
      * Halo backup markdown directory.(Not recommended to modify this config);
      */
-    private String backupMarkdownDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup-markdown" + FILE_SEPARATOR;
+    private String backupMarkdownDir =
+        ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-backup-markdown" + FILE_SEPARATOR;
 
     /**
      * Halo data export directory.
      */
-    private String dataExportDir = ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-data-export" + FILE_SEPARATOR;
+    private String dataExportDir =
+        ensureSuffix(TEMP_DIR, FILE_SEPARATOR) + "halo-data-export" + FILE_SEPARATOR;
 
     /**
      * Upload prefix.
@@ -84,19 +88,4 @@ public class HaloProperties {
      * level
      */
     private String cache = "memory";
-
-    private List<String> cacheRedisNodes = new ArrayList<>();
-
-    private String cacheRedisPassword = "";
-
-    /**
-     * hazelcast cache store impl
-     * memory
-     * level
-     */
-    private List<String> hazelcastMembers = new ArrayList<>();
-
-    private String hazelcastGroupName;
-
-    private int initialBackoffSeconds = 5;
 }

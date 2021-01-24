@@ -1,9 +1,13 @@
 package run.halo.app.model.dto.base;
 
-import lombok.*;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.junit.jupiter.api.Test;
 
 /**
  * Output converter test.

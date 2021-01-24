@@ -1,15 +1,14 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Log;
 import run.halo.app.model.enums.LogType;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  * @author johnniang

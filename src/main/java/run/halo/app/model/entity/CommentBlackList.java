@@ -1,10 +1,20 @@
 package run.halo.app.model.entity;
 
-import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
 import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * comment_black_list
@@ -22,7 +32,8 @@ import java.util.Date;
 public class CommentBlackList extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
-    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
+    @GenericGenerator(name = "custom-id",
+        strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
     private Long id;
 
     @Column(name = "ip_address", length = 127, nullable = false)

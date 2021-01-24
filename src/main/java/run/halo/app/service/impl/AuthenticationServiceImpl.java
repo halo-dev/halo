@@ -28,8 +28,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PostCategoryRepository postCategoryRepository;
 
     public AuthenticationServiceImpl(PostCategoryRepository postCategoryRepository,
-            CategoryRepository categoryRepository,
-            AuthorizationService authorizationService
+        CategoryRepository categoryRepository,
+        AuthorizationService authorizationService
     ) {
         this.postCategoryRepository = postCategoryRepository;
         this.categoryRepository = categoryRepository;

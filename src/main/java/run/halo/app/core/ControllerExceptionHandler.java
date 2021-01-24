@@ -1,5 +1,7 @@
 package run.halo.app.core;
 
+import java.util.Map;
+import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -20,21 +22,20 @@ import run.halo.app.model.support.BaseResponse;
 import run.halo.app.utils.ExceptionUtils;
 import run.halo.app.utils.ValidationUtils;
 
-import javax.validation.ConstraintViolationException;
-import java.util.Map;
-
 /**
  * Exception handler of controller.
  *
  * @author johnniang
  */
-@RestControllerAdvice(value = {"run.halo.app.controller.admin.api", "run.halo.app.controller.content.api"})
+@RestControllerAdvice(value = {"run.halo.app.controller.admin.api",
+    "run.halo.app.controller.content.api"})
 @Slf4j
 public class ControllerExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<?> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+    public BaseResponse<?> handleDataIntegrityViolationException(
+        DataIntegrityViolationException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         if (e.getCause() instanceof org.hibernate.exception.ConstraintViolationException) {
             baseResponse = handleBaseException(e.getCause());
@@ -45,9 +46,11 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+    public BaseResponse<?> handleMissingServletRequestParameterException(
+        MissingServletRequestParameterException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
-        baseResponse.setMessage(String.format("请求字段缺失, 类型为 %s，名称为 %s", e.getParameterType(), e.getParameterName()));
+        baseResponse.setMessage(
+            String.format("请求字段缺失, 类型为 %s，名称为 %s", e.getParameterType(), e.getParameterName()));
         return baseResponse;
     }
 
@@ -63,18 +66,21 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public BaseResponse<?> handleMethodArgumentNotValidException(
+        MethodArgumentNotValidException e) {
         BaseResponse<Map<String, String>> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         baseResponse.setMessage("字段验证错误，请完善后重试！");
-        Map<String, String> errMap = ValidationUtils.mapWithFieldError(e.getBindingResult().getFieldErrors());
+        Map<String, String> errMap =
+            ValidationUtils.mapWithFieldError(e.getBindingResult().getFieldErrors());
         baseResponse.setData(errMap);
         return baseResponse;
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<?> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    public BaseResponse<?> handleHttpRequestMethodNotSupportedException(
+        HttpRequestMethodNotSupportedException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         return baseResponse;
@@ -82,7 +88,8 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException.class)
     @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    public BaseResponse<?> handleHttpMediaTypeNotAcceptableException(HttpMediaTypeNotAcceptableException e) {
+    public BaseResponse<?> handleHttpMediaTypeNotAcceptableException(
+        HttpMediaTypeNotAcceptableException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.NOT_ACCEPTABLE.value());
         return baseResponse;
@@ -90,7 +97,8 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public BaseResponse<?> handleHttpMessageNotReadableException(
+        HttpMessageNotReadableException e) {
         BaseResponse<?> baseResponse = handleBaseException(e);
         baseResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         baseResponse.setMessage("缺失请求主体");

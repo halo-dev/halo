@@ -3,10 +3,9 @@ package run.halo.app.core;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import java.io.IOException;
 import org.springframework.data.domain.Page;
 import run.halo.app.model.support.CommentPage;
-
-import java.io.IOException;
 
 /**
  * Custom serializer for Page object.
@@ -17,7 +16,8 @@ import java.io.IOException;
 public class PageJacksonSerializer extends JsonSerializer<Page> {
 
     @Override
-    public void serialize(Page page, JsonGenerator generator, SerializerProvider serializers) throws IOException {
+    public void serialize(Page page, JsonGenerator generator, SerializerProvider serializers)
+        throws IOException {
         generator.writeStartObject();
 
         generator.writeObjectField("content", page.getContent());
