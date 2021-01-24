@@ -28,7 +28,7 @@ public enum ThemeFileScanner {
      * Lists theme folder by absolute path.
      *
      * @param absolutePath absolutePath
-     * @return List<ThemeFile> a list of theme files
+     * @return a list of theme files
      */
     @NonNull
     public List<ThemeFile> scan(@NonNull String absolutePath) {

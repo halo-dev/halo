@@ -29,9 +29,9 @@ import run.halo.app.exception.BadRequestException;
 @Disabled("Due to time-consumption")
 class GithubTest {
 
-    final static String API_URL =
+    static final String API_URL =
         "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
-    final static String HALO_ADMIN_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
+    static final String HALO_ADMIN_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
     final Path tempPath;
     final RestTemplate restTemplate;
 
@@ -52,11 +52,11 @@ class GithubTest {
         log.debug("Assets: " + assetsObject);
         if (assetsObject instanceof List) {
             List assets = (List) assetsObject;
-            Map assetMap = (Map) assets.stream().filter(aAsset -> {
-                if (!(aAsset instanceof Map)) {
+            Map assetMap = (Map) assets.stream().filter(anAsset -> {
+                if (!(anAsset instanceof Map)) {
                     return false;
                 }
-                Map aAssetMap = (Map) aAsset;
+                Map aAssetMap = (Map) anAsset;
                 Object name = aAssetMap.getOrDefault("name", "");
                 return name.toString().matches(HALO_ADMIN_REGEX);
             })

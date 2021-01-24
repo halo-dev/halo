@@ -189,7 +189,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * Get post by slug
      *
      * @param slug post slug
-     * @return Optional<POST> post or empty
+     * @return post or empty
      */
     Optional<POST> getBySlug(@NonNull String slug);
 

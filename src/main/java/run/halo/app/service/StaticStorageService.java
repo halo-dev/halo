@@ -23,7 +23,7 @@ public interface StaticStorageService {
     /**
      * Lists static folder.
      *
-     * @return List<StaticFile> static file list
+     * @return static file list
      */
     List<StaticFile> listStaticFolder();
 
