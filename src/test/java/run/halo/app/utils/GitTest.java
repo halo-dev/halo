@@ -244,18 +244,19 @@ class GitTest {
                 .forEach(
                     ref -> log.debug("ref: {}, object id: {}", ref.getName(), ref.getObjectId()));
 
-            ObjectId objectId = ObjectId.fromString("51bf554e58f38cff22bb93f8e6cd8f8b72aa2d64");
-            RevWalk revWalk = new RevWalk(git.getRepository());
-            revWalk.reset();
-            revWalk.setTreeFilter(TreeFilter.ANY_DIFF);
-            revWalk.sort(RevSort.TOPO, true);
-            revWalk.sort(RevSort.COMMIT_TIME_DESC, true);
-            RevCommit revCommit = revWalk.parseCommit(objectId);
-            log.debug("Found commit: {} for object: {}", revCommit, objectId);
-            log.debug("Commit details: {} {} {}",
-                revCommit.getName(),
-                revCommit.getFullMessage(),
-                new Timestamp(revCommit.getCommitTime() * 1000L));
+            final var objectId = ObjectId.fromString("51bf554e58f38cff22bb93f8e6cd8f8b72aa2d64");
+            try (final var revWalk = new RevWalk(git.getRepository())) {
+                revWalk.reset();
+                revWalk.setTreeFilter(TreeFilter.ANY_DIFF);
+                revWalk.sort(RevSort.TOPO, true);
+                revWalk.sort(RevSort.COMMIT_TIME_DESC, true);
+                RevCommit revCommit = revWalk.parseCommit(objectId);
+                log.debug("Found commit: {} for object: {}", revCommit, objectId);
+                log.debug("Commit details: {} {} {}",
+                    revCommit.getName(),
+                    revCommit.getFullMessage(),
+                    new Timestamp(revCommit.getCommitTime() * 1000L));
+            }
             git.tagList()
                 .call()
                 .forEach(
