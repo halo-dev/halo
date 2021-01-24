@@ -1,5 +1,8 @@
 package run.halo.app.controller.content.model;
 
+import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
+import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +20,6 @@ import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.CategoryService;
@@ -81,10 +83,10 @@ public class PostModel {
 
         if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
             model.addAttribute("slug", post.getSlug());
-            if (themeService.templateExists(HaloConst.POST_PASSWORD_TEMPLATE + HaloConst.SUFFIX_FTL)) {
-                return themeService.render(HaloConst.POST_PASSWORD_TEMPLATE);
+            if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
+                return themeService.render(POST_PASSWORD_TEMPLATE);
             }
-            return "common/template/" + HaloConst.POST_PASSWORD_TEMPLATE;
+            return "common/template/" + POST_PASSWORD_TEMPLATE;
         }
 
         if (StringUtils.isEmpty(token)) {
@@ -137,7 +139,7 @@ public class PostModel {
         model.addAttribute("metas", postMetaService.convertToMap(metas));
 
         if (themeService.templateExists(
-            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 

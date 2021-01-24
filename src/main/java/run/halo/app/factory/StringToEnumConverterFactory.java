@@ -1,8 +1,8 @@
 package run.halo.app.factory;
 
-import org.springframework.lang.NonNull;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**

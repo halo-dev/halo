@@ -1,10 +1,6 @@
 package run.halo.app.service.impl;
 
 import static run.halo.app.model.support.HaloConst.DATABASE_PRODUCT_NAME;
-import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELATIVE_BACKUP_PATH;
-import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELATIVE_PATH;
-import static run.halo.app.model.support.HaloConst.HALO_ADMIN_RELEASES_LATEST;
-import static run.halo.app.model.support.HaloConst.HALO_ADMIN_VERSION_REGEX;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
@@ -14,18 +10,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -63,7 +54,6 @@ import run.halo.app.service.PostService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.UserService;
-import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.TwoFactorAuthUtils;
 
@@ -368,111 +358,6 @@ public class AdminServiceImpl implements AdminService {
         return buildAuthToken(user);
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void updateAdminAssets() {
-        // Request github api
-        ResponseEntity<Map> responseEntity =
-            restTemplate.getForEntity(HaloConst.HALO_ADMIN_RELEASES_LATEST, Map.class);
-
-        if (responseEntity.getStatusCode().isError() || responseEntity.getBody() == null) {
-            log.debug("Failed to request remote url: [{}]", HALO_ADMIN_RELEASES_LATEST);
-            throw new ServiceException("系统无法访问到 Github 的 API")
-                .setErrorData(HALO_ADMIN_RELEASES_LATEST);
-        }
-
-        Object assetsObject = responseEntity.getBody().get("assets");
-
-        if (!(assetsObject instanceof List)) {
-            throw new ServiceException("Github API 返回内容有误").setErrorData(assetsObject);
-        }
-
-        try {
-            List<?> assets = (List<?>) assetsObject;
-            Map assetMap = (Map) assets.stream()
-                .filter(assetPredicate())
-                .findFirst()
-                .orElseThrow(() -> new ServiceException("Halo admin 最新版暂无资源文件，请稍后再试"));
-
-            Object browserDownloadUrl = assetMap.getOrDefault("browser_download_url", "");
-            // Download the assets
-            ResponseEntity<byte[]> downloadResponseEntity =
-                restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
-
-            if (downloadResponseEntity.getStatusCode().isError()
-                || downloadResponseEntity.getBody() == null) {
-                throw new ServiceException(
-                    "Failed to request remote url: " + browserDownloadUrl.toString())
-                    .setErrorData(browserDownloadUrl.toString());
-            }
-
-            String adminTargetName = haloProperties.getWorkDir() + HALO_ADMIN_RELATIVE_PATH;
-
-            Path adminPath = Paths.get(adminTargetName);
-            Path adminBackupPath =
-                Paths.get(haloProperties.getWorkDir(), HALO_ADMIN_RELATIVE_BACKUP_PATH);
-
-            backupAndClearAdminAssetsIfPresent(adminPath, adminBackupPath);
-
-            // Create temp folder
-            Path assetTempPath = FileUtils.createTempDirectory()
-                .resolve(assetMap.getOrDefault("name", "halo-admin-latest.zip").toString());
-
-            // Unzip
-            FileUtils.unzip(downloadResponseEntity.getBody(), assetTempPath);
-
-            // find root folder
-            Path adminRootPath = FileUtils.findRootPath(assetTempPath,
-                path -> StringUtils.equalsIgnoreCase("index.html", path.getFileName().toString()))
-                .orElseThrow(() -> new BadRequestException("无法准确定位到压缩包的根路径，请确认包含 index.html 文件。"));
-
-            // Copy it to template/admin folder
-            FileUtils.copyFolder(adminRootPath, adminPath);
-        } catch (Throwable t) {
-            throw new ServiceException("更新 Halo admin 失败，" + t.getMessage(), t);
-        }
-    }
-
-    @NonNull
-    @SuppressWarnings("unchecked")
-    private Predicate<Object> assetPredicate() {
-        return asset -> {
-            if (!(asset instanceof Map)) {
-                return false;
-            }
-            Map aAssetMap = (Map) asset;
-            // Get content-type
-            String contentType = aAssetMap.getOrDefault("content_type", "").toString();
-
-            Object name = aAssetMap.getOrDefault("name", "");
-            return name.toString().matches(HALO_ADMIN_VERSION_REGEX)
-                && "application/zip".equalsIgnoreCase(contentType);
-        };
-    }
-
-    private void backupAndClearAdminAssetsIfPresent(@NonNull Path sourcePath,
-        @NonNull Path backupPath) throws IOException {
-        Assert.notNull(sourcePath, "Source path must not be null");
-        Assert.notNull(backupPath, "Backup path must not be null");
-
-        if (!FileUtils.isEmpty(sourcePath)) {
-            // Clone this assets
-            Path adminPathBackup =
-                Paths.get(haloProperties.getWorkDir(), HALO_ADMIN_RELATIVE_BACKUP_PATH);
-
-            // Delete backup
-            FileUtils.deleteFolder(backupPath);
-
-            // Copy older assets into backup
-            FileUtils.copyFolder(sourcePath, backupPath);
-
-            // Delete older assets
-            FileUtils.deleteFolder(sourcePath);
-        } else {
-            FileUtils.createIfAbsent(sourcePath);
-        }
-    }
-
     /**
      * Builds authentication token.
      *
@@ -562,10 +447,7 @@ public class AdminServiceImpl implements AdminService {
 
         Collections.reverse(linesArray);
 
-        linesArray.forEach(line -> {
-            result.append(line)
-                .append(StringUtils.LF);
-        });
+        linesArray.forEach(line -> result.append(line).append(StringUtils.LF));
 
         return result.toString();
     }
