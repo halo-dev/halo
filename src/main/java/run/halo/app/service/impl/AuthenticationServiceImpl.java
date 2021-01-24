@@ -78,11 +78,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return doCategoryAuthentication(idToCategoryMap, accessPermissionStore, categoryId, password);
     }
 
-    private boolean doCategoryAuthentication(
-            Map<Integer, Category> idToCategoryMap,
+    private boolean doCategoryAuthentication(Map<Integer, Category> idToCategoryMap,
             Set<String> accessPermissionStore,
-            Integer categoryId, String password
-    ) {
+            Integer categoryId, String password) {
 
         Category category = idToCategoryMap.get(categoryId);
 

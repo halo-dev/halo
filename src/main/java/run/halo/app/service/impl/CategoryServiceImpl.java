@@ -216,7 +216,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     public Category getBySlug(String slug) {
         Optional<Category> bySlug = categoryRepository.getBySlug(slug);
-        if (!bySlug.isPresent()) {
+        if (bySlug.isEmpty()) {
             return null;
         }
 
@@ -231,12 +231,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
     @Override
     public Category getBySlugOfNonNull(String slug) {
-        Optional<Category> bySlug = categoryRepository.getBySlug(slug);
-        if (!bySlug.isPresent()) {
-            throw new NotFoundException("查询不到该分类的信息").setErrorData(slug);
-        }
 
-        Category category = bySlug.get();
+        Category category = categoryRepository
+                .getBySlug(slug)
+                .orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
 
         if (authenticationService.categoryAuthentication(category.getId(), null)) {
             return category;
@@ -253,7 +251,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     @Override
     public Category getByName(String name) {
         Optional<Category> byName = categoryRepository.getByName(name);
-        if (!byName.isPresent()) {
+        if (byName.isEmpty()) {
             return null;
         }
 
@@ -300,14 +298,11 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
             if (StrUtil.isNotBlank(post.getPassword())) {
                 post.setStatus(PostStatus.INTIMATE);
             } else {
-                List<Integer> categoryIdList = postCategoryService.listByPostId(postId)
-                        .stream().map(PostCategory::getCategoryId).collect(Collectors.toList());
-                for (Integer categoryId : categoryIdList) {
-                    if (categoryHasEncrypt(categoryId)) {
-                        post.setStatus(PostStatus.INTIMATE);
-                        break;
-                    }
-                }
+                postCategoryService.listByPostId(postId)
+                        .stream().map(PostCategory::getCategoryId)
+                        .filter(this::categoryHasEncrypt)
+                        .findAny()
+                        .ifPresent(id -> post.setStatus(PostStatus.INTIMATE));
             }
 
             if (post.getStatus() == null) {
