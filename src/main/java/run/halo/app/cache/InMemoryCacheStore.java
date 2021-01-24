@@ -1,16 +1,15 @@
 package run.halo.app.cache;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
-
-import javax.annotation.PreDestroy;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 
 /**
  * In-memory cache store.
@@ -23,12 +22,13 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     /**
      * Cleaner schedule period. (ms)
      */
-    private final static long PERIOD = 60 * 1000;
+    private static final long PERIOD = 60 * 1000;
 
     /**
      * Cache container.
      */
-    private final static ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER =
+        new ConcurrentHashMap<>();
 
     private final Timer timer;
 
@@ -59,7 +59,8 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
         // Put the cache wrapper
         CacheWrapper<String> putCacheWrapper = CACHE_CONTAINER.put(key, cacheWrapper);
 
-        log.debug("Put [{}] cache result: [{}], original cache wrapper: [{}]", key, putCacheWrapper, cacheWrapper);
+        log.debug("Put [{}] cache result: [{}], original cache wrapper: [{}]", key, putCacheWrapper,
+            cacheWrapper);
     }
 
     @Override
@@ -75,7 +76,8 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
             Optional<String> valueOptional = get(key);
 
             if (valueOptional.isPresent()) {
-                log.warn("Failed to put the cache, because the key: [{}] has been present already", key);
+                log.warn("Failed to put the cache, because the key: [{}] has been present already",
+                    key);
                 return false;
             }
 

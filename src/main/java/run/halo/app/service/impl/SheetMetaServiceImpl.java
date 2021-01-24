@@ -18,14 +18,15 @@ import run.halo.app.service.SheetMetaService;
  */
 @Slf4j
 @Service
-public class SheetMetaServiceImpl extends BaseMetaServiceImpl<SheetMeta> implements SheetMetaService {
+public class SheetMetaServiceImpl extends BaseMetaServiceImpl<SheetMeta>
+    implements SheetMetaService {
 
     private final SheetMetaRepository sheetMetaRepository;
 
     private final SheetRepository sheetRepository;
 
     public SheetMetaServiceImpl(SheetMetaRepository sheetMetaRepository,
-            SheetRepository sheetRepository) {
+        SheetRepository sheetRepository) {
         super(sheetMetaRepository);
         this.sheetMetaRepository = sheetMetaRepository;
         this.sheetRepository = sheetRepository;
@@ -34,6 +35,6 @@ public class SheetMetaServiceImpl extends BaseMetaServiceImpl<SheetMeta> impleme
     @Override
     public void validateTarget(@NonNull Integer sheetId) {
         sheetRepository.findById(sheetId)
-                .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
+            .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
     }
 }

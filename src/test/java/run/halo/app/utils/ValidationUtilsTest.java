@@ -1,17 +1,20 @@
 package run.halo.app.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotBlank;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.junit.jupiter.api.Test;
 
 /**
  * Validation utils test.
@@ -29,7 +32,7 @@ class ValidationUtilsTest {
         validateObjectAssert(violations);
 
         ConstraintViolationException exception = assertThrows(ConstraintViolationException.class,
-                () -> ValidationUtils.validate(car));
+            () -> ValidationUtils.validate(car));
         validateObjectAssert(exception.getConstraintViolations());
     }
 
@@ -43,11 +46,11 @@ class ValidationUtilsTest {
     @Test
     void validateListTest() {
         List<Car> cars = Arrays.asList(new Car(""),
-                new Car("car name"),
-                new Car(null));
+            new Car("car name"),
+            new Car(null));
 
         ConstraintViolationException exception = assertThrows(ConstraintViolationException.class,
-                () -> ValidationUtils.validate(cars));
+            () -> ValidationUtils.validate(cars));
 
         validateIteratorTest(exception.getConstraintViolations());
     }

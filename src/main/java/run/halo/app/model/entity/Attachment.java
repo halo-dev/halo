@@ -1,13 +1,18 @@
 package run.halo.app.model.entity;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 import run.halo.app.model.enums.AttachmentType;
-
-import javax.persistence.*;
 
 /**
  * Attachment entity
@@ -18,15 +23,16 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "attachments", indexes = {
-        @Index(name = "attachments_media_type", columnList = "media_type"),
-        @Index(name = "attachments_create_time", columnList = "create_time")})
+    @Index(name = "attachments_media_type", columnList = "media_type"),
+    @Index(name = "attachments_create_time", columnList = "create_time")})
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class Attachment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
-    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support"
+        + ".CustomIdGenerator")
     private Integer id;
 
     /**

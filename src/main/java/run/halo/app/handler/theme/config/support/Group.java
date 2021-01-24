@@ -1,8 +1,7 @@
 package run.halo.app.handler.theme.config.support;
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * Theme configuration: group entity.

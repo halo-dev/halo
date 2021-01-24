@@ -1,5 +1,7 @@
 package run.halo.app.controller.content.model;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,9 +14,11 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.*;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import run.halo.app.service.CategoryService;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.PostCategoryService;
+import run.halo.app.service.PostService;
+import run.halo.app.service.ThemeService;
 
 /**
  * Category Model.
@@ -35,7 +39,9 @@ public class CategoryModel {
 
     private final OptionService optionService;
 
-    public CategoryModel(CategoryService categoryService, ThemeService themeService, PostCategoryService postCategoryService, PostService postService, OptionService optionService) {
+    public CategoryModel(CategoryService categoryService, ThemeService themeService,
+        PostCategoryService postCategoryService, PostService postService,
+        OptionService optionService) {
         this.categoryService = categoryService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -60,8 +66,8 @@ public class CategoryModel {
      * List category posts.
      *
      * @param model model
-     * @param slug  slug
-     * @param page  current page
+     * @param slug slug
+     * @param page current page
      * @return template name
      */
     public String listPost(Model model, String slug, Integer page) {
@@ -70,9 +76,10 @@ public class CategoryModel {
         CategoryDTO categoryDTO = categoryService.convertTo(category);
 
         final Pageable pageable = PageRequest.of(page - 1,
-                optionService.getArchivesPageSize(),
-                Sort.by(DESC, "topPriority", "createTime"));
-        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
+            optionService.getArchivesPageSize(),
+            Sort.by(DESC, "topPriority", "createTime"));
+        Page<Post> postPage =
+            postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         // Generate meta description.

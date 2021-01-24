@@ -1,9 +1,8 @@
 package run.halo.app.event;
 
+import java.nio.file.Path;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
-
-import java.nio.file.Path;
 
 /**
  * @author ryanwang
@@ -18,7 +17,7 @@ public class StaticStorageChangedEvent extends ApplicationEvent {
      * Create a new {@code ApplicationEvent}.
      *
      * @param source the object on which the event initially occurred or with
-     *               which the event is associated (never {@code null})
+     * which the event is associated (never {@code null})
      */
     public StaticStorageChangedEvent(Object source, Path staticPath) {
         super(source);

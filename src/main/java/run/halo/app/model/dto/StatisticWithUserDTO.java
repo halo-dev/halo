@@ -12,7 +12,8 @@ import run.halo.app.model.dto.base.OutputConverter;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class StatisticWithUserDTO extends StatisticDTO implements OutputConverter<StatisticWithUserDTO, StatisticDTO> {
+public class StatisticWithUserDTO extends StatisticDTO
+    implements OutputConverter<StatisticWithUserDTO, StatisticDTO> {
 
     private UserDTO user;
 }

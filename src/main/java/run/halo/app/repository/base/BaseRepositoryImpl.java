@@ -1,5 +1,17 @@
 package run.halo.app.repository.base;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.ParameterExpression;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,31 +26,25 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.annotation.SensitiveConceal;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Implementation of base repository.
  *
  * @param <DOMAIN> domain type
- * @param <ID>     id type
+ * @param <ID> id type
  * @author johnniang
  * @author ryanwang
  * @date 2019-03-15
  */
 @Slf4j
-public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, ID> implements BaseRepository<DOMAIN, ID> {
+public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, ID>
+    implements BaseRepository<DOMAIN, ID> {
 
     private final JpaEntityInformation<DOMAIN, ID> entityInformation;
 
     private final EntityManager entityManager;
 
-    public BaseRepositoryImpl(JpaEntityInformation<DOMAIN, ID> entityInformation, EntityManager entityManager) {
+    public BaseRepositoryImpl(JpaEntityInformation<DOMAIN, ID> entityInformation,
+        EntityManager entityManager) {
         super(entityInformation, entityManager);
         this.entityInformation = entityInformation;
         this.entityManager = entityManager;
@@ -48,7 +54,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
      * Executes a count query and transparently sums up all values returned.
      *
      * @param query must not be {@literal null}.
-     * @return
+     * @return count
      */
     private static long executeCountQuery(TypedQuery<Long> query) {
 
@@ -67,7 +73,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
     /**
      * Finds all domain by id list and the specified sort.
      *
-     * @param ids  id list of domain must not be null
+     * @param ids id list of domain must not be null
      * @param sort the specified sort must not be null
      * @return a list of domains
      */
@@ -105,16 +111,19 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         }
 
         if (entityInformation.hasCompositeId()) {
-            throw new UnsupportedOperationException("Unsupported find all by composite id with page info");
+            throw new UnsupportedOperationException(
+                "Unsupported find all by composite id with page info");
         }
 
         ByIdsSpecification<DOMAIN> specification = new ByIdsSpecification<>(entityInformation);
-        TypedQuery<DOMAIN> query = super.getQuery(specification, pageable).setParameter(specification.parameter, ids);
-        TypedQuery<Long> countQuery = getCountQuery(specification, getDomainClass()).setParameter(specification.parameter, ids);
+        TypedQuery<DOMAIN> query =
+            super.getQuery(specification, pageable).setParameter(specification.parameter, ids);
+        TypedQuery<Long> countQuery = getCountQuery(specification, getDomainClass())
+            .setParameter(specification.parameter, ids);
 
-        return pageable.isUnpaged() ?
-                new PageImpl<>(query.getResultList())
-                : readPage(query, getDomainClass(), pageable, countQuery);
+        return pageable.isUnpaged()
+            ? new PageImpl<>(query.getResultList())
+            : readPage(query, getDomainClass(), pageable, countQuery);
     }
 
     /**
@@ -138,7 +147,8 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         return domains.size();
     }
 
-    protected <S extends DOMAIN> Page<S> readPage(TypedQuery<S> query, Class<S> domainClass, Pageable pageable, TypedQuery<Long> countQuery) {
+    protected <S extends DOMAIN> Page<S> readPage(TypedQuery<S> query, Class<S> domainClass,
+        Pageable pageable, TypedQuery<Long> countQuery) {
 
         if (pageable.isPaged()) {
             query.setFirstResult((int) pageable.getOffset());
@@ -146,7 +156,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         }
 
         return PageableExecutionUtils.getPage(query.getResultList(), pageable,
-                () -> executeCountQuery(countQuery));
+            () -> executeCountQuery(countQuery));
     }
 
     private static final class ByIdsSpecification<T> implements Specification<T> {

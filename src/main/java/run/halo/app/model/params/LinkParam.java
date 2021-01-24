@@ -1,13 +1,12 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Link;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Link param.

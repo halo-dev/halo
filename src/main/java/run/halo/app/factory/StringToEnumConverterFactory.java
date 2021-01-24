@@ -1,8 +1,8 @@
 package run.halo.app.factory;
 
-import org.springframework.lang.NonNull;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,7 +19,7 @@ public class StringToEnumConverterFactory implements ConverterFactory<String, En
     }
 
     private static class StringToEnumConverter<T extends Enum<T>>
-            implements Converter<String, T> {
+        implements Converter<String, T> {
 
         private final Class<T> enumType;
 

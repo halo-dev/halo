@@ -1,5 +1,13 @@
 package run.halo.app.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -14,9 +22,6 @@ import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BaseMetaService;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 /**
  * Base meta service implementation.
  *
@@ -25,7 +30,8 @@ import java.util.stream.Collectors;
  * @date 2019-08-04
  */
 @Slf4j
-public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends AbstractCrudService<META, Long> implements BaseMetaService<META> {
+public abstract class BaseMetaServiceImpl<META extends BaseMeta>
+    extends AbstractCrudService<META, Long> implements BaseMetaService<META> {
 
     private final BaseMetaRepository<META> baseMetaRepository;
 
@@ -49,7 +55,8 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
 
         // Save post metas
         metas.forEach(postMeta -> {
-            if (StringUtils.isNotEmpty(postMeta.getValue()) && StringUtils.isNotEmpty(postMeta.getKey())) {
+            if (StringUtils.isNotEmpty(postMeta.getValue())
+                && StringUtils.isNotEmpty(postMeta.getKey())) {
                 postMeta.setPostId(postId);
                 baseMetaRepository.save(postMeta);
             }
@@ -80,7 +87,8 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
         Map<Integer, List<META>> postMetaListMap = new HashMap<>();
 
         // Foreach and collect
-        metas.forEach(meta -> postMetaListMap.computeIfAbsent(meta.getPostId(), postId -> new LinkedList<>())
+        metas.forEach(
+            meta -> postMetaListMap.computeIfAbsent(meta.getPostId(), postId -> new LinkedList<>())
                 .add(postMetaMap.get(meta.getId())));
 
         return postMetaListMap;
@@ -131,7 +139,7 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta> extends Abstrac
         }
 
         return postMetaList.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 }

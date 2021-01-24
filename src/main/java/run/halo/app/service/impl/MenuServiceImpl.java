@@ -1,5 +1,12 @@
 package run.halo.app.service.impl;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -15,9 +22,6 @@ import run.halo.app.repository.MenuRepository;
 import run.halo.app.service.MenuService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * MenuService implementation class.
@@ -53,7 +57,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         Set<String> teams = ServiceUtils.fetchProperty(menus, MenuDTO::getTeam);
 
         // Convert to team menu list map (Key: team, value: menu list)
-        Map<String, List<MenuDTO>> teamMenuListMap = ServiceUtils.convertToListMap(teams, menus, MenuDTO::getTeam);
+        Map<String, List<MenuDTO>> teamMenuListMap =
+            ServiceUtils.convertToListMap(teams, menus, MenuDTO::getTeam);
 
         List<MenuTeamVO> result = new LinkedList<>();
 
@@ -74,7 +79,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     @Override
     public List<MenuDTO> listByTeam(@NonNull String team, Sort sort) {
         List<Menu> menus = menuRepository.findByTeam(team, sort);
-        return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu)).collect(Collectors.toList());
+        return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -148,7 +154,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
      * Concrete menu tree.
      *
      * @param parentMenu parent menu vo must not be null
-     * @param menus      a list of menu
+     * @param menus a list of menu
      */
     private void concreteTree(MenuVO parentMenu, List<Menu> menus) {
         Assert.notNull(parentMenu, "Parent menu must not be null");
@@ -206,8 +212,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         }
 
         return menus.stream()
-                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
-                .collect(Collectors.toList());
+            .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+            .collect(Collectors.toList());
     }
 
     @Deprecated

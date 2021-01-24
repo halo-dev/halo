@@ -1,6 +1,9 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -21,10 +24,6 @@ import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.repository.base.BaseRepositoryImpl;
 import run.halo.app.utils.HttpClientUtils;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * Halo configuration.
  *
@@ -35,7 +34,8 @@ import java.security.NoSuchAlgorithmException;
 @EnableScheduling
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(HaloProperties.class)
-@EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass = BaseRepositoryImpl.class)
+@EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass =
+    BaseRepositoryImpl.class)
 public class HaloConfiguration {
 
     @Autowired
@@ -49,9 +49,10 @@ public class HaloConfiguration {
 
     @Bean
     public RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
-            throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate httpsRestTemplate = builder.build();
-        httpsRestTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
+        httpsRestTemplate.setRequestFactory(
+            new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
                 (int) haloProperties.getDownloadTimeout().toMillis())));
         return httpsRestTemplate;
     }
