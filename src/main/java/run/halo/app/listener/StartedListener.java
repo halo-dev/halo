@@ -21,10 +21,10 @@ import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.config.properties.HaloProperties;
@@ -42,7 +42,7 @@ import run.halo.app.utils.FileUtils;
  * @date 2018-12-05
  */
 @Slf4j
-@Configuration
+@Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class StartedListener implements ApplicationListener<ApplicationStartedEvent> {
 
@@ -71,8 +71,8 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         } catch (SQLException e) {
             log.error("Failed to migrate database!", e);
         }
-        this.initThemes();
         this.initDirectory();
+        this.initThemes();
         this.printStartInfo();
     }
 
