@@ -1,5 +1,34 @@
 <template>
-  <div>
+  <page-view
+    affix
+    :title="postToStage.title?postToStage.title:'新文章'"
+  >
+    <template slot="extra">
+      <a-space>
+        <ReactiveButton
+          type="danger"
+          @click="handleSaveDraft(false)"
+          @callback="draftSavederrored = false"
+          :loading="draftSaving"
+          :errored="draftSavederrored"
+          text="保存草稿"
+          loadedText="保存成功"
+          erroredText="保存失败"
+        ></ReactiveButton>
+        <a-button
+          @click="handlePreview"
+          :loading="previewSaving"
+        >预览</a-button>
+        <a-button
+          type="primary"
+          @click="postSettingVisible = true"
+        >发布</a-button>
+        <a-button
+          type="dashed"
+          @click="attachmentDrawerVisible = true"
+        >附件库</a-button>
+      </a-space>
+    </template>
     <a-row :gutter="12">
       <a-col :span="24">
         <div class="mb-4">
@@ -41,34 +70,7 @@
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
-
-    <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%' }">
-      <a-space>
-        <ReactiveButton
-          type="danger"
-          @click="handleSaveDraft(false)"
-          @callback="draftSavederrored = false"
-          :loading="draftSaving"
-          :errored="draftSavederrored"
-          text="保存草稿"
-          loadedText="保存成功"
-          erroredText="保存失败"
-        ></ReactiveButton>
-        <a-button
-          @click="handlePreview"
-          :loading="previewSaving"
-        >预览</a-button>
-        <a-button
-          type="primary"
-          @click="postSettingVisible = true"
-        >发布</a-button>
-        <a-button
-          type="dashed"
-          @click="attachmentDrawerVisible = true"
-        >附件库</a-button>
-      </a-space>
-    </footer-tool-bar>
-  </div>
+  </page-view>
 </template>
 
 <script>
@@ -78,8 +80,8 @@ import { datetimeFormat } from '@/utils/datetime'
 
 import PostSettingDrawer from './components/PostSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
-import FooterToolBar from '@/components/FooterToolbar'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
+import { PageView } from '@/layouts'
 // import RichTextEditor from '@/components/editor/RichTextEditor'
 
 import postApi from '@/api/post'
@@ -87,9 +89,9 @@ export default {
   mixins: [mixin, mixinDevice],
   components: {
     PostSettingDrawer,
-    FooterToolBar,
     AttachmentDrawer,
     MarkdownEditor,
+    PageView,
     // RichTextEditor
   },
   data() {

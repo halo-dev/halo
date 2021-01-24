@@ -21,8 +21,8 @@ export const asyncRouterMap = [
       {
         path: '/posts',
         name: 'Posts',
+        component: BlankLayout,
         redirect: '/posts/list',
-        component: PageView,
         meta: { title: '文章', icon: 'form' },
         children: [
           {
@@ -33,9 +33,16 @@ export const asyncRouterMap = [
           },
           {
             path: '/posts/write',
-            name: 'PostEdit',
+            name: 'PostWrite',
             component: () => import('@/views/post/PostEdit'),
             meta: { title: '写文章', hiddenHeaderContent: false, keepAlive: false }
+          },
+          {
+            path: '/posts/edit',
+            name: 'PostEdit',
+            hidden: true,
+            component: () => import('@/views/post/PostEdit'),
+            meta: { title: '编辑文章', hiddenHeaderContent: false, keepAlive: false }
           },
           {
             path: '/categories',
@@ -56,7 +63,7 @@ export const asyncRouterMap = [
       {
         path: '/sheets',
         name: 'Sheets',
-        component: PageView,
+        component: BlankLayout,
         redirect: '/sheets/list',
         meta: { title: '页面', icon: 'read' },
         children: [
@@ -68,9 +75,16 @@ export const asyncRouterMap = [
           },
           {
             path: '/sheets/write',
-            name: 'SheetEdit',
+            name: 'SheetWrite',
             component: () => import('@/views/sheet/SheetEdit'),
             meta: { title: '新建页面', hiddenHeaderContent: false, keepAlive: false }
+          },
+          {
+            path: '/sheets/edit',
+            name: 'SheetEdit',
+            hidden: true,
+            component: () => import('@/views/sheet/SheetEdit'),
+            meta: { title: '编辑页面', hiddenHeaderContent: false, keepAlive: false }
           },
           {
             path: '/sheets/links',

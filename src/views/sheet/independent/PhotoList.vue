@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row
       :gutter="12"
       type="flex"
@@ -272,10 +272,11 @@
         :drawerWidth="480"
       />
     </a-drawer>
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
 import { mapActions } from 'vuex'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import photoApi from '@/api/photo'
@@ -284,6 +285,7 @@ import { datetimeFormat } from '@/utils/datetime'
 
 export default {
   mixins: [mixin, mixinDevice],
+  components: { PageView },
   data() {
     return {
       list: {

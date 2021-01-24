@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-card
       :bordered="false"
       :bodyStyle="{ padding: '16px' }"
@@ -78,7 +78,7 @@
       </div>
 
       <div class="table-operator">
-        <router-link :to="{ name: 'PostEdit' }">
+        <router-link :to="{ name: 'PostWrite' }">
           <a-button
             type="primary"
             icon="plus"
@@ -515,11 +515,12 @@
       :id="selectedPost.id"
       @close="onPostCommentsClose"
     />
-  </div>
+  </page-view>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { PageView } from '@/layouts'
 import PostSettingDrawer from './components/PostSettingDrawer'
 import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
 import TagSelect from './components/TagSelect'
@@ -579,6 +580,7 @@ const columns = [
 export default {
   name: 'PostList',
   components: {
+    PageView,
     TagSelect,
     CategoryTree,
     PostSettingDrawer,

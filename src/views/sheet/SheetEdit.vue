@@ -1,5 +1,34 @@
 <template>
-  <div>
+  <page-view
+    affix
+    :title="sheetToStage.title?sheetToStage.title:'新页面'"
+  >
+    <template slot="extra">
+      <a-space>
+        <ReactiveButton
+          type="danger"
+          @click="handleSaveDraft(false)"
+          @callback="draftSavederrored = false"
+          :loading="draftSaving"
+          :errored="draftSavederrored"
+          text="保存草稿"
+          loadedText="保存成功"
+          erroredText="保存失败"
+        ></ReactiveButton>
+        <a-button
+          @click="handlePreview"
+          :loading="previewSaving"
+        >预览</a-button>
+        <a-button
+          type="primary"
+          @click="sheetSettingVisible = true"
+        >发布</a-button>
+        <a-button
+          type="dashed"
+          @click="attachmentDrawerVisible = true"
+        >附件库</a-button>
+      </a-space>
+    </template>
     <a-row :gutter="12">
       <a-col :span="24">
         <div class="mb-4">
@@ -37,39 +66,14 @@
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
-    <footer-tool-bar :style="{ width: isSideMenu() && isDesktop() ? `calc(100% - ${sidebarOpened ? 256 : 80}px)` : '100%'}">
-      <a-space>
-        <ReactiveButton
-          type="danger"
-          @click="handleSaveDraft(false)"
-          @callback="draftSavederrored = false"
-          :loading="draftSaving"
-          :errored="draftSavederrored"
-          text="保存草稿"
-          loadedText="保存成功"
-          erroredText="保存失败"
-        ></ReactiveButton>
-        <a-button
-          @click="handlePreview"
-          :loading="previewSaving"
-        >预览</a-button>
-        <a-button
-          type="primary"
-          @click="sheetSettingVisible = true"
-        >发布</a-button>
-        <a-button
-          type="dashed"
-          @click="attachmentDrawerVisible = true"
-        >附件库</a-button>
-      </a-space>
-    </footer-tool-bar>
-  </div>
+  </page-view>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 // import { mapGetters } from 'vuex'
 import { datetimeFormat } from '@/utils/datetime'
+import { PageView } from '@/layouts'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import FooterToolBar from '@/components/FooterToolbar'
@@ -79,10 +83,11 @@ import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 import sheetApi from '@/api/sheet'
 export default {
   components: {
+    PageView,
     FooterToolBar,
     AttachmentDrawer,
     SheetSettingDrawer,
-    MarkdownEditor
+    MarkdownEditor,
     // RichTextEditor
   },
   mixins: [mixin, mixinDevice],
@@ -95,7 +100,7 @@ export default {
       contentChanges: 0,
       draftSaving: false,
       draftSavederrored: false,
-      previewSaving: false
+      previewSaving: false,
     }
   },
   beforeRouteEnter(to, from, next) {
@@ -141,7 +146,7 @@ export default {
         },
         onCancel() {
           next(false)
-        }
+        },
       })
     }
   },
@@ -162,12 +167,12 @@ export default {
       if (newValue) {
         this.contentChanges++
       }
-    }
+    },
   },
   computed: {
     temporaryContent() {
       return this.sheetToStage.originalContent
-    }
+    },
     // ...mapGetters(['options'])
   },
   methods: {
@@ -276,7 +281,7 @@ export default {
     },
     onRefreshSheetMetasFromSetting(metas) {
       this.selectedMetas = metas
-    }
-  }
+    },
+  },
 }
 </script>

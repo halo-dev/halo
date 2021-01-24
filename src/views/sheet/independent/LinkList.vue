@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row :gutter="12">
       <a-col
         :xl="10"
@@ -260,10 +260,11 @@
         </a-form-item>
       </a-form>
     </a-modal>
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
 import { mapActions } from 'vuex'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
 import optionApi from '@/api/option'
@@ -298,6 +299,9 @@ const columns = [
 ]
 export default {
   mixins: [mixin, mixinDevice],
+  components: {
+    PageView,
+  },
   data() {
     return {
       table: {

@@ -1,5 +1,6 @@
 <template>
   <page-view
+    affix
     :title="activatedTheme ? activatedTheme.name : '无'"
     subTitle="当前启用"
   >

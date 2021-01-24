@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row>
       <a-col :span="24">
         <a-card
@@ -255,10 +255,11 @@
     />
 
     <AttachmentDrawer v-model="attachmentDrawer.visible" />
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
 import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
 import AttachmentDrawer from '../../attachment/components/AttachmentDrawer'
 import { mixin, mixinDevice } from '@/utils/mixin.js'
@@ -267,7 +268,7 @@ import journalApi from '@/api/journal'
 import optionApi from '@/api/option'
 export default {
   mixins: [mixin, mixinDevice],
-  components: { TargetCommentDrawer, AttachmentDrawer },
+  components: { PageView, TargetCommentDrawer, AttachmentDrawer },
   data() {
     return {
       list: {

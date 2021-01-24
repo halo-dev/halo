@@ -14,7 +14,7 @@
           :number="statisticsData.postCount"
         >
           <router-link
-            :to="{ name:'PostEdit' }"
+            :to="{ name:'PostWrite' }"
             slot="action"
           >
             <a-icon

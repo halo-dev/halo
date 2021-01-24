@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row>
       <a-col :span="24">
         <div class="card-container">
@@ -20,28 +20,34 @@
         </div>
       </a-col>
     </a-row>
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
 import IndependentSheetList from './components/IndependentSheetList'
 import CustomSheetList from './components/CustomSheetList'
 
 export default {
+  components: {
+    PageView,
+    IndependentSheetList,
+    CustomSheetList,
+  },
   data() {
     const panes = [
       { title: '独立页面', icon: 'paper-clip', component: 'IndependentSheetList', key: 'independent' },
-      { title: '自定义页面', icon: 'fork', component: 'CustomSheetList', key: 'custom' }
+      { title: '自定义页面', icon: 'fork', component: 'CustomSheetList', key: 'custom' },
     ]
     return {
       activeKey: panes[0].key,
-      panes
+      panes,
     }
   },
   beforeRouteEnter(to, from, next) {
     // Get post id from query
     const activeKey = to.query.activeKey
-    next(vm => {
+    next((vm) => {
       if (activeKey) {
         vm.activeKey = activeKey
       }
@@ -52,14 +58,10 @@ export default {
       handler: function(newVal, oldVal) {
         if (newVal) {
           const path = this.$router.history.current.path
-          this.$router.push({ path, query: { activeKey: newVal } }).catch(err => err)
+          this.$router.push({ path, query: { activeKey: newVal } }).catch((err) => err)
         }
-      }
-    }
+      },
+    },
   },
-  components: {
-    IndependentSheetList,
-    CustomSheetList
-  }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <page-view>
     <a-row :gutter="12">
       <a-col
         :xl="10"
@@ -131,13 +131,15 @@
       @listenToSelect="handleSelectThumbnail"
       title="选择封面图"
     />
-  </div>
+  </page-view>
 </template>
 
 <script>
+import { PageView } from '@/layouts'
 import tagApi from '@/api/tag'
 
 export default {
+  components: { PageView },
   data() {
     return {
       list: {
