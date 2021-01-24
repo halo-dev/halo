@@ -251,7 +251,7 @@ public class FileUtils {
     public static Optional<Path> findRootPath(@NonNull final Path path,
         @Nullable final Predicate<Path> pathPredicate)
         throws IOException {
-        return findRootPath(path, Integer.MAX_VALUE, pathPredicate).map(Path::getParent);
+        return findRootPath(path, Integer.MAX_VALUE, pathPredicate);
     }
 
     /**
@@ -306,18 +306,20 @@ public class FileUtils {
             return Optional.empty();
         }
 
-        log.debug("Trying to find root path from [{}]", path);
+        log.debug("Trying to find path from [{}]", path);
 
         // the queue holds folders which may be root
-        final LinkedList<Path> queue = new LinkedList<>();
+        final var queue = new LinkedList<Path>();
         // depth container
-        final LinkedList<Integer> depthQueue = new LinkedList<>();
+        final var depthQueue = new LinkedList<Integer>();
 
         // init queue
         queue.push(path);
         depthQueue.push(1);
 
-        while (!queue.isEmpty()) {
+        boolean found = false;
+        Path result = null;
+        while (!found && !queue.isEmpty()) {
             // pop the first path as candidate root path
             final var rootPath = queue.pop();
             final int depth = depthQueue.pop();
@@ -325,7 +327,7 @@ public class FileUtils {
                 log.debug("Peek({}) into {}", depth, rootPath);
             }
             try (final Stream<Path> childrenPaths = Files.list(rootPath)) {
-                final List<Path> subFolders = new LinkedList<>();
+                final var subFolders = new LinkedList<Path>();
                 var resultPath = childrenPaths
                     .peek(p -> {
                         if (Files.isDirectory(p)) {
@@ -335,25 +337,29 @@ public class FileUtils {
                     .filter(pathPredicate)
                     .findFirst();
                 if (resultPath.isPresent()) {
-                    log.debug("Found path: [{}]", rootPath);
                     queue.clear();
-                    return resultPath;
-                }
-                // put all directory into queue
-                if (depth < maxDepth) {
-                    for (Path subFolder : subFolders) {
-                        if (!Files.isHidden(subFolder)) {
-                            // skip hidden folder
-                            queue.push(subFolder);
-                            depthQueue.push(depth + 1);
+                    depthQueue.clear();
+                    // return current result path
+                    found = true;
+                    result = resultPath.get();
+                } else {
+                    // put all directory into queue
+                    if (depth < maxDepth) {
+                        for (Path subFolder : subFolders) {
+                            if (!Files.isHidden(subFolder)) {
+                                // skip hidden folder
+                                queue.push(subFolder);
+                                depthQueue.push(depth + 1);
+                            }
                         }
                     }
                 }
                 subFolders.clear();
             }
         }
-        // if tests are failed completely
-        return Optional.empty();
+
+        log.debug("Found path: [{}]", result);
+        return Optional.ofNullable(result);
     }
 
     /**

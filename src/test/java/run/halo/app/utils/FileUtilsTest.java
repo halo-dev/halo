@@ -205,7 +205,6 @@ class FileUtilsTest {
         //   file2
         //   folder3
         //     expected_file
-        // expected: folder2
         tempDirectory = Files.createTempDirectory("halo-test");
 
         log.info("Preparing test folder structure");
@@ -223,11 +222,12 @@ class FileUtilsTest {
         Files.createFile(expectedFile);
         log.info("Prepared test folder structure");
 
-        // find the root folder where expected file locates, and we expect folder3
-        Optional<Path> rootPath = FileUtils.findRootPath(tempDirectory,
-            path -> path.getFileName().toString().equals("expected_file"));
-        assertTrue(rootPath.isPresent());
-        assertEquals(folder3.toString(), rootPath.get().toString());
+        // find expected_file
+        final var resultPath = FileUtils.findRootPath(tempDirectory,
+                path -> path.getFileName().toString().equals("expected_file"));
+        assertTrue(resultPath.isPresent());
+        log.debug("Got result path: {}", resultPath.get());
+        assertEquals(folder3.toString(), resultPath.get().toString());
     }
 
 
@@ -242,7 +242,6 @@ class FileUtilsTest {
         //   file2
         //   folder3
         //     file3
-        // expected: folder2
         tempDirectory = Files.createTempDirectory("halo-test");
 
         log.info("Preparing test folder structure");
@@ -279,7 +278,6 @@ class FileUtilsTest {
         //   file2
         //   folder3
         //     expected_file
-        // expected: folder2
         tempDirectory = Files.createTempDirectory("halo-test");
 
         log.info("Preparing test folder structure");
