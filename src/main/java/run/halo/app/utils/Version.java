@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import run.halo.app.model.support.HaloConst;
@@ -157,7 +156,7 @@ public class Version implements Comparable<Version> {
     }
 
     @Override
-    public int compareTo(@NotNull Version anotherVersion) {
+    public int compareTo(@NonNull Version anotherVersion) {
         // compare major
         int majorCompare = Long.compare(major, anotherVersion.major);
         if (majorCompare != 0) {

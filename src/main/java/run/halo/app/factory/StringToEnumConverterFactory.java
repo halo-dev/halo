@@ -1,9 +1,8 @@
 package run.halo.app.factory;
 
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,7 +14,7 @@ public class StringToEnumConverterFactory implements ConverterFactory<String, En
 
     @Override
     @NonNull
-    public <T extends Enum<?>> Converter<String, T> getConverter(@NotNull Class<T> targetType) {
+    public <T extends Enum<?>> Converter<String, T> getConverter(@NonNull Class<T> targetType) {
         return new StringToEnumConverter(targetType);
     }
 

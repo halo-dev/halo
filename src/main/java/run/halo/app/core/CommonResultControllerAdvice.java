@@ -1,6 +1,6 @@
 package run.halo.app.core;
 
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,7 +9,6 @@ import org.springframework.http.converter.json.AbstractJackson2HttpMessageConver
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
@@ -24,18 +23,18 @@ import run.halo.app.model.support.BaseResponse;
 public class CommonResultControllerAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
-    public boolean supports(MethodParameter returnType, @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
+    public boolean supports(@NonNull MethodParameter returnType, @NonNull Class<? extends HttpMessageConverter<?>> converterType) {
         return AbstractJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
     @Override
     @NonNull
     public final Object beforeBodyWrite(@Nullable Object body,
-            @NotNull MethodParameter returnType,
-            @NotNull MediaType contentType,
-            @NotNull Class<? extends HttpMessageConverter<?>> converterType,
-            @NotNull ServerHttpRequest request,
-            @NotNull ServerHttpResponse response) {
+            @NonNull MethodParameter returnType,
+            @NonNull MediaType contentType,
+            @NonNull Class<? extends HttpMessageConverter<?>> converterType,
+            @NonNull ServerHttpRequest request,
+            @NonNull ServerHttpResponse response) {
         MappingJacksonValue container = getOrCreateContainer(body);
         // The contain body will never be null
         beforeBodyWriteInternal(container, contentType, returnType, request, response);
