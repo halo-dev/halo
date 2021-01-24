@@ -52,7 +52,8 @@ public class JournalCommentController {
 
     @GetMapping
     @ApiOperation("Lists journal comments")
-    public Page<JournalCommentWithJournalVO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
+    public Page<JournalCommentWithJournalVO> pageBy(
+        @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
         CommentQuery commentQuery) {
         Page<JournalComment> journalCommentPage =
             journalCommentService.pageBy(commentQuery, pageable);
@@ -62,7 +63,8 @@ public class JournalCommentController {
 
     @GetMapping("latest")
     @ApiOperation("Lists latest journal comments")
-    public List<JournalCommentWithJournalVO> listLatest(@RequestParam(name = "top", defaultValue = "10") int top,
+    public List<JournalCommentWithJournalVO> listLatest(
+        @RequestParam(name = "top", defaultValue = "10") int top,
         @RequestParam(name = "status", required = false) CommentStatus status) {
         List<JournalComment> latestComments =
             journalCommentService.pageLatest(top, status).getContent();

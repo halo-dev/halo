@@ -241,6 +241,14 @@ public interface PostService extends BasePostService<Post> {
     PostDetailVO convertToDetailVo(@NonNull Post post);
 
     /**
+     * Converts to a page of detail vo.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail vo
+     */
+    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
+
+    /**
      * Converts to detail vo.
      *
      * @param post post must not be null
@@ -286,14 +294,6 @@ public interface PostService extends BasePostService<Post> {
      * @return a list of post list vo
      */
     List<PostListVO> convertToListVo(List<Post> posts, Boolean queryEncryptCategory);
-
-    /**
-     * Converts to a page of detail vo.
-     *
-     * @param postPage post page must not be null
-     * @return a page of post detail vo
-     */
-    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
 
     /**
      * Publish a post visit event.

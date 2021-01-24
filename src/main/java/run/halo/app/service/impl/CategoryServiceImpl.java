@@ -148,7 +148,11 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * @param categories a list of category
      * @param fillPassword   whether to fill in the password
      */
-    private void concreteTree(CategoryVO parentCategory, List<Category> categories, Boolean fillPassword) {
+    private void concreteTree(
+        CategoryVO parentCategory,
+        List<Category> categories,
+        Boolean fillPassword
+    ) {
         Assert.notNull(parentCategory, "Parent category must not be null");
 
         if (CollectionUtils.isEmpty(categories)) {
@@ -426,12 +430,14 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
             collectorList.add(category);
 
-            if (doNotCollectEncryptedCategory && !authenticationService.categoryAuthentication(category.getId(), null)) {
+            if (doNotCollectEncryptedCategory
+                && !authenticationService.categoryAuthentication(category.getId(), null)) {
                 continue;
             }
 
             if (CollectionUtil.isNotEmpty(categoryVO.getChildren())) {
-                collectAllChild(collectorList, categoryVO.getChildren(), doNotCollectEncryptedCategory);
+                collectAllChild(collectorList,
+                    categoryVO.getChildren(), doNotCollectEncryptedCategory);
             }
 
         }
@@ -455,7 +461,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
         for (CategoryVO categoryVO : childrenList) {
             if (categoryVO.getId().equals(categoryId)) {
-                collectAllChild(collectorList, categoryVO.getChildren(), doNotCollectEncryptedCategory);
+                collectAllChild(collectorList,
+                    categoryVO.getChildren(), doNotCollectEncryptedCategory);
                 break;
             }
         }
@@ -528,7 +535,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
         List<Category> collectorList = new ArrayList<>();
 
-        collectAllChildByCategoryId(collectorList, topLevelCategory.getChildren(), category.getId(), true);
+        collectAllChildByCategoryId(collectorList,
+            topLevelCategory.getChildren(), category.getId(), true);
 
         Optional.of(collectorList.stream().map(Category::getId).collect(Collectors.toList()))
             .map(categoryIdList -> {
@@ -545,7 +553,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             .map(postIdList -> postService.listAllByIds(postIdList))
 
             .filter(postList -> !postList.isEmpty())
-            .map(postList -> postList.stream().filter(post -> PostStatus.PUBLISHED.equals(post.getStatus()))
+            .map(postList -> postList.stream()
+                .filter(post -> PostStatus.PUBLISHED.equals(post.getStatus()))
                 .map(Post::getId).collect(Collectors.toList()))
 
             .filter(postIdList -> !postIdList.isEmpty())
@@ -571,7 +580,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         List<Category> collectorList = new ArrayList<>();
 
         // Only collect unencrypted sub-categories under the category.
-        collectAllChildByCategoryId(collectorList, topLevelCategory.getChildren(), category.getId(), false);
+        collectAllChildByCategoryId(collectorList,
+            topLevelCategory.getChildren(), category.getId(), false);
         // Collect the currently decrypted category
         collectorList.add(category);
 
@@ -607,11 +617,13 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     /**
      * Find whether the parent category is encrypted.
+     *
      * @param idToCategoryMap find category by id
      * @param categoryId category id
      * @return whether to encrypt
      */
-    private boolean doCategoryHasEncrypt(Map<Integer, Category> idToCategoryMap, Integer categoryId) {
+    private boolean doCategoryHasEncrypt(
+        Map<Integer, Category> idToCategoryMap, Integer categoryId) {
 
         if (categoryId == 0) {
             return false;

@@ -254,7 +254,8 @@ public class ContentContentController {
         return "redirect:" + redirectUrl;
     }
 
-    private String doAuthenticationPost(String slug, String password) throws UnsupportedEncodingException {
+    private String doAuthenticationPost(
+        String slug, String password) throws UnsupportedEncodingException {
         Post post = postService.getBy(PostStatus.INTIMATE, slug);
 
         post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8.name()));

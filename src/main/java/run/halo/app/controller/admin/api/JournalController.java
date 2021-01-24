@@ -43,7 +43,8 @@ public class JournalController {
 
     @GetMapping
     @ApiOperation("Lists journals")
-    public Page<JournalWithCmtCountDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
+    public Page<JournalWithCmtCountDTO> pageBy(
+        @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
         JournalQuery journalQuery) {
         Page<Journal> journalPage = journalService.pageBy(journalQuery, pageable);
         return journalService.convertToCmtCountDto(journalPage);
@@ -51,7 +52,8 @@ public class JournalController {
 
     @GetMapping("latest")
     @ApiOperation("Gets latest journals")
-    public List<JournalWithCmtCountDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+    public List<JournalWithCmtCountDTO> pageLatest(
+        @RequestParam(name = "top", defaultValue = "10") int top) {
         List<Journal> journals = journalService.pageLatest(top).getContent();
         return journalService.convertToCmtCountDto(journals);
     }

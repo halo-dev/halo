@@ -3,9 +3,7 @@ package run.halo.app.service.impl;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;

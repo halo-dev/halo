@@ -1,11 +1,10 @@
 package run.halo.app.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import cn.hutool.core.util.StrUtil;
 import org.springframework.stereotype.Service;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
@@ -13,6 +12,7 @@ import run.halo.app.repository.CategoryRepository;
 import run.halo.app.repository.PostCategoryRepository;
 import run.halo.app.service.AuthenticationService;
 import run.halo.app.service.AuthorizationService;
+
 
 /**
  * @author ZhiXiang Yuan
@@ -52,7 +52,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return false;
         }
 
-        Set<Integer> allCategoryIdSet = postCategoryRepository.findAllCategoryIdsByPostId(post.getId());
+        Set<Integer> allCategoryIdSet = postCategoryRepository
+            .findAllCategoryIdsByPostId(post.getId());
 
         if (allCategoryIdSet.isEmpty()) {
             return true;
@@ -75,7 +76,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Set<String> accessPermissionStore = authorizationService.getAccessPermissionStore();
 
-        return doCategoryAuthentication(idToCategoryMap, accessPermissionStore, categoryId, password);
+        return doCategoryAuthentication(
+            idToCategoryMap, accessPermissionStore, categoryId, password);
     }
 
     private boolean doCategoryAuthentication(Map<Integer, Category> idToCategoryMap,
@@ -85,7 +87,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         Category category = idToCategoryMap.get(categoryId);
 
         if (StrUtil.isNotBlank(category.getPassword())) {
-            if (accessPermissionStore.contains(AuthorizationService.buildCategoryToken(category.getId()))) {
+            if (accessPermissionStore.contains(
+                AuthorizationService.buildCategoryToken(category.getId()))) {
                 return true;
             }
 
@@ -101,6 +104,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return true;
         }
 
-        return doCategoryAuthentication(idToCategoryMap, accessPermissionStore, category.getParentId(), password);
+        return doCategoryAuthentication(
+            idToCategoryMap, accessPermissionStore, category.getParentId(), password);
     }
 }

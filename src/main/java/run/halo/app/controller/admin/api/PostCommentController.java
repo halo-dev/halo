@@ -109,7 +109,8 @@ public class PostCommentController {
 
     @PutMapping("status/{status}")
     @ApiOperation("Updates post comment status in batch")
-    public List<BaseCommentDTO> updateStatusInBatch(@PathVariable(name = "status") CommentStatus status,
+    public List<BaseCommentDTO> updateStatusInBatch(
+        @PathVariable(name = "status") CommentStatus status,
         @RequestBody List<Long> ids) {
         List<PostComment> comments = postCommentService.updateStatusByIds(ids, status);
         return postCommentService.convertTo(comments);

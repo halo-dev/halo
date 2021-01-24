@@ -56,7 +56,8 @@ public class MenuController {
 
     @GetMapping("team/tree_view")
     @ApiOperation("Lists menus as tree by team")
-    public List<MenuVO> listDefaultsAsTreeByTeam(@SortDefault(sort = "priority", direction = ASC) Sort sort,
+    public List<MenuVO> listDefaultsAsTreeByTeam(
+        @SortDefault(sort = "priority", direction = ASC) Sort sort,
         @RequestParam(name = "team") String team) {
         return menuService.listByTeamAsTree(team, sort);
     }

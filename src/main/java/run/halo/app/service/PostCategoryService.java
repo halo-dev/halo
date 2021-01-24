@@ -53,7 +53,8 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a category list map (key: postId, value: a list of category)
      */
     @NonNull
-    Map<Integer, List<Category>> listCategoryListMap(@Nullable Collection<Integer> postIds, @NonNull Boolean queryEncryptCategory);
+    Map<Integer, List<Category>> listCategoryListMap(
+        @Nullable Collection<Integer> postIds, @NonNull Boolean queryEncryptCategory);
 
     /**
      * Lists post by category id.
@@ -135,7 +136,8 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return page of post
      */
     @NonNull
-    Page<Post> pagePostBy(@NonNull Integer categoryId, @NonNull Set<PostStatus> status, Pageable pageable);
+    Page<Post> pagePostBy(
+        @NonNull Integer categoryId, @NonNull Set<PostStatus> status, Pageable pageable);
 
     /**
      * Merges or creates post categories by post id and category id set if absent.
@@ -203,7 +205,8 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a list of category dto
      */
     @NonNull
-    List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(@NonNull Sort sort, @NonNull Boolean queryEncryptCategory);
+    List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(
+        @NonNull Sort sort, @NonNull Boolean queryEncryptCategory);
 
     /**
      * Lists by category id.

@@ -57,7 +57,8 @@ public class PostController {
 
     @GetMapping
     @ApiOperation("Lists posts")
-    public Page<? extends BasePostSimpleDTO> pageBy(@PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
+    public Page<? extends BasePostSimpleDTO> pageBy(
+        @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
         PostQuery postQuery,
         @RequestParam(value = "more", defaultValue = "true") Boolean more) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
@@ -70,13 +71,15 @@ public class PostController {
 
     @GetMapping("latest")
     @ApiOperation("Pages latest post")
-    public List<BasePostMinimalDTO> pageLatest(@RequestParam(name = "top", defaultValue = "10") int top) {
+    public List<BasePostMinimalDTO> pageLatest(
+        @RequestParam(name = "top", defaultValue = "10") int top) {
         return postService.convertToMinimal(postService.pageLatest(top).getContent());
     }
 
     @GetMapping("status/{status}")
     @ApiOperation("Gets a page of post by post status")
-    public Page<? extends BasePostSimpleDTO> pageByStatus(@PathVariable(name = "status") PostStatus status,
+    public Page<? extends BasePostSimpleDTO> pageByStatus(
+        @PathVariable(name = "status") PostStatus status,
         @RequestParam(value = "more", required = false, defaultValue = "false") Boolean more,
         @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Post> posts = postService.pageBy(status, pageable);
@@ -104,7 +107,8 @@ public class PostController {
     @PostMapping
     @ApiOperation("Creates a post")
     public PostDetailVO createBy(@Valid @RequestBody PostParam postParam,
-        @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+        @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave
+    ) {
         // Convert to
         Post post = postParam.convertTo();
         return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(),
@@ -115,7 +119,8 @@ public class PostController {
     @ApiOperation("Updates a post")
     public PostDetailVO updateBy(@Valid @RequestBody PostParam postParam,
         @PathVariable("postId") Integer postId,
-        @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave) {
+        @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave
+    ) {
         // Get the post info
         Post postToUpdate = postService.getById(postId);
 

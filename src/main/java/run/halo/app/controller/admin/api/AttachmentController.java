@@ -44,7 +44,8 @@ public class AttachmentController {
     }
 
     @GetMapping
-    public Page<AttachmentDTO> pageBy(@PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
+    public Page<AttachmentDTO> pageBy(
+        @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
         AttachmentQuery attachmentQuery) {
         return attachmentService.pageDtosBy(pageable, attachmentQuery);
     }

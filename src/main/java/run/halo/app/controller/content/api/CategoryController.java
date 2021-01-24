@@ -56,7 +56,8 @@ public class CategoryController {
 
     @GetMapping
     @ApiOperation("Lists categories")
-    public List<? extends CategoryDTO> listCategories(@SortDefault(sort = "updateTime", direction = DESC) Sort sort,
+    public List<? extends CategoryDTO> listCategories(
+        @SortDefault(sort = "updateTime", direction = DESC) Sort sort,
         @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
             return postCategoryService.listCategoryWithPostCountDto(sort, false);
@@ -78,7 +79,8 @@ public class CategoryController {
         }
 
         Page<Post> postPage =
-            postCategoryService.pagePostBy(category.getId(), Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
+            postCategoryService.pagePostBy(category.getId(),
+                Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
         return postService.convertToListVo(postPage);
     }
 }

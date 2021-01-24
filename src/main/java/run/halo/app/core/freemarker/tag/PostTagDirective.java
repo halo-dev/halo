@@ -78,12 +78,14 @@ public class PostTagDirective implements TemplateDirectiveModel {
                 case "listByCategoryId":
                     Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
                     env.setVariable("posts", builder.build().wrap(postService.convertToListVo(
-                        postCategoryService.listPostBy(categoryId, Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE)))));
+                        postCategoryService.listPostBy(categoryId,
+                            Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE)))));
                     break;
                 case "listByCategorySlug":
                     String categorySlug = params.get("categorySlug").toString();
                     List<Post> posts =
-                        postCategoryService.listPostBy(categorySlug, Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE));
+                        postCategoryService.listPostBy(categorySlug,
+                            Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE));
                     env.setVariable("posts",
                         builder.build().wrap(postService.convertToListVo(posts)));
                     break;

@@ -86,8 +86,8 @@ public class PostModel {
 
     public String content(Post post, String token, Model model) {
 
-        if (post.getStatus().equals(PostStatus.INTIMATE) &&
-                !authenticationService.postAuthentication(post, null)) {
+        if (post.getStatus().equals(PostStatus.INTIMATE)
+            && !authenticationService.postAuthentication(post, null)) {
             model.addAttribute("slug", post.getSlug());
             model.addAttribute("type", EncryptTypeEnum.POST.getName());
             if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {

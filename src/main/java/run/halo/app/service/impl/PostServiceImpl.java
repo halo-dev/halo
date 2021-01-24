@@ -515,7 +515,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // List tags
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         // List categories
-        List<Category> categories = postCategoryService.listCategoriesBy(post.getId(), queryEncryptCategory);
+        List<Category> categories = postCategoryService
+            .listCategoriesBy(post.getId(), queryEncryptCategory);
         // List metas
         List<PostMeta> metas = postMetaService.listBy(post.getId());
         // Convert to detail vo
@@ -833,8 +834,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 }).orElse(Boolean.FALSE);
 
         // if password is not empty or parent category has encrypt, change status to intimate
-        if (post.getStatus() != PostStatus.DRAFT &&
-                (StringUtils.isNotEmpty(post.getPassword()) || needEncrypt)
+        if (post.getStatus() != PostStatus.DRAFT
+            && (StringUtils.isNotEmpty(post.getPassword()) || needEncrypt)
         ) {
             post.setStatus(PostStatus.INTIMATE);
         }
