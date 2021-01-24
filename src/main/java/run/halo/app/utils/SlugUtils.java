@@ -1,12 +1,11 @@
 package run.halo.app.utils;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
-
 import java.text.Normalizer;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 
 /**
  * Slugify utilities.

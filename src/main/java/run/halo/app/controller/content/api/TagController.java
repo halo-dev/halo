@@ -1,13 +1,20 @@
 package run.halo.app.controller.content.api;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.TagDTO;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
@@ -16,10 +23,6 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
-
-import java.util.List;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Content tag controller.

@@ -1,5 +1,15 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,11 +30,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Post category service implementation.

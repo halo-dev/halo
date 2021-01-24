@@ -1,18 +1,17 @@
 package run.halo.app.utils;
 
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+
 import cn.hutool.core.util.URLUtil;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import run.halo.app.model.support.HaloConst;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.UUID;
-
-import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
 /**
  * Common utils

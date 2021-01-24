@@ -1,9 +1,8 @@
 package run.halo.app.event;
 
+import java.nio.file.Path;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
-
-import java.nio.file.Path;
 
 /**
  * @author ryanwang

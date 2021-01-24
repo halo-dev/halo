@@ -1,11 +1,10 @@
 package run.halo.app.model.dto.base;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Objects;
 import org.springframework.lang.Nullable;
 import run.halo.app.utils.BeanUtils;
 import run.halo.app.utils.ReflectionUtils;
-
-import java.lang.reflect.ParameterizedType;
-import java.util.Objects;
 
 /**
  * Converter interface for input DTO.

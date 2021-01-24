@@ -1,5 +1,10 @@
 package run.halo.app.handler.file;
 
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+import static run.halo.app.model.support.HaloConst.TEMP_DIR;
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+import static run.halo.app.utils.HaloUtils.ensureSuffix;
+
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
@@ -9,6 +14,10 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.persistent.FileRecorder;
 import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,14 +34,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 import run.halo.app.utils.JsonUtils;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Objects;
-
-import static run.halo.app.model.support.HaloConst.*;
-import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 /**
  * Qiniu oss file handler.

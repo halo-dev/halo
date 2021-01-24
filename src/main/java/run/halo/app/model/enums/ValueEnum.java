@@ -1,8 +1,7 @@
 package run.halo.app.model.enums;
 
-import org.springframework.util.Assert;
-
 import java.util.stream.Stream;
+import org.springframework.util.Assert;
 
 /**
  * Interface for value enum.

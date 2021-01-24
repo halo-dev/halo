@@ -1,5 +1,11 @@
 package run.halo.app.service.impl;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -16,9 +22,6 @@ import run.halo.app.repository.MenuRepository;
 import run.halo.app.service.MenuService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * MenuService implementation class.

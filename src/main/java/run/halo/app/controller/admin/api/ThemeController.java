@@ -1,8 +1,19 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
@@ -13,9 +24,6 @@ import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Theme controller.

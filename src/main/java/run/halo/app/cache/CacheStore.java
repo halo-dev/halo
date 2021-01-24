@@ -1,9 +1,8 @@
 package run.halo.app.cache;
 
-import org.springframework.lang.NonNull;
-
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import org.springframework.lang.NonNull;
 
 /**
  * Cache store interface.

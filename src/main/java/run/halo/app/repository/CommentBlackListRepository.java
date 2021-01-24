@@ -1,12 +1,11 @@
 package run.halo.app.repository;
 
+import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import run.halo.app.model.entity.CommentBlackList;
 import run.halo.app.repository.base.BaseRepository;
-
-import java.util.Optional;
 
 /**
  * 评论黑名单Repository

@@ -1,5 +1,12 @@
 package run.halo.app.mail;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -11,14 +18,6 @@ import org.springframework.util.Assert;
 import run.halo.app.exception.EmailException;
 import run.halo.app.model.properties.EmailProperties;
 import run.halo.app.service.OptionService;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Abstract mail service.

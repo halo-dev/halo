@@ -1,6 +1,8 @@
 package run.halo.app.handler.file;
 
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -8,6 +10,7 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -21,10 +24,6 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
-
-import java.util.Objects;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Tencent cos file handler.

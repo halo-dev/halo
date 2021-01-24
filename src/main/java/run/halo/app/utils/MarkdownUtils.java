@@ -21,14 +21,13 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import org.apache.commons.lang3.StringUtils;
-import run.halo.app.model.support.HaloConst;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import run.halo.app.model.support.HaloConst;
 
 /**
  * Markdown utils.

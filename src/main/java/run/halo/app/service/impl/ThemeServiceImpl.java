@@ -1,5 +1,24 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.DEFAULT_ERROR_PATH;
+import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -26,7 +45,15 @@ import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
-import run.halo.app.exception.*;
+import run.halo.app.exception.AlreadyExistsException;
+import run.halo.app.exception.BadRequestException;
+import run.halo.app.exception.ForbiddenException;
+import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.ServiceException;
+import run.halo.app.exception.ThemeNotSupportException;
+import run.halo.app.exception.ThemePropertyMissingException;
+import run.halo.app.exception.ThemeUpdateException;
+import run.halo.app.exception.UnsupportedMediaTypeException;
 import run.halo.app.handler.theme.config.ThemeConfigResolver;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
@@ -38,21 +65,12 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.theme.ThemeFileScanner;
 import run.halo.app.theme.ThemePropertyScanner;
-import run.halo.app.utils.*;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.ZipInputStream;
-
-import static run.halo.app.model.support.HaloConst.DEFAULT_ERROR_PATH;
-import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
+import run.halo.app.utils.FileUtils;
+import run.halo.app.utils.FilenameUtils;
+import run.halo.app.utils.GitUtils;
+import run.halo.app.utils.GithubUtils;
+import run.halo.app.utils.HaloUtils;
+import run.halo.app.utils.VersionUtil;
 
 /**
  * Theme service implementation.

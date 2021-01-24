@@ -1,6 +1,12 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 import com.google.common.base.Objects;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -19,13 +25,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
-
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * CategoryService implementation class.

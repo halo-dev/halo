@@ -1,9 +1,19 @@
 package run.halo.app.config;
 
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+import static run.halo.app.utils.HaloUtils.URL_SEPARATOR;
+import static run.halo.app.utils.HaloUtils.ensureBoth;
+import static run.halo.app.utils.HaloUtils.ensureSuffix;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import javax.servlet.MultipartConfigElement;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -37,15 +47,6 @@ import run.halo.app.core.PageJacksonSerializer;
 import run.halo.app.factory.StringToEnumConverterFactory;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
-
-import javax.servlet.MultipartConfigElement;
-import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-
-import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
-import static run.halo.app.utils.HaloUtils.*;
 
 /**
  * Halo mvc configuration.

@@ -1,15 +1,14 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.support.CreateCheck;
 import run.halo.app.model.support.UpdateCheck;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Size;
 
 /**
  * User param.

@@ -1,10 +1,9 @@
 package run.halo.app.model.dto;
 
+import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import run.halo.app.model.enums.OptionType;
-
-import java.util.Date;
 
 /**
  * Option list output dto.

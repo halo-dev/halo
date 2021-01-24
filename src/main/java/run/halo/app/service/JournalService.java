@@ -1,5 +1,6 @@
 package run.halo.app.service;
 
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -11,8 +12,6 @@ import run.halo.app.model.enums.JournalType;
 import run.halo.app.model.params.JournalParam;
 import run.halo.app.model.params.JournalQuery;
 import run.halo.app.service.base.CrudService;
-
-import java.util.List;
 
 /**
  * Journal service interface.

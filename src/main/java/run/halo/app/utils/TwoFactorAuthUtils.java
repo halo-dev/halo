@@ -1,14 +1,13 @@
 package run.halo.app.utils;
 
-import run.halo.app.exception.AuthenticationException;
-import run.halo.app.exception.BadRequestException;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Random;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import run.halo.app.exception.AuthenticationException;
+import run.halo.app.exception.BadRequestException;
 
 public class TwoFactorAuthUtils {
 

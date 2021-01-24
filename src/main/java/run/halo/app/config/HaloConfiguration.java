@@ -1,6 +1,9 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,10 +23,6 @@ import run.halo.app.cache.LevelCacheStore;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.repository.base.BaseRepositoryImpl;
 import run.halo.app.utils.HttpClientUtils;
-
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Halo configuration.

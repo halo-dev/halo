@@ -1,5 +1,11 @@
 package run.halo.app.utils;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -10,13 +16,6 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Git utilities.

@@ -1,6 +1,9 @@
 package run.halo.app.mail;
 
 import freemarker.template.Template;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
@@ -8,10 +11,6 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.service.OptionService;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
 
 /**
  * Mail service implementation.

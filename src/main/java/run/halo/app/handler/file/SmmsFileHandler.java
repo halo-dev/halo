@@ -1,10 +1,17 @@
 package run.halo.app.handler.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Objects;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -22,10 +29,6 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HttpClientUtils;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Objects;
 
 /**
  * Sm.ms file handler.

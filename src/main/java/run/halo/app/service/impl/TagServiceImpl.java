@@ -1,5 +1,10 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,12 +18,6 @@ import run.halo.app.repository.TagRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.TagService;
 import run.halo.app.service.base.AbstractCrudService;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * TagService implementation class.

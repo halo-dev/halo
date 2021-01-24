@@ -1,13 +1,12 @@
 package run.halo.app.utils;
 
-import org.junit.jupiter.api.Test;
-import run.halo.app.handler.theme.config.impl.YamlThemeConfigResolverImpl;
-import run.halo.app.handler.theme.config.support.Group;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import run.halo.app.handler.theme.config.impl.YamlThemeConfigResolverImpl;
+import run.halo.app.handler.theme.config.support.Group;
 
 /**
  * Yaml test.

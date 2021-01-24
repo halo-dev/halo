@@ -1,12 +1,11 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.OptionType;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Optional param.

@@ -1,19 +1,23 @@
 package run.halo.app.core.freemarker.tag;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import freemarker.core.Environment;
-import freemarker.template.*;
+import freemarker.template.Configuration;
+import freemarker.template.DefaultObjectWrapperBuilder;
+import freemarker.template.TemplateDirectiveBody;
+import freemarker.template.TemplateDirectiveModel;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateModel;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Freemarker custom tag of tag.

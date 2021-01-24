@@ -1,5 +1,7 @@
 package run.halo.app.handler.file;
 
+import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
@@ -13,9 +15,6 @@ import run.halo.app.exception.RepeatTypeException;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
-
-import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * File handler manager.

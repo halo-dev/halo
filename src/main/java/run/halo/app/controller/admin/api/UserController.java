@@ -4,7 +4,12 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
+import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.BadRequestException;
@@ -20,8 +25,6 @@ import run.halo.app.model.vo.MultiFactorAuthVO;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.TwoFactorAuthUtils;
 import run.halo.app.utils.ValidationUtils;
-
-import javax.validation.Valid;
 
 /**
  * User controller.

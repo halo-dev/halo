@@ -1,16 +1,19 @@
 package run.halo.app.controller.content.api;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.http.HttpStatus;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.*;
-import run.halo.app.model.dto.OptionDTO;
-import run.halo.app.model.support.BaseResponse;
-import run.halo.app.service.OptionService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.model.dto.OptionDTO;
+import run.halo.app.model.support.BaseResponse;
+import run.halo.app.service.OptionService;
 
 /**
  * Content option controller.

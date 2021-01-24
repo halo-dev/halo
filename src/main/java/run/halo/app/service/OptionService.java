@@ -2,6 +2,10 @@ package run.halo.app.service;
 
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Region;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -18,11 +22,6 @@ import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.params.OptionQuery;
 import run.halo.app.model.properties.PropertyEnum;
 import run.halo.app.service.base.CrudService;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Option service interface.

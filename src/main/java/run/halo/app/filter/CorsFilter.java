@@ -1,5 +1,15 @@
 package run.halo.app.filter;
 
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_HEADER_NAME;
+
+import java.io.IOException;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -7,17 +17,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.filter.GenericFilterBean;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
-import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_HEADER_NAME;
 
 /**
  * Filter for CORS.

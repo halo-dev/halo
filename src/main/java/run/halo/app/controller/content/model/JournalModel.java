@@ -1,5 +1,7 @@
 package run.halo.app.controller.content.model;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +14,6 @@ import run.halo.app.model.properties.SheetProperties;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * @author ryanwang

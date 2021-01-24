@@ -1,5 +1,6 @@
 package run.halo.app.controller.content;
 
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +12,6 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
-
-import java.util.Objects;
 
 /**
  * Blog index page controller

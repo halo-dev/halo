@@ -1,5 +1,7 @@
 package run.halo.app.repository.base;
 
+import java.util.Collection;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -12,9 +14,6 @@ import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Base comment repository.

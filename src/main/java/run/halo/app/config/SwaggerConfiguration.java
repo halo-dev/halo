@@ -1,7 +1,19 @@
 package run.halo.app.config;
 
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_QUERY_NAME;
+import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.API_ACCESS_KEY_QUERY_NAME;
+import static run.halo.app.model.support.HaloConst.HALO_VERSION;
+import static springfox.documentation.schema.AlternateTypeRules.newRule;
+
 import com.fasterxml.classmate.TypeResolver;
 import io.swagger.models.auth.In;
+import java.lang.reflect.Type;
+import java.time.temporal.Temporal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -15,23 +27,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.model.entity.User;
 import run.halo.app.security.support.UserDetail;
-import springfox.documentation.builders.*;
+import springfox.documentation.builders.AlternateTypeBuilder;
+import springfox.documentation.builders.AlternateTypePropertyBuilder;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.ResponseMessageBuilder;
 import springfox.documentation.schema.AlternateTypeRule;
 import springfox.documentation.schema.AlternateTypeRuleConvention;
-import springfox.documentation.service.*;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.Contact;
+import springfox.documentation.service.ResponseMessage;
+import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.SecurityScheme;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.*;
-
-import java.lang.reflect.Type;
-import java.time.temporal.Temporal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static run.halo.app.model.support.HaloConst.*;
-import static springfox.documentation.schema.AlternateTypeRules.newRule;
+import springfox.documentation.swagger.web.DocExpansion;
+import springfox.documentation.swagger.web.ModelRendering;
+import springfox.documentation.swagger.web.OperationsSorter;
+import springfox.documentation.swagger.web.SecurityConfiguration;
+import springfox.documentation.swagger.web.SecurityConfigurationBuilder;
+import springfox.documentation.swagger.web.TagsSorter;
+import springfox.documentation.swagger.web.UiConfiguration;
+import springfox.documentation.swagger.web.UiConfigurationBuilder;
 
 /**
  * Swagger configuration.

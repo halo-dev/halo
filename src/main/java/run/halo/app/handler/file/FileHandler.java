@@ -1,5 +1,11 @@
 package run.halo.app.handler.file;
 
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.function.Supplier;
+import javax.imageio.ImageReader;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -11,13 +17,6 @@ import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.utils.ImageUtils;
-
-import javax.imageio.ImageReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.function.Supplier;
-
-import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
 /**
  * File handler interface.

@@ -1,5 +1,6 @@
 package run.halo.app.cache.lock;
 
+import java.lang.annotation.Annotation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,8 +14,6 @@ import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.FrequentAccessException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.utils.ServletUtils;
-
-import java.lang.annotation.Annotation;
 
 /**
  * Interceptor for cache lock annotation.

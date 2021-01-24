@@ -2,6 +2,8 @@ package run.halo.app.listener.comment;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.text.StrBuilder;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
@@ -12,12 +14,21 @@ import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.mail.MailService;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
-import run.halo.app.model.entity.*;
+import run.halo.app.model.entity.Journal;
+import run.halo.app.model.entity.JournalComment;
+import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.entity.SheetComment;
+import run.halo.app.model.entity.User;
 import run.halo.app.model.properties.CommentProperties;
-import run.halo.app.service.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import run.halo.app.service.JournalCommentService;
+import run.halo.app.service.JournalService;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.PostCommentService;
+import run.halo.app.service.PostService;
+import run.halo.app.service.SheetCommentService;
+import run.halo.app.service.SheetService;
+import run.halo.app.service.ThemeService;
+import run.halo.app.service.UserService;
 
 /**
  * PostComment event listener.

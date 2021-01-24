@@ -1,13 +1,20 @@
 package run.halo.app.utils;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.kohsuke.github.*;
+import org.kohsuke.github.GHContent;
+import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.HttpException;
 import run.halo.app.service.ThemeService;
-
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /**
  * GithubUtils send request to api.github.com

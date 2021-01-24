@@ -1,5 +1,7 @@
 package run.halo.app.core;
 
+import java.util.Map;
+import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,9 +21,6 @@ import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.utils.ExceptionUtils;
 import run.halo.app.utils.ValidationUtils;
-
-import javax.validation.ConstraintViolationException;
-import java.util.Map;
 
 /**
  * Exception handler of controller.

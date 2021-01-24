@@ -1,12 +1,11 @@
 package run.halo.app.repository.base;
 
+import java.util.List;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.BaseMeta;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Base meta repository.

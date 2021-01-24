@@ -1,5 +1,15 @@
 package run.halo.app.config;
 
+import static run.halo.app.utils.HaloUtils.URL_SEPARATOR;
+import static run.halo.app.utils.HaloUtils.ensureBoth;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.util.AntPathMatcher;
@@ -8,17 +18,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.StaticStorageChangedEvent;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static run.halo.app.utils.HaloUtils.URL_SEPARATOR;
-import static run.halo.app.utils.HaloUtils.ensureBoth;
 
 /**
  * @author ryanwang

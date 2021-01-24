@@ -1,15 +1,14 @@
 package run.halo.app.repository;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.repository.base.BaseRepository;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 
 /**

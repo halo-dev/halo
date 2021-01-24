@@ -1,5 +1,7 @@
 package run.halo.app.controller.content;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +19,6 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.ThemeService;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Search controller.

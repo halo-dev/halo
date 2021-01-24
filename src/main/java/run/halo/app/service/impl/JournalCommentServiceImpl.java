@@ -1,6 +1,11 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,12 +22,6 @@ import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.ServiceUtils;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Journal comment service implementation.

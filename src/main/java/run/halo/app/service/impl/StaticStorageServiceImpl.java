@@ -1,6 +1,16 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
+import javax.activation.MimetypesFileTypeMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -18,17 +28,6 @@ import run.halo.app.exception.ServiceException;
 import run.halo.app.model.support.StaticFile;
 import run.halo.app.service.StaticStorageService;
 import run.halo.app.utils.FileUtils;
-
-import javax.activation.MimetypesFileTypeMap;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * StaticStorageService implementation class.

@@ -1,7 +1,11 @@
 package run.halo.app.handler.file;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 import com.obs.services.ObsClient;
 import com.obs.services.model.PutObjectResult;
+import java.io.IOException;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -16,11 +20,6 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
-
-import java.io.IOException;
-import java.util.Objects;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Huawei obs file handler.

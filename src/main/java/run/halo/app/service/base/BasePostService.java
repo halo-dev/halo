@@ -1,5 +1,7 @@
 package run.halo.app.service.base;
 
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -9,9 +11,6 @@ import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Base post service implementation.

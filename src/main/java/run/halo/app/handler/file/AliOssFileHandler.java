@@ -1,9 +1,12 @@
 package run.halo.app.handler.file;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.PutObjectResult;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -18,10 +21,6 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
-
-import java.util.Objects;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Ali oss file handler.

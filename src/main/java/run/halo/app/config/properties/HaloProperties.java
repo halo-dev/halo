@@ -1,15 +1,16 @@
 package run.halo.app.config.properties;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import run.halo.app.model.enums.Mode;
+import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+import static run.halo.app.model.support.HaloConst.TEMP_DIR;
+import static run.halo.app.model.support.HaloConst.USER_HOME;
+import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-
-import static run.halo.app.model.support.HaloConst.*;
-import static run.halo.app.utils.HaloUtils.ensureSuffix;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import run.halo.app.model.enums.Mode;
 
 
 /**

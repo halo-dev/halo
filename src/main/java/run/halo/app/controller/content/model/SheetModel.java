@@ -1,5 +1,6 @@
 package run.halo.app.controller.content.model;
 
+import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
@@ -16,8 +17,6 @@ import run.halo.app.service.SheetMetaService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
-
-import java.util.List;
 
 /**
  * Sheet model.

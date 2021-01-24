@@ -1,13 +1,16 @@
 package run.halo.app.listener.post;
 
+import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 import run.halo.app.event.post.AbstractVisitEvent;
 import run.halo.app.service.base.BasePostService;
-
-import java.util.Map;
-import java.util.concurrent.*;
 
 /**
  * Abstract visit event listener.

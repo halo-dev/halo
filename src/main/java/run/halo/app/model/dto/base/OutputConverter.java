@@ -1,8 +1,8 @@
 package run.halo.app.model.dto.base;
 
-import org.springframework.lang.NonNull;
-
 import static run.halo.app.utils.BeanUtils.updateProperties;
+
+import org.springframework.lang.NonNull;
 
 /**
  * Converter interface for output DTO.

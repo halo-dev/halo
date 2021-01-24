@@ -1,5 +1,6 @@
 package run.halo.app.service;
 
+import java.util.Optional;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import run.halo.app.exception.ForbiddenException;
@@ -8,8 +9,6 @@ import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.MFAType;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.service.base.CrudService;
-
-import java.util.Optional;
 
 /**
  * User service interface.

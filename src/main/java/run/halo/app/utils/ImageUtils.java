@@ -1,17 +1,16 @@
 package run.halo.app.utils;
 
-import lombok.extern.slf4j.Slf4j;
-import net.sf.image4j.codec.ico.ICODecoder;
-import org.springframework.lang.NonNull;
-import run.halo.app.exception.ImageFormatException;
-
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import lombok.extern.slf4j.Slf4j;
+import net.sf.image4j.codec.ico.ICODecoder;
+import org.springframework.lang.NonNull;
+import run.halo.app.exception.ImageFormatException;
 
 /**
  * @author ryanwang

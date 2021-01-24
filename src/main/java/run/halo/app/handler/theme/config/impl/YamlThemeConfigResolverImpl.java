@@ -2,6 +2,11 @@ package run.halo.app.handler.theme.config.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -11,12 +16,6 @@ import run.halo.app.handler.theme.config.support.Item;
 import run.halo.app.handler.theme.config.support.Option;
 import run.halo.app.model.enums.DataType;
 import run.halo.app.model.enums.InputType;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Theme configuration resolver.

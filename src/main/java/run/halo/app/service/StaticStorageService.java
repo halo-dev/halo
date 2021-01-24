@@ -1,10 +1,9 @@
 package run.halo.app.service;
 
+import java.util.List;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.support.StaticFile;
-
-import java.util.List;
 
 /**
  * Static storage service interface class.

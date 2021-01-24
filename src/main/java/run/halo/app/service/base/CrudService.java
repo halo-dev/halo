@@ -1,5 +1,8 @@
 package run.halo.app.service.base;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -7,10 +10,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.exception.NotFoundException;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * CrudService interface contains some common methods.

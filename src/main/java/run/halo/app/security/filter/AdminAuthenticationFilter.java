@@ -1,6 +1,15 @@
 package run.halo.app.security.filter;
 
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
+import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_QUERY_NAME;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Optional;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
@@ -19,16 +28,6 @@ import run.halo.app.security.support.UserDetail;
 import run.halo.app.security.util.SecurityUtils;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Optional;
-
-import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_HEADER_NAME;
-import static run.halo.app.model.support.HaloConst.ADMIN_TOKEN_QUERY_NAME;
 
 /**
  * Admin authentication filter.

@@ -1,5 +1,6 @@
 package run.halo.app.security.resolver;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
@@ -12,8 +13,6 @@ import run.halo.app.model.entity.User;
 import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.support.UserDetail;
-
-import java.util.Optional;
 
 /**
  * Authentication argument resolver.
