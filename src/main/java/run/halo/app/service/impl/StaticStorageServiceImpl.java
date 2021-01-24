@@ -1,6 +1,16 @@
 package run.halo.app.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
+import javax.activation.MimetypesFileTypeMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -19,17 +29,6 @@ import run.halo.app.model.support.StaticFile;
 import run.halo.app.service.StaticStorageService;
 import run.halo.app.utils.FileUtils;
 
-import javax.activation.MimetypesFileTypeMap;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Stream;
-
 /**
  * StaticStorageService implementation class.
  *
@@ -38,14 +37,15 @@ import java.util.stream.Stream;
  */
 @Service
 @Slf4j
-public class StaticStorageServiceImpl implements StaticStorageService, ApplicationListener<ApplicationStartedEvent> {
+public class StaticStorageServiceImpl
+    implements StaticStorageService, ApplicationListener<ApplicationStartedEvent> {
 
     private final Path staticDir;
 
     private final ApplicationEventPublisher eventPublisher;
 
     public StaticStorageServiceImpl(HaloProperties haloProperties,
-            ApplicationEventPublisher eventPublisher) throws IOException {
+        ApplicationEventPublisher eventPublisher) throws IOException {
         staticDir = Paths.get(haloProperties.getWorkDir(), STATIC_FOLDER);
         this.eventPublisher = eventPublisher;
         FileUtils.createIfAbsent(staticDir);
@@ -72,14 +72,16 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
                 staticFile.setId(IdUtil.fastSimpleUUID());
                 staticFile.setName(path.getFileName().toString());
                 staticFile.setPath(path.toString());
-                staticFile.setRelativePath(StringUtils.removeStart(path.toString(), staticDir.toString()));
+                staticFile.setRelativePath(
+                    StringUtils.removeStart(path.toString(), staticDir.toString()));
                 staticFile.setIsFile(Files.isRegularFile(path));
                 try {
                     staticFile.setCreateTime(Files.getLastModifiedTime(path).toMillis());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                staticFile.setMimeType(MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(path.toFile()));
+                staticFile.setMimeType(
+                    MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(path.toFile()));
                 if (Files.isDirectory(path)) {
                     staticFile.setChildren(listStaticFileTree(path));
                 }
@@ -167,7 +169,8 @@ public class StaticStorageServiceImpl implements StaticStorageService, Applicati
         FileUtils.checkDirectoryTraversal(staticDir.toString(), uploadPath.toString());
 
         if (uploadPath.toFile().exists()) {
-            throw new FileOperationException("文件 " + file.getOriginalFilename() + " 已存在").setErrorData(uploadPath);
+            throw new FileOperationException("文件 " + file.getOriginalFilename() + " 已存在")
+                .setErrorData(uploadPath);
         }
 
         try {

@@ -1,10 +1,12 @@
 package run.halo.app.model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author johnniang

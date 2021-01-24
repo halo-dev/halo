@@ -1,10 +1,9 @@
 package run.halo.app.repository;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import run.halo.app.model.entity.Link;
 import run.halo.app.repository.base.BaseRepository;
-
-import java.util.List;
 
 /**
  * Link repository.

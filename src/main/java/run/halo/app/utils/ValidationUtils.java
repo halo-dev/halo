@@ -1,14 +1,22 @@
 package run.halo.app.utils;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Path;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.FieldError;
-
-import javax.validation.*;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Object validation utilities.
@@ -45,7 +53,7 @@ public class ValidationUtils {
     /**
      * Validates bean by hand.
      *
-     * @param obj    bean to be validated
+     * @param obj bean to be validated
      * @param groups validation group
      * @throws ConstraintViolationException throw if validation failure
      */
@@ -70,7 +78,7 @@ public class ValidationUtils {
     /**
      * Validates iterable objects.
      *
-     * @param objs   iterable objects could be null
+     * @param objs iterable objects could be null
      * @param groups validation groups
      */
     public static void validate(@Nullable Iterable<?> objs, @Nullable Class<?>... groups) {
@@ -108,7 +116,8 @@ public class ValidationUtils {
      * @return error detail map
      */
     @NonNull
-    public static Map<String, String> mapWithValidError(Set<ConstraintViolation<?>> constraintViolations) {
+    public static Map<String, String> mapWithValidError(
+        Set<ConstraintViolation<?>> constraintViolations) {
         if (CollectionUtils.isEmpty(constraintViolations)) {
             return Collections.emptyMap();
         }
@@ -116,7 +125,8 @@ public class ValidationUtils {
         Map<String, String> errMap = new HashMap<>(4);
         // Format the error message
         constraintViolations.forEach(constraintViolation ->
-                errMap.put(constraintViolation.getPropertyPath().toString(), constraintViolation.getMessage()));
+            errMap.put(constraintViolation.getPropertyPath().toString(),
+                constraintViolation.getMessage()));
         return errMap;
     }
 
@@ -132,7 +142,8 @@ public class ValidationUtils {
         }
 
         Map<String, String> errMap = new HashMap<>(4);
-        fieldErrors.forEach(filedError -> errMap.put(filedError.getField(), filedError.getDefaultMessage()));
+        fieldErrors.forEach(
+            filedError -> errMap.put(filedError.getField(), filedError.getDefaultMessage()));
         return errMap;
     }
 }

@@ -4,7 +4,12 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
+import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.exception.BadRequestException;
@@ -20,8 +25,6 @@ import run.halo.app.model.vo.MultiFactorAuthVO;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.TwoFactorAuthUtils;
 import run.halo.app.utils.ValidationUtils;
-
-import javax.validation.Valid;
 
 /**
  * User controller.
@@ -62,21 +65,25 @@ public class UserController {
     @PutMapping("profiles/password")
     @ApiOperation("Updates user's password")
     @DisableOnCondition
-    public BaseResponse<String> updatePassword(@RequestBody @Valid PasswordParam passwordParam, User user) {
-        userService.updatePassword(passwordParam.getOldPassword(), passwordParam.getNewPassword(), user.getId());
+    public BaseResponse<String> updatePassword(@RequestBody @Valid PasswordParam passwordParam,
+        User user) {
+        userService.updatePassword(passwordParam.getOldPassword(), passwordParam.getNewPassword(),
+            user.getId());
         return BaseResponse.ok("密码修改成功");
     }
 
     @PutMapping("mfa/generate")
     @ApiOperation("Generate Multi-Factor Auth qr image")
     @DisableOnCondition
-    public MultiFactorAuthVO generateMFAQrImage(@RequestBody MultiFactorAuthParam multiFactorAuthParam, User user) {
+    public MultiFactorAuthVO generateMFAQrImage(
+        @RequestBody MultiFactorAuthParam multiFactorAuthParam, User user) {
         if (MFAType.NONE == user.getMfaType()) {
             if (MFAType.TFA_TOTP == multiFactorAuthParam.getMfaType()) {
                 String mfaKey = TwoFactorAuthUtils.generateTFAKey();
-                String optAuthUrl = TwoFactorAuthUtils.generateOtpAuthUrl(user.getNickname(), mfaKey);
-                String qrImageBase64 = "data:image/png;base64," +
-                        Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 128, 128));
+                String optAuthUrl =
+                    TwoFactorAuthUtils.generateOtpAuthUrl(user.getNickname(), mfaKey);
+                String qrImageBase64 = "data:image/png;base64,"
+                    + Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 128, 128));
                 return new MultiFactorAuthVO(qrImageBase64, optAuthUrl, mfaKey, MFAType.TFA_TOTP);
             } else {
                 throw new BadRequestException("暂不支持的 MFA 认证的方式");
@@ -90,17 +97,23 @@ public class UserController {
     @ApiOperation("Updates user's Multi Factor Auth")
     @CacheLock(autoDelete = false, prefix = "mfa")
     @DisableOnCondition
-    public MultiFactorAuthVO updateMFAuth(@RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
-        if (StrUtil.isNotBlank(user.getMfaKey()) && MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
+    public MultiFactorAuthVO updateMFAuth(
+        @RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
+        if (StrUtil.isNotBlank(user.getMfaKey())
+            && MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.TFA_TOTP);
-        } else if (StrUtil.isBlank(user.getMfaKey()) && !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
+        } else if (StrUtil.isBlank(user.getMfaKey())
+            && !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.NONE);
         } else {
-            final String tfaKey = StrUtil.isNotBlank(user.getMfaKey()) ? user.getMfaKey() : multiFactorAuthParam.getMfaKey();
+            final String tfaKey = StrUtil.isNotBlank(user.getMfaKey()) ? user.getMfaKey() :
+                multiFactorAuthParam.getMfaKey();
             TwoFactorAuthUtils.validateTFACode(tfaKey, multiFactorAuthParam.getAuthcode());
         }
         // update MFA key
-        User updateUser = userService.updateMFA(multiFactorAuthParam.getMfaType(), multiFactorAuthParam.getMfaKey(), user.getId());
+        User updateUser = userService
+            .updateMFA(multiFactorAuthParam.getMfaType(), multiFactorAuthParam.getMfaKey(),
+                user.getId());
 
         return new MultiFactorAuthVO(updateUser.getMfaType());
     }

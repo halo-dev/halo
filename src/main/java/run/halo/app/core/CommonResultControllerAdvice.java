@@ -24,18 +24,19 @@ import run.halo.app.model.support.BaseResponse;
 public class CommonResultControllerAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
-    public boolean supports(MethodParameter returnType, @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
+    public boolean supports(MethodParameter returnType,
+        @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
         return AbstractJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
     @Override
     @NonNull
     public final Object beforeBodyWrite(@Nullable Object body,
-            @NotNull MethodParameter returnType,
-            @NotNull MediaType contentType,
-            @NotNull Class<? extends HttpMessageConverter<?>> converterType,
-            @NotNull ServerHttpRequest request,
-            @NotNull ServerHttpResponse response) {
+        @NotNull MethodParameter returnType,
+        @NotNull MediaType contentType,
+        @NotNull Class<? extends HttpMessageConverter<?>> converterType,
+        @NotNull ServerHttpRequest request,
+        @NotNull ServerHttpResponse response) {
         MappingJacksonValue container = getOrCreateContainer(body);
         // The contain body will never be null
         beforeBodyWriteInternal(container, contentType, returnType, request, response);
@@ -47,14 +48,15 @@ public class CommonResultControllerAdvice implements ResponseBodyAdvice<Object> 
      * additional serialization instructions) or simply cast it if already wrapped.
      */
     private MappingJacksonValue getOrCreateContainer(Object body) {
-        return body instanceof MappingJacksonValue ? (MappingJacksonValue) body : new MappingJacksonValue(body);
+        return body instanceof MappingJacksonValue ? (MappingJacksonValue) body :
+            new MappingJacksonValue(body);
     }
 
     private void beforeBodyWriteInternal(MappingJacksonValue bodyContainer,
-            MediaType contentType,
-            MethodParameter returnType,
-            ServerHttpRequest request,
-            ServerHttpResponse response) {
+        MediaType contentType,
+        MethodParameter returnType,
+        ServerHttpRequest request,
+        ServerHttpResponse response) {
         // Get return body
         Object returnBody = bodyContainer.getValue();
 

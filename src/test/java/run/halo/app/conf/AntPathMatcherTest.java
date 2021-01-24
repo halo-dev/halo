@@ -1,10 +1,10 @@
 package run.halo.app.conf;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.util.AntPathMatcher;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.util.AntPathMatcher;
 
 /**
  * Ant path matcher test.

@@ -1,12 +1,17 @@
 package run.halo.app.model.entity;
 
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreRemove;
+import javax.persistence.PreUpdate;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.utils.DateUtils;
-
-import javax.persistence.*;
-import java.util.Date;
 
 /**
  * Base entity.

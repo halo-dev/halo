@@ -1,10 +1,9 @@
 package run.halo.app.service;
 
+import java.util.List;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.support.StaticFile;
-
-import java.util.List;
 
 /**
  * Static storage service interface class.
@@ -24,7 +23,7 @@ public interface StaticStorageService {
     /**
      * Lists static folder.
      *
-     * @return List<StaticFile>
+     * @return static file list
      */
     List<StaticFile> listStaticFolder();
 
@@ -38,7 +37,7 @@ public interface StaticStorageService {
     /**
      * Create folder.
      *
-     * @param basePath   base path
+     * @param basePath base path
      * @param folderName folder name must not be null
      */
     void createFolder(String basePath, @NonNull String folderName);
@@ -47,7 +46,7 @@ public interface StaticStorageService {
      * Update static file.
      *
      * @param basePath base path
-     * @param file     file must not be null.
+     * @param file file must not be null.
      */
     void upload(String basePath, @NonNull MultipartFile file);
 
@@ -55,14 +54,14 @@ public interface StaticStorageService {
      * Rename static file or folder.
      *
      * @param basePath base path must not be null
-     * @param newName  new name must not be null
+     * @param newName new name must not be null
      */
     void rename(@NonNull String basePath, @NonNull String newName);
 
     /**
      * Save static file.
      *
-     * @param path    path must not be null
+     * @param path path must not be null
      * @param content saved content
      */
     void save(@NonNull String path, String content);

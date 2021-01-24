@@ -5,9 +5,8 @@ import freemarker.template.Configuration;
 import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * Freemarker template random method.

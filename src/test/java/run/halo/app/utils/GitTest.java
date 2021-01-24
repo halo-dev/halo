@@ -1,5 +1,13 @@
 package run.halo.app.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
@@ -7,16 +15,11 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
-import org.junit.jupiter.api.*;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Git test.
@@ -41,7 +44,8 @@ class GitTest {
 
     @Test
     void openFailureTest() {
-        Assertions.assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
+        Assertions
+            .assertThrows(RepositoryNotFoundException.class, () -> Git.open(tempPath.toFile()));
     }
 
     @Test
@@ -60,9 +64,11 @@ class GitTest {
     void remoteAddTest() throws GitAPIException, URISyntaxException {
         Git git = Git.init().setDirectory(tempPath.toFile()).call();
         git.remoteRemove().setRemoteName("theme-provider").call();
-        git.remoteAdd().setName("theme-provider").setUri(new URIish("https://github.com/halo-dev/halo-theme-pinghsu.git")).call();
+        git.remoteAdd().setName("theme-provider")
+            .setUri(new URIish("https://github.com/halo-dev/halo-theme-pinghsu.git")).call();
         List<RemoteConfig> remoteConfigs = git.remoteList().call();
-        remoteConfigs.forEach(remoteConfig -> log.debug("name: [{}], url: [{}]", remoteConfig.getName(), remoteConfig.getURIs()));
+        remoteConfigs.forEach(remoteConfig -> log
+            .debug("name: [{}], url: [{}]", remoteConfig.getName(), remoteConfig.getURIs()));
     }
 
     @Test
@@ -83,22 +89,24 @@ class GitTest {
     @Test
     @Disabled("Due to time-consumption fetching")
     void getAllBranchesTest() {
-        List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
+        List<String> branches =
+            GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme-hux.git");
         assertNotNull(branches);
     }
 
     @Test
     @Disabled("Due to time-consumption fetching")
     void getAllBranchesWithInvalidURL() {
-        List<String> branches = GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme.git");
+        List<String> branches =
+            GitUtils.getAllBranches("https://github.com/halo-dev/halo-theme.git");
         assertNotNull(branches);
         assertEquals(0, branches.size());
     }
 
     Git cloneRepository() throws GitAPIException {
         return Git.cloneRepository()
-                .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
-                .setDirectory(tempPath.toFile())
-                .call();
+            .setURI("https://github.com/halo-dev/halo-theme-pinghsu.git")
+            .setDirectory(tempPath.toFile())
+            .call();
     }
 }

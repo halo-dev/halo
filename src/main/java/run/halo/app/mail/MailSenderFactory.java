@@ -1,13 +1,12 @@
 package run.halo.app.mail;
 
+import java.util.Properties;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.lang.NonNull;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-
-import java.util.Properties;
 
 /**
  * Java mail sender factory.
@@ -34,7 +33,8 @@ public class MailSenderFactory {
         return mailSender;
     }
 
-    private void setProperties(@NonNull JavaMailSenderImpl mailSender, @NonNull MailProperties mailProperties) {
+    private void setProperties(@NonNull JavaMailSenderImpl mailSender,
+        @NonNull MailProperties mailProperties) {
         mailSender.setHost(mailProperties.getHost());
         mailSender.setPort(mailProperties.getPort());
         mailSender.setUsername(mailProperties.getUsername());

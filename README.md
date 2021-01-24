@@ -60,6 +60,7 @@ java -jar halo.jar
 > Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议。
 
 ## 贡献
+
 参考 [CONTRIBUTING](./CONTRIBUTING.md)。
 
 ## 捐赠

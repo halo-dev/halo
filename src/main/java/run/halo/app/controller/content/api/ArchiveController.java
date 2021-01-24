@@ -1,13 +1,12 @@
 package run.halo.app.controller.content.api;
 
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.service.PostService;
-
-import java.util.List;
 
 /**
  * Content archive controller.

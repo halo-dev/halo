@@ -1,6 +1,7 @@
 package run.halo.app.controller.admin.api;
 
 import io.swagger.annotations.ApiOperation;
+import javax.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,8 +10,6 @@ import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.mail.MailService;
 import run.halo.app.model.params.MailParam;
 import run.halo.app.model.support.BaseResponse;
-
-import javax.validation.Valid;
 
 /**
  * Mail controller.
