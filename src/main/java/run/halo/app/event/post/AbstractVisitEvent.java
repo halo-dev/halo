@@ -18,7 +18,7 @@ public abstract class AbstractVisitEvent extends ApplicationEvent {
      * Create a new ApplicationEvent.
      *
      * @param source the object on which the event initially occurred (never {@code null})
-     * @param id     id
+     * @param id id
      */
     public AbstractVisitEvent(@NonNull Object source, @NonNull Integer id) {
         super(source);

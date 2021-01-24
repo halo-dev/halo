@@ -1,6 +1,14 @@
 package run.halo.app.service.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
 import com.qiniu.common.Zone;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -11,15 +19,6 @@ import run.halo.app.model.entity.Option;
 import run.halo.app.model.properties.QiniuOssProperties;
 import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 /**
  * OptionService test.
@@ -86,10 +85,13 @@ class OptionServiceImplTest {
         QiniuOssProperties zoneProperty = QiniuOssProperties.OSS_ZONE;
 
         // Given
-        // given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional.ofNullable(option));
+        // given(optionRepository.findByKey(zoneProperty.getValue())).willReturn(Optional
+        // .ofNullable(option));
         Map<String, Object> optionMap = new HashMap<>(1);
-        optionMap.put(zoneProperty.getValue(), Optional.ofNullable(option).map(Option::getValue).orElse(null));
-        given(cacheStore.getAny(OptionService.OPTIONS_KEY, Map.class)).willReturn(Optional.of(optionMap));
+        optionMap.put(zoneProperty.getValue(),
+            Optional.ofNullable(option).map(Option::getValue).orElse(null));
+        given(cacheStore.getAny(OptionService.OPTIONS_KEY, Map.class))
+            .willReturn(Optional.of(optionMap));
 
         // When
         Zone zone = optionService.getQnYunZone();

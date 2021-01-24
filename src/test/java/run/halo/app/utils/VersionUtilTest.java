@@ -1,11 +1,11 @@
 package run.halo.app.utils;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import run.halo.app.model.support.HaloConst;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author ryanwang
@@ -27,9 +27,9 @@ class VersionUtilTest {
     void unknownVersionCompareTest() {
         // build a random version
         String randomVersion = String.join(".",
-                RandomStringUtils.randomNumeric(1),
-                RandomStringUtils.randomNumeric(2),
-                RandomStringUtils.randomNumeric(3));
+            RandomStringUtils.randomNumeric(1),
+            RandomStringUtils.randomNumeric(2),
+            RandomStringUtils.randomNumeric(3));
         assertTrue(VersionUtil.compareVersion(HaloConst.UNKNOWN_VERSION, randomVersion));
     }
 

@@ -1,5 +1,6 @@
 package run.halo.app.cache.lock;
 
+import java.lang.annotation.Annotation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -14,8 +15,6 @@ import run.halo.app.exception.FrequentAccessException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.utils.ServletUtils;
 
-import java.lang.annotation.Annotation;
-
 /**
  * Interceptor for cache lock annotation.
  *
@@ -27,9 +26,9 @@ import java.lang.annotation.Annotation;
 @Configuration
 public class CacheLockInterceptor {
 
-    private final static String CACHE_LOCK_PREFOX = "cache_lock_";
+    private static final String CACHE_LOCK_PREFIX = "cache_lock_";
 
-    private final static String CACHE_LOCK_VALUE = "locked";
+    private static final String CACHE_LOCK_VALUE = "locked";
 
     private final AbstractStringCacheStore cacheStore;
 
@@ -55,10 +54,13 @@ public class CacheLockInterceptor {
 
         try {
             // Get from cache
-            Boolean cacheResult = cacheStore.putIfAbsent(cacheLockKey, CACHE_LOCK_VALUE, cacheLock.expired(), cacheLock.timeUnit());
+            Boolean cacheResult = cacheStore
+                .putIfAbsent(cacheLockKey, CACHE_LOCK_VALUE, cacheLock.expired(),
+                    cacheLock.timeUnit());
 
             if (cacheResult == null) {
-                throw new ServiceException("Unknown reason of cache " + cacheLockKey).setErrorData(cacheLockKey);
+                throw new ServiceException("Unknown reason of cache " + cacheLockKey)
+                    .setErrorData(cacheLockKey);
             }
 
             if (!cacheResult) {
@@ -76,7 +78,8 @@ public class CacheLockInterceptor {
         }
     }
 
-    private String buildCacheLockKey(@NonNull CacheLock cacheLock, @NonNull ProceedingJoinPoint joinPoint) {
+    private String buildCacheLockKey(@NonNull CacheLock cacheLock,
+        @NonNull ProceedingJoinPoint joinPoint) {
         Assert.notNull(cacheLock, "Cache lock must not be null");
         Assert.notNull(joinPoint, "Proceeding join point must not be null");
 
@@ -84,7 +87,7 @@ public class CacheLockInterceptor {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 
         // Build the cache lock key
-        StringBuilder cacheKeyBuilder = new StringBuilder(CACHE_LOCK_PREFOX);
+        StringBuilder cacheKeyBuilder = new StringBuilder(CACHE_LOCK_PREFIX);
 
         String delimiter = cacheLock.delimiter();
 
