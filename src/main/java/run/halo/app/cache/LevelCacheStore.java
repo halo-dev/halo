@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.iq80.leveldb.*;
 import org.iq80.leveldb.impl.Iq80DBFactory;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import run.halo.app.config.properties.HaloProperties;
@@ -70,8 +70,8 @@ public class LevelCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    @NotNull
-    Optional<CacheWrapper<String>> getInternal(@NotNull String key) {
+    @NonNull
+    Optional<CacheWrapper<String>> getInternal(@NonNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
         byte[] bytes = LEVEL_DB.get(stringToBytes(key));
         if (bytes != null) {
@@ -82,12 +82,12 @@ public class LevelCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    void putInternal(@NotNull String key, @NotNull CacheWrapper<String> cacheWrapper) {
+    void putInternal(@NonNull String key, @NonNull CacheWrapper<String> cacheWrapper) {
         putInternalIfAbsent(key, cacheWrapper);
     }
 
     @Override
-    Boolean putInternalIfAbsent(@NotNull String key, @NotNull CacheWrapper<String> cacheWrapper) {
+    Boolean putInternalIfAbsent(@NonNull String key, @NonNull CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
         try {
@@ -104,7 +104,7 @@ public class LevelCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    public void delete(@NotNull String key) {
+    public void delete(@NonNull String key) {
         LEVEL_DB.delete(stringToBytes(key));
         log.debug("cache remove key: [{}]", key);
     }
