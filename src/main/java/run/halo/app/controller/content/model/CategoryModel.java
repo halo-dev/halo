@@ -39,11 +39,12 @@ public class CategoryModel {
 
     private final AuthenticationService authenticationService;
 
-    public CategoryModel(
-            CategoryService categoryService, ThemeService themeService,
-            PostCategoryService postCategoryService, PostService postService,
-            OptionService optionService, AuthenticationService authenticationService
-    ) {
+    public CategoryModel(CategoryService categoryService,
+            ThemeService themeService,
+            PostCategoryService postCategoryService,
+            PostService postService,
+            OptionService optionService,
+            AuthenticationService authenticationService) {
         this.categoryService = categoryService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;

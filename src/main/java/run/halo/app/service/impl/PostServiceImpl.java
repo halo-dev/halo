@@ -82,8 +82,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final AuthorizationService authorizationService;
 
-    public PostServiceImpl(
-            BasePostRepository<Post> basePostRepository,
+    public PostServiceImpl(BasePostRepository<Post> basePostRepository,
             OptionService optionService,
             PostRepository postRepository,
             TagService tagService,
@@ -93,8 +92,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             PostCommentService postCommentService,
             ApplicationEventPublisher eventPublisher,
             PostMetaService postMetaService,
-            AuthorizationService authorizationService
-    ) {
+            AuthorizationService authorizationService) {
         super(basePostRepository, optionService);
         this.postRepository = postRepository;
         this.tagService = tagService;

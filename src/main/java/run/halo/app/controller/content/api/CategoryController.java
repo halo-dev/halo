@@ -41,12 +41,10 @@ public class CategoryController {
 
     private final AuthenticationService authenticationService;
 
-    public CategoryController(
-            CategoryService categoryService,
+    public CategoryController(CategoryService categoryService,
             PostCategoryService postCategoryService,
             PostService postService,
-            AuthenticationService authenticationService
-    ) {
+            AuthenticationService authenticationService) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
         this.postService = postService;

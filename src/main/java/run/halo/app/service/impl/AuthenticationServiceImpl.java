@@ -27,8 +27,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final PostCategoryRepository postCategoryRepository;
 
-    public AuthenticationServiceImpl(
-            PostCategoryRepository postCategoryRepository,
+    public AuthenticationServiceImpl(PostCategoryRepository postCategoryRepository,
             CategoryRepository categoryRepository,
             AuthorizationService authorizationService
     ) {
