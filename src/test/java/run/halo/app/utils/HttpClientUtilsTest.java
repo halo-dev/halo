@@ -1,12 +1,11 @@
 package run.halo.app.utils;
 
-import cn.hutool.core.lang.Tuple;
-import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Method;
-
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import cn.hutool.core.lang.Tuple;
+import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 
 public class HttpClientUtilsTest {
 

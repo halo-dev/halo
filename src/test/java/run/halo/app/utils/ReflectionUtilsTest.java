@@ -1,13 +1,12 @@
 package run.halo.app.utils;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import run.halo.app.model.params.BaseCommentParam;
 import run.halo.app.model.params.JournalCommentParam;
-
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Objects;
 
 /**
  * Reflection utils test.

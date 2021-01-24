@@ -2,12 +2,11 @@ package run.halo.app.handler.theme;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
-
-import java.io.IOException;
 
 /**
  * @author johnniang

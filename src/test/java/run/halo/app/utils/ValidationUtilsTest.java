@@ -1,17 +1,20 @@
 package run.halo.app.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 import javax.validation.constraints.NotBlank;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.junit.jupiter.api.Test;
 
 /**
  * Validation utils test.

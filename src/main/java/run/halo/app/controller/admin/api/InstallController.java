@@ -278,8 +278,8 @@ public class InstallController {
             return userService.update(user);
         }).orElseGet(() -> {
             String gravatar =
-                "//cn.gravatar.com/avatar/" + SecureUtil.md5(installParam.getEmail()) +
-                    "?s=256&d=mm";
+                "//cn.gravatar.com/avatar/" + SecureUtil.md5(installParam.getEmail())
+                    + "?s=256&d=mm";
             installParam.setAvatar(gravatar);
             return userService.createBy(installParam);
         });
