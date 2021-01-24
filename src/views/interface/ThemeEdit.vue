@@ -132,7 +132,7 @@ export default {
     handleListThemes() {
       this.themesLoading = true
       themeApi
-        .listAll()
+        .list()
         .then((response) => {
           this.themes = response.data.data
         })

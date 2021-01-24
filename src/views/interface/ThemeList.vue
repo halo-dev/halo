@@ -162,13 +162,13 @@
                 更多主题请访问：
                 <a
                   target="_blank"
-                  href="https://halo.run/p/themes"
+                  href="https://halo.run/p/themes.html"
                 >https://halo.run/p/themes</a>
               </template>
             </a-alert>
           </a-tab-pane>
           <a-tab-pane
-            tab="远程拉取"
+            tab="远程下载"
             key="2"
           >
             <a-form-model
@@ -179,72 +179,18 @@
             >
               <a-form-model-item
                 prop="url"
-                label="Github 仓库地址："
+                label="远程地址："
+                help="* 支持 Git 仓库地址，ZIP 链接。"
               >
-                <a-input-search
-                  v-model="installModal.remote.url"
-                  enter-button="获取版本"
-                  @search="handleFetching"
-                  :loading="installModal.remote.repoFetching"
-                />
+                <a-input v-model="installModal.remote.url" />
               </a-form-model-item>
-              <a-form-model-item label="版本类型：">
-                <a-select v-model="installModal.remote.byBranchOrRelease">
-                  <a-select-option value="release">发行版</a-select-option>
-                  <a-select-option value="branch">开发版</a-select-option>
-                </a-select>
-              </a-form-model-item>
-              <a-form-model-item
-                label="版本："
-                v-show="installModal.remote.byBranchOrRelease === 'release'"
-              >
-                <a-select
-                  v-model="installModal.remote.selectedRelease"
-                  :loading="installModal.remote.repoFetching"
-                >
-                  <a-select-option
-                    v-for="(item, index) in installModal.remote.releases"
-                    :key="index"
-                    :value="item.branch"
-                  >{{ item.branch }}</a-select-option>
-                </a-select>
-              </a-form-model-item>
-              <a-form-model-item
-                label="分支："
-                v-show="installModal.remote.byBranchOrRelease === 'branch'"
-              >
-                <a-select
-                  v-model="installModal.remote.selectedBranch"
-                  :loading="installModal.remote.repoFetching"
-                >
-                  <a-select-option
-                    v-for="(item, index) in installModal.remote.branches"
-                    :key="index"
-                    :value="item.branch"
-                  >{{ item.branch }}</a-select-option>
-                </a-select>
-              </a-form-model-item>
-              <a-form-model-item v-show="installModal.remote.byBranchOrRelease === 'release'">
+              <a-form-model-item>
                 <ReactiveButton
-                  :disabled="!installModal.remote.selectedRelease"
                   type="primary"
-                  @click="handleReleaseDownloading"
-                  @callback="handleReleaseDownloadedCallback"
-                  :loading="installModal.remote.releaseDownloading"
-                  :errored="installModal.remote.releaseDownloadErrored"
-                  text="下载"
-                  loadedText="下载成功"
-                  erroredText="下载失败"
-                ></ReactiveButton>
-              </a-form-model-item>
-              <a-form-model-item v-show="installModal.remote.byBranchOrRelease === 'branch'">
-                <ReactiveButton
-                  :disabled="!installModal.remote.selectedBranch"
-                  type="primary"
-                  @click="handleBranchPulling"
-                  @callback="handleBranchPulledCallback"
-                  :loading="installModal.remote.branchPulling"
-                  :errored="installModal.remote.branchPullErrored"
+                  @click="handleRemoteFetching"
+                  @callback="handleRemoteFetchCallback"
+                  :loading="installModal.remote.fetching"
+                  :errored="installModal.remote.fetchErrored"
                   text="下载"
                   loadedText="下载成功"
                   erroredText="下载失败"
@@ -256,7 +202,7 @@
               closable
             >
               <template slot="message">
-                远程地址即主题仓库地址，建议使用发行版本。更多主题请访问：
+                目前仅支持远程 Git 仓库和 ZIP 下载链接。更多主题请访问：
                 <a
                   target="_blank"
                   href="https://halo.run/p/themes.html"
@@ -341,23 +287,11 @@ export default {
         remote: {
           url: null,
 
-          repoFetching: false,
-          repoFetchErrored: false,
-
-          branches: [],
-          selectedBranch: null,
-          branchPulling: false,
-          branchPullErrored: false,
-
-          releases: [],
-          selectedRelease: null,
-          releaseDownloading: false,
-          releaseDownloadErrored: false,
-
-          byBranchOrRelease: 'release', // release or branch, default is release
+          fetching: false,
+          fetchErrored: false,
 
           rules: {
-            url: [{ required: true, message: '* Github 仓库地址不能为空', trigger: ['change'] }],
+            url: [{ required: true, message: '* 远程地址不能为空', trigger: ['change'] }],
           },
         },
       },
@@ -417,7 +351,7 @@ export default {
     handleListThemes() {
       this.list.loading = true
       themeApi
-        .listAll()
+        .list()
         .then((response) => {
           this.list.data = response.data.data
         })
@@ -463,72 +397,26 @@ export default {
       this.localUpdateModel.visible = false
       this.handleListThemes()
     },
-    handleFetching() {
-      const _this = this
-      _this.$refs.remoteInstallForm.validate((valid) => {
+    handleRemoteFetching() {
+      this.$refs.remoteInstallForm.validate((valid) => {
         if (valid) {
-          _this.installModal.remote.repoFetching = true
-          themeApi.fetchingBranches(_this.installModal.remote.url).then((response) => {
-            const branches = response.data.data
-            _this.installModal.remote.branches = branches
-            if (branches && branches.length > 0) {
-              _this.installModal.remote.selectedBranch = branches[0].branch
-            }
-          })
+          this.installModal.remote.fetching = true
           themeApi
-            .fetchingReleases(_this.installModal.remote.url)
-            .then((response) => {
-              const releases = response.data.data
-              _this.installModal.remote.releases = releases
-              if (releases && releases.length > 0) {
-                _this.installModal.remote.selectedRelease = releases[0].branch
-              }
+            .fetching(this.installModal.remote.url)
+            .catch(() => {
+              this.installModal.remote.fetchErrored = true
             })
             .finally(() => {
               setTimeout(() => {
-                _this.installModal.remote.repoFetching = false
+                this.installModal.remote.fetching = false
               }, 400)
             })
         }
       })
     },
-    handleBranchPulling() {
-      this.installModal.remote.branchPulling = true
-      themeApi
-        .fetchingBranch(this.installModal.remote.url, this.installModal.remote.selectedBranch)
-        .catch(() => {
-          this.installModal.remote.branchPullErrored = true
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.installModal.remote.branchPulling = false
-          }, 400)
-        })
-    },
-    handleBranchPulledCallback() {
-      if (this.installModal.remote.branchPullErrored) {
-        this.installModal.remote.branchPullErrored = false
-      } else {
-        this.installModal.visible = false
-        this.handleListThemes()
-      }
-    },
-    handleReleaseDownloading() {
-      this.installModal.remote.releaseDownloading = true
-      themeApi
-        .fetchingRelease(this.installModal.remote.url, this.installModal.remote.selectedRelease)
-        .catch(() => {
-          this.installModal.remote.branchPullErrored = true
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.installModal.remote.releaseDownloading = false
-          }, 400)
-        })
-    },
-    handleReleaseDownloadedCallback() {
-      if (this.installModal.remote.releaseDownloadErrored) {
-        this.installModal.remote.releaseDownloadErrored = false
+    handleRemoteFetchCallback() {
+      if (this.installModal.remote.fetchErrored) {
+        this.installModal.remote.fetchErrored = false
       } else {
         this.installModal.visible = false
         this.handleListThemes()
@@ -574,12 +462,7 @@ export default {
       if (this.$refs.updateByupload) {
         this.$refs.updateByupload.handleClearFileList()
       }
-      this.installModal.remote.branches = []
-      this.installModal.remote.selectedBranch = null
-      this.installModal.remote.releases = []
-      this.installModal.remote.selectedRelease = null
       this.installModal.remote.url = null
-      this.installModal.remote.byBranchOrRelease = 'release'
       this.handleListThemes()
     },
     onThemeSettingsDrawerClose() {

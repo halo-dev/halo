@@ -4,7 +4,7 @@ const baseUrl = '/api/admin/themes'
 
 const themeApi = {}
 
-themeApi.listAll = () => {
+themeApi.list = () => {
   return service({
     url: `${baseUrl}`,
     method: 'get'
@@ -130,63 +130,6 @@ themeApi.fetching = url => {
       uri: url
     },
     method: 'post'
-  })
-}
-
-themeApi.fetchingBranches = url => {
-  return service({
-    url: `${baseUrl}/fetchingBranches`,
-    timeout: 60000,
-    params: {
-      uri: url
-    },
-    method: 'post'
-  })
-}
-
-themeApi.fetchingReleases = url => {
-  return service({
-    url: `${baseUrl}/fetchingReleases`,
-    timeout: 60000,
-    params: {
-      uri: url
-    },
-    method: 'post'
-  })
-}
-
-themeApi.fetchingBranch = (url, branchName) => {
-  return service({
-    url: `${baseUrl}/fetchBranch`,
-    timeout: 60000,
-    params: {
-      uri: url,
-      branch: branchName
-    },
-    method: 'get'
-  })
-}
-
-themeApi.fetchingLatestRelease = url => {
-  return service({
-    url: `${baseUrl}/fetchLatestRelease`,
-    timeout: 60000,
-    params: {
-      uri: url
-    },
-    method: 'get'
-  })
-}
-
-themeApi.fetchingRelease = (url, tagName) => {
-  return service({
-    url: `${baseUrl}/fetchingRelease`,
-    timeout: 60000,
-    params: {
-      uri: url,
-      tag: tagName
-    },
-    method: 'get'
   })
 }
 
