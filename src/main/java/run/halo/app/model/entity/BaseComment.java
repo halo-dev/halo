@@ -38,8 +38,8 @@ public class BaseComment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
-    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support" +
-        ".CustomIdGenerator")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support"
+        + ".CustomIdGenerator")
     private Long id;
 
     /**

@@ -26,10 +26,10 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
      * @return a list of CommentCountProjection
      */
     @Query(
-        "select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), " +
-            "comment.postId) " +
-            "from PostComment comment " +
-            "where comment.postId in ?1 group by comment.postId")
+        "select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), "
+            + "comment.postId) "
+            + "from PostComment comment "
+            + "where comment.postId in ?1 group by comment.postId")
     @NonNull
     @Override
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
@@ -41,11 +41,11 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
      * @return a list of CommentChildrenCountProjection
      */
     @Query(
-        "select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment" +
-            ".id), comment.parentId) " +
-            "from PostComment comment " +
-            "where comment.parentId in ?1 " +
-            "group by comment.parentId")
+        "select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment"
+            + ".id), comment.parentId) "
+            + "from PostComment comment "
+            + "where comment.parentId in ?1 "
+            + "group by comment.parentId")
     @NonNull
     @Override
     List<CommentChildrenCountProjection> findDirectChildrenCount(
@@ -59,7 +59,7 @@ public interface PostCommentRepository extends BaseCommentRepository<PostComment
      * @param endTime 结束时间
      * @return 评论次数
      */
-    @Query("SELECT COUNT(id) FROM PostComment WHERE ipAddress=?1 AND updateTime BETWEEN ?2 AND ?3" +
-        " AND status <> 2")
+    @Query("SELECT COUNT(id) FROM PostComment WHERE ipAddress=?1 AND updateTime BETWEEN ?2 AND ?3"
+        + " AND status <> 2")
     int countByIpAndTime(String ipAddress, Date startTime, Date endTime);
 }

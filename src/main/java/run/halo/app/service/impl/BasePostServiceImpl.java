@@ -249,6 +249,12 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     @Override
     @Transactional
+    public void increaseVisit(Integer postId) {
+        increaseVisit(1L, postId);
+    }
+
+    @Override
+    @Transactional
     public void increaseLike(long likes, Integer postId) {
         Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
         Assert.notNull(postId, "Post id must not be null");
@@ -260,12 +266,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             throw new BadRequestException(
                 "Failed to increase likes " + likes + " for post with id " + postId);
         }
-    }
-
-    @Override
-    @Transactional
-    public void increaseVisit(Integer postId) {
-        increaseVisit(1L, postId);
     }
 
     @Override

@@ -225,8 +225,8 @@ public class CommonController extends AbstractErrorController {
         if (include == ErrorProperties.IncludeStacktrace.ALWAYS) {
             return ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE);
         }
-        if (include == ErrorProperties.IncludeStacktrace.ON_TRACE_PARAM &&
-            getTraceParameter(request)) {
+        if (include == ErrorProperties.IncludeStacktrace.ON_TRACE_PARAM
+            && getTraceParameter(request)) {
             return ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE);
         }
         return ErrorAttributeOptions.defaults();

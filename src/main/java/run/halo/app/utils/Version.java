@@ -27,14 +27,14 @@ public class Version implements Comparable<Version> {
     /**
      * Regex expression.
      */
-    private static final String REGEX = "^" +
-        "(?<major>0|[1-9]\\d*)\\." + // major number
-        "(?<minor>0|[1-9]\\d*)\\." + // minor number
-        "(?<patch>0|[1-9]\\d*)" + // patch number
-        "(?:-" + // pre-release start
-        "(?<preRelease>beta|alpha|rc)\\." + // pre-release type
-        "(?<preReleaseMajor>0|[1-9]\\d*)" + // pre-release major number
-        ")?$"; // pre-release end
+    private static final String REGEX = "^"
+        + "(?<major>0|[1-9]\\d*)\\."  // major number
+        + "(?<minor>0|[1-9]\\d*)\\."  // minor number
+        + "(?<patch>0|[1-9]\\d*)"  // patch number
+        + "(?:-"  // pre-release start
+        + "(?<preRelease>beta|alpha|rc)\\."  // pre-release type
+        + "(?<preReleaseMajor>0|[1-9]\\d*)"  // pre-release major number
+        + ")?$"; // pre-release end
 
     /**
      * Pattern.

@@ -86,11 +86,11 @@ public class ControllerLogAop {
 
         boolean shouldNotLog = false;
         for (Object arg : args) {
-            if (arg == null ||
-                arg instanceof HttpServletRequest ||
-                arg instanceof HttpServletResponse ||
-                arg instanceof MultipartFile ||
-                arg.getClass().isAssignableFrom(MultipartFile[].class)) {
+            if (arg == null
+                || arg instanceof HttpServletRequest
+                || arg instanceof HttpServletResponse
+                || arg instanceof MultipartFile
+                || arg.getClass().isAssignableFrom(MultipartFile[].class)) {
                 shouldNotLog = true;
                 break;
             }

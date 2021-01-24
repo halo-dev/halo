@@ -12,14 +12,14 @@ import org.springframework.lang.NonNull;
 /**
  * Base repository interface contains some common methods.
  *
- * @param <DOMAIN> doamin type
- * @param <ID> id type
+ * @param <D> domain type
+ * @param <I> id type
  * @author johnniang
  * @author ryanwang
  * @date 2019-03-15
  */
 @NoRepositoryBean
-public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
+public interface BaseRepository<D, I> extends JpaRepository<D, I> {
 
     /**
      * Finds all domain by id list.
@@ -29,7 +29,7 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
      * @return a list of domains
      */
     @NonNull
-    List<DOMAIN> findAllByIdIn(@NonNull Collection<ID> ids, @NonNull Sort sort);
+    List<D> findAllByIdIn(@NonNull Collection<I> ids, @NonNull Sort sort);
 
     /**
      * Finds all domain by domain id list.
@@ -39,7 +39,7 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
      * @return a list of domains
      */
     @NonNull
-    Page<DOMAIN> findAllByIdIn(@NonNull Collection<ID> ids, @NonNull Pageable pageable);
+    Page<D> findAllByIdIn(@NonNull Collection<I> ids, @NonNull Pageable pageable);
 
     /**
      * Deletes by id list.
@@ -47,6 +47,6 @@ public interface BaseRepository<DOMAIN, ID> extends JpaRepository<DOMAIN, ID> {
      * @param ids id list of domain must not be null
      * @return number of rows affected
      */
-    long deleteByIdIn(@NonNull Collection<ID> ids);
+    long deleteByIdIn(@NonNull Collection<I> ids);
 
 }

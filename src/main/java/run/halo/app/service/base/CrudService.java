@@ -14,11 +14,11 @@ import run.halo.app.exception.NotFoundException;
 /**
  * CrudService interface contains some common methods.
  *
- * @param <DOMAIN> domain type
- * @param <ID> id type
+ * @param <D> domain type
+ * @param <I> id type
  * @author johnniang
  */
-public interface CrudService<DOMAIN, ID> {
+public interface CrudService<D, I> {
 
 
     /**
@@ -27,7 +27,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return List
      */
     @NonNull
-    List<DOMAIN> listAll();
+    List<D> listAll();
 
     /**
      * List all by sort
@@ -36,7 +36,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return List
      */
     @NonNull
-    List<DOMAIN> listAll(@NonNull Sort sort);
+    List<D> listAll(@NonNull Sort sort);
 
     /**
      * List all by pageable
@@ -45,7 +45,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return Page
      */
     @NonNull
-    Page<DOMAIN> listAll(@NonNull Pageable pageable);
+    Page<D> listAll(@NonNull Pageable pageable);
 
     /**
      * List all by ids
@@ -54,7 +54,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return List
      */
     @NonNull
-    List<DOMAIN> listAllByIds(@Nullable Collection<ID> ids);
+    List<D> listAllByIds(@Nullable Collection<I> ids);
 
     /**
      * List all by ids and sort
@@ -64,7 +64,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return List
      */
     @NonNull
-    List<DOMAIN> listAllByIds(@Nullable Collection<ID> ids, @NonNull Sort sort);
+    List<D> listAllByIds(@Nullable Collection<I> ids, @NonNull Sort sort);
 
     /**
      * Fetch by id
@@ -73,7 +73,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return Optional
      */
     @NonNull
-    Optional<DOMAIN> fetchById(@NonNull ID id);
+    Optional<D> fetchById(@NonNull I id);
 
     /**
      * Get by id
@@ -83,7 +83,7 @@ public interface CrudService<DOMAIN, ID> {
      * @throws NotFoundException If the specified id does not exist
      */
     @NonNull
-    DOMAIN getById(@NonNull ID id);
+    D getById(@NonNull I id);
 
     /**
      * Gets domain of nullable by id.
@@ -92,7 +92,7 @@ public interface CrudService<DOMAIN, ID> {
      * @return DOMAIN
      */
     @Nullable
-    DOMAIN getByIdOfNullable(@NonNull ID id);
+    D getByIdOfNullable(@NonNull I id);
 
     /**
      * Exists by id.
@@ -100,7 +100,7 @@ public interface CrudService<DOMAIN, ID> {
      * @param id id
      * @return boolean
      */
-    boolean existsById(@NonNull ID id);
+    boolean existsById(@NonNull I id);
 
     /**
      * Must exist by id, or throw NotFoundException.
@@ -108,7 +108,7 @@ public interface CrudService<DOMAIN, ID> {
      * @param id id
      * @throws NotFoundException If the specified id does not exist
      */
-    void mustExistById(@NonNull ID id);
+    void mustExistById(@NonNull I id);
 
     /**
      * count all
@@ -125,7 +125,7 @@ public interface CrudService<DOMAIN, ID> {
      */
     @NonNull
     @Transactional
-    DOMAIN create(@NonNull DOMAIN domain);
+    D create(@NonNull D domain);
 
     /**
      * save by domains
@@ -135,7 +135,7 @@ public interface CrudService<DOMAIN, ID> {
      */
     @NonNull
     @Transactional
-    List<DOMAIN> createInBatch(@NonNull Collection<DOMAIN> domains);
+    List<D> createInBatch(@NonNull Collection<D> domains);
 
     /**
      * Updates by domain
@@ -145,7 +145,7 @@ public interface CrudService<DOMAIN, ID> {
      */
     @NonNull
     @Transactional
-    DOMAIN update(@NonNull DOMAIN domain);
+    D update(@NonNull D domain);
 
     /**
      * Flushes all pending changes to the database.
@@ -160,7 +160,7 @@ public interface CrudService<DOMAIN, ID> {
      */
     @NonNull
     @Transactional
-    List<DOMAIN> updateInBatch(@NonNull Collection<DOMAIN> domains);
+    List<D> updateInBatch(@NonNull Collection<D> domains);
 
     /**
      * Removes by id
@@ -171,7 +171,7 @@ public interface CrudService<DOMAIN, ID> {
      */
     @NonNull
     @Transactional
-    DOMAIN removeById(@NonNull ID id);
+    D removeById(@NonNull I id);
 
     /**
      * Removes by id if present.
@@ -181,7 +181,7 @@ public interface CrudService<DOMAIN, ID> {
      */
     @Nullable
     @Transactional
-    DOMAIN removeByIdOfNullable(@NonNull ID id);
+    D removeByIdOfNullable(@NonNull I id);
 
     /**
      * Remove by domain
@@ -189,7 +189,7 @@ public interface CrudService<DOMAIN, ID> {
      * @param domain domain
      */
     @Transactional
-    void remove(@NonNull DOMAIN domain);
+    void remove(@NonNull D domain);
 
     /**
      * Remove by ids
@@ -197,7 +197,7 @@ public interface CrudService<DOMAIN, ID> {
      * @param ids ids
      */
     @Transactional
-    void removeInBatch(@NonNull Collection<ID> ids);
+    void removeInBatch(@NonNull Collection<I> ids);
 
     /**
      * Remove all by domains
@@ -205,7 +205,7 @@ public interface CrudService<DOMAIN, ID> {
      * @param domains domains
      */
     @Transactional
-    void removeAll(@NonNull Collection<DOMAIN> domains);
+    void removeAll(@NonNull Collection<D> domains);
 
     /**
      * Remove all

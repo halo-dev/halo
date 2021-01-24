@@ -133,8 +133,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
         // Create them
         createInBatch(optionsToCreate);
 
-        if (!CollectionUtils.isEmpty(optionsToUpdate) ||
-            !CollectionUtils.isEmpty(optionsToCreate)) {
+        if (!CollectionUtils.isEmpty(optionsToUpdate)
+            || !CollectionUtils.isEmpty(optionsToCreate)) {
             // If there is something changed
             publishOptionUpdatedEvent();
         }
@@ -321,6 +321,11 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
     }
 
     @Override
+    public <T> Optional<T> getByKey(String key, Class<T> valueType) {
+        return getByKey(key).map(value -> PropertyEnum.convertTo(value.toString(), valueType));
+    }
+
+    @Override
     public Object getByPropertyOfNullable(PropertyEnum property) {
         return getByProperty(property).orElse(null);
     }
@@ -340,6 +345,12 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
     }
 
     @Override
+    public <T> Optional<T> getByProperty(PropertyEnum property, Class<T> propertyType) {
+        return getByProperty(property)
+            .map(propertyValue -> PropertyEnum.convertTo(propertyValue.toString(), propertyType));
+    }
+
+    @Override
     public <T> T getByPropertyOrDefault(PropertyEnum property, Class<T> propertyType,
         T defaultValue) {
         Assert.notNull(property, "Blog property must not be null");
@@ -353,19 +364,8 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
     }
 
     @Override
-    public <T> Optional<T> getByProperty(PropertyEnum property, Class<T> propertyType) {
-        return getByProperty(property)
-            .map(propertyValue -> PropertyEnum.convertTo(propertyValue.toString(), propertyType));
-    }
-
-    @Override
     public <T> T getByKeyOrDefault(String key, Class<T> valueType, T defaultValue) {
         return getByKey(key, valueType).orElse(defaultValue);
-    }
-
-    @Override
-    public <T> Optional<T> getByKey(String key, Class<T> valueType) {
-        return getByKey(key).map(value -> PropertyEnum.convertTo(value.toString(), valueType));
     }
 
     @Override

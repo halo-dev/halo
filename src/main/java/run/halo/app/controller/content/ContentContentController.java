@@ -148,15 +148,15 @@ public class ContentContentController {
                 Post post = postService.getBySlug(slug);
                 return postModel.content(post, token, model);
             }
-            if (postPermalinkType.equals(PostPermalinkType.ID_SLUG) &&
-                StringUtils.isNumeric(slug)) {
+            if (postPermalinkType.equals(PostPermalinkType.ID_SLUG)
+                && StringUtils.isNumeric(slug)) {
                 Post post = postService.getById(Integer.parseInt(slug));
                 return postModel.content(post, token, model);
             }
         }
 
-        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.SECONDARY) &&
-            optionService.getSheetPrefix().equals(prefix)) {
+        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.SECONDARY)
+            && optionService.getSheetPrefix().equals(prefix)) {
             Sheet sheet = sheetService.getBySlug(slug);
             return sheetModel.content(sheet, token, model);
         }
@@ -169,8 +169,8 @@ public class ContentContentController {
             return tagModel.listPost(model, slug, 1);
         }
 
-        if (postPermalinkType.equals(PostPermalinkType.YEAR) && prefix.length() == 4 &&
-            StringUtils.isNumeric(prefix)) {
+        if (postPermalinkType.equals(PostPermalinkType.YEAR) && prefix.length() == 4
+            && StringUtils.isNumeric(prefix)) {
             Post post = postService.getBy(Integer.parseInt(prefix), slug);
             return postModel.content(post, token, model);
         }

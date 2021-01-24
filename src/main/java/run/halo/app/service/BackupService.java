@@ -111,9 +111,9 @@ public interface BackupService {
     List<BackupDTO> listMarkdowns();
 
     /**
-     * delete a markdown backup
+     * delete a markdown backup.
      *
-     * @param fileName
+     * @param fileName file name
      */
     void deleteMarkdown(@NonNull String fileName);
 }

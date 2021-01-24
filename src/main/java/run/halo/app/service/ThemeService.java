@@ -136,7 +136,7 @@ public interface ThemeService {
      * Lists theme folder by theme name.
      *
      * @param themeId theme id
-     * @return List<ThemeFile>
+     * @return List<ThemeFile> theme file list
      */
     @NonNull
     List<ThemeFile> listThemeFolderBy(@NonNull String themeId);

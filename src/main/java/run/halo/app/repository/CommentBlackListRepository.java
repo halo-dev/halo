@@ -16,21 +16,21 @@ import run.halo.app.repository.base.BaseRepository;
 public interface CommentBlackListRepository extends BaseRepository<CommentBlackList, Long> {
 
     /**
-     * 根据IP地址获取数据
+     * 根据IP地址获取数据.
      *
-     * @param ipAddress
-     * @return
+     * @param ipAddress ip address
+     * @return comment black list or empty
      */
     Optional<CommentBlackList> findByIpAddress(String ipAddress);
 
     /**
-     * Update Comment BlackList By IPAddress
+     * Update Comment BlackList By IPAddress.
      *
-     * @param commentBlackList
+     * @param commentBlackList comment black list
      * @return result
      */
     @Modifying
-    @Query("UPDATE CommentBlackList SET banTime=:#{#commentBlackList.banTime} WHERE " +
-        "ipAddress=:#{#commentBlackList.ipAddress}")
+    @Query("UPDATE CommentBlackList SET banTime=:#{#commentBlackList.banTime} WHERE "
+        + "ipAddress=:#{#commentBlackList.ipAddress}")
     int updateByIpAddress(@Param("commentBlackList") CommentBlackList commentBlackList);
 }

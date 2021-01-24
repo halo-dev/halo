@@ -349,7 +349,8 @@ public class GithubUtils {
 
                         try {
                             ghContent = ghRepository.getFileContent(themePropertyFile, branch);
-                        } catch (FileNotFoundException e) {
+                        } catch (FileNotFoundException ignored) {
+                            // ignore this exception
                         }
                     }
 
@@ -374,7 +375,8 @@ public class GithubUtils {
 
                 try {
                     Thread.sleep(2000);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
+                    // ignore this exception
                 }
             }
         }

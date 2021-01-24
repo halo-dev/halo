@@ -113,8 +113,8 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         DatabaseMetaData databaseMetaData = JdbcUtils.getDatabaseMetaData(connection);
 
         // Gets database product name
-        HaloConst.DATABASE_PRODUCT_NAME = databaseMetaData.getDatabaseProductName() + " " +
-            databaseMetaData.getDatabaseProductVersion();
+        HaloConst.DATABASE_PRODUCT_NAME = databaseMetaData.getDatabaseProductName() + " "
+            + databaseMetaData.getDatabaseProductVersion();
 
         // Close connection.
         connection.close();

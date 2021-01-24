@@ -83,8 +83,8 @@ public class QiniuOssFileHandler implements FileHandler {
         // Build put plicy
         StringMap putPolicy = new StringMap();
         putPolicy.put("returnBody",
-            "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"size\":$(fsize),\"width\":$(imageInfo" +
-                ".width),\"height\":$(imageInfo.height)}");
+            "{\"key\":\"$(key)\",\"hash\":\"$(etag)\",\"size\":$(fsize),\"width\":$(imageInfo"
+                + ".width),\"height\":$(imageInfo.height)}");
         // Get upload token
         String uploadToken = auth.uploadToken(bucket, null, 60 * 60, putPolicy);
 

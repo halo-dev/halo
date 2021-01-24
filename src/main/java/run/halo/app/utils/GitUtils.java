@@ -53,21 +53,6 @@ public class GitUtils {
         }
     }
 
-    public static Git openOrInit(Path repoPath) throws IOException, GitAPIException {
-        Git git;
-
-        try {
-            git = Git.open(repoPath.toFile());
-        } catch (RepositoryNotFoundException e) {
-            log.warn(
-                "Git repository may not exist, we will try to initialize an empty repository: [{}]",
-                e.getMessage());
-            git = Git.init().setDirectory(repoPath.toFile()).call();
-        }
-
-        return git;
-    }
-
     public static void cloneFromGit(@NonNull String repoUrl, @NonNull Path targetPath,
         @NonNull String branchName) throws GitAPIException {
         Assert.hasText(repoUrl, "Repository remote url must not be blank");
@@ -84,6 +69,21 @@ public class GitUtils {
         } finally {
             closeQuietly(git);
         }
+    }
+
+    public static Git openOrInit(Path repoPath) throws IOException, GitAPIException {
+        Git git;
+
+        try {
+            git = Git.open(repoPath.toFile());
+        } catch (RepositoryNotFoundException e) {
+            log.warn(
+                "Git repository may not exist, we will try to initialize an empty repository: [{}]",
+                e.getMessage());
+            git = Git.init().setDirectory(repoPath.toFile()).call();
+        }
+
+        return git;
     }
 
     public static List<String> getAllBranches(@NonNull String repoUrl) {

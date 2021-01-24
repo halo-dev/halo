@@ -159,6 +159,20 @@ public class FileUtils {
     }
 
     /**
+     * Unzips content to the target path.
+     *
+     * @param bytes zip bytes array must not be null
+     * @param targetPath target path must not be null and not empty
+     * @throws IOException io exception
+     */
+    public static void unzip(@NonNull byte[] bytes, @NonNull Path targetPath) throws IOException {
+        Assert.notNull(bytes, "Zip bytes must not be null");
+
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
+        unzip(zis, targetPath);
+    }
+
+    /**
      * Zips folder or file.
      *
      * @param pathToZip file path to zip must not be null
@@ -232,20 +246,6 @@ public class FileUtils {
 
 
     /**
-     * Unzips content to the target path.
-     *
-     * @param bytes zip bytes array must not be null
-     * @param targetPath target path must not be null and not empty
-     * @throws IOException
-     */
-    public static void unzip(@NonNull byte[] bytes, @NonNull Path targetPath) throws IOException {
-        Assert.notNull(bytes, "Zip bytes must not be null");
-
-        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
-        unzip(zis, targetPath);
-    }
-
-    /**
      * Find root path.
      *
      * @param path super root path starter
@@ -299,7 +299,7 @@ public class FileUtils {
      * Creates directories if absent.
      *
      * @param path path must not be null
-     * @throws IOException
+     * @throws IOException io exception
      */
     public static void createIfAbsent(@NonNull Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
@@ -317,7 +317,7 @@ public class FileUtils {
      *
      * @param path path must not be null
      * @return true if the given path is empty; false otherwise
-     * @throws IOException
+     * @throws IOException io exception
      */
     public static boolean isEmpty(@NonNull Path path) throws IOException {
         Assert.notNull(path, "Path must not be null");
@@ -335,7 +335,7 @@ public class FileUtils {
      * The given path must be empty.
      *
      * @param path path must not be null
-     * @throws IOException
+     * @throws IOException io exception
      */
     public static void ensureEmpty(@NonNull Path path) throws IOException {
         if (!isEmpty(path)) {

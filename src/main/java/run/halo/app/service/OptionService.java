@@ -162,6 +162,17 @@ public interface OptionService extends CrudService<Option, Integer> {
     Optional<Object> getByKey(@NonNull String key);
 
     /**
+     * Gets value by key.
+     *
+     * @param key key must not be null
+     * @param valueType value type must not be null
+     * @param <T> value type
+     * @return value
+     */
+    @NonNull
+    <T> Optional<T> getByKey(@NonNull String key, @NonNull Class<T> valueType);
+
+    /**
      * Gets option value by blog property.
      *
      * @param property blog property must not be null
@@ -194,6 +205,16 @@ public interface OptionService extends CrudService<Option, Integer> {
      *
      * @param property blog property must not be null
      * @param propertyType property type must not be null
+     * @param <T> property type
+     * @return property value
+     */
+    <T> Optional<T> getByProperty(@NonNull PropertyEnum property, @NonNull Class<T> propertyType);
+
+    /**
+     * Gets property value by blog property.
+     *
+     * @param property blog property must not be null
+     * @param propertyType property type must not be null
      * @param defaultValue default value
      * @param <T> property type
      * @return property value
@@ -214,16 +235,6 @@ public interface OptionService extends CrudService<Option, Integer> {
     <T> T getByPropertyOrDefault(@NonNull PropertyEnum property, @NonNull Class<T> propertyType);
 
     /**
-     * Gets property value by blog property.
-     *
-     * @param property blog property must not be null
-     * @param propertyType property type must not be null
-     * @param <T> property type
-     * @return property value
-     */
-    <T> Optional<T> getByProperty(@NonNull PropertyEnum property, @NonNull Class<T> propertyType);
-
-    /**
      * Gets value by key.
      *
      * @param key key must not be null
@@ -233,17 +244,6 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return value
      */
     <T> T getByKeyOrDefault(@NonNull String key, @NonNull Class<T> valueType, T defaultValue);
-
-    /**
-     * Gets value by key.
-     *
-     * @param key key must not be null
-     * @param valueType value type must not be null
-     * @param <T> value type
-     * @return value
-     */
-    @NonNull
-    <T> Optional<T> getByKey(@NonNull String key, @NonNull Class<T> valueType);
 
     /**
      * Gets enum value by property.
@@ -298,7 +298,6 @@ public interface OptionService extends CrudService<Option, Integer> {
     @Nullable
     <V, E extends ValueEnum<V>> E getValueEnumByPropertyOrDefault(@NonNull PropertyEnum property,
         @NonNull Class<V> valueType, @NonNull Class<E> enumType, @Nullable E defaultValue);
-
 
     /**
      * Gets post page size.

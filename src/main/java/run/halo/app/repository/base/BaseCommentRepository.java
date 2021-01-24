@@ -65,11 +65,11 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @return a list of comment count
      */
     @Query(
-        "select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), " +
-            "comment.postId) " +
-            "from BaseComment comment " +
-            "where comment.postId in ?1 " +
-            "group by comment.postId")
+        "select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), "
+            + "comment.postId) "
+            + "from BaseComment comment "
+            + "where comment.postId in ?1 "
+            + "group by comment.postId")
     @NonNull
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> postIds);
 
@@ -144,6 +144,20 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
         @NonNull CommentStatus status, @NonNull Long parentId);
 
     /**
+     * Finds comments by post id, comment status and parent id.
+     *
+     * @param postId post id must not be null
+     * @param status comment status must not be null
+     * @param parentId comment parent id must not be null
+     * @param pageable page info must not be null
+     * @return a page of comment
+     */
+    @NonNull
+    @SensitiveConceal
+    Page<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status,
+        Long parentId, Pageable pageable);
+
+    /**
      * Finds comments by post id and parent id.
      *
      * @param postId post id must not be null
@@ -175,20 +189,6 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
     @SensitiveConceal
     List<COMMENT> findAllByParentIdIn(@NonNull Collection<Long> parentIds);
 
-    /**
-     * Finds comments by post id, comment status and parent id.
-     *
-     * @param postId post id must not be null
-     * @param status comment status must not be null
-     * @param parentId comment parent id must not be null
-     * @param pageable page info must not be null
-     * @return a page of comment
-     */
-    @NonNull
-    @SensitiveConceal
-    Page<COMMENT> findAllByPostIdAndStatusAndParentId(Integer postId, CommentStatus status,
-        Long parentId, Pageable pageable);
-
 
     /**
      * Finds direct children count by comment ids.
@@ -197,11 +197,11 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
      * @return a list of CommentChildrenCountProjection
      */
     @Query(
-        "select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment" +
-            ".id), comment.parentId) " +
-            "from BaseComment comment " +
-            "where comment.parentId in ?1 " +
-            "group by comment.parentId")
+        "select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment"
+            + ".id), comment.parentId) "
+            + "from BaseComment comment "
+            + "where comment.parentId in ?1 "
+            + "group by comment.parentId")
     @NonNull
     List<CommentChildrenCountProjection> findDirectChildrenCount(
         @NonNull Collection<Long> commentIds);

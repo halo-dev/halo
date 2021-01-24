@@ -44,8 +44,8 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
      * @param slug post slug
      * @return a optional of post
      */
-    @Query("select post from Post post where year(post.createTime) = :year and month(post" +
-        ".createTime) = :month and post.slug = :slug")
+    @Query("select post from Post post where year(post.createTime) = :year and month(post"
+        + ".createTime) = :month and post.slug = :slug")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month,
         @Param("slug") String slug);
 
@@ -69,8 +69,8 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
      * @param status post status
      * @return a optional of post
      */
-    @Query("select post from Post post where year(post.createTime) = :year and month(post" +
-        ".createTime) = :month and post.slug = :slug and post.status = :status")
+    @Query("select post from Post post where year(post.createTime) = :year and month(post"
+        + ".createTime) = :month and post.slug = :slug and post.status = :status")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month,
         @Param("slug") String slug, @Param("status") PostStatus status);
 
@@ -83,8 +83,8 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
      * @param slug post slug
      * @return a optional of post
      */
-    @Query("select post from Post post where year(post.createTime) = :year and month(post" +
-        ".createTime) = :month and day(post.createTime) = :day and post.slug = :slug")
+    @Query("select post from Post post where year(post.createTime) = :year and month(post"
+        + ".createTime) = :month and day(post.createTime) = :day and post.slug = :slug")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month,
         @Param("day") Integer day, @Param("slug") String slug);
 
@@ -98,9 +98,9 @@ public interface PostRepository extends BasePostRepository<Post>, JpaSpecificati
      * @param status post status
      * @return a optional of post
      */
-    @Query("select post from Post post where year(post.createTime) = :year and month(post" +
-        ".createTime) = :month and day(post.createTime) = :day and post.slug = :slug and post" +
-        ".status = :status")
+    @Query("select post from Post post where year(post.createTime) = :year and month(post"
+        + ".createTime) = :month and day(post.createTime) = :day and post.slug = :slug and post"
+        + ".status = :status")
     Optional<Post> findBy(@Param("year") Integer year, @Param("month") Integer month,
         @Param("day") Integer day, @Param("slug") String slug, @Param("status") PostStatus status);
 }

@@ -54,7 +54,7 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
      * Executes a count query and transparently sums up all values returned.
      *
      * @param query must not be {@literal null}.
-     * @return
+     * @return count
      */
     private static long executeCountQuery(TypedQuery<Long> query) {
 
@@ -121,8 +121,8 @@ public class BaseRepositoryImpl<DOMAIN, ID> extends SimpleJpaRepository<DOMAIN, 
         TypedQuery<Long> countQuery = getCountQuery(specification, getDomainClass())
             .setParameter(specification.parameter, ids);
 
-        return pageable.isUnpaged() ?
-            new PageImpl<>(query.getResultList())
+        return pageable.isUnpaged()
+            ? new PageImpl<>(query.getResultList())
             : readPage(query, getDomainClass(), pageable, countQuery);
     }
 

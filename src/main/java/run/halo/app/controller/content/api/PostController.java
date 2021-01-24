@@ -102,24 +102,6 @@ public class PostController {
         return postDetailVO;
     }
 
-    @GetMapping("{postId:\\d+}/prev")
-    @ApiOperation("Gets previous post by current post id.")
-    public PostDetailVO getPrevPostBy(@PathVariable("postId") Integer postId) {
-        Post post = postService.getById(postId);
-        Post prevPost =
-            postService.getPrevPost(post).orElseThrow(() -> new NotFoundException("查询不到该文章的信息"));
-        return postService.convertToDetailVo(prevPost);
-    }
-
-    @GetMapping("{postId:\\d+}/next")
-    @ApiOperation("Gets next post by current post id.")
-    public PostDetailVO getNextPostBy(@PathVariable("postId") Integer postId) {
-        Post post = postService.getById(postId);
-        Post nextPost =
-            postService.getNextPost(post).orElseThrow(() -> new NotFoundException("查询不到该文章的信息"));
-        return postService.convertToDetailVo(nextPost);
-    }
-
     @GetMapping("/slug")
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@RequestParam("slug") String slug,
@@ -144,6 +126,24 @@ public class PostController {
         return postDetailVO;
     }
 
+    @GetMapping("{postId:\\d+}/prev")
+    @ApiOperation("Gets previous post by current post id.")
+    public PostDetailVO getPrevPostBy(@PathVariable("postId") Integer postId) {
+        Post post = postService.getById(postId);
+        Post prevPost =
+            postService.getPrevPost(post).orElseThrow(() -> new NotFoundException("查询不到该文章的信息"));
+        return postService.convertToDetailVo(prevPost);
+    }
+
+    @GetMapping("{postId:\\d+}/next")
+    @ApiOperation("Gets next post by current post id.")
+    public PostDetailVO getNextPostBy(@PathVariable("postId") Integer postId) {
+        Post post = postService.getById(postId);
+        Post nextPost =
+            postService.getNextPost(post).orElseThrow(() -> new NotFoundException("查询不到该文章的信息"));
+        return postService.convertToDetailVo(nextPost);
+    }
+
     @GetMapping("{postId:\\d+}/comments/top_view")
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("postId") Integer postId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
@@ -151,7 +151,6 @@ public class PostController {
         return postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED,
             PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
-
 
     @GetMapping("{postId:\\d+}/comments/{commentParentId:\\d+}/children")
     public List<BaseCommentDTO> listChildrenBy(@PathVariable("postId") Integer postId,

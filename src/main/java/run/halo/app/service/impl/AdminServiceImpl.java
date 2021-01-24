@@ -150,8 +150,8 @@ public class AdminServiceImpl implements AdminService {
 
         try {
             // Get user by username or email
-            user = Validator.isEmail(username) ?
-                userService.getByEmailOfNonNull(username) :
+            user = Validator.isEmail(username)
+                ? userService.getByEmailOfNonNull(username) :
                 userService.getByUsernameOfNonNull(username);
         } catch (NotFoundException e) {
             log.error("Failed to find user by name: " + username);
@@ -304,8 +304,8 @@ public class AdminServiceImpl implements AdminService {
     @NonNull
     public StatisticDTO getCount() {
         StatisticDTO statisticDTO = new StatisticDTO();
-        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED) +
-            sheetService.countByStatus(PostStatus.PUBLISHED));
+        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED)
+            + sheetService.countByStatus(PostStatus.PUBLISHED));
         statisticDTO.setAttachmentCount(attachmentService.count());
 
         // Handle comment count
@@ -399,8 +399,8 @@ public class AdminServiceImpl implements AdminService {
             ResponseEntity<byte[]> downloadResponseEntity =
                 restTemplate.getForEntity(browserDownloadUrl.toString(), byte[].class);
 
-            if (downloadResponseEntity.getStatusCode().isError() ||
-                downloadResponseEntity.getBody() == null) {
+            if (downloadResponseEntity.getStatusCode().isError()
+                || downloadResponseEntity.getBody() == null) {
                 throw new ServiceException(
                     "Failed to request remote url: " + browserDownloadUrl.toString())
                     .setErrorData(browserDownloadUrl.toString());
@@ -445,8 +445,8 @@ public class AdminServiceImpl implements AdminService {
             String contentType = aAssetMap.getOrDefault("content_type", "").toString();
 
             Object name = aAssetMap.getOrDefault("name", "");
-            return name.toString().matches(HALO_ADMIN_VERSION_REGEX) &&
-                "application/zip".equalsIgnoreCase(contentType);
+            return name.toString().matches(HALO_ADMIN_VERSION_REGEX)
+                && "application/zip".equalsIgnoreCase(contentType);
         };
     }
 
@@ -576,8 +576,8 @@ public class AdminServiceImpl implements AdminService {
 
         boolean useMFA = true;
         try {
-            final User user = Validator.isEmail(username) ?
-                userService.getByEmailOfNonNull(username) :
+            final User user = Validator.isEmail(username)
+                ? userService.getByEmailOfNonNull(username) :
                 userService.getByUsernameOfNonNull(username);
             useMFA = MFAType.useMFA(user.getMfaType());
         } catch (NotFoundException e) {

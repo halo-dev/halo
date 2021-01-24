@@ -50,7 +50,7 @@ public abstract class AbstractVisitEventListener {
      * Handle visit event.
      *
      * @param event visit event must not be null
-     * @throws InterruptedException
+     * @throws InterruptedException interrupted exception
      */
     protected void handleVisitEvent(@NonNull AbstractVisitEvent event) throws InterruptedException {
         Assert.notNull(event, "Visit event must not be null");

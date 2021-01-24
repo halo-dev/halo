@@ -165,19 +165,19 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     void increaseVisit(long visits, @NonNull Integer postId);
 
     /**
+     * Increases post visits (1).
+     *
+     * @param postId post id must not be null
+     */
+    void increaseVisit(@NonNull Integer postId);
+
+    /**
      * Increase post likes.
      *
      * @param likes likes must not be less than 1
      * @param postId post id must not be null
      */
     void increaseLike(long likes, @NonNull Integer postId);
-
-    /**
-     * Increases post visits (1).
-     *
-     * @param postId post id must not be null
-     */
-    void increaseVisit(@NonNull Integer postId);
 
     /**
      * Increases post likes(1).

@@ -11,7 +11,7 @@ import run.halo.app.utils.ReflectionUtils;
  *
  * @author johnniang
  */
-public interface InputConverter<DOMAIN> {
+public interface InputConverter<D> {
 
     /**
      * Convert to domain.(shallow)
@@ -19,7 +19,7 @@ public interface InputConverter<DOMAIN> {
      * @return new domain with same value(not null)
      */
     @SuppressWarnings("unchecked")
-    default DOMAIN convertTo() {
+    default D convertTo() {
         // Get parameterized type
         ParameterizedType currentType = parameterizedType();
 
@@ -27,7 +27,7 @@ public interface InputConverter<DOMAIN> {
         Objects.requireNonNull(currentType,
             "Cannot fetch actual type because parameterized type is null");
 
-        Class<DOMAIN> domainClass = (Class<DOMAIN>) currentType.getActualTypeArguments()[0];
+        Class<D> domainClass = (Class<D>) currentType.getActualTypeArguments()[0];
 
         return BeanUtils.transformFrom(this, domainClass);
     }
@@ -37,7 +37,7 @@ public interface InputConverter<DOMAIN> {
      *
      * @param domain updated domain
      */
-    default void update(DOMAIN domain) {
+    default void update(D domain) {
         BeanUtils.updateProperties(this, domain);
     }
 

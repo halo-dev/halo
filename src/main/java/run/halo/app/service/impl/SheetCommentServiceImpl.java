@@ -98,6 +98,14 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
             .collect(Collectors.toList());
     }
 
+    @Override
+    public Page<SheetCommentWithSheetVO> convertToWithSheetVo(Page<SheetComment> sheetCommentPage) {
+        Assert.notNull(sheetCommentPage, "Sheet comment page must not be null");
+
+        return new PageImpl<>(convertToWithSheetVo(sheetCommentPage.getContent()),
+            sheetCommentPage.getPageable(), sheetCommentPage.getTotalElements());
+    }
+
     private BasePostMinimalDTO buildSheetFullPath(BasePostMinimalDTO basePostMinimalDTO) {
         StringBuilder fullPath = new StringBuilder();
 
@@ -123,12 +131,4 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
         return basePostMinimalDTO;
     }
 
-    @Override
-    public Page<SheetCommentWithSheetVO> convertToWithSheetVo(Page<SheetComment> sheetCommentPage) {
-        Assert.notNull(sheetCommentPage, "Sheet comment page must not be null");
-
-        return new PageImpl<>(convertToWithSheetVo(sheetCommentPage.getContent()),
-            sheetCommentPage.getPageable(), sheetCommentPage.getTotalElements());
-
-    }
 }

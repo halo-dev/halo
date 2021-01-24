@@ -26,9 +26,9 @@ import run.halo.app.utils.ServletUtils;
 @Configuration
 public class CacheLockInterceptor {
 
-    private final static String CACHE_LOCK_PREFOX = "cache_lock_";
+    private static final String CACHE_LOCK_PREFIX = "cache_lock_";
 
-    private final static String CACHE_LOCK_VALUE = "locked";
+    private static final String CACHE_LOCK_VALUE = "locked";
 
     private final AbstractStringCacheStore cacheStore;
 
@@ -87,7 +87,7 @@ public class CacheLockInterceptor {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 
         // Build the cache lock key
-        StringBuilder cacheKeyBuilder = new StringBuilder(CACHE_LOCK_PREFOX);
+        StringBuilder cacheKeyBuilder = new StringBuilder(CACHE_LOCK_PREFIX);
 
         String delimiter = cacheLock.delimiter();
 

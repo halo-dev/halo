@@ -27,8 +27,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
      * @return a list of category id
      */
     @NonNull
-    @Query("select postCategory.categoryId from PostCategory postCategory where postCategory" +
-        ".postId = ?1")
+    @Query("select postCategory.categoryId from PostCategory postCategory where postCategory"
+        + ".postId = ?1")
     Set<Integer> findAllCategoryIdsByPostId(@NonNull Integer postId);
 
     /**
@@ -38,8 +38,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
      * @return a set of post id
      */
     @NonNull
-    @Query("select postCategory.postId from PostCategory postCategory where postCategory" +
-        ".categoryId = ?1")
+    @Query("select postCategory.postId from PostCategory postCategory where postCategory"
+        + ".categoryId = ?1")
     Set<Integer> findAllPostIdsByCategoryId(@NonNull Integer categoryId);
 
     /**
@@ -50,8 +50,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
      * @return a set of post id
      */
     @NonNull
-    @Query("select postCategory.postId from PostCategory postCategory, Post post where " +
-        "postCategory.categoryId = ?1 and post.id = postCategory.postId and post.status = ?2")
+    @Query("select postCategory.postId from PostCategory postCategory, Post post where "
+        + "postCategory.categoryId = ?1 and post.id = postCategory.postId and post.status = ?2")
     Set<Integer> findAllPostIdsByCategoryId(@NonNull Integer categoryId,
         @NonNull PostStatus status);
 
@@ -100,8 +100,8 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
     @NonNull
     List<PostCategory> deleteByCategoryId(@NonNull Integer categoryId);
 
-    @Query("select new run.halo.app.model.projection.CategoryPostCountProjection(count(pc.postId)" +
-        ", pc.categoryId) from PostCategory pc group by pc.categoryId")
+    @Query("select new run.halo.app.model.projection.CategoryPostCountProjection(count(pc.postId)"
+        + ", pc.categoryId) from PostCategory pc group by pc.categoryId")
     @NonNull
     List<CategoryPostCountProjection> findPostCount();
 }

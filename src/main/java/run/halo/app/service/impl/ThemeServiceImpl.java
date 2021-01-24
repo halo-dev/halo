@@ -501,8 +501,8 @@ public class ThemeServiceImpl implements ThemeService {
         }
 
         // Not support current halo version.
-        if (StringUtils.isNotEmpty(tmpThemeProperty.getRequire()) &&
-            !VersionUtil.compareVersion(HaloConst.HALO_VERSION, tmpThemeProperty.getRequire())) {
+        if (StringUtils.isNotEmpty(tmpThemeProperty.getRequire())
+            && !VersionUtil.compareVersion(HaloConst.HALO_VERSION, tmpThemeProperty.getRequire())) {
             throw new ThemeNotSupportException(
                 "当前主题仅支持 Halo " + tmpThemeProperty.getRequire() + " 以上的版本");
         }
@@ -769,8 +769,8 @@ public class ThemeServiceImpl implements ThemeService {
         Assert.notNull(themeProperty, "Theme property must not be null");
 
         // Get branch
-        String branch = StringUtils.isBlank(themeProperty.getBranch()) ?
-            DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
+        String branch = StringUtils.isBlank(themeProperty.getBranch())
+            ? DEFAULT_REMOTE_BRANCH : themeProperty.getBranch();
 
         Git git = null;
 

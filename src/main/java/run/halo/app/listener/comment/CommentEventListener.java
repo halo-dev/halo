@@ -200,8 +200,8 @@ public class CommentEventListener {
 
             PostComment baseComment = postCommentService.getById(postComment.getParentId());
 
-            if (StringUtils.isEmpty(baseComment.getEmail()) &&
-                !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail())
+                && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -233,8 +233,8 @@ public class CommentEventListener {
 
             SheetComment baseComment = sheetCommentService.getById(sheetComment.getParentId());
 
-            if (StringUtils.isEmpty(baseComment.getEmail()) &&
-                !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail())
+                && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -267,8 +267,8 @@ public class CommentEventListener {
             JournalComment baseComment =
                 journalCommentService.getById(journalComment.getParentId());
 
-            if (StringUtils.isEmpty(baseComment.getEmail()) &&
-                !Validator.isEmail(baseComment.getEmail())) {
+            if (StringUtils.isEmpty(baseComment.getEmail())
+                && !Validator.isEmail(baseComment.getEmail())) {
                 return;
             }
 

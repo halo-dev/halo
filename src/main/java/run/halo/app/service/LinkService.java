@@ -39,7 +39,7 @@ public interface LinkService extends CrudService<Link, Integer> {
     /**
      * Lists link team vos by random
      *
-     * @param sort
+     * @param sort sort
      * @return a list of link team vo by random
      */
     @NonNull

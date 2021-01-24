@@ -512,6 +512,12 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
+    public Page<PostDetailVO> convertToDetailVo(Page<Post> postPage) {
+        Assert.notNull(postPage, "Post page must not be null");
+        return postPage.map(this::convertToDetailVo);
+    }
+
+    @Override
     public Post removeById(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
 
@@ -660,12 +666,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
             return postListVO;
         }).collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<PostDetailVO> convertToDetailVo(Page<Post> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-        return postPage.map(this::convertToDetailVo);
     }
 
     @Override

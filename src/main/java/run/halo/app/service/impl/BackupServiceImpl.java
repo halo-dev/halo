@@ -1,5 +1,10 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.HALO_BACKUP_MARKDOWN_PREFIX;
+import static run.halo.app.model.support.HaloConst.HALO_BACKUP_PREFIX;
+import static run.halo.app.model.support.HaloConst.HALO_DATA_EXPORT_PREFIX;
+import static run.halo.app.utils.DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER;
+
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.file.FileWriter;
@@ -116,7 +121,7 @@ public class BackupServiceImpl implements BackupService {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-    private final static String UPLOAD_SUB_DIR = "upload/";
+    private static final String UPLOAD_SUB_DIR = "upload/";
 
     private static final Type MAP_TYPE = new TypeToken<Map<String, ?>>() {
     }.getType();
@@ -216,10 +221,9 @@ public class BackupServiceImpl implements BackupService {
      * @return sanitized file name
      */
     public static String sanitizeFilename(final String unSanitized) {
-        return unSanitized.
-            replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "").
-            replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "").
-            replaceAll("\\s", "");
+        return unSanitized.replaceAll("[^(a-zA-Z0-9\\u4e00-\\u9fa5\\.)]", "")
+            .replaceAll("[\\?\\\\/:|<>\\*\\[\\]\\(\\)\\$%\\{\\}@~\\.]", "")
+            .replaceAll("\\s", "");
     }
 
     @Override
@@ -238,10 +242,9 @@ public class BackupServiceImpl implements BackupService {
         // Zip work directory to temporary file
         try {
             // Create zip path for halo zip
-            String haloZipFileName = HaloConst.HALO_BACKUP_PREFIX +
-                DateTimeUtils
-                    .format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                IdUtil.simpleUUID().hashCode() + ".zip";
+            String haloZipFileName = HALO_BACKUP_PREFIX
+                + DateTimeUtils.format(LocalDateTime.now(), HORIZONTAL_LINE_DATETIME_FORMATTER)
+                + IdUtil.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
             Path haloZipFilePath = Paths.get(haloProperties.getBackupDir(), haloZipFileName);
             if (!Files.exists(haloZipFilePath.getParent())) {
@@ -273,7 +276,7 @@ public class BackupServiceImpl implements BackupService {
             return subPathStream
                 .filter(backupPath -> StringUtils
                     .startsWithIgnoreCase(backupPath.getFileName().toString(),
-                        HaloConst.HALO_BACKUP_PREFIX))
+                        HALO_BACKUP_PREFIX))
                 .map(backupPath -> buildBackupDto(BACKUP_RESOURCE_BASE_URI, backupPath))
                 .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
                 .collect(Collectors.toList());
@@ -367,10 +370,9 @@ public class BackupServiceImpl implements BackupService {
         data.put("user", userService.listAll());
 
         try {
-            String haloDataFileName = HaloConst.HALO_DATA_EXPORT_PREFIX +
-                DateTimeUtils
-                    .format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                IdUtil.simpleUUID().hashCode() + ".json";
+            String haloDataFileName = HALO_DATA_EXPORT_PREFIX
+                + DateTimeUtils.format(LocalDateTime.now(), HORIZONTAL_LINE_DATETIME_FORMATTER)
+                + IdUtil.simpleUUID().hashCode() + ".json";
 
             Path haloDataFilePath = Paths.get(haloProperties.getDataExportDir(), haloDataFileName);
             if (!Files.exists(haloDataFilePath.getParent())) {
@@ -399,7 +401,7 @@ public class BackupServiceImpl implements BackupService {
             return subPathStream
                 .filter(backupPath -> StringUtils
                     .startsWithIgnoreCase(backupPath.getFileName().toString(),
-                        HaloConst.HALO_DATA_EXPORT_PREFIX))
+                        HALO_DATA_EXPORT_PREFIX))
                 .map(backupPath -> buildBackupDto(DATA_EXPORT_BASE_URI, backupPath))
                 .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
                 .collect(Collectors.toList());
@@ -567,10 +569,9 @@ public class BackupServiceImpl implements BackupService {
         // Zip file
         try {
             // Create zip path
-            String markdownZipFileName = HaloConst.HALO_BACKUP_MARKDOWN_PREFIX +
-                DateTimeUtils
-                    .format(LocalDateTime.now(), DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER) +
-                IdUtil.simpleUUID().hashCode() + ".zip";
+            String markdownZipFileName = HALO_BACKUP_MARKDOWN_PREFIX
+                + DateTimeUtils.format(LocalDateTime.now(), HORIZONTAL_LINE_DATETIME_FORMATTER)
+                + IdUtil.simpleUUID().hashCode() + ".zip";
 
             // Create zip file
             Path markdownZipFilePath =
@@ -621,7 +622,7 @@ public class BackupServiceImpl implements BackupService {
             return subPathStream
                 .filter(backupPath -> StringUtils
                     .startsWithIgnoreCase(backupPath.getFileName().toString(),
-                        HaloConst.HALO_BACKUP_MARKDOWN_PREFIX))
+                        HALO_BACKUP_MARKDOWN_PREFIX))
                 .map(backupPath -> buildBackupDto(DATA_EXPORT_MARKDOWN_BASE_URI, backupPath))
                 .sorted(Comparator.comparingLong(BackupDTO::getUpdateTime).reversed())
                 .collect(Collectors.toList());

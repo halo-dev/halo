@@ -27,12 +27,12 @@ public class MainController {
     /**
      * Index redirect uri.
      */
-    private final static String INDEX_REDIRECT_URI = "index.html";
+    private static final String INDEX_REDIRECT_URI = "index.html";
 
     /**
      * Install redirect uri.
      */
-    private final static String INSTALL_REDIRECT_URI = INDEX_REDIRECT_URI + "#install";
+    private static final String INSTALL_REDIRECT_URI = INDEX_REDIRECT_URI + "#install";
 
     private final UserService userService;
 
@@ -50,8 +50,8 @@ public class MainController {
     @GetMapping("${halo.admin-path:admin}")
     public void admin(HttpServletResponse response) throws IOException {
         String adminIndexRedirectUri =
-            HaloUtils.ensureBoth(haloProperties.getAdminPath(), HaloUtils.URL_SEPARATOR) +
-                INDEX_REDIRECT_URI;
+            HaloUtils.ensureBoth(haloProperties.getAdminPath(), HaloUtils.URL_SEPARATOR)
+                + INDEX_REDIRECT_URI;
         response.sendRedirect(adminIndexRedirectUri);
     }
 
@@ -64,8 +64,8 @@ public class MainController {
     @GetMapping("install")
     public void installation(HttpServletResponse response) throws IOException {
         String installRedirectUri =
-            StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/") +
-                INSTALL_REDIRECT_URI;
+            StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/")
+                + INSTALL_REDIRECT_URI;
         response.sendRedirect(installRedirectUri);
     }
 

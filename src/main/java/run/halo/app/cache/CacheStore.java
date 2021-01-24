@@ -33,6 +33,15 @@ public interface CacheStore<K, V> {
      */
     void put(@NonNull K key, @NonNull V value, long timeout, @NonNull TimeUnit timeUnit);
 
+
+    /**
+     * Puts a non-expired cache.
+     *
+     * @param key cache key must not be null
+     * @param value cache value must not be null
+     */
+    void put(@NonNull K key, @NonNull V value);
+
     /**
      * Puts a cache which will be expired if the key is absent.
      *
@@ -44,14 +53,6 @@ public interface CacheStore<K, V> {
      * before, or null if any other reason
      */
     Boolean putIfAbsent(@NonNull K key, @NonNull V value, long timeout, @NonNull TimeUnit timeUnit);
-
-    /**
-     * Puts a non-expired cache.
-     *
-     * @param key cache key must not be null
-     * @param value cache value must not be null
-     */
-    void put(@NonNull K key, @NonNull V value);
 
     /**
      * Delete a key.

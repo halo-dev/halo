@@ -25,10 +25,10 @@ public interface SheetCommentRepository extends BaseCommentRepository<SheetComme
      * @return a list of CommentCountProjection
      */
     @Query(
-        "select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), " +
-            "comment.postId) " +
-            "from SheetComment comment " +
-            "where comment.postId in ?1 group by comment.postId")
+        "select new run.halo.app.model.projection.CommentCountProjection(count(comment.id), "
+            + "comment.postId) "
+            + "from SheetComment comment "
+            + "where comment.postId in ?1 group by comment.postId")
     @NonNull
     @Override
     List<CommentCountProjection> countByPostIds(@NonNull Collection<Integer> sheetIds);
@@ -40,11 +40,11 @@ public interface SheetCommentRepository extends BaseCommentRepository<SheetComme
      * @return a list of CommentChildrenCountProjection
      */
     @Query(
-        "select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment" +
-            ".id), comment.parentId) " +
-            "from SheetComment comment " +
-            "where comment.parentId in ?1 " +
-            "group by comment.parentId")
+        "select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment"
+            + ".id), comment.parentId) "
+            + "from SheetComment comment "
+            + "where comment.parentId in ?1 "
+            + "group by comment.parentId")
     @NonNull
     @Override
     List<CommentChildrenCountProjection> findDirectChildrenCount(

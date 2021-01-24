@@ -55,8 +55,8 @@ public abstract class BaseMetaServiceImpl<META extends BaseMeta>
 
         // Save post metas
         metas.forEach(postMeta -> {
-            if (StringUtils.isNotEmpty(postMeta.getValue()) &&
-                StringUtils.isNotEmpty(postMeta.getKey())) {
+            if (StringUtils.isNotEmpty(postMeta.getValue())
+                && StringUtils.isNotEmpty(postMeta.getKey())) {
                 postMeta.setPostId(postId);
                 baseMetaRepository.save(postMeta);
             }

@@ -85,8 +85,8 @@ public abstract class AbstractMailService implements MailService {
         if (!emailEnabled) {
             // If disabled
             log.info(
-                "Email has been disabled by yourself, you can re-enable it through email settings" +
-                    " on admin page.");
+                "Email has been disabled by yourself, you can re-enable it through email settings"
+                    + " on admin page.");
             return;
         }
 

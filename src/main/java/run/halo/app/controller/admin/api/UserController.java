@@ -82,8 +82,8 @@ public class UserController {
                 String mfaKey = TwoFactorAuthUtils.generateTFAKey();
                 String optAuthUrl =
                     TwoFactorAuthUtils.generateOtpAuthUrl(user.getNickname(), mfaKey);
-                String qrImageBase64 = "data:image/png;base64," +
-                    Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 128, 128));
+                String qrImageBase64 = "data:image/png;base64,"
+                    + Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 128, 128));
                 return new MultiFactorAuthVO(qrImageBase64, optAuthUrl, mfaKey, MFAType.TFA_TOTP);
             } else {
                 throw new BadRequestException("暂不支持的 MFA 认证的方式");
@@ -99,11 +99,11 @@ public class UserController {
     @DisableOnCondition
     public MultiFactorAuthVO updateMFAuth(
         @RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
-        if (StrUtil.isNotBlank(user.getMfaKey()) &&
-            MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
+        if (StrUtil.isNotBlank(user.getMfaKey())
+            && MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.TFA_TOTP);
-        } else if (StrUtil.isBlank(user.getMfaKey()) &&
-            !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
+        } else if (StrUtil.isBlank(user.getMfaKey())
+            && !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.NONE);
         } else {
             final String tfaKey = StrUtil.isNotBlank(user.getMfaKey()) ? user.getMfaKey() :

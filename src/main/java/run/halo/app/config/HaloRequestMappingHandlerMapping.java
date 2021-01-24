@@ -82,8 +82,8 @@ public class HaloRequestMappingHandlerMapping extends RequestMappingHandlerMappi
                 initBlackPatterns();
                 rootPathStream.forEach(rootPath -> {
                         if (Files.isDirectory(rootPath)) {
-                            String directoryPattern = "/" + rootPath.getFileName().toString() +
-                                "/**";
+                            String directoryPattern = "/" + rootPath.getFileName().toString()
+                                + "/**";
                             blackPatterns.add(directoryPattern);
                             log.debug("Exclude for folder path pattern: [{}]", directoryPattern);
                         } else {

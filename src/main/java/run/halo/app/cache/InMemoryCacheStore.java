@@ -21,12 +21,12 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     /**
      * Cleaner schedule period. (ms)
      */
-    private final static long PERIOD = 60 * 1000;
+    private static final long PERIOD = 60 * 1000;
 
     /**
      * Cache container.
      */
-    private final static ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER =
+    private static final ConcurrentHashMap<String, CacheWrapper<String>> CACHE_CONTAINER =
         new ConcurrentHashMap<>();
 
     private final Timer timer;

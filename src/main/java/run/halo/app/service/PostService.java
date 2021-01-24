@@ -241,6 +241,14 @@ public interface PostService extends BasePostService<Post> {
     PostDetailVO convertToDetailVo(@NonNull Post post);
 
     /**
+     * Converts to a page of detail vo.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail vo
+     */
+    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
+
+    /**
      * Converts to a page of post list vo.
      *
      * @param postPage post page must not be null
@@ -258,13 +266,6 @@ public interface PostService extends BasePostService<Post> {
     @NonNull
     List<PostListVO> convertToListVo(@NonNull List<Post> posts);
 
-    /**
-     * Converts to a page of detail vo.
-     *
-     * @param postPage post page must not be null
-     * @return a page of post detail vo
-     */
-    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
 
     /**
      * Publish a post visit event.
@@ -276,9 +277,9 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Get Post Pageable default sort
      *
-     * @return
-     * @Desc contains three parts. First, Top Priority; Second, From Custom index sort; Third,
-     * basic id sort
+     * @return post default sort
+     * @description contains three parts. First, Top Priority; Second, From Custom index sort;
+     * Third, basic id sort
      */
     @NotNull
     Sort getPostDefaultSort();

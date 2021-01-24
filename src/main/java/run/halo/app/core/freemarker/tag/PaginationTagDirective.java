@@ -108,8 +108,7 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                         .append(pathSuffix);
 
                     if (page == 1) {
-                        prevPageFullPath.
-                            append(pathSuffix);
+                        prevPageFullPath.append(pathSuffix);
                     } else {
                         prevPageFullPath.append("/page/")
                             .append(page)

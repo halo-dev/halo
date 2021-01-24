@@ -144,8 +144,8 @@ public class FreemarkerConfigAwareListener {
         // Get current activated theme.
         themeService.fetchActivatedTheme().ifPresent(activatedTheme -> {
             String themeBasePath =
-                (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") +
-                    "/themes/" + activatedTheme.getFolderName();
+                (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "")
+                    + "/themes/" + activatedTheme.getFolderName();
             try {
                 configuration.setSharedVariable("theme", activatedTheme);
 

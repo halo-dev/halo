@@ -151,8 +151,8 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
     public boolean passwordMatch(User user, String plainPassword) {
         Assert.notNull(user, "User must not be null");
 
-        return !StringUtils.isBlank(plainPassword) &&
-            BCrypt.checkpw(plainPassword, user.getPassword());
+        return !StringUtils.isBlank(plainPassword)
+            && BCrypt.checkpw(plainPassword, user.getPassword());
     }
 
     @Override

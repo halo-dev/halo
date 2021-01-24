@@ -54,8 +54,8 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
 
         return getInternal(key).map(cacheWrapper -> {
             // Check expiration
-            if (cacheWrapper.getExpireAt() != null &&
-                cacheWrapper.getExpireAt().before(run.halo.app.utils.DateUtils.now())) {
+            if (cacheWrapper.getExpireAt() != null
+                && cacheWrapper.getExpireAt().before(run.halo.app.utils.DateUtils.now())) {
                 // Expired then delete it
                 log.warn("Cache key: [{}] has been expired", key);
 
@@ -76,13 +76,13 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
     }
 
     @Override
-    public Boolean putIfAbsent(K key, V value, long timeout, TimeUnit timeUnit) {
-        return putInternalIfAbsent(key, buildCacheWrapper(value, timeout, timeUnit));
+    public void put(K key, V value) {
+        putInternal(key, buildCacheWrapper(value, 0, null));
     }
 
     @Override
-    public void put(K key, V value) {
-        putInternal(key, buildCacheWrapper(value, 0, null));
+    public Boolean putIfAbsent(K key, V value, long timeout, TimeUnit timeUnit) {
+        return putInternalIfAbsent(key, buildCacheWrapper(value, timeout, timeUnit));
     }
 
     /**

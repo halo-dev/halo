@@ -186,8 +186,9 @@ public class InstallController {
         comment.setAuthor("Halo");
         comment.setAuthorUrl("https://halo.run");
         comment.setContent(
-            "欢迎使用 Halo，这是你的第一条评论，头像来自 [Gravatar](https://cn.gravatar.com)，你也可以通过注册 [Gravatar]" +
-                "(https://cn.gravatar.com) 来显示自己的头像。");
+            "欢迎使用 Halo，这是你的第一条评论，头像来自 [Gravatar](https://cn.gravatar.com)，"
+                + "你也可以通过注册 [Gravatar]"
+                + "(https://cn.gravatar.com) 来显示自己的头像。");
         comment.setEmail("hi@halo.run");
         comment.setPostId(post.getId());
         postCommentService.create(comment);
@@ -206,21 +207,21 @@ public class InstallController {
         postParam.setSlug("hello-halo");
         postParam.setTitle("Hello Halo");
         postParam.setStatus(PostStatus.PUBLISHED);
-        postParam.setOriginalContent("## Hello Halo\n" +
-            "\n" +
-            "如果你看到了这一篇文章，那么证明你已经安装成功了，感谢使用 [Halo](https://halo.run) 进行创作，希望能够使用愉快。\n" +
-            "\n" +
-            "## 相关链接\n" +
-            "\n" +
-            "- 官网：[https://halo.run](https://halo.run)\n" +
-            "- 社区：[https://bbs.halo.run](https://bbs.halo.run)\n" +
-            "- 主题仓库：[https://halo.run/p/themes.html](https://halo.run/p/themes.html)\n" +
-            "- 开源地址：[https://github.com/halo-dev/halo](https://github.com/halo-dev/halo)\n" +
-            "\n" +
-            "在使用过程中，有任何问题都可以通过以上链接找寻答案，或者联系我们。\n" +
-            "\n" +
-            "> 这是一篇自动生成的文章，请删除这篇文章之后开始你的创作吧！\n" +
-            "\n");
+        postParam.setOriginalContent("## Hello Halo\n"
+            + "\n"
+            + "如果你看到了这一篇文章，那么证明你已经安装成功了，感谢使用 [Halo](https://halo.run) 进行创作，希望能够使用愉快。\n"
+            + "\n"
+            + "## 相关链接\n"
+            + "\n"
+            + "- 官网：[https://halo.run](https://halo.run)\n"
+            + "- 社区：[https://bbs.halo.run](https://bbs.halo.run)\n"
+            + "- 主题仓库：[https://halo.run/p/themes.html](https://halo.run/p/themes.html)\n"
+            + "- 开源地址：[https://github.com/halo-dev/halo](https://github.com/halo-dev/halo)\n"
+            + "\n"
+            + "在使用过程中，有任何问题都可以通过以上链接找寻答案，或者联系我们。\n"
+            + "\n"
+            + "> 这是一篇自动生成的文章，请删除这篇文章之后开始你的创作吧！\n"
+            + "\n");
 
         Set<Integer> categoryIds = new HashSet<>();
         if (category != null) {
@@ -242,11 +243,12 @@ public class InstallController {
         sheetParam.setSlug("about");
         sheetParam.setTitle("关于页面");
         sheetParam.setStatus(PostStatus.PUBLISHED);
-        sheetParam.setOriginalContent("## 关于页面\n" +
-            "\n" +
-            "这是一个自定义页面，你可以在后台的 `页面` -> `所有页面` -> `自定义页面` 找到它，你可以用于新建关于页面、留言板页面等等。发挥你自己的想象力！\n" +
-            "\n" +
-            "> 这是一篇自动生成的页面，你可以在后台删除它。");
+        sheetParam.setOriginalContent("## 关于页面\n"
+            + "\n"
+            + "这是一个自定义页面，你可以在后台的 `页面` -> `所有页面` -> `自定义页面` 找到它，"
+            + "你可以用于新建关于页面、留言板页面等等。发挥你自己的想象力！\n"
+            + "\n"
+            + "> 这是一篇自动生成的页面，你可以在后台删除它。");
         sheetService.createBy(sheetParam.convertTo(), false);
     }
 
