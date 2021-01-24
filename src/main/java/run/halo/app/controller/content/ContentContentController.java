@@ -226,11 +226,9 @@ public class ContentContentController {
 
     @PostMapping(value = "archives/{type}/{slug:.*}/password")
     @CacheLock(traceRequest = true, expired = 2)
-    public String password(
-            @PathVariable("type") String type,
+    public String password(@PathVariable("type") String type,
             @PathVariable("slug") String slug,
-            @RequestParam(value = "password") String password
-    ) throws UnsupportedEncodingException {
+            @RequestParam(value = "password") String password) throws UnsupportedEncodingException {
 
         String redirectUrl;
 

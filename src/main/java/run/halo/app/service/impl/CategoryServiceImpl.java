@@ -69,13 +69,11 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
     private AuthenticationService authenticationService;
 
-    public CategoryServiceImpl(
-            CategoryRepository categoryRepository,
+    public CategoryServiceImpl(CategoryRepository categoryRepository,
             PostCategoryService postCategoryService,
             OptionService optionService,
             AuthenticationService authenticationService,
-            AuthorizationService authorizationService
-    ) {
+            AuthorizationService authorizationService) {
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
         this.postCategoryService = postCategoryService;
@@ -415,9 +413,9 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
      * @param childrenList  contains categories of children
      * @param doNotCollectEncryptedCategory true is not collect, false is collect
      */
-    private void collectAllChild(
-            List<Category> collectorList, List<CategoryVO> childrenList, Boolean doNotCollectEncryptedCategory
-    ) {
+    private void collectAllChild(List<Category> collectorList,
+            List<CategoryVO> childrenList,
+            Boolean doNotCollectEncryptedCategory) {
         if (CollectionUtil.isEmpty(childrenList)) {
             return;
         }
@@ -448,12 +446,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
      * @param categoryId    category id
      * @param doNotCollectEncryptedCategory true is not collect, false is collect
      */
-    private void collectAllChildByCategoryId(
-            List<Category> collectorList,
+    private void collectAllChildByCategoryId(List<Category> collectorList,
             List<CategoryVO> childrenList,
             Integer categoryId,
-            Boolean doNotCollectEncryptedCategory
-    ) {
+            Boolean doNotCollectEncryptedCategory) {
         if (CollectionUtil.isEmpty(childrenList)) {
             return;
         }
