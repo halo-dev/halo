@@ -5,7 +5,7 @@ import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -37,9 +37,9 @@ public class MinioFileHandler implements FileHandler {
         this.optionService = optionService;
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public UploadResult upload(@NotNull MultipartFile file) {
+    public UploadResult upload(@NonNull MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
         // Get config
         String endpoint = optionService.getByPropertyOfNonNull(MinioProperties.ENDPOINT).toString();
@@ -90,7 +90,7 @@ public class MinioFileHandler implements FileHandler {
     }
 
     @Override
-    public void delete(@NotNull String key) {
+    public void delete(@NonNull String key) {
         Assert.notNull(key, "File key must not be blank");
 
         String endPoint = optionService.getByPropertyOfNonNull(MinioProperties.ENDPOINT).toString();

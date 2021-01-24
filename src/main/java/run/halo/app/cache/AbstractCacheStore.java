@@ -49,7 +49,7 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
     abstract Boolean putInternalIfAbsent(@NonNull K key, @NonNull CacheWrapper<V> cacheWrapper);
 
     @Override
-    public Optional<V> get(K key) {
+    public @NonNull Optional<V> get(@NonNull K key) {
         Assert.notNull(key, "Cache key must not be blank");
 
         return getInternal(key).map(cacheWrapper -> {
@@ -70,17 +70,17 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
     }
 
     @Override
-    public void put(K key, V value, long timeout, TimeUnit timeUnit) {
+    public void put(@NonNull K key, @NonNull V value, long timeout, @NonNull TimeUnit timeUnit) {
         putInternal(key, buildCacheWrapper(value, timeout, timeUnit));
     }
 
     @Override
-    public Boolean putIfAbsent(K key, V value, long timeout, TimeUnit timeUnit) {
+    public Boolean putIfAbsent(@NonNull K key, @NonNull V value, long timeout, @NonNull TimeUnit timeUnit) {
         return putInternalIfAbsent(key, buildCacheWrapper(value, timeout, timeUnit));
     }
 
     @Override
-    public void put(K key, V value) {
+    public void put(@NonNull K key, @NonNull V value) {
         putInternal(key, buildCacheWrapper(value, 0, null));
     }
 

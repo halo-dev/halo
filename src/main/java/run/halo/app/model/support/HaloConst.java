@@ -110,16 +110,6 @@ public class HaloConst {
      */
     public static final String YOUTUBE_VIDEO_REG_PATTERN = "\\[youtube:(\\w+)\\,(\\d+)\\,(\\d+)\\]";
     /**
-     * Github Api url for halo-admin release.
-     */
-    public final static String HALO_ADMIN_RELEASES_LATEST = "https://api.github.com/repos/halo-dev/halo-admin/releases/latest";
-    /**
-     * Halo admin version regex.
-     */
-    public final static String HALO_ADMIN_VERSION_REGEX = "halo-admin-\\d+\\.\\d+(\\.\\d+)?(-\\S*)?\\.zip";
-    public final static String HALO_ADMIN_RELATIVE_PATH = "templates/admin/";
-    public final static String HALO_ADMIN_RELATIVE_BACKUP_PATH = "templates/admin-backup/";
-    /**
      * Content token header name.
      */
     public final static String API_ACCESS_KEY_HEADER_NAME = "API-" + HttpHeaders.AUTHORIZATION;
@@ -131,10 +121,6 @@ public class HaloConst {
      * Admin token param name.
      */
     public final static String ADMIN_TOKEN_QUERY_NAME = "admin_token";
-    /**
-     * Temporary token.
-     */
-    public final static String TEMP_TOKEN = "temp_token";
     /**
      * Content api token param name
      */
@@ -155,10 +141,6 @@ public class HaloConst {
      * Database product name.
      */
     public static String DATABASE_PRODUCT_NAME = null;
-    /**
-     * user_session
-     */
-    public static String USER_SESSION_KEY = "user_session";
 
     static {
         // Set version
