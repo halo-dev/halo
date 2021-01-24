@@ -273,6 +273,11 @@
         </div>
         <a-divider class="divider-transparent" />
       </div>
+      <div class="bottom-control">
+        <a-space>
+          <a-button type="primary" @click="advancedVisible = false">返回</a-button>
+        </a-space>
+      </div>
     </a-drawer>
 
     <div class="bottom-control">

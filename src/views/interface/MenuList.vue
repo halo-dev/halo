@@ -274,9 +274,6 @@ export default {
   created() {
     this.handleListTeams()
   },
-  mounted() {
-    window.addEventListener('scroll', this.scrollHandle, true)
-  },
   methods: {
     ...mapActions(['refreshOptionsCache']),
     handleListTeams(autoSelectTeam = false) {
@@ -415,14 +412,7 @@ export default {
       } else {
         this.refreshOptionsCache()
       }
-    },
-
-    scrollHandle: function(e) {
-      if (this.$refs.mheader.$el !== undefined) {
-        this.headerIsFixed = this.$refs.mheader.$el.getBoundingClientRect().top < 0
-        this.$set(this.headStyle, 'width', this.$refs.mheader.$el.offsetWidth + 'px')
-      }
-    },
+    }
   },
 }
 </script>

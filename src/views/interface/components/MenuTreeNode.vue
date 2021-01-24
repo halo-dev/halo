@@ -44,16 +44,16 @@
             <template slot="actions">
               <a
                 href="javascript:void(0);"
-                @click="handleDelete(item.id)"
-              >删除</a>
-            </template>
-            <template slot="actions">
-              <a
-                href="javascript:void(0);"
                 @click="handleOpenEditForm(item)"
               >
                 编辑
               </a>
+            </template>
+            <template slot="actions">
+              <a
+                href="javascript:void(0);"
+                @click="handleDelete(item.id)"
+              >删除</a>
             </template>
             <template
               slot="actions"
@@ -146,11 +146,9 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 100,
+        animation: 200,
         group: 'description',
-        disabled: false,
         ghostClass: 'ghost',
-        forceFallback: true,
         emptyInsertThreshold: 20,
       }
     },

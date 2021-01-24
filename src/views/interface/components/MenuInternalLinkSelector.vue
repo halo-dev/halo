@@ -271,18 +271,19 @@ export default {
     },
     otherInternalLinks() {
       const options = this.options
+      const pathSuffix = this.options.path_suffix ? this.options.path_suffix : ''
       return [
         {
           name: '分类目录',
-          url: `${options.blog_url}/${options.categories_prefix}${options.path_suffix}`,
+          url: `${options.blog_url}/${options.categories_prefix}${pathSuffix}`,
         },
         {
           name: '标签',
-          url: `${options.blog_url}/${options.tags_prefix}${options.path_suffix}`,
+          url: `${options.blog_url}/${options.tags_prefix}${pathSuffix}`,
         },
         {
           name: '文章归档',
-          url: `${options.blog_url}/${options.archives_prefix}${options.path_suffix}`,
+          url: `${options.blog_url}/${options.archives_prefix}${pathSuffix}`,
         },
         {
           name: 'RSS',
