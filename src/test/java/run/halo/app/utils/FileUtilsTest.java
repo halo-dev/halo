@@ -293,14 +293,17 @@ class FileUtilsTest {
         // source
         //  .hidden
         //      test.txt # contain: test
-        Path target = tempDirectory.resolve("target");
-        Path source = tempDirectory.resolve("source");
+        final var source = tempDirectory.resolve("source");
         Files.createDirectories(source);
-        Path hidden = source.resolve(".hidden");
+        var hidden = source.resolve(".git");
         Files.createDirectories(hidden);
-        Path testTxt = hidden.resolve("test.txt");
+        var testTxt = hidden.resolve("test.txt");
         Files.writeString(testTxt, "test");
 
+        final var target = tempDirectory.resolve("target");
         FileUtils.copyFolder(source, target);
+
+        assertTrue(Files.exists(target.resolve(".git")));
+        assertEquals("test", Files.readString(target.resolve(".git").resolve("test.txt")));
     }
 }
