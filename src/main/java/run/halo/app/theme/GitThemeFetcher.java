@@ -2,11 +2,9 @@ package run.halo.app.theme;
 
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.TagOpt;
 import run.halo.app.exception.ThemePropertyMissingException;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
@@ -49,7 +47,8 @@ public class GitThemeFetcher implements ThemeFetcher {
                 .call()) {
                 log.info("Cloned git repo {} to {} successfully", repoUrl, tempDirectory);
 
-                Pair<Ref, RevCommit> latestTag = GitUtils.getLatestTag(git);
+                // find latest tag
+                final var latestTag = GitUtils.getLatestTag(git);
                 final var checkoutCommand = git.checkout()
                     .setName("halo")
                     .setCreateBranch(true);

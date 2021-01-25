@@ -58,6 +58,7 @@ import run.halo.app.repository.ThemeRepository;
 import run.halo.app.repository.ThemeSettingRepository;
 import run.halo.app.service.ThemeService;
 import run.halo.app.theme.GitThemeFetcher;
+import run.halo.app.theme.GitThemeUpdater;
 import run.halo.app.theme.MultipartFileThemeUpdater;
 import run.halo.app.theme.MultipartZipFileThemeFetcher;
 import run.halo.app.theme.ThemeFetcherComposite;
@@ -550,12 +551,12 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public ThemeProperty update(String themeId) {
+        final var themeUpdater = new GitThemeUpdater(themeRepository, fetcherComposite);
         Assert.hasText(themeId, "Theme id must not be blank");
 
-        final var updatingTheme = getThemeOfNonNullBy(themeId);
-
         try {
-            pullFromGit(updatingTheme);
+            final var themeProperty = themeUpdater.update(themeId);
+            themeRepository.attemptToAdd(themeProperty);
         } catch (Exception e) {
             if (e instanceof ThemeNotSupportException) {
                 throw (ThemeNotSupportException) e;

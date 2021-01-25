@@ -246,7 +246,6 @@ class GitTest {
             Ref latestTag = latestTagPair.getKey();
             RevCommit tagCommit = latestTagPair.getValue();
 
-
             log.debug("Latest tag: {} with commit: {} {}",
                 latestTag.getName(),
                 tagCommit.getFullMessage(),

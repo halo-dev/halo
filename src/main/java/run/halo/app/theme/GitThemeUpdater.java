@@ -6,16 +6,18 @@ import static run.halo.app.theme.ThemeUpdater.restore;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.Date;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RebaseCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.RemoteConfig;
-import org.eclipse.jgit.transport.TagOpt;
 import org.eclipse.jgit.transport.URIish;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
+import run.halo.app.exception.ThemeUpdateException;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.repository.ThemeRepository;
 
@@ -30,14 +32,10 @@ public class GitThemeUpdater implements ThemeUpdater {
 
     private final ThemeFetcherComposite fetcherComposite;
 
-    private final ConflictStrategy conflictStrategy;
-
     public GitThemeUpdater(ThemeRepository themeRepository,
-        ThemeFetcherComposite fetcherComposite,
-        ConflictStrategy conflictStrategy) {
+        ThemeFetcherComposite fetcherComposite) {
         this.themeRepository = themeRepository;
         this.fetcherComposite = fetcherComposite;
-        this.conflictStrategy = conflictStrategy;
     }
 
     @Override
@@ -76,15 +74,7 @@ public class GitThemeUpdater implements ThemeUpdater {
 
     public ThemeProperty merge(ThemeProperty oldThemeProperty, ThemeProperty newThemeProperty)
         throws IOException {
-        // 0. commit old repo
-        // 1. find latest tag
-        // 2. new repo checkout the tag
-        // 3. old repo checkout halo branch
-        // 4. old repo set new repo as remote
-        // 5. old repo rebase remote
 
-        //TODO Complete merging process
-        // make sure that both themes contain .git folder
         final var oldThemePath = Paths.get(oldThemeProperty.getThemePath());
         final var newThemePath = Paths.get(newThemeProperty.getThemePath());
 
@@ -93,49 +83,49 @@ public class GitThemeUpdater implements ThemeUpdater {
 
         // open old git repo
         try (final var oldGit = Git.open(oldThemePath.toFile())) {
-            // try to add and commit changes not staged
-            if (!oldGit.status().call().isClean()) {
-                oldGit.add().addFilepattern(".").call();
-                oldGit.commit()
-                    .setSign(false)
-                    .setAuthor("halo", "hi@halo.run")
-                    .setMessage("Committed by halo automatically.")
-                    .call();
-            }
+            // TODO ensure that halo branch
+            // 0. commit old repo
+            commitAutomatically(oldGit);
+
+            // 1. find latest tag
+            // 2. new repo checkout the tag
+            // 3. old repo checkout halo branch
+            // 4. old repo set new repo as remote
+            // 5. old repo rebase remote
+
             // open new git repo
             try (final var newGit = Git.open(newThemePath.toFile())) {
-                newGit.fetch().setTagOpt(TagOpt.FETCH_TAGS).call();
-                // clear remote
-                final var remoteExists = oldGit.remoteList()
-                    .call()
-                    .stream().map(RemoteConfig::getName)
-                    .anyMatch(name -> name.equalsIgnoreCase("newRepo"));
-                if (remoteExists) {
-                    // remove newRepo remote
-                    oldGit.remoteRemove()
-                        .setRemoteName("newRepo")
-                        .call();
-                }
+                // TODO ensure that halo branch
 
+                // remove remote
+                removeRemoteIfExists(oldGit, "newTheme");
                 // add this new git to remote for old repo
-                oldGit.remoteAdd()
-                    .setName("newRepo")
+                final var addedRemoteConfig = oldGit.remoteAdd()
+                    .setName("newTheme")
                     .setUri(new URIish(newThemePath.toString()))
                     .call();
+                log.info("git remote add newTheme {} {}",
+                    addedRemoteConfig.getName(),
+                    addedRemoteConfig.getURIs());
 
                 // fetch remote data
-                final var branch = oldThemeProperty.getBranch();
-                final var remote = "newRepo/" + branch;
-                oldGit.fetch()
+                final var remote = "newTheme/halo";
+                log.info("git fetch newTheme/halo");
+                final var fetchResult = oldGit.fetch()
                     .setRemote(remote)
                     .call();
+                log.info("Fetch result: {}", fetchResult.getMessages());
 
                 // rebase upstream
+                log.info("git rebase newTheme/halo");
                 final var rebaseResult = oldGit.rebase()
                     .setUpstream(remote)
                     .setStrategy(MergeStrategy.THEIRS)
                     .call();
+                log.info("Rebase result: {}", rebaseResult.getStatus());
+                logCommit(rebaseResult.getCurrentCommit());
 
+                // check rebase result
                 if (!rebaseResult.getStatus().isSuccessful()
                     && oldGit.getRepository().getRepositoryState() != RepositoryState.SAFE) {
                     // if rebasing stopped or failed, you can get back to the original state by
@@ -148,6 +138,7 @@ public class GitThemeUpdater implements ThemeUpdater {
                     log.error("Aborted rebase with state: {} : {}",
                         abortRebaseResult.getStatus(),
                         abortRebaseResult.getConflicts());
+                    throw new ThemeUpdateException("无法自动合并最新文件！请删除后重新拉取主题。");
                 }
             }
         } catch (URISyntaxException | GitAPIException e) {
@@ -157,17 +148,49 @@ public class GitThemeUpdater implements ThemeUpdater {
         return newThemeProperty;
     }
 
-    private String newBranchName(ThemeProperty oldThemeProperty) {
-        final var updateStrategy = oldThemeProperty.getUpdateStrategy();
-        switch (updateStrategy) {
-            case BRANCH:
-                return oldThemeProperty.getBranch();
-            case RELEASE:
-                // get release from
-                return "";
-            default:
-                // should never come up here
-                throw new UnsupportedOperationException();
+    private void commitAutomatically(final Git git) throws GitAPIException, IOException {
+        // git status
+        if (git.status().call().isClean()) {
+            final var branch = git.getRepository().getBranch();
+            final var fullBranch = git.getRepository().getFullBranch();
+            log.info("Current branch {}", branch);
+            log.info("Your branch is up to date with {}.", fullBranch);
+            log.info("");
+            log.info("nothing to commit, working tree clean");
+            return;
+        }
+        // git add .
+        git.add().addFilepattern(".").call();
+        log.info("git add .");
+        // git commit -m "Committed by halo automatically."
+        final var commit = git.commit()
+            .setSign(false)
+            .setAuthor("halo", "hi@halo.run")
+            .setMessage("Committed by halo automatically.")
+            .call();
+        log.info("git commit -m \"Committed by halo automatically.\"");
+        logCommit(commit);
+    }
+
+    private void logCommit(final RevCommit commit) {
+        log.info("Commit result: {} {} {}",
+            commit.getName(),
+            commit.getFullMessage(),
+            new Date(commit.getCommitTime() * 1000L));
+    }
+
+    private void removeRemoteIfExists(final Git git, String remote) throws GitAPIException {
+        final var remoteExists = git.remoteList()
+            .call()
+            .stream().map(RemoteConfig::getName)
+            .anyMatch(name -> name.equals(remote));
+        if (remoteExists) {
+            // remove newRepo remote
+            final var removedRemoteConfig = git.remoteRemove()
+                .setRemoteName(remote)
+                .call();
+            log.info("git remote remove {} {}", removedRemoteConfig.getName(),
+                removedRemoteConfig.getURIs());
         }
     }
 
