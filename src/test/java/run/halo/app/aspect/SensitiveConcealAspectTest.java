@@ -1,5 +1,8 @@
 package run.halo.app.aspect;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +14,6 @@ import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.security.context.SecurityContextImpl;
 import run.halo.app.security.support.UserDetail;
 import run.halo.app.service.PostCommentService;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author giveup
@@ -39,7 +38,8 @@ class SensitiveConcealAspectTest {
 
     @Test
     void testAdmin() {
-        SecurityContextHolder.setContext(new SecurityContextImpl(new AuthenticationImpl(new UserDetail(new User()))));
+        SecurityContextHolder.setContext(
+            new SecurityContextImpl(new AuthenticationImpl(new UserDetail(new User()))));
 
         List<PostComment> postComments = postCommentService.listBy(1);
         for (PostComment postComment : postComments) {

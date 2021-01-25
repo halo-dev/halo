@@ -1,11 +1,10 @@
 package run.halo.app.handler.theme.config.support;
 
+import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import run.halo.app.model.enums.DataType;
 import run.halo.app.model.enums.InputType;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Theme configuration: item entity

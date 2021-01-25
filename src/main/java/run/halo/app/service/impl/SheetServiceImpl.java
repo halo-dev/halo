@@ -1,5 +1,14 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,14 +33,13 @@ import run.halo.app.model.enums.SheetPermalinkType;
 import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.repository.SheetRepository;
-import run.halo.app.service.*;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.SheetCommentService;
+import run.halo.app.service.SheetMetaService;
+import run.halo.app.service.SheetService;
+import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 /**
  * Sheet service implementation.
@@ -58,11 +66,11 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     private final OptionService optionService;
 
     public SheetServiceImpl(SheetRepository sheetRepository,
-            ApplicationEventPublisher eventPublisher,
-            SheetCommentService sheetCommentService,
-            SheetMetaService sheetMetaService,
-            ThemeService themeService,
-            OptionService optionService) {
+        ApplicationEventPublisher eventPublisher,
+        SheetCommentService sheetCommentService,
+        SheetMetaService sheetMetaService,
+        ThemeService themeService,
+        OptionService optionService) {
         super(sheetRepository, optionService);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
@@ -77,7 +85,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Sheet createdSheet = createOrUpdateBy(sheet);
         if (!autoSave) {
             // Log the creation
-            LogEvent logEvent = new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED, createdSheet.getTitle());
+            LogEvent logEvent =
+                new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED,
+                    createdSheet.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return createdSheet;
@@ -88,12 +98,15 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Sheet createdSheet = createOrUpdateBy(sheet);
 
         // Create sheet meta data
-        List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(sheet.getId(), metas);
+        List<SheetMeta> sheetMetaList =
+            sheetMetaService.createOrUpdateByPostId(sheet.getId(), metas);
         log.debug("Created sheet metas: [{}]", sheetMetaList);
 
         if (!autoSave) {
             // Log the creation
-            LogEvent logEvent = new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED, createdSheet.getTitle());
+            LogEvent logEvent =
+                new LogEvent(this, createdSheet.getId().toString(), LogType.SHEET_PUBLISHED,
+                    createdSheet.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return createdSheet;
@@ -104,7 +117,9 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Sheet updatedSheet = createOrUpdateBy(sheet);
         if (!autoSave) {
             // Log the creation
-            LogEvent logEvent = new LogEvent(this, updatedSheet.getId().toString(), LogType.SHEET_EDITED, updatedSheet.getTitle());
+            LogEvent logEvent =
+                new LogEvent(this, updatedSheet.getId().toString(), LogType.SHEET_EDITED,
+                    updatedSheet.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return updatedSheet;
@@ -115,12 +130,15 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Sheet updatedSheet = createOrUpdateBy(sheet);
 
         // Create sheet meta data
-        List<SheetMeta> sheetMetaList = sheetMetaService.createOrUpdateByPostId(updatedSheet.getId(), metas);
+        List<SheetMeta> sheetMetaList =
+            sheetMetaService.createOrUpdateByPostId(updatedSheet.getId(), metas);
         log.debug("Created sheet metas: [{}]", sheetMetaList);
 
         if (!autoSave) {
             // Log the creation
-            LogEvent logEvent = new LogEvent(this, updatedSheet.getId().toString(), LogType.SHEET_EDITED, updatedSheet.getTitle());
+            LogEvent logEvent =
+                new LogEvent(this, updatedSheet.getId().toString(), LogType.SHEET_EDITED,
+                    updatedSheet.getTitle());
             eventPublisher.publishEvent(logEvent);
         }
         return updatedSheet;
@@ -137,7 +155,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     public Sheet getBySlug(String slug) {
         Assert.hasText(slug, "Sheet slug must not be blank");
 
-        return sheetRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
+        return sheetRepository.getBySlug(slug)
+            .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
     }
 
     @Override
@@ -147,7 +166,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         Optional<Sheet> postOptional = sheetRepository.getBySlugAndStatus(slug, status);
 
-        return postOptional.orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
+        return postOptional
+            .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
     }
 
     @Override
@@ -194,7 +214,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     @Override
     public List<IndependentSheetDTO> listIndependentSheets() {
 
-        String context = (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/";
+        String context =
+            (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/";
 
         // TODO 日后将重构该部分，提供接口用于拓展独立页面，以供插件系统使用。
 
@@ -239,7 +260,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Sheet sheet = super.removeById(id);
 
         // Log it
-        eventPublisher.publishEvent(new LogEvent(this, id.toString(), LogType.SHEET_DELETED, sheet.getTitle()));
+        eventPublisher.publishEvent(
+            new LogEvent(this, id.toString(), LogType.SHEET_DELETED, sheet.getTitle()));
 
         return sheet;
     }
@@ -296,8 +318,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         }
 
         return sheets.stream()
-                .map(this::convertToMinimal)
-                .collect(Collectors.toList());
+            .map(this::convertToMinimal)
+            .collect(Collectors.toList());
     }
 
     @NonNull
@@ -355,14 +377,14 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
         if (permalinkType.equals(SheetPermalinkType.SECONDARY)) {
             fullPath.append(URL_SEPARATOR)
-                    .append(optionService.getSheetPrefix())
-                    .append(URL_SEPARATOR)
-                    .append(sheet.getSlug())
-                    .append(optionService.getPathSuffix());
+                .append(optionService.getSheetPrefix())
+                .append(URL_SEPARATOR)
+                .append(sheet.getSlug())
+                .append(optionService.getPathSuffix());
         } else if (permalinkType.equals(SheetPermalinkType.ROOT)) {
             fullPath.append(URL_SEPARATOR)
-                    .append(sheet.getSlug())
-                    .append(optionService.getPathSuffix());
+                .append(sheet.getSlug())
+                .append(optionService.getPathSuffix());
         }
 
         return fullPath.toString();

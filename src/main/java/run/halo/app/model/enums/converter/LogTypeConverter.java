@@ -1,8 +1,7 @@
 package run.halo.app.model.enums.converter;
 
-import run.halo.app.model.enums.LogType;
-
 import javax.persistence.Converter;
+import run.halo.app.model.enums.LogType;
 
 /**
  * Log type converter.

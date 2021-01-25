@@ -1,6 +1,12 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 import com.google.common.base.Objects;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
@@ -20,13 +26,6 @@ import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
-
 /**
  * CategoryService implementation class.
  *
@@ -36,7 +35,8 @@ import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
  */
 @Slf4j
 @Service
-public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> implements CategoryService {
+public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
+    implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
@@ -45,8 +45,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
     private final OptionService optionService;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository,
-            PostCategoryService postCategoryService,
-            OptionService optionService) {
+        PostCategoryService postCategoryService,
+        OptionService optionService) {
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
         this.postCategoryService = postCategoryService;
@@ -71,8 +71,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
             count = categoryRepository.countById(category.getParentId());
 
             if (count == 0) {
-                log.error("Parent category with id: [{}] was not found, category: [{}]", category.getParentId(), category);
-                throw new NotFoundException("Parent category with id = " + category.getParentId() + " was not found");
+                log.error("Parent category with id: [{}] was not found, category: [{}]",
+                    category.getParentId(), category);
+                throw new NotFoundException(
+                    "Parent category with id = " + category.getParentId() + " was not found");
             }
         }
 
@@ -104,7 +106,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
      * Concrete category tree.
      *
      * @param parentCategory parent category vo must not be null
-     * @param categories     a list of category
+     * @param categories a list of category
      */
     private void concreteTree(CategoryVO parentCategory, List<Category> categories) {
         Assert.notNull(parentCategory, "Parent category must not be null");
@@ -115,8 +117,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
         // Get children for removing after
         List<Category> children = categories.stream()
-                .filter(category -> Objects.equal(parentCategory.getId(), category.getParentId()))
-                .collect(Collectors.toList());
+            .filter(category -> Objects.equal(parentCategory.getId(), category.getParentId()))
+            .collect(Collectors.toList());
 
         children.forEach(category -> {
             // Convert to child category vo
@@ -133,10 +135,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
             }
 
             fullPath.append(URL_SEPARATOR)
-                    .append(optionService.getCategoriesPrefix())
-                    .append(URL_SEPARATOR)
-                    .append(child.getSlug())
-                    .append(optionService.getPathSuffix());
+                .append(optionService.getCategoriesPrefix())
+                .append(URL_SEPARATOR)
+                .append(child.getSlug())
+                .append(optionService.getPathSuffix());
 
             child.setFullPath(fullPath.toString());
 
@@ -149,7 +151,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
         // Foreach children vos
         if (!CollectionUtils.isEmpty(parentCategory.getChildren())) {
-            parentCategory.getChildren().forEach(childCategory -> concreteTree(childCategory, categories));
+            parentCategory.getChildren()
+                .forEach(childCategory -> concreteTree(childCategory, categories));
         }
     }
 
@@ -176,7 +179,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
 
     @Override
     public Category getBySlugOfNonNull(String slug) {
-        return categoryRepository.getBySlug(slug).orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+        return categoryRepository.getBySlug(slug)
+            .orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
     }
 
     @Override
@@ -219,10 +223,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         }
 
         fullPath.append(URL_SEPARATOR)
-                .append(optionService.getCategoriesPrefix())
-                .append(URL_SEPARATOR)
-                .append(category.getSlug())
-                .append(optionService.getPathSuffix());
+            .append(optionService.getCategoriesPrefix())
+            .append(URL_SEPARATOR)
+            .append(category.getSlug())
+            .append(optionService.getPathSuffix());
 
         categoryDTO.setFullPath(fullPath.toString());
 
@@ -236,7 +240,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer> 
         }
 
         return categories.stream()
-                .map(this::convertTo)
-                .collect(Collectors.toList());
+            .map(this::convertTo)
+            .collect(Collectors.toList());
     }
 }

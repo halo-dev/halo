@@ -14,6 +14,12 @@ java {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
+checkstyle {
+    toolVersion = "8.39"
+    showViolations = false
+    ignoreFailures = false
+}
+
 repositories {
     mavenLocal()
     maven {
@@ -88,9 +94,9 @@ ext {
     dataformatYamlVersion = "2.11.0"
     jgitVersion = "5.9.0.202009080501-r"
     flexmarkVersion = "0.62.2"
-    thumbnailatorVersion = "0.4.11"
+    thumbnailatorVersion = "0.4.13"
     image4jVersion = "0.7zensight1"
-    flywayVersion = "6.5.0"
+    flywayVersion = "7.5.1"
     h2Version = "1.4.197"
     levelDbVersion = "0.12"
     annotationsVersion = "3.0.1u2"

@@ -1,5 +1,8 @@
 package run.halo.app.repository.base;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -9,10 +12,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Base post repository.
@@ -42,7 +41,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     /**
      * Finds posts by status and pageable.
      *
-     * @param status   post status must not be null
+     * @param status post status must not be null
      * @param pageable page info must not be null
      * @return a page of post
      */
@@ -62,7 +61,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * Finds posts by status.
      *
      * @param status post staus must not be null
-     * @param sort   sort info must not be null
+     * @param sort sort info must not be null
      * @return a list of post
      */
     @NonNull
@@ -71,73 +70,79 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     /**
      * Finds all post by status and create time before.
      *
-     * @param status     status must not be null
+     * @param status status must not be null
      * @param createTime create time must not be null
-     * @param pageable   page info must not be null
+     * @param pageable page info must not be null
      * @return a page of post
      */
     @NonNull
-    Page<POST> findAllByStatusAndCreateTimeBefore(@NonNull PostStatus status, @NonNull Date createTime, @NonNull Pageable pageable);
+    Page<POST> findAllByStatusAndCreateTimeBefore(@NonNull PostStatus status,
+        @NonNull Date createTime, @NonNull Pageable pageable);
 
     /**
      * Finds all post by status and create time after.
      *
-     * @param status     status must not be null
+     * @param status status must not be null
      * @param createTime create time must not be null
-     * @param pageable   page info must not be null
+     * @param pageable page info must not be null
      * @return a page of post
      */
     @NonNull
-    Page<POST> findAllByStatusAndCreateTimeAfter(@NonNull PostStatus status, @NonNull Date createTime, @NonNull Pageable pageable);
+    Page<POST> findAllByStatusAndCreateTimeAfter(@NonNull PostStatus status,
+        @NonNull Date createTime, @NonNull Pageable pageable);
 
     /**
      * Finds all post by status and edit time before.
      *
-     * @param status   status must not be null
+     * @param status status must not be null
      * @param editTime edit time must not be null
      * @param pageable page info must not be null
      * @return a page of post
      */
     @NonNull
-    Page<POST> findAllByStatusAndEditTimeBefore(@NonNull PostStatus status, @NonNull Date editTime, @NonNull Pageable pageable);
+    Page<POST> findAllByStatusAndEditTimeBefore(@NonNull PostStatus status, @NonNull Date editTime,
+        @NonNull Pageable pageable);
 
     /**
      * Finds all post by status and edit time after.
      *
-     * @param status   status must not be null
+     * @param status status must not be null
      * @param editTime edit time must not be null
      * @param pageable page info must not be null
      * @return a page of post
      */
     @NonNull
-    Page<POST> findAllByStatusAndEditTimeAfter(@NonNull PostStatus status, @NonNull Date editTime, @NonNull Pageable pageable);
+    Page<POST> findAllByStatusAndEditTimeAfter(@NonNull PostStatus status, @NonNull Date editTime,
+        @NonNull Pageable pageable);
 
     /**
      * Finds all post by status and visits before.
      *
-     * @param status   status must not be null
-     * @param visits   visits must not be null
+     * @param status status must not be null
+     * @param visits visits must not be null
      * @param pageable page info must not be null
      * @return a page of post
      */
     @NonNull
-    Page<POST> findAllByStatusAndVisitsBefore(@NonNull PostStatus status, @NonNull Long visits, @NonNull Pageable pageable);
+    Page<POST> findAllByStatusAndVisitsBefore(@NonNull PostStatus status, @NonNull Long visits,
+        @NonNull Pageable pageable);
 
     /**
      * Finds all post by status and visits after.
      *
-     * @param status   status must not be null
-     * @param visits   visits must not be null
+     * @param status status must not be null
+     * @param visits visits must not be null
      * @param pageable page info must not be null
      * @return a page of post
      */
     @NonNull
-    Page<POST> findAllByStatusAndVisitsAfter(@NonNull PostStatus status, @NonNull Long visits, @NonNull Pageable pageable);
+    Page<POST> findAllByStatusAndVisitsAfter(@NonNull PostStatus status, @NonNull Long visits,
+        @NonNull Pageable pageable);
 
     /**
      * Gets post by slug and status.
      *
-     * @param slug   slug must not be blank
+     * @param slug slug must not be blank
      * @param status status must not be null
      * @return an optional post
      */
@@ -147,7 +152,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     /**
      * Gets post by id and status.
      *
-     * @param id     id must not be blank
+     * @param id id must not be blank
      * @param status status must not be null
      * @return an optional post
      */
@@ -174,7 +179,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     /**
      * Determine if the slug exists.
      *
-     * @param id   post id must not be null.
+     * @param id post id must not be null.
      * @param slug slug must not be null.
      * @return true or false.
      */
@@ -184,7 +189,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * Get post by slug
      *
      * @param slug post slug
-     * @return Optional<Post>
+     * @return post or empty
      */
     Optional<POST> getBySlug(@NonNull String slug);
 
@@ -202,7 +207,7 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     /**
      * Updates post likes.
      *
-     * @param likes  likes delta
+     * @param likes likes delta
      * @param postId post id must not be null
      * @return updated rows
      */
@@ -214,12 +219,13 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      * Updates post original content.
      *
      * @param content content could be blank but disallow to be null
-     * @param postId  post id must not be null
+     * @param postId post id must not be null
      * @return updated rows
      */
     @Modifying
     @Query("update BasePost p set p.originalContent = :content where p.id = :postId")
-    int updateOriginalContent(@Param("content") @NonNull String content, @Param("postId") @NonNull Integer postId);
+    int updateOriginalContent(@Param("content") @NonNull String content,
+        @Param("postId") @NonNull Integer postId);
 
     /**
      * Updates post status by post id.
@@ -230,16 +236,18 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
      */
     @Modifying
     @Query("update BasePost p set p.status = :status where p.id = :postId")
-    int updateStatus(@Param("status") @NonNull PostStatus status, @Param("postId") @NonNull Integer postId);
+    int updateStatus(@Param("status") @NonNull PostStatus status,
+        @Param("postId") @NonNull Integer postId);
 
     /**
      * Updates post format content by post id.
      *
      * @param formatContent format content must not be null.
-     * @param postId        post id must not be null.
+     * @param postId post id must not be null.
      * @return updated rows.
      */
     @Modifying
     @Query("update BasePost p set p.formatContent = :formatContent where p.id = :postId")
-    int updateFormatContent(@Param("formatContent") @NonNull String formatContent, @Param("postId") @NonNull Integer postId);
+    int updateFormatContent(@Param("formatContent") @NonNull String formatContent,
+        @Param("postId") @NonNull Integer postId);
 }

@@ -1,14 +1,13 @@
 package run.halo.app.service;
 
+import java.io.IOException;
+import java.util.List;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.params.PostMarkdownParam;
-
-import java.io.IOException;
-import java.util.List;
 
 /**
  * Backup service interface.
@@ -112,9 +111,9 @@ public interface BackupService {
     List<BackupDTO> listMarkdowns();
 
     /**
-     * delete a markdown backup
+     * delete a markdown backup.
      *
-     * @param fileName
+     * @param fileName file name
      */
     void deleteMarkdown(@NonNull String fileName);
 }

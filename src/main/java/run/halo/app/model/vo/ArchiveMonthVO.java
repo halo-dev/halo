@@ -1,10 +1,9 @@
 package run.halo.app.model.vo;
 
+import java.util.Comparator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import java.util.Comparator;
 
 /**
  * Month archive vo.

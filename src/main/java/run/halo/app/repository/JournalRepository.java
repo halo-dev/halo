@@ -18,12 +18,13 @@ import run.halo.app.repository.base.BaseRepository;
  * @author ryanwang
  * @date 2019-03-22
  */
-public interface JournalRepository extends BaseRepository<Journal, Integer>, JpaSpecificationExecutor<Journal> {
+public interface JournalRepository
+    extends BaseRepository<Journal, Integer>, JpaSpecificationExecutor<Journal> {
 
     /**
      * Finds journals by type and pageable.
      *
-     * @param type     journal type must not be null
+     * @param type journal type must not be null
      * @param pageable page info must not be null
      * @return a page of journal
      */
@@ -34,7 +35,7 @@ public interface JournalRepository extends BaseRepository<Journal, Integer>, Jpa
      * Updates journal likes.
      *
      * @param likes likes delta
-     * @param id    id must not be null
+     * @param id id must not be null
      * @return updated rows
      */
     @Modifying

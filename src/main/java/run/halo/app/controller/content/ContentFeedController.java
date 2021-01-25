@@ -1,7 +1,11 @@
 package run.halo.app.controller.content;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import java.io.IOException;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.springframework.data.domain.Page;
@@ -29,11 +33,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 
-import java.io.IOException;
-import java.util.List;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
-
 /**
  * @author ryanwang
  * @date 2019-03-21
@@ -42,11 +41,11 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Controller
 public class ContentFeedController {
 
-    private final static String UTF_8_SUFFIX = ";charset=UTF-8";
+    private static final String UTF_8_SUFFIX = ";charset=UTF-8";
 
-    private final static String XML_INVALID_CHAR = "[\\x00-\\x1F\\x7F]";
+    private static final String XML_INVALID_CHAR = "[\\x00-\\x1F\\x7F]";
 
-    private final static String XML_MEDIA_TYPE = MediaType.APPLICATION_XML_VALUE + UTF_8_SUFFIX;
+    private static final String XML_MEDIA_TYPE = MediaType.APPLICATION_XML_VALUE + UTF_8_SUFFIX;
 
     private final PostService postService;
 
@@ -59,10 +58,10 @@ public class ContentFeedController {
     private final FreeMarkerConfigurer freeMarker;
 
     public ContentFeedController(PostService postService,
-            CategoryService categoryService,
-            PostCategoryService postCategoryService,
-            OptionService optionService,
-            FreeMarkerConfigurer freeMarker) {
+        CategoryService categoryService,
+        PostCategoryService postCategoryService,
+        OptionService optionService,
+        FreeMarkerConfigurer freeMarker) {
         this.postService = postService;
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
@@ -90,18 +89,21 @@ public class ContentFeedController {
      * Get category post rss.
      *
      * @param model model
-     * @param slug  slug
+     * @param slug slug
      * @return rss xml content
      * @throws IOException       throw IOException
      * @throws TemplateException throw TemplateException
      */
-    @GetMapping(value = {"feed/categories/{slug}", "feed/categories/{slug}.xml"}, produces = XML_MEDIA_TYPE)
+    @GetMapping(value = {"feed/categories/{slug}",
+        "feed/categories/{slug}.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
-    public String feed(Model model, @PathVariable(name = "slug") String slug) throws IOException, TemplateException {
+    public String feed(Model model, @PathVariable(name = "slug") String slug)
+        throws IOException, TemplateException {
         Category category = categoryService.getBySlugOfNonNull(slug);
         CategoryDTO categoryDTO = categoryService.convertTo(category);
         model.addAttribute("category", categoryDTO);
-        model.addAttribute("posts", buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO));
+        model.addAttribute("posts",
+            buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO));
         Template template = freeMarker.getConfiguration().getTemplate("common/web/rss.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -126,18 +128,21 @@ public class ContentFeedController {
      * Get category posts atom.xml
      *
      * @param model model
-     * @param slug  slug
+     * @param slug slug
      * @return atom xml content
      * @throws IOException       throw IOException
      * @throws TemplateException throw TemplateException
      */
-    @GetMapping(value = {"atom/categories/{slug}", "atom/categories/{slug}.xml"}, produces = XML_MEDIA_TYPE)
+    @GetMapping(value = {"atom/categories/{slug}",
+        "atom/categories/{slug}.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
-    public String atom(Model model, @PathVariable(name = "slug") String slug) throws IOException, TemplateException {
+    public String atom(Model model, @PathVariable(name = "slug") String slug)
+        throws IOException, TemplateException {
         Category category = categoryService.getBySlugOfNonNull(slug);
         CategoryDTO categoryDTO = categoryService.convertTo(category);
         model.addAttribute("category", categoryDTO);
-        model.addAttribute("posts", buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO));
+        model.addAttribute("posts",
+            buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO));
         Template template = freeMarker.getConfiguration().getTemplate("common/web/atom.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -153,7 +158,8 @@ public class ContentFeedController {
     @GetMapping(value = {"sitemap", "sitemap.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
     public String sitemapXml(Model model,
-            @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC) Pageable pageable) throws IOException, TemplateException {
+        @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC)
+            Pageable pageable) throws IOException, TemplateException {
         model.addAttribute("posts", buildPosts(pageable));
         Template template = freeMarker.getConfiguration().getTemplate("common/web/sitemap_xml.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
@@ -167,7 +173,8 @@ public class ContentFeedController {
      */
     @GetMapping(value = "sitemap.html")
     public String sitemapHtml(Model model,
-            @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC) Pageable pageable) {
+        @PageableDefault(size = Integer.MAX_VALUE, sort = "createTime", direction = DESC)
+            Pageable pageable) {
         model.addAttribute("posts", buildPosts(pageable));
         return "common/web/sitemap_html";
     }
@@ -210,8 +217,10 @@ public class ContentFeedController {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
-            postDetailVO.setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
+            postDetailVO.setFormatContent(
+                RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
+            postDetailVO
+                .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });
         return posts.getContent();
     }
@@ -223,15 +232,19 @@ public class ContentFeedController {
      * @param category category
      * @return list of post detail vo.
      */
-    private List<PostDetailVO> buildCategoryPosts(@NonNull Pageable pageable, @NonNull CategoryDTO category) {
+    private List<PostDetailVO> buildCategoryPosts(@NonNull Pageable pageable,
+        @NonNull CategoryDTO category) {
         Assert.notNull(pageable, "Pageable must not be null");
         Assert.notNull(category, "Category slug must not be null");
 
-        Page<Post> postPage = postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
+        Page<Post> postPage =
+            postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
-            postDetailVO.setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
+            postDetailVO.setFormatContent(
+                RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
+            postDetailVO
+                .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });
         return posts.getContent();
     }

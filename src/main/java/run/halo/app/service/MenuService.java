@@ -1,5 +1,6 @@
 package run.halo.app.service;
 
+import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.MenuDTO;
@@ -8,8 +9,6 @@ import run.halo.app.model.params.MenuParam;
 import run.halo.app.model.vo.MenuTeamVO;
 import run.halo.app.model.vo.MenuVO;
 import run.halo.app.service.base.CrudService;
-
-import java.util.List;
 
 /**
  * Menu service interface.

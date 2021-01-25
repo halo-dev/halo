@@ -1,11 +1,10 @@
 package run.halo.app.model.params;
 
+import java.util.Date;
+import javax.validation.constraints.NotBlank;
 import lombok.Data;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Photo;
-
-import javax.validation.constraints.NotBlank;
-import java.util.Date;
 
 /**
  * Post param.

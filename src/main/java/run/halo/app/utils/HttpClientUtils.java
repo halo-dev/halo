@@ -1,6 +1,12 @@
 package run.halo.app.utils;
 
 import cn.hutool.core.lang.Tuple;
+import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
+import javax.net.ssl.SSLContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -16,13 +22,6 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.lang.NonNull;
 
-import javax.net.ssl.SSLContext;
-import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
-
 /**
  * Http client utilities.
  *
@@ -34,7 +33,7 @@ public class HttpClientUtils {
     /**
      * Timeout (Default is 5s).
      */
-    private final static int TIMEOUT = 5000;
+    private static final int TIMEOUT = 5000;
 
     private HttpClientUtils() {
     }
@@ -49,16 +48,17 @@ public class HttpClientUtils {
      * @throws KeyManagementException   key management exception
      */
     @NonNull
-    public static CloseableHttpClient createHttpsClient(int timeout) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+    public static CloseableHttpClient createHttpsClient(int timeout)
+        throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         SSLContext sslContext = new SSLContextBuilder()
-                .loadTrustMaterial(null, (certificate, authType) -> true)
-                .build();
+            .loadTrustMaterial(null, (certificate, authType) -> true)
+            .build();
 
         return resolveProxySetting(HttpClients.custom())
-                .setSSLContext(sslContext)
-                .setSSLHostnameVerifier(new NoopHostnameVerifier())
-                .setDefaultRequestConfig(getRequestConfig(timeout))
-                .build();
+            .setSSLContext(sslContext)
+            .setSSLHostnameVerifier(new NoopHostnameVerifier())
+            .setDefaultRequestConfig(getRequestConfig(timeout))
+            .build();
     }
 
     /**
@@ -67,7 +67,8 @@ public class HttpClientUtils {
      * @param httpClientBuilder the httpClientBuilder
      * @return the argument
      */
-    private static HttpClientBuilder resolveProxySetting(final HttpClientBuilder httpClientBuilder) {
+    private static HttpClientBuilder resolveProxySetting(
+        final HttpClientBuilder httpClientBuilder) {
         final String httpProxyEnv = System.getenv("http_proxy");
         if (StringUtils.isNotBlank(httpProxyEnv)) {
             final Tuple httpProxy = resolveHttpProxy(httpProxyEnv);
@@ -76,7 +77,8 @@ public class HttpClientUtils {
             if (httpProxy.getMembers().length == 3) {
                 //set proxy credentials
                 final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                credentialsProvider.setCredentials(new AuthScope(httpHost.getHostName(), httpHost.getPort()),
+                credentialsProvider
+                    .setCredentials(new AuthScope(httpHost.getHostName(), httpHost.getPort()),
                         new UsernamePasswordCredentials(httpProxy.get(1), httpProxy.get(2)));
                 httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
             }
@@ -86,7 +88,8 @@ public class HttpClientUtils {
 
     /**
      * @param httpProxy http proxy env values
-     * @return resolved http proxy values; first is host(@nonNull), second is username(@nullable), third is password(@nullable)
+     * @return resolved http proxy values; first is host(@nonNull), second is username(@nullable)
+     * , third is password(@nullable)
      */
     private static Tuple resolveHttpProxy(final String httpProxy) {
         final URI proxyUri = URI.create(httpProxy);
@@ -126,10 +129,10 @@ public class HttpClientUtils {
      */
     private static RequestConfig getRequestConfig(int timeout) {
         return RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .setConnectionRequestTimeout(timeout)
-                .setSocketTimeout(timeout)
-                .build();
+            .setConnectTimeout(timeout)
+            .setConnectionRequestTimeout(timeout)
+            .setSocketTimeout(timeout)
+            .build();
     }
 
 

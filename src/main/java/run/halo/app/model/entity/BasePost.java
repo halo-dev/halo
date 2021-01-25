@@ -1,5 +1,18 @@
 package run.halo.app.model.entity;
 
+import java.util.Date;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -7,9 +20,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
-
-import javax.persistence.*;
-import java.util.Date;
 
 /**
  * Post base entity.
@@ -21,16 +31,18 @@ import java.util.Date;
 @Data
 @Entity(name = "BasePost")
 @Table(name = "posts", indexes = {
-        @Index(name = "posts_type_status", columnList = "type, status"),
-        @Index(name = "posts_create_time", columnList = "create_time")})
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER, columnDefinition = "int default 0")
+    @Index(name = "posts_type_status", columnList = "type, status"),
+    @Index(name = "posts_create_time", columnList = "create_time")})
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER,
+    columnDefinition = "int default 0")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class BasePost extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
-    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
+    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support"
+        + ".CustomIdGenerator")
     private Integer id;
 
     /**

@@ -1,8 +1,7 @@
 package run.halo.app.security.service;
 
-import org.springframework.lang.NonNull;
-
 import java.util.Optional;
+import org.springframework.lang.NonNull;
 
 /**
  * One-time-token service interface.

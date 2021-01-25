@@ -15,16 +15,16 @@ public class SecurityUtils {
     /**
      * Access token cache prefix.
      */
-    private final static String TOKEN_ACCESS_CACHE_PREFIX = "halo.admin.access.token.";
+    private static final String TOKEN_ACCESS_CACHE_PREFIX = "halo.admin.access.token.";
 
     /**
      * Refresh token cache prefix.
      */
-    private final static String TOKEN_REFRESH_CACHE_PREFIX = "halo.admin.refresh.token.";
+    private static final String TOKEN_REFRESH_CACHE_PREFIX = "halo.admin.refresh.token.";
 
-    private final static String ACCESS_TOKEN_CACHE_PREFIX = "halo.admin.access_token.";
+    private static final String ACCESS_TOKEN_CACHE_PREFIX = "halo.admin.access_token.";
 
-    private final static String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";
+    private static final String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";
 
     private SecurityUtils() {
     }

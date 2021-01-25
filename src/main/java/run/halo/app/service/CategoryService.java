@@ -1,5 +1,6 @@
 package run.halo.app.service;
 
+import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -8,8 +9,6 @@ import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.service.base.CrudService;
-
-import java.util.List;
 
 /**
  * Category service.

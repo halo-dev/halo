@@ -1,10 +1,9 @@
 package run.halo.app.model.dto;
 
+import java.util.Date;
 import lombok.Data;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.Photo;
-
-import java.util.Date;
 
 /**
  * @author ryanwang

@@ -42,6 +42,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
+import run.halo.app.model.support.HaloConst;
 
 /**
  * Markdown utils.
@@ -51,7 +53,8 @@ import java.util.regex.Pattern;
  */
 public class MarkdownUtils {
 
-    private static final DataHolder OPTIONS = new MutableDataSet().set(Parser.EXTENSIONS, Arrays.asList(AttributesExtension.create(),
+    private static final DataHolder OPTIONS =
+        new MutableDataSet().set(Parser.EXTENSIONS, Arrays.asList(AttributesExtension.create(),
             AutolinkExtension.create(),
             EmojiExtension.create(),
             EscapedCharacterExtension.create(),
@@ -105,17 +108,20 @@ public class MarkdownUtils {
 
         // Render netease music short url.
         if (markdown.contains(HaloConst.NETEASE_MUSIC_PREFIX)) {
-            markdown = markdown.replaceAll(HaloConst.NETEASE_MUSIC_REG_PATTERN, HaloConst.NETEASE_MUSIC_IFRAME);
+            markdown = markdown
+                .replaceAll(HaloConst.NETEASE_MUSIC_REG_PATTERN, HaloConst.NETEASE_MUSIC_IFRAME);
         }
 
         // Render bilibili video short url.
         if (markdown.contains(HaloConst.BILIBILI_VIDEO_PREFIX)) {
-            markdown = markdown.replaceAll(HaloConst.BILIBILI_VIDEO_REG_PATTERN, HaloConst.BILIBILI_VIDEO_IFRAME);
+            markdown = markdown
+                .replaceAll(HaloConst.BILIBILI_VIDEO_REG_PATTERN, HaloConst.BILIBILI_VIDEO_IFRAME);
         }
 
         // Render youtube video short url.
         if (markdown.contains(HaloConst.YOUTUBE_VIDEO_PREFIX)) {
-            markdown = markdown.replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
+            markdown = markdown
+                .replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
         }
 
         Node document = PARSER.parse(markdown);
