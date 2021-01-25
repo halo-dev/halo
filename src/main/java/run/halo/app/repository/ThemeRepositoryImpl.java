@@ -120,7 +120,7 @@ public class ThemeRepositoryImpl implements ThemeRepository {
             deleteFolderQuietly(targetThemePath);
             throw new ServiceException("复制主题文件失败！", e);
         } finally {
-            log.info("Clear temporary theme folder {}", sourceThemePath);
+            log.info("Clean temporary theme folder {}", sourceThemePath);
             deleteFolderQuietly(sourceThemePath);
         }
 

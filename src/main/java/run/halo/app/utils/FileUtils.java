@@ -56,7 +56,7 @@ public class FileUtils {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
                 throws IOException {
-                Path current = target.resolve(source.relativize(dir).toString());
+                Path current = target.resolve(source.relativize(dir));
                 Files.createDirectories(current);
                 return FileVisitResult.CONTINUE;
             }
@@ -64,7 +64,7 @@ public class FileUtils {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                 throws IOException {
-                Files.copy(file, target.resolve(source.relativize(file).toString()),
+                Files.copy(file, target.resolve(source.relativize(file)),
                     StandardCopyOption.REPLACE_EXISTING);
                 return FileVisitResult.CONTINUE;
             }

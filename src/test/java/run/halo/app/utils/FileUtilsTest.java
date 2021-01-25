@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import run.halo.app.model.support.HaloConst;
@@ -30,19 +30,14 @@ class FileUtilsTest {
 
     Path tempDirectory = null;
 
-    @AfterEach
-    void cleanUp() throws IOException {
-        if (tempDirectory != null) {
-            FileUtils.deleteFolder(tempDirectory);
-            assertTrue(Files.notExists(tempDirectory));
-        }
+
+    @BeforeEach
+    void setUp() throws IOException {
+        tempDirectory = FileUtils.createTempDirectory();
     }
 
     @Test
     void deleteFolder() throws IOException {
-        // Create a temp folder
-        tempDirectory = Files.createTempDirectory("halo-test");
-
         Path testPath = tempDirectory.resolve("test/test/test");
 
         // Create test folders
@@ -75,8 +70,6 @@ class FileUtilsTest {
 
     @Test
     void zipFolderTest() throws IOException {
-        // Create some temporary files
-        tempDirectory = Files.createTempDirectory("zip-root-");
         log.debug("Folder name: [{}]", tempDirectory.getFileName());
         Files.createTempFile(tempDirectory, "zip-file1-", ".txt");
         Files.createTempFile(tempDirectory, "zip-file2-", ".txt");
@@ -118,9 +111,6 @@ class FileUtilsTest {
 
     @Test
     void testRenameFile() throws IOException {
-        // Create a temp folder
-        tempDirectory = Files.createTempDirectory("halo-test");
-
         Path testPath = tempDirectory.resolve("test/test");
         Path filePath = tempDirectory.resolve("test/test/test.file");
 
@@ -143,9 +133,6 @@ class FileUtilsTest {
 
     @Test
     void testRenameFolder() throws IOException {
-        // Create a temp folder
-        tempDirectory = Files.createTempDirectory("halo-test");
-
         Path testPath = tempDirectory.resolve("test/test");
         Path filePath = tempDirectory.resolve("test/test.file");
 
@@ -163,9 +150,6 @@ class FileUtilsTest {
 
     @Test
     void testRenameRepeat() throws IOException {
-        // Create a temp folder
-        tempDirectory = Files.createTempDirectory("halo-test");
-
         Path testPathOne = tempDirectory.resolve("test/testOne");
         Path testPathTwo = tempDirectory.resolve("test/testTwo");
         Path filePathOne = tempDirectory.resolve("test/testOne.file");
@@ -205,8 +189,6 @@ class FileUtilsTest {
         //   file2
         //   folder3
         //     expected_file
-        tempDirectory = Files.createTempDirectory("halo-test");
-
         log.info("Preparing test folder structure");
         Path folder1 = tempDirectory.resolve("folder1");
         Files.createDirectory(folder1);
@@ -224,7 +206,7 @@ class FileUtilsTest {
 
         // find expected_file
         final var resultPath = FileUtils.findRootPath(tempDirectory,
-                path -> path.getFileName().toString().equals("expected_file"));
+            path -> path.getFileName().toString().equals("expected_file"));
         assertTrue(resultPath.isPresent());
         log.debug("Got result path: {}", resultPath.get());
         assertEquals(folder3.toString(), resultPath.get().toString());
@@ -242,8 +224,6 @@ class FileUtilsTest {
         //   file2
         //   folder3
         //     file3
-        tempDirectory = Files.createTempDirectory("halo-test");
-
         log.info("Preparing test folder structure");
         Path folder1 = tempDirectory.resolve("folder1");
         Files.createDirectory(folder1);
@@ -278,8 +258,6 @@ class FileUtilsTest {
         //   file2
         //   folder3
         //     expected_file
-        tempDirectory = Files.createTempDirectory("halo-test");
-
         log.info("Preparing test folder structure");
         Path folder1 = tempDirectory.resolve("folder1");
         Files.createDirectory(folder1);
@@ -308,5 +286,21 @@ class FileUtilsTest {
             path -> path.getFileName().toString().equals("expected_file"));
         assertTrue(filePathResult.isPresent());
         assertEquals(expectedFile.toString(), filePathResult.get().toString());
+    }
+
+    @Test
+    void copyHiddenFolder() throws IOException {
+        // source
+        //  .hidden
+        //      test.txt # contain: test
+        Path target = tempDirectory.resolve("target");
+        Path source = tempDirectory.resolve("source");
+        Files.createDirectories(source);
+        Path hidden = source.resolve(".hidden");
+        Files.createDirectories(hidden);
+        Path testTxt = hidden.resolve("test.txt");
+        Files.writeString(testTxt, "test");
+
+        FileUtils.copyFolder(source, target);
     }
 }
