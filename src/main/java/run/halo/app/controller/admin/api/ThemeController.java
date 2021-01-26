@@ -193,21 +193,21 @@ public class ThemeController {
 
     @PostMapping(value = {"fetchingBranches", "/fetching/git/branches"})
     @ApiOperation("Fetches all branches")
-    @Deprecated
+    @Deprecated(since = "1.4.2", forRemoval = true)
     public List<ThemeProperty> fetchBranches(@RequestParam("uri") String uri) {
         return themeService.fetchBranches(uri);
     }
 
     @PostMapping("fetchingReleases")
     @ApiOperation("Fetches all releases")
-    @Deprecated
+    @Deprecated(since = "1.4.2", forRemoval = true)
     public List<ThemeProperty> fetchReleases(@RequestParam("uri") String uri) {
         return themeService.fetchReleases(uri);
     }
 
     @GetMapping("fetchingRelease")
     @ApiOperation("Fetches a specific release")
-    @Deprecated
+    @Deprecated(since = "1.4.2", forRemoval = true)
     public ThemeProperty fetchRelease(@RequestParam("uri") String uri,
         @RequestParam("tag") String tagName) {
         return themeService.fetchRelease(uri, tagName);
@@ -215,7 +215,7 @@ public class ThemeController {
 
     @GetMapping("fetchBranch")
     @ApiOperation("Fetch specific branch")
-    @Deprecated
+    @Deprecated(since = "1.4.2", forRemoval = true)
     public ThemeProperty fetchBranch(@RequestParam("uri") String uri,
         @RequestParam("branch") String branchName) {
         return themeService.fetchBranch(uri, branchName);
@@ -223,7 +223,7 @@ public class ThemeController {
 
     @GetMapping("fetchLatestRelease")
     @ApiOperation("Fetch latest release")
-    @Deprecated
+    @Deprecated(since = "1.4.2", forRemoval = true)
     public ThemeProperty fetchLatestRelease(@RequestParam("uri") String uri) {
         return themeService.fetchLatestRelease(uri);
     }
