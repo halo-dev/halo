@@ -52,6 +52,7 @@ public class GitUtils {
                 .setCloneSubmodules(true)
                 .setBranch("refs/heads/" + branchName)
                 .call()) {
+            // empty block placeholder
         }
     }
 
