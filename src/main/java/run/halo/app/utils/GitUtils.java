@@ -10,18 +10,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
-import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.storage.file.WindowCacheConfig;
+import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -38,45 +36,22 @@ import org.springframework.util.CollectionUtils;
 public class GitUtils {
 
     private GitUtils() {
-        // Config packed git MMAP
-        if (SystemUtils.IS_OS_WINDOWS) {
-            WindowCacheConfig config = new WindowCacheConfig();
-            config.setPackedGitMMAP(false);
-            config.install();
-        }
     }
 
-    public static Git openOrInit(Path repoPath) throws IOException, GitAPIException {
-        Git git;
-
-        try {
-            git = Git.open(repoPath.toFile());
-        } catch (RepositoryNotFoundException e) {
-            log.warn(
-                "Git repository may not exist, we will try to initialize an empty repository: [{}]",
-                e.getMessage());
-            git = Git.init().setDirectory(repoPath.toFile()).call();
-        }
-
-        return git;
-    }
-
+    @Deprecated(since = "1.4.2", forRemoval = true)
     public static void cloneFromGit(@NonNull String repoUrl, @NonNull Path targetPath,
         @NonNull String branchName) throws GitAPIException {
         Assert.hasText(repoUrl, "Repository remote url must not be blank");
         Assert.notNull(targetPath, "Target path must not be null");
 
-        Git git = null;
-        try {
-            git = Git.cloneRepository()
+        try (
+            Git ignored = Git.cloneRepository()
                 .setURI(repoUrl)
                 .setDirectory(targetPath.toFile())
                 .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
                 .setCloneSubmodules(true)
                 .setBranch("refs/heads/" + branchName)
-                .call();
-        } finally {
-            closeQuietly(git);
+                .call()) {
         }
     }
 
@@ -100,15 +75,9 @@ public class GitUtils {
         return branches;
     }
 
-    public static void closeQuietly(Git git) {
-        if (git != null) {
-            git.getRepository().close();
-            git.close();
-        }
-    }
-
     @Nullable
-    public static Pair<Ref, RevCommit> getLatestTag(Git git) throws GitAPIException, IOException {
+    public static Pair<Ref, RevCommit> getLatestTag(final Git git)
+        throws GitAPIException, IOException {
         final var tags = git.tagList().call();
         if (CollectionUtils.isEmpty(tags)) {
             return null;
@@ -133,9 +102,57 @@ public class GitUtils {
             return commitTagMap.keySet()
                 .stream()
                 .max(Comparator.comparing(RevCommit::getCommitTime))
-                .map(latestCommit -> {
-                    return Pair.of(commitTagMap.get(latestCommit), latestCommit);
-                }).orElse(null);
+                .map(latestCommit -> Pair.of(commitTagMap.get(latestCommit), latestCommit))
+                .orElse(null);
         }
+    }
+
+    public static void removeRemoteIfExists(final Git git, String remote) throws GitAPIException {
+        final var remoteExists = git.remoteList()
+            .call()
+            .stream().map(RemoteConfig::getName)
+            .anyMatch(name -> name.equals(remote));
+        if (remoteExists) {
+            // remove newRepo remote
+            final var removedRemoteConfig = git.remoteRemove()
+                .setRemoteName(remote)
+                .call();
+            log.info("git remote remove {} {}", removedRemoteConfig.getName(),
+                removedRemoteConfig.getURIs());
+        }
+    }
+
+    public static void logCommit(final RevCommit commit) {
+        if (commit == null) {
+            return;
+        }
+        log.info("Commit result: {} {} {}",
+            commit.getName(),
+            commit.getFullMessage(),
+            new Date(commit.getCommitTime() * 1000L));
+    }
+
+    public static void commitAutomatically(final Git git) throws GitAPIException, IOException {
+        // git status
+        if (git.status().call().isClean()) {
+            final var branch = git.getRepository().getBranch();
+            final var fullBranch = git.getRepository().getFullBranch();
+            log.info("Current branch {}", branch);
+            log.info("Your branch is up to date with {}.", fullBranch);
+            log.info("");
+            log.info("nothing to commit, working tree clean");
+            return;
+        }
+        // git add .
+        git.add().addFilepattern(".").call();
+        log.info("git add .");
+        // git commit -m "Committed by halo automatically."
+        final var commit = git.commit()
+            .setSign(false)
+            .setAuthor("halo", "hi@halo.run")
+            .setMessage("Committed by halo automatically.")
+            .call();
+        log.info("git commit -m \"Committed by halo automatically.\"");
+        logCommit(commit);
     }
 }

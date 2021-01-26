@@ -13,6 +13,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
+import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.internal.jdbc.JdbcUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,6 +76,16 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         this.initDirectory();
         this.initThemes();
         this.printStartInfo();
+        this.configGit();
+    }
+
+    private void configGit() {
+        // Config packed git MMAP
+        if (SystemUtils.IS_OS_WINDOWS) {
+            WindowCacheConfig config = new WindowCacheConfig();
+            config.setPackedGitMMAP(false);
+            config.install();
+        }
     }
 
     private void printStartInfo() {

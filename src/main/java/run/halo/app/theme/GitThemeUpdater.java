@@ -2,18 +2,17 @@ package run.halo.app.theme;
 
 import static run.halo.app.theme.ThemeUpdater.backup;
 import static run.halo.app.theme.ThemeUpdater.restore;
+import static run.halo.app.utils.GitUtils.commitAutomatically;
+import static run.halo.app.utils.GitUtils.logCommit;
+import static run.halo.app.utils.GitUtils.removeRemoteIfExists;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.Date;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RebaseCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.RepositoryState;
-import org.eclipse.jgit.merge.MergeStrategy;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
@@ -76,27 +75,14 @@ public class GitThemeUpdater implements ThemeUpdater {
         throws IOException {
 
         final var oldThemePath = Paths.get(oldThemeProperty.getThemePath());
-        final var newThemePath = Paths.get(newThemeProperty.getThemePath());
-
-        // final var branch = oldThemeProperty.getBranch();
-        // final var updateStrategy = oldThemeProperty.getUpdateStrategy();
-
         // open old git repo
         try (final var oldGit = Git.open(oldThemePath.toFile())) {
-            // TODO ensure that halo branch
             // 0. commit old repo
             commitAutomatically(oldGit);
 
-            // 1. find latest tag
-            // 2. new repo checkout the tag
-            // 3. old repo checkout halo branch
-            // 4. old repo set new repo as remote
-            // 5. old repo rebase remote
-
-            // open new git repo
-            try (final var newGit = Git.open(newThemePath.toFile())) {
-                // TODO ensure that halo branch
-
+            final var newThemePath = Paths.get(newThemeProperty.getThemePath());
+            // trying to open new git repo
+            try (final var ignored = Git.open(newThemePath.toFile())) {
                 // remove remote
                 removeRemoteIfExists(oldGit, "newTheme");
                 // add this new git to remote for old repo
@@ -112,33 +98,33 @@ public class GitThemeUpdater implements ThemeUpdater {
                 final var remote = "newTheme/halo";
                 log.info("git fetch newTheme/halo");
                 final var fetchResult = oldGit.fetch()
-                    .setRemote(remote)
+                    .setRemote("newTheme")
                     .call();
                 log.info("Fetch result: {}", fetchResult.getMessages());
 
                 // rebase upstream
-                log.info("git rebase newTheme/halo");
+                log.info("git rebase newTheme");
                 final var rebaseResult = oldGit.rebase()
                     .setUpstream(remote)
-                    .setStrategy(MergeStrategy.THEIRS)
                     .call();
                 log.info("Rebase result: {}", rebaseResult.getStatus());
                 logCommit(rebaseResult.getCurrentCommit());
 
                 // check rebase result
-                if (!rebaseResult.getStatus().isSuccessful()
-                    && oldGit.getRepository().getRepositoryState() != RepositoryState.SAFE) {
-                    // if rebasing stopped or failed, you can get back to the original state by
-                    // running it
-                    // with setOperation(RebaseCommand.Operation.ABORT)
-                    final var abortRebaseResult = oldGit.rebase()
-                        .setUpstream(remote)
-                        .setOperation(RebaseCommand.Operation.ABORT)
-                        .call();
-                    log.error("Aborted rebase with state: {} : {}",
-                        abortRebaseResult.getStatus(),
-                        abortRebaseResult.getConflicts());
-                    throw new ThemeUpdateException("无法自动合并最新文件！请删除后重新拉取主题。");
+                if (!rebaseResult.getStatus().isSuccessful()) {
+                    if (oldGit.getRepository().getRepositoryState() != RepositoryState.SAFE) {
+                        // if rebasing stopped or failed, you can get back to the original state by
+                        // running it
+                        // with setOperation(RebaseCommand.Operation.ABORT)
+                        final var abortRebaseResult = oldGit.rebase()
+                            .setUpstream(remote)
+                            .setOperation(RebaseCommand.Operation.ABORT)
+                            .call();
+                        log.error("Aborted rebase with state: {} : {}",
+                            abortRebaseResult.getStatus(),
+                            abortRebaseResult.getConflicts());
+                    }
+                    throw new ThemeUpdateException("无法自动合并最新文件！请尝试删除主题并重新拉取。");
                 }
             }
         } catch (URISyntaxException | GitAPIException e) {
@@ -148,68 +134,4 @@ public class GitThemeUpdater implements ThemeUpdater {
         return newThemeProperty;
     }
 
-    private void commitAutomatically(final Git git) throws GitAPIException, IOException {
-        // git status
-        if (git.status().call().isClean()) {
-            final var branch = git.getRepository().getBranch();
-            final var fullBranch = git.getRepository().getFullBranch();
-            log.info("Current branch {}", branch);
-            log.info("Your branch is up to date with {}.", fullBranch);
-            log.info("");
-            log.info("nothing to commit, working tree clean");
-            return;
-        }
-        // git add .
-        git.add().addFilepattern(".").call();
-        log.info("git add .");
-        // git commit -m "Committed by halo automatically."
-        final var commit = git.commit()
-            .setSign(false)
-            .setAuthor("halo", "hi@halo.run")
-            .setMessage("Committed by halo automatically.")
-            .call();
-        log.info("git commit -m \"Committed by halo automatically.\"");
-        logCommit(commit);
-    }
-
-    private void logCommit(final RevCommit commit) {
-        log.info("Commit result: {} {} {}",
-            commit.getName(),
-            commit.getFullMessage(),
-            new Date(commit.getCommitTime() * 1000L));
-    }
-
-    private void removeRemoteIfExists(final Git git, String remote) throws GitAPIException {
-        final var remoteExists = git.remoteList()
-            .call()
-            .stream().map(RemoteConfig::getName)
-            .anyMatch(name -> name.equals(remote));
-        if (remoteExists) {
-            // remove newRepo remote
-            final var removedRemoteConfig = git.remoteRemove()
-                .setRemoteName(remote)
-                .call();
-            log.info("git remote remove {} {}", removedRemoteConfig.getName(),
-                removedRemoteConfig.getURIs());
-        }
-    }
-
-    /**
-     * Update strategy when there are conflicts.
-     *
-     * @author johnniang
-     */
-    public enum ConflictStrategy {
-
-        /**
-         * Override old theme.
-         */
-        OVERRIDE,
-
-        /**
-         * Cancel update theme.
-         */
-        CANCEL
-
-    }
 }
