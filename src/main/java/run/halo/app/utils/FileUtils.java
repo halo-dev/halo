@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -39,11 +38,6 @@ import run.halo.app.exception.ForbiddenException;
 @Slf4j
 public class FileUtils {
 
-    /**
-     * Ignored folders while finding root path.
-     */
-    private static final List<String> IGNORED_FOLDERS = Arrays.asList(".git");
-
     private FileUtils() {
     }
 
@@ -57,12 +51,12 @@ public class FileUtils {
         Assert.notNull(source, "Source path must not be null");
         Assert.notNull(target, "Target path must not be null");
 
-        Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(source, new SimpleFileVisitor<>() {
 
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
                 throws IOException {
-                Path current = target.resolve(source.relativize(dir).toString());
+                Path current = target.resolve(source.relativize(dir));
                 Files.createDirectories(current);
                 return FileVisitResult.CONTINUE;
             }
@@ -70,7 +64,7 @@ public class FileUtils {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                 throws IOException {
-                Files.copy(file, target.resolve(source.relativize(file).toString()),
+                Files.copy(file, target.resolve(source.relativize(file)),
                     StandardCopyOption.REPLACE_EXISTING);
                 return FileVisitResult.CONTINUE;
             }
@@ -255,44 +249,117 @@ public class FileUtils {
      */
     @NonNull
     public static Optional<Path> findRootPath(@NonNull final Path path,
-        @Nullable final Predicate<Path> pathPredicate) throws IOException {
+        @Nullable final Predicate<Path> pathPredicate)
+        throws IOException {
+        return findRootPath(path, Integer.MAX_VALUE, pathPredicate);
+    }
+
+    /**
+     * Find root path.
+     *
+     * @param path super root path starter
+     * @param maxDepth max loop depth
+     * @param pathPredicate path predicate
+     * @return empty if path is not a directory or the given path predicate is null
+     * @throws IOException IO exception
+     */
+    @NonNull
+    public static Optional<Path> findRootPath(@NonNull final Path path,
+        int maxDepth,
+        @Nullable final Predicate<Path> pathPredicate)
+        throws IOException {
+        return findPath(path, maxDepth, pathPredicate).map(Path::getParent);
+    }
+
+    /**
+     * Find path.
+     *
+     * @param path super root path starter
+     * @param pathPredicate path predicate
+     * @return empty if path is not a directory or the given path predicate is null
+     * @throws IOException IO exception
+     */
+    @NonNull
+    public static Optional<Path> findPath(@NonNull final Path path,
+        @Nullable final Predicate<Path> pathPredicate)
+        throws IOException {
+        return findPath(path, Integer.MAX_VALUE, pathPredicate);
+    }
+
+    /**
+     * Find path.
+     *
+     * @param path super root path starter
+     * @param pathPredicate path predicate
+     * @return empty if path is not a directory or the given path predicate is null
+     * @throws IOException IO exception
+     */
+    @NonNull
+    public static Optional<Path> findPath(@NonNull final Path path,
+        int maxDepth,
+        @Nullable final Predicate<Path> pathPredicate)
+        throws IOException {
+        Assert.isTrue(maxDepth > 0, "Max depth must not be less than 1");
         if (!Files.isDirectory(path) || pathPredicate == null) {
             // if the path is not a directory or the given path predicate is null, then return an
             // empty optional
             return Optional.empty();
         }
 
-        log.debug("Trying to find root path from [{}]", path);
+        log.debug("Trying to find path from [{}]", path);
 
         // the queue holds folders which may be root
-        final LinkedList<Path> queue = new LinkedList<>();
+        final var queue = new LinkedList<Path>();
+        // depth container
+        final var depthQueue = new LinkedList<Integer>();
+
+        // init queue
         queue.push(path);
-        while (!queue.isEmpty()) {
+        depthQueue.push(1);
+
+        boolean found = false;
+        Path result = null;
+        while (!found && !queue.isEmpty()) {
             // pop the first path as candidate root path
-            final Path rootPath = queue.pop();
+            final var rootPath = queue.pop();
+            final int depth = depthQueue.pop();
+            if (log.isDebugEnabled()) {
+                log.debug("Peek({}) into {}", depth, rootPath);
+            }
             try (final Stream<Path> childrenPaths = Files.list(rootPath)) {
-                List<Path> subFolders = new LinkedList<>();
-                Optional<Path> matchedPath = childrenPaths.peek(child -> {
-                    if (Files.isDirectory(child)) {
-                        // collect directory
-                        subFolders.add(child);
+                final var subFolders = new LinkedList<Path>();
+                var resultPath = childrenPaths
+                    .peek(p -> {
+                        if (Files.isDirectory(p)) {
+                            subFolders.add(p);
+                        }
+                    })
+                    .filter(pathPredicate)
+                    .findFirst();
+                if (resultPath.isPresent()) {
+                    queue.clear();
+                    depthQueue.clear();
+                    // return current result path
+                    found = true;
+                    result = resultPath.get();
+                } else {
+                    // put all directory into queue
+                    if (depth < maxDepth) {
+                        for (Path subFolder : subFolders) {
+                            if (!Files.isHidden(subFolder)) {
+                                // skip hidden folder
+                                queue.push(subFolder);
+                                depthQueue.push(depth + 1);
+                            }
+                        }
                     }
-                }).filter(pathPredicate).findAny();
-                if (matchedPath.isPresent()) {
-                    log.debug("Found root path: [{}]", rootPath);
-                    return Optional.of(rootPath);
                 }
-                // add all folder into queue
-                subFolders.forEach(e -> {
-                    // if
-                    if (!IGNORED_FOLDERS.contains(e.getFileName().toString())) {
-                        queue.push(e);
-                    }
-                });
+                subFolders.clear();
             }
         }
-        // if tests are failed completely
-        return Optional.empty();
+
+        log.debug("Found path: [{}]", result);
+        return Optional.ofNullable(result);
     }
 
     /**
@@ -427,7 +494,7 @@ public class FileUtils {
                 FileUtils.deleteFolder(deletingPath);
             }
         } catch (IOException e) {
-            log.warn("Failed to delete " + deletingPath);
+            log.warn("Failed to delete {}", deletingPath);
         }
     }
 
@@ -440,7 +507,9 @@ public class FileUtils {
      */
     @NonNull
     public static Path createTempDirectory() throws IOException {
-        return Files.createTempDirectory("halo");
+        final var tempDirectory = Files.createTempDirectory("halo");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> deleteFolderQuietly(tempDirectory)));
+        return tempDirectory;
     }
 
 }
