@@ -14,7 +14,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
@@ -32,6 +35,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.lang.NonNull;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -118,7 +122,16 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
     @Bean(name = "multipartResolver")
     MultipartResolver multipartResolver(MultipartProperties multipartProperties) {
         MultipartConfigElement multipartConfigElement = multipartProperties.createMultipartConfig();
-        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
+        CommonsMultipartResolver resolver = new CommonsMultipartResolver() {
+            @Override
+            public boolean isMultipart(@NonNull HttpServletRequest request) {
+                final var method = request.getMethod();
+                if (!"POST".equalsIgnoreCase(method) && !"PUT".equalsIgnoreCase(method)) {
+                    return false;
+                }
+                return FileUploadBase.isMultipartContent(new ServletRequestContext(request));
+            }
+        };
         resolver.setDefaultEncoding("UTF-8");
         resolver.setMaxUploadSize(multipartConfigElement.getMaxRequestSize());
         resolver.setMaxUploadSizePerFile(multipartConfigElement.getMaxFileSize());

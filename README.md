@@ -22,35 +22,33 @@
 
 ## 快速开始
 
-### 下载最新的 Halo 安装包
+下载最新的 Halo 安装包：
 
-> 其他地址：https://docs.halo.run/zh/install/downloads
+> 其他地址：https://docs.halo.run/install/downloads
 
 ```bash
 curl -L https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar --output halo.jar
 ```
 
-或者
-
-```bash
-wget https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar -O halo.jar
-```
-
-### 启动 Halo
-
 ```bash
 java -jar halo.jar
 ```
 
-详细部署文档请移步：<https://docs.halo.run/install/index>
+### Docker:
+
+```bash
+docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=always ruibaby/halo
+```
+
+详细部署文档请查阅：<https://docs.halo.run/install/index>
 
 ## 周边
 
 - 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
 - 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
 - 管理 APP（已停止维护）：<https://github.com/halo-dev/halo-app>
-- 主题仓库：<https://halo.run/themes.html>
-- 资源下载：<https://dl.halo.run>
+- 主题仓库：<https://halo.run/p/themes.html>
+- 资源下载：<https://docs.halo.run/install/downloads>
 - WeHalo 小程序：<https://github.com/aquanlerou/WeHalo>
 
 ## 许可证

@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.Objects;
-import java.util.concurrent.locks.ReentrantLock;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.http.MediaType;
@@ -58,8 +57,6 @@ public class LocalFileHandler implements FileHandler {
 
     private final String workDir;
 
-    private final ReentrantLock lock = new ReentrantLock();
-
     public LocalFileHandler(OptionService optionService,
         HaloProperties haloProperties) {
         this.optionService = optionService;
@@ -79,13 +76,11 @@ public class LocalFileHandler implements FileHandler {
         Path workPath = Paths.get(workDir);
 
         // Check file type
-        Assert.isTrue(Files.isDirectory(workPath), workDir + " isn't a directory");
-
-        // Check readable
-        Assert.isTrue(Files.isReadable(workPath), workDir + " isn't readable");
-
-        // Check writable
-        Assert.isTrue(Files.isWritable(workPath), workDir + " isn't writable");
+        if (!Files.isDirectory(workPath)
+            || !Files.isReadable(workPath)
+            || !Files.isWritable(workPath)) {
+            log.warn("Please make sure that {} is a directory, readable and writable!", workDir);
+        }
     }
 
     @Override

@@ -112,7 +112,6 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
-    @Deprecated
     ThemeProperty getThemeOfNonNullBy(@NonNull String themeId);
 
     /**
@@ -305,6 +304,7 @@ public interface ThemeService {
      * @throws IOException IOException
      */
     @NonNull
+    @Deprecated
     ThemeProperty add(@NonNull Path themeTmpPath) throws IOException;
 
     /**
@@ -323,6 +323,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     ThemeProperty fetchLatestRelease(@NonNull String uri);
 
     /**
@@ -332,6 +333,7 @@ public interface ThemeService {
      * @return list of theme properties
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     List<ThemeProperty> fetchBranches(@NonNull String uri);
 
     /**
@@ -341,6 +343,7 @@ public interface ThemeService {
      * @return list of theme properties
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     List<ThemeProperty> fetchReleases(@NonNull String uri);
 
     /**
@@ -351,6 +354,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName);
 
     /**
@@ -361,6 +365,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     ThemeProperty fetchBranch(@NonNull String uri, @NonNull String branchName);
 
     /**
