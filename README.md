@@ -27,7 +27,7 @@
 > 其他地址：https://docs.halo.run/install/downloads
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar --output halo.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.4.3/halo-1.4.3.jar --output halo.jar
 ```
 
 ```bash
@@ -47,7 +47,7 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=alwa
 - 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
 - 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
 - 管理 APP（已停止维护）：<https://github.com/halo-dev/halo-app>
-- 主题仓库：<https://halo.run/p/themes.html>
+- 主题仓库：<https://halo.run/themes.html>
 - 资源下载：<https://docs.halo.run/install/downloads>
 - WeHalo 小程序：<https://github.com/aquanlerou/WeHalo>
 
