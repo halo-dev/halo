@@ -162,8 +162,8 @@
                 更多主题请访问：
                 <a
                   target="_blank"
-                  href="https://halo.run/p/themes.html"
-                >https://halo.run/p/themes</a>
+                  href="https://halo.run/themes.html"
+                >https://halo.run/themes</a>
               </template>
             </a-alert>
           </a-tab-pane>
@@ -205,8 +205,8 @@
                 目前仅支持远程 Git 仓库和 ZIP 下载链接。更多主题请访问：
                 <a
                   target="_blank"
-                  href="https://halo.run/p/themes.html"
-                >https://halo.run/p/themes</a>
+                  href="https://halo.run/themes.html"
+                >https://halo.run/themes</a>
               </template>
             </a-alert>
           </a-tab-pane>

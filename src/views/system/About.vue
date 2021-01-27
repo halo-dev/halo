@@ -46,19 +46,25 @@
               <li>运行模式：{{ environments.mode }}</li>
               <li>启动时间：{{ environments.startTime | moment }}</li>
             </ul>
-
+            <a
+              href="https://halo.run"
+              target="_blank"
+              class="mr-3"
+            >官网
+              <a-icon type="link" />
+            </a>
+            <a
+              href="https://docs.halo.run"
+              target="_blank"
+              class="mr-3"
+            >文档
+              <a-icon type="link" />
+            </a>
             <a
               href="https://github.com/halo-dev"
               target="_blank"
               class="mr-3"
             >开源组织
-              <a-icon type="link" />
-            </a>
-            <a
-              href="https://halo.run"
-              target="_blank"
-              class="mr-3"
-            >用户文档
               <a-icon type="link" />
             </a>
             <a

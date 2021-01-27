@@ -6,7 +6,7 @@ const backupApi = {}
 
 backupApi.importMarkdown = (formData, uploadProgress, cancelToken) => {
   return service({
-    url: `${baseUrl}/markdown`,
+    url: `${baseUrl}/markdown/import`,
     timeout: 8640000, // 24 hours
     data: formData, // form data
     onUploadProgress: uploadProgress,

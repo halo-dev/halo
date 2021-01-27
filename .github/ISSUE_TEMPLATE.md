@@ -5,7 +5,7 @@
 
 **我确定我已经查看了** (标注`[ ]`为`[x]`)
 
-- [ ] [Halo 使用文档](https://halo.run/guide)
+- [ ] [Halo 文档](https://docs.halo.run)
 - [ ] [Github Wiki 常见问题](https://github.com/halo-dev/halo/wiki/4.-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
 - [ ] [其他 Issues](https://github.com/halo-dev/halo-admin/issues)
 
