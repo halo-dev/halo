@@ -93,10 +93,6 @@ public class ContentContentController {
     public String content(@PathVariable("prefix") String prefix,
         @RequestParam(value = "token", required = false) String token,
         Model model) {
-        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.ROOT)) {
-            Sheet sheet = sheetService.getBySlug(prefix);
-            return sheetModel.content(sheet, token, model);
-        }
         if (optionService.getArchivesPrefix().equals(prefix)) {
             return postModel.archives(1, model);
         }
@@ -115,7 +111,11 @@ public class ContentContentController {
         if (optionService.getLinksPrefix().equals(prefix)) {
             return linkModel.list(model);
         }
-        return null;
+        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.ROOT)) {
+            Sheet sheet = sheetService.getBySlug(prefix);
+            return sheetModel.content(sheet, token, model);
+        }
+        throw new NotFoundException("Not Found");
     }
 
     @GetMapping("{prefix}/page/{page:\\d+}")
@@ -155,12 +155,6 @@ public class ContentContentController {
             }
         }
 
-        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.SECONDARY)
-            && optionService.getSheetPrefix().equals(prefix)) {
-            Sheet sheet = sheetService.getBySlug(slug);
-            return sheetModel.content(sheet, token, model);
-        }
-
         if (optionService.getCategoriesPrefix().equals(prefix)) {
             return categoryModel.listPost(model, slug, 1);
         }
@@ -173,6 +167,12 @@ public class ContentContentController {
             && StringUtils.isNumeric(prefix)) {
             Post post = postService.getBy(Integer.parseInt(prefix), slug);
             return postModel.content(post, token, model);
+        }
+
+        if (optionService.getSheetPermalinkType().equals(SheetPermalinkType.SECONDARY)
+            && optionService.getSheetPrefix().equals(prefix)) {
+            Sheet sheet = sheetService.getBySlug(slug);
+            return sheetModel.content(sheet, token, model);
         }
 
         throw new NotFoundException("Not Found");
