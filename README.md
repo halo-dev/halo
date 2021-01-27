@@ -7,7 +7,7 @@
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/halo-dev/halo/total.svg?style=flat-square"></a>
 <a href="https://hub.docker.com/r/ruibaby/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/ruibaby/halo?style=flat-square"></a>
 <a href="https://github.com/halo-dev/halo/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo.svg?style=flat-square"></a>
-<a href="https://travis-ci.org/halo-dev/halo"><img alt="Travis CI" src="https://img.shields.io/travis/halo-dev/halo.svg?style=flat-square"/></a>
+<a href="https://github.com/halo-dev/halo/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo/Halo%20CI?style=flat-square"/></a>
 </p>
 
 ------------------------------
@@ -18,7 +18,7 @@
 
 一个优秀的开源博客发布应用，值得一试。
 
-> [官网 & 文档](https://halo.run) | [社区](https://bbs.halo.run) | [Telegram 频道](https://t.me/halo_dev)
+> [官网](https://halo.run) | [文档](https://docs.halo.run) | [社区](https://bbs.halo.run) | [Telegram 频道](https://t.me/halo_dev)
 
 ## 快速开始
 
@@ -31,7 +31,7 @@ curl -L https://github.com/halo-dev/halo/releases/download/v1.4.2/halo-1.4.2.jar
 ```
 
 ```bash
-java -jar halo-latest.jar
+java -jar halo.jar
 ```
 
 ### Docker:
@@ -40,7 +40,7 @@ java -jar halo-latest.jar
 docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=always ruibaby/halo
 ```
 
-详细部署文档请移步：<https://docs.halo.run/install/index>
+详细部署文档请查阅：<https://docs.halo.run/install/index>
 
 ## 周边
 
@@ -48,7 +48,7 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=alwa
 - 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
 - 管理 APP（已停止维护）：<https://github.com/halo-dev/halo-app>
 - 主题仓库：<https://halo.run/p/themes.html>
-- 资源下载：<https://docs.halo.run/zh/install/downloads>
+- 资源下载：<https://docs.halo.run/install/downloads>
 - WeHalo 小程序：<https://github.com/aquanlerou/WeHalo>
 
 ## 许可证
