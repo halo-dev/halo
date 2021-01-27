@@ -178,7 +178,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm/v7,linux/arm64/v8,linux/ppc64le,linux/s390x
+          platforms: ${{ secrets.DOCKER_PLATFORMS }}
           push: true
           tags: |
             ${{ secrets.DOCKER_IMAGE_NAME }}:${{ env.HALO_VERSION}}
@@ -188,7 +188,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x
+          platforms: ${{ secrets.DOCKER_PLATFORMS }}
           push: true
           tags: |
             ${{ secrets.DOCKER_IMAGE_NAME }}:latest
