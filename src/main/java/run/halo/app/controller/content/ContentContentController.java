@@ -286,7 +286,7 @@ public class ContentContentController {
             redirectUrl.append(optionService.getBlogBaseUrl());
         }
 
-        redirectUrl.append("/categories/").append(slug);
+        redirectUrl.append(optionService.getCategoriesPrefix()).append(slug);
 
         return redirectUrl.toString();
     }
