@@ -37,7 +37,7 @@ java -jar halo.jar
 ### Docker:
 
 ```bash
-docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=always ruibaby/halo
+docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=always halohub/halo
 ```
 
 详细部署文档请查阅：<https://docs.halo.run/install/index>
