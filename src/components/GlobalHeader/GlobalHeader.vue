@@ -62,7 +62,7 @@
 import UserMenu from '../Tools/UserMenu'
 import SMenu from '../Menu/'
 import Logo from '../Tools/Logo'
-import { mixin } from '@/utils/mixin'
+import { mixin } from '@/mixins/mixin'
 
 export default {
   name: 'GlobalHeader',

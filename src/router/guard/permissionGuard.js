@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import router from './router'
-import store from './store'
-import NProgress from 'nprogress' // progress bar
+import router from '@/router'
+import store from '@/store'
+import NProgress from 'nprogress'
 import { setDocumentTitle, domTitle } from '@/utils/domUtil'
 import adminApi from '@api/admin'
 

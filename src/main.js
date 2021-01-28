@@ -6,10 +6,10 @@ import Contextmenu from 'vue-contextmenujs'
 import store from './store/'
 import './logger'
 
-import '@/assets/css/tailwind.css'
+import '@/styles/tailwind.css'
 import './core/lazy_use'
-import './permission'
-import '@/utils/filter' // global filter
+import '@/router/guard/'
+import '@/filters/filter' // global filter
 import './components'
 import { version } from '../package.json'
 

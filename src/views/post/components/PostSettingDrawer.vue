@@ -317,7 +317,7 @@ import CategorySelectTree from './CategorySelectTree'
 import TagSelect from './TagSelect'
 
 // libs
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { datetimeFormat } from '@/utils/datetime'
 import pinyin from 'tiny-pinyin'
 import { mapGetters } from 'vuex'

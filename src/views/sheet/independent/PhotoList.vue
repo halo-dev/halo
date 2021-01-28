@@ -278,7 +278,7 @@
 <script>
 import { PageView } from '@/layouts'
 import { mapActions } from 'vuex'
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import photoApi from '@/api/photo'
 import optionApi from '@/api/option'
 import { datetimeFormat } from '@/utils/datetime'

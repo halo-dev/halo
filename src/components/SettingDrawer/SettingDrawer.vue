@@ -193,7 +193,7 @@
 import SettingItem from '@/components/SettingDrawer/SettingItem'
 import config from '@/config/defaultSettings'
 import { updateTheme, colorList } from './setting'
-import { mixin, mixinDevice } from '@/utils/mixin'
+import { mixin, mixinDevice } from '@/mixins/mixin'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {

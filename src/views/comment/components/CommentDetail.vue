@@ -121,7 +121,7 @@
   </a-drawer>
 </template>
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import commentApi from '@/api/comment'
 export default {
   name: 'CommentDetail',

@@ -519,7 +519,7 @@
 </template>
 
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { PageView } from '@/layouts'
 import PostSettingDrawer from './components/PostSettingDrawer'
 import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'

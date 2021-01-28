@@ -197,7 +197,7 @@
 </template>
 
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { PageView } from '@/layouts'
 import AttachmentDetailDrawer from './components/AttachmentDetailDrawer'
 import attachmentApi from '@/api/attachment'

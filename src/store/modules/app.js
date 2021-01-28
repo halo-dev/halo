@@ -48,7 +48,6 @@ const app = {
       state.device = device
     },
     TOGGLE_THEME: (state, theme) => {
-      // setStore('_DEFAULT_THEME', theme)
       Vue.ls.set(DEFAULT_THEME, theme)
       state.theme = theme
     },

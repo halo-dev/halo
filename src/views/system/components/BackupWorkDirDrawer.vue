@@ -79,7 +79,7 @@
   </a-drawer>
 </template>
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import backupApi from '@/api/backup'
 export default {
   name: 'BackupWorkDirDrawer',

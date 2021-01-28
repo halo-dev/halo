@@ -101,7 +101,7 @@
   </div>
 </template>
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import sheetApi from '@/api/sheet'
 const independentColumns = [
   {

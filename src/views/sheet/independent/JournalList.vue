@@ -262,7 +262,7 @@
 import { PageView } from '@/layouts'
 import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
 import AttachmentDrawer from '../../attachment/components/AttachmentDrawer'
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { mapGetters, mapActions } from 'vuex'
 import journalApi from '@/api/journal'
 import optionApi from '@/api/option'

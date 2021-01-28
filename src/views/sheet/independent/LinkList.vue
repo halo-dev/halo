@@ -266,7 +266,7 @@
 <script>
 import { PageView } from '@/layouts'
 import { mapActions } from 'vuex'
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import optionApi from '@/api/option'
 import linkApi from '@/api/link'
 const columns = [

@@ -230,7 +230,7 @@
 
 <script>
 import { PageView } from '@/layouts'
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import CategorySelectTree from './components/CategorySelectTree'
 import categoryApi from '@/api/category'
 

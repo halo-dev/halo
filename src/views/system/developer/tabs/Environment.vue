@@ -202,7 +202,7 @@
   </div>
 </template>
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import actuatorApi from '@/api/actuator'
 export default {
   name: 'Environment',

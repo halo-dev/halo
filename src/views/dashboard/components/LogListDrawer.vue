@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import logApi from '@/api/log'
 export default {
   name: 'LogListDrawer',

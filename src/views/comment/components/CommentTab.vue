@@ -439,7 +439,7 @@
   </div>
 </template>
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import CommentDetail from './CommentDetail'
 import marked from 'marked'
 import commentApi from '@/api/comment'

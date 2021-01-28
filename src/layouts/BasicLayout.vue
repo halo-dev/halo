@@ -64,7 +64,7 @@
 <script>
 import { triggerWindowResizeEvent } from '@/utils/util'
 import { mapState, mapActions } from 'vuex'
-import { mixin, mixinDevice } from '@/utils/mixin'
+import { mixin, mixinDevice } from '@/mixins/mixin'
 import config from '@/config/defaultSettings'
 import { asyncRouterMap } from '@/config/router.config.js'
 

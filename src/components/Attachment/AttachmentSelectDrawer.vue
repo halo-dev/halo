@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { mixin, mixinDevice } from '@/utils/mixin.js'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import attachmentApi from '@/api/attachment'
 
 export default {
