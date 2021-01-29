@@ -75,23 +75,19 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
-    public List<Category> listCategoriesBy(Integer postId, Boolean queryEncryptCategory) {
+    public List<Category> listCategoriesBy(Integer postId, boolean queryEncryptCategory) {
         Assert.notNull(postId, "Post id must not be null");
 
         // Find all category ids
         Set<Integer> categoryIds = postCategoryRepository.findAllCategoryIdsByPostId(postId);
 
-        if (queryEncryptCategory) {
-            return categoryService.listAllByIdsNotEncrypt(categoryIds);
-        } else {
-            return categoryService.listAllByIds(categoryIds);
-        }
+        return categoryService.listAllByIds(categoryIds, queryEncryptCategory);
     }
 
 
     @Override
     public Map<Integer, List<Category>> listCategoryListMap(
-        Collection<Integer> postIds, Boolean queryEncryptCategory) {
+        Collection<Integer> postIds, boolean queryEncryptCategory) {
         if (CollectionUtils.isEmpty(postIds)) {
             return Collections.emptyMap();
         }
@@ -104,13 +100,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
             ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId);
 
         // Find all categories
-        List<Category> categories;
-
-        if (queryEncryptCategory) {
-            categories = categoryService.listAllByIdsNotEncrypt(categoryIds);
-        } else {
-            categories = categoryService.listAllByIds(categoryIds);
-        }
+        List<Category> categories = categoryService.listAllByIds(categoryIds, queryEncryptCategory);
 
         // Convert to category map
         Map<Integer, Category> categoryMap = ServiceUtils.convertToMap(categories, Category::getId);
@@ -315,16 +305,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
     @Override
     public List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(
-        Sort sort, Boolean queryEncryptCategory) {
+        Sort sort, boolean queryEncryptCategory) {
         Assert.notNull(sort, "Sort info must not be null");
-        List<Category> categories;
-
-        if (queryEncryptCategory) {
-            categories = categoryService.listAllNotEncrypt(sort);
-        } else {
-            categories = categoryService.listAll(sort);
-        }
-
+        List<Category> categories = categoryService.listAll(sort, queryEncryptCategory);
 
         // Query category post count
         Map<Integer, Long> categoryPostCountMap = ServiceUtils

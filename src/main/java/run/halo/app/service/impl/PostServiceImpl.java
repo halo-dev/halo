@@ -511,7 +511,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public PostDetailVO convertToDetailVo(Post post, Boolean queryEncryptCategory) {
+    public PostDetailVO convertToDetailVo(Post post, boolean queryEncryptCategory) {
         // List tags
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         // List categories
@@ -568,7 +568,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public Page<PostListVO> convertToListVo(Page<Post> postPage, Boolean queryEncryptCategory) {
+    public Page<PostListVO> convertToListVo(Page<Post> postPage, boolean queryEncryptCategory) {
         Assert.notNull(postPage, "Post page must not be null");
 
         List<Post> posts = postPage.getContent();
@@ -633,7 +633,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
-    public List<PostListVO> convertToListVo(List<Post> posts, Boolean queryEncryptCategory) {
+    public List<PostListVO> convertToListVo(List<Post> posts, boolean queryEncryptCategory) {
         Assert.notNull(posts, "Post page must not be null");
 
         Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
@@ -850,7 +850,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Tag> tags = tagService.listAllByIds(tagIds);
 
         // List all categories
-        List<Category> categories = categoryService.listAllByIdsNotEncrypt(categoryIds);
+        List<Category> categories = categoryService.listAllByIds(categoryIds, true);
 
         // Create post tags
         List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(),

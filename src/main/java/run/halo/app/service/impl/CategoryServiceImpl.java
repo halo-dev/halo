@@ -251,9 +251,13 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     }
 
     @Override
-    public Category getBySlugOfNonNullNotEncrypt(String slug) {
-        return categoryRepository.getBySlug(slug)
-            .orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+    public Category getBySlugOfNonNull(String slug, boolean queryEncryptCategory) {
+        if (queryEncryptCategory) {
+            return categoryRepository.getBySlug(slug)
+                .orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+        } else {
+            return this.getBySlugOfNonNull(slug);
+        }
     }
 
     @Override
@@ -469,8 +473,12 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     }
 
     @Override
-    public List<Category> listAllNotEncrypt(Sort sort) {
-        return super.listAll();
+    public List<Category> listAll(Sort sort, boolean queryEncryptCategory) {
+        if (queryEncryptCategory) {
+            return super.listAll(sort);
+        } else {
+            return this.listAll(sort);
+        }
     }
 
     @Override
@@ -492,8 +500,12 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     }
 
     @Override
-    public List<Category> listAllByIdsNotEncrypt(Collection<Integer> integers) {
-        return super.listAllByIds(integers);
+    public List<Category> listAllByIds(Collection<Integer> integers, boolean queryEncryptCategory) {
+        if (queryEncryptCategory) {
+            return super.listAllByIds(integers);
+        } else {
+            return this.listAllByIds(integers);
+        }
     }
 
     @Override

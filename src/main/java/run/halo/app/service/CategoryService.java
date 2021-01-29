@@ -51,10 +51,11 @@ public interface CategoryService extends CrudService<Category, Integer> {
      * Get category by slug
      *
      * @param slug slug
+     * @param queryEncryptCategory whether to query encryption category
      * @return Category
      */
     @NonNull
-    Category getBySlugOfNonNullNotEncrypt(String slug);
+    Category getBySlugOfNonNull(String slug, boolean queryEncryptCategory);
 
     /**
      * Get Category by name.
@@ -93,19 +94,21 @@ public interface CategoryService extends CrudService<Category, Integer> {
      * List all category not encrypt.
      *
      * @param sort sort
+     * @param queryEncryptCategory whether to query encryption category
      * @return list of category.
      */
     @NonNull
-    List<Category> listAllNotEncrypt(Sort sort);
+    List<Category> listAll(Sort sort, boolean queryEncryptCategory);
 
     /**
      * List all by ids
      *
      * @param ids ids
+     * @param queryEncryptCategory whether to query encryption category
      * @return List
      */
     @NonNull
-    List<Category> listAllByIdsNotEncrypt(Collection<Integer> ids);
+    List<Category> listAllByIds(Collection<Integer> ids, boolean queryEncryptCategory);
 
     /**
      * Converts to category dto.

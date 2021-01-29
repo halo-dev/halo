@@ -276,7 +276,7 @@ public class ContentContentController {
     }
 
     private String doAuthenticationCategory(String slug, String password) {
-        Category category = categoryService.getBySlugOfNonNullNotEncrypt(slug);
+        Category category = categoryService.getBySlugOfNonNull(slug, true);
 
         authenticationService.categoryAuthentication(category.getId(), password);
 
@@ -286,7 +286,7 @@ public class ContentContentController {
             redirectUrl.append(optionService.getBlogBaseUrl());
         }
 
-        redirectUrl.append(optionService.getCategoriesPrefix()).append(slug);
+        redirectUrl.append("/categories/").append(slug);
 
         return redirectUrl.toString();
     }

@@ -59,7 +59,7 @@ public class CategoryController {
             return postCategoryService.listCategoryWithPostCountDto(sort, true);
         }
 
-        return categoryService.convertTo(categoryService.listAllNotEncrypt(sort));
+        return categoryService.convertTo(categoryService.listAll(sort, true));
     }
 
     @GetMapping("tree_view")

@@ -1,8 +1,6 @@
 package run.halo.app.controller.content.model;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
-import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
-import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -84,15 +82,12 @@ public class CategoryModel {
     public String listPost(Model model, String slug, Integer page) {
 
         // Get category by slug
-        final Category category = categoryService.getBySlugOfNonNullNotEncrypt(slug);
+        final Category category = categoryService.getBySlugOfNonNull(slug, true);
 
         if (!authenticationService.categoryAuthentication(category.getId(), null)) {
             model.addAttribute("slug", category.getSlug());
             model.addAttribute("type", EncryptTypeEnum.CATEGORY.getName());
-            if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
-                return themeService.render(POST_PASSWORD_TEMPLATE);
-            }
-            return "common/template/" + POST_PASSWORD_TEMPLATE;
+            return "common/template/post_password";
         }
 
         CategoryDTO categoryDTO = categoryService.convertTo(category);

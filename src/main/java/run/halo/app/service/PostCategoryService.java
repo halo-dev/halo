@@ -43,7 +43,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * @return a list of category
      */
     @NonNull
-    List<Category> listCategoriesBy(@NonNull Integer postId, @NonNull Boolean queryEncryptCategory);
+    List<Category> listCategoriesBy(@NonNull Integer postId, @NonNull boolean queryEncryptCategory);
 
     /**
      * List category list map by post id collection.
@@ -54,7 +54,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      */
     @NonNull
     Map<Integer, List<Category>> listCategoryListMap(
-        @Nullable Collection<Integer> postIds, @NonNull Boolean queryEncryptCategory);
+        @Nullable Collection<Integer> postIds, @NonNull boolean queryEncryptCategory);
 
     /**
      * Lists post by category id.
@@ -206,7 +206,7 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      */
     @NonNull
     List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(
-        @NonNull Sort sort, @NonNull Boolean queryEncryptCategory);
+        @NonNull Sort sort, @NonNull boolean queryEncryptCategory);
 
     /**
      * Lists by category id.

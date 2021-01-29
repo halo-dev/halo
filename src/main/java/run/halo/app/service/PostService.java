@@ -256,7 +256,7 @@ public interface PostService extends BasePostService<Post> {
      * @return post detail vo
      */
     @NonNull
-    PostDetailVO convertToDetailVo(@NonNull Post post, @NonNull Boolean queryEncryptCategory);
+    PostDetailVO convertToDetailVo(@NonNull Post post, @NonNull boolean queryEncryptCategory);
 
     /**
      * Converts to a page of post list vo.
@@ -275,7 +275,7 @@ public interface PostService extends BasePostService<Post> {
      * @return a page of post list vo
      */
     @NonNull
-    Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage, Boolean queryEncryptCategory);
+    Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage, boolean queryEncryptCategory);
 
     /**
      * Converts to a list of post list vo.
@@ -293,7 +293,7 @@ public interface PostService extends BasePostService<Post> {
      * @param queryEncryptCategory whether to query encryption category
      * @return a list of post list vo
      */
-    List<PostListVO> convertToListVo(List<Post> posts, Boolean queryEncryptCategory);
+    List<PostListVO> convertToListVo(List<Post> posts, boolean queryEncryptCategory);
 
     /**
      * Publish a post visit event.

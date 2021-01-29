@@ -72,7 +72,7 @@ public class CategoryController {
         @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC)
             Pageable pageable) {
         // Get category by slug
-        Category category = categoryService.getBySlugOfNonNullNotEncrypt(slug);
+        Category category = categoryService.getBySlugOfNonNull(slug, true);
 
         if (!authenticationService.categoryAuthentication(category.getId(), password)) {
             throw new ForbiddenException("您没有该分类的访问权限");
