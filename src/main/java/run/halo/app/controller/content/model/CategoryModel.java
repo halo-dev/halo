@@ -1,6 +1,8 @@
 package run.halo.app.controller.content.model;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
+import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
+import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
@@ -87,7 +89,10 @@ public class CategoryModel {
         if (!authenticationService.categoryAuthentication(category.getId(), null)) {
             model.addAttribute("slug", category.getSlug());
             model.addAttribute("type", EncryptTypeEnum.CATEGORY.getName());
-            return "common/template/post_password";
+            if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
+                return themeService.render(POST_PASSWORD_TEMPLATE);
+            }
+            return "common/template/" + POST_PASSWORD_TEMPLATE;
         }
 
         CategoryDTO categoryDTO = categoryService.convertTo(category);
