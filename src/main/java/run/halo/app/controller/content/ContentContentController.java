@@ -1,10 +1,8 @@
 package run.halo.app.controller.content;
 
-import cn.hutool.core.util.IdUtil;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -24,12 +22,17 @@ import run.halo.app.controller.content.model.PostModel;
 import run.halo.app.controller.content.model.SheetModel;
 import run.halo.app.controller.content.model.TagModel;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.exception.UnsupportedException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
+import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Sheet;
+import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.enums.SheetPermalinkType;
+import run.halo.app.service.AuthenticationService;
+import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
@@ -65,6 +68,10 @@ public class ContentContentController {
 
     private final AbstractStringCacheStore cacheStore;
 
+    private final AuthenticationService authenticationService;
+
+    private final CategoryService categoryService;
+
     public ContentContentController(PostModel postModel,
         SheetModel sheetModel,
         CategoryModel categoryModel,
@@ -75,7 +82,9 @@ public class ContentContentController {
         OptionService optionService,
         PostService postService,
         SheetService sheetService,
-        AbstractStringCacheStore cacheStore) {
+        AbstractStringCacheStore cacheStore,
+            AuthenticationService authenticationService,
+            CategoryService categoryService) {
         this.postModel = postModel;
         this.sheetModel = sheetModel;
         this.categoryModel = categoryModel;
@@ -87,6 +96,8 @@ public class ContentContentController {
         this.postService = postService;
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
+        this.authenticationService = authenticationService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping("{prefix}")
@@ -225,13 +236,31 @@ public class ContentContentController {
         throw new NotFoundException("Not Found");
     }
 
-    @PostMapping(value = "archives/{slug:.*}/password")
+    @PostMapping(value = "archives/{type}/{slug:.*}/password")
     @CacheLock(traceRequest = true, expired = 2)
-    public String password(@PathVariable("slug") String slug,
+    public String password(@PathVariable("type") String type,
+        @PathVariable("slug") String slug,
         @RequestParam(value = "password") String password) throws UnsupportedEncodingException {
+
+        String redirectUrl;
+
+        if (EncryptTypeEnum.POST.getName().equals(type)) {
+            redirectUrl = doAuthenticationPost(slug, password);
+        } else if (EncryptTypeEnum.CATEGORY.getName().equals(type)) {
+            redirectUrl = doAuthenticationCategory(slug, password);
+        } else {
+            throw new UnsupportedException("未知的加密类型");
+        }
+        return "redirect:" + redirectUrl;
+    }
+
+    private String doAuthenticationPost(
+        String slug, String password) throws UnsupportedEncodingException {
         Post post = postService.getBy(PostStatus.INTIMATE, slug);
 
         post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8.name()));
+
+        authenticationService.postAuthentication(post, password);
 
         BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
 
@@ -243,19 +272,22 @@ public class ContentContentController {
 
         redirectUrl.append(postMinimalDTO.getFullPath());
 
-        if (password.equals(post.getPassword())) {
-            String token = IdUtil.simpleUUID();
-            cacheStore.putAny(token, token, 10, TimeUnit.SECONDS);
+        return redirectUrl.toString();
+    }
 
-            if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
-                redirectUrl.append("&token=")
-                    .append(token);
-            } else {
-                redirectUrl.append("?token=")
-                    .append(token);
-            }
+    private String doAuthenticationCategory(String slug, String password) {
+        Category category = categoryService.getBySlugOfNonNull(slug, true);
+
+        authenticationService.categoryAuthentication(category.getId(), password);
+
+        StringBuilder redirectUrl = new StringBuilder();
+
+        if (!optionService.isEnabledAbsolutePath()) {
+            redirectUrl.append(optionService.getBlogBaseUrl());
         }
 
-        return "redirect:" + redirectUrl;
+        redirectUrl.append(optionService.getCategoriesPrefix()).append(slug);
+
+        return redirectUrl.toString();
     }
 }

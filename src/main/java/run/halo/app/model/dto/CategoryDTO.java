@@ -31,6 +31,8 @@ public class CategoryDTO implements OutputConverter<CategoryDTO, Category> {
 
     private Integer parentId;
 
+    private String password;
+
     private Date createTime;
 
     private String fullPath;

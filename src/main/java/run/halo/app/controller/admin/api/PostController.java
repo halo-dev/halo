@@ -2,13 +2,11 @@ package run.halo.app.controller.admin.api;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,12 +20,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
-import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
@@ -50,15 +46,12 @@ public class PostController {
 
     private final PostService postService;
 
-    private final AbstractStringCacheStore cacheStore;
-
     private final OptionService optionService;
 
+
     public PostController(PostService postService,
-        AbstractStringCacheStore cacheStore,
         OptionService optionService) {
         this.postService = postService;
-        this.cacheStore = cacheStore;
         this.optionService = optionService;
     }
 
@@ -70,7 +63,7 @@ public class PostController {
         @RequestParam(value = "more", defaultValue = "true") Boolean more) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         if (more) {
-            return postService.convertToListVo(postPage);
+            return postService.convertToListVo(postPage, true);
         }
 
         return postService.convertToSimple(postPage);
@@ -92,7 +85,7 @@ public class PostController {
         Page<Post> posts = postService.pageBy(status, pageable);
 
         if (more) {
-            return postService.convertToListVo(posts);
+            return postService.convertToListVo(posts, true);
         }
 
         return postService.convertToSimple(posts);
@@ -102,7 +95,7 @@ public class PostController {
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId) {
         Post post = postService.getById(postId);
-        return postService.convertToDetailVo(post);
+        return postService.convertToDetailVo(post, true);
     }
 
     @PutMapping("{postId:\\d+}/likes")
@@ -114,8 +107,8 @@ public class PostController {
     @PostMapping
     @ApiOperation("Creates a post")
     public PostDetailVO createBy(@Valid @RequestBody PostParam postParam,
-        @RequestParam(value = "autoSave", required = false, defaultValue = "false")
-            Boolean autoSave) {
+        @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave
+    ) {
         // Convert to
         Post post = postParam.convertTo();
         return postService.createBy(post, postParam.getTagIds(), postParam.getCategoryIds(),
@@ -126,8 +119,8 @@ public class PostController {
     @ApiOperation("Updates a post")
     public PostDetailVO updateBy(@Valid @RequestBody PostParam postParam,
         @PathVariable("postId") Integer postId,
-        @RequestParam(value = "autoSave", required = false, defaultValue = "false")
-            Boolean autoSave) {
+        @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave
+    ) {
         // Get the post info
         Post postToUpdate = postService.getById(postId);
 
@@ -186,11 +179,6 @@ public class PostController {
 
         BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
 
-        String token = IdUtil.simpleUUID();
-
-        // cache preview token
-        cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
-
         StringBuilder previewUrl = new StringBuilder();
 
         if (!optionService.isEnabledAbsolutePath()) {
@@ -198,14 +186,6 @@ public class PostController {
         }
 
         previewUrl.append(postMinimalDTO.getFullPath());
-
-        if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
-            previewUrl.append("&token=")
-                .append(token);
-        } else {
-            previewUrl.append("?token=")
-                .append(token);
-        }
 
         // build preview post url and return
         return previewUrl.toString();

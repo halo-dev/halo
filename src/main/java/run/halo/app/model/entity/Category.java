@@ -73,6 +73,12 @@ public class Category extends BaseEntity {
     @ColumnDefault("0")
     private Integer parentId;
 
+    /**
+     * Category password.
+     */
+    @Column(name = "password")
+    private String password;
+
     @Override
     public void prePersist() {
         super.prePersist();
