@@ -31,6 +31,9 @@ public class CategoryParam implements InputConverter<Category> {
     @Size(max = 1023, message = "封面图链接的字符长度不能超过 {max}")
     private String thumbnail;
 
+    @Size(max = 255, message = "分类密码的字符长度不能超过 {max}")
+    private String password;
+
     private Integer parentId = 0;
 
     @Override

@@ -56,6 +56,19 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
         @NonNull PostStatus status);
 
     /**
+     * Finds all post ids by category id and post status.
+     *
+     * @param categoryId category id must not be null
+     * @param status     post status must not be empty
+     * @return a set of post id
+     */
+    @NonNull
+    @Query("select postCategory.postId from PostCategory postCategory, Post post where"
+        + " postCategory.categoryId = ?1 and post.id = postCategory.postId and post.status in (?2)")
+    Set<Integer> findAllPostIdsByCategoryId(
+        @NonNull Integer categoryId, @NonNull Set<PostStatus> status);
+
+    /**
      * Finds all post categories by post id in.
      *
      * @param postIds post id collection must not be null
@@ -104,4 +117,14 @@ public interface PostCategoryRepository extends BaseRepository<PostCategory, Int
         + ", pc.categoryId) from PostCategory pc group by pc.categoryId")
     @NonNull
     List<CategoryPostCountProjection> findPostCount();
+
+    /**
+     * Finds all post categories by category id list.
+     *
+     * @param categoryIdList category id list must not be empty
+     * @return a list of post category
+     */
+    @Query("select pc from PostCategory pc where pc.categoryId in (?1)")
+    @NonNull
+    List<PostCategory> findAllByCategoryIdList(List<Integer> categoryIdList);
 }

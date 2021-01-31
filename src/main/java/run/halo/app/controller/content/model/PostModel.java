@@ -13,15 +13,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
-import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
+import run.halo.app.service.AuthenticationService;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
@@ -59,6 +60,8 @@ public class PostModel {
 
     private final AbstractStringCacheStore cacheStore;
 
+    private final AuthenticationService authenticationService;
+
     public PostModel(PostService postService,
         ThemeService themeService,
         PostCategoryService postCategoryService,
@@ -67,7 +70,8 @@ public class PostModel {
         PostTagService postTagService,
         TagService tagService,
         OptionService optionService,
-        AbstractStringCacheStore cacheStore) {
+        AbstractStringCacheStore cacheStore,
+        AuthenticationService authenticationService) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -77,32 +81,27 @@ public class PostModel {
         this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
+        this.authenticationService = authenticationService;
     }
 
     public String content(Post post, String token, Model model) {
 
-        if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
+        if (post.getStatus().equals(PostStatus.INTIMATE)
+            && !authenticationService.postAuthentication(post, null)) {
             model.addAttribute("slug", post.getSlug());
+            model.addAttribute("type", EncryptTypeEnum.POST.getName());
             if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
                 return themeService.render(POST_PASSWORD_TEMPLATE);
             }
             return "common/template/" + POST_PASSWORD_TEMPLATE;
         }
 
-        if (StringUtils.isEmpty(token)) {
-            post = postService.getBy(PostStatus.PUBLISHED, post.getSlug());
+        post = postService.getById(post.getId());
+
+        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
+            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         } else {
-            // verify token
-            String cachedToken = cacheStore.getAny(token, String.class)
-                .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
-            if (!cachedToken.equals(token)) {
-                throw new ForbiddenException("您没有该文章的访问权限");
-            }
-            if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-                post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
-            } else {
-                post.setFormatContent(post.getOriginalContent());
-            }
+            post.setFormatContent(post.getOriginalContent());
         }
 
         postService.publishVisitEvent(post.getId());
@@ -112,7 +111,7 @@ public class PostModel {
         postService.getNextPost(post).ifPresent(
             nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
-        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId(), false);
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         List<PostMeta> metas = postMetaService.listBy(post.getId());
 

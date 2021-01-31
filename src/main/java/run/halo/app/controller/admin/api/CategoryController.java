@@ -56,10 +56,10 @@ public class CategoryController {
         @SortDefault(sort = "createTime", direction = DESC) Sort sort,
         @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
         if (more) {
-            return postCategoryService.listCategoryWithPostCountDto(sort);
+            return postCategoryService.listCategoryWithPostCountDto(sort, true);
         }
 
-        return categoryService.convertTo(categoryService.listAll(sort));
+        return categoryService.convertTo(categoryService.listAll(sort, true));
     }
 
     @GetMapping("tree_view")
@@ -81,7 +81,8 @@ public class CategoryController {
     @PutMapping("{categoryId:\\d+}")
     @ApiOperation("Updates category")
     public CategoryDTO updateBy(@PathVariable("categoryId") Integer categoryId,
-        @RequestBody @Valid CategoryParam categoryParam) {
+        @RequestBody @Valid CategoryParam categoryParam
+    ) {
         Category categoryToUpdate = categoryService.getById(categoryId);
         categoryParam.update(categoryToUpdate);
         return categoryService.convertTo(categoryService.update(categoryToUpdate));

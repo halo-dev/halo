@@ -51,8 +51,8 @@ public class AdminController {
     @GetMapping(value = "/is_installed")
     @ApiOperation("Checks Installation status")
     public boolean isInstall() {
-        return optionService
-            .getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+        return optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class,
+            false);
     }
 
     @PostMapping("login/precheck")
