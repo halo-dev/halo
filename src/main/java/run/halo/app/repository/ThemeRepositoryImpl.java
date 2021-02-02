@@ -25,6 +25,7 @@ import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.service.OptionService;
 import run.halo.app.theme.ThemePropertyScanner;
 import run.halo.app.utils.FileUtils;
 
@@ -39,11 +40,15 @@ public class ThemeRepositoryImpl implements ThemeRepository {
 
     private final OptionRepository optionRepository;
 
+    private final OptionService optionService;
+
     private final HaloProperties properties;
 
     public ThemeRepositoryImpl(OptionRepository optionRepository,
+        OptionService optionService,
         HaloProperties properties) {
         this.optionRepository = optionRepository;
+        this.optionService = optionService;
         this.properties = properties;
     }
 
@@ -75,14 +80,7 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     public void setActivatedTheme(@NonNull String themeId) {
         Assert.hasText(themeId, "Theme id must not be blank");
 
-        final var newThemeOption = optionRepository.findByKey(PrimaryProperties.THEME.getValue())
-            .map(themeOption -> {
-                // set theme id
-                themeOption.setValue(themeId);
-                return themeOption;
-            })
-            .orElseGet(() -> new Option(PrimaryProperties.THEME.getValue(), themeId));
-        optionRepository.save(newThemeOption);
+        optionService.saveProperty(PrimaryProperties.THEME, themeId);
     }
 
     @Override
