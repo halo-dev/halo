@@ -1,5 +1,7 @@
 package run.halo.app.listener.freemarker;
 
+import static run.halo.app.model.support.HaloConst.OPTIONS_CACHE_KEY;
+
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
@@ -41,16 +44,20 @@ public class FreemarkerConfigAwareListener {
 
     private final UserService userService;
 
+    private final AbstractStringCacheStore cacheStore;
+
     public FreemarkerConfigAwareListener(OptionService optionService,
         Configuration configuration,
         ThemeService themeService,
         ThemeSettingService themeSettingService,
-        UserService userService) {
+        UserService userService,
+        AbstractStringCacheStore cacheStore) {
         this.optionService = optionService;
         this.configuration = configuration;
         this.themeService = themeService;
         this.themeSettingService = themeSettingService;
         this.userService = userService;
+        this.cacheStore = cacheStore;
     }
 
     @EventListener
@@ -89,6 +96,10 @@ public class FreemarkerConfigAwareListener {
     @EventListener
     public void onOptionUpdate(OptionUpdatedEvent event) throws TemplateModelException {
         log.debug("Received option updated event");
+
+        // refresh options cache
+        optionService.flush();
+        cacheStore.delete(OPTIONS_CACHE_KEY);
 
         loadOptionsConfig();
         loadThemeConfig();
