@@ -155,6 +155,11 @@ public class HaloConst {
      */
     public static String DATABASE_PRODUCT_NAME = null;
 
+    /**
+     * Options cache key.
+     */
+    public static String OPTIONS_CACHE_KEY = "options";
+
     static {
         // Set version
         HALO_VERSION = Optional.ofNullable(HaloConst.class.getPackage().getImplementationVersion())
