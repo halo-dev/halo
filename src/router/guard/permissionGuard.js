@@ -26,12 +26,14 @@ router.beforeEach(async(to, from, next) => {
       next({
         name: 'Install'
       })
+      onProgressTimerDone()
       return
     }
     if (to.name === 'Login') {
       next({
         name: 'Dashboard'
       })
+      onProgressTimerDone()
       return
     }
 
@@ -53,9 +55,16 @@ router.beforeEach(async(to, from, next) => {
       redirect: to.fullPath
     }
   })
+  onProgressTimerDone()
 })
 
 router.afterEach(() => {
-  clearTimeout(progressTimer)
-  NProgress.done()
+  onProgressTimerDone()
 })
+
+function onProgressTimerDone() {
+  if (progressTimer) {
+    clearTimeout(progressTimer)
+    NProgress.done()
+  }
+}

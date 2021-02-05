@@ -58,6 +58,16 @@
               </a-input>
             </a-form-model-item>
             <a-form-model-item
+              label="密码："
+              help="* 分类密码"
+              prop="password"
+            >
+              <a-input-password
+                v-model="form.model.password"
+                autocomplete="new-password"
+              />
+            </a-form-model-item>
+            <a-form-model-item
               label="描述："
               help="* 分类描述，需要主题支持"
               prop="description"
@@ -166,7 +176,7 @@
                   slot="title"
                   style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
                 >
-                  {{ item.name }}
+                  {{ item.name }}{{ item.password?'（加密）':'' }}
                 </span>
 
               </a-list-item-meta>
@@ -184,6 +194,13 @@
             :loading="table.loading"
             :scrollToFirstRowOnChange="true"
           >
+            <span
+              slot="name"
+              slot-scope="text,record"
+              class="cursor-pointer"
+            >
+              {{ record.name }}{{ record.password?'（加密）':'' }}
+            </span>
             <span
               slot="postCount"
               slot-scope="text,record"
@@ -239,16 +256,12 @@ const columns = [
     title: '名称',
     ellipsis: true,
     dataIndex: 'name',
+    scopedSlots: { customRender: 'name' },
   },
   {
     title: '别名',
     ellipsis: true,
     dataIndex: 'slug',
-  },
-  {
-    title: '描述',
-    ellipsis: true,
-    dataIndex: 'description',
   },
   {
     title: '文章数',

@@ -54,7 +54,7 @@
                   <a-select-option
                     v-for="category in categories"
                     :key="category.id"
-                  >{{ category.name }} ({{ category.postCount }})</a-select-option>
+                  >{{ category.name }}({{ category.postCount }})</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -281,6 +281,7 @@
               v-for="(category, categoryIndex) in item.categories"
               :key="'category_' + categoryIndex"
               color="blue"
+              @click="handleSelectCategory(category)"
               style="margin-bottom: 8px"
             >{{ category.name }}</a-tag>
             <br />
@@ -368,7 +369,8 @@
               v-for="(category, index) in categoriesOfPost"
               :key="index"
               color="blue"
-              style="margin-bottom: 8px"
+              @click="handleSelectCategory(category)"
+              style="margin-bottom: 8px;cursor:pointer"
             >{{
               category.name
             }}</a-tag>
@@ -534,48 +536,48 @@ const columns = [
     dataIndex: 'title',
     width: '150px',
     ellipsis: true,
-    scopedSlots: { customRender: 'postTitle' }
+    scopedSlots: { customRender: 'postTitle' },
   },
   {
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
     width: '100px',
-    scopedSlots: { customRender: 'status' }
+    scopedSlots: { customRender: 'status' },
   },
   {
     title: '分类',
     dataIndex: 'categories',
-    scopedSlots: { customRender: 'categories' }
+    scopedSlots: { customRender: 'categories' },
   },
   {
     title: '标签',
     dataIndex: 'tags',
-    scopedSlots: { customRender: 'tags' }
+    scopedSlots: { customRender: 'tags' },
   },
   {
     title: '评论',
     width: '70px',
     dataIndex: 'commentCount',
-    scopedSlots: { customRender: 'commentCount' }
+    scopedSlots: { customRender: 'commentCount' },
   },
   {
     title: '访问',
     width: '70px',
     dataIndex: 'visits',
-    scopedSlots: { customRender: 'visits' }
+    scopedSlots: { customRender: 'visits' },
   },
   {
     title: '发布时间',
     dataIndex: 'createTime',
     width: '170px',
-    scopedSlots: { customRender: 'createTime' }
+    scopedSlots: { customRender: 'createTime' },
   },
   {
     title: '操作',
     width: '180px',
-    scopedSlots: { customRender: 'action' }
-  }
+    scopedSlots: { customRender: 'action' },
+  },
 ]
 export default {
   name: 'PostList',
@@ -584,7 +586,7 @@ export default {
     TagSelect,
     CategoryTree,
     PostSettingDrawer,
-    TargetCommentDrawer
+    TargetCommentDrawer,
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -594,7 +596,7 @@ export default {
         page: 1,
         size: 10,
         sort: null,
-        total: 1
+        total: 1,
       },
       queryParam: {
         page: 0,
@@ -602,7 +604,7 @@ export default {
         sort: null,
         keyword: null,
         categoryId: null,
-        status: null
+        status: null,
       },
       // 表头
       columns,
@@ -611,8 +613,8 @@ export default {
       selectedMetas: [
         {
           key: '',
-          value: ''
-        }
+          value: '',
+        },
       ],
       posts: [],
       postsLoading: false,
@@ -621,7 +623,7 @@ export default {
       postCommentVisible: false,
       selectedPost: {},
       selectedTagIds: [],
-      selectedCategoryIds: []
+      selectedCategoryIds: [],
     }
   },
   computed: {
@@ -630,7 +632,7 @@ export default {
         post.statusProperty = this.postStatus[post.status]
         return post
       })
-    }
+    },
   },
   beforeMount() {
     this.handleListCategories()
@@ -672,8 +674,8 @@ export default {
           const path = this.$router.history.current.path
           this.$router.push({ path, query: params }).catch((err) => err)
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     handleListPosts(enableLoading = true) {
@@ -720,8 +722,8 @@ export default {
       return {
         props: {
           disabled: this.queryParam.status == null || this.queryParam.status === '',
-          name: post.title
-        }
+          name: post.title,
+        },
       }
     },
     handlePaginationChange(page, pageSize) {
@@ -741,6 +743,10 @@ export default {
     handleQuery() {
       this.handleClearRowKeys()
       this.handlePaginationChange(1, this.pagination.size)
+    },
+    handleSelectCategory(category) {
+      this.queryParam.categoryId = category.id
+      this.handleQuery()
     },
     handleEditStatusClick(postId, status) {
       postApi
@@ -841,7 +847,7 @@ export default {
     },
     onRefreshPostMetasFromSetting(metas) {
       this.selectedMetas = metas
-    }
-  }
+    },
+  },
 }
 </script>
