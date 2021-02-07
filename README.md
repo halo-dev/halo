@@ -27,7 +27,7 @@
 > 其他地址：https://docs.halo.run/install/downloads
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.4.3/halo-1.4.3.jar --output halo.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.4.4/halo-1.4.4.jar --output halo.jar
 ```
 
 ```bash
