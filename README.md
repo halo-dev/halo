@@ -35,7 +35,7 @@ git clone https://github.com/halo-dev/halo-admin
 2、检出最新版本：
 
 ```bash
-git checkout v1.4.3
+git checkout v1.4.4
 ```
 
 3、打包构建：

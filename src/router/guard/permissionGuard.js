@@ -11,6 +11,7 @@ const whiteList = ['Login', 'Install', 'NotFound', 'ResetPassword'] // no redire
 
 let progressTimer = null
 router.beforeEach(async(to, from, next) => {
+  onProgressTimerDone()
   progressTimer = setTimeout(() => {
     NProgress.start()
   }, 250)
@@ -63,8 +64,9 @@ router.afterEach(() => {
 })
 
 function onProgressTimerDone() {
-  if (progressTimer) {
+  if (progressTimer && progressTimer !== 0) {
     clearTimeout(progressTimer)
+    progressTimer = null
     NProgress.done()
   }
 }
