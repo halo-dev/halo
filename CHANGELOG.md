@@ -1,5 +1,16 @@
 # CHANGELOG
 
+# 1.4.5
+
+## Improvements
+
+- sitemap.xml 新增所有分类和标签的链接。#1267
+
+## Bug Fixes
+
+- 修复后台因为垂直滚动条导致界面抖动的问题。halo-dev/halo-admin#293
+- 修复加密分类页面输入密码后重定向的页面链接不正确的问题。#1264
+
 # 1.4.4
 
 ## Features
