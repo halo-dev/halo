@@ -152,7 +152,7 @@
 </head>
 <body>
 <div class="container">
-    <form method="post" action="${blog_url!}/archives/${type!}/${slug!}/password">
+    <form method="post" action="${blog_url!}/content/${type!}/${slug!}/authentication">
         <div class="password-input">
             <input type="password" name="password" placeholder="请输入访问密码">
             <span class="bottom"></span>
