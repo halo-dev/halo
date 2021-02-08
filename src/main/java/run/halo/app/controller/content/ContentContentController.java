@@ -23,8 +23,8 @@ import run.halo.app.controller.content.model.SheetModel;
 import run.halo.app.controller.content.model.TagModel;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.UnsupportedException;
+import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
-import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.enums.EncryptTypeEnum;
@@ -83,8 +83,8 @@ public class ContentContentController {
         PostService postService,
         SheetService sheetService,
         AbstractStringCacheStore cacheStore,
-            AuthenticationService authenticationService,
-            CategoryService categoryService) {
+        AuthenticationService authenticationService,
+        CategoryService categoryService) {
         this.postModel = postModel;
         this.sheetModel = sheetModel;
         this.categoryModel = categoryModel;
@@ -236,7 +236,7 @@ public class ContentContentController {
         throw new NotFoundException("Not Found");
     }
 
-    @PostMapping(value = "archives/{type}/{slug:.*}/password")
+    @PostMapping(value = "content/{type}/{slug:.*}/authentication")
     @CacheLock(traceRequest = true, expired = 2)
     public String password(@PathVariable("type") String type,
         @PathVariable("slug") String slug,
@@ -276,7 +276,8 @@ public class ContentContentController {
     }
 
     private String doAuthenticationCategory(String slug, String password) {
-        Category category = categoryService.getBySlugOfNonNull(slug, true);
+        CategoryDTO
+            category = categoryService.convertTo(categoryService.getBySlugOfNonNull(slug, true));
 
         authenticationService.categoryAuthentication(category.getId(), password);
 
@@ -286,7 +287,7 @@ public class ContentContentController {
             redirectUrl.append(optionService.getBlogBaseUrl());
         }
 
-        redirectUrl.append(optionService.getCategoriesPrefix()).append(slug);
+        redirectUrl.append(category.getFullPath());
 
         return redirectUrl.toString();
     }
