@@ -126,6 +126,7 @@ public class JournalController {
 
     @PostMapping("{id:\\d+}/likes")
     @ApiOperation("Likes a journal")
+    @CacheLock(autoDelete = false, traceRequest = true)
     public void like(@PathVariable("id") Integer id) {
         journalService.increaseLike(id);
     }

@@ -196,6 +196,7 @@ public class PostController {
 
     @PostMapping("{postId:\\d+}/likes")
     @ApiOperation("Likes a post")
+    @CacheLock(autoDelete = false, traceRequest = true)
     public void like(@PathVariable("postId") Integer postId) {
         postService.increaseLike(postId);
     }
