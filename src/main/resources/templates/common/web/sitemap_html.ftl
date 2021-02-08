@@ -1,4 +1,4 @@
-#--
+<#--
 see https://gitee.com/yadong.zhang/DBlog/blob/master/blog-web/src/main/java/com/zyd/blog/controller/RestWebSiteController.java
 -->
 <#compress >
