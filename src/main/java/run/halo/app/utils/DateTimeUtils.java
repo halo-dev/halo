@@ -1,12 +1,20 @@
 package run.halo.app.utils;
 
-import java.time.*;
+import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
+import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
+import static cn.hutool.core.date.DatePattern.PURE_DATETIME_PATTERN;
+import static cn.hutool.core.date.DatePattern.PURE_DATE_PATTERN;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
-
-import static cn.hutool.core.date.DatePattern.*;
 
 /**
  * 日期工具
@@ -18,50 +26,57 @@ public class DateTimeUtils {
     /**
      * 标准日期格式 {@link DateTimeFormatter}：yyyyMMddHHmmssSSS
      */
-    public static final DateTimeFormatter PURE_DATETIME_MS_FORMATTER = new DateTimeFormatterBuilder()
+    public static final DateTimeFormatter PURE_DATETIME_MS_FORMATTER =
+        new DateTimeFormatterBuilder()
             .appendPattern(PURE_DATETIME_PATTERN)
             .appendValue(ChronoField.MILLI_OF_SECOND, 3)
             .toFormatter();
     /**
      * 标准日期格式 {@link DateTimeFormatter}：yyyyMMdd
      */
-    public static final DateTimeFormatter PURE_DATE_FORMATTER = DateTimeFormatter.ofPattern(PURE_DATE_PATTERN);
+    public static final DateTimeFormatter PURE_DATE_FORMATTER =
+        DateTimeFormatter.ofPattern(PURE_DATE_PATTERN);
     /**
      * 标准日期格式 {@link DateTimeFormatter}：yyyy-MM-dd
      */
-    public static final DateTimeFormatter NORM_DATE_FORMATTER = DateTimeFormatter.ofPattern(NORM_DATE_PATTERN);
+    public static final DateTimeFormatter NORM_DATE_FORMATTER =
+        DateTimeFormatter.ofPattern(NORM_DATE_PATTERN);
     /**
      * 标准日期格式：HHmm
      */
-    public final static String TIME_PATTERN = "HHmm";
+    public static final String TIME_PATTERN = "HHmm";
     /**
      * 标准日期格式 {@link DateTimeFormatter} HHmm
      */
-    public static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
+    public static final DateTimeFormatter TIME_FORMATTER =
+        DateTimeFormatter.ofPattern(TIME_PATTERN);
     /**
      * 标准日期格式：HH:mm
      */
-    public final static String NORM_TIME_PATTERN = "HH:mm";
+    public static final String NORM_TIME_PATTERN = "HH:mm";
 
     /**
      * 标准日期格式 {@link DateTimeFormatter} HH:mm
      */
-    public static final DateTimeFormatter NORM_TIME_FORMATTER = DateTimeFormatter.ofPattern(NORM_TIME_PATTERN);
+    public static final DateTimeFormatter NORM_TIME_FORMATTER =
+        DateTimeFormatter.ofPattern(NORM_TIME_PATTERN);
 
     /**
      * 标准日期时间格式，精确到秒 {@link DateTimeFormatter}：yyyy-MM-dd HH:mm:ss
      */
-    public static final DateTimeFormatter NORM_DATETIME_FORMATTER = DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN);
+    public static final DateTimeFormatter NORM_DATETIME_FORMATTER =
+        DateTimeFormatter.ofPattern(NORM_DATETIME_PATTERN);
 
     /**
      * 横线分隔日期时间格式：yyyy-MM-dd-HH-mm-ss-
      */
-    public final static String HORIZONTAL_LINE_PATTERN = "yyyy-MM-dd-HH-mm-ss-";
+    public static final String HORIZONTAL_LINE_PATTERN = "yyyy-MM-dd-HH-mm-ss-";
 
     /**
      * 横线分隔日期时间格式，精确到秒 {@link DateTimeFormatter}：yyyy-MM-dd-HH-mm-ss-
      */
-    public static final DateTimeFormatter HORIZONTAL_LINE_DATETIME_FORMATTER = DateTimeFormatter.ofPattern(HORIZONTAL_LINE_PATTERN);
+    public static final DateTimeFormatter HORIZONTAL_LINE_DATETIME_FORMATTER =
+        DateTimeFormatter.ofPattern(HORIZONTAL_LINE_PATTERN);
 
     /**
      * 上海时区格式
@@ -150,7 +165,7 @@ public class DateTimeUtils {
      * 根据日期格式化时间
      *
      * @param localDateTime 时间
-     * @param formatter     时间格式
+     * @param formatter 时间格式
      * @return Result
      */
     public static String format(LocalDateTime localDateTime, DateTimeFormatter formatter) {
@@ -195,7 +210,7 @@ public class DateTimeUtils {
      * 根据日期格式解析时间
      *
      * @param formatter 时间格式
-     * @param time      时间
+     * @param time 时间
      * @return LocalDateTime
      */
     public static LocalDateTime parse(String time, DateTimeFormatter formatter) {
@@ -266,7 +281,7 @@ public class DateTimeUtils {
      * 增加一天时间
      *
      * @param localDateTime 日期时间
-     * @param localTime     时间
+     * @param localTime 时间
      * @return 新增一天后的 LocalDateTime
      */
     public static LocalDateTime plusOneDay(LocalDateTime localDateTime, LocalTime localTime) {
@@ -297,17 +312,6 @@ public class DateTimeUtils {
     }
 
     /**
-     * 根据days新增天数
-     *
-     * @param localDateTime 日期时间
-     * @param days          天数
-     * @return 新增 days 后的 LocalDateTime
-     */
-    public static LocalDateTime plusDays(LocalDateTime localDateTime, long days) {
-        return localDateTime.plusDays(days);
-    }
-
-    /**
      * 新增一天
      *
      * @param localDate 日期
@@ -320,8 +324,19 @@ public class DateTimeUtils {
     /**
      * 根据days新增天数
      *
+     * @param localDateTime 日期时间
+     * @param days 天数
+     * @return 新增 days 后的 LocalDateTime
+     */
+    public static LocalDateTime plusDays(LocalDateTime localDateTime, long days) {
+        return localDateTime.plusDays(days);
+    }
+
+    /**
+     * 根据days新增天数
+     *
      * @param localDate 日期
-     * @param days      新增的天数
+     * @param days 新增的天数
      * @return 新增 days 后的 LocalDate
      */
     public static LocalDate plusDays(LocalDate localDate, long days) {
@@ -362,6 +377,16 @@ public class DateTimeUtils {
     }
 
     /**
+     * 新增1分钟
+     *
+     * @param localTime 日期时间
+     * @return 返回新增的 LocalTime
+     */
+    public static LocalTime plusOneMinute(LocalTime localTime) {
+        return plusMinutes(localTime, 1);
+    }
+
+    /**
      * 增加30分钟
      *
      * @param localDateTime 日期时间
@@ -369,6 +394,17 @@ public class DateTimeUtils {
      */
     public static LocalDateTime plusThirtyMinute(LocalDateTime localDateTime) {
         return plusMinutes(localDateTime, 30);
+    }
+
+
+    /**
+     * 增加30分钟
+     *
+     * @param localTime 日期时间
+     * @return 返回新增的 LocalTime
+     */
+    public static LocalTime plusThirtyMinute(LocalTime localTime) {
+        return plusMinutes(localTime, 30);
     }
 
     /**
@@ -382,30 +418,10 @@ public class DateTimeUtils {
     }
 
     /**
-     * 新增1分钟
-     *
-     * @param localTime 日期时间
-     * @return 返回新增的 LocalTime
-     */
-    public static LocalTime plusOneMinute(LocalTime localTime) {
-        return plusMinutes(localTime, 1);
-    }
-
-    /**
-     * 增加30分钟
-     *
-     * @param localTime 日期时间
-     * @return 返回新增的 LocalTime
-     */
-    public static LocalTime plusThirtyMinute(LocalTime localTime) {
-        return plusMinutes(localTime, 30);
-    }
-
-    /**
      * 根据 minutes 新增分钟
      *
      * @param localDateTime 日期时间
-     * @param minutes       分钟数
+     * @param minutes 分钟数
      * @return 返回新增的 LocalDateTime
      */
     public static LocalDateTime plusMinutes(LocalDateTime localDateTime, long minutes) {
@@ -416,7 +432,7 @@ public class DateTimeUtils {
      * 根据 minutes 新增分钟
      *
      * @param localTime 时间
-     * @param minutes   分钟数
+     * @param minutes 分钟数
      * @return 返回新增的 LocalTime
      */
     public static LocalTime plusMinutes(LocalTime localTime, long minutes) {
@@ -427,7 +443,7 @@ public class DateTimeUtils {
      * 减少 1 分钟
      *
      * @param localDateTime 日期时间
-     * @param localTime     时间
+     * @param localTime 时间
      * @return 返回新增的 LocalTime
      */
     public static LocalDateTime minusOneMinutes(LocalDateTime localDateTime, LocalTime localTime) {
@@ -461,7 +477,7 @@ public class DateTimeUtils {
      * 根据 minutes 减少分钟
      *
      * @param localDateTime 日期时间
-     * @param minutes       分钟数
+     * @param minutes 分钟数
      * @return 返回新增的 LocalTime
      */
     public static LocalDateTime minusMinutes(LocalDateTime localDateTime, long minutes) {
@@ -472,7 +488,7 @@ public class DateTimeUtils {
      * 根据 minutes 减少分钟
      *
      * @param localTime 时间
-     * @param minutes   分钟数
+     * @param minutes 分钟数
      * @return 返回新增的 LocalTime
      */
     public static LocalTime minusMinutes(LocalTime localTime, long minutes) {
@@ -504,7 +520,7 @@ public class DateTimeUtils {
      * 是否是负数，startInclusive 大于 endInclusive 就是负数
      *
      * @param startInclusive Start
-     * @param endInclusive   end
+     * @param endInclusive end
      * @return boolean
      */
     public static boolean isNegative(Temporal startInclusive, Temporal endInclusive) {
@@ -515,7 +531,7 @@ public class DateTimeUtils {
      * 相比是否是0，两个时间一致就是0
      *
      * @param startInclusive Start
-     * @param endInclusive   end
+     * @param endInclusive end
      * @return boolean
      */
     public static boolean isZero(Temporal startInclusive, Temporal endInclusive) {
@@ -526,7 +542,7 @@ public class DateTimeUtils {
      * endInclusive 大于或等于 startInclusive
      *
      * @param startInclusive Start
-     * @param endInclusive   end
+     * @param endInclusive end
      * @return boolean
      */
     public static boolean isGreaterOrEqual(Temporal startInclusive, Temporal endInclusive) {
@@ -537,7 +553,7 @@ public class DateTimeUtils {
      * endInclusive 大于 startInclusive
      *
      * @param startInclusive Start
-     * @param endInclusive   end
+     * @param endInclusive end
      * @return boolean
      */
     public static boolean isGreater(Temporal startInclusive, Temporal endInclusive) {
@@ -548,7 +564,7 @@ public class DateTimeUtils {
      * endInclusive 小或等于 startInclusive
      *
      * @param startInclusive Start
-     * @param endInclusive   end
+     * @param endInclusive end
      * @return boolean
      */
     public static boolean isLessThanOrEqual(Temporal startInclusive, Temporal endInclusive) {

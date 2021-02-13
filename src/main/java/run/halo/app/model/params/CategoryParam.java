@@ -1,13 +1,12 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Category;
 import run.halo.app.utils.SlugUtils;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Category param.
@@ -31,6 +30,9 @@ public class CategoryParam implements InputConverter<Category> {
 
     @Size(max = 1023, message = "封面图链接的字符长度不能超过 {max}")
     private String thumbnail;
+
+    @Size(max = 255, message = "分类密码的字符长度不能超过 {max}")
+    private String password;
 
     private Integer parentId = 0;
 

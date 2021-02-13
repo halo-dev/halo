@@ -1,16 +1,15 @@
 package run.halo.app.service;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.handler.theme.config.support.Group;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.support.ThemeFile;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Theme service interface.
@@ -46,7 +45,8 @@ public interface ThemeService {
     /**
      * These file names cannot be displayed.
      */
-    String[] FILTER_FILES = {".git", ".DS_Store", "theme.yaml", "theme.yml", "settings.yaml", "settings.yml"};
+    String[] FILTER_FILES =
+        {".git", ".DS_Store", "theme.yaml", "theme.yml", "settings.yaml", "settings.yml"};
 
     /**
      * Theme folder location.
@@ -112,7 +112,6 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
-    @Deprecated
     ThemeProperty getThemeOfNonNullBy(@NonNull String themeId);
 
     /**
@@ -136,7 +135,7 @@ public interface ThemeService {
      * Lists theme folder by theme name.
      *
      * @param themeId theme id
-     * @return List<ThemeFile>
+     * @return theme file list
      */
     @NonNull
     List<ThemeFile> listThemeFolderBy(@NonNull String themeId);
@@ -152,10 +151,11 @@ public interface ThemeService {
     List<String> listCustomTemplates(@NonNull String themeId);
 
     /**
-     * Lists a set of custom template, such as sheet_xxx.ftl/post_xxx.ftl, and xxx will be template name
+     * Lists a set of custom template, such as sheet_xxx.ftl/post_xxx.ftl, and xxx will be
+     * template name
      *
      * @param themeId theme id must not be blank
-     * @param prefix  post_ or sheet_
+     * @param prefix post_ or sheet_
      * @return a set of templates
      */
     @NonNull
@@ -195,7 +195,7 @@ public interface ThemeService {
     /**
      * Gets template content by template absolute path and themeId.
      *
-     * @param themeId      themeId
+     * @param themeId themeId
      * @param absolutePath absolute path
      * @return template content
      */
@@ -205,23 +205,24 @@ public interface ThemeService {
      * Saves template content by template absolute path.
      *
      * @param absolutePath absolute path
-     * @param content      new content
+     * @param content new content
      */
     void saveTemplateContent(@NonNull String absolutePath, @NonNull String content);
 
     /**
      * Saves template content by template absolute path and themeId.
      *
-     * @param themeId      themeId
+     * @param themeId themeId
      * @param absolutePath absolute path
-     * @param content      new content
+     * @param content new content
      */
-    void saveTemplateContent(@NonNull String themeId, @NonNull String absolutePath, @NonNull String content);
+    void saveTemplateContent(@NonNull String themeId, @NonNull String absolutePath,
+        @NonNull String content);
 
     /**
      * Deletes a theme by key.
      *
-     * @param themeId        theme id must not be blank
+     * @param themeId theme id must not be blank
      * @param deleteSettings whether all settings of the specified theme should be deleted.
      */
     void deleteTheme(@NonNull String themeId, @NonNull Boolean deleteSettings);
@@ -303,6 +304,7 @@ public interface ThemeService {
      * @throws IOException IOException
      */
     @NonNull
+    @Deprecated
     ThemeProperty add(@NonNull Path themeTmpPath) throws IOException;
 
     /**
@@ -321,6 +323,7 @@ public interface ThemeService {
      * @return theme property
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     ThemeProperty fetchLatestRelease(@NonNull String uri);
 
     /**
@@ -330,6 +333,7 @@ public interface ThemeService {
      * @return list of theme properties
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     List<ThemeProperty> fetchBranches(@NonNull String uri);
 
     /**
@@ -339,26 +343,29 @@ public interface ThemeService {
      * @return list of theme properties
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     List<ThemeProperty> fetchReleases(@NonNull String uri);
 
     /**
      * Fetches a specific release
      *
-     * @param uri     theme remote uri must not be null
+     * @param uri theme remote uri must not be null
      * @param tagName release tag name must not be null
      * @return theme property
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     ThemeProperty fetchRelease(@NonNull String uri, @NonNull String tagName);
 
     /**
      * Fetches a specific branch (clone)
      *
-     * @param uri        theme remote uri must not be null
+     * @param uri theme remote uri must not be null
      * @param branchName wanted branch must not be null
      * @return theme property
      */
     @NonNull
+    @Deprecated(since = "1.4.2", forRemoval = true)
     ThemeProperty fetchBranch(@NonNull String uri, @NonNull String branchName);
 
     /**
@@ -379,7 +386,7 @@ public interface ThemeService {
      * Updates theme by theme id.
      *
      * @param themeId theme id must not be blank
-     * @param file    multipart file must not be null
+     * @param file multipart file must not be null
      * @return theme info
      */
     ThemeProperty update(@NonNull String themeId, @NonNull MultipartFile file);

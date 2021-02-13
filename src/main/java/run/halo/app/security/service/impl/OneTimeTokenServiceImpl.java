@@ -1,13 +1,12 @@
 package run.halo.app.security.service.impl;
 
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.utils.HaloUtils;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * One-time token service implementation.

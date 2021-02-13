@@ -21,9 +21,13 @@ class AttachmentTypeTest {
 
     @Test
     void conversionTest() {
-        Assertions.assertEquals(AttachmentType.LOCAL, conversionService.convert("LOCAL", AttachmentType.class));
-        Assertions.assertEquals(AttachmentType.LOCAL, conversionService.convert("local", AttachmentType.class));
-        Assertions.assertEquals(AttachmentType.LOCAL, conversionService.convert("Local", AttachmentType.class));
-        Assertions.assertEquals(AttachmentType.LOCAL, conversionService.convert("LoCal", AttachmentType.class));
+        Assertions.assertEquals(AttachmentType.LOCAL,
+            conversionService.convert("LOCAL", AttachmentType.class));
+        Assertions.assertEquals(AttachmentType.LOCAL,
+            conversionService.convert("local", AttachmentType.class));
+        Assertions.assertEquals(AttachmentType.LOCAL,
+            conversionService.convert("Local", AttachmentType.class));
+        Assertions.assertEquals(AttachmentType.LOCAL,
+            conversionService.convert("LoCal", AttachmentType.class));
     }
 }

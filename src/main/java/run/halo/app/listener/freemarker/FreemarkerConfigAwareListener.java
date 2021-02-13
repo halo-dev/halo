@@ -1,5 +1,7 @@
 package run.halo.app.listener.freemarker;
 
+import static run.halo.app.model.support.HaloConst.OPTIONS_CACHE_KEY;
+
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
@@ -41,21 +44,26 @@ public class FreemarkerConfigAwareListener {
 
     private final UserService userService;
 
+    private final AbstractStringCacheStore cacheStore;
+
     public FreemarkerConfigAwareListener(OptionService optionService,
-            Configuration configuration,
-            ThemeService themeService,
-            ThemeSettingService themeSettingService,
-            UserService userService) {
+        Configuration configuration,
+        ThemeService themeService,
+        ThemeSettingService themeSettingService,
+        UserService userService,
+        AbstractStringCacheStore cacheStore) {
         this.optionService = optionService;
         this.configuration = configuration;
         this.themeService = themeService;
         this.themeSettingService = themeSettingService;
         this.userService = userService;
+        this.cacheStore = cacheStore;
     }
 
     @EventListener
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    public void onApplicationStartedEvent(ApplicationStartedEvent applicationStartedEvent) throws TemplateModelException {
+    public void onApplicationStartedEvent(ApplicationStartedEvent applicationStartedEvent)
+        throws TemplateModelException {
         log.debug("Received application started event");
 
         loadThemeConfig();
@@ -64,7 +72,8 @@ public class FreemarkerConfigAwareListener {
     }
 
     @EventListener
-    public void onThemeActivatedEvent(ThemeActivatedEvent themeActivatedEvent) throws TemplateModelException {
+    public void onThemeActivatedEvent(ThemeActivatedEvent themeActivatedEvent)
+        throws TemplateModelException {
         log.debug("Received theme activated event");
 
         loadThemeConfig();
@@ -88,6 +97,10 @@ public class FreemarkerConfigAwareListener {
     public void onOptionUpdate(OptionUpdatedEvent event) throws TemplateModelException {
         log.debug("Received option updated event");
 
+        // refresh options cache
+        optionService.flush();
+        cacheStore.delete(OPTIONS_CACHE_KEY);
+
         loadOptionsConfig();
         loadThemeConfig();
     }
@@ -107,12 +120,19 @@ public class FreemarkerConfigAwareListener {
         configuration.setSharedVariable("context", context);
         configuration.setSharedVariable("version", HaloConst.HALO_VERSION);
 
-        configuration.setSharedVariable("globalAbsolutePathEnabled", optionService.isEnabledAbsolutePath());
+        configuration
+            .setSharedVariable("globalAbsolutePathEnabled", optionService.isEnabledAbsolutePath());
         configuration.setSharedVariable("blog_title", optionService.getBlogTitle());
         configuration.setSharedVariable("blog_url", blogBaseUrl);
-        configuration.setSharedVariable("blog_logo", optionService.getByPropertyOrDefault(BlogProperties.BLOG_LOGO, String.class, BlogProperties.BLOG_LOGO.defaultValue()));
-        configuration.setSharedVariable("seo_keywords", optionService.getByPropertyOrDefault(SeoProperties.KEYWORDS, String.class, SeoProperties.KEYWORDS.defaultValue()));
-        configuration.setSharedVariable("seo_description", optionService.getByPropertyOrDefault(SeoProperties.DESCRIPTION, String.class, SeoProperties.DESCRIPTION.defaultValue()));
+        configuration.setSharedVariable("blog_logo", optionService
+            .getByPropertyOrDefault(BlogProperties.BLOG_LOGO, String.class,
+                BlogProperties.BLOG_LOGO.defaultValue()));
+        configuration.setSharedVariable("seo_keywords", optionService
+            .getByPropertyOrDefault(SeoProperties.KEYWORDS, String.class,
+                SeoProperties.KEYWORDS.defaultValue()));
+        configuration.setSharedVariable("seo_description", optionService
+            .getByPropertyOrDefault(SeoProperties.DESCRIPTION, String.class,
+                SeoProperties.DESCRIPTION.defaultValue()));
 
         configuration.setSharedVariable("rss_url", blogBaseUrl + "/rss.xml");
         configuration.setSharedVariable("atom_url", blogBaseUrl + "/atom.xml");
@@ -120,9 +140,12 @@ public class FreemarkerConfigAwareListener {
         configuration.setSharedVariable("sitemap_html_url", blogBaseUrl + "/sitemap.html");
         configuration.setSharedVariable("links_url", context + optionService.getLinksPrefix());
         configuration.setSharedVariable("photos_url", context + optionService.getPhotosPrefix());
-        configuration.setSharedVariable("journals_url", context + optionService.getJournalsPrefix());
-        configuration.setSharedVariable("archives_url", context + optionService.getArchivesPrefix());
-        configuration.setSharedVariable("categories_url", context + optionService.getCategoriesPrefix());
+        configuration
+            .setSharedVariable("journals_url", context + optionService.getJournalsPrefix());
+        configuration
+            .setSharedVariable("archives_url", context + optionService.getArchivesPrefix());
+        configuration
+            .setSharedVariable("categories_url", context + optionService.getCategoriesPrefix());
         configuration.setSharedVariable("tags_url", context + optionService.getTagsPrefix());
 
         log.debug("Loaded options");
@@ -131,7 +154,9 @@ public class FreemarkerConfigAwareListener {
     private void loadThemeConfig() {
         // Get current activated theme.
         themeService.fetchActivatedTheme().ifPresent(activatedTheme -> {
-            String themeBasePath = (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "") + "/themes/" + activatedTheme.getFolderName();
+            String themeBasePath =
+                (optionService.isEnabledAbsolutePath() ? optionService.getBlogBaseUrl() : "")
+                    + "/themes/" + activatedTheme.getFolderName();
             try {
                 configuration.setSharedVariable("theme", activatedTheme);
 
@@ -140,7 +165,8 @@ public class FreemarkerConfigAwareListener {
 
                 configuration.setSharedVariable("theme_base", themeBasePath);
 
-                configuration.setSharedVariable("settings", themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
+                configuration.setSharedVariable("settings",
+                    themeSettingService.listAsMapBy(themeService.getActivatedThemeId()));
                 log.debug("Loaded theme and settings");
             } catch (TemplateModelException e) {
                 log.error("Failed to set shared variable!", e);

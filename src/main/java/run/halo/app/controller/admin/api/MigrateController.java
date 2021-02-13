@@ -27,7 +27,7 @@ public class MigrateController {
     private final OptionService optionService;
 
     public MigrateController(MigrateService migrateService,
-            OptionService optionService) {
+        OptionService optionService) {
         this.migrateService = migrateService;
         this.optionService = optionService;
     }
@@ -35,7 +35,8 @@ public class MigrateController {
     @PostMapping("halo")
     @ApiOperation("Migrate from Halo")
     public void migrateHalo(@RequestPart("file") MultipartFile file) {
-        if (optionService.getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false)) {
+        if (optionService.getByPropertyOrDefault(
+            PrimaryProperties.IS_INSTALLED, Boolean.class, false)) {
             throw new BadRequestException("无法在博客初始化完成之后迁移数据");
         }
         migrateService.migrate(file, MigrateType.HALO);

@@ -1,5 +1,7 @@
 package run.halo.app.controller.content;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +20,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.ThemeService;
 
-import static org.springframework.data.domain.Sort.Direction.DESC;
-
 /**
  * Search controller.
  *
@@ -36,7 +36,8 @@ public class ContentSearchController {
 
     private final ThemeService themeService;
 
-    public ContentSearchController(PostService postService, OptionService optionService, ThemeService themeService) {
+    public ContentSearchController(PostService postService, OptionService optionService,
+        ThemeService themeService) {
         this.postService = postService;
         this.optionService = optionService;
         this.themeService = themeService;
@@ -45,28 +46,28 @@ public class ContentSearchController {
     /**
      * Render post search page.
      *
-     * @param model   model
+     * @param model model
      * @param keyword keyword
      * @return template path : themes/{theme}/search.ftl
      */
     @GetMapping
     public String search(Model model,
-            @RequestParam(value = "keyword") String keyword) {
+        @RequestParam(value = "keyword") String keyword) {
         return this.search(model, HtmlUtils.htmlEscape(keyword), 1, Sort.by(DESC, "createTime"));
     }
 
     /**
      * Render post search page.
      *
-     * @param model   model
+     * @param model model
      * @param keyword keyword
      * @return template path :themes/{theme}/search.ftl
      */
     @GetMapping(value = "page/{page}")
     public String search(Model model,
-            @RequestParam(value = "keyword") String keyword,
-            @PathVariable(value = "page") Integer page,
-            @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
+        @RequestParam(value = "keyword") String keyword,
+        @PathVariable(value = "page") Integer page,
+        @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
         final Page<Post> postPage = postService.pageBy(keyword, pageable);
 

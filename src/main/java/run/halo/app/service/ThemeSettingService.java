@@ -1,13 +1,12 @@
 package run.halo.app.service;
 
+import java.util.List;
+import java.util.Map;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.model.entity.ThemeSetting;
 import run.halo.app.service.base.CrudService;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Theme setting service interface.
@@ -21,8 +20,8 @@ public interface ThemeSettingService extends CrudService<ThemeSetting, Integer> 
     /**
      * Saves theme setting.
      *
-     * @param key     setting key must not be blank
-     * @param value   setting value
+     * @param key setting key must not be blank
+     * @param value setting value
      * @param themeId theme id must not be blank
      * @return theme setting or null if the key does not exist
      */
@@ -34,7 +33,7 @@ public interface ThemeSettingService extends CrudService<ThemeSetting, Integer> 
      * Saves theme settings.
      *
      * @param settings theme setting map
-     * @param themeId  theme id must not be blank
+     * @param themeId theme id must not be blank
      */
     @Transactional
     void save(@Nullable Map<String, Object> settings, @NonNull String themeId);

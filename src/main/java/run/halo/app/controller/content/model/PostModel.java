@@ -1,5 +1,10 @@
 package run.halo.app.controller.content.model;
 
+import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
+import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
+
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -8,21 +13,25 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
-import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.*;
+import run.halo.app.service.AuthenticationService;
+import run.halo.app.service.CategoryService;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.PostCategoryService;
+import run.halo.app.service.PostMetaService;
+import run.halo.app.service.PostService;
+import run.halo.app.service.PostTagService;
+import run.halo.app.service.TagService;
+import run.halo.app.service.ThemeService;
 import run.halo.app.utils.MarkdownUtils;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Post Model
@@ -51,15 +60,18 @@ public class PostModel {
 
     private final AbstractStringCacheStore cacheStore;
 
+    private final AuthenticationService authenticationService;
+
     public PostModel(PostService postService,
-            ThemeService themeService,
-            PostCategoryService postCategoryService,
-            CategoryService categoryService,
-            PostMetaService postMetaService,
-            PostTagService postTagService,
-            TagService tagService,
-            OptionService optionService,
-            AbstractStringCacheStore cacheStore) {
+        ThemeService themeService,
+        PostCategoryService postCategoryService,
+        CategoryService categoryService,
+        PostMetaService postMetaService,
+        PostTagService postTagService,
+        TagService tagService,
+        OptionService optionService,
+        AbstractStringCacheStore cacheStore,
+        AuthenticationService authenticationService) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -69,36 +81,37 @@ public class PostModel {
         this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
+        this.authenticationService = authenticationService;
     }
 
     public String content(Post post, String token, Model model) {
 
-        if (post.getStatus().equals(PostStatus.INTIMATE) && StringUtils.isEmpty(token)) {
+        if (post.getStatus().equals(PostStatus.INTIMATE)
+            && !authenticationService.postAuthentication(post, null)) {
             model.addAttribute("slug", post.getSlug());
-            return "common/template/post_password";
+            model.addAttribute("type", EncryptTypeEnum.POST.getName());
+            if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
+                return themeService.render(POST_PASSWORD_TEMPLATE);
+            }
+            return "common/template/" + POST_PASSWORD_TEMPLATE;
         }
 
-        if (StringUtils.isEmpty(token)) {
-            post = postService.getBy(PostStatus.PUBLISHED, post.getSlug());
+        post = postService.getById(post.getId());
+
+        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
+            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
         } else {
-            // verify token
-            String cachedToken = cacheStore.getAny(token, String.class).orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
-            if (!cachedToken.equals(token)) {
-                throw new ForbiddenException("您没有该文章的访问权限");
-            }
-            if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-                post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
-            } else {
-                post.setFormatContent(post.getOriginalContent());
-            }
+            post.setFormatContent(post.getOriginalContent());
         }
 
         postService.publishVisitEvent(post.getId());
 
-        postService.getPrevPost(post).ifPresent(prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
-        postService.getNextPost(post).ifPresent(nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
+        postService.getPrevPost(post).ifPresent(
+            prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
+        postService.getNextPost(post).ifPresent(
+            nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
-        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId(), false);
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         List<PostMeta> metas = postMetaService.listBy(post.getId());
 
@@ -106,14 +119,16 @@ public class PostModel {
         if (StringUtils.isNotEmpty(post.getMetaKeywords())) {
             model.addAttribute("meta_keywords", post.getMetaKeywords());
         } else {
-            model.addAttribute("meta_keywords", tags.stream().map(Tag::getName).collect(Collectors.joining(",")));
+            model.addAttribute("meta_keywords",
+                tags.stream().map(Tag::getName).collect(Collectors.joining(",")));
         }
 
         // Generate meta description.
         if (StringUtils.isNotEmpty(post.getMetaDescription())) {
             model.addAttribute("meta_description", post.getMetaDescription());
         } else {
-            model.addAttribute("meta_description", postService.generateDescription(post.getFormatContent()));
+            model.addAttribute("meta_description",
+                postService.generateDescription(post.getFormatContent()));
         }
 
         model.addAttribute("is_post", true);
@@ -123,7 +138,7 @@ public class PostModel {
         model.addAttribute("metas", postMetaService.convertToMap(metas));
 
         if (themeService.templateExists(
-                ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + HaloConst.SUFFIX_FTL)) {
+            ThemeService.CUSTOM_POST_PREFIX + post.getTemplate() + SUFFIX_FTL)) {
             return themeService.render(ThemeService.CUSTOM_POST_PREFIX + post.getTemplate());
         }
 
@@ -133,7 +148,7 @@ public class PostModel {
     public String list(Integer page, Model model) {
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
+            .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
@@ -148,7 +163,7 @@ public class PostModel {
     public String archives(Integer page, Model model) {
         int pageSize = optionService.getArchivesPageSize();
         Pageable pageable = PageRequest
-                .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
+            .of(page >= 1 ? page - 1 : page, pageSize, Sort.by(Sort.Direction.DESC, "createTime"));
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
 

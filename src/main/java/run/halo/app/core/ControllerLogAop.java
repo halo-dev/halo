@@ -2,6 +2,10 @@ package run.halo.app.core;
 
 import cn.hutool.extra.servlet.ServletUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.lang.reflect.Method;
+import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -19,11 +23,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.utils.JsonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
-import java.util.Objects;
-
 /**
  * @author johnniang
  */
@@ -32,11 +31,15 @@ import java.util.Objects;
 @Slf4j
 public class ControllerLogAop {
 
+    @Pointcut("@within(org.springframework.web.bind.annotation.RestController)")
+    public void restController() {
+    }
+
     @Pointcut("@within(org.springframework.stereotype.Controller)")
     public void controller() {
     }
 
-    @Around("controller()")
+    @Around("controller() || restController()")
     public Object controller(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         final Method method = signature.getMethod();
@@ -50,7 +53,8 @@ public class ControllerLogAop {
         Object[] args = joinPoint.getArgs();
 
         // Get request attribute
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        ServletRequestAttributes requestAttributes =
+            (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = Objects.requireNonNull(requestAttributes).getRequest();
 
         final StopWatch watch = new StopWatch(request.getRequestURI());
@@ -72,12 +76,13 @@ public class ControllerLogAop {
         return returnObj;
     }
 
-    private void printRequestLog(HttpServletRequest request, String clazzName, String methodName, Object[] args) throws JsonProcessingException {
+    private void printRequestLog(HttpServletRequest request, String clazzName, String methodName,
+        Object[] args) throws JsonProcessingException {
         log.debug("Request URL: [{}], URI: [{}], Request Method: [{}], IP: [{}]",
-                request.getRequestURL(),
-                request.getRequestURI(),
-                request.getMethod(),
-                ServletUtil.getClientIP(request));
+            request.getRequestURL(),
+            request.getRequestURI(),
+            request.getMethod(),
+            ServletUtil.getClientIP(request));
 
         if (args == null || !log.isDebugEnabled()) {
             return;
@@ -85,11 +90,11 @@ public class ControllerLogAop {
 
         boolean shouldNotLog = false;
         for (Object arg : args) {
-            if (arg == null ||
-                    arg instanceof HttpServletRequest ||
-                    arg instanceof HttpServletResponse ||
-                    arg instanceof MultipartFile ||
-                    arg.getClass().isAssignableFrom(MultipartFile[].class)) {
+            if (arg == null
+                || arg instanceof HttpServletRequest
+                || arg instanceof HttpServletResponse
+                || arg instanceof MultipartFile
+                || arg.getClass().isAssignableFrom(MultipartFile[].class)) {
                 shouldNotLog = true;
                 break;
             }
@@ -101,8 +106,9 @@ public class ControllerLogAop {
         }
     }
 
-    private void printResponseLog(HttpServletRequest request, String className, String methodName, Object returnObj)
-            throws JsonProcessingException {
+    private void printResponseLog(HttpServletRequest request, String className, String methodName,
+        Object returnObj)
+        throws JsonProcessingException {
         if (log.isDebugEnabled()) {
             String returnData = "";
             if (returnObj != null) {
