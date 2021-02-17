@@ -3,7 +3,9 @@ package run.halo.app.conf;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.AntPathMatcher;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Ant path matcher test.
