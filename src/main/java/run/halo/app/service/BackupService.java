@@ -1,7 +1,9 @@
 package run.halo.app.service;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +45,16 @@ public interface BackupService {
      */
     @NonNull
     List<BackupDTO> listWorkDirBackups();
+
+    /**
+     * Get backup data by backup file name.
+     *
+     * @param backupFileName backup file name must not be blank
+     * @param type backup type must not be null
+     * @return an optional of backup data
+     */
+    @NonNull
+    Optional<BackupDTO> getBackup(@NonNull Path backupFileName, @NonNull BackupType type);
 
     /**
      * Deletes backup.
@@ -116,4 +128,26 @@ public interface BackupService {
      * @param fileName file name
      */
     void deleteMarkdown(@NonNull String fileName);
+
+    /**
+     * Backup type.
+     *
+     * @author johnniang
+     */
+    enum BackupType {
+        WHOLE_SITE("/api/admin/backups/work-dir"),
+        JSON_DATA("/api/admin/backups/data"),
+        MARKDOWN("/api/admin/backups/markdown/export"),
+        ;
+
+        private final String baseUri;
+
+        BackupType(String baseUri) {
+            this.baseUri = baseUri;
+        }
+
+        public String getBaseUri() {
+            return baseUri;
+        }
+    }
 }
