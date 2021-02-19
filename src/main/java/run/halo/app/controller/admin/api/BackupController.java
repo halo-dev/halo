@@ -54,19 +54,6 @@ public class BackupController {
         this.haloProperties = haloProperties;
     }
 
-    @PostMapping("work-dir")
-    @ApiOperation("Backups work directory")
-    @DisableOnCondition
-    public BackupDTO backupHalo() {
-        return backupService.backupWorkDirectory();
-    }
-
-    @GetMapping("work-dir")
-    @ApiOperation("Gets all work directory backups")
-    public List<BackupDTO> listBackups() {
-        return backupService.listWorkDirBackups();
-    }
-
     @GetMapping("work-dir/fetch")
     public BackupDTO getWorkDirBackup(@RequestParam("filename") String filename) {
         return backupService.getBackup(Paths.get(haloProperties.getWorkDir(), filename), WHOLE_SITE)
@@ -88,6 +75,19 @@ public class BackupController {
             .getBackup(Paths.get(haloProperties.getBackupMarkdownDir(), filename), MARKDOWN)
             .orElseThrow(() ->
                 new NotFoundException("备份文件 " + filename + " 不存在或已删除！").setErrorData(filename));
+    }
+
+    @PostMapping("work-dir")
+    @ApiOperation("Backups work directory")
+    @DisableOnCondition
+    public BackupDTO backupHalo() {
+        return backupService.backupWorkDirectory();
+    }
+
+    @GetMapping("work-dir")
+    @ApiOperation("Gets all work directory backups")
+    public List<BackupDTO> listBackups() {
+        return backupService.listWorkDirBackups();
     }
 
     @GetMapping("work-dir/{filename:.+}")
