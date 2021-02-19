@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 import run.halo.app.cache.lock.CacheLock;
+import run.halo.app.cache.lock.CacheParam;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
@@ -127,7 +128,7 @@ public class JournalController {
     @PostMapping("{id:\\d+}/likes")
     @ApiOperation("Likes a journal")
     @CacheLock(autoDelete = false, traceRequest = true)
-    public void like(@PathVariable("id") Integer id) {
+    public void like(@PathVariable("id") @CacheParam Integer id) {
         journalService.increaseLike(id);
     }
 }
