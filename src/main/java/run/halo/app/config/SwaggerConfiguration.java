@@ -146,8 +146,8 @@ public class SwaggerConfiguration {
 
     private List<SecurityScheme> adminApiKeys() {
         return Arrays.asList(
-            new ApiKey("Token from header", ADMIN_TOKEN_HEADER_NAME, In.HEADER.name()),
-            new ApiKey("Token from query", ADMIN_TOKEN_QUERY_NAME, In.QUERY.name())
+            new ApiKey(ADMIN_TOKEN_HEADER_NAME, ADMIN_TOKEN_HEADER_NAME, In.HEADER.name()),
+            new ApiKey(ADMIN_TOKEN_QUERY_NAME, ADMIN_TOKEN_QUERY_NAME, In.QUERY.name())
         );
     }
 
@@ -155,7 +155,7 @@ public class SwaggerConfiguration {
         final PathMatcher pathMatcher = new AntPathMatcher();
         return Collections.singletonList(
             SecurityContext.builder()
-                .securityReferences(defaultAuth())
+                .securityReferences(adminApiAuths())
                 .operationSelector(operationContext -> {
                     var requestMappingPattern = operationContext.requestMappingPattern();
                     return pathMatcher.match("/api/admin/**/*", requestMappingPattern);
@@ -166,8 +166,8 @@ public class SwaggerConfiguration {
 
     private List<SecurityScheme> contentApiKeys() {
         return Arrays.asList(
-            new ApiKey("Access key from header", API_ACCESS_KEY_HEADER_NAME, In.HEADER.name()),
-            new ApiKey("Access key from query", API_ACCESS_KEY_QUERY_NAME, In.QUERY.name())
+            new ApiKey(API_ACCESS_KEY_HEADER_NAME, API_ACCESS_KEY_HEADER_NAME, In.HEADER.name()),
+            new ApiKey(API_ACCESS_KEY_QUERY_NAME, API_ACCESS_KEY_QUERY_NAME, In.QUERY.name())
         );
     }
 
@@ -175,7 +175,7 @@ public class SwaggerConfiguration {
         final PathMatcher pathMatcher = new AntPathMatcher();
         return Collections.singletonList(
             SecurityContext.builder()
-                .securityReferences(contentApiAuth())
+                .securityReferences(contentApiAuths())
                 .operationSelector(operationContext -> {
                     var requestMappingPattern = operationContext.requestMappingPattern();
                     return pathMatcher.match("/api/content/**/*", requestMappingPattern);
@@ -184,18 +184,18 @@ public class SwaggerConfiguration {
         );
     }
 
-    private List<SecurityReference> defaultAuth() {
+    private List<SecurityReference> adminApiAuths() {
         AuthorizationScope[] authorizationScopes =
             {new AuthorizationScope("Admin api", "Access admin api")};
-        return Arrays.asList(new SecurityReference("Token from header", authorizationScopes),
-            new SecurityReference("Token from query", authorizationScopes));
+        return Arrays.asList(new SecurityReference(ADMIN_TOKEN_HEADER_NAME, authorizationScopes),
+            new SecurityReference(ADMIN_TOKEN_QUERY_NAME, authorizationScopes));
     }
 
-    private List<SecurityReference> contentApiAuth() {
+    private List<SecurityReference> contentApiAuths() {
         AuthorizationScope[] authorizationScopes =
             {new AuthorizationScope("content api", "Access content api")};
-        return Arrays.asList(new SecurityReference("Access key from header", authorizationScopes),
-            new SecurityReference("Access key from query", authorizationScopes));
+        return Arrays.asList(new SecurityReference(API_ACCESS_KEY_HEADER_NAME, authorizationScopes),
+            new SecurityReference(API_ACCESS_KEY_QUERY_NAME, authorizationScopes));
     }
 
     private ApiInfo apiInfo() {

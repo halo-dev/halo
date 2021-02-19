@@ -1,7 +1,12 @@
 package run.halo.app.controller.admin.api;
 
+import static run.halo.app.service.BackupService.BackupType.JSON_DATA;
+import static run.halo.app.service.BackupService.BackupType.MARKDOWN;
+import static run.halo.app.service.BackupService.BackupType.WHOLE_SITE;
+
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.params.PostMarkdownParam;
@@ -48,6 +54,29 @@ public class BackupController {
         this.haloProperties = haloProperties;
     }
 
+    @GetMapping("work-dir/fetch")
+    public BackupDTO getWorkDirBackup(@RequestParam("filename") String filename) {
+        return backupService.getBackup(Paths.get(haloProperties.getWorkDir(), filename), WHOLE_SITE)
+            .orElseThrow(() ->
+                new NotFoundException("备份文件 " + filename + " 不存在或已删除！").setErrorData(filename));
+    }
+
+    @GetMapping("data/fetch")
+    public BackupDTO getDataBackup(@RequestParam("filename") String filename) {
+        return backupService
+            .getBackup(Paths.get(haloProperties.getDataExportDir(), filename), JSON_DATA)
+            .orElseThrow(() ->
+                new NotFoundException("备份文件 " + filename + " 不存在或已删除！").setErrorData(filename));
+    }
+
+    @GetMapping("markdown/fetch")
+    public BackupDTO getMarkdownBackup(@RequestParam("filename") String filename) {
+        return backupService
+            .getBackup(Paths.get(haloProperties.getBackupMarkdownDir(), filename), MARKDOWN)
+            .orElseThrow(() ->
+                new NotFoundException("备份文件 " + filename + " 不存在或已删除！").setErrorData(filename));
+    }
+
     @PostMapping("work-dir")
     @ApiOperation("Backups work directory")
     @DisableOnCondition
@@ -61,16 +90,16 @@ public class BackupController {
         return backupService.listWorkDirBackups();
     }
 
-    @GetMapping("work-dir/{fileName:.+}")
+    @GetMapping("work-dir/{filename:.+}")
     @ApiOperation("Downloads a work directory backup file")
     @DisableOnCondition
-    public ResponseEntity<Resource> downloadBackup(@PathVariable("fileName") String fileName,
+    public ResponseEntity<Resource> downloadBackup(@PathVariable("filename") String filename,
         HttpServletRequest request) {
-        log.info("Try to download backup file: [{}]", fileName);
+        log.info("Trying to download backup file: [{}]", filename);
 
         // Load file as resource
         Resource backupResource =
-            backupService.loadFileAsResource(haloProperties.getBackupDir(), fileName);
+            backupService.loadFileAsResource(haloProperties.getBackupDir(), filename);
 
         String contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
         // Try to determine file's content type
