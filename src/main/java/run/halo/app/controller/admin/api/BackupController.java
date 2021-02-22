@@ -56,7 +56,8 @@ public class BackupController {
 
     @GetMapping("work-dir/fetch")
     public BackupDTO getWorkDirBackup(@RequestParam("filename") String filename) {
-        return backupService.getBackup(Paths.get(haloProperties.getWorkDir(), filename), WHOLE_SITE)
+        return backupService
+            .getBackup(Paths.get(haloProperties.getBackupDir(), filename), WHOLE_SITE)
             .orElseThrow(() ->
                 new NotFoundException("备份文件 " + filename + " 不存在或已删除！").setErrorData(filename));
     }
