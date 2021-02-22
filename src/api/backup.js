@@ -30,6 +30,13 @@ backupApi.listWorkDirBackups = () => {
   })
 }
 
+backupApi.fetchWorkDir = filename => {
+  return service({
+    url: `${baseUrl}/work-dir/fetch?filename=${filename}`,
+    method: 'get'
+  })
+}
+
 backupApi.deleteWorkDirBackup = filename => {
   return service({
     url: `${baseUrl}/work-dir`,
@@ -51,6 +58,13 @@ backupApi.exportData = () => {
 backupApi.listExportedData = () => {
   return service({
     url: `${baseUrl}/data`,
+    method: 'get'
+  })
+}
+
+backupApi.fetchData = filename => {
+  return service({
+    url: `${baseUrl}/data/fetch?filename=${filename}`,
     method: 'get'
   })
 }
@@ -79,6 +93,13 @@ backupApi.exportMarkdowns = needFrontMatter => {
 backupApi.listExportedMarkdowns = () => {
   return service({
     url: `${baseUrl}/markdown/export`,
+    method: 'get'
+  })
+}
+
+backupApi.fetchMarkdown = filename => {
+  return service({
+    url: `${baseUrl}/markdown/fetch?filename=${filename}`,
     method: 'get'
   })
 }

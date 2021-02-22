@@ -40,7 +40,8 @@
             <a-list-item-meta>
               <a
                 slot="title"
-                :href="file.downloadLink"
+                href="javascript:void(0)"
+                @click="handleDownloadBackupFile(file)"
               >
                 <a-icon
                   type="schedule"
@@ -89,19 +90,19 @@ export default {
       backuping: false,
       loading: false,
       backupErrored: false,
-      files: []
+      files: [],
     }
   },
   model: {
     prop: 'visible',
-    event: 'close'
+    event: 'close',
   },
   props: {
     visible: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: true,
+    },
   },
   methods: {
     handleAfterVisibleChanged(visible) {
@@ -113,7 +114,7 @@ export default {
       this.loading = true
       backupApi
         .listExportedData()
-        .then(response => {
+        .then((response) => {
           this.files = response.data.data
         })
         .finally(() => {
@@ -151,9 +152,26 @@ export default {
         this.handleListBackups()
       })
     },
+    handleDownloadBackupFile(item) {
+      backupApi
+        .fetchData(item.filename)
+        .then((response) => {
+          var downloadElement = document.createElement('a')
+          var href = new window.URL(response.data.data.downloadLink)
+          downloadElement.href = href
+          downloadElement.download = response.data.data.filename
+          document.body.appendChild(downloadElement)
+          downloadElement.click()
+          document.body.removeChild(downloadElement)
+          window.URL.revokeObjectURL(href)
+        })
+        .catch(() => {
+          this.$message.error('下载失败！')
+        })
+    },
     onClose() {
       this.$emit('close', false)
-    }
-  }
+    },
+  },
 }
 </script>

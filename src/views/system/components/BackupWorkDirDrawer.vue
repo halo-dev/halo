@@ -40,7 +40,8 @@
             <a-list-item-meta>
               <a
                 slot="title"
-                :href="backup.downloadLink"
+                href="javascript:void(0)"
+                @click="handleDownloadBackupPackage(backup)"
               >
                 <a-icon
                   type="schedule"
@@ -150,6 +151,23 @@ export default {
         }, 400)
         this.handleListBackups()
       })
+    },
+    handleDownloadBackupPackage(item) {
+      backupApi
+        .fetchWorkDir(item.filename)
+        .then((response) => {
+          var downloadElement = document.createElement('a')
+          var href = new window.URL(response.data.data.downloadLink)
+          downloadElement.href = href
+          downloadElement.download = response.data.data.filename
+          document.body.appendChild(downloadElement)
+          downloadElement.click()
+          document.body.removeChild(downloadElement)
+          window.URL.revokeObjectURL(href)
+        })
+        .catch((error) => {
+          this.$message.error(error.data.message)
+        })
     },
     onClose() {
       this.$emit('close', false)

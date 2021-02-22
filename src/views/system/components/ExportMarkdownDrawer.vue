@@ -40,7 +40,8 @@
             <a-list-item-meta>
               <a
                 slot="title"
-                :href="file.downloadLink"
+                href="javascript:void(0)"
+                @click="handleDownloadMarkdownPackage(file)"
               >
                 <a-icon
                   type="schedule"
@@ -157,6 +158,23 @@ export default {
         }, 400)
         this.handleListBackups()
       })
+    },
+    handleDownloadMarkdownPackage(item) {
+      backupApi
+        .fetchMarkdown(item.filename)
+        .then((response) => {
+          var downloadElement = document.createElement('a')
+          var href = new window.URL(response.data.data.downloadLink)
+          downloadElement.href = href
+          downloadElement.download = response.data.data.filename
+          document.body.appendChild(downloadElement)
+          downloadElement.click()
+          document.body.removeChild(downloadElement)
+          window.URL.revokeObjectURL(href)
+        })
+        .catch(() => {
+          this.$message.error('下载失败！')
+        })
     },
     onClose() {
       this.$emit('close', false)
