@@ -68,6 +68,7 @@ import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.entity.ThemeSetting;
+import run.halo.app.model.entity.User;
 import run.halo.app.model.params.PostMarkdownParam;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.PostMarkdownVO;
@@ -515,6 +516,14 @@ public class BackupServiceImpl implements BackupService {
         themeSettingService.createInBatch(themeSettings);
 
         eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
+
+        List<User> users = Arrays.asList(mapper
+            .readValue(mapper.writeValueAsString(data.get("user")),
+                User[].class));
+
+        if (users.size() > 0) {
+            userService.create(users.get(0));
+        }
     }
 
     @Override
