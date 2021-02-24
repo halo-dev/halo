@@ -41,16 +41,4 @@ public class MigrateController {
         }
         migrateService.migrate(file, MigrateType.HALO);
     }
-
-    //    @PostMapping("wordpress")
-    //    @ApiOperation("Migrate from WordPress")
-    //    public void migrateWordPress(@RequestPart("file") MultipartFile file) {
-    //        migrateService.migrate(file, MigrateType.WORDPRESS);
-    //    }
-    //
-    //    @PostMapping("cnblogs")
-    //    @ApiOperation("Migrate from cnblogs")
-    //    public void migrateCnBlogs(@RequestPart("file") MultipartFile file) {
-    //        migrateService.migrate(file, MigrateType.CNBLOGS);
-    //    }
 }
