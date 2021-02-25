@@ -45,7 +45,7 @@ public class ThemeController {
         this.themeSettingService = themeSettingService;
     }
 
-    @GetMapping("{themeId}")
+    @GetMapping("{themeId:.+}")
     @ApiOperation("Gets theme property by theme id")
     public ThemeProperty getBy(@PathVariable("themeId") String themeId) {
         return themeService.getThemeOfNonNullBy(themeId);
@@ -63,7 +63,7 @@ public class ThemeController {
         return themeService.listThemeFolderBy(themeService.getActivatedThemeId());
     }
 
-    @GetMapping("{themeId}/files")
+    @GetMapping("{themeId:.+}/files")
     @ApiOperation("Lists theme files by theme id")
     public List<ThemeFile> listFiles(@PathVariable("themeId") String themeId) {
         return themeService.listThemeFolderBy(themeId);
@@ -76,7 +76,7 @@ public class ThemeController {
             .ok(HttpStatus.OK.getReasonPhrase(), themeService.getTemplateContent(path));
     }
 
-    @GetMapping("{themeId}/files/content")
+    @GetMapping("{themeId:.+}/files/content")
     @ApiOperation("Gets template content by theme id")
     public BaseResponse<String> getContentBy(@PathVariable("themeId") String themeId,
         @RequestParam(name = "path") String path) {
@@ -91,7 +91,7 @@ public class ThemeController {
         themeService.saveTemplateContent(param.getPath(), param.getContent());
     }
 
-    @PutMapping("{themeId}/files/content")
+    @PutMapping("{themeId:.+}/files/content")
     @ApiOperation("Updates template content by theme id")
     @DisableOnCondition
     public void updateContentBy(@PathVariable("themeId") String themeId,
@@ -113,7 +113,7 @@ public class ThemeController {
             ThemeService.CUSTOM_POST_PREFIX);
     }
 
-    @PostMapping("{themeId}/activation")
+    @PostMapping("{themeId:.+}/activation")
     @ApiOperation("Activates a theme")
     public ThemeProperty active(@PathVariable("themeId") String themeId) {
         return themeService.activateTheme(themeId);
@@ -131,7 +131,7 @@ public class ThemeController {
         return BaseResponse.ok(themeService.fetchConfig(themeService.getActivatedThemeId()));
     }
 
-    @GetMapping("{themeId}/configurations")
+    @GetMapping("{themeId:.+}/configurations")
     @ApiOperation("Fetches theme configuration by theme id")
     public List<Group> fetchConfig(@PathVariable("themeId") String themeId) {
         return themeService.fetchConfig(themeId);
@@ -143,7 +143,7 @@ public class ThemeController {
         return themeSettingService.listAsMapBy(themeService.getActivatedThemeId());
     }
 
-    @GetMapping("{themeId}/settings")
+    @GetMapping("{themeId:.+}/settings")
     @ApiOperation("Lists theme settings by theme id")
     public Map<String, Object> listSettingsBy(@PathVariable("themeId") String themeId) {
         return themeSettingService.listAsMapBy(themeId);
@@ -155,7 +155,7 @@ public class ThemeController {
         themeSettingService.save(settings, themeService.getActivatedThemeId());
     }
 
-    @PostMapping("{themeId}/settings")
+    @PostMapping("{themeId:.+}/settings")
     @ApiOperation("Saves theme settings")
     @CacheLock(prefix = "save_theme_setting_by_themeId")
     public void saveSettingsBy(@PathVariable("themeId") String themeId,
@@ -163,7 +163,7 @@ public class ThemeController {
         themeSettingService.save(settings, themeId);
     }
 
-    @DeleteMapping("{themeId}")
+    @DeleteMapping("{themeId:.+}")
     @ApiOperation("Deletes a theme")
     @DisableOnCondition
     public void deleteBy(@PathVariable("themeId") String themeId,
@@ -177,8 +177,7 @@ public class ThemeController {
         return themeService.upload(file);
     }
 
-    @PutMapping("upload/{themeId}")
-    @PostMapping("upload/{themeId}")
+    @PutMapping("upload/{themeId:.+}")
     @ApiOperation("Upgrades theme by file")
     public ThemeProperty updateThemeByUpload(@PathVariable("themeId") String themeId,
         @RequestPart("file") MultipartFile file) {
@@ -228,7 +227,7 @@ public class ThemeController {
         return themeService.fetchLatestRelease(uri);
     }
 
-    @PutMapping("fetching/{themeId}")
+    @PutMapping("fetching/{themeId:.+}")
     @ApiOperation("Upgrades theme from remote")
     public ThemeProperty updateThemeByFetching(@PathVariable("themeId") String themeId) {
         return themeService.update(themeId);
