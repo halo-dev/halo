@@ -97,19 +97,19 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
 import LoginForm from '@/components/Login/LoginForm'
 export default {
   components: {
-    LoginForm
+    LoginForm,
   },
   data() {
     return {
       resetPasswordButtonVisible: false,
       apiForm: {
         apiUrl: window.location.host,
-        visible: false
-      }
+        visible: false,
+      },
     }
   },
   computed: {
-    ...mapGetters({ defaultApiUrl: 'apiUrl' })
+    ...mapGetters({ defaultApiUrl: 'apiUrl' }),
   },
   beforeMount() {
     const _this = this
@@ -124,14 +124,13 @@ export default {
     ...mapActions(['refreshUserCache', 'refreshOptionsCache']),
     ...mapMutations({
       setApiUrl: 'SET_API_URL',
-      restoreApiUrl: 'RESTORE_API_URL'
+      restoreApiUrl: 'RESTORE_API_URL',
     }),
-    handleVerifyIsInstall() {
-      adminApi.isInstalled().then((response) => {
-        if (!response.data.data) {
-          this.$router.push({ name: 'Install' })
-        }
-      })
+    async handleVerifyIsInstall() {
+      const response = await adminApi.isInstalled()
+      if (!response.data.data) {
+        this.$router.push({ name: 'Install' })
+      }
     },
     onLoginSucceed() {
       // Refresh the user info
@@ -156,7 +155,7 @@ export default {
       if (this.apiForm.visible) {
         this.apiForm.apiUrl = this.defaultApiUrl
       }
-    }
-  }
+    },
+  },
 }
 </script>

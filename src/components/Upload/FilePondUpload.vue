@@ -6,7 +6,7 @@
       :name="name"
       :allow-multiple="multiple"
       :allowRevert="false"
-      :accepted-file-types="accept"
+      :accepted-file-types="accepts"
       :maxParallelUploads="maxParallelUploads"
       :allowImagePreview="allowImagePreview"
       :maxFiles="maxFiles"
@@ -16,6 +16,8 @@
       labelFileProcessingError="上传错误"
       labelTapToCancel="点击取消"
       labelTapToRetry="点击重试"
+      labelFileTypeNotAllowed="不支持当前文件格式"
+      fileValidateTypeLabelExpectedTypes="请选择 {allTypes} 格式的文件"
       :files="fileList"
       :server="server"
       @init="handleFilePondInit"
@@ -33,49 +35,52 @@ import 'filepond/dist/filepond.min.css'
 // Plugins
 import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css'
+import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
 
 // Create component and regist plugins
-const FilePond = vueFilePond(FilePondPluginImagePreview)
+const FilePond = vueFilePond(FilePondPluginImagePreview, FilePondPluginFileValidateType)
 export default {
   name: 'FilePondUpload',
   components: {
-    FilePond
+    FilePond,
   },
   props: {
     name: {
       type: String,
       required: false,
-      default: 'file'
+      default: 'file',
     },
     filed: {
       type: String,
       required: false,
-      default: ''
+      default: '',
     },
     multiple: {
       type: Boolean,
       required: false,
-      default: true
+      default: true,
     },
-    accept: {
-      type: String,
+    accepts: {
+      type: Array,
       required: false,
-      default: ''
+      default: () => {
+        return []
+      },
     },
     label: {
       type: String,
       required: false,
-      default: '点击选择文件或将文件拖拽到此处'
+      default: '点击选择文件或将文件拖拽到此处',
     },
     uploadHandler: {
       type: Function,
-      required: true
+      required: true,
     },
     loadOptions: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: true,
+    },
   },
   computed: {
     ...mapGetters(['options']),
@@ -96,7 +101,7 @@ export default {
         return this.options.attachment_upload_max_files
       }
       return 1
-    }
+    },
   },
   data: function() {
     return {
@@ -134,11 +139,11 @@ export default {
               abort()
               this.$log.debug('Upload operation aborted by the user')
               source.cancel('Upload operation canceled by the user.')
-            }
+            },
           }
-        }
+        },
       },
-      fileList: []
+      fileList: [],
     }
   },
   methods: {
@@ -147,7 +152,7 @@ export default {
     },
     handleClearFileList() {
       this.$refs.pond.removeFiles()
-    }
-  }
+    },
+  },
 }
 </script>

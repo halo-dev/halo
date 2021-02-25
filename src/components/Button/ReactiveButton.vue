@@ -4,6 +4,8 @@
     @click="handleClick"
     :icon="computedIcon"
     :loading="loading"
+    :size="size"
+    :block="block"
   >{{ computedText }}</a-button>
 </template>
 <script>
@@ -17,6 +19,14 @@ export default {
     icon: {
       type: String,
       default: null,
+    },
+    size: {
+      type: String,
+      default: 'default',
+    },
+    block: {
+      type: Boolean,
+      default: false,
     },
     loading: {
       type: Boolean,
