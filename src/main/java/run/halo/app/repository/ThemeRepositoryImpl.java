@@ -1,6 +1,8 @@
 package run.halo.app.repository;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static run.halo.app.model.properties.PrimaryProperties.THEME;
+import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 import static run.halo.app.utils.FileUtils.copyFolder;
 import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
 import static run.halo.app.utils.VersionUtil.compareVersion;
@@ -14,6 +16,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
@@ -25,7 +28,6 @@ import run.halo.app.exception.ServiceException;
 import run.halo.app.exception.ThemeNotSupportException;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.entity.Option;
-import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.theme.ThemePropertyScanner;
 import run.halo.app.utils.FileUtils;
@@ -37,13 +39,16 @@ import run.halo.app.utils.FileUtils;
  */
 @Repository
 @Slf4j
-public class ThemeRepositoryImpl implements ThemeRepository {
+public class ThemeRepositoryImpl
+    implements ThemeRepository, ApplicationListener<OptionUpdatedEvent> {
 
     private final OptionRepository optionRepository;
 
     private final HaloProperties properties;
 
     private final ApplicationEventPublisher eventPublisher;
+
+    private volatile ThemeProperty currentTheme;
 
     public ThemeRepositoryImpl(OptionRepository optionRepository,
         HaloProperties properties,
@@ -55,19 +60,35 @@ public class ThemeRepositoryImpl implements ThemeRepository {
 
     @Override
     public String getActivatedThemeId() {
-        return optionRepository.findByKey(PrimaryProperties.THEME.getValue())
-            .map(Option::getValue)
-            .orElse(HaloConst.DEFAULT_THEME_ID);
+        return getActivatedThemeProperty().getId();
     }
 
     @Override
     public ThemeProperty getActivatedThemeProperty() {
-        return fetchThemePropertyByThemeId(getActivatedThemeId()).orElseThrow();
+        ThemeProperty themeProperty = this.currentTheme;
+        if (themeProperty == null) {
+            synchronized (this) {
+                if (this.currentTheme == null) {
+                    // get current theme id
+                    String currentThemeId = this.optionRepository.findByKey(THEME.getValue())
+                        .map(Option::getValue)
+                        .orElse(DEFAULT_THEME_ID);
+                    // fetch current theme
+                    this.currentTheme = this.getThemeByThemeId(currentThemeId);
+                }
+            }
+        }
+        return this.currentTheme;
     }
 
     @Override
     public Optional<ThemeProperty> fetchThemePropertyByThemeId(String themeId) {
-        return listAll().stream()
+        if (StringUtils.equals(themeId, getActivatedThemeId())) {
+            return Optional.of(getActivatedThemeProperty());
+        }
+
+        return ThemePropertyScanner.INSTANCE.scan(getThemeRootPath(), null)
+            .stream()
             .filter(property -> Objects.equals(themeId, property.getId()))
             .findFirst();
     }
@@ -80,13 +101,13 @@ public class ThemeRepositoryImpl implements ThemeRepository {
     @Override
     public void setActivatedTheme(@NonNull String themeId) {
         Assert.hasText(themeId, "Theme id must not be blank");
-        final var newThemeOption = optionRepository.findByKey(PrimaryProperties.THEME.getValue())
+        final var newThemeOption = optionRepository.findByKey(THEME.getValue())
             .map(themeOption -> {
                 // set theme id
                 themeOption.setValue(themeId);
                 return themeOption;
             })
-            .orElseGet(() -> new Option(PrimaryProperties.THEME.getValue(), themeId));
+            .orElseGet(() -> new Option(THEME.getValue(), themeId));
         optionRepository.save(newThemeOption);
 
         eventPublisher.publishEvent(new OptionUpdatedEvent(this));
@@ -162,5 +183,21 @@ public class ThemeRepositoryImpl implements ThemeRepository {
 
     private Path getThemeRootPath() {
         return Paths.get(properties.getWorkDir()).resolve("templates/themes");
+    }
+
+    @Override
+    public void onApplicationEvent(OptionUpdatedEvent event) {
+        synchronized (this) {
+            this.currentTheme = null;
+        }
+    }
+
+    @NonNull
+    protected ThemeProperty getThemeByThemeId(String themeId) {
+        return ThemePropertyScanner.INSTANCE.scan(getThemeRootPath(), null)
+            .stream()
+            .filter(property -> Objects.equals(themeId, property.getId()))
+            .findFirst()
+            .orElseThrow();
     }
 }
