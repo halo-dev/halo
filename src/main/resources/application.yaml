@@ -1,6 +1,10 @@
 server:
   port: 8090
   forward-headers-strategy: native
+  error:
+    include-message: always
+    white-label:
+      enabled: false
   compression:
     enabled: false
 spring:
@@ -41,6 +45,11 @@ spring:
       max-file-size: 10240MB
       max-request-size: 10240MB
       location: /tmp/run.halo.app
+  freemarker:
+    suffix: .ftl
+    template-loader-path:
+      - file:///${halo.work-dir}templates/
+      - classpath:/templates/
 management:
   endpoints:
     web:

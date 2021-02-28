@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import static run.halo.app.model.support.HaloConst.DEFAULT_ERROR_PATH;
 import static run.halo.app.utils.FileUtils.copyFolder;
 import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
 import static run.halo.app.utils.VersionUtil.compareVersion;
@@ -314,18 +313,14 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public String render(String pageName) {
-        return fetchActivatedTheme()
-            .map(themeProperty ->
-                String.format(RENDER_TEMPLATE, themeProperty.getFolderName(), pageName))
-            .orElse(DEFAULT_ERROR_PATH);
+        var folderName = getActivatedTheme().getFolderName();
+        return "themes/" + folderName + "/" + pageName;
     }
 
     @Override
     public String renderWithSuffix(String pageName) {
-        // Get activated theme
-        ThemeProperty activatedTheme = getActivatedTheme();
-        // Build render url
-        return String.format(RENDER_TEMPLATE_SUFFIX, activatedTheme.getFolderName(), pageName);
+        var folderName = getActivatedTheme().getFolderName();
+        return "themes/" + folderName + "/" + pageName + ".ftl";
     }
 
     @Override
@@ -337,13 +332,13 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     @NonNull
     public ThemeProperty getActivatedTheme() {
-        return themeRepository.getActivatedThemeProperty();
+        return fetchActivatedTheme().orElseThrow();
     }
 
     @Override
     @NonNull
     public Optional<ThemeProperty> fetchActivatedTheme() {
-        return fetchThemePropertyBy(getActivatedThemeId());
+        return Optional.of(themeRepository.getActivatedThemeProperty());
     }
 
     @Override

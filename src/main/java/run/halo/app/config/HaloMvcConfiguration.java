@@ -88,9 +88,6 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
     FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties)
         throws IOException, TemplateException {
         FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer
-            .setTemplateLoaderPaths(FILE_PROTOCOL + haloProperties.getWorkDir() + "templates/",
-                "classpath:/templates/");
         configurer.setDefaultEncoding("UTF-8");
 
         Properties properties = new Properties();
