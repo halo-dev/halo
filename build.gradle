@@ -1,5 +1,5 @@
 plugins {
-    id "org.springframework.boot" version "2.4.2"
+    id "org.springframework.boot" version "2.5.0-M2"
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id "checkstyle"
     id "java"
@@ -8,11 +8,7 @@ plugins {
 group = "run.halo.app"
 version = "1.4.5"
 description = "Halo, An excellent open source blog publishing application."
-
-java {
-    archivesBaseName = "halo"
-    sourceCompatibility = JavaVersion.VERSION_11
-}
+sourceCompatibility = JavaVersion.VERSION_11
 
 checkstyle {
     toolVersion = "8.39"
@@ -26,6 +22,7 @@ repositories {
 //        url "https://maven.aliyun.com/nexus/content/groups/public"
 //    }
     mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
     jcenter()
 }
 
