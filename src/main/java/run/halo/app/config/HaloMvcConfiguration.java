@@ -6,6 +6,7 @@ import static run.halo.app.utils.HaloUtils.ensureBoth;
 import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.MultipartConfigElement;
@@ -15,6 +16,7 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.MultipartProperties;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
@@ -22,6 +24,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.jackson.JsonComponentModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileUrlResource;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.data.web.SortHandlerMethodArgumentResolver;
@@ -31,6 +34,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.lang.NonNull;
+import org.springframework.util.StringUtils;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -79,7 +83,10 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
      * @return new multipartResolver
      */
     @Bean(name = "multipartResolver")
-    MultipartResolver multipartResolver(MultipartProperties multipartProperties) {
+    @ConditionalOnProperty(prefix = "spring.servlet.multipart", name = "enabled",
+        havingValue = "true", matchIfMissing = true)
+    MultipartResolver multipartResolver(MultipartProperties multipartProperties)
+        throws IOException {
         MultipartConfigElement multipartConfigElement = multipartProperties.createMultipartConfig();
         CommonsMultipartResolver resolver = new CommonsMultipartResolver() {
             @Override
@@ -94,10 +101,15 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
         resolver.setDefaultEncoding("UTF-8");
         resolver.setMaxUploadSize(multipartConfigElement.getMaxRequestSize());
         resolver.setMaxUploadSizePerFile(multipartConfigElement.getMaxFileSize());
+        var location = multipartProperties.getLocation();
+        if (StringUtils.hasText(location)) {
+            FileUrlResource resource = new FileUrlResource(location);
+            resolver.setUploadTempDir(resource);
+        }
 
         //lazy multipart parsing, throwing parse exceptions once the application attempts to
         // obtain multipart files
-        resolver.setResolveLazily(true);
+        resolver.setResolveLazily(multipartProperties.isResolveLazily());
 
         return resolver;
     }

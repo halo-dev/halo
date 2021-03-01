@@ -42,7 +42,7 @@ spring:
     multipart:
       max-file-size: 10240MB
       max-request-size: 10240MB
-      location: /tmp/run.halo.app
+      resolve-lazily: true
   freemarker:
     suffix: .ftl
     settings:
