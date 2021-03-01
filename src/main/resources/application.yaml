@@ -3,8 +3,6 @@ server:
   forward-headers-strategy: native
   error:
     include-message: always
-    white-label:
-      enabled: false
   compression:
     enabled: false
 spring:

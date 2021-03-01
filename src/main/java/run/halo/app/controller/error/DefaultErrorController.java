@@ -3,6 +3,7 @@ package run.halo.app.controller.error;
 import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorViewResolver;
@@ -18,6 +19,7 @@ import run.halo.app.exception.AbstractHaloException;
  * @author johnniang
  */
 @Component
+@Slf4j
 public class DefaultErrorController extends BasicErrorController {
 
     public DefaultErrorController(
@@ -36,6 +38,9 @@ public class DefaultErrorController extends BasicErrorController {
             var nse = (NestedServletException) exception;
             if (nse.getCause() instanceof AbstractHaloException) {
                 status = ((AbstractHaloException) nse.getCause()).getStatus();
+                if (log.isDebugEnabled()) {
+                    log.error("Halo exception occurred.", nse.getCause());
+                }
                 // reset status
                 request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, status.value());
                 request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, nse.getCause());
