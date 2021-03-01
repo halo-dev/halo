@@ -6,12 +6,7 @@ import static run.halo.app.utils.HaloUtils.ensureBoth;
 import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import freemarker.core.TemplateClassResolver;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateExceptionHandler;
-import java.io.IOException;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +39,6 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.core.PageJacksonSerializer;
@@ -77,38 +71,6 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
         this.pageableResolver = pageableResolver;
         this.sortResolver = sortResolver;
         this.haloProperties = haloProperties;
-    }
-
-    /**
-     * Configuring freemarker template file path.
-     *
-     * @return new FreeMarkerConfigurer
-     */
-    @Bean
-    FreeMarkerConfigurer freemarkerConfig(HaloProperties haloProperties)
-        throws IOException, TemplateException {
-        FreeMarkerConfigurer configurer = new FreeMarkerConfigurer();
-        configurer.setDefaultEncoding("UTF-8");
-
-        Properties properties = new Properties();
-        properties.setProperty("auto_import",
-            "/common/macro/common_macro.ftl as common,/common/macro/global_macro.ftl as global");
-
-        configurer.setFreemarkerSettings(properties);
-
-        // Predefine configuration
-        freemarker.template.Configuration configuration = configurer.createConfiguration();
-
-        configuration.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
-
-        if (haloProperties.isProductionEnv()) {
-            configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
-        }
-
-        // Set predefined freemarker configuration
-        configurer.setConfiguration(configuration);
-
-        return configurer;
     }
 
     /**

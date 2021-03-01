@@ -3,6 +3,7 @@ package run.halo.app.controller.content;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import run.halo.app.cache.AbstractStringCacheStore;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.controller.content.model.CategoryModel;
 import run.halo.app.controller.content.model.JournalModel;
@@ -66,8 +68,6 @@ public class ContentContentController {
 
     private final SheetService sheetService;
 
-    private final AbstractStringCacheStore cacheStore;
-
     private final AuthenticationService authenticationService;
 
     private final CategoryService categoryService;
@@ -82,7 +82,6 @@ public class ContentContentController {
         OptionService optionService,
         PostService postService,
         SheetService sheetService,
-        AbstractStringCacheStore cacheStore,
         AuthenticationService authenticationService,
         CategoryService categoryService) {
         this.postModel = postModel;
@@ -95,7 +94,6 @@ public class ContentContentController {
         this.optionService = optionService;
         this.postService = postService;
         this.sheetService = sheetService;
-        this.cacheStore = cacheStore;
         this.authenticationService = authenticationService;
         this.categoryService = categoryService;
     }
@@ -126,12 +124,14 @@ public class ContentContentController {
             Sheet sheet = sheetService.getBySlug(prefix);
             return sheetModel.content(sheet, token, model);
         }
-        throw new NotFoundException("Not Found");
+
+        throw buildPathNotFoundException();
     }
 
     @GetMapping("{prefix}/page/{page:\\d+}")
     public String content(@PathVariable("prefix") String prefix,
         @PathVariable(value = "page") Integer page,
+        HttpServletRequest request,
         Model model) {
         if (optionService.getArchivesPrefix().equals(prefix)) {
             return postModel.archives(page, model);
@@ -145,7 +145,7 @@ public class ContentContentController {
             return photoModel.list(page, model);
         }
 
-        throw new NotFoundException("Not Found");
+        throw buildPathNotFoundException();
     }
 
     @GetMapping("{prefix}/{slug}")
@@ -186,7 +186,7 @@ public class ContentContentController {
             return sheetModel.content(sheet, token, model);
         }
 
-        throw new NotFoundException("Not Found");
+        throw buildPathNotFoundException();
     }
 
     @GetMapping("{prefix}/{slug}/page/{page:\\d+}")
@@ -202,7 +202,7 @@ public class ContentContentController {
             return tagModel.listPost(model, slug, page);
         }
 
-        throw new NotFoundException("Not Found");
+        throw buildPathNotFoundException();
     }
 
     @GetMapping("{year:\\d+}/{month:\\d+}/{slug}")
@@ -217,7 +217,7 @@ public class ContentContentController {
             return postModel.content(post, token, model);
         }
 
-        throw new NotFoundException("Not Found");
+        throw buildPathNotFoundException();
     }
 
     @GetMapping("{year:\\d+}/{month:\\d+}/{day:\\d+}/{slug}")
@@ -233,7 +233,7 @@ public class ContentContentController {
             return postModel.content(post, token, model);
         }
 
-        throw new NotFoundException("Not Found");
+        throw buildPathNotFoundException();
     }
 
     @PostMapping(value = "content/{type}/{slug:.*}/authentication")
@@ -252,6 +252,17 @@ public class ContentContentController {
             throw new UnsupportedException("未知的加密类型");
         }
         return "redirect:" + redirectUrl;
+    }
+
+    private NotFoundException buildPathNotFoundException() {
+        var requestAttributes = RequestContextHolder.currentRequestAttributes();
+
+        var requestUri = "";
+        if (requestAttributes instanceof ServletRequestAttributes) {
+            requestUri =
+                ((ServletRequestAttributes) requestAttributes).getRequest().getRequestURI();
+        }
+        return new NotFoundException("无法定位到该路径：" + requestUri);
     }
 
     private String doAuthenticationPost(

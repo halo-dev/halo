@@ -37,18 +37,25 @@ public class DefaultErrorController extends BasicErrorController {
         if (exception instanceof NestedServletException) {
             var nse = (NestedServletException) exception;
             if (nse.getCause() instanceof AbstractHaloException) {
-                status = ((AbstractHaloException) nse.getCause()).getStatus();
-                if (log.isDebugEnabled()) {
-                    log.error("Halo exception occurred.", nse.getCause());
-                }
-                // reset status
-                request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, status.value());
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, nse.getCause());
-                request.setAttribute(RequestDispatcher.ERROR_MESSAGE, nse.getCause().getMessage());
-                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE,
-                    nse.getCause().getClass());
+                status = resolveHaloException((AbstractHaloException) nse.getCause(), request);
             }
+        } else if (exception instanceof AbstractHaloException) {
+            status = resolveHaloException((AbstractHaloException) exception, request);
         }
+        return status;
+    }
+
+    private HttpStatus resolveHaloException(AbstractHaloException haloException,
+        HttpServletRequest request) {
+        HttpStatus status = haloException.getStatus();
+        if (log.isDebugEnabled()) {
+            log.error("Halo exception occurred.", haloException);
+        }
+        // reset status
+        request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, status.value());
+        request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, haloException);
+        request.setAttribute(RequestDispatcher.ERROR_MESSAGE, haloException.getMessage());
+        request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE, haloException.getClass());
         return status;
     }
 }
