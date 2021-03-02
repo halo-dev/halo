@@ -21,18 +21,8 @@ spring:
     show-sql: true
   flyway:
     enabled: false
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
   cache:
     type: none
-management:
-  endpoints:
-    web:
-      base-path: /api/admin/actuator
-      exposure:
-        include: [ 'httptrace', 'metrics','env','logfile' ]
 logging:
   level:
     run.halo.app: DEBUG
