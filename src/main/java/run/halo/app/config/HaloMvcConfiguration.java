@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import freemarker.template.TemplateModel;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
-import freemarker.template.TemplateModel;
 import kr.pe.kwonnam.freemarker.inheritance.BlockDirective;
 import kr.pe.kwonnam.freemarker.inheritance.PutDirective;
 import lombok.extern.slf4j.Slf4j;
@@ -124,9 +124,10 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
             configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         }
 
-        configuration.setSharedVariables(new HashMap<>(){{
-            put("layout", freemarkerLayoutDirectives());
-        }});
+        configuration.setSharedVariables(new HashMap<>() {{
+                put("layout", freemarkerLayoutDirectives());
+            }
+        });
 
         // Set predefined freemarker configuration
         configurer.setConfiguration(configuration);
