@@ -103,6 +103,7 @@ ext {
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
     githubApiVersion = "1.84"
+    templateInheritanceVersion = "0.4.RELEASE"
 }
 
 dependencies {
@@ -148,6 +149,7 @@ dependencies {
     implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-gitlab:$flexmarkVersion"
 
+    implementation "kr.pe.kwonnam.freemarker:freemarker-template-inheritance:$templateInheritanceVersion"
     implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
