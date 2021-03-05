@@ -133,6 +133,7 @@ class GitTest {
     }
 
     @Test
+    @Disabled("Due to time-consumption fetching")
     void getBranchesFromRemote() throws GitAPIException {
         Map<String, Ref> refMap = Git.lsRemoteRepository()
             .setRemote("https://github.com/halo-dev/halo.git")

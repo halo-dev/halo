@@ -72,15 +72,14 @@ public class FreemarkerConfigAwareListener {
     }
 
     @EventListener
-    public void onThemeActivatedEvent(ThemeActivatedEvent themeActivatedEvent)
-        throws TemplateModelException {
+    public void onThemeActivatedEvent(ThemeActivatedEvent themeActivatedEvent) {
         log.debug("Received theme activated event");
 
         loadThemeConfig();
     }
 
     @EventListener
-    public void onThemeUpdatedEvent(ThemeUpdatedEvent event) throws TemplateModelException {
+    public void onThemeUpdatedEvent(ThemeUpdatedEvent event) {
         log.debug("Received theme updated event");
 
         loadThemeConfig();
