@@ -141,6 +141,11 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         // Whether the blog has initialized
         Boolean isInstalled = optionService
             .getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+
+        if (isInstalled) {
+            return;
+        }
+
         try {
             String themeClassPath = ResourceUtils.CLASSPATH_URL_PREFIX + ThemeService.THEME_FOLDER;
 
@@ -163,7 +168,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             Path themePath = themeService.getBasePath();
 
             // Fix the problem that the project cannot start after moving to a new server
-            if (!haloProperties.isProductionEnv() || Files.notExists(themePath) || !isInstalled) {
+            if (!haloProperties.isProductionEnv() || Files.notExists(themePath)) {
                 FileUtils.copyFolder(source, themePath);
                 log.debug("Copied theme folder from [{}] to [{}]", source, themePath);
             } else {
