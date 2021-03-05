@@ -9,12 +9,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import freemarker.core.TemplateClassResolver;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import freemarker.template.TemplateModel;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.http.HttpServletRequest;
+import kr.pe.kwonnam.freemarker.inheritance.BlockDirective;
+import kr.pe.kwonnam.freemarker.inheritance.PutDirective;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
@@ -48,6 +53,7 @@ import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.core.PageJacksonSerializer;
+import run.halo.app.core.freemarker.inheritance.ThemeExtendsDirective;
 import run.halo.app.factory.StringToEnumConverterFactory;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
@@ -79,6 +85,16 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
         this.haloProperties = haloProperties;
     }
 
+    @Bean
+    public Map<String, TemplateModel> freemarkerLayoutDirectives() {
+        Map<String, TemplateModel> freemarkerLayoutDirectives = new HashMap<>();
+        freemarkerLayoutDirectives.put("extends", new ThemeExtendsDirective());
+        freemarkerLayoutDirectives.put("block", new BlockDirective());
+        freemarkerLayoutDirectives.put("put", new PutDirective());
+
+        return freemarkerLayoutDirectives;
+    }
+
     /**
      * Configuring freemarker template file path.
      *
@@ -107,6 +123,11 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
         if (haloProperties.isProductionEnv()) {
             configuration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         }
+
+        configuration.setSharedVariables(new HashMap<>() {{
+                put("layout", freemarkerLayoutDirectives());
+            }
+        });
 
         // Set predefined freemarker configuration
         configurer.setConfiguration(configuration);
