@@ -93,12 +93,7 @@
         :xs="24"
         class="pb-3"
       >
-        <a-card
-          :bodyStyle="{ padding: '16px' }"
-          ref="mheader"
-          :class="{ 'card-header-fixed': headerIsFixed }"
-          :headStyle="headStyle"
-        >
+        <a-card :bodyStyle="{ padding: '16px' }">
           <template slot="title">
             <span>
               {{ menuListTitle }}
@@ -106,7 +101,7 @@
             <a-tooltip
               slot="action"
               title="分组下的菜单为空时，该分组也不会保存"
-              v-if="list.data.length <= 0"
+              v-if="list.data.length <= 0 && !list.loading"
             >
               <a-icon
                 type="info-circle-o"
@@ -127,12 +122,19 @@
                 :disabled="list.data.length<=0"
               ></ReactiveButton>
               <a-button
+                v-if="!form.visible"
                 @click="handleOpenCreateMenuForm()"
-                :disabled="form.visible"
                 type="primary"
                 ghost
               >
                 新增
+              </a-button>
+              <a-button
+                v-else
+                @click="handleCloseCreateMenuForm()"
+                type="default"
+              >
+                取消新增
               </a-button>
               <a-dropdown :trigger="['click']">
                 <a-menu slot="overlay">
@@ -225,17 +227,10 @@ export default {
       menuInternalLinkSelector: {
         visible: false,
       },
-      headerIsFixed: false,
-      headStyle: {},
     }
   },
   computed: {
     ...mapGetters(['options']),
-    computedTeams() {
-      return this.teams.data.filter((item) => {
-        return item !== ''
-      })
-    },
     computedMenusMoved() {
       const menus = deepClone(this.list.data)
       return this.handleMenuMoved(0, menus)
@@ -267,9 +262,6 @@ export default {
     defaultMenuTeam() {
       return this.options.default_menu_team ? this.options.default_menu_team : ''
     },
-    mHeaderFromTopAbs() {
-      return Math.floor(Math.abs(this.mHeaderFromTop))
-    },
   },
   created() {
     this.handleListTeams()
@@ -294,6 +286,7 @@ export default {
         })
     },
     handleListMenus() {
+      this.list.data = []
       this.list.loading = true
       menuApi
         .listTreeByTeam(this.teams.selected)
@@ -412,7 +405,7 @@ export default {
       } else {
         this.refreshOptionsCache()
       }
-    }
+    },
   },
 }
 </script>

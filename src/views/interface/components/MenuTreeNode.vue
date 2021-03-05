@@ -19,6 +19,18 @@
           <a-list-item class="cursor-pointer menu-item">
             <a-list-item-meta>
               <span
+                slot="title"
+                class="title cursor-move inline-block font-bold"
+              >{{ item.name }}
+                <a-tooltip
+                  title="外部链接"
+                  v-if="item.target==='_blank'"
+                >
+                  <a-icon type="link" />
+                </a-tooltip>
+                {{ item.formVisible?'（正在编辑）':'' }}
+              </span>
+              <span
                 slot="description"
                 class="inline-block"
               >
@@ -28,25 +40,21 @@
                   class="ant-anchor-link-title"
                 > {{ item.url }} </a>
               </span>
-              <span
-                slot="title"
-                class="title cursor-move inline-block font-bold"
-              >{{ item.name }}
-                <a-tooltip title="外部链接">
-                  <a-icon
-                    v-if="item.target==='_blank'"
-                    type="link"
-                  />
-                </a-tooltip>
-                {{ item.formVisible?'（正在编辑）':'' }}
-              </span>
             </a-list-item-meta>
             <template slot="actions">
               <a
+                v-if="!item.formVisible"
                 href="javascript:void(0);"
                 @click="handleOpenEditForm(item)"
               >
                 编辑
+              </a>
+              <a
+                v-else
+                href="javascript:void(0);"
+                @click="handleCloseCreateMenuForm(item)"
+              >
+                取消编辑
               </a>
             </template>
             <template slot="actions">
@@ -146,9 +154,11 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 200,
+        animation: 300,
         group: 'description',
         ghostClass: 'ghost',
+        chosenClass: 'chosen',
+        dragClass: 'drag',
         emptyInsertThreshold: 20,
       }
     },
@@ -210,7 +220,16 @@ export default {
 <style scoped>
 .ghost {
   opacity: 0.8;
-  background: #c8ebfb;
+  @apply bg-gray-200;
+}
+.chosen {
+  opacity: 0.8;
+  @apply bg-gray-200;
+  padding: 0 5px;
+}
+.drag {
+  @apply bg-white;
+  padding: 0 5px;
 }
 ::v-deep .ant-list-item-action {
   display: none;
