@@ -1,5 +1,6 @@
 package run.halo.app.listener;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystem;
@@ -135,7 +136,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     }
 
     /**
-     * Init internal themes
+     * Init internal themes.
      */
     private void initThemes() {
         // Whether the blog has initialized
@@ -175,6 +176,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
                 log.debug("Skipped copying theme folder due to existence of theme folder");
             }
         } catch (Exception e) {
+            if (e instanceof FileNotFoundException) {
+                log.error("Please check location: classpath:{}", ThemeService.THEME_FOLDER);
+            }
             log.error("Initialize internal theme to user path error!", e);
         }
     }

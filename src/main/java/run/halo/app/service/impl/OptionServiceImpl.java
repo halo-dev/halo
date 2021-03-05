@@ -72,15 +72,12 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
     private final AbstractStringCacheStore cacheStore;
     private final Map<String, PropertyEnum> propertyEnumMap;
     private final ApplicationEventPublisher eventPublisher;
-    private final HaloProperties haloProperties;
 
-    public OptionServiceImpl(HaloProperties haloProperties,
-        OptionRepository optionRepository,
+    public OptionServiceImpl(OptionRepository optionRepository,
         ApplicationContext applicationContext,
         AbstractStringCacheStore cacheStore,
         ApplicationEventPublisher eventPublisher) {
         super(optionRepository);
-        this.haloProperties = haloProperties;
         this.optionRepository = optionRepository;
         this.applicationContext = applicationContext;
         this.cacheStore = cacheStore;

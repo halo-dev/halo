@@ -1,6 +1,8 @@
 server:
   port: 8090
   forward-headers-strategy: native
+  error:
+    include-message: always
   compression:
     enabled: false
 spring:
@@ -40,7 +42,14 @@ spring:
     multipart:
       max-file-size: 10240MB
       max-request-size: 10240MB
-      location: /tmp/run.halo.app
+      resolve-lazily: true
+  freemarker:
+    suffix: .ftl
+    settings:
+      auto_import: /common/macro/global_macro.ftl as global
+    template-loader-path:
+      - file:///${halo.work-dir}templates/
+      - classpath:/templates/
 management:
   endpoints:
     web:
@@ -61,3 +70,4 @@ springfox:
 halo:
   download-timeout: 5m
   cache: memory
+  work-dir: ${user.home}/.halo/
