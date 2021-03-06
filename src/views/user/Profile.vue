@@ -1,21 +1,10 @@
 <template>
   <div>
     <a-row :gutter="12">
-      <a-col
-        :lg="10"
-        :md="24"
-        class="pb-3"
-      >
-        <a-card
-          :bordered="false"
-          :bodyStyle="{ padding: '16px' }"
-        >
-          <div class="text-center mb-6">
-            <a-tooltip
-              placement="right"
-              :trigger="['hover']"
-              title="点击可修改头像"
-            >
+      <a-col :lg="10" :md="24" class="pb-3">
+        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
+          <div class="mb-6 text-center">
+            <a-tooltip placement="right" :trigger="['hover']" title="点击可修改头像">
               <a-avatar
                 :size="104"
                 :src="userForm.model.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
@@ -23,41 +12,21 @@
                 class="cursor-pointer"
               />
             </a-tooltip>
-            <div
-              class="text-xl leading-5 font-medium mt-4 mb-1"
-              style="color: rgba(0, 0, 0, 0.85);"
-            >{{ userForm.model.nickname }}</div>
+            <div class="mt-4 mb-1 text-xl font-medium leading-5" style="color: rgba(0, 0, 0, 0.85);">
+              {{ userForm.model.nickname }}
+            </div>
             <div>{{ userForm.model.description }}</div>
           </div>
           <div>
             <p class="mb-3">
-              <a-icon
-                type="link"
-                class="mr-3"
-              /><a
-                :href="options.blog_url"
-                target="method"
-              >{{ options.blog_url }}</a>
+              <a-icon type="link" class="mr-3" /><a :href="options.blog_url" target="method">{{ options.blog_url }}</a>
             </p>
-            <p class="mb-3">
-              <a-icon
-                type="mail"
-                class="mr-3"
-              />{{ userForm.model.email }}
-            </p>
-            <p class="mb-3">
-              <a-icon
-                type="calendar"
-                class="mr-3"
-              />{{ statistics.data.establishDays || 0 }} 天
-            </p>
+            <p class="mb-3"><a-icon type="mail" class="mr-3" />{{ userForm.model.email }}</p>
+            <p class="mb-3"><a-icon type="calendar" class="mr-3" />{{ statistics.data.establishDays || 0 }} 天</p>
           </div>
           <a-divider />
           <div>
-            <a-list
-              :loading="statistics.loading"
-              itemLayout="horizontal"
-            >
+            <a-list :loading="statistics.loading" itemLayout="horizontal">
               <a-list-item>累计发表了 {{ statistics.data.postCount || 0 }} 篇文章。</a-list-item>
               <a-list-item>累计创建了 {{ statistics.data.categoryCount || 0 }} 个分类。</a-list-item>
               <a-list-item>累计创建了 {{ statistics.data.tagCount || 0 }} 个标签。</a-list-item>
@@ -69,55 +38,24 @@
           </div>
         </a-card>
       </a-col>
-      <a-col
-        :lg="14"
-        :md="24"
-        class="pb-3"
-      >
-        <a-card
-          :bodyStyle="{ padding: '0' }"
-          :bordered="false"
-          title="个人资料"
-        >
+      <a-col :lg="14" :md="24" class="pb-3">
+        <a-card :bodyStyle="{ padding: '0' }" :bordered="false" title="个人资料">
           <div class="card-container">
             <a-tabs type="card">
               <a-tab-pane key="1">
-                <span slot="tab">
-                  <a-icon type="idcard" />基本资料
-                </span>
-                <a-form-model
-                  ref="userForm"
-                  :model="userForm.model"
-                  :rules="userForm.rules"
-                  layout="vertical"
-                >
-                  <a-form-model-item
-                    label="用户名："
-                    prop="username"
-                  >
+                <span slot="tab"> <a-icon type="idcard" />基本资料 </span>
+                <a-form-model ref="userForm" :model="userForm.model" :rules="userForm.rules" layout="vertical">
+                  <a-form-model-item label="用户名：" prop="username">
                     <a-input v-model="userForm.model.username" />
                   </a-form-model-item>
-                  <a-form-model-item
-                    label="昵称："
-                    prop="nickname"
-                  >
+                  <a-form-model-item label="昵称：" prop="nickname">
                     <a-input v-model="userForm.model.nickname" />
                   </a-form-model-item>
-                  <a-form-model-item
-                    label="电子邮箱："
-                    prop="email"
-                  >
+                  <a-form-model-item label="电子邮箱：" prop="email">
                     <a-input v-model="userForm.model.email" />
                   </a-form-model-item>
-                  <a-form-model-item
-                    label="个人说明："
-                    prop="description"
-                  >
-                    <a-input
-                      :autoSize="{ minRows: 5 }"
-                      type="textarea"
-                      v-model="userForm.model.description"
-                    />
+                  <a-form-model-item label="个人说明：" prop="description">
+                    <a-input :autoSize="{ minRows: 5 }" type="textarea" v-model="userForm.model.description" />
                   </a-form-model-item>
                   <a-form-model-item>
                     <ReactiveButton
@@ -134,41 +72,21 @@
                 </a-form-model>
               </a-tab-pane>
               <a-tab-pane key="2">
-                <span slot="tab">
-                  <a-icon type="lock" />密码
-                </span>
+                <span slot="tab"> <a-icon type="lock" />密码 </span>
                 <a-form-model
                   ref="passwordForm"
                   :model="passwordForm.model"
                   :rules="passwordForm.rules"
                   layout="vertical"
                 >
-                  <a-form-model-item
-                    label="原密码："
-                    prop="oldPassword"
-                  >
-                    <a-input-password
-                      v-model="passwordForm.model.oldPassword"
-                      autocomplete="new-password"
-                    />
+                  <a-form-model-item label="原密码：" prop="oldPassword">
+                    <a-input-password v-model="passwordForm.model.oldPassword" autocomplete="new-password" />
                   </a-form-model-item>
-                  <a-form-model-item
-                    label="新密码："
-                    prop="newPassword"
-                  >
-                    <a-input-password
-                      v-model="passwordForm.model.newPassword"
-                      autocomplete="new-password"
-                    />
+                  <a-form-model-item label="新密码：" prop="newPassword">
+                    <a-input-password v-model="passwordForm.model.newPassword" autocomplete="new-password" />
                   </a-form-model-item>
-                  <a-form-model-item
-                    label="确认密码："
-                    prop="confirmPassword"
-                  >
-                    <a-input-password
-                      v-model="passwordForm.model.confirmPassword"
-                      autocomplete="new-password"
-                    />
+                  <a-form-model-item label="确认密码：" prop="confirmPassword">
+                    <a-input-password v-model="passwordForm.model.confirmPassword" autocomplete="new-password" />
                   </a-form-model-item>
                   <a-form-model-item>
                     <ReactiveButton
@@ -185,9 +103,7 @@
                 </a-form-model>
               </a-tab-pane>
               <a-tab-pane key="3">
-                <span slot="tab">
-                  <a-icon type="safety-certificate" />两步验证
-                </span>
+                <span slot="tab"> <a-icon type="safety-certificate" />两步验证 </span>
                 <a-form-model layout="vertical">
                   <a-form-model-item label="两步验证：">
                     <a-switch
@@ -201,10 +117,7 @@
                       <a-list-item>
                         <b>Authy</b> 功能丰富 专为两步验证码
                         <a-divider type="vertical" />
-                        <a
-                          target="_blank"
-                          href="https://authy.com/download/"
-                        >
+                        <a target="_blank" href="https://authy.com/download/">
                           iOS/Android/Windows/Mac/Linux
                           <a-icon type="link" />
                         </a>
@@ -220,10 +133,7 @@
                       <a-list-item>
                         <b>Google Authenticator</b> 简单易用，但不支持密钥导出备份
                         <a-divider type="vertical" />
-                        <a
-                          target="_blank"
-                          href="https://apps.apple.com/us/app/google-authenticator/id388497605"
-                        >
+                        <a target="_blank" href="https://apps.apple.com/us/app/google-authenticator/id388497605">
                           iOS
                           <a-icon type="link" />
                         </a>
@@ -239,10 +149,7 @@
                       <a-list-item>
                         <b>Microsoft Authenticator</b> 使用微软全家桶的推荐
                         <a-divider type="vertical" />
-                        <a
-                          target="_blank"
-                          href="https://www.microsoft.com/zh-cn/account/authenticator"
-                        >
+                        <a target="_blank" href="https://www.microsoft.com/zh-cn/account/authenticator">
                           iOS/Android
                           <a-icon type="link" />
                         </a>
@@ -250,10 +157,7 @@
                       <a-list-item>
                         <b>1Password</b> 强大安全的密码管理付费应用
                         <a-divider type="vertical" />
-                        <a
-                          target="_blank"
-                          href="https://1password.com/zh-cn/downloads/"
-                        >
+                        <a target="_blank" href="https://1password.com/zh-cn/downloads/">
                           iOS/Android/Windows/Mac/Linux/ChromeOS
                           <a-icon type="link" />
                         </a>
@@ -288,10 +192,7 @@
       :width="400"
     >
       <template slot="footer">
-        <a-button
-          key="back"
-          @click="handleCloseMFAuthModal"
-        >
+        <a-button key="back" @click="handleCloseMFAuthModal">
           取消
         </a-button>
         <ReactiveButton
@@ -306,55 +207,23 @@
           erroredText="设置失败"
         ></ReactiveButton>
       </template>
-      <a-form-model
-        ref="mfaForm"
-        :model="mfaParam"
-        :rules="mfaParam.rules"
-        layout="vertical"
-      >
-        <a-form-model-item
-          v-if="mfaUsed"
-          label="两步验证码"
-          prop="authcode"
-        >
-          <a-input
-            v-model="mfaParam.authcode"
-            :maxLength="6"
-          >
-            <a-icon
-              slot="prefix"
-              type="safety-certificate"
-              style="color: rgba(0,0,0,.25)"
-            />
+      <a-form-model ref="mfaForm" :model="mfaParam" :rules="mfaParam.rules" layout="vertical">
+        <a-form-model-item v-if="mfaUsed" label="两步验证码" prop="authcode">
+          <a-input v-model="mfaParam.authcode" :maxLength="6">
+            <a-icon slot="prefix" type="safety-certificate" style="color: rgba(0,0,0,.25)" />
           </a-input>
         </a-form-model-item>
-        <a-form-model-item
-          v-if="!mfaUsed"
-          label="1. 请扫描二维码或导入 key"
-          :help="`MFAKey:${mfaParam.mfaKey}`"
-        >
+        <a-form-model-item v-if="!mfaUsed" label="1. 请扫描二维码或导入 key" :help="`MFAKey:${mfaParam.mfaKey}`">
           <template slot="extra">
-            <span class="text-red-600">* 建议保存此二维码或 MFAKey，验证设备丢失将无法找回，只能通过重置密码关闭二步验证。</span>
+            <span class="text-red-600"
+              >* 建议保存此二维码或 MFAKey，验证设备丢失将无法找回，只能通过重置密码关闭二步验证。</span
+            >
           </template>
-          <img
-            width="100%"
-            :src="mfaParam.qrImage"
-          />
+          <img width="100%" :src="mfaParam.qrImage" />
         </a-form-model-item>
-        <a-form-model-item
-          v-if="!mfaUsed"
-          label="2. 验证两步验证码"
-          prop="authcode"
-        >
-          <a-input
-            v-model="mfaParam.authcode"
-            :maxLength="6"
-          >
-            <a-icon
-              slot="prefix"
-              type="safety-certificate"
-              style="color: rgba(0,0,0,.25)"
-            />
+        <a-form-model-item v-if="!mfaUsed" label="2. 验证两步验证码" prop="authcode">
+          <a-input v-model="mfaParam.authcode" :maxLength="6">
+            <a-icon slot="prefix" type="safety-certificate" style="color: rgba(0,0,0,.25)" />
           </a-input>
         </a-form-model-item>
       </a-form-model>

@@ -20,19 +20,19 @@ import attachmentApi from '@/api/attachment'
 export default {
   name: 'MarkdownEditor',
   components: {
-    haloEditor,
+    haloEditor
   },
   props: {
     originalContent: {
       type: String,
       required: false,
-      default: '',
-    },
+      default: ''
+    }
   },
   data() {
     return {
       toolbars,
-      originalContentData: '',
+      originalContentData: ''
     }
   },
   watch: {
@@ -41,13 +41,13 @@ export default {
     },
     originalContentData(val) {
       this.$emit('onContentChange', val)
-    },
+    }
   },
   methods: {
     handleAttachmentUpload(pos, $file) {
       var formdata = new FormData()
       formdata.append('file', $file)
-      attachmentApi.upload(formdata).then((response) => {
+      attachmentApi.upload(formdata).then(response => {
         var responseObject = response.data
         var HaloEditor = this.$refs.md
         HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
@@ -55,7 +55,7 @@ export default {
     },
     handleSaveDraft() {
       this.$emit('onSaveDraft')
-    },
-  },
+    }
+  }
 }
 </script>

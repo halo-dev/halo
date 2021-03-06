@@ -1,8 +1,5 @@
 <template>
-  <page-view
-    affix
-    :title="sheetToStage.title?sheetToStage.title:'新页面'"
-  >
+  <page-view affix :title="sheetToStage.title ? sheetToStage.title : '新页面'">
     <template slot="extra">
       <a-space>
         <ReactiveButton
@@ -15,28 +12,15 @@
           loadedText="保存成功"
           erroredText="保存失败"
         ></ReactiveButton>
-        <a-button
-          @click="handlePreview"
-          :loading="previewSaving"
-        >预览</a-button>
-        <a-button
-          type="primary"
-          @click="sheetSettingVisible = true"
-        >发布</a-button>
-        <a-button
-          type="dashed"
-          @click="attachmentDrawerVisible = true"
-        >附件库</a-button>
+        <a-button @click="handlePreview" :loading="previewSaving">预览</a-button>
+        <a-button type="primary" @click="sheetSettingVisible = true">发布</a-button>
+        <a-button type="dashed" @click="attachmentDrawerVisible = true">附件库</a-button>
       </a-space>
     </template>
     <a-row :gutter="12">
       <a-col :span="24">
         <div class="mb-4">
-          <a-input
-            v-model="sheetToStage.title"
-            size="large"
-            placeholder="请输入页面标题"
-          />
+          <a-input v-model="sheetToStage.title" size="large" placeholder="请输入页面标题" />
         </div>
 
         <div id="editor">
@@ -76,7 +60,6 @@ import { datetimeFormat } from '@/utils/datetime'
 import { PageView } from '@/layouts'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
-import FooterToolBar from '@/components/FooterToolbar'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 // import RichTextEditor from '@/components/editor/RichTextEditor'
 
@@ -84,10 +67,9 @@ import sheetApi from '@/api/sheet'
 export default {
   components: {
     PageView,
-    FooterToolBar,
     AttachmentDrawer,
     SheetSettingDrawer,
-    MarkdownEditor,
+    MarkdownEditor
     // RichTextEditor
   },
   mixins: [mixin, mixinDevice],
@@ -100,16 +82,16 @@ export default {
       contentChanges: 0,
       draftSaving: false,
       draftSavederrored: false,
-      previewSaving: false,
+      previewSaving: false
     }
   },
   beforeRouteEnter(to, from, next) {
     // Get sheetId id from query
     const sheetId = to.query.sheetId
 
-    next((vm) => {
+    next(vm => {
       if (sheetId) {
-        sheetApi.get(sheetId).then((response) => {
+        sheetApi.get(sheetId).then(response => {
           const sheet = response.data.data
           vm.sheetToStage = sheet
           vm.selectedMetas = sheet.metas
@@ -140,13 +122,13 @@ export default {
     } else {
       this.$confirm({
         title: '当前页面数据未保存，确定要离开吗？',
-        content: (h) => <div style="color:red;">如果离开当面页面，你的数据很可能会丢失！</div>,
+        content: () => <div style="color:red;">如果离开当面页面，你的数据很可能会丢失！</div>,
         onOk() {
           next()
         },
         onCancel() {
           next(false)
-        },
+        }
       })
     }
   },
@@ -163,16 +145,16 @@ export default {
     // }
   },
   watch: {
-    temporaryContent: function(newValue, oldValue) {
+    temporaryContent(newValue) {
       if (newValue) {
         this.contentChanges++
       }
-    },
+    }
   },
   computed: {
     temporaryContent() {
       return this.sheetToStage.originalContent
-    },
+    }
     // ...mapGetters(['options'])
   },
   methods: {
@@ -187,7 +169,7 @@ export default {
         if (draftOnly) {
           sheetApi
             .updateDraft(this.sheetToStage.id, this.sheetToStage.originalContent)
-            .then((response) => {
+            .then(() => {
               this.handleRestoreSavedStatus()
             })
             .catch(() => {
@@ -201,7 +183,7 @@ export default {
         } else {
           sheetApi
             .update(this.sheetToStage.id, this.sheetToStage, false)
-            .then((response) => {
+            .then(response => {
               this.sheetToStage = response.data.data
               this.handleRestoreSavedStatus()
             })
@@ -217,7 +199,7 @@ export default {
       } else {
         sheetApi
           .create(this.sheetToStage, false)
-          .then((response) => {
+          .then(response => {
             this.sheetToStage = response.data.data
             this.handleRestoreSavedStatus()
           })
@@ -238,11 +220,11 @@ export default {
       }
       this.previewSaving = true
       if (this.sheetToStage.id) {
-        sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then((response) => {
+        sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
           this.$log.debug('Updated sheet', response.data.data)
           sheetApi
             .preview(this.sheetToStage.id)
-            .then((response) => {
+            .then(response => {
               window.open(response.data, '_blank')
               this.handleRestoreSavedStatus()
             })
@@ -253,12 +235,12 @@ export default {
             })
         })
       } else {
-        sheetApi.create(this.sheetToStage, false).then((response) => {
+        sheetApi.create(this.sheetToStage, false).then(response => {
           this.$log.debug('Created sheet', response.data.data)
           this.sheetToStage = response.data.data
           sheetApi
             .preview(this.sheetToStage.id)
-            .then((response) => {
+            .then(response => {
               window.open(response.data, '_blank')
               this.handleRestoreSavedStatus()
             })
@@ -281,7 +263,7 @@ export default {
     },
     onRefreshSheetMetasFromSetting(metas) {
       this.selectedMetas = metas
-    },
-  },
+    }
+  }
 }
 </script>

@@ -105,6 +105,6 @@ sheetApi.permalinkType = {
   ROOT: {
     type: 'ROOT',
     text: '根路径'
-  },
+  }
 }
 export default sheetApi

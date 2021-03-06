@@ -9,25 +9,19 @@
       :dataSource="independentSheets"
       :loading="loading"
     >
-      <a-list-item
-        slot="renderItem"
-        slot-scope="item, index"
-        :key="index"
-      >
+      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
         <template slot="actions">
           <span>
-            <router-link :to="{name:item.routeName}">
+            <router-link :to="{ name: item.routeName }">
               <a-icon type="edit" />
             </router-link>
           </span>
         </template>
         <template slot="extra">
           <span v-if="item.available">可用</span>
-          <span v-else>不可用
-            <a-tooltip
-              slot="action"
-              title="当前主题没有对应模板"
-            >
+          <span v-else
+            >不可用
+            <a-tooltip slot="action" title="当前主题没有对应模板">
               <a-icon type="info-circle-o" />
             </a-tooltip>
           </span>
@@ -37,19 +31,9 @@
             slot="title"
             style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
-            <a
-              :href="item.fullPath"
-              target="_blank"
-              v-if="item.available"
-            >{{ item.title }}</a>
-            <a
-              :href="item.fullPath"
-              target="_blank"
-              disabled
-              v-else
-            >{{ item.title }}</a>
+            <a :href="item.fullPath" target="_blank" v-if="item.available">{{ item.title }}</a>
+            <a :href="item.fullPath" target="_blank" disabled v-else>{{ item.title }}</a>
           </span>
-
         </a-list-item-meta>
       </a-list-item>
     </a-list>
@@ -63,39 +47,22 @@
       :rowKey="sheet => sheet.id"
       :loading="loading"
     >
-      <template
-        slot="available"
-        slot-scope="available"
-      >
+      <template slot="available" slot-scope="available">
         <span v-if="available">可用</span>
-        <span v-else>不可用
-          <a-tooltip
-            slot="action"
-            title="当前主题没有对应模板"
-          >
+        <span v-else
+          >不可用
+          <a-tooltip slot="action" title="当前主题没有对应模板">
             <a-icon type="info-circle-o" />
           </a-tooltip>
         </span>
       </template>
-      <span
-        slot="action"
-        slot-scope="text, record"
-      >
-        <router-link :to="{name:record.routeName}">
+      <span slot="action" slot-scope="text, record">
+        <router-link :to="{ name: record.routeName }">
           <a href="javascript:void(0);">管理</a>
         </router-link>
         <a-divider type="vertical" />
-        <a
-          :href="record.fullPath"
-          target="_blank"
-          v-if="record.available"
-        >访问</a>
-        <a
-          :href="record.fullPath"
-          target="_blank"
-          disabled
-          v-else
-        >访问</a>
+        <a :href="record.fullPath" target="_blank" v-if="record.available">访问</a>
+        <a :href="record.fullPath" target="_blank" disabled v-else>访问</a>
       </span>
     </a-table>
   </div>

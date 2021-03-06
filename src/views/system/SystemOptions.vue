@@ -1,157 +1,125 @@
 <template>
-  <page-view :title="advancedOptions?'高级选项':'基础选项'">
+  <page-view :title="advancedOptions ? '高级选项' : '基础选项'">
     <template slot="extra">
-      <a-button
-        type="link"
-        @click="advancedOptions = !advancedOptions"
-        style="padding:0"
-      >
-        切换到{{ advancedOptions?'基础选项':'高级选项' }}
+      <a-button type="link" @click="advancedOptions = !advancedOptions" style="padding:0">
+        切换到{{ advancedOptions ? '基础选项' : '高级选项' }}
       </a-button>
     </template>
     <a-row>
       <a-col :span="24">
         <div class="card-container">
-          <a-tabs
-            type="card"
-            class="general"
-            v-if="!advancedOptions"
-          >
+          <a-tabs type="card" class="general" v-if="!advancedOptions">
             <a-tab-pane key="general">
-              <span slot="tab">
-                <a-icon type="tool" />常规设置
-              </span>
+              <span slot="tab"> <a-icon type="tool" />常规设置 </span>
               <GeneralTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
             <a-tab-pane key="seo">
-              <span slot="tab">
-                <a-icon type="global" />SEO 设置
-              </span>
+              <span slot="tab"> <a-icon type="global" />SEO 设置 </span>
               <SeoTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
             <a-tab-pane key="post">
-              <span slot="tab">
-                <a-icon type="form" />文章设置
-              </span>
+              <span slot="tab"> <a-icon type="form" />文章设置 </span>
               <PostTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
             <a-tab-pane key="comment">
-              <span slot="tab">
-                <a-icon type="message" />评论设置
-              </span>
+              <span slot="tab"> <a-icon type="message" />评论设置 </span>
               <CommentTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
             <a-tab-pane key="attachment">
-              <span slot="tab">
-                <a-icon type="picture" />附件设置
-              </span>
+              <span slot="tab"> <a-icon type="picture" />附件设置 </span>
               <AttachmentTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
             <a-tab-pane key="smtp">
-              <span slot="tab">
-                <a-icon type="mail" />SMTP 服务
-              </span>
+              <span slot="tab"> <a-icon type="mail" />SMTP 服务 </span>
               <SmtpTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
             <a-tab-pane key="other">
-              <span slot="tab">
-                <a-icon type="align-left" />其他设置
-              </span>
+              <span slot="tab"> <a-icon type="align-left" />其他设置 </span>
               <OtherTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
           </a-tabs>
 
-          <a-tabs
-            type="card"
-            class="advanced"
-            v-else
-          >
+          <a-tabs type="card" class="advanced" v-else>
             <a-tab-pane key="permalink">
-              <span slot="tab">
-                <a-icon type="link" />固定链接
-              </span>
+              <span slot="tab"> <a-icon type="link" />固定链接 </span>
               <PermalinkTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
             <a-tab-pane key="api">
-              <span slot="tab">
-                <a-icon type="api" />API 设置
-              </span>
+              <span slot="tab"> <a-icon type="api" />API 设置 </span>
               <ApiTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
             <a-tab-pane key="advanced-other">
-              <span slot="tab">
-                <a-icon type="align-left" />其他设置
-              </span>
+              <span slot="tab"> <a-icon type="align-left" />其他设置 </span>
               <AdvancedOtherTab
                 :options="options"
                 @onChange="onOptionsChange"
                 @onSave="onSaveOptions"
                 :saving="saving"
                 :errored="errored"
-                @callback="errored=false"
+                @callback="errored = false"
               />
             </a-tab-pane>
           </a-tabs>
@@ -187,14 +155,14 @@ export default {
     OtherTab,
     PermalinkTab,
     ApiTab,
-    AdvancedOtherTab,
+    AdvancedOtherTab
   },
   data() {
     return {
       options: {},
       advancedOptions: false,
       saving: false,
-      errored: false,
+      errored: false
     }
   },
   created() {
@@ -203,7 +171,7 @@ export default {
   methods: {
     ...mapActions(['refreshUserCache', 'refreshOptionsCache']),
     hanldeListOptions() {
-      optionApi.listAll().then((response) => {
+      optionApi.listAll().then(response => {
         this.options = response.data.data
       })
     },
@@ -225,7 +193,7 @@ export default {
           this.refreshOptionsCache()
           this.refreshUserCache()
         })
-    },
-  },
+    }
+  }
 }
 </script>

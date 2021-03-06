@@ -12,7 +12,7 @@ photoApi.query = params => {
   })
 }
 
-photoApi.create = (photo) => {
+photoApi.create = photo => {
   return service({
     url: baseUrl,
     data: photo,

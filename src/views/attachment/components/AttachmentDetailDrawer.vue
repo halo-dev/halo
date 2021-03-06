@@ -1,36 +1,20 @@
 <template>
   <a-drawer
     title="附件详情"
-    :width="isMobile()?'100%':'480'"
+    :width="isMobile() ? '100%' : '480'"
     closable
     :visible="visible"
     destroyOnClose
     @close="onClose"
   >
-    <a-row
-      type="flex"
-      align="middle"
-    >
+    <a-row type="flex" align="middle">
       <a-col :span="24">
         <div class="attach-detail-img">
           <div v-show="nonsupportPreviewVisible">此文件不支持预览</div>
-          <a
-            :href="attachment.path"
-            target="_blank"
-          >
-            <img
-              :src="attachment.path"
-              v-show="photoPreviewVisible"
-              class="w-full"
-              loading="lazy"
-            >
+          <a :href="attachment.path" target="_blank">
+            <img :src="attachment.path" v-show="photoPreviewVisible" class="w-full" loading="lazy" />
           </a>
-          <d-player
-            ref="player"
-            :options="videoOptions"
-            v-show="videoPreviewVisible"
-            class="video-player-box w-full"
-          >
+          <d-player ref="player" :options="videoOptions" v-show="videoPreviewVisible" class="w-full video-player-box">
           </d-player>
         </div>
       </a-col>
@@ -39,27 +23,14 @@
         <a-list itemLayout="horizontal">
           <a-list-item>
             <a-list-item-meta>
-              <template
-                slot="description"
-                v-if="editable"
-              >
-                <a-input
-                  ref="nameInput"
-                  v-model="attachment.name"
-                  @blur="doUpdateAttachment"
-                />
+              <template slot="description" v-if="editable">
+                <a-input ref="nameInput" v-model="attachment.name" @blur="doUpdateAttachment" />
               </template>
-              <template
-                slot="description"
-                v-else
-              >{{ attachment.name }}</template>
+              <template slot="description" v-else>{{ attachment.name }}</template>
               <span slot="title">
                 附件名：
                 <a href="javascript:void(0);">
-                  <a-icon
-                    type="edit"
-                    @click="handleEditName"
-                  />
+                  <a-icon type="edit" @click="handleEditName" />
                 </a>
               </span>
             </a-list-item-meta>
@@ -83,7 +54,7 @@
             </a-list-item-meta>
           </a-list-item>
           <a-list-item v-if="photoPreviewVisible">
-            <a-list-item-meta :description="attachment.height+'x'+attachment.width">
+            <a-list-item-meta :description="attachment.height + 'x' + attachment.width">
               <span slot="title">图片尺寸：</span>
             </a-list-item-meta>
           </a-list-item>
@@ -99,10 +70,7 @@
             <a-list-item-meta :description="attachment.path">
               <span slot="title">
                 普通链接：
-                <a
-                  href="javascript:void(0);"
-                  @click="handleCopyNormalLink"
-                >
+                <a href="javascript:void(0);" @click="handleCopyNormalLink">
                   <a-icon type="copy" />
                 </a>
               </span>
@@ -113,10 +81,7 @@
               <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
               <span slot="title">
                 Markdown 格式：
-                <a
-                  href="javascript:void(0);"
-                  @click="handleCopyMarkdownLink"
-                >
+                <a href="javascript:void(0);" @click="handleCopyMarkdownLink">
                   <a-icon type="copy" />
                 </a>
               </span>
@@ -137,12 +102,7 @@
         >
           <a-button type="dashed">添加到图库</a-button>
         </a-popconfirm>
-        <a-popconfirm
-          title="你确定要删除该附件？"
-          @confirm="handleDeleteAttachment"
-          okText="确定"
-          cancelText="取消"
-        >
+        <a-popconfirm title="你确定要删除该附件？" @confirm="handleDeleteAttachment" okText="确定" cancelText="取消">
           <ReactiveButton
             type="danger"
             @callback="handleDeletedCallback"
@@ -171,7 +131,7 @@ export default {
   name: 'AttachmentDetailDrawer',
   mixins: [mixin, mixinDevice],
   components: {
-    'd-player': VueDPlayer,
+    'd-player': VueDPlayer
   },
   data() {
     return {
@@ -187,40 +147,40 @@ export default {
         lang: 'zh-cn',
         video: {
           url: '',
-          type: 'auto',
-        },
-      },
+          type: 'auto'
+        }
+      }
     }
   },
   model: {
     prop: 'visible',
-    event: 'close',
+    event: 'close'
   },
   props: {
     attachment: {
       type: Object,
-      required: true,
+      required: true
     },
     addToPhoto: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     },
     visible: {
       type: Boolean,
       required: false,
-      default: true,
-    },
+      default: true
+    }
   },
   mounted() {
     this.player = this.$refs.player
   },
   watch: {
-    attachment: function(newValue, oldValue) {
+    attachment(newValue) {
       if (newValue) {
         this.handleJudgeMediaType(newValue)
       }
-    },
+    }
   },
   methods: {
     handleDeleteAttachment() {
@@ -253,11 +213,11 @@ export default {
       if (!this.attachment.name) {
         this.$notification['error']({
           message: '提示',
-          description: '附件名称不能为空！',
+          description: '附件名称不能为空！'
         })
         return
       }
-      attachmentApi.update(this.attachment.id, this.attachment).then((response) => {
+      attachmentApi.update(this.attachment.id, this.attachment).then(response => {
         this.$log.debug('Updated attachment', response.data.data)
       })
       this.editable = false
@@ -265,11 +225,11 @@ export default {
     handleCopyNormalLink() {
       const text = `${encodeURI(this.attachment.path)}`
       this.$copyText(text)
-        .then((message) => {
+        .then(message => {
           this.$log.debug('copy', message)
           this.$message.success('复制成功！')
         })
-        .catch((err) => {
+        .catch(err => {
           this.$log.debug('copy.err', err)
           this.$message.error('复制失败！')
         })
@@ -277,11 +237,11 @@ export default {
     handleCopyMarkdownLink() {
       const text = `![${this.attachment.name}](${encodeURI(this.attachment.path)})`
       this.$copyText(text)
-        .then((message) => {
+        .then(message => {
           this.$log.debug('copy', message)
           this.$message.success('复制成功！')
         })
-        .catch((err) => {
+        .catch(err => {
           this.$log.debug('copy.err', err)
           this.$message.error('复制失败！')
         })
@@ -291,7 +251,7 @@ export default {
       this.photo['thumbnail'] = encodeURI(this.attachment.thumbPath)
       this.photo['url'] = encodeURI(this.attachment.path)
       this.photo['takeTime'] = new Date().getTime()
-      photoApi.create(this.photo).then((response) => {
+      photoApi.create(this.photo).then(() => {
         this.$message.success('添加成功！')
         this.photo = {}
       })
@@ -328,7 +288,7 @@ export default {
       this.$set(this, 'photoPreviewVisible', photo)
       this.$set(this, 'videoPreviewVisible', video)
       this.$set(this, 'nonsupportPreviewVisible', nonsupport)
-    },
-  },
+    }
+  }
 }
 </script>

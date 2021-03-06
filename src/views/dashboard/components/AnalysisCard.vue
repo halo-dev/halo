@@ -1,8 +1,5 @@
 <template>
-  <a-card
-    :body-style="{ padding: '24px' }"
-    :bordered="false"
-  >
+  <a-card :body-style="{ padding: '24px' }" :bordered="false">
     <div class="analysis-card-container">
       <div class="meta">
         <span class="analysis-card-title">
@@ -16,7 +13,7 @@
         <slot name="number">
           <countTo
             :startVal="startNumber"
-            :endVal="typeof number === 'function' && number() || number"
+            :endVal="(typeof number === 'function' && number()) || number"
             :duration="3000"
             :autoplay="true"
           ></countTo>

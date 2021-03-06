@@ -42,45 +42,45 @@ const FilePond = vueFilePond(FilePondPluginImagePreview, FilePondPluginFileValid
 export default {
   name: 'FilePondUpload',
   components: {
-    FilePond,
+    FilePond
   },
   props: {
     name: {
       type: String,
       required: false,
-      default: 'file',
+      default: 'file'
     },
     filed: {
       type: String,
       required: false,
-      default: '',
+      default: ''
     },
     multiple: {
       type: Boolean,
       required: false,
-      default: true,
+      default: true
     },
     accepts: {
       type: Array,
       required: false,
       default: () => {
         return []
-      },
+      }
     },
     label: {
       type: String,
       required: false,
-      default: '点击选择文件或将文件拖拽到此处',
+      default: '点击选择文件或将文件拖拽到此处'
     },
     uploadHandler: {
       type: Function,
-      required: true,
+      required: true
     },
     loadOptions: {
       type: Boolean,
       required: false,
-      default: true,
-    },
+      default: true
+    }
   },
   computed: {
     ...mapGetters(['options']),
@@ -101,7 +101,7 @@ export default {
         return this.options.attachment_upload_max_files
       }
       return 1
-    },
+    }
   },
   data: function() {
     return {
@@ -115,7 +115,7 @@ export default {
 
           this.uploadHandler(
             formData,
-            (progressEvent) => {
+            progressEvent => {
               if (progressEvent.total > 0) {
                 progress(progressEvent.lengthComputable, progressEvent.loaded, progressEvent.total)
               }
@@ -124,12 +124,12 @@ export default {
             this.filed,
             file
           )
-            .then((response) => {
+            .then(response => {
               load(response)
               this.$log.debug('Uploaded successfully', response)
               this.$emit('success', response, file)
             })
-            .catch((failure) => {
+            .catch(failure => {
               this.$log.debug('Failed to upload file', failure)
               this.$emit('failure', failure, file)
               error()
@@ -139,11 +139,11 @@ export default {
               abort()
               this.$log.debug('Upload operation aborted by the user')
               source.cancel('Upload operation canceled by the user.')
-            },
+            }
           }
-        },
+        }
       },
-      fileList: [],
+      fileList: []
     }
   },
   methods: {
@@ -152,7 +152,7 @@ export default {
     },
     handleClearFileList() {
       this.$refs.pond.removeFiles()
-    },
-  },
+    }
+  }
 }
 </script>

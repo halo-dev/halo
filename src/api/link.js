@@ -11,7 +11,7 @@ linkApi.listAll = () => {
   })
 }
 
-linkApi.create = (link) => {
+linkApi.create = link => {
   return service({
     url: baseUrl,
     data: link,

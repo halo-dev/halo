@@ -1,48 +1,24 @@
 <template>
   <page-view>
-    <a-card
-      :bordered="false"
-      :bodyStyle="{ padding: '16px' }"
-    >
+    <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
-            <a-col
-              :md="6"
-              :sm="24"
-            >
+            <a-col :md="6" :sm="24">
               <a-form-item label="关键词：">
-                <a-input
-                  v-model="queryParam.keyword"
-                  @keyup.enter="handleQuery()"
-                />
+                <a-input v-model="queryParam.keyword" @keyup.enter="handleQuery()" />
               </a-form-item>
             </a-col>
-            <a-col
-              :md="6"
-              :sm="24"
-            >
+            <a-col :md="6" :sm="24">
               <a-form-item label="文章状态：">
-                <a-select
-                  v-model="queryParam.status"
-                  placeholder="请选择文章状态"
-                  @change="handleQuery()"
-                  allowClear
-                >
-                  <a-select-option
-                    v-for="status in Object.keys(postStatus)"
-                    :key="status"
-                    :value="status"
-                  >{{
+                <a-select v-model="queryParam.status" placeholder="请选择文章状态" @change="handleQuery()" allowClear>
+                  <a-select-option v-for="status in Object.keys(postStatus)" :key="status" :value="status">{{
                     postStatus[status].text
                   }}</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
-            <a-col
-              :md="6"
-              :sm="24"
-            >
+            <a-col :md="6" :sm="24">
               <a-form-item label="分类目录：">
                 <a-select
                   v-model="queryParam.categoryId"
@@ -51,24 +27,17 @@
                   :loading="categoriesLoading"
                   allowClear
                 >
-                  <a-select-option
-                    v-for="category in categories"
-                    :key="category.id"
-                  >{{ category.name }}({{ category.postCount }})</a-select-option>
+                  <a-select-option v-for="category in categories" :key="category.id"
+                    >{{ category.name }}({{ category.postCount }})</a-select-option
+                  >
                 </a-select>
               </a-form-item>
             </a-col>
 
-            <a-col
-              :md="6"
-              :sm="24"
-            >
+            <a-col :md="6" :sm="24">
               <span class="table-page-search-submitButtons">
                 <a-space>
-                  <a-button
-                    type="primary"
-                    @click="handleQuery()"
-                  >查询</a-button>
+                  <a-button type="primary" @click="handleQuery()">查询</a-button>
                   <a-button @click="handleResetParam()">重置</a-button>
                 </a-space>
               </span>
@@ -79,21 +48,12 @@
 
       <div class="table-operator">
         <router-link :to="{ name: 'PostWrite' }">
-          <a-button
-            type="primary"
-            icon="plus"
-          >写文章</a-button>
+          <a-button type="primary" icon="plus">写文章</a-button>
         </router-link>
         <a-dropdown v-show="queryParam.status != null && queryParam.status != '' && !isMobile()">
           <a-menu slot="overlay">
-            <a-menu-item
-              key="1"
-              v-if="queryParam.status === 'DRAFT' || queryParam.status === 'RECYCLE'"
-            >
-              <a
-                href="javascript:void(0);"
-                @click="handleEditStatusMore(postStatus.PUBLISHED.value)"
-              >
+            <a-menu-item key="1" v-if="queryParam.status === 'DRAFT' || queryParam.status === 'RECYCLE'">
+              <a href="javascript:void(0);" @click="handleEditStatusMore(postStatus.PUBLISHED.value)">
                 <span>发布</span>
               </a>
             </a-menu-item>
@@ -103,10 +63,7 @@
                 queryParam.status === 'PUBLISHED' || queryParam.status === 'DRAFT' || queryParam.status === 'INTIMATE'
               "
             >
-              <a
-                href="javascript:void(0);"
-                @click="handleEditStatusMore(postStatus.RECYCLE.value)"
-              >
+              <a href="javascript:void(0);" @click="handleEditStatusMore(postStatus.RECYCLE.value)">
                 <span>移到回收站</span>
               </a>
             </a-menu-item>
@@ -116,21 +73,12 @@
                 queryParam.status === 'RECYCLE' || queryParam.status === 'PUBLISHED' || queryParam.status === 'INTIMATE'
               "
             >
-              <a
-                href="javascript:void(0);"
-                @click="handleEditStatusMore(postStatus.DRAFT.value)"
-              >
+              <a href="javascript:void(0);" @click="handleEditStatusMore(postStatus.DRAFT.value)">
                 <span>草稿</span>
               </a>
             </a-menu-item>
-            <a-menu-item
-              key="4"
-              v-if="queryParam.status === 'RECYCLE' || queryParam.status === 'DRAFT'"
-            >
-              <a
-                href="javascript:void(0);"
-                @click="handleDeleteMore"
-              >
+            <a-menu-item key="4" v-if="queryParam.status === 'RECYCLE' || queryParam.status === 'DRAFT'">
+              <a href="javascript:void(0);" @click="handleDeleteMore">
                 <span>永久删除</span>
               </a>
             </a-menu-item>
@@ -151,11 +99,7 @@
           :dataSource="formattedPosts"
           :loading="postsLoading"
         >
-          <a-list-item
-            slot="renderItem"
-            slot-scope="item, index"
-            :key="index"
-          >
+          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
             <template slot="actions">
               <span>
                 <a-icon type="eye" />
@@ -165,19 +109,15 @@
                 <a-icon type="message" />
                 {{ item.commentCount }}
               </span>
-              <a-dropdown
-                placement="topLeft"
-                :trigger="['click']"
-              >
+              <a-dropdown placement="topLeft" :trigger="['click']">
                 <span>
                   <a-icon type="bars" />
                 </span>
                 <a-menu slot="overlay">
-                  <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT' || item.status === 'INTIMATE'">
-                    <a
-                      href="javascript:;"
-                      @click="handleEditClick(item)"
-                    >编辑</a>
+                  <a-menu-item
+                    v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT' || item.status === 'INTIMATE'"
+                  >
+                    <a href="javascript:;" @click="handleEditClick(item)">编辑</a>
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
                     <a-popconfirm
@@ -189,7 +129,9 @@
                       <a href="javascript:;">还原</a>
                     </a-popconfirm>
                   </a-menu-item>
-                  <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT' || item.status === 'INTIMATE'">
+                  <a-menu-item
+                    v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT' || item.status === 'INTIMATE'"
+                  >
                     <a-popconfirm
                       :title="'你确定要将【' + item.title + '】文章移到回收站？'"
                       @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
@@ -210,21 +152,16 @@
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item>
-                    <a
-                      rel="noopener noreferrer"
-                      href="javascript:void(0);"
-                      @click="handleShowPostSettings(item)"
-                    >设置</a>
+                    <a rel="noopener noreferrer" href="javascript:void(0);" @click="handleShowPostSettings(item)"
+                      >设置</a
+                    >
                   </a-menu-item>
                 </a-menu>
               </a-dropdown>
             </template>
             <template slot="extra">
               <span>
-                <a-badge
-                  :status="item.statusProperty.status"
-                  :text="item.statusProperty.text"
-                />
+                <a-badge :status="item.statusProperty.status" :text="item.statusProperty.text" />
               </span>
             </template>
             <a-list-item-meta>
@@ -248,10 +185,7 @@
                   target="_blank"
                   class="no-underline"
                 >
-                  <a-tooltip
-                    placement="top"
-                    :title="'点击访问【' + item.title + '】'"
-                  >{{ item.title }}</a-tooltip>
+                  <a-tooltip placement="top" :title="'点击访问【' + item.title + '】'">{{ item.title }}</a-tooltip>
                 </a>
                 <a
                   v-else-if="item.status == 'DRAFT'"
@@ -259,17 +193,9 @@
                   class="no-underline"
                   @click="handlePreview(item.id)"
                 >
-                  <a-tooltip
-                    placement="topLeft"
-                    :title="'点击预览【' + item.title + '】'"
-                  >{{ item.title }}</a-tooltip>
+                  <a-tooltip placement="topLeft" :title="'点击预览【' + item.title + '】'">{{ item.title }}</a-tooltip>
                 </a>
-                <a
-                  v-else
-                  href="javascript:void(0);"
-                  class="no-underline"
-                  disabled
-                >
+                <a v-else href="javascript:void(0);" class="no-underline" disabled>
                   {{ item.title }}
                 </a>
               </span>
@@ -283,14 +209,16 @@
               color="blue"
               @click="handleSelectCategory(category)"
               style="margin-bottom: 8px"
-            >{{ category.name }}</a-tag>
+              >{{ category.name }}</a-tag
+            >
             <br />
             <a-tag
               v-for="(tag, tagIndex) in item.tags"
               :key="'tag_' + tagIndex"
               color="green"
               style="margin-bottom: 8px"
-            >{{ tag.name }}</a-tag>
+              >{{ tag.name }}</a-tag
+            >
           </a-list-item>
         </a-list>
 
@@ -309,10 +237,7 @@
           :pagination="false"
           :scrollToFirstRowOnChange="true"
         >
-          <span
-            slot="postTitle"
-            slot-scope="text, record"
-          >
+          <span slot="postTitle" slot-scope="text, record">
             <a-icon
               type="pushpin"
               v-if="record.topPriority != 0"
@@ -326,10 +251,7 @@
               target="_blank"
               class="no-underline"
             >
-              <a-tooltip
-                placement="top"
-                :title="'点击访问【' + text + '】'"
-              >{{ text }}</a-tooltip>
+              <a-tooltip placement="top" :title="'点击访问【' + text + '】'">{{ text }}</a-tooltip>
             </a>
             <a
               v-else-if="record.status == 'DRAFT'"
@@ -337,55 +259,29 @@
               class="no-underline"
               @click="handlePreview(record.id)"
             >
-              <a-tooltip
-                placement="topLeft"
-                :title="'点击预览【' + text + '】'"
-              >{{ text }}</a-tooltip>
+              <a-tooltip placement="topLeft" :title="'点击预览【' + text + '】'">{{ text }}</a-tooltip>
             </a>
-            <a
-              v-else
-              href="javascript:void(0);"
-              class="no-underline"
-              disabled
-            >
+            <a v-else href="javascript:void(0);" class="no-underline" disabled>
               {{ text }}
             </a>
           </span>
-          <span
-            slot="status"
-            slot-scope="statusProperty"
-          >
-            <a-badge
-              :status="statusProperty.status"
-              :text="statusProperty.text"
-            />
+          <span slot="status" slot-scope="statusProperty">
+            <a-badge :status="statusProperty.status" :text="statusProperty.text" />
           </span>
 
-          <span
-            slot="categories"
-            slot-scope="categoriesOfPost"
-          >
+          <span slot="categories" slot-scope="categoriesOfPost">
             <a-tag
               v-for="(category, index) in categoriesOfPost"
               :key="index"
               color="blue"
               @click="handleSelectCategory(category)"
               style="margin-bottom: 8px;cursor:pointer"
-            >{{
-              category.name
-            }}</a-tag>
+              >{{ category.name }}</a-tag
+            >
           </span>
 
-          <span
-            slot="tags"
-            slot-scope="tags"
-          >
-            <a-tag
-              v-for="(tag, index) in tags"
-              :key="index"
-              color="green"
-              style="margin-bottom: 8px"
-            >{{
+          <span slot="tags" slot-scope="tags">
+            <a-tag v-for="(tag, index) in tags" :key="index" color="green" style="margin-bottom: 8px">{{
               tag.name
             }}</a-tag>
           </span>
@@ -404,10 +300,7 @@
             />
           </span>
 
-          <span
-            slot="visits"
-            slot-scope="visits"
-          >
+          <span slot="visits" slot-scope="visits">
             <a-badge
               :count="visits"
               :numberStyle="{ backgroundColor: '#00e0ff' }"
@@ -416,10 +309,7 @@
             />
           </span>
 
-          <span
-            slot="createTime"
-            slot-scope="createTime"
-          >
+          <span slot="createTime" slot-scope="createTime">
             <a-tooltip placement="top">
               <template slot="title">
                 {{ createTime | moment }}
@@ -428,15 +318,13 @@
             </a-tooltip>
           </span>
 
-          <span
-            slot="action"
-            slot-scope="text, post"
-          >
+          <span slot="action" slot-scope="text, post">
             <a
               href="javascript:;"
               @click="handleEditClick(post)"
               v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT' || post.status === 'INTIMATE'"
-            >编辑</a>
+              >编辑</a
+            >
             <a-popconfirm
               :title="'你确定要发布【' + post.title + '】文章？'"
               @confirm="handleEditStatusClick(post.id, 'PUBLISHED')"
@@ -471,10 +359,7 @@
 
             <a-divider type="vertical" />
 
-            <a
-              href="javascript:;"
-              @click="handleShowPostSettings(post)"
-            >设置</a>
+            <a href="javascript:;" @click="handleShowPostSettings(post)">设置</a>
           </span>
         </a-table>
         <div class="page-wrapper">
@@ -525,8 +410,6 @@ import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { PageView } from '@/layouts'
 import PostSettingDrawer from './components/PostSettingDrawer'
 import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
-import TagSelect from './components/TagSelect'
-import CategoryTree from './components/CategoryTree'
 import categoryApi from '@/api/category'
 import postApi from '@/api/post'
 
@@ -536,57 +419,55 @@ const columns = [
     dataIndex: 'title',
     width: '150px',
     ellipsis: true,
-    scopedSlots: { customRender: 'postTitle' },
+    scopedSlots: { customRender: 'postTitle' }
   },
   {
     title: '状态',
     className: 'status',
     dataIndex: 'statusProperty',
     width: '100px',
-    scopedSlots: { customRender: 'status' },
+    scopedSlots: { customRender: 'status' }
   },
   {
     title: '分类',
     dataIndex: 'categories',
-    scopedSlots: { customRender: 'categories' },
+    scopedSlots: { customRender: 'categories' }
   },
   {
     title: '标签',
     dataIndex: 'tags',
-    scopedSlots: { customRender: 'tags' },
+    scopedSlots: { customRender: 'tags' }
   },
   {
     title: '评论',
     width: '70px',
     dataIndex: 'commentCount',
-    scopedSlots: { customRender: 'commentCount' },
+    scopedSlots: { customRender: 'commentCount' }
   },
   {
     title: '访问',
     width: '70px',
     dataIndex: 'visits',
-    scopedSlots: { customRender: 'visits' },
+    scopedSlots: { customRender: 'visits' }
   },
   {
     title: '发布时间',
     dataIndex: 'createTime',
     width: '170px',
-    scopedSlots: { customRender: 'createTime' },
+    scopedSlots: { customRender: 'createTime' }
   },
   {
     title: '操作',
     width: '180px',
-    scopedSlots: { customRender: 'action' },
-  },
+    scopedSlots: { customRender: 'action' }
+  }
 ]
 export default {
   name: 'PostList',
   components: {
     PageView,
-    TagSelect,
-    CategoryTree,
     PostSettingDrawer,
-    TargetCommentDrawer,
+    TargetCommentDrawer
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -596,7 +477,7 @@ export default {
         page: 1,
         size: 10,
         sort: null,
-        total: 1,
+        total: 1
       },
       queryParam: {
         page: 0,
@@ -604,7 +485,7 @@ export default {
         sort: null,
         keyword: null,
         categoryId: null,
-        status: null,
+        status: null
       },
       // 表头
       columns,
@@ -613,8 +494,8 @@ export default {
       selectedMetas: [
         {
           key: '',
-          value: '',
-        },
+          value: ''
+        }
       ],
       posts: [],
       postsLoading: false,
@@ -623,16 +504,16 @@ export default {
       postCommentVisible: false,
       selectedPost: {},
       selectedTagIds: [],
-      selectedCategoryIds: [],
+      selectedCategoryIds: []
     }
   },
   computed: {
     formattedPosts() {
-      return this.posts.map((post) => {
+      return this.posts.map(post => {
         post.statusProperty = this.postStatus[post.status]
         return post
       })
-    },
+    }
   },
   beforeMount() {
     this.handleListCategories()
@@ -643,7 +524,7 @@ export default {
     }
   },
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(vm => {
       if (to.query.page) {
         vm.pagination.page = Number(to.query.page) + 1
       }
@@ -668,14 +549,14 @@ export default {
   watch: {
     queryParam: {
       deep: true,
-      handler: function(newVal, oldVal) {
+      handler: function(newVal) {
         if (newVal) {
           const params = JSON.parse(JSON.stringify(this.queryParam))
           const path = this.$router.history.current.path
-          this.$router.push({ path, query: params }).catch((err) => err)
+          this.$router.push({ path, query: params }).catch(err => err)
         }
-      },
-    },
+      }
+    }
   },
   methods: {
     handleListPosts(enableLoading = true) {
@@ -688,7 +569,7 @@ export default {
       this.queryParam.sort = this.pagination.sort
       postApi
         .query(this.queryParam)
-        .then((response) => {
+        .then(response => {
           this.posts = response.data.data.content
           this.pagination.total = response.data.data.total
         })
@@ -702,7 +583,7 @@ export default {
       this.categoriesLoading = true
       categoryApi
         .listAll(true)
-        .then((response) => {
+        .then(response => {
           this.categories = response.data.data
         })
         .finally(() => {
@@ -722,8 +603,8 @@ export default {
       return {
         props: {
           disabled: this.queryParam.status == null || this.queryParam.status === '',
-          name: post.title,
-        },
+          name: post.title
+        }
       }
     },
     handlePaginationChange(page, pageSize) {
@@ -751,7 +632,7 @@ export default {
     handleEditStatusClick(postId, status) {
       postApi
         .updateStatus(postId, status)
-        .then((response) => {
+        .then(() => {
           this.$message.success('操作成功！')
         })
         .finally(() => {
@@ -761,7 +642,7 @@ export default {
     handleDeleteClick(postId) {
       postApi
         .delete(postId)
-        .then((response) => {
+        .then(() => {
           this.$message.success('删除成功！')
         })
         .finally(() => {
@@ -775,7 +656,7 @@ export default {
       }
       postApi
         .updateStatusInBatch(this.selectedRowKeys, status)
-        .then((response) => {
+        .then(() => {
           this.$log.debug(`postId: ${this.selectedRowKeys}, status: ${status}`)
           this.selectedRowKeys = []
         })
@@ -790,7 +671,7 @@ export default {
       }
       postApi
         .deleteInBatch(this.selectedRowKeys)
-        .then((response) => {
+        .then(() => {
           this.$log.debug(`delete: ${this.selectedRowKeys}`)
           this.selectedRowKeys = []
         })
@@ -799,7 +680,7 @@ export default {
         })
     },
     handleShowPostSettings(post) {
-      postApi.get(post.id).then((response) => {
+      postApi.get(post.id).then(response => {
         this.selectedPost = response.data.data
         this.selectedTagIds = this.selectedPost.tagIds
         this.selectedCategoryIds = this.selectedPost.categoryIds
@@ -808,13 +689,13 @@ export default {
       })
     },
     handleShowPostComments(post) {
-      postApi.get(post.id).then((response) => {
+      postApi.get(post.id).then(response => {
         this.selectedPost = response.data.data
         this.postCommentVisible = true
       })
     },
     handlePreview(postId) {
-      postApi.preview(postId).then((response) => {
+      postApi.preview(postId).then(response => {
         window.open(response.data, '_blank')
       })
     },
@@ -847,7 +728,7 @@ export default {
     },
     onRefreshPostMetasFromSetting(metas) {
       this.selectedMetas = metas
-    },
-  },
+    }
+  }
 }
 </script>

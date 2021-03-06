@@ -2,35 +2,19 @@
   <a-form layout="vertical">
     <a-form-item>
       <a-spin :spinning="loading">
-        <codemirror
-          v-model="logContent"
-          :options="codemirrorOptions"
-        ></codemirror>
+        <codemirror v-model="logContent" :options="codemirrorOptions"></codemirror>
       </a-spin>
     </a-form-item>
     <a-form-item>
       <a-space>
-        <a-select
-          defaultValue="200"
-          v-model="logLines"
-          @change="handleLoadLogsLines"
-          style="width: 100px"
-        >
+        <a-select defaultValue="200" v-model="logLines" @change="handleLoadLogsLines" style="width: 100px">
           <a-select-option value="200">200 行</a-select-option>
           <a-select-option value="500">500 行</a-select-option>
           <a-select-option value="800">800 行</a-select-option>
           <a-select-option value="1000">1000 行</a-select-option>
         </a-select>
-        <a-button
-          type="primary"
-          @click="handleLoadLogsLines()"
-          :loading="loading"
-        >刷新</a-button>
-        <a-button
-          type="dashed"
-          @click="handleDownloadLogFile()"
-          :loading="downloading"
-        >下载</a-button>
+        <a-button type="primary" @click="handleLoadLogsLines()" :loading="loading">刷新</a-button>
+        <a-button type="dashed" @click="handleDownloadLogFile()" :loading="downloading">下载</a-button>
       </a-space>
     </a-form-item>
   </a-form>
@@ -43,7 +27,7 @@ import { datetimeFormat } from '@/utils/datetime'
 export default {
   name: 'RuntimeLogs',
   components: {
-    codemirror,
+    codemirror
   },
   data() {
     return {
@@ -51,12 +35,12 @@ export default {
         tabSize: 4,
         mode: 'shell',
         lineNumbers: true,
-        line: true,
+        line: true
       },
       logContent: '',
       loading: false,
       logLines: 200,
-      downloading: false,
+      downloading: false
     }
   },
   beforeMount() {
@@ -71,7 +55,7 @@ export default {
       this.loading = true
       adminApi
         .getLogFiles(this.logLines)
-        .then((response) => {
+        .then(response => {
           this.logContent = response.data.data
         })
         .finally(() => {
@@ -85,7 +69,7 @@ export default {
       this.downloading = true
       adminApi
         .getLogFiles(this.logLines)
-        .then((response) => {
+        .then(response => {
           var blob = new Blob([response.data.data])
           var downloadElement = document.createElement('a')
           var href = window.URL.createObjectURL(blob)
@@ -105,7 +89,7 @@ export default {
             hide()
           }, 400)
         })
-    },
-  },
+    }
+  }
 }
 </script>

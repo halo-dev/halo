@@ -1,32 +1,15 @@
 <template>
-  <div
-    class="setting-drawer"
-    ref="settingDrawer"
-  >
-    <a-drawer
-      width="300"
-      closable
-      @close="onClose"
-      :visible="layoutSetting"
-    >
+  <div class="setting-drawer" ref="settingDrawer">
+    <a-drawer width="300" closable @close="onClose" :visible="layoutSetting">
       <div class="setting-drawer-index-content">
         <div class="mb-6">
           <h3 class="setting-drawer-index-title">整体风格设置</h3>
           <div class="setting-drawer-index-blockChecbox">
             <a-tooltip>
               <template slot="title">暗色菜单风格</template>
-              <div
-                class="setting-drawer-index-item"
-                @click="handleMenuTheme('dark')"
-              >
-                <img
-                  src="/images/dark.svg"
-                  alt="dark"
-                >
-                <div
-                  class="setting-drawer-index-selectIcon"
-                  v-if="navTheme === 'dark'"
-                >
+              <div class="setting-drawer-index-item" @click="handleMenuTheme('dark')">
+                <img src="/images/dark.svg" alt="dark" />
+                <div class="setting-drawer-index-selectIcon" v-if="navTheme === 'dark'">
                   <a-icon type="check" />
                 </div>
               </div>
@@ -34,18 +17,9 @@
 
             <a-tooltip>
               <template slot="title">亮色菜单风格</template>
-              <div
-                class="setting-drawer-index-item"
-                @click="handleMenuTheme('light')"
-              >
-                <img
-                  src="/images/dark.svg"
-                  alt="light"
-                >
-                <div
-                  class="setting-drawer-index-selectIcon"
-                  v-if="navTheme !== 'dark'"
-                >
+              <div class="setting-drawer-index-item" @click="handleMenuTheme('light')">
+                <img src="/images/dark.svg" alt="light" />
+                <div class="setting-drawer-index-selectIcon" v-if="navTheme !== 'dark'">
                   <a-icon type="check" />
                 </div>
               </div>
@@ -56,20 +30,10 @@
         <div class="mb-6">
           <h3 class="setting-drawer-index-title">主题色</h3>
           <div class="h-5">
-            <a-tooltip
-              class="setting-drawer-theme-color-colorBlock"
-              v-for="(item, index) in colorList"
-              :key="index"
-            >
+            <a-tooltip class="setting-drawer-theme-color-colorBlock" v-for="(item, index) in colorList" :key="index">
               <template slot="title">{{ item.key }}</template>
-              <a-tag
-                :color="item.color"
-                @click="changeColor(item.color)"
-              >
-                <a-icon
-                  type="check"
-                  v-if="item.color === primaryColor"
-                ></a-icon>
+              <a-tag :color="item.color" @click="changeColor(item.color)">
+                <a-icon type="check" v-if="item.color === primaryColor"></a-icon>
               </a-tag>
             </a-tooltip>
           </div>
@@ -79,34 +43,16 @@
           <h3 class="setting-drawer-index-title">导航模式</h3>
 
           <div class="setting-drawer-index-blockChecbox">
-            <div
-              class="setting-drawer-index-item"
-              @click="handleLayout('sidemenu')"
-            >
-              <img
-                src="/images/sidemenu.svg"
-                alt="sidemenu"
-              >
-              <div
-                class="setting-drawer-index-selectIcon"
-                v-if="layoutMode === 'sidemenu'"
-              >
+            <div class="setting-drawer-index-item" @click="handleLayout('sidemenu')">
+              <img src="/images/sidemenu.svg" alt="sidemenu" />
+              <div class="setting-drawer-index-selectIcon" v-if="layoutMode === 'sidemenu'">
                 <a-icon type="check" />
               </div>
             </div>
 
-            <div
-              class="setting-drawer-index-item"
-              @click="handleLayout('topmenu')"
-            >
-              <img
-                src="/images/topmenu.svg"
-                alt="topmenu"
-              >
-              <div
-                class="setting-drawer-index-selectIcon"
-                v-if="layoutMode !== 'sidemenu'"
-              >
+            <div class="setting-drawer-index-item" @click="handleLayout('topmenu')">
+              <img src="/images/topmenu.svg" alt="topmenu" />
+              <div class="setting-drawer-index-selectIcon" v-if="layoutMode !== 'sidemenu'">
                 <a-icon type="check" />
               </div>
             </div>
@@ -127,10 +73,7 @@
                   @change="handleContentWidthChange"
                 >
                   <a-select-option value="Fixed">固定</a-select-option>
-                  <a-select-option
-                    value="Fluid"
-                    v-if="layoutMode != 'sidemenu'"
-                  >流式</a-select-option>
+                  <a-select-option value="Fluid" v-if="layoutMode != 'sidemenu'">流式</a-select-option>
                 </a-select>
               </a-tooltip>
               <a-list-item-meta>
@@ -138,12 +81,7 @@
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-switch
-                slot="actions"
-                size="small"
-                :defaultChecked="fixedHeader"
-                @change="handleFixedHeader"
-              />
+              <a-switch slot="actions" size="small" :defaultChecked="fixedHeader" @change="handleFixedHeader" />
               <a-list-item-meta>
                 <div slot="title">固定 Header</div>
               </a-list-item-meta>
@@ -157,10 +95,7 @@
                 @change="handleFixedHeaderHidden"
               />
               <a-list-item-meta>
-                <a-tooltip
-                  slot="title"
-                  placement="left"
-                >
+                <a-tooltip slot="title" placement="left">
                   <template slot="title">固定 Header 时可配置</template>
                   <div :style="{ opacity: !fixedHeader ? '0.5' : '1' }">下滑时隐藏 Header</div>
                 </a-tooltip>
@@ -170,15 +105,12 @@
               <a-switch
                 slot="actions"
                 size="small"
-                :disabled="(layoutMode === 'topmenu')"
+                :disabled="layoutMode === 'topmenu'"
                 :defaultChecked="fixSiderbar"
                 @change="handleFixSiderbar"
               />
               <a-list-item-meta>
-                <div
-                  slot="title"
-                  :style="{ opacity: (layoutMode==='topmenu') ? '0.5' : '1' }"
-                >固定侧边菜单</div>
+                <div slot="title" :style="{ opacity: layoutMode === 'topmenu' ? '0.5' : '1' }">固定侧边菜单</div>
               </a-list-item-meta>
             </a-list-item>
           </a-list>
@@ -190,16 +122,12 @@
 </template>
 
 <script>
-import SettingItem from '@/components/SettingDrawer/SettingItem'
 import config from '@/config/defaultSettings'
 import { updateTheme, colorList } from './setting'
 import { mixin, mixinDevice } from '@/mixins/mixin'
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
-  components: {
-    SettingItem
-  },
   mixins: [mixin, mixinDevice],
   data() {
     return {

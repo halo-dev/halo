@@ -2,32 +2,21 @@
   <div>
     <a-drawer
       title="附件库"
-      :width="isMobile()?'100%':'480'"
+      :width="isMobile() ? '100%' : '480'"
       closable
       :visible="visible"
       destroyOnClose
       @close="onClose"
       :afterVisibleChange="handleAfterVisibleChanged"
     >
-      <a-row
-        type="flex"
-        align="middle"
-      >
-        <a-input-search
-          placeholder="搜索附件"
-          v-model="queryParam.keyword"
-          @search="handleQuery()"
-          enterButton
-        />
+      <a-row type="flex" align="middle">
+        <a-input-search placeholder="搜索附件" v-model="queryParam.keyword" @search="handleQuery()" enterButton />
       </a-row>
       <a-divider />
-      <a-row
-        type="flex"
-        align="middle"
-      >
+      <a-row type="flex" align="middle">
         <a-col :span="24">
           <a-spin :spinning="loading">
-            <a-empty v-if="formattedDatas.length==0" />
+            <a-empty v-if="formattedDatas.length == 0" />
             <div
               v-else
               class="attach-item"
@@ -37,11 +26,7 @@
               @contextmenu.prevent="handleContextMenu($event, item)"
             >
               <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
-              <img
-                :src="item.thumbPath"
-                v-show="handleJudgeMediaType(item)"
-                loading="lazy"
-              >
+              <img :src="item.thumbPath" v-show="handleJudgeMediaType(item)" loading="lazy" />
             </div>
           </a-spin>
         </a-col>
@@ -65,24 +50,12 @@
       />
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
-        <a-button
-          @click="uploadVisible = true"
-          type="primary"
-        >上传附件</a-button>
+        <a-button @click="uploadVisible = true" type="primary">上传附件</a-button>
       </div>
     </a-drawer>
 
-    <a-modal
-      title="上传附件"
-      v-model="uploadVisible"
-      :footer="null"
-      :afterClose="onUploadClose"
-      destroyOnClose
-    >
-      <FilePondUpload
-        ref="upload"
-        :uploadHandler="uploadHandler"
-      ></FilePondUpload>
+    <a-modal title="上传附件" v-model="uploadVisible" :footer="null" :afterClose="onUploadClose" destroyOnClose>
+      <FilePondUpload ref="upload" :uploadHandler="uploadHandler"></FilePondUpload>
     </a-modal>
   </div>
 </template>

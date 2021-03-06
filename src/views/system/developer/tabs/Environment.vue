@@ -1,20 +1,8 @@
 <template>
   <div>
     <a-row :gutter="12">
-      <a-col
-        :xl="12"
-        :lg="12"
-        :md="24"
-        :sm="24"
-        :xs="24"
-        class="mb-3"
-      >
-        <a-card
-          title="服务器"
-          :bordered="false"
-          hoverable
-          :bodyStyle="{ padding: 0 }"
-        >
+      <a-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24" class="mb-3">
+        <a-card title="服务器" :bordered="false" hoverable :bodyStyle="{ padding: 0 }">
           <table class="w-full">
             <tbody class="ant-table-tbody">
               <tr>
@@ -46,20 +34,8 @@
         </a-card>
         <a-divider dashed />
       </a-col>
-      <a-col
-        :xl="12"
-        :lg="12"
-        :md="24"
-        :sm="24"
-        :xs="24"
-        class="mb-3"
-      >
-        <a-card
-          title="使用情况"
-          :bordered="false"
-          hoverable
-          :bodyStyle="{ padding: 0 }"
-        >
+      <a-col :xl="12" :lg="12" :md="24" :sm="24" :xs="24" class="mb-3">
+        <a-card title="使用情况" :bordered="false" hoverable :bodyStyle="{ padding: 0 }">
           <table class="w-full">
             <tbody class="ant-table-tbody">
               <tr>
@@ -91,20 +67,8 @@
         </a-card>
         <a-divider dashed />
       </a-col>
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-        class="mb-3"
-      >
-        <a-card
-          title="环境"
-          :bordered="false"
-          hoverable
-          :bodyStyle="{ padding: 0 }"
-        >
+      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24" class="mb-3">
+        <a-card title="环境" :bordered="false" hoverable :bodyStyle="{ padding: 0 }">
           <table class="w-full">
             <tbody class="ant-table-tbody">
               <tr>
@@ -118,10 +82,7 @@
               <tr>
                 <td>Java Home</td>
                 <td>
-                  <ellipsis
-                    :length="isMobile() ? 50 : 256"
-                    tooltip
-                  >
+                  <ellipsis :length="isMobile() ? 50 : 256" tooltip>
                     {{ systemProperties['java.home'].value }}
                   </ellipsis>
                 </td>
@@ -131,20 +92,8 @@
         </a-card>
         <a-divider dashed />
       </a-col>
-      <a-col
-        :xl="24"
-        :lg="24"
-        :md="24"
-        :sm="24"
-        :xs="24"
-        class="mb-3"
-      >
-        <a-card
-          title="应用"
-          :bordered="false"
-          hoverable
-          :bodyStyle="{ padding: 0 }"
-        >
+      <a-col :xl="24" :lg="24" :md="24" :sm="24" :xs="24" class="mb-3">
+        <a-card title="应用" :bordered="false" hoverable :bodyStyle="{ padding: 0 }">
           <table class="w-full">
             <tbody class="ant-table-tbody">
               <tr>
@@ -161,15 +110,12 @@
               </tr>
               <tr>
                 <td>已启动时间</td>
-                <td>{{ system.process.uptime | dayTime }} </td>
+                <td>{{ system.process.uptime | dayTime }}</td>
               </tr>
               <tr>
                 <td>启动目录</td>
                 <td>
-                  <ellipsis
-                    :length="isMobile() ? 50 : 256"
-                    tooltip
-                  >
+                  <ellipsis :length="isMobile() ? 50 : 256" tooltip>
                     {{ systemProperties['user.dir'].value }}
                   </ellipsis>
                 </td>
@@ -177,10 +123,7 @@
               <tr>
                 <td>日志目录</td>
                 <td>
-                  <ellipsis
-                    :length="isMobile() ? 50 : 256"
-                    tooltip
-                  >
+                  <ellipsis :length="isMobile() ? 50 : 256" tooltip>
                     {{ systemProperties['LOG_FILE'].value }}
                   </ellipsis>
                 </td>
@@ -191,13 +134,7 @@
       </a-col>
     </a-row>
     <div style="position: fixed;bottom: 30px;right: 30px;">
-      <a-button
-        type="primary"
-        shape="circle"
-        icon="sync"
-        size="large"
-        @click="handleRefresh"
-      ></a-button>
+      <a-button type="primary" shape="circle" icon="sync" size="large" @click="handleRefresh"></a-button>
     </div>
   </div>
 </template>

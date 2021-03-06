@@ -1,12 +1,6 @@
 <template>
   <div>
-    <a-form-model
-      ref="otherOptionsForm"
-      :model="options"
-      :rules="rules"
-      layout="vertical"
-      :wrapperCol="wrapperCol"
-    >
+    <a-form-model ref="otherOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
       <a-form-model-item label="自定义全局 head：">
         <a-input
           type="textarea"

@@ -1,12 +1,6 @@
 <template>
   <div>
-    <a-form-model
-      ref="advancedOptionsForm"
-      :model="options"
-      :rules="rules"
-      layout="vertical"
-      :wrapperCol="wrapperCol"
-    >
+    <a-form-model ref="advancedOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
       <a-form-model-item
         label="全局绝对路径："
         help="* 对网站上面的所有页面路径、本地附件路径、以及主题中的静态资源路径有效。"

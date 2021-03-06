@@ -9,81 +9,27 @@
     :visible="visible"
     :afterVisibleChange="handleAfterVisibleChanged"
   >
-    <a-row
-      :gutter="12"
-      type="flex"
-    >
-      <a-col
-        :xl="12"
-        :lg="12"
-        :md="12"
-        :sm="24"
-        :xs="24"
-        v-if="!viewMode"
-      >
+    <a-row :gutter="12" type="flex">
+      <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24" v-if="!viewMode">
         <a-card :bordered="false">
-          <img
-            :alt="theme.name"
-            :src="theme.screenshots"
-            slot="cover"
-          >
+          <img :alt="theme.name" :src="theme.screenshots" slot="cover" />
           <a-card-meta :description="theme.description">
             <template slot="title">
-              <a
-                :href="author.website"
-                target="_blank"
-              >{{ author.name }}</a>
+              <a :href="author.website" target="_blank">{{ author.name }}</a>
             </template>
-            <a-avatar
-              v-if="theme.logo"
-              :src="theme.logo"
-              size="large"
-              slot="avatar"
-            />
-            <a-avatar
-              v-else
-              size="large"
-              slot="avatar"
-            >{{ author.name }}</a-avatar>
+            <a-avatar v-if="theme.logo" :src="theme.logo" size="large" slot="avatar" />
+            <a-avatar v-else size="large" slot="avatar">{{ author.name }}</a-avatar>
           </a-card-meta>
         </a-card>
       </a-col>
-      <a-col
-        :xl="formColValue"
-        :lg="formColValue"
-        :md="formColValue"
-        :sm="24"
-        :xs="24"
-        style="padding-bottom: 50px;"
-      >
+      <a-col :xl="formColValue" :lg="formColValue" :md="formColValue" :sm="24" :xs="24" style="padding-bottom: 50px;">
         <a-spin :spinning="settingLoading">
-          <div
-            class="card-container"
-            v-if="themeConfigurations.length>0"
-          >
-            <a-tabs
-              type="card"
-              defaultActiveKey="0"
-            >
-              <a-tab-pane
-                v-for="(group, index) in themeConfigurations"
-                :key="index.toString()"
-                :tab="group.label"
-              >
-                <a-form
-                  layout="vertical"
-                  :wrapperCol="wrapperCol"
-                >
-                  <a-form-item
-                    v-for="(item, index1) in group.items"
-                    :label="item.label + '：'"
-                    :key="index1"
-                  >
-                    <p
-                      v-if="item.description && item.description!=''"
-                      slot="help"
-                      v-html="item.description"
-                    ></p>
+          <div class="card-container" v-if="themeConfigurations.length > 0">
+            <a-tabs type="card" defaultActiveKey="0">
+              <a-tab-pane v-for="(group, index) in themeConfigurations" :key="index.toString()" :tab="group.label">
+                <a-form layout="vertical" :wrapperCol="wrapperCol">
+                  <a-form-item v-for="(item, index1) in group.items" :label="item.label + '：'" :key="index1">
+                    <p v-if="item.description && item.description != ''" slot="help" v-html="item.description"></p>
                     <a-input
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
@@ -103,22 +49,18 @@
                       v-model="themeSettings[item.name]"
                       v-else-if="item.type == 'RADIO'"
                     >
-                      <a-radio
-                        v-for="(option, index2) in item.options"
-                        :key="index2"
-                        :value="option.value"
-                      >{{ option.label }}</a-radio>
+                      <a-radio v-for="(option, index2) in item.options" :key="index2" :value="option.value">{{
+                        option.label
+                      }}</a-radio>
                     </a-radio-group>
                     <a-select
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
                       v-else-if="item.type == 'SELECT'"
                     >
-                      <a-select-option
-                        v-for="option in item.options"
-                        :key="option.value"
-                        :value="option.value"
-                      >{{ option.label }}</a-select-option>
+                      <a-select-option v-for="option in item.options" :key="option.value" :value="option.value">{{
+                        option.label
+                      }}</a-select-option>
                     </a-select>
                     <verte
                       picker="square"
@@ -133,11 +75,7 @@
                       :defaultValue="item.defaultValue"
                       v-else-if="item.type == 'ATTACHMENT'"
                     >
-                      <a
-                        href="javascript:void(0);"
-                        slot="addonAfter"
-                        @click="handleShowSelectAttachment(item.name)"
-                      >
+                      <a href="javascript:void(0);" slot="addonAfter" @click="handleShowSelectAttachment(item.name)">
                         <a-icon type="picture" />
                       </a>
                     </a-input>
@@ -163,26 +101,12 @@
               </a-tab-pane>
             </a-tabs>
           </div>
-          <a-empty
-            v-if="themeConfigurations.length <=0 && !settingLoading"
-            description="当前主题暂无设置选项"
-          />
+          <a-empty v-if="themeConfigurations.length <= 0 && !settingLoading" description="当前主题暂无设置选项" />
         </a-spin>
       </a-col>
 
-      <a-col
-        :xl="20"
-        :lg="20"
-        :md="20"
-        :sm="24"
-        :xs="24"
-        v-if="viewMode"
-        style="padding-bottom: 50px;"
-      >
-        <a-card
-          :bordered="true"
-          :bodyStyle="{ padding: 0}"
-        >
+      <a-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24" v-if="viewMode" style="padding-bottom: 50px;">
+        <a-card :bordered="true" :bodyStyle="{ padding: 0 }">
           <iframe
             id="themeViewIframe"
             title="主题预览"
@@ -191,8 +115,9 @@
             border="0"
             :src="options.blog_url"
             width="100%"
-            :height="clientHeight-165"
-          > </iframe>
+            :height="clientHeight - 165"
+          >
+          </iframe>
         </a-card>
       </a-col>
     </a-row>
@@ -203,26 +128,18 @@
       title="选择附件"
     />
 
-    <footer-tool-bar
-      v-if="themeConfigurations.length>0"
-      class="w-full"
-    >
+    <footer-tool-bar v-if="themeConfigurations.length > 0" class="w-full">
       <a-space>
-        <a-button
-          v-if="!this.isMobile() && theme.activated && viewMode"
-          type="primary"
-          @click="toggleViewMode"
-          ghost
-        >普通模式</a-button>
-        <a-button
-          v-else-if="!this.isMobile() && theme.activated && !viewMode"
-          type="dashed"
-          @click="toggleViewMode"
-        >预览模式</a-button>
+        <a-button v-if="!this.isMobile() && theme.activated && viewMode" type="primary" @click="toggleViewMode" ghost
+          >普通模式</a-button
+        >
+        <a-button v-else-if="!this.isMobile() && theme.activated && !viewMode" type="dashed" @click="toggleViewMode"
+          >预览模式</a-button
+        >
         <ReactiveButton
           type="primary"
           @click="handleSaveSettings"
-          @callback="saveErrored=false"
+          @callback="saveErrored = false"
           :loading="saving"
           :errored="saveErrored"
           text="保存"
@@ -316,7 +233,7 @@ export default {
       this.saving = true
       themeApi
         .saveSettings(this.theme.id, this.themeSettings)
-        .then(response => {
+        .then(() => {
           if (this.viewMode) {
             document.getElementById('themeViewIframe').contentWindow.location.reload(true)
           }

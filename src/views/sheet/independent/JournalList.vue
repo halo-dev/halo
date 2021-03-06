@@ -2,52 +2,28 @@
   <page-view>
     <a-row>
       <a-col :span="24">
-        <a-card
-          :bordered="false"
-          :bodyStyle="{ padding: '16px' }"
-        >
+        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="关键词：">
-                    <a-input
-                      v-model="list.queryParam.keyword"
-                      @keyup.enter="handleQuery()"
-                    />
+                    <a-input v-model="list.queryParam.keyword" @keyup.enter="handleQuery()" />
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="状态：">
-                    <a-select
-                      placeholder="请选择状态"
-                      v-model="list.queryParam.type"
-                      @change="handleQuery()"
-                    >
-                      <a-select-option
-                        v-for="type in Object.keys(list.journalType)"
-                        :key="type"
-                        :value="type"
-                      >{{ list.journalType[type].text }}</a-select-option>
+                    <a-select placeholder="请选择状态" v-model="list.queryParam.type" @change="handleQuery()">
+                      <a-select-option v-for="type in Object.keys(list.journalType)" :key="type" :value="type">{{
+                        list.journalType[type].text
+                      }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
                     <a-space>
-                      <a-button
-                        type="primary"
-                        @click="handleQuery()"
-                      >查询</a-button>
+                      <a-button type="primary" @click="handleQuery()">查询</a-button>
                       <a-button @click="handleResetParam()">重置</a-button>
                     </a-space>
                   </span>
@@ -56,27 +32,13 @@
             </a-form>
           </div>
           <div class="table-operator">
-            <a-button
-              type="primary"
-              icon="plus"
-              @click="handleOpenPublishModal"
-            >写日志</a-button>
+            <a-button type="primary" icon="plus" @click="handleOpenPublishModal">写日志</a-button>
           </div>
           <a-divider />
           <div class="mt-4">
-            <a-empty v-if="!list.loading && list.data.length==0" />
-            <a-list
-              v-else
-              itemLayout="vertical"
-              :pagination="false"
-              :dataSource="list.data"
-              :loading="list.loading"
-            >
-              <a-list-item
-                slot="renderItem"
-                slot-scope="item, index"
-                :key="index"
-              >
+            <a-empty v-if="!list.loading && list.data.length == 0" />
+            <a-list v-else itemLayout="vertical" :pagination="false" :dataSource="list.data" :loading="list.loading">
+              <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
                 <template slot="actions">
                   <span>
                     <a href="javascript:void(0);">
@@ -85,19 +47,13 @@
                     </a>
                   </span>
                   <span>
-                    <a
-                      href="javascript:void(0);"
-                      @click="handleOpenJournalCommentsDrawer(item)"
-                    >
+                    <a href="javascript:void(0);" @click="handleOpenJournalCommentsDrawer(item)">
                       <a-icon type="message" />
                       {{ item.commentCount }}
                     </a>
                   </span>
-                  <span v-if="item.type=='INTIMATE'">
-                    <a
-                      href="javascript:void(0);"
-                      disabled
-                    >
+                  <span v-if="item.type == 'INTIMATE'">
+                    <a href="javascript:void(0);" disabled>
                       <a-icon type="lock" />
                     </a>
                   </span>
@@ -108,10 +64,7 @@
                   </span>
                 </template>
                 <template slot="extra">
-                  <a
-                    href="javascript:void(0);"
-                    @click="handleOpenEditModal(item)"
-                  >编辑</a>
+                  <a href="javascript:void(0);" @click="handleOpenEditModal(item)">编辑</a>
                   <a-divider type="vertical" />
                   <a-popconfirm
                     title="你确定要删除这条日志？"
@@ -125,17 +78,10 @@
 
                 <a-list-item-meta>
                   <template slot="description">
-                    <p
-                      v-html="item.content"
-                      class="journal-list-content"
-                    ></p>
+                    <p v-html="item.content" class="journal-list-content"></p>
                   </template>
                   <span slot="title">{{ item.createTime | moment }}</span>
-                  <a-avatar
-                    slot="avatar"
-                    size="large"
-                    :src="user.avatar"
-                  />
+                  <a-avatar slot="avatar" size="large" :src="user.avatar" />
                 </a-list-item-meta>
               </a-list-item>
               <div class="page-wrapper">
@@ -163,33 +109,19 @@
         shape="circle"
         icon="setting"
         size="large"
-        @click="optionModal.visible=true"
+        @click="optionModal.visible = true"
       ></a-button>
     </div>
-    <a-modal
-      v-model="optionModal.visible"
-      title="页面设置"
-      :afterClose="() => optionModal.visible = false"
-    >
+    <a-modal v-model="optionModal.visible" title="页面设置" :afterClose="() => (optionModal.visible = false)">
       <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="handleSaveOptions()"
-        >保存</a-button>
+        <a-button key="submit" type="primary" @click="handleSaveOptions()">保存</a-button>
       </template>
       <a-form layout="vertical">
-        <a-form-item
-          label="页面标题："
-          help="* 需要主题进行适配"
-        >
+        <a-form-item label="页面标题：" help="* 需要主题进行适配">
           <a-input v-model="optionModal.options.journals_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
-          <a-input-number
-            v-model="optionModal.options.journals_page_size"
-            style="width:100%"
-          />
+          <a-input-number v-model="optionModal.options.journals_page_size" style="width:100%" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -198,18 +130,12 @@
     <a-modal v-model="form.visible">
       <template slot="title">
         {{ formTitle }}
-        <a-tooltip
-          slot="action"
-          title="只能输入250字"
-        >
+        <a-tooltip slot="action" title="只能输入250字">
           <a-icon type="info-circle-o" />
         </a-tooltip>
       </template>
       <template slot="footer">
-        <a-button
-          type="dashed"
-          @click="attachmentDrawer.visible = true"
-        >附件库</a-button>
+        <a-button type="dashed" @click="attachmentDrawer.visible = true">附件库</a-button>
         <ReactiveButton
           type="primary"
           @click="handleSaveOrUpdate"
@@ -221,12 +147,7 @@
           erroredText="发布失败"
         ></ReactiveButton>
       </template>
-      <a-form-model
-        ref="journalForm"
-        :model="form.model"
-        :rules="form.rules"
-        layout="vertical"
-      >
+      <a-form-model ref="journalForm" :model="form.model" :rules="form.rules" layout="vertical">
         <a-form-model-item prop="sourceContent">
           <a-input
             ref="sourceContentInput"
@@ -236,12 +157,7 @@
           />
         </a-form-model-item>
         <a-form-model-item>
-          <a-switch
-            checkedChildren="公开"
-            unCheckedChildren="私密"
-            v-model="form.isPublic"
-            defaultChecked
-          />
+          <a-switch checkedChildren="公开" unCheckedChildren="私密" v-model="form.isPublic" defaultChecked />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -278,40 +194,40 @@ export default {
           page: 1,
           size: 10,
           sort: null,
-          total: 1,
+          total: 1
         },
         queryParam: {
           page: 0,
           size: 10,
           sort: null,
           keyword: null,
-          type: null,
+          type: null
         },
         selected: {},
 
-        journalType: journalApi.journalType,
+        journalType: journalApi.journalType
       },
 
       form: {
         model: {},
         rules: {
-          sourceContent: [{ required: true, message: '* 内容不能为空', trigger: ['change'] }],
+          sourceContent: [{ required: true, message: '* 内容不能为空', trigger: ['change'] }]
         },
         visible: false,
         saving: false,
         saveErrored: false,
-        isPublic: true,
+        isPublic: true
       },
       journalCommentDrawer: {
-        visible: false,
+        visible: false
       },
       attachmentDrawer: {
-        visible: false,
+        visible: false
       },
       optionModal: {
         visible: false,
-        options: [],
-      },
+        options: []
+      }
     }
   },
   beforeMount() {
@@ -322,7 +238,7 @@ export default {
     ...mapGetters(['user']),
     formTitle() {
       return this.form.model.id ? '编辑' : '发表'
-    },
+    }
   },
   methods: {
     ...mapActions(['refreshOptionsCache']),
@@ -333,7 +249,7 @@ export default {
       this.list.queryParam.sort = this.list.pagination.sort
       journalApi
         .query(this.list.queryParam)
-        .then((response) => {
+        .then(response => {
           this.list.data = response.data.data.content
           this.list.pagination.total = response.data.data.total
         })
@@ -344,7 +260,7 @@ export default {
         })
     },
     hanldeListOptions() {
-      optionApi.listAll().then((response) => {
+      optionApi.listAll().then(response => {
         this.optionModal.options = response.data.data
       })
     },
@@ -382,7 +298,7 @@ export default {
     },
     handleSaveOrUpdate() {
       const _this = this
-      _this.$refs.journalForm.validate((valid) => {
+      _this.$refs.journalForm.validate(valid => {
         if (valid) {
           _this.form.model.type = _this.form.isPublic ? 'PUBLIC' : 'INTIMATE'
           _this.form.saving = true
@@ -434,7 +350,7 @@ export default {
     handleSaveOptions() {
       optionApi
         .save(this.optionModal.options)
-        .then((response) => {
+        .then(() => {
           this.$message.success('保存成功！')
           this.optionModal.visible = false
         })
@@ -442,7 +358,7 @@ export default {
           this.hanldeListOptions()
           this.refreshOptionsCache()
         })
-    },
-  },
+    }
+  }
 }
 </script>

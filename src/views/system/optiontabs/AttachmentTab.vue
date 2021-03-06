@@ -11,32 +11,19 @@
         <a-switch v-model="options.attachment_upload_image_preview_enable" />
       </a-form-model-item>
       <a-form-model-item label="最大上传文件数：">
-        <a-input-number
-          v-model="options.attachment_upload_max_files"
-          :min="1"
-          style="width:100%"
-        />
+        <a-input-number v-model="options.attachment_upload_max_files" :min="1" style="width:100%" />
       </a-form-model-item>
       <a-form-model-item label="同时上传文件数：">
-        <a-input-number
-          v-model="options.attachment_upload_max_parallel_uploads"
-          :min="1"
-          style="width:100%"
-        />
+        <a-input-number v-model="options.attachment_upload_max_parallel_uploads" :min="1" style="width:100%" />
       </a-form-model-item>
       <a-form-model-item label="存储位置：">
         <a-select v-model="options.attachment_type">
-          <a-select-option
-            v-for="item in Object.keys(attachmentType)"
-            :key="item"
-            :value="item"
-          >{{ attachmentType[item].text }}</a-select-option>
+          <a-select-option v-for="item in Object.keys(attachmentType)" :key="item" :value="item">{{
+            attachmentType[item].text
+          }}</a-select-option>
         </a-select>
       </a-form-model-item>
-      <div
-        id="smmsForm"
-        v-show="options.attachment_type === 'SMMS'"
-      >
+      <div id="smmsForm" v-show="options.attachment_type === 'SMMS'">
         <a-form-model-item label="Secret Token：">
           <a-input-password
             v-model="options.smms_api_secret_token"
@@ -45,10 +32,7 @@
           />
         </a-form-model-item>
       </div>
-      <div
-        id="upOssForm"
-        v-show="options.attachment_type === 'UPOSS'"
-      >
+      <div id="upOssForm" v-show="options.attachment_type === 'UPOSS'">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.oss_upyun_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -56,10 +40,7 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item label="绑定域名：">
-          <a-input
-            v-model="options.oss_upyun_domain"
-            placeholder="无需再加上 http:// 或者 https://"
-          />
+          <a-input v-model="options.oss_upyun_domain" placeholder="无需再加上 http:// 或者 https://" />
         </a-form-model-item>
         <a-form-model-item label="空间名称：">
           <a-input v-model="options.oss_upyun_bucket" />
@@ -68,19 +49,13 @@
           <a-input v-model="options.oss_upyun_operator" />
         </a-form-model-item>
         <a-form-model-item label="操作员密码：">
-          <a-input-password
-            v-model="options.oss_upyun_password"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.oss_upyun_password" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="文件目录：">
           <a-input v-model="options.oss_upyun_source" />
         </a-form-model-item>
         <a-form-model-item label="图片处理策略：">
-          <a-input
-            v-model="options.oss_upyun_style_rule"
-            placeholder="间隔标识符+图片处理版本名称"
-          />
+          <a-input v-model="options.oss_upyun_style_rule" placeholder="间隔标识符+图片处理版本名称" />
         </a-form-model-item>
         <a-form-model-item label="缩略图处理策略：">
           <a-input
@@ -89,10 +64,7 @@
           />
         </a-form-model-item>
       </div>
-      <div
-        id="qiniuOssForm"
-        v-show="options.attachment_type === 'QINIUOSS'"
-      >
+      <div id="qiniuOssForm" v-show="options.attachment_type === 'QINIUOSS'">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.oss_qiniu_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -100,47 +72,25 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item label="绑定域名：">
-          <a-input
-            v-model="options.oss_qiniu_domain"
-            placeholder="无需再加上 http:// 或者 https://"
-          />
+          <a-input v-model="options.oss_qiniu_domain" placeholder="无需再加上 http:// 或者 https://" />
         </a-form-model-item>
         <a-form-model-item label="区域：">
-          <a-auto-complete
-            :dataSource="qiniuOssZones"
-            v-model="options.oss_qiniu_zone"
-            allowClear
-          />
+          <a-auto-complete :dataSource="qiniuOssZones" v-model="options.oss_qiniu_zone" allowClear />
         </a-form-model-item>
         <a-form-model-item label="Access Key：">
-          <a-input-password
-            v-model="options.oss_qiniu_access_key"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.oss_qiniu_access_key" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="Secret Key：">
-          <a-input-password
-            v-model="options.oss_qiniu_secret_key"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.oss_qiniu_secret_key" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="文件目录：">
-          <a-input
-            v-model="options.oss_qiniu_source"
-            placeholder="不填写则上传到根目录"
-          />
+          <a-input v-model="options.oss_qiniu_source" placeholder="不填写则上传到根目录" />
         </a-form-model-item>
         <a-form-model-item label="Bucket：">
-          <a-input
-            v-model="options.oss_qiniu_bucket"
-            placeholder="存储空间名称"
-          />
+          <a-input v-model="options.oss_qiniu_bucket" placeholder="存储空间名称" />
         </a-form-model-item>
         <a-form-model-item label="图片处理策略：">
-          <a-input
-            v-model="options.oss_qiniu_style_rule"
-            placeholder="样式分隔符+图片处理样式名称"
-          />
+          <a-input v-model="options.oss_qiniu_style_rule" placeholder="样式分隔符+图片处理样式名称" />
         </a-form-model-item>
         <a-form-model-item label="缩略图处理策略：">
           <a-input
@@ -149,10 +99,7 @@
           />
         </a-form-model-item>
       </div>
-      <div
-        id="aliOssForm"
-        v-show="options.attachment_type === 'ALIOSS'"
-      >
+      <div id="aliOssForm" v-show="options.attachment_type === 'ALIOSS'">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.oss_ali_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -160,43 +107,25 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item label="绑定域名：">
-          <a-input
-            v-model="options.oss_ali_domain"
-            placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
-          />
+          <a-input v-model="options.oss_ali_domain" placeholder="如不填写，路径根域名将为 Bucket + EndPoint" />
         </a-form-model-item>
         <a-form-model-item label="Bucket：">
-          <a-input
-            v-model="options.oss_ali_bucket_name"
-            placeholder="存储空间名称"
-          />
+          <a-input v-model="options.oss_ali_bucket_name" placeholder="存储空间名称" />
         </a-form-model-item>
         <a-form-model-item label="EndPoint（地域节点）：">
           <a-input v-model="options.oss_ali_endpoint" />
         </a-form-model-item>
         <a-form-model-item label="Access Key：">
-          <a-input-password
-            v-model="options.oss_ali_access_key"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.oss_ali_access_key" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="Access Secret：">
-          <a-input-password
-            v-model="options.oss_ali_access_secret"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.oss_ali_access_secret" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="文件目录：">
-          <a-input
-            v-model="options.oss_ali_source"
-            placeholder="不填写则上传到根目录"
-          />
+          <a-input v-model="options.oss_ali_source" placeholder="不填写则上传到根目录" />
         </a-form-model-item>
         <a-form-model-item label="图片处理策略：">
-          <a-input
-            v-model="options.oss_ali_style_rule"
-            placeholder="请到阿里云控制台的图片处理获取"
-          />
+          <a-input v-model="options.oss_ali_style_rule" placeholder="请到阿里云控制台的图片处理获取" />
         </a-form-model-item>
         <a-form-model-item label="缩略图处理策略：">
           <a-input
@@ -205,10 +134,7 @@
           />
         </a-form-model-item>
       </div>
-      <div
-        id="baiduBosForm"
-        v-show="options.attachment_type === 'BAIDUBOS'"
-      >
+      <div id="baiduBosForm" v-show="options.attachment_type === 'BAIDUBOS'">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.bos_baidu_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -216,37 +142,22 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item label="绑定域名：">
-          <a-input
-            v-model="options.bos_baidu_domain"
-            placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
-          />
+          <a-input v-model="options.bos_baidu_domain" placeholder="如不填写，路径根域名将为 Bucket + EndPoint" />
         </a-form-model-item>
         <a-form-model-item label="Bucket：">
-          <a-input
-            v-model="options.bos_baidu_bucket_name"
-            placeholder="存储空间名称"
-          />
+          <a-input v-model="options.bos_baidu_bucket_name" placeholder="存储空间名称" />
         </a-form-model-item>
         <a-form-model-item label="EndPoint（地域节点）：">
           <a-input v-model="options.bos_baidu_endpoint" />
         </a-form-model-item>
         <a-form-model-item label="Access Key：">
-          <a-input-password
-            v-model="options.bos_baidu_access_key"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.bos_baidu_access_key" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="Secret Key：">
-          <a-input-password
-            v-model="options.bos_baidu_secret_key"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.bos_baidu_secret_key" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="图片处理策略：">
-          <a-input
-            v-model="options.bos_baidu_style_rule"
-            placeholder="请到百度云控制台的图片处理获取"
-          />
+          <a-input v-model="options.bos_baidu_style_rule" placeholder="请到百度云控制台的图片处理获取" />
         </a-form-model-item>
         <a-form-model-item label="缩略图处理策略：">
           <a-input
@@ -255,10 +166,7 @@
           />
         </a-form-model-item>
       </div>
-      <div
-        id="tencentCosForm"
-        v-show="options.attachment_type === 'TENCENTCOS'"
-      >
+      <div id="tencentCosForm" v-show="options.attachment_type === 'TENCENTCOS'">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.cos_tencent_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -266,47 +174,25 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item label="绑定域名：">
-          <a-input
-            v-model="options.cos_tencent_domain"
-            placeholder="如不填写，路径根域名将为 Bucket + 区域地址"
-          />
+          <a-input v-model="options.cos_tencent_domain" placeholder="如不填写，路径根域名将为 Bucket + 区域地址" />
         </a-form-model-item>
         <a-form-model-item label="Bucket：">
-          <a-input
-            v-model="options.cos_tencent_bucket_name"
-            placeholder="存储桶名称"
-          />
+          <a-input v-model="options.cos_tencent_bucket_name" placeholder="存储桶名称" />
         </a-form-model-item>
         <a-form-model-item label="区域：">
-          <a-auto-complete
-            :dataSource="tencentCosRegions"
-            v-model="options.cos_tencent_region"
-            allowClear
-          />
+          <a-auto-complete :dataSource="tencentCosRegions" v-model="options.cos_tencent_region" allowClear />
         </a-form-model-item>
         <a-form-model-item label="Secret Id：">
-          <a-input-password
-            v-model="options.cos_tencent_secret_id"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.cos_tencent_secret_id" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="Secret Key：">
-          <a-input-password
-            v-model="options.cos_tencent_secret_key"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.cos_tencent_secret_key" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="文件目录：">
-          <a-input
-            v-model="options.cos_tencent_source"
-            placeholder="不填写则上传到根目录"
-          />
+          <a-input v-model="options.cos_tencent_source" placeholder="不填写则上传到根目录" />
         </a-form-model-item>
         <a-form-model-item label="图片处理策略：">
-          <a-input
-            v-model="options.cos_tencent_style_rule"
-            placeholder="请到腾讯云控制台的图片处理获取"
-          />
+          <a-input v-model="options.cos_tencent_style_rule" placeholder="请到腾讯云控制台的图片处理获取" />
         </a-form-model-item>
         <a-form-model-item label="缩略图处理策略：">
           <a-input
@@ -315,10 +201,7 @@
           />
         </a-form-model-item>
       </div>
-      <div
-        id="huaweiObsForm"
-        v-show="options.attachment_type === 'HUAWEIOBS'"
-      >
+      <div id="huaweiObsForm" v-show="options.attachment_type === 'HUAWEIOBS'">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.obs_huawei_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -326,46 +209,25 @@
           </a-select>
         </a-form-model-item>
         <a-form-model-item label="绑定域名：">
-          <a-input
-            v-model="options.obs_huawei_domain"
-            placeholder="如不填写，路径根域名将为 Bucket + EndPoint"
-          />
+          <a-input v-model="options.obs_huawei_domain" placeholder="如不填写，路径根域名将为 Bucket + EndPoint" />
         </a-form-model-item>
         <a-form-model-item label="Bucket（桶名称）：">
-          <a-input
-            v-model="options.obs_huawei_bucket_name"
-            placeholder="桶名称"
-          />
+          <a-input v-model="options.obs_huawei_bucket_name" placeholder="桶名称" />
         </a-form-model-item>
         <a-form-model-item label="EndPoint（终端节点）：">
-          <a-input
-            v-model="options.obs_huawei_endpoint"
-            placeholder="Endpoint"
-          />
+          <a-input v-model="options.obs_huawei_endpoint" placeholder="Endpoint" />
         </a-form-model-item>
         <a-form-model-item label="Access Key：">
-          <a-input-password
-            v-model="options.obs_huawei_access_key"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.obs_huawei_access_key" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="Access Secret：">
-          <a-input-password
-            v-model="options.obs_huawei_access_secret"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.obs_huawei_access_secret" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="文件目录：">
-          <a-input
-            v-model="options.obs_huawei_source"
-            placeholder="不填写则上传到根目录"
-          />
+          <a-input v-model="options.obs_huawei_source" placeholder="不填写则上传到根目录" />
         </a-form-model-item>
         <a-form-model-item label="图片处理策略：">
-          <a-input
-            v-model="options.obs_huawei_style_rule"
-            placeholder="请到华为云控制台的图片处理创建"
-          />
+          <a-input v-model="options.obs_huawei_style_rule" placeholder="请到华为云控制台的图片处理创建" />
         </a-form-model-item>
         <a-form-model-item label="缩略图处理策略：">
           <a-input
@@ -374,39 +236,21 @@
           />
         </a-form-model-item>
       </div>
-      <div
-        id="minioForm"
-        v-show="options.attachment_type === 'MINIO'"
-      >
+      <div id="minioForm" v-show="options.attachment_type === 'MINIO'">
         <a-form-model-item label="EndPoint（终端节点）：">
-          <a-input
-            v-model="options.minio_endpoint"
-            placeholder="Endpoint"
-          />
+          <a-input v-model="options.minio_endpoint" placeholder="Endpoint" />
         </a-form-model-item>
         <a-form-model-item label="Bucket（桶名称）：">
-          <a-input
-            v-model="options.minio_bucket_name"
-            placeholder="桶名称"
-          />
+          <a-input v-model="options.minio_bucket_name" placeholder="桶名称" />
         </a-form-model-item>
         <a-form-model-item label="Access Key：">
-          <a-input-password
-            v-model="options.minio_access_key"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.minio_access_key" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="Access Secret：">
-          <a-input-password
-            v-model="options.minio_access_secret"
-            autocomplete="new-password"
-          />
+          <a-input-password v-model="options.minio_access_secret" autocomplete="new-password" />
         </a-form-model-item>
         <a-form-model-item label="文件目录：">
-          <a-input
-            v-model="options.minio_source"
-            placeholder="不填写则上传到根目录"
-          />
+          <a-input v-model="options.minio_source" placeholder="不填写则上传到根目录" />
         </a-form-model-item>
       </div>
       <a-form-model-item>

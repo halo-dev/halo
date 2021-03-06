@@ -1,17 +1,14 @@
 <template>
   <a-drawer
     title="导出文章为 Markdown 文档"
-    :width="isMobile()?'100%':'480'"
+    :width="isMobile() ? '100%' : '480'"
     closable
     :visible="visible"
     destroyOnClose
     @close="onClose"
     :afterVisibleChange="handleAfterVisibleChanged"
   >
-    <a-row
-      type="flex"
-      align="middle"
-    >
+    <a-row type="flex" align="middle">
       <a-col :span="24">
         <a-alert
           message="注意：导出后的数据文件存储在临时文件中，重启服务器会造成备份文件的丢失，所以请尽快下载。"
@@ -19,16 +16,8 @@
           closable
         />
         <a-divider>历史文件</a-divider>
-        <a-list
-          itemLayout="vertical"
-          size="small"
-          :dataSource="files"
-          :loading="loading"
-        >
-          <a-list-item
-            slot="renderItem"
-            slot-scope="file"
-          >
+        <a-list itemLayout="vertical" size="small" :dataSource="files" :loading="loading">
+          <a-list-item slot="renderItem" slot-scope="file">
             <a-button
               slot="extra"
               type="link"
@@ -36,17 +25,11 @@
               icon="delete"
               :loading="file.deleting"
               @click="handleFileDeleteClick(file)"
-            >删除</a-button>
+              >删除</a-button
+            >
             <a-list-item-meta>
-              <a
-                slot="title"
-                href="javascript:void(0)"
-                @click="handleDownloadMarkdownPackage(file)"
-              >
-                <a-icon
-                  type="schedule"
-                  style="color: #52c41a"
-                />
+              <a slot="title" href="javascript:void(0)" @click="handleDownloadMarkdownPackage(file)">
+                <a-icon type="schedule" style="color: #52c41a" />
                 {{ file.filename }}
               </a>
               <p slot="description">{{ file.updateTime | timeAgo }}/{{ file.fileSize | fileSizeFormat }}</p>
@@ -76,12 +59,7 @@
             erroredText="备份失败"
           ></ReactiveButton>
         </a-popconfirm>
-        <a-button
-          type="dashed"
-          icon="reload"
-          :loading="loading"
-          @click="handleListBackups"
-        >刷新</a-button>
+        <a-button type="dashed" icon="reload" :loading="loading" @click="handleListBackups">刷新</a-button>
       </a-space>
     </div>
   </a-drawer>
@@ -97,19 +75,19 @@ export default {
       backuping: false,
       loading: false,
       backupErrored: false,
-      files: [],
+      files: []
     }
   },
   model: {
     prop: 'visible',
-    event: 'close',
+    event: 'close'
   },
   props: {
     visible: {
       type: Boolean,
       required: false,
-      default: true,
-    },
+      default: true
+    }
   },
   methods: {
     handleAfterVisibleChanged(visible) {
@@ -121,7 +99,7 @@ export default {
       this.loading = true
       backupApi
         .listExportedMarkdowns()
-        .then((response) => {
+        .then(response => {
           this.files = response.data.data
         })
         .finally(() => {
@@ -162,7 +140,7 @@ export default {
     handleDownloadMarkdownPackage(item) {
       backupApi
         .fetchMarkdown(item.filename)
-        .then((response) => {
+        .then(response => {
           var downloadElement = document.createElement('a')
           var href = new window.URL(response.data.data.downloadLink)
           downloadElement.href = href
@@ -178,7 +156,7 @@ export default {
     },
     onClose() {
       this.$emit('close', false)
-    },
-  },
+    }
+  }
 }
 </script>

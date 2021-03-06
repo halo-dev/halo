@@ -1,27 +1,29 @@
 <template>
   <div>
-    <a-form-model
-      ref="permalinkOptionsForm"
-      :model="options"
-      :rules="rules"
-      layout="vertical"
-      :wrapperCol="wrapperCol"
-    >
+    <a-form-model ref="permalinkOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
       <a-form-model-item label="文章固定链接类型：">
         <template slot="help">
-          <span v-if="options.post_permalink_type === 'DEFAULT'">{{ options.blog_url }}/{{ options.archives_prefix }}/{slug}{{ options.path_suffix }}</span>
-          <span v-else-if="options.post_permalink_type === 'YEAR'">{{ options.blog_url }}{{ new Date() | moment_post_year }}{slug}{{ options.path_suffix }}</span>
-          <span v-else-if="options.post_permalink_type === 'DATE'">{{ options.blog_url }}{{ new Date() | moment_post_date }}{slug}{{ options.path_suffix }}</span>
-          <span v-else-if="options.post_permalink_type === 'DAY'">{{ options.blog_url }}{{ new Date() | moment_post_day }}{slug}{{ options.path_suffix }}</span>
+          <span v-if="options.post_permalink_type === 'DEFAULT'"
+            >{{ options.blog_url }}/{{ options.archives_prefix }}/{slug}{{ options.path_suffix }}</span
+          >
+          <span v-else-if="options.post_permalink_type === 'YEAR'"
+            >{{ options.blog_url }}{{ new Date() | moment_post_year }}{slug}{{ options.path_suffix }}</span
+          >
+          <span v-else-if="options.post_permalink_type === 'DATE'"
+            >{{ options.blog_url }}{{ new Date() | moment_post_date }}{slug}{{ options.path_suffix }}</span
+          >
+          <span v-else-if="options.post_permalink_type === 'DAY'"
+            >{{ options.blog_url }}{{ new Date() | moment_post_day }}{slug}{{ options.path_suffix }}</span
+          >
           <span v-else-if="options.post_permalink_type === 'ID'">{{ options.blog_url }}/?p={id}</span>
-          <span v-else-if="options.post_permalink_type === 'ID_SLUG'">{{ options.blog_url }}/{{ options.archives_prefix }}/{id}{{ options.path_suffix }}</span>
+          <span v-else-if="options.post_permalink_type === 'ID_SLUG'"
+            >{{ options.blog_url }}/{{ options.archives_prefix }}/{id}{{ options.path_suffix }}</span
+          >
         </template>
         <a-select v-model="options.post_permalink_type">
-          <a-select-option
-            v-for="item in Object.keys(postPermalinkType)"
-            :key="item"
-            :value="item"
-          >{{ postPermalinkType[item].text }}</a-select-option>
+          <a-select-option v-for="item in Object.keys(postPermalinkType)" :key="item" :value="item">{{
+            postPermalinkType[item].text
+          }}</a-select-option>
         </a-select>
       </a-form-model-item>
       <a-form-model-item label="归档前缀：">
@@ -44,21 +46,20 @@
       </a-form-model-item>
       <a-form-model-item label="自定义页面固定链接类型：">
         <template slot="help">
-          <span v-if="options.sheet_permalink_type === 'SECONDARY'">{{ options.blog_url }}/{{ options.sheet_prefix }}/{slug}{{ options.path_suffix }}</span>
-          <span v-else-if="options.sheet_permalink_type === 'ROOT'">{{ options.blog_url }}/{slug}{{ options.path_suffix }}</span>
+          <span v-if="options.sheet_permalink_type === 'SECONDARY'"
+            >{{ options.blog_url }}/{{ options.sheet_prefix }}/{slug}{{ options.path_suffix }}</span
+          >
+          <span v-else-if="options.sheet_permalink_type === 'ROOT'"
+            >{{ options.blog_url }}/{slug}{{ options.path_suffix }}</span
+          >
         </template>
         <a-select v-model="options.sheet_permalink_type">
-          <a-select-option
-            v-for="item in Object.keys(sheetPermalinkType)"
-            :key="item"
-            :value="item"
-          >{{ sheetPermalinkType[item].text }}</a-select-option>
+          <a-select-option v-for="item in Object.keys(sheetPermalinkType)" :key="item" :value="item">{{
+            sheetPermalinkType[item].text
+          }}</a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item
-        label="自定义页面前缀："
-        v-show="options.sheet_permalink_type === 'SECONDARY'"
-      >
+      <a-form-model-item label="自定义页面前缀：" v-show="options.sheet_permalink_type === 'SECONDARY'">
         <template slot="help">
           <span>{{ options.blog_url }}/{{ options.sheet_prefix }}/{slug}{{ options.path_suffix }}</span>
         </template>
@@ -111,16 +112,16 @@ export default {
   props: {
     options: {
       type: Object,
-      required: true,
+      required: true
     },
     saving: {
       type: Boolean,
-      default: false,
+      default: false
     },
     errored: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data() {
     return {
@@ -130,25 +131,25 @@ export default {
         xl: { span: 8 },
         lg: { span: 8 },
         sm: { span: 12 },
-        xs: { span: 24 },
+        xs: { span: 24 }
       },
-      rules: {},
+      rules: {}
     }
   },
   watch: {
     options(val) {
       this.$emit('onChange', val)
-    },
+    }
   },
   methods: {
     handleSaveOptions() {
       const _this = this
-      _this.$refs.permalinkOptionsForm.validate((valid) => {
+      _this.$refs.permalinkOptionsForm.validate(valid => {
         if (valid) {
           this.$emit('onSave')
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>

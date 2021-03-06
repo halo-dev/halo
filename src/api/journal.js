@@ -12,7 +12,7 @@ journalApi.query = params => {
   })
 }
 
-journalApi.create = (journal) => {
+journalApi.create = journal => {
   return service({
     url: baseUrl,
     data: journal,

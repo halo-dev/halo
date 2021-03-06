@@ -1,56 +1,29 @@
 <template>
   <page-view>
-    <a-row
-      :gutter="12"
-      type="flex"
-      align="middle"
-    >
-      <a-col
-        :span="24"
-        class="pb-3"
-      >
-        <a-card
-          :bordered="false"
-          :bodyStyle="{ padding: '16px' }"
-        >
+    <a-row :gutter="12" type="flex" align="middle">
+      <a-col :span="24" class="pb-3">
+        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="关键词：">
                     <a-input v-model="list.queryParam.keyword" />
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <a-form-item label="分组：">
-                    <a-select
-                      v-model="list.queryParam.team"
-                      @change="handleQuery()"
-                    >
-                      <a-select-option
-                        v-for="(item,index) in computedTeams"
-                        :key="index"
-                        :value="item"
-                      >{{ item }}</a-select-option>
+                    <a-select v-model="list.queryParam.team" @change="handleQuery()">
+                      <a-select-option v-for="(item, index) in computedTeams" :key="index" :value="item">{{
+                        item
+                      }}</a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
-                <a-col
-                  :md="6"
-                  :sm="24"
-                >
+                <a-col :md="6" :sm="24">
                   <span class="table-page-search-submitButtons">
                     <a-space>
-                      <a-button
-                        type="primary"
-                        @click="handleQuery()"
-                      >查询</a-button>
+                      <a-button type="primary" @click="handleQuery()">查询</a-button>
                       <a-button @click="handleResetParam()">重置</a-button>
                     </a-space>
                   </span>
@@ -58,12 +31,8 @@
               </a-row>
             </a-form>
           </div>
-          <div class="table-operator mb-0">
-            <a-button
-              type="primary"
-              icon="plus"
-              @click="form.visible = true"
-            >添加</a-button>
+          <div class="mb-0 table-operator">
+            <a-button type="primary" icon="plus" @click="form.visible = true">添加</a-button>
           </div>
         </a-card>
       </a-col>
@@ -73,28 +42,13 @@
           :dataSource="list.data"
           :loading="list.loading"
         >
-          <a-list-item
-            slot="renderItem"
-            slot-scope="item, index"
-            :key="index"
-          >
-            <a-card
-              :bodyStyle="{ padding: 0 }"
-              hoverable
-              @click="handleOpenEditForm(item)"
-            >
+          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+            <a-card :bodyStyle="{ padding: 0 }" hoverable @click="handleOpenEditForm(item)">
               <div class="photo-thumb">
-                <img
-                  :src="item.thumbnail"
-                  loading="lazy"
-                >
+                <img :src="item.thumbnail" loading="lazy" />
               </div>
               <a-card-meta class="p-3">
-                <ellipsis
-                  :length="isMobile()?12:16"
-                  tooltip
-                  slot="description"
-                >{{ item.name }}</ellipsis>
+                <ellipsis :length="isMobile() ? 12 : 16" tooltip slot="description">{{ item.name }}</ellipsis>
               </a-card-meta>
             </a-card>
           </a-list-item>
@@ -106,7 +60,7 @@
         :current="list.pagination.page"
         :total="list.pagination.total"
         :defaultPageSize="list.pagination.size"
-        :pageSizeOptions="['18', '36', '54','72','90','108']"
+        :pageSizeOptions="['18', '36', '54', '72', '90', '108']"
         showSizeChanger
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
@@ -114,88 +68,48 @@
       />
     </div>
     <div style="position: fixed;bottom: 30px;right: 30px;">
-      <a-button
-        type="primary"
-        shape="circle"
-        icon="setting"
-        size="large"
-        @click="optionFormVisible=true"
-      ></a-button>
+      <a-button type="primary" shape="circle" icon="setting" size="large" @click="optionFormVisible = true"></a-button>
     </div>
-    <a-modal
-      v-model="optionFormVisible"
-      title="页面设置"
-      :afterClose="() => optionFormVisible = false"
-    >
+    <a-modal v-model="optionFormVisible" title="页面设置" :afterClose="() => (optionFormVisible = false)">
       <template slot="footer">
-        <a-button
-          key="submit"
-          type="primary"
-          @click="handleSaveOptions()"
-        >保存</a-button>
+        <a-button key="submit" type="primary" @click="handleSaveOptions()">保存</a-button>
       </template>
       <a-form layout="vertical">
-        <a-form-item
-          label="页面标题："
-          help="* 需要主题进行适配"
-        >
+        <a-form-item label="页面标题：" help="* 需要主题进行适配">
           <a-input v-model="options.photos_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
-          <a-input-number
-            v-model="options.photos_page_size"
-            style="width:100%"
-          />
+          <a-input-number v-model="options.photos_page_size" style="width:100%" />
         </a-form-item>
       </a-form>
     </a-modal>
     <a-drawer
-      :title="`图片${form.model.id?'修改':'添加'}`"
-      :width="isMobile()?'100%':'480'"
+      :title="`图片${form.model.id ? '修改' : '添加'}`"
+      :width="isMobile() ? '100%' : '480'"
       closable
       :visible="form.visible"
       destroyOnClose
       @close="onDrawerClose"
     >
-      <a-form-model
-        ref="photoForm"
-        :model="form.model"
-        :rules="form.rules"
-        layout="vertical"
-      >
-        <a-form-model-item
-          prop="url"
-          label="图片地址："
-        >
+      <a-form-model ref="photoForm" :model="form.model" :rules="form.rules" layout="vertical">
+        <a-form-model-item prop="url" label="图片地址：">
           <div class="pb-2">
             <img
               :src="form.model.url || '/images/placeholder.jpg'"
               @click="attachmentSelectDrawer.visible = true"
               class="w-full cursor-pointer"
               style="border-radius:4px"
-            >
+            />
           </div>
-          <a-input
-            v-model="form.model.url"
-            placeholder="点击封面图选择图片，或者输入外部链接"
-          />
+          <a-input v-model="form.model.url" placeholder="点击封面图选择图片，或者输入外部链接" />
         </a-form-model-item>
-        <a-form-model-item
-          prop="thumbnail"
-          label="缩略图地址："
-        >
+        <a-form-model-item prop="thumbnail" label="缩略图地址：">
           <a-input v-model="form.model.thumbnail" />
         </a-form-model-item>
-        <a-form-model-item
-          prop="name"
-          label="图片名称："
-        >
+        <a-form-model-item prop="name" label="图片名称：">
           <a-input v-model="form.model.name" />
         </a-form-model-item>
-        <a-form-model-item
-          prop="takeTime"
-          label="拍摄日期："
-        >
+        <a-form-model-item prop="takeTime" label="拍摄日期：">
           <a-date-picker
             showTime
             :defaultValue="takeTimeDefaultValue"
@@ -205,32 +119,14 @@
             @ok="onTakeTimeSelect"
           />
         </a-form-model-item>
-        <a-form-model-item
-          prop="location"
-          label="拍摄地点："
-        >
+        <a-form-model-item prop="location" label="拍摄地点：">
           <a-input v-model="form.model.location" />
         </a-form-model-item>
-        <a-form-model-item
-          prop="team"
-          label="分组："
-        >
-          <a-auto-complete
-            :dataSource="computedTeams"
-            v-model="form.model.team"
-            allowClear
-            style="width:100%"
-          />
+        <a-form-model-item prop="team" label="分组：">
+          <a-auto-complete :dataSource="computedTeams" v-model="form.model.team" allowClear style="width:100%" />
         </a-form-model-item>
-        <a-form-model-item
-          prop="description"
-          label="描述："
-        >
-          <a-input
-            v-model="form.model.description"
-            type="textarea"
-            :autoSize="{ minRows: 5 }"
-          />
+        <a-form-model-item prop="description" label="描述：">
+          <a-input v-model="form.model.description" type="textarea" :autoSize="{ minRows: 5 }" />
         </a-form-model-item>
       </a-form-model>
       <a-divider class="divider-transparent" />
@@ -241,9 +137,9 @@
             @callback="handleCreateOrUpdateCallback"
             :loading="form.saving"
             :errored="form.saveErrored"
-            :text="`${form.model.id?'修改':'添加'}`"
-            :loadedText="`${form.model.id?'修改':'添加'}成功`"
-            :erroredText="`${form.model.id?'修改':'添加'}失败`"
+            :text="`${form.model.id ? '修改' : '添加'}`"
+            :loadedText="`${form.model.id ? '修改' : '添加'}成功`"
+            :erroredText="`${form.model.id ? '修改' : '添加'}失败`"
           ></ReactiveButton>
           <a-popconfirm
             title="你确定要删除该图片？"
@@ -295,15 +191,15 @@ export default {
           page: 1,
           size: 18,
           sort: null,
-          total: 1,
+          total: 1
         },
         queryParam: {
           page: 0,
           size: 18,
           sort: null,
           keyword: null,
-          team: null,
-        },
+          team: null
+        }
       },
 
       form: {
@@ -312,21 +208,21 @@ export default {
         rules: {
           url: [{ required: true, message: '* 图片地址不能为空', trigger: ['change'] }],
           thumbnail: [{ required: true, message: '* 缩略图地址不能为空', trigger: ['change'] }],
-          name: [{ required: true, message: '* 图片名称不能为空', trigger: ['change'] }],
+          name: [{ required: true, message: '* 图片名称不能为空', trigger: ['change'] }]
         },
         saving: false,
         saveErrored: false,
         deleting: false,
-        deleteErrored: false,
+        deleteErrored: false
       },
 
       attachmentSelectDrawer: {
-        visible: false,
+        visible: false
       },
 
       optionFormVisible: false,
       teams: [],
-      options: [],
+      options: []
     }
   },
   created() {
@@ -343,10 +239,10 @@ export default {
       return datetimeFormat(new Date(), 'YYYY-MM-DD HH:mm:ss')
     },
     computedTeams() {
-      return this.teams.filter((item) => {
+      return this.teams.filter(item => {
         return item !== ''
       })
-    },
+    }
   },
   methods: {
     ...mapActions(['refreshOptionsCache']),
@@ -357,7 +253,7 @@ export default {
       this.list.queryParam.sort = this.list.pagination.sort
       photoApi
         .query(this.list.queryParam)
-        .then((response) => {
+        .then(response => {
           this.list.data = response.data.data.content
           this.list.pagination.total = response.data.data.total
         })
@@ -371,18 +267,18 @@ export default {
       this.handlePaginationChange(1, this.list.pagination.size)
     },
     hanldeListOptions() {
-      optionApi.listAll().then((response) => {
+      optionApi.listAll().then(response => {
         this.options = response.data.data
       })
     },
     hanldeListPhotoTeams() {
-      photoApi.listTeams().then((response) => {
+      photoApi.listTeams().then(response => {
         this.teams = response.data.data
       })
     },
     handleCreateOrUpdate() {
       const _this = this
-      _this.$refs.photoForm.validate((valid) => {
+      _this.$refs.photoForm.validate(valid => {
         if (valid) {
           _this.form.saving = true
           if (_this.form.model.id) {
@@ -472,7 +368,7 @@ export default {
     handleSaveOptions() {
       optionApi
         .save(this.options)
-        .then((response) => {
+        .then(() => {
           this.$message.success('保存成功！')
           this.optionFormVisible = false
         })
@@ -481,12 +377,12 @@ export default {
           this.refreshOptionsCache()
         })
     },
-    onTakeTimeChange(value, dateString) {
+    onTakeTimeChange(value) {
       this.form.model.takeTime = value.valueOf()
     },
     onTakeTimeSelect(value) {
       this.form.model.takeTime = value.valueOf()
-    },
-  },
+    }
+  }
 }
 </script>

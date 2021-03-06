@@ -1,23 +1,12 @@
 <template>
-  <a-card
-    :bordered="false"
-    :bodyStyle="{ padding: '16px' }"
-  >
+  <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
     <template slot="title">
       速记
-      <a-tooltip
-        slot="action"
-        title="内容将保存到页面/所有页面/日志页面"
-      >
-        <a-icon type="info-circle-o" class="cursor-pointer"/>
+      <a-tooltip slot="action" title="内容将保存到页面/所有页面/日志页面">
+        <a-icon type="info-circle-o" class="cursor-pointer" />
       </a-tooltip>
     </template>
-    <a-form-model
-      ref="journalForm"
-      :model="form.model"
-      :rules="form.rules"
-      layout="vertical"
-    >
+    <a-form-model ref="journalForm" :model="form.model" :rules="form.rules" layout="vertical">
       <a-form-model-item prop="sourceContent">
         <a-input
           type="textarea"
@@ -29,10 +18,12 @@
       <a-form-model-item>
         <ReactiveButton
           @click="handleCreateJournalClick"
-          @callback="() => {
-            if(!form.errored) form.model = {}
-            form.errored = false
-          }"
+          @callback="
+            () => {
+              if (!form.errored) form.model = {}
+              form.errored = false
+            }
+          "
           :loading="form.saving"
           :errored="form.errored"
           text="发布"

@@ -42,7 +42,7 @@ export default {
   },
   render() {
     const { tooltip, length } = this.$props
-    const str = this.$slots.default.map((vNode) => vNode.text).join('')
+    const str = this.$slots.default.map(vNode => vNode.text).join('')
     const fullLength = getStrFullLength(str)
     const strDom = tooltip && fullLength > length ? this.getTooltip(str, fullLength) : this.getStrDom(str, fullLength)
     return strDom

@@ -4,7 +4,7 @@ const baseUrl = '/api/admin/logs'
 
 const logApi = {}
 
-logApi.listLatest = (top) => {
+logApi.listLatest = top => {
   return service({
     url: `${baseUrl}/latest`,
     params: {

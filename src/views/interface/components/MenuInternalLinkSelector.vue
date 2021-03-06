@@ -1,10 +1,5 @@
 <template>
-  <a-modal
-    v-model="visible"
-    title="从系统预设链接添加菜单"
-    :width="1024"
-    :bodyStyle="{ padding: '0 24px 24px' }"
-  >
+  <a-modal v-model="visible" title="从系统预设链接添加菜单" :width="1024" :bodyStyle="{ padding: '0 24px 24px' }">
     <template slot="footer">
       <a-button @click="handleCancel">
         取消
@@ -25,110 +20,61 @@
         <a-spin :spinning="loading">
           <div class="custom-tab-wrapper">
             <a-tabs default-active-key="1">
-              <a-tab-pane
-                key="1"
-                tab="分类目录"
-                force-render
-              >
+              <a-tab-pane key="1" tab="分类目录" force-render>
                 <a-list item-layout="horizontal">
-                  <a-list-item
-                    v-for="(category,index) in categories"
-                    :key="index"
-                  >
+                  <a-list-item v-for="(category, index) in categories" :key="index">
                     <a-list-item-meta>
                       <span slot="title">{{ category.name }}</span>
                       <span slot="description">{{ category.fullPath }}</span>
                     </a-list-item-meta>
                     <template slot="actions">
-                      <a
-                        href="javascript:void(0);"
-                        class="text-base"
-                      >
-                        <a-icon
-                          type="plus-circle"
-                          @click="handleInsertPre(category.name,category.fullPath)"
-                        />
+                      <a href="javascript:void(0);" class="text-base">
+                        <a-icon type="plus-circle" @click="handleInsertPre(category.name, category.fullPath)" />
                       </a>
                     </template>
                   </a-list-item>
                 </a-list>
               </a-tab-pane>
-              <a-tab-pane
-                key="2"
-                tab="标签"
-              >
+              <a-tab-pane key="2" tab="标签">
                 <a-list item-layout="horizontal">
-                  <a-list-item
-                    v-for="(tag,index) in tags"
-                    :key="index"
-                  >
+                  <a-list-item v-for="(tag, index) in tags" :key="index">
                     <a-list-item-meta>
                       <span slot="title">{{ tag.name }}</span>
                       <span slot="description">{{ tag.fullPath }}</span>
                     </a-list-item-meta>
                     <template slot="actions">
-                      <a
-                        href="javascript:void(0);"
-                        class="text-base"
-                      >
-                        <a-icon
-                          type="plus-circle"
-                          @click="handleInsertPre(tag.name,tag.fullPath)"
-                        />
+                      <a href="javascript:void(0);" class="text-base">
+                        <a-icon type="plus-circle" @click="handleInsertPre(tag.name, tag.fullPath)" />
                       </a>
                     </template>
                   </a-list-item>
                 </a-list>
               </a-tab-pane>
-              <a-tab-pane
-                key="3"
-                tab="独立页面"
-              >
+              <a-tab-pane key="3" tab="独立页面">
                 <a-list item-layout="horizontal">
-                  <a-list-item
-                    v-for="(item,index) in sheet.independents"
-                    :key="index"
-                  >
+                  <a-list-item v-for="(item, index) in sheet.independents" :key="index">
                     <a-list-item-meta>
                       <span slot="title">{{ item.title }}</span>
                       <span slot="description">{{ item.fullPath }}</span>
                     </a-list-item-meta>
                     <template slot="actions">
-                      <a
-                        href="javascript:void(0);"
-                        class="text-base"
-                      >
-                        <a-icon
-                          type="plus-circle"
-                          @click="handleInsertPre(item.title,item.fullPath)"
-                        />
+                      <a href="javascript:void(0);" class="text-base">
+                        <a-icon type="plus-circle" @click="handleInsertPre(item.title, item.fullPath)" />
                       </a>
                     </template>
                   </a-list-item>
                 </a-list>
               </a-tab-pane>
-              <a-tab-pane
-                key="4"
-                tab="自定义页面"
-              >
+              <a-tab-pane key="4" tab="自定义页面">
                 <a-list item-layout="horizontal">
-                  <a-list-item
-                    v-for="(item,index) in sheet.customs.data"
-                    :key="index"
-                  >
+                  <a-list-item v-for="(item, index) in sheet.customs.data" :key="index">
                     <a-list-item-meta>
                       <span slot="title">{{ item.title }}</span>
                       <span slot="description">{{ item.fullPath }}</span>
                     </a-list-item-meta>
                     <template slot="actions">
-                      <a
-                        href="javascript:void(0);"
-                        class="text-base"
-                      >
-                        <a-icon
-                          type="plus-circle"
-                          @click="handleInsertPre(item.title,item.fullPath)"
-                        />
+                      <a href="javascript:void(0);" class="text-base">
+                        <a-icon type="plus-circle" @click="handleInsertPre(item.title, item.fullPath)" />
                       </a>
                     </template>
                   </a-list-item>
@@ -147,28 +93,16 @@
                   />
                 </div>
               </a-tab-pane>
-              <a-tab-pane
-                key="5"
-                tab="其他"
-              >
+              <a-tab-pane key="5" tab="其他">
                 <a-list item-layout="horizontal">
-                  <a-list-item
-                    v-for="(item,index) in otherInternalLinks"
-                    :key="index"
-                  >
+                  <a-list-item v-for="(item, index) in otherInternalLinks" :key="index">
                     <a-list-item-meta>
                       <span slot="title">{{ item.name }}</span>
                       <span slot="description">{{ item.url }}</span>
                     </a-list-item-meta>
                     <template slot="actions">
-                      <a
-                        href="javascript:void(0);"
-                        class="text-base"
-                      >
-                        <a-icon
-                          type="plus-circle"
-                          @click="handleInsertPre(item.name,item.url)"
-                        />
+                      <a href="javascript:void(0);" class="text-base">
+                        <a-icon type="plus-circle" @click="handleInsertPre(item.name, item.url)" />
                       </a>
                     </template>
                   </a-list-item>
@@ -181,26 +115,15 @@
       <a-col :span="12">
         <div class="custom-tab-wrapper">
           <a-tabs default-active-key="1">
-            <a-tab-pane
-              key="1"
-              tab="备选"
-              force-render
-            >
+            <a-tab-pane key="1" tab="备选" force-render>
               <a-list item-layout="horizontal">
-                <a-list-item
-                  v-for="(menu,index) in menus"
-                  :key="index"
-                >
+                <a-list-item v-for="(menu, index) in menus" :key="index">
                   <a-list-item-meta>
                     <span slot="title">{{ menu.name }}</span>
                     <span slot="description">{{ menu.url }}</span>
                   </a-list-item-meta>
                   <template slot="actions">
-                    <a
-                      href="javascript:void(0);"
-                      class="text-base"
-                      @click="handleRemovePre(index)"
-                    >
+                    <a href="javascript:void(0);" class="text-base" @click="handleRemovePre(index)">
                       <a-icon type="close-circle" />
                     </a>
                   </template>
@@ -225,12 +148,12 @@ export default {
   props: {
     value: {
       type: Boolean,
-      default: false,
+      default: false
     },
     team: {
       type: String,
-      default: '',
-    },
+      default: ''
+    }
   },
   data() {
     return {
@@ -246,18 +169,18 @@ export default {
             page: 1,
             size: 10,
             sort: null,
-            total: 1,
+            total: 1
           },
           queryParam: {
             page: 0,
             size: 10,
-            sort: null,
-          },
-        },
+            sort: null
+          }
+        }
       },
       loading: false,
       saving: false,
-      saveErrored: false,
+      saveErrored: false
     }
   },
   computed: {
@@ -267,7 +190,7 @@ export default {
       },
       set(value) {
         this.$emit('input', value)
-      },
+      }
     },
     otherInternalLinks() {
       const options = this.options
@@ -275,30 +198,30 @@ export default {
       return [
         {
           name: '分类目录',
-          url: `${options.blog_url}/${options.categories_prefix}${pathSuffix}`,
+          url: `${options.blog_url}/${options.categories_prefix}${pathSuffix}`
         },
         {
           name: '标签',
-          url: `${options.blog_url}/${options.tags_prefix}${pathSuffix}`,
+          url: `${options.blog_url}/${options.tags_prefix}${pathSuffix}`
         },
         {
           name: '文章归档',
-          url: `${options.blog_url}/${options.archives_prefix}${pathSuffix}`,
+          url: `${options.blog_url}/${options.archives_prefix}${pathSuffix}`
         },
         {
           name: 'RSS',
-          url: `${options.blog_url}/atom.xml`,
+          url: `${options.blog_url}/atom.xml`
         },
         {
           name: '网站地图',
-          url: `${options.blog_url}/sitemap.xml`,
+          url: `${options.blog_url}/sitemap.xml`
         },
         {
           name: '网站地图',
-          url: `${options.blog_url}/sitemap.html`,
-        },
+          url: `${options.blog_url}/sitemap.html`
+        }
       ]
-    },
+    }
   },
   watch: {
     visible(value) {
@@ -306,13 +229,13 @@ export default {
         this.handleFetchAll()
         this.handleListSheets()
       }
-    },
+    }
   },
   methods: {
     handleFetchAll() {
       this.loading = true
       Promise.all([optionApi.listAll(), categoryApi.listAll(true), tagApi.listAll(true), sheetApi.listIndependent()])
-        .then((response) => {
+        .then(response => {
           this.options = response[0].data.data
           this.categories = response[1].data.data
           this.tags = response[2].data.data
@@ -328,7 +251,7 @@ export default {
       this.sheet.customs.queryParam.page = this.sheet.customs.pagination.page - 1
       this.sheet.customs.queryParam.size = this.sheet.customs.pagination.size
       this.sheet.customs.queryParam.sort = this.sheet.customs.pagination.sort
-      sheetApi.list(this.sheet.customs.queryParam).then((response) => {
+      sheetApi.list(this.sheet.customs.queryParam).then(response => {
         this.sheet.customs.data = response.data.data.content
         this.sheet.customs.pagination.total = response.data.data.total
       })
@@ -342,7 +265,7 @@ export default {
       this.menus.push({
         name: name,
         url: url,
-        team: this.team,
+        team: this.team
       })
     },
     handleRemovePre(index) {
@@ -372,7 +295,7 @@ export default {
       } else {
         this.handleCancel()
       }
-    },
-  },
+    }
+  }
 }
 </script>

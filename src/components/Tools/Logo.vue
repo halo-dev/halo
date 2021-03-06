@@ -1,14 +1,8 @@
 <template>
   <div class="logo">
-    <a
-      href="javascript:void(0);"
-      @click="onLogoClick()"
-    >
+    <a href="javascript:void(0);" @click="onLogoClick()">
       <h1 class="logo-title">Halo</h1>
-      <h1
-        class="logo-sub-title"
-        style="padding-left: 10px;"
-      >Dashboard</h1>
+      <h1 class="logo-sub-title" style="padding-left: 10px;">Dashboard</h1>
     </a>
   </div>
 </template>
@@ -34,7 +28,7 @@ export default {
     onLogoClick() {
       this.clickCount++
       if (this.clickCount === 10) {
-        optionApi.save(this.optionsToCreate).then((response) => {
+        optionApi.save(this.optionsToCreate).then(() => {
           this.refreshOptionsCache()
           this.$message.success(`开发者选项已启用！`)
           this.clickCount = 0

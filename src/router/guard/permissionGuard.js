@@ -3,14 +3,14 @@ import router from '@/router'
 import store from '@/store'
 import NProgress from 'nprogress'
 import { setDocumentTitle, domTitle } from '@/utils/domUtil'
-import adminApi from '@api/admin'
+import adminApi from '@/api/admin'
 
 NProgress.configure({ showSpinner: false, speed: 500 })
 
 const whiteList = ['Login', 'Install', 'NotFound', 'ResetPassword'] // no redirect whitelist
 
 let progressTimer = null
-router.beforeEach(async(to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   onProgressTimerDone()
   progressTimer = setTimeout(() => {
     NProgress.start()

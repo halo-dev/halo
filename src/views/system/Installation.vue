@@ -1,34 +1,16 @@
 <template>
   <div>
-    <a-row
-      type="flex"
-      justify="center"
-      align="middle"
-      class="h-screen"
-    >
-      <a-col
-        :xxl="8"
-        :xl="12"
-        :lg="16"
-        :md="20"
-        :sm="20"
-        :xs="23"
-      >
+    <a-row type="flex" justify="center" align="middle" class="h-screen">
+      <a-col :xxl="8" :xl="12" :lg="16" :md="20" :sm="20" :xs="23">
         <div class="card-container animated fadeIn">
-          <a-card
-            :bordered="false"
-            style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;"
-          >
+          <a-card :bordered="false" style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;">
             <div class="halo-logo">
-              <span>Halo
+              <span
+                >Halo
                 <small>安装向导</small>
               </span>
             </div>
-            <a-alert
-              :message="`欢迎使用 Halo，您正在安装的是 Halo ${VERSION}。`"
-              type="success"
-              show-icon
-            />
+            <a-alert :message="`欢迎使用 Halo，您正在安装的是 Halo ${VERSION}。`" type="success" show-icon />
             <!-- Blogger info -->
             <div class="mt-5 mb-5">
               <a-radio-group v-model="installationMode">
@@ -48,111 +30,51 @@
               layout="horizontal"
               v-show="isInstallMode"
             >
-              <a-divider
-                orientation="left"
-                dashed
-              >
+              <a-divider orientation="left" dashed>
                 管理员信息
               </a-divider>
               <a-form-model-item prop="username">
-                <a-input
-                  v-model="form.model.username"
-                  placeholder="用户名"
-                >
-                  <a-icon
-                    slot="prefix"
-                    type="user"
-                    style="color: rgba(0,0,0,.25)"
-                  />
+                <a-input v-model="form.model.username" placeholder="用户名">
+                  <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="username">
-                <a-input
-                  v-model="form.model.nickname"
-                  placeholder="用户昵称"
-                >
-                  <a-icon
-                    slot="prefix"
-                    type="user"
-                    style="color: rgba(0,0,0,.25)"
-                  />
+                <a-input v-model="form.model.nickname" placeholder="用户昵称">
+                  <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="email">
-                <a-input
-                  v-model="form.model.email"
-                  placeholder="用户邮箱"
-                >
-                  <a-icon
-                    slot="prefix"
-                    type="mail"
-                    style="color: rgba(0,0,0,.25)"
-                  />
+                <a-input v-model="form.model.email" placeholder="用户邮箱">
+                  <a-icon slot="prefix" type="mail" style="color: rgba(0,0,0,.25)" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="password">
-                <a-input
-                  v-model="form.model.password"
-                  type="password"
-                  placeholder="登录密码（8-100位）"
-                >
-                  <a-icon
-                    slot="prefix"
-                    type="lock"
-                    style="color: rgba(0,0,0,.25)"
-                  />
+                <a-input v-model="form.model.password" type="password" placeholder="登录密码（8-100位）">
+                  <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="confirmPassword">
-                <a-input
-                  v-model="form.model.confirmPassword"
-                  type="password"
-                  placeholder="确认登录密码"
-                >
-                  <a-icon
-                    slot="prefix"
-                    type="lock"
-                    style="color: rgba(0,0,0,.25)"
-                  />
+                <a-input v-model="form.model.confirmPassword" type="password" placeholder="确认登录密码">
+                  <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
                 </a-input>
               </a-form-model-item>
-              <a-divider
-                orientation="left"
-                dashed
-              >
+              <a-divider orientation="left" dashed>
                 站点信息
               </a-divider>
               <a-form-model-item prop="url">
-                <a-input
-                  v-model="form.model.url"
-                  placeholder="博客地址"
-                >
-                  <a-icon
-                    slot="prefix"
-                    type="link"
-                    style="color: rgba(0,0,0,.25)"
-                  />
+                <a-input v-model="form.model.url" placeholder="博客地址">
+                  <a-icon slot="prefix" type="link" style="color: rgba(0,0,0,.25)" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="title">
-                <a-input
-                  v-model="form.model.title"
-                  placeholder="博客标题"
-                >
-                  <a-icon
-                    slot="prefix"
-                    type="book"
-                    style="color: rgba(0,0,0,.25)"
-                  />
+                <a-input v-model="form.model.title" placeholder="博客标题">
+                  <a-icon slot="prefix" type="book" style="color: rgba(0,0,0,.25)" />
                 </a-input>
               </a-form-model-item>
             </a-form-model>
 
             <!-- Data migration -->
-            <div
-              class="animated fadeIn"
-              v-show="isImportMode"
-            >
+            <div class="animated fadeIn" v-show="isImportMode">
               <FilePondUpload
                 ref="upload"
                 name="file"
@@ -222,11 +144,11 @@ export default {
         rules: {
           username: [
             { required: true, message: '* 用户名不能为空', trigger: ['change'] },
-            { max: 50, message: '* 用户名的字符长度不能超过 50', trigger: ['change'] },
+            { max: 50, message: '* 用户名的字符长度不能超过 50', trigger: ['change'] }
           ],
           nickname: [
             { required: true, message: '* 用户昵称不能为空', trigger: ['change'] },
-            { max: 255, message: '* 用户昵称的字符长度不能超过 255', trigger: ['change'] },
+            { max: 255, message: '* 用户昵称的字符长度不能超过 255', trigger: ['change'] }
           ],
           email: [
             { required: true, message: '* 电子邮件地址不能为空', trigger: ['change'] },
@@ -234,27 +156,27 @@ export default {
             {
               pattern: /\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}/g,
               message: '* 电子邮件地址的格式不正确',
-              trigger: ['change'],
-            },
+              trigger: ['change']
+            }
           ],
           password: [
             { required: true, message: '* 密码不能为空', trigger: ['change'] },
-            { min: 8, max: 100, message: '* 密码的字符长度必须在 8 - 100 之间', trigger: ['change'] },
+            { min: 8, max: 100, message: '* 密码的字符长度必须在 8 - 100 之间', trigger: ['change'] }
           ],
           confirmPassword: [
             { required: true, message: '* 确认密码不能为空', trigger: ['change'] },
-            { validator: confirmPasswordValidate, trigger: ['change'] },
+            { validator: confirmPasswordValidate, trigger: ['change'] }
           ],
           url: [{ required: true, message: '* 博客地址不能为空', trigger: ['change'] }],
-          title: [{ required: true, message: '* 博客标题不能为空', trigger: ['change'] }],
+          title: [{ required: true, message: '* 博客标题不能为空', trigger: ['change'] }]
         },
         installing: false,
         installErrored: false,
 
         importing: false,
         importErrored: false,
-        importData: null,
-      },
+        importData: null
+      }
     }
   },
   beforeMount() {
@@ -267,7 +189,7 @@ export default {
     },
     isImportMode() {
       return this.installationMode === 'import'
-    },
+    }
   },
   methods: {
     ...mapActions(['installCleanToken']),
@@ -278,11 +200,11 @@ export default {
       }
     },
     handleInstall() {
-      this.$refs.installationForm.validate((valid) => {
+      this.$refs.installationForm.validate(valid => {
         if (valid) {
           this.form.installing = true
           this.installCleanToken(this.form.model)
-            .then((response) => {
+            .then(response => {
               this.$log.debug('Installation response', response)
             })
             .catch(() => {
@@ -307,7 +229,7 @@ export default {
     onImportUpload(data) {
       this.$log.debug('Selected data', data)
       this.form.importData = data
-      return new Promise((resolve, reject) => {
+      return new Promise(resolve => {
         this.$log.debug('Handle uploading')
         resolve()
       })
@@ -320,7 +242,7 @@ export default {
       this.form.importing = true
       migrateApi
         .migrate(this.form.importData)
-        .then((response) => {
+        .then(() => {
           this.$log.debug('Migrated successfullly')
         })
         .catch(() => {
@@ -339,8 +261,8 @@ export default {
         this.$message.success('导入成功！')
         this.$router.push({ name: 'Login' })
       }
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

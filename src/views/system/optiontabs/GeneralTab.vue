@@ -1,59 +1,27 @@
 <template>
   <div>
-    <a-form-model
-      ref="generalOptionsForm"
-      :model="options"
-      :rules="rules"
-      layout="vertical"
-      :wrapperCol="wrapperCol"
-    >
-      <a-form-model-item
-        label="博客标题："
-        prop="blog_title"
-      >
+    <a-form-model ref="generalOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
+      <a-form-model-item label="博客标题：" prop="blog_title">
         <a-input v-model="options.blog_title" />
       </a-form-model-item>
-      <a-form-model-item
-        label="博客地址："
-        prop="blog_url"
-      >
-        <a-input
-          v-model="options.blog_url"
-          placeholder="如：https://halo.run"
-        />
+      <a-form-model-item label="博客地址：" prop="blog_url">
+        <a-input v-model="options.blog_url" placeholder="如：https://halo.run" />
       </a-form-model-item>
-      <a-form-model-item
-        label="Logo："
-        prop="blog_logo"
-      >
+      <a-form-model-item label="Logo：" prop="blog_logo">
         <a-input v-model="options.blog_logo">
-          <a
-            href="javascript:void(0);"
-            slot="addonAfter"
-            @click="handleShowLogoSelector"
-          >
+          <a href="javascript:void(0);" slot="addonAfter" @click="handleShowLogoSelector">
             <a-icon type="picture" />
           </a>
         </a-input>
       </a-form-model-item>
-      <a-form-model-item
-        label="Favicon："
-        prop="blog_favicon"
-      >
+      <a-form-model-item label="Favicon：" prop="blog_favicon">
         <a-input v-model="options.blog_favicon">
-          <a
-            href="javascript:void(0);"
-            slot="addonAfter"
-            @click="handleShowFaviconSelector"
-          >
+          <a href="javascript:void(0);" slot="addonAfter" @click="handleShowFaviconSelector">
             <a-icon type="picture" />
           </a>
         </a-input>
       </a-form-model-item>
-      <a-form-model-item
-        label="页脚信息："
-        prop="blog_footer_info"
-      >
+      <a-form-model-item label="页脚信息：" prop="blog_footer_info">
         <a-input
           type="textarea"
           :autoSize="{ minRows: 5 }"

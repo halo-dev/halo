@@ -1,9 +1,6 @@
 <template>
   <a-config-provider :locale="locale">
-    <div
-      id="app"
-      class="h-full"
-    >
+    <div id="app" class="h-full">
       <router-view />
     </div>
   </a-config-provider>
@@ -21,7 +18,7 @@ export default {
   },
   mounted() {
     const { $store } = this
-    deviceEnquire((deviceType) => {
+    deviceEnquire(deviceType => {
       switch (deviceType) {
         case DEVICE_TYPE.DESKTOP:
           $store.commit('TOGGLE_DEVICE', 'desktop')

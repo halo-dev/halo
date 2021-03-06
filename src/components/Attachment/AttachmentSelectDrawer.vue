@@ -2,32 +2,21 @@
   <div>
     <a-drawer
       :title="title"
-      :width="isMobile()?'100%':drawerWidth"
+      :width="isMobile() ? '100%' : drawerWidth"
       closable
       :visible="visible"
       destroyOnClose
       @close="onClose"
       :afterVisibleChange="handleAfterVisibleChanged"
     >
-      <a-row
-        type="flex"
-        align="middle"
-      >
-        <a-input-search
-          placeholder="搜索"
-          v-model="queryParam.keyword"
-          @search="handleQuery()"
-          enterButton
-        />
+      <a-row type="flex" align="middle">
+        <a-input-search placeholder="搜索" v-model="queryParam.keyword" @search="handleQuery()" enterButton />
       </a-row>
       <a-divider />
-      <a-row
-        type="flex"
-        align="middle"
-      >
+      <a-row type="flex" align="middle">
         <a-col :span="24">
           <a-spin :spinning="loading">
-            <a-empty v-if="attachments.length==0" />
+            <a-empty v-if="attachments.length == 0" />
             <div
               v-else
               class="attach-item"
@@ -36,11 +25,7 @@
               @click="handleSelectAttachment(item)"
             >
               <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
-              <img
-                :src="item.thumbPath"
-                v-show="handleJudgeMediaType(item)"
-                loading="lazy"
-              >
+              <img :src="item.thumbPath" v-show="handleJudgeMediaType(item)" loading="lazy" />
             </div>
           </a-spin>
         </a-col>
@@ -58,30 +43,14 @@
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-space>
-          <a-button
-            type="dashed"
-            v-if="isChooseAvatar"
-            @click="handleSelectGravatar"
-          >使用 Gravatar</a-button>
-          <a-button
-            @click="handleShowUploadModal"
-            type="primary"
-          >上传附件</a-button>
+          <a-button type="dashed" v-if="isChooseAvatar" @click="handleSelectGravatar">使用 Gravatar</a-button>
+          <a-button @click="handleShowUploadModal" type="primary">上传附件</a-button>
         </a-space>
       </div>
     </a-drawer>
 
-    <a-modal
-      title="上传附件"
-      v-model="uploadVisible"
-      :footer="null"
-      :afterClose="onUploadClose"
-      destroyOnClose
-    >
-      <FilePondUpload
-        ref="upload"
-        :uploadHandler="uploadHandler"
-      ></FilePondUpload>
+    <a-modal title="上传附件" v-model="uploadVisible" :footer="null" :afterClose="onUploadClose" destroyOnClose>
+      <FilePondUpload ref="upload" :uploadHandler="uploadHandler"></FilePondUpload>
     </a-modal>
   </div>
 </template>
@@ -150,7 +119,7 @@ export default {
       this.queryParam.sort = this.pagination.sort
       attachmentApi
         .query(this.queryParam)
-        .then((response) => {
+        .then(response => {
           this.attachments = response.data.data.content
           this.pagination.total = response.data.data.total
         })

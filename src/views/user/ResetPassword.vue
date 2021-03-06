@@ -5,113 +5,45 @@
     </div>
     <div class="animated">
       <a-form layout="vertical">
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.1s'}"
-        >
-          <a-input
-            placeholder="用户名"
-            v-model="resetParam.username"
-          >
-            <a-icon
-              slot="prefix"
-              type="user"
-              style="color: rgba(0,0,0,.25)"
-            />
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.1s' }">
+          <a-input placeholder="用户名" v-model="resetParam.username">
+            <a-icon slot="prefix" type="user" style="color: rgba(0, 0, 0, 0.25)" />
           </a-input>
         </a-form-item>
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.2s'}"
-        >
-          <a-input
-            placeholder="邮箱"
-            v-model="resetParam.email"
-          >
-            <a-icon
-              slot="prefix"
-              type="mail"
-              style="color: rgba(0,0,0,.25)"
-            />
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.2s' }">
+          <a-input placeholder="邮箱" v-model="resetParam.email">
+            <a-icon slot="prefix" type="mail" style="color: rgba(0, 0, 0, 0.25)" />
+          </a-input>
+        </a-form-item>
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.3s' }">
+          <a-input v-model="resetParam.code" type="password" placeholder="验证码">
+            <a-icon slot="prefix" type="safety-certificate" style="color: rgba(0, 0, 0, 0.25)" />
+            <a href="javascript:void(0);" slot="addonAfter" @click="handleSendCode"> 获取 </a>
           </a-input>
         </a-form-item>
 
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.3s'}"
-        >
-          <a-input
-            v-model="resetParam.code"
-            type="password"
-            placeholder="验证码"
-          >
-            <a-icon
-              slot="prefix"
-              type="safety-certificate"
-              style="color: rgba(0,0,0,.25)"
-            />
-            <a
-              href="javascript:void(0);"
-              slot="addonAfter"
-              @click="handleSendCode"
-            >
-              获取
-            </a>
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.4s' }">
+          <a-input v-model="resetParam.password" type="password" placeholder="新密码" autocomplete="new-password">
+            <a-icon slot="prefix" type="lock" style="color: rgba(0, 0, 0, 0.25)" />
           </a-input>
         </a-form-item>
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.4s'}"
-        >
-          <a-input
-            v-model="resetParam.password"
-            type="password"
-            placeholder="新密码"
-            autocomplete="new-password"
-          >
-            <a-icon
-              slot="prefix"
-              type="lock"
-              style="color: rgba(0,0,0,.25)"
-            />
-          </a-input>
-        </a-form-item>
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.5s'}"
-        >
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.5s' }">
           <a-input
             v-model="resetParam.confirmPassword"
             type="password"
             placeholder="确认密码"
             autocomplete="new-password"
           >
-            <a-icon
-              slot="prefix"
-              type="lock"
-              style="color: rgba(0,0,0,.25)"
-            />
+            <a-icon slot="prefix" type="lock" style="color: rgba(0, 0, 0, 0.25)" />
           </a-input>
         </a-form-item>
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.6s'}"
-        >
-          <a-button
-            type="primary"
-            :block="true"
-            @click="handleResetPassword"
-          >重置密码</a-button>
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.6s' }">
+          <a-button type="primary" :block="true" @click="handleResetPassword">重置密码</a-button>
         </a-form-item>
 
         <a-row>
-          <router-link :to="{ name:'Login' }">
-            <a
-              class="tip animated fadeInUp"
-              :style="{'animation-delay': '0.7s'}"
-            >
-              返回登录
-            </a>
+          <router-link :to="{ name: 'Login' }">
+            <a class="tip animated fadeInUp" :style="{ 'animation-delay': '0.7s' }"> 返回登录 </a>
           </router-link>
         </a-row>
       </a-form>
@@ -153,7 +85,7 @@ export default {
       const hide = this.$message.loading('发送中...', 0)
       adminApi
         .sendResetCode(this.resetParam)
-        .then(response => {
+        .then(() => {
           this.$message.success('邮件发送成功，五分钟内有效')
         })
         .finally(() => {
@@ -203,7 +135,7 @@ export default {
         })
         return
       }
-      adminApi.resetPassword(this.resetParam).then(response => {
+      adminApi.resetPassword(this.resetParam).then(() => {
         this.$message.success('密码重置成功！')
         this.$router.push({ name: 'Login' })
       })

@@ -4,7 +4,7 @@ const baseUrl = '/api/admin/journals/comments'
 
 const journalCommentApi = {}
 
-journalCommentApi.create = (comment) => {
+journalCommentApi.create = comment => {
   return service({
     url: baseUrl,
     data: comment,

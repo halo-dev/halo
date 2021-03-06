@@ -1,17 +1,14 @@
 <template>
   <a-drawer
     title="整站备份"
-    :width="isMobile()?'100%':'480'"
+    :width="isMobile() ? '100%' : '480'"
     closable
     :visible="visible"
     destroyOnClose
     @close="onClose"
     :afterVisibleChange="handleAfterVisibleChanged"
   >
-    <a-row
-      type="flex"
-      align="middle"
-    >
+    <a-row type="flex" align="middle">
       <a-col :span="24">
         <a-alert
           message="注意：备份后生成的压缩文件存储在临时文件中，重启服务器会造成备份文件的丢失，所以请尽快下载。"
@@ -19,16 +16,8 @@
           closable
         />
         <a-divider>历史备份</a-divider>
-        <a-list
-          itemLayout="vertical"
-          size="small"
-          :dataSource="backups"
-          :loading="loading"
-        >
-          <a-list-item
-            slot="renderItem"
-            slot-scope="backup"
-          >
+        <a-list itemLayout="vertical" size="small" :dataSource="backups" :loading="loading">
+          <a-list-item slot="renderItem" slot-scope="backup">
             <a-button
               slot="extra"
               type="link"
@@ -36,17 +25,11 @@
               icon="delete"
               :loading="backup.deleting"
               @click="handleBackupDeleteClick(backup)"
-            >删除</a-button>
+              >删除</a-button
+            >
             <a-list-item-meta>
-              <a
-                slot="title"
-                href="javascript:void(0)"
-                @click="handleDownloadBackupPackage(backup)"
-              >
-                <a-icon
-                  type="schedule"
-                  style="color: #52c41a"
-                />
+              <a slot="title" href="javascript:void(0)" @click="handleDownloadBackupPackage(backup)">
+                <a-icon type="schedule" style="color: #52c41a" />
                 {{ backup.filename }}
               </a>
               <p slot="description">{{ backup.updateTime | timeAgo }}/{{ backup.fileSize | fileSizeFormat }}</p>
@@ -69,12 +52,7 @@
           loadedText="备份成功"
           erroredText="备份失败"
         ></ReactiveButton>
-        <a-button
-          type="dashed"
-          icon="reload"
-          :loading="loading"
-          @click="handleListBackups"
-        >刷新</a-button>
+        <a-button type="dashed" icon="reload" :loading="loading" @click="handleListBackups">刷新</a-button>
       </a-space>
     </div>
   </a-drawer>
@@ -90,19 +68,19 @@ export default {
       backuping: false,
       loading: false,
       backupErrored: false,
-      backups: [],
+      backups: []
     }
   },
   model: {
     prop: 'visible',
-    event: 'close',
+    event: 'close'
   },
   props: {
     visible: {
       type: Boolean,
       required: false,
-      default: true,
-    },
+      default: true
+    }
   },
   methods: {
     handleAfterVisibleChanged(visible) {
@@ -114,7 +92,7 @@ export default {
       this.loading = true
       backupApi
         .listWorkDirBackups()
-        .then((response) => {
+        .then(response => {
           this.backups = response.data.data
         })
         .finally(() => {
@@ -155,7 +133,7 @@ export default {
     handleDownloadBackupPackage(item) {
       backupApi
         .fetchWorkDir(item.filename)
-        .then((response) => {
+        .then(response => {
           var downloadElement = document.createElement('a')
           var href = new window.URL(response.data.data.downloadLink)
           downloadElement.href = href
@@ -165,13 +143,13 @@ export default {
           document.body.removeChild(downloadElement)
           window.URL.revokeObjectURL(href)
         })
-        .catch((error) => {
+        .catch(error => {
           this.$message.error(error.data.message)
         })
     },
     onClose() {
       this.$emit('close', false)
-    },
-  },
+    }
+  }
 }
 </script>

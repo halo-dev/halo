@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="head-info"
-    :class="center && 'center'"
-  >
+  <div class="head-info" :class="center && 'center'">
     <span>{{ title }}</span>
     <p>{{ content }}</p>
     <em v-if="bordered" />

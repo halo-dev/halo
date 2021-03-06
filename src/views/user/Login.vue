@@ -1,87 +1,43 @@
 <template>
   <div class="container-wrapper">
     <div class="halo-logo animated fadeInUp">
-      <span>Halo
+      <span
+        >Halo
         <small v-if="apiForm.visible">API 设置</small>
       </span>
     </div>
-    <div
-      v-show="!apiForm.visible"
-      class="login-form animated"
-    >
+    <div v-show="!apiForm.visible" class="login-form animated">
       <LoginForm @success="onLoginSucceed" />
       <a-row>
         <a-col :span="24">
-          <router-link :to="{ name:'ResetPassword' }">
-            <a
-              class="tip animated fadeInRight"
-              v-if="resetPasswordButtonVisible"
-              href="javascript:void(0);"
-            >
+          <router-link :to="{ name: 'ResetPassword' }">
+            <a class="tip animated fadeInRight" v-if="resetPasswordButtonVisible" href="javascript:void(0);">
               找回密码
             </a>
           </router-link>
-          <a
-            @click="handleToggleShowApiForm"
-            class="tip animated fadeInUp"
-            :style="{'animation-delay': '0.4s'}"
-          >
+          <a @click="handleToggleShowApiForm" class="tip animated fadeInUp" :style="{ 'animation-delay': '0.4s' }">
             <a-icon type="setting" />
           </a>
         </a-col>
       </a-row>
     </div>
-    <div
-      v-show="apiForm.visible"
-      class="api-form animated"
-    >
+    <div v-show="apiForm.visible" class="api-form animated">
       <a-form layout="vertical">
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.1s'}"
-        >
-          <a-tooltip
-            placement="top"
-            title="如果 Admin 不是独立部署，请不要更改此 API"
-            trigger="click"
-          >
-            <a-input
-              placeholder="API 地址"
-              v-model="apiForm.apiUrl"
-            >
-              <a-icon
-                slot="prefix"
-                type="api"
-                style="color: rgba(0,0,0,.25)"
-              />
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.1s' }">
+          <a-tooltip placement="top" title="如果 Admin 不是独立部署，请不要更改此 API" trigger="click">
+            <a-input placeholder="API 地址" v-model="apiForm.apiUrl">
+              <a-icon slot="prefix" type="api" style="color: rgba(0,0,0,.25)" />
             </a-input>
           </a-tooltip>
         </a-form-item>
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.2s'}"
-        >
-          <a-button
-            :block="true"
-            @click="handleRestoreApiUrl"
-          >恢复默认</a-button>
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.2s' }">
+          <a-button :block="true" @click="handleRestoreApiUrl">恢复默认</a-button>
         </a-form-item>
-        <a-form-item
-          class="animated fadeInUp"
-          :style="{'animation-delay': '0.3s'}"
-        >
-          <a-button
-            type="primary"
-            :block="true"
-            @click="handleModifyApiUrl"
-          >保存设置</a-button>
+        <a-form-item class="animated fadeInUp" :style="{ 'animation-delay': '0.3s' }">
+          <a-button type="primary" :block="true" @click="handleModifyApiUrl">保存设置</a-button>
         </a-form-item>
         <a-row>
-          <a
-            @click="handleToggleShowApiForm"
-            class="tip animated fadeInUp"
-            :style="{'animation-delay': '0.4s'}"
-          >
+          <a @click="handleToggleShowApiForm" class="tip animated fadeInUp" :style="{ 'animation-delay': '0.4s' }">
             <a-icon type="rollback" />
           </a>
         </a-row>
@@ -97,19 +53,19 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
 import LoginForm from '@/components/Login/LoginForm'
 export default {
   components: {
-    LoginForm,
+    LoginForm
   },
   data() {
     return {
       resetPasswordButtonVisible: false,
       apiForm: {
         apiUrl: window.location.host,
-        visible: false,
-      },
+        visible: false
+      }
     }
   },
   computed: {
-    ...mapGetters({ defaultApiUrl: 'apiUrl' }),
+    ...mapGetters({ defaultApiUrl: 'apiUrl' })
   },
   beforeMount() {
     const _this = this
@@ -124,7 +80,7 @@ export default {
     ...mapActions(['refreshUserCache', 'refreshOptionsCache']),
     ...mapMutations({
       setApiUrl: 'SET_API_URL',
-      restoreApiUrl: 'RESTORE_API_URL',
+      restoreApiUrl: 'RESTORE_API_URL'
     }),
     async handleVerifyIsInstall() {
       const response = await adminApi.isInstalled()
@@ -155,7 +111,7 @@ export default {
       if (this.apiForm.visible) {
         this.apiForm.apiUrl = this.defaultApiUrl
       }
-    },
-  },
+    }
+  }
 }
 </script>

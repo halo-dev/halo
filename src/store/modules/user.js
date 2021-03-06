@@ -1,8 +1,5 @@
 import Vue from 'vue'
-import {
-  ACCESS_TOKEN,
-  USER
-} from '@/store/mutation-types'
+import { ACCESS_TOKEN, USER } from '@/store/mutation-types'
 import adminApi from '@/api/admin'
 import userApi from '@/api/user'
 
@@ -26,9 +23,7 @@ const user = {
     }
   },
   actions: {
-    installCleanToken({
-      commit
-    }, installData) {
+    installCleanToken({ commit }, installData) {
       return new Promise((resolve, reject) => {
         adminApi
           .install(installData)
@@ -41,9 +36,7 @@ const user = {
           })
       })
     },
-    refreshUserCache({
-      commit
-    }) {
+    refreshUserCache({ commit }) {
       return new Promise((resolve, reject) => {
         userApi
           .getProfile()
@@ -56,13 +49,7 @@ const user = {
           })
       })
     },
-    login({
-      commit
-    }, {
-      username,
-      password,
-      authcode
-    }) {
+    login({ commit }, { username, password, authcode }) {
       return new Promise((resolve, reject) => {
         adminApi
           .login(username, password, authcode)
@@ -78,13 +65,11 @@ const user = {
           })
       })
     },
-    logout({
-      commit
-    }) {
+    logout({ commit }) {
       return new Promise(resolve => {
         adminApi
           .logout()
-          .then(response => {
+          .then(() => {
             commit('CLEAR_TOKEN')
             resolve()
           })
@@ -93,9 +78,7 @@ const user = {
           })
       })
     },
-    refreshToken({
-      commit
-    }, refreshToken) {
+    refreshToken({ commit }, refreshToken) {
       return new Promise((resolve, reject) => {
         adminApi
           .refreshToken(refreshToken)

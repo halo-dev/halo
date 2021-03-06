@@ -2,34 +2,21 @@
   <div>
     <a-drawer
       title="操作日志"
-      :width="isMobile()?'100%':'480'"
+      :width="isMobile() ? '100%' : '480'"
       closable
       :visible="visible"
       destroyOnClose
       @close="onClose"
       :afterVisibleChange="handleAfterVisibleChanged"
     >
-      <a-row
-        type="flex"
-        align="middle"
-      >
+      <a-row type="flex" align="middle">
         <a-col :span="24">
-          <a-list
-            :loading="loading"
-            :dataSource="formattedLogsDatas"
-          >
-            <a-list-item
-              slot="renderItem"
-              slot-scope="item, index"
-              :key="index"
-            >
+          <a-list :loading="loading" :dataSource="formattedLogsDatas">
+            <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
               <a-list-item-meta :description="item.createTime | timeAgo">
                 <span slot="title">{{ item.type }}</span>
               </a-list-item-meta>
-              <ellipsis
-                :length="35"
-                tooltip
-              >{{ item.content }}</ellipsis>
+              <ellipsis :length="35" tooltip>{{ item.content }}</ellipsis>
             </a-list-item>
           </a-list>
 
@@ -39,7 +26,7 @@
               :current="pagination.page"
               :total="pagination.total"
               :defaultPageSize="pagination.size"
-              :pageSizeOptions="['50', '100','150','200']"
+              :pageSizeOptions="['50', '100', '150', '200']"
               showSizeChanger
               @showSizeChange="handlePaginationChange"
               @change="handlePaginationChange"
@@ -50,12 +37,7 @@
       </a-row>
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
-        <a-popconfirm
-          title="你确定要清空所有操作日志？"
-          okText="确定"
-          @confirm="handleClearLogs"
-          cancelText="取消"
-        >
+        <a-popconfirm title="你确定要清空所有操作日志？" okText="确定" @confirm="handleClearLogs" cancelText="取消">
           <a-button type="danger">清空操作日志</a-button>
         </a-popconfirm>
       </div>
@@ -123,7 +105,7 @@ export default {
     handleClearLogs() {
       logApi
         .clear()
-        .then(response => {
+        .then(() => {
           this.$message.success('清除成功！')
         })
         .finally(() => {

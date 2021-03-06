@@ -2,116 +2,69 @@
   <page-view>
     <a-row>
       <a-col :span="24">
-        <a-card
-          :bordered="false"
-          :bodyStyle="{ padding: '16px' }"
-        >
-          <a-card
-            :bordered="false"
-            class="environment-info"
-            :bodyStyle="{ padding: '16px' }"
-          >
+        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
+          <a-card :bordered="false" class="environment-info" :bodyStyle="{ padding: '16px' }">
             <template slot="title">
               环境信息
-              <a
-                href="javascript:void(0);"
-                @click="handleCopyEnvironments"
-              >
+              <a href="javascript:void(0);" @click="handleCopyEnvironments">
                 <a-icon type="copy" />
               </a>
             </template>
-            <a-popover
-              slot="extra"
-              placement="left"
-              :title="isLatest?'当前为最新版本':'有新版本'"
-            >
+            <a-popover slot="extra" placement="left" :title="isLatest ? '当前为最新版本' : '有新版本'">
               <template slot="content">
                 <p>{{ versionMessage }}</p>
-                <a-button
-                  type="dashed"
-                  @click="handleShowVersionContent"
-                >查看详情</a-button>
+                <a-button type="dashed" @click="handleShowVersionContent">查看详情</a-button>
               </template>
               <a-button
                 :loading="checking"
                 type="dashed"
                 shape="circle"
-                :icon="isLatest?'check-circle':'exclamation-circle'"
+                :icon="isLatest ? 'check-circle' : 'exclamation-circle'"
               ></a-button>
             </a-popover>
 
-            <ul class="m-0 p-0 list-none">
+            <ul class="p-0 m-0 list-none">
               <li>版本：{{ environments.version }}</li>
               <li>数据库：{{ environments.database }}</li>
               <li>运行模式：{{ environments.mode }}</li>
               <li>启动时间：{{ environments.startTime | moment }}</li>
             </ul>
-            <a
-              href="https://halo.run"
-              target="_blank"
-              class="mr-3"
-            >官网
+            <a href="https://halo.run" target="_blank" class="mr-3"
+              >官网
               <a-icon type="link" />
             </a>
-            <a
-              href="https://docs.halo.run"
-              target="_blank"
-              class="mr-3"
-            >文档
+            <a href="https://docs.halo.run" target="_blank" class="mr-3"
+              >文档
               <a-icon type="link" />
             </a>
-            <a
-              href="https://github.com/halo-dev"
-              target="_blank"
-              class="mr-3"
-            >开源组织
+            <a href="https://github.com/halo-dev" target="_blank" class="mr-3"
+              >开源组织
               <a-icon type="link" />
             </a>
-            <a
-              href="https://bbs.halo.run"
-              target="_blank"
-              class="mr-3"
-            >在线社区
+            <a href="https://bbs.halo.run" target="_blank" class="mr-3"
+              >在线社区
               <a-icon type="link" />
             </a>
           </a-card>
 
-          <a-card
-            title="开发者"
-            :bordered="false"
-            :bodyStyle="{ padding: '16px' }"
-            :loading="contributorsLoading"
-          >
-            <a
-              :href="item.html_url"
-              v-for="(item,index) in contributors"
-              :key="index"
-              target="_blank"
-            >
-              <a-tooltip
-                placement="top"
-                :title="item.login"
-              >
-                <a-avatar
-                  size="large"
-                  :src="item.avatar_url"
-                  :style="{ marginRight: '10px',marginBottom: '10px'}"
-                />
+          <a-card title="开发者" :bordered="false" :bodyStyle="{ padding: '16px' }" :loading="contributorsLoading">
+            <a :href="item.html_url" v-for="(item, index) in contributors" :key="index" target="_blank">
+              <a-tooltip placement="top" :title="item.login">
+                <a-avatar size="large" :src="item.avatar_url" :style="{ marginRight: '10px', marginBottom: '10px' }" />
               </a-tooltip>
             </a>
           </a-card>
         </a-card>
       </a-col>
 
-      <a-col :span="24">
-      </a-col>
+      <a-col :span="24"> </a-col>
     </a-row>
 
     <a-modal
       :title="versionContentModalTitle"
       :visible="versionContentVisible"
       ok-text="查看更多"
-      @cancel="versionContentVisible=false"
+      @cancel="versionContentVisible = false"
       @ok="handleOpenVersionUrl"
       :width="620"
     >
@@ -127,7 +80,7 @@ import marked from 'marked'
 import { PageView } from '@/layouts'
 export default {
   components: {
-    PageView,
+    PageView
   },
   data() {
     return {
@@ -152,14 +105,14 @@ export default {
           received_events_url: '',
           type: '',
           site_admin: false,
-          contributions: 0,
-        },
+          contributions: 0
+        }
       ],
       contributorsLoading: true,
       checking: false,
       isLatest: false,
       latestData: {},
-      versionContentVisible: false,
+      versionContentVisible: false
     }
   },
   computed: {
@@ -177,7 +130,7 @@ export default {
     },
     versionContentModalTitle() {
       return `${this.latestData.name} 更新内容`
-    },
+    }
   },
   created() {
     this.getEnvironments()
@@ -185,7 +138,7 @@ export default {
   },
   methods: {
     async getEnvironments() {
-      await adminApi.environments().then((response) => {
+      await adminApi.environments().then(response => {
         this.environments = response.data.data
       })
       this.checkServerUpdate()
@@ -196,11 +149,11 @@ export default {
 运行模式：${this.environments.mode}
 User Agent：${navigator.userAgent}`
       this.$copyText(text)
-        .then((message) => {
+        .then(message => {
           this.$log.debug('copy', message)
           this.$message.success('复制成功！')
         })
-        .catch((err) => {
+        .catch(err => {
           this.$log.debug('copy.err', err)
           this.$message.error('复制失败！')
         })
@@ -210,11 +163,11 @@ User Agent：${navigator.userAgent}`
       _this.contributorsLoading = true
       axios
         .get('https://api.github.com/repos/halo-dev/halo/contributors')
-        .then((response) => {
+        .then(response => {
           _this.contributors = response.data
         })
         .catch(function(error) {
-          console.error('Fetch contributors error', error)
+          _this.$log.error('Fetch contributors error', error)
         })
         .finally(() => {
           setTimeout(() => {
@@ -227,7 +180,7 @@ User Agent：${navigator.userAgent}`
       _this.checking = true
       axios
         .get('https://api.github.com/repos/halo-dev/halo/releases/latest')
-        .then((response) => {
+        .then(response => {
           const data = response.data
           _this.latestData = data
           if (data.draft || data.prerelease) {
@@ -245,25 +198,25 @@ User Agent：${navigator.userAgent}`
             message: title,
             description: content,
             icon: <a-icon type="smile" style="color: #108ee9" />,
-            btn: (h) => {
+            btn: h => {
               return h(
                 'a-button',
                 {
                   props: {
                     type: 'primary',
-                    size: 'small',
+                    size: 'small'
                   },
                   on: {
-                    click: () => this.handleShowVersionContent(),
-                  },
+                    click: () => this.handleShowVersionContent()
+                  }
                 },
                 '去看看'
               )
-            },
+            }
           })
         })
         .catch(function(error) {
-          console.error('Check update fail', error)
+          this.$log.error('Check update fail', error)
         })
         .finally(() => {
           setTimeout(() => {
@@ -290,7 +243,7 @@ User Agent：${navigator.userAgent}`
         return -1
       }
       return major * 1000000 + minor * 1000 + micro
-    },
-  },
+    }
+  }
 }
 </script>

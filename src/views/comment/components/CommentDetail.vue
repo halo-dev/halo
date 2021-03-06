@@ -1,16 +1,13 @@
 <template>
   <a-drawer
     title="评论详情"
-    :width="isMobile()?'100%':'480'"
+    :width="isMobile() ? '100%' : '480'"
     closable
     :visible="visible"
     destroyOnClose
     @close="onClose"
   >
-    <a-row
-      type="flex"
-      align="middle"
-    >
+    <a-row type="flex" align="middle">
       <a-col :span="24">
         <a-list itemLayout="horizontal">
           <a-list-item>
@@ -30,66 +27,36 @@
           </a-list-item>
           <a-list-item>
             <a-list-item-meta>
-              <a
-                slot="description"
-                target="_blank"
-                :href="comment.authorUrl"
-              >{{ comment.authorUrl }}</a>
+              <a slot="description" target="_blank" :href="comment.authorUrl">{{ comment.authorUrl }}</a>
               <span slot="title">评论者网址：</span>
             </a-list-item-meta>
           </a-list-item>
           <a-list-item>
             <a-list-item-meta>
               <span slot="description">
-                <a-badge
-                  :status="comment.statusProperty.status"
-                  :text="comment.statusProperty.text"
-                />
+                <a-badge :status="comment.statusProperty.status" :text="comment.statusProperty.text" />
               </span>
               <span slot="title">评论状态：</span>
             </a-list-item-meta>
           </a-list-item>
           <a-list-item>
             <a-list-item-meta>
-              <a
-                slot="description"
-                target="_blank"
-                :href="comment.post.fullPath"
-                v-if="this.type=='posts'"
-              >{{ comment.post.title }}</a>
-              <a
-                slot="description"
-                target="_blank"
-                :href="comment.sheet.fullPath"
-                v-else-if="this.type=='sheets'"
-              >{{ comment.sheet.title }}</a>
-              <span
-                slot="title"
-                v-if="this.type=='posts'"
-              >评论文章：</span>
-              <span
-                slot="title"
-                v-else-if="this.type=='sheets'"
-              >评论页面：</span>
+              <a slot="description" target="_blank" :href="comment.post.fullPath" v-if="this.type == 'posts'">{{
+                comment.post.title
+              }}</a>
+              <a slot="description" target="_blank" :href="comment.sheet.fullPath" v-else-if="this.type == 'sheets'">{{
+                comment.sheet.title
+              }}</a>
+              <span slot="title" v-if="this.type == 'posts'">评论文章：</span>
+              <span slot="title" v-else-if="this.type == 'sheets'">评论页面：</span>
             </a-list-item-meta>
           </a-list-item>
           <a-list-item>
             <a-list-item-meta>
-              <template
-                slot="description"
-                v-if="editable"
-              >
-                <a-input
-                  type="textarea"
-                  :autoSize="{ minRows: 5 }"
-                  v-model="comment.content"
-                />
+              <template slot="description" v-if="editable">
+                <a-input type="textarea" :autoSize="{ minRows: 5 }" v-model="comment.content" />
               </template>
-              <span
-                slot="description"
-                v-html="comment.content"
-                v-else
-              ></span>
+              <span slot="description" v-html="comment.content" v-else></span>
               <span slot="title">评论内容：</span>
             </a-list-item-meta>
           </a-list-item>
@@ -99,21 +66,9 @@
     <a-divider class="divider-transparent" />
     <div class="bottom-control">
       <a-space>
-        <a-button
-          type="dashed"
-          @click="handleEditComment"
-          v-if="!editable"
-        >编辑</a-button>
-        <a-button
-          type="primary"
-          @click="handleUpdateComment"
-          v-if="editable"
-        >保存</a-button>
-        <a-popconfirm
-          title="你确定要将此评论者加入黑名单？"
-          okText="确定"
-          cancelText="取消"
-        >
+        <a-button type="dashed" @click="handleEditComment" v-if="!editable">编辑</a-button>
+        <a-button type="primary" @click="handleUpdateComment" v-if="editable">保存</a-button>
+        <a-popconfirm title="你确定要将此评论者加入黑名单？" okText="确定" cancelText="取消">
           <a-button type="danger">加入黑名单</a-button>
         </a-popconfirm>
       </a-space>

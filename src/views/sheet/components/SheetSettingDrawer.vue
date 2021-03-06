@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     title="页面设置"
-    :width="isMobile()?'100%':'480'"
+    :width="isMobile() ? '100%' : '480'"
     placement="right"
     closable
     destroyOnClose
@@ -14,16 +14,10 @@
         <h3 class="post-setting-drawer-title">基本设置</h3>
         <div class="post-setting-drawer-item">
           <a-form layout="vertical">
-            <a-form-item
-              label="页面标题："
-              v-if="needTitle"
-            >
+            <a-form-item label="页面标题：" v-if="needTitle">
               <a-input v-model="selectedSheet.title" />
             </a-form-item>
-            <a-form-item
-              label="页面别名："
-              :help="fullPath"
-            >
+            <a-form-item label="页面别名：" :help="fullPath">
               <a-input v-model="selectedSheet.slug" />
             </a-form-item>
             <a-form-item label="发表时间：">
@@ -37,31 +31,15 @@
               />
             </a-form-item>
             <a-form-item label="开启评论：">
-              <a-radio-group
-                v-model="selectedSheet.disallowComment"
-                :defaultValue="false"
-              >
+              <a-radio-group v-model="selectedSheet.disallowComment" :defaultValue="false">
                 <a-radio :value="false">开启</a-radio>
                 <a-radio :value="true">关闭</a-radio>
               </a-radio-group>
             </a-form-item>
-            <a-form-item
-              label="自定义模板："
-              v-if="customTpls.length>0"
-            >
-              <a-select
-                v-model="selectedSheet.template"
-                :loading="customTplsLoading"
-              >
-                <a-select-option
-                  key=""
-                  value=""
-                >无</a-select-option>
-                <a-select-option
-                  v-for="tpl in customTpls"
-                  :key="tpl"
-                  :value="tpl"
-                >{{ tpl }}</a-select-option>
+            <a-form-item label="自定义模板：" v-if="customTpls.length > 0">
+              <a-select v-model="selectedSheet.template" :loading="customTplsLoading">
+                <a-select-option key="" value="">无</a-select-option>
+                <a-select-option v-for="tpl in customTpls" :key="tpl" :value="tpl">{{ tpl }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-form>
@@ -94,36 +72,25 @@
               class="img"
               :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
               @click="thumbDrawerVisible = true"
-            >
+            />
 
             <a-form layout="vertial">
               <a-form-item>
-                <a-input
-                  v-model="selectedSheet.thumbnail"
-                  placeholder="点击封面图选择图片，或者输入外部链接"
-                ></a-input>
+                <a-input v-model="selectedSheet.thumbnail" placeholder="点击封面图选择图片，或者输入外部链接"></a-input>
               </a-form-item>
             </a-form>
 
-            <a-button
-              class="sheet-thumb-remove"
-              type="dashed"
-              @click="selectedSheet.thumbnail = null"
-            >移除</a-button>
+            <a-button class="sheet-thumb-remove" type="dashed" @click="selectedSheet.thumbnail = null">移除</a-button>
           </div>
         </div>
       </div>
       <a-divider class="divider-transparent" />
     </div>
-    <AttachmentSelectDrawer
-      v-model="thumbDrawerVisible"
-      @listenToSelect="handleSelectSheetThumb"
-      :drawerWidth="480"
-    />
+    <AttachmentSelectDrawer v-model="thumbDrawerVisible" @listenToSelect="handleSelectSheetThumb" :drawerWidth="480" />
 
     <a-drawer
       title="高级设置"
-      :width="isMobile()?'100%':'480'"
+      :width="isMobile() ? '100%' : '480'"
       placement="right"
       closable
       destroyOnClose
@@ -136,10 +103,7 @@
           <div class="post-setting-drawer-item">
             <a-form layout="vertical">
               <a-form-item label="自定义关键词：">
-                <a-input
-                  v-model="selectedSheet.metaKeywords"
-                  placeholder="多个关键词以英文逗号隔开"
-                />
+                <a-input v-model="selectedSheet.metaKeywords" placeholder="多个关键词以英文逗号隔开" />
               </a-form-item>
               <a-form-item label="自定义描述：">
                 <a-input
@@ -156,11 +120,7 @@
         <div class="mb-4">
           <h3 class="post-setting-drawer-title">元数据</h3>
           <a-form layout="vertical">
-            <a-form-item
-              v-for="(meta, index) in selectedMetas"
-              :key="index"
-              :prop="'meta.' + index + '.value'"
-            >
+            <a-form-item v-for="(meta, index) in selectedMetas" :key="index" :prop="'meta.' + index + '.value'">
               <a-row :gutter="5">
                 <a-col :span="12">
                   <a-input v-model="meta.key"><i slot="addonBefore">K</i></a-input>
@@ -168,11 +128,7 @@
                 <a-col :span="12">
                   <a-input v-model="meta.value">
                     <i slot="addonBefore">V</i>
-                    <a
-                      href="javascript:void(0);"
-                      slot="addonAfter"
-                      @click.prevent="handleRemoveSheetMeta(meta)"
-                    >
+                    <a href="javascript:void(0);" slot="addonAfter" @click.prevent="handleRemoveSheetMeta(meta)">
                       <a-icon type="close" />
                     </a>
                   </a-input>
@@ -180,10 +136,7 @@
               </a-row>
             </a-form-item>
             <a-form-item>
-              <a-button
-                type="dashed"
-                @click="handleInsertSheetMeta()"
-              >新增</a-button>
+              <a-button type="dashed" @click="handleInsertSheetMeta()">新增</a-button>
             </a-form-item>
           </a-form>
         </div>
@@ -191,20 +144,14 @@
       </div>
       <div class="bottom-control">
         <a-space>
-          <a-button
-            type="primary"
-            @click="advancedVisible = false"
-          >返回</a-button>
+          <a-button type="primary" @click="advancedVisible = false">返回</a-button>
         </a-space>
       </div>
     </a-drawer>
 
     <div class="bottom-control">
       <a-space>
-        <a-button
-          type="dashed"
-          @click="advancedVisible = true"
-        >高级</a-button>
+        <a-button type="dashed" @click="advancedVisible = true">高级</a-button>
         <ReactiveButton
           type="danger"
           v-if="saveDraftButton"
@@ -221,9 +168,9 @@
           @callback="handleSavedCallback"
           :loading="saving"
           :errored="savedErrored"
-          :text="`${selectedSheet.id?'保存':'发布'}`"
-          :loadedText="`${selectedSheet.id?'保存':'发布'}成功`"
-          :erroredText="`${selectedSheet.id?'保存':'发布'}失败`"
+          :text="`${selectedSheet.id ? '保存' : '发布'}`"
+          :loadedText="`${selectedSheet.id ? '保存' : '发布'}成功`"
+          :erroredText="`${selectedSheet.id ? '保存' : '发布'}失败`"
         ></ReactiveButton>
       </a-space>
     </div>
@@ -252,33 +199,33 @@ export default {
       saving: false,
       savedErrored: false,
       draftSaving: false,
-      draftSavedErrored: false,
+      draftSavedErrored: false
     }
   },
   props: {
     sheet: {
       type: Object,
-      required: true,
+      required: true
     },
     metas: {
       type: Array,
-      required: true,
+      required: true
     },
     needTitle: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     },
     saveDraftButton: {
       type: Boolean,
       required: false,
-      default: true,
+      default: true
     },
     visible: {
       type: Boolean,
       required: false,
-      default: true,
-    },
+      default: true
+    }
   },
   watch: {
     sheet(val) {
@@ -289,7 +236,7 @@ export default {
     },
     selectedMetas(val) {
       this.$emit('onRefreshSheetMetas', val)
-    },
+    }
   },
   computed: {
     ...mapGetters(['options']),
@@ -318,7 +265,7 @@ export default {
         default:
           return ''
       }
-    },
+    }
   },
   methods: {
     handleAfterVisibleChanged(visible) {
@@ -330,13 +277,13 @@ export default {
     },
     handleListPresetMetasField() {
       if (this.metas.length <= 0) {
-        themeApi.getActivatedTheme().then((response) => {
+        themeApi.getActivatedTheme().then(response => {
           const fields = response.data.data.sheetMetaField
           if (fields && fields.length > 0) {
             for (let i = 0, len = fields.length; i < len; i++) {
               this.selectedMetas.push({
                 value: '',
-                key: fields[i],
+                key: fields[i]
               })
             }
           }
@@ -347,7 +294,7 @@ export default {
       this.customTplsLoading = true
       themeApi
         .customSheetTpls()
-        .then((response) => {
+        .then(response => {
           this.customTpls = response.data.data
         })
         .finally(() => {
@@ -372,7 +319,7 @@ export default {
       if (!this.selectedSheet.title) {
         this.$notification['error']({
           message: '提示',
-          description: '页面标题不能为空！',
+          description: '页面标题不能为空！'
         })
         return
       }
@@ -408,7 +355,7 @@ export default {
               this.savedErrored = true
             }
           })
-          .then((response) => {
+          .then(response => {
             this.selectedSheet = response.data.data
           })
           .finally(() => {
@@ -431,7 +378,7 @@ export default {
     onClose() {
       this.$emit('close', false)
     },
-    onSheetDateChange(value, dateString) {
+    onSheetDateChange(value) {
       this.selectedSheet.createTime = value.valueOf()
     },
     onSheetDateOk(value) {
@@ -446,7 +393,7 @@ export default {
     handleInsertSheetMeta() {
       this.selectedMetas.push({
         value: '',
-        key: '',
+        key: ''
       })
     },
     handleSetPinyinSlug() {
@@ -455,7 +402,7 @@ export default {
           let result = ''
           const tokens = pinyin.parse(this.selectedSheet.title)
           let lastToken
-          tokens.forEach((token, i) => {
+          tokens.forEach(token => {
             if (token.type === 2) {
               const target = token.target ? token.target.toLowerCase() : ''
               result += result && !/\n|\s/.test(lastToken.target) ? '-' + target : target
@@ -467,7 +414,7 @@ export default {
           this.$set(this.selectedSheet, 'slug', result)
         }
       }
-    },
-  },
+    }
+  }
 }
 </script>

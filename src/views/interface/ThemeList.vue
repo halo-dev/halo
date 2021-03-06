@@ -1,121 +1,42 @@
 <template>
-  <page-view
-    affix
-    :title="activatedTheme ? activatedTheme.name : '无'"
-    subTitle="当前启用"
-  >
+  <page-view affix :title="activatedTheme ? activatedTheme.name : '无'" subTitle="当前启用">
     <template slot="extra">
-      <a-button
-        icon="reload"
-        :loading="list.loading"
-        @click="handleRefreshThemesCache"
-      >
+      <a-button icon="reload" :loading="list.loading" @click="handleRefreshThemesCache">
         刷新
       </a-button>
-      <a-button
-        type="primary"
-        icon="plus"
-        @click="installModal.visible = true"
-      >
+      <a-button type="primary" icon="plus" @click="installModal.visible = true">
         安装
       </a-button>
     </template>
-    <a-row
-      :gutter="12"
-      type="flex"
-      align="middle"
-    >
+    <a-row :gutter="12" type="flex" align="middle">
       <a-col :span="24">
         <a-list
           :grid="{ gutter: 12, xs: 1, sm: 1, md: 2, lg: 4, xl: 4, xxl: 4 }"
           :dataSource="sortedThemes"
           :loading="list.loading"
         >
-          <a-list-item
-            slot="renderItem"
-            slot-scope="item, index"
-            :key="index"
-          >
-            <a-card
-              hoverable
-              :title="item.name"
-              :bodyStyle="{ padding: 0 }"
-            >
+          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+            <a-card hoverable :title="item.name" :bodyStyle="{ padding: 0 }">
               <div class="theme-screenshot">
-                <img
-                  :alt="item.name"
-                  :src="item.screenshots || '/images/placeholder.jpg'"
-                  loading="lazy"
-                />
+                <img :alt="item.name" :src="item.screenshots || '/images/placeholder.jpg'" loading="lazy" />
               </div>
-              <template
-                class="ant-card-actions"
-                slot="actions"
-              >
-                <div v-if="item.activated">
-                  <a-icon
-                    type="unlock"
-                    theme="twoTone"
-                    style="margin-right:3px"
-                  />已启用
-                </div>
-                <div
-                  v-else
-                  @click="handleActiveTheme(item)"
-                >
-                  <a-icon
-                    type="lock"
-                    style="margin-right:3px"
-                  />启用
-                </div>
+              <template class="ant-card-actions" slot="actions">
+                <div v-if="item.activated"><a-icon type="unlock" theme="twoTone" style="margin-right:3px" />已启用</div>
+                <div v-else @click="handleActiveTheme(item)"><a-icon type="lock" style="margin-right:3px" />启用</div>
                 <div @click="handleOpenThemeSettingDrawer(item)">
-                  <a-icon
-                    type="setting"
-                    style="margin-right:3px"
-                  />设置
+                  <a-icon type="setting" style="margin-right:3px" />设置
                 </div>
-                <a-dropdown
-                  placement="topCenter"
-                  :trigger="['click']"
-                >
-                  <a
-                    class="ant-dropdown-link"
-                    href="#"
-                  >
-                    <a-icon
-                      type="ellipsis"
-                      style="margin-right:3px"
-                    />更多
-                  </a>
+                <a-dropdown placement="topCenter" :trigger="['click']">
+                  <a class="ant-dropdown-link" href="#"> <a-icon type="ellipsis" style="margin-right:3px" />更多 </a>
                   <a-menu slot="overlay">
-                    <a-menu-item
-                      :key="1"
-                      :disabled="item.activated"
-                      @click="handleOpenThemeDeleteModal(item)"
-                    >
-                      <a-icon
-                        type="delete"
-                        style="margin-right:3px"
-                      />删除
+                    <a-menu-item :key="1" :disabled="item.activated" @click="handleOpenThemeDeleteModal(item)">
+                      <a-icon type="delete" style="margin-right:3px" />删除
                     </a-menu-item>
-                    <a-menu-item
-                      :key="2"
-                      v-if="item.repo"
-                      @click="handleConfirmRemoteUpdate(item)"
-                    >
-                      <a-icon
-                        type="cloud"
-                        style="margin-right:3px"
-                      />在线更新
+                    <a-menu-item :key="2" v-if="item.repo" @click="handleConfirmRemoteUpdate(item)">
+                      <a-icon type="cloud" style="margin-right:3px" />在线更新
                     </a-menu-item>
-                    <a-menu-item
-                      :key="3"
-                      @click="handleOpenLocalUpdateModal(item)"
-                    >
-                      <a-icon
-                        type="file"
-                        style="margin-right:3px"
-                      />从主题包更新
+                    <a-menu-item :key="3" @click="handleOpenLocalUpdateModal(item)">
+                      <a-icon type="file" style="margin-right:3px" />从主题包更新
                     </a-menu-item>
                   </a-menu>
                 </a-dropdown>
@@ -142,10 +63,7 @@
     >
       <div class="custom-tab-wrapper">
         <a-tabs>
-          <a-tab-pane
-            tab="本地上传"
-            key="1"
-          >
+          <a-tab-pane tab="本地上传" key="1">
             <FilePondUpload
               ref="upload"
               name="file"
@@ -154,34 +72,21 @@
               :uploadHandler="installModal.local.uploadHandler"
               @success="handleUploadSucceed"
             ></FilePondUpload>
-            <a-alert
-              type="info"
-              closable
-            >
+            <a-alert type="info" closable>
               <template slot="message">
                 更多主题请访问：
-                <a
-                  target="_blank"
-                  href="https://halo.run/themes.html"
-                >https://halo.run/themes</a>
+                <a target="_blank" href="https://halo.run/themes.html">https://halo.run/themes</a>
               </template>
             </a-alert>
           </a-tab-pane>
-          <a-tab-pane
-            tab="远程下载"
-            key="2"
-          >
+          <a-tab-pane tab="远程下载" key="2">
             <a-form-model
               ref="remoteInstallForm"
               :model="installModal.remote"
               :rules="installModal.remote.rules"
               layout="vertical"
             >
-              <a-form-model-item
-                prop="url"
-                label="远程地址："
-                help="* 支持 Git 仓库地址，ZIP 链接。"
-              >
+              <a-form-model-item prop="url" label="远程地址：" help="* 支持 Git 仓库地址，ZIP 链接。">
                 <a-input v-model="installModal.remote.url" />
               </a-form-model-item>
               <a-form-model-item>
@@ -197,16 +102,10 @@
                 ></ReactiveButton>
               </a-form-model-item>
             </a-form-model>
-            <a-alert
-              type="info"
-              closable
-            >
+            <a-alert type="info" closable>
               <template slot="message">
                 目前仅支持远程 Git 仓库和 ZIP 下载链接。更多主题请访问：
-                <a
-                  target="_blank"
-                  href="https://halo.run/themes.html"
-                >https://halo.run/themes</a>
+                <a target="_blank" href="https://halo.run/themes.html">https://halo.run/themes</a>
               </template>
             </a-alert>
           </a-tab-pane>
@@ -269,19 +168,19 @@ import themeApi from '@/api/theme'
 export default {
   components: {
     PageView,
-    ThemeSettingDrawer,
+    ThemeSettingDrawer
   },
   data() {
     return {
       list: {
         loading: false,
-        data: [],
+        data: []
       },
 
       installModal: {
         visible: false,
         local: {
-          uploadHandler: themeApi.upload,
+          uploadHandler: themeApi.upload
         },
 
         remote: {
@@ -291,15 +190,15 @@ export default {
           fetchErrored: false,
 
           rules: {
-            url: [{ required: true, message: '* 远程地址不能为空', trigger: ['change'] }],
-          },
-        },
+            url: [{ required: true, message: '* 远程地址不能为空', trigger: ['change'] }]
+          }
+        }
       },
 
       localUpdateModel: {
         visible: false,
         uploadHandler: themeApi.updateByUpload,
-        selected: {},
+        selected: {}
       },
 
       themeDeleteModal: {
@@ -307,13 +206,13 @@ export default {
         deleteSettings: false,
         selected: {},
         deleting: false,
-        deleteErrored: false,
+        deleteErrored: false
       },
 
       themeSettingDrawer: {
         visible: false,
-        selected: {},
-      },
+        selected: {}
+      }
     }
   },
   computed: {
@@ -328,7 +227,7 @@ export default {
         return this.sortedThemes[0]
       }
       return null
-    },
+    }
   },
   beforeMount() {
     this.handleListThemes()
@@ -352,7 +251,7 @@ export default {
       this.list.loading = true
       themeApi
         .list()
-        .then((response) => {
+        .then(response => {
           this.list.data = response.data.data
         })
         .finally(() => {
@@ -398,7 +297,7 @@ export default {
       this.handleListThemes()
     },
     handleRemoteFetching() {
-      this.$refs.remoteInstallForm.validate((valid) => {
+      this.$refs.remoteInstallForm.validate(valid => {
         if (valid) {
           this.installModal.remote.fetching = true
           themeApi
@@ -444,7 +343,7 @@ export default {
           const hide = _this.$message.loading('更新中...', 0)
           themeApi
             .update(item.id)
-            .then((response) => {
+            .then(() => {
               _this.$message.success('更新成功！')
             })
             .finally(() => {
@@ -452,7 +351,7 @@ export default {
               _this.handleListThemes()
             })
         },
-        onCancel() {},
+        onCancel() {}
       })
     },
     onThemeInstallModalClose() {
@@ -473,7 +372,7 @@ export default {
       this.themeDeleteModal.visible = false
       this.themeDeleteModal.deleteSettings = false
       this.themeDeleteModal.selected = {}
-    },
-  },
+    }
+  }
 }
 </script>

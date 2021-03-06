@@ -1,7 +1,5 @@
 module.exports = {
-  purge: [
-    './src/**/*.vue',
-  ],
+  purge: ['./src/**/*.vue'],
   target: 'relaxed',
   prefix: '',
   important: false,

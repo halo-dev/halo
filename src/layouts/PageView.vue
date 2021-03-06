@@ -1,50 +1,20 @@
 <template>
   <div :style="!$route.meta.hiddenHeaderContent ? 'margin: -24px -24px 0px;' : null">
     <a-affix v-if="affix">
-      <div
-        class="page-header"
-        v-if="!$route.meta.hiddenHeaderContent"
-      >
+      <div class="page-header" v-if="!$route.meta.hiddenHeaderContent">
         <div class="page-header-index-wide">
-          <a-page-header
-            :title="title"
-            :sub-title="subTitle"
-            :breadcrumb="{ props: { routes:breadList } }"
-          >
-            <slot
-              name="extra"
-              slot="extra"
-            >
-            </slot>
-            <slot
-              name="footer"
-              slot="footer"
-            >
-            </slot>
+          <a-page-header :title="title" :sub-title="subTitle" :breadcrumb="{ props: { routes: breadList } }">
+            <slot name="extra" slot="extra"> </slot>
+            <slot name="footer" slot="footer"> </slot>
           </a-page-header>
         </div>
       </div>
     </a-affix>
-    <div
-      class="page-header"
-      v-if="!$route.meta.hiddenHeaderContent && !affix"
-    >
+    <div class="page-header" v-if="!$route.meta.hiddenHeaderContent && !affix">
       <div class="page-header-index-wide">
-        <a-page-header
-          :title="title"
-          :sub-title="subTitle"
-          :breadcrumb="{ props: { routes:breadList } }"
-        >
-          <slot
-            name="extra"
-            slot="extra"
-          >
-          </slot>
-          <slot
-            name="footer"
-            slot="footer"
-          >
-          </slot>
+        <a-page-header :title="title" :sub-title="subTitle" :breadcrumb="{ props: { routes: breadList } }">
+          <slot name="extra" slot="extra"> </slot>
+          <slot name="footer" slot="footer"> </slot>
         </a-page-header>
       </div>
     </div>
@@ -64,20 +34,20 @@ export default {
   props: {
     title: {
       type: String,
-      default: null,
+      default: null
     },
     subTitle: {
       type: String,
-      default: null,
+      default: null
     },
     affix: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data() {
     return {
-      breadList: [],
+      breadList: []
     }
   },
   created() {
@@ -86,17 +56,17 @@ export default {
   watch: {
     $route() {
       this.getBreadcrumb()
-    },
+    }
   },
   methods: {
     getBreadcrumb() {
       this.breadList = []
-      this.$route.matched.forEach((item) => {
+      this.$route.matched.forEach(item => {
         item.breadcrumbName = item.meta.title
         this.breadList.push(item)
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

@@ -1,68 +1,40 @@
 <template>
-  <a-list
-    itemLayout="horizontal"
-    :dataSource="formmatedCommentData"
-    :loading="loading"
-  >
-    <a-list-item
-      slot="renderItem"
-      slot-scope="item, index"
-      :key="index"
-    >
-      <a-comment :avatar="'//cn.gravatar.com/avatar/'+item.gravatarMd5+'/?s=256&d=mp'">
-        <template
-          slot="author"
-          v-if="type==='posts'"
-        >
-          <a
-            :href="item.authorUrl"
-            target="_blank"
-          >{{ item.author }}</a> 发表在 《<a
-            v-if="item.post.status=='PUBLISHED' || item.post.status=='INTIMATE'"
+  <a-list itemLayout="horizontal" :dataSource="formmatedCommentData" :loading="loading">
+    <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+      <a-comment :avatar="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '/?s=256&d=mp'">
+        <template slot="author" v-if="type === 'posts'">
+          <a :href="item.authorUrl" target="_blank">{{ item.author }}</a> 发表在 《<a
+            v-if="item.post.status == 'PUBLISHED' || item.post.status == 'INTIMATE'"
             :href="item.post.fullPath"
             target="_blank"
-          >{{ item.post.title }}</a><a
-            v-else-if="item.post.status=='DRAFT'"
+            >{{ item.post.title }}</a
+          ><a
+            v-else-if="item.post.status == 'DRAFT'"
             href="javascript:void(0)"
             @click="handlePostPreview(item.post.id)"
-          >{{ item.post.title }}</a><a
-            v-else
-            href="javascript:void(0)"
-          >{{ item.post.title }}</a>
+            >{{ item.post.title }}</a
+          ><a v-else href="javascript:void(0)">{{ item.post.title }}</a>
           》
         </template>
-        <template
-          slot="author"
-          v-else-if="type==='sheets'"
-        >
-          <a
-            :href="item.authorUrl"
-            target="_blank"
-          >{{ item.author }}</a> 发表在 《<a
-            v-if="item.sheet.status=='PUBLISHED'"
+        <template slot="author" v-else-if="type === 'sheets'">
+          <a :href="item.authorUrl" target="_blank">{{ item.author }}</a> 发表在 《<a
+            v-if="item.sheet.status == 'PUBLISHED'"
             :href="item.sheet.fullPath"
             target="_blank"
-          >{{ item.sheet.title }}</a><a
-            v-else-if="item.sheet.status=='DRAFT'"
+            >{{ item.sheet.title }}</a
+          ><a
+            v-else-if="item.sheet.status == 'DRAFT'"
             href="javascript:void(0)"
             @click="handleSheetPreview(item.sheet.id)"
-          >{{ item.sheet.title }}</a><a
-            v-else
-            href="javascript:void(0)"
-          >{{ item.sheet.title }}</a>》
+            >{{ item.sheet.title }}</a
+          ><a v-else href="javascript:void(0)">{{ item.sheet.title }}</a
+          >》
         </template>
         <!-- <template slot="actions">
           <span>回复</span>
         </template> -->
-        <p
-          class="comment-content-wrapper"
-          slot="content"
-          v-html="item.content"
-        ></p>
-        <a-tooltip
-          slot="datetime"
-          :title="item.createTime | moment"
-        >
+        <p class="comment-content-wrapper" slot="content" v-html="item.content"></p>
+        <a-tooltip slot="datetime" :title="item.createTime | moment">
           <span>{{ item.createTime | timeAgo }}</span>
         </a-tooltip>
       </a-comment>
