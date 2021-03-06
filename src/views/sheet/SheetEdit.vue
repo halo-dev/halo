@@ -29,12 +29,6 @@
             @onSaveDraft="handleSaveDraft(true)"
             @onContentChange="onContentChange"
           />
-
-          <!-- <RichTextEditor
-            v-else
-            :originalContent="sheetToStage.originalContent"
-            @onContentChange="onContentChange"
-          /> -->
         </div>
       </a-col>
     </a-row>
@@ -55,13 +49,11 @@
 
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
-// import { mapGetters } from 'vuex'
 import { datetimeFormat } from '@/utils/datetime'
 import { PageView } from '@/layouts'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
-// import RichTextEditor from '@/components/editor/RichTextEditor'
 
 import sheetApi from '@/api/sheet'
 export default {
@@ -70,7 +62,6 @@ export default {
     AttachmentDrawer,
     SheetSettingDrawer,
     MarkdownEditor
-    // RichTextEditor
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -140,22 +131,6 @@ export default {
       }
       return '当前页面数据未保存，确定要离开吗？'
     }
-    // if (!this.sheetToStage.editorType) {
-    //   this.sheetToStage.editorType = this.options.default_editor
-    // }
-  },
-  watch: {
-    temporaryContent(newValue) {
-      if (newValue) {
-        this.contentChanges++
-      }
-    }
-  },
-  computed: {
-    temporaryContent() {
-      return this.sheetToStage.originalContent
-    }
-    // ...mapGetters(['options'])
   },
   methods: {
     handleSaveDraft(draftOnly = false) {
@@ -256,6 +231,7 @@ export default {
       this.contentChanges = 0
     },
     onContentChange(val) {
+      this.contentChanges++
       this.sheetToStage.originalContent = val
     },
     onRefreshSheetFromSetting(sheet) {

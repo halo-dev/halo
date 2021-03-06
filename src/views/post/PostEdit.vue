@@ -29,12 +29,6 @@
             @onSaveDraft="handleSaveDraft(true)"
             @onContentChange="onContentChange"
           />
-
-          <!-- <RichTextEditor
-            v-else
-            :originalContent="postToStage.originalContent"
-            @onContentChange="onContentChange"
-          /> -->
         </div>
       </a-col>
     </a-row>
@@ -59,14 +53,12 @@
 
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
-// import { mapGetters } from 'vuex'
 import { datetimeFormat } from '@/utils/datetime'
 
 import PostSettingDrawer from './components/PostSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 import { PageView } from '@/layouts'
-// import RichTextEditor from '@/components/editor/RichTextEditor'
 
 import postApi from '@/api/post'
 export default {
@@ -76,7 +68,6 @@ export default {
     AttachmentDrawer,
     MarkdownEditor,
     PageView
-    // RichTextEditor
   },
   data() {
     return {
@@ -149,22 +140,6 @@ export default {
       }
       return '当前页面数据未保存，确定要离开吗？'
     }
-    // if (!this.postToStage.editorType) {
-    //   this.postToStage.editorType = this.options.default_editor
-    // }
-  },
-  watch: {
-    temporaryContent(newValue) {
-      if (newValue) {
-        this.contentChanges++
-      }
-    }
-  },
-  computed: {
-    temporaryContent() {
-      return this.postToStage.originalContent
-    }
-    // ...mapGetters(['options'])
   },
   methods: {
     handleSaveDraft(draftOnly = false) {
@@ -269,6 +244,7 @@ export default {
       this.contentChanges = 0
     },
     onContentChange(val) {
+      this.contentChanges++
       this.postToStage.originalContent = val
     },
     onRefreshPostFromSetting(post) {
