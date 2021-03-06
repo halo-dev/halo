@@ -64,7 +64,7 @@ export default {
       type: Array,
       required: false,
       default: () => {
-        return []
+        return null
       }
     },
     label: {
@@ -75,11 +75,6 @@ export default {
     uploadHandler: {
       type: Function,
       required: true
-    },
-    loadOptions: {
-      type: Boolean,
-      required: false,
-      default: true
     }
   },
   computed: {
