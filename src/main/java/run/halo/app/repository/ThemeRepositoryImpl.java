@@ -132,7 +132,7 @@ public class ThemeRepositoryImpl
     @Override
     public ThemeProperty attemptToAdd(ThemeProperty newProperty) {
         // 1. check existence
-        final var alreadyExist = fetchThemePropertyByThemeId(newProperty.getId()).isPresent();
+        final var alreadyExist = fetchThemeByThemeId(newProperty.getId()).isPresent();
         if (alreadyExist) {
             throw new AlreadyExistsException("当前安装的主题已存在");
         }
