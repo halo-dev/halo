@@ -1,6 +1,5 @@
 package run.halo.app.repository;
 
-import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static run.halo.app.model.properties.PrimaryProperties.THEME;
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 import static run.halo.app.utils.FileUtils.copyFolder;
@@ -147,7 +146,7 @@ public class ThemeRepositoryImpl
         // 3. move the temp folder into templates/themes/{theme_id}
         final var sourceThemePath = Paths.get(newProperty.getThemePath());
         final var targetThemePath =
-            getThemeRootPath().resolve(newProperty.getId() + "-" + randomAlphabetic(5));
+            getThemeRootPath().resolve(newProperty.getId());
 
         // 4. clear target theme folder firstly
         deleteFolderQuietly(targetThemePath);
