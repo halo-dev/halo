@@ -39,7 +39,7 @@ spring:
     settings:
       auto_import: /common/macro/global_macro.ftl as global
     template-loader-path:
-      - file:///${halo.work-dir}templates/
+      - file:///${halo.work-dir}/templates/
       - classpath:/templates/
 management:
   endpoints:
