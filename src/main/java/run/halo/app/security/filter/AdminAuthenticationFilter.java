@@ -69,7 +69,7 @@ public class AdminAuthenticationFilter extends AbstractAuthenticationFilter {
         // set failure handler
         DefaultAuthenticationFailureHandler failureHandler =
             new DefaultAuthenticationFailureHandler();
-        failureHandler.setProductionEnv(haloProperties.isProductionEnv());
+        failureHandler.setProductionEnv(haloProperties.getMode().isProductionEnv());
         failureHandler.setObjectMapper(objectMapper);
 
         setFailureHandler(failureHandler);

@@ -58,7 +58,7 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
         // set failure handler
         DefaultAuthenticationFailureHandler failureHandler =
             new DefaultAuthenticationFailureHandler();
-        failureHandler.setProductionEnv(haloProperties.isProductionEnv());
+        failureHandler.setProductionEnv(haloProperties.getMode().isProductionEnv());
         failureHandler.setObjectMapper(objectMapper);
         setFailureHandler(failureHandler);
     }
@@ -91,7 +91,7 @@ public class ApiAuthenticationFilter extends AbstractAuthenticationFilter {
         Optional<String> optionalAccessKey =
             optionService.getByProperty(ApiProperties.API_ACCESS_KEY, String.class);
 
-        if (!optionalAccessKey.isPresent()) {
+        if (optionalAccessKey.isEmpty()) {
             // If the access key is not set
             throw new AuthenticationException("API access key hasn't been set by blogger");
         }
