@@ -2,13 +2,16 @@ server:
   port: 8090
   forward-headers-strategy: native
   compression:
-    enabled: false
+    enabled: true
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   output:
     ansi:
       enabled: always
+  devtools:
+    restart:
+      eanbled: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
@@ -56,15 +59,9 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: INFO
     org.hibernate.type.descriptor.sql.BasicExtractor: INFO
   file:
-    path: ${user.home}/halo-dev/logs
-
-springfox:
-  documentation:
-    enabled: true
+    path: ${halo.work-dir}/newLogs
 
 halo:
-  doc-disabled: false
-  production-env: false
   auth-enabled: true
   mode: development
   workDir: ${user.home}/halo-dev/
