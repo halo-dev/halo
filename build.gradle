@@ -101,6 +101,7 @@ ext {
     huaweiObsVersion = "3.19.7"
     githubApiVersion = "1.84"
     templateInheritanceVersion = "0.4.RELEASE"
+    jsoupVersion = "1.13.1"
 }
 
 dependencies {
@@ -108,7 +109,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
-    implementation "org.springframework.boot:spring-boot-starter-undertow"
+    implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.springframework.boot:spring-boot-starter-freemarker"
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
@@ -165,6 +166,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
+    testImplementation("org.jsoup:jsoup:${jsoupVersion}")
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
 }

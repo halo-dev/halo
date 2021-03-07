@@ -35,7 +35,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
     @Override
     public Set<String> getAccessPermissionStore() {
-        return cacheStore.getAny(buildAccessPermissionKey(), Set.class).orElse(new HashSet());
+        return cacheStore.getAny(buildAccessPermissionKey(), Set.class).orElseGet(HashSet::new);
     }
 
     @Override

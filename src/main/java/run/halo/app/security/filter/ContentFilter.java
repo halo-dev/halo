@@ -54,6 +54,8 @@ public class ContentFilter extends AbstractAuthenticationFilter {
     protected void doAuthenticate(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
         // Do nothing
+        // create session
+        request.getSession(true);
         filterChain.doFilter(request, response);
     }
 }
