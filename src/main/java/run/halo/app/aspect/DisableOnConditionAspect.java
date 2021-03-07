@@ -28,8 +28,7 @@ public class DisableOnConditionAspect {
         this.haloProperties = haloProperties;
     }
 
-    @Pointcut("execution(* run.halo.app.controller.*.*(..)) "
-        + "&& @annotation(run.halo.app.annotation.DisableOnCondition)")
+    @Pointcut("within(run.halo.app.controller..*)")
     public void pointcut() {
     }
 
