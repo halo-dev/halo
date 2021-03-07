@@ -25,15 +25,17 @@ public class HaloProperties {
     /**
      * Doc api disabled. (Default is true)
      */
+    @Deprecated
     private boolean docDisabled = true;
 
     /**
      * Production env. (Default is true)
      */
+    @Deprecated
     private boolean productionEnv = true;
 
     /**
-     * Authentication enabled
+     * Authentication enabled.
      */
     private boolean authEnabled = true;
 

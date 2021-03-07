@@ -19,7 +19,7 @@ import run.halo.app.security.context.SecurityContextHolder;
 public class SensitiveConcealAspect {
 
 
-    @Pointcut("execution(* run.halo.app.repository.*.*(..)) "
+    @Pointcut("within(run.halo.app.repository..*) "
         + "&& @annotation(run.halo.app.annotation.SensitiveConceal)")
     public void pointCut() {
     }

@@ -5,7 +5,6 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -38,17 +37,20 @@ import run.halo.app.utils.HttpClientUtils;
     BaseRepositoryImpl.class)
 public class HaloConfiguration {
 
-    @Autowired
-    private HaloProperties haloProperties;
+    private final HaloProperties haloProperties;
+
+    public HaloConfiguration(HaloProperties haloProperties) {
+        this.haloProperties = haloProperties;
+    }
 
     @Bean
-    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+    ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         builder.failOnEmptyBeans(false);
         return builder.build();
     }
 
     @Bean
-    public RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
+    RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
         throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         RestTemplate httpsRestTemplate = builder.build();
         httpsRestTemplate.setRequestFactory(
@@ -59,7 +61,7 @@ public class HaloConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AbstractStringCacheStore stringCacheStore() {
+    AbstractStringCacheStore stringCacheStore() {
         AbstractStringCacheStore stringCacheStore;
         switch (haloProperties.getCache()) {
             case "level":

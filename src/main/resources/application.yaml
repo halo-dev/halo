@@ -3,16 +3,15 @@ server:
   forward-headers-strategy: native
   error:
     include-message: always
-  compression:
-    enabled: false
 spring:
+  devtools:
+    restart:
+      eanbled: false
   mvc:
     pathmatch:
       use-suffix-pattern: true
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
-  devtools:
-    add-properties: false
   output:
     ansi:
       enabled: always
@@ -21,20 +20,12 @@ spring:
 
     # H2 database configuration.
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/.halo/db/halo
+    url: jdbc:h2:file:${halo.work-dir}/db/halo
     username: admin
     password: 123456
-
-  h2:
-    console:
-      settings:
-        web-allow-others: false
-      path: /h2-console
-      enabled: false
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
     open-in-view: false
   flyway:
     enabled: false
@@ -48,20 +39,20 @@ spring:
     settings:
       auto_import: /common/macro/global_macro.ftl as global
     template-loader-path:
-      - file:///${halo.work-dir}templates/
+      - file:///${halo.work-dir}/templates/
       - classpath:/templates/
 management:
   endpoints:
     web:
       base-path: /api/admin/actuator
       exposure:
-        include: [ 'httptrace', 'metrics','env','logfile','health' ]
+        include: [ 'httptrace', 'metrics', 'env', 'logfile', 'health' ]
 logging:
   level:
     run.halo.app: INFO
     org.eclipse.jetty.server.HttpChannel: ERROR
   file:
-    path: ${user.home}/.halo/logs
+    path: ${halo.work-dir}/logs
 
 springfox:
   documentation:

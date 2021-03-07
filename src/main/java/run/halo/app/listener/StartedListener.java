@@ -169,7 +169,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             Path themePath = themeService.getBasePath();
 
             // Fix the problem that the project cannot start after moving to a new server
-            if (!haloProperties.isProductionEnv() || Files.notExists(themePath)) {
+            if (!haloProperties.getMode().isProductionEnv() || Files.notExists(themePath)) {
                 FileUtils.copyFolder(source, themePath);
                 log.debug("Copied theme folder from [{}] to [{}]", source, themePath);
             } else {
