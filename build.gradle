@@ -103,6 +103,7 @@ ext {
     zxingVersion = "3.4.0"
     huaweiObsVersion = "3.19.7"
     githubApiVersion = "1.84"
+    jsoupVersion = "1.13.1"
 }
 
 dependencies {
@@ -166,6 +167,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
+    testImplementation("org.jsoup:jsoup:${jsoupVersion}")
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
 }
