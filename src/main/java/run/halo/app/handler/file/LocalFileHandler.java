@@ -152,7 +152,7 @@ public class LocalFileHandler implements FileHandler {
                         // Set thumb path
                         return thumbnailSubFilePath;
                     }
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     log.warn("Failed to open image file.", e);
                 }
                 return subFilePath;

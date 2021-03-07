@@ -5,9 +5,7 @@ import java.util.Optional;
 import org.springframework.http.HttpHeaders;
 
 /**
- * <pre>
- *     公共常量
- * </pre>
+ * Halo constants.
  *
  * @author ryanwang
  * @date 2017/12/29
@@ -17,12 +15,12 @@ public class HaloConst {
     /**
      * User home directory.
      */
-    public static final String USER_HOME = System.getProperties().getProperty("user.home");
+    public static final String USER_HOME = System.getProperty("user.home");
 
     /**
      * Temporary directory.
      */
-    public static final String TEMP_DIR = "/tmp/run.halo.app";
+    public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
     public static final String PROTOCOL_HTTPS = "https://";
 
@@ -65,7 +63,7 @@ public class HaloConst {
      */
     public static final String POST_PASSWORD_TEMPLATE = "post_password";
     /**
-     * Suffix of freemarker template file
+     * Suffix of freemarker template file.
      */
     public static final String SUFFIX_FTL = ".ftl";
     /**

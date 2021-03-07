@@ -6,8 +6,6 @@ import static run.halo.app.model.support.HaloConst.USER_HOME;
 import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import run.halo.app.model.enums.Mode;
