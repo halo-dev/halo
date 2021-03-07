@@ -1,5 +1,27 @@
 # CHANGELOG
 
+# 1.4.6
+
+## Features
+
+- 主题编写支持继承以及 block 特性。halo-dev/halo#1295
+
+## Improvements
+
+- 重构初始化页面，目前分为全新安装和数据导入。从这个版本开始，数据导入将导入所有数据。halo-dev/halo-admin#296
+- 优化后台菜单管理的排序拖动体验。halo-dev/halo-admin#291
+- 移除后台设置项字符数的限制。halo-dev/halo#1287
+
+## Bug Fixes
+
+- 修复后台上传组件格式限制不生效的问题。halo-dev/halo-admin#296
+- 修复后台新建文章页面，点击浏览器回退键不提示保存的问题。halo-dev/halo-admin#302
+- 修复后台备份无法下载的问题。halo-dev/halo#1278
+- 修复 1.4.5 版本中前台页面渲染不完整的问题。halo-dev/halo#1301
+- 修复上传某些格式的图片因为缩略图生成失败导致上传错误的问题。halo-dev/halo#1298
+- 修复 Swagger 文档分页数据字段和实际不一致的问题。halo-dev/halo#1277
+- 修复 1.4.5 版本中通过主题包升级主题失败的问题。halo-dev/halo#1284
+
 # 1.4.5
 
 ## Improvements
