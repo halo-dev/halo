@@ -67,7 +67,7 @@
             <FilePondUpload
               ref="upload"
               name="file"
-              :accepts="['application/zip']"
+              :accepts="['application/x-zip', 'application/x-zip-compressed', 'application/zip']"
               label="点击选择主题包或将主题包拖拽到此处<br>仅支持 ZIP 格式的文件"
               :uploadHandler="installModal.local.uploadHandler"
               @success="handleUploadSucceed"
@@ -122,7 +122,7 @@
       <FilePondUpload
         ref="updateByupload"
         name="file"
-        :accepts="['application/zip']"
+        :accepts="['application/x-zip', 'application/x-zip-compressed', 'application/zip']"
         label="点击选择主题更新包或将主题更新包拖拽到此处<br>仅支持 ZIP 格式的文件"
         :uploadHandler="localUpdateModel.uploadHandler"
         :filed="localUpdateModel.selected.id"

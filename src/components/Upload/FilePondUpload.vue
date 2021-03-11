@@ -17,7 +17,7 @@
       labelTapToCancel="点击取消"
       labelTapToRetry="点击重试"
       labelFileTypeNotAllowed="不支持当前文件格式"
-      fileValidateTypeLabelExpectedTypes="请选择 {allTypes} 格式的文件"
+      fileValidateTypeLabelExpectedTypes="请选择 {lastType} 格式的文件"
       :files="fileList"
       :server="server"
       @init="handleFilePondInit"
