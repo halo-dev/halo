@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "run.halo.app"
-version = "1.4.6"
+version = "1.4.7-beta.1"
 description = "Halo, An excellent open source blog publishing application."
 sourceCompatibility = JavaVersion.VERSION_11
 
