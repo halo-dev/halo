@@ -1,6 +1,6 @@
 {
   "name": "halo-admin",
-  "version": "1.4.6",
+  "version": "1.4.7-beta.1",
   "author": "halo-dev",
   "description": "Halo admin client.",
   "repository": {
@@ -47,7 +47,8 @@
     "vuex": "^3.6.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
+    "@babel/polyfill": "^7.12.1",
+    "@vue/cli-plugin-babel": "^3.8.0",
     "@vue/cli-plugin-eslint": "^4.5.4",
     "@vue/cli-plugin-unit-jest": "^4.5.4",
     "@vue/cli-service": "^4.5.4",
