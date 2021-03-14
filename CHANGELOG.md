@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 1.4.7
+
+## Bug Fixes
+
+- 修复在 Windows 平台下，上传主题压缩包提示不支持当前文件格式的问题。halo-dev/halo-admin#309
+
 # 1.4.6
 
 ## Features
