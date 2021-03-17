@@ -50,7 +50,6 @@
       <FilePondUpload
         ref="upload"
         name="file"
-        :accepts="['text/markdown']"
         label="拖拽或点击选择 Markdown 文件到此处"
         :uploadHandler="uploadHandler"
       ></FilePondUpload>
