@@ -5,4 +5,4 @@ ${AnsiColor.BLUE}
  / __  / /_/ / / /_/ /
 /_/ /_/\__,_/_/\____/
 ${AnsiColor.BRIGHT_YELLOW}
-Version: ${application.version}
+Version: ${application.version}${AnsiColor.DEFAULT}
