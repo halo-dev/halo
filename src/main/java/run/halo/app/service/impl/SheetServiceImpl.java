@@ -27,6 +27,7 @@ import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.entity.SheetMeta;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.enums.SheetPermalinkType;
@@ -276,7 +277,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         Set<Integer> sheetIds = ServiceUtils.fetchProperty(sheets, Sheet::getId);
 
         // key: sheet id, value: comment count
-        Map<Integer, Long> sheetCommentCountMap = sheetCommentService.countByPostIds(sheetIds);
+        Map<Integer, Long> sheetCommentCountMap = sheetCommentService.countByStatusAndPostIds(
+            CommentStatus.PUBLISHED, sheetIds);
 
         return sheetPage.map(sheet -> {
             SheetListVO sheetListVO = new SheetListVO().convertFrom(sheet);

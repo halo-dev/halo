@@ -135,6 +135,16 @@ public interface BaseCommentService<COMMENT extends BaseComment>
     Map<Integer, Long> countByPostIds(@Nullable Collection<Integer> postIds);
 
     /**
+     * Counts by comment status and post id collection.
+     *
+     * @param status status
+     * @param postIds post id collection
+     * @return a count map, key: post id, value: comment count
+     */
+    Map<Integer, Long> countByStatusAndPostIds(@NonNull CommentStatus status,
+        @NonNull Collection<Integer> postIds);
+
+    /**
      * Count comments by post id.
      *
      * @param postId post id must not be null.
