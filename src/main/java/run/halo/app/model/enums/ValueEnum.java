@@ -12,6 +12,13 @@ import org.springframework.util.Assert;
 public interface ValueEnum<T> {
 
     /**
+     * Gets enum value.
+     *
+     * @return enum value
+     */
+    T getValue();
+
+    /**
      * Converts value to corresponding enum.
      *
      * @param enumType enum type
@@ -30,12 +37,4 @@ public interface ValueEnum<T> {
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("unknown database value: " + value));
     }
-
-    /**
-     * Gets enum value.
-     *
-     * @return enum value
-     */
-    T getValue();
-
 }
