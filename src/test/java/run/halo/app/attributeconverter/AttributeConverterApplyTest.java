@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import run.halo.app.config.JpaConfiguration;
 
 /**
  * Attribute converter apply result test.
@@ -14,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
  * @author johnniang
  */
 @DataJpaTest
+@Import(JpaConfiguration.class)
 class AttributeConverterApplyTest {
 
     @Autowired
@@ -31,7 +34,6 @@ class AttributeConverterApplyTest {
 
         final var cityId = city.getId();
 
-        entityManager.clear();
         Query nativeQuery =
             entityManager.createNativeQuery("SELECT level from city where id = " + cityId);
         Object level = nativeQuery.getSingleResult();
