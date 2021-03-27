@@ -9,6 +9,7 @@ import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
 import org.springframework.orm.jpa.persistenceunit.PersistenceUnitPostProcessor;
 import org.springframework.util.ClassUtils;
 import run.halo.app.model.enums.ValueEnum;
+import run.halo.app.model.properties.PropertyEnum;
 
 /**
  * Attribute converter persistence unit post processor.
@@ -32,7 +33,10 @@ class AutoGenerateConverterPersistenceUnitPostProcessor implements PersistenceUn
 
     private Set<Class<?>> findValueEnumClasses() {
         var scanner = new ClassPathScanningCandidateComponentProvider(false);
+        // include ValueEnum class
         scanner.addIncludeFilter(new AssignableTypeFilter(ValueEnum.class));
+        // exclude PropertyEnum class
+        scanner.addExcludeFilter(new AssignableTypeFilter(PropertyEnum.class));
 
         return scanner.findCandidateComponents(PACKAGE_TO_SCAN)
             .stream()
