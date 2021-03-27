@@ -28,7 +28,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.util.PathMatcher;
-import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.utils.SwaggerUtils;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
@@ -66,12 +65,6 @@ import springfox.documentation.swagger.web.UiConfigurationBuilder;
     matchIfMissing = true)
 public class SwaggerConfiguration {
 
-    private final HaloProperties haloProperties;
-
-    public SwaggerConfiguration(HaloProperties haloProperties) {
-        this.haloProperties = haloProperties;
-    }
-
     @Bean
     public Docket haloDefaultApi() {
         return buildApiDocket("run.halo.app.content.api",
@@ -83,10 +76,6 @@ public class SwaggerConfiguration {
 
     @Bean
     public Docket haloAdminApi() {
-        if (haloProperties.isDocDisabled()) {
-            log.debug("Doc has been disabled");
-        }
-
         return buildApiDocket("run.halo.app.admin.api",
             "run.halo.app.controller.admin",
             "/api/admin/**")
