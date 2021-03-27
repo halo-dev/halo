@@ -47,7 +47,7 @@ public class Journal extends BaseEntity {
     private Long likes;
 
     @Column(name = "type")
-    @ColumnDefault("1")
+    @ColumnDefault("0")
     private JournalType type;
 
     @Override
