@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author johnniang
  */
-public class AttributeConverterAutoGenerator {
+class AttributeConverterAutoGenerator {
 
     /**
      * Auto generation suffix.

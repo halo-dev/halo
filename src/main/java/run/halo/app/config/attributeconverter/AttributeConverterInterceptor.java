@@ -9,7 +9,7 @@ import run.halo.app.model.enums.ValueEnum;
  *
  * @author johnniang
  */
-class AttributeConverterInterceptor {
+public class AttributeConverterInterceptor {
 
     private AttributeConverterInterceptor() {
     }

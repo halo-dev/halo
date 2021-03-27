@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import run.halo.app.config.JpaConfiguration;
+import run.halo.app.config.attributeconverter.JpaConfiguration;
 
 /**
  * Attribute converter apply result test.
@@ -35,9 +35,9 @@ class AttributeConverterApplyTest {
         final var cityId = city.getId();
 
         Query nativeQuery =
-            entityManager.createNativeQuery("SELECT level from city where id = " + cityId);
+            entityManager.createNativeQuery("select level from city where id = " + cityId);
         Object level = nativeQuery.getSingleResult();
-        Assertions.assertEquals(CityLevel.PROVINCE.getValue(), level);
+        Assertions.assertEquals(CityLevel.CITY.getValue(), level);
     }
 
     @SpringBootApplication
