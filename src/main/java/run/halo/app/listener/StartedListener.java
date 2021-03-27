@@ -67,6 +67,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
     @Value("${spring.datasource.password}")
     private String password;
 
+    @Value("${springfox.documentation.enabled}")
+    private Boolean documentationEnabled;
+
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         try {
@@ -95,9 +98,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
         log.info(AnsiOutput
             .toString(AnsiColor.BRIGHT_BLUE, "Halo admin started at   ", blogUrl, "/",
                 haloProperties.getAdminPath()));
-        if (!haloProperties.isDocDisabled()) {
+        if (documentationEnabled) {
             log.debug(AnsiOutput
-                .toString(AnsiColor.BRIGHT_BLUE, "Halo api doc was enabled at  ", blogUrl,
+                .toString(AnsiColor.BRIGHT_BLUE, "Halo api documentation was enabled at  ", blogUrl,
                     "/swagger-ui.html"));
         }
         log.info(AnsiOutput.toString(AnsiColor.BRIGHT_YELLOW, "Halo has started successfully!"));
