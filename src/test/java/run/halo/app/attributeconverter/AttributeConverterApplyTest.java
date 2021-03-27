@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import run.halo.app.config.attributeconverter.JpaConfiguration;
+import run.halo.app.config.attributeconverter.AttributeConverterAutoGenerateConfiguration;
 
 /**
  * Attribute converter apply result test.
@@ -16,7 +16,7 @@ import run.halo.app.config.attributeconverter.JpaConfiguration;
  * @author johnniang
  */
 @DataJpaTest
-@Import(JpaConfiguration.class)
+@Import(AttributeConverterAutoGenerateConfiguration.class)
 class AttributeConverterApplyTest {
 
     @Autowired
