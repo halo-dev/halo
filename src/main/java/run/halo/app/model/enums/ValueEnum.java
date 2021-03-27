@@ -12,6 +12,13 @@ import org.springframework.util.Assert;
 public interface ValueEnum<T> {
 
     /**
+     * Gets enum value.
+     *
+     * @return enum value
+     */
+    T getValue();
+
+    /**
      * Converts value to corresponding enum.
      *
      * @param enumType enum type
@@ -20,7 +27,7 @@ public interface ValueEnum<T> {
      * @param <E> enum generic
      * @return corresponding enum
      */
-    static <V, E extends ValueEnum<V>> E valueToEnum(Class<E> enumType, V value) {
+    static <V, E extends Enum<E> & ValueEnum<V>> E valueToEnum(Class<E> enumType, V value) {
         Assert.notNull(enumType, "enum type must not be null");
         Assert.notNull(value, "value must not be null");
         Assert.isTrue(enumType.isEnum(), "type must be an enum type");
@@ -30,12 +37,4 @@ public interface ValueEnum<T> {
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("unknown database value: " + value));
     }
-
-    /**
-     * Gets enum value.
-     *
-     * @return enum value
-     */
-    T getValue();
-
 }

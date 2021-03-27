@@ -10,12 +10,12 @@ public enum JournalType implements ValueEnum<Integer> {
     /**
      * Public type.
      */
-    PUBLIC(1),
+    PUBLIC(0),
 
     /**
      * Intimate type.
      */
-    INTIMATE(0);
+    INTIMATE(1);
 
     private final int value;
 

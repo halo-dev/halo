@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.AbstractStringCacheStore;
-import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.exception.MissingPropertyException;
 import run.halo.app.model.dto.OptionDTO;
@@ -379,14 +378,16 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
     }
 
     @Override
-    public <V, E extends ValueEnum<V>> Optional<E> getValueEnumByProperty(PropertyEnum property,
+    public <V, E extends Enum<E> & ValueEnum<V>> Optional<E> getValueEnumByProperty(
+        PropertyEnum property,
         Class<V> valueType, Class<E> enumType) {
         return getByProperty(property).map(value -> ValueEnum
             .valueToEnum(enumType, PropertyEnum.convertTo(value.toString(), valueType)));
     }
 
     @Override
-    public <V, E extends ValueEnum<V>> E getValueEnumByPropertyOrDefault(PropertyEnum property,
+    public <V, E extends Enum<E> & ValueEnum<V>> E getValueEnumByPropertyOrDefault(
+        PropertyEnum property,
         Class<V> valueType, Class<E> enumType, E defaultValue) {
         return getValueEnumByProperty(property, valueType, enumType).orElse(defaultValue);
     }
