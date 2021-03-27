@@ -23,12 +23,6 @@ import run.halo.app.model.enums.Mode;
 public class HaloProperties {
 
     /**
-     * Doc api disabled. (Default is true)
-     */
-    @Deprecated
-    private boolean docDisabled = true;
-
-    /**
      * Production env. (Default is true)
      */
     @Deprecated

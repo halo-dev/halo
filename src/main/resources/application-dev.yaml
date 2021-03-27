@@ -61,6 +61,10 @@ logging:
   file:
     path: ${halo.work-dir}/newLogs
 
+springfox:
+  documentation:
+    enabled: true
+
 halo:
   auth-enabled: true
   mode: development
