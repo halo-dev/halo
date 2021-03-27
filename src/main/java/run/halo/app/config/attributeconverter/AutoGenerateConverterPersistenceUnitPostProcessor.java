@@ -3,6 +3,7 @@ package run.halo.app.config.attributeconverter;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import java.util.Set;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.orm.jpa.persistenceunit.MutablePersistenceUnitInfo;
@@ -20,9 +21,16 @@ class AutoGenerateConverterPersistenceUnitPostProcessor implements PersistenceUn
 
     private static final String PACKAGE_TO_SCAN = "run.halo.app";
 
+    private final ConfigurableListableBeanFactory factory;
+
+    public AutoGenerateConverterPersistenceUnitPostProcessor(
+        ConfigurableListableBeanFactory factory) {
+        this.factory = factory;
+    }
+
     @Override
     public void postProcessPersistenceUnitInfo(MutablePersistenceUnitInfo pui) {
-        var generator = new AttributeConverterAutoGenerator(ClassUtils.getDefaultClassLoader());
+        var generator = new AttributeConverterAutoGenerator(factory.getBeanClassLoader());
 
         findValueEnumClasses()
             .stream()

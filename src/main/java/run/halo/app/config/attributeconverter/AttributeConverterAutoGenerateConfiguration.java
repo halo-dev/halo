@@ -15,6 +15,6 @@ public class AttributeConverterAutoGenerateConfiguration {
     EntityManagerFactoryBuilderCustomizer entityManagerFactoryBuilderCustomizer(
         ConfigurableListableBeanFactory factory) {
         return builder -> builder.setPersistenceUnitPostProcessors(
-            new AutoGenerateConverterPersistenceUnitPostProcessor());
+                new AutoGenerateConverterPersistenceUnitPostProcessor(factory));
     }
 }

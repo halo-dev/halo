@@ -56,7 +56,7 @@ class AttributeConverterAutoGenerator {
                 .method(named("convertToEntityAttribute"))
                 .intercept(to(AttributeConverterInterceptor.class))
                 .make()
-                .load(this.classLoader, ClassLoadingStrategy.Default.INJECTION)
+                .load(this.classLoader, ClassLoadingStrategy.Default.INJECTION.allowExistingTypes())
                 .getLoaded();
         } catch (NoSuchMethodException e) {
             // should never happen
