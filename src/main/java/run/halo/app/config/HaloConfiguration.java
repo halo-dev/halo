@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -19,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.cache.InMemoryCacheStore;
 import run.halo.app.cache.LevelCacheStore;
+import run.halo.app.config.attributeconverter.AttributeConverterAutoGenerateConfiguration;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.repository.base.BaseRepositoryImpl;
 import run.halo.app.utils.HttpClientUtils;
@@ -35,6 +37,7 @@ import run.halo.app.utils.HttpClientUtils;
 @EnableConfigurationProperties(HaloProperties.class)
 @EnableJpaRepositories(basePackages = "run.halo.app.repository", repositoryBaseClass =
     BaseRepositoryImpl.class)
+@Import(AttributeConverterAutoGenerateConfiguration.class)
 public class HaloConfiguration {
 
     private final HaloProperties haloProperties;
