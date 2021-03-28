@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -50,7 +51,7 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     }
 
     @Override
-    public void validateTarget(Integer sheetId) {
+    public void validateTarget(@NonNull Integer sheetId) {
         Sheet sheet = sheetRepository.findById(sheetId)
             .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(sheetId));
 
@@ -60,19 +61,24 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
     }
 
     @Override
-    public SheetCommentWithSheetVO convertToWithSheetVo(SheetComment comment) {
+    @NonNull
+    public SheetCommentWithSheetVO convertToWithSheetVo(@NonNull SheetComment comment) {
         Assert.notNull(comment, "SheetComment must not be null");
-        SheetCommentWithSheetVO sheetCommentWithSheetVO =
+        SheetCommentWithSheetVO sheetCommentWithSheetVo =
             new SheetCommentWithSheetVO().convertFrom(comment);
 
-        BasePostMinimalDTO basePostMinimalDTO =
+        BasePostMinimalDTO basePostMinimalDto =
             new BasePostMinimalDTO().convertFrom(sheetRepository.getOne(comment.getPostId()));
 
-        sheetCommentWithSheetVO.setSheet(buildSheetFullPath(basePostMinimalDTO));
-        return sheetCommentWithSheetVO;
+        sheetCommentWithSheetVo.setSheet(buildSheetFullPath(basePostMinimalDto));
+
+        sheetCommentWithSheetVo.setAvatar(buildAvatarUrl(comment.getGravatarMd5()));
+
+        return sheetCommentWithSheetVo;
     }
 
     @Override
+    @NonNull
     public List<SheetCommentWithSheetVO> convertToWithSheetVo(List<SheetComment> sheetComments) {
         if (CollectionUtils.isEmpty(sheetComments)) {
             return Collections.emptyList();
@@ -86,27 +92,32 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
         return sheetComments.stream()
             .filter(comment -> sheetMap.containsKey(comment.getPostId()))
             .map(comment -> {
-                SheetCommentWithSheetVO sheetCmtWithPostVO =
+                SheetCommentWithSheetVO sheetCmtWithPostVo =
                     new SheetCommentWithSheetVO().convertFrom(comment);
 
-                BasePostMinimalDTO postMinimalDTO =
+                BasePostMinimalDTO postMinimalDto =
                     new BasePostMinimalDTO().convertFrom(sheetMap.get(comment.getPostId()));
 
-                sheetCmtWithPostVO.setSheet(buildSheetFullPath(postMinimalDTO));
-                return sheetCmtWithPostVO;
+                sheetCmtWithPostVo.setSheet(buildSheetFullPath(postMinimalDto));
+
+                sheetCmtWithPostVo.setAvatar(buildAvatarUrl(comment.getGravatarMd5()));
+
+                return sheetCmtWithPostVo;
             })
             .collect(Collectors.toList());
     }
 
     @Override
-    public Page<SheetCommentWithSheetVO> convertToWithSheetVo(Page<SheetComment> sheetCommentPage) {
+    @NonNull
+    public Page<SheetCommentWithSheetVO> convertToWithSheetVo(
+        @NonNull Page<SheetComment> sheetCommentPage) {
         Assert.notNull(sheetCommentPage, "Sheet comment page must not be null");
 
         return new PageImpl<>(convertToWithSheetVo(sheetCommentPage.getContent()),
             sheetCommentPage.getPageable(), sheetCommentPage.getTotalElements());
     }
 
-    private BasePostMinimalDTO buildSheetFullPath(BasePostMinimalDTO basePostMinimalDTO) {
+    private BasePostMinimalDTO buildSheetFullPath(BasePostMinimalDTO basePostMinimalDto) {
         StringBuilder fullPath = new StringBuilder();
 
         SheetPermalinkType permalinkType = optionService.getSheetPermalinkType();
@@ -119,16 +130,16 @@ public class SheetCommentServiceImpl extends BaseCommentServiceImpl<SheetComment
             fullPath.append(URL_SEPARATOR)
                 .append(optionService.getSheetPrefix())
                 .append(URL_SEPARATOR)
-                .append(basePostMinimalDTO.getSlug())
+                .append(basePostMinimalDto.getSlug())
                 .append(optionService.getPathSuffix());
         } else if (permalinkType.equals(SheetPermalinkType.ROOT)) {
             fullPath.append(URL_SEPARATOR)
-                .append(basePostMinimalDTO.getSlug())
+                .append(basePostMinimalDto.getSlug())
                 .append(optionService.getPathSuffix());
         }
 
-        basePostMinimalDTO.setFullPath(fullPath.toString());
-        return basePostMinimalDTO;
+        basePostMinimalDto.setFullPath(fullPath.toString());
+        return basePostMinimalDto;
     }
 
 }

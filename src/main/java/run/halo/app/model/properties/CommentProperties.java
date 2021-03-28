@@ -50,6 +50,11 @@ public enum CommentProperties implements PropertyEnum {
     INTERNAL_PLUGIN_JS("comment_internal_plugin_js", String.class,
         "//cdn.jsdelivr.net/npm/halo-comment@latest/dist/halo-comment.min.js"),
 
+    /**
+     * Gravatar mirror source base url.
+     */
+    GRAVATAR_SOURCE("gravatar_source", String.class, "//gravatar.com/avatar/"),
+
     COMMENT_BAN_TIME("comment_ban_time", Integer.class, "10"),
 
     COMMENT_RANGE("comment_range", Integer.class, "30");

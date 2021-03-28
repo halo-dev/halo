@@ -298,16 +298,6 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     List<POST> updateStatusByIds(@NonNull List<Integer> ids, @NonNull PostStatus status);
 
     /**
-     * Replace post blog url in batch.
-     *
-     * @param oldUrl old blog url.
-     * @param newUrl new blog url.
-     * @return replaced posts.
-     */
-    @NonNull
-    List<BasePostDetailDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
-
-    /**
      * Generate description.
      *
      * @param content html content must not be null.

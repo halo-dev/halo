@@ -2,7 +2,6 @@ package run.halo.app.service.impl;
 
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Region;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -12,7 +11,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -275,7 +273,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
     private Specification<Option> buildSpecByQuery(@NonNull OptionQuery optionQuery) {
         Assert.notNull(optionQuery, "Option query must not be null");
 
-        return (Specification<Option>) (root, query, criteriaBuilder) -> {
+        return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
             if (optionQuery.getType() != null) {
@@ -614,21 +612,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
     public Boolean isEnabledAbsolutePath() {
         return getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class,
             true);
-    }
-
-    @Override
-    public List<OptionDTO> replaceUrl(String oldUrl, String newUrl) {
-        List<Option> options = listAll();
-        List<Option> replaced = new ArrayList<>();
-        options.forEach(option -> {
-            if (StringUtils.isNotEmpty(option.getValue())) {
-                option.setValue(option.getValue().replaceAll(oldUrl, newUrl));
-            }
-            replaced.add(option);
-        });
-        List<Option> updated = updateInBatch(replaced);
-        eventPublisher.publishEvent(new OptionUpdatedEvent(this));
-        return updated.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @Override

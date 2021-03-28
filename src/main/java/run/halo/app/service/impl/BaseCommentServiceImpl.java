@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.criteria.Predicate;
@@ -86,18 +85,21 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public List<COMMENT> listBy(Integer postId) {
+    @NonNull
+    public List<COMMENT> listBy(@NonNull Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
 
         return baseCommentRepository.findAllByPostId(postId);
     }
 
     @Override
-    public Page<COMMENT> pageLatest(int top) {
+    @NonNull
+    public Page<COMMENT> pageLatest(@NonNull int top) {
         return pageLatest(top, null);
     }
 
     @Override
+    @NonNull
     public Page<COMMENT> pageLatest(int top, CommentStatus status) {
         if (status == null) {
             return listAll(ServiceUtils.buildLatestPageable(top));
@@ -107,7 +109,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public Page<COMMENT> pageBy(CommentStatus status, Pageable pageable) {
+    @NonNull
+    public Page<COMMENT> pageBy(@NonNull CommentStatus status, @NonNull Pageable pageable) {
 
         Assert.notNull(status, "Comment status must not be null");
         Assert.notNull(pageable, "Page info must not be null");
@@ -117,14 +120,16 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public Page<COMMENT> pageBy(CommentQuery commentQuery, Pageable pageable) {
+    @NonNull
+    public Page<COMMENT> pageBy(@NonNull CommentQuery commentQuery, @NonNull Pageable pageable) {
         Assert.notNull(pageable, "Page info must not be null");
 
         return baseCommentRepository.findAll(buildSpecByQuery(commentQuery), pageable);
     }
 
     @Override
-    public Page<BaseCommentVO> pageVosAllBy(Integer postId, Pageable pageable) {
+    @NonNull
+    public Page<BaseCommentVO> pageVosAllBy(@NonNull Integer postId, @NonNull Pageable pageable) {
         Assert.notNull(postId, "Post id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
@@ -137,7 +142,9 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public Page<BaseCommentVO> pageVosBy(List<COMMENT> comments, Pageable pageable) {
+    @NonNull
+    public Page<BaseCommentVO> pageVosBy(@NonNull List<COMMENT> comments,
+        @NonNull Pageable pageable) {
         Assert.notNull(comments, "Comments must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
@@ -170,7 +177,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public Page<BaseCommentVO> pageVosBy(Integer postId, Pageable pageable) {
+    @NonNull
+    public Page<BaseCommentVO> pageVosBy(@NonNull Integer postId, @NonNull Pageable pageable) {
         Assert.notNull(postId, "Post id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
@@ -184,7 +192,9 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public Page<BaseCommentWithParentVO> pageWithParentVoBy(Integer postId, Pageable pageable) {
+    @NonNull
+    public Page<BaseCommentWithParentVO> pageWithParentVoBy(@NonNull Integer postId,
+        @NonNull Pageable pageable) {
         Assert.notNull(postId, "Post id must not be null");
         Assert.notNull(pageable, "Page info must not be null");
 
@@ -214,8 +224,10 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         // Convert to comment page
         return commentPage.map(comment -> {
             // Convert to with parent vo
-            BaseCommentWithParentVO commentWithParentVO =
+            BaseCommentWithParentVO commentWithParentVo =
                 new BaseCommentWithParentVO().convertFrom(comment);
+
+            commentWithParentVo.setAvatar(buildAvatarUrl(commentWithParentVo.getGravatarMd5()));
 
             // Get parent comment vo from cache
             BaseCommentWithParentVO parentCommentVo = parentCommentVoMap.get(comment.getParentId());
@@ -227,19 +239,23 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
                 if (parentComment != null) {
                     // Convert to parent comment vo
                     parentCommentVo = new BaseCommentWithParentVO().convertFrom(parentComment);
+
+                    parentCommentVo.setAvatar(buildAvatarUrl(parentComment.getGravatarMd5()));
+
                     // Cache the parent comment vo
                     parentCommentVoMap.put(parentComment.getId(), parentCommentVo);
                 }
             }
 
             // Set parent
-            commentWithParentVO.setParent(parentCommentVo == null ? null : parentCommentVo.clone());
+            commentWithParentVo.setParent(parentCommentVo == null ? null : parentCommentVo.clone());
 
-            return commentWithParentVO;
+            return commentWithParentVo;
         });
     }
 
     @Override
+    @NonNull
     public Map<Integer, Long> countByPostIds(Collection<Integer> postIds) {
         if (CollectionUtils.isEmpty(postIds)) {
             return Collections.emptyMap();
@@ -269,18 +285,19 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public long countByPostId(Integer postId) {
+    public long countByPostId(@NonNull Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
         return baseCommentRepository.countByPostId(postId);
     }
 
     @Override
-    public long countByStatus(CommentStatus status) {
+    public long countByStatus(@NonNull CommentStatus status) {
         return baseCommentRepository.countByStatus(status);
     }
 
     @Override
-    public COMMENT create(COMMENT comment) {
+    @NonNull
+    public COMMENT create(@NonNull COMMENT comment) {
         Assert.notNull(comment, "Domain must not be null");
 
         // Check post id
@@ -294,7 +311,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         }
 
         // Check user login status and set this field
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
 
         // Set some default values
         if (comment.getIpAddress() == null) {
@@ -342,7 +360,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public COMMENT createBy(BaseCommentParam<COMMENT> commentParam) {
+    @NonNull
+    public COMMENT createBy(@NonNull BaseCommentParam<COMMENT> commentParam) {
         Assert.notNull(commentParam, "Comment param must not be null");
 
         // Check user login status and set this field
@@ -374,7 +393,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public COMMENT updateStatus(Long commentId, CommentStatus status) {
+    @NonNull
+    public COMMENT updateStatus(@NonNull Long commentId, @NonNull CommentStatus status) {
         Assert.notNull(commentId, "Comment id must not be null");
         Assert.notNull(status, "Comment status must not be null");
 
@@ -389,7 +409,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public List<COMMENT> updateStatusByIds(List<Long> ids, CommentStatus status) {
+    @NonNull
+    public List<COMMENT> updateStatusByIds(@NonNull List<Long> ids, @NonNull CommentStatus status) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -399,13 +420,14 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public List<COMMENT> removeByPostId(Integer postId) {
+    public List<COMMENT> removeByPostId(@NonNull Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
         return baseCommentRepository.deleteByPostId(postId);
     }
 
     @Override
-    public COMMENT removeById(Long id) {
+    @NonNull
+    public COMMENT removeById(@NonNull Long id) {
         Assert.notNull(id, "Comment id must not be null");
 
         COMMENT comment = baseCommentRepository.findById(id)
@@ -424,7 +446,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public List<COMMENT> removeByIds(Collection<Long> ids) {
+    @NonNull
+    public List<COMMENT> removeByIds(@NonNull Collection<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
@@ -432,7 +455,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public List<BaseCommentDTO> convertTo(List<COMMENT> comments) {
+    @NonNull
+    public List<BaseCommentDTO> convertTo(@NonNull List<COMMENT> comments) {
         if (CollectionUtils.isEmpty(comments)) {
             return Collections.emptyList();
         }
@@ -442,17 +466,23 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public Page<BaseCommentDTO> convertTo(Page<COMMENT> commentPage) {
+    @NonNull
+    public Page<BaseCommentDTO> convertTo(@NonNull Page<COMMENT> commentPage) {
         Assert.notNull(commentPage, "Comment page must not be null");
 
         return commentPage.map(this::convertTo);
     }
 
     @Override
-    public BaseCommentDTO convertTo(COMMENT comment) {
+    @NonNull
+    public BaseCommentDTO convertTo(@NonNull COMMENT comment) {
         Assert.notNull(comment, "Comment must not be null");
 
-        return new BaseCommentDTO().convertFrom(comment);
+        BaseCommentDTO baseCommentDto = new BaseCommentDTO().convertFrom(comment);
+
+        baseCommentDto.setAvatar(buildAvatarUrl(comment.getGravatarMd5()));
+
+        return baseCommentDto;
     }
 
     @NonNull
@@ -527,8 +557,10 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public Page<CommentWithHasChildrenVO> pageTopCommentsBy(Integer targetId, CommentStatus status,
-        Pageable pageable) {
+    @NonNull
+    public Page<CommentWithHasChildrenVO> pageTopCommentsBy(@NonNull Integer targetId,
+        @NonNull CommentStatus status,
+        @NonNull Pageable pageable) {
         Assert.notNull(targetId, "Target id must not be null");
         Assert.notNull(status, "Comment status must not be null");
         Assert.notNull(pageable, "Page info must not be null");
@@ -561,13 +593,15 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
                 new CommentWithHasChildrenVO().convertFrom(topComment);
             comment
                 .setHasChildren(commentChildrenCountMap.getOrDefault(topComment.getId(), 0L) > 0);
+            comment.setAvatar(buildAvatarUrl(topComment.getGravatarMd5()));
             return comment;
         });
     }
 
     @Override
-    public List<COMMENT> listChildrenBy(Integer targetId, Long commentParentId,
-        CommentStatus status, Sort sort) {
+    @NonNull
+    public List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId,
+        @NonNull CommentStatus status, @NonNull Sort sort) {
         Assert.notNull(targetId, "Target id must not be null");
         Assert.notNull(commentParentId, "Comment parent id must not be null");
         Assert.notNull(sort, "Sort info must not be null");
@@ -592,7 +626,9 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
-    public List<COMMENT> listChildrenBy(Integer targetId, Long commentParentId, Sort sort) {
+    @NonNull
+    public List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId,
+        @NonNull Sort sort) {
         Assert.notNull(targetId, "Target id must not be null");
         Assert.notNull(commentParentId, "Comment parent id must not be null");
         Assert.notNull(sort, "Sort info must not be null");
@@ -614,70 +650,6 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         childrenList.sort(Comparator.comparing(BaseComment::getId));
 
         return childrenList;
-    }
-
-    @Override
-    @Deprecated
-    public <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment) {
-        Assert.notNull(comment, "Base comment dto must not be null");
-
-        // Clear ip address
-        comment.setIpAddress("");
-
-        // Handle base comment vo
-        if (comment instanceof BaseCommentVO) {
-            BaseCommentVO baseCommentVO = (BaseCommentVO) comment;
-            Queue<BaseCommentVO> commentQueue = new LinkedList<>();
-            commentQueue.offer(baseCommentVO);
-            while (!commentQueue.isEmpty()) {
-                BaseCommentVO current = commentQueue.poll();
-
-                // Clear ip address
-                current.setIpAddress("");
-
-                if (!CollectionUtils.isEmpty(current.getChildren())) {
-                    // Add children
-                    commentQueue.addAll(current.getChildren());
-                }
-            }
-        }
-
-        return comment;
-    }
-
-    @Override
-    @Deprecated
-    public <T extends BaseCommentDTO> List<T> filterIpAddress(List<T> comments) {
-        if (CollectionUtils.isEmpty(comments)) {
-            return Collections.emptyList();
-        }
-
-        comments.forEach(this::filterIpAddress);
-
-        return comments;
-    }
-
-    @Override
-    @Deprecated
-    public <T extends BaseCommentDTO> Page<T> filterIpAddress(Page<T> commentPage) {
-        Assert.notNull(commentPage, "Comment page must not be null");
-        commentPage.forEach(this::filterIpAddress);
-
-        return commentPage;
-    }
-
-    @Override
-    public List<BaseCommentDTO> replaceUrl(String oldUrl, String newUrl) {
-        List<COMMENT> comments = listAll();
-        List<COMMENT> replaced = new ArrayList<>();
-        comments.forEach(comment -> {
-            if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
-                comment.setAuthorUrl(comment.getAuthorUrl().replaceAll(oldUrl, newUrl));
-            }
-            replaced.add(comment);
-        });
-        List<COMMENT> updated = updateInBatch(replaced);
-        return convertTo(updated);
     }
 
     /**
@@ -761,13 +733,15 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         // Add children
         children.forEach(comment -> {
             // Convert to comment vo
-            BaseCommentVO commentVO = new BaseCommentVO().convertFrom(comment);
+            BaseCommentVO commentVo = new BaseCommentVO().convertFrom(comment);
+
+            commentVo.setAvatar(buildAvatarUrl(commentVo.getGravatarMd5()));
 
             if (parentComment.getChildren() == null) {
                 parentComment.setChildren(new LinkedList<>());
             }
 
-            parentComment.getChildren().add(commentVO);
+            parentComment.getChildren().add(commentVo);
         });
 
         // Remove children
@@ -784,4 +758,18 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         }
     }
 
+    /**
+     * Build avatar url by gravatarMd5
+     *
+     * @param gravatarMd5 gravatarMd5
+     * @return avatar url
+     */
+    public String buildAvatarUrl(String gravatarMd5) {
+        final String gravatarSource =
+            optionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_SOURCE, String.class);
+        final String gravatarDefault =
+            optionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_DEFAULT, String.class);
+
+        return gravatarSource + gravatarMd5 + "?d=" + gravatarDefault;
+    }
 }

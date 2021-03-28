@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -117,29 +116,11 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         return photoRepository.findAllTeams();
     }
 
-    @Override
-    public List<PhotoDTO> replaceUrl(String oldUrl, String newUrl) {
-        List<Photo> photos = listAll();
-        List<Photo> replaced = new ArrayList<>();
-        photos.forEach(photo -> {
-            if (StringUtils.isNotEmpty(photo.getThumbnail())) {
-                photo.setThumbnail(photo.getThumbnail().replace(oldUrl, newUrl));
-            }
-            if (StringUtils.isNotEmpty(photo.getUrl())) {
-                photo.setUrl(photo.getUrl().replaceAll(oldUrl, newUrl));
-            }
-            replaced.add(photo);
-        });
-        List<Photo> updated = updateInBatch(replaced);
-        return updated.stream().map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo))
-            .collect(Collectors.toList());
-    }
-
     @NonNull
     private Specification<Photo> buildSpecByQuery(@NonNull PhotoQuery photoQuery) {
         Assert.notNull(photoQuery, "Photo query must not be null");
 
-        return (Specification<Photo>) (root, query, criteriaBuilder) -> {
+        return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
             if (photoQuery.getTeam() != null) {
