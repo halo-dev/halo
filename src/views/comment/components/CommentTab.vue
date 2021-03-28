@@ -285,7 +285,6 @@
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import marked from 'marked'
 import commentApi from '@/api/comment'
-import { decodeHTML } from '@/utils/util'
 
 const postColumns = [
   {
@@ -418,7 +417,7 @@ export default {
     formattedComments() {
       return this.comments.map(comment => {
         comment.statusProperty = this.commentStatus[comment.status]
-        comment.content = marked(decodeHTML(comment.content))
+        comment.content = marked(comment.content)
         return comment
       })
     }

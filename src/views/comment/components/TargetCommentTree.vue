@@ -67,7 +67,6 @@
 </template>
 <script>
 import marked from 'marked'
-import { decodeHTML } from '@/utils/util'
 
 export default {
   name: 'TargetCommentTree',
@@ -83,7 +82,7 @@ export default {
       return `//cn.gravatar.com/avatar/${this.comment.gravatarMd5}/?s=256&d=mp`
     },
     content() {
-      return marked(decodeHTML(this.comment.content))
+      return marked(this.comment.content)
     }
   },
   methods: {

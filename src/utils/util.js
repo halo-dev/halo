@@ -9,7 +9,12 @@ export function isObject(value) {
   return value && typeof value === 'object' && value.constructor === Object
 }
 
-// decode html tag
+/**
+ * decode html tag
+ * @param {*} html
+ * @returns
+ * @deprecated
+ */
 export function decodeHTML(html) {
   let elem = document.createElement('div')
   elem.innerHTML = html

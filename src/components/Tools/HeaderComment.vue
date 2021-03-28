@@ -70,7 +70,6 @@
 <script>
 import commentApi from '@/api/comment'
 import marked from 'marked'
-import { decodeHTML } from '@/utils/util'
 
 export default {
   name: 'HeaderComment',
@@ -87,13 +86,13 @@ export default {
   computed: {
     converttedPostComments() {
       return this.postComments.map(comment => {
-        comment.content = marked(decodeHTML(comment.content))
+        comment.content = marked(comment.content)
         return comment
       })
     },
     converttedSheetComments() {
       return this.sheetComments.map(comment => {
-        comment.content = marked(decodeHTML(comment.content))
+        comment.content = marked(comment.content)
         return comment
       })
     }
