@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.exception.NotFoundException;
@@ -33,8 +34,6 @@ import run.halo.app.utils.ServiceUtils;
 public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalComment>
     implements JournalCommentService {
 
-    private final JournalCommentRepository journalCommentRepository;
-
     private final JournalRepository journalRepository;
 
     public JournalCommentServiceImpl(JournalCommentRepository journalCommentRepository,
@@ -42,18 +41,18 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
         UserService userService,
         ApplicationEventPublisher eventPublisher, JournalRepository journalRepository) {
         super(journalCommentRepository, optionService, userService, eventPublisher);
-        this.journalCommentRepository = journalCommentRepository;
         this.journalRepository = journalRepository;
     }
 
     @Override
-    public void validateTarget(Integer journalId) {
+    public void validateTarget(@NonNull Integer journalId) {
         if (!journalRepository.existsById(journalId)) {
             throw new NotFoundException("查询不到该日志信息").setErrorData(journalId);
         }
     }
 
     @Override
+    @NonNull
     public List<JournalCommentWithJournalVO> convertToWithJournalVo(
         List<JournalComment> journalComments) {
 
@@ -76,22 +75,24 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
                     new JournalCommentWithJournalVO().convertFrom(journalComment);
                 journalCmtWithJournalVo.setJournal(
                     new JournalDTO().convertFrom(journalMap.get(journalComment.getPostId())));
+                journalCmtWithJournalVo.setAvatar(buildAvatarUrl(journalComment.getGravatarMd5()));
                 return journalCmtWithJournalVo;
             })
             .collect(Collectors.toList());
     }
 
     @Override
+    @NonNull
     public Page<JournalCommentWithJournalVO> convertToWithJournalVo(
-        Page<JournalComment> journalCommentPage) {
+        @NonNull Page<JournalComment> journalCommentPage) {
         Assert.notNull(journalCommentPage, "Journal comment page must not be null");
 
         // Convert the list
-        List<JournalCommentWithJournalVO> journalCmtWithJournalVOS =
+        List<JournalCommentWithJournalVO> journalCmtWithJournalVos =
             convertToWithJournalVo(journalCommentPage.getContent());
 
         // Build and return
-        return new PageImpl<>(journalCmtWithJournalVOS, journalCommentPage.getPageable(),
+        return new PageImpl<>(journalCmtWithJournalVos, journalCommentPage.getPageable(),
             journalCommentPage.getTotalElements());
     }
 }

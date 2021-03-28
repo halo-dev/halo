@@ -457,26 +457,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    public List<BasePostDetailDTO> replaceUrl(String oldUrl, String newUrl) {
-        List<POST> posts = listAll();
-        List<POST> replaced = new ArrayList<>();
-        posts.forEach(post -> {
-            if (StringUtils.isNotEmpty(post.getThumbnail())) {
-                post.setThumbnail(post.getThumbnail().replaceAll(oldUrl, newUrl));
-            }
-            if (StringUtils.isNotEmpty(post.getOriginalContent())) {
-                post.setOriginalContent(post.getOriginalContent().replaceAll(oldUrl, newUrl));
-            }
-            if (StringUtils.isNotEmpty(post.getFormatContent())) {
-                post.setFormatContent(post.getFormatContent().replaceAll(oldUrl, newUrl));
-            }
-            replaced.add(post);
-        });
-        List<POST> updated = updateInBatch(replaced);
-        return updated.stream().map(this::convertToDetail).collect(Collectors.toList());
-    }
-
-    @Override
     public String generateDescription(String content) {
         Assert.notNull(content, "html content must not be null");
 

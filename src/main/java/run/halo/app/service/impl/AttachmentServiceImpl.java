@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -77,7 +76,7 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     private Specification<Attachment> buildSpecByQuery(@NonNull AttachmentQuery attachmentQuery) {
         Assert.notNull(attachmentQuery, "Attachment query must not be null");
 
-        return (Specification<Attachment>) (root, query, criteriaBuilder) -> {
+        return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
             if (attachmentQuery.getMediaType() != null) {
@@ -196,22 +195,6 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
     @Override
     public List<AttachmentType> listAllType() {
         return attachmentRepository.findAllType();
-    }
-
-    @Override
-    public List<Attachment> replaceUrl(String oldUrl, String newUrl) {
-        List<Attachment> attachments = listAll();
-        List<Attachment> replaced = new ArrayList<>();
-        attachments.forEach(attachment -> {
-            if (StringUtils.isNotEmpty(attachment.getPath())) {
-                attachment.setPath(attachment.getPath().replaceAll(oldUrl, newUrl));
-            }
-            if (StringUtils.isNotEmpty(attachment.getThumbPath())) {
-                attachment.setThumbPath(attachment.getThumbPath().replaceAll(oldUrl, newUrl));
-            }
-            replaced.add(attachment);
-        });
-        return updateInBatch(replaced);
     }
 
     @Override
