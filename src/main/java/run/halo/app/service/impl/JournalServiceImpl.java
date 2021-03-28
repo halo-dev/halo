@@ -23,6 +23,7 @@ import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.JournalComment;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.JournalType;
 import run.halo.app.model.params.JournalParam;
 import run.halo.app.model.params.JournalQuery;
@@ -123,7 +124,7 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer>
 
         // Get comment count map
         Map<Integer, Long> journalCommentCountMap =
-            journalCommentService.countByPostIds(journalIds);
+            journalCommentService.countByStatusAndPostIds(CommentStatus.PUBLISHED, journalIds);
 
         return journals.stream()
             .map(journal -> {
@@ -182,7 +183,7 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer>
     private Specification<Journal> buildSpecByQuery(@NonNull JournalQuery journalQuery) {
         Assert.notNull(journalQuery, "Journal query must not be null");
 
-        return (Specification<Journal>) (root, query, criteriaBuilder) -> {
+        return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
             if (journalQuery.getType() != null) {
