@@ -48,6 +48,7 @@ import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
@@ -583,7 +584,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             .listCategoryListMap(postIds, queryEncryptCategory);
 
         // Get comment count
-        Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
+        Map<Integer, Long> commentCountMap = postCommentService.countByStatusAndPostIds(
+            CommentStatus.PUBLISHED, postIds);
 
         // Get post meta list map
         Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
@@ -646,7 +648,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             .listCategoryListMap(postIds, queryEncryptCategory);
 
         // Get comment count
-        Map<Integer, Long> commentCountMap = postCommentService.countByPostIds(postIds);
+        Map<Integer, Long> commentCountMap =
+            postCommentService.countByStatusAndPostIds(CommentStatus.PUBLISHED, postIds);
 
         // Get post meta list map
         Map<Integer, List<PostMeta>> postMetaListMap = postMetaService.listPostMetaAsMap(postIds);
@@ -782,7 +785,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private Specification<Post> buildSpecByQuery(@NonNull PostQuery postQuery) {
         Assert.notNull(postQuery, "Post query must not be null");
 
-        return (Specification<Post>) (root, query, criteriaBuilder) -> {
+        return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
             if (postQuery.getStatus() != null) {
@@ -823,15 +826,15 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Create or update post
         Boolean needEncrypt = Optional.ofNullable(categoryIds)
-                .filter(CollectionUtil::isNotEmpty)
-                .map(categoryIdSet -> {
-                    for (Integer categoryId : categoryIdSet) {
-                        if (categoryService.categoryHasEncrypt(categoryId)) {
-                            return true;
-                        }
+            .filter(CollectionUtil::isNotEmpty)
+            .map(categoryIdSet -> {
+                for (Integer categoryId : categoryIdSet) {
+                    if (categoryService.categoryHasEncrypt(categoryId)) {
+                        return true;
                     }
-                    return false;
-                }).orElse(Boolean.FALSE);
+                }
+                return false;
+            }).orElse(Boolean.FALSE);
 
         // if password is not empty or parent category has encrypt, change status to intimate
         if (post.getStatus() != PostStatus.DRAFT

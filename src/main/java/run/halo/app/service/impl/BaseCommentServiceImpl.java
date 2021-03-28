@@ -254,6 +254,21 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
+    public Map<Integer, Long> countByStatusAndPostIds(@NonNull CommentStatus status,
+        @NonNull Collection<Integer> postIds) {
+        if (CollectionUtils.isEmpty(postIds)) {
+            return Collections.emptyMap();
+        }
+
+        // Get all comment counts
+        List<CommentCountProjection> commentCountProjections =
+            baseCommentRepository.countByStatusAndPostIds(status, postIds);
+
+        return ServiceUtils.convertToMap(commentCountProjections, CommentCountProjection::getPostId,
+            CommentCountProjection::getCount);
+    }
+
+    @Override
     public long countByPostId(Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
         return baseCommentRepository.countByPostId(postId);
@@ -444,7 +459,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     protected Specification<COMMENT> buildSpecByQuery(@NonNull CommentQuery commentQuery) {
         Assert.notNull(commentQuery, "Comment query must not be null");
 
-        return (Specification<COMMENT>) (root, query, criteriaBuilder) -> {
+        return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
             if (commentQuery.getStatus() != null) {
