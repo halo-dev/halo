@@ -223,22 +223,4 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
     @NonNull
     List<CommentChildrenCountProjection> findDirectChildrenCount(
         @NonNull Collection<Long> commentIds);
-
-    /**
-     * Finds direct children count by comment ids and status.
-     *
-     * @param commentIds comment ids must not be null.
-     * @param status comment status must not be null.
-     * @return a list of CommentChildrenCountProjection
-     */
-    @Query(
-        "select new run.halo.app.model.projection.CommentChildrenCountProjection(count(comment"
-            + ".id), comment.parentId) "
-            + "from BaseComment comment "
-            + "where comment.parentId in ?1 "
-            + "and comment.status = ?2 "
-            + "group by comment.parentId")
-    @NonNull
-    List<CommentChildrenCountProjection> findDirectChildrenCount(
-        @NonNull Collection<Long> commentIds, @NonNull CommentStatus status);
 }

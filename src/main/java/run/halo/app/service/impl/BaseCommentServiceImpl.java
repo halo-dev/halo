@@ -580,7 +580,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
         // Get direct children count
         List<CommentChildrenCountProjection> directChildrenCount =
-            baseCommentRepository.findDirectChildrenCount(topCommentIds, CommentStatus.PUBLISHED);
+            baseCommentRepository.findDirectChildrenCount(topCommentIds);
 
         // Convert to comment - children count map
         Map<Long, Long> commentChildrenCountMap = ServiceUtils
