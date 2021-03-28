@@ -46,4 +46,5 @@ public class BaseCommentDTO implements OutputConverter<BaseCommentDTO, BaseComme
 
     private Date createTime;
 
+    private String avatar;
 }

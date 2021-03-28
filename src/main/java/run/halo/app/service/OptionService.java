@@ -469,15 +469,6 @@ public interface OptionService extends CrudService<Option, Integer> {
     Boolean isEnabledAbsolutePath();
 
     /**
-     * Replace option url in batch.
-     *
-     * @param oldUrl old blog url.
-     * @param newUrl new blog url.
-     * @return replaced options.
-     */
-    List<OptionDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
-
-    /**
      * Converts to option output dto.
      *
      * @param option option must not be null

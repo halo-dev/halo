@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -62,7 +63,8 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
     }
 
     @Override
-    public Page<PostCommentWithPostVO> convertToWithPostVo(Page<PostComment> commentPage) {
+    @NonNull
+    public Page<PostCommentWithPostVO> convertToWithPostVo(@NonNull Page<PostComment> commentPage) {
         Assert.notNull(commentPage, "PostComment page must not be null");
 
         return new PageImpl<>(convertToWithPostVo(commentPage.getContent()),
@@ -71,19 +73,24 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
     }
 
     @Override
-    public PostCommentWithPostVO convertToWithPostVo(PostComment comment) {
+    @NonNull
+    public PostCommentWithPostVO convertToWithPostVo(@NonNull PostComment comment) {
         Assert.notNull(comment, "PostComment must not be null");
-        PostCommentWithPostVO postCommentWithPostVO =
+        PostCommentWithPostVO postCommentWithPostVo =
             new PostCommentWithPostVO().convertFrom(comment);
 
-        BasePostMinimalDTO basePostMinimalDTO =
-            new BasePostMinimalDTO().convertFrom(postRepository.getOne(comment.getPostId()));
+        BasePostMinimalDTO basePostMinimalDto =
+            new BasePostMinimalDTO().convertFrom(postRepository.getById(comment.getPostId()));
 
-        postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
-        return postCommentWithPostVO;
+        postCommentWithPostVo.setPost(buildPostFullPath(basePostMinimalDto));
+
+        postCommentWithPostVo.setAvatar(buildAvatarUrl(comment.getGravatarMd5()));
+
+        return postCommentWithPostVo;
     }
 
     @Override
+    @NonNull
     public List<PostCommentWithPostVO> convertToWithPostVo(List<PostComment> postComments) {
         if (CollectionUtils.isEmpty(postComments)) {
             return Collections.emptyList();
@@ -100,15 +107,17 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
             .filter(comment -> postMap.containsKey(comment.getPostId()))
             .map(comment -> {
                 // Convert to vo
-                PostCommentWithPostVO postCommentWithPostVO =
+                PostCommentWithPostVO postCommentWithPostVo =
                     new PostCommentWithPostVO().convertFrom(comment);
 
-                BasePostMinimalDTO basePostMinimalDTO =
+                BasePostMinimalDTO basePostMinimalDto =
                     new BasePostMinimalDTO().convertFrom(postMap.get(comment.getPostId()));
 
-                postCommentWithPostVO.setPost(buildPostFullPath(basePostMinimalDTO));
+                postCommentWithPostVo.setPost(buildPostFullPath(basePostMinimalDto));
 
-                return postCommentWithPostVO;
+                postCommentWithPostVo.setAvatar(buildAvatarUrl(comment.getGravatarMd5()));
+
+                return postCommentWithPostVo;
             }).collect(Collectors.toList());
     }
 
@@ -177,7 +186,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
     }
 
     @Override
-    public void validateTarget(Integer postId) {
+    public void validateTarget(@NonNull Integer postId) {
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(postId));
 

@@ -2,7 +2,6 @@ package run.halo.app.service.impl;
 
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModelException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -173,19 +172,6 @@ public class ThemeSettingServiceImpl extends AbstractCrudService<ThemeSetting, I
         });
 
         return result;
-    }
-
-    @Override
-    public List<ThemeSetting> replaceUrl(String oldUrl, String newUrl) {
-        List<ThemeSetting> themeSettings = listAll();
-        List<ThemeSetting> replaced = new ArrayList<>();
-        themeSettings.forEach(themeSetting -> {
-            if (StringUtils.isNotEmpty(themeSetting.getValue())) {
-                themeSetting.setValue(themeSetting.getValue().replaceAll(oldUrl, newUrl));
-            }
-            replaced.add(themeSetting);
-        });
-        return updateInBatch(replaced);
     }
 
     @Override

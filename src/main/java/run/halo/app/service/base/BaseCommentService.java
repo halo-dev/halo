@@ -296,38 +296,4 @@ public interface BaseCommentService<COMMENT extends BaseComment>
     @NonNull
     List<COMMENT> listChildrenBy(@NonNull Integer targetId, @NonNull Long commentParentId,
         @NonNull Sort sort);
-
-    /**
-     * Filters comment ip address.
-     *
-     * @param comment comment dto must not be null
-     */
-    @Deprecated
-    <T extends BaseCommentDTO> T filterIpAddress(@NonNull T comment);
-
-    /**
-     * Filters comment ip address.
-     *
-     * @param comments comment dto list
-     */
-    @Deprecated
-    <T extends BaseCommentDTO> List<T> filterIpAddress(@Nullable List<T> comments);
-
-    /**
-     * Filters comment ip address.
-     *
-     * @param commentPage comment page
-     */
-    @Deprecated
-    <T extends BaseCommentDTO> Page<T> filterIpAddress(@NonNull Page<T> commentPage);
-
-    /**
-     * Replace comment url in batch.
-     *
-     * @param oldUrl old blog url.
-     * @param newUrl new blog url.
-     * @return replaced comments.
-     */
-    List<BaseCommentDTO> replaceUrl(@NonNull String oldUrl, @NonNull String newUrl);
-
 }
