@@ -126,7 +126,7 @@
                 <a v-if="type === 'posts'" :href="item.post.fullPath" target="_blank">《{{ item.post.title }}》</a>
                 <a v-if="type === 'sheets'" :href="item.sheet.fullPath" target="_blank">《{{ item.sheet.title }}》</a>
               </template>
-              <a-avatar slot="avatar" size="large" :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'" />
+              <a-avatar slot="avatar" size="large" :src="item.avatar" />
               <span
                 slot="title"
                 style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"

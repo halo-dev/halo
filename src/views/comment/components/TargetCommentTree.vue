@@ -44,7 +44,7 @@
         <a-icon type="user" v-if="comment.isAdmin" style="margin-right: 3px;" />
         {{ comment.author }}
       </a>
-      <a-avatar size="large" slot="avatar" :src="avatar" :alt="comment.author" />
+      <a-avatar size="large" slot="avatar" :src="comment.avatar" :alt="comment.author" />
       <p slot="content" v-html="content"></p>
       <a-tooltip slot="datetime">
         <span slot="title">{{ comment.createTime | moment }}</span>
@@ -78,9 +78,6 @@ export default {
     }
   },
   computed: {
-    avatar() {
-      return `//cn.gravatar.com/avatar/${this.comment.gravatarMd5}/?s=256&d=mp`
-    },
     content() {
       return marked(this.comment.content)
     }

@@ -1,7 +1,7 @@
 <template>
   <a-list itemLayout="horizontal" :dataSource="formmatedCommentData" :loading="loading">
     <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-      <a-comment :avatar="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '/?s=256&d=mp'">
+      <a-comment :avatar="item.avatar">
         <template slot="author" v-if="type === 'posts'">
           <a :href="item.authorUrl" target="_blank">{{ item.author }}</a> 发表在 《<a
             v-if="item.post.status == 'PUBLISHED' || item.post.status == 'INTIMATE'"

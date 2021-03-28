@@ -15,12 +15,7 @@
             <a-list :loading="postCommentsLoading" :dataSource="converttedPostComments">
               <a-list-item slot="renderItem" slot-scope="item">
                 <a-list-item-meta>
-                  <a-avatar
-                    class="bg-white"
-                    slot="avatar"
-                    :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
-                    size="large"
-                  />
+                  <a-avatar class="bg-white" slot="avatar" :src="item.avatar" size="large" />
                   <template slot="title">
                     <a :href="item.authorUrl" target="_blank">{{ item.author }}</a
                     >：<span v-html="item.content"></span>
@@ -36,12 +31,7 @@
             <a-list :loading="sheetCommentsLoading" :dataSource="converttedSheetComments">
               <a-list-item slot="renderItem" slot-scope="item">
                 <a-list-item-meta>
-                  <a-avatar
-                    class="bg-white"
-                    slot="avatar"
-                    :src="'//cn.gravatar.com/avatar/' + item.gravatarMd5 + '&d=mm'"
-                    size="large"
-                  />
+                  <a-avatar class="bg-white" slot="avatar" :src="item.avatar" size="large" />
                   <template slot="title">
                     <a :href="item.authorUrl" target="_blank">{{ item.author }}</a
                     >：<span v-html="item.content"></span>
