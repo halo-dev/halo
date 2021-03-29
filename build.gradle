@@ -77,7 +77,7 @@ ext {
     hutoolVersion = "5.3.8"
     upyunSdkVersion = "4.2.0"
     qiniuSdkVersion = "7.2.29"
-    aliyunSdkVersion = "3.9.1"
+    aliyunSdkVersion = "3.11.3"
     baiduSdkVersion = "0.10.36"
     qcloudSdkVersion = "5.6.25"
     minioSdkVersion = "7.1.4"
