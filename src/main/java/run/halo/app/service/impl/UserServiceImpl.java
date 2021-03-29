@@ -11,7 +11,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.user.UserUpdatedEvent;
@@ -41,16 +40,12 @@ public class UserServiceImpl extends AbstractCrudService<User, Integer> implemen
 
     private final UserRepository userRepository;
 
-    private final AbstractStringCacheStore stringCacheStore;
-
     private final ApplicationEventPublisher eventPublisher;
 
     public UserServiceImpl(UserRepository userRepository,
-        AbstractStringCacheStore stringCacheStore,
         ApplicationEventPublisher eventPublisher) {
         super(userRepository);
         this.userRepository = userRepository;
-        this.stringCacheStore = stringCacheStore;
         this.eventPublisher = eventPublisher;
     }
 

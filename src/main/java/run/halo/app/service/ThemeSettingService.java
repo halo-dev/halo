@@ -16,7 +16,6 @@ import run.halo.app.service.base.CrudService;
  */
 public interface ThemeSettingService extends CrudService<ThemeSetting, Integer> {
 
-
     /**
      * Saves theme setting.
      *

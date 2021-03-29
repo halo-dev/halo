@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
@@ -40,14 +38,16 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public @NonNull List<MenuDTO> listDtos(@NonNull Sort sort) {
+    public @NonNull
+    List<MenuDTO> listDtos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
     }
 
     @Override
-    public @NonNull List<MenuTeamVO> listTeamVos(@NonNull Sort sort) {
+    public @NonNull
+    List<MenuTeamVO> listTeamVos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all menus
@@ -101,7 +101,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public @NonNull Menu createBy(@NonNull MenuParam menuParam) {
+    public @NonNull
+    Menu createBy(@NonNull MenuParam menuParam) {
         Assert.notNull(menuParam, "Menu param must not be null");
 
         // Create an return
@@ -141,12 +142,14 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public @NonNull Menu create(@NonNull Menu menu) {
+    public @NonNull
+    Menu create(@NonNull Menu menu) {
         return super.create(menu);
     }
 
     @Override
-    public @NonNull Menu update(@NonNull Menu menu) {
+    public @NonNull
+    Menu update(@NonNull Menu menu) {
         return super.update(menu);
     }
 
@@ -214,24 +217,5 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         return menus.stream()
             .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
             .collect(Collectors.toList());
-    }
-
-    @Deprecated
-    private void nameMustNotExist(@NonNull Menu menu) {
-        Assert.notNull(menu, "Menu must not be null");
-
-        boolean exist = false;
-
-        if (ServiceUtils.isEmptyId(menu.getId())) {
-            // Create action
-            exist = menuRepository.existsByName(menu.getName());
-        } else {
-            // Update action
-            exist = menuRepository.existsByIdNotAndName(menu.getId(), menu.getName());
-        }
-
-        if (exist) {
-            throw new AlreadyExistsException("菜单 " + menu.getName() + " 已存在");
-        }
     }
 }

@@ -27,15 +27,7 @@ import run.halo.app.model.vo.CommentWithHasChildrenVO;
  */
 public interface BaseCommentService<COMMENT extends BaseComment>
     extends CrudService<COMMENT, Long> {
-
-    /**
-     * %d: parent commentator id
-     * %s: parent commentator author name
-     * %s: comment content
-     */
-    @Deprecated
-    String COMMENT_TEMPLATE = "<a href='#comment-id-%d'>@%s</a> %s";
-
+    
     /**
      * Lists comments by post id.
      *
