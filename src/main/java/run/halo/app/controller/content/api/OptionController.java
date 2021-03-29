@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.OptionDTO;
+import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.service.OptionService;
 
@@ -60,8 +61,9 @@ public class OptionController {
     @ApiOperation("Options for comment")
     public Map<String, Object> comment() {
         List<String> keys = new ArrayList<>();
-        keys.add("comment_gravatar_default");
-        keys.add("comment_content_placeholder");
+        keys.add(CommentProperties.GRAVATAR_DEFAULT.getValue());
+        keys.add(CommentProperties.CONTENT_PLACEHOLDER.getValue());
+        keys.add(CommentProperties.GRAVATAR_SOURCE.getValue());
         return optionService.listOptions(keys);
     }
 }
