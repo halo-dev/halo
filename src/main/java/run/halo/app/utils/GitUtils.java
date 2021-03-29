@@ -1,10 +1,8 @@
 package run.halo.app.utils;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,7 +21,6 @@ import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -36,24 +33,6 @@ import org.springframework.util.CollectionUtils;
 public class GitUtils {
 
     private GitUtils() {
-    }
-
-    @Deprecated(since = "1.4.2", forRemoval = true)
-    public static void cloneFromGit(@NonNull String repoUrl, @NonNull Path targetPath,
-        @NonNull String branchName) throws GitAPIException {
-        Assert.hasText(repoUrl, "Repository remote url must not be blank");
-        Assert.notNull(targetPath, "Target path must not be null");
-
-        try (
-            Git ignored = Git.cloneRepository()
-                .setURI(repoUrl)
-                .setDirectory(targetPath.toFile())
-                .setBranchesToClone(Collections.singletonList("refs/heads/" + branchName))
-                .setCloneSubmodules(true)
-                .setBranch("refs/heads/" + branchName)
-                .call()) {
-            // empty block placeholder
-        }
     }
 
     public static List<String> getAllBranchesFromRemote(@NonNull String repoUrl) {

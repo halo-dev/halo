@@ -23,7 +23,7 @@ import run.halo.app.security.service.OneTimeTokenService;
 @AutoConfigureMockMvc
 class OneTimeTokenTest {
 
-    static final String REQUEST_URI = "/api/admin/counts";
+    static final String REQUEST_URI = "/api/admin/statistics";
 
     @Autowired
     MockMvc mvc;

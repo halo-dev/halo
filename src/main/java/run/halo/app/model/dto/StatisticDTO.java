@@ -18,9 +18,6 @@ public class StatisticDTO {
 
     private Long categoryCount;
 
-    @Deprecated
-    private Long attachmentCount;
-
     private Long tagCount;
 
     private Long journalCount;

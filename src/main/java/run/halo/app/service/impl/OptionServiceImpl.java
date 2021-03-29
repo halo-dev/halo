@@ -620,17 +620,5 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
 
         return new OptionSimpleDTO().convertFrom(option);
     }
-
-    @Deprecated
-    private void cleanCache() {
-        cacheStore.delete(OPTIONS_KEY);
-    }
-
-    @Deprecated
-    private void publishOptionUpdatedEvent() {
-        flush();
-        cleanCache();
-        eventPublisher.publishEvent(new OptionUpdatedEvent(this));
-    }
 }
 
