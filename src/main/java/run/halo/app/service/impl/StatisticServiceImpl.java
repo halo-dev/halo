@@ -78,42 +78,42 @@ public class StatisticServiceImpl implements StatisticService {
 
     @Override
     public StatisticDTO getStatistic() {
-        StatisticDTO statisticDTO = new StatisticDTO();
-        statisticDTO.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
+        StatisticDTO statisticDto = new StatisticDTO();
+        statisticDto.setPostCount(postService.countByStatus(PostStatus.PUBLISHED));
 
         // Handle comment count
         long postCommentCount = postCommentService.countByStatus(CommentStatus.PUBLISHED);
         long sheetCommentCount = sheetCommentService.countByStatus(CommentStatus.PUBLISHED);
         long journalCommentCount = journalCommentService.countByStatus(CommentStatus.PUBLISHED);
 
-        statisticDTO.setCommentCount(postCommentCount + sheetCommentCount + journalCommentCount);
-        statisticDTO.setTagCount(tagService.count());
-        statisticDTO.setCategoryCount(categoryService.count());
-        statisticDTO.setJournalCount(journalService.count());
+        statisticDto.setCommentCount(postCommentCount + sheetCommentCount + journalCommentCount);
+        statisticDto.setTagCount(tagService.count());
+        statisticDto.setCategoryCount(categoryService.count());
+        statisticDto.setJournalCount(journalService.count());
 
         long birthday = optionService.getBirthday();
         long days = (System.currentTimeMillis() - birthday) / (1000 * 24 * 3600);
-        statisticDTO.setEstablishDays(days);
-        statisticDTO.setBirthday(birthday);
+        statisticDto.setEstablishDays(days);
+        statisticDto.setBirthday(birthday);
 
-        statisticDTO.setLinkCount(linkService.count());
-        statisticDTO.setVisitCount(postService.countVisit() + sheetService.countVisit());
-        statisticDTO.setLikeCount(postService.countLike() + sheetService.countLike());
-        return statisticDTO;
+        statisticDto.setLinkCount(linkService.count());
+        statisticDto.setVisitCount(postService.countVisit() + sheetService.countVisit());
+        statisticDto.setLikeCount(postService.countLike() + sheetService.countLike());
+        return statisticDto;
     }
 
     @Override
     public StatisticWithUserDTO getStatisticWithUser() {
 
-        StatisticDTO statisticDTO = getStatistic();
+        StatisticDTO statisticDto = getStatistic();
 
-        StatisticWithUserDTO statisticWithUserDTO = new StatisticWithUserDTO();
-        statisticWithUserDTO.convertFrom(statisticDTO);
+        StatisticWithUserDTO statisticWithUserDto = new StatisticWithUserDTO();
+        statisticWithUserDto.convertFrom(statisticDto);
 
         User user =
             userService.getCurrentUser().orElseThrow(() -> new ServiceException("未查询到博主信息"));
-        statisticWithUserDTO.setUser(new UserDTO().convertFrom(user));
+        statisticWithUserDto.setUser(new UserDTO().convertFrom(user));
 
-        return statisticWithUserDTO;
+        return statisticWithUserDto;
     }
 }

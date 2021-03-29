@@ -16,7 +16,6 @@ import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.EnvironmentDTO;
 import run.halo.app.model.dto.LoginPreCheckDTO;
-import run.halo.app.model.dto.StatisticDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.MFAType;
 import run.halo.app.model.params.LoginParam;
@@ -98,13 +97,6 @@ public class AdminController {
     @CacheLock(autoDelete = false)
     public AuthToken refresh(@PathVariable("refreshToken") String refreshToken) {
         return adminService.refreshToken(refreshToken);
-    }
-
-    @GetMapping("counts")
-    @ApiOperation("Gets count info")
-    @Deprecated
-    public StatisticDTO getCount() {
-        return adminService.getCount();
     }
 
     @GetMapping("environments")
