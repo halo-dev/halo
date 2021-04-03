@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<#setting locale="en_US">
 <rss version="2.0">
     <channel>
         <#if category??>
@@ -21,6 +22,7 @@
             </#if>
         </#if>
         <generator>Halo ${version!}</generator>
+        <lastBuildDate>${lastModified?string('EEE, dd MMM yyyy HH:mm:ss z')}</lastBuildDate>
         <#if posts?? && posts?size gt 0>
             <#list posts as post>
                 <item>
@@ -35,7 +37,7 @@
                             <![CDATA[${post.summary!}]]>
                         </#if>
                     </description>
-                    <pubDate>${post.createTime?iso_local}</pubDate>
+                    <pubDate>${post.createTime?string('EEE, dd MMM yyyy HH:mm:ss z')}</pubDate>
                 </item>
             </#list>
         </#if>
