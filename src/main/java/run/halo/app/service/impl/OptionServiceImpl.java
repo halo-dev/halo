@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Region;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -228,7 +229,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
     }
 
     @Override
-    public Map<String, Object> listOptions(List<String> keys) {
+    public Map<String, Object> listOptions(Collection<String> keys) {
         if (CollectionUtils.isEmpty(keys)) {
             return Collections.emptyMap();
         }

@@ -156,7 +156,9 @@ public class HaloConst {
     /**
      * Options cache key.
      */
-    public static String OPTIONS_CACHE_KEY = "options";
+    public static final String OPTIONS_CACHE_KEY = "options";
+
+    public static final String PRIVATE_OPTION_KEY = "private_options";
 
     static {
         // Set version
