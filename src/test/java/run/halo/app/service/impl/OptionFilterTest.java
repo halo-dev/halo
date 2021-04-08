@@ -34,9 +34,13 @@ class OptionFilterTest {
         given(optionService.getByKey(any(), eq(String.class)))
             .willReturn(Optional.empty());
 
-        var optionNames = Set.of(AliOssProperties.OSS_ACCESS_KEY.getValue());
+        var optionNames = Set.of(AliOssProperties.OSS_ACCESS_SECRET.getValue());
         var filteredOptionNames = optionFilter.filter(optionNames);
         assertTrue(filteredOptionNames.isEmpty());
+
+        var filteredOptionName =
+            optionFilter.filter(AliOssProperties.OSS_ACCESS_SECRET.getValue());
+        assertTrue(filteredOptionName.isEmpty());
     }
 
     @Test
@@ -46,18 +50,24 @@ class OptionFilterTest {
 
         var optionNames = Set.of("hello", "world");
         var filteredOptionNames = optionFilter.filter(optionNames);
+        var filteredOptionName = optionFilter.filter("hello");
         assertEquals(Set.of("world"), filteredOptionNames);
+        assertTrue(filteredOptionName.isEmpty());
 
         given(optionService.getByKey(any(), eq(String.class)))
             .willReturn(Optional.of("hello,world"));
 
         optionNames = Set.of("hello");
         filteredOptionNames = optionFilter.filter(optionNames);
+        filteredOptionName = optionFilter.filter("hello");
         assertTrue(filteredOptionNames.isEmpty());
+        assertTrue(filteredOptionName.isEmpty());
 
         optionNames = Set.of("hello", "world");
         filteredOptionNames = optionFilter.filter(optionNames);
+        filteredOptionName = optionFilter.filter("hello");
         assertTrue(filteredOptionNames.isEmpty());
+        assertTrue(filteredOptionName.isEmpty());
     }
 
     @Test
@@ -67,18 +77,24 @@ class OptionFilterTest {
 
         var optionNames = Set.of("hello", "world");
         var filteredOptionNames = optionFilter.filter(optionNames);
+        var filteredOptionName = optionFilter.filter("hello");
         assertEquals(Set.of("world"), filteredOptionNames);
+        assertTrue(filteredOptionName.isEmpty());
 
         given(optionService.getByKey(any(), eq(String.class)))
             .willReturn(Optional.of(" hello ,    world "));
 
         optionNames = Set.of("hello");
         filteredOptionNames = optionFilter.filter(optionNames);
+        filteredOptionName = optionFilter.filter("hello");
         assertTrue(filteredOptionNames.isEmpty());
+        assertTrue(filteredOptionName.isEmpty());
 
         optionNames = Set.of("hello", "world");
         filteredOptionNames = optionFilter.filter(optionNames);
+        filteredOptionName = optionFilter.filter("world");
         assertTrue(filteredOptionNames.isEmpty());
+        assertTrue(filteredOptionName.isEmpty());
     }
 
     @Test
@@ -100,6 +116,8 @@ class OptionFilterTest {
         var optionNames =
             Set.of("hello", "halo");
         var filteredOptionNames = optionFilter.filter(optionNames);
+        var filteredOptionName = optionFilter.filter("halo");
         assertEquals(optionNames, filteredOptionNames);
+        assertEquals(Optional.of("halo"), filteredOptionName);
     }
 }
