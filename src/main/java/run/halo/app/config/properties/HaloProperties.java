@@ -23,12 +23,6 @@ import run.halo.app.model.enums.Mode;
 public class HaloProperties {
 
     /**
-     * Production env. (Default is true)
-     */
-    @Deprecated
-    private boolean productionEnv = true;
-
-    /**
      * Authentication enabled.
      */
     private boolean authEnabled = true;
