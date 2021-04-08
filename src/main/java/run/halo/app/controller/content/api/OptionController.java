@@ -98,13 +98,4 @@ public class OptionController {
         return optionService.listOptions(optionFilter.filter(keys));
     }
 
-    @GetMapping("/bulk")
-    @ApiOperation("Lists options by providing option keys")
-    public Map<String, Object> listByKeys(@RequestParam("keys") String keys) {
-        var nameSet = Arrays.stream(keys.split(","))
-            .map(String::trim)
-            .collect(Collectors.toUnmodifiableSet());
-        var filteredNames = optionFilter.filter(nameSet);
-        return optionService.listOptions(filteredNames);
-    }
 }
