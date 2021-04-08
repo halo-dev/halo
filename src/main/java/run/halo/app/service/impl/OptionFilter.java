@@ -21,16 +21,16 @@ import run.halo.app.service.OptionService;
  */
 public class OptionFilter {
 
-    private final Set<String> defaultPrivateOptionNames;
+    private final Set<String> defaultPrivateOptionKeys;
 
     private final OptionService optionService;
 
     public OptionFilter(OptionService optionService) {
         this.optionService = optionService;
-        this.defaultPrivateOptionNames = getDefaultPrivateOptionNames();
+        this.defaultPrivateOptionKeys = getDefaultPrivateOptionKeys();
     }
 
-    private Set<String> getDefaultPrivateOptionNames() {
+    private Set<String> getDefaultPrivateOptionKeys() {
         return Set.of(
             AliOssProperties.OSS_ACCESS_KEY.getValue(),
             AliOssProperties.OSS_ACCESS_SECRET.getValue(),
@@ -38,7 +38,7 @@ public class OptionFilter {
         );
     }
 
-    private Set<String> getConfiguredPrivateOptionNames() {
+    private Set<String> getConfiguredPrivateOptionKeys() {
         // resolve configured private option names
         return optionService.getByKey(HaloConst.PRIVATE_OPTION_KEY, String.class)
             .map(privateOptions -> privateOptions.split(","))
@@ -50,40 +50,40 @@ public class OptionFilter {
     }
 
     /**
-     * Filter option names to prevent outsider from accessing private options.
+     * Filter option keys to prevent outsider from accessing private options.
      *
-     * @param optionNames option name collection
-     * @return filtered option names
+     * @param optionKeys option key collection
+     * @return filtered option keys
      */
-    public Set<String> filter(Collection<String> optionNames) {
-        if (CollectionUtils.isEmpty(optionNames)) {
+    public Set<String> filter(Collection<String> optionKeys) {
+        if (CollectionUtils.isEmpty(optionKeys)) {
             return Collections.emptySet();
         }
 
-        return optionNames.stream()
+        return optionKeys.stream()
             .filter(Objects::nonNull)
-            .filter(optionName -> !optionName.isBlank())
-            .filter(optionName -> !defaultPrivateOptionNames.contains(optionName))
-            .filter(optionName -> !getConfiguredPrivateOptionNames().contains(optionName))
+            .filter(optionKey -> !optionKey.isBlank())
+            .filter(optionKey -> !defaultPrivateOptionKeys.contains(optionKey))
+            .filter(optionKey -> !getConfiguredPrivateOptionKeys().contains(optionKey))
             .collect(Collectors.toUnmodifiableSet());
     }
 
     /**
-     * Filter option name to prevent outsider from accessing private option.
+     * Filter option key to prevent outsider from accessing private option.
      *
-     * @param optionName option name
-     * @return an optional of option name
+     * @param optionKey option key
+     * @return an optional of option key
      */
-    public Optional<String> filter(String optionName) {
-        if (!StringUtils.hasText(optionName)) {
+    public Optional<String> filter(String optionKey) {
+        if (!StringUtils.hasText(optionKey)) {
             return Optional.empty();
         }
-        if (defaultPrivateOptionNames.contains(optionName)) {
+        if (defaultPrivateOptionKeys.contains(optionKey)) {
             return Optional.empty();
         }
-        if (getConfiguredPrivateOptionNames().contains(optionName)) {
+        if (getConfiguredPrivateOptionKeys().contains(optionKey)) {
             return Optional.empty();
         }
-        return Optional.of(optionName);
+        return Optional.of(optionKey);
     }
 }
