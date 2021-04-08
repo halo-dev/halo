@@ -1,7 +1,16 @@
 package run.halo.app.controller.content;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Locale;
+import java.util.OptionalLong;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.springframework.data.domain.Page;
@@ -28,15 +37,6 @@ import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.OptionalLong;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * @author ryanwang
@@ -77,7 +77,7 @@ public class ContentFeedController {
     }
 
     /**
-     * Get post rss
+     * Get post rss.
      *
      * @param model model
      * @return rss xml content
@@ -279,7 +279,7 @@ public class ContentFeedController {
     private Timestamp getLastModifiedTime(List<PostDetailVO> posts) {
         OptionalLong lastModifiedTimestamp =
             posts.stream().mapToLong(post -> post.getEditTime().getTime()).max();
-        if (!lastModifiedTimestamp.isPresent()) {
+        if (lastModifiedTimestamp.isEmpty()) {
             return new Timestamp(System.currentTimeMillis());
         }
         return new Timestamp(lastModifiedTimestamp.getAsLong());
