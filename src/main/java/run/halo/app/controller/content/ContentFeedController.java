@@ -5,7 +5,12 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
+import java.util.OptionalLong;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RegExUtils;
 import org.springframework.data.domain.Page;
@@ -47,6 +52,8 @@ public class ContentFeedController {
 
     private static final String XML_MEDIA_TYPE = MediaType.APPLICATION_XML_VALUE + UTF_8_SUFFIX;
 
+    private static final String LAST_MODIFIED_HEADER = "Last-Modified";
+
     private final PostService postService;
 
     private final CategoryService categoryService;
@@ -70,7 +77,7 @@ public class ContentFeedController {
     }
 
     /**
-     * Get post rss
+     * Get post rss.
      *
      * @param model model
      * @return rss xml content
@@ -79,8 +86,13 @@ public class ContentFeedController {
      */
     @GetMapping(value = {"feed", "feed.xml", "rss", "rss.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
-    public String feed(Model model) throws IOException, TemplateException {
-        model.addAttribute("posts", buildPosts(buildPostPageable(optionService.getRssPageSize())));
+    public String feed(Model model, HttpServletResponse response)
+        throws IOException, TemplateException {
+        List<PostDetailVO> posts = buildPosts(buildPostPageable(optionService.getRssPageSize()));
+        model.addAttribute("posts", posts);
+        Timestamp lastModified = this.getLastModifiedTime(posts);
+        this.lastModified2ResponseHeader(response, lastModified);
+        model.addAttribute("lastModified", lastModified);
         Template template = freeMarker.getConfiguration().getTemplate("common/web/rss.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -97,13 +109,18 @@ public class ContentFeedController {
     @GetMapping(value = {"feed/categories/{slug}",
         "feed/categories/{slug}.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
-    public String feed(Model model, @PathVariable(name = "slug") String slug)
+    public String feed(Model model, @PathVariable(name = "slug") String slug,
+        HttpServletResponse response)
         throws IOException, TemplateException {
         Category category = categoryService.getBySlugOfNonNull(slug);
         CategoryDTO categoryDTO = categoryService.convertTo(category);
+        List<PostDetailVO> posts =
+            buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO);
         model.addAttribute("category", categoryDTO);
-        model.addAttribute("posts",
-            buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO));
+        model.addAttribute("posts", posts);
+        Timestamp lastModified = this.getLastModifiedTime(posts);
+        this.lastModified2ResponseHeader(response, lastModified);
+        model.addAttribute("lastModified", lastModified);
         Template template = freeMarker.getConfiguration().getTemplate("common/web/rss.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -118,8 +135,13 @@ public class ContentFeedController {
      */
     @GetMapping(value = {"atom", "atom.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
-    public String atom(Model model) throws IOException, TemplateException {
-        model.addAttribute("posts", buildPosts(buildPostPageable(optionService.getRssPageSize())));
+    public String atom(Model model, HttpServletResponse response)
+        throws IOException, TemplateException {
+        List<PostDetailVO> posts = buildPosts(buildPostPageable(optionService.getRssPageSize()));
+        model.addAttribute("posts", posts);
+        Timestamp lastModified = this.getLastModifiedTime(posts);
+        this.lastModified2ResponseHeader(response, lastModified);
+        model.addAttribute("lastModified", lastModified);
         Template template = freeMarker.getConfiguration().getTemplate("common/web/atom.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -136,13 +158,18 @@ public class ContentFeedController {
     @GetMapping(value = {"atom/categories/{slug}",
         "atom/categories/{slug}.xml"}, produces = XML_MEDIA_TYPE)
     @ResponseBody
-    public String atom(Model model, @PathVariable(name = "slug") String slug)
+    public String atom(Model model, @PathVariable(name = "slug") String slug,
+        HttpServletResponse response)
         throws IOException, TemplateException {
         Category category = categoryService.getBySlugOfNonNull(slug);
         CategoryDTO categoryDTO = categoryService.convertTo(category);
+        List<PostDetailVO> posts =
+            buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO);
         model.addAttribute("category", categoryDTO);
-        model.addAttribute("posts",
-            buildCategoryPosts(buildPostPageable(optionService.getRssPageSize()), categoryDTO));
+        model.addAttribute("posts", posts);
+        Timestamp lastModified = this.getLastModifiedTime(posts);
+        this.lastModified2ResponseHeader(response, lastModified);
+        model.addAttribute("lastModified", lastModified);
         Template template = freeMarker.getConfiguration().getTemplate("common/web/atom.ftl");
         return FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
     }
@@ -247,5 +274,20 @@ public class ContentFeedController {
                 .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });
         return posts.getContent();
+    }
+
+    private Timestamp getLastModifiedTime(List<PostDetailVO> posts) {
+        OptionalLong lastModifiedTimestamp =
+            posts.stream().mapToLong(post -> post.getEditTime().getTime()).max();
+        if (lastModifiedTimestamp.isEmpty()) {
+            return new Timestamp(System.currentTimeMillis());
+        }
+        return new Timestamp(lastModifiedTimestamp.getAsLong());
+    }
+
+    private void lastModified2ResponseHeader(HttpServletResponse response, Timestamp time) {
+        SimpleDateFormat dateFormat =
+            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
+        response.setHeader(LAST_MODIFIED_HEADER, dateFormat.format(time));
     }
 }
