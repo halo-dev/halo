@@ -2,6 +2,7 @@ package run.halo.app.service;
 
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Region;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -106,7 +107,7 @@ public interface OptionService extends CrudService<Option, Integer> {
      * @return a map of option
      */
     @NonNull
-    Map<String, Object> listOptions(@Nullable List<String> keys);
+    Map<String, Object> listOptions(@Nullable Collection<String> keys);
 
     /**
      * Lists all option dtos.
@@ -224,7 +225,7 @@ public interface OptionService extends CrudService<Option, Integer> {
 
     /**
      * Gets property value by blog property.
-     * <p>
+     *
      * Default value from property default value.
      *
      * @param property blog property must not be null
