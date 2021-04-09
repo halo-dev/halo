@@ -53,13 +53,9 @@ public class OptionFilter {
             BaiduBosProperties.BOS_ACCESS_KEY.getValue(),
             BaiduBosProperties.BOS_SECRET_KEY.getValue(),
 
-            EmailProperties.HOST.getValue(),
-            EmailProperties.PROTOCOL.getValue(),
-            EmailProperties.SSL_PORT.getValue(),
             EmailProperties.USERNAME.getValue(),
             EmailProperties.PASSWORD.getValue(),
             EmailProperties.FROM_NAME.getValue(),
-            EmailProperties.ENABLED.getValue(),
 
             HuaweiObsProperties.OSS_DOMAIN.getValue(),
             HuaweiObsProperties.OSS_ENDPOINT.getValue(),
