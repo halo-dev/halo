@@ -1,6 +1,6 @@
 {
   "name": "halo-admin",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "author": "halo-dev",
   "description": "Halo admin client.",
   "repository": {
@@ -13,6 +13,7 @@
   },
   "homepage": "https://github.com/halo-dev/halo-admin#readme",
   "scripts": {
+    "prepare": "husky install",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build:jsdelivr": "vue-cli-service build --mode jsdelivr",
@@ -62,20 +63,12 @@
     "eslint-plugin-html": "^6.1.2",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-vue": "^6.2.2",
+    "husky": "^6.0.0",
     "less": "^3.13.1",
     "less-loader": "^5.0.0",
     "lint-staged": "^10.5.4",
     "prettier": "^1.19.1",
     "tailwindcss": "^1.9.6",
     "vue-template-compiler": "^2.6.12"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,vue}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
   }
 }
