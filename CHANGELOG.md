@@ -1,5 +1,22 @@
 # CHANGELOG
 
+# 1.4.8
+
+## Features
+
+- 系统设置中支持设置 Gravatar 源地址。#1331 halo-dev/halo-admin#314
+
+## Improvements
+
+- 优化 RSS 订阅最后更新时间字段。#1342
+
+## Bug Fixes
+
+- 修复在 1.4.7 中，导入 Markdown 提示格式不正确的问题。halo-dev/halo-admin#311
+- 修复后台评论管理页面安全性问题。halo-dev/halo-admin#313
+- 修复 Content API 中，文章评论数不正确的问题。#1327
+- 修复 Content API 中，有关 Options 内容安全性的问题。#1345
+
 # 1.4.7
 
 ## Bug Fixes
