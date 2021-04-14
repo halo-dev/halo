@@ -1,4 +1,8 @@
-<h1 align="center"><a href="https://github.com/halo-dev" target="_blank">Halo</a></h1>
+<p align="center">
+    <a href="https://halo.run" target="_blank" rel="noopener noreferrer">
+        <img width="100" src="https://halo.run/logo" alt="Halo logo">
+    </a>
+</p>
 
 > Halo 是一款现代化的个人独立博客系统，给习惯写博客的同学多一个选择。
 
@@ -14,17 +18,15 @@
 
 ## 简介
 
-**Halo** `[ˈheɪloʊ]`，意为光环。当然，你也可以当成拼音读(哈喽)。
+**Halo** `[ˈheɪloʊ]`，一个优秀的开源博客发布应用，值得一试。
 
-一个优秀的开源博客发布应用，值得一试。
-
-> [官网](https://halo.run) | [文档](https://docs.halo.run) | [社区](https://bbs.halo.run) | [Telegram 频道](https://t.me/halo_dev)
+[官网](https://halo.run) | [文档](https://docs.halo.run) | [社区](https://bbs.halo.run) | [Telegram 频道](https://t.me/halo_dev)
 
 ## 快速开始
 
-下载最新的 Halo 安装包：
+下载最新的 Halo 运行包：
 
-> 其他地址：https://docs.halo.run/install/downloads
+其他地址：https://docs.halo.run/install/downloads
 
 ```bash
 curl -L https://github.com/halo-dev/halo/releases/download/v1.4.8/halo-1.4.8.jar --output halo.jar
@@ -42,28 +44,30 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=alwa
 
 详细部署文档请查阅：<https://docs.halo.run/install/index>
 
-## 周边
+## 生态
 
-- 后台管理（halo-admin）：<https://github.com/halo-dev/halo-admin>
-- 独立评论模块（halo-comment）：<https://github.com/halo-dev/halo-comment>
-- 管理 APP（已停止维护）：<https://github.com/halo-dev/halo-app>
-- 主题仓库：<https://halo.run/themes.html>
-- 资源下载：<https://docs.halo.run/install/downloads>
-- WeHalo 小程序：<https://github.com/aquanlerou/WeHalo>
+| 项目                                                                         | 版本                                                                                                                                                              | 描述                                     |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| [halo-admin](https://github.com/halo-dev/halo-admin)                         | <a href="https://www.npmjs.com/package/halo-admin"><img alt="npm release" src="https://img.shields.io/npm/v/halo-admin?style=flat-square"/></a>                   | Web 管理端 UI，已内置在主应用            |
+| [halo-comment](https://github.com/halo-dev/halo-comment)                     | <a href="https://www.npmjs.com/package/halo-comment"><img alt="npm release" src="https://img.shields.io/npm/v/halo-comment?style=flat-square"/></a>               | 独立评论组件，可以非常方便的集成到主题中 |
+| [halo-comment-normal](https://github.com/halo-dev/halo-comment-normal)       | <a href="https://www.npmjs.com/package/halo-comment-normal"><img alt="npm release" src="https://img.shields.io/npm/v/halo-comment-normal?style=flat-square"/></a> | 另外一款评论组件                         |
+| [halo-app](https://github.com/halo-dev/halo-app)                             | 已停止维护                                                                                                                                                        | 移动端管理 APP                           |
+| [tencent-cloudbase-halo](https://github.com/halo-dev/tencent-cloudbase-halo) | 无                                                                                                                                                                | 腾讯云 CloudBase 一键部署配置            |
+| [halo-theme-*](https://github.com/topics/halo-theme)                         | 无                                                                                                                                                                | GitHub 上开源的 Halo 主题集合            | 
 
 ## 许可证
 
 [![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
-> Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议。
+Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议。
 
 ## 贡献
 
 参考 [CONTRIBUTING](./CONTRIBUTING.md)。
 
-## 捐赠
+## 赞助我们
 
-> 如果 Halo 对你有帮助，可以请开发团队们喝杯☕️。
+> 如果 Halo 对您有帮助，不妨赞助我们
 
-- 一次性赞助：<https://sponsor.halo.run>
-- 周期性赞助：<https://afdian.net/@halo-dev>
+<https://docs.halo.run/zh/contribution/sponsor>
+
