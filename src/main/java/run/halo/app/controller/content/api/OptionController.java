@@ -82,7 +82,7 @@ public class OptionController {
     @ApiOperation("Gets option value by option key")
     public BaseResponse<Object> getBy(@PathVariable("key") String key) {
         Object optionValue = optionFilter.filter(key)
-            .map(k -> optionService.getByKey(key))
+            .flatMap(k -> optionService.getByKey(key))
             .orElse(null);
         return BaseResponse.ok(optionValue);
     }
