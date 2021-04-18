@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -280,15 +279,18 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         Assert.notNull(post, "Post must not be null");
 
         String originalContent = post.getOriginalContent();
-        originalContent = HaloUtils.cleanHtmlTag(originalContent);
 
-        post.setWordCount((long) originalContent.length());
-
-        // Render content
+        // Render content and set word count
         if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+
+            post.setWordCount(markdownWordCount(originalContent));
         } else {
             post.setFormatContent(post.getOriginalContent());
+
+            originalContent = HaloUtils.cleanHtmlTag(originalContent);
+
+            post.setWordCount((long) originalContent.length());
         }
 
         // Create or update post
@@ -526,5 +528,30 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
         return StringUtils.substring(text, 0, summaryLength);
+    }
+
+    /**
+     * @param originalContent the markdown style content
+     * @return word count except space and line separator
+     */
+
+    public static long markdownWordCount(String originalContent) {
+        originalContent = MarkdownUtils.renderHtml(originalContent);
+
+        originalContent = HaloUtils.cleanHtmlTag(originalContent);
+
+        return originalContent.length() - countChar(originalContent, '\n')
+            - countChar(originalContent, '\r')
+            - countChar(originalContent, ' ');
+    }
+
+    private static int countChar(String originalContent, char c) {
+        int totalChar = 0;
+        for (char i : originalContent.toCharArray()) {
+            if (i == c) {
+                totalChar++;
+            }
+        }
+        return totalChar;
     }
 }
