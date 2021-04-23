@@ -284,13 +284,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
 
-            post.setWordCount(markdownWordCount(originalContent));
+            post.setWordCount(htmlFormatWordCount(post.getFormatContent()));
         } else {
-            post.setFormatContent(post.getOriginalContent());
+            post.setFormatContent(originalContent);
 
-            originalContent = HaloUtils.cleanHtmlTag(originalContent);
-
-            post.setWordCount((long) originalContent.length());
+            post.setWordCount(htmlFormatWordCount(originalContent));
         }
 
         // Create or update post
@@ -531,27 +529,21 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     /**
-     * @param originalContent the markdown style content
+     * @param htmlContent the markdown style content
      * @return word count except space and line separator
      */
 
-    public static long markdownWordCount(String originalContent) {
-        originalContent = MarkdownUtils.renderHtml(originalContent);
+    public static long htmlFormatWordCount(String htmlContent) {
+        htmlContent = HaloUtils.cleanHtmlTag(htmlContent);
 
-        originalContent = HaloUtils.cleanHtmlTag(originalContent);
+        Matcher matcher = Pattern.compile("\\s").matcher(htmlContent);
 
-        return originalContent.length() - countChar(originalContent, '\n')
-            - countChar(originalContent, '\r')
-            - countChar(originalContent, ' ');
-    }
+        int count = 0;
 
-    private static int countChar(String originalContent, char c) {
-        int totalChar = 0;
-        for (char i : originalContent.toCharArray()) {
-            if (i == c) {
-                totalChar++;
-            }
+        while (matcher.find()) {
+            count++;
         }
-        return totalChar;
+
+        return htmlContent.length() - count;
     }
 }
