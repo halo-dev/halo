@@ -28,11 +28,11 @@
 
 下载最新的 Halo 运行包：
 
-其他地址：https://docs.halo.run/install/downloads
-
 ```bash
 curl -L https://github.com/halo-dev/halo/releases/download/v1.4.8/halo-1.4.8.jar --output halo.jar
 ```
+
+其他地址：https://docs.halo.run/install/downloads
 
 ```bash
 java -jar halo.jar
