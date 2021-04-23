@@ -54,7 +54,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     private final OptionService optionService;
 
-    private final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
+    private static final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
+
+    private static final Pattern blankPattern = Pattern.compile("\\s");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
         OptionService optionService) {
@@ -536,7 +538,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     public static long htmlFormatWordCount(String htmlContent) {
         htmlContent = HaloUtils.cleanHtmlTag(htmlContent);
 
-        Matcher matcher = Pattern.compile("\\s").matcher(htmlContent);
+        Matcher matcher = blankPattern.matcher(htmlContent);
 
         int count = 0;
 
