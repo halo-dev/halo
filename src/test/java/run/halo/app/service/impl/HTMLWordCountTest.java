@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 
+// Workaround for https://github.com/halo-dev/halo/issues/1224
+
 @Slf4j
 public class HTMLWordCountTest {
 

@@ -275,6 +275,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         increaseLike(1L, postId);
     }
 
+    /**
+     * @param post post for article
+     * @return post with handled data
+     */
     @Override
     @Transactional
     public POST createOrUpdateBy(POST post) {
@@ -282,6 +286,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
         String originalContent = post.getOriginalContent();
 
+        // Workaround for https://github.com/halo-dev/halo/issues/1224
         // Render content and set word count
         if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
@@ -529,6 +534,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
         return StringUtils.substring(text, 0, summaryLength);
     }
+
+    // Workaround for https://github.com/halo-dev/halo/issues/1224
 
     /**
      * @param htmlContent the markdown style content
