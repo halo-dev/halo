@@ -536,6 +536,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
      */
 
     public static long htmlFormatWordCount(String htmlContent) {
+        if (htmlContent == null) {
+            return 0;
+        }
+
         htmlContent = HaloUtils.cleanHtmlTag(htmlContent);
 
         Matcher matcher = blankPattern.matcher(htmlContent);
