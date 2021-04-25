@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import run.halo.app.model.params.PostQuery;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
@@ -28,7 +29,6 @@ import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostCommentParam;
-import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.CommentWithHasChildrenVO;
@@ -62,7 +62,6 @@ public class PostController {
         this.postCommentService = postCommentService;
         this.optionService = optionService;
     }
-
     //Workaround for https://github.com/halo-dev/halo/issues/1351
     /**
      *
@@ -77,12 +76,19 @@ public class PostController {
         @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
         PostQuery postQuery,
         @RequestParam(value = "more", defaultValue = "true") Boolean more) {
-        PostStatus status=PostStatus.PUBLISHED;
+        PostStatus status = PostStatus.PUBLISHED;
         postQuery.setStatus(status);
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
-
         return postService.convertToListVo(postPage, true);
+    }
 
+
+    @GetMapping
+    @ApiOperation("Lists posts")
+    public Page<PostListVO> pageBy(
+        @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
+        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        return postService.convertToListVo(postPage);
     }
 
     @PostMapping(value = "search")
