@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import run.halo.app.model.params.PostQuery;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
@@ -29,6 +28,7 @@ import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostCommentParam;
+import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.CommentWithHasChildrenVO;
@@ -70,6 +70,7 @@ public class PostController {
      * @param more      boolean value whether more information
      * @return          published articles that contains keywords
      */
+
     @GetMapping
     @ApiOperation("Lists posts")
     public Page<PostListVO> pageBy(
