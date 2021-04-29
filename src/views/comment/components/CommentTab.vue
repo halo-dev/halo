@@ -275,7 +275,7 @@
       </template>
       <a-form-model ref="replyCommentForm" :model="replyComment" :rules="replyCommentRules" layout="vertical">
         <a-form-model-item prop="content">
-          <a-input ref="contentInput" type="textarea" :autoSize="{ minRows: 8 }" v-model.trim="replyComment.content" />
+          <a-input ref="contentInput" type="textarea" :autoSize="{ minRows: 8 }" v-model="replyComment.content" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
