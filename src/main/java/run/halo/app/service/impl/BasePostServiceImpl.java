@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -55,7 +54,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     private final OptionService optionService;
 
-    private final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
+    private static final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
+
+    private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
         OptionService optionService) {
@@ -274,21 +275,27 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         increaseLike(1L, postId);
     }
 
+    /**
+     * @param post post for article
+     * @return post with handled data
+     */
     @Override
     @Transactional
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
 
         String originalContent = post.getOriginalContent();
-        originalContent = HaloUtils.cleanHtmlTag(originalContent);
 
-        post.setWordCount((long) originalContent.length());
-
-        // Render content
+        // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
+        // Render content and set word count
         if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
             post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+
+            post.setWordCount(htmlFormatWordCount(post.getFormatContent()));
         } else {
-            post.setFormatContent(post.getOriginalContent());
+            post.setFormatContent(originalContent);
+
+            post.setWordCount(htmlFormatWordCount(originalContent));
         }
 
         // Create or update post
@@ -526,5 +533,30 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
         return StringUtils.substring(text, 0, summaryLength);
+    }
+
+    // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
+
+    /**
+     * @param htmlContent the markdown style content
+     * @return word count except space and line separator
+     */
+
+    public static long htmlFormatWordCount(String htmlContent) {
+        if (htmlContent == null) {
+            return 0;
+        }
+
+        String cleanContent = HaloUtils.cleanHtmlTag(htmlContent);
+
+        Matcher matcher = BLANK_PATTERN.matcher(cleanContent);
+
+        int count = 0;
+
+        while (matcher.find()) {
+            count++;
+        }
+
+        return cleanContent.length() - count;
     }
 }
