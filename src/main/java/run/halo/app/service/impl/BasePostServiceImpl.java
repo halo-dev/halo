@@ -56,7 +56,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     private static final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
-    private static final Pattern blankPattern = Pattern.compile("\\s");
+    private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
         OptionService optionService) {
@@ -547,9 +547,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             return 0;
         }
 
-        htmlContent = HaloUtils.cleanHtmlTag(htmlContent);
+        String cleanContent = HaloUtils.cleanHtmlTag(htmlContent);
 
-        Matcher matcher = blankPattern.matcher(htmlContent);
+        Matcher matcher = BLANK_PATTERN.matcher(cleanContent);
 
         int count = 0;
 
@@ -557,6 +557,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             count++;
         }
 
-        return htmlContent.length() - count;
+        return cleanContent.length() - count;
     }
 }

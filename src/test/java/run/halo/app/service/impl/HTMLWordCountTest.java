@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 
 // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
@@ -39,61 +38,81 @@ public class HTMLWordCountTest {
         "|复杂|文本|测试|\n\n" +
         "## 复杂文本测试\n";
 
+    String htmlText =
+        "<body><h1>复杂文本测试 </h1>\n" +
+        "<p><img src=\"http://127.0.0.1:8090/upload/2021/04/image-51142fdc369c48698dd75c24f6049738\" " +
+        "referrerpolicy=\"no-referrer\" alt=\"图片不算字数\"> \n" +
+        "<del><strong><em>复杂文本测试</em></strong></del>  <code>复杂文本测试</code>  <a href='https://halo" +
+        ".run'>复杂文本测试</a> </p>\n" +
+        "<figure><table>\n" +
+        "<thead>\n" +
+        "<tr><th>复杂</th><th>文本</th><th>测试</th></tr></thead>\n" +
+        "<tbody><tr><td>复杂</td><td>文本</td><td>测试</td></tr></tbody>\n" +
+        "</table></figure>\n" +
+        "<h2>复杂文本测试</h2>\n" +
+        "</body>\n" +
+        "</html>";
+
     String nullString = null;
 
     String emptyString = "";
 
     @Test
-    void PictureTest() {
+    void pictureTest() {
         assertEquals("图片字数测试".length(),
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(markdownWithPicture)));
     }
 
     @Test
-    void TitleTest() {
+    void titleTest() {
         assertEquals("标题字数测试".length(),
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(markdownWithTitle)));
     }
 
     @Test
-    void FontTypeTest() {
+    void fontTypeTest() {
         assertEquals("字体样式字数测试".length(),
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(markdownWithFontType)));
     }
 
     @Test
-    void CodeTypeTest() {
+    void codeTypeTest() {
         assertEquals("代码样式字数测试".length(),
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(markdownWithCodeType)));
     }
 
     @Test
-    void LinkTest() {
+    void linkTest() {
         assertEquals("链接字数测试".length(),
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(markdownWithLink)));
     }
 
     @Test
-    void TableTest() {
+    void tableTest() {
         assertEquals("表格字数测试".length() * 2,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(markdownWithTable)));
     }
 
     @Test
-    void PlainTextTest() {
+    void plainTextTest() {
         assertEquals(plainText.length(),
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(plainText)));
     }
 
     @Test
-    void ComplexTextTest() {
-        System.out.println(HaloUtils.cleanHtmlTag(MarkdownUtils.renderHtml(complexText)));
-        assertEquals("复杂文本测试".length() * 7,
+    void complexTextTest() {
+        assertEquals("复杂文本测试复杂文本测试复杂文本测试复杂文本测试复杂文本测试复杂文本测试复杂文本测试".length(),
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText)));
     }
 
     @Test
-    void NullTest() {
+    void htmlTest() {
+        assertEquals("复杂文本测试复杂文本测试复杂文本测试复杂文本测试复杂文本测试复杂文本测试复杂文本测试".length(),
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(htmlText)));
+    }
+
+    @Test
+    void nullTest() {
         assertEquals(0,
             BasePostServiceImpl.htmlFormatWordCount(null));
         assertEquals(0,
@@ -101,7 +120,7 @@ public class HTMLWordCountTest {
     }
 
     @Test
-    void EmptyTest() {
+    void emptyTest() {
         assertEquals(0,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(emptyString)));
     }
