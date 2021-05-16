@@ -182,12 +182,22 @@ public class PostController {
             PageRequest.of(page, optionService.getCommentPageSize(), sort));
     }
 
+    //CS304 issue for https://github.com/halo-dev/halo/issues/1369
+    /**
+     * Enable users search published articles with keywords
+     *
+     * @param postCommentParam store the params of the specific comment
+     * @return          publish the comment
+     */
+
     @PostMapping("comments")
     @ApiOperation("Comments a post")
     @CacheLock(autoDelete = false, traceRequest = true)
     public BaseCommentDTO comment(@RequestBody PostCommentParam postCommentParam) {
         postCommentService.validateCommentBlackListStatus();
-
+        if(postCommentParam.getEmail()==null){
+            postCommentParam.setEmail(postCommentParam.getAuthor());
+        }
         // Escape content
         postCommentParam.setContent(HtmlUtils
             .htmlEscape(postCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
