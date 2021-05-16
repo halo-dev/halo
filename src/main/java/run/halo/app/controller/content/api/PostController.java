@@ -67,20 +67,22 @@ public class PostController {
     /**
      * Enable users search published articles with keywords
      *
-     * @param pageable store the priority of the sort algorithm
-     * @param keyword  search articles with keyword
-     * @return          published articles that contains keywords
+     * @param pageable    store the priority of the sort algorithm
+     * @param keyword     search articles with keyword
+     * @param categoryid  search articles with categoryid
+     * @return            published articles that contains keywords and specific categoryid
      */
 
     @GetMapping
     @ApiOperation("Lists posts")
     public Page<PostListVO> pageBy(
         @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
-        @RequestParam(value = "keyword") String keyword) {
-        PostStatus status = PostStatus.PUBLISHED;
+        @RequestParam(value = "keyword") String keyword,
+        @RequestParam(value = "categoryid") int categoryid) {
         PostQuery postQuery=new PostQuery();
         postQuery.setKeyword(keyword);
-        postQuery.setStatus(status);
+        postQuery.setCategoryId(categoryid);
+        postQuery.setStatus(PostStatus.PUBLISHED);
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage, true);
     }
