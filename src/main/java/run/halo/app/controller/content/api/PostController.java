@@ -28,6 +28,7 @@ import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostCommentParam;
+import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.CommentWithHasChildrenVO;
@@ -62,12 +63,28 @@ public class PostController {
         this.optionService = optionService;
     }
 
+    //CS304 issue for https://github.com/halo-dev/halo/issues/1351
+    /**
+     * Enable users search published articles with keywords
+     *
+     * @param pageable    store the priority of the sort algorithm
+     * @param keyword     search articles with keyword
+     * @param categoryid  search articles with categoryid
+     * @return            published articles that contains keywords and specific categoryid
+     */
+
     @GetMapping
     @ApiOperation("Lists posts")
     public Page<PostListVO> pageBy(
-        @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
-        Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        return postService.convertToListVo(postPage);
+        @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
+        @RequestParam(value = "keyword") String keyword,
+        @RequestParam(value = "categoryid") int categoryid) {
+        PostQuery postQuery = new PostQuery();
+        postQuery.setKeyword(keyword);
+        postQuery.setCategoryId(categoryid);
+        postQuery.setStatus(PostStatus.PUBLISHED);
+        Page<Post> postPage = postService.pageBy(postQuery, pageable);
+        return postService.convertToListVo(postPage, true);
     }
 
     @PostMapping(value = "search")
