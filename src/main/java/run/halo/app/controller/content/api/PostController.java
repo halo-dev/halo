@@ -79,7 +79,7 @@ public class PostController {
         @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
         @RequestParam(value = "keyword") String keyword,
         @RequestParam(value = "categoryid") int categoryid) {
-        PostQuery postQuery=new PostQuery();
+        PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
         postQuery.setCategoryId(categoryid);
         postQuery.setStatus(PostStatus.PUBLISHED);
