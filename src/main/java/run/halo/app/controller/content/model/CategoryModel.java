@@ -102,7 +102,7 @@ public class CategoryModel {
             Sort.by(DESC, "topPriority", "createTime"));
         Page<Post> postPage =
             postCategoryService.pagePostBy(category.getId(), Sets
-                .immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE), pageable);
+                .immutableEnumSet(PostStatus.PUBLISHED), pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         // Generate meta description.
