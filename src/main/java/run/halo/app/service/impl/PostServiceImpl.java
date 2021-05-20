@@ -417,15 +417,23 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             tagIds.add(tag.getId());
                             break;
                         case "categories":
-                            Category category = categoryService.getByName(ele);
-                            if (null == category) {
-                                category = new Category();
-                                category.setName(ele);
-                                category.setSlug(SlugUtils.slug(ele));
-                                category.setDescription(ele);
-                                category = categoryService.create(category);
+                            Integer lastCategoryId = null;
+                            for (String categoryName : ele.split(",")) {
+                                Category category = categoryService
+                                    .getByName(StrUtil.strip(categoryName.trim(), "\""));
+                                if (null == category) {
+                                    category = new Category();
+                                    category.setName(categoryName);
+                                    category.setSlug(SlugUtils.slug(categoryName));
+                                    category.setDescription(categoryName);
+                                    if (lastCategoryId != null) {
+                                        category.setParentId(lastCategoryId);
+                                    }
+                                    category = categoryService.create(category);
+                                }
+                                lastCategoryId = category.getId();
+                                categoryIds.add(lastCategoryId);
                             }
-                            categoryIds.add(category.getId());
                             break;
                         default:
                             break;
