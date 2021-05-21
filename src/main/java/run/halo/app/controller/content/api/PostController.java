@@ -195,8 +195,8 @@ public class PostController {
     @CacheLock(autoDelete = false, traceRequest = true)
     public BaseCommentDTO comment(@RequestBody PostCommentParam postCommentParam) {
         postCommentService.validateCommentBlackListStatus();
-        if(postCommentParam.getEmail()==null){
-            postCommentParam.setEmail(postCommentParam.getAuthor());
+        if (postCommentParam.getEmail() == null) {
+            postCommentParam.setEmail("default");
         }
         // Escape content
         postCommentParam.setContent(HtmlUtils
