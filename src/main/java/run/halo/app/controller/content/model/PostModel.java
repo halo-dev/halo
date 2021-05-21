@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
@@ -85,6 +86,10 @@ public class PostModel {
     }
 
     public String content(Post post, String token, Model model) {
+
+        if (post.getStatus().equals(PostStatus.RECYCLE)) {
+            throw new NotFoundException("The post has entered the recycle bin!");
+        }
 
         if (post.getStatus().equals(PostStatus.INTIMATE)
             && !authenticationService.postAuthentication(post, null)) {
