@@ -22,7 +22,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.client.RestTemplate;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostEditorType;
@@ -53,11 +52,8 @@ public class RequestRecycledPostTest extends BaseApiTest {
 
     String slug;
 
-    String blogUrl;
-
     @BeforeEach
     void setUp() {
-        blogUrl = "localhost:" + port;
         slug = "recycle-post";
         MockitoAnnotations.initMocks(this);
         Assertions.assertNotNull(postService);
