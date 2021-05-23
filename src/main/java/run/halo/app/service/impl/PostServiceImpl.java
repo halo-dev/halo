@@ -384,6 +384,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 for (String ele : elementValue) {
                     ele = StrUtil.strip(ele, "[", "]");
                     ele = StrUtil.strip(ele, "\"");
+                    ele = StrUtil.strip(ele, "\'");
                     if ("".equals(ele)) {
                         continue;
                     }
@@ -407,20 +408,28 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             post.setDisallowComment(Boolean.parseBoolean(ele));
                             break;
                         case "tags":
-                            Tag tag = tagService.getByName(ele);
-                            if (null == tag) {
-                                tag = new Tag();
-                                tag.setName(ele);
-                                tag.setSlug(SlugUtils.slug(ele));
-                                tag = tagService.create(tag);
+                            Tag tag;
+                            for (String tagName : ele.split(",")) {
+                                tagName = tagName.trim();
+                                tagName = StrUtil.strip(tagName, "\"");
+                                tagName = StrUtil.strip(tagName, "\'");
+                                tag = tagService.getByName(tagName);
+                                if (null == tag) {
+                                    tag = new Tag();
+                                    tag.setName(tagName);
+                                    tag.setSlug(SlugUtils.slug(tagName));
+                                    tag = tagService.create(tag);
+                                }
+                                tagIds.add(tag.getId());
                             }
-                            tagIds.add(tag.getId());
                             break;
                         case "categories":
                             Integer lastCategoryId = null;
                             for (String categoryName : ele.split(",")) {
-                                Category category = categoryService
-                                    .getByName(StrUtil.strip(categoryName.trim(), "\""));
+                                categoryName = categoryName.trim();
+                                categoryName = StrUtil.strip(categoryName, "\"");
+                                categoryName = StrUtil.strip(categoryName, "\'");
+                                Category category = categoryService.getByName(categoryName);
                                 if (null == category) {
                                     category = new Category();
                                     category.setName(categoryName);
