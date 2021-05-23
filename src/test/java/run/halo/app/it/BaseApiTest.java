@@ -8,7 +8,6 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import run.halo.app.exception.BadRequestException;
 import run.halo.app.model.params.InstallParam;
 
 /**
