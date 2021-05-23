@@ -30,8 +30,9 @@ import run.halo.app.service.PostService;
 import run.halo.app.utils.JsonUtils;
 
 /**
+ * request recycled post Test
+ *
  * @author chenwenjie.star
- * @date 2021/5/21 15:50 下午
  */
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = "halo.auth-enabled=false")
 @Slf4j
@@ -44,8 +45,8 @@ public class RequestRecycledPostTest extends BaseApiTest {
     @Autowired
     private MockMvc mvc;
 
-    private final String ADMIN_POST_URI = "/api/admin/posts";
-    private final String ARCHIVES_POST_URI = "/archives/";
+    private static final String ADMIN_POST_URI = "/api/admin/posts";
+    private static final String ARCHIVES_POST_URI = "/archives/";
 
     @LocalServerPort
     int port;
