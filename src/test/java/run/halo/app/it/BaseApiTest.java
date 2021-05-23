@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import run.halo.app.model.params.InstallParam;
 
@@ -18,6 +18,7 @@ import run.halo.app.model.params.InstallParam;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Slf4j
+@DirtiesContext
 class BaseApiTest {
 
     @Autowired
@@ -43,12 +44,8 @@ class BaseApiTest {
         install.setUrl("http://localhost:" + port);
         install.setTitle("Test's Blog");
 
-        try {
-            restTemplate.postForObject(blogUrl + "/api/admin/installations", install,
-                String.class);
-        } catch (HttpClientErrorException.BadRequest e) {
-            log.warn("博客可能安装过，跳过安装，错误信息：{}", e.getMessage());
-        }
+        restTemplate.postForObject(blogUrl + "/api/admin/installations", install,
+            String.class);
     }
 
 }
