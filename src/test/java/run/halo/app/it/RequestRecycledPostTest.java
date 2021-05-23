@@ -94,7 +94,6 @@ public class RequestRecycledPostTest extends BaseApiTest {
 
     private Post createPost() throws Exception {
         Post post = new Post();
-        post.setId(10086);
         post.setTitle("recycle bin post");
         post.setOriginalContent("recycle bin post");
         post.setFormatContent("<p>recycle bin post</p>");
