@@ -5,7 +5,7 @@
       :model="form.model"
       :rules="form.rules"
       layout="vertical"
-      @keyup.enter.native="handleLogin"
+      @keyup.enter.native="form.needAuthCode ? handleLogin() : handleLoginClick()"
     >
       <a-form-model-item
         v-if="!form.needAuthCode"
@@ -112,9 +112,9 @@ export default {
     },
     handleLogin() {
       const _this = this
-      _this.form.logging = true
       _this.$refs.loginForm.validate(valid => {
         if (valid) {
+          _this.form.logging = true
           _this
             .login(_this.form.model)
             .then(() => {

@@ -468,7 +468,7 @@ export default {
       } else {
         _this.handleCloseMFAuthModal()
         _this.handleLoadStatistics()
-        _this.$message.success(_this.mfaUsed ? '两步验证已关闭！' : '两步验证已开启,下次登陆生效！')
+        _this.$message.success(_this.mfaUsed ? '两步验证已关闭！' : '两步验证已开启,下次登录生效！')
       }
     },
     handleCloseMFAuthModal() {

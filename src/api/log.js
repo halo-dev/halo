@@ -84,7 +84,7 @@ logApi.logTypes = {
   },
   LOGGED_PRE_CHECK: {
     value: 70,
-    text: '登陆验证'
+    text: '登录验证'
   }
 }
 
