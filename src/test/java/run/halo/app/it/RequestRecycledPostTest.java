@@ -33,7 +33,7 @@ import run.halo.app.service.PostService;
 import run.halo.app.utils.JsonUtils;
 
 /**
- * request recycled post Test
+ * request recycled post Test.
  *
  * @author chenwenjie.star
  */
@@ -87,7 +87,10 @@ public class RequestRecycledPostTest extends BaseApiTest {
 
     private void updatePostStatus(Integer postId, PostStatus postStatus) throws Exception {
         mvc.perform(
-            put(new UriTemplate(ADMIN_POST_URI + "/{postId}/status/{postStatus}").expand(postId, postStatus))
+            put(
+                new UriTemplate(ADMIN_POST_URI + "/{postId}/status/{postStatus}")
+                    .expand(postId, postStatus)
+            )
         ).andDo(print())
             .andExpect(status().isOk());
     }
