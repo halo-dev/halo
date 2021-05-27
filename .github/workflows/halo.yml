@@ -85,7 +85,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: halo-jar
-          path: build/libs
+          path: |
+            build/libs
+            !build/libs/*-plain.jar
           retention-days: 1
   github-release:
     runs-on: ubuntu-latest
