@@ -79,13 +79,15 @@ jobs:
             ${{ runner.os }}-dependencies-
 
       - name: Build with Gradle
-        run: ./gradlew clean bootJar -x test
+        run: ./gradlew clean build -x test
 
       - name: Archive halo jar
         uses: actions/upload-artifact@v2
         with:
           name: halo-jar
-          path: build/libs
+          path: |
+            build/libs
+            !build/libs/*-plain.jar
           retention-days: 1
   github-release:
     runs-on: ubuntu-latest
