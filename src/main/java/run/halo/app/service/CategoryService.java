@@ -101,6 +101,14 @@ public interface CategoryService extends CrudService<Category, Integer> {
     List<Category> listAll(Sort sort, boolean queryEncryptCategory);
 
     /**
+     * List all category not encrypt.
+     *
+     * @param queryEncryptCategory whether to query encryption category
+     * @return list of category.
+     */
+    List<Category> listAll(boolean queryEncryptCategory);
+
+    /**
      * List all by ids
      *
      * @param ids ids
