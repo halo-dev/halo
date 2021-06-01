@@ -67,7 +67,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     private PostService postService;
 
-    private AuthenticationService authenticationService;
+    private final AuthenticationService authenticationService;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository,
         PostCategoryService postCategoryService,
@@ -146,7 +146,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      *
      * @param parentCategory parent category vo must not be null
      * @param categories a list of category
-     * @param fillPassword   whether to fill in the password
+     * @param fillPassword whether to fill in the password
      */
     private void concreteTree(
         CategoryVO parentCategory,
@@ -240,8 +240,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     public Category getBySlugOfNonNull(String slug) {
 
         Category category = categoryRepository
-                .getBySlug(slug)
-                .orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
+            .getBySlug(slug)
+            .orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
 
         if (authenticationService.categoryAuthentication(category.getId(), null)) {
             return category;
@@ -291,7 +291,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         removeById(categoryId);
         // Remove post categories
         List<Integer> affectedPostIdList = postCategoryService.removeByCategoryId(categoryId)
-                .stream().map(PostCategory::getPostId).collect(Collectors.toList());
+            .stream().map(PostCategory::getPostId).collect(Collectors.toList());
 
         refreshPostStatus(affectedPostIdList);
     }
@@ -311,10 +311,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
                 post.setStatus(PostStatus.INTIMATE);
             } else {
                 postCategoryService.listByPostId(postId)
-                        .stream().map(PostCategory::getCategoryId)
-                        .filter(this::categoryHasEncrypt)
-                        .findAny()
-                        .ifPresent(id -> post.setStatus(PostStatus.INTIMATE));
+                    .stream().map(PostCategory::getCategoryId)
+                    .filter(this::categoryHasEncrypt)
+                    .findAny()
+                    .ifPresent(id -> post.setStatus(PostStatus.INTIMATE));
             }
 
             if (post.getStatus() == null) {
@@ -417,12 +417,12 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * Collect all child from tree
      *
      * @param collectorList collector
-     * @param childrenList  contains categories of children
+     * @param childrenList contains categories of children
      * @param doNotCollectEncryptedCategory true is not collect, false is collect
      */
     private void collectAllChild(List<Category> collectorList,
-            List<CategoryVO> childrenList,
-            Boolean doNotCollectEncryptedCategory) {
+        List<CategoryVO> childrenList,
+        Boolean doNotCollectEncryptedCategory) {
         if (CollectionUtil.isEmpty(childrenList)) {
             return;
         }
@@ -451,14 +451,14 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * Collect sub-categories under the specified category.
      *
      * @param collectorList collector
-     * @param childrenList  contains categories of children
-     * @param categoryId    category id
+     * @param childrenList contains categories of children
+     * @param categoryId category id
      * @param doNotCollectEncryptedCategory true is not collect, false is collect
      */
     private void collectAllChildByCategoryId(List<Category> collectorList,
-            List<CategoryVO> childrenList,
-            Integer categoryId,
-            Boolean doNotCollectEncryptedCategory) {
+        List<CategoryVO> childrenList,
+        Integer categoryId,
+        Boolean doNotCollectEncryptedCategory) {
         if (CollectionUtil.isEmpty(childrenList)) {
             return;
         }
@@ -478,6 +478,15 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             return super.listAll(sort);
         } else {
             return this.listAll(sort);
+        }
+    }
+
+    @Override
+    public List<Category> listAll(boolean queryEncryptCategory) {
+        if (queryEncryptCategory) {
+            return super.listAll();
+        } else {
+            return this.listAll();
         }
     }
 
@@ -578,7 +587,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         List<Category> allCategoryList = super.listAll();
 
         Map<Integer, Category> idToCategoryMap = allCategoryList.stream().collect(
-                Collectors.toMap(Category::getId, Function.identity()));
+            Collectors.toMap(Category::getId, Function.identity()));
 
         if (doCategoryHasEncrypt(idToCategoryMap, category.getParentId())) {
             // If the parent category is encrypted, there is no need to update the encryption status
@@ -622,7 +631,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         List<Category> allCategoryList = super.listAll();
 
         Map<Integer, Category> idToCategoryMap = allCategoryList.stream().collect(
-                Collectors.toMap(Category::getId, Function.identity()));
+            Collectors.toMap(Category::getId, Function.identity()));
 
         return doCategoryHasEncrypt(idToCategoryMap, categoryId);
     }
