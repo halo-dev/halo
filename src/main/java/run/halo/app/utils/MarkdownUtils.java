@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.support.HaloConst;
 
@@ -120,6 +121,18 @@ public class MarkdownUtils {
      * @return Map
      */
     public static Map<String, List<String>> getFrontMatter(String markdown) {
+        markdown = markdown.trim();
+        Matcher matcher = FRONT_MATTER.matcher(markdown);
+        if (matcher.find()) {
+            markdown = matcher.group();
+        }
+        markdown = Arrays.stream(markdown.split("\\r?\\n")).map(row -> {
+            if (row.startsWith("- ")) {
+                return " " + row;
+            } else {
+                return row;
+            }
+        }).collect(Collectors.joining("\n"));
         AbstractYamlFrontMatterVisitor visitor = new AbstractYamlFrontMatterVisitor();
         Node document = PARSER.parse(markdown);
         visitor.visit(document);

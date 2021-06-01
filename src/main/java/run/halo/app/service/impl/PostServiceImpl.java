@@ -384,6 +384,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 for (String ele : elementValue) {
                     ele = StrUtil.strip(ele, "[", "]");
                     ele = StrUtil.strip(ele, "\"");
+                    ele = StrUtil.strip(ele, "\'");
                     if ("".equals(ele)) {
                         continue;
                     }
@@ -407,25 +408,41 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             post.setDisallowComment(Boolean.parseBoolean(ele));
                             break;
                         case "tags":
-                            Tag tag = tagService.getByName(ele);
-                            if (null == tag) {
-                                tag = new Tag();
-                                tag.setName(ele);
-                                tag.setSlug(SlugUtils.slug(ele));
-                                tag = tagService.create(tag);
+                            Tag tag;
+                            for (String tagName : ele.split(",")) {
+                                tagName = tagName.trim();
+                                tagName = StrUtil.strip(tagName, "\"");
+                                tagName = StrUtil.strip(tagName, "\'");
+                                tag = tagService.getByName(tagName);
+                                if (null == tag) {
+                                    tag = new Tag();
+                                    tag.setName(tagName);
+                                    tag.setSlug(SlugUtils.slug(tagName));
+                                    tag = tagService.create(tag);
+                                }
+                                tagIds.add(tag.getId());
                             }
-                            tagIds.add(tag.getId());
                             break;
                         case "categories":
-                            Category category = categoryService.getByName(ele);
-                            if (null == category) {
-                                category = new Category();
-                                category.setName(ele);
-                                category.setSlug(SlugUtils.slug(ele));
-                                category.setDescription(ele);
-                                category = categoryService.create(category);
+                            Integer lastCategoryId = null;
+                            for (String categoryName : ele.split(",")) {
+                                categoryName = categoryName.trim();
+                                categoryName = StrUtil.strip(categoryName, "\"");
+                                categoryName = StrUtil.strip(categoryName, "\'");
+                                Category category = categoryService.getByName(categoryName);
+                                if (null == category) {
+                                    category = new Category();
+                                    category.setName(categoryName);
+                                    category.setSlug(SlugUtils.slug(categoryName));
+                                    category.setDescription(categoryName);
+                                    if (lastCategoryId != null) {
+                                        category.setParentId(lastCategoryId);
+                                    }
+                                    category = categoryService.create(category);
+                                }
+                                lastCategoryId = category.getId();
+                                categoryIds.add(lastCategoryId);
                             }
-                            categoryIds.add(category.getId());
                             break;
                         default:
                             break;
