@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import run.halo.app.model.entity.Sheet;
 
@@ -18,7 +17,6 @@ import run.halo.app.model.entity.Sheet;
 @SpringBootTest
 @ActiveProfiles("test")
 @Slf4j
-@DirtiesContext
 class SheetRepositoryTest {
 
     @Autowired
