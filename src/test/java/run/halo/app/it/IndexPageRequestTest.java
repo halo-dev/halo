@@ -33,7 +33,7 @@ class IndexPageRequestTest extends BaseApiTest {
         // validate post link
         Element postTitleLink =
             document.body().selectFirst(".content > .post > .post-title > h3 > a");
-        assertEquals(blogUrl + "/archives/hello-halo", postTitleLink.attr("href"));
+        assertEquals("/archives/hello-halo", postTitleLink.attr("href"));
         assertEquals("Hello Halo", postTitleLink.text());
     }
 }
