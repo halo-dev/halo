@@ -295,21 +295,7 @@ public class InstallController {
         properties.put(BlogProperties.BLOG_URL,
             StringUtils.isBlank(installParam.getUrl()) ? optionService.getBlogBaseUrl() :
                 installParam.getUrl());
-
-        Long birthday =
-            optionService.getByPropertyOrDefault(PrimaryProperties.BIRTHDAY, Long.class, 0L);
-
-        if (birthday.equals(0L)) {
-            properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(System.currentTimeMillis()));
-        }
-
-        Boolean globalAbsolutePathEnabled = optionService
-            .getByPropertyOrDefault(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.class,
-                null);
-
-        if (globalAbsolutePathEnabled == null) {
-            properties.put(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.FALSE.toString());
-        }
+        properties.put(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.FALSE.toString());
 
         // Create properties
         optionService.saveProperties(properties);
