@@ -23,18 +23,18 @@
   "dependencies": {
     "ant-design-vue": "^1.7.5",
     "axios": "^0.21.1",
-    "dayjs": "^1.10.4",
+    "dayjs": "^1.10.5",
     "enquire.js": "^2.1.6",
-    "filepond": "^4.27.1",
+    "filepond": "^4.28.2",
     "filepond-plugin-file-validate-type": "^1.2.6",
     "filepond-plugin-image-preview": "^4.6.6",
     "flv.js": "^1.5.0",
     "halo-editor": "^2.8.2",
-    "marked": "^2.0.3",
+    "marked": "^2.0.7",
     "nprogress": "^0.2.0",
     "tiny-pinyin": "^1.3.2",
     "verte": "^0.0.12",
-    "vue": "^2.6.12",
+    "vue": "^2.6.14",
     "vue-clipboard2": "^0.3.1",
     "vue-codemirror-lite": "^1.0.4",
     "vue-contextmenujs": "^1.3.13",
@@ -69,6 +69,6 @@
     "lint-staged": "^10.5.4",
     "prettier": "^1.19.1",
     "tailwindcss": "^1.9.6",
-    "vue-template-compiler": "^2.6.12"
+    "vue-template-compiler": "^2.6.14"
   }
 }
