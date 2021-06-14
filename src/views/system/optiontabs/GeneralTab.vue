@@ -89,14 +89,8 @@ export default {
           { required: true, message: '* 博客地址不能为空', trigger: ['change'] },
           { max: 1023, message: '* 字符数不能超过 1023', trigger: ['change'] }
         ],
-        blog_logo: [
-          { type: 'url', message: '* 链接格式不正确', trigger: ['change'] },
-          { max: 1023, message: '* 字符数不能超过 1023', trigger: ['change'] }
-        ],
-        blog_favicon: [
-          { type: 'url', message: '* 链接格式不正确', trigger: ['change'] },
-          { max: 1023, message: '* 字符数不能超过 1023', trigger: ['change'] }
-        ],
+        blog_logo: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change'] }],
+        blog_favicon: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change'] }],
         blog_footer_info: [{ max: 1023, message: '* 字符数不能超过 1023', trigger: ['change'] }]
       }
     }
