@@ -7,7 +7,7 @@
 <a href="https://www.jsdelivr.com/package/npm/halo-admin"><img alt="npm release" src="https://data.jsdelivr.com/v1/package/npm/halo-admin/badge"/></a>
 <a href="https://github.com/halo-dev/halo-admin/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/halo-dev/halo-admin/total.svg?style=flat-square"></a>
 <a href="https://github.com/halo-dev/halo-admin/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo-admin.svg?style=flat-square"></a>
-<a href="https://travis-ci.org/halo-dev/halo-admin"><img alt="Travis CI" src="https://img.shields.io/travis/halo-dev/halo-admin.svg?style=flat-square"/></a>
+<a href="https://github.com/halo-dev/halo-admin/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo-admin/Halo%20Admin%20CI?style=flat-square"/></a>
 </p>
 
 ------------------------------

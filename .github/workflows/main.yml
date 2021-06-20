@@ -1,30 +1,83 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Node.js CI
+name: Halo Admin CI
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+    paths:
+      - '**'
+      - '!**.md'
+  push:
+    branches:
+      - '**'
+    paths:
+      - '**'
+      - '!**.md'
+  release:
+    types:
+      - created
 
 jobs:
-  build:
-
+  check:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+        node-version: [10.x, 12.x, 14.x, 15.x, 16.x]
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm test
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install
+      - run: npm run lint
+
+  github-release:
+    runs-on: ubuntu-latest
+    needs: check
+    if: github.event_name == 'release'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: npm install
+      - name: Build for release
+        run: npm run build
+      - name: Compress dist directory
+        run: |
+          PACKAGE_VERSION=$(sed -nE 's/^\s*"version": "(.*?)",$/\1/p' package.json)
+          ARTIFACT_NAME=halo-admin-${PACKAGE_VERSION}.zip
+          ARTIFACT_PATHNAME=dist/${ARTIFACT_NAME}
+
+          echo "Halo admin version $PACKAGE_VERSION"
+          echo "Artifact name: ${ARTIFACT_NAME}"
+          echo "Artifact pathname: ${ARTIFACT_PATHNAME}"
+          echo "PACKAGE_VERSION=${PACKAGE_VERSION}" >> $GITHUB_ENV
+          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> $GITHUB_ENV
+          echo "ARTIFACT_PATHNAME=${ARTIFACT_PATHNAME}" >> $GITHUB_ENV
+          echo "RELEASE_ID=${{ github.event.release.id }}" >> $GITHUB_ENV
+          zip -r $ARTIFACT_PATHNAME dist
+
+      - name: Upload a Release Asset
+        uses: actions/github-script@v2
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const fs = require('fs').promises;
+            const { repo: { owner, repo }, sha } = context;
+            console.log({ owner, repo, sha });
+            
+            const releaseId = process.env.RELEASE_ID
+            const artifactPathName = process.env.ARTIFACT_PATHNAME
+            const artifactName = process.env.ARTIFACT_NAME
+            console.log('Releasing', releaseId, artifactPathName, artifactName)
+
+            await github.repos.uploadReleaseAsset({
+              owner, repo,
+              release_id: releaseId,
+              name: artifactName,
+              data: await fs.readFile(artifactPathName)
+            });
+        
+
