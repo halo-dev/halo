@@ -2,6 +2,7 @@ package run.halo.app.listener.freemarker;
 
 import static run.halo.app.model.support.HaloConst.OPTIONS_CACHE_KEY;
 
+import freemarker.core.TemplateClassResolver;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -78,6 +79,7 @@ public class FreemarkerConfigAwareListener {
 
     private void initFreemarkerConfig() throws TemplateModelException {
         configuration.setSharedVariable("layout", freemarkerLayoutDirectives());
+        configuration.setNewBuiltinClassResolver(TemplateClassResolver.SAFER_RESOLVER);
     }
 
     @EventListener
