@@ -98,6 +98,7 @@ ext {
     huaweiObsVersion = "3.19.7"
     templateInheritanceVersion = "0.4.RELEASE"
     jsoupVersion = "1.13.1"
+    byteBuddyAgentVersion = "1.10.22"
 }
 
 dependencies {
@@ -149,6 +150,7 @@ dependencies {
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     implementation "com.google.zxing:core:$zxingVersion"
+    implementation "net.bytebuddy:byte-buddy-agent:$byteBuddyAgentVersion"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"

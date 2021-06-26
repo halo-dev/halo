@@ -110,6 +110,8 @@ public class MarkdownUtils {
             markdown = markdown
                 .replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
         }
+        // footnote render method delegation.
+        FootnoteNodeRendererInterceptor.doDelegationMethod();
 
         Node document = PARSER.parse(markdown);
 
