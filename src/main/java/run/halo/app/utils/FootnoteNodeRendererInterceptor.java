@@ -1,5 +1,7 @@
 package run.halo.app.utils;
 
+import com.vladsch.flexmark.ast.Link;
+import com.vladsch.flexmark.ast.LinkNodeBase;
 import com.vladsch.flexmark.ext.footnotes.Footnote;
 import com.vladsch.flexmark.ext.footnotes.FootnoteBlock;
 import com.vladsch.flexmark.ext.footnotes.internal.FootnoteNodeRenderer;
@@ -11,6 +13,7 @@ import com.vladsch.flexmark.html.renderer.RenderingPhase;
 import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
+import com.vladsch.flexmark.util.sequence.BasedSequence;
 import java.lang.reflect.Field;
 import java.util.Locale;
 import net.bytebuddy.ByteBuddy;
@@ -23,6 +26,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.yaml.snakeyaml.nodes.SequenceNode;
 
 /**
  * <code>Flexmark</code> footnote node render interceptor.
@@ -56,9 +60,9 @@ public class FootnoteNodeRendererInterceptor {
     /**
      * footnote render see {@link FootnoteNodeRenderer#renderDocument}.
      *
-     * @param node    footnote node
+     * @param node footnote node
      * @param context node renderer context
-     * @param html    html writer
+     * @param html html writer
      */
     public static void render(Footnote node, NodeRendererContext context, HtmlWriter html) {
         FootnoteBlock footnoteBlock = node.getFootnoteBlock();
@@ -72,37 +76,42 @@ public class FootnoteNodeRendererInterceptor {
             int i = node.getReferenceOrdinal();
 
             html.attr("class", "footnote-ref");
-            html.srcPos(node.getChars()).withAttr().tag("sup", false, false, () -> {
-                // if (!options.footnoteLinkRefClass.isEmpty()) html.attr("class", options
-                // .footnoteLinkRefClass);
-                html.attr("id", "fnref"
-                    + footnoteOrdinal + (i == 0 ? "" : String.format(Locale.US, "%d", i)));
-                html.attr("href", "#fn" + footnoteOrdinal);
-                html.withAttr().tag("a");
-                html.raw("[" + footnoteOrdinal + "]");
-                html.tag("/a");
-            });
+            html.srcPos(node.getChars()).withAttr()
+                .tag("sup", false, false, () -> {
+                    // if (!options.footnoteLinkRefClass.isEmpty()) html.attr("class", options
+                    // .footnoteLinkRefClass);
+                    String ordinal = footnoteOrdinal + (i == 0 ? "" : String.format(Locale.US,
+                        ":%d", i));
+                    html.attr("id", "fnref"
+                        + ordinal);
+                    html.attr("href", "#fn" + footnoteOrdinal);
+                    html.withAttr().tag("a");
+                    html.raw("[" + ordinal + "]");
+                    html.tag("/a");
+                });
         }
     }
 
     /**
-     * @param footnoteRepository         footnoteRepository field of FootNoteRenderer class
-     * @param options                    options field of FootNoteRenderer class
+     * render document.
+     *
+     * @param footnoteRepository footnoteRepository field of FootNoteRenderer class
+     * @param options options field of FootNoteRenderer class
      * @param recheckUndefinedReferences recheckUndefinedReferences field of FootNoteRenderer class
-     * @param context                    node render context
-     * @param html                       html writer
-     * @param document                   document
-     * @param phase                      rendering phase
+     * @param context node render context
+     * @param html html writer
+     * @param document document
+     * @param phase rendering phase
      */
     public static void renderDocument(@FieldValue("footnoteRepository")
-                                          FootnoteRepository footnoteRepository,
-                                      @FieldValue("options") FootnoteOptions options,
-                                      @FieldValue("recheckUndefinedReferences")
-                                          boolean recheckUndefinedReferences,
-                                      @Argument(0) NodeRendererContext context,
-                                      @Argument(1) HtmlWriter html, @Argument(2) Document document,
-                                      @Argument(3)
-                                          RenderingPhase phase) {
+        FootnoteRepository footnoteRepository,
+        @FieldValue("options") FootnoteOptions options,
+        @FieldValue("recheckUndefinedReferences")
+            boolean recheckUndefinedReferences,
+        @Argument(0) NodeRendererContext context,
+        @Argument(1) HtmlWriter html, @Argument(2) Document document,
+        @Argument(3)
+            RenderingPhase phase) {
         final String footnoteBackLinkRefClass =
             (String) getFootnoteOptionsFieldValue("footnoteBackLinkRefClass", options);
         final String footnoteBackRefString = ObjectUtils
@@ -148,17 +157,35 @@ public class FootnoteNodeRendererInterceptor {
                                 .attr("class", "footnote-item");
                             html.withAttr().tagIndent("li", () -> {
                                 context.renderChildren(footnoteBlock);
-
-                                int iMax = footnoteBlock.getFootnoteReferences();
-                                for (int i = 0; i < iMax; i++) {
-                                    html.attr("href", "#fnref" + footnoteOrdinal
-                                        + (i == 0 ? "" : String.format(Locale.US, "%d", i)));
-                                    if (StringUtils.isNotBlank(footnoteBackLinkRefClass)) {
-                                        html.attr("class", footnoteBackLinkRefClass);
+                                int lineIndex = html.getLineCount() - 1;
+                                BasedSequence line = html.getLine(lineIndex);
+                                if (line.lastIndexOf("</p>") > -1) {
+                                    int iMax = footnoteBlock.getFootnoteReferences();
+                                    for (int i = 0; i < iMax; i++) {
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.append(" <a href=\"#fnref").append(footnoteOrdinal)
+                                            .append(i == 0 ? "" : String
+                                                .format(Locale.US, ":%d", i)).append("\"");
+                                        if (StringUtils.isNotBlank(footnoteBackLinkRefClass)) {
+                                            sb.append(" class=\"").append(footnoteBackLinkRefClass)
+                                                .append("\"");
+                                        }
+                                        sb.append(">").append(footnoteBackRefString).append("</a>");
+                                        html.setLine(html.getLineCount() - 1, "",
+                                            line.insert(line.lastIndexOf("</p"), sb.toString()));
                                     }
-                                    html.line().withAttr().tag("a");
-                                    html.raw(footnoteBackRefString);
-                                    html.tag("/a");
+                                } else {
+                                    int iMax = footnoteBlock.getFootnoteReferences();
+                                    for (int i = 0; i < iMax; i++) {
+                                        html.attr("href", "#fnref" + footnoteOrdinal
+                                            + (i == 0 ? "" : String.format(Locale.US, ":%d", i)));
+                                        if (StringUtils.isNotBlank(footnoteBackLinkRefClass)) {
+                                            html.attr("class", footnoteBackLinkRefClass);
+                                        }
+                                        html.line().withAttr().tag("a");
+                                        html.raw(footnoteBackRefString);
+                                        html.tag("/a");
+                                    }
                                 }
                             });
                         }
@@ -172,7 +199,7 @@ public class FootnoteNodeRendererInterceptor {
      * Gets field value from FootnoteOptions.
      *
      * @param fieldName field name of FootNoteOptions class, must not be null.
-     * @param options   target object, must not be null.
+     * @param options target object, must not be null.
      * @return field value.
      */
     private static Object getFootnoteOptionsFieldValue(String fieldName, FootnoteOptions options) {
