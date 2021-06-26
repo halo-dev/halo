@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
  * Compare the rendering result of FootnoteNodeRendererInterceptor
  * and <a href="https://github.com/markdown-it/markdown-it-footnote">markdown-it-footnote</a>.
  * You can view <code>markdown-it-footnote's</code> rendering HTML results on this
- * link <a href="https://markdown-it.github.io/">markdown-it-footnote example page</>.
+ * link <a href="https://markdown-it.github.io/">markdown-it-footnote example page</a>.
  *
  * @author guqing
  * @date 2021-06-26
