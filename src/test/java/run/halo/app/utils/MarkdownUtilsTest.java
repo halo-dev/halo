@@ -44,7 +44,7 @@ class MarkdownUtilsTest {
             + "<section class=\"footnotes\">\n"
             + "<ol class=\"footnotes-list\">\n"
             + "<li id=\"fn1\" class=\"footnote-item\">\n"
-            + "<p>驿（yì）外：指荒僻、冷清之地。驿，驿站。 <a href=\"#fnref1\" class=\"footnote-backref\">&#8617;"
+            + "<p>驿（yì）外：指荒僻、冷清之地。驿，驿站。 <a href=\"#fnref1\" class=\"footnote-backref\">↩︎"
             + "</a></p>\n"
             + "</li>\n"
             + "</ol>\n"
@@ -61,7 +61,7 @@ class MarkdownUtilsTest {
             + "<ol class=\"footnotes-list\">\n"
             + "<li id=\"fn1\" class=\"footnote-item\">\n"
             + "<p>Footnote text added at the bottom of the document <a href=\"#fnref1\" "
-            + "class=\"footnote-backref\">&#8617;</a></p>\n"
+            + "class=\"footnote-backref\">↩︎</a></p>\n"
             + "</li>\n"
             + "</ol>\n"
             + "</section>\n";
