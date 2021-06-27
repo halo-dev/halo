@@ -5563,10 +5563,10 @@ gzip-size@^5.0.0:
     duplexer "^0.1.1"
     pify "^4.0.1"
 
-halo-editor@^2.8.2:
-  version "2.8.2"
-  resolved "https://registry.npmjs.org/halo-editor/-/halo-editor-2.8.2.tgz"
-  integrity sha512-Pjptx1y/gmSRKVwtNrv850t9XY5Aw15CLPg9t/oa86DgFtXNXnGYPxAqWl+AmK9pOAzUFnB8aqHSeJmW0+6HkQ==
+halo-editor@^2.8.3:
+  version "2.8.3"
+  resolved "https://registry.yarnpkg.com/halo-editor/-/halo-editor-2.8.3.tgz#8c813f273a0230fcef459b5e08b2c376d00cab5e"
+  integrity sha512-5vzJdCJxuNNQl0qMgkjuEMXMdRoBLhMjl8NloPof/W7EFYvfoEp/vD8h2JzwXkDEugHM19SDmO5QNyH6oyr8rQ==
   dependencies:
     highlight.js "^9.11.0"
     highlight.js-async-webpack "^1.0.4"
