@@ -30,7 +30,7 @@ public class FootnoteNodeRendererInterceptorTest {
         new MutableDataSet().set(Parser.EXTENSIONS, Arrays.asList(EmojiExtension.create(),
             FootnoteExtension.create()))
             .set(HtmlRenderer.SOFT_BREAK, "<br />\n")
-            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING, "↩︎")
+            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING, "\u21a9\uFE0E")
             .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
             .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY);
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
@@ -56,6 +56,7 @@ public class FootnoteNodeRendererInterceptorTest {
             + "[^footnote]: duplicated footnote text\n"
             + "with continuation";
         String s = renderHtml(markdown);
+        System.out.println(s);
         Assert.isTrue(StringUtils.equals(s, "<p>text <sup class=\"footnote-ref\"><a id=\"fnref1\""
             + " href=\"#fn1\">[1]</a></sup> embedded.</p>\n"
             + "<hr class=\"footnotes-sep\" />\n"
