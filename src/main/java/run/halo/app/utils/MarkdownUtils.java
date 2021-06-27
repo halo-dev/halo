@@ -66,7 +66,7 @@ public class MarkdownUtils {
             .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
             .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY)
             .set(HtmlRenderer.SOFT_BREAK, "<br />\n")
-            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING,"↩︎");
+            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING, "↩︎");
 
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
 

@@ -30,7 +30,7 @@ public class FootnoteNodeRendererInterceptorTest {
         new MutableDataSet().set(Parser.EXTENSIONS, Arrays.asList(EmojiExtension.create(),
             FootnoteExtension.create()))
             .set(HtmlRenderer.SOFT_BREAK, "<br />\n")
-            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING,"↩︎")
+            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING, "↩︎")
             .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
             .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY);
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
@@ -167,7 +167,7 @@ public class FootnoteNodeRendererInterceptorTest {
     }
 
     @Test
-    public void notAFootnoteTest() {
+    public void notFootnoteTest() {
         // Not a footnote nor a footnote definition if space between [ and ^.
         String markdown = "This paragraph has no footnote[ ^footnote].\n"
             + "\n"
