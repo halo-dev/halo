@@ -30,7 +30,7 @@ public class FootnoteNodeRendererInterceptorTest {
         new MutableDataSet().set(Parser.EXTENSIONS, Arrays.asList(EmojiExtension.create(),
             FootnoteExtension.create()))
             .set(HtmlRenderer.SOFT_BREAK, "<br />\n")
-            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING, "\u21a9\uFE0E")
+            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING, "↩︎")
             .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
             .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY);
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
