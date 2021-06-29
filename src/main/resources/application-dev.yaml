@@ -59,7 +59,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: INFO
     org.hibernate.type.descriptor.sql.BasicExtractor: INFO
   file:
-    path: ${halo.work-dir}/newLogs
+    path: ${halo.work-dir}/logs
 
 springfox:
   documentation:
