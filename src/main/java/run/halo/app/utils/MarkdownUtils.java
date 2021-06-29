@@ -6,6 +6,7 @@ import com.vladsch.flexmark.ext.emoji.EmojiExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiImageType;
 import com.vladsch.flexmark.ext.emoji.EmojiShortcutType;
 import com.vladsch.flexmark.ext.escaped.character.EscapedCharacterExtension;
+import com.vladsch.flexmark.ext.footnotes.FootnoteExtension;
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
 import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
 import com.vladsch.flexmark.ext.gitlab.GitLabExtension;
@@ -51,6 +52,7 @@ public class MarkdownUtils {
             TocExtension.create(),
             SuperscriptExtension.create(),
             YamlFrontMatterExtension.create(),
+            FootnoteExtension.create(),
             GitLabExtension.create()))
             .set(TocExtension.LEVELS, 255)
             .set(TablesExtension.WITH_CAPTION, false)
@@ -63,7 +65,8 @@ public class MarkdownUtils {
             .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
             .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.EMOJI_CHEAT_SHEET)
             .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.UNICODE_ONLY)
-            .set(HtmlRenderer.SOFT_BREAK, "<br />\n");
+            .set(HtmlRenderer.SOFT_BREAK, "<br />\n")
+            .set(FootnoteExtension.FOOTNOTE_BACK_REF_STRING, "↩︎");
 
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
 
@@ -108,6 +111,8 @@ public class MarkdownUtils {
             markdown = markdown
                 .replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
         }
+        // footnote render method delegation.
+        FootnoteNodeRendererInterceptor.doDelegationMethod();
 
         Node document = PARSER.parse(markdown);
 
