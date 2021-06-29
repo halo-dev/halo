@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 import run.halo.app.cache.lock.CacheLock;
+import run.halo.app.cache.lock.CacheParam;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
@@ -214,7 +215,7 @@ public class PostController {
     @PostMapping("{postId:\\d+}/likes")
     @ApiOperation("Likes a post")
     @CacheLock(autoDelete = false, traceRequest = true)
-    public void like(@PathVariable("postId") Integer postId) {
+    public void like(@PathVariable("postId") @CacheParam Integer postId) {
         postService.increaseLike(postId);
     }
 }
