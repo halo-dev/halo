@@ -19,7 +19,7 @@
       <a-col :span="12">
         <a-spin :spinning="loading">
           <div class="custom-tab-wrapper">
-            <a-tabs default-active-key="1">
+            <a-tabs default-active-key="1" :animated="{ inkBar: true, tabPane: false }">
               <a-tab-pane key="1" tab="分类目录" force-render>
                 <a-list item-layout="horizontal">
                   <a-list-item v-for="(category, index) in categories" :key="index">

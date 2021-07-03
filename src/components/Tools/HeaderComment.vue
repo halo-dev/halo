@@ -10,7 +10,7 @@
   >
     <template slot="content">
       <div class="custom-tab-wrapper">
-        <a-tabs v-model="activeKey" @change="handleTabsChanged">
+        <a-tabs v-model="activeKey" @change="handleTabsChanged" :animated="{ inkBar: true, tabPane: false }">
           <a-tab-pane tab="文章" key="post">
             <a-list :loading="postCommentsLoading" :dataSource="converttedPostComments">
               <a-list-item slot="renderItem" slot-scope="item">

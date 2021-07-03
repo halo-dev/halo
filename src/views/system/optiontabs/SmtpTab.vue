@@ -1,6 +1,6 @@
 <template>
   <div class="custom-tab-wrapper">
-    <a-tabs>
+    <a-tabs :animated="{ inkBar: true, tabPane: false }">
       <a-tab-pane tab="发信设置" key="smtpoptions">
         <a-form-model ref="smtpOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
           <a-form-model-item label="是否启用：">

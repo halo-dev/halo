@@ -62,7 +62,7 @@
       :afterClose="onThemeInstallModalClose"
     >
       <div class="custom-tab-wrapper">
-        <a-tabs>
+        <a-tabs :animated="{ inkBar: true, tabPane: false }">
           <a-tab-pane tab="本地上传" key="1">
             <FilePondUpload
               ref="upload"
