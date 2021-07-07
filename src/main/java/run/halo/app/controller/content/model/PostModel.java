@@ -12,7 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import cn.hutool.core.util.StrUtil;
 import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
@@ -85,15 +87,29 @@ public class PostModel {
     }
 
     public String content(Post post, String token, Model model) {
-
-        if (post.getStatus().equals(PostStatus.INTIMATE)
-            && !authenticationService.postAuthentication(post, null)) {
-            model.addAttribute("slug", post.getSlug());
-            model.addAttribute("type", EncryptTypeEnum.POST.getName());
-            if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
-                return themeService.render(POST_PASSWORD_TEMPLATE);
+        // If the token is empty, it means it is an external request,
+        // and the password needs to be verified.
+        if (StrUtil.isEmpty(token)) {
+            // verify password
+            if (!PostStatus.PUBLISHED.equals(post.getStatus())
+                && !authenticationService.postAuthentication(post, null)) {
+                model.addAttribute("slug", post.getSlug());
+                model.addAttribute("type", EncryptTypeEnum.POST.getName());
+                if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
+                    return themeService.render(POST_PASSWORD_TEMPLATE);
+                }
+                return "common/template/" + POST_PASSWORD_TEMPLATE;
             }
-            return "common/template/" + POST_PASSWORD_TEMPLATE;
+        }
+        // If the token is not empty, it means it is an admin request,
+        // then verify the token.
+        else {
+            // verify token
+            String cachedToken = cacheStore.getAny(token, String.class)
+                .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
+            if (!cachedToken.equals(token)) {
+                throw new ForbiddenException("您没有该文章的访问权限");
+            }
         }
 
         post = postService.getById(post.getId());
