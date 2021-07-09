@@ -3,6 +3,7 @@ package run.halo.app.controller.content.model;
 import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
 import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
 
+import cn.hutool.core.util.StrUtil;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import cn.hutool.core.util.StrUtil;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.entity.Category;
@@ -100,10 +100,10 @@ public class PostModel {
                 }
                 return "common/template/" + POST_PASSWORD_TEMPLATE;
             }
-        }
-        // If the token is not empty, it means it is an admin request,
-        // then verify the token.
-        else {
+        } else {
+            // If the token is not empty, it means it is an admin request,
+            // then verify the token.
+
             // verify token
             String cachedToken = cacheStore.getAny(token, String.class)
                 .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
