@@ -87,20 +87,9 @@ public class PostModel {
     }
 
     public String content(Post post, String token, Model model) {
-        // If the token is empty, it means it is an external request,
-        // and the password needs to be verified.
-        if (StrUtil.isEmpty(token)) {
-            // verify password
-            if (!PostStatus.PUBLISHED.equals(post.getStatus())
-                && !authenticationService.postAuthentication(post, null)) {
-                model.addAttribute("slug", post.getSlug());
-                model.addAttribute("type", EncryptTypeEnum.POST.getName());
-                if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
-                    return themeService.render(POST_PASSWORD_TEMPLATE);
-                }
-                return "common/template/" + POST_PASSWORD_TEMPLATE;
-            }
-        } else {
+        if (PostStatus.PUBLISHED.equals(post.getStatus())) {
+            // direct interview
+        } else if (StrUtil.isNotEmpty(token)) {
             // If the token is not empty, it means it is an admin request,
             // then verify the token.
 
@@ -110,6 +99,18 @@ public class PostModel {
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该文章的访问权限");
             }
+        } else if (PostStatus.INTIMATE.equals(post.getStatus())
+            && !authenticationService.postAuthentication(post, null)
+        ) {
+            model.addAttribute("slug", post.getSlug());
+            model.addAttribute("type", EncryptTypeEnum.POST.getName());
+            if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
+                return themeService.render(POST_PASSWORD_TEMPLATE);
+            }
+            return "common/template/" + POST_PASSWORD_TEMPLATE;
+        } else {
+            // Drafts and articles in the recycle bin do not allow external access.
+            throw new ForbiddenException("您没有该文章的访问权限");
         }
 
         post = postService.getById(post.getId());
