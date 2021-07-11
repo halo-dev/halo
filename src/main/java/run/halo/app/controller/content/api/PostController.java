@@ -79,10 +79,10 @@ public class PostController {
     public Page<PostListVO> pageBy(
         @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
         @RequestParam(value = "keyword") String keyword,
-        @RequestParam(value = "categoryid") int categoryid) {
+        @RequestParam(value = "categoryId") Integer categoryId) {
         PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
-        postQuery.setCategoryId(categoryid);
+        postQuery.setCategoryId(categoryId);
         postQuery.setStatus(PostStatus.PUBLISHED);
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage, true);
