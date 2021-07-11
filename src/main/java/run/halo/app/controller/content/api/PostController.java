@@ -65,13 +65,14 @@ public class PostController {
     }
 
     //CS304 issue for https://github.com/halo-dev/halo/issues/1351
+
     /**
      * Enable users search published articles with keywords
      *
-     * @param pageable    store the priority of the sort algorithm
-     * @param keyword     search articles with keyword
-     * @param categoryid  search articles with categoryid
-     * @return            published articles that contains keywords and specific categoryid
+     * @param pageable store the priority of the sort algorithm
+     * @param keyword search articles with keyword
+     * @param categoryId search articles with categoryId
+     * @return published articles that contains keywords and specific categoryid
      */
 
     @GetMapping
@@ -79,10 +80,10 @@ public class PostController {
     public Page<PostListVO> pageBy(
         @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
         @RequestParam(value = "keyword") String keyword,
-        @RequestParam(value = "categoryid") int categoryid) {
+        @RequestParam(value = "categoryId") Integer categoryId) {
         PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
-        postQuery.setCategoryId(categoryid);
+        postQuery.setCategoryId(categoryId);
         postQuery.setStatus(PostStatus.PUBLISHED);
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage, true);
