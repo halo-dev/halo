@@ -65,13 +65,14 @@ public class PostController {
     }
 
     //CS304 issue for https://github.com/halo-dev/halo/issues/1351
+
     /**
      * Enable users search published articles with keywords
      *
-     * @param pageable    store the priority of the sort algorithm
-     * @param keyword     search articles with keyword
-     * @param categoryid  search articles with categoryid
-     * @return            published articles that contains keywords and specific categoryid
+     * @param pageable store the priority of the sort algorithm
+     * @param keyword search articles with keyword
+     * @param categoryId search articles with categoryId
+     * @return published articles that contains keywords and specific categoryid
      */
 
     @GetMapping
