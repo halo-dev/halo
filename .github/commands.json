@@ -79,7 +79,8 @@
       "JohnNiang",
       "guqing",
       "LIlGG",
-      "halo-dev-bot"
+      "halo-dev-bot",
+      "guqing-bot"
     ],
     "action": "updateLabels",
     "addLabel": "confirmed",
