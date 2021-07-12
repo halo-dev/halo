@@ -54,6 +54,16 @@
   },
   {
     "type": "comment",
+    "name": "notebook",
+    "assign": [
+      "ruibaby",
+      "JohnNiang",
+      "guqing",
+      "LIlGG"
+    ]
+  },
+  {
+    "type": "comment",
     "name": "duplicate",
     "allowUsers": [
       "ruibaby",
