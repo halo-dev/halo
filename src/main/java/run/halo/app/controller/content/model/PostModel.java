@@ -3,6 +3,7 @@ package run.halo.app.controller.content.model;
 import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
 import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
 
+import cn.hutool.core.util.StrUtil;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.exception.ForbiddenException;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
@@ -85,9 +88,27 @@ public class PostModel {
     }
 
     public String content(Post post, String token, Model model) {
+        if (PostStatus.RECYCLE.equals(post.getStatus())) {
+            // Articles in the recycle bin are not allowed to be accessed.
+            throw new NotFoundException("查询不到该文章的信息");
+        } else if (StrUtil.isNotEmpty(token)) {
+            // If the token is not empty, it means it is an admin request,
+            // then verify the token.
 
-        if (post.getStatus().equals(PostStatus.INTIMATE)
-            && !authenticationService.postAuthentication(post, null)) {
+            // verify token
+            String cachedToken = cacheStore.getAny(token, String.class)
+                .orElseThrow(() -> new ForbiddenException("您没有该文章的访问权限"));
+            if (!cachedToken.equals(token)) {
+                throw new ForbiddenException("您没有该文章的访问权限");
+            }
+        } else if (PostStatus.DRAFT.equals(post.getStatus())) {
+            // Drafts are not allowed bo be accessed by outsiders.
+            throw new NotFoundException("查询不到该文章的信息");
+        } else if (PostStatus.INTIMATE.equals(post.getStatus())
+            && !authenticationService.postAuthentication(post, null)
+        ) {
+            // Encrypted articles must has the correct password before they can be accessed.
+
             model.addAttribute("slug", post.getSlug());
             model.addAttribute("type", EncryptTypeEnum.POST.getName());
             if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {

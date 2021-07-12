@@ -2,12 +2,16 @@ package run.halo.app.controller.admin.api;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
+import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.validation.Valid;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -20,10 +24,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
@@ -46,12 +52,15 @@ public class PostController {
 
     private final PostService postService;
 
+    private final AbstractStringCacheStore cacheStore;
+
     private final OptionService optionService;
 
-
     public PostController(PostService postService,
+        AbstractStringCacheStore cacheStore,
         OptionService optionService) {
         this.postService = postService;
+        this.cacheStore = cacheStore;
         this.optionService = optionService;
     }
 
@@ -172,12 +181,17 @@ public class PostController {
     @GetMapping(value = {"preview/{postId:\\d+}", "{postId:\\d+}/preview"})
     @ApiOperation("Gets a post preview link")
     public String preview(@PathVariable("postId") Integer postId)
-        throws UnsupportedEncodingException {
+        throws UnsupportedEncodingException, URISyntaxException {
         Post post = postService.getById(postId);
 
         post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8.name()));
 
         BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
+
+        String token = IdUtil.simpleUUID();
+
+        // cache preview token
+        cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
 
         StringBuilder previewUrl = new StringBuilder();
 
@@ -188,6 +202,8 @@ public class PostController {
         previewUrl.append(postMinimalDTO.getFullPath());
 
         // build preview post url and return
-        return previewUrl.toString();
+        return new URIBuilder(previewUrl.toString())
+            .addParameter("token", token)
+            .build().toString();
     }
 }
