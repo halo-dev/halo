@@ -1,7 +1,7 @@
 [
   {
     "type": "comment",
-    "name": "question",
+    "name": "*question",
     "allowUsers": [
       "ruibaby",
       "JohnNiang",
@@ -10,11 +10,11 @@
       "halo-dev-bot"
     ],
     "action": "updateLabels",
-    "addLabel": "question"
+    "addLabel": "*question"
   },
   {
     "type": "label",
-    "name": "question",
+    "name": "*question",
     "action": "close",
     "comment": "请到 [Halo Forum](https://bbs.halo.run/) 提问. 我们在那边有一个很好的社区. 他们已经回答了数千个问题，并且很乐意回答您的问题. 也可以到[Halo 官网](https://halo.run) 查看文档指南."
   },
