@@ -22,7 +22,7 @@ jobs:
         uses: ./actions/author-verified
         with:
           token: ${{secrets.ISSUE_TRIAGE_BOT_PAT}}
-          requestVerificationComment: "该问题已在最新版本中修复!\n\n@${author}, 请在今天或者稍晚确认你的使用的版本是否包含该提交： ${commit}，如果这件事已按预期得到解决，您可以通过评论 `/verified` 来帮助我们标记此问题.\n\n如果该问题仍然没有得到解决, 可以在评论中留下你希望得到的预期结果.\n\nHappy Coding!"
+          requestVerificationComment: "该问题已在最新版本中修复!\n\n@${author}, 请在今天或者稍晚确认你的使用的版本是否包含该提交： ${commit}，如果这件事已按预期得到解决，您可以通过评论 `/verified` 来帮助我们标记此问题.\n\n如果该问题仍然没有得到解决, 可以在评论中留下你希望得到的预期结果."
           verifiedLabel: verified
           authorVerificationRequestedLabel: author-verification-requested
 

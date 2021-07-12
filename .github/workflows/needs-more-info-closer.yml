@@ -24,6 +24,6 @@ jobs:
           label: needs more info
           closeDays: 7
           additionalTeam: "ruibaby|JohnNiang|guqing|LIlGG|halo-dev-bot"
-          closeComment: "此问题已自动关闭，因为它需要更多信息且最近没有活跃.\n\nHappy Coding!"
+          closeComment: "此问题已自动关闭，因为它需要更多信息且最近没有活跃."
           pingDays: 80
           pingComment: "Hey @${assignee}, 这个问题可能需要进一步关注.\n\n@${author}, 如果问题不再存在，您可以帮助我们关闭此问题, 或者添加更多信息."
