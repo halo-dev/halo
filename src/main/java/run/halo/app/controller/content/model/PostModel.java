@@ -88,9 +88,7 @@ public class PostModel {
     }
 
     public String content(Post post, String token, Model model) {
-        if (PostStatus.PUBLISHED.equals(post.getStatus())) {
-            // direct interview
-        } else if (PostStatus.RECYCLE.equals(post.getStatus())) {
+        if (PostStatus.RECYCLE.equals(post.getStatus())) {
             // Articles in the recycle bin are not allowed to be accessed.
             throw new NotFoundException("查询不到该文章的信息");
         } else if (StrUtil.isNotEmpty(token)) {
