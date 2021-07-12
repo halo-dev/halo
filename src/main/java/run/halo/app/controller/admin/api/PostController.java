@@ -5,11 +5,13 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.validation.Valid;
+import org.apache.http.client.utils.URIBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -179,7 +181,7 @@ public class PostController {
     @GetMapping(value = {"preview/{postId:\\d+}", "{postId:\\d+}/preview"})
     @ApiOperation("Gets a post preview link")
     public String preview(@PathVariable("postId") Integer postId)
-        throws UnsupportedEncodingException {
+        throws UnsupportedEncodingException, URISyntaxException {
         Post post = postService.getById(postId);
 
         post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8.name()));
@@ -199,15 +201,9 @@ public class PostController {
 
         previewUrl.append(postMinimalDTO.getFullPath());
 
-        if (optionService.getPostPermalinkType().equals(PostPermalinkType.ID)) {
-            previewUrl.append("&token=")
-                .append(token);
-        } else {
-            previewUrl.append("?token=")
-                .append(token);
-        }
-
         // build preview post url and return
-        return previewUrl.toString();
+        return new URIBuilder(previewUrl.toString())
+            .addParameter("token", token)
+            .build().toString();
     }
 }
