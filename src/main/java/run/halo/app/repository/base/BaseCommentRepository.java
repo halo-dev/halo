@@ -221,6 +221,7 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
             + "where comment.parentId in ?1 "
             + "group by comment.parentId")
     @NonNull
+    @Deprecated
     List<CommentChildrenCountProjection> findDirectChildrenCount(
         @NonNull Collection<Long> commentIds);
 
