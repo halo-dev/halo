@@ -41,6 +41,7 @@ spring:
     template-loader-path:
       - file:///${halo.work-dir}/templates/
       - classpath:/templates/
+    expose-spring-macro-helpers: false
 management:
   endpoints:
     web:

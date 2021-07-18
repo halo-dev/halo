@@ -45,15 +45,12 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewResolverRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.core.PageJacksonSerializer;
 import run.halo.app.core.freemarker.inheritance.ThemeExtendsDirective;
 import run.halo.app.factory.StringToEnumConverterFactory;
-import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.resolver.AuthenticationArgumentResolver;
 
 /**
@@ -210,23 +207,4 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverterFactory(new StringToEnumConverterFactory());
     }
-
-    /**
-     * Configuring view resolver
-     *
-     * @param registry registry
-     */
-    @Override
-    public void configureViewResolvers(ViewResolverRegistry registry) {
-        FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();
-        resolver.setAllowRequestOverride(false);
-        resolver.setCache(false);
-        resolver.setExposeRequestAttributes(false);
-        resolver.setExposeSessionAttributes(false);
-        resolver.setExposeSpringMacroHelpers(true);
-        resolver.setSuffix(HaloConst.SUFFIX_FTL);
-        resolver.setContentType("text/html; charset=UTF-8");
-        registry.viewResolver(resolver);
-    }
-
 }
