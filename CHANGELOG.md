@@ -1,5 +1,33 @@
 # CHANGELOG
 
+# 1.4.9
+
+## Features
+
+- 编辑器支持脚注语法。halo-dev/halo#1406 halo-dev/halo-admin#341
+
+## Improvements
+
+- 优化文章字数计算。halo-dev/halo#1354
+- Content Api 中的获取文章列表支持传入关键字和分类 id 筛选项。halo-dev/halo#1373
+- 优化导入 Markdown 时，对多级分类的处理。halo-dev/halo#1380
+
+## Security Fixes
+
+- 修复 Freemarker SSTI 漏洞。halo-dev/halo#1402 halo-dev/halo#1427 Thanks @LazyMaple @5wimming
+
+## Bug Fixes
+
+- 修复在分类文章列表可以显示私密文章的问题。halo-dev/halo#1379
+- 修复使用后台的小工具数据导出迁移后分类密码消失的问题。halo-dev/halo#1390
+- 修复在站点初始化的时候，`全局绝对路径` 选项设置错误的问题。halo-dev/halo#1396
+- 修复 Content Api 的文章点赞接口限流没有按照文章 id 做处理的问题。halo-dev/halo#1410
+- 修复回收站的文章可以访问的问题。halo-dev/halo#1414
+- 修复后台评论回复时，输入框无法输入空格的问题。halo-dev/halo-admin#322
+- 修复后台菜单管理中菜单项的链接过长会导致挡住操作按钮的问题。halo-dev/halo-admin#328
+- 修复后台日志管理中长文本无法换行的问题。halo-dev/halo-admin#330
+- 修复后台在登录页面无法通过回车键进行登录的问题。halo-dev/halo-admin#332
+
 # 1.4.8
 
 ## Features
