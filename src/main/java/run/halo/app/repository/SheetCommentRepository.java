@@ -49,6 +49,7 @@ public interface SheetCommentRepository extends BaseCommentRepository<SheetComme
             + "and comment.postId in ?2 "
             + "group by comment.postId")
     @NonNull
+    @Override
     List<CommentCountProjection> countByStatusAndPostIds(@NonNull CommentStatus status,
         @NonNull Collection<Integer> sheetsId);
 
