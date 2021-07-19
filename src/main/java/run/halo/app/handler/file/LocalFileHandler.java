@@ -194,6 +194,7 @@ public class LocalFileHandler implements FileHandler {
             boolean deleteResult = Files.deleteIfExists(thumbnailPath);
             if (!deleteResult) {
                 log.warn("Thumbnail: [{}] may not exist", thumbnailPath.toString());
+                throw new FileOperationException("附件缩略图 " + thumbnailName + " 删除失败");
             }
         } catch (IOException e) {
             throw new FileOperationException("附件缩略图 " + thumbnailName + " 删除失败", e);
