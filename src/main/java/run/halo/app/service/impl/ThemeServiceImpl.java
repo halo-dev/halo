@@ -75,12 +75,15 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final ThemeRepository themeRepository;
 
+    private final OptionServiceImpl optionService;
+
     public ThemeServiceImpl(HaloProperties haloProperties,
         ThemeConfigResolver themeConfigResolver,
         RestTemplate restTemplate,
         ApplicationEventPublisher eventPublisher,
         ThemeSettingRepository themeSettingRepository,
-        ThemeRepository themeRepository) {
+        ThemeRepository themeRepository,
+        OptionServiceImpl optionService) {
         this.themeConfigResolver = themeConfigResolver;
         this.restTemplate = restTemplate;
 
@@ -88,6 +91,7 @@ public class ThemeServiceImpl implements ThemeService {
         this.eventPublisher = eventPublisher;
         this.themeSettingRepository = themeSettingRepository;
         this.themeRepository = themeRepository;
+        this.optionService = optionService;
 
         this.fetcherComposite = new ThemeFetcherComposite();
         this.fetcherComposite.addFetcher(new ZipThemeFetcher());
@@ -112,7 +116,12 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     @NonNull
     public List<ThemeProperty> getThemes() {
-        return themeRepository.listAll();
+        List<ThemeProperty> properties = themeRepository.listAll();
+        String blogUrl = StringUtils.removeEnd(optionService.getBlogBaseUrl(), "/");
+        for (ThemeProperty property : properties) {
+            property.setScreenshots(blogUrl + property.getScreenshots());
+        }
+        return properties;
     }
 
     @Override
