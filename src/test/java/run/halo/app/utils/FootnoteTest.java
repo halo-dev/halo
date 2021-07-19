@@ -1,12 +1,9 @@
 package run.halo.app.utils;
 
 import cn.hutool.core.lang.Assert;
-import com.vladsch.flexmark.ext.attributes.AttributesExtension;
-import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiImageType;
 import com.vladsch.flexmark.ext.emoji.EmojiShortcutType;
-import com.vladsch.flexmark.ext.footnotes.FootnoteExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
@@ -15,9 +12,10 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
 import java.util.Arrays;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
+import run.halo.app.utils.footnotes.FootnoteExtension;
 
 /**
- * Compare the rendering result of FootnoteNodeRendererInterceptor
+ * Compare the rendering result of FootnoteNodeRenderer
  * and <a href="https://github.com/markdown-it/markdown-it-footnote">markdown-it-footnote</a>.
  * You can view <code>markdown-it-footnote's</code> rendering HTML results on this
  * link <a href="https://markdown-it.github.io/">markdown-it-footnote example page</a>.
@@ -25,7 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author guqing
  * @date 2021-06-26
  */
-public class FootnoteNodeRendererInterceptorTest {
+public class FootnoteTest {
     private static final DataHolder OPTIONS =
         new MutableDataSet().set(Parser.EXTENSIONS, Arrays.asList(EmojiExtension.create(),
             FootnoteExtension.create()))
@@ -38,7 +36,6 @@ public class FootnoteNodeRendererInterceptorTest {
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
 
     private String renderHtml(String markdown) {
-        FootnoteNodeRendererInterceptor.doDelegationMethod();
 
         Node document = PARSER.parse(markdown);
 
