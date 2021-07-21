@@ -6,7 +6,6 @@ import com.vladsch.flexmark.ext.emoji.EmojiExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiImageType;
 import com.vladsch.flexmark.ext.emoji.EmojiShortcutType;
 import com.vladsch.flexmark.ext.escaped.character.EscapedCharacterExtension;
-import com.vladsch.flexmark.ext.footnotes.FootnoteExtension;
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
 import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
 import com.vladsch.flexmark.ext.gitlab.GitLabExtension;
@@ -30,6 +29,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.utils.footnotes.FootnoteExtension;
 
 /**
  * Markdown utils.
@@ -111,8 +111,6 @@ public class MarkdownUtils {
             markdown = markdown
                 .replaceAll(HaloConst.YOUTUBE_VIDEO_REG_PATTERN, HaloConst.YOUTUBE_VIDEO_IFRAME);
         }
-        // footnote render method delegation.
-        FootnoteNodeRendererInterceptor.doDelegationMethod();
 
         Node document = PARSER.parse(markdown);
 
