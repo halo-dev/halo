@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# next
+
+## Bug Fixes
+
+- 修复 Content Api 中文章列表接口的 `keyword` 和 `categoryId` 参数为必传的问题。
+
 # 1.4.10
 
 ## Features
