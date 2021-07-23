@@ -72,15 +72,14 @@ public class PostController {
      * @param pageable store the priority of the sort algorithm
      * @param keyword search articles with keyword
      * @param categoryId search articles with categoryId
-     * @return published articles that contains keywords and specific categoryid
+     * @return published articles that contains keywords and specific categoryId
      */
-
     @GetMapping
     @ApiOperation("Lists posts")
     public Page<PostListVO> pageBy(
         @PageableDefault(sort = {"topPriority", "createTime"}, direction = DESC) Pageable pageable,
-        @RequestParam(value = "keyword") String keyword,
-        @RequestParam(value = "categoryId") Integer categoryId) {
+        @RequestParam(value = "keyword", required = false) String keyword,
+        @RequestParam(value = "categoryId", required = false) Integer categoryId) {
         PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
         postQuery.setCategoryId(categoryId);
