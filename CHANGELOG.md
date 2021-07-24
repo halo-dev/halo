@@ -4,7 +4,8 @@
 
 ## Bug Fixes
 
-- 修复 Content Api 中文章列表接口的 `keyword` 和 `categoryId` 参数为必传的问题。
+- 修复 Content Api 中文章列表接口的 `keyword` 和 `categoryId` 参数为必传的问题。halo-dev/halo#1436
+- 修复删除非图片附件时提示附件缩略图删除失败的问题。halo-dev/halo#1438
 
 # 1.4.10
 
