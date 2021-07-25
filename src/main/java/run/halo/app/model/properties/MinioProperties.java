@@ -31,7 +31,12 @@ public enum MinioProperties implements PropertyEnum {
     /**
      * Minio source
      */
-    SOURCE("minio_source", String.class, "");
+    SOURCE("minio_source", String.class, ""),
+
+    /**
+     * Minio regoin
+     */
+    REGION("minio_region", String.class, "");
 
     private final String value;
 

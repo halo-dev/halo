@@ -50,12 +50,15 @@ public class MinioFileHandler implements FileHandler {
             optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString();
         String source =
             optionService.getByPropertyOrDefault(MinioProperties.SOURCE, String.class, "");
+        String region =
+            optionService.getByPropertyOfNonNull(MinioProperties.REGION).toString();
 
         endpoint = StringUtils.appendIfMissing(endpoint, HaloConst.URL_SEPARATOR);
 
         MinioClient minioClient = MinioClient.builder()
             .endpoint(endpoint)
             .credentials(accessKey, accessSecret)
+            .region(region)
             .build();
 
         try {
@@ -110,10 +113,13 @@ public class MinioFileHandler implements FileHandler {
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_SECRET).toString();
         String bucketName =
             optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString();
+        String region =
+            optionService.getByPropertyOfNonNull(MinioProperties.REGION).toString();
 
         MinioClient minioClient = MinioClient.builder()
             .endpoint(endPoint)
             .credentials(accessKey, accessSecret)
+            .region(region)
             .build();
 
         try {
