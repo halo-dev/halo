@@ -75,12 +75,15 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final ThemeRepository themeRepository;
 
+    private final OptionServiceImpl optionService;
+
     public ThemeServiceImpl(HaloProperties haloProperties,
         ThemeConfigResolver themeConfigResolver,
         RestTemplate restTemplate,
         ApplicationEventPublisher eventPublisher,
         ThemeSettingRepository themeSettingRepository,
-        ThemeRepository themeRepository) {
+        ThemeRepository themeRepository,
+        OptionServiceImpl optionService) {
         this.themeConfigResolver = themeConfigResolver;
         this.restTemplate = restTemplate;
 
@@ -88,6 +91,7 @@ public class ThemeServiceImpl implements ThemeService {
         this.eventPublisher = eventPublisher;
         this.themeSettingRepository = themeSettingRepository;
         this.themeRepository = themeRepository;
+        this.optionService = optionService;
 
         this.fetcherComposite = new ThemeFetcherComposite();
         this.fetcherComposite.addFetcher(new ZipThemeFetcher());
@@ -106,13 +110,20 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     @NonNull
     public Optional<ThemeProperty> fetchThemePropertyBy(String themeId) {
-        return themeRepository.fetchThemePropertyByThemeId(themeId);
+        Optional<ThemeProperty> optional = themeRepository.fetchThemePropertyByThemeId(themeId);
+        optional.ifPresent(this::fillScreenShots);
+        return optional;
     }
 
     @Override
     @NonNull
     public List<ThemeProperty> getThemes() {
-        return themeRepository.listAll();
+        List<ThemeProperty> properties = themeRepository.listAll();
+        String blogUrl = StringUtils.removeEnd(optionService.getBlogBaseUrl(), "/");
+        for (ThemeProperty property : properties) {
+            property.setScreenshots(blogUrl + property.getScreenshots());
+        }
+        return properties;
     }
 
     @Override
@@ -321,7 +332,7 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     @NonNull
     public Optional<ThemeProperty> fetchActivatedTheme() {
-        return Optional.of(themeRepository.getActivatedThemeProperty());
+        return Optional.of(fillScreenShots(themeRepository.getActivatedThemeProperty()));
     }
 
     @Override
@@ -336,7 +347,7 @@ public class ThemeServiceImpl implements ThemeService {
         // Publish a theme activated event
         eventPublisher.publishEvent(new ThemeActivatedEvent(this));
 
-        return themeRepository.getActivatedThemeProperty();
+        return fillScreenShots(themeRepository.getActivatedThemeProperty());
     }
 
     @Override
@@ -456,5 +467,13 @@ public class ThemeServiceImpl implements ThemeService {
         return ThemePropertyScanner.INSTANCE.fetchThemeProperty(themePath)
             .orElseThrow(() -> new ThemePropertyMissingException(themePath + " 没有说明文件")
                 .setErrorData(themePath));
+    }
+
+    private ThemeProperty fillScreenShots(ThemeProperty property) {
+        String blogUrl = StringUtils.removeEnd(optionService.getBlogBaseUrl(), "/");
+        if (!property.getScreenshots().startsWith(blogUrl)) {
+            property.setScreenshots(blogUrl + property.getScreenshots());
+        }
+        return property;
     }
 }
