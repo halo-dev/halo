@@ -1,0 +1,31 @@
+name: 新特性建议
+description: 提交新特性建议
+body:
+  - type: markdown
+    id: preface
+    attributes:
+      value: "你好！感谢你为 Halo 提交新特性建议。在开始之前，我们非常推荐阅读一遍[《开源最佳实践》](https://github.com/LinuxSuRen/open-source-best-practice)，这会在很大程度上提高我们彼此的效率。"
+  - type: markdown
+    id: environment
+    attributes:
+      value: "## 环境信息"
+  - type: input
+    id: version
+    attributes:
+      label: "你当前使用的版本"
+      description: "可以在管理后台的关于页面中找到。"
+  - type: markdown
+    id: details
+    attributes:
+      value: "## 详细信息"
+  - type: textarea
+    id: description
+    attributes:
+      label: "描述一下此特性"
+    validations:
+      required: true
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: "附加信息"
+      description: "如果你还有其他需要提供的信息，可以在这里填写（可以提供截图、视频等）。"
