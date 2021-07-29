@@ -296,8 +296,7 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public String render(String pageName) {
-        var folderName = getActivatedTheme().getFolderName();
-        return "themes/" + folderName + "/" + pageName;
+        return pageName;
     }
 
     @Override

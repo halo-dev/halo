@@ -24,6 +24,8 @@ public class ThemeProperty {
      */
     private String name;
 
+    private String engine;
+
     /**
      * Theme website.
      */

@@ -183,7 +183,7 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
 
         // register /themes/** resource handler.
         registry.addResourceHandler("/themes/**")
-            .addResourceLocations(workDir + "templates/themes/");
+            .addResourceLocations(haloProperties.getThemesPrefix());
 
         String uploadUrlPattern =
             ensureBoth(haloProperties.getUploadUrlPrefix(), URL_SEPARATOR) + "**";

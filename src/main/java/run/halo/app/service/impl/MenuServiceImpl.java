@@ -1,16 +1,22 @@
 package run.halo.app.service.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.event.menu.MenuUpdateEvent;
 import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
@@ -31,10 +37,13 @@ import run.halo.app.utils.ServiceUtils;
 public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implements MenuService {
 
     private final MenuRepository menuRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public MenuServiceImpl(MenuRepository menuRepository) {
+    public MenuServiceImpl(MenuRepository menuRepository,
+        ApplicationEventPublisher eventPublisher) {
         super(menuRepository);
         this.menuRepository = menuRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -101,12 +110,23 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
+    @Transactional
     public @NonNull
     Menu createBy(@NonNull MenuParam menuParam) {
         Assert.notNull(menuParam, "Menu param must not be null");
 
         // Create an return
+        publishUpdateEvent();
         return create(menuParam.convertTo());
+    }
+
+    private void publishUpdateEvent() {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                eventPublisher.publishEvent(new MenuUpdateEvent(MenuServiceImpl.this));
+            }
+        });
     }
 
     @Override
@@ -144,13 +164,28 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     @Override
     public @NonNull
     Menu create(@NonNull Menu menu) {
+        publishUpdateEvent();
         return super.create(menu);
     }
 
     @Override
     public @NonNull
     Menu update(@NonNull Menu menu) {
+        publishUpdateEvent();
         return super.update(menu);
+    }
+
+    @Transactional
+    @Override
+    public Menu removeById(Integer id) {
+        publishUpdateEvent();
+        return super.removeById(id);
+    }
+
+    @Override
+    public List<Menu> updateInBatch(Collection<Menu> domains) {
+        publishUpdateEvent();
+        return super.updateInBatch(domains);
     }
 
     /**

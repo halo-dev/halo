@@ -76,4 +76,9 @@ public class HaloProperties {
      * level
      */
     private String cache = "memory";
+
+    /**
+     * themes prefix.
+     */
+    private String themesPrefix;
 }
