@@ -76,7 +76,7 @@ public class ThemeConfiguration {
     /**
      * Get current active theme from http request attributes.
      *
-     * @return
+     * @return current active theme
      */
     public static String getTheme(HttpServletRequest request) {
         if (request == null) {

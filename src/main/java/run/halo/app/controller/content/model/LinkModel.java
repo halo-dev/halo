@@ -7,8 +7,6 @@ import run.halo.app.service.LinkService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 
-import static org.springframework.data.domain.Sort.Direction.ASC;
-
 /**
  * @author ryanwang
  * @date 2020-03-04
@@ -30,7 +28,7 @@ public class LinkModel {
 
     public String list(Model model) {
         // links
-        model.addAttribute("links", linkService.listDtos(Sort.by(ASC, "priority")));
+        model.addAttribute("links", linkService.listDtos(Sort.by(Sort.Direction.ASC, "priority")));
         model.addAttribute("is_links", true);
         model.addAttribute("meta_keywords", optionService.getSeoKeywords());
         model.addAttribute("meta_description", optionService.getSeoDescription());
