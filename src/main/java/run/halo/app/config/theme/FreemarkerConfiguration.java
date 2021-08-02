@@ -1,5 +1,7 @@
 package run.halo.app.config.theme;
 
+import java.io.IOException;
+import java.util.Properties;
 import org.springframework.boot.autoconfigure.freemarker.FreeMarkerProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -10,8 +12,6 @@ import org.springframework.ui.freemarker.SpringTemplateLoader;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.utils.ThemeUtil;
-import java.io.IOException;
-import java.util.Properties;
 
 /**
  * Freemarker theming configuration.

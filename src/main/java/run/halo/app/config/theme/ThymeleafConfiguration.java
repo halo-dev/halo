@@ -1,5 +1,8 @@
 package run.halo.app.config.theme;
 
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -15,9 +18,6 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolution;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.utils.ThemeUtil;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
 
 /**
  * Thymeleaf theming configuration.
@@ -97,13 +97,6 @@ public class ThymeleafConfiguration {
     private static class VerifiedThymeleafViewResolver extends ThymeleafViewResolver {
         public VerifiedThymeleafViewResolver(SpringTemplateEngine templateEngine) {
             this.setTemplateEngine(templateEngine);
-        }
-
-        /**
-         * Invoke this method to reload templates after updating theme files.
-         */
-        public void clearTemplateCache() {
-            ((SpringTemplateEngine) this.getTemplateEngine()).clearTemplateCache();
         }
 
         @Override

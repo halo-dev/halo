@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractCachingViewResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import run.halo.app.event.menu.MenuUpdateEvent;
 import run.halo.app.event.options.OptionUpdatedEvent;
@@ -75,6 +76,11 @@ public class ThemeManager {
         viewResolverMap.values().forEach(AbstractCachingViewResolver::clearCache);
     }
 
+    private void clearResourceCache() {
+        ThymeleafViewResolver viewResolver = (ThymeleafViewResolver) viewResolverMap.get(THYMELEAF);
+        ((SpringTemplateEngine) viewResolver.getTemplateEngine()).clearTemplateCache();
+    }
+
     private void loadUser() {
         ThymeleafViewResolver viewResolver = (ThymeleafViewResolver) viewResolverMap.get(THYMELEAF);
         viewResolver.addStaticVariable("user", userService.getCurrentUser().orElse(null));
@@ -116,6 +122,7 @@ public class ThemeManager {
             loadThemeSettings(x.getId());
 
             clearViewCache();
+            clearResourceCache();
         });
     }
 
@@ -126,6 +133,7 @@ public class ThemeManager {
             loadThemeSettings(x.getId());
 
             clearViewCache();
+            clearResourceCache();
         });
     }
 
@@ -141,6 +149,7 @@ public class ThemeManager {
         log.debug("Received theme updated event");
         loadThemeSettings(themeService.getActivatedThemeId());
         clearViewCache();
+        clearResourceCache();
     }
 
     @EventListener

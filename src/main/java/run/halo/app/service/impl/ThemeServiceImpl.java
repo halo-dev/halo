@@ -226,6 +226,8 @@ public class ThemeServiceImpl implements ThemeService {
         Path path = Paths.get(absolutePath);
         try {
             Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+            // notify view resolvers to reload templates
+            eventPublisher.publishEvent(new ThemeUpdatedEvent(this));
         } catch (IOException e) {
             throw new ServiceException("保存模板内容失败 " + absolutePath, e);
         }
