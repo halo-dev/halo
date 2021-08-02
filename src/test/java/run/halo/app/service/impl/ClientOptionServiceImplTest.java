@@ -1,8 +1,13 @@
 package run.halo.app.service.impl;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static run.halo.app.service.OptionService.OPTIONS_KEY;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.properties.AliOssProperties;
 import run.halo.app.model.properties.CommentProperties;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
 
 /**
  * @author LIlGG
@@ -31,6 +33,7 @@ class ClientOptionServiceImplTest {
     ClientOptionServiceImpl clientOptionService;
 
     Map<String, Object> map = new HashMap<>();
+
     {
         map.put(AliOssProperties.OSS_DOMAIN.getValue(), "1");
         map.put(CommentProperties.CONTENT_PLACEHOLDER.getValue(), "2");
@@ -62,6 +65,7 @@ class ClientOptionServiceImplTest {
 
     @Test
     void getByKeyTest() {
-        assertNull(clientOptionService.getByKey(AliOssProperties.OSS_DOMAIN.getValue()).orElse(null));
+        assertNull(clientOptionService.getByKey(AliOssProperties.OSS_DOMAIN.getValue())
+            .orElse(null));
     }
 }
