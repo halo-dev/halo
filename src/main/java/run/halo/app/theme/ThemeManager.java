@@ -13,6 +13,7 @@ import org.springframework.web.servlet.view.AbstractCachingViewResolver;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+import run.halo.app.config.theme.ThemeConfiguration;
 import run.halo.app.event.menu.MenuUpdateEvent;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeActivatedEvent;
@@ -41,6 +42,8 @@ public class ThemeManager {
     private ThemeSettingService themeSettingService;
     @Resource
     private OptionService optionService;
+    @Resource
+    private ThemeConfiguration.I18nThemeSource i18nThemeSource;
 
     private static final String FREEMARKER = "freemarker";
     private static final String THYMELEAF = "thymeleaf";
@@ -72,13 +75,20 @@ public class ThemeManager {
         }
     }
 
+    // clear view cache when static variables change or current theme is switched.
     private void clearViewCache() {
         viewResolverMap.values().forEach(AbstractCachingViewResolver::clearCache);
     }
 
-    private void clearResourceCache() {
+    // clear template cache when theme file is changed.
+    private void clearTemplateCache() {
         ThymeleafViewResolver viewResolver = (ThymeleafViewResolver) viewResolverMap.get(THYMELEAF);
         ((SpringTemplateEngine) viewResolver.getTemplateEngine()).clearTemplateCache();
+    }
+
+    // clear i18n cache where i18n file (properties) is changed or default locale is changed.
+    private void clearI18nCache() {
+        i18nThemeSource.clearCache();
     }
 
     private void loadUser() {
@@ -99,6 +109,7 @@ public class ThemeManager {
         ThymeleafViewResolver viewResolver = (ThymeleafViewResolver) viewResolverMap.get(THYMELEAF);
         viewResolver.addStaticVariable("options", optionService.listOptions());
 
+        i18nThemeSource.setDefaultLocale(optionService.getLocale());
         // TODO for freemarker
     }
 
@@ -121,8 +132,9 @@ public class ThemeManager {
             // load theme settings
             loadThemeSettings(x.getId());
 
+            clearI18nCache();
+            clearTemplateCache();
             clearViewCache();
-            clearResourceCache();
         });
     }
 
@@ -132,8 +144,8 @@ public class ThemeManager {
             loadOptions();
             loadThemeSettings(x.getId());
 
+            clearTemplateCache();
             clearViewCache();
-            clearResourceCache();
         });
     }
 
@@ -141,6 +153,8 @@ public class ThemeManager {
     public void onOptionUpdate(OptionUpdatedEvent event) {
         log.debug("Received option updated event");
         loadOptions();
+        // default locale may change
+        clearI18nCache();
         clearViewCache();
     }
 
@@ -148,8 +162,10 @@ public class ThemeManager {
     public void onThemeUpdatedEvent(ThemeUpdatedEvent event) {
         log.debug("Received theme updated event");
         loadThemeSettings(themeService.getActivatedThemeId());
+        // properties may change
+        clearI18nCache();
+        clearTemplateCache();
         clearViewCache();
-        clearResourceCache();
     }
 
     @EventListener

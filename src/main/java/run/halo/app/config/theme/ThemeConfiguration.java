@@ -16,7 +16,6 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.Nullable;
 import org.springframework.ui.context.ThemeSource;
 import org.springframework.ui.context.support.ResourceBundleThemeSource;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ThemeResolver;
 import org.springframework.web.servlet.ViewResolver;
@@ -57,7 +56,7 @@ public class ThemeConfiguration {
 
     @Bean
     ThemeSource themeSource(HaloProperties haloProperties, OptionService optionService,
-        ApplicationContext context) {
+                            ApplicationContext context) {
         Locale defaultLocale = optionService.getLocale();
         return new I18nThemeSource(haloProperties.getThemesPrefix(), defaultLocale, context);
     }
@@ -86,9 +85,9 @@ public class ThemeConfiguration {
     /**
      * Get i18n resources under theme folder, e.g. {@code themeFolder/i18n/i18n_zh_CN.properties}.
      * <p>
-     * priority: parameter -> cookie -> header -> default locale
+     * priority: parameter -> cookie -> header -> default locale (fallback)
      */
-    private static class I18nThemeSource extends ResourceBundleThemeSource {
+    public static class I18nThemeSource extends ResourceBundleThemeSource {
         private String prefix;
         private Locale defaultLocale;
         private ResourceLoader resourceLoader;
@@ -132,6 +131,13 @@ public class ThemeConfiguration {
         public synchronized void clearCache() {
             cache.values().forEach(ReloadableResourceBundleMessageSource::clearCache);
         }
+
+        public synchronized void setDefaultLocale(Locale locale) {
+            this.defaultLocale = locale;
+            cache.values().forEach(x -> {
+                x.setDefaultLocale(locale);
+            });
+        }
     }
 
 
@@ -141,25 +147,12 @@ public class ThemeConfiguration {
     private static class ThemingResourceResolver extends PathResourceResolver {
         @Override
         public Resource resolveResource(@Nullable HttpServletRequest request, String requestPath,
-            List<? extends Resource> locations, ResourceResolverChain chain) {
+                                        List<? extends Resource> locations,
+                                        ResourceResolverChain chain) {
             Resource resource = null;
-            // append theme prefix
+            // prepend theme prefix
             requestPath = "/" + ThemeUtil.getTheme(request) + request.getServletPath();
-
-            // support responsive images
-            // refer to https://medium.freecodecamp.org/a-guide-to-responsive-images-with-ready-to-use-templates-c400bd65c433
-            String size = request.getParameter("size");
-            if (StringUtils.hasText(size)) {
-                String imagePath = imgUrl(requestPath, size);
-                resource = super.resolveResource(request, imagePath, locations, chain);
-            }
-
-            // not image or fallback for responsive image
-            if (resource == null) {
-                resource = super.resolveResource(request, requestPath, locations, chain);
-            }
-
-            return resource;
+            return super.resolveResource(request, requestPath, locations, chain);
         }
 
         public String imgUrl(String path, String size) {
@@ -198,7 +191,7 @@ public class ThemeConfiguration {
 
         @Override
         public void setThemeName(HttpServletRequest request, HttpServletResponse response,
-            String themeName) {
+                                 String themeName) {
             throw new UnsupportedOperationException("Can't set theme here");
         }
     }
