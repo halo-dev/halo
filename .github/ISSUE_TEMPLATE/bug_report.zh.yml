@@ -30,6 +30,15 @@ body:
         - MySQL 5.7
         - MySQL 8.x
         - Other
+  - type: dropdown
+    id: deployment-method
+    validations:
+      required: true
+    attributes:
+      label: "使用的哪种方式部署？"
+      options:
+        - Fat Jar
+        - Docker
   - type: input
     id: site-url
     attributes:
