@@ -36,7 +36,7 @@ public enum MinioProperties implements PropertyEnum {
     /**
      * Minio regoin
      */
-    REGION("minio_region", String.class, "");
+    REGION("minio_region", String.class, "us-east-1");
 
     private final String value;
 
