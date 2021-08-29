@@ -9,14 +9,15 @@
       @input="emitter"
       @start="isDragging = true"
       @end="isDragging = false"
-      handle=".title"
+      handle=".mover"
     >
       <transition-group>
         <div :key="item.id" v-for="item in realValue">
-          <a-list-item class="cursor-pointer menu-item">
+          <a-list-item class="menu-item">
             <a-list-item-meta>
-              <span slot="title" class="inline-block font-bold cursor-move title"
-                >{{ item.name }}
+              <span slot="title" class="inline-block font-bold title">
+                <a-icon class="cursor-pointer mover" type="bars" />
+                {{ item.name }}
                 <a-tooltip title="外部链接" v-if="item.target === '_blank'">
                   <a-icon type="link" />
                 </a-tooltip>
