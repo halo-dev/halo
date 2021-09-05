@@ -92,6 +92,7 @@ ext {
     image4jVersion = "0.7zensight1"
     flywayVersion = "7.5.1"
     h2Version = "1.4.197"
+    mysqlVersion = "8.0.25"
     levelDbVersion = "0.12"
     annotationsVersion = "3.0.1u2"
     zxingVersion = "3.4.0"
@@ -150,7 +151,7 @@ dependencies {
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
-    runtimeOnly "mysql:mysql-connector-java"
+    runtimeOnly "mysql:mysql-connector-java:$mysqlVersion"
 
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
