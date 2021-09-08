@@ -17,7 +17,7 @@ spring:
 
     # H2 database configuration.
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/halo-dev/db/halo
+    url: jdbc:h2:file:~/halo-dev/db/halo;AUTO_SERVER=TRUE
     username: admin
     password: 123456
 
