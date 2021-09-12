@@ -2,6 +2,7 @@ package run.halo.app.handler.file;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Supplier;
@@ -73,9 +74,19 @@ public interface FileHandler {
         if (isImageType(file)) {
             // Handle image
             try (InputStream is = file.getInputStream()) {
-                ImageReader image = ImageUtils.getImageReaderFromFile(is, uploadResult.getSuffix());
-                uploadResult.setWidth(image.getWidth(0));
-                uploadResult.setHeight(image.getHeight(0));
+
+                if(ImageUtils.EXTENSION_ICO.equals(uploadResult.getSuffix())) {
+                    BufferedImage icoImage =
+                        ImageUtils.getImageFromFile(is, uploadResult.getSuffix());
+                    uploadResult.setWidth(icoImage.getWidth());
+                    uploadResult.setHeight(icoImage.getHeight());
+                } else {
+                    ImageReader image =
+                        ImageUtils.getImageReaderFromFile(is, uploadResult.getSuffix());
+                    uploadResult.setWidth(image.getWidth(0));
+                    uploadResult.setHeight(image.getHeight(0));
+                }
+
                 if (thumbnailSupplier != null) {
                     uploadResult.setThumbPath(thumbnailSupplier.get());
                 }
