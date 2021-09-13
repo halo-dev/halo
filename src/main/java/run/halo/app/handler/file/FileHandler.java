@@ -2,6 +2,7 @@ package run.halo.app.handler.file;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Supplier;
@@ -63,6 +64,8 @@ public interface FileHandler {
     }
 
     /**
+     * Update Metadata for image object.
+     *
      * @param uploadResult updated result must not be null
      * @param file multipart file must not be null
      * @param thumbnailSupplier thumbnail supplier
@@ -73,9 +76,19 @@ public interface FileHandler {
         if (isImageType(file)) {
             // Handle image
             try (InputStream is = file.getInputStream()) {
-                ImageReader image = ImageUtils.getImageReaderFromFile(is, uploadResult.getSuffix());
-                uploadResult.setWidth(image.getWidth(0));
-                uploadResult.setHeight(image.getHeight(0));
+                String extension = uploadResult.getSuffix();
+                if (ImageUtils.EXTENSION_ICO.equals(extension)) {
+                    BufferedImage icoImage =
+                        ImageUtils.getImageFromFile(is, extension);
+                    uploadResult.setWidth(icoImage.getWidth());
+                    uploadResult.setHeight(icoImage.getHeight());
+                } else {
+                    ImageReader image =
+                        ImageUtils.getImageReaderFromFile(is, extension);
+                    uploadResult.setWidth(image.getWidth(0));
+                    uploadResult.setHeight(image.getHeight(0));
+                }
+
                 if (thumbnailSupplier != null) {
                     uploadResult.setThumbPath(thumbnailSupplier.get());
                 }
