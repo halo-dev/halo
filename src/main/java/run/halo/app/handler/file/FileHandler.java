@@ -64,6 +64,8 @@ public interface FileHandler {
     }
 
     /**
+     * Update Metadata for image object.
+     *
      * @param uploadResult updated result must not be null
      * @param file multipart file must not be null
      * @param thumbnailSupplier thumbnail supplier
@@ -74,15 +76,15 @@ public interface FileHandler {
         if (isImageType(file)) {
             // Handle image
             try (InputStream is = file.getInputStream()) {
-
-                if(ImageUtils.EXTENSION_ICO.equals(uploadResult.getSuffix())) {
+                String extension = uploadResult.getSuffix();
+                if (ImageUtils.EXTENSION_ICO.equals(extension)) {
                     BufferedImage icoImage =
-                        ImageUtils.getImageFromFile(is, uploadResult.getSuffix());
+                        ImageUtils.getImageFromFile(is, extension);
                     uploadResult.setWidth(icoImage.getWidth());
                     uploadResult.setHeight(icoImage.getHeight());
                 } else {
                     ImageReader image =
-                        ImageUtils.getImageReaderFromFile(is, uploadResult.getSuffix());
+                        ImageUtils.getImageReaderFromFile(is, extension);
                     uploadResult.setWidth(image.getWidth(0));
                     uploadResult.setHeight(image.getHeight(0));
                 }
