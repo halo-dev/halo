@@ -36,16 +36,6 @@
       <a-form-model-item label="占位提示：">
         <a-input v-model="options.comment_content_placeholder" />
       </a-form-model-item>
-      <!-- <a-form-model-item
-                  label="自定义样式："
-
-                >
-                  <a-input
-                    type="textarea"
-                    :autoSize="{ minRows: 5 }"
-                    v-model="options.comment_custom_style"
-                  />
-                </a-form-model-item> -->
       <a-form-model-item>
         <ReactiveButton
           type="primary"

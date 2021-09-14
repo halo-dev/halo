@@ -36,7 +36,7 @@
           </div>
           <a-divider />
           <div class="mt-4">
-            <a-empty v-if="!list.loading && list.data.length == 0" />
+            <a-empty v-if="!list.loading && list.data.length === 0" />
             <a-list v-else itemLayout="vertical" :pagination="false" :dataSource="list.data" :loading="list.loading">
               <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
                 <template slot="actions">
@@ -52,7 +52,7 @@
                       {{ item.commentCount }}
                     </a>
                   </span>
-                  <span v-if="item.type == 'INTIMATE'">
+                  <span v-if="item.type === 'INTIMATE'">
                     <a href="javascript:void(0);" disabled>
                       <a-icon type="lock" />
                     </a>

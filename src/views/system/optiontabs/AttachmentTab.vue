@@ -4,8 +4,8 @@
       ref="attachmentOptionsForm"
       :model="options"
       :rules="rules"
-      layout="vertical"
       :wrapperCol="wrapperCol"
+      layout="vertical"
     >
       <a-form-model-item label="上传图片时预览：">
         <a-switch v-model="options.attachment_upload_image_preview_enable" />
@@ -18,21 +18,21 @@
       </a-form-model-item>
       <a-form-model-item label="存储位置：">
         <a-select v-model="options.attachment_type">
-          <a-select-option v-for="item in Object.keys(attachmentType)" :key="item" :value="item">{{
-            attachmentType[item].text
-          }}</a-select-option>
+          <a-select-option v-for="item in Object.keys(attachmentType)" :key="item" :value="item">
+            {{ attachmentType[item].text }}
+          </a-select-option>
         </a-select>
       </a-form-model-item>
-      <div id="smmsForm" v-show="options.attachment_type === 'SMMS'">
+      <div v-show="options.attachment_type === 'SMMS'" id="smmsForm">
         <a-form-model-item label="Secret Token：">
           <a-input-password
             v-model="options.smms_api_secret_token"
-            placeholder="需要到 sm.ms 官网注册后获取"
             autocomplete="new-password"
+            placeholder="需要到 sm.ms 官网注册后获取"
           />
         </a-form-model-item>
       </div>
-      <div id="upOssForm" v-show="options.attachment_type === 'UPOSS'">
+      <div v-show="options.attachment_type === 'UPOSS'" id="upOssForm">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.oss_upyun_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -64,7 +64,7 @@
           />
         </a-form-model-item>
       </div>
-      <div id="qiniuOssForm" v-show="options.attachment_type === 'QINIUOSS'">
+      <div v-show="options.attachment_type === 'QINIUOSS'" id="qiniuOssForm">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.oss_qiniu_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -75,7 +75,7 @@
           <a-input v-model="options.oss_qiniu_domain" placeholder="无需再加上 http:// 或者 https://" />
         </a-form-model-item>
         <a-form-model-item label="区域：">
-          <a-auto-complete :dataSource="qiniuOssZones" v-model="options.oss_qiniu_zone" allowClear />
+          <a-auto-complete v-model="options.oss_qiniu_zone" :dataSource="qiniuOssZones" allowClear />
         </a-form-model-item>
         <a-form-model-item label="Access Key：">
           <a-input-password v-model="options.oss_qiniu_access_key" autocomplete="new-password" />
@@ -99,7 +99,7 @@
           />
         </a-form-model-item>
       </div>
-      <div id="aliOssForm" v-show="options.attachment_type === 'ALIOSS'">
+      <div v-show="options.attachment_type === 'ALIOSS'" id="aliOssForm">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.oss_ali_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -134,7 +134,7 @@
           />
         </a-form-model-item>
       </div>
-      <div id="baiduBosForm" v-show="options.attachment_type === 'BAIDUBOS'">
+      <div v-show="options.attachment_type === 'BAIDUBOS'" id="baiduBosForm">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.bos_baidu_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -166,7 +166,7 @@
           />
         </a-form-model-item>
       </div>
-      <div id="tencentCosForm" v-show="options.attachment_type === 'TENCENTCOS'">
+      <div v-show="options.attachment_type === 'TENCENTCOS'" id="tencentCosForm">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.cos_tencent_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -180,7 +180,7 @@
           <a-input v-model="options.cos_tencent_bucket_name" placeholder="存储桶名称" />
         </a-form-model-item>
         <a-form-model-item label="区域：">
-          <a-auto-complete :dataSource="tencentCosRegions" v-model="options.cos_tencent_region" allowClear />
+          <a-auto-complete v-model="options.cos_tencent_region" :dataSource="tencentCosRegions" allowClear />
         </a-form-model-item>
         <a-form-model-item label="Secret Id：">
           <a-input-password v-model="options.cos_tencent_secret_id" autocomplete="new-password" />
@@ -201,7 +201,7 @@
           />
         </a-form-model-item>
       </div>
-      <div id="huaweiObsForm" v-show="options.attachment_type === 'HUAWEIOBS'">
+      <div v-show="options.attachment_type === 'HUAWEIOBS'" id="huaweiObsForm">
         <a-form-model-item label="绑定域名协议：">
           <a-select v-model="options.obs_huawei_domain_protocol">
             <a-select-option value="https://">HTTPS</a-select-option>
@@ -236,7 +236,7 @@
           />
         </a-form-model-item>
       </div>
-      <div id="minioForm" v-show="options.attachment_type === 'MINIO'">
+      <div v-show="options.attachment_type === 'MINIO'" id="minioForm">
         <a-form-model-item label="EndPoint（终端节点）：">
           <a-input v-model="options.minio_endpoint" placeholder="Endpoint" />
         </a-form-model-item>
@@ -258,14 +258,14 @@
       </div>
       <a-form-model-item>
         <ReactiveButton
-          type="primary"
-          @click="handleSaveOptions"
-          @callback="$emit('callback')"
-          :loading="saving"
           :errored="errored"
-          text="保存"
-          loadedText="保存成功"
+          :loading="saving"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存"
+          type="primary"
+          @callback="$emit('callback')"
+          @click="handleSaveOptions"
         ></ReactiveButton>
       </a-form-model-item>
     </a-form-model>
@@ -273,6 +273,7 @@
 </template>
 <script>
 import attachmentApi from '@/api/attachment'
+
 const tencentCosRegions = [
   {
     text: '北京一区',

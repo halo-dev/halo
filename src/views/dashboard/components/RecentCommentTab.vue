@@ -4,12 +4,12 @@
       <a-comment :avatar="item.avatar">
         <template slot="author" v-if="type === 'posts'">
           <a :href="item.authorUrl" target="_blank">{{ item.author }}</a> 发表在 《<a
-            v-if="item.post.status == 'PUBLISHED' || item.post.status == 'INTIMATE'"
+            v-if="['PUBLISHED', 'INTIMATE'].includes(item.post.status)"
             :href="item.post.fullPath"
             target="_blank"
             >{{ item.post.title }}</a
           ><a
-            v-else-if="item.post.status == 'DRAFT'"
+            v-else-if="item.post.status === 'DRAFT'"
             href="javascript:void(0)"
             @click="handlePostPreview(item.post.id)"
             >{{ item.post.title }}</a
@@ -18,12 +18,12 @@
         </template>
         <template slot="author" v-else-if="type === 'sheets'">
           <a :href="item.authorUrl" target="_blank">{{ item.author }}</a> 发表在 《<a
-            v-if="item.sheet.status == 'PUBLISHED'"
+            v-if="item.sheet.status === 'PUBLISHED'"
             :href="item.sheet.fullPath"
             target="_blank"
             >{{ item.sheet.title }}</a
           ><a
-            v-else-if="item.sheet.status == 'DRAFT'"
+            v-else-if="item.sheet.status === 'DRAFT'"
             href="javascript:void(0)"
             @click="handleSheetPreview(item.sheet.id)"
             >{{ item.sheet.title }}</a

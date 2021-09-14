@@ -166,11 +166,11 @@ export default {
     }
   },
   created() {
-    this.hanldeListOptions()
+    this.handleListOptions()
   },
   methods: {
     ...mapActions(['refreshUserCache', 'refreshOptionsCache']),
-    hanldeListOptions() {
+    handleListOptions() {
       optionApi.listAll().then(response => {
         this.options = response.data.data
       })
@@ -189,7 +189,7 @@ export default {
           setTimeout(() => {
             this.saving = false
           }, 400)
-          this.hanldeListOptions()
+          this.handleListOptions()
           this.refreshOptionsCache()
           this.refreshUserCache()
         })

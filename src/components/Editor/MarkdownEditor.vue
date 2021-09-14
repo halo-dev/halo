@@ -45,11 +45,11 @@ export default {
   },
   methods: {
     handleAttachmentUpload(pos, $file) {
-      var formdata = new FormData()
+      const formdata = new FormData()
       formdata.append('file', $file)
       attachmentApi.upload(formdata).then(response => {
-        var responseObject = response.data
-        var HaloEditor = this.$refs.md
+        const responseObject = response.data
+        const HaloEditor = this.$refs.md
         HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
       })
     },

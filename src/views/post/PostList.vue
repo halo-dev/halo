@@ -50,7 +50,7 @@
         <router-link :to="{ name: 'PostWrite' }">
           <a-button type="primary" icon="plus">写文章</a-button>
         </router-link>
-        <a-dropdown v-show="queryParam.status != null && queryParam.status != '' && !isMobile()">
+        <a-dropdown v-show="queryParam.status != null && queryParam.status !== '' && !isMobile()">
           <a-menu slot="overlay">
             <a-menu-item key="1" v-if="queryParam.status === 'DRAFT' || queryParam.status === 'RECYCLE'">
               <a href="javascript:void(0);" @click="handleEditStatusMore(postStatus.PUBLISHED.value)">
@@ -117,7 +117,7 @@
                   <a-menu-item
                     v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT' || item.status === 'INTIMATE'"
                   >
-                    <a href="javascript:;" @click="handleEditClick(item)">编辑</a>
+                    <a href="javascript:void(0);" @click="handleEditClick(item)">编辑</a>
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
                     <a-popconfirm
@@ -126,7 +126,7 @@
                       okText="确定"
                       cancelText="取消"
                     >
-                      <a href="javascript:;">还原</a>
+                      <a href="javascript:void(0);">还原</a>
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item
@@ -138,7 +138,7 @@
                       okText="确定"
                       cancelText="取消"
                     >
-                      <a href="javascript:;">回收站</a>
+                      <a href="javascript:void(0);">回收站</a>
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
@@ -148,7 +148,7 @@
                       okText="确定"
                       cancelText="取消"
                     >
-                      <a href="javascript:;">删除</a>
+                      <a href="javascript:void(0);">删除</a>
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item>
@@ -174,13 +174,13 @@
               >
                 <a-icon
                   type="pushpin"
-                  v-if="item.topPriority != 0"
+                  v-if="item.topPriority !== 0"
                   theme="twoTone"
                   twoToneColor="red"
                   style="margin-right: 3px;"
                 />
                 <a
-                  v-if="item.status == 'PUBLISHED' || item.status == 'INTIMATE'"
+                  v-if="['PUBLISHED', 'INTIMATE'].includes(item.status)"
                   :href="item.fullPath"
                   target="_blank"
                   class="no-underline"
@@ -188,7 +188,7 @@
                   <a-tooltip placement="top" :title="'点击访问【' + item.title + '】'">{{ item.title }}</a-tooltip>
                 </a>
                 <a
-                  v-else-if="item.status == 'DRAFT'"
+                  v-else-if="item.status === 'DRAFT'"
                   href="javascript:void(0)"
                   class="no-underline"
                   @click="handlePreview(item.id)"
@@ -240,13 +240,13 @@
           <span slot="postTitle" slot-scope="text, record">
             <a-icon
               type="pushpin"
-              v-if="record.topPriority != 0"
+              v-if="record.topPriority !== 0"
               theme="twoTone"
               twoToneColor="red"
               style="margin-right: 3px;"
             />
             <a
-              v-if="record.status == 'PUBLISHED' || record.status == 'INTIMATE'"
+              v-if="['PUBLISHED', 'INTIMATE'].includes(record.status)"
               :href="record.fullPath"
               target="_blank"
               class="no-underline"
@@ -254,7 +254,7 @@
               <a-tooltip placement="top" :title="'点击访问【' + text + '】'">{{ text }}</a-tooltip>
             </a>
             <a
-              v-else-if="record.status == 'DRAFT'"
+              v-else-if="record.status === 'DRAFT'"
               href="javascript:void(0)"
               class="no-underline"
               @click="handlePreview(record.id)"
@@ -320,7 +320,7 @@
 
           <span slot="action" slot-scope="text, post">
             <a
-              href="javascript:;"
+              href="javascript:void(0);"
               @click="handleEditClick(post)"
               v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT' || post.status === 'INTIMATE'"
               >编辑</a
@@ -332,7 +332,7 @@
               cancelText="取消"
               v-else-if="post.status === 'RECYCLE'"
             >
-              <a href="javascript:;">还原</a>
+              <a href="javascript:void(0);">还原</a>
             </a-popconfirm>
 
             <a-divider type="vertical" />
@@ -344,7 +344,7 @@
               cancelText="取消"
               v-if="post.status === 'PUBLISHED' || post.status === 'DRAFT' || post.status === 'INTIMATE'"
             >
-              <a href="javascript:;">回收站</a>
+              <a href="javascript:void(0);">回收站</a>
             </a-popconfirm>
 
             <a-popconfirm
@@ -354,12 +354,12 @@
               cancelText="取消"
               v-else-if="post.status === 'RECYCLE'"
             >
-              <a href="javascript:;">删除</a>
+              <a href="javascript:void(0);">删除</a>
             </a-popconfirm>
 
             <a-divider type="vertical" />
 
-            <a href="javascript:;" @click="handleShowPostSettings(post)">设置</a>
+            <a href="javascript:void(0);" @click="handleShowPostSettings(post)">设置</a>
           </span>
         </a-table>
         <div class="page-wrapper">

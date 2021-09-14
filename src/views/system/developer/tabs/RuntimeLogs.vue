@@ -70,9 +70,9 @@ export default {
       adminApi
         .getLogFiles(this.logLines)
         .then(response => {
-          var blob = new Blob([response.data.data])
-          var downloadElement = document.createElement('a')
-          var href = window.URL.createObjectURL(blob)
+          const blob = new Blob([response.data.data])
+          const downloadElement = document.createElement('a')
+          const href = window.URL.createObjectURL(blob)
           downloadElement.href = href
           downloadElement.download = 'halo-log-' + datetimeFormat(new Date(), 'YYYY-MM-DD-HH-mm-ss') + '.log'
           document.body.appendChild(downloadElement)

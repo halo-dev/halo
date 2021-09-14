@@ -9,20 +9,6 @@ export function isObject(value) {
   return value && typeof value === 'object' && value.constructor === Object
 }
 
-/**
- * decode html tag
- * @param {*} html
- * @returns
- * @deprecated
- */
-export function decodeHTML(html) {
-  let elem = document.createElement('div')
-  elem.innerHTML = html
-  const output = elem.innerText || elem.textContent
-  elem = null
-  return output
-}
-
 export function deepClone(source) {
   if (!source && typeof source !== 'object') {
     throw new Error('error arguments', 'deepClone')

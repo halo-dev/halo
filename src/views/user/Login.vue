@@ -85,7 +85,7 @@ export default {
     async handleVerifyIsInstall() {
       const response = await adminApi.isInstalled()
       if (!response.data.data) {
-        this.$router.push({ name: 'Install' })
+        await this.$router.push({ name: 'Install' })
       }
     },
     onLoginSucceed() {

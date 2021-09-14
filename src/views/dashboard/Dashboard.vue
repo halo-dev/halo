@@ -50,20 +50,20 @@
                   <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
                     <a-list-item-meta>
                       <a
-                        v-if="item.status == 'PUBLISHED' || item.status == 'INTIMATE'"
+                        v-if="['PUBLISHED', 'INTIMATE'].includes(item.status)"
                         slot="title"
                         :href="item.fullPath"
                         target="_blank"
                         >{{ item.title }}</a
                       >
                       <a
-                        v-else-if="item.status == 'DRAFT'"
+                        v-else-if="item.status === 'DRAFT'"
                         slot="title"
                         href="javascript:void(0)"
                         @click="handlePostPreview(item.id)"
                         >{{ item.title }}</a
                       >
-                      <a v-else-if="item.status == 'RECYCLE'" slot="title" href="javascript:void(0);" disabled>
+                      <a v-else-if="item.status === 'RECYCLE'" slot="title" href="javascript:void(0);" disabled>
                         {{ item.title }}
                       </a>
                     </a-list-item-meta>

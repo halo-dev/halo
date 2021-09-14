@@ -24,7 +24,7 @@
       <a-divider />
       <a-col :span="24">
         <a-spin :spinning="list.loading">
-          <a-empty v-if="list.data.length == 0" />
+          <a-empty v-if="list.data.length === 0" />
           <TargetCommentTree
             v-else
             v-for="(comment, index) in list.data"

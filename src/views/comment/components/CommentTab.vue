@@ -32,7 +32,7 @@
       </div>
 
       <div class="table-operator">
-        <a-dropdown v-show="queryParam.status != null && queryParam.status != '' && !isMobile()">
+        <a-dropdown v-show="queryParam.status != null && queryParam.status !== '' && !isMobile()">
           <a-menu slot="overlay">
             <a-menu-item key="1" v-if="queryParam.status === 'AUDITING'">
               <a href="javascript:void(0);" @click="handleEditStatusMore(commentStatus.PUBLISHED.value)">
@@ -74,13 +74,13 @@
                 </span>
                 <a-menu slot="overlay">
                   <a-menu-item v-if="item.status === 'AUDITING'">
-                    <a href="javascript:;" @click="handleEditStatusClick(item.id, 'PUBLISHED')">通过</a>
+                    <a href="javascript:void(0);" @click="handleEditStatusClick(item.id, 'PUBLISHED')">通过</a>
                   </a-menu-item>
                   <a-menu-item v-if="item.status === 'AUDITING'">
-                    <a href="javascript:;" @click="handleReplyAndPassClick(item)">通过并回复</a>
+                    <a href="javascript:void(0);" @click="handleReplyAndPassClick(item)">通过并回复</a>
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'PUBLISHED'">
-                    <a href="javascript:;" @click="handleReplyClick(item)">回复</a>
+                    <a href="javascript:void(0);" @click="handleReplyClick(item)">回复</a>
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
                     <a-popconfirm
@@ -89,7 +89,7 @@
                       okText="确定"
                       cancelText="取消"
                     >
-                      <a href="javascript:;">还原</a>
+                      <a href="javascript:void(0);">还原</a>
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'AUDITING'">
@@ -99,7 +99,7 @@
                       okText="确定"
                       cancelText="取消"
                     >
-                      <a href="javascript:;">回收站</a>
+                      <a href="javascript:void(0);">回收站</a>
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
@@ -109,7 +109,7 @@
                       okText="确定"
                       cancelText="取消"
                     >
-                      <a href="javascript:;">删除</a>
+                      <a href="javascript:void(0);">删除</a>
                     </a-popconfirm>
                   </a-menu-item>
                 </a-menu>
@@ -212,7 +212,7 @@
               cancelText="取消"
               v-else-if="record.status === 'RECYCLE'"
             >
-              <a href="javascript:;">还原</a>
+              <a href="javascript:void(0);">还原</a>
             </a-popconfirm>
 
             <a-divider type="vertical" />
@@ -224,7 +224,7 @@
               cancelText="取消"
               v-if="record.status === 'PUBLISHED' || record.status === 'AUDITING'"
             >
-              <a href="javascript:;">回收站</a>
+              <a href="javascript:void(0);">回收站</a>
             </a-popconfirm>
 
             <a-popconfirm
@@ -234,7 +234,7 @@
               cancelText="取消"
               v-else-if="record.status === 'RECYCLE'"
             >
-              <a href="javascript:;">删除</a>
+              <a href="javascript:void(0);">删除</a>
             </a-popconfirm>
           </span>
         </a-table>

@@ -141,8 +141,8 @@ export default {
       backupApi
         .fetchMarkdown(item.filename)
         .then(response => {
-          var downloadElement = document.createElement('a')
-          var href = new window.URL(response.data.data.downloadLink)
+          const downloadElement = document.createElement('a')
+          const href = new window.URL(response.data.data.downloadLink)
           downloadElement.href = href
           downloadElement.download = response.data.data.filename
           document.body.appendChild(downloadElement)

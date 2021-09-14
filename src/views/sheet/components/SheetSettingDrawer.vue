@@ -245,7 +245,7 @@ export default {
     },
     pickerDefaultValue() {
       if (this.selectedSheet.createTime) {
-        var date = new Date(this.selectedSheet.createTime)
+        const date = new Date(this.selectedSheet.createTime)
         return datetimeFormat(date, 'YYYY-MM-DD HH:mm:ss')
       }
       return datetimeFormat(new Date(), 'YYYY-MM-DD HH:mm:ss')
@@ -385,7 +385,7 @@ export default {
       this.selectedSheet.createTime = value.valueOf()
     },
     handleRemoveSheetMeta(item) {
-      var index = this.selectedMetas.indexOf(item)
+      const index = this.selectedMetas.indexOf(item)
       if (index !== -1) {
         this.selectedMetas.splice(index, 1)
       }

@@ -423,7 +423,6 @@ export default {
       this.attachmentDrawer.visible = false
     },
     handleMFASwitch(useMFAuth) {
-      // loding
       this.mfaParam.switch.loading = true
       if (!useMFAuth && this.mfaUsed) {
         // true -> false
@@ -444,7 +443,7 @@ export default {
     },
     handleSetMFAuth() {
       const _this = this
-      var mfaType = _this.mfaUsed ? 'NONE' : 'TFA_TOTP'
+      const mfaType = _this.mfaUsed ? 'NONE' : 'TFA_TOTP'
       _this.$refs.mfaForm.validate(valid => {
         if (valid) {
           _this.mfaParam.saving = true

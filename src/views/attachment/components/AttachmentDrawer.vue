@@ -16,7 +16,7 @@
       <a-row type="flex" align="middle">
         <a-col :span="24">
           <a-spin :spinning="loading">
-            <a-empty v-if="formattedDatas.length == 0" />
+            <a-empty v-if="formattedDatas.length === 0" />
             <div
               v-else
               class="attach-item"
@@ -196,18 +196,12 @@ export default {
       }
     },
     handleJudgeMediaType(attachment) {
-      var mediaType = attachment.mediaType
+      const mediaType = attachment.mediaType
       // 判断文件类型
       if (mediaType) {
-        var prefix = mediaType.split('/')[0]
+        const prefix = mediaType.split('/')[0]
 
-        if (prefix === 'image') {
-          // 是图片
-          return true
-        } else {
-          // 非图片
-          return false
-        }
+        return prefix === 'image'
       }
       // 没有获取到文件返回false
       return false

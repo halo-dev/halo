@@ -249,11 +249,7 @@ export default {
     },
     handleShowDetailDrawer(attachment) {
       this.selectAttachment = attachment
-      if (this.supportMultipleSelection) {
-        this.drawerVisible = false
-      } else {
-        this.drawerVisible = true
-      }
+      this.drawerVisible = !this.supportMultipleSelection
     },
     handleContextMenu(event, item) {
       this.$contextmenu({
@@ -320,18 +316,12 @@ export default {
       this.handleListTypes()
     },
     handleJudgeMediaType(attachment) {
-      var mediaType = attachment.mediaType
+      const mediaType = attachment.mediaType
       // 判断文件类型
       if (mediaType) {
-        var prefix = mediaType.split('/')[0]
+        const prefix = mediaType.split('/')[0]
 
-        if (prefix === 'image') {
-          // 是图片
-          return true
-        } else {
-          // 非图片
-          return false
-        }
+        return prefix === 'image'
       }
       // 没有获取到文件返回false
       return false
@@ -351,24 +341,24 @@ export default {
       this.supportMultipleSelection = false
       this.drawerVisible = false
       this.batchSelectedAttachments = []
-      for (var key in this.selectedCheckbox) {
+      for (const key in this.selectedCheckbox) {
         this.$set(this.selectedAttachmentCheckbox, key, false)
       }
     },
     handleAttachmentSelectionChanged(e, item) {
-      var isChecked = e.target.checked || false
+      const isChecked = e.target.checked || false
       if (isChecked) {
         this.$set(this.selectedAttachmentCheckbox, item.id, true)
         this.batchSelectedAttachments.push(item.id)
       } else {
         this.$set(this.selectedAttachmentCheckbox, item.id, false)
         // 从选中id集合中删除id
-        var index = this.batchSelectedAttachments.indexOf(item.id)
+        const index = this.batchSelectedAttachments.indexOf(item.id)
         this.batchSelectedAttachments.splice(index, 1)
       }
     },
     handleDeleteAttachmentInBatch() {
-      var that = this
+      const that = this
       if (this.batchSelectedAttachments.length <= 0) {
         this.$message.warn('你还未选择任何附件，请至少选择一个！')
         return

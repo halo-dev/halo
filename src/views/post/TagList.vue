@@ -58,7 +58,7 @@
       <a-col :xl="14" :lg="14" :md="14" :sm="24" :xs="24" class="pb-3">
         <a-card title="所有标签" :bodyStyle="{ padding: '16px' }">
           <a-spin :spinning="list.loading">
-            <a-empty v-if="list.data.length == 0" />
+            <a-empty v-if="list.data.length === 0" />
             <a-tooltip placement="topLeft" v-for="tag in list.data" :key="tag.id" v-else>
               <template slot="title">
                 <span>{{ tag.postCount }} 篇文章</span>

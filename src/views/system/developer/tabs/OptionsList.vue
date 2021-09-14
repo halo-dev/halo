@@ -37,7 +37,7 @@
         <a-table
           :rowKey="option => option.id"
           :columns="columns"
-          :dataSource="formattedDatas"
+          :dataSource="formattedData"
           :loading="loading"
           :pagination="false"
           :scrollToFirstRowOnChange="true"
@@ -70,7 +70,7 @@
               cancelText="取消"
               @confirm="handleDeleteOption(record.id)"
             >
-              <a href="javascript:;">删除</a>
+              <a href="javascript:void(0);">删除</a>
             </a-popconfirm>
           </span>
         </a-table>
@@ -194,7 +194,7 @@ export default {
     }
   },
   computed: {
-    formattedDatas() {
+    formattedData() {
       return this.options.map(option => {
         option.typeProperty = this.optionType[option.type]
         return option

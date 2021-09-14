@@ -37,7 +37,7 @@ import FilePondPluginImagePreview from 'filepond-plugin-image-preview'
 import 'filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css'
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type'
 
-// Create component and regist plugins
+// Create component and register plugins
 const FilePond = vueFilePond(FilePondPluginImagePreview, FilePondPluginFileValidateType)
 export default {
   name: 'FilePondUpload',

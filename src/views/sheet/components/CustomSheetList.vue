@@ -25,7 +25,7 @@
             </span>
             <a-menu slot="overlay">
               <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
-                <a href="javascript:;" @click="handleEditClick(item)">编辑</a>
+                <a href="javascript:void(0);" @click="handleEditClick(item)">编辑</a>
               </a-menu-item>
               <a-menu-item v-else-if="item.status === 'RECYCLE'">
                 <a-popconfirm
@@ -34,7 +34,7 @@
                   okText="确定"
                   cancelText="取消"
                 >
-                  <a href="javascript:;">还原</a>
+                  <a href="javascript:void(0);">还原</a>
                 </a-popconfirm>
               </a-menu-item>
               <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
@@ -44,7 +44,7 @@
                   okText="确定"
                   cancelText="取消"
                 >
-                  <a href="javascript:;">回收站</a>
+                  <a href="javascript:void(0);">回收站</a>
                 </a-popconfirm>
               </a-menu-item>
               <a-menu-item v-else-if="item.status === 'RECYCLE'">
@@ -54,7 +54,7 @@
                   okText="确定"
                   cancelText="取消"
                 >
-                  <a href="javascript:;">删除</a>
+                  <a href="javascript:void(0);">删除</a>
                 </a-popconfirm>
               </a-menu-item>
               <a-menu-item>
@@ -76,11 +76,11 @@
             slot="title"
             style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
-            <a v-if="item.status == 'PUBLISHED'" :href="item.fullPath" target="_blank" class="no-underline">
+            <a v-if="item.status === 'PUBLISHED'" :href="item.fullPath" target="_blank" class="no-underline">
               <a-tooltip placement="top" :title="'点击访问【' + item.title + '】'">{{ item.title }}</a-tooltip>
             </a>
             <a
-              v-else-if="item.status == 'DRAFT'"
+              v-else-if="item.status === 'DRAFT'"
               href="javascript:void(0)"
               class="no-underline"
               @click="handlePreview(item.id)"
@@ -107,11 +107,11 @@
       :scrollToFirstRowOnChange="true"
     >
       <span slot="sheetTitle" slot-scope="text, record">
-        <a v-if="record.status == 'PUBLISHED'" :href="record.fullPath" target="_blank" class="no-underline">
+        <a v-if="record.status === 'PUBLISHED'" :href="record.fullPath" target="_blank" class="no-underline">
           <a-tooltip placement="top" :title="'点击访问【' + text + '】'">{{ text }}</a-tooltip>
         </a>
         <a
-          v-else-if="record.status == 'DRAFT'"
+          v-else-if="record.status === 'DRAFT'"
           href="javascript:void(0)"
           class="no-underline"
           @click="handlePreview(record.id)"
@@ -156,7 +156,7 @@
 
       <span slot="action" slot-scope="text, sheet">
         <a
-          href="javascript:;"
+          href="javascript:void(0);"
           @click="handleEditClick(sheet)"
           v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
           >编辑</a
@@ -169,7 +169,7 @@
           cancelText="取消"
           v-else-if="sheet.status === 'RECYCLE'"
         >
-          <a href="javascript:;">还原</a>
+          <a href="javascript:void(0);">还原</a>
         </a-popconfirm>
 
         <a-divider type="vertical" />
@@ -181,7 +181,7 @@
           cancelText="取消"
           v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
         >
-          <a href="javascript:;">回收站</a>
+          <a href="javascript:void(0);">回收站</a>
         </a-popconfirm>
 
         <a-popconfirm
@@ -191,7 +191,7 @@
           cancelText="取消"
           v-else-if="sheet.status === 'RECYCLE'"
         >
-          <a href="javascript:;">删除</a>
+          <a href="javascript:void(0);">删除</a>
         </a-popconfirm>
         <a-divider type="vertical" />
         <a href="javascript:void(0);" @click="handleShowSheetSettings(sheet)">设置</a>

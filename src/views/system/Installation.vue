@@ -3,7 +3,7 @@
     <a-row type="flex" justify="center" align="middle" class="h-screen">
       <a-col :xxl="8" :xl="12" :lg="16" :md="20" :sm="20" :xs="23">
         <div class="card-container animated fadeIn">
-          <a-card :bordered="false" style="box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;">
+          <a-card :bordered="false" style="box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;">
             <div class="halo-logo">
               <span
                 >Halo
@@ -195,7 +195,7 @@ export default {
     async handleVerifyIsInstall() {
       const response = await adminApi.isInstalled()
       if (response.data.data) {
-        this.$router.push({ name: 'Login' })
+        await this.$router.push({ name: 'Login' })
       }
     },
     handleInstall() {
@@ -242,7 +242,7 @@ export default {
       migrateApi
         .migrate(this.form.importData)
         .then(() => {
-          this.$log.debug('Migrated successfullly')
+          this.$log.debug('Migrated successfully')
         })
         .catch(() => {
           this.form.importErrored = true

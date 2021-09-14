@@ -86,7 +86,7 @@
                         okText="确定"
                         cancelText="取消"
                       >
-                        <a href="javascript:;">删除</a>
+                        <a href="javascript:void(0);">删除</a>
                       </a-popconfirm>
                     </a-menu-item>
                   </a-menu>
@@ -133,7 +133,7 @@
                 okText="确定"
                 cancelText="取消"
               >
-                <a href="javascript:;">删除</a>
+                <a href="javascript:void(0);">删除</a>
               </a-popconfirm>
             </span>
           </a-table>

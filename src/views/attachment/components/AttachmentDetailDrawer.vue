@@ -260,18 +260,18 @@ export default {
       this.$emit('close', false)
     },
     handleJudgeMediaType(attachment) {
-      var mediaType = attachment.mediaType
+      const mediaType = attachment.mediaType
       // 判断文件类型
       if (mediaType) {
-        var prefix = mediaType.split('/')[0]
+        const prefix = mediaType.split('/')[0]
 
         if (prefix === 'video' || prefix === 'flv') {
           // 控制各个组件的显示
           this.handlePreviewVisible(false, true, false)
 
           // 去除视频地址后面的参数
-          var lastIndex = attachment.path.lastIndexOf('?')
-          var path = attachment.path.substring(0, lastIndex)
+          const lastIndex = attachment.path.lastIndexOf('?')
+          const path = attachment.path.substring(0, lastIndex)
 
           // 设置视频地址
           this.$set(this.videoOptions.video, 'url', path)

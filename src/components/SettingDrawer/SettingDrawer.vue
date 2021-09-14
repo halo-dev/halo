@@ -73,7 +73,7 @@
                   @change="handleContentWidthChange"
                 >
                   <a-select-option value="Fixed">固定</a-select-option>
-                  <a-select-option value="Fluid" v-if="layoutMode != 'sidemenu'">流式</a-select-option>
+                  <a-select-option value="Fluid" v-if="layoutMode !== 'sidemenu'">流式</a-select-option>
                 </a-select>
               </a-tooltip>
               <a-list-item-meta>
@@ -230,8 +230,8 @@ export default {
     float: left;
     cursor: pointer;
     margin-right: 8px;
-    padding-left: 0px;
-    padding-right: 0px;
+    padding-left: 0;
+    padding-right: 0;
     text-align: center;
     color: #fff;
     font-weight: 700;
