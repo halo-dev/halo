@@ -770,6 +770,6 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         final String gravatarDefault =
             optionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_DEFAULT, String.class);
 
-        return gravatarSource + gravatarMd5 + "?d=" + gravatarDefault;
+        return gravatarSource + gravatarMd5 + "?s=256&d=" + gravatarDefault;
     }
 }
