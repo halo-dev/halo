@@ -9,42 +9,43 @@
     >
       <a-form-model-item
         v-if="!form.needAuthCode"
-        class="animated fadeInUp"
         :style="{ 'animation-delay': '0.1s' }"
+        class="animated fadeInUp"
         prop="username"
       >
-        <a-input placeholder="用户名/邮箱" v-model="form.model.username">
-          <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
+        <a-input v-model="form.model.username" placeholder="用户名/邮箱">
+          <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="user" />
         </a-input>
       </a-form-model-item>
       <a-form-model-item
         v-if="!form.needAuthCode"
-        class="animated fadeInUp"
         :style="{ 'animation-delay': '0.2s' }"
+        class="animated fadeInUp"
         prop="password"
       >
-        <a-input v-model="form.model.password" type="password" placeholder="密码">
-          <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
+        <a-input v-model="form.model.password" placeholder="密码" type="password">
+          <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="lock" />
         </a-input>
       </a-form-model-item>
       <a-form-model-item
         v-if="form.needAuthCode"
-        class="animated fadeInUp"
         :style="{ 'animation-delay': '0.1s' }"
+        class="animated fadeInUp"
         prop="authcode"
       >
-        <a-input placeholder="两步验证码" v-model="form.model.authcode" :maxLength="6">
-          <a-icon slot="prefix" type="safety-certificate" style="color: rgba(0,0,0,.25)" />
+        <a-input v-model="form.model.authcode" :maxLength="6" placeholder="两步验证码">
+          <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="safety-certificate" />
         </a-input>
       </a-form-model-item>
-      <a-form-model-item class="animated fadeInUp" :style="{ 'animation-delay': '0.3s' }">
+      <a-form-model-item :style="{ 'animation-delay': '0.3s' }" class="animated fadeInUp">
         <a-button
+          :block="true"
           :loading="form.logging"
           type="primary"
-          :block="true"
           @click="form.needAuthCode ? handleLogin() : handleLoginClick()"
-          >{{ buttonName }}</a-button
         >
+          {{ buttonName }}
+        </a-button>
       </a-form-model-item>
     </a-form-model>
   </div>
@@ -52,6 +53,7 @@
 <script>
 import adminApi from '@/api/admin'
 import { mapActions } from 'vuex'
+
 export default {
   name: 'LoginForm',
   data() {
