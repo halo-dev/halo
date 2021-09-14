@@ -96,9 +96,9 @@ public class CategoryModel {
             return "common/template/" + POST_PASSWORD_TEMPLATE;
         }
 
-        Set<PostStatus> status = Sets.immutableEnumSet(PostStatus.PUBLISHED);
+        Set<PostStatus> statuses = Sets.immutableEnumSet(PostStatus.PUBLISHED);
         if (StringUtils.isNotBlank(category.getPassword())) {
-            status = Sets.immutableEnumSet(PostStatus.INTIMATE);
+            statuses = Sets.immutableEnumSet(PostStatus.INTIMATE);
         }
 
         CategoryDTO categoryDTO = categoryService.convertTo(category);
@@ -107,7 +107,7 @@ public class CategoryModel {
             optionService.getArchivesPageSize(),
             Sort.by(DESC, "topPriority", "createTime"));
         Page<Post> postPage =
-            postCategoryService.pagePostBy(category.getId(), status, pageable);
+            postCategoryService.pagePostBy(category.getId(), statuses, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         // Generate meta description.
