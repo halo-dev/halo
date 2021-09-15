@@ -98,10 +98,6 @@ public class ThemeRepositoryImpl
 
     @Override
     public Optional<ThemeProperty> fetchThemePropertyByThemeId(String themeId) {
-        if (StringUtils.equals(themeId, getActivatedThemeId())) {
-            return Optional.of(getActivatedThemeProperty());
-        }
-
         return ThemePropertyScanner.INSTANCE.scan(getThemeRootPath(), null)
             .stream()
             .filter(property -> Objects.equals(themeId, property.getId()))

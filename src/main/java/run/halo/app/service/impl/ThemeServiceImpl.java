@@ -27,11 +27,13 @@ import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
+import run.halo.app.exception.ThemeNotFoundException;
 import run.halo.app.exception.ThemeNotSupportException;
 import run.halo.app.exception.ThemePropertyMissingException;
 import run.halo.app.exception.ThemeUpdateException;
 import run.halo.app.handler.theme.config.ThemeConfigResolver;
 import run.halo.app.handler.theme.config.support.Group;
+import run.halo.app.handler.theme.config.support.Option;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.ThemeFile;
@@ -131,7 +133,7 @@ public class ThemeServiceImpl implements ThemeService {
             Path themePath = Paths.get(themeProperty.getThemePath());
             try (Stream<Path> pathStream = Files.list(themePath)) {
                 return pathStream.filter(path ->
-                    StringUtils.startsWithIgnoreCase(path.getFileName().toString(), prefix))
+                        StringUtils.startsWithIgnoreCase(path.getFileName().toString(), prefix))
                     .map(path -> {
                         // Remove prefix
                         final var customTemplate = StringUtils
@@ -315,13 +317,17 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     @NonNull
     public ThemeProperty getActivatedTheme() {
-        return fetchActivatedTheme().orElseThrow();
+        return themeRepository.getActivatedThemeProperty();
     }
 
     @Override
     @NonNull
     public Optional<ThemeProperty> fetchActivatedTheme() {
-        return Optional.of(themeRepository.getActivatedThemeProperty());
+        try {
+            return Optional.of(themeRepository.getActivatedThemeProperty());
+        } catch (ThemeNotFoundException tne) {
+            return Optional.empty();
+        }
     }
 
     @Override
