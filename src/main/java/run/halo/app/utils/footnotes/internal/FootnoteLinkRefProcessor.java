@@ -6,7 +6,7 @@ import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import run.halo.app.utils.footnotes.Footnote;
 import run.halo.app.utils.footnotes.FootnoteBlock;
 import run.halo.app.utils.footnotes.FootnoteExtension;
@@ -33,14 +33,14 @@ public class FootnoteLinkRefProcessor implements LinkRefProcessor {
     }
 
     @Override
-    public boolean isMatch(@NotNull BasedSequence nodeChars) {
+    public boolean isMatch(@NonNull BasedSequence nodeChars) {
         return nodeChars.length() >= 3 && nodeChars.charAt(0) == '[' && nodeChars.charAt(1) == '^'
             && nodeChars.endCharAt(1) == ']';
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public Node createNode(@NotNull BasedSequence nodeChars) {
+    public Node createNode(@NonNull BasedSequence nodeChars) {
         BasedSequence footnoteId = nodeChars.midSequence(2, -1).trim();
         FootnoteBlock footnoteBlock =
             footnoteId.length() > 0 ? footnoteRepository.get(footnoteId.toString()) : null;
@@ -55,39 +55,39 @@ public class FootnoteLinkRefProcessor implements LinkRefProcessor {
         return footnote;
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public BasedSequence adjustInlineText(@NotNull Document document, @NotNull Node node) {
+    public BasedSequence adjustInlineText(@NonNull Document document, @NonNull Node node) {
         assert node instanceof Footnote;
         return ((Footnote) node).getText();
     }
 
     @Override
-    public boolean allowDelimiters(@NotNull BasedSequence chars, @NotNull Document document,
-        @NotNull Node node) {
+    public boolean allowDelimiters(@NonNull BasedSequence chars, @NonNull Document document,
+        @NonNull Node node) {
         return true;
     }
 
     @Override
-    public void updateNodeElements(@NotNull Document document, @NotNull Node node) {
+    public void updateNodeElements(@NonNull Document document, @NonNull Node node) {
 
     }
 
     public static class Factory implements LinkRefProcessorFactory {
 
-        @NotNull
+        @NonNull
         @Override
-        public LinkRefProcessor apply(@NotNull Document document) {
+        public LinkRefProcessor apply(@NonNull Document document) {
             return new FootnoteLinkRefProcessor(document);
         }
 
         @Override
-        public boolean getWantExclamationPrefix(@NotNull DataHolder options) {
+        public boolean getWantExclamationPrefix(@NonNull DataHolder options) {
             return WANT_EXCLAMATION_PREFIX;
         }
 
         @Override
-        public int getBracketNestingLevel(@NotNull DataHolder options) {
+        public int getBracketNestingLevel(@NonNull DataHolder options) {
             return BRACKET_NESTING_LEVEL;
         }
     }

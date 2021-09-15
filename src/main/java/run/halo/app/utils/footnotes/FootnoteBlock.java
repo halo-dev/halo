@@ -10,8 +10,8 @@ import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
 import com.vladsch.flexmark.util.sequence.SequenceUtils;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import run.halo.app.utils.footnotes.internal.FootnoteRepository;
 
 /**
@@ -43,7 +43,7 @@ public class FootnoteBlock extends Block
 
     @Nullable
     @Override
-    public Footnote getReferencingNode(@NotNull Node node) {
+    public Footnote getReferencingNode(@NonNull Node node) {
         return node instanceof Footnote ? (Footnote) node : null;
     }
 
@@ -74,7 +74,7 @@ public class FootnoteBlock extends Block
     }
 
     @Override
-    public void getAstExtra(@NotNull StringBuilder out) {
+    public void getAstExtra(@NonNull StringBuilder out) {
         out.append(" ordinal: ").append(footnoteOrdinal).append(" ");
         segmentSpan(out, openingMarker, "open");
         segmentSpan(out, text, "text");
@@ -82,7 +82,7 @@ public class FootnoteBlock extends Block
         segmentSpan(out, footnote, "footnote");
     }
 
-    @NotNull
+    @NonNull
     @Override
     public BasedSequence[] getSegments() {
         return new BasedSequence[] {openingMarker, text, closingMarker, footnote};

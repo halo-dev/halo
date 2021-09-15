@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import run.halo.app.utils.footnotes.Footnote;
 import run.halo.app.utils.footnotes.FootnoteBlock;
 import run.halo.app.utils.footnotes.FootnoteExtension;
@@ -53,8 +53,8 @@ public class FootnoteNodeRenderer implements PhasedNodeRenderer {
     }
 
     @Override
-    public void renderDocument(@NotNull NodeRendererContext context, @NotNull HtmlWriter html,
-        @NotNull Document document, @NotNull RenderingPhase phase) {
+    public void renderDocument(@NonNull NodeRendererContext context, @NonNull HtmlWriter html,
+        @NonNull Document document, @NonNull RenderingPhase phase) {
         if (phase == RenderingPhase.BODY_TOP) {
             if (recheckUndefinedReferences) {
                 // need to see if have undefined footnotes that were defined after parsing
@@ -171,9 +171,9 @@ public class FootnoteNodeRenderer implements PhasedNodeRenderer {
 
     public static class Factory implements NodeRendererFactory {
 
-        @NotNull
+        @NonNull
         @Override
-        public NodeRenderer apply(@NotNull DataHolder options) {
+        public NodeRenderer apply(@NonNull DataHolder options) {
             return new FootnoteNodeRenderer(options);
         }
     }
