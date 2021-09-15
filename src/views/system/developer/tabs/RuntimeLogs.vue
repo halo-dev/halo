@@ -2,53 +2,47 @@
   <a-form layout="vertical">
     <a-form-item>
       <a-spin :spinning="loading">
-        <codemirror v-model="logContent" :options="codemirrorOptions"></codemirror>
+        <Codemirror ref="editor" v-model="logContent" :extensions="editor.extensions" height="700px" />
       </a-spin>
     </a-form-item>
     <a-form-item>
       <a-space>
-        <a-select defaultValue="200" v-model="logLines" @change="handleLoadLogsLines" style="width: 100px">
+        <a-select v-model="logLines" defaultValue="200" style="width: 100px" @change="handleLoadLogsLines">
           <a-select-option value="200">200 行</a-select-option>
           <a-select-option value="500">500 行</a-select-option>
           <a-select-option value="800">800 行</a-select-option>
           <a-select-option value="1000">1000 行</a-select-option>
         </a-select>
-        <a-button type="primary" @click="handleLoadLogsLines()" :loading="loading">刷新</a-button>
-        <a-button type="dashed" @click="handleDownloadLogFile()" :loading="downloading">下载</a-button>
+        <a-button :loading="loading" type="primary" @click="handleLoadLogsLines()">刷新</a-button>
+        <a-button :loading="downloading" type="dashed" @click="handleDownloadLogFile()">下载</a-button>
       </a-space>
     </a-form-item>
   </a-form>
 </template>
 <script>
-import { codemirror } from 'vue-codemirror-lite'
-import 'codemirror/mode/shell/shell.js'
+import Codemirror from '@/components/Codemirror/Codemirror'
+import { java } from '@codemirror/lang-java'
 import adminApi from '@/api/admin'
 import { datetimeFormat } from '@/utils/datetime'
+
 export default {
   name: 'RuntimeLogs',
   components: {
-    codemirror
+    Codemirror
   },
   data() {
     return {
-      codemirrorOptions: {
-        tabSize: 4,
-        mode: 'shell',
-        lineNumbers: true,
-        line: true
-      },
       logContent: '',
       loading: false,
       logLines: 200,
-      downloading: false
+      downloading: false,
+      editor: {
+        extensions: [java()]
+      }
     }
   },
   beforeMount() {
     this.handleLoadLogsLines()
-  },
-  updated() {
-    // 滚动条定位到底部
-    this.$el.querySelector('.CodeMirror-scroll').scrollTop = this.$el.querySelector('.CodeMirror-scroll').scrollHeight
   },
   methods: {
     handleLoadLogsLines() {
@@ -57,11 +51,14 @@ export default {
         .getLogFiles(this.logLines)
         .then(response => {
           this.logContent = response.data.data
+          this.$nextTick(() => {
+            this.$refs.editor.handleInitCodemirror()
+            const scrollerView = this.$el.querySelector('.cm-scroller')
+            scrollerView.scrollTop = scrollerView.scrollHeight - scrollerView.clientHeight
+          })
         })
         .finally(() => {
-          setTimeout(() => {
-            this.loading = false
-          }, 400)
+          this.loading = false
         })
     },
     handleDownloadLogFile() {

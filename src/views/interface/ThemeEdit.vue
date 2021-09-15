@@ -1,37 +1,36 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col :xl="6" :lg="6" :md="6" :sm="24" :xs="24" class="pb-3">
+      <a-col :lg="6" :md="6" :sm="24" :xl="6" :xs="24" class="pb-3">
         <a-card :bodyStyle="{ padding: '16px' }">
           <template slot="title">
-            <a-select class="w-full" @change="onSelectTheme" v-model="selectedTheme.id" :loading="themesLoading">
-              <a-select-option v-for="(theme, index) in themes" :key="index" :value="theme.id"
-                >{{ theme.name }}
-                <a-icon v-if="theme.activated" type="check" />
+            <a-select v-model="themes.selectedId" :loading="themes.loading" class="w-full" @change="onSelectTheme">
+              <a-select-option v-for="(theme, index) in themes.data" :key="index" :value="theme.id">
+                {{ theme.name }}{{ theme.activated ? '（当前启用）' : '' }}
               </a-select-option>
             </a-select>
           </template>
-          <a-spin :spinning="filesLoading">
-            <theme-file v-if="files" :files="files" @listenToSelect="handleSelectFile" />
+          <a-spin :spinning="files.loading">
+            <theme-file v-if="files.data" :files="files.data" @listenToSelect="handleSelectFile" />
           </a-spin>
         </a-card>
       </a-col>
-      <a-col :xl="18" :lg="18" :md="18" :sm="24" :xs="24" class="pb-3">
+      <a-col :lg="18" :md="18" :sm="24" :xl="18" :xs="24" class="pb-3">
         <a-card :bodyStyle="{ padding: '16px' }">
           <a-form layout="vertical">
             <a-form-item>
-              <codemirror v-model="content" :options="codemirrorOptions"></codemirror>
+              <Codemirror ref="editor" v-model="files.content" :extensions="editor.extensions" height="700px" />
             </a-form-item>
             <a-form-item>
               <ReactiveButton
-                @click="handlerSaveContent"
-                @callback="saveErrored = false"
-                :loading="saving"
-                :errored="saveErrored"
-                :disabled="buttonDisabled"
-                text="保存"
-                loadedText="保存成功"
+                :disabled="!files.content"
+                :errored="files.saveErrored"
+                :loading="files.saving"
                 erroredText="保存失败"
+                loadedText="保存成功"
+                text="保存"
+                @callback="files.saveErrored = false"
+                @click="handlerSaveContent"
               ></ReactiveButton>
             </a-form-item>
           </a-form>
@@ -45,130 +44,130 @@
 import themeApi from '@/api/theme'
 import ThemeFile from './components/ThemeFile'
 import { PageView } from '@/layouts'
-import { codemirror } from 'vue-codemirror-lite'
-import 'codemirror/mode/htmlmixed/htmlmixed.js'
+import Codemirror from '@/components/Codemirror/Codemirror'
+import { html } from '@codemirror/lang-html'
+import { javascript } from '@codemirror/lang-javascript'
+import { css } from '@codemirror/lang-css'
+
+const languageExtensionsMap = {
+  ftl: html(),
+  css: css(),
+  js: javascript()
+}
+
 export default {
   components: {
-    codemirror,
+    Codemirror,
     ThemeFile,
     PageView
   },
   data() {
     return {
-      buttonDisabled: true,
-      codemirrorOptions: {
-        tabSize: 4,
-        mode: 'text/html',
-        lineNumbers: true,
-        line: true
+      themes: {
+        data: [],
+        loading: false,
+        selectedId: null
       },
-      files: [],
-      filesLoading: false,
-      file: {},
-      content: '',
-      themes: [],
-      themesLoading: false,
-      selectedTheme: {},
-      saving: false,
-      saveErrored: false
+
+      files: {
+        data: [],
+        loading: false,
+        selected: {},
+        content: '',
+        saving: false,
+        saveErrored: false
+      },
+
+      editor: {
+        languageExtensionsMap,
+        extensions: []
+      }
     }
   },
   created() {
-    this.handleGetActivatedTheme()
-    this.handleListThemeFiles()
     this.handleListThemes()
   },
   methods: {
-    handleGetActivatedTheme() {
-      themeApi.getActivatedTheme().then(response => {
-        this.selectedTheme = response.data.data
-      })
-    },
-    handleListThemeFiles() {
-      this.filesLoading = true
-      themeApi
-        .listFilesActivated()
-        .then(response => {
-          this.files = response.data.data
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.filesLoading = false
-          }, 200)
-        })
-    },
     handleListThemes() {
-      this.themesLoading = true
+      this.themes.loading = true
       themeApi
         .list()
         .then(response => {
-          this.themes = response.data.data
+          this.themes.data = response.data.data
+
+          const activatedTheme = this.themes.data.find(item => item.activated)
+
+          if (activatedTheme) {
+            this.themes.selectedId = activatedTheme.id
+            this.onSelectTheme(activatedTheme.id)
+          }
         })
         .finally(() => {
-          setTimeout(() => {
-            this.themesLoading = false
-          }, 200)
+          this.themes.loading = false
         })
     },
     onSelectTheme(themeId) {
-      this.files = []
-      this.filesLoading = true
+      this.files.data = []
+      this.files.loading = true
       themeApi
         .listFiles(themeId)
         .then(response => {
-          this.files = response.data.data
-          this.content = ''
-          this.file = {}
+          this.files.data = response.data.data
+          this.files.content = ''
+          this.files.selected = {}
         })
         .finally(() => {
-          setTimeout(() => {
-            this.filesLoading = false
-          }, 200)
+          this.files.loading = false
         })
     },
     handleSelectFile(file) {
       const _this = this
       if (!file.editable) {
         this.$message.info('该文件不支持修改！')
-        this.content = ''
-        this.file = {}
-        this.buttonDisabled = true
+        this.files.content = ''
+        this.files.selected = {}
+        this.handleInitEditor()
         return
       }
-      if (
-        file.name === 'settings.yaml' ||
-        file.name === 'settings.yml' ||
-        file.name === 'theme.yaml' ||
-        file.name === 'theme.yml'
-      ) {
+      if (['settings.yaml', 'settings.yml', 'theme.yaml', 'theme.yml'].includes(file.name)) {
         this.$confirm({
           title: '警告：请谨慎修改该配置文件',
           content: '修改之后可能会产生不可预料的问题！',
           onCancel() {
-            _this.content = ''
-            _this.file = {}
-            _this.buttonDisabled = true
+            _this.files.content = ''
+            _this.files.selected = {}
+            _this.handleInitEditor()
           }
         })
       }
-      themeApi.getContent(this.selectedTheme.id, file.path).then(response => {
-        this.content = response.data.data
-        this.file = file
-        this.buttonDisabled = false
+      themeApi.getContent(this.themes.selectedId, file.path).then(response => {
+        this.files.content = response.data.data
+        this.files.selected = file
+        this.handleInitEditor()
       })
     },
     handlerSaveContent() {
-      this.saving = true
+      this.files.saving = true
       themeApi
-        .saveContent(this.selectedTheme.id, this.file.path, this.content)
+        .saveContent(this.themes.selectedId, this.files.selected.path, this.files.content)
         .catch(() => {
-          this.saveErrored = true
+          this.files.saveErrored = true
         })
         .finally(() => {
           setTimeout(() => {
-            this.saving = false
+            this.files.saving = false
           }, 400)
         })
+    },
+    handleInitEditor() {
+      this.$nextTick(() => {
+        const filename = this.files.selected.name
+        if (filename) {
+          const fileExtension = filename.substring(filename.lastIndexOf('.') + 1)
+          this.editor.extensions = [this.editor.languageExtensionsMap[fileExtension]]
+        }
+        this.$refs.editor.handleInitCodemirror()
+      })
     }
   }
 }
