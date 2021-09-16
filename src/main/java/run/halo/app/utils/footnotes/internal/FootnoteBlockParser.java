@@ -16,8 +16,8 @@ import com.vladsch.flexmark.util.sequence.BasedSequence;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import run.halo.app.utils.footnotes.FootnoteBlock;
 import run.halo.app.utils.footnotes.FootnoteExtension;
 
@@ -115,9 +115,9 @@ public class FootnoteBlockParser extends AbstractBlockParser {
             return false;
         }
 
-        @NotNull
+        @NonNull
         @Override
-        public BlockParserFactory apply(@NotNull DataHolder options) {
+        public BlockParserFactory apply(@NonNull DataHolder options) {
             return new BlockFactory(options);
         }
     }

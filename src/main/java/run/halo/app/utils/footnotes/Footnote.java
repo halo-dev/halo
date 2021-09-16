@@ -7,7 +7,7 @@ import com.vladsch.flexmark.util.ast.Document;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.ast.ReferencingNode;
 import com.vladsch.flexmark.util.sequence.BasedSequence;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import run.halo.app.utils.footnotes.internal.FootnoteRepository;
 
 /**
@@ -30,7 +30,7 @@ public class Footnote extends Node implements DelimitedNode, DoNotDecorate, Link
 
     protected int referenceOrdinal;
 
-    @NotNull
+    @NonNull
     @Override
     public BasedSequence getReference() {
         return text;
@@ -80,14 +80,14 @@ public class Footnote extends Node implements DelimitedNode, DoNotDecorate, Link
         this.footnoteBlock = footnoteBlock;
     }
 
-    @NotNull
+    @NonNull
     @Override
     public BasedSequence[] getSegments() {
         return new BasedSequence[] {openingMarker, text, closingMarker};
     }
 
     @Override
-    public void getAstExtra(@NotNull StringBuilder out) {
+    public void getAstExtra(@NonNull StringBuilder out) {
         out.append(" ordinal: ")
             .append(footnoteBlock != null ? footnoteBlock.getFootnoteOrdinal() : 0).append(" ");
         delimitedSegmentSpanChars(out, openingMarker, text, closingMarker, "text");

@@ -15,8 +15,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import run.halo.app.utils.footnotes.Footnote;
 import run.halo.app.utils.footnotes.FootnoteBlock;
 import run.halo.app.utils.footnotes.FootnoteExtension;
@@ -100,9 +100,9 @@ public class FootnoteNodeFormatter
 
     public static class Factory implements NodeFormatterFactory {
 
-        @NotNull
+        @NonNull
         @Override
-        public NodeFormatter create(@NotNull DataHolder options) {
+        public NodeFormatter create(@NonNull DataHolder options) {
             return new FootnoteNodeFormatter(options);
         }
     }

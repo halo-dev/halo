@@ -167,12 +167,9 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             // Create theme folder
             Path themePath = themeService.getBasePath();
 
-            // Fix the problem that the project cannot start after moving to a new server
-            if (Files.notExists(themePath) || !isInstalled) {
+            if (themeService.fetchThemePropertyBy(HaloConst.DEFAULT_THEME_ID).isEmpty()) {
                 FileUtils.copyFolder(source, themePath);
-                log.debug("Copied theme folder from [{}] to [{}]", source, themePath);
-            } else {
-                log.debug("Skipped copying theme folder due to existence of theme folder");
+                log.info("Copied theme folder from [{}] to [{}]", source, themePath);
             }
         } catch (Exception e) {
             if (e instanceof FileNotFoundException) {
