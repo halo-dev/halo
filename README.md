@@ -29,7 +29,7 @@
 下载最新的 Halo 运行包：
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.4.11/halo-1.4.11.jar --output halo.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.4.12/halo-1.4.12.jar --output halo.jar
 ```
 
 其他地址：https://docs.halo.run/install/downloads
@@ -61,11 +61,13 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=alwa
 
 [![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
-Halo 使用 GPL-v3.0 协议开源，请尽量遵守开源协议。
+Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
 
 ## 贡献
 
 参考 [CONTRIBUTING](./CONTRIBUTING.md)。
+
+<a href="https://github.com/halo-dev/halo/graphs/contributors"><img src="https://opencollective.com/halo/contributors.svg?width=890&button=false" /></a>
 
 ## 赞助我们
 

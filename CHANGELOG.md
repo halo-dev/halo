@@ -1,5 +1,25 @@
 # CHANGELOG
 
+# 1.4.12
+
+## Features
+
+- Minio 存储提供 Region 设置项。halo-dev/halo#1440 halo-dev/halo-admin#346
+
+## Improvements
+
+- 后台菜单列表提供拖动按钮，优化拖动排序的体验。halo-dev/halo-admin#350
+- 后台升级 CodeMirror 的版本，降低最终构建体积。halo-dev/halo-admin#354
+- 后台文章编辑器支持显示滚动条，编辑器始终占用窗口剩下的区域高度。halo-dev/halo-admin#355
+
+## Bug Fixes
+
+- 修复 Minio 存储 EndPoint 使用 HTTPS 协议时，无法上传文件的问题。halo-dev/halo#1458
+- 修复上传 ICO 格式附件无法读取宽高度的问题。halo-dev/halo#1474
+- 修复加密分类目录输入密码之后无法正常显示文章列表的问题。halo-dev/halo#1471
+- 修复手动上传的主题无法通过远程 Git 仓库更新的问题。halo-dev/halo#1479
+- 修复在 macOS 下，后台登录页面无法通过快捷键显示找回密码按钮的问题。halo-dev/halo-admin#352
+
 # 1.4.11
 
 ## Bug Fixes
