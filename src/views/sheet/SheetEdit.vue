@@ -1,18 +1,18 @@
 <template>
-  <page-view affix :title="sheetToStage.title ? sheetToStage.title : '新页面'">
+  <page-view :title="sheetToStage.title ? sheetToStage.title : '新页面'" affix>
     <template slot="extra">
       <a-space>
         <ReactiveButton
-          type="danger"
-          @click="handleSaveDraft(false)"
-          @callback="draftSavederrored = false"
+          :errored="draftSavedErrored"
           :loading="draftSaving"
-          :errored="draftSavederrored"
-          text="保存草稿"
-          loadedText="保存成功"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存草稿"
+          type="danger"
+          @callback="draftSavedErrored = false"
+          @click="handleSaveDraft(false)"
         ></ReactiveButton>
-        <a-button @click="handlePreview" :loading="previewSaving">预览</a-button>
+        <a-button :loading="previewSaving" @click="handlePreview">预览</a-button>
         <a-button type="primary" @click="sheetSettingVisible = true">发布</a-button>
         <a-button type="dashed" @click="attachmentDrawerVisible = true">附件库</a-button>
       </a-space>
@@ -20,22 +20,22 @@
     <a-row :gutter="12">
       <a-col :span="24">
         <div class="mb-4">
-          <a-input v-model="sheetToStage.title" size="large" placeholder="请输入页面标题" />
+          <a-input v-model="sheetToStage.title" placeholder="请输入页面标题" size="large" />
         </div>
 
-        <div id="editor">
+        <div id="editor" :style="{ height: editorHeight }">
           <MarkdownEditor
             :originalContent="sheetToStage.originalContent"
-            @onSaveDraft="handleSaveDraft(true)"
             @onContentChange="onContentChange"
+            @onSaveDraft="handleSaveDraft(true)"
           />
         </div>
       </a-col>
     </a-row>
 
     <SheetSettingDrawer
-      :sheet="sheetToStage"
       :metas="selectedMetas"
+      :sheet="sheetToStage"
       :visible="sheetSettingVisible"
       @close="sheetSettingVisible = false"
       @onRefreshSheet="onRefreshSheetFromSetting"
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { mixin, mixinDevice } from '@/mixins/mixin.js'
+import { mixin, mixinDevice, mixinPostEdit } from '@/mixins/mixin.js'
 import { datetimeFormat } from '@/utils/datetime'
 import { PageView } from '@/layouts'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
@@ -56,6 +56,7 @@ import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 
 import sheetApi from '@/api/sheet'
+
 export default {
   components: {
     PageView,
@@ -63,7 +64,7 @@ export default {
     SheetSettingDrawer,
     MarkdownEditor
   },
-  mixins: [mixin, mixinDevice],
+  mixins: [mixin, mixinDevice, mixinPostEdit],
   data() {
     return {
       attachmentDrawerVisible: false,
@@ -148,7 +149,7 @@ export default {
               this.handleRestoreSavedStatus()
             })
             .catch(() => {
-              this.draftSavederrored = true
+              this.draftSavedErrored = true
             })
             .finally(() => {
               setTimeout(() => {
@@ -163,7 +164,7 @@ export default {
               this.handleRestoreSavedStatus()
             })
             .catch(() => {
-              this.draftSavederrored = true
+              this.draftSavedErrored = true
             })
             .finally(() => {
               setTimeout(() => {
@@ -179,7 +180,7 @@ export default {
             this.handleRestoreSavedStatus()
           })
           .catch(() => {
-            this.draftSavederrored = true
+            this.draftSavedErrored = true
           })
           .finally(() => {
             setTimeout(() => {

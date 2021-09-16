@@ -48,4 +48,43 @@ const mixinDevice = {
   }
 }
 
-export { mixin, mixinDevice }
+const mixinPostEdit = {
+  data() {
+    return {
+      viewMetas: {
+        pageHeaderHeight: 0,
+        pageFooterHeight: 0
+      }
+    }
+  },
+  computed: {
+    editorHeight() {
+      const toolbarHeight = 64
+      const contentMarginTop = 24
+      const titleInputHeight = 40
+      return `calc(100vh - ${toolbarHeight +
+        contentMarginTop +
+        titleInputHeight +
+        this.viewMetas.pageHeaderHeight +
+        this.viewMetas.pageFooterHeight +
+        10}px - 1rem)`
+    }
+  },
+  mounted() {
+    this.handleGetViewMetas()
+  },
+  methods: {
+    handleGetViewMetas() {
+      const pageHeaderView = document.getElementsByClassName('page-header')
+      if (pageHeaderView && pageHeaderView.length > 0) {
+        this.viewMetas.pageHeaderHeight = pageHeaderView[0].clientHeight
+      }
+      const pageFooterView = document.getElementsByClassName('ant-layout-footer')
+      if (pageFooterView && pageFooterView.length > 0) {
+        this.viewMetas.pageFooterHeight = pageFooterView[0].clientHeight
+      }
+    }
+  }
+}
+
+export { mixin, mixinDevice, mixinPostEdit }

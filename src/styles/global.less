@@ -22,6 +22,7 @@ body {
      * ant-table-wrapper
      * 覆盖的表格手机模式样式，如果想修改在手机上表格最低宽度，可以在这里改动
      */
+
     .ant-table-wrapper {
       .ant-table-content {
         overflow-y: auto;
@@ -34,6 +35,7 @@ body {
 
     .topmenu {
       /* 必须为 topmenu  才能启用流式布局 */
+
       &.content-width-Fluid {
         .header-index-wide {
           margin-left: 0;
@@ -88,6 +90,7 @@ body {
     }
 
     /* 必须为 topmenu  才能启用流式布局 */
+
     &.content-width-Fluid {
       .header-index-wide {
         max-width: unset;
@@ -597,7 +600,7 @@ body {
 }
 
 .ant-anchor-link-title {
-  white-space: normal!important;
+  white-space: normal !important;
 }
 
 .bottom-control {
@@ -705,7 +708,7 @@ body {
 
 #editor {
   .v-note-wrapper {
-    min-height: 580px;
+    height: 100%;
   }
 }
 
@@ -860,11 +863,11 @@ body {
 }
 
 .ant-affix {
-  z-index: 1000!important;
+  z-index: 1000 !important;
 }
 
 .v-note-wrapper {
-  z-index: 999!important;
+  z-index: 999 !important;
 }
 
 #nprogress {
@@ -894,8 +897,8 @@ body {
   opacity: 1.0;
 
   -webkit-transform: rotate(3deg) translate(0px, -4px);
-      -ms-transform: rotate(3deg) translate(0px, -4px);
-          transform: rotate(3deg) translate(0px, -4px);
+  -ms-transform: rotate(3deg) translate(0px, -4px);
+  transform: rotate(3deg) translate(0px, -4px);
 }
 
 /* Remove these to get rid of the spinner */
@@ -918,7 +921,7 @@ body {
   border-radius: 50%;
 
   -webkit-animation: nprogress-spinner 400ms linear infinite;
-          animation: nprogress-spinner 400ms linear infinite;
+  animation: nprogress-spinner 400ms linear infinite;
 }
 
 .nprogress-custom-parent {
@@ -932,10 +935,19 @@ body {
 }
 
 @-webkit-keyframes nprogress-spinner {
-  0%   { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
 }
+
 @keyframes nprogress-spinner {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

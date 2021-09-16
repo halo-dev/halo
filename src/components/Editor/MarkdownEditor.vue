@@ -1,22 +1,21 @@
 <template>
-  <div>
-    <halo-editor
-      ref="md"
-      v-model="originalContentData"
-      :boxShadow="false"
-      :toolbars="toolbars"
-      :ishljs="true"
-      autofocus
-      @imgAdd="handleAttachmentUpload"
-      @save="handleSaveDraft"
-    />
-  </div>
+  <halo-editor
+    ref="md"
+    v-model="originalContentData"
+    :boxShadow="false"
+    :ishljs="true"
+    :toolbars="toolbars"
+    autofocus
+    @imgAdd="handleAttachmentUpload"
+    @save="handleSaveDraft"
+  />
 </template>
 <script>
 import { toolbars } from '@/core/const'
 import { haloEditor } from 'halo-editor'
 import 'halo-editor/dist/css/index.css'
 import attachmentApi from '@/api/attachment'
+
 export default {
   name: 'MarkdownEditor',
   components: {
