@@ -71,7 +71,6 @@ export default {
     ...mapGetters(['options'])
   },
   beforeRouteEnter(to, from, next) {
-    // Get post id from query
     const activeKey = to.query.activeKey
     next(vm => {
       if (activeKey) {

@@ -41,9 +41,11 @@ git checkout v1.4.12
 3、打包构建：
 
 ```bash
-npm i
+npm install -g pnpm
 
-npm run build
+pnpm install
+
+pnpm build
 ```
 
 最后，得到 dist 文件夹之后就可以单独部署了。

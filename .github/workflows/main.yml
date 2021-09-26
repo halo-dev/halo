@@ -21,15 +21,16 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x, 15.x, 16.x]
+        node-version: [12.x, 14.x, 15.x, 16.x]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install
-      - run: npm run lint
+      - run: npm install -g pnpm
+      - run: pnpm install
+      - run: pnpm lint
 
   github-release:
     runs-on: ubuntu-latest
@@ -41,9 +42,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: npm install
+      - name: Install pnpm package manager
+        run: npm install -g pnpm
+      - run: pnpm install
       - name: Build for release
-        run: npm run build
+        run: pnpm build
       - name: Compress dist directory
         run: |
           PACKAGE_VERSION=$(sed -nE 's/^\s*"version": "(.*?)",$/\1/p' package.json)
