@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
+import java.util.Date;
 
 /**
  * 日期工具
@@ -569,5 +570,15 @@ public class DateTimeUtils {
      */
     public static boolean isLessThanOrEqual(Temporal startInclusive, Temporal endInclusive) {
         return Duration.between(startInclusive, endInclusive).toNanos() <= 0;
+    }
+
+    /**
+     * convert date to LocalDateTime
+     *
+     * @param date date
+     * @return LocalDateTime by default zone
+     */
+    public static LocalDateTime toLocalDateTime(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 }

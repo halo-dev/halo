@@ -3,7 +3,6 @@ package run.halo.app.controller.content.model;
 import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
 import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
 
-import cn.hutool.core.util.StrUtil;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -91,7 +90,7 @@ public class PostModel {
         if (PostStatus.RECYCLE.equals(post.getStatus())) {
             // Articles in the recycle bin are not allowed to be accessed.
             throw new NotFoundException("查询不到该文章的信息");
-        } else if (StrUtil.isNotEmpty(token)) {
+        } else if (StringUtils.isNotBlank(token)) {
             // If the token is not empty, it means it is an admin request,
             // then verify the token.
 

@@ -1,8 +1,5 @@
 package run.halo.app.utils;
 
-import cn.hutool.core.date.DateField;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.Week;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -16,10 +13,12 @@ import org.springframework.util.Assert;
  * Date utilities.
  *
  * @author johnniang
- * @date 3/18/19
+ * @author guqing
+ * @since 3/18/19
  */
 public class DateUtils {
-    private static final Week FIRST_DAY_OF_WEEK = Week.MONDAY;
+    private static final int FIRST_DAY_OF_WEEK = Calendar.MONDAY;
+
     private DateUtils() {
     }
 
@@ -205,8 +204,7 @@ public class DateUtils {
         }
         final Calendar cal =
             (null != zone) ? Calendar.getInstance(zone, locale) : Calendar.getInstance(locale);
-        //noinspection MagicConstant
-        cal.setFirstDayOfWeek(FIRST_DAY_OF_WEEK.getValue());
+        cal.setFirstDayOfWeek(FIRST_DAY_OF_WEEK);
         cal.setTime(date);
         return cal;
     }

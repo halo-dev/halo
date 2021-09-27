@@ -1,10 +1,10 @@
 package run.halo.app.controller.admin.api;
 
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -99,14 +99,14 @@ public class UserController {
     @DisableOnCondition
     public MultiFactorAuthVO updateMFAuth(
         @RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
-        if (StrUtil.isNotBlank(user.getMfaKey())
+        if (StringUtils.isNotBlank(user.getMfaKey())
             && MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.TFA_TOTP);
-        } else if (StrUtil.isBlank(user.getMfaKey())
+        } else if (StringUtils.isBlank(user.getMfaKey())
             && !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.NONE);
         } else {
-            final String tfaKey = StrUtil.isNotBlank(user.getMfaKey()) ? user.getMfaKey() :
+            final String tfaKey = StringUtils.isNotBlank(user.getMfaKey()) ? user.getMfaKey() :
                 multiFactorAuthParam.getMfaKey();
             TwoFactorAuthUtils.validateTFACode(tfaKey, multiFactorAuthParam.getAuthcode());
         }

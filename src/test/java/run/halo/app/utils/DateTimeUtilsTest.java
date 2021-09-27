@@ -13,13 +13,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import org.junit.jupiter.api.Test;
 
 /**
  * DateTimeUtils 测试用例
  *
  * @author LeiXinXin
- * @date 2020/1/9
+ * @author guqing
+ * @since 2020/1/9
  */
 class DateTimeUtilsTest {
     /**
@@ -162,5 +165,13 @@ class DateTimeUtilsTest {
         final LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 5, 6, 40, 30, 999);
         final LocalDateTime time = DateTimeUtils.secondAndNanoSetZero(localDateTime);
         assertEquals("2020-01-05T06:40", time.toString());
+    }
+
+    @Test
+    void toLocalDateTime() {
+        GregorianCalendar january31th =
+            new GregorianCalendar(2021, Calendar.JANUARY, 31, 12, 45, 20);
+        LocalDateTime localDateTime = DateTimeUtils.toLocalDateTime(january31th.getTime());
+        assertEquals("2021-01-31T12:45:20", localDateTime.toString());
     }
 }

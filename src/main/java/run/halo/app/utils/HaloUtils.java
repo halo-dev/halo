@@ -290,4 +290,23 @@ public class HaloUtils {
     public static boolean isNotEmpty(Collection<?> collection) {
         return !CollectionUtils.isEmpty(collection);
     }
+
+    /**
+     * <p>Strips any of a set of characters from the start and end of a String.
+     * This is similar to {@link String#trim()} but allows the characters
+     * to be stripped to be controlled.</p>
+     *
+     * @param str the String to remove characters from, may be null
+     * @param prefixStripChars the characters to remove from start of str, null treated as whitespace
+     * @param suffixStripChars the characters to remove from end of str, null treated as whitespace
+     * @return the stripped String, {@code null} if null String input
+     */
+    public static String strip(String str, final String prefixStripChars,
+        final String suffixStripChars) {
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
+        str = StringUtils.stripStart(str, prefixStripChars);
+        return StringUtils.stripEnd(str, suffixStripChars);
+    }
 }

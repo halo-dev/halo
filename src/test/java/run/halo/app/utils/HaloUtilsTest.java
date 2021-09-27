@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -16,7 +16,8 @@ import org.junit.jupiter.api.Test;
  *
  * @author johnniang
  * @author ryanwang
- * @date 2019-03-29
+ * @author guqing
+ * @since 2019-03-29
  */
 @Slf4j
 class HaloUtilsTest {
@@ -160,7 +161,7 @@ class HaloUtilsTest {
     @Test
     void collectionIsNotEmpty() {
         assertFalse(HaloUtils.isNotEmpty(null));
-        assertFalse(HaloUtils.isNotEmpty(ImmutableList.of()));
-        assertTrue(HaloUtils.isNotEmpty(ImmutableList.of("A")));
+        assertFalse(HaloUtils.isNotEmpty(List.of()));
+        assertTrue(HaloUtils.isNotEmpty(List.of("A")));
     }
 }

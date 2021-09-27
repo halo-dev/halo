@@ -4,7 +4,6 @@ import static run.halo.app.model.support.HaloConst.DATABASE_PRODUCT_NAME;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -132,7 +131,7 @@ public class AdminServiceImpl implements AdminService {
 
         // check authCode
         if (MFAType.useMFA(user.getMfaType())) {
-            if (StrUtil.isBlank(loginParam.getAuthcode())) {
+            if (StringUtils.isBlank(loginParam.getAuthcode())) {
                 throw new BadRequestException("请输入两步验证码");
             }
             TwoFactorAuthUtils.validateTFACode(user.getMfaKey(), loginParam.getAuthcode());

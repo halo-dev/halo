@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
-import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -381,9 +380,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             for (String key : frontMatter.keySet()) {
                 elementValue = frontMatter.get(key);
                 for (String ele : elementValue) {
-                    ele = StrUtil.strip(ele, "[", "]");
-                    ele = StrUtil.strip(ele, "\"");
-                    ele = StrUtil.strip(ele, "\'");
+                    ele = HaloUtils.strip(ele, "[", "]");
+                    ele = StringUtils.strip(ele, "\"");
+                    ele = StringUtils.strip(ele, "\'");
                     if ("".equals(ele)) {
                         continue;
                     }
@@ -410,8 +409,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             Tag tag;
                             for (String tagName : ele.split(",")) {
                                 tagName = tagName.trim();
-                                tagName = StrUtil.strip(tagName, "\"");
-                                tagName = StrUtil.strip(tagName, "\'");
+                                tagName = StringUtils.strip(tagName, "\"");
+                                tagName = StringUtils.strip(tagName, "\'");
                                 tag = tagService.getByName(tagName);
                                 if (null == tag) {
                                     tag = new Tag();
@@ -426,8 +425,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             Integer lastCategoryId = null;
                             for (String categoryName : ele.split(",")) {
                                 categoryName = categoryName.trim();
-                                categoryName = StrUtil.strip(categoryName, "\"");
-                                categoryName = StrUtil.strip(categoryName, "\'");
+                                categoryName = StringUtils.strip(categoryName, "\"");
+                                categoryName = StringUtils.strip(categoryName, "\'");
                                 Category category = categoryService.getByName(categoryName);
                                 if (null == category) {
                                     category = new Category();

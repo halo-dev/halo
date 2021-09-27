@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Objects;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +14,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -113,7 +113,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             }
         }
 
-        if (StrUtil.isNotBlank(category.getPassword())) {
+        if (StringUtils.isNotBlank(category.getPassword())) {
             category.setPassword(category.getPassword().trim());
         }
 
@@ -307,7 +307,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
             post.setStatus(null);
 
-            if (StrUtil.isNotBlank(post.getPassword())) {
+            if (StringUtils.isNotBlank(post.getPassword())) {
                 post.setStatus(PostStatus.INTIMATE);
             } else {
                 postCategoryService.listByPostId(postId)
@@ -532,7 +532,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     public Category update(Category category) {
         Category update = super.update(category);
 
-        if (StrUtil.isNotBlank(category.getPassword())) {
+        if (StringUtils.isNotBlank(category.getPassword())) {
             doEncryptPost(category);
         } else {
             doDecryptPost(category);
@@ -618,7 +618,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
             .filter(postList -> !postList.isEmpty())
             .map(postList -> postList.stream()
-                .filter(post -> StrUtil.isBlank(post.getPassword()))
+                .filter(post -> StringUtils.isBlank(post.getPassword()))
                 .filter(post -> PostStatus.INTIMATE.equals(post.getStatus()))
                 .map(Post::getId).collect(Collectors.toList()))
 
@@ -652,7 +652,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
         Category category = idToCategoryMap.get(categoryId);
 
-        if (StrUtil.isNotBlank(category.getPassword())) {
+        if (StringUtils.isNotBlank(category.getPassword())) {
             return true;
         }
 
