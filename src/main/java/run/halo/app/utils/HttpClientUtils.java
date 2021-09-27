@@ -1,6 +1,5 @@
 package run.halo.app.utils;
 
-import cn.hutool.core.lang.Tuple;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -71,15 +70,15 @@ public class HttpClientUtils {
         final HttpClientBuilder httpClientBuilder) {
         final String httpProxyEnv = System.getenv("http_proxy");
         if (StringUtils.isNotBlank(httpProxyEnv)) {
-            final Tuple httpProxy = resolveHttpProxy(httpProxyEnv);
-            final HttpHost httpHost = HttpHost.create(httpProxy.get(0));
+            final String[] httpProxy = resolveHttpProxy(httpProxyEnv);
+            final HttpHost httpHost = HttpHost.create(httpProxy[0]);
             httpClientBuilder.setProxy(httpHost);
-            if (httpProxy.getMembers().length == 3) {
+            if (httpProxy.length == 3) {
                 //set proxy credentials
                 final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 credentialsProvider
                     .setCredentials(new AuthScope(httpHost.getHostName(), httpHost.getPort()),
-                        new UsernamePasswordCredentials(httpProxy.get(1), httpProxy.get(2)));
+                        new UsernamePasswordCredentials(httpProxy[1], httpProxy[2]));
                 httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
             }
         }
@@ -91,7 +90,7 @@ public class HttpClientUtils {
      * @return resolved http proxy values; first is host(@nonNull), second is username(@nullable)
      * , third is password(@nullable)
      */
-    private static Tuple resolveHttpProxy(final String httpProxy) {
+    private static String[] resolveHttpProxy(final String httpProxy) {
         final URI proxyUri = URI.create(httpProxy);
         int port = proxyUri.getPort();
         if (port == -1) {
@@ -115,9 +114,9 @@ public class HttpClientUtils {
                 username = usernamePassword;
                 password = null;
             }
-            return new Tuple(hostUrl, username, password);
+            return new String[] {hostUrl, username, password};
         } else {
-            return new Tuple(hostUrl);
+            return new String[] {hostUrl};
         }
     }
 
