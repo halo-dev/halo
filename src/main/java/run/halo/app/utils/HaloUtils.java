@@ -3,10 +3,24 @@ package run.halo.app.utils;
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
 import cn.hutool.core.util.URLUtil;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -354,6 +368,59 @@ public class HaloUtils {
             }
         }
         return result;
+    }
 
+    public static String simpleUUID() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    /**
+     * generate png qrcode to byte array
+     *
+     * @param content qrcode content
+     * @param width qrcode width
+     * @param height qrcode height
+     * @return QR code byte array in png format
+     * @throws UnsupportedOperationException If the QR code fails to be generated
+     */
+    public static byte[] generateQrCodeToPng(String content, int width, int height) {
+        Map<EncodeHintType, Object> hints = new HashMap<>(3, 1);
+        hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+        // 纠错级别
+        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+        // 空白
+        hints.put(EncodeHintType.MARGIN, 2);
+
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+
+        try {
+            BitMatrix byteMatrix =
+                qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height, hints);
+            // Make the BufferedImage that are to hold the QRCode
+            int matrixWidth = byteMatrix.getWidth();
+            int matrixHeight = byteMatrix.getHeight();
+            BufferedImage image =
+                new BufferedImage(matrixWidth, matrixHeight, BufferedImage.TYPE_INT_RGB);
+            image.createGraphics();
+
+            Graphics2D graphics = (Graphics2D) image.getGraphics();
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(0, 0, matrixWidth, matrixHeight);
+            // Paint and save the image using the ByteMatrix
+            graphics.setColor(Color.BLACK);
+
+            for (int i = 0; i < matrixWidth; i++) {
+                for (int j = 0; j < matrixWidth; j++) {
+                    if (byteMatrix.get(i, j)) {
+                        graphics.fillRect(i, j, 1, 1);
+                    }
+                }
+            }
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", os);
+            return os.toByteArray();
+        } catch (IOException | WriterException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 }

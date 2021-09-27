@@ -1,6 +1,5 @@
 package run.halo.app.filter;
 
-import cn.hutool.extra.servlet.ServletUtil;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -11,6 +10,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import run.halo.app.utils.ServletUtils;
 
 /**
  * Filter for logging.
@@ -26,7 +26,7 @@ public class LogFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
 
-        final String remoteAddr = ServletUtil.getClientIP(request);
+        final String remoteAddr = ServletUtils.getClientIP(request);
 
         log.debug("Starting url: [{}], method: [{}], ip: [{}]",
             request.getRequestURL(),

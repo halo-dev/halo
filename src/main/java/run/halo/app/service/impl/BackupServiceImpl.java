@@ -9,7 +9,6 @@ import static run.halo.app.utils.FileUtils.checkDirectoryTraversal;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.core.util.IdUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -222,7 +221,7 @@ public class BackupServiceImpl implements BackupService {
             // Create zip path for halo zip
             String haloZipFileName = HALO_BACKUP_PREFIX
                 + DateTimeUtils.format(LocalDateTime.now(), HORIZONTAL_LINE_DATETIME_FORMATTER)
-                + IdUtil.simpleUUID().hashCode() + ".zip";
+                + HaloUtils.simpleUUID().hashCode() + ".zip";
             // Create halo zip file
             Path haloZipFilePath = Paths.get(haloProperties.getBackupDir(), haloZipFileName);
             if (!Files.exists(haloZipFilePath.getParent())) {
@@ -360,7 +359,7 @@ public class BackupServiceImpl implements BackupService {
         try {
             String haloDataFileName = HALO_DATA_EXPORT_PREFIX
                 + DateTimeUtils.format(LocalDateTime.now(), HORIZONTAL_LINE_DATETIME_FORMATTER)
-                + IdUtil.simpleUUID().hashCode() + ".json";
+                + HaloUtils.simpleUUID().hashCode() + ".json";
 
             Path haloDataFilePath = Paths.get(haloProperties.getDataExportDir(), haloDataFileName);
             if (!Files.exists(haloDataFilePath.getParent())) {
@@ -534,7 +533,7 @@ public class BackupServiceImpl implements BackupService {
 
         // Write files to the temporary directory
         String markdownFileTempPathName =
-            haloProperties.getBackupMarkdownDir() + IdUtil.simpleUUID().hashCode();
+            haloProperties.getBackupMarkdownDir() + HaloUtils.simpleUUID().hashCode();
         for (PostMarkdownVO postMarkdownVo : postMarkdownList) {
             StringBuilder content = new StringBuilder();
             Boolean needFrontMatter =
@@ -563,7 +562,7 @@ public class BackupServiceImpl implements BackupService {
         // Create zip path
         String markdownZipFileName = HALO_BACKUP_MARKDOWN_PREFIX
             + DateTimeUtils.format(LocalDateTime.now(), HORIZONTAL_LINE_DATETIME_FORMATTER)
-            + IdUtil.simpleUUID().hashCode() + ".zip";
+            + HaloUtils.simpleUUID().hashCode() + ".zip";
 
         // Create zip file
         Path markdownZipFilePath =

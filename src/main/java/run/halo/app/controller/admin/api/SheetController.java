@@ -2,7 +2,6 @@ package run.halo.app.controller.admin.api;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -34,6 +33,7 @@ import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetService;
+import run.halo.app.utils.HaloUtils;
 
 /**
  * Sheet controller.
@@ -149,7 +149,7 @@ public class SheetController {
 
         BasePostMinimalDTO sheetMinimalDTO = sheetService.convertToMinimal(sheet);
 
-        String token = IdUtil.simpleUUID();
+        String token = HaloUtils.simpleUUID();
 
         // cache preview token
         cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);
