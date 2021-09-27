@@ -1,9 +1,12 @@
 package run.halo.app.utils;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.Week;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
@@ -15,7 +18,7 @@ import org.springframework.util.Assert;
  * @date 3/18/19
  */
 public class DateUtils {
-
+    private static final Week FIRST_DAY_OF_WEEK = Week.MONDAY;
     private DateUtils() {
     }
 
@@ -139,5 +142,51 @@ public class DateUtils {
         } catch (ParseException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    /**
+     * Get the month, counting from 0
+     *
+     * @return month for the given date.
+     */
+    public static int month(Date date) {
+        return getField(date, Calendar.MONTH);
+    }
+
+    /**
+     * Get the specified part of the given date.
+     *
+     * @return the specified part
+     */
+    public static int getField(Date date, int field) {
+        return toCalendar(date).get(field);
+    }
+
+    /**
+     * convert date to calendar
+     * default locale is sets by the Java Virtual Machine during startup
+     * based on the host environment.
+     *
+     * @param date date
+     * @return calendar object using the default locale for the given date
+     */
+    public static Calendar toCalendar(Date date) {
+        return toCalendar(date, Locale.getDefault(Locale.Category.FORMAT));
+    }
+
+    public static Calendar toCalendar(Date date, Locale locale) {
+        return toCalendar(date, TimeZone.getDefault(), locale);
+    }
+
+    public static Calendar toCalendar(Date date, TimeZone zone, Locale locale) {
+        if (null == locale) {
+            locale = Locale.getDefault(Locale.Category.FORMAT);
+        }
+        final Calendar cal =
+            (null != zone) ? Calendar.getInstance(zone, locale) : Calendar.getInstance(locale);
+        //noinspection MagicConstant
+        cal.setFirstDayOfWeek(FIRST_DAY_OF_WEEK.getValue());
+        cal.setTime(date);
+        return cal;
     }
 }

@@ -2,6 +2,8 @@ package run.halo.app.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +14,7 @@ import org.junit.jupiter.api.Test;
 public class DateUtilsTest {
 
     @Test
-    public void test() {
+    void testDateParse() {
         // yyyy-MM-dd HH:mm:ss
         assertDateParseEquals("Sun Sep 26 06:39:12 CST 2021", "2021-09-26 06:39:12");
 
@@ -69,6 +71,21 @@ public class DateUtilsTest {
 
         // yyyy-MM-dd'T'HH:mm:ss.SSSZ
         assertDateParseEquals("Sun Sep 26 05:34:31 CST 2021", "2021-09-26T05:34:31.999+0800");
+    }
+
+    @Test
+    void testMonth() {
+        GregorianCalendar january =
+            new GregorianCalendar(2021, Calendar.JANUARY, 1);
+        assertEquals(1 , DateUtils.month(january.getTime()) + 1);
+
+        GregorianCalendar february =
+            new GregorianCalendar(2021, Calendar.FEBRUARY, 2);
+        assertEquals(2 , DateUtils.month(february.getTime()) + 1);
+
+        GregorianCalendar december =
+            new GregorianCalendar(2021, Calendar.DECEMBER, 30);
+        assertEquals(12 , DateUtils.month(december.getTime()) + 1);
     }
 
     private void assertDateParseEquals(String expected, String dateStr) {
