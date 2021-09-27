@@ -76,7 +76,7 @@ public class GitThemeUpdater implements ThemeUpdater {
 
         final var oldThemePath = Paths.get(oldThemeProperty.getThemePath());
         // open old git repo
-        try (final var oldGit = Git.open(oldThemePath.toFile())) {
+        try (final var oldGit = Git.init().setDirectory(oldThemePath.toFile()).call()) {
             // 0. commit old repo
             commitAutomatically(oldGit);
 

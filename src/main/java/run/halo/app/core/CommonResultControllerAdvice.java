@@ -1,6 +1,5 @@
 package run.halo.app.core;
 
-import org.jetbrains.annotations.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,18 +25,18 @@ public class CommonResultControllerAdvice implements ResponseBodyAdvice<Object> 
 
     @Override
     public boolean supports(MethodParameter returnType,
-        @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
+        @NonNull Class<? extends HttpMessageConverter<?>> converterType) {
         return AbstractJackson2HttpMessageConverter.class.isAssignableFrom(converterType);
     }
 
     @Override
     @NonNull
     public final Object beforeBodyWrite(@Nullable Object body,
-        @NotNull MethodParameter returnType,
-        @NotNull MediaType contentType,
-        @NotNull Class<? extends HttpMessageConverter<?>> converterType,
-        @NotNull ServerHttpRequest request,
-        @NotNull ServerHttpResponse response) {
+        @NonNull MethodParameter returnType,
+        @NonNull MediaType contentType,
+        @NonNull Class<? extends HttpMessageConverter<?>> converterType,
+        @NonNull ServerHttpRequest request,
+        @NonNull ServerHttpResponse response) {
         MappingJacksonValue container = getOrCreateContainer(body);
         // The contain body will never be null
         beforeBodyWriteInternal(container, contentType, returnType, request, response);

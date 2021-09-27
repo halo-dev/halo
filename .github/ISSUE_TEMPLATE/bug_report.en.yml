@@ -16,19 +16,28 @@ body:
       required: true
     attributes:
       label: What is version of Halo has the issue?
-      description: "Can be found in the about page in admin background."
+      description: "Can be found in backstage management system."
   - type: dropdown
     id: database
     validations:
       required: true
     attributes:
       label: "What database are you using?"
-      description: "Can be found in the about page in admin background."
+      description: "Can be found in backstage management system."
       options:
         - H2
         - MySQL 5.7
         - MySQL 8.x
         - Other
+  - type: dropdown
+    id: deployment-method
+    validations:
+      required: true
+    attributes:
+      label: "What is your deployment method?"
+      options:
+        - Fat Jar
+        - Docker
   - type: input
     id: site-url
     attributes:

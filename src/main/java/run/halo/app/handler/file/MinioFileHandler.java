@@ -50,12 +50,15 @@ public class MinioFileHandler implements FileHandler {
             optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString();
         String source =
             optionService.getByPropertyOrDefault(MinioProperties.SOURCE, String.class, "");
+        String region =
+            optionService.getByPropertyOrDefault(MinioProperties.REGION, String.class, "us-east-1");
 
         endpoint = StringUtils.appendIfMissing(endpoint, HaloConst.URL_SEPARATOR);
 
         MinioClient minioClient = MinioClient.builder()
             .endpoint(endpoint)
             .credentials(accessKey, accessSecret)
+            .region(region)
             .build();
 
         try {
@@ -75,6 +78,7 @@ public class MinioFileHandler implements FileHandler {
                 .stream(file.getInputStream(), file.getSize(), -1)
                 .object(upFilePath)
                 .build();
+            minioClient.ignoreCertCheck();
             minioClient.putObject(putObjectArgs);
 
             UploadResult uploadResult = new UploadResult();
@@ -110,13 +114,17 @@ public class MinioFileHandler implements FileHandler {
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_SECRET).toString();
         String bucketName =
             optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString();
+        String region =
+            optionService.getByPropertyOrDefault(MinioProperties.REGION, String.class, "us-east-1");
 
         MinioClient minioClient = MinioClient.builder()
             .endpoint(endPoint)
             .credentials(accessKey, accessSecret)
+            .region(region)
             .build();
 
         try {
+            minioClient.ignoreCertCheck();
             minioClient.removeObject(RemoveObjectArgs.builder()
                 .bucket(bucketName)
                 .object(key)

@@ -25,6 +25,7 @@ import run.halo.app.event.user.UserUpdatedEvent;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.SeoProperties;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.service.ClientOptionService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
@@ -41,7 +42,7 @@ import run.halo.app.service.UserService;
 @Component
 public class FreemarkerConfigAwareListener {
 
-    private final OptionService optionService;
+    private final ClientOptionService optionService;
 
     private final Configuration configuration;
 
@@ -53,7 +54,7 @@ public class FreemarkerConfigAwareListener {
 
     private final AbstractStringCacheStore cacheStore;
 
-    public FreemarkerConfigAwareListener(OptionService optionService,
+    public FreemarkerConfigAwareListener(ClientOptionService optionService,
         Configuration configuration,
         ThemeService themeService,
         ThemeSettingService themeSettingService,

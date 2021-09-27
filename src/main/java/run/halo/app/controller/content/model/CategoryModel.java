@@ -5,6 +5,7 @@ import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
 import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
 
 import com.google.common.collect.Sets;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -77,8 +78,8 @@ public class CategoryModel {
      * List category posts.
      *
      * @param model model
-     * @param slug slug
-     * @param page current page
+     * @param slug  slug
+     * @param page  current page
      * @return template name
      */
     public String listPost(Model model, String slug, Integer page) {
@@ -95,14 +96,18 @@ public class CategoryModel {
             return "common/template/" + POST_PASSWORD_TEMPLATE;
         }
 
+        Set<PostStatus> statuses = Sets.immutableEnumSet(PostStatus.PUBLISHED);
+        if (StringUtils.isNotBlank(category.getPassword())) {
+            statuses = Sets.immutableEnumSet(PostStatus.INTIMATE);
+        }
+
         CategoryDTO categoryDTO = categoryService.convertTo(category);
 
         final Pageable pageable = PageRequest.of(page - 1,
             optionService.getArchivesPageSize(),
             Sort.by(DESC, "topPriority", "createTime"));
         Page<Post> postPage =
-            postCategoryService.pagePostBy(category.getId(), Sets
-                .immutableEnumSet(PostStatus.PUBLISHED), pageable);
+            postCategoryService.pagePostBy(category.getId(), statuses, pageable);
         Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         // Generate meta description.

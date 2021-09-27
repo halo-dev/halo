@@ -1,6 +1,61 @@
 # CHANGELOG
 
-# 1.4.9
+# 1.4.12
+
+## Features
+
+- Minio 存储提供 Region 设置项。halo-dev/halo#1440 halo-dev/halo-admin#346
+
+## Improvements
+
+- 后台菜单列表提供拖动按钮，优化拖动排序的体验。halo-dev/halo-admin#350
+- 后台升级 CodeMirror 的版本，降低最终构建体积。halo-dev/halo-admin#354
+- 后台文章编辑器支持显示滚动条，编辑器始终占用窗口剩下的区域高度。halo-dev/halo-admin#355
+
+## Bug Fixes
+
+- 修复 Minio 存储 EndPoint 使用 HTTPS 协议时，无法上传文件的问题。halo-dev/halo#1458
+- 修复上传 ICO 格式附件无法读取宽高度的问题。halo-dev/halo#1474
+- 修复加密分类目录输入密码之后无法正常显示文章列表的问题。halo-dev/halo#1471
+- 修复手动上传的主题无法通过远程 Git 仓库更新的问题。halo-dev/halo#1479
+- 修复在 macOS 下，后台登录页面无法通过快捷键显示找回密码按钮的问题。halo-dev/halo-admin#352
+
+# 1.4.11
+
+## Bug Fixes
+
+- 修复 Content Api 中文章列表接口的 `keyword` 和 `categoryId` 参数为必传的问题。halo-dev/halo#1436
+- 修复删除非图片附件时提示附件缩略图删除失败的问题。halo-dev/halo#1438
+
+# 1.4.10
+
+## Features
+
+- 编辑器支持脚注语法。halo-dev/halo#1406 halo-dev/halo-admin#341
+
+## Improvements
+
+- 优化文章字数计算。halo-dev/halo#1354
+- Content Api 中的获取文章列表支持传入关键字和分类 id 筛选项。halo-dev/halo#1373
+- 优化导入 Markdown 时，对多级分类的处理。halo-dev/halo#1380
+
+## Security Fixes
+
+- 修复 Freemarker SSTI 漏洞。halo-dev/halo#1402 halo-dev/halo#1427 Thanks @LazyMaple @5wimming
+
+## Bug Fixes
+
+- 修复在分类文章列表可以显示私密文章的问题。halo-dev/halo#1379
+- 修复使用后台的小工具数据导出迁移后分类密码消失的问题。halo-dev/halo#1390
+- 修复在站点初始化的时候，`全局绝对路径` 选项设置错误的问题。halo-dev/halo#1396
+- 修复 Content Api 的文章点赞接口限流没有按照文章 id 做处理的问题。halo-dev/halo#1410
+- 修复回收站的文章可以访问的问题。halo-dev/halo#1414
+- 修复后台评论回复时，输入框无法输入空格的问题。halo-dev/halo-admin#322
+- 修复后台菜单管理中菜单项的链接过长会导致挡住操作按钮的问题。halo-dev/halo-admin#328
+- 修复后台日志管理中长文本无法换行的问题。halo-dev/halo-admin#330
+- 修复后台在登录页面无法通过回车键进行登录的问题。halo-dev/halo-admin#332
+
+# 1.4.9(deprecated)
 
 ## Features
 

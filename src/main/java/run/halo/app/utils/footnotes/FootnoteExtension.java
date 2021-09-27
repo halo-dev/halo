@@ -9,7 +9,7 @@ import com.vladsch.flexmark.util.data.DataKey;
 import com.vladsch.flexmark.util.data.MutableDataHolder;
 import com.vladsch.flexmark.util.format.options.ElementPlacement;
 import com.vladsch.flexmark.util.format.options.ElementPlacementSort;
-import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.NonNull;
 import run.halo.app.utils.footnotes.internal.FootnoteBlockParser;
 import run.halo.app.utils.footnotes.internal.FootnoteLinkRefProcessor;
 import run.halo.app.utils.footnotes.internal.FootnoteNodeFormatter;
@@ -63,8 +63,8 @@ public class FootnoteExtension
     }
 
     @Override
-    public void extend(@NotNull HtmlRenderer.Builder htmlRendererBuilder,
-        @NotNull String rendererType) {
+    public void extend(@NonNull HtmlRenderer.Builder htmlRendererBuilder,
+        @NonNull String rendererType) {
         if (htmlRendererBuilder.isRendererType("HTML")) {
             htmlRendererBuilder.nodeRendererFactory(new FootnoteNodeRenderer.Factory());
         }
@@ -77,7 +77,7 @@ public class FootnoteExtension
     }
 
     @Override
-    public void rendererOptions(@NotNull MutableDataHolder options) {
+    public void rendererOptions(@NonNull MutableDataHolder options) {
 
     }
 

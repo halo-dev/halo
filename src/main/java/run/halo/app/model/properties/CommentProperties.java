@@ -12,7 +12,7 @@ public enum CommentProperties implements PropertyEnum {
     /**
      * The default gravatar type.
      */
-    GRAVATAR_DEFAULT("comment_gravatar_default", String.class, "mm"),
+    GRAVATAR_DEFAULT("comment_gravatar_default", String.class, ""),
 
     /**
      * Does it need to be checked.

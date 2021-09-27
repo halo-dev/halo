@@ -1,0 +1,31 @@
+name: Feature Request
+description: File a feature request
+body:
+  - type: markdown
+    id: preface
+    attributes:
+      value: "Hello there! Thank you for submitting new features for Halo. Please spend a little bit to fill in the following instructions in detail."
+  - type: markdown
+    id: environment
+    attributes:
+      value: "## Environment"
+  - type: input
+    id: version
+    attributes:
+      label: "Your current Halo version"
+      description: "Can be found in backstage management system."
+  - type: markdown
+    id: details
+    attributes:
+      value: "## Details"
+  - type: textarea
+    id: description
+    attributes:
+      label: "Describe this feature"
+    validations:
+      required: true
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: "Additional information"
+      description: "If you have other information to note, you can fill it in here (screenshots, videos, etc.)."
