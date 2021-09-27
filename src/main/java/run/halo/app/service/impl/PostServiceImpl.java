@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -996,11 +995,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         String archivesPrefix = optionService.getArchivesPrefix();
 
-        int month = DateUtil.month(post.getCreateTime()) + 1;
+        int month = DateUtils.month(post.getCreateTime()) + 1;
 
         String monthString = month < 10 ? "0" + month : String.valueOf(month);
 
-        int day = DateUtil.dayOfMonth(post.getCreateTime());
+        int day = DateUtils.dayOfMonth(post.getCreateTime());
 
         String dayString = day < 10 ? "0" + day : String.valueOf(day);
 
@@ -1021,14 +1020,14 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             fullPath.append("?p=")
                 .append(post.getId());
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
+            fullPath.append(DateUtils.year(post.getCreateTime()))
                 .append(URL_SEPARATOR)
                 .append(monthString)
                 .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
+            fullPath.append(DateUtils.year(post.getCreateTime()))
                 .append(URL_SEPARATOR)
                 .append(monthString)
                 .append(URL_SEPARATOR)
@@ -1037,7 +1036,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.YEAR)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
+            fullPath.append(DateUtils.year(post.getCreateTime()))
                 .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);

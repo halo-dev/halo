@@ -1,5 +1,6 @@
 package run.halo.app.utils;
 
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.Week;
 import java.text.ParseException;
@@ -145,12 +146,32 @@ public class DateUtils {
     }
 
     /**
+     * Gets the year in the date
+     *
+     * @param date date
+     * @return year in the date
+     */
+    public static int year(Date date) {
+        return getField(date, Calendar.YEAR);
+    }
+
+    /**
      * Get the month, counting from 0
      *
      * @return month for the given date.
      */
     public static int month(Date date) {
         return getField(date, Calendar.MONTH);
+    }
+
+    /**
+     * Get the specified date is the day of the month in which the date is located.
+     *
+     * @param date date
+     * @return day of the month in given date
+     */
+    public static int dayOfMonth(Date date) {
+        return getField(date, Calendar.DAY_OF_MONTH);
     }
 
     /**

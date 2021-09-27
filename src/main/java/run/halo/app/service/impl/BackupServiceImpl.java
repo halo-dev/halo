@@ -6,7 +6,6 @@ import static run.halo.app.model.support.HaloConst.HALO_DATA_EXPORT_PREFIX;
 import static run.halo.app.utils.DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER;
 import static run.halo.app.utils.FileUtils.checkDirectoryTraversal;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.io.file.FileWriter;
 import cn.hutool.core.util.CharsetUtil;
@@ -96,6 +95,7 @@ import run.halo.app.service.TagService;
 import run.halo.app.service.ThemeSettingService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.DateTimeUtils;
+import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.JsonUtils;
 
@@ -334,7 +334,7 @@ public class BackupServiceImpl implements BackupService {
     public BackupDTO exportData() {
         Map<String, Object> data = new HashMap<>();
         data.put("version", HaloConst.HALO_VERSION);
-        data.put("export_date", DateUtil.now());
+        data.put("export_date", DateUtils.now());
         data.put("attachments", attachmentService.listAll());
         data.put("categories", categoryService.listAll(true));
         data.put("comment_black_list", commentBlackListService.listAll());

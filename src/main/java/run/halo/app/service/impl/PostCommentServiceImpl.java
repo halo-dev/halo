@@ -2,7 +2,6 @@ package run.halo.app.service.impl;
 
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
-import cn.hutool.core.date.DateUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +31,7 @@ import run.halo.app.service.CommentBlackListService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ServletUtils;
 
@@ -128,11 +128,11 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
 
         String archivesPrefix = optionService.getArchivesPrefix();
 
-        int month = DateUtil.month(post.getCreateTime()) + 1;
+        int month = DateUtils.month(post.getCreateTime()) + 1;
 
         String monthString = month < 10 ? "0" + month : String.valueOf(month);
 
-        int day = DateUtil.dayOfMonth(post.getCreateTime());
+        int day = DateUtils.dayOfMonth(post.getCreateTime());
 
         String dayString = day < 10 ? "0" + day : String.valueOf(day);
 
@@ -153,14 +153,14 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
             fullPath.append("?p=")
                 .append(post.getId());
         } else if (permalinkType.equals(PostPermalinkType.DATE)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
+            fullPath.append(DateUtils.year(post.getCreateTime()))
                 .append(URL_SEPARATOR)
                 .append(monthString)
                 .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.DAY)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
+            fullPath.append(DateUtils.year(post.getCreateTime()))
                 .append(URL_SEPARATOR)
                 .append(monthString)
                 .append(URL_SEPARATOR)
@@ -169,7 +169,7 @@ public class PostCommentServiceImpl extends BaseCommentServiceImpl<PostComment>
                 .append(post.getSlug())
                 .append(pathSuffix);
         } else if (permalinkType.equals(PostPermalinkType.YEAR)) {
-            fullPath.append(DateUtil.year(post.getCreateTime()))
+            fullPath.append(DateUtils.year(post.getCreateTime()))
                 .append(URL_SEPARATOR)
                 .append(post.getSlug())
                 .append(pathSuffix);
