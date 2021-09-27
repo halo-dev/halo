@@ -5,12 +5,14 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 import cn.hutool.core.util.URLUtil;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.model.support.HaloConst;
 
 /**
@@ -279,5 +281,13 @@ public class HaloUtils {
             return StringUtils.EMPTY;
         }
         return content.replaceAll(RE_HTML_MARK, StringUtils.EMPTY);
+    }
+
+    /**
+     * @param collection collection
+     * @return true if this collection not null and contains elements.
+     */
+    public static boolean isNotEmpty(Collection<?> collection) {
+        return !CollectionUtils.isEmpty(collection);
     }
 }

@@ -1,7 +1,9 @@
 package run.halo.app.utils;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
@@ -87,5 +89,55 @@ public class DateUtils {
                 result = date;
         }
         return result;
+    }
+
+    /**
+     * Parses a string representing a date by trying a variety of different patterns,
+     * using the default date format symbols for the default locale.
+     *
+     * @param str date string
+     * @return the parsed date
+     */
+    public static Date parseDate(String str) {
+        return parseDate(str, Locale.getDefault());
+    }
+
+    /**
+     * Parses a string representing a date by trying a variety of different patterns,
+     * using the default date format symbols for the given locale.
+     *
+     * @param str date string
+     * @param locale locale the locale whose date format symbols should be used.
+     *               If null, the system locale is used (as per parseDate(String, String...)).
+     * @return the parsed date object
+     */
+    public static Date parseDate(String str, Locale locale) {
+        String[] patterns = new String[] {"yyyy-MM-dd HH:mm:ss",
+            "yyyy/MM/dd HH:mm:ss",
+            "yyyy.MM.dd HH:mm:ss",
+            "yyyy年MM月dd日 HH时mm分ss秒",
+            "yyyy-MM-dd",
+            "yyyy/MM/dd",
+            "yyyy.MM.dd",
+            "HH:mm:ss",
+            "HH时mm分ss秒",
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd HH:mm:ss.SSS",
+            "yyyyMMddHHmmss",
+            "yyyyMMddHHmmssSSS",
+            "yyyyMMdd",
+            "yyyy-MM-dd'T'HH:mm:ss",
+
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+
+            "yyyy-MM-dd'T'HH:mm:ssZ",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+        };
+        try {
+            return org.apache.commons.lang3.time.DateUtils.parseDate(str, locale, patterns);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

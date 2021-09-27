@@ -3,7 +3,6 @@ package run.halo.app.service.impl;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import java.util.ArrayList;
@@ -72,6 +71,7 @@ import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
 import run.halo.app.utils.DateUtils;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.SlugUtils;
@@ -393,7 +393,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                             post.setTitle(ele);
                             break;
                         case "date":
-                            post.setCreateTime(DateUtil.parse(ele));
+                            post.setCreateTime(DateUtils.parseDate(ele));
                             break;
                         case "permalink":
                             post.setSlug(ele);
@@ -843,7 +843,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Create or update post
         Boolean needEncrypt = Optional.ofNullable(categoryIds)
-            .filter(CollectionUtil::isNotEmpty)
+            .filter(HaloUtils::isNotEmpty)
             .map(categoryIdSet -> {
                 for (Integer categoryId : categoryIdSet) {
                     if (categoryService.categoryHasEncrypt(categoryId)) {

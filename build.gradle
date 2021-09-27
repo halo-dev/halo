@@ -75,6 +75,7 @@ bootBuildImage {
 
 ext {
     hutoolVersion = "5.3.8"
+    guavaVersion= "31.0-jre"
     upyunSdkVersion = "4.2.0"
     qiniuSdkVersion = "7.2.29"
     aliyunSdkVersion = "3.11.3"
@@ -109,6 +110,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     implementation "com.sun.mail:jakarta.mail"
+    implementation "com.google.guava:guava:$guavaVersion"
     implementation "cn.hutool:hutool-core:$hutoolVersion"
     implementation "cn.hutool:hutool-crypto:$hutoolVersion"
     implementation "cn.hutool:hutool-extra:$hutoolVersion"

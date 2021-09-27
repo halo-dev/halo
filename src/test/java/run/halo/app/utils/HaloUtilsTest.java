@@ -1,8 +1,11 @@
 package run.halo.app.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.google.common.collect.ImmutableList;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
@@ -152,5 +155,12 @@ class HaloUtilsTest {
 
         assertEquals("https://cn.gravatar.com/avatar?d=mm",
             HaloUtils.normalizeUrl("https://cn.gravatar.com/avatar?d=mm"));
+    }
+
+    @Test
+    void collectionIsNotEmpty() {
+        assertFalse(HaloUtils.isNotEmpty(null));
+        assertFalse(HaloUtils.isNotEmpty(ImmutableList.of()));
+        assertTrue(HaloUtils.isNotEmpty(ImmutableList.of("A")));
     }
 }
