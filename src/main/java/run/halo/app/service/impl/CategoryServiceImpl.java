@@ -2,7 +2,6 @@ package run.halo.app.service.impl;
 
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
-import cn.hutool.core.collection.CollectionUtil;
 import com.google.common.base.Objects;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,6 +42,7 @@ import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.BeanUtils;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 
 /**
@@ -298,7 +298,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     @Override
     public void refreshPostStatus(List<Integer> affectedPostIdList) {
-        if (CollectionUtil.isEmpty(affectedPostIdList)) {
+        if (CollectionUtils.isEmpty(affectedPostIdList)) {
             return;
         }
 
@@ -368,7 +368,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     @Override
     public List<Category> filterEncryptCategory(List<Category> categories) {
-        if (CollectionUtil.isEmpty(categories)) {
+        if (CollectionUtils.isEmpty(categories)) {
             return Collections.emptyList();
         }
 
@@ -399,7 +399,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * @param categoryList category list
      */
     private void doFilterEncryptCategory(List<CategoryVO> categoryList) {
-        if (CollectionUtil.isEmpty(categoryList)) {
+        if (CollectionUtils.isEmpty(categoryList)) {
             return;
         }
 
@@ -423,7 +423,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     private void collectAllChild(List<Category> collectorList,
         List<CategoryVO> childrenList,
         Boolean doNotCollectEncryptedCategory) {
-        if (CollectionUtil.isEmpty(childrenList)) {
+        if (CollectionUtils.isEmpty(childrenList)) {
             return;
         }
 
@@ -439,7 +439,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
                 continue;
             }
 
-            if (CollectionUtil.isNotEmpty(categoryVO.getChildren())) {
+            if (HaloUtils.isNotEmpty(categoryVO.getChildren())) {
                 collectAllChild(collectorList,
                     categoryVO.getChildren(), doNotCollectEncryptedCategory);
             }
@@ -459,7 +459,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         List<CategoryVO> childrenList,
         Integer categoryId,
         Boolean doNotCollectEncryptedCategory) {
-        if (CollectionUtil.isEmpty(childrenList)) {
+        if (CollectionUtils.isEmpty(childrenList)) {
             return;
         }
 

@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.entity.Journal;
@@ -56,7 +56,7 @@ public class JournalCommentServiceImpl extends BaseCommentServiceImpl<JournalCom
     public List<JournalCommentWithJournalVO> convertToWithJournalVo(
         List<JournalComment> journalComments) {
 
-        if (CollectionUtil.isEmpty(journalComments)) {
+        if (CollectionUtils.isEmpty(journalComments)) {
             return Collections.emptyList();
         }
 
