@@ -309,4 +309,51 @@ public class HaloUtils {
         str = StringUtils.stripStart(str, prefixStripChars);
         return StringUtils.stripEnd(str, suffixStripChars);
     }
+
+
+    /**
+     * 分页彩虹算法<br>
+     * 来自：https://github.com/iceroot/iceroot/blob/master/src/main/java/com/icexxx/util/IceUtil.java<br>
+     * 通过传入的信息，生成一个分页列表显示
+     *
+     * @param pageNo       当前页
+     * @param totalPage    总页数
+     * @param displayCount 每屏展示的页数
+     * @return 分页条
+     */
+    public static int[] rainbow(int pageNo, int totalPage, int displayCount) {
+        boolean isEven = displayCount % 2 == 0;
+        int left = displayCount / 2;
+        int right = displayCount / 2;
+
+        int length = displayCount;
+        if (isEven) {
+            right++;
+        }
+        if (totalPage < displayCount) {
+            length = totalPage;
+        }
+        int[] result = new int[length];
+        if (totalPage >= displayCount) {
+            if (pageNo <= left) {
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = i + 1;
+                }
+            } else if (pageNo > totalPage - right) {
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = i + totalPage - displayCount + 1;
+                }
+            } else {
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = i + pageNo - left + (isEven ? 1 : 0);
+                }
+            }
+        } else {
+            for (int i = 0; i < result.length; i++) {
+                result[i] = i + 1;
+            }
+        }
+        return result;
+
+    }
 }

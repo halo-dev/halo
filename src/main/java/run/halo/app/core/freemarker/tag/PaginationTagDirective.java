@@ -2,7 +2,6 @@ package run.halo.app.core.freemarker.tag;
 
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
-import cn.hutool.core.util.PageUtil;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapperBuilder;
@@ -19,6 +18,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.Pagination;
 import run.halo.app.model.support.RainbowPage;
 import run.halo.app.service.OptionService;
+import run.halo.app.utils.HaloUtils;
 
 /**
  * @author ryanwang
@@ -60,7 +60,7 @@ public class PaginationTagDirective implements TemplateDirectiveModel {
                 prevPageFullPath.append(optionService.getBlogBaseUrl());
             }
 
-            int[] rainbow = PageUtil.rainbow(page + 1, total, display);
+            int[] rainbow = HaloUtils.rainbow(page + 1, total, display);
 
             List<RainbowPage> rainbowPages = new ArrayList<>();
             StringBuilder fullPath = new StringBuilder();
