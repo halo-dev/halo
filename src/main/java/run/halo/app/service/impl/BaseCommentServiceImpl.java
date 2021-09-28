@@ -2,7 +2,6 @@ package run.halo.app.service.impl;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-import cn.hutool.core.util.URLUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,6 +53,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BaseCommentService;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ServletUtils;
 import run.halo.app.utils.ValidationUtils;
@@ -328,7 +328,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         }
 
         if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {
-            comment.setAuthorUrl(URLUtil.normalize(comment.getAuthorUrl()));
+            comment.setAuthorUrl(HaloUtils.normalizeUrl(comment.getAuthorUrl()));
         }
 
         if (authentication != null) {

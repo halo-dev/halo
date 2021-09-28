@@ -74,7 +74,6 @@ bootBuildImage {
 }
 
 ext {
-    hutoolVersion = "5.3.8"
     guavaVersion= "31.0-jre"
     upyunSdkVersion = "4.2.0"
     qiniuSdkVersion = "7.2.29"
@@ -111,9 +110,6 @@ dependencies {
 
     implementation "com.sun.mail:jakarta.mail"
     implementation "com.google.guava:guava:$guavaVersion"
-    implementation "cn.hutool:hutool-core:$hutoolVersion"
-    implementation "cn.hutool:hutool-crypto:$hutoolVersion"
-    implementation "cn.hutool:hutool-extra:$hutoolVersion"
     implementation "com.upyun:java-sdk:$upyunSdkVersion"
     implementation "com.qiniu:qiniu-java-sdk:$qiniuSdkVersion"
     implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"

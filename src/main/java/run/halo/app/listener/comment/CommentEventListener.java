@@ -1,7 +1,5 @@
 package run.halo.app.listener.comment;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.text.StrBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +27,7 @@ import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.ValidationUtils;
 
 /**
  * PostComment event listener.
@@ -146,10 +145,10 @@ public class CommentEventListener {
 
             Journal journal = journalService.getById(journalComment.getPostId());
 
-            StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
+            StringBuilder url = new StringBuilder(optionService.getBlogBaseUrl())
                 .append("/")
                 .append(optionService.getJournalsPrefix());
-            data.put("pageFullPath", url.toString());
+            data.put("pageFullPath", url);
             data.put("pageTitle", journal.getCreateTime());
             data.put("author", journalComment.getAuthor());
             data.put("content", journalComment.getContent());
@@ -201,7 +200,7 @@ public class CommentEventListener {
             PostComment baseComment = postCommentService.getById(postComment.getParentId());
 
             if (StringUtils.isEmpty(baseComment.getEmail())
-                && !Validator.isEmail(baseComment.getEmail())) {
+                && !ValidationUtils.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -234,7 +233,7 @@ public class CommentEventListener {
             SheetComment baseComment = sheetCommentService.getById(sheetComment.getParentId());
 
             if (StringUtils.isEmpty(baseComment.getEmail())
-                && !Validator.isEmail(baseComment.getEmail())) {
+                && !ValidationUtils.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -268,7 +267,7 @@ public class CommentEventListener {
                 journalCommentService.getById(journalComment.getParentId());
 
             if (StringUtils.isEmpty(baseComment.getEmail())
-                && !Validator.isEmail(baseComment.getEmail())) {
+                && !ValidationUtils.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -280,7 +279,7 @@ public class CommentEventListener {
 
             Journal journal = journalService.getById(journalComment.getPostId());
 
-            StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
+            StringBuilder url = new StringBuilder(optionService.getBlogBaseUrl())
                 .append("/")
                 .append(optionService.getJournalsPrefix());
             data.put("pageFullPath", url);

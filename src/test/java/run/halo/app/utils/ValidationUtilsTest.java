@@ -1,7 +1,9 @@
 package run.halo.app.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -53,6 +55,13 @@ class ValidationUtilsTest {
             () -> ValidationUtils.validate(cars));
 
         validateIteratorTest(exception.getConstraintViolations());
+    }
+
+    @Test
+    void emailValidateTest() {
+        assertTrue(ValidationUtils.isEmail("example@example.com"));
+        assertTrue(ValidationUtils.isEmail("12313213@example.com"));
+        assertFalse(ValidationUtils.isEmail("example.com"));
     }
 
     void validateIteratorTest(Set<? extends ConstraintViolation<?>> violations) {

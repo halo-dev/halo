@@ -2,8 +2,6 @@ package run.halo.app.service.impl;
 
 import static run.halo.app.model.support.HaloConst.DATABASE_PRODUCT_NAME;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.RandomUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -44,6 +42,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.TwoFactorAuthUtils;
+import run.halo.app.utils.ValidationUtils;
 
 /**
  * Admin service implementation.
@@ -97,7 +96,7 @@ public class AdminServiceImpl implements AdminService {
 
         try {
             // Get user by username or email
-            user = Validator.isEmail(username)
+            user = ValidationUtils.isEmail(username)
                 ? userService.getByEmailOfNonNull(username) :
                 userService.getByUsernameOfNonNull(username);
         } catch (NotFoundException e) {
@@ -194,7 +193,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // Gets random code.
-        String code = RandomUtil.randomNumbers(6);
+        String code = HaloUtils.randomNumbers(6);
 
         log.info("Got reset password code:{}", code);
 
@@ -388,7 +387,7 @@ public class AdminServiceImpl implements AdminService {
 
         boolean useMFA = true;
         try {
-            final User user = Validator.isEmail(username)
+            final User user = ValidationUtils.isEmail(username)
                 ? userService.getByEmailOfNonNull(username) :
                 userService.getByUsernameOfNonNull(username);
             useMFA = MFAType.useMFA(user.getMfaType());

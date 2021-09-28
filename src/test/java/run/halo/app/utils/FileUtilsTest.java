@@ -1,10 +1,13 @@
 package run.halo.app.utils;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -305,5 +308,13 @@ class FileUtilsTest {
 
         assertTrue(Files.exists(target.resolve(".git")));
         assertEquals("test", Files.readString(target.resolve(".git").resolve("test.txt")));
+    }
+
+    @Test
+    void convertInputStreamToString() {
+        String originalString = randomAlphabetic(8);
+        InputStream inputStream = new ByteArrayInputStream(originalString.getBytes());
+
+        assertEquals(originalString, FileUtils.readString(inputStream));
     }
 }

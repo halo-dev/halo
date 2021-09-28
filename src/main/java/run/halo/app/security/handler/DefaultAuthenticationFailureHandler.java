@@ -1,6 +1,5 @@
 package run.halo.app.security.handler;
 
-import cn.hutool.extra.servlet.ServletUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +11,7 @@ import run.halo.app.exception.AbstractHaloException;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.utils.ExceptionUtils;
 import run.halo.app.utils.JsonUtils;
+import run.halo.app.utils.ServletUtils;
 
 /**
  * Default AuthenticationFailureHandler.
@@ -32,7 +32,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
     @Override
     public void onFailure(HttpServletRequest request, HttpServletResponse response,
         AbstractHaloException exception) throws IOException {
-        log.warn("Handle unsuccessful authentication, ip: [{}]", ServletUtil.getClientIP(request));
+        log.warn("Handle unsuccessful authentication, ip: [{}]", ServletUtils.getClientIP(request));
         log.error("Authentication failure: [{}], status: [{}], data: [{}]", exception.getMessage(),
             exception.getStatus(), exception.getErrorData());
 

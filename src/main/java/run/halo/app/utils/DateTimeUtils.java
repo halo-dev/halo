@@ -1,10 +1,5 @@
 package run.halo.app.utils;
 
-import static cn.hutool.core.date.DatePattern.NORM_DATETIME_PATTERN;
-import static cn.hutool.core.date.DatePattern.NORM_DATE_PATTERN;
-import static cn.hutool.core.date.DatePattern.PURE_DATETIME_PATTERN;
-import static cn.hutool.core.date.DatePattern.PURE_DATE_PATTERN;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,9 +16,28 @@ import java.util.Date;
  * 日期工具
  *
  * @author LeiXinXin
- * @date 2019/12/10
+ * @author guqing
+ * @since 2019/12/10
  */
 public class DateTimeUtils {
+
+    /**
+     * 标准日期时间格式，精确到秒：yyyy-MM-dd HH:mm:ss
+     */
+    public static final String NORM_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    /**
+     * 标准日期格式：yyyy-MM-dd
+     */
+    public static final String NORM_DATE_PATTERN = "yyyy-MM-dd";
+    /**
+     * 标准日期格式：yyyyMMddHHmmss
+     */
+    public static final String PURE_DATETIME_PATTERN = "yyyyMMddHHmmss";
+    /**
+     * 标准日期格式：yyyyMMdd
+     */
+    public static final String PURE_DATE_PATTERN = "yyyyMMdd";
+
     /**
      * 标准日期格式 {@link DateTimeFormatter}：yyyyMMddHHmmssSSS
      */

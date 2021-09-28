@@ -1,6 +1,5 @@
 package run.halo.app.controller.admin.api;
 
-import cn.hutool.crypto.SecureUtil;
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.Nullable;
@@ -279,7 +279,7 @@ public class InstallController {
             return userService.update(user);
         }).orElseGet(() -> {
             String gravatar =
-                "//cn.gravatar.com/avatar/" + SecureUtil.md5(installParam.getEmail())
+                "//cn.gravatar.com/avatar/" + DigestUtils.md5Hex(installParam.getEmail())
                     + "?s=256&d=mm";
             installParam.setAvatar(gravatar);
             return userService.createBy(installParam);

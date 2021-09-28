@@ -101,7 +101,8 @@ public class ServletUtils {
      * @return IP地址
      */
     public static String getClientIP(HttpServletRequest request, String... otherHeaderNames) {
-        String[] headers = { "X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR" };
+        String[] headers = {"X-Forwarded-For", "X-Real-IP", "Proxy-Client-IP", "WL-Proxy-Client-IP",
+            "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
         if (ArrayUtils.isNotEmpty(otherHeaderNames)) {
             headers = ArrayUtils.addAll(headers, otherHeaderNames);
         }
@@ -111,7 +112,7 @@ public class ServletUtils {
 
 
     /**
-     * 检测给定字符串是否为未知，多用于检测HTTP请求相关<br>
+     * 检测给定字符串是否为未知，多用于检测HTTP请求相关.
      *
      * @param checkString 被检测的字符串
      * @return 是否未知
@@ -122,7 +123,7 @@ public class ServletUtils {
     }
 
     /**
-     * 获取客户端IP
+     * 获取客户端IP.
      *
      * <p>
      * headerNames参数用于自定义检测的Header<br>
@@ -149,7 +150,7 @@ public class ServletUtils {
 
 
     /**
-     * 从多级反向代理中获得第一个非unknown IP地址
+     * 从多级反向代理中获得第一个非unknown IP地址.
      *
      * @param ip 获得的IP地址
      * @return 第一个非unknown IP地址

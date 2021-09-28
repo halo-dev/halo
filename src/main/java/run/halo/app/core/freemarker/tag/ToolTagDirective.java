@@ -1,6 +1,5 @@
 package run.halo.app.core.freemarker.tag;
 
-import cn.hutool.core.util.RandomUtil;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapperBuilder;
@@ -46,7 +45,7 @@ public class ToolTagDirective implements TemplateDirectiveModel {
                 case "random":
                     int min = Integer.parseInt(params.get("min").toString());
                     int max = Integer.parseInt(params.get("max").toString());
-                    env.setVariable("number", builder.build().wrap(RandomUtil.randomInt(min, max)));
+                    env.setVariable("number", builder.build().wrap(HaloUtils.randomInt(min, max)));
                     break;
                 default:
                     break;

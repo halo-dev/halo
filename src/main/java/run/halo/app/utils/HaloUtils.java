@@ -2,7 +2,6 @@ package run.halo.app.utils;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
-import cn.hutool.core.util.URLUtil;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -20,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,8 @@ import run.halo.app.model.support.HaloConst;
  *
  * @author ryanwang
  * @author johnniang
- * @date 2017-12-22
+ * @author guqing
+ * @since 2017-12-22
  */
 @Slf4j
 public class HaloUtils {
@@ -266,7 +267,40 @@ public class HaloUtils {
             return originalUrl;
         }
 
-        return URLUtil.normalize(originalUrl);
+        final int sepIndex = originalUrl.indexOf("://");
+        String protocol;
+        String body;
+        if (sepIndex > 0) {
+            protocol = StringUtils.substring(originalUrl, 0, sepIndex + 3);
+            body = StringUtils.substring(originalUrl, sepIndex + 3, originalUrl.length());
+        } else {
+            protocol = "http://";
+            body = originalUrl;
+        }
+
+        final int paramsSepIndex = StringUtils.indexOf(body, '?');
+        String params = null;
+        if (paramsSepIndex > 0) {
+            params = StringUtils.substring(body, paramsSepIndex, body.length());
+            body = StringUtils.substring(body, 0, paramsSepIndex);
+        }
+
+        if (StringUtils.isNotEmpty(body)) {
+            // 去除开头的\或者/
+            body = body.replaceAll("^[\\\\/]+", StringUtils.EMPTY);
+            // 替换多个\或/为单个/
+            body = body.replace("\\", "/").replaceAll("//+", "/");
+        }
+
+        final int pathSepIndex = StringUtils.indexOf(body, '/');
+        String domain = body;
+        String path = null;
+        if (pathSepIndex > 0) {
+            domain = StringUtils.substring(body, 0, pathSepIndex);
+            path = StringUtils.substring(body, pathSepIndex, body.length());
+        }
+        return protocol + domain + StringUtils.defaultIfEmpty(path, StringUtils.EMPTY)
+            + StringUtils.defaultIfEmpty(params, StringUtils.EMPTY);
     }
 
     /**
@@ -311,7 +345,8 @@ public class HaloUtils {
      * to be stripped to be controlled.</p>
      *
      * @param str the String to remove characters from, may be null
-     * @param prefixStripChars the characters to remove from start of str, null treated as whitespace
+     * @param prefixStripChars the characters to remove from start of str, null treated as
+     *                        whitespace
      * @param suffixStripChars the characters to remove from end of str, null treated as whitespace
      * @return the stripped String, {@code null} if null String input
      */
@@ -422,5 +457,51 @@ public class HaloUtils {
         } catch (IOException | WriterException e) {
             throw new UnsupportedOperationException(e);
         }
+    }
+
+    /**
+     * 获得一个随机的字符串
+     *
+     * @param baseString 随机字符选取的样本
+     * @param length     字符串的长度
+     * @return 随机字符串
+     */
+    public static String randomString(String baseString, int length) {
+        if (StringUtils.isEmpty(baseString)) {
+            return StringUtils.EMPTY;
+        }
+        final StringBuilder sb = new StringBuilder(length);
+
+        if (length < 1) {
+            length = 1;
+        }
+        int baseLength = baseString.length();
+        for (int i = 0; i < length; i++) {
+            int number = randomInt(baseLength);
+            sb.append(baseString.charAt(number));
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 获得一个只包含数字的字符串
+     *
+     * @param length 字符串的长度
+     * @return 随机字符串
+     */
+    public static String randomNumbers(int length) {
+        return randomString("0123456789", length);
+    }
+
+    public static int randomInt(int min, int max) {
+        return getRandom().nextInt(min, max);
+    }
+
+    public static int randomInt(int limit) {
+        return getRandom().nextInt(limit);
+    }
+
+    public static ThreadLocalRandom getRandom() {
+        return ThreadLocalRandom.current();
     }
 }

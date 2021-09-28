@@ -6,14 +6,10 @@ import static run.halo.app.model.support.HaloConst.HALO_DATA_EXPORT_PREFIX;
 import static run.halo.app.utils.DateTimeUtils.HORIZONTAL_LINE_DATETIME_FORMATTER;
 import static run.halo.app.utils.FileUtils.checkDirectoryTraversal;
 
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.io.file.FileWriter;
-import cn.hutool.core.util.CharsetUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -95,6 +91,7 @@ import run.halo.app.service.ThemeSettingService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.DateTimeUtils;
 import run.halo.app.utils.DateUtils;
+import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.JsonUtils;
 
@@ -104,7 +101,8 @@ import run.halo.app.utils.JsonUtils;
  * @author johnniang
  * @author ryanwang
  * @author Raremaa
- * @date 2019-04-26
+ * @author guqing
+ * @since  2019-04-26
  */
 @Service
 @Slf4j
@@ -208,7 +206,7 @@ public class BackupServiceImpl implements BackupService {
     public BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException {
 
         // Read markdown content.
-        String markdown = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);
+        String markdown = FileUtils.readString(file.getInputStream());
 
         // TODO sheet import
         return postService.importMarkdown(markdown, file.getOriginalFilename());
@@ -367,9 +365,7 @@ public class BackupServiceImpl implements BackupService {
             }
             Path haloDataPath = Files.createFile(haloDataFilePath);
 
-            FileWriter fileWriter = new FileWriter(haloDataPath.toFile(), CharsetUtil.UTF_8);
-            fileWriter.write(JsonUtils.objectToJson(data));
-
+            FileUtils.writeStringToFile(haloDataPath.toFile(), JsonUtils.objectToJson(data));
             return buildBackupDto(DATA_EXPORT_BASE_URI, haloDataPath);
         } catch (IOException e) {
             throw new ServiceException("导出数据失败", e);
@@ -419,7 +415,7 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public void importData(MultipartFile file) throws IOException {
-        String jsonContent = IoUtil.read(file.getInputStream(), StandardCharsets.UTF_8);
+        String jsonContent = FileUtils.readString(file.getInputStream());
 
         ObjectMapper mapper = JsonUtils.createDefaultJsonMapper();
         TypeReference<HashMap<String, Object>> typeRef =
@@ -551,9 +547,7 @@ public class BackupServiceImpl implements BackupService {
                     Files.createDirectories(markdownFilePath.getParent());
                 }
                 Path markdownDataPath = Files.createFile(markdownFilePath);
-                FileWriter fileWriter =
-                    new FileWriter(markdownDataPath.toFile(), CharsetUtil.UTF_8);
-                fileWriter.write(content.toString());
+                FileUtils.writeStringToFile(markdownDataPath.toFile(), content.toString());
             } catch (IOException e) {
                 throw new ServiceException("导出数据失败", e);
             }
