@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.TimeZone;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -19,6 +20,8 @@ public class DateUtilsTest {
 
     @Test
     void testDateParse() {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+
         // yyyy-MM-dd HH:mm:ss
         assertDateParseEquals("Sun Sep 26 06:39:12 CST 2021", "2021-09-26 06:39:12");
 
@@ -127,7 +130,7 @@ public class DateUtilsTest {
     }
 
     private void assertDateParseEquals(String expected, String dateStr) {
-        log.debug("expected: {}, actual: {}, Locale: {}", expected, DateUtils.parseDate(dateStr),
+        log.debug("expected: {}, actual: {}, Locale: {}", expected, DateUtils.parseDate(dateStr, Locale.ENGLISH),
             Locale.getDefault());
         assertEquals(expected, DateUtils.parseDate(dateStr).toString());
     }
