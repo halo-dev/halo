@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
  * @author guqing
  * @since 2021-09-27
  */
+@Slf4j
 public class DateUtilsTest {
 
     @Test
@@ -125,6 +127,7 @@ public class DateUtilsTest {
     }
 
     private void assertDateParseEquals(String expected, String dateStr) {
-        assertEquals(expected, DateUtils.parseDate(dateStr, Locale.CHINA).toString());
+        log.debug("expected: {}, actual: {}, Locale: {}", expected, dateStr, Locale.getDefault());
+        assertEquals(expected, DateUtils.parseDate(dateStr).toString());
     }
 }
