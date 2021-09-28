@@ -130,8 +130,8 @@ public class DateUtilsTest {
     }
 
     private void assertDateParseEquals(String expected, String dateStr) {
-        log.debug("expected: {}, actual: {}, Locale: {}", expected, DateUtils.parseDate(dateStr, Locale.ENGLISH),
-            Locale.getDefault());
-        assertEquals(expected, DateUtils.parseDate(dateStr).toString());
+        log.debug("expected: {}, actual: {}, Locale: {}", expected,
+            DateUtils.parseDate(dateStr, Locale.CHINESE), Locale.getDefault());
+        assertEquals(expected, DateUtils.parseDate(dateStr, Locale.CHINESE).toString());
     }
 }
