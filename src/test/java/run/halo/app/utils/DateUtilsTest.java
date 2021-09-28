@@ -127,7 +127,8 @@ public class DateUtilsTest {
     }
 
     private void assertDateParseEquals(String expected, String dateStr) {
-        log.debug("expected: {}, actual: {}, Locale: {}", expected, dateStr, Locale.getDefault());
+        log.debug("expected: {}, actual: {}, Locale: {}", expected, DateUtils.parseDate(dateStr),
+            Locale.getDefault());
         assertEquals(expected, DateUtils.parseDate(dateStr).toString());
     }
 }
