@@ -1,6 +1,5 @@
 package run.halo.app.utils;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -18,15 +17,16 @@ import java.util.GregorianCalendar;
 import org.junit.jupiter.api.Test;
 
 /**
- * DateTimeUtils 测试用例
+ * DateTimeUtils 测试用例.
  *
  * @author LeiXinXin
  * @author guqing
  * @since 2020/1/9
  */
 class DateTimeUtilsTest {
+
     /**
-     * 获取上海时区的当前时间
+     * 获取上海时区的当前时间.
      */
     @Test
     void nowTest() {
@@ -40,7 +40,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 格式化日期时间
+     * 格式化日期时间.
      */
     @Test
     void formatTest() {
@@ -66,7 +66,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 增加时间
+     * 增加时间.
      */
     @Test
     void plusTest() {
@@ -77,7 +77,6 @@ class DateTimeUtilsTest {
         LocalTime localTime = LocalTime.of(7, 30);
         final LocalDateTime localDateTime1 = DateTimeUtils.plusOneMinute(now, localTime);
         assertEquals("2020-01-09T07:31", localDateTime1.toString());
-
 
         final LocalDate date = LocalDate.of(2020, 1, 3);
         final LocalDateTime localDateTime2 = DateTimeUtils.plusOneMinute(date, localTime);
@@ -91,7 +90,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 解析时间格式为LocalDateTime
+     * 解析时间格式为LocalDateTime.
      */
     @Test
     void parseTest() {
@@ -106,7 +105,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 减少日期时间
+     * 减少日期时间.
      */
     @Test
     void minusTest() {
@@ -116,7 +115,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 转为Instant
+     * 转为Instant.
      */
     @Test
     void toInstantTest() {
@@ -130,7 +129,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 一些其他的使用方法
+     * 一些其他的使用方法.
      */
     @Test
     void other() {

@@ -15,13 +15,13 @@ public class HttpClientUtilsTest {
         resolveHttpProxy.setAccessible(true);
 
         Object[] result = (Object[]) resolveHttpProxy.invoke(null, "http://127.0.0.1");
-        assertEquals( "http://127.0.0.1:80", result[0]);
+        assertEquals("http://127.0.0.1:80", result[0]);
 
         result = (Object[]) resolveHttpProxy.invoke(null, "https://127.0.0.1");
         assertEquals("https://127.0.0.1:443", result[0]);
 
         result = (Object[]) resolveHttpProxy.invoke(null, "https://127.0.0.1:123");
-        assertEquals( "https://127.0.0.1:123", result[0]);
+        assertEquals("https://127.0.0.1:123", result[0]);
 
         result = (Object[]) resolveHttpProxy.invoke(null, "https://u:p@127.0.0.1:123");
         assertArrayEquals(new Object[] {"https://127.0.0.1:123", "u", "p"}, result);

@@ -8,6 +8,8 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 /**
+ * DateUtils test.
+ *
  * @author guqing
  * @since 2021-09-27
  */
@@ -77,49 +79,49 @@ public class DateUtilsTest {
     void testMonth() {
         GregorianCalendar january =
             new GregorianCalendar(2021, Calendar.JANUARY, 1);
-        assertEquals(1 , DateUtils.month(january.getTime()) + 1);
+        assertEquals(1, DateUtils.month(january.getTime()) + 1);
 
         GregorianCalendar february =
             new GregorianCalendar(2021, Calendar.FEBRUARY, 2);
-        assertEquals(2 , DateUtils.month(february.getTime()) + 1);
+        assertEquals(2, DateUtils.month(february.getTime()) + 1);
 
         GregorianCalendar december =
             new GregorianCalendar(2021, Calendar.DECEMBER, 31);
-        assertEquals(12 , DateUtils.month(december.getTime()) + 1);
+        assertEquals(12, DateUtils.month(december.getTime()) + 1);
     }
 
     @Test
     void testDayOfMonth() {
         GregorianCalendar january1st =
             new GregorianCalendar(2021, Calendar.JANUARY, 1);
-        assertEquals(1 , DateUtils.dayOfMonth(january1st.getTime()));
+        assertEquals(1, DateUtils.dayOfMonth(january1st.getTime()));
 
         GregorianCalendar january2nd =
             new GregorianCalendar(2021, Calendar.JANUARY, 2);
-        assertEquals(2 , DateUtils.dayOfMonth(january2nd.getTime()));
+        assertEquals(2, DateUtils.dayOfMonth(january2nd.getTime()));
 
         GregorianCalendar january15th =
             new GregorianCalendar(2021, Calendar.JANUARY, 15);
-        assertEquals(15 , DateUtils.dayOfMonth(january15th.getTime()));
+        assertEquals(15, DateUtils.dayOfMonth(january15th.getTime()));
 
         GregorianCalendar january31th =
             new GregorianCalendar(2021, Calendar.JANUARY, 31);
-        assertEquals(31 , DateUtils.dayOfMonth(january31th.getTime()));
+        assertEquals(31, DateUtils.dayOfMonth(january31th.getTime()));
     }
 
     @Test
     void testYear() {
         GregorianCalendar year2015 =
             new GregorianCalendar(2015, Calendar.JANUARY, 1);
-        assertEquals(2015 , DateUtils.year(year2015.getTime()));
+        assertEquals(2015, DateUtils.year(year2015.getTime()));
 
         GregorianCalendar year2019 =
             new GregorianCalendar(2019, Calendar.JANUARY, 1);
-        assertEquals(2019 , DateUtils.year(year2019.getTime()));
+        assertEquals(2019, DateUtils.year(year2019.getTime()));
 
         GregorianCalendar year2021 =
             new GregorianCalendar(2021, Calendar.JANUARY, 1);
-        assertEquals(2021 , DateUtils.year(year2021.getTime()));
+        assertEquals(2021, DateUtils.year(year2021.getTime()));
     }
 
     private void assertDateParseEquals(String expected, String dateStr) {
