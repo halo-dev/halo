@@ -5,6 +5,7 @@ import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 import java.util.List;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Component;
 import run.halo.app.utils.HaloUtils;
 
@@ -42,6 +43,6 @@ public class RandomMethod implements TemplateMethodModelEx {
         SimpleNumber argTwo = (SimpleNumber) arguments.get(1);
         int start = argOne.getAsNumber().intValue();
         int end = argTwo.getAsNumber().intValue();
-        return HaloUtils.randomInt(start, end);
+        return RandomUtils.nextInt(start, end);
     }
 }

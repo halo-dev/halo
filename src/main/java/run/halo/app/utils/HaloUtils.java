@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -457,51 +456,5 @@ public class HaloUtils {
         } catch (IOException | WriterException e) {
             throw new UnsupportedOperationException(e);
         }
-    }
-
-    /**
-     * 获得一个随机的字符串
-     *
-     * @param baseString 随机字符选取的样本
-     * @param length     字符串的长度
-     * @return 随机字符串
-     */
-    public static String randomString(String baseString, int length) {
-        if (StringUtils.isEmpty(baseString)) {
-            return StringUtils.EMPTY;
-        }
-        final StringBuilder sb = new StringBuilder(length);
-
-        if (length < 1) {
-            length = 1;
-        }
-        int baseLength = baseString.length();
-        for (int i = 0; i < length; i++) {
-            int number = randomInt(baseLength);
-            sb.append(baseString.charAt(number));
-        }
-        return sb.toString();
-    }
-
-    /**
-     * 获得一个只包含数字的字符串
-     *
-     * @param length 字符串的长度
-     * @return 随机字符串
-     */
-    public static String randomNumbers(int length) {
-        return randomString("0123456789", length);
-    }
-
-    public static int randomInt(int min, int max) {
-        return getRandom().nextInt(min, max);
-    }
-
-    public static int randomInt(int limit) {
-        return getRandom().nextInt(limit);
-    }
-
-    public static ThreadLocalRandom getRandom() {
-        return ThreadLocalRandom.current();
     }
 }

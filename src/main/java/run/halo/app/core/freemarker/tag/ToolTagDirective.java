@@ -9,6 +9,7 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import java.io.IOException;
 import java.util.Map;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.utils.HaloUtils;
@@ -45,7 +46,7 @@ public class ToolTagDirective implements TemplateDirectiveModel {
                 case "random":
                     int min = Integer.parseInt(params.get("min").toString());
                     int max = Integer.parseInt(params.get("max").toString());
-                    env.setVariable("number", builder.build().wrap(HaloUtils.randomInt(min, max)));
+                    env.setVariable("number", builder.build().wrap(RandomUtils.nextInt(min, max)));
                     break;
                 default:
                     break;
