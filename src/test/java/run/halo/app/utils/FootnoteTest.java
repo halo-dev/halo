@@ -22,7 +22,7 @@ import run.halo.app.utils.footnotes.FootnoteExtension;
  * link <a href="https://markdown-it.github.io/">markdown-it-footnote example page</a>.
  *
  * @author guqing
- * @since 2021-06-26
+ * @date 2021-06-26
  */
 public class FootnoteTest {
     private static final DataHolder OPTIONS =

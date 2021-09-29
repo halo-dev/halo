@@ -23,7 +23,7 @@ import org.springframework.validation.FieldError;
  * Object validation utilities.
  *
  * @author johnniang
- * @since 03/29/19
+ * @date 03/29/19
  */
 public class ValidationUtils {
 

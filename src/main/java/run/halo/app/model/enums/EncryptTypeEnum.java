@@ -2,7 +2,7 @@ package run.halo.app.model.enums;
 
 /**
  * @author zhixiang.yuan
- * @since 2021/01/24 10:45:33
+ * @date 2021/01/24 10:45:33
  */
 public enum EncryptTypeEnum {
 

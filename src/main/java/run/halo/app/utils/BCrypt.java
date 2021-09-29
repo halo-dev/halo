@@ -44,7 +44,7 @@ import java.util.Arrays;
  *
  * @author guqing
  * @see <a href="https://github.com/spring-projects/spring-security/blob/main/crypto/src/main/java/org/springframework/security/crypto/bcrypt/BCrypt.java">Spring Security BCrypt</a>
- * @since 2021-09-28
+ * @date 2021-09-28
  */
 public class BCrypt {
 

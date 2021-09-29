@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
  * @author johnniang
  * @author ryanwang
  * @author guqing
- * @since 2019-03-29
+ * @date 2019-03-29
  */
 @Slf4j
 class HaloUtilsTest {

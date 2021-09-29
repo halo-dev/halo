@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  *
  * @author johnniang
  * @author guqing
- * @since 3/28/19
+ * @date 3/28/19
  */
 @Slf4j
 class BcryptTest {

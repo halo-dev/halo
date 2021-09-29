@@ -14,7 +14,7 @@ import org.springframework.util.Assert;
  *
  * @author johnniang
  * @author guqing
- * @since 3/18/19
+ * @date 3/18/19
  */
 public class DateUtils {
     private static final int FIRST_DAY_OF_WEEK = Calendar.MONDAY;

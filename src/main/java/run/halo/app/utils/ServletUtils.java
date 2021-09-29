@@ -15,7 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  *
  * @author johnniang
  * @author guqing
- * @since 19-4-21
+ * @date 19-4-21
  */
 public class ServletUtils {
 
@@ -116,7 +116,7 @@ public class ServletUtils {
      *
      * @param checkString 被检测的字符串
      * @return 是否未知
-     * @since 5.2.6
+     * @since 1.4.13
      */
     public static boolean isUnknown(String checkString) {
         return StringUtils.isBlank(checkString) || "unknown".equalsIgnoreCase(checkString);
@@ -133,7 +133,7 @@ public class ServletUtils {
      * @param request 请求对象{@link HttpServletRequest}
      * @param headerNames 自定义头，通常在Http服务器（例如Nginx）中配置
      * @return IP地址
-     * @since 4.4.1
+     * @since 1.4.13
      */
     public static String getClientIPByHeader(HttpServletRequest request, String... headerNames) {
         String ip;
@@ -154,7 +154,7 @@ public class ServletUtils {
      *
      * @param ip 获得的IP地址
      * @return 第一个非unknown IP地址
-     * @since 4.4.1
+     * @since 1.4.13
      */
     public static String getMultistageReverseProxyIp(String ip) {
         // 多级反向代理检测
