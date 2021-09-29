@@ -28,9 +28,9 @@ Vulnerability has been observed in...
   - Docker? [n/y]: 
     if yes for the question above,
     - `docker -v`: 
-    - `docker images ruibaby/halo`: 
+    - `docker images halohub/halo`: 
   
-  - by `java -jar halo-latest.jar`? [n/y]: 
+  - by `java -jar halo.jar`? [n/y]: 
     if yes for the question above,
     - `uname -a`: 
     - `java -version`: 
