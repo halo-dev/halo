@@ -107,9 +107,9 @@ public class UserController {
             && !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.NONE);
         } else {
-            final String tfaKey = StringUtils.isNotBlank(user.getMfaKey()) ? user.getMfaKey() :
+            final String mfaKey = StringUtils.isNotBlank(user.getMfaKey()) ? user.getMfaKey() :
                 multiFactorAuthParam.getMfaKey();
-            TwoFactorAuthUtils.validateTFACode(tfaKey, multiFactorAuthParam.getAuthcode());
+            TwoFactorAuthUtils.validateTFACode(mfaKey, multiFactorAuthParam.getAuthcode());
         }
         // update MFA key
         User updateUser = userService
