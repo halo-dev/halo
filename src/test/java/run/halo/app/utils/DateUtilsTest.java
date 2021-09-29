@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
  */
 @Slf4j
 public class DateUtilsTest {
+
     private TimeZone defaultTimeZone;
 
     @BeforeEach
