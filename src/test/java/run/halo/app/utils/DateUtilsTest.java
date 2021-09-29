@@ -7,6 +7,8 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -17,11 +19,21 @@ import org.junit.jupiter.api.Test;
  */
 @Slf4j
 public class DateUtilsTest {
+    private TimeZone defaultTimeZone;
+
+    @BeforeEach
+    public void setUp() {
+        defaultTimeZone = TimeZone.getDefault();
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
+    }
+
+    @AfterEach
+    public void cleanUp() {
+        TimeZone.setDefault(defaultTimeZone);
+    }
 
     @Test
     void testDateParse() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
-
         // yyyy-MM-dd HH:mm:ss
         assertDateParseEquals("Sun Sep 26 06:39:12 CST 2021", "2021-09-26 06:39:12");
 
