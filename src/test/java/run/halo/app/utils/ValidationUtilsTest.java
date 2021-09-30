@@ -59,9 +59,29 @@ class ValidationUtilsTest {
 
     @Test
     void emailValidateTest() {
+        // Valid email addresses
         assertTrue(ValidationUtils.isEmail("example@example.com"));
         assertTrue(ValidationUtils.isEmail("12313213@example.com"));
-        assertFalse(ValidationUtils.isEmail("example.com"));
+        assertTrue(ValidationUtils.isEmail("user.name@example.com.cn"));
+        assertTrue(ValidationUtils.isEmail("very.common@example.com"));
+        assertTrue(ValidationUtils.isEmail("disposable.style.email.with+symbol@example.com"));
+        assertTrue(ValidationUtils.isEmail("other.email-with-hyphen@example.com"));
+        assertTrue(ValidationUtils.isEmail("fully-qualified-domain@example.com"));
+        assertTrue(ValidationUtils.isEmail("user.name+tag+sorting@example.com"));
+        assertTrue(ValidationUtils.isEmail("x@example.com"));
+        assertTrue(ValidationUtils.isEmail("example-indeed@strange-example.com"));
+        assertTrue(ValidationUtils.isEmail("example@s.example"));
+        assertTrue(ValidationUtils.isEmail("\"john..doe\"@example.org"));
+
+        // Invalid email addresses
+        assertFalse(ValidationUtils.isEmail("Abc.example.com"));
+        assertFalse(ValidationUtils.isEmail("A@b@c@example.com"));
+        assertFalse(ValidationUtils.isEmail("a\"b(c)d,e:f;g<h>i[j\\k]l@example.com"));
+        assertFalse(ValidationUtils.isEmail("just\"not\"right@example.com"));
+        assertFalse(ValidationUtils.isEmail("this is\"not\\allowed@example.com"));
+        assertFalse(ValidationUtils.isEmail("this\\ still\\\"not\\\\allowed@example.com"));
+        assertFalse(ValidationUtils.isEmail("john..doe@example.com"));
+        assertFalse(ValidationUtils.isEmail("john.doe@example..com"));
     }
 
     void validateIteratorTest(Set<? extends ConstraintViolation<?>> violations) {
