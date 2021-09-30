@@ -145,7 +145,7 @@ public class DateUtils {
     }
 
     /**
-     * Gets the year in the date
+     * Gets the year in the date.
      *
      * @param date date
      * @return year in the date
@@ -155,7 +155,7 @@ public class DateUtils {
     }
 
     /**
-     * Get the month, counting from 0
+     * Get the month, counting from 0.
      *
      * @return month for the given date.
      */
@@ -183,7 +183,7 @@ public class DateUtils {
     }
 
     /**
-     * convert date to calendar
+     * Convert date to calendar.
      * default locale is sets by the Java Virtual Machine during startup
      * based on the host environment.
      *

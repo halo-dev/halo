@@ -516,7 +516,7 @@ public class FileUtils {
     }
 
     /**
-     * Convert an InputStream to a String
+     * Convert an InputStream to a String.
      *
      * @param inputStream input stream
      * @return the string content read through the input stream without closing the InputStream

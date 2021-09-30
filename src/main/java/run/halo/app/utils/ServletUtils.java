@@ -59,7 +59,7 @@ public class ServletUtils {
 
 
     /**
-     * 忽略大小写获得请求header中的信息
+     * 忽略大小写获得请求header中的信息.
      *
      * @param request 请求对象{@link HttpServletRequest}
      * @param nameIgnoreCase 忽略大小写头信息的KEY
@@ -79,7 +79,7 @@ public class ServletUtils {
     }
 
     /**
-     * 获取客户端IP
+     * 获取客户端IP.
      *
      * <p>
      * 默认检测的Header:
@@ -98,6 +98,7 @@ public class ServletUtils {
      *
      * @param request 请求对象{@link HttpServletRequest}
      * @param otherHeaderNames 其他自定义头文件，通常在Http服务器（例如Nginx）中配置
+     * @see <a href="https://github.com/dromara/hutool/blob/v5-master/hutool-extra/src/main/java/cn/hutool/extra/servlet/ServletUtil.java">查看来源</a>
      * @return IP地址
      */
     public static String getClientIP(HttpServletRequest request, String... otherHeaderNames) {
@@ -132,6 +133,7 @@ public class ServletUtils {
      *
      * @param request 请求对象{@link HttpServletRequest}
      * @param headerNames 自定义头，通常在Http服务器（例如Nginx）中配置
+     * @see <a href="https://github.com/dromara/hutool/blob/v5-master/hutool-extra/src/main/java/cn/hutool/extra/servlet/ServletUtil.java">查看来源</a>
      * @return IP地址
      * @since 1.4.13
      */

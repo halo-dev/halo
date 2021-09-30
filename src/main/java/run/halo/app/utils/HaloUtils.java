@@ -251,7 +251,7 @@ public class HaloUtils {
     }
 
     /**
-     * Normalize url
+     * Normalize url.
      *
      * @param originalUrl original url
      * @return normalized url.
@@ -318,7 +318,7 @@ public class HaloUtils {
     }
 
     /**
-     * Clean all html tag
+     * Clean all html tag.
      *
      * @param content html document
      * @return text before cleaned
@@ -331,6 +331,8 @@ public class HaloUtils {
     }
 
     /**
+     * Determine whether the collection is empty.
+     *
      * @param collection collection
      * @return true if this collection not null and contains elements.
      */
@@ -409,7 +411,7 @@ public class HaloUtils {
     }
 
     /**
-     * generate png qrcode to byte array
+     * generate png qrcode to byte array.
      *
      * @param content qrcode content
      * @param width qrcode width

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 /**
  * BCrypt test.
  *
+ * @see <a href="https://github.com/spring-projects/spring-security/blob/main/crypto/src/test/java/org/springframework/security/crypto/bcrypt/BCryptTests.java">测试用例参考</a>
  * @author johnniang
  * @author guqing
  * @date 3/28/19
