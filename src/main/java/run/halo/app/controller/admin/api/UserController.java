@@ -1,10 +1,9 @@
 package run.halo.app.controller.admin.api;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.qrcode.QrCodeUtil;
 import io.swagger.annotations.ApiOperation;
 import javax.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +22,7 @@ import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.UpdateCheck;
 import run.halo.app.model.vo.MultiFactorAuthVO;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.TwoFactorAuthUtils;
 import run.halo.app.utils.ValidationUtils;
 
@@ -83,7 +83,8 @@ public class UserController {
                 String optAuthUrl =
                     TwoFactorAuthUtils.generateOtpAuthUrl(user.getNickname(), mfaKey);
                 String qrImageBase64 = "data:image/png;base64,"
-                    + Base64.encode(QrCodeUtil.generatePng(optAuthUrl, 128, 128));
+                    + Base64Utils.encodeToString(
+                    HaloUtils.generateQrCodeToPng(optAuthUrl, 128, 128));
                 return new MultiFactorAuthVO(qrImageBase64, optAuthUrl, mfaKey, MFAType.TFA_TOTP);
             } else {
                 throw new BadRequestException("暂不支持的 MFA 认证的方式");
@@ -99,16 +100,16 @@ public class UserController {
     @DisableOnCondition
     public MultiFactorAuthVO updateMFAuth(
         @RequestBody @Valid MultiFactorAuthParam multiFactorAuthParam, User user) {
-        if (StrUtil.isNotBlank(user.getMfaKey())
+        if (StringUtils.isNotBlank(user.getMfaKey())
             && MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.TFA_TOTP);
-        } else if (StrUtil.isBlank(user.getMfaKey())
+        } else if (StringUtils.isBlank(user.getMfaKey())
             && !MFAType.useMFA(multiFactorAuthParam.getMfaType())) {
             return new MultiFactorAuthVO(MFAType.NONE);
         } else {
-            final String tfaKey = StrUtil.isNotBlank(user.getMfaKey()) ? user.getMfaKey() :
+            final String mfaKey = StringUtils.isNotBlank(user.getMfaKey()) ? user.getMfaKey() :
                 multiFactorAuthParam.getMfaKey();
-            TwoFactorAuthUtils.validateTFACode(tfaKey, multiFactorAuthParam.getAuthcode());
+            TwoFactorAuthUtils.validateTFACode(mfaKey, multiFactorAuthParam.getAuthcode());
         }
         // update MFA key
         User updateUser = userService

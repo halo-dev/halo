@@ -2,7 +2,6 @@ package run.halo.app.controller.admin.api;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
@@ -37,6 +36,7 @@ import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
+import run.halo.app.utils.HaloUtils;
 
 /**
  * Post controller.
@@ -188,7 +188,7 @@ public class PostController {
 
         BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
 
-        String token = IdUtil.simpleUUID();
+        String token = HaloUtils.simpleUUID();
 
         // cache preview token
         cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);

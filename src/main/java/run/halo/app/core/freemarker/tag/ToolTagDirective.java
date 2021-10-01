@@ -1,7 +1,5 @@
 package run.halo.app.core.freemarker.tag;
 
-import cn.hutool.core.util.PageUtil;
-import cn.hutool.core.util.RandomUtil;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapperBuilder;
@@ -11,8 +9,10 @@ import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
 import java.io.IOException;
 import java.util.Map;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Component;
 import run.halo.app.model.support.HaloConst;
+import run.halo.app.utils.HaloUtils;
 
 /**
  * Freemarker custom tag of tools.
@@ -41,12 +41,12 @@ public class ToolTagDirective implements TemplateDirectiveModel {
                     int total = Integer.parseInt(params.get("total").toString());
                     int display = Integer.parseInt(params.get("display").toString());
                     env.setVariable("numbers",
-                        builder.build().wrap(PageUtil.rainbow(page, total, display)));
+                        builder.build().wrap(HaloUtils.rainbow(page, total, display)));
                     break;
                 case "random":
                     int min = Integer.parseInt(params.get("min").toString());
                     int max = Integer.parseInt(params.get("max").toString());
-                    env.setVariable("number", builder.build().wrap(RandomUtil.randomInt(min, max)));
+                    env.setVariable("number", builder.build().wrap(RandomUtils.nextInt(min, max)));
                     break;
                 default:
                     break;

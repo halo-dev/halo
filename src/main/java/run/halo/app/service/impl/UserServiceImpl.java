@@ -1,6 +1,5 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.crypto.digest.BCrypt;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +24,7 @@ import run.halo.app.model.params.UserParam;
 import run.halo.app.repository.UserRepository;
 import run.halo.app.service.UserService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.BCrypt;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
 

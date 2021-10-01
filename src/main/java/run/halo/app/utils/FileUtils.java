@@ -1,10 +1,13 @@
 package run.halo.app.utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -512,4 +515,28 @@ public class FileUtils {
         return tempDirectory;
     }
 
+    /**
+     * Convert an InputStream to a String.
+     *
+     * @param inputStream input stream
+     * @return the string content read through the input stream without closing the InputStream
+     */
+    public static String readString(InputStream inputStream) {
+        return new BufferedReader(
+            new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+            .lines()
+            .collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * Writes a String to a file creating the file if it does not exist using the UTF_8 encoding.
+     * NOTE: the parent directories of the file will be created if they do not exist.
+     *
+     * @param file the file to write
+     * @param content the content to write to the file
+     * @throws IOException in case of an I/O error
+     */
+    public static void writeStringToFile(File file, String content) throws IOException {
+        org.apache.commons.io.FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
+    }
 }

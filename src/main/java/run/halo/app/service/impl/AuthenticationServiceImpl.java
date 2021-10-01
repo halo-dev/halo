@@ -1,10 +1,10 @@
 package run.halo.app.service.impl;
 
-import cn.hutool.core.util.StrUtil;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
@@ -40,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public boolean postAuthentication(Post post, String password) {
         Set<String> accessPermissionStore = authorizationService.getAccessPermissionStore();
 
-        if (StrUtil.isNotBlank(post.getPassword())) {
+        if (StringUtils.isNotBlank(post.getPassword())) {
             if (accessPermissionStore.contains(AuthorizationService.buildPostToken(post.getId()))) {
                 return true;
             }
@@ -86,7 +86,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Category category = idToCategoryMap.get(categoryId);
 
-        if (StrUtil.isNotBlank(category.getPassword())) {
+        if (StringUtils.isNotBlank(category.getPassword())) {
             if (accessPermissionStore.contains(
                 AuthorizationService.buildCategoryToken(category.getId()))) {
                 return true;

@@ -2,9 +2,6 @@ package run.halo.app.service.impl;
 
 import static run.halo.app.model.support.HaloConst.DATABASE_PRODUCT_NAME;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -15,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.NonNull;
@@ -45,6 +43,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.TwoFactorAuthUtils;
+import run.halo.app.utils.ValidationUtils;
 
 /**
  * Admin service implementation.
@@ -98,7 +97,7 @@ public class AdminServiceImpl implements AdminService {
 
         try {
             // Get user by username or email
-            user = Validator.isEmail(username)
+            user = ValidationUtils.isEmail(username)
                 ? userService.getByEmailOfNonNull(username) :
                 userService.getByUsernameOfNonNull(username);
         } catch (NotFoundException e) {
@@ -132,7 +131,7 @@ public class AdminServiceImpl implements AdminService {
 
         // check authCode
         if (MFAType.useMFA(user.getMfaType())) {
-            if (StrUtil.isBlank(loginParam.getAuthcode())) {
+            if (StringUtils.isBlank(loginParam.getAuthcode())) {
                 throw new BadRequestException("请输入两步验证码");
             }
             TwoFactorAuthUtils.validateTFACode(user.getMfaKey(), loginParam.getAuthcode());
@@ -195,7 +194,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // Gets random code.
-        String code = RandomUtil.randomNumbers(6);
+        String code = RandomStringUtils.randomNumeric(6);
 
         log.info("Got reset password code:{}", code);
 
@@ -389,7 +388,7 @@ public class AdminServiceImpl implements AdminService {
 
         boolean useMFA = true;
         try {
-            final User user = Validator.isEmail(username)
+            final User user = ValidationUtils.isEmail(username)
                 ? userService.getByEmailOfNonNull(username) :
                 userService.getByUsernameOfNonNull(username);
             useMFA = MFAType.useMFA(user.getMfaType());

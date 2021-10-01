@@ -2,8 +2,6 @@ package run.halo.app.service.impl;
 
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.StrUtil;
 import com.google.common.base.Objects;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +13,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -43,6 +42,7 @@ import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.BeanUtils;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 
 /**
@@ -113,7 +113,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             }
         }
 
-        if (StrUtil.isNotBlank(category.getPassword())) {
+        if (StringUtils.isNotBlank(category.getPassword())) {
             category.setPassword(category.getPassword().trim());
         }
 
@@ -298,7 +298,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     @Override
     public void refreshPostStatus(List<Integer> affectedPostIdList) {
-        if (CollectionUtil.isEmpty(affectedPostIdList)) {
+        if (CollectionUtils.isEmpty(affectedPostIdList)) {
             return;
         }
 
@@ -307,7 +307,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
             post.setStatus(null);
 
-            if (StrUtil.isNotBlank(post.getPassword())) {
+            if (StringUtils.isNotBlank(post.getPassword())) {
                 post.setStatus(PostStatus.INTIMATE);
             } else {
                 postCategoryService.listByPostId(postId)
@@ -368,7 +368,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     @Override
     public List<Category> filterEncryptCategory(List<Category> categories) {
-        if (CollectionUtil.isEmpty(categories)) {
+        if (CollectionUtils.isEmpty(categories)) {
             return Collections.emptyList();
         }
 
@@ -399,7 +399,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * @param categoryList category list
      */
     private void doFilterEncryptCategory(List<CategoryVO> categoryList) {
-        if (CollectionUtil.isEmpty(categoryList)) {
+        if (CollectionUtils.isEmpty(categoryList)) {
             return;
         }
 
@@ -423,7 +423,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     private void collectAllChild(List<Category> collectorList,
         List<CategoryVO> childrenList,
         Boolean doNotCollectEncryptedCategory) {
-        if (CollectionUtil.isEmpty(childrenList)) {
+        if (CollectionUtils.isEmpty(childrenList)) {
             return;
         }
 
@@ -439,7 +439,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
                 continue;
             }
 
-            if (CollectionUtil.isNotEmpty(categoryVO.getChildren())) {
+            if (HaloUtils.isNotEmpty(categoryVO.getChildren())) {
                 collectAllChild(collectorList,
                     categoryVO.getChildren(), doNotCollectEncryptedCategory);
             }
@@ -459,7 +459,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         List<CategoryVO> childrenList,
         Integer categoryId,
         Boolean doNotCollectEncryptedCategory) {
-        if (CollectionUtil.isEmpty(childrenList)) {
+        if (CollectionUtils.isEmpty(childrenList)) {
             return;
         }
 
@@ -532,7 +532,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     public Category update(Category category) {
         Category update = super.update(category);
 
-        if (StrUtil.isNotBlank(category.getPassword())) {
+        if (StringUtils.isNotBlank(category.getPassword())) {
             doEncryptPost(category);
         } else {
             doDecryptPost(category);
@@ -618,7 +618,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
             .filter(postList -> !postList.isEmpty())
             .map(postList -> postList.stream()
-                .filter(post -> StrUtil.isBlank(post.getPassword()))
+                .filter(post -> StringUtils.isBlank(post.getPassword()))
                 .filter(post -> PostStatus.INTIMATE.equals(post.getStatus()))
                 .map(Post::getId).collect(Collectors.toList()))
 
@@ -652,7 +652,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
         Category category = idToCategoryMap.get(categoryId);
 
-        if (StrUtil.isNotBlank(category.getPassword())) {
+        if (StringUtils.isNotBlank(category.getPassword())) {
             return true;
         }
 

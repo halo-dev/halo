@@ -2,15 +2,30 @@ package run.halo.app.utils;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
-import cn.hutool.core.util.URLUtil;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import javax.imageio.ImageIO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.model.support.HaloConst;
 
 /**
@@ -18,6 +33,7 @@ import run.halo.app.model.support.HaloConst;
  *
  * @author ryanwang
  * @author johnniang
+ * @author guqing
  * @date 2017-12-22
  */
 @Slf4j
@@ -235,7 +251,7 @@ public class HaloUtils {
     }
 
     /**
-     * Normalize url
+     * Normalize url.
      *
      * @param originalUrl original url
      * @return normalized url.
@@ -250,7 +266,40 @@ public class HaloUtils {
             return originalUrl;
         }
 
-        return URLUtil.normalize(originalUrl);
+        final int sepIndex = originalUrl.indexOf("://");
+        String protocol;
+        String body;
+        if (sepIndex > 0) {
+            protocol = StringUtils.substring(originalUrl, 0, sepIndex + 3);
+            body = StringUtils.substring(originalUrl, sepIndex + 3, originalUrl.length());
+        } else {
+            protocol = "http://";
+            body = originalUrl;
+        }
+
+        final int paramsSepIndex = StringUtils.indexOf(body, '?');
+        String params = null;
+        if (paramsSepIndex > 0) {
+            params = StringUtils.substring(body, paramsSepIndex, body.length());
+            body = StringUtils.substring(body, 0, paramsSepIndex);
+        }
+
+        if (StringUtils.isNotEmpty(body)) {
+            // 去除开头的\或者/
+            body = body.replaceAll("^[\\\\/]+", StringUtils.EMPTY);
+            // 替换多个\或/为单个/
+            body = body.replace("\\", "/").replaceAll("//+", "/");
+        }
+
+        final int pathSepIndex = StringUtils.indexOf(body, '/');
+        String domain = body;
+        String path = null;
+        if (pathSepIndex > 0) {
+            domain = StringUtils.substring(body, 0, pathSepIndex);
+            path = StringUtils.substring(body, pathSepIndex, body.length());
+        }
+        return protocol + domain + StringUtils.defaultIfEmpty(path, StringUtils.EMPTY)
+            + StringUtils.defaultIfEmpty(params, StringUtils.EMPTY);
     }
 
     /**
@@ -269,7 +318,7 @@ public class HaloUtils {
     }
 
     /**
-     * Clean all html tag
+     * Clean all html tag.
      *
      * @param content html document
      * @return text before cleaned
@@ -279,5 +328,135 @@ public class HaloUtils {
             return StringUtils.EMPTY;
         }
         return content.replaceAll(RE_HTML_MARK, StringUtils.EMPTY);
+    }
+
+    /**
+     * Determine whether the collection is empty.
+     *
+     * @param collection collection
+     * @return true if this collection not null and contains elements.
+     */
+    public static boolean isNotEmpty(Collection<?> collection) {
+        return !CollectionUtils.isEmpty(collection);
+    }
+
+    /**
+     * <p>Strips any of a set of characters from the start and end of a String.
+     * This is similar to {@link String#trim()} but allows the characters
+     * to be stripped to be controlled.</p>
+     *
+     * @param str the String to remove characters from, may be null
+     * @param prefixStripChars the characters to remove from start of str, null treated as
+     *                        whitespace
+     * @param suffixStripChars the characters to remove from end of str, null treated as whitespace
+     * @return the stripped String, {@code null} if null String input
+     */
+    public static String strip(String str, final String prefixStripChars,
+        final String suffixStripChars) {
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
+        str = StringUtils.stripStart(str, prefixStripChars);
+        return StringUtils.stripEnd(str, suffixStripChars);
+    }
+
+
+    /**
+     * 分页彩虹算法<br>
+     * 来自：https://github.com/iceroot/iceroot/blob/master/src/main/java/com/icexxx/util/IceUtil.java<br>
+     * 通过传入的信息，生成一个分页列表显示
+     *
+     * @param pageNo       当前页
+     * @param totalPage    总页数
+     * @param displayCount 每屏展示的页数
+     * @return 分页条
+     */
+    public static int[] rainbow(int pageNo, int totalPage, int displayCount) {
+        boolean isEven = displayCount % 2 == 0;
+        int left = displayCount / 2;
+        int right = displayCount / 2;
+
+        int length = displayCount;
+        if (isEven) {
+            right++;
+        }
+        if (totalPage < displayCount) {
+            length = totalPage;
+        }
+        int[] result = new int[length];
+        if (totalPage >= displayCount) {
+            if (pageNo <= left) {
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = i + 1;
+                }
+            } else if (pageNo > totalPage - right) {
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = i + totalPage - displayCount + 1;
+                }
+            } else {
+                for (int i = 0; i < result.length; i++) {
+                    result[i] = i + pageNo - left + (isEven ? 1 : 0);
+                }
+            }
+        } else {
+            for (int i = 0; i < result.length; i++) {
+                result[i] = i + 1;
+            }
+        }
+        return result;
+    }
+
+    public static String simpleUUID() {
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    /**
+     * generate png qrcode to byte array.
+     *
+     * @param content qrcode content
+     * @param width qrcode width
+     * @param height qrcode height
+     * @return QR code byte array in png format
+     * @throws UnsupportedOperationException If the QR code fails to be generated
+     */
+    public static byte[] generateQrCodeToPng(String content, int width, int height) {
+        Map<EncodeHintType, Object> hints = new HashMap<>(3, 1);
+        hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+        // 纠错级别
+        hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+        // 空白
+        hints.put(EncodeHintType.MARGIN, 2);
+
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+
+        try {
+            BitMatrix byteMatrix =
+                qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height, hints);
+            // Make the BufferedImage that are to hold the QRCode
+            int matrixWidth = byteMatrix.getWidth();
+            int matrixHeight = byteMatrix.getHeight();
+            BufferedImage image =
+                new BufferedImage(matrixWidth, matrixHeight, BufferedImage.TYPE_INT_RGB);
+            image.createGraphics();
+
+            Graphics2D graphics = (Graphics2D) image.getGraphics();
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(0, 0, matrixWidth, matrixHeight);
+            // Paint and save the image using the ByteMatrix
+            graphics.setColor(Color.BLACK);
+
+            for (int i = 0; i < matrixWidth; i++) {
+                for (int j = 0; j < matrixWidth; j++) {
+                    if (byteMatrix.get(i, j)) {
+                        graphics.fillRect(i, j, 1, 1);
+                    }
+                }
+            }
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", os);
+            return os.toByteArray();
+        } catch (IOException | WriterException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 }
