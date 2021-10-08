@@ -3,11 +3,11 @@ package run.halo.app.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author zhixiang.yuan
