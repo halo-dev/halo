@@ -3,6 +3,8 @@ package run.halo.app.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,15 @@ class MarkdownUtilsTest {
 
         markdown = "---\n"
             + "title: \"test remove\"\n"
+            + "---"
+            + "test---";
+        assertEquals("test---", MarkdownUtils.removeFrontMatter(markdown));
+
+        markdown = "title: \"test remove\"\n"
+            + "test---";
+        assertEquals("", MarkdownUtils.removeFrontMatter(markdown));
+
+        markdown = "title: \"test remove\"\n"
             + "---"
             + "test---";
         assertEquals("test---", MarkdownUtils.removeFrontMatter(markdown));
@@ -69,5 +80,19 @@ class MarkdownUtilsTest {
             + "</ol>\n"
             + "</section>\n";
         assertTrue(StringUtils.equals(s2Expected, s2));
+    }
+
+    @Test
+    void getFrontMatter() {
+        String markdown = "---\n"
+            + "title: \"test remove\"\n"
+            + "---";
+        Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        assertEquals("\"test remove\"", frontMatter.get("title").get(0));
+
+        markdown = "title: \"test remove\"\n"
+            + "---";
+        frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        assertEquals("\"test remove\"", frontMatter.get("title").get(0));
     }
 }
