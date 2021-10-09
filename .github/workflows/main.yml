@@ -24,11 +24,18 @@ jobs:
         node-version: [12.x, 14.x, 15.x, 16.x]
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.15.1
+  
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install -g pnpm
+          cache: 'pnpm'
+
       - run: pnpm install
       - run: pnpm lint
 
