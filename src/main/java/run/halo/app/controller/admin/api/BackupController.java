@@ -96,6 +96,7 @@ public class BackupController {
             .map(Path::getFileName)
             .filter(Objects::nonNull)
             .map(Path::toString)
+            .sorted()
             .collect(Collectors.toList());
     }
 
