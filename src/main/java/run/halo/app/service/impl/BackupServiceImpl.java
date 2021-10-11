@@ -215,9 +215,9 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public BackupDTO backupWorkDirectory(List<String> backupItems) {
-        if (CollectionUtils.isEmpty(backupItems)) {
-            throw new BadRequestException("The backupItems parameter is missing, at least one.");
+    public BackupDTO backupWorkDirectory(List<String> options) {
+        if (CollectionUtils.isEmpty(options)) {
+            throw new BadRequestException("The options parameter is missing, at least one.");
         }
         // Zip work directory to temporary file
         try {
@@ -236,7 +236,7 @@ public class BackupServiceImpl implements BackupService {
             run.halo.app.utils.FileUtils
                 .zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath,
                     path -> {
-                        for (String itemToBackup : backupItems) {
+                        for (String itemToBackup : options) {
                             Path backupItemPath =
                                 Paths.get(this.haloProperties.getWorkDir()).resolve(itemToBackup);
                             if (path.startsWith(backupItemPath)) {

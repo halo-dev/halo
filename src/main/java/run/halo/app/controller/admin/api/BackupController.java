@@ -85,8 +85,8 @@ public class BackupController {
     @PostMapping("work-dir")
     @ApiOperation("Backups work directory")
     @DisableOnCondition
-    public BackupDTO backupHalo(@RequestBody List<String> backupItems) {
-        return backupService.backupWorkDirectory(backupItems);
+    public BackupDTO backupHalo(@RequestBody List<String> options) {
+        return backupService.backupWorkDirectory(options);
     }
 
     @GetMapping("work-dir/options")
