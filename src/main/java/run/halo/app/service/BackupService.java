@@ -32,11 +32,11 @@ public interface BackupService {
     /**
      * Zips work directory.
      *
+     * @param options file or directory items to back up
      * @return backup dto.
      */
     @NonNull
-    BackupDTO backupWorkDirectory();
-
+    BackupDTO backupWorkDirectory(List<String> options);
 
     /**
      * Lists all backups.

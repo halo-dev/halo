@@ -33,10 +33,12 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.event.options.OptionUpdatedEvent;
 import run.halo.app.event.theme.ThemeUpdatedEvent;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.handler.file.FileHandler;
@@ -213,7 +215,10 @@ public class BackupServiceImpl implements BackupService {
     }
 
     @Override
-    public BackupDTO backupWorkDirectory() {
+    public BackupDTO backupWorkDirectory(List<String> options) {
+        if (CollectionUtils.isEmpty(options)) {
+            throw new BadRequestException("The options parameter is missing, at least one.");
+        }
         // Zip work directory to temporary file
         try {
             // Create zip path for halo zip
@@ -229,7 +234,17 @@ public class BackupServiceImpl implements BackupService {
 
             // Zip halo
             run.halo.app.utils.FileUtils
-                .zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath);
+                .zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath,
+                    path -> {
+                        for (String itemToBackup : options) {
+                            Path backupItemPath =
+                                Paths.get(this.haloProperties.getWorkDir()).resolve(itemToBackup);
+                            if (path.startsWith(backupItemPath)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
 
             // Build backup dto
             return buildBackupDto(BACKUP_RESOURCE_BASE_URI, haloZipPath);
