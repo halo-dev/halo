@@ -1,10 +1,22 @@
 package run.halo.app.controller.admin.api;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
+import java.util.Map;
+import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
@@ -12,12 +24,6 @@ import run.halo.app.model.entity.Option;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.params.OptionQuery;
 import run.halo.app.service.OptionService;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Option Controller.
@@ -63,8 +69,9 @@ public class OptionController {
 
     @GetMapping("list_view")
     @ApiOperation("Lists all options with list view")
-    public Page<OptionSimpleDTO> listAllWithListView(@PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
-            OptionQuery optionQuery) {
+    public Page<OptionSimpleDTO> listAllWithListView(
+        @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
+        OptionQuery optionQuery) {
         return optionService.pageDtosBy(pageable, optionQuery);
     }
 
@@ -86,7 +93,7 @@ public class OptionController {
     @ApiOperation("Updates option")
     @DisableOnCondition
     public void updateBy(@PathVariable("optionId") Integer optionId,
-            @RequestBody @Valid OptionParam optionParam) {
+        @RequestBody @Valid OptionParam optionParam) {
         optionService.update(optionId, optionParam);
     }
 

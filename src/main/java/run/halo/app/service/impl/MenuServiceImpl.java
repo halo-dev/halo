@@ -1,12 +1,16 @@
 package run.halo.app.service.impl;
 
-import org.jetbrains.annotations.NotNull;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
@@ -16,9 +20,6 @@ import run.halo.app.repository.MenuRepository;
 import run.halo.app.service.MenuService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * MenuService implementation class.
@@ -37,14 +38,16 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public @NotNull List<MenuDTO> listDtos(@NotNull Sort sort) {
+    public @NonNull
+    List<MenuDTO> listDtos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
     }
 
     @Override
-    public @NotNull List<MenuTeamVO> listTeamVos(@NotNull Sort sort) {
+    public @NonNull
+    List<MenuTeamVO> listTeamVos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all menus
@@ -54,7 +57,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         Set<String> teams = ServiceUtils.fetchProperty(menus, MenuDTO::getTeam);
 
         // Convert to team menu list map (Key: team, value: menu list)
-        Map<String, List<MenuDTO>> teamMenuListMap = ServiceUtils.convertToListMap(teams, menus, MenuDTO::getTeam);
+        Map<String, List<MenuDTO>> teamMenuListMap =
+            ServiceUtils.convertToListMap(teams, menus, MenuDTO::getTeam);
 
         List<MenuTeamVO> result = new LinkedList<>();
 
@@ -73,13 +77,14 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public List<MenuDTO> listByTeam(@NotNull String team, Sort sort) {
+    public List<MenuDTO> listByTeam(@NonNull String team, Sort sort) {
         List<Menu> menus = menuRepository.findByTeam(team, sort);
-        return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu)).collect(Collectors.toList());
+        return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+            .collect(Collectors.toList());
     }
 
     @Override
-    public List<MenuVO> listByTeamAsTree(@NotNull String team, Sort sort) {
+    public List<MenuVO> listByTeamAsTree(@NonNull String team, Sort sort) {
         Assert.notNull(team, "Team must not be null");
 
         List<Menu> menus = menuRepository.findByTeam(team, sort);
@@ -96,7 +101,8 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public @NotNull Menu createBy(@NotNull MenuParam menuParam) {
+    public @NonNull
+    Menu createBy(@NonNull MenuParam menuParam) {
         Assert.notNull(menuParam, "Menu param must not be null");
 
         // Create an return
@@ -104,7 +110,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public List<MenuVO> listAsTree(@NotNull Sort sort) {
+    public List<MenuVO> listAsTree(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all menu
@@ -124,7 +130,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public List<Menu> listByParentId(@NotNull Integer id) {
+    public List<Menu> listByParentId(@NonNull Integer id) {
         Assert.notNull(id, "Menu parent id must not be null");
 
         return menuRepository.findByParentId(id);
@@ -136,16 +142,14 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     }
 
     @Override
-    public @NotNull Menu create(@NotNull Menu menu) {
-        nameMustNotExist(menu);
-
+    public @NonNull
+    Menu create(@NonNull Menu menu) {
         return super.create(menu);
     }
 
     @Override
-    public @NotNull Menu update(@NotNull Menu menu) {
-        nameMustNotExist(menu);
-
+    public @NonNull
+    Menu update(@NonNull Menu menu) {
         return super.update(menu);
     }
 
@@ -153,7 +157,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
      * Concrete menu tree.
      *
      * @param parentMenu parent menu vo must not be null
-     * @param menus      a list of menu
+     * @param menus a list of menu
      */
     private void concreteTree(MenuVO parentMenu, List<Menu> menus) {
         Assert.notNull(parentMenu, "Parent menu must not be null");
@@ -211,25 +215,7 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
         }
 
         return menus.stream()
-                .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
-                .collect(Collectors.toList());
-    }
-
-    private void nameMustNotExist(@NonNull Menu menu) {
-        Assert.notNull(menu, "Menu must not be null");
-
-        boolean exist = false;
-
-        if (ServiceUtils.isEmptyId(menu.getId())) {
-            // Create action
-            exist = menuRepository.existsByName(menu.getName());
-        } else {
-            // Update action
-            exist = menuRepository.existsByIdNotAndName(menu.getId(), menu.getName());
-        }
-
-        if (exist) {
-            throw new AlreadyExistsException("菜单 " + menu.getName() + " 已存在");
-        }
+            .map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+            .collect(Collectors.toList());
     }
 }

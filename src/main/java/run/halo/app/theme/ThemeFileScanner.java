@@ -1,9 +1,6 @@
 package run.halo.app.theme;
 
-import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
-import run.halo.app.exception.ServiceException;
-import run.halo.app.model.support.ThemeFile;
+import static run.halo.app.service.ThemeService.CAN_EDIT_SUFFIX;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,8 +10,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static run.halo.app.service.ThemeService.CAN_EDIT_SUFFIX;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
+import run.halo.app.exception.ServiceException;
+import run.halo.app.model.support.ThemeFile;
 
 /**
  * Theme file scanner.
@@ -29,7 +28,7 @@ public enum ThemeFileScanner {
      * Lists theme folder by absolute path.
      *
      * @param absolutePath absolutePath
-     * @return List<ThemeFile> a list of theme files
+     * @return a list of theme files
      */
     @NonNull
     public List<ThemeFile> scan(@NonNull String absolutePath) {

@@ -1,9 +1,12 @@
 package run.halo.app.cache;
 
-import lombok.*;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * Cache wrapper.

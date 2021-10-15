@@ -1,13 +1,18 @@
 package run.halo.app.model.entity;
 
+import java.util.Objects;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
-import java.util.Objects;
 
 /**
  * Post tag entity.
@@ -21,13 +26,14 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "post_tags", indexes = {
-        @Index(name = "post_tags_post_id", columnList = "post_id"),
-        @Index(name = "post_tags_tag_id", columnList = "tag_id")})
+    @Index(name = "post_tags_post_id", columnList = "post_id"),
+    @Index(name = "post_tags_tag_id", columnList = "tag_id")})
 public class PostTag extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id")
-    @GenericGenerator(name = "custom-id", strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
+    @GenericGenerator(name = "custom-id",
+        strategy = "run.halo.app.model.entity.support.CustomIdGenerator")
     private Integer id;
 
     /**
@@ -51,8 +57,8 @@ public class PostTag extends BaseEntity {
             return false;
         }
         PostTag postTag = (PostTag) o;
-        return Objects.equals(postId, postTag.postId) &&
-                Objects.equals(tagId, postTag.tagId);
+        return Objects.equals(postId, postTag.postId)
+            && Objects.equals(tagId, postTag.tagId);
     }
 
     @Override

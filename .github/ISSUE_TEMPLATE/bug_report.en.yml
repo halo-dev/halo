@@ -1,0 +1,70 @@
+name: Bug Report
+description: File a bug report
+labels: [bug]
+body:
+  - type: markdown
+    id: preface
+    attributes:
+      value: "Thanks for taking the time to fill out this bug report!"
+  - type: markdown
+    id: environment
+    attributes:
+      value: "## Environment"
+  - type: input
+    id: version
+    validations:
+      required: true
+    attributes:
+      label: What is version of Halo has the issue?
+      description: "Can be found in backstage management system."
+  - type: dropdown
+    id: database
+    validations:
+      required: true
+    attributes:
+      label: "What database are you using?"
+      description: "Can be found in backstage management system."
+      options:
+        - H2
+        - MySQL 5.7
+        - MySQL 8.x
+        - Other
+  - type: dropdown
+    id: deployment-method
+    validations:
+      required: true
+    attributes:
+      label: "What is your deployment method?"
+      options:
+        - Fat Jar
+        - Docker
+  - type: input
+    id: site-url
+    attributes:
+      label: "Your site address."
+      description: "Note your online address, if possible."
+      placeholder: "ex. https://halo.run"
+    validations:
+      required: false
+  - type: markdown
+    id: details
+    attributes:
+      value: "## Details"
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: "What happened?"
+      description: "Also tell us, what did you expect to happen?"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Relevant log output"
+      description: "Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks."
+      render: shell
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: "Additional information"
+      description: "If you have other information to note, you can fill it in here (screenshots, videos, etc.)."

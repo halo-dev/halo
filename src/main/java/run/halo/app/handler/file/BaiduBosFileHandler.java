@@ -5,6 +5,7 @@ import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
 import com.baidubce.services.bos.model.PutObjectResponse;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
@@ -18,9 +19,6 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
-
-import javax.imageio.ImageReader;
-import java.util.Objects;
 
 /**
  * Baidu bos file handler.
@@ -45,13 +43,20 @@ public class BaiduBosFileHandler implements FileHandler {
 
         // Get config
         Object protocol = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_PROTOCOL);
-        String domain = optionService.getByPropertyOrDefault(BaiduBosProperties.BOS_DOMAIN, String.class, "");
-        String endPoint = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString();
-        String accessKey = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ACCESS_KEY).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_SECRET_KEY).toString();
-        String bucketName = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString();
-        String styleRule = optionService.getByPropertyOrDefault(BaiduBosProperties.BOS_STYLE_RULE, String.class, "");
-        String thumbnailStyleRule = optionService.getByPropertyOrDefault(BaiduBosProperties.BOS_THUMBNAIL_STYLE_RULE, String.class, "");
+        String domain =
+            optionService.getByPropertyOrDefault(BaiduBosProperties.BOS_DOMAIN, String.class, "");
+        String endPoint =
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString();
+        String accessKey =
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ACCESS_KEY).toString();
+        String secretKey =
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_SECRET_KEY).toString();
+        String bucketName =
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString();
+        String styleRule = optionService
+            .getByPropertyOrDefault(BaiduBosProperties.BOS_STYLE_RULE, String.class, "");
+        String thumbnailStyleRule = optionService
+            .getByPropertyOrDefault(BaiduBosProperties.BOS_THUMBNAIL_STYLE_RULE, String.class, "");
         String source = StringUtils.join(protocol, bucketName, "." + endPoint);
 
         BosClientConfiguration config = new BosClientConfiguration();
@@ -64,14 +69,18 @@ public class BaiduBosFileHandler implements FileHandler {
         domain = protocol + domain;
 
         try {
-            String basename = FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
+            String basename =
+                FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
             String extension = FilenameUtils.getExtension(file.getOriginalFilename());
             String timestamp = String.valueOf(System.currentTimeMillis());
             String upFilePath = StringUtils.join(basename, "_", timestamp, ".", extension);
-            String filePath = StringUtils.join(StringUtils.appendIfMissing(StringUtils.isNotBlank(domain) ? domain : source, "/"), upFilePath);
+            String filePath = StringUtils.join(
+                StringUtils.appendIfMissing(StringUtils.isNotBlank(domain) ? domain : source, "/"),
+                upFilePath);
 
             // Upload
-            PutObjectResponse putObjectResponseFromInputStream = client.putObject(bucketName, upFilePath, file.getInputStream());
+            PutObjectResponse putObjectResponseFromInputStream =
+                client.putObject(bucketName, upFilePath, file.getInputStream());
             if (putObjectResponseFromInputStream == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到百度云失败 ");
             }
@@ -79,24 +88,23 @@ public class BaiduBosFileHandler implements FileHandler {
             // Response result
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(basename);
-            uploadResult.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
+            uploadResult
+                .setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
             uploadResult.setKey(upFilePath);
-            uploadResult.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
+            uploadResult
+                .setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSuffix(extension);
             uploadResult.setSize(file.getSize());
 
             // Handle thumbnail
-            if (FileHandler.isImageType(uploadResult.getMediaType())) {
-                ImageReader image = ImageUtils.getImageReaderFromFile(file.getInputStream(), extension);
-                assert image != null;
-                uploadResult.setWidth(image.getWidth(0));
-                uploadResult.setHeight(image.getHeight(0));
+            handleImageMetadata(file, uploadResult, () -> {
                 if (ImageUtils.EXTENSION_ICO.equals(extension)) {
-                    uploadResult.setThumbPath(filePath);
+                    return filePath;
                 } else {
-                    uploadResult.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath : filePath + thumbnailStyleRule);
+                    return StringUtils.isBlank(thumbnailStyleRule) ? filePath :
+                        filePath + thumbnailStyleRule;
                 }
-            }
+            });
 
             return uploadResult;
         } catch (Exception e) {
@@ -111,10 +119,14 @@ public class BaiduBosFileHandler implements FileHandler {
         Assert.notNull(key, "File key must not be blank");
 
         // Get config
-        String endPoint = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString();
-        String accessKey = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ACCESS_KEY).toString();
-        String secretKey = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_SECRET_KEY).toString();
-        String bucketName = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString();
+        String endPoint =
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString();
+        String accessKey =
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ACCESS_KEY).toString();
+        String secretKey =
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_SECRET_KEY).toString();
+        String bucketName =
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString();
 
         BosClientConfiguration config = new BosClientConfiguration();
         config.setCredentials(new DefaultBceCredentials(accessKey, secretKey));

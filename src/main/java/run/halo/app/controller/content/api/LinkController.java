@@ -1,6 +1,9 @@
 package run.halo.app.controller.content.api;
 
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,10 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.LinkDTO;
 import run.halo.app.model.vo.LinkTeamVO;
 import run.halo.app.service.LinkService;
-
-import java.util.List;
-
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Content link controller.

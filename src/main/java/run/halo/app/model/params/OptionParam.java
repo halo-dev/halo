@@ -1,12 +1,11 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.OptionType;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
 /**
  * Optional param.
@@ -22,8 +21,6 @@ public class OptionParam implements InputConverter<Option> {
     @Size(max = 100, message = "Length of option key must not be more than {max}")
     private String key;
 
-
-    @Size(max = 1023, message = "Length of option value must not be more than {max}")
     private String value;
 
     private OptionType type;

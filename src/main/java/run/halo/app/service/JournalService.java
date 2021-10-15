@@ -1,5 +1,6 @@
 package run.halo.app.service;
 
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -11,8 +12,6 @@ import run.halo.app.model.enums.JournalType;
 import run.halo.app.model.params.JournalParam;
 import run.halo.app.model.params.JournalQuery;
 import run.halo.app.service.base.CrudService;
-
-import java.util.List;
 
 /**
  * Journal service interface.
@@ -52,7 +51,7 @@ public interface JournalService extends CrudService<Journal, Integer> {
      * Pages journals.
      *
      * @param journalQuery journal query must not be null
-     * @param pageable     page info must not be null
+     * @param pageable page info must not be null
      * @return a page of journal
      */
     @NonNull
@@ -61,7 +60,7 @@ public interface JournalService extends CrudService<Journal, Integer> {
     /**
      * Lists by type.
      *
-     * @param type     journal type must not be null
+     * @param type journal type must not be null
      * @param pageable page info must not be null
      * @return a page of journal
      */
@@ -94,4 +93,19 @@ public interface JournalService extends CrudService<Journal, Integer> {
      */
     @NonNull
     Page<JournalWithCmtCountDTO> convertToCmtCountDto(@NonNull Page<Journal> journalPage);
+
+    /**
+     * Increases journal likes(1).
+     *
+     * @param id id must not be null
+     */
+    void increaseLike(@NonNull Integer id);
+
+    /**
+     * Increase journal likes.
+     *
+     * @param likes likes must not be less than 1
+     * @param id id must not be null
+     */
+    void increaseLike(long likes, @NonNull Integer id);
 }

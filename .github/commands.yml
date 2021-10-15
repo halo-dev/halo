@@ -1,0 +1,19 @@
+{
+  perform: true,
+  commands:
+    [
+      {
+        type: "comment",
+        name: "findDuplicates",
+        allowUsers: [
+            "ruibaby",
+            "JohnNiang",
+            "guqing",
+            "LIlGG",
+            "halo-dev-bot"
+        ],
+        action: "comment",
+        comment: "Potential duplicates:\n${potentialDuplicates}",
+      },
+    ],
+}

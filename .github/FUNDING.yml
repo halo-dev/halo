@@ -1,8 +1,8 @@
 # These are supported funding model platforms
 
 github:
-patreon: halo_dev
+patreon: 
 open_collective: # Replace with a single Open Collective username
 ko_fi: # Replace with a single Ko-fi username
 tidelift: # Replace with a single Tidelift platform-name/package-name e.g., npm/babel
-custom: ['https://afdian.net/@halo-dev','https://sponsor.halo.run']
+custom: [ 'https://docs.halo.run/contribution/sponsor','https://sponsor.halo.run' ]

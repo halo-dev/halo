@@ -1,0 +1,37 @@
+server:
+  forward-headers-strategy: native
+  compression:
+    enabled: false
+    mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:h2:mem:halo-test
+  h2:
+    console:
+      enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  flyway:
+    enabled: false
+  cache:
+    type: none
+logging:
+  level:
+    run.halo.app: DEBUG
+    org.hibernate: ERROR
+  file:
+    path: ${user.home}/halo-test/logs
+
+halo:
+  doc-disabled: false
+  auth-enable: false
+  mode: test
+  workDir: ${user.home}/halo-test/

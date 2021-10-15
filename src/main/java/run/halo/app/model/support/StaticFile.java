@@ -1,10 +1,9 @@
 package run.halo.app.model.support;
 
-import lombok.Data;
-import lombok.ToString;
-
 import java.util.Comparator;
 import java.util.List;
+import lombok.Data;
+import lombok.ToString;
 
 /**
  * Static file.

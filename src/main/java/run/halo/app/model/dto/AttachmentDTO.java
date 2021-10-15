@@ -1,11 +1,10 @@
 package run.halo.app.model.dto;
 
+import java.util.Date;
 import lombok.Data;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
-
-import java.util.Date;
 
 /**
  * Attachment output dto.

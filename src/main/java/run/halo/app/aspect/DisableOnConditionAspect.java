@@ -28,13 +28,13 @@ public class DisableOnConditionAspect {
         this.haloProperties = haloProperties;
     }
 
-    @Pointcut("@annotation(run.halo.app.annotation.DisableOnCondition)")
+    @Pointcut("within(run.halo.app.controller..*)")
     public void pointcut() {
     }
 
     @Around("pointcut() && @annotation(disableApi)")
     public Object around(ProceedingJoinPoint joinPoint,
-            DisableOnCondition disableApi) throws Throwable {
+        DisableOnCondition disableApi) throws Throwable {
         Mode mode = disableApi.mode();
         if (haloProperties.getMode().equals(mode)) {
             throw new ForbiddenException("禁止访问");

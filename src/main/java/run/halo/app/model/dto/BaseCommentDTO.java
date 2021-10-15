@@ -1,13 +1,12 @@
 package run.halo.app.model.dto;
 
+import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
-
-import java.util.Date;
 
 /**
  * Base comment output dto.
@@ -47,4 +46,5 @@ public class BaseCommentDTO implements OutputConverter<BaseCommentDTO, BaseComme
 
     private Date createTime;
 
+    private String avatar;
 }

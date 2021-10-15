@@ -1,5 +1,12 @@
 package run.halo.app.aspect;
 
+import static org.hamcrest.core.Is.is;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,13 +23,6 @@ import org.springframework.web.util.NestedServletException;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.service.OptionService;
-
-import static org.hamcrest.core.Is.is;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @author guqing
@@ -45,7 +45,8 @@ class DisableOnConditionAspectTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         Assertions.assertNotNull(optionService);
-        Mockito.doReturn(true).when(optionService).getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+        Mockito.doReturn(true).when(optionService)
+            .getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
     }
 
     @Test()
@@ -53,8 +54,8 @@ class DisableOnConditionAspectTest {
         Throwable t = null;
         try {
             mvc.perform(get(REQUEST_URI + "/no"))
-                    .andDo(print())
-                    .andReturn();
+                .andDo(print())
+                .andReturn();
         } catch (NestedServletException nse) {
             t = nse;
         }
@@ -68,8 +69,8 @@ class DisableOnConditionAspectTest {
     @Test
     void ableAccessTest() throws Exception {
         mvc.perform(get(REQUEST_URI + "/yes"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())));
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status", is(HttpStatus.OK.value())));
     }
 }

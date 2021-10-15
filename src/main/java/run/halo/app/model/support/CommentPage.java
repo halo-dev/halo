@@ -1,12 +1,11 @@
 package run.halo.app.model.support;
 
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 /**
  * PostComment page implementation.

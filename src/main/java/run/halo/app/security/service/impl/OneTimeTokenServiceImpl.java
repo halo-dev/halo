@@ -1,13 +1,13 @@
 package run.halo.app.security.service.impl;
 
+import java.time.Duration;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.security.service.OneTimeTokenService;
 import run.halo.app.utils.HaloUtils;
-
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * One-time token service implementation.
@@ -17,10 +17,9 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class OneTimeTokenServiceImpl implements OneTimeTokenService {
 
-    /**
-     * One-time token expired day. (unit: day)
-     */
-    public static final int OTT_EXPIRED_DAY = 1;
+    private static final String tokenPrefix = "OTT-";
+
+    private static final Duration OTT_EXPIRATION_TIME = Duration.ofMinutes(5);
 
     private final AbstractStringCacheStore cacheStore;
 
@@ -33,7 +32,7 @@ public class OneTimeTokenServiceImpl implements OneTimeTokenService {
         Assert.hasText(oneTimeToken, "One-time token must not be blank");
 
         // Get from cache store
-        return cacheStore.get(oneTimeToken);
+        return cacheStore.get(tokenPrefix + oneTimeToken);
     }
 
     @Override
@@ -44,7 +43,10 @@ public class OneTimeTokenServiceImpl implements OneTimeTokenService {
         String oneTimeToken = HaloUtils.randomUUIDWithoutDash();
 
         // Put ott along with request uri
-        cacheStore.put(oneTimeToken, uri, OTT_EXPIRED_DAY, TimeUnit.DAYS);
+        cacheStore.put(tokenPrefix + oneTimeToken,
+            uri,
+            OTT_EXPIRATION_TIME.getSeconds(),
+            TimeUnit.SECONDS);
 
         // Return ott
         return oneTimeToken;
@@ -55,6 +57,6 @@ public class OneTimeTokenServiceImpl implements OneTimeTokenService {
         Assert.hasText(oneTimeToken, "One-time token must not be blank");
 
         // Delete the token
-        cacheStore.delete(oneTimeToken);
+        cacheStore.delete(tokenPrefix + oneTimeToken);
     }
 }

@@ -19,7 +19,8 @@ import run.halo.app.security.context.SecurityContextHolder;
 public class SensitiveConcealAspect {
 
 
-    @Pointcut("@annotation(run.halo.app.annotation.SensitiveConceal)")
+    @Pointcut("within(run.halo.app.repository..*) "
+        + "&& @annotation(run.halo.app.annotation.SensitiveConceal)")
     public void pointCut() {
     }
 
@@ -31,27 +32,15 @@ public class SensitiveConcealAspect {
         return comment;
     }
 
-
     @Around("pointCut()")
     public Object mask(ProceedingJoinPoint joinPoint) throws Throwable {
-
         Object result = joinPoint.proceed();
-
         if (SecurityContextHolder.getContext().isAuthenticated()) {
-
             return result;
-
         }
-
         if (result instanceof Iterable) {
-
             ((Iterable<?>) result).forEach(this::sensitiveMask);
-
         }
-
         return sensitiveMask(result);
-
     }
-
-
 }

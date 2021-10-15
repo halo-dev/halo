@@ -1,5 +1,9 @@
 package run.halo.app.service;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import javax.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,12 +16,8 @@ import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
+import run.halo.app.model.vo.PostMarkdownVO;
 import run.halo.app.service.base.BasePostService;
-
-import javax.validation.constraints.NotNull;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Post service interface.
@@ -33,7 +33,7 @@ public interface PostService extends BasePostService<Post> {
      * Pages posts.
      *
      * @param postQuery post query must not be null
-     * @param pageable  page info must not be null
+     * @param pageable page info must not be null
      * @return a page of post
      */
     @NonNull
@@ -42,7 +42,7 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Pages post by keyword
      *
-     * @param keyword  keyword
+     * @param keyword keyword
      * @param pageable pageable
      * @return a page of post
      */
@@ -52,46 +52,49 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Creates post by post param.
      *
-     * @param post        post must not be null
-     * @param tagIds      tag id set
+     * @param post post must not be null
+     * @param tagIds tag id set
      * @param categoryIds category id set
-     * @param metas       metas
-     * @param autoSave    autoSave
+     * @param metas metas
+     * @param autoSave autoSave
      * @return post created
      */
     @NonNull
-    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> metas, boolean autoSave);
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds,
+        Set<PostMeta> metas, boolean autoSave);
 
     /**
      * Creates post by post param.
      *
-     * @param post        post must not be null
-     * @param tagIds      tag id set
+     * @param post post must not be null
+     * @param tagIds tag id set
      * @param categoryIds category id set
-     * @param autoSave    autoSave
+     * @param autoSave autoSave
      * @return post created
      */
     @NonNull
-    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds, boolean autoSave);
+    PostDetailVO createBy(@NonNull Post post, Set<Integer> tagIds, Set<Integer> categoryIds,
+        boolean autoSave);
 
     /**
      * Updates post by post, tag id set and category id set.
      *
      * @param postToUpdate post to update must not be null
-     * @param tagIds       tag id set
-     * @param categoryIds  category id set
-     * @param metas        metas
-     * @param autoSave     autoSave
+     * @param tagIds tag id set
+     * @param categoryIds category id set
+     * @param metas metas
+     * @param autoSave autoSave
      * @return updated post
      */
     @NonNull
-    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds, Set<PostMeta> metas, boolean autoSave);
+    PostDetailVO updateBy(@NonNull Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds,
+        Set<PostMeta> metas, boolean autoSave);
 
     /**
      * Gets post by post status and slug.
      *
      * @param status post status must not be null
-     * @param slug   post slug must not be blank
+     * @param slug post slug must not be blank
      * @return post info
      */
     @NonNull
@@ -101,50 +104,63 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Gets post by post year and month and slug.
      *
-     * @param year  post create year.
+     * @param year post create year.
      * @param month post create month.
-     * @param slug  post slug.
+     * @param slug post slug.
      * @return post info
      */
     @NonNull
     Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String slug);
 
     /**
-     * Gets post by post year and month and slug.
+     * Gets post by post year and slug.
      *
-     * @param year   post create year.
-     * @param month  post create month.
-     * @param slug   post slug.
-     * @param status post status.
+     * @param year post create year.
+     * @param slug post slug.
      * @return post info
      */
     @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String slug, @NonNull PostStatus status);
+    Post getBy(@NonNull Integer year, @NonNull String slug);
 
     /**
      * Gets post by post year and month and slug.
      *
-     * @param year  post create year.
+     * @param year post create year.
      * @param month post create month.
-     * @param day   post create day.
-     * @param slug  post slug.
-     * @return post info
-     */
-    @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String slug);
-
-    /**
-     * Gets post by post year and month and slug.
-     *
-     * @param year   post create year.
-     * @param month  post create month.
-     * @param day    post create day.
-     * @param slug   post slug.
+     * @param slug post slug.
      * @param status post status.
      * @return post info
      */
     @NonNull
-    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day, @NonNull String slug, @NonNull PostStatus status);
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull String slug,
+        @NonNull PostStatus status);
+
+    /**
+     * Gets post by post year and month and slug.
+     *
+     * @param year post create year.
+     * @param month post create month.
+     * @param day post create day.
+     * @param slug post slug.
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day,
+        @NonNull String slug);
+
+    /**
+     * Gets post by post year and month and slug.
+     *
+     * @param year post create year.
+     * @param month post create month.
+     * @param day post create day.
+     * @param slug post slug.
+     * @param status post status.
+     * @return post info
+     */
+    @NonNull
+    Post getBy(@NonNull Integer year, @NonNull Integer month, @NonNull Integer day,
+        @NonNull String slug, @NonNull PostStatus status);
 
     /**
      * Removes posts in batch.
@@ -225,6 +241,24 @@ public interface PostService extends BasePostService<Post> {
     PostDetailVO convertToDetailVo(@NonNull Post post);
 
     /**
+     * Converts to a page of detail vo.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail vo
+     */
+    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
+
+    /**
+     * Converts to detail vo.
+     *
+     * @param post post must not be null
+     * @param queryEncryptCategory whether to query encryption category
+     * @return post detail vo
+     */
+    @NonNull
+    PostDetailVO convertToDetailVo(@NonNull Post post, @NonNull boolean queryEncryptCategory);
+
+    /**
      * Converts to a page of post list vo.
      *
      * @param postPage post page must not be null
@@ -232,6 +266,16 @@ public interface PostService extends BasePostService<Post> {
      */
     @NonNull
     Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
+
+    /**
+     * Converts to a page of post list vo.
+     *
+     * @param postPage post page must not be null
+     * @param queryEncryptCategory whether to query encryption category
+     * @return a page of post list vo
+     */
+    @NonNull
+    Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage, boolean queryEncryptCategory);
 
     /**
      * Converts to a list of post list vo.
@@ -243,12 +287,13 @@ public interface PostService extends BasePostService<Post> {
     List<PostListVO> convertToListVo(@NonNull List<Post> posts);
 
     /**
-     * Converts to a page of detail vo.
+     * Converts to a list of post list vo.
      *
-     * @param postPage post page must not be null
-     * @return a page of post detail vo
+     * @param posts post must not be null
+     * @param queryEncryptCategory whether to query encryption category
+     * @return a list of post list vo
      */
-    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
+    List<PostListVO> convertToListVo(List<Post> posts, boolean queryEncryptCategory);
 
     /**
      * Publish a post visit event.
@@ -260,10 +305,19 @@ public interface PostService extends BasePostService<Post> {
     /**
      * Get Post Pageable default sort
      *
-     * @return
-     * @Desc contains three parts. First, Top Priority; Second, From Custom index sort; Third, basic id sort
+     * @return post default sort
+     * @description contains three parts. First, Top Priority; Second, From Custom index sort;
+     * Third, basic id sort
      */
     @NotNull
     Sort getPostDefaultSort();
 
+
+    /**
+     * Lists PostMarkdown vo
+     *
+     * @return a list of PostMarkdown vo
+     */
+    @NonNull
+    List<PostMarkdownVO> listPostMarkdowns();
 }

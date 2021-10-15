@@ -1,35 +1,46 @@
 package run.halo.app.utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import org.junit.jupiter.api.Test;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 /**
- * DateTimeUtils 测试用例
+ * DateTimeUtils 测试用例.
  *
  * @author LeiXinXin
+ * @author guqing
  * @date 2020/1/9
  */
 class DateTimeUtilsTest {
+
     /**
-     * 获取上海时区的当前时间
+     * 获取上海时区的当前时间.
      */
     @Test
     void nowTest() {
         final LocalDateTime now = DateTimeUtils.now().withNano(0);
         assertNotNull(now);
-        final LocalDateTime ctt = DateTimeUtils.now(ZoneId.of(ZoneId.SHORT_IDS.get("CTT"))).withNano(0);
+        final LocalDateTime ctt =
+            DateTimeUtils.now(ZoneId.of(ZoneId.SHORT_IDS.get("CTT"))).withNano(0);
         assertNotNull(ctt);
 
         assertEquals(0, Duration.between(now, ctt).toMinutes());
     }
 
     /**
-     * 格式化日期时间
+     * 格式化日期时间.
      */
     @Test
     void formatTest() {
@@ -49,12 +60,13 @@ class DateTimeUtilsTest {
         final String formatTime = DateTimeUtils.formatTime(time1);
         assertEquals("1020", formatTime);
 
-        final String formatTime1 = DateTimeUtils.format(time1, DateTimeFormatter.ofPattern("HH:mm"));
+        final String formatTime1 =
+            DateTimeUtils.format(time1, DateTimeFormatter.ofPattern("HH:mm"));
         assertEquals("10:20", formatTime1);
     }
 
     /**
-     * 增加时间
+     * 增加时间.
      */
     @Test
     void plusTest() {
@@ -65,7 +77,6 @@ class DateTimeUtilsTest {
         LocalTime localTime = LocalTime.of(7, 30);
         final LocalDateTime localDateTime1 = DateTimeUtils.plusOneMinute(now, localTime);
         assertEquals("2020-01-09T07:31", localDateTime1.toString());
-
 
         final LocalDate date = LocalDate.of(2020, 1, 3);
         final LocalDateTime localDateTime2 = DateTimeUtils.plusOneMinute(date, localTime);
@@ -79,7 +90,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 解析时间格式为LocalDateTime
+     * 解析时间格式为LocalDateTime.
      */
     @Test
     void parseTest() {
@@ -88,12 +99,13 @@ class DateTimeUtilsTest {
         assertEquals("2020-01-09T13:55", localDateTime.toString());
 
         String time2 = "2020/1/9 13:56";
-        final LocalDateTime dateTime = DateTimeUtils.parse(time2, DateTimeFormatter.ofPattern("yyyy/M/d HH:mm"));
+        final LocalDateTime dateTime =
+            DateTimeUtils.parse(time2, DateTimeFormatter.ofPattern("yyyy/M/d HH:mm"));
         assertEquals("2020-01-09T13:56", dateTime.toString());
     }
 
     /**
-     * 减少日期时间
+     * 减少日期时间.
      */
     @Test
     void minusTest() {
@@ -103,7 +115,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 转为Instant
+     * 转为Instant.
      */
     @Test
     void toInstantTest() {
@@ -117,7 +129,7 @@ class DateTimeUtilsTest {
     }
 
     /**
-     * 一些其他的使用方法
+     * 一些其他的使用方法.
      */
     @Test
     void other() {
@@ -130,7 +142,8 @@ class DateTimeUtilsTest {
         /*
          * 小于等于
          */
-        final boolean lessThanOrEqual = DateTimeUtils.isLessThanOrEqual(startInclusive, endInclusive);
+        final boolean lessThanOrEqual =
+            DateTimeUtils.isLessThanOrEqual(startInclusive, endInclusive);
         assertFalse(lessThanOrEqual);
 
         /*
@@ -151,5 +164,13 @@ class DateTimeUtilsTest {
         final LocalDateTime localDateTime = LocalDateTime.of(2020, 1, 5, 6, 40, 30, 999);
         final LocalDateTime time = DateTimeUtils.secondAndNanoSetZero(localDateTime);
         assertEquals("2020-01-05T06:40", time.toString());
+    }
+
+    @Test
+    void toLocalDateTime() {
+        GregorianCalendar january31th =
+            new GregorianCalendar(2021, Calendar.JANUARY, 31, 12, 45, 20);
+        LocalDateTime localDateTime = DateTimeUtils.toLocalDateTime(january31th.getTime());
+        assertEquals("2021-01-31T12:45:20", localDateTime.toString());
     }
 }

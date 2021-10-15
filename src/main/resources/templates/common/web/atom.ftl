@@ -14,7 +14,7 @@
             <subtitle type="text">${user.description!}</subtitle>
         </#if>
     </#if>
-    <updated>${.now?iso_local}</updated>
+    <updated>${lastModified?iso_local}</updated>
     <#if category??>
         <id>${category.fullPath!}</id>
     <#else>

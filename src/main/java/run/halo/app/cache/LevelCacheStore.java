@@ -1,20 +1,28 @@
 package run.halo.app.cache;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import org.iq80.leveldb.*;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.DBFactory;
+import org.iq80.leveldb.DBIterator;
+import org.iq80.leveldb.Options;
+import org.iq80.leveldb.WriteBatch;
 import org.iq80.leveldb.impl.Iq80DBFactory;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.utils.JsonUtils;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.*;
 
 /**
  * level-db cache store
@@ -25,7 +33,7 @@ public class LevelCacheStore extends AbstractStringCacheStore {
     /**
      * Cleaner schedule period. (ms)
      */
-    private final static long PERIOD = 60 * 1000;
+    private static final long PERIOD = 60 * 1000;
 
     private static DB LEVEL_DB;
 
@@ -69,29 +77,31 @@ public class LevelCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    Optional<CacheWrapper<String>> getInternal(String key) {
+    @NonNull
+    Optional<CacheWrapper<String>> getInternal(@NonNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
         byte[] bytes = LEVEL_DB.get(stringToBytes(key));
         if (bytes != null) {
             String valueJson = bytesToString(bytes);
-            return StringUtils.isEmpty(valueJson) ? Optional.empty() : jsonToCacheWrapper(valueJson);
+            return StringUtils.isEmpty(valueJson) ? Optional.empty() :
+                jsonToCacheWrapper(valueJson);
         }
         return Optional.empty();
     }
 
     @Override
-    void putInternal(String key, CacheWrapper<String> cacheWrapper) {
+    void putInternal(@NonNull String key, @NonNull CacheWrapper<String> cacheWrapper) {
         putInternalIfAbsent(key, cacheWrapper);
     }
 
     @Override
-    Boolean putInternalIfAbsent(String key, CacheWrapper<String> cacheWrapper) {
+    Boolean putInternalIfAbsent(@NonNull String key, @NonNull CacheWrapper<String> cacheWrapper) {
         Assert.hasText(key, "Cache key must not be blank");
         Assert.notNull(cacheWrapper, "Cache wrapper must not be null");
         try {
             LEVEL_DB.put(
-                    stringToBytes(key),
-                    stringToBytes(JsonUtils.objectToJson(cacheWrapper))
+                stringToBytes(key),
+                stringToBytes(JsonUtils.objectToJson(cacheWrapper))
             );
             return true;
         } catch (JsonProcessingException e) {
@@ -102,7 +112,7 @@ public class LevelCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    public void delete(String key) {
+    public void delete(@NonNull String key) {
         LEVEL_DB.delete(stringToBytes(key));
         log.debug("cache remove key: [{}]", key);
     }
@@ -132,16 +142,19 @@ public class LevelCacheStore extends AbstractStringCacheStore {
                 }
 
                 String valueJson = bytesToString(next.getValue());
-                Optional<CacheWrapper<String>> stringCacheWrapper = StringUtils.isEmpty(valueJson) ? Optional.empty() : jsonToCacheWrapper(valueJson);
+                Optional<CacheWrapper<String>> stringCacheWrapper =
+                    StringUtils.isEmpty(valueJson) ? Optional.empty() :
+                        jsonToCacheWrapper(valueJson);
                 if (stringCacheWrapper.isPresent()) {
                     //get expireat time
                     long expireAtTime = stringCacheWrapper.map(CacheWrapper::getExpireAt)
-                            .map(Date::getTime)
-                            .orElse(0L);
+                        .map(Date::getTime)
+                        .orElse(0L);
                     //if expire
                     if (expireAtTime != 0 && currentTimeMillis > expireAtTime) {
                         writeBatch.delete(next.getKey());
-                        log.debug("deleted the cache: [{}] for expiration", bytesToString(next.getKey()));
+                        log.debug("deleted the cache: [{}] for expiration",
+                            bytesToString(next.getKey()));
                     }
                 }
             }
