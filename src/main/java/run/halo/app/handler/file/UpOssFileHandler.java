@@ -107,6 +107,7 @@ public class UpOssFileHandler implements FileHandler {
                         filePath + thumbnailStyleRule;
                 }
             });
+            result.close();
             return uploadResult;
         } catch (Exception e) {
             throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到又拍云失败", e);

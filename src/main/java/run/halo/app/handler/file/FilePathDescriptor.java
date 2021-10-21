@@ -3,10 +3,10 @@ package run.halo.app.handler.file;
 import java.util.function.Predicate;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import run.halo.app.utils.FilenameUtils;
-import run.halo.app.utils.HaloUtils;
 
 /**
  * File path descriptor.
@@ -14,6 +14,7 @@ import run.halo.app.utils.HaloUtils;
  * @author guqing
  * @since 2021-10-21
  */
+@Slf4j
 @Data
 @Accessors(chain = true)
 public final class FilePathDescriptor {
@@ -30,15 +31,16 @@ public final class FilePathDescriptor {
 
         private String name;
         private String extension;
-        private String path;
+        private String subPath;
         private String basePath;
         private String nameSuffix = StringUtils.EMPTY;
         private String separator = "/";
         private boolean automaticRename;
-        private Predicate<Builder> renamePredicate;
+        private Predicate<String> renamePredicate;
+        private String relativePath;
 
         public Builder setSubPath(String subPath) {
-            this.path = StringUtils.removeEnd(subPath, separator);
+            this.subPath = StringUtils.removeEnd(subPath, separator);
             return this;
         }
 
@@ -47,7 +49,7 @@ public final class FilePathDescriptor {
             return this;
         }
 
-        public Builder setRenamePredicate(Predicate<Builder> predicate) {
+        public Builder setRenamePredicate(Predicate<String> predicate) {
             this.renamePredicate = predicate;
             return this;
         }
@@ -80,7 +82,7 @@ public final class FilePathDescriptor {
         }
 
         public Builder setBasePath(String basePath) {
-            this.basePath = basePath;
+            this.basePath = StringUtils.removeEnd(basePath, separator);
             return this;
         }
 
@@ -98,7 +100,7 @@ public final class FilePathDescriptor {
             return this;
         }
 
-        String getName() {
+        String buildName() {
             StringBuilder sb = new StringBuilder()
                 .append(this.name);
             if (shouldRename()) {
@@ -112,16 +114,20 @@ public final class FilePathDescriptor {
         String getFullName() {
             // eg. hello.jpg -> hello-uuid-thumbnail.jpg
             if (StringUtils.isNotBlank(this.extension)) {
-                return getName() + '.' + this.extension;
+                return this.name + '.' + this.extension;
             }
-            return getName();
+            return this.name;
         }
 
         String getFullPath() {
             if (StringUtils.isNotBlank(this.basePath)) {
-                return getPath(this.basePath, this.path, this.getFullName());
+                return getPath(this.basePath, this.subPath, this.getFullName());
             }
-            return getPath(this.path, this.getFullName());
+            return getPath(this.subPath, this.getFullName());
+        }
+
+        String getRelativePath() {
+            return getPath(this.subPath, getFullName());
         }
 
         private boolean shouldRename() {
@@ -133,7 +139,7 @@ public final class FilePathDescriptor {
                 return true;
             }
             // renamePredicate not null
-            return renamePredicate.test(this);
+            return renamePredicate.test(this.relativePath);
         }
 
         private String getPath(String first, String... more) {
@@ -162,14 +168,22 @@ public final class FilePathDescriptor {
          * @return file path
          */
         public FilePathDescriptor build() {
-            return new FilePathDescriptor()
+            // build relative path first, used to determine if it needs to be renamed
+            this.relativePath = getRelativePath();
+            // then build name, returns a new name if the relative path exists
+            this.name = buildName();
+
+            FilePathDescriptor descriptor = new FilePathDescriptor()
                 .setBasePath(this.basePath)
-                .setSubPath(this.path)
-                .setRelativePath(getPath(this.path, getFullName()))
-                .setName(FilenameUtils.getBasename(getName()))
+                .setSubPath(this.subPath)
+                // regenerate relative path
+                .setRelativePath(getRelativePath())
+                .setName(FilenameUtils.getBasename(this.name))
                 .setExtension(extension)
                 .setFullPath(getFullPath())
                 .setFullName(getFullName());
+            log.info("FilePathDescriptor: [{}]", descriptor);
+            return descriptor;
         }
     }
 }

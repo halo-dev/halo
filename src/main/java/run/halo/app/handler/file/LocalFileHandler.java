@@ -94,8 +94,9 @@ public class LocalFileHandler implements FileHandler {
             .setSubPath(generatePath())
             .setSeparator(FILE_SEPARATOR)
             .setAutomaticRename(true)
-            .setRenamePredicate(builder ->
-                attachmentRepository.countByPath(builder.getFullPath()) > 0)
+            .setRenamePredicate(relativePath ->
+                attachmentRepository
+                    .countByFileKeyAndType(relativePath, AttachmentType.LOCAL) > 0)
             .setOriginalName(file.getOriginalFilename())
             .build();
         log.info("Uploading file: [{}] to directory: [{}]", file.getOriginalFilename(),

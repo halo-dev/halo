@@ -69,8 +69,9 @@ public class MinioFileHandler implements FileHandler {
                 .setBasePath(endpoint + bucketName)
                 .setSubPath(source)
                 .setAutomaticRename(true)
-                .setRenamePredicate(builder ->
-                    attachmentRepository.countByPath(builder.getFullPath()) > 0)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.MINIO) > 0)
                 .setOriginalName(file.getOriginalFilename())
                 .build();
 

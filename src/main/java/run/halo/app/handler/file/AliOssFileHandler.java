@@ -87,8 +87,9 @@ public class AliOssFileHandler implements FileHandler {
                 .setBasePath(basePath.toString())
                 .setSubPath(source)
                 .setAutomaticRename(true)
-                .setRenamePredicate(builder ->
-                    attachmentRepository.countByPath(builder.getFullPath()) > 0)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.ALIOSS) > 0)
                 .setOriginalName(file.getOriginalFilename())
                 .build();
 

@@ -32,7 +32,6 @@ import run.halo.app.model.properties.QiniuOssProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.OptionService;
-import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 import run.halo.app.utils.JsonUtils;
 
@@ -105,8 +104,9 @@ public class QiniuOssFileHandler implements FileHandler {
                 .setBasePath(basePath.toString())
                 .setSubPath(source)
                 .setAutomaticRename(true)
-                .setRenamePredicate(builder ->
-                    attachmentRepository.countByPath(builder.getFullPath()) > 0)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.QINIUOSS) > 0)
                 .setOriginalName(file.getOriginalFilename())
                 .build();
 

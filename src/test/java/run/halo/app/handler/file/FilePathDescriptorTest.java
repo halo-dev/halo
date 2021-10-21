@@ -45,12 +45,12 @@ public class FilePathDescriptorTest {
     @Test
     public void autoRenameWithPredicate() {
         FilePathDescriptor descriptor1 = descriptorBuilder.setAutomaticRename(true)
-            .setRenamePredicate(builder -> false).build();
+            .setRenamePredicate(path -> false).build();
         assertEquals("/home/halo/2021/10/hello.jpg", descriptor1.getFullPath());
         assertEquals("2021/10/hello.jpg", descriptor1.getRelativePath());
 
         FilePathDescriptor descriptor2 = descriptorBuilder.setAutomaticRename(true)
-            .setRenamePredicate(builder -> true).build();
+            .setRenamePredicate(path -> true).build();
         assertNotEquals("/home/halo/2021/10/hello.jpg", descriptor2.getFullPath());
         assertNotEquals("2021/10/hello.jpg", descriptor2.getRelativePath());
     }

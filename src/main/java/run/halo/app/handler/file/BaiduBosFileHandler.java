@@ -75,8 +75,9 @@ public class BaiduBosFileHandler implements FileHandler {
                 .setBasePath(domain)
                 .setSubPath(source)
                 .setAutomaticRename(true)
-                .setRenamePredicate(builder ->
-                    attachmentRepository.countByPath(builder.getFullPath()) > 0)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.BAIDUBOS) > 0)
                 .setOriginalName(file.getOriginalFilename())
                 .build();
 
