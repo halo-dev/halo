@@ -10,23 +10,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.Objects;
-import lombok.Data;
-import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.FileOperationException;
-import run.halo.app.handler.file.LocalFileHandler.FilePath.Builder;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
-import run.halo.app.service.OptionService;
+import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.utils.FilenameUtils;
-import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ImageUtils;
 
 /**
@@ -34,6 +30,7 @@ import run.halo.app.utils.ImageUtils;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-27
  */
 @Slf4j
@@ -57,13 +54,13 @@ public class LocalFileHandler implements FileHandler {
      */
     private static final int THUMB_HEIGHT = 256;
 
-    private final OptionService optionService;
+    private final AttachmentRepository attachmentRepository;
 
     private final String workDir;
 
-    public LocalFileHandler(OptionService optionService,
+    public LocalFileHandler(AttachmentRepository attachmentRepository,
         HaloProperties haloProperties) {
-        this.optionService = optionService;
+        this.attachmentRepository = attachmentRepository;
 
         // Get work dir
         workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
@@ -87,31 +84,37 @@ public class LocalFileHandler implements FileHandler {
         }
     }
 
+    @NonNull
     @Override
-    public UploadResult upload(MultipartFile file) {
+    public UploadResult upload(@NonNull MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
-        FilePath uploadFilePath = new Builder()
+        FilePathDescriptor uploadFilePath = new FilePathDescriptor.Builder()
             .setBasePath(workDir)
+            .setSubPath(generatePath())
+            .setSeparator(FILE_SEPARATOR)
+            .setAutomaticRename(true)
+            .setRenamePredicate(builder ->
+                attachmentRepository.countByPath(builder.getFullPath()) > 0)
             .setOriginalName(file.getOriginalFilename())
             .build();
         log.info("Uploading file: [{}] to directory: [{}]", file.getOriginalFilename(),
-            uploadFilePath.getSubPath());
-
+            uploadFilePath.getRelativePath());
+        Path localFileFullPath = Paths.get(uploadFilePath.getFullPath());
         try {
             // TODO Synchronize here
             // Create directory
-            Files.createDirectories(uploadFilePath.getFullPath().getParent());
-            Files.createFile(uploadFilePath.getFullPath());
+            Files.createDirectories(localFileFullPath.getParent());
+            Files.createFile(localFileFullPath);
 
             // Upload this file
-            file.transferTo(uploadFilePath.getFullPath());
+            file.transferTo(localFileFullPath);
 
             // Build upload result
             UploadResult uploadResult = new UploadResult();
             uploadResult.setFilename(uploadFilePath.getName());
-            uploadResult.setFilePath(uploadFilePath.getSubPath());
-            uploadResult.setKey(uploadFilePath.getSubPath());
+            uploadResult.setFilePath(uploadFilePath.getRelativePath());
+            uploadResult.setKey(uploadFilePath.getRelativePath());
             uploadResult.setSuffix(uploadFilePath.getExtension());
             uploadResult
                 .setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
@@ -120,11 +123,14 @@ public class LocalFileHandler implements FileHandler {
             // TODO refactor this: if image is svg ext. extension
             handleImageMetadata(file, uploadResult, () -> {
                 // Upload a thumbnail
-                FilePath thumbnailFilePath = new Builder()
+                FilePathDescriptor thumbnailFilePath = new FilePathDescriptor.Builder()
                     .setBasePath(workDir)
-                    .setOriginalName(THUMBNAIL_SUFFIX + uploadFilePath.getFullName())
+                    .setSubPath(uploadFilePath.getSubPath())
+                    .setSeparator(FILE_SEPARATOR)
+                    .setOriginalName(uploadFilePath.getFullName())
+                    .setNameSuffix(THUMBNAIL_SUFFIX)
                     .build();
-                final Path thumbnailPath = thumbnailFilePath.getFullPath();
+                final Path thumbnailPath = Paths.get(thumbnailFilePath.getFullPath());
                 try (InputStream is = file.getInputStream()) {
                     // Generate thumbnail
                     BufferedImage originalImage =
@@ -133,110 +139,19 @@ public class LocalFileHandler implements FileHandler {
                         uploadFilePath.getExtension());
                     if (result) {
                         // Set thumb path
-                        return thumbnailFilePath.getSubFilePath();
+                        return thumbnailFilePath.getRelativePath();
                     }
                 } catch (Throwable e) {
                     log.warn("Failed to open image file.", e);
                 }
-                return uploadFilePath.getSubFilePath();
+                return uploadFilePath.getRelativePath();
             });
 
             log.info("Uploaded file: [{}] to directory: [{}] successfully",
-                file.getOriginalFilename(), uploadFilePath.getFullPath().toString());
+                file.getOriginalFilename(), uploadFilePath.getFullPath());
             return uploadResult;
         } catch (IOException e) {
-            throw new FileOperationException("上传附件失败").setErrorData(uploadFilePath);
-        }
-    }
-
-    @Data
-    @Accessors(chain = true)
-    public static final class FilePath {
-        String name;
-        String extension;
-        String subPath;
-        String subFilePath;
-        String basePath;
-        String fullName;
-        Path fullPath;
-
-        public static final class Builder {
-            String name;
-            String extension;
-            String path;
-            String basePath;
-
-            public Builder() {
-                this.path = generatePath();
-            }
-
-            private String generatePath() {
-                // Get current time
-                Calendar current = Calendar.getInstance();
-                // Get month and day of month
-                int year = current.get(Calendar.YEAR);
-                int month = current.get(Calendar.MONTH) + 1;
-
-                String monthString = month < 10 ? "0" + month : String.valueOf(month);
-
-                // Build directory
-                return UPLOAD_SUB_DIR + year + FILE_SEPARATOR + monthString + FILE_SEPARATOR;
-            }
-
-            /**
-             * Set original file name.
-             *
-             * @param originalFileName original file name
-             * @return file path builder
-             */
-            public Builder setOriginalName(String originalFileName) {
-                Assert.notNull(originalFileName, "The originalFileName must not be null.");
-                this.name = FilenameUtils.getBasename(originalFileName);
-                this.extension = FilenameUtils.getExtension(originalFileName);
-                return this;
-            }
-
-            public Builder setBasePath(String basePath) {
-                this.basePath = basePath;
-                return this;
-            }
-
-            String getFullName() {
-                if (!hasExtension()) {
-                    return this.name;
-                }
-                return this.name + '.' + this.extension;
-            }
-
-            private Path getFullPath() {
-                if (StringUtils.isNotBlank(this.basePath)) {
-                    return Paths.get(this.basePath, this.path, this.getFullName());
-                }
-                return Paths.get(this.path, this.getFullName());
-            }
-
-            /**
-             * build file path object.
-             *
-             * @return file path
-             */
-            public FilePath build() {
-                if (Files.exists(getFullPath())) {
-                    this.name = this.name + '-' + HaloUtils.simpleUUID();
-                }
-                return new FilePath()
-                    .setBasePath(this.basePath)
-                    .setSubPath(this.path)
-                    .setSubFilePath(this.path + getFullName())
-                    .setName(this.name)
-                    .setExtension(extension)
-                    .setFullPath(getFullPath())
-                    .setFullName(getFullName());
-            }
-
-            private boolean hasExtension() {
-                return StringUtils.isNotBlank(this.extension);
-            }
+            throw new FileOperationException("上传附件失败").setErrorData(uploadFilePath.getFullPath());
         }
     }
 
@@ -279,6 +194,19 @@ public class LocalFileHandler implements FileHandler {
         return AttachmentType.LOCAL;
     }
 
+    private String generatePath() {
+        // Get current time
+        Calendar current = Calendar.getInstance();
+        // Get month and day of month
+        int year = current.get(Calendar.YEAR);
+        int month = current.get(Calendar.MONTH) + 1;
+
+        String monthString = month < 10 ? "0" + month : String.valueOf(month);
+
+        // Build directory
+        return UPLOAD_SUB_DIR + year + FILE_SEPARATOR + monthString + FILE_SEPARATOR;
+    }
+
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath,
         String extension) {
         Assert.notNull(originalImage, "Image must not be null");
@@ -289,11 +217,10 @@ public class LocalFileHandler implements FileHandler {
         try {
             Files.createFile(thumbPath);
             // Convert to thumbnail and copy the thumbnail
-            log.debug("Trying to generate thumbnail: [{}]", thumbPath.toString());
+            log.debug("Trying to generate thumbnail: [{}]", thumbPath);
             Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true)
                 .toFile(thumbPath.toFile());
-            log.info("Generated thumbnail image, and wrote the thumbnail to [{}]",
-                thumbPath.toString());
+            log.info("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath);
             result = true;
         } catch (Throwable t) {
             // Ignore the error
