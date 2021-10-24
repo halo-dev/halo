@@ -1,5 +1,21 @@
 # CHANGELOG
 
+# 1.4.13
+
+## Breaking changes
+
+- 修改评论 Gravatar 默认头像设置。halo-dev/halo#1485 @cetr
+
+## Features
+
+- 整站备份支持可选项备份。halo-dev/halo#1494 halo-dev/halo-admin#362 @guqing
+
+## Improvements
+
+- 后台评论设置中默认头像选择支持预览头像样式。halo-dev/halo-admin#357 @cetr
+- 优化后台页面滚动条样式。halo-dev/halo-admin#364 @1357885013
+- 优化 Markdown 文件导入。halo-dev/halo#1492 @lrzl
+
 # 1.4.12
 
 ## Features
