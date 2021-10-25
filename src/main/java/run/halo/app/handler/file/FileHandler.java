@@ -136,7 +136,6 @@ public interface FileHandler {
             .setRenamePredicate(predicate)
             .setOriginalName(originalFileName)
             .build();
-
     }
 
 }
