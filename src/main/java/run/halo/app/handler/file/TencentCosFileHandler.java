@@ -90,15 +90,11 @@ public class TencentCosFileHandler implements FileHandler {
         }
 
         try {
-            FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
-                .setBasePath(basePath.toString())
-                .setSubPath(source)
-                .setAutomaticRename(true)
-                .setRenamePredicate(relativePath ->
-                    attachmentRepository
-                        .countByFileKeyAndType(relativePath, AttachmentType.TENCENTCOS) > 0)
-                .setOriginalName(file.getOriginalFilename())
-                .build();
+            FilePathDescriptor pathDescriptor =
+                getFilePathDescriptor(basePath.toString(), source, file.getOriginalFilename(),
+                    relativePath ->
+                        attachmentRepository
+                            .countByFileKeyAndType(relativePath, AttachmentType.TENCENTCOS) > 0);
 
             // Upload
             ObjectMetadata objectMetadata = new ObjectMetadata();

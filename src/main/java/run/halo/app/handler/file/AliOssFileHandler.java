@@ -83,15 +83,11 @@ public class AliOssFileHandler implements FileHandler {
         }
 
         try {
-            FilePathDescriptor uploadFilePath = new FilePathDescriptor.Builder()
-                .setBasePath(basePath.toString())
-                .setSubPath(source)
-                .setAutomaticRename(true)
-                .setRenamePredicate(relativePath ->
-                    attachmentRepository
-                        .countByFileKeyAndType(relativePath, AttachmentType.ALIOSS) > 0)
-                .setOriginalName(file.getOriginalFilename())
-                .build();
+            FilePathDescriptor uploadFilePath =
+                getFilePathDescriptor(basePath.toString(), source, file.getOriginalFilename(),
+                    relativePath ->
+                        attachmentRepository
+                            .countByFileKeyAndType(relativePath, AttachmentType.ALIOSS) > 0);
 
             log.info(basePath.toString());
 

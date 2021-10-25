@@ -71,15 +71,11 @@ public class BaiduBosFileHandler implements FileHandler {
         domain = protocol + domain;
 
         try {
-            FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
-                .setBasePath(domain)
-                .setSubPath(source)
-                .setAutomaticRename(true)
-                .setRenamePredicate(relativePath ->
-                    attachmentRepository
-                        .countByFileKeyAndType(relativePath, AttachmentType.BAIDUBOS) > 0)
-                .setOriginalName(file.getOriginalFilename())
-                .build();
+            FilePathDescriptor pathDescriptor =
+                getFilePathDescriptor(domain, source, file.getOriginalFilename(),
+                    relativePath ->
+                        attachmentRepository
+                            .countByFileKeyAndType(relativePath, AttachmentType.BAIDUBOS) > 0);
 
             // Upload
             PutObjectResponse putObjectResponseFromInputStream =
