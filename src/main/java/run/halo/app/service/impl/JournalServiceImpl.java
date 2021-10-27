@@ -107,10 +107,16 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer>
     }
 
     @Override
-    public JournalDTO convertTo(Journal journal) {
+    public JournalWithCmtCountDTO convertTo(Journal journal) {
         Assert.notNull(journal, "Journal must not be null");
 
-        return new JournalDTO().convertFrom(journal);
+        JournalWithCmtCountDTO journalWithCmtCountDto = new JournalWithCmtCountDTO()
+            .convertFrom(journal);
+
+        journalWithCmtCountDto.setCommentCount(journalCommentService.countByStatusAndPostId(
+            CommentStatus.PUBLISHED, journal.getId()));
+
+        return journalWithCmtCountDto;
     }
 
     @Override
