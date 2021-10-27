@@ -178,7 +178,7 @@ public final class FilePathDescriptor {
                 .setSubPath(this.subPath)
                 // regenerate relative path
                 .setRelativePath(getRelativePath())
-                .setName(FilenameUtils.getBasename(this.name))
+                .setName(this.name)
                 .setExtension(extension)
                 .setFullPath(getFullPath())
                 .setFullName(getFullName());

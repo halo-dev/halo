@@ -78,4 +78,13 @@ public class FilePathDescriptorTest {
         assertEquals("hello", descriptor.getFullName());
         assertEquals("2021/10/hello", descriptor.getRelativePath());
     }
+
+    @Test
+    public void otherName() {
+        FilePathDescriptor descriptor = descriptorBuilder.setOriginalName("1.4.9.png").build();
+        assertEquals("1.4.9", descriptor.getName());
+        assertEquals("1.4.9.png", descriptor.getFullName());
+        assertEquals("/home/halo/2021/10/1.4.9.png", descriptor.getFullPath());
+        assertEquals("2021/10/1.4.9.png", descriptor.getRelativePath());
+    }
 }
