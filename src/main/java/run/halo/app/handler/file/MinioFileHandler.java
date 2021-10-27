@@ -65,11 +65,15 @@ public class MinioFileHandler implements FileHandler {
             .build();
 
         try {
-            FilePathDescriptor pathDescriptor =
-                getFilePathDescriptor(endpoint + bucketName, source, file.getOriginalFilename(),
-                    relativePath ->
-                        attachmentRepository
-                            .countByFileKeyAndType(relativePath, AttachmentType.MINIO) > 0);
+            FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
+                .setBasePath(endpoint + bucketName)
+                .setSubPath(source)
+                .setAutomaticRename(true)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.MINIO) > 0)
+                .setOriginalName(file.getOriginalFilename())
+                .build();
 
             PutObjectArgs putObjectArgs = PutObjectArgs.builder()
                 .contentType(file.getContentType())

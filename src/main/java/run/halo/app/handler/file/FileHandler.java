@@ -5,7 +5,6 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import javax.imageio.ImageReader;
 import org.apache.commons.lang3.StringUtils;
@@ -117,25 +116,5 @@ public interface FileHandler {
      * @return attachment type
      */
     AttachmentType getAttachmentType();
-
-    /**
-     * Gets file path descriptor.
-     *
-     * @param basePath root path, e.g. 'https://halo.run' or '/'
-     * @param subPath sub path
-     * @param originalFileName original file name
-     * @param predicate predicate of auto rename
-     * @return a file path descriptor
-     */
-    default FilePathDescriptor getFilePathDescriptor(String basePath, String subPath,
-        String originalFileName, Predicate<String> predicate) {
-        return new FilePathDescriptor.Builder()
-            .setBasePath(basePath)
-            .setSubPath(subPath)
-            .setAutomaticRename(true)
-            .setRenamePredicate(predicate)
-            .setOriginalName(originalFileName)
-            .build();
-    }
 
 }

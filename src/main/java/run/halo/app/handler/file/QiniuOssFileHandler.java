@@ -100,11 +100,15 @@ public class QiniuOssFileHandler implements FileHandler {
             .append(URL_SEPARATOR);
 
         try {
-            FilePathDescriptor pathDescriptor =
-                getFilePathDescriptor(basePath.toString(), source, file.getOriginalFilename(),
-                    relativePath ->
-                        attachmentRepository
-                            .countByFileKeyAndType(relativePath, AttachmentType.QINIUOSS) > 0);
+            FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
+                .setBasePath(basePath.toString())
+                .setSubPath(source)
+                .setAutomaticRename(true)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.QINIUOSS) > 0)
+                .setOriginalName(file.getOriginalFilename())
+                .build();
 
             // Get file recorder for temp directory
             FileRecorder fileRecorder = new FileRecorder(tmpPath.toFile());
