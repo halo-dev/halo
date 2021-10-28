@@ -11,6 +11,7 @@ import run.halo.app.model.entity.Menu;
  *
  * @author johnniang
  * @author ryanwang
+ * @author linfeng
  * @date 4/3/19
  */
 @Data
@@ -33,4 +34,6 @@ public class MenuDTO implements OutputConverter<MenuDTO, Menu> {
     private Integer parentId;
 
     private String team;
+
+    private String fullPath;
 }

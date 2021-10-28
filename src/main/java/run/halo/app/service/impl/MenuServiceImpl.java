@@ -1,5 +1,7 @@
 package run.halo.app.service.impl;
 
+import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.MenuParam;
@@ -18,6 +21,7 @@ import run.halo.app.model.vo.MenuTeamVO;
 import run.halo.app.model.vo.MenuVO;
 import run.halo.app.repository.MenuRepository;
 import run.halo.app.service.MenuService;
+import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
@@ -25,15 +29,19 @@ import run.halo.app.utils.ServiceUtils;
  * MenuService implementation class.
  *
  * @author ryanwang
+ * @author linfeng
  * @date 2019-03-14
  */
 @Service
 public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implements MenuService {
 
+    private final OptionService optionService;
     private final MenuRepository menuRepository;
 
-    public MenuServiceImpl(MenuRepository menuRepository) {
+    public MenuServiceImpl(OptionService optionService,
+        MenuRepository menuRepository) {
         super(menuRepository);
+        this.optionService = optionService;
         this.menuRepository = menuRepository;
     }
 
@@ -79,7 +87,23 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     @Override
     public List<MenuDTO> listByTeam(@NonNull String team, Sort sort) {
         List<Menu> menus = menuRepository.findByTeam(team, sort);
-        return menus.stream().map(menu -> (MenuDTO) new MenuDTO().convertFrom(menu))
+        return menus.stream().map(menu -> {
+
+                MenuDTO menuDTO = new MenuDTO().convertFrom(menu);
+                // modify by linfeng at 2021.10.28
+                String fullPath;
+                if (StringUtils.hasLength(menu.getUrl())) {
+                    if (menu.getUrl().endsWith(URL_SEPARATOR)) {
+                        fullPath = menu.getUrl();
+                    } else {
+                        fullPath = menu.getUrl() + optionService.getPathSuffix();
+                    }
+                } else {
+                    fullPath = menu.getUrl();
+                }
+                menuDTO.setFullPath(fullPath);
+                return menuDTO;
+            })
             .collect(Collectors.toList());
     }
 
