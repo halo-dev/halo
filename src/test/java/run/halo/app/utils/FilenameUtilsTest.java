@@ -26,6 +26,7 @@ class FilenameUtilsTest {
         assertEquals("", FilenameUtils.getBasename("a/b/c/"));
         assertEquals("o", FilenameUtils.getBasename("he/ll/o.tar.gz"));
         assertEquals("i", FilenameUtils.getBasename("h/i.tar.bz2"));
+        assertEquals("1.4.9", FilenameUtils.getBasename("1.4.9.png"));
     }
 
     // foo.txt      --> "txt"

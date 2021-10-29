@@ -1,6 +1,5 @@
 package run.halo.app.handler.file;
 
-
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 import com.qcloud.cos.COSClient;
@@ -21,8 +20,8 @@ import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.properties.TencentCosProperties;
 import run.halo.app.model.support.UploadResult;
+import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.OptionService;
-import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
 /**
@@ -37,9 +36,12 @@ import run.halo.app.utils.ImageUtils;
 public class TencentCosFileHandler implements FileHandler {
 
     private final OptionService optionService;
+    private final AttachmentRepository attachmentRepository;
 
-    public TencentCosFileHandler(OptionService optionService) {
+    public TencentCosFileHandler(OptionService optionService,
+        AttachmentRepository attachmentRepository) {
         this.optionService = optionService;
+        this.attachmentRepository = attachmentRepository;
     }
 
     @Override
@@ -88,24 +90,15 @@ public class TencentCosFileHandler implements FileHandler {
         }
 
         try {
-            String basename =
-                FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
-            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-            String timestamp = String.valueOf(System.currentTimeMillis());
-            StringBuilder upFilePath = new StringBuilder();
-
-            if (StringUtils.isNotEmpty(source)) {
-                upFilePath.append(source)
-                    .append(URL_SEPARATOR);
-            }
-
-            upFilePath.append(basename)
-                .append("_")
-                .append(timestamp)
-                .append(".")
-                .append(extension);
-
-            String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
+            FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
+                .setBasePath(basePath.toString())
+                .setSubPath(source)
+                .setAutomaticRename(true)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.TENCENTCOS) > 0)
+                .setOriginalName(file.getOriginalFilename())
+                .build();
 
             // Upload
             ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -114,31 +107,31 @@ public class TencentCosFileHandler implements FileHandler {
             // 设置 Content type, 默认是 application/octet-stream
             objectMetadata.setContentType(file.getContentType());
             PutObjectResult putObjectResponseFromInputStream = cosClient
-                .putObject(bucketName, upFilePath.toString(), file.getInputStream(),
+                .putObject(bucketName, pathDescriptor.getRelativePath(), file.getInputStream(),
                     objectMetadata);
             if (putObjectResponseFromInputStream == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到腾讯云失败 ");
             }
-
+            String fullPath = pathDescriptor.getFullPath();
             // Response result
             UploadResult uploadResult = new UploadResult();
-            uploadResult.setFilename(basename);
+            uploadResult.setFilename(pathDescriptor.getName());
             uploadResult
-                .setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
-            uploadResult.setKey(upFilePath.toString());
+                .setFilePath(StringUtils.isBlank(styleRule) ? fullPath : fullPath + styleRule);
+            uploadResult.setKey(pathDescriptor.getRelativePath());
             uploadResult
                 .setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
-            uploadResult.setSuffix(extension);
+            uploadResult.setSuffix(pathDescriptor.getExtension());
             uploadResult.setSize(file.getSize());
 
             // Handle thumbnail
             handleImageMetadata(file, uploadResult, () -> {
-                if (ImageUtils.EXTENSION_ICO.equals(extension)) {
-                    uploadResult.setThumbPath(filePath);
-                    return filePath;
+                if (ImageUtils.EXTENSION_ICO.equals(pathDescriptor.getExtension())) {
+                    uploadResult.setThumbPath(fullPath);
+                    return fullPath;
                 } else {
-                    return StringUtils.isBlank(thumbnailStyleRule) ? filePath :
-                        filePath + thumbnailStyleRule;
+                    return StringUtils.isBlank(thumbnailStyleRule) ? fullPath :
+                        fullPath + thumbnailStyleRule;
                 }
             });
             return uploadResult;
