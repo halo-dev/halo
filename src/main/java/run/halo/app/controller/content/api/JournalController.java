@@ -71,7 +71,7 @@ public class JournalController {
 
     @GetMapping("{journalId:\\d+}")
     @ApiOperation("Gets a journal detail")
-    public JournalDTO getBy(@PathVariable("journalId") Integer journalId) {
+    public JournalWithCmtCountDTO getBy(@PathVariable("journalId") Integer journalId) {
         Journal journal = journalService.getById(journalId);
         return journalService.convertTo(journal);
     }

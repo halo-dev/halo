@@ -68,13 +68,13 @@ public interface JournalService extends CrudService<Journal, Integer> {
     Page<Journal> pageBy(@NonNull JournalType type, @NonNull Pageable pageable);
 
     /**
-     * Converts to journal dto.
+     * Converts to journal with comment count dto.
      *
      * @param journal journal must not be null
-     * @return journal dto
+     * @return journal with comment count dto
      */
     @NonNull
-    JournalDTO convertTo(@NonNull Journal journal);
+    JournalWithCmtCountDTO convertTo(@NonNull Journal journal);
 
     /**
      * Converts to journal with comment count dto list.

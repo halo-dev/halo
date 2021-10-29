@@ -341,7 +341,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
             sheetDetailVO.setSummary(generateSummary(sheet.getFormatContent()));
         }
 
-        sheetDetailVO.setCommentCount(sheetCommentService.countByPostId(sheet.getId()));
+        sheetDetailVO.setCommentCount(sheetCommentService.countByStatusAndPostId(
+            CommentStatus.PUBLISHED, sheet.getId()));
 
         sheetDetailVO.setFullPath(buildFullPath(sheet));
 

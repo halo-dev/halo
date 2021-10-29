@@ -100,6 +100,15 @@ public interface BaseCommentRepository<COMMENT extends BaseComment>
     long countByPostId(@NonNull Integer postId);
 
     /**
+     * Count comments by comment status and post id.
+     *
+     * @param status status must not be null
+     * @param postId post id must not be null.
+     * @return comments count
+     */
+    long countByStatusAndPostId(@NonNull CommentStatus status, @NonNull Integer postId);
+
+    /**
      * Counts by comment status.
      *
      * @param status comment status must not be null
