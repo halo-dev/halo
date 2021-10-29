@@ -7,37 +7,22 @@
       layout="vertical"
       @keyup.enter.native="form.needAuthCode ? handleLogin() : handleLoginClick()"
     >
-      <a-form-model-item
-        v-if="!form.needAuthCode"
-        :style="{ 'animation-delay': '0.1s' }"
-        class="animated fadeInUp"
-        prop="username"
-      >
+      <a-form-model-item v-if="!form.needAuthCode" prop="username">
         <a-input v-model="form.model.username" placeholder="用户名/邮箱">
           <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="user" />
         </a-input>
       </a-form-model-item>
-      <a-form-model-item
-        v-if="!form.needAuthCode"
-        :style="{ 'animation-delay': '0.2s' }"
-        class="animated fadeInUp"
-        prop="password"
-      >
+      <a-form-model-item v-if="!form.needAuthCode" prop="password">
         <a-input v-model="form.model.password" placeholder="密码" type="password">
           <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="lock" />
         </a-input>
       </a-form-model-item>
-      <a-form-model-item
-        v-if="form.needAuthCode"
-        :style="{ 'animation-delay': '0.1s' }"
-        class="animated fadeInUp"
-        prop="authcode"
-      >
+      <a-form-model-item v-if="form.needAuthCode" prop="authcode">
         <a-input v-model="form.model.authcode" :maxLength="6" placeholder="两步验证码">
           <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="safety-certificate" />
         </a-input>
       </a-form-model-item>
-      <a-form-model-item :style="{ 'animation-delay': '0.3s' }" class="animated fadeInUp">
+      <a-form-model-item>
         <a-button
           :block="true"
           :loading="form.logging"
