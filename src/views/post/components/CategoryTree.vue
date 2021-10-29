@@ -1,5 +1,5 @@
 <template>
-  <a-tree checkable :treeData="categoryTree" :defaultExpandAll="true" :checkedKeys="categoryIds" @check="onCheck">
+  <a-tree checkable :treeData="categoryTree" defaultExpandAll checkStrictly :checkedKeys="categoryIds" @check="onCheck">
   </a-tree>
 </template>
 
@@ -33,15 +33,8 @@ export default {
     onCheck(checkedKeys, e) {
       this.$log.debug('Chekced keys', checkedKeys)
       this.$log.debug('e', e)
-      const categoryIds = e.checkedNodes
-        .filter(node => {
-          return node.data.props.isLeaf
-        })
-        .map(node => node.key)
 
-      this.$log.debug('Effectively selected category ids', categoryIds)
-
-      this.$emit('check', categoryIds)
+      this.$emit('check', checkedKeys.checked)
     }
   }
 }

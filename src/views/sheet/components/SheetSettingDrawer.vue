@@ -13,7 +13,7 @@
       <div class="mb-4">
         <h3 class="post-setting-drawer-title">基本设置</h3>
         <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
+          <a-form>
             <a-form-item label="页面标题：" v-if="needTitle">
               <a-input v-model="selectedSheet.title" />
             </a-form-item>
@@ -62,7 +62,7 @@
       <div class="mb-4">
         <h3 class="post-setting-drawer-title">摘要</h3>
         <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
+          <a-form>
             <a-form-item>
               <a-input
                 type="textarea"
@@ -80,19 +80,15 @@
         <h3 class="post-setting-drawer-title">封面图</h3>
         <div class="post-setting-drawer-item">
           <div class="sheet-thumb">
-            <img
-              class="img"
-              :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
-              @click="thumbDrawerVisible = true"
-            />
-
-            <a-form layout="vertial">
-              <a-form-item>
-                <a-input v-model="selectedSheet.thumbnail" placeholder="点击封面图选择图片，或者输入外部链接"></a-input>
-              </a-form-item>
-            </a-form>
-
-            <a-button class="sheet-thumb-remove" type="dashed" @click="selectedSheet.thumbnail = null">移除</a-button>
+            <a-space direction="vertical">
+              <img
+                class="img"
+                :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
+                @click="thumbDrawerVisible = true"
+              />
+              <a-input v-model="selectedSheet.thumbnail" placeholder="点击封面图选择图片，或者输入外部链接"></a-input>
+              <a-button type="dashed" @click="selectedSheet.thumbnail = null">移除</a-button>
+            </a-space>
           </div>
         </div>
       </div>
@@ -113,7 +109,7 @@
         <div class="mb-4">
           <h3 class="post-setting-drawer-title">SEO 设置</h3>
           <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
+            <a-form>
               <a-form-item label="自定义关键词：">
                 <a-input v-model="selectedSheet.metaKeywords" placeholder="多个关键词以英文逗号隔开" />
               </a-form-item>
@@ -131,7 +127,7 @@
         <a-divider />
         <div class="mb-4">
           <h3 class="post-setting-drawer-title">元数据</h3>
-          <a-form layout="vertical">
+          <a-form>
             <a-form-item v-for="(meta, index) in selectedMetas" :key="index" :prop="'meta.' + index + '.value'">
               <a-row :gutter="5">
                 <a-col :span="12">
@@ -170,7 +166,7 @@
           @click="handleDraftClick"
           @callback="handleSavedCallback"
           :loading="draftSaving"
-          :errored="draftSavedErrored"
+          :errored="draftSaveErrored"
           text="保存草稿"
           loadedText="保存成功"
           erroredText="保存失败"
@@ -179,7 +175,7 @@
           @click="handlePublishClick()"
           @callback="handleSavedCallback"
           :loading="saving"
-          :errored="savedErrored"
+          :errored="saveErrored"
           :text="`${selectedSheet.id ? '保存' : '发布'}`"
           :loadedText="`${selectedSheet.id ? '保存' : '发布'}成功`"
           :erroredText="`${selectedSheet.id ? '保存' : '发布'}失败`"
@@ -209,9 +205,9 @@ export default {
       selectedSheet: this.sheet,
       customTpls: [],
       saving: false,
-      savedErrored: false,
+      saveErrored: false,
       draftSaving: false,
-      draftSavedErrored: false
+      draftSaveErrored: false
     }
   },
   props: {
@@ -348,9 +344,9 @@ export default {
           .update(this.selectedSheet.id, this.selectedSheet, false)
           .catch(() => {
             if (this.selectedSheet.status === 'DRAFT') {
-              this.draftSavedErrored = true
+              this.draftSaveErrored = true
             } else {
-              this.savedErrored = true
+              this.saveErrored = true
             }
           })
           .finally(() => {
@@ -364,9 +360,9 @@ export default {
           .create(this.selectedSheet, false)
           .catch(() => {
             if (this.selectedSheet.status === 'DRAFT') {
-              this.draftSavedErrored = true
+              this.draftSaveErrored = true
             } else {
-              this.savedErrored = true
+              this.saveErrored = true
             }
           })
           .then(response => {
@@ -381,9 +377,9 @@ export default {
       }
     },
     handleSavedCallback() {
-      if (this.draftSavedErrored || this.savedErrored) {
-        this.draftSavedErrored = false
-        this.savedErrored = false
+      if (this.draftSaveErrored || this.saveErrored) {
+        this.draftSaveErrored = false
+        this.saveErrored = false
       } else {
         this.$emit('onSaved', true)
         this.$router.push({ name: 'SheetList', query: { activeKey: 'custom' } })

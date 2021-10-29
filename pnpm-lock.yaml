@@ -6,9 +6,9 @@ specifiers:
   '@codemirror/lang-html': ^0.19.3
   '@codemirror/lang-java': ^0.19.1
   '@vue/cli-plugin-babel': ^3.12.1
-  '@vue/cli-plugin-eslint': ^4.5.13
-  '@vue/cli-plugin-unit-jest': ^4.5.13
-  '@vue/cli-service': ^4.5.13
+  '@vue/cli-plugin-eslint': ^4.5.15
+  '@vue/cli-plugin-unit-jest': ^4.5.15
+  '@vue/cli-service': ^4.5.15
   '@vue/eslint-config-prettier': ^6.0.0
   '@vue/test-utils': ^1.2.2
   ant-design-vue: ^1.7.8
@@ -23,7 +23,7 @@ specifiers:
   eslint-plugin-html: ^6.2.0
   eslint-plugin-prettier: ^3.4.1
   eslint-plugin-vue: ^6.2.2
-  filepond: ^4.29.1
+  filepond: ^4.30.3
   filepond-plugin-file-validate-type: ^1.2.6
   filepond-plugin-image-preview: ^4.6.10
   flv.js: ^1.6.2
@@ -45,7 +45,7 @@ specifiers:
   vue-dplayer: 0.0.10
   vue-filepond: ^6.0.3
   vue-ls: ^3.2.2
-  vue-router: ^3.5.2
+  vue-router: ^3.5.3
   vue-template-compiler: ^2.6.14
   vuedraggable: ^2.24.3
   vuejs-logger: ^1.10.2
@@ -59,9 +59,9 @@ dependencies:
   axios: 0.21.4
   dayjs: 1.10.7
   enquire.js: 2.1.6
-  filepond: 4.29.1
-  filepond-plugin-file-validate-type: 1.2.6_filepond@4.29.1
-  filepond-plugin-image-preview: 4.6.10_filepond@4.29.1
+  filepond: 4.30.3
+  filepond-plugin-file-validate-type: 1.2.6_filepond@4.30.3
+  filepond-plugin-image-preview: 4.6.10_filepond@4.30.3
   flv.js: 1.6.2
   halo-editor: 2.8.3
   marked: 2.1.3
@@ -73,9 +73,9 @@ dependencies:
   vue-contextmenujs: 1.3.13
   vue-count-to: 1.0.13
   vue-dplayer: 0.0.10
-  vue-filepond: 6.0.3_filepond@4.29.1+vue@2.6.14
+  vue-filepond: 6.0.3_filepond@4.30.3+vue@2.6.14
   vue-ls: 3.2.2
-  vue-router: 3.5.2
+  vue-router: 3.5.3
   vuedraggable: 2.24.3
   vuejs-logger: 1.10.2
   vuex: 3.6.2_vue@2.6.14
@@ -83,9 +83,9 @@ dependencies:
 devDependencies:
   '@babel/polyfill': 7.12.1
   '@vue/cli-plugin-babel': 3.12.1
-  '@vue/cli-plugin-eslint': 4.5.13_a58cf9e4d577795b8c257bee96d49483
-  '@vue/cli-plugin-unit-jest': 4.5.13_4e86dea06beb54eccc1910d899f74f0d
-  '@vue/cli-service': 4.5.13_6e991adc599438a4ab84a9dd52158ae9
+  '@vue/cli-plugin-eslint': 4.5.15_159f9ca94908a7070131e2c321d72521
+  '@vue/cli-plugin-unit-jest': 4.5.15_3ca2529360d3dc6148df6c0445843a57
+  '@vue/cli-service': 4.5.15_6e991adc599438a4ab84a9dd52158ae9
   '@vue/eslint-config-prettier': 6.0.0_6cba795d40c78049f8228de49cc26ac7
   '@vue/test-utils': 1.2.2_9065e7474e033a8e4b95615fc8e6c36c
   babel-core: 7.0.0-bridge.0
@@ -2022,8 +2022,8 @@ packages:
       camelcase: 5.3.1
     dev: true
 
-  /@vue/cli-overlay/4.5.13:
-    resolution: {integrity: sha512-jhUIg3klgi5Cxhs8dnat5hi/W2tQJvsqCxR0u6hgfSob0ORODgUBlN+F/uwq7cKIe/pzedVUk1y07F13GQvPqg==}
+  /@vue/cli-overlay/4.5.15:
+    resolution: {integrity: sha512-0zI0kANAVmjFO2LWGUIzdGPMeE3+9k+KeRDXsUqB30YfRF7abjfiiRPq5BU9pOzlJbVdpRkisschBrvdJqDuDg==}
     dev: true
 
   /@vue/cli-plugin-babel/3.12.1:
@@ -2040,14 +2040,14 @@ packages:
       - webpack-command
     dev: true
 
-  /@vue/cli-plugin-eslint/4.5.13_a58cf9e4d577795b8c257bee96d49483:
-    resolution: {integrity: sha512-yc2uXX6aBiy3vEf5TwaueaDqQbdIXIhk0x0KzEtpPo23jBdLkpOSoU5NCgE06g/ZiGAcettpmBSv73Hfp4wHEw==}
+  /@vue/cli-plugin-eslint/4.5.15_159f9ca94908a7070131e2c321d72521:
+    resolution: {integrity: sha512-/2Fl6wY/5bz3HD035oSnFRMsKNxDxU396KqBdpCQdwdvqk4mm6JAbXqihpcBRTNPeTO6w+LwGe6FE56PVbJdbg==}
     peerDependencies:
       '@vue/cli-service': ^3.0.0 || ^4.0.0-0
       eslint: '>= 1.6.0 < 7.0.0'
     dependencies:
-      '@vue/cli-service': 4.5.13_6e991adc599438a4ab84a9dd52158ae9
-      '@vue/cli-shared-utils': 4.5.13
+      '@vue/cli-service': 4.5.15_6e991adc599438a4ab84a9dd52158ae9
+      '@vue/cli-shared-utils': 4.5.15
       eslint: 6.8.0
       eslint-loader: 2.2.1_eslint@6.8.0+webpack@4.46.0
       globby: 9.2.0
@@ -2059,25 +2059,25 @@ packages:
       - webpack-command
     dev: true
 
-  /@vue/cli-plugin-router/4.5.13_@vue+cli-service@4.5.13:
-    resolution: {integrity: sha512-tgtMDjchB/M1z8BcfV4jSOY9fZSMDTPgF9lsJIiqBWMxvBIsk9uIZHxp62DibYME4CCKb/nNK61XHaikFp+83w==}
+  /@vue/cli-plugin-router/4.5.15_@vue+cli-service@4.5.15:
+    resolution: {integrity: sha512-q7Y6kP9b3k55Ca2j59xJ7XPA6x+iSRB+N4ac0ZbcL1TbInVQ4j5wCzyE+uqid40hLy4fUdlpl4X9fHJEwuVxPA==}
     peerDependencies:
       '@vue/cli-service': ^3.0.0 || ^4.0.0-0
     dependencies:
-      '@vue/cli-service': 4.5.13_6e991adc599438a4ab84a9dd52158ae9
-      '@vue/cli-shared-utils': 4.5.13
+      '@vue/cli-service': 4.5.15_6e991adc599438a4ab84a9dd52158ae9
+      '@vue/cli-shared-utils': 4.5.15
     dev: true
 
-  /@vue/cli-plugin-unit-jest/4.5.13_4e86dea06beb54eccc1910d899f74f0d:
-    resolution: {integrity: sha512-8t7QIihJWB9Kv85FamrEzWbJnvsLhQdyXHl3h+qhAihrZdLL+9mj905y88cBCq+i2PqqZ/qAoabbpf4DxDAb7g==}
+  /@vue/cli-plugin-unit-jest/4.5.15_3ca2529360d3dc6148df6c0445843a57:
+    resolution: {integrity: sha512-oE3RDMerb21P6ALg70Zh2zU+RYYjoe09/7ZXYUj03uTb2obqUbcINpFfeVwM0B/J6H1YmqWJpnNBxWURhrqQHg==}
     peerDependencies:
       '@vue/cli-service': ^3.0.0 || ^4.0.0-0
     dependencies:
       '@babel/core': 7.15.5
       '@babel/plugin-transform-modules-commonjs': 7.15.4_@babel+core@7.15.5
       '@types/jest': 24.9.1
-      '@vue/cli-service': 4.5.13_6e991adc599438a4ab84a9dd52158ae9
-      '@vue/cli-shared-utils': 4.5.13
+      '@vue/cli-service': 4.5.15_6e991adc599438a4ab84a9dd52158ae9
+      '@vue/cli-shared-utils': 4.5.15
       babel-core: 7.0.0-bridge.0_@babel+core@7.15.5
       babel-jest: 24.9.0_@babel+core@7.15.5
       babel-plugin-transform-es2015-modules-commonjs: 6.26.2
@@ -2098,16 +2098,16 @@ packages:
       - vue-template-compiler
     dev: true
 
-  /@vue/cli-plugin-vuex/4.5.13_@vue+cli-service@4.5.13:
-    resolution: {integrity: sha512-I1S9wZC7iI0Wn8kw8Zh+A2Qkf6s1M6vTGBkx8boXjuzfwEEyEHRxadsVCecZc8Mkpydo0nykj+MyYF96TKFuVA==}
+  /@vue/cli-plugin-vuex/4.5.15_@vue+cli-service@4.5.15:
+    resolution: {integrity: sha512-fqap+4HN+w+InDxlA3hZTOGE0tzBTgXhKLoDydhywqgmhQ1D9JA6Feh94ze6tG8DsWX58/ujYUqA8jAz17FJtg==}
     peerDependencies:
       '@vue/cli-service': ^3.0.0 || ^4.0.0-0
     dependencies:
-      '@vue/cli-service': 4.5.13_6e991adc599438a4ab84a9dd52158ae9
+      '@vue/cli-service': 4.5.15_6e991adc599438a4ab84a9dd52158ae9
     dev: true
 
-  /@vue/cli-service/4.5.13_6e991adc599438a4ab84a9dd52158ae9:
-    resolution: {integrity: sha512-CKAZN4iokMMsaUyJRU22oUAz3oS/X9sVBSKAF2/shFBV5xh3jqAlKl8OXZYz4cXGFLA6djNuYrniuLAo7Ku97A==}
+  /@vue/cli-service/4.5.15_6e991adc599438a4ab84a9dd52158ae9:
+    resolution: {integrity: sha512-sFWnLYVCn4zRfu45IcsIE9eXM0YpDV3S11vlM2/DVbIPAGoYo5ySpSof6aHcIvkeGsIsrHFpPHzNvDZ/efs7jA==}
     engines: {node: '>=8'}
     hasBin: true
     peerDependencies:
@@ -2140,10 +2140,10 @@ packages:
       '@types/minimist': 1.2.2
       '@types/webpack': 4.41.31
       '@types/webpack-dev-server': 3.11.6_debug@4.3.2
-      '@vue/cli-overlay': 4.5.13
-      '@vue/cli-plugin-router': 4.5.13_@vue+cli-service@4.5.13
-      '@vue/cli-plugin-vuex': 4.5.13_@vue+cli-service@4.5.13
-      '@vue/cli-shared-utils': 4.5.13
+      '@vue/cli-overlay': 4.5.15
+      '@vue/cli-plugin-router': 4.5.15_@vue+cli-service@4.5.15
+      '@vue/cli-plugin-vuex': 4.5.15_@vue+cli-service@4.5.15
+      '@vue/cli-shared-utils': 4.5.15
       '@vue/component-compiler-utils': 3.2.2
       '@vue/preload-webpack-plugin': 1.1.2_502c618fc8a7d35df07e93275324a2d0
       '@vue/web-component-wrapper': 1.3.0
@@ -2217,8 +2217,8 @@ packages:
       string.prototype.padstart: 3.1.2
     dev: true
 
-  /@vue/cli-shared-utils/4.5.13:
-    resolution: {integrity: sha512-HpnOrkLg42RFUsQGMJv26oTG3J3FmKtO2WSRhKIIL+1ok3w9OjGCtA3nMMXN27f9eX14TqO64M36DaiSZ1fSiw==}
+  /@vue/cli-shared-utils/4.5.15:
+    resolution: {integrity: sha512-SKaej9hHzzjKSOw1NlFmc6BSE0vcqUQMQiv1cxQ2DhVyy4QxZXBmzmiLBUBe+hYZZs1neXW7n//udeN9bCAY+Q==}
     dependencies:
       '@hapi/joi': 15.1.1
       chalk: 2.4.2
@@ -5397,24 +5397,24 @@ packages:
     resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
     dev: true
 
-  /filepond-plugin-file-validate-type/1.2.6_filepond@4.29.1:
+  /filepond-plugin-file-validate-type/1.2.6_filepond@4.30.3:
     resolution: {integrity: sha512-3JFxpb4o5D4BssP/Drjn2GPpejg/QXzU4e3/Pq8IvIJuokHz95b6+RPYstQ+6ITKREYup0N8F/CO/OQfhVkUgg==}
     peerDependencies:
       filepond: '>=1.x <5.x'
     dependencies:
-      filepond: 4.29.1
+      filepond: 4.30.3
     dev: false
 
-  /filepond-plugin-image-preview/4.6.10_filepond@4.29.1:
+  /filepond-plugin-image-preview/4.6.10_filepond@4.30.3:
     resolution: {integrity: sha512-C7Q5Sr/d4RQb2nMNQR93OiMt91OHxpvmIBGl+CO1dZE46lM49NUfI08dyElAOxTslDcA8pAfjFFCKo0sNYbrBg==}
     peerDependencies:
       filepond: '>=4.x <5.x'
     dependencies:
-      filepond: 4.29.1
+      filepond: 4.30.3
     dev: false
 
-  /filepond/4.29.1:
-    resolution: {integrity: sha512-j2YMYxzhDXYQScARkkYb5NwwfOxLWKWJK3v/Wozq1gQX3s5XLY3GfJhR9ysqP5l4697J3gIn898fRG5Z61UYIQ==}
+  /filepond/4.30.3:
+    resolution: {integrity: sha512-G2b1LEe90Sq2vH0SYDASTB+vVU735NBctzIaFPlZtb14QAgi/AL89WyQ6LhTfqgyrMyuZur2O9yHAmzS2E9ZnA==}
     dev: false
 
   /filesize/3.6.1:
@@ -10589,6 +10589,7 @@ packages:
   /svgo/1.3.2:
     resolution: {integrity: sha512-yhy/sQYxR5BkC98CY7o31VGsg014AKLEPxdfhora76l36hD9Rdy5NZA/Ocn6yayNPgSamYdtX2rFJdcv07AYVw==}
     engines: {node: '>=4.0.0'}
+    deprecated: This SVGO version is no longer supported. Upgrade to v2.x.x.
     hasBin: true
     dependencies:
       chalk: 2.4.2
@@ -11246,13 +11247,13 @@ packages:
       - supports-color
     dev: true
 
-  /vue-filepond/6.0.3_filepond@4.29.1+vue@2.6.14:
+  /vue-filepond/6.0.3_filepond@4.30.3+vue@2.6.14:
     resolution: {integrity: sha512-m0wArAdpgzOOs19bWA6zzYlHAb2aK+igPoKPZGrzpgKiiELPKW7XZ2OBDXzk7rhpFLkedujVrMqwjPyZfmQTTQ==}
     peerDependencies:
       filepond: '>=4.7.4 < 5.x'
       vue: '>=2.6.0 < 3.x'
     dependencies:
-      filepond: 4.29.1
+      filepond: 4.30.3
       vue: 2.6.14
     dev: false
 
@@ -11336,8 +11337,8 @@ packages:
     resolution: {integrity: sha512-uKNKpFOVeWNqS2mrBZqnpLyXJo5Q+vnkex6JvpENvhXHFNBW/SJTP8vJywLuVT3DpxwXcF9N0dyIiZ4/NpTexQ==}
     dev: false
 
-  /vue-router/3.5.2:
-    resolution: {integrity: sha512-807gn82hTnjCYGrnF3eNmIw/dk7/GE4B5h69BlyCK9KHASwSloD1Sjcn06zg9fVG4fYH2DrsNBZkpLtb25WtaQ==}
+  /vue-router/3.5.3:
+    resolution: {integrity: sha512-FUlILrW3DGitS2h+Xaw8aRNvGTwtuaxrRkNSHWTizOfLUie7wuYwezeZ50iflRn8YPV5kxmU2LQuu3nM/b3Zsg==}
     dev: false
 
   /vue-style-loader/4.1.3:

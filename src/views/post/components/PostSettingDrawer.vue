@@ -13,7 +13,7 @@
       <div class="mb-4">
         <h3 class="post-setting-drawer-title">基本设置</h3>
         <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
+          <a-form>
             <a-form-item label="文章标题：" v-if="needTitle">
               <a-input v-model="selectedPost.title" />
             </a-form-item>
@@ -69,7 +69,7 @@
       <div class="mb-4">
         <h3 class="post-setting-drawer-title">分类目录</h3>
         <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
+          <a-form>
             <a-form-item>
               <category-tree v-model="selectedCategoryIds" :categories="categories" />
             </a-form-item>
@@ -97,7 +97,7 @@
       <div class="mb-4">
         <h3 class="post-setting-drawer-title">标签</h3>
         <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
+          <a-form>
             <a-form-item>
               <TagSelect v-model="selectedTagIds" />
             </a-form-item>
@@ -109,7 +109,7 @@
       <div class="mb-4">
         <h3 class="post-setting-drawer-title">摘要</h3>
         <div class="post-setting-drawer-item">
-          <a-form layout="vertical">
+          <a-form>
             <a-form-item>
               <a-input
                 type="textarea"
@@ -127,19 +127,15 @@
         <h3 class="post-setting-drawer-title">封面图</h3>
         <div class="post-setting-drawer-item">
           <div class="post-thumb">
-            <img
-              class="img"
-              :src="selectedPost.thumbnail || '/images/placeholder.jpg'"
-              @click="thumbDrawerVisible = true"
-            />
-
-            <a-form layout="vertial">
-              <a-form-item>
-                <a-input v-model="selectedPost.thumbnail" placeholder="点击封面图选择图片，或者输入外部链接"></a-input>
-              </a-form-item>
-            </a-form>
-
-            <a-button class="post-thumb-remove" type="dashed" @click="selectedPost.thumbnail = null">移除</a-button>
+            <a-space direction="vertical">
+              <img
+                class="img"
+                :src="selectedPost.thumbnail || '/images/placeholder.jpg'"
+                @click="thumbDrawerVisible = true"
+              />
+              <a-input v-model="selectedPost.thumbnail" placeholder="点击封面图选择图片，或者输入外部链接"></a-input>
+              <a-button type="dashed" @click="selectedPost.thumbnail = null">移除</a-button>
+            </a-space>
           </div>
         </div>
       </div>
@@ -160,7 +156,7 @@
         <div class="mb-4">
           <h3 class="post-setting-drawer-title">加密设置</h3>
           <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
+            <a-form>
               <a-form-item label="访问密码：">
                 <a-input-password v-model="selectedPost.password" autocomplete="new-password" />
               </a-form-item>
@@ -171,7 +167,7 @@
         <div class="mb-4">
           <h3 class="post-setting-drawer-title">SEO 设置</h3>
           <div class="post-setting-drawer-item">
-            <a-form layout="vertical">
+            <a-form>
               <a-form-item label="自定义关键词：">
                 <a-input
                   v-model="selectedPost.metaKeywords"
@@ -192,7 +188,7 @@
         <a-divider />
         <div class="mb-4">
           <h3 class="post-setting-drawer-title">元数据</h3>
-          <a-form layout="vertical">
+          <a-form>
             <a-form-item v-for="(meta, index) in selectedMetas" :key="index" :prop="'metas.' + index + '.value'">
               <a-row :gutter="5">
                 <a-col :span="12">
@@ -231,7 +227,7 @@
           @click="handleDraftClick"
           @callback="handleSavedCallback"
           :loading="draftSaving"
-          :errored="draftSavedErrored"
+          :errored="draftSaveErrored"
           text="保存草稿"
           loadedText="保存成功"
           erroredText="保存失败"
@@ -240,7 +236,7 @@
           @click="handlePublishClick()"
           @callback="handleSavedCallback"
           :loading="saving"
-          :errored="savedErrored"
+          :errored="saveErrored"
           :text="`${selectedPost.id ? '保存' : '发布'}`"
           :loadedText="`${selectedPost.id ? '保存' : '发布'}成功`"
           :erroredText="`${selectedPost.id ? '保存' : '发布'}失败`"
@@ -286,9 +282,9 @@ export default {
       categoryToCreate: {},
       customTpls: [],
       saving: false,
-      savedErrored: false,
+      saveErrored: false,
       draftSaving: false,
-      draftSavedErrored: false
+      draftSaveErrored: false
     }
   },
   props: {
@@ -484,9 +480,9 @@ export default {
           .update(this.selectedPost.id, this.selectedPost, false)
           .catch(() => {
             if (this.selectedPost.status === 'DRAFT') {
-              this.draftSavedErrored = true
+              this.draftSaveErrored = true
             } else {
-              this.savedErrored = true
+              this.saveErrored = true
             }
           })
           .finally(() => {
@@ -501,9 +497,9 @@ export default {
           .create(this.selectedPost, false)
           .catch(() => {
             if (this.selectedPost.status === 'DRAFT') {
-              this.draftSavedErrored = true
+              this.draftSaveErrored = true
             } else {
-              this.savedErrored = true
+              this.saveErrored = true
             }
           })
           .then(response => {
@@ -518,9 +514,9 @@ export default {
       }
     },
     handleSavedCallback() {
-      if (this.draftSavedErrored || this.savedErrored) {
-        this.draftSavedErrored = false
-        this.savedErrored = false
+      if (this.draftSaveErrored || this.saveErrored) {
+        this.draftSaveErrored = false
+        this.saveErrored = false
       } else {
         this.$emit('onSaved', true)
         this.$router.push({ name: 'PostList' })

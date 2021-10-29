@@ -3,13 +3,13 @@
     <template slot="extra">
       <a-space>
         <ReactiveButton
-          :errored="draftSavedErrored"
+          :errored="draftSaveErrored"
           :loading="draftSaving"
           erroredText="保存失败"
           loadedText="保存成功"
           text="保存草稿"
           type="danger"
-          @callback="draftSavedErrored = false"
+          @callback="draftSaveErrored = false"
           @click="handleSaveDraft(false)"
         ></ReactiveButton>
         <a-button :loading="previewSaving" @click="handlePreview">预览</a-button>
@@ -73,7 +73,7 @@ export default {
       selectedMetas: [],
       contentChanges: 0,
       draftSaving: false,
-      draftSavederrored: false,
+      draftSaveErrored: false,
       previewSaving: false
     }
   },
@@ -149,7 +149,7 @@ export default {
               this.handleRestoreSavedStatus()
             })
             .catch(() => {
-              this.draftSavedErrored = true
+              this.draftSaveErrored = true
             })
             .finally(() => {
               setTimeout(() => {
@@ -164,7 +164,7 @@ export default {
               this.handleRestoreSavedStatus()
             })
             .catch(() => {
-              this.draftSavedErrored = true
+              this.draftSaveErrored = true
             })
             .finally(() => {
               setTimeout(() => {
@@ -180,7 +180,7 @@ export default {
             this.handleRestoreSavedStatus()
           })
           .catch(() => {
-            this.draftSavedErrored = true
+            this.draftSaveErrored = true
           })
           .finally(() => {
             setTimeout(() => {
