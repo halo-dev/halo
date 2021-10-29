@@ -18,7 +18,19 @@
               <a-input v-model="selectedPost.title" />
             </a-form-item>
             <a-form-item label="文章别名：" :help="fullPath">
-              <a-input v-model="selectedPost.slug" />
+              <a-input v-model="selectedPost.slug">
+                <template #addonAfter>
+                  <a-popconfirm
+                    title="是否确定根据标题重新生成别名？"
+                    ok-text="确定"
+                    cancel-text="取消"
+                    placement="left"
+                    @confirm="handleSetPinyinSlug"
+                  >
+                    <a-icon class="cursor-pointer" type="sync" />
+                  </a-popconfirm>
+                </template>
+              </a-input>
             </a-form-item>
 
             <a-form-item label="发表时间：">
@@ -387,7 +399,9 @@ export default {
         this.handleListCategories()
         this.handleListPresetMetasField()
         this.handleListCustomTpls()
-        this.handleSetPinyinSlug()
+        if (!this.selectedPost.slug && !this.selectedPost.id) {
+          this.handleSetPinyinSlug()
+        }
       }
     },
     handleListCategories() {
@@ -534,10 +548,10 @@ export default {
       })
     },
     handleSetPinyinSlug() {
-      if (this.selectedPost.title && this.selectedPost.title !== '' && !this.selectedPost.id) {
+      if (this.selectedPost.title) {
         if (pinyin.isSupported()) {
           let result = ''
-          const tokens = pinyin.parse(this.selectedPost.title)
+          const tokens = pinyin.parse(this.selectedPost.title.replace(/\s+/g, '').toLowerCase())
           let lastToken
           tokens.forEach(token => {
             if (token.type === 2) {

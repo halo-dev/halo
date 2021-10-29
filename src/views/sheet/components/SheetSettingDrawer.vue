@@ -18,7 +18,19 @@
               <a-input v-model="selectedSheet.title" />
             </a-form-item>
             <a-form-item label="页面别名：" :help="fullPath">
-              <a-input v-model="selectedSheet.slug" />
+              <a-input v-model="selectedSheet.slug">
+                <template #addonAfter>
+                  <a-popconfirm
+                    title="是否确定根据标题重新生成别名？"
+                    ok-text="确定"
+                    cancel-text="取消"
+                    placement="left"
+                    @confirm="handleSetPinyinSlug"
+                  >
+                    <a-icon class="cursor-pointer" type="sync" />
+                  </a-popconfirm>
+                </template>
+              </a-input>
             </a-form-item>
             <a-form-item label="发表时间：">
               <a-date-picker
@@ -272,7 +284,9 @@ export default {
       if (visible) {
         this.handleListCustomTpls()
         this.handleListPresetMetasField()
-        this.handleSetPinyinSlug()
+        if (!this.selectedSheet.slug && !this.selectedSheet.id) {
+          this.handleSetPinyinSlug()
+        }
       }
     },
     handleListPresetMetasField() {
@@ -397,10 +411,10 @@ export default {
       })
     },
     handleSetPinyinSlug() {
-      if (this.selectedSheet.title && !this.selectedSheet.id) {
+      if (this.selectedSheet.title) {
         if (pinyin.isSupported()) {
           let result = ''
-          const tokens = pinyin.parse(this.selectedSheet.title)
+          const tokens = pinyin.parse(this.selectedSheet.title.replace(/\s+/g, '').toLowerCase())
           let lastToken
           tokens.forEach(token => {
             if (token.type === 2) {
