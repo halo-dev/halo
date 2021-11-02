@@ -2,6 +2,7 @@ package run.halo.app.controller.content.api;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,5 +49,11 @@ public class PhotoController {
         @PageableDefault(sort = "updateTime", direction = DESC) Pageable pageable,
         PhotoQuery photoQuery) {
         return photoService.pageDtosBy(pageable, photoQuery);
+    }
+
+    @GetMapping("teams")
+    @ApiOperation("Lists all of photo teams")
+    public List<String> listTeams() {
+        return photoService.listAllTeams();
     }
 }
