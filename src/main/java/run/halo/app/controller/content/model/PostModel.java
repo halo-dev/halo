@@ -167,6 +167,7 @@ public class PostModel {
     }
 
     public String list(Integer page, Model model) {
+        // 获取页面条数
         int pageSize = optionService.getPostPageSize();
         Pageable pageable = PageRequest
             .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());

@@ -19,7 +19,7 @@ import run.halo.app.service.PostService;
  * @author ryanwang
  * @date 2019-03-17
  */
-@Slf4j
+@Slf4j  //private final Logger logger = LoggerFactory.getLogger(当前类名.class); 获取log对象
 @Controller
 @RequestMapping
 public class ContentIndexController {
@@ -29,7 +29,7 @@ public class ContentIndexController {
     private final OptionService optionService;
 
     private final PostModel postModel;
-
+// 没明白是怎么注入的  这样注入和@有什么区别
     public ContentIndexController(PostService postService,
         OptionService optionService,
         PostModel postModel) {
@@ -69,6 +69,9 @@ public class ContentIndexController {
     @GetMapping(value = "page/{page}")
     public String index(Model model,
         @PathVariable(value = "page") Integer page) {
-        return postModel.list(page, model);
+        String list = postModel.list(page, model);
+        System.out.println(list);
+        return list;
+        // return postModel.list(page, model);
     }
 }
