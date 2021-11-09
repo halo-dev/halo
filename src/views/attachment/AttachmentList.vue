@@ -71,6 +71,7 @@
       </a-col>
       <a-col :span="24">
         <a-list
+          class="attachments-group"
           :grid="{ gutter: 12, xs: 2, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
           :dataSource="formattedDatas"
           :loading="listLoading"
@@ -82,9 +83,14 @@
               @click="handleShowDetailDrawer(item)"
               @contextmenu.prevent="handleContextMenu($event, item)"
             >
-              <div class="attach-thumb">
-                <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
-                <img :src="item.thumbPath" v-show="handleJudgeMediaType(item)" loading="lazy" />
+              <div class="attach-thumb attachments-group-item">
+                <span v-if="!handleJudgeMediaType(item)" class="attachments-group-item-type">{{ item.suffix }}</span>
+                <span
+                  v-else
+                  class="attachments-group-item-img"
+                  :style="`background-image:url(${item.thumbPath})`"
+                  loading="lazy"
+                />
               </div>
               <a-card-meta class="p-3">
                 <ellipsis :length="isMobile() ? 12 : 16" tooltip slot="description">{{ item.name }}</ellipsis>

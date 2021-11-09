@@ -814,6 +814,25 @@ body {
   top: 0;
 }
 
+// 附件图片样式
+.attachments-group {
+  &-item {
+    padding: 0;
+    height: 140px;
+    &-img {
+      display: block;
+      height: 100%;
+      background-repeat: no-repeat;
+      background-size: 100%;
+      background-position: center;
+    }
+    .attachments-group &-type {
+      font-size: 38px;
+      text-transform: capitalize;
+    }
+  }
+}
+
 .ant-affix {
   z-index: 1000 !important;
 }

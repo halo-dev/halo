@@ -15,17 +15,22 @@
       <a-divider />
       <a-row type="flex" align="middle">
         <a-col :span="24">
-          <a-spin :spinning="loading">
+          <a-spin :spinning="loading" class="attachments-group">
             <a-empty v-if="attachments.length === 0" />
             <div
               v-else
-              class="attach-item"
+              class="attach-item  attachments-group-item"
               v-for="(item, index) in attachments"
               :key="index"
               @click="handleSelectAttachment(item)"
             >
-              <span v-show="!handleJudgeMediaType(item)">当前格式不支持预览</span>
-              <img :src="item.thumbPath" v-show="handleJudgeMediaType(item)" loading="lazy" />
+              <span v-if="!handleJudgeMediaType(item)" class="attachments-group-item-type">{{ item.suffix }}</span>
+              <span
+                v-else
+                class="attachments-group-item-img"
+                :style="`background-image:url(${item.thumbPath})`"
+                loading="lazy"
+              />
             </div>
           </a-spin>
         </a-col>
