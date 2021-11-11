@@ -69,6 +69,10 @@ Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
 
 <a href="https://github.com/halo-dev/halo/graphs/contributors"><img src="https://opencollective.com/halo/contributors.svg?width=890&button=false" /></a>
 
+## 状态
+
+![Repobeats analytics](https://repobeats.axiom.co/api/embed/ad008b2151c22e7cf734d2688befaa795d593b95.svg "Repobeats analytics image")
+
 ## 赞助我们
 
 > 如果 Halo 对您有帮助，不妨赞助我们
