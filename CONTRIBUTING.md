@@ -50,4 +50,4 @@ git push
 
 ### 开发规范
 
-请参考 [https://halo.run/archives/code-style](https://halo.run/archives/code-style)，请确保所有代码格式化之后再提交。
+请参考 [https://docs.halo.run/developer-guide/core/code-style](https://docs.halo.run/developer-guide/core/code-style)，请确保所有代码格式化之后再提交。
