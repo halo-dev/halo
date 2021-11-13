@@ -16,11 +16,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -149,7 +151,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
-        postQuery.setStatus(PostStatus.PUBLISHED);
+        postQuery.setStatus(new PostStatus[] {PostStatus.PUBLISHED});
 
         // Build specification and find all
         return postRepository.findAll(buildSpecByQuery(postQuery), pageable);
@@ -807,8 +809,12 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
-            if (postQuery.getStatus() != null) {
-                predicates.add(criteriaBuilder.equal(root.get("status"), postQuery.getStatus()));
+            if (ArrayUtils.isNotEmpty(postQuery.getStatus())) {
+                In<PostStatus> statusInClause = criteriaBuilder.in(root.get("status"));
+                for (PostStatus status : postQuery.getStatus()) {
+                    statusInClause.value(status);
+                }
+                predicates.add(statusInClause);
             }
 
             if (postQuery.getCategoryId() != null) {

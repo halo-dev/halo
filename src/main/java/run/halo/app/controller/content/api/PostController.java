@@ -83,7 +83,7 @@ public class PostController {
         PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
         postQuery.setCategoryId(categoryId);
-        postQuery.setStatus(PostStatus.PUBLISHED);
+        postQuery.setStatus(new PostStatus[] {PostStatus.PUBLISHED});
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage, true);
     }
