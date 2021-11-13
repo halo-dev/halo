@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.MenuDTO;
@@ -19,6 +21,7 @@ import run.halo.app.model.vo.MenuVO;
 import run.halo.app.repository.MenuRepository;
 import run.halo.app.service.MenuService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.BeanUtils;
 import run.halo.app.utils.ServiceUtils;
 
 /**
@@ -151,6 +154,22 @@ public class MenuServiceImpl extends AbstractCrudService<Menu, Integer> implemen
     public @NonNull
     Menu update(@NonNull Menu menu) {
         return super.update(menu);
+    }
+
+    @Override
+    @NonNull
+    @Transactional(rollbackFor = Exception.class)
+    public List<Menu> updateInBatch(@NonNull Collection<Menu> menus) {
+        Set<Integer> menuIds = ServiceUtils.fetchProperty(menus, Menu::getId);
+        Map<Integer, Menu> idMenuParamMap = ServiceUtils.convertToMap(menus, Menu::getId);
+        return menuRepository.findAllById(menuIds)
+            .stream()
+            .map(menuToUpdate -> {
+                Menu menuParam = idMenuParamMap.get(menuToUpdate.getId());
+                BeanUtils.updateProperties(menuParam, menuToUpdate);
+                return update(menuToUpdate);
+            })
+            .collect(Collectors.toList());
     }
 
     /**
