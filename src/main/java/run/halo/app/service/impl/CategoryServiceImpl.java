@@ -672,10 +672,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             ServiceUtils.convertToMap(categories, Category::getId);
         return categoryRepository.findAllById(categoryIds)
             .stream()
-            .map(categoryToUse -> {
-                Category categoryParam = idCategoryParamMap.get(categoryToUse.getId());
-                BeanUtils.updateProperties(categoryParam, categoryToUse);
-                return update(categoryToUse);
+            .map(categoryToUpdate -> {
+                Category categoryParam = idCategoryParamMap.get(categoryToUpdate.getId());
+                BeanUtils.updateProperties(categoryParam, categoryToUpdate);
+                return update(categoryToUpdate);
             })
             .collect(Collectors.toList());
     }
