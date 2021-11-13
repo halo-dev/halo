@@ -5,6 +5,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.data.domain.Sort;
@@ -103,6 +104,7 @@ public class MenuController {
     public List<MenuDTO> updateBatchBy(@RequestBody @Valid List<MenuParam> menuParams) {
         List<Menu> menus = menuParams
             .stream()
+            .filter(menuParam -> Objects.nonNull(menuParam.getId()))
             .map(InputConverter::convertTo)
             .collect(Collectors.toList());
         return menuService.updateInBatch(menus).stream()
