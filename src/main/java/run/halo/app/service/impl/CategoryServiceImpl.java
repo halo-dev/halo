@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -661,15 +662,21 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<Category> updateInBatch(Collection<Category> categories) {
         if (CollectionUtils.isEmpty(categories)) {
             return Collections.emptyList();
         }
-
-        ArrayList<Category> resultList = new ArrayList<>();
-        for (Category category : categories) {
-            resultList.add(update(category));
-        }
-        return resultList;
+        Set<Integer> categoryIds = ServiceUtils.fetchProperty(categories, Category::getId);
+        Map<Integer, Category> idCategoryParamMap =
+            ServiceUtils.convertToMap(categories, Category::getId);
+        return categoryRepository.findAllById(categoryIds)
+            .stream()
+            .map(categoryToUpdate -> {
+                Category categoryParam = idCategoryParamMap.get(categoryToUpdate.getId());
+                BeanUtils.updateProperties(categoryParam, categoryToUpdate);
+                return update(categoryToUpdate);
+            })
+            .collect(Collectors.toList());
     }
 }
