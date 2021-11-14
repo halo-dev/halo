@@ -809,12 +809,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
-            if (!CollectionUtils.isEmpty(postQuery.getStatuses())) {
-                In<PostStatus> statusInClause = criteriaBuilder.in(root.get("status"));
-                for (PostStatus status : postQuery.getStatuses()) {
-                    statusInClause.value(status);
-                }
-                predicates.add(statusInClause);
+            Set<PostStatus> statuses = postQuery.getStatuses();
+            if (!CollectionUtils.isEmpty(statuses)) {
+                predicates.add(root.get("status").in(statuses));
             }
 
             if (postQuery.getCategoryId() != null) {

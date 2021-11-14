@@ -24,7 +24,7 @@ public class PostQuery {
     /**
      * Post status.
      */
-    @Deprecated(forRemoval = true, since = "2.0.0")
+    @Deprecated(forRemoval = true, since = "1.5.0")
     private PostStatus status;
 
     /**
