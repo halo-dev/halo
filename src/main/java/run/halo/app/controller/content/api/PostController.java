@@ -46,6 +46,7 @@ import run.halo.app.service.PostService;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-02
  */
 @RestController("ApiContentPostController")

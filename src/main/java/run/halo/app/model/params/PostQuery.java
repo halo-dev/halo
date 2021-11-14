@@ -10,6 +10,7 @@ import run.halo.app.model.enums.PostStatus;
  * Post query.
  *
  * @author johnniang
+ * @author guqing
  * @date 4/10/19
  */
 @Data
