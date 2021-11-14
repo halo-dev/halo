@@ -2,7 +2,6 @@ package run.halo.app.controller.content.api;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.ApiOperation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
