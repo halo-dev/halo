@@ -51,7 +51,7 @@ public class PostQuery {
 
     /**
      * In order to be compatible with status, this method will return the combined results
-     * of status and status before status is removed.
+     * of status and statuses before status is removed.
      *
      * @return a combined status set of status and statues
      */
