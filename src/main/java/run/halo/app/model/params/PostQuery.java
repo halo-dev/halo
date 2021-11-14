@@ -31,8 +31,8 @@ public class PostQuery {
 
     public void setStatus(PostStatus... status) {
         if (!CollectionUtils.isEmpty(this.status)) {
-            throw new IllegalArgumentException(
-                "There is already a value in the statusSet, If you want to overwrite please use the overload method.");
+            throw new IllegalArgumentException("There is already a value in the statusSet, "
+                + "If you want to overwrite please use the overload method.");
         }
         this.status = Set.of(status);
     }
