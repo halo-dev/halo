@@ -5,6 +5,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 import io.swagger.annotations.ApiOperation;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,6 +45,7 @@ import run.halo.app.service.PostService;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-02
  */
 @RestController("ApiContentPostController")
@@ -83,7 +85,7 @@ public class PostController {
         PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
         postQuery.setCategoryId(categoryId);
-        postQuery.setStatus(PostStatus.PUBLISHED);
+        postQuery.setStatuses(Set.of(PostStatus.PUBLISHED));
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         return postService.convertToListVo(postPage, true);
     }
