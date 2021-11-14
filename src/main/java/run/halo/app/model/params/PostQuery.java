@@ -1,5 +1,6 @@
 package run.halo.app.model.params;
 
+import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
 import org.springframework.util.CollectionUtils;
@@ -22,22 +23,46 @@ public class PostQuery {
     /**
      * Post status.
      */
-    private Set<PostStatus> status;
+    @Deprecated(forRemoval = true, since = "2.0.0")
+    private PostStatus status;
+
+    /**
+     * Post statuses.
+     */
+    private Set<PostStatus> statuses;
 
     /**
      * Category id.
      */
     private Integer categoryId;
 
-    public void setStatus(PostStatus... status) {
-        if (!CollectionUtils.isEmpty(this.status)) {
-            throw new IllegalArgumentException("There is already a value in the statusSet, "
-                + "If you want to overwrite please use the overload method.");
-        }
-        this.status = Set.of(status);
+    /**
+     * This method is deprecated in version 1.5.0, and it is recommended to use
+     * <code>getStatuses()</code> method.
+     *
+     * @see #getStatuses()
+     * @return post status.
+     */
+    @Deprecated
+    public PostStatus getStatus() {
+        return status;
     }
 
-    public void setStatus(Set<PostStatus> status) {
-        this.status = status;
+    /**
+     * In order to be compatible with status, this method will return the combined results
+     * of status and status before status is removed.
+     *
+     * @return a combined status set of status and statues
+     */
+    public Set<PostStatus> getStatuses() {
+        Set<PostStatus> statuses = new HashSet<>();
+        // Need to be compatible with status parameter values due to historical reasons.
+        if (this.status != null) {
+            statuses.add(this.status);
+        }
+        if (!CollectionUtils.isEmpty(this.statuses)) {
+            statuses.addAll(this.statuses);
+        }
+        return statuses;
     }
 }

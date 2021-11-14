@@ -151,7 +151,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         PostQuery postQuery = new PostQuery();
         postQuery.setKeyword(keyword);
-        postQuery.setStatus(PostStatus.PUBLISHED);
+        postQuery.setStatuses(Set.of(PostStatus.PUBLISHED));
 
         // Build specification and find all
         return postRepository.findAll(buildSpecByQuery(postQuery), pageable);
@@ -809,9 +809,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
-            if (!CollectionUtils.isEmpty(postQuery.getStatus())) {
+            if (!CollectionUtils.isEmpty(postQuery.getStatuses())) {
                 In<PostStatus> statusInClause = criteriaBuilder.in(root.get("status"));
-                for (PostStatus status : postQuery.getStatus()) {
+                for (PostStatus status : postQuery.getStatuses()) {
                     statusInClause.value(status);
                 }
                 predicates.add(statusInClause);
