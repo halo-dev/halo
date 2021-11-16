@@ -74,7 +74,7 @@ public class ContentSearchController {
         final Page<PostListVO> posts = postService.convertToListVo(postPage);
 
         model.addAttribute("is_search", true);
-        model.addAttribute("keyword", keyword);
+        model.addAttribute("keyword", HtmlUtils.htmlEscape(keyword));
         model.addAttribute("posts", posts);
         model.addAttribute("meta_keywords", optionService.getSeoKeywords());
         model.addAttribute("meta_description", optionService.getSeoDescription());
