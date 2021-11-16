@@ -574,9 +574,7 @@ export default {
           this.pagination.total = response.data.data.total
         })
         .finally(() => {
-          setTimeout(() => {
-            this.postsLoading = false
-          }, 200)
+          this.postsLoading = false
         })
     },
     handleListCategories() {

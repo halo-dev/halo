@@ -47,12 +47,12 @@
         ></a-pagination>
       </div>
 
-      <AttachmentDetailDrawer
+      <!-- <AttachmentDetailDrawer
         v-model="detailVisible"
         v-if="selectedAttachment"
         :attachment="selectedAttachment"
         @delete="handleListAttachments"
-      />
+      /> -->
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-button @click="uploadVisible = true" type="primary">上传附件</a-button>
@@ -67,14 +67,14 @@
 
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
-import AttachmentDetailDrawer from './AttachmentDetailDrawer'
+// import AttachmentDetailDrawer from './AttachmentDetailDrawer'
 import attachmentApi from '@/api/attachment'
 
 export default {
   name: 'AttachmentDrawer',
   mixins: [mixin, mixinDevice],
   components: {
-    AttachmentDetailDrawer
+    // AttachmentDetailDrawer
   },
   model: {
     prop: 'visible',

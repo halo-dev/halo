@@ -26,7 +26,6 @@ specifiers:
   filepond: ^4.30.3
   filepond-plugin-file-validate-type: ^1.2.6
   filepond-plugin-image-preview: ^4.6.10
-  flv.js: ^1.6.2
   halo-editor: ^2.8.3
   husky: ^6.0.0
   less: ^3.13.1
@@ -42,7 +41,6 @@ specifiers:
   vue-clipboard2: ^0.3.3
   vue-contextmenujs: ^1.3.13
   vue-count-to: ^1.0.13
-  vue-dplayer: 0.0.10
   vue-filepond: ^6.0.3
   vue-ls: ^3.2.2
   vue-router: ^3.5.3
@@ -62,7 +60,6 @@ dependencies:
   filepond: 4.30.3
   filepond-plugin-file-validate-type: 1.2.6_filepond@4.30.3
   filepond-plugin-image-preview: 4.6.10_filepond@4.30.3
-  flv.js: 1.6.2
   halo-editor: 2.8.3
   marked: 2.1.3
   nprogress: 0.2.0
@@ -72,7 +69,6 @@ dependencies:
   vue-clipboard2: 0.3.3
   vue-contextmenujs: 1.3.13
   vue-count-to: 1.0.13
-  vue-dplayer: 0.0.10
   vue-filepond: 6.0.3_filepond@4.30.3+vue@2.6.14
   vue-ls: 3.2.2
   vue-router: 3.5.3
@@ -2820,13 +2816,6 @@ packages:
     resolution: {integrity: sha512-xh1Rl34h6Fi1DC2WWKfxUTVqRsNnr6LsKz2+hfwDxQJWmrx8+c7ylaqBMcHfl1U1r2dsifOvKX3LQuLNZ+XSvA==}
     dev: true
 
-  /axios/0.19.2:
-    resolution: {integrity: sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==}
-    deprecated: Critical security vulnerability fixed in v0.21.1. For more information, see https://github.com/axios/axios/pull/3410
-    dependencies:
-      follow-redirects: 1.5.10
-    dev: false
-
   /axios/0.21.4:
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
     dependencies:
@@ -3141,10 +3130,6 @@ packages:
   /balanced-match/1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
     dev: true
-
-  /balloon-css/1.2.0:
-    resolution: {integrity: sha512-urXwkHgwp6GsXVF+it01485Z2Cj4pnW02ICnM0TemOlkKmCNnDLmyy+ZZiRXBpwldUXO+aRNr7Hdia4CBvXJ5A==}
-    dev: false
 
   /base/0.11.2:
     resolution: {integrity: sha512-5T6P4xPgpp0YDFvSWwEZ4NoE3aM4QBQXDzmVbraCkFj8zHM+mba8SyqB5DbZWyR7mYHo6Y7BdQo3MoA4m0TeQg==}
@@ -4383,12 +4368,6 @@ packages:
       ms: 2.0.0
     dev: true
 
-  /debug/3.1.0:
-    resolution: {integrity: sha512-OX8XqP7/1a9cqkxYw2yXss15f26NKWBpDXQd0/uK/KPqdQhxbPa994hnzjcE2VqQpDslf55723cKPUOGSmMY3g==}
-    dependencies:
-      ms: 2.0.0
-    dev: false
-
   /debug/3.2.7:
     resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
     dependencies:
@@ -4714,14 +4693,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /dplayer/1.26.0:
-    resolution: {integrity: sha512-uOE0w/WdlX7N9d0ppIEcAYrcnUjY52TMX+MBL4lj9Mj+JMljVuaEc5w88HkZp5Q11VqvN/jxnM8ktx2Dr7/MgA==}
-    dependencies:
-      axios: 0.19.2
-      balloon-css: 1.2.0
-      promise-polyfill: 8.1.3
-    dev: false
-
   /duplexer/0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
     dev: true
@@ -4892,10 +4863,6 @@ packages:
       is-date-object: 1.0.5
       is-symbol: 1.0.4
     dev: true
-
-  /es6-promise/4.2.8:
-    resolution: {integrity: sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==}
-    dev: false
 
   /escalade/3.1.1:
     resolution: {integrity: sha512-k0er2gUkLf8O0zKJiAhmkTnJlTvINGv7ygDNPbeIsX/TJjGJZHuh9B2UxbsaEkmlEo9MfhrSzmhIlhRlI2GXnw==}
@@ -5537,13 +5504,6 @@ packages:
       readable-stream: 2.3.7
     dev: true
 
-  /flv.js/1.6.2:
-    resolution: {integrity: sha512-xre4gUbX1MPtgQRKj2pxJENp/RnaHaxYvy3YToVVCrSmAWUu85b9mug6pTXF6zakUjNP2lFWZ1rkSX7gxhB/2A==}
-    dependencies:
-      es6-promise: 4.2.8
-      webworkify-webpack: 2.1.5
-    dev: false
-
   /follow-redirects/1.14.4:
     resolution: {integrity: sha512-zwGkiSXC1MUJG/qmeIFH2HBJx9u0V46QGUe3YR1fXG8bXQxq7fLj0RjLZQ5nubr9qNJUZrH+xUcwXEoXNpfS+g==}
     engines: {node: '>=4.0'}
@@ -5552,13 +5512,6 @@ packages:
     peerDependenciesMeta:
       debug:
         optional: true
-
-  /follow-redirects/1.5.10:
-    resolution: {integrity: sha512-0V5l4Cizzvqt5D44aTXbFZz+FtyXV1vrDN6qrelxtfYQKW0KO0W2T/hkE8xvGa/540LkZlkaUjO4ailYTFtHVQ==}
-    engines: {node: '>=4.0'}
-    dependencies:
-      debug: 3.1.0
-    dev: false
 
   /for-each/0.3.3:
     resolution: {integrity: sha512-jqYfLp7mo9vIyQf8ykW2v7A+2N4QjeCeI5+Dz9XraiO1ign81wjiH7Fb9vSOWvQfNtmSa4H2RoQTrrXivdUZmw==}
@@ -8055,6 +8008,7 @@ packages:
 
   /ms/2.0.0:
     resolution: {integrity: sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=}
+    dev: true
 
   /ms/2.1.1:
     resolution: {integrity: sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==}
@@ -9317,10 +9271,6 @@ packages:
   /promise-inflight/1.0.1:
     resolution: {integrity: sha1-mEcocL8igTL8vdhoEputEsPAKeM=}
     dev: true
-
-  /promise-polyfill/8.1.3:
-    resolution: {integrity: sha512-MG5r82wBzh7pSKDRa9y+vllNHz3e3d4CNj1PQE4BQYxLme0gKYYBm9YENq+UkEikyZ0XbiGWxYlVw3Rl9O/U8g==}
-    dev: false
 
   /prompts/2.4.1:
     resolution: {integrity: sha512-EQyfIuO2hPDsX1L/blblV+H7I0knhgAd82cVneCwcdND9B8AuCDuRcBH6yIcG4dFzlOUqbazQqwGjx5xmsNLuQ==}
@@ -11222,13 +11172,6 @@ packages:
     resolution: {integrity: sha512-6R4OVBVNtQTlcbXu6SJ8ENR35M2/CdWt3Jmv57jOUM+1ojiFmjVGvZPH8DfHpMDSA+ITs+EW5V6qthADxeyYOQ==}
     dev: false
 
-  /vue-dplayer/0.0.10:
-    resolution: {integrity: sha512-l6d6OnhEUO87lhAees9mEBUFsG5Thqv/VeEVZlSQ993/S0oxvWTDLjjkzH59hO2PALimBK2kB6yNYsHyJBgotw==}
-    dependencies:
-      dplayer: 1.26.0
-      vue-github-badge: 1.0.1
-    dev: false
-
   /vue-eslint-parser/7.11.0_eslint@6.8.0:
     resolution: {integrity: sha512-qh3VhDLeh773wjgNTl7ss0VejY9bMMa0GoDG2fQVyDzRFdiU3L7fw74tWZDHNQXdZqxO3EveQroa9ct39D2nqg==}
     engines: {node: '>=8.10'}
@@ -11255,10 +11198,6 @@ packages:
     dependencies:
       filepond: 4.30.3
       vue: 2.6.14
-    dev: false
-
-  /vue-github-badge/1.0.1:
-    resolution: {integrity: sha1-3/fOBzIOZKIY7fEGsVpDF27AYQY=}
     dev: false
 
   /vue-hot-reload-api/2.3.4:
@@ -11606,10 +11545,6 @@ packages:
     resolution: {integrity: sha512-OqedPIGOfsDlo31UNwYbCFMSaO9m9G/0faIHj5/dZFDMFqPTcx6UwqyOy3COEaEOg/9VsGIpdqn62W5KhoKSpg==}
     engines: {node: '>=0.8.0'}
     dev: true
-
-  /webworkify-webpack/2.1.5:
-    resolution: {integrity: sha512-2akF8FIyUvbiBBdD+RoHpoTbHMQF2HwjcxfDvgztAX5YwbZNyrtfUMgvfgFVsgDhDPVTlkbb5vyasqDHfIDPQw==}
-    dev: false
 
   /whatwg-encoding/1.0.5:
     resolution: {integrity: sha512-b5lim54JOPN9HtzvK9HFXvBma/rnfFeqsic0hSpjtDbVxR3dJKLc+KB4V6GgiGOvl7CY/KNh8rxSo9DKQrnUEw==}

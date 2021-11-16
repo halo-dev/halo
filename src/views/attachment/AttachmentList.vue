@@ -1,41 +1,41 @@
 <template>
   <page-view>
-    <a-row :gutter="12" type="flex" align="middle">
+    <a-row :gutter="12" align="middle" type="flex">
       <a-col :span="24" class="pb-3">
-        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
+        <a-card :bodyStyle="{ padding: '16px' }" :bordered="false">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
                 <a-col :md="6" :sm="24">
                   <a-form-item label="关键词：">
-                    <a-input v-model="queryParam.keyword" @keyup.enter="handleQuery()" />
+                    <a-input v-model="list.params.keyword" @keyup.enter="handleQuery()" />
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
                   <a-form-item label="存储位置：">
                     <a-select
-                      v-model="queryParam.attachmentType"
-                      @change="handleQuery()"
-                      :loading="typesLoading"
+                      v-model="list.params.attachmentType"
+                      :loading="types.loading"
                       allowClear
+                      @change="handleQuery()"
                     >
-                      <a-select-option v-for="item in types" :key="item" :value="item">{{
-                        attachmentType[item].text
-                      }}</a-select-option>
+                      <a-select-option v-for="item in types.data" :key="item" :value="item">
+                        {{ item | typeText }}
+                      </a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
                 <a-col :md="6" :sm="24">
                   <a-form-item label="文件类型：">
                     <a-select
-                      v-model="queryParam.mediaType"
-                      @change="handleQuery()"
-                      :loading="mediaTypesLoading"
+                      v-model="list.params.mediaType"
+                      :loading="mediaTypes.loading"
                       allowClear
+                      @change="handleQuery()"
                     >
-                      <a-select-option v-for="(item, index) in mediaTypes" :key="index" :value="item">{{
-                        item
-                      }}</a-select-option>
+                      <a-select-option v-for="(item, index) in mediaTypes.data" :key="index" :value="item"
+                        >{{ item }}
+                      </a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -51,19 +51,19 @@
             </a-form>
           </div>
           <div class="mb-0 table-operator">
-            <a-button type="primary" icon="cloud-upload" @click="() => (uploadVisible = true)">上传</a-button>
-            <a-button icon="select" v-show="!supportMultipleSelection" @click="handleMultipleSelection">
+            <a-button icon="cloud-upload" type="primary" @click="upload.visible = true">上传</a-button>
+            <a-button v-show="!supportMultipleSelection" icon="select" @click="handleMultipleSelection">
               批量操作
             </a-button>
             <a-button
-              type="danger"
-              icon="delete"
               v-show="supportMultipleSelection"
+              icon="delete"
+              type="danger"
               @click="handleDeleteAttachmentInBatch"
             >
               删除
             </a-button>
-            <a-button icon="close" v-show="supportMultipleSelection" @click="handleCancelMultipleSelection">
+            <a-button v-show="supportMultipleSelection" icon="close" @click="handleCancelMultipleSelection">
               取消
             </a-button>
           </div>
@@ -71,36 +71,36 @@
       </a-col>
       <a-col :span="24">
         <a-list
-          class="attachments-group"
+          :dataSource="list.data"
           :grid="{ gutter: 12, xs: 2, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
-          :dataSource="formattedDatas"
-          :loading="listLoading"
+          :loading="list.loading"
+          class="attachments-group"
         >
-          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+          <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
             <a-card
               :bodyStyle="{ padding: 0 }"
               hoverable
-              @click="handleShowDetailDrawer(item)"
+              @click="handleOpenDetail(item)"
               @contextmenu.prevent="handleContextMenu($event, item)"
             >
               <div class="attach-thumb attachments-group-item">
-                <span v-if="!handleJudgeMediaType(item)" class="attachments-group-item-type">{{ item.suffix }}</span>
+                <span v-if="!isImage(item)" class="attachments-group-item-type">{{ item.suffix }}</span>
                 <span
                   v-else
-                  class="attachments-group-item-img"
                   :style="`background-image:url(${item.thumbPath})`"
+                  class="attachments-group-item-img"
                   loading="lazy"
                 />
               </div>
               <a-card-meta class="p-3">
-                <ellipsis :length="isMobile() ? 12 : 16" tooltip slot="description">{{ item.name }}</ellipsis>
+                <ellipsis slot="description" :length="isMobile() ? 12 : 16" tooltip>{{ item.name }}</ellipsis>
               </a-card-meta>
               <a-checkbox
-                class="select-attachment-checkbox"
-                :style="getCheckStatus(item.id) ? selectedAttachmentStyle : ''"
-                :checked="getCheckStatus(item.id)"
-                @click="handleAttachmentSelectionChanged($event, item)"
                 v-show="supportMultipleSelection"
+                :checked="getCheckStatus(item.id)"
+                :style="getCheckStatus(item.id) ? selectedAttachmentStyle : ''"
+                class="select-attachment-checkbox"
+                @click="handleAttachmentSelectionChanged($event, item)"
               ></a-checkbox>
             </a-card>
           </a-list-item>
@@ -109,87 +109,120 @@
     </a-row>
     <div class="page-wrapper">
       <a-pagination
-        class="pagination"
         :current="pagination.page"
-        :total="pagination.total"
         :defaultPageSize="pagination.size"
         :pageSizeOptions="['18', '36', '54', '72', '90', '108']"
-        showSizeChanger
-        @change="handlePaginationChange"
-        @showSizeChange="handlePaginationChange"
+        :total="pagination.total"
+        class="pagination"
         showLessItems
+        showSizeChanger
+        @change="handlePageChange"
+        @showSizeChange="handlePageSizeChange"
       />
     </div>
-    <a-modal title="上传附件" v-model="uploadVisible" :footer="null" :afterClose="onUploadClose" destroyOnClose>
-      <FilePondUpload ref="upload" :uploadHandler="uploadHandler"></FilePondUpload>
+    <a-modal v-model="upload.visible" :afterClose="onUploadClose" :footer="null" destroyOnClose title="上传附件">
+      <FilePondUpload ref="upload" :uploadHandler="upload.handler"></FilePondUpload>
     </a-modal>
-    <AttachmentDetailDrawer
-      v-model="drawerVisible"
-      v-if="selectAttachment"
-      :attachment="selectAttachment"
+    <AttachmentDetailModal
       :addToPhoto="true"
+      :attachment="list.selected"
+      :visible.sync="detailVisible"
       @delete="handleListAttachments()"
-    />
+    >
+      <template #extraFooter>
+        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious">上一项</a-button>
+        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext">下一项</a-button>
+      </template>
+    </AttachmentDetailModal>
   </page-view>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { PageView } from '@/layouts'
-import AttachmentDetailDrawer from './components/AttachmentDetailDrawer'
+import AttachmentDetailModal from './components/AttachmentDetailModal.vue'
 import attachmentApi from '@/api/attachment'
 import { mapGetters } from 'vuex'
 
 export default {
   components: {
     PageView,
-    AttachmentDetailDrawer
+    AttachmentDetailModal
   },
   mixins: [mixin, mixinDevice],
+  filters: {
+    typeText(type) {
+      return attachmentApi.type[type].text
+    }
+  },
   data() {
     return {
-      attachmentType: attachmentApi.type,
-      listLoading: true,
-      uploadVisible: false,
+      list: {
+        data: [],
+        loading: false,
+        total: 0,
+        hasNext: false,
+        hasPrevious: false,
+        selected: {},
+        params: {
+          page: 0,
+          size: 18,
+          keyword: null,
+          mediaType: null,
+          attachmentType: null
+        }
+      },
+
+      mediaTypes: {
+        data: [],
+        loading: false
+      },
+
+      types: {
+        data: [],
+        loading: false
+      },
+
+      upload: {
+        handler: attachmentApi.upload,
+        visible: false
+      },
+
+      detailVisible: false,
+
       supportMultipleSelection: false,
       selectedAttachmentCheckbox: {},
-      batchSelectedAttachments: [],
-      selectAttachment: {},
-      attachments: [],
-      mediaTypes: [],
-      mediaTypesLoading: false,
-      types: [],
-      typesLoading: false,
-      editable: false,
-      pagination: {
-        page: 1,
-        size: 18,
-        sort: null,
-        total: 1
-      },
-      queryParam: {
-        page: 0,
-        size: 18,
-        sort: null,
-        keyword: null,
-        mediaType: null,
-        attachmentType: null
-      },
-      drawerVisible: false,
-      uploadHandler: attachmentApi.upload
+      batchSelectedAttachments: []
     }
   },
   computed: {
-    formattedDatas() {
-      return this.attachments.map(attachment => {
-        attachment.typeProperty = this.attachmentType[attachment.type]
-        return attachment
-      })
-    },
     selectedAttachmentStyle() {
       return {
         border: `2px solid ${this.color()}`
       }
+    },
+    isImage() {
+      return function(attachment) {
+        if (!attachment || !attachment.mediaType) {
+          return false
+        }
+        return attachment.mediaType.startsWith('image')
+      }
+    },
+    pagination() {
+      return {
+        page: this.list.params.page + 1,
+        size: this.list.params.size,
+        total: this.list.total
+      }
+    },
+    selectPreviousButtonDisabled() {
+      const index = this.list.data.findIndex(attachment => attachment.id === this.list.selected.id)
+      return index === 0 && !this.list.hasPrevious
+    },
+    selectNextButtonDisabled() {
+      const index = this.list.data.findIndex(attachment => attachment.id === this.list.selected.id)
+      return index === this.list.data.length - 1 && !this.list.hasNext
     }
   },
   created() {
@@ -197,71 +230,79 @@ export default {
     this.handleListMediaTypes()
     this.handleListTypes()
   },
-  destroyed: function() {
-    if (this.drawerVisible) {
-      this.drawerVisible = false
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    if (this.drawerVisible) {
-      this.drawerVisible = false
-    }
-    next()
-  },
   methods: {
     ...mapGetters(['color']),
-    handleListAttachments() {
-      this.listLoading = true
-      this.queryParam.page = this.pagination.page - 1
-      this.queryParam.size = this.pagination.size
-      this.queryParam.sort = this.pagination.sort
-      attachmentApi
-        .query(this.queryParam)
-        .then(response => {
-          this.attachments = response.data.data.content
-          this.pagination.total = response.data.data.total
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.listLoading = false
-          }, 200)
-        })
+
+    /**
+     * List attachments
+     */
+    async handleListAttachments() {
+      try {
+        this.list.loading = true
+
+        const response = await attachmentApi.query(this.list.params)
+
+        this.list.data = response.data.data.content
+        this.list.total = response.data.data.total
+        this.list.hasNext = response.data.data.hasNext
+        this.list.hasPrevious = response.data.data.hasPrevious
+      } catch (error) {
+        this.$log.error(error)
+      } finally {
+        this.list.loading = false
+      }
     },
-    handleListMediaTypes() {
-      this.mediaTypesLoading = true
-      attachmentApi
-        .getMediaTypes()
-        .then(response => {
-          this.mediaTypes = response.data.data
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.mediaTypesLoading = false
-          }, 200)
-        })
+
+    /**
+     * List attachment media types
+     */
+    async handleListMediaTypes() {
+      try {
+        this.mediaTypes.loading = true
+
+        const response = await attachmentApi.getMediaTypes()
+
+        this.mediaTypes.data = response.data.data
+      } catch (error) {
+        this.$log.error(error)
+      } finally {
+        this.mediaTypes.loading = false
+      }
     },
-    handleListTypes() {
-      this.typesLoading = true
-      attachmentApi
-        .getTypes()
-        .then(response => {
-          this.types = response.data.data
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.typesLoading = false
-          }, 200)
-        })
+
+    /**
+     * List attachment upload types
+     */
+    async handleListTypes() {
+      try {
+        this.types.loading = true
+
+        const response = await attachmentApi.getTypes()
+
+        this.types.data = response.data.data
+      } catch (error) {
+        this.$log.error(error)
+      } finally {
+        this.types.loading = false
+      }
     },
-    handleShowDetailDrawer(attachment) {
-      this.selectAttachment = attachment
-      this.drawerVisible = !this.supportMultipleSelection
+
+    /**
+     * Handle open attachment detail modal event
+     */
+    handleOpenDetail(attachment) {
+      this.list.selected = attachment
+      this.detailVisible = !this.supportMultipleSelection
     },
+
+    /**
+     * Show context menu
+     */
     handleContextMenu(event, item) {
       this.$contextmenu({
         items: [
           {
-            label: `${this.handleJudgeMediaType(item) ? '复制图片链接' : '复制文件链接'}`,
+            label: `复制${this.isImage(item) ? '图片' : '文件'}链接`,
             onClick: () => {
               const text = `${encodeURI(item.path)}`
               this.$copyText(text)
@@ -277,7 +318,7 @@ export default {
             divided: true
           },
           {
-            disabled: !this.handleJudgeMediaType(item),
+            disabled: !this.isImage(item),
             label: '复制 Markdown 格式链接',
             onClick: () => {
               const text = `![${item.name}](${encodeURI(item.path)})`
@@ -290,6 +331,22 @@ export default {
                   this.$log.debug('copy.err', err)
                   this.$message.error('复制失败！')
                 })
+            },
+            divided: true
+          },
+          {
+            label: '删除',
+            onClick: () => {
+              this.$confirm({
+                title: '提示',
+                content: '确定删除该附件？',
+                okText: '确定',
+                cancelText: '取消',
+                onOk: async () => {
+                  await attachmentApi.delete(item.id)
+                  this.handleListAttachments()
+                }
+              })
             }
           }
         ],
@@ -298,39 +355,48 @@ export default {
       })
       return false
     },
-    handlePaginationChange(page, size) {
-      this.$log.debug(`Current: ${page}, PageSize: ${size}`)
-      this.pagination.page = page
-      this.pagination.size = size
+
+    /**
+     * Handle page change
+     */
+    handlePageChange(page = 1) {
+      this.list.params.page = page - 1
       this.handleListAttachments()
     },
+
+    /**
+     * Handle page size change
+     */
+    handlePageSizeChange(current, size) {
+      this.$log.debug(`Current: ${current}, PageSize: ${size}`)
+      this.list.params.page = 0
+      this.list.params.size = size
+      this.handleListAttachments()
+    },
+
+    /**
+     * Reset query params
+     */
     handleResetParam() {
-      this.queryParam.keyword = null
-      this.queryParam.mediaType = null
-      this.queryParam.attachmentType = null
-      this.handlePaginationChange(1, this.pagination.size)
+      this.list.params.keyword = null
+      this.list.params.mediaType = null
+      this.list.params.attachmentType = null
+      this.handlePageChange()
       this.handleListMediaTypes()
       this.handleListTypes()
     },
+
+    /**
+     * Search attachments
+     */
     handleQuery() {
-      this.handlePaginationChange(1, this.pagination.size)
+      this.handlePageChange()
     },
     onUploadClose() {
       this.$refs.upload.handleClearFileList()
-      this.handlePaginationChange(1, this.pagination.size)
+      this.handlePageChange()
       this.handleListMediaTypes()
       this.handleListTypes()
-    },
-    handleJudgeMediaType(attachment) {
-      const mediaType = attachment.mediaType
-      // 判断文件类型
-      if (mediaType) {
-        const prefix = mediaType.split('/')[0]
-
-        return prefix === 'image'
-      }
-      // 没有获取到文件返回false
-      return false
     },
     getCheckStatus(key) {
       return this.selectedAttachmentCheckbox[key] || false
@@ -338,14 +404,14 @@ export default {
     handleMultipleSelection() {
       this.supportMultipleSelection = true
       // 不允许附件详情抽屉显示
-      this.drawerVisible = false
-      this.attachments.forEach(item => {
+      this.detailVisible = false
+      this.list.data.forEach(item => {
         this.$set(this.selectedAttachmentCheckbox, item.id, false)
       })
     },
     handleCancelMultipleSelection() {
       this.supportMultipleSelection = false
-      this.drawerVisible = false
+      this.detailVisible = false
       this.batchSelectedAttachments = []
       for (const key in this.selectedCheckbox) {
         this.$set(this.selectedAttachmentCheckbox, key, false)
@@ -363,6 +429,10 @@ export default {
         this.batchSelectedAttachments.splice(index, 1)
       }
     },
+
+    /**
+     * Deletes selected attachments
+     */
     handleDeleteAttachmentInBatch() {
       const that = this
       if (this.batchSelectedAttachments.length <= 0) {
@@ -385,6 +455,40 @@ export default {
         },
         onCancel() {}
       })
+    },
+
+    /**
+     * Select previous attachment
+     */
+    async handleSelectPrevious() {
+      const index = this.list.data.findIndex(item => item.id === this.list.selected.id)
+      if (index > 0) {
+        this.list.selected = this.list.data[index - 1]
+        return
+      }
+      if (index === 0 && this.list.hasPrevious) {
+        this.list.params.page--
+        await this.handleListAttachments()
+
+        this.list.selected = this.list.data[this.list.data.length - 1]
+      }
+    },
+
+    /**
+     * Select next attachment
+     */
+    async handleSelectNext() {
+      const index = this.list.data.findIndex(item => item.id === this.list.selected.id)
+      if (index < this.list.data.length - 1) {
+        this.list.selected = this.list.data[index + 1]
+        return
+      }
+      if (index === this.list.data.length - 1 && this.list.hasNext) {
+        this.list.params.page++
+        await this.handleListAttachments()
+
+        this.list.selected = this.list.data[0]
+      }
     }
   }
 }
