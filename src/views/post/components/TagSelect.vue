@@ -1,16 +1,15 @@
 <template>
-  <div>
-    <a-select
-      v-model="selectedTagNames"
-      class="w-full"
-      allowClear
-      mode="tags"
-      placeholder="选择或输入标签"
-      @change="handleChange"
-    >
-      <a-select-option v-for="tag in tags" :key="tag.id" :value="tag.name">{{ tag.name }}</a-select-option>
-    </a-select>
-  </div>
+  <a-select
+    v-model="selectedTagNames"
+    :token-separators="[',', '|']"
+    allowClear
+    class="w-full"
+    mode="tags"
+    placeholder="选择或输入标签"
+    @change="handleChange"
+  >
+    <a-select-option v-for="tag in tags" :key="tag.id" :value="tag.name">{{ tag.name }}</a-select-option>
+  </a-select>
 </template>
 
 <script>
@@ -44,6 +43,15 @@ export default {
       if (newValue) {
         this.selectedTagNames = this.tagIds.map(tagId => this.tagIdMap[tagId].name)
       }
+    },
+    tagIds: {
+      handler(newValue) {
+        if (!this.tags.length) {
+          return
+        }
+        this.selectedTagNames = newValue.map(tagId => this.tagIdMap[tagId].name)
+      },
+      deep: true
     }
   },
   computed: {
@@ -72,14 +80,12 @@ export default {
       })
     },
     handleChange() {
-      this.$log.debug('Changed')
       const tagNamesToCreate = this.selectedTagNames.filter(tagName => !this.tagNameMap[tagName])
 
       this.$log.debug('Tag names to create', tagNamesToCreate)
 
-      if (tagNamesToCreate === []) {
+      if (!tagNamesToCreate.length) {
         const tagIds = this.selectedTagNames.map(tagName => this.tagNameMap[tagName].id)
-        // If empty
         this.$emit('change', tagIds)
         return
       }

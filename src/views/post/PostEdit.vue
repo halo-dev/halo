@@ -32,18 +32,11 @@
       </a-col>
     </a-row>
 
-    <PostSettingDrawer
-      :categoryIds="selectedCategoryIds"
-      :metas="selectedMetas"
+    <PostSettingModal
       :post="postToStage"
-      :tagIds="selectedTagIds"
-      :visible="postSettingVisible"
-      @close="postSettingVisible = false"
-      @onRefreshCategoryIds="onRefreshCategoryIdsFromSetting"
-      @onRefreshPost="onRefreshPostFromSetting"
-      @onRefreshPostMetas="onRefreshPostMetasFromSetting"
-      @onRefreshTagIds="onRefreshTagIdsFromSetting"
-      @onSaved="handleRestoreSavedStatus"
+      :savedCallback="onPostSavedCallback"
+      :visible.sync="postSettingVisible"
+      @onUpdate="onUpdateFromSetting"
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
@@ -54,7 +47,7 @@
 import { mixin, mixinDevice, mixinPostEdit } from '@/mixins/mixin.js'
 import { datetimeFormat } from '@/utils/datetime'
 
-import PostSettingDrawer from './components/PostSettingDrawer'
+import PostSettingModal from './components/PostSettingModal'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 import { PageView } from '@/layouts'
@@ -64,7 +57,7 @@ import postApi from '@/api/post'
 export default {
   mixins: [mixin, mixinDevice, mixinPostEdit],
   components: {
-    PostSettingDrawer,
+    PostSettingModal,
     AttachmentDrawer,
     MarkdownEditor,
     PageView
@@ -74,9 +67,6 @@ export default {
       attachmentDrawerVisible: false,
       postSettingVisible: false,
       postToStage: {},
-      selectedTagIds: [],
-      selectedCategoryIds: [],
-      selectedMetas: [],
       contentChanges: 0,
       draftSaving: false,
       previewSaving: false,
@@ -89,19 +79,12 @@ export default {
     next(vm => {
       if (postId) {
         postApi.get(postId).then(response => {
-          const post = response.data.data
-          vm.postToStage = post
-          vm.selectedTagIds = post.tagIds
-          vm.selectedCategoryIds = post.categoryIds
-          vm.selectedMetas = post.metas
+          vm.postToStage = response.data.data
         })
       }
     })
   },
-  destroyed: function() {
-    if (this.postSettingVisible) {
-      this.postSettingVisible = false
-    }
+  destroyed() {
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
@@ -110,9 +93,6 @@ export default {
     }
   },
   beforeRouteLeave(to, from, next) {
-    if (this.postSettingVisible) {
-      this.postSettingVisible = false
-    }
     if (this.attachmentDrawerVisible) {
       this.attachmentDrawerVisible = false
     }
@@ -247,17 +227,12 @@ export default {
       this.contentChanges++
       this.postToStage.originalContent = val
     },
-    onRefreshPostFromSetting(post) {
+    onPostSavedCallback() {
+      this.contentChanges = 0
+      this.$router.push({ name: 'PostList' })
+    },
+    onUpdateFromSetting(post) {
       this.postToStage = post
-    },
-    onRefreshTagIdsFromSetting(tagIds) {
-      this.selectedTagIds = tagIds
-    },
-    onRefreshCategoryIdsFromSetting(categoryIds) {
-      this.selectedCategoryIds = categoryIds
-    },
-    onRefreshPostMetasFromSetting(metas) {
-      this.selectedMetas = metas
     }
   }
 }
