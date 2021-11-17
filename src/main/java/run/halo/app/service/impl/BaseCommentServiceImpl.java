@@ -227,7 +227,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
             BaseCommentWithParentVO commentWithParentVo =
                 new BaseCommentWithParentVO().convertFrom(comment);
 
-            commentWithParentVo.setAvatar(buildAvatarUrl(commentWithParentVo.getGravatarMd5()));
+            commentWithParentVo.setAvatar(buildAvatarUrl(commentWithParentVo.getGravatarMd5(), commentWithParentVo.getEmail() == null));
 
             // Get parent comment vo from cache
             BaseCommentWithParentVO parentCommentVo = parentCommentVoMap.get(comment.getParentId());
@@ -486,7 +486,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
         BaseCommentDTO baseCommentDto = new BaseCommentDTO().convertFrom(comment);
 
-        baseCommentDto.setAvatar(buildAvatarUrl(comment.getGravatarMd5()));
+        baseCommentDto.setAvatar(buildAvatarUrl(comment.getGravatarMd5(), comment.getEmail() == null));
 
         return baseCommentDto;
     }
@@ -599,7 +599,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
                 new CommentWithHasChildrenVO().convertFrom(topComment);
             comment
                 .setHasChildren(commentChildrenCountMap.getOrDefault(topComment.getId(), 0L) > 0);
-            comment.setAvatar(buildAvatarUrl(topComment.getGravatarMd5()));
+            comment.setAvatar(buildAvatarUrl(topComment.getGravatarMd5(), topComment.getEmail() == null));
             return comment;
         });
     }
@@ -741,7 +741,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
             // Convert to comment vo
             BaseCommentVO commentVo = new BaseCommentVO().convertFrom(comment);
 
-            commentVo.setAvatar(buildAvatarUrl(commentVo.getGravatarMd5()));
+            commentVo.setAvatar(buildAvatarUrl(commentVo.getGravatarMd5(), commentVo.getEmail() == null));
 
             if (parentComment.getChildren() == null) {
                 parentComment.setChildren(new LinkedList<>());
@@ -771,9 +771,22 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
      * @return avatar url
      */
     public String buildAvatarUrl(String gravatarMd5) {
+        return buildAvatarUrl(gravatarMd5, false);
+    }
+
+    /**
+     * Build avatar url by gravatarMd5
+     *
+     * @param gravatarMd5 gravatarMd5
+     * @param isEmailEmpty isEmailEmpty
+     * @return avatar url
+     */
+    public String buildAvatarUrl(String gravatarMd5, boolean isEmailEmpty) {
+
         final String gravatarSource =
             optionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_SOURCE, String.class);
-        final String gravatarDefault =
+        final String gravatarDefault = isEmailEmpty ?
+            optionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_IDENTICON, String.class) :
             optionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_DEFAULT, String.class);
 
         return gravatarSource + gravatarMd5 + "?s=256&d=" + gravatarDefault;

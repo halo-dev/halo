@@ -15,6 +15,11 @@ public enum CommentProperties implements PropertyEnum {
     GRAVATAR_DEFAULT("comment_gravatar_default", String.class, ""),
 
     /**
+     * The identicon gravatar type.
+     */
+    GRAVATAR_IDENTICON("comment_gravatar_identicon", String.class, "identicon"),
+
+    /**
      * Does it need to be checked.
      */
     NEW_NEED_CHECK("comment_new_need_check", Boolean.class, "true"),
