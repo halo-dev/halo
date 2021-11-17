@@ -31,7 +31,7 @@ public class PostCommentParamValidationTest {
     }
 
     @Test
-    public void testEmailIsNullDontReturnValidationViolations() {
+    public void validate_whenEmailIsNull_NoValidationViolations() {
         // Arrange
         setupDefaultValuesForPostCommentParam();
 
@@ -44,7 +44,7 @@ public class PostCommentParamValidationTest {
     }
 
     @Test
-    public void testEmailFormatIsInvalidShouldReturnOneValidationViolation() {
+    public void validate_whenEmailIsInvalid_ReturnEmailInvalidValidationViolation() {
         // Arrange
         setupDefaultValuesForPostCommentParam();
         postCommentParam.setEmail(TEST_INVALID_EMAIL);
@@ -55,6 +55,7 @@ public class PostCommentParamValidationTest {
 
         // Assert
         Assertions.assertEquals(1, violations.size());
+        Assertions.assertEquals("email", violations.iterator().next().getPropertyPath().toString());
         Assertions.assertEquals("邮箱格式不正确", violations.iterator().next().getMessage());
     }
 
