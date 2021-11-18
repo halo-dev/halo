@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.cache.lock.CacheLock;
+import run.halo.app.cache.lock.CacheParam;
 import run.halo.app.model.dto.PhotoDTO;
 import run.halo.app.model.entity.Photo;
 import run.halo.app.model.params.PhotoParam;
@@ -85,6 +87,13 @@ public class PhotoController {
 
         // Update menu in database
         return new PhotoDTO().convertFrom(photoService.update(photo));
+    }
+
+    @PutMapping("{photoId:\\d+}/likes")
+    @ApiOperation("Likes a photo")
+    @CacheLock(autoDelete = false, traceRequest = true)
+    public void likes(@PathVariable @CacheParam Integer photoId) {
+        photoService.increaseLike(photoId);
     }
 
     @GetMapping("teams")
