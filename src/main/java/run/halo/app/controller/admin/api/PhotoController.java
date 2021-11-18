@@ -87,6 +87,12 @@ public class PhotoController {
         return new PhotoDTO().convertFrom(photoService.update(photo));
     }
 
+    @PutMapping("{photoId:\\d+}/likes")
+    @ApiOperation("Likes a photo")
+    public void likes(@PathVariable Integer photoId) {
+        photoService.increaseLike(photoId);
+    }
+
     @GetMapping("teams")
     @ApiOperation("Lists all of photo teams")
     public List<String> listTeams() {
