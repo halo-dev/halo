@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
-import run.halo.app.model.params.CommentContentParam;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.params.PostCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
@@ -37,7 +36,6 @@ import run.halo.app.service.PostCommentService;
  *
  * @author johnniang
  * @author ryanwang
- * @author guqing
  * @date 2019-03-29
  */
 @RestController
@@ -145,17 +143,6 @@ public class PostCommentController {
         PostComment commentToUpdate = postCommentService.getById(commentId);
 
         commentParam.update(commentToUpdate);
-
-        return postCommentService.convertTo(postCommentService.update(commentToUpdate));
-    }
-
-    @PutMapping("/{commentId:\\d+}/contents")
-    @ApiOperation("Updates a post comment content by comment id")
-    public BaseCommentDTO updateCommentContentBy(@PathVariable Long commentId,
-        @RequestBody CommentContentParam contentParam) {
-        PostComment commentToUpdate = postCommentService.getById(commentId);
-
-        commentToUpdate.setContent(contentParam.getContent());
 
         return postCommentService.convertTo(postCommentService.update(commentToUpdate));
     }

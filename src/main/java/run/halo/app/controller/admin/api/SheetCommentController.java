@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.enums.CommentStatus;
-import run.halo.app.model.params.CommentContentParam;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.params.SheetCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
@@ -37,7 +36,6 @@ import run.halo.app.service.SheetCommentService;
  *
  * @author johnniang
  * @author ryanwang
- * @author guqing
  * @date 2019-04-25
  */
 @RestController
@@ -143,17 +141,6 @@ public class SheetCommentController {
         SheetComment commentToUpdate = sheetCommentService.getById(commentId);
 
         commentParam.update(commentToUpdate);
-
-        return sheetCommentService.convertTo(sheetCommentService.update(commentToUpdate));
-    }
-
-    @PutMapping("/{commentId:\\d+}/contents")
-    @ApiOperation("Updates a sheet comment content by comment id")
-    public BaseCommentDTO updateCommentContentBy(@PathVariable Long commentId,
-        @RequestBody CommentContentParam contentParam) {
-        SheetComment commentToUpdate = sheetCommentService.getById(commentId);
-
-        commentToUpdate.setContent(contentParam.getContent());
 
         return sheetCommentService.convertTo(sheetCommentService.update(commentToUpdate));
     }
