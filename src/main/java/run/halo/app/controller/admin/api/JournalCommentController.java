@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.JournalComment;
 import run.halo.app.model.enums.CommentStatus;
+import run.halo.app.model.params.CommentContentParam;
 import run.halo.app.model.params.CommentQuery;
 import run.halo.app.model.params.JournalCommentParam;
 import run.halo.app.model.vo.BaseCommentVO;
@@ -34,6 +35,7 @@ import run.halo.app.service.OptionService;
  * Journal comment controller.
  *
  * @author johnniang
+ * @author guqing
  * @date 2019-04-25
  */
 @RestController
@@ -104,6 +106,17 @@ public class JournalCommentController {
         JournalComment updatedJournalComment =
             journalCommentService.updateStatus(commentId, status);
         return journalCommentService.convertTo(updatedJournalComment);
+    }
+
+    @PutMapping("/{commentId:\\d+}/contents")
+    @ApiOperation("Updates a journal comment content by comment id")
+    public BaseCommentDTO updateCommentContentBy(@PathVariable Long commentId,
+        @RequestBody CommentContentParam contentParam) {
+        JournalComment commentToUpdate = journalCommentService.getById(commentId);
+
+        commentToUpdate.setContent(contentParam.getContent());
+
+        return journalCommentService.convertTo(journalCommentService.update(commentToUpdate));
     }
 
     @DeleteMapping("{commentId:\\d+}")
