@@ -34,6 +34,7 @@ import run.halo.app.service.OptionService;
  * Journal comment controller.
  *
  * @author johnniang
+ * @author guqing
  * @date 2019-04-25
  */
 @RestController
@@ -104,6 +105,16 @@ public class JournalCommentController {
         JournalComment updatedJournalComment =
             journalCommentService.updateStatus(commentId, status);
         return journalCommentService.convertTo(updatedJournalComment);
+    }
+
+    @PutMapping("/{commentId:\\d+}")
+    @ApiOperation("Updates a journal comment by comment id")
+    public BaseCommentDTO updateCommentBy(@PathVariable Long commentId,
+        @RequestBody JournalCommentParam journalCommentParam) {
+        JournalComment commentToUpdate = journalCommentService.getById(commentId);
+        journalCommentParam.update(commentToUpdate);
+
+        return journalCommentService.convertTo(journalCommentService.update(commentToUpdate));
     }
 
     @DeleteMapping("{commentId:\\d+}")
