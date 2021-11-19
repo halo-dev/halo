@@ -99,19 +99,21 @@ class InMemoryCacheStoreTest {
 
     @Test
     void toMapTest() {
+        InMemoryCacheStore localCacheStore = new InMemoryCacheStore();
+        localCacheStore.clear();
         String key1 = "test_key_1";
         String value1 = "test_value_1";
 
         // Put the cache
-        cacheStore.put(key1, value1);
-        assertEquals("{test_key_1=test_value_1}", cacheStore.toMap().toString());
+        localCacheStore.put(key1, value1);
+        assertEquals("{test_key_1=test_value_1}", localCacheStore.toMap().toString());
 
         String key2 = "test_key_2";
         String value2 = "test_value_2";
 
         // Put the cache
-        cacheStore.put(key2, value2);
+        localCacheStore.put(key2, value2);
         assertEquals("{test_key_2=test_value_2, test_key_1=test_value_1}",
-            cacheStore.toMap().toString());
+            localCacheStore.toMap().toString());
     }
 }

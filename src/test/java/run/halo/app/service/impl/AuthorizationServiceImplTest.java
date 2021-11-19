@@ -1,7 +1,6 @@
 package run.halo.app.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.Set;
@@ -33,6 +32,7 @@ public class AuthorizationServiceImplTest {
 
     @Test
     public void deletePostAuthorizationTest() {
+        inMemoryCacheStore.clear();
         RequestContextHolder.setRequestAttributes(mockRequestAttributes("1"));
 
         authorizationService.postAuthorization(1);
@@ -51,6 +51,7 @@ public class AuthorizationServiceImplTest {
 
     @Test
     public void complexityOfDeletePostAuthorizationTest() {
+        inMemoryCacheStore.clear();
         // simulate session of user 1
         RequestContextHolder.setRequestAttributes(mockRequestAttributes("1"));
         // user 1 accessed two encrypted posts
@@ -81,6 +82,7 @@ public class AuthorizationServiceImplTest {
 
     @Test
     public void deleteCategoryAuthorizationTest() {
+        inMemoryCacheStore.clear();
         // simulate session of user 1
         RequestContextHolder.setRequestAttributes(mockRequestAttributes("1"));
         // user 1 accessed two encrypted posts
