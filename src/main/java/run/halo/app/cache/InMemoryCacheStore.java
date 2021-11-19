@@ -1,15 +1,20 @@
 package run.halo.app.cache;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import run.halo.app.utils.JsonUtils;
 
 /**
  * In-memory cache store.
@@ -58,7 +63,11 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
 
         // Put the cache wrapper
         CacheWrapper<String> putCacheWrapper = CACHE_CONTAINER.put(key, cacheWrapper);
-
+        try {
+            System.out.println(JsonUtils.objectToJson(CACHE_CONTAINER));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
         log.debug("Put [{}] cache result: [{}], original cache wrapper: [{}]", key, putCacheWrapper,
             cacheWrapper);
     }
@@ -96,6 +105,13 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
 
         CACHE_CONTAINER.remove(key);
         log.debug("Removed key: [{}]", key);
+    }
+
+    @Override
+    public Map<String, String> toMap() {
+        Map<String, String> map = new LinkedHashMap<>();
+        CACHE_CONTAINER.forEach((key, value) -> map.put(key, value.getData()));
+        return map;
     }
 
     @PreDestroy

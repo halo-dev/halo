@@ -2,6 +2,7 @@ package run.halo.app.cache;
 
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
