@@ -65,12 +65,13 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         for (Entry<String, String> entry : cacheStore.toMap().entrySet()) {
             String key = entry.getKey();
-            if (key.startsWith(ACCESS_PERMISSION_PREFIX)) {
-                Set<String> valueSet = jsonToValueSet(entry.getValue());
-                if (valueSet.contains(value)) {
-                    valueSet.remove(value);
-                    cacheStore.putAny(key, valueSet, 1, TimeUnit.DAYS);
-                }
+            if (!key.startsWith(ACCESS_PERMISSION_PREFIX)) {
+                continue;
+            }
+            Set<String> valueSet = jsonToValueSet(entry.getValue());
+            if (valueSet.contains(value)) {
+                valueSet.remove(value);
+                cacheStore.putAny(key, valueSet, 1, TimeUnit.DAYS);
             }
         }
     }

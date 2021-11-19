@@ -119,8 +119,8 @@ public class LevelCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    public Map<String, String> toMap() {
-        Map<String, String> map = new LinkedHashMap<>();
+    public LinkedHashMap<String, String> toMap() {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
         LEVEL_DB.forEach(entry -> {
             String key = bytesToString(entry.getKey());
             String valueJson = bytesToString(entry.getValue());

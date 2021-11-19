@@ -63,11 +63,6 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
 
         // Put the cache wrapper
         CacheWrapper<String> putCacheWrapper = CACHE_CONTAINER.put(key, cacheWrapper);
-        try {
-            System.out.println(JsonUtils.objectToJson(CACHE_CONTAINER));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
         log.debug("Put [{}] cache result: [{}], original cache wrapper: [{}]", key, putCacheWrapper,
             cacheWrapper);
     }
@@ -108,8 +103,8 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
-    public Map<String, String> toMap() {
-        Map<String, String> map = new LinkedHashMap<>();
+    public LinkedHashMap<String, String> toMap() {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
         CACHE_CONTAINER.forEach((key, value) -> map.put(key, value.getData()));
         return map;
     }
@@ -121,7 +116,7 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
         clear();
     }
 
-    private void clear() {
+    public void clear() {
         CACHE_CONTAINER.clear();
     }
 

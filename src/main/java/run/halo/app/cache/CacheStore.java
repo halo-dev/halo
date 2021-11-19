@@ -1,5 +1,6 @@
 package run.halo.app.cache;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
@@ -67,5 +68,5 @@ public interface CacheStore<K, V> {
      * Returns a view of the entries stored in this cache as a none thread-safe map.
      * Modifications made to the map do not directly affect the cache.
      */
-    Map<K, V> toMap();
+    LinkedHashMap<K, V> toMap();
 }
