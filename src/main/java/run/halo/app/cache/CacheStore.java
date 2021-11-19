@@ -1,9 +1,7 @@
 package run.halo.app.cache;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import org.springframework.lang.NonNull;
 
