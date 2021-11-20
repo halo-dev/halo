@@ -50,7 +50,7 @@ public class PostControllerTest {
     }
 
     @Test
-    public void comment_whenPostCommentParamHasNullEmail_ReturnBaseCommentDTO() {
+    public void nullEmailCommentTest() {
         // Arrange
         PostCommentParam postCommentParam = new PostCommentParam();
         postCommentParam.setContent(COMMENT_CONTENT_TEST);
