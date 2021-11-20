@@ -331,7 +331,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         }
 
         if (comment.getGravatarMd5() == null) {
-            comment.setGravatarMd5(DigestUtils.md5Hex(Optional.ofNullable(comment.getEmail()).orElse("")));
+            comment.setGravatarMd5(
+                DigestUtils.md5Hex(Optional.ofNullable(comment.getEmail()).orElse("")));
         }
 
         if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {

@@ -31,7 +31,7 @@ public class PostCommentParamValidationTest {
     }
 
     @Test
-    public void validate_whenEmailIsNull_NoValidationViolations() {
+    public void nullEmailValidationTest() {
         // Arrange
         setupDefaultValuesForPostCommentParam();
 
@@ -44,7 +44,7 @@ public class PostCommentParamValidationTest {
     }
 
     @Test
-    public void validate_whenEmailIsInvalid_ReturnEmailInvalidValidationViolation() {
+    public void invalidEmailValidationTest() {
         // Arrange
         setupDefaultValuesForPostCommentParam();
         postCommentParam.setEmail(TEST_INVALID_EMAIL);

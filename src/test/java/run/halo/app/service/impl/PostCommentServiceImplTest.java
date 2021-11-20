@@ -75,7 +75,7 @@ public class PostCommentServiceImplTest {
     }
 
     @Test
-    public void createBy_whenPostCommentParamHasNullEmailAndCommentNeedAudit_ReturnPostComment() {
+    public void nullEmailWithAuditCreatedByTest() {
         // Arrange
         postCommentParam.setContent(POST_COMMENT_CONTENT_TEST);
         postCommentParam.setAuthor(POST_COMMENT_AUTHOR_TEST);
@@ -92,7 +92,7 @@ public class PostCommentServiceImplTest {
     }
 
     @Test
-    public void createBy_whenPostCommentParamHasNullEmailAndCommentDONOTNeedAudit_ReturnPostComment() {
+    public void nullEmailWithoutAuditCreatedByTest() {
         // Arrange
         postCommentParam.setContent(POST_COMMENT_CONTENT_TEST);
         postCommentParam.setAuthor(POST_COMMENT_AUTHOR_TEST);
@@ -109,7 +109,7 @@ public class PostCommentServiceImplTest {
     }
 
     @Test
-    public void convertTo_whenPostCommentHasNullEmail_returnBaseCommentDTOWithAvatar() {
+    public void nullEmailConvertToTest() {
         // Arrange
         when(mockPostComment.getGravatarMd5()).thenReturn(POST_COMMENT_GRAVATAR_MD5_TEST);
         when(mockOptionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_SOURCE,
@@ -122,7 +122,7 @@ public class PostCommentServiceImplTest {
 
         // Assert
         Assertions.assertEquals(
-            GRAVATAR_SOURCE_TEST + POST_COMMENT_GRAVATAR_MD5_TEST + "?s=256&d=" +
-                GRAVATAR_DEFAULT_TEST, result.getAvatar());
+            GRAVATAR_SOURCE_TEST + POST_COMMENT_GRAVATAR_MD5_TEST + "?s=256&d="
+                + GRAVATAR_DEFAULT_TEST, result.getAvatar());
     }
 }
