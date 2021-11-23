@@ -22,6 +22,8 @@ public class PostControllerTest {
 
     private static final String COMMENT_CONTENT_TEST = "Hello world!";
 
+    private static final String COMMENT_EMAIL_TEST = "test@example.com";
+
     @Mock
     private PostService mockPostService;
 
@@ -47,6 +49,22 @@ public class PostControllerTest {
             mockPostCommentService,
             mockOptionService
         );
+    }
+
+    @Test
+    public void notNullEmailCommentTest() {
+        // Arrange
+        PostCommentParam postCommentParam = new PostCommentParam();
+        postCommentParam.setContent(COMMENT_CONTENT_TEST);
+        postCommentParam.setEmail(COMMENT_EMAIL_TEST);
+        when(mockPostCommentService.createBy(postCommentParam)).thenReturn(mockPostComment);
+        when(mockPostCommentService.convertTo(mockPostComment)).thenReturn(mockBaseCommentDTO);
+
+        // Act
+        BaseCommentDTO result = postController.comment(postCommentParam);
+
+        // Assert
+        Assertions.assertEquals(mockBaseCommentDTO, result);
     }
 
     @Test
