@@ -56,8 +56,8 @@ public class PostCommentApiTest extends BaseApiTest {
         // Act
         ResponseEntity<BaseResponse<BaseCommentDTO>>
             result = restTemplate.exchange(blogUrl + COMMENT_API_ROUTE, HttpMethod.POST, request,
-            new ParameterizedTypeReference<>() {
-            });
+                new ParameterizedTypeReference<>() {}
+            );
         BaseCommentDTO comment = Objects.requireNonNull(result.getBody()).getData();
 
         // Assert
@@ -82,8 +82,8 @@ public class PostCommentApiTest extends BaseApiTest {
         // Act
         ResponseEntity<BaseResponse<BaseCommentDTO>>
             result = restTemplate.exchange(blogUrl + COMMENT_API_ROUTE, HttpMethod.POST, request,
-            new ParameterizedTypeReference<>() {
-            });
+                new ParameterizedTypeReference<>() {}
+            );
 
         // Assert
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, result.getStatusCode());
@@ -104,8 +104,8 @@ public class PostCommentApiTest extends BaseApiTest {
         // Act
         ResponseEntity<BaseResponse<BaseCommentDTO>>
             result = restTemplate.exchange(blogUrl + COMMENT_API_ROUTE, HttpMethod.POST, request,
-            new ParameterizedTypeReference<>() {
-            });
+                new ParameterizedTypeReference<>() {}
+            );
         BaseCommentDTO comment = Objects.requireNonNull(result.getBody()).getData();
 
         // Assert
