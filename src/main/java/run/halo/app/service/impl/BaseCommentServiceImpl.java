@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.criteria.Predicate;
@@ -330,7 +331,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         }
 
         if (comment.getGravatarMd5() == null) {
-            comment.setGravatarMd5(DigestUtils.md5Hex(comment.getEmail()));
+            comment.setGravatarMd5(
+                DigestUtils.md5Hex(Optional.ofNullable(comment.getEmail()).orElse("")));
         }
 
         if (StringUtils.isNotEmpty(comment.getAuthorUrl())) {

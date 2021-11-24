@@ -24,7 +24,6 @@ public abstract class BaseCommentParam<COMMENT> implements InputConverter<COMMEN
     @Size(max = 50, message = "评论者昵称的字符长度不能超过 {max}")
     private String author;
 
-    @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
     @Size(max = 255, message = "邮箱的字符长度不能超过 {max}")
     private String email;
