@@ -36,13 +36,13 @@
   </div>
 </template>
 <script>
-import adminApi from '@/api/admin'
 import { mapActions } from 'vuex'
+import apiClient from '@/utils/api-client'
 
 export default {
   name: 'LoginForm',
   data() {
-    const authcodeValidate = (rule, value, callback) => {
+    const mfaValidate = (rule, value, callback) => {
       if (!value && this.form.needAuthCode) {
         callback(new Error('* 请输入两步验证码'))
       } else {
@@ -59,7 +59,7 @@ export default {
         rules: {
           username: [{ required: true, message: '* 用户名/邮箱不能为空', trigger: ['change'] }],
           password: [{ required: true, message: '* 密码不能为空', trigger: ['change'] }],
-          authcode: [{ validator: authcodeValidate, trigger: ['change'] }]
+          authcode: [{ validator: mfaValidate, trigger: ['change'] }]
         },
         needAuthCode: false,
         logging: false
@@ -78,10 +78,13 @@ export default {
       _this.$refs.loginForm.validate(valid => {
         if (valid) {
           _this.form.logging = true
-          adminApi
-            .loginPreCheck(_this.form.model.username, _this.form.model.password)
+          apiClient
+            .needMFACode({
+              username: _this.form.model.username,
+              password: _this.form.model.password
+            })
             .then(response => {
-              const data = response.data.data
+              const data = response.data
               if (data && data.needMFACode) {
                 _this.form.needAuthCode = true
                 _this.form.model.authcode = null

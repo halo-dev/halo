@@ -16,6 +16,7 @@
 <script>
 import { PageView } from '@/layouts'
 import CommentTab from './components/CommentTab'
+
 export default {
   components: {
     PageView,

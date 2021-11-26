@@ -1,20 +1,20 @@
 <template>
   <a-drawer
-    title="评论列表"
+    :afterVisibleChange="handleAfterVisibleChanged"
+    :visible="visible"
     :width="isMobile() ? '100%' : '480'"
     closable
-    :visible="visible"
     destroyOnClose
+    title="评论列表"
     @close="onClose"
-    :afterVisibleChange="handleAfterVisibleChanged"
   >
-    <a-row type="flex" align="middle">
+    <a-row align="middle" type="flex">
       <a-col :span="24">
         <a-list itemLayout="horizontal">
           <a-list-item>
             <a-list-item-meta>
               <template slot="description">
-                <p v-html="description" class="comment-drawer-content"></p>
+                <p class="comment-drawer-content" v-html="description"></p>
               </template>
               <h3 slot="title">{{ title }}</h3>
             </a-list-item-meta>
@@ -26,13 +26,13 @@
         <a-spin :spinning="list.loading">
           <a-empty v-if="list.data.length === 0" />
           <TargetCommentTree
-            v-else
             v-for="(comment, index) in list.data"
+            v-else
             :key="index"
             :comment="comment"
-            @reply="handleCommentReply"
             @delete="handleCommentDelete"
             @editStatus="handleEditStatusClick"
+            @reply="handleCommentReply"
           />
         </a-spin>
       </a-col>
@@ -41,32 +41,32 @@
     <div class="page-wrapper">
       <a-pagination
         :current="list.pagination.page"
-        :total="list.pagination.total"
         :defaultPageSize="list.pagination.size"
-        @change="handlePaginationChange"
+        :total="list.pagination.total"
         showLessItems
+        @change="handlePaginationChange"
       ></a-pagination>
     </div>
     <a-divider class="divider-transparent" />
     <div class="bottom-control">
       <a-button type="primary" @click="handleCommentReply({})">评论</a-button>
     </div>
-    <a-modal :title="replyModalTitle" v-model="replyModal.visible" @close="onReplyModalClose" destroyOnClose>
+    <a-modal v-model="replyModal.visible" :title="replyModalTitle" destroyOnClose @close="onReplyModalClose">
       <template slot="footer">
         <ReactiveButton
-          type="primary"
-          @click="handleReplyClick"
-          @callback="handleReplyCallback"
-          :loading="replyModal.saving"
           :errored="replyModal.saveErrored"
-          text="回复"
-          loadedText="回复成功"
+          :loading="replyModal.saving"
           erroredText="回复失败"
+          loadedText="回复成功"
+          text="回复"
+          type="primary"
+          @callback="handleReplyCallback"
+          @click="handleReplyClick"
         ></ReactiveButton>
       </template>
       <a-form-model ref="replyCommentForm" :model="replyModal.model" :rules="replyModal.rules" layout="vertical">
         <a-form-model-item prop="content">
-          <a-input ref="contentInput" type="textarea" :autoSize="{ minRows: 8 }" v-model="replyModal.model.content" />
+          <a-input ref="contentInput" v-model="replyModal.model.content" :autoSize="{ minRows: 8 }" type="textarea" />
         </a-form-model-item>
       </a-form-model>
     </a-modal>
@@ -75,7 +75,8 @@
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import TargetCommentTree from './TargetCommentTree'
-import commentApi from '@/api/comment'
+import apiClient from '@/utils/api-client'
+
 export default {
   name: 'TargetCommentDrawer',
   mixins: [mixin, mixinDevice],
@@ -148,16 +149,14 @@ export default {
       this.list.queryParam.page = this.list.pagination.page - 1
       this.list.queryParam.size = this.list.pagination.size
       this.list.queryParam.sort = this.list.pagination.sort
-      commentApi
-        .commentTree(this.target, this.id, this.list.queryParam)
+      apiClient.comment
+        .listAsTreeView(this.target, this.id, this.list.queryParam)
         .then(response => {
-          this.list.data = response.data.data.content
-          this.list.pagination.total = response.data.data.total
+          this.list.data = response.data.content
+          this.list.pagination.total = response.data.total
         })
         .finally(() => {
-          setTimeout(() => {
-            this.list.loading = false
-          }, 200)
+          this.list.loading = false
         })
     },
     handlePaginationChange(page, pageSize) {
@@ -179,7 +178,7 @@ export default {
       _this.$refs.replyCommentForm.validate(valid => {
         if (valid) {
           _this.replyModal.saving = true
-          commentApi
+          apiClient.comment
             .create(_this.target, _this.replyModal.model)
             .catch(() => {
               _this.replyModal.saveErrored = true
@@ -203,8 +202,8 @@ export default {
       }
     },
     handleEditStatusClick(comment, status) {
-      commentApi
-        .updateStatus(this.target, comment.id, status)
+      apiClient.comment
+        .updateStatusById(this.target, comment.id, status)
         .then(() => {
           this.$message.success('操作成功！')
         })
@@ -213,7 +212,7 @@ export default {
         })
     },
     handleCommentDelete(comment) {
-      commentApi
+      apiClient.comment
         .delete(this.target, comment.id)
         .then(() => {
           this.$message.success('删除成功！')

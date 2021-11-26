@@ -4,7 +4,7 @@ export default {
   layout: 'topmenu',
   contentWidth: 'Fixed',
   fixedHeader: false,
-  fixSiderbar: false,
+  fixedSidebar: false,
   autoHideHeader: false,
   storageOptions: {
     namespace: 'halo__',

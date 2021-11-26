@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-form-model ref="seoOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
+    <a-form-model ref="seoOptionsForm" :model="options" :rules="rules" :wrapperCol="wrapperCol" layout="vertical">
       <a-form-model-item label="屏蔽搜索引擎：" prop="seo_spider_disabled">
         <a-switch v-model="options.seo_spider_disabled" />
       </a-form-model-item>
@@ -8,18 +8,18 @@
         <a-input v-model="options.seo_keywords" placeholder="多个关键词以英文状态下的逗号隔开" />
       </a-form-model-item>
       <a-form-model-item label="博客描述：" prop="seo_description">
-        <a-input type="textarea" :autoSize="{ minRows: 5 }" v-model="options.seo_description" />
+        <a-input v-model="options.seo_description" :autoSize="{ minRows: 5 }" type="textarea" />
       </a-form-model-item>
       <a-form-model-item>
         <ReactiveButton
-          type="primary"
-          @click="handleSaveOptions"
-          @callback="$emit('callback')"
-          :loading="saving"
           :errored="errored"
-          text="保存"
-          loadedText="保存成功"
+          :loading="saving"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存"
+          type="primary"
+          @callback="$emit('callback')"
+          @click="handleSaveOptions"
         ></ReactiveButton>
       </a-form-model-item>
     </a-form-model>

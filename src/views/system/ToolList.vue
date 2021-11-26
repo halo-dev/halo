@@ -1,16 +1,22 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col v-if="options.developer_mode" :xl="6" :lg="6" :md="12" :sm="24" :xs="24" class="pb-3">
-        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
-          <div slot="title"><a-icon type="experiment" /> 开发者选项</div>
+      <a-col v-if="options.developer_mode" :lg="6" :md="12" :sm="24" :xl="6" :xs="24" class="pb-3">
+        <a-card :bodyStyle="{ padding: '16px' }" :bordered="false">
+          <div slot="title">
+            <a-icon type="experiment" />
+            开发者选项
+          </div>
           <p style="min-height: 50px;">点击进入开发者选项页面</p>
-          <a-button type="primary" class="float-right" @click="handleToDeveloperOptions()">进入</a-button>
+          <a-button class="float-right" type="primary" @click="handleToDeveloperOptions()">进入</a-button>
         </a-card>
       </a-col>
-      <a-col :xl="6" :lg="6" :md="12" :sm="24" :xs="24" class="mb-3">
-        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
-          <div slot="title"><a-icon type="hdd" /> 博客备份</div>
+      <a-col :lg="6" :md="12" :sm="24" :xl="6" :xs="24" class="mb-3">
+        <a-card :bodyStyle="{ padding: '16px' }" :bordered="false">
+          <div slot="title">
+            <a-icon type="hdd" />
+            博客备份
+          </div>
           <p style="min-height: 50px;">支持备份全站数据和数据导出，支持下载到本地</p>
 
           <a-dropdown class="float-right">
@@ -32,26 +38,29 @@
           </a-dropdown>
         </a-card>
       </a-col>
-      <a-col :xl="6" :lg="6" :md="12" :sm="24" :xs="24" class="pb-3">
-        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
-          <div slot="title"><a-icon type="file-markdown" /> Markdown 文章导入</div>
+      <a-col :lg="6" :md="12" :sm="24" :xl="6" :xs="24" class="pb-3">
+        <a-card :bodyStyle="{ padding: '16px' }" :bordered="false">
+          <div slot="title">
+            <a-icon type="file-markdown" />
+            Markdown 文章导入
+          </div>
           <p style="min-height: 50px;">支持 Hexo/Jekyll 文章导入并解析元数据</p>
-          <a-button type="primary" class="float-right" @click="markdownUpload = true">导入</a-button>
+          <a-button class="float-right" type="primary" @click="markdownUpload = true">导入</a-button>
         </a-card>
       </a-col>
     </a-row>
     <a-modal
-      title="Markdown 文章导入"
       v-model="markdownUpload"
+      :afterClose="onUploadClose"
       :footer="null"
       destroyOnClose
-      :afterClose="onUploadClose"
+      title="Markdown 文章导入"
     >
       <FilePondUpload
         ref="upload"
-        name="file"
-        label="拖拽或点击选择 Markdown 文件到此处"
         :uploadHandler="uploadHandler"
+        label="拖拽或点击选择 Markdown 文件到此处"
+        name="file"
       ></FilePondUpload>
     </a-modal>
     <BackupWorkDirDrawer v-model="backupWorkDirDrawerVisible"></BackupWorkDirDrawer>
@@ -67,8 +76,8 @@ import ExportDataDrawer from './components/ExportDataDrawer'
 import ExportMarkdownDrawer from './components/ExportMarkdownDrawer'
 
 import { mapGetters } from 'vuex'
+import apiClient from '@/utils/api-client'
 
-import backupApi from '@/api/backup'
 export default {
   components: { PageView, BackupWorkDirDrawer, ExportDataDrawer, ExportMarkdownDrawer },
   data() {
@@ -77,7 +86,7 @@ export default {
       exportDataDrawerVisible: false,
       exportMarkdownDrawerVisible: false,
       markdownUpload: false,
-      uploadHandler: backupApi.importMarkdown
+      uploadHandler: (file, options) => apiClient.backup.importMarkdown(file, options)
     }
   },
   computed: {

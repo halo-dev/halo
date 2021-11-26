@@ -1,45 +1,45 @@
 <template>
   <div>
     <a-form-model
-      labelAlign="left"
       ref="menuForm"
       :model="menuModel"
       :rules="form.rules"
+      labelAlign="left"
       @keyup.enter.native="handleCreateOrUpdateMenu"
     >
       <a-row :gutter="24">
-        <a-col :xl="8" :lg="8" :md="12" :sm="12" :xs="12">
-          <a-form-model-item label="名称" prop="name" help="* 页面上所显示的名称">
+        <a-col :lg="8" :md="12" :sm="12" :xl="8" :xs="12">
+          <a-form-model-item help="* 页面上所显示的名称" label="名称" prop="name">
             <a-input v-model="menuModel.name" autoFocus />
           </a-form-model-item>
         </a-col>
-        <a-col :xl="8" :lg="8" :md="12" :sm="12" :xs="12">
-          <a-form-model-item label="地址" prop="url" help="* 菜单的地址">
+        <a-col :lg="8" :md="12" :sm="12" :xl="8" :xs="12">
+          <a-form-model-item help="* 菜单的地址" label="地址" prop="url">
             <a-input v-model="menuModel.url" />
           </a-form-model-item>
         </a-col>
-        <a-col :xl="8" :lg="8" :md="12" :sm="12" :xs="12">
-          <a-form-model-item label="图标" prop="icon" help="* 请根据主题的支持情况选填">
+        <a-col :lg="8" :md="12" :sm="12" :xl="8" :xs="12">
+          <a-form-model-item help="* 请根据主题的支持情况选填" label="图标" prop="icon">
             <a-input v-model="menuModel.icon" />
           </a-form-model-item>
         </a-col>
-        <a-col :xl="8" :lg="8" :md="12" :sm="12" :xs="12">
+        <a-col :lg="8" :md="12" :sm="12" :xl="8" :xs="12">
           <a-form-model-item label="打开方式" prop="target">
             <a-radio-group v-model="menuModel.target" :options="targets" />
           </a-form-model-item>
         </a-col>
-        <a-col :xl="8" :lg="8" :md="12" :sm="12" :xs="12">
-          <a-form-model-item label=" " :colon="false">
+        <a-col :lg="8" :md="12" :sm="12" :xl="8" :xs="12">
+          <a-form-model-item :colon="false" label=" ">
             <a-space>
               <ReactiveButton
-                type="primary"
-                @click="handleCreateOrUpdateMenu"
-                @callback="handleSavedCallback"
-                :loading="form.saving"
                 :errored="form.errored"
-                text="保存"
-                loadedText="保存成功"
+                :loading="form.saving"
                 erroredText="保存失败"
+                loadedText="保存成功"
+                text="保存"
+                type="primary"
+                @callback="handleSavedCallback"
+                @click="handleCreateOrUpdateMenu"
               ></ReactiveButton>
               <a-button @click="handleCancel">取消</a-button>
             </a-space>
@@ -50,7 +50,8 @@
   </div>
 </template>
 <script>
-import menuApi from '@/api/menu'
+import apiClient from '@/utils/api-client'
+
 const targets = [
   {
     value: '_self',
@@ -116,7 +117,7 @@ export default {
         if (valid) {
           _this.form.saving = true
           if (_this.isUpdateMode) {
-            menuApi
+            apiClient.menu
               .update(_this.menuModel.id, _this.menuModel)
               .catch(() => {
                 _this.form.errored = true
@@ -127,7 +128,7 @@ export default {
                 }, 400)
               })
           } else {
-            menuApi
+            apiClient.menu
               .create(_this.menuModel)
               .catch(() => {
                 _this.form.errored = true

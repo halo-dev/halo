@@ -1,6 +1,6 @@
 <template>
-  <div class="setting-drawer" ref="settingDrawer">
-    <a-drawer width="300" closable @close="onClose" :visible="layoutSetting">
+  <div ref="settingDrawer" class="setting-drawer">
+    <a-drawer :visible="layoutSetting" closable width="300" @close="onClose">
       <div class="setting-drawer-index-content">
         <div class="mb-6">
           <h3 class="setting-drawer-index-title">整体风格设置</h3>
@@ -8,8 +8,8 @@
             <a-tooltip>
               <template slot="title">暗色菜单风格</template>
               <div class="setting-drawer-index-item" @click="handleMenuTheme('dark')">
-                <img src="/images/dark.svg" alt="dark" />
-                <div class="setting-drawer-index-selectIcon" v-if="navTheme === 'dark'">
+                <img alt="dark" src="/images/dark.svg" />
+                <div v-if="navTheme === 'dark'" class="setting-drawer-index-selectIcon">
                   <a-icon type="check" />
                 </div>
               </div>
@@ -18,8 +18,8 @@
             <a-tooltip>
               <template slot="title">亮色菜单风格</template>
               <div class="setting-drawer-index-item" @click="handleMenuTheme('light')">
-                <img src="/images/dark.svg" alt="light" />
-                <div class="setting-drawer-index-selectIcon" v-if="navTheme !== 'dark'">
+                <img alt="light" src="/images/dark.svg" />
+                <div v-if="navTheme !== 'dark'" class="setting-drawer-index-selectIcon">
                   <a-icon type="check" />
                 </div>
               </div>
@@ -30,10 +30,10 @@
         <div class="mb-6">
           <h3 class="setting-drawer-index-title">主题色</h3>
           <div class="h-5">
-            <a-tooltip class="setting-drawer-theme-color-colorBlock" v-for="(item, index) in colorList" :key="index">
+            <a-tooltip v-for="(item, index) in colorList" :key="index" class="setting-drawer-theme-color-colorBlock">
               <template slot="title">{{ item.key }}</template>
               <a-tag :color="item.color" @click="changeColor(item.color)">
-                <a-icon type="check" v-if="item.color === primaryColor"></a-icon>
+                <a-icon v-if="item.color === primaryColor" type="check"></a-icon>
               </a-tag>
             </a-tooltip>
           </div>
@@ -44,15 +44,15 @@
 
           <div class="setting-drawer-index-blockChecbox">
             <div class="setting-drawer-index-item" @click="handleLayout('sidemenu')">
-              <img src="/images/sidemenu.svg" alt="sidemenu" />
-              <div class="setting-drawer-index-selectIcon" v-if="layoutMode === 'sidemenu'">
+              <img alt="sidemenu" src="/images/sidemenu.svg" />
+              <div v-if="layoutMode === 'sidemenu'" class="setting-drawer-index-selectIcon">
                 <a-icon type="check" />
               </div>
             </div>
 
             <div class="setting-drawer-index-item" @click="handleLayout('topmenu')">
-              <img src="/images/topmenu.svg" alt="topmenu" />
-              <div class="setting-drawer-index-selectIcon" v-if="layoutMode !== 'sidemenu'">
+              <img alt="topmenu" src="/images/topmenu.svg" />
+              <div v-if="layoutMode !== 'sidemenu'" class="setting-drawer-index-selectIcon">
                 <a-icon type="check" />
               </div>
             </div>
@@ -67,13 +67,13 @@
                   该设定仅 [顶部栏导航] 时有效
                 </template>
                 <a-select
+                  :defaultValue="contentWidth"
                   size="small"
                   style="width: 80px;"
-                  :defaultValue="contentWidth"
                   @change="handleContentWidthChange"
                 >
                   <a-select-option value="Fixed">固定</a-select-option>
-                  <a-select-option value="Fluid" v-if="layoutMode !== 'sidemenu'">流式</a-select-option>
+                  <a-select-option v-if="layoutMode !== 'sidemenu'" value="Fluid">流式</a-select-option>
                 </a-select>
               </a-tooltip>
               <a-list-item-meta>
@@ -81,7 +81,7 @@
               </a-list-item-meta>
             </a-list-item>
             <a-list-item>
-              <a-switch slot="actions" size="small" :defaultChecked="fixedHeader" @change="handleFixedHeader" />
+              <a-switch slot="actions" :defaultChecked="fixedHeader" size="small" @change="handleFixedHeader" />
               <a-list-item-meta>
                 <div slot="title">固定 Header</div>
               </a-list-item-meta>
@@ -89,9 +89,9 @@
             <a-list-item>
               <a-switch
                 slot="actions"
-                size="small"
-                :disabled="!fixedHeader"
                 :defaultChecked="autoHideHeader"
+                :disabled="!fixedHeader"
+                size="small"
                 @change="handleFixedHeaderHidden"
               />
               <a-list-item-meta>
@@ -104,10 +104,10 @@
             <a-list-item>
               <a-switch
                 slot="actions"
-                size="small"
+                :defaultChecked="fixedSidebar"
                 :disabled="layoutMode === 'topmenu'"
-                :defaultChecked="fixSiderbar"
-                @change="handleFixSiderbar"
+                size="small"
+                @change="handleFixedSidebar"
               />
               <a-list-item-meta>
                 <div slot="title" :style="{ opacity: layoutMode === 'topmenu' ? '0.5' : '1' }">固定侧边菜单</div>
@@ -123,7 +123,7 @@
 
 <script>
 import config from '@/config/defaultSettings'
-import { updateTheme, colorList } from './setting'
+import { colorList, updateTheme } from './setting'
 import { mixin, mixinDevice } from '@/mixins/mixin'
 import { mapActions, mapGetters } from 'vuex'
 
@@ -157,7 +157,7 @@ export default {
     handleLayout(mode) {
       this.baseConfig.layout = mode
       this.$store.dispatch('ToggleLayoutMode', mode)
-      this.handleFixSiderbar(false)
+      this.handleFixedSidebar(false)
       if (mode === 'sidemenu') {
         this.handleContentWidthChange('Fixed')
       }
@@ -181,14 +181,14 @@ export default {
       this.baseConfig.autoHideHeader = autoHidden
       this.$store.dispatch('ToggleFixedHeaderHidden', autoHidden)
     },
-    handleFixSiderbar(fixed) {
+    handleFixedSidebar(fixed) {
       if (this.layoutMode === 'topmenu') {
-        this.baseConfig.fixSiderbar = false
-        this.$store.dispatch('ToggleFixSiderbar', false)
+        this.baseConfig.fixedSidebar = false
+        this.$store.dispatch('ToggleFixedSidebar', false)
         return
       }
-      this.baseConfig.fixSiderbar = fixed
-      this.$store.dispatch('ToggleFixSiderbar', fixed)
+      this.baseConfig.fixedSidebar = fixed
+      this.$store.dispatch('ToggleFixedSidebar', fixed)
     }
   }
 }
@@ -223,6 +223,7 @@ export default {
       }
     }
   }
+
   .setting-drawer-theme-color-colorBlock {
     width: 20px;
     height: 20px;

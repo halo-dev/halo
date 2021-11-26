@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-form-model ref="generalOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
+    <a-form-model ref="generalOptionsForm" :model="options" :rules="rules" :wrapperCol="wrapperCol" layout="vertical">
       <a-form-model-item label="博客标题：" prop="blog_title">
         <a-input v-model="options.blog_title" />
       </a-form-model-item>
@@ -9,44 +9,44 @@
       </a-form-model-item>
       <a-form-model-item label="Logo：" prop="blog_logo">
         <a-input v-model="options.blog_logo">
-          <a href="javascript:void(0);" slot="addonAfter" @click="handleShowLogoSelector">
+          <a slot="addonAfter" href="javascript:void(0);" @click="handleShowLogoSelector">
             <a-icon type="picture" />
           </a>
         </a-input>
       </a-form-model-item>
       <a-form-model-item label="Favicon：" prop="blog_favicon">
         <a-input v-model="options.blog_favicon">
-          <a href="javascript:void(0);" slot="addonAfter" @click="handleShowFaviconSelector">
+          <a slot="addonAfter" href="javascript:void(0);" @click="handleShowFaviconSelector">
             <a-icon type="picture" />
           </a>
         </a-input>
       </a-form-model-item>
       <a-form-model-item label="页脚信息：" prop="blog_footer_info">
         <a-input
-          type="textarea"
-          :autoSize="{ minRows: 5 }"
           v-model="options.blog_footer_info"
+          :autoSize="{ minRows: 5 }"
           placeholder="支持 HTML 格式的文本"
+          type="textarea"
         />
       </a-form-model-item>
       <a-form-model-item>
         <ReactiveButton
-          type="primary"
-          @click="handleSaveOptions"
-          @callback="$emit('callback')"
-          :loading="saving"
           :errored="errored"
-          text="保存"
-          loadedText="保存成功"
+          :loading="saving"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存"
+          type="primary"
+          @callback="$emit('callback')"
+          @click="handleSaveOptions"
         ></ReactiveButton>
       </a-form-model-item>
     </a-form-model>
 
     <AttachmentSelectDrawer
       v-model="attachmentSelector.visible"
-      @listenToSelect="handleSelectAttachment"
       :title="attachmentSelectorTitle"
+      @listenToSelect="handleSelectAttachment"
     />
   </div>
 </template>

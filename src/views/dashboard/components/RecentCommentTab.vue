@@ -1,8 +1,8 @@
 <template>
-  <a-list itemLayout="horizontal" :dataSource="formmatedCommentData" :loading="loading">
-    <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+  <a-list :dataSource="formmatedCommentData" :loading="loading" itemLayout="horizontal">
+    <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
       <a-comment :avatar="item.avatar">
-        <template slot="author" v-if="type === 'posts'">
+        <template v-if="type === 'posts'" slot="author">
           <a :href="item.authorUrl" target="_blank">{{ item.author }}</a> 发表在 《<a
             v-if="['PUBLISHED', 'INTIMATE'].includes(item.post.status)"
             :href="item.post.fullPath"
@@ -16,7 +16,7 @@
           ><a v-else href="javascript:void(0)">{{ item.post.title }}</a>
           》
         </template>
-        <template slot="author" v-else-if="type === 'sheets'">
+        <template v-else-if="type === 'sheets'" slot="author">
           <a :href="item.authorUrl" target="_blank">{{ item.author }}</a> 发表在 《<a
             v-if="item.sheet.status === 'PUBLISHED'"
             :href="item.sheet.fullPath"
@@ -33,7 +33,7 @@
         <!-- <template slot="actions">
           <span>回复</span>
         </template> -->
-        <p class="comment-content-wrapper" slot="content" v-html="item.content"></p>
+        <p slot="content" class="comment-content-wrapper" v-html="item.content"></p>
         <a-tooltip slot="datetime" :title="item.createTime | moment">
           <span>{{ item.createTime | timeAgo }}</span>
         </a-tooltip>
@@ -43,11 +43,10 @@
 </template>
 
 <script>
-import commentApi from '@/api/comment'
-import postApi from '@/api/post'
-import sheetApi from '@/api/sheet'
+import apiClient from '@/utils/api-client'
 
 import marked from 'marked'
+
 export default {
   name: 'RecentCommentTab',
   props: {
@@ -80,24 +79,22 @@ export default {
   methods: {
     handleListTargetComments() {
       this.loading = true
-      commentApi
-        .latestComment(this.type, 5, 'PUBLISHED')
+      apiClient.comment
+        .latest(this.type, 5, 'PUBLISHED')
         .then(response => {
-          this.comments = response.data.data
+          this.comments = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.loading = false
-          }, 200)
+          this.loading = false
         })
     },
     handlePostPreview(postId) {
-      postApi.preview(postId).then(response => {
+      apiClient.post.getPreviewLinkById(postId).then(response => {
         window.open(response.data, '_blank')
       })
     },
     handleSheetPreview(sheetId) {
-      sheetApi.preview(sheetId).then(response => {
+      apiClient.post.getPreviewLinkById(sheetId).then(response => {
         window.open(response.data, '_blank')
       })
     }

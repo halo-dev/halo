@@ -1,7 +1,7 @@
 <template>
-  <a-modal title="附件详情" :width="isMobile() ? '100%' : '50%'" v-model="modalVisible">
-    <a-row type="flex" :gutter="24">
-      <a-col :xl="9" :lg="9" :md="24" :sm="24" :xs="24">
+  <a-modal v-model="modalVisible" :width="isMobile() ? '100%' : '50%'" title="附件详情">
+    <a-row :gutter="24" type="flex">
+      <a-col :lg="9" :md="24" :sm="24" :xl="9" :xs="24">
         <div class="attach-detail-img pb-3">
           <a v-if="isImage" :href="attachment.path" target="_blank">
             <img :src="attachment.path" class="w-full" loading="lazy" />
@@ -9,14 +9,14 @@
           <div v-else>此文件不支持预览</div>
         </div>
       </a-col>
-      <a-col :xl="15" :lg="15" :md="24" :sm="24" :xs="24">
+      <a-col :lg="15" :md="24" :sm="24" :xl="15" :xs="24">
         <a-list itemLayout="horizontal">
           <a-list-item style="padding-top: 0;">
             <a-list-item-meta>
-              <template slot="description" v-if="editable">
+              <template v-if="editable" slot="description">
                 <a-input ref="nameInput" v-model="attachment.name" @blur="handleUpdateName" />
               </template>
-              <template slot="description" v-else>{{ attachment.name }}</template>
+              <template v-else slot="description">{{ attachment.name }}</template>
               <span slot="title">
                 附件名：
                 <a href="javascript:void(0);">
@@ -89,16 +89,16 @@
 
     <template #footer>
       <slot name="extraFooter" />
-      <a-popconfirm title="你确定要删除该附件？" @confirm="handleDelete" okText="确定" cancelText="取消">
+      <a-popconfirm cancelText="取消" okText="确定" title="你确定要删除该附件？" @confirm="handleDelete">
         <ReactiveButton
-          type="danger"
-          @callback="handleDeletedCallback"
-          :loading="deleting"
           :errored="deleteErrored"
-          text="删除"
+          :loading="deleting"
+          erroredText="删除失败"
           icon="delete"
           loadedText="删除成功"
-          erroredText="删除失败"
+          text="删除"
+          type="danger"
+          @callback="handleDeletedCallback"
         ></ReactiveButton>
       </a-popconfirm>
     </template>
@@ -107,14 +107,53 @@
 
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
-import attachmentApi from '@/api/attachment'
+import apiClient from '@/utils/api-client'
+
+const attachmentType = {
+  LOCAL: {
+    type: 'LOCAL',
+    text: '本地'
+  },
+  SMMS: {
+    type: 'SMMS',
+    text: 'SM.MS'
+  },
+  UPOSS: {
+    type: 'UPOSS',
+    text: '又拍云'
+  },
+  QINIUOSS: {
+    type: 'QINIUOSS',
+    text: '七牛云'
+  },
+  ALIOSS: {
+    type: 'ALIOSS',
+    text: '阿里云'
+  },
+  BAIDUBOS: {
+    type: 'BAIDUBOS',
+    text: '百度云'
+  },
+  TENCENTCOS: {
+    type: 'TENCENTCOS',
+    text: '腾讯云'
+  },
+  HUAWEIOBS: {
+    type: 'HUAWEIOBS',
+    text: '华为云'
+  },
+  MINIO: {
+    type: 'MINIO',
+    text: 'MinIO'
+  }
+}
 
 export default {
   name: 'AttachmentDetailModal',
   mixins: [mixin, mixinDevice],
   filters: {
     typeText(type) {
-      return type ? attachmentApi.type[type].text : ''
+      return type ? attachmentType[type].text : ''
     }
   },
   props: {
@@ -158,7 +197,7 @@ export default {
       try {
         this.deleting = true
 
-        await attachmentApi.delete(this.attachment.id)
+        await apiClient.attachment.delete(this.attachment.id)
       } catch (error) {
         this.$log.error(error)
         this.deleteErrored = true
@@ -202,7 +241,7 @@ export default {
         return
       }
       try {
-        await attachmentApi.update(this.attachment.id, this.attachment)
+        await apiClient.attachment.update(this.attachment.id, this.attachment)
       } catch (error) {
         this.$log.error(error)
       } finally {

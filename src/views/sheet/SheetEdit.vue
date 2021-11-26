@@ -54,8 +54,7 @@ import { PageView } from '@/layouts'
 import SheetSettingDrawer from './components/SheetSettingDrawer'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
-
-import sheetApi from '@/api/sheet'
+import apiClient from '@/utils/api-client'
 
 export default {
   components: {
@@ -83,8 +82,8 @@ export default {
 
     next(vm => {
       if (sheetId) {
-        sheetApi.get(sheetId).then(response => {
-          const sheet = response.data.data
+        apiClient.sheet.get(sheetId).then(response => {
+          const sheet = response.data
           vm.sheetToStage = sheet
           vm.selectedMetas = sheet.metas
         })
@@ -143,8 +142,8 @@ export default {
       this.draftSaving = true
       if (this.sheetToStage.id) {
         if (draftOnly) {
-          sheetApi
-            .updateDraft(this.sheetToStage.id, this.sheetToStage.originalContent)
+          apiClient.sheet
+            .updateDraftById(this.sheetToStage.id, this.sheetToStage.originalContent)
             .then(() => {
               this.handleRestoreSavedStatus()
             })
@@ -157,10 +156,10 @@ export default {
               }, 400)
             })
         } else {
-          sheetApi
-            .update(this.sheetToStage.id, this.sheetToStage, false)
+          apiClient.sheet
+            .update(this.sheetToStage.id, this.sheetToStage)
             .then(response => {
-              this.sheetToStage = response.data.data
+              this.sheetToStage = response.data
               this.handleRestoreSavedStatus()
             })
             .catch(() => {
@@ -173,10 +172,10 @@ export default {
             })
         }
       } else {
-        sheetApi
-          .create(this.sheetToStage, false)
+        apiClient.sheet
+          .create(this.sheetToStage)
           .then(response => {
-            this.sheetToStage = response.data.data
+            this.sheetToStage = response.data
             this.handleRestoreSavedStatus()
           })
           .catch(() => {
@@ -196,10 +195,10 @@ export default {
       }
       this.previewSaving = true
       if (this.sheetToStage.id) {
-        sheetApi.update(this.sheetToStage.id, this.sheetToStage, false).then(response => {
-          this.$log.debug('Updated sheet', response.data.data)
-          sheetApi
-            .preview(this.sheetToStage.id)
+        apiClient.sheet.update(this.sheetToStage.id, this.sheetToStage).then(response => {
+          this.$log.debug('Updated sheet', response.data)
+          apiClient.sheet
+            .getPreviewLinkById(this.sheetToStage.id)
             .then(response => {
               window.open(response.data, '_blank')
               this.handleRestoreSavedStatus()
@@ -211,11 +210,11 @@ export default {
             })
         })
       } else {
-        sheetApi.create(this.sheetToStage, false).then(response => {
-          this.$log.debug('Created sheet', response.data.data)
-          this.sheetToStage = response.data.data
-          sheetApi
-            .preview(this.sheetToStage.id)
+        apiClient.sheet.create(this.sheetToStage).then(response => {
+          this.$log.debug('Created sheet', response.data)
+          this.sheetToStage = response.data
+          apiClient.sheet
+            .getPreviewLinkById(this.sheetToStage.id)
             .then(response => {
               window.open(response.data, '_blank')
               this.handleRestoreSavedStatus()

@@ -1,30 +1,30 @@
 <template>
   <a-drawer
-    title="页面设置"
+    :afterVisibleChange="handleAfterVisibleChanged"
+    :visible="visible"
     :width="isMobile() ? '100%' : '480'"
-    placement="right"
     closable
     destroyOnClose
+    placement="right"
+    title="页面设置"
     @close="onClose"
-    :visible="visible"
-    :afterVisibleChange="handleAfterVisibleChanged"
   >
     <div class="post-setting-drawer-content">
       <div class="mb-4">
         <h3 class="post-setting-drawer-title">基本设置</h3>
         <div class="post-setting-drawer-item">
           <a-form>
-            <a-form-item label="页面标题：" v-if="needTitle">
+            <a-form-item v-if="needTitle" label="页面标题：">
               <a-input v-model="selectedSheet.title" />
             </a-form-item>
-            <a-form-item label="页面别名：" :help="fullPath">
+            <a-form-item :help="fullPath" label="页面别名：">
               <a-input v-model="selectedSheet.slug">
                 <template #addonAfter>
                   <a-popconfirm
-                    title="是否确定根据标题重新生成别名？"
-                    ok-text="确定"
                     cancel-text="取消"
+                    ok-text="确定"
                     placement="left"
+                    title="是否确定根据标题重新生成别名？"
                     @confirm="handleSetPinyinSlug"
                   >
                     <a-icon class="cursor-pointer" type="sync" />
@@ -34,10 +34,10 @@
             </a-form-item>
             <a-form-item label="发表时间：">
               <a-date-picker
-                showTime
                 :defaultValue="pickerDefaultValue"
                 format="YYYY-MM-DD HH:mm:ss"
                 placeholder="选择页面发表时间"
+                showTime
                 @change="onSheetDateChange"
                 @ok="onSheetDateOk"
               />
@@ -48,7 +48,7 @@
                 <a-radio :value="true">关闭</a-radio>
               </a-radio-group>
             </a-form-item>
-            <a-form-item label="自定义模板：" v-if="customTpls.length > 0">
+            <a-form-item v-if="customTpls.length > 0" label="自定义模板：">
               <a-select v-model="selectedSheet.template" :loading="customTplsLoading">
                 <a-select-option key="" value="">无</a-select-option>
                 <a-select-option v-for="tpl in customTpls" :key="tpl" :value="tpl">{{ tpl }}</a-select-option>
@@ -65,10 +65,10 @@
           <a-form>
             <a-form-item>
               <a-input
-                type="textarea"
-                :autoSize="{ minRows: 5 }"
                 v-model="selectedSheet.summary"
+                :autoSize="{ minRows: 5 }"
                 placeholder="不填写则会自动生成"
+                type="textarea"
               />
             </a-form-item>
           </a-form>
@@ -82,8 +82,8 @@
           <div class="sheet-thumb">
             <a-space direction="vertical">
               <img
-                class="img"
                 :src="selectedSheet.thumbnail || '/images/placeholder.jpg'"
+                class="img"
                 @click="thumbDrawerVisible = true"
               />
               <a-input v-model="selectedSheet.thumbnail" placeholder="点击封面图选择图片，或者输入外部链接"></a-input>
@@ -94,16 +94,16 @@
       </div>
       <a-divider class="divider-transparent" />
     </div>
-    <AttachmentSelectDrawer v-model="thumbDrawerVisible" @listenToSelect="handleSelectSheetThumb" :drawerWidth="480" />
+    <AttachmentSelectDrawer v-model="thumbDrawerVisible" :drawerWidth="480" @listenToSelect="handleSelectSheetThumb" />
 
     <a-drawer
-      title="高级设置"
+      :visible="advancedVisible"
       :width="isMobile() ? '100%' : '480'"
-      placement="right"
       closable
       destroyOnClose
+      placement="right"
+      title="高级设置"
       @close="advancedVisible = false"
-      :visible="advancedVisible"
     >
       <div class="post-setting-drawer-content">
         <div class="mb-4">
@@ -115,10 +115,10 @@
               </a-form-item>
               <a-form-item label="自定义描述：">
                 <a-input
-                  type="textarea"
-                  :autoSize="{ minRows: 5 }"
                   v-model="selectedSheet.metaDescription"
+                  :autoSize="{ minRows: 5 }"
                   placeholder="如不填写，会从页面中自动截取"
+                  type="textarea"
                 />
               </a-form-item>
             </a-form>
@@ -136,7 +136,7 @@
                 <a-col :span="12">
                   <a-input v-model="meta.value">
                     <i slot="addonBefore">V</i>
-                    <a href="javascript:void(0);" slot="addonAfter" @click.prevent="handleRemoveSheetMeta(meta)">
+                    <a slot="addonAfter" href="javascript:void(0);" @click.prevent="handleRemoveSheetMeta(meta)">
                       <a-icon type="close" />
                     </a>
                   </a-input>
@@ -161,24 +161,24 @@
       <a-space>
         <a-button type="dashed" @click="advancedVisible = true">高级</a-button>
         <ReactiveButton
-          type="danger"
           v-if="saveDraftButton"
-          @click="handleDraftClick"
-          @callback="handleSavedCallback"
-          :loading="draftSaving"
           :errored="draftSaveErrored"
-          text="保存草稿"
-          loadedText="保存成功"
+          :loading="draftSaving"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存草稿"
+          type="danger"
+          @callback="handleSavedCallback"
+          @click="handleDraftClick"
         ></ReactiveButton>
         <ReactiveButton
-          @click="handlePublishClick()"
-          @callback="handleSavedCallback"
-          :loading="saving"
           :errored="saveErrored"
-          :text="`${selectedSheet.id ? '保存' : '发布'}`"
-          :loadedText="`${selectedSheet.id ? '保存' : '发布'}成功`"
           :erroredText="`${selectedSheet.id ? '保存' : '发布'}失败`"
+          :loadedText="`${selectedSheet.id ? '保存' : '发布'}成功`"
+          :loading="saving"
+          :text="`${selectedSheet.id ? '保存' : '发布'}`"
+          @callback="handleSavedCallback"
+          @click="handlePublishClick()"
         ></ReactiveButton>
       </a-space>
     </div>
@@ -192,8 +192,8 @@ import { mapGetters } from 'vuex'
 import pinyin from 'tiny-pinyin'
 
 // apis
-import themeApi from '@/api/theme'
-import sheetApi from '@/api/sheet'
+import apiClient from '@/utils/api-client'
+
 export default {
   name: 'SheetSettingDrawer',
   mixins: [mixin, mixinDevice],
@@ -287,8 +287,8 @@ export default {
     },
     handleListPresetMetasField() {
       if (this.metas.length <= 0) {
-        themeApi.getActivatedTheme().then(response => {
-          const fields = response.data.data.sheetMetaField
+        apiClient.theme.getActivatedTheme().then(response => {
+          const fields = response.data.sheetMetaField
           if (fields && fields.length > 0) {
             for (let i = 0, len = fields.length; i < len; i++) {
               this.selectedMetas.push({
@@ -302,15 +302,13 @@ export default {
     },
     handleListCustomTpls() {
       this.customTplsLoading = true
-      themeApi
-        .customSheetTpls()
+      apiClient.theme
+        .listCustomSheetTemplates()
         .then(response => {
-          this.customTpls = response.data.data
+          this.customTpls = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.customTplsLoading = false
-          }, 200)
+          this.customTplsLoading = false
         })
     },
     handleSelectSheetThumb(data) {
@@ -340,8 +338,8 @@ export default {
         this.saving = true
       }
       if (this.selectedSheet.id) {
-        sheetApi
-          .update(this.selectedSheet.id, this.selectedSheet, false)
+        apiClient.sheet
+          .update(this.selectedSheet.id, this.selectedSheet)
           .catch(() => {
             if (this.selectedSheet.status === 'DRAFT') {
               this.draftSaveErrored = true
@@ -356,8 +354,8 @@ export default {
             }, 400)
           })
       } else {
-        sheetApi
-          .create(this.selectedSheet, false)
+        apiClient.sheet
+          .create(this.selectedSheet)
           .catch(() => {
             if (this.selectedSheet.status === 'DRAFT') {
               this.draftSaveErrored = true
@@ -366,7 +364,7 @@ export default {
             }
           })
           .then(response => {
-            this.selectedSheet = response.data.data
+            this.selectedSheet = response.data
           })
           .finally(() => {
             setTimeout(() => {

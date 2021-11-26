@@ -1,21 +1,21 @@
 <template>
   <a-popover
     v-model="visible"
-    trigger="click"
-    placement="bottomRight"
-    :autoAdjustOverflow="true"
     :arrowPointAtCenter="true"
+    :autoAdjustOverflow="true"
     :overlayStyle="{ width: '300px', top: '50px' }"
+    placement="bottomRight"
     title="待审核评论"
+    trigger="click"
   >
     <template slot="content">
       <div class="custom-tab-wrapper">
-        <a-tabs v-model="activeKey" @change="handleTabsChanged" :animated="{ inkBar: true, tabPane: false }">
-          <a-tab-pane tab="文章" key="post">
-            <a-list :loading="postCommentsLoading" :dataSource="converttedPostComments">
+        <a-tabs v-model="activeKey" :animated="{ inkBar: true, tabPane: false }" @change="handleTabsChanged">
+          <a-tab-pane key="post" tab="文章">
+            <a-list :dataSource="converttedPostComments" :loading="postCommentsLoading">
               <a-list-item slot="renderItem" slot-scope="item">
                 <a-list-item-meta>
-                  <a-avatar class="bg-white" slot="avatar" :src="item.avatar" size="large" />
+                  <a-avatar slot="avatar" :src="item.avatar" class="bg-white" size="large" />
                   <template slot="title">
                     <a :href="item.authorUrl" target="_blank">{{ item.author }}</a
                     >：<span v-html="item.content"></span>
@@ -27,11 +27,11 @@
               </a-list-item>
             </a-list>
           </a-tab-pane>
-          <a-tab-pane tab="页面" key="sheet">
-            <a-list :loading="sheetCommentsLoading" :dataSource="converttedSheetComments">
+          <a-tab-pane key="sheet" tab="页面">
+            <a-list :dataSource="converttedSheetComments" :loading="sheetCommentsLoading">
               <a-list-item slot="renderItem" slot-scope="item">
                 <a-list-item-meta>
-                  <a-avatar class="bg-white" slot="avatar" :src="item.avatar" size="large" />
+                  <a-avatar slot="avatar" :src="item.avatar" class="bg-white" size="large" />
                   <template slot="title">
                     <a :href="item.authorUrl" target="_blank">{{ item.author }}</a
                     >：<span v-html="item.content"></span>
@@ -47,7 +47,7 @@
       </div>
     </template>
     <span class="header-comment">
-      <a-badge dot v-if="postComments.length > 0 || sheetComments.length > 0">
+      <a-badge v-if="postComments.length > 0 || sheetComments.length > 0" dot>
         <a-icon type="bell" />
       </a-badge>
       <a-badge v-else>
@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import commentApi from '@/api/comment'
+import apiClient from '@/utils/api-client'
 import marked from 'marked'
 
 export default {
@@ -107,30 +107,26 @@ export default {
       if (enableLoading) {
         this.postCommentsLoading = true
       }
-      commentApi
-        .latestComment('posts', 5, 'AUDITING')
+      apiClient.comment
+        .latest('posts', 5, 'AUDITING')
         .then(response => {
-          this.postComments = response.data.data
+          this.postComments = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.postCommentsLoading = false
-          }, 200)
+          this.postCommentsLoading = false
         })
     },
     handleListSheetAuditingComments(enableLoading = true) {
       if (enableLoading) {
         this.sheetCommentsLoading = true
       }
-      commentApi
-        .latestComment('sheets', 5, 'AUDITING')
+      apiClient.comment
+        .latest('sheets', 5, 'AUDITING')
         .then(response => {
-          this.sheetComments = response.data.data
+          this.sheetComments = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.sheetCommentsLoading = false
-          }, 200)
+          this.sheetCommentsLoading = false
         })
     },
     handleTabsChanged(activeKey) {

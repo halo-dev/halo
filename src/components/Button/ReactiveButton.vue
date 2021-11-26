@@ -1,13 +1,13 @@
 <template>
   <a-button
-    :type="computedType"
-    @click="handleClick"
+    :block="block"
     :icon="computedIcon"
     :loading="loading"
     :size="size"
-    :block="block"
-    >{{ computedText }}</a-button
-  >
+    :type="computedType"
+    @click="handleClick"
+    >{{ computedText }}
+  </a-button>
 </template>
 <script>
 export default {

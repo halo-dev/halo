@@ -1,18 +1,18 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col :xl="10" :lg="10" :md="10" :sm="24" :xs="24" class="pb-3">
-        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
+      <a-col :lg="10" :md="10" :sm="24" :xl="10" :xs="24" class="pb-3">
+        <a-card :bodyStyle="{ padding: '16px' }" :title="title">
           <a-form-model ref="tagForm" :model="form.model" :rules="form.rules" layout="horizontal">
-            <a-form-model-item label="名称：" help="* 页面上所显示的名称" prop="name">
+            <a-form-model-item help="* 页面上所显示的名称" label="名称：" prop="name">
               <a-input v-model="form.model.name" />
             </a-form-model-item>
-            <a-form-model-item label="别名：" help="* 一般为单个标签页面的标识，最好为英文" prop="slug">
+            <a-form-model-item help="* 一般为单个标签页面的标识，最好为英文" label="别名：" prop="slug">
               <a-input v-model="form.model.slug" />
             </a-form-model-item>
-            <a-form-model-item label="封面图：" help="* 在标签页面可展示，需要主题支持" prop="thumbnail">
+            <a-form-model-item help="* 在标签页面可展示，需要主题支持" label="封面图：" prop="thumbnail">
               <a-input v-model="form.model.thumbnail">
-                <a href="javascript:void(0);" slot="addonAfter" @click="thumbnailDrawer.visible = true">
+                <a slot="addonAfter" href="javascript:void(0);" @click="thumbnailDrawer.visible = true">
                   <a-icon type="picture" />
                 </a>
               </a-input>
@@ -20,52 +20,52 @@
             <a-form-model-item>
               <ReactiveButton
                 v-if="!isUpdateMode"
-                type="primary"
-                @click="handleCreateOrUpdateTag"
-                @callback="handleSavedCallback"
-                :loading="form.saving"
                 :errored="form.errored"
-                text="保存"
-                loadedText="保存成功"
+                :loading="form.saving"
                 erroredText="保存失败"
+                loadedText="保存成功"
+                text="保存"
+                type="primary"
+                @callback="handleSavedCallback"
+                @click="handleCreateOrUpdateTag"
               ></ReactiveButton>
               <a-button-group v-else>
                 <ReactiveButton
-                  type="primary"
-                  @click="handleCreateOrUpdateTag"
-                  @callback="handleSavedCallback"
-                  :loading="form.saving"
                   :errored="form.errored"
-                  text="更新"
-                  loadedText="更新成功"
+                  :loading="form.saving"
                   erroredText="更新失败"
+                  loadedText="更新成功"
+                  text="更新"
+                  type="primary"
+                  @callback="handleSavedCallback"
+                  @click="handleCreateOrUpdateTag"
                 ></ReactiveButton>
                 <a-button type="dashed" @click="form.model = {}">返回添加</a-button>
               </a-button-group>
               <a-popconfirm
-                :title="'你确定要删除【' + form.model.name + '】标签？'"
-                @confirm="handleDeleteTag(form.model.id)"
-                okText="确定"
-                cancelText="取消"
                 v-if="isUpdateMode"
+                :title="'你确定要删除【' + form.model.name + '】标签？'"
+                cancelText="取消"
+                okText="确定"
+                @confirm="handleDeleteTag(form.model.id)"
               >
-                <a-button type="danger" class="float-right">删除</a-button>
+                <a-button class="float-right" type="danger">删除</a-button>
               </a-popconfirm>
             </a-form-model-item>
           </a-form-model>
         </a-card>
       </a-col>
-      <a-col :xl="14" :lg="14" :md="14" :sm="24" :xs="24" class="pb-3">
-        <a-card title="所有标签" :bodyStyle="{ padding: '16px' }">
+      <a-col :lg="14" :md="14" :sm="24" :xl="14" :xs="24" class="pb-3">
+        <a-card :bodyStyle="{ padding: '16px' }" title="所有标签">
           <a-spin :spinning="list.loading">
             <a-empty v-if="list.data.length === 0" />
-            <a-tooltip placement="topLeft" v-for="tag in list.data" :key="tag.id" v-else>
+            <a-tooltip v-for="tag in list.data" v-else :key="tag.id" placement="topLeft">
               <template slot="title">
                 <span>{{ tag.postCount }} 篇文章</span>
               </template>
-              <a-tag color="blue" style="margin-bottom: 8px;cursor:pointer;" @click="form.model = tag">{{
-                tag.name
-              }}</a-tag>
+              <a-tag color="blue" style="margin-bottom: 8px;cursor:pointer;" @click="form.model = tag"
+                >{{ tag.name }}
+              </a-tag>
             </a-tooltip>
           </a-spin>
         </a-card>
@@ -74,15 +74,15 @@
 
     <AttachmentSelectDrawer
       v-model="thumbnailDrawer.visible"
-      @listenToSelect="handleSelectThumbnail"
       title="选择封面图"
+      @listenToSelect="handleSelectThumbnail"
     />
   </page-view>
 </template>
 
 <script>
 import { PageView } from '@/layouts'
-import tagApi from '@/api/tag'
+import apiClient from '@/utils/api-client'
 
 export default {
   components: { PageView },
@@ -127,19 +127,17 @@ export default {
   methods: {
     handleListTags() {
       this.list.loading = true
-      tagApi
-        .listAll(true)
+      apiClient.tag
+        .list({ more: true })
         .then(response => {
-          this.list.data = response.data.data
+          this.list.data = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.list.loading = false
-          }, 200)
+          this.list.loading = false
         })
     },
     handleDeleteTag(tagId) {
-      tagApi.delete(tagId).finally(() => {
+      apiClient.tag.delete(tagId).finally(() => {
         this.form.model = {}
         this.handleListTags()
       })
@@ -150,7 +148,7 @@ export default {
         if (valid) {
           this.form.saving = true
           if (_this.isUpdateMode) {
-            tagApi
+            apiClient.tag
               .update(_this.form.model.id, _this.form.model)
               .catch(() => {
                 this.form.errored = true
@@ -161,7 +159,7 @@ export default {
                 }, 400)
               })
           } else {
-            tagApi
+            apiClient.tag
               .create(_this.form.model)
               .catch(() => {
                 this.form.errored = true

@@ -1,6 +1,6 @@
 <template>
   <div class="exception">
-    <a-result :status="type" :title="type" :subTitle="config[type].desc">
+    <a-result :status="type" :subTitle="config[type].desc" :title="type">
       <template v-slot:extra>
         <a-button type="primary" @click="handleToHome">返回仪表盘</a-button>
       </template>

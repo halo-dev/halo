@@ -166,8 +166,7 @@ import pinyin from 'tiny-pinyin'
 import { mapGetters } from 'vuex'
 
 // apis
-import postApi from '@/api/post'
-import themeApi from '@/api/theme'
+import apiClient from '@/utils/api-client'
 
 export default {
   name: 'PostSettingModal',
@@ -303,9 +302,9 @@ export default {
         this.form[status === 'PUBLISHED' ? 'saving' : 'draftSaving'] = true
 
         if (id) {
-          await postApi.update(id, this.form.model, false)
+          await apiClient.post.update(id, this.form.model)
         } else {
-          await postApi.create(this.form.model, false)
+          await apiClient.post.create(this.form.model)
         }
       } catch (error) {
         this.form[status === 'PUBLISHED' ? 'saveErrored' : 'draftSaveErrored'] = true
@@ -335,9 +334,9 @@ export default {
      */
     async handleListCustomTemplates() {
       try {
-        const response = await themeApi.customPostTpls()
+        const response = await apiClient.theme.listCustomPostTemplates()
 
-        this.templates = response.data.data
+        this.templates = response.data
       } catch (error) {
         this.$log.error(error)
       }

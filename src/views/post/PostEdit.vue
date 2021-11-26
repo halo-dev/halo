@@ -51,8 +51,7 @@ import PostSettingModal from './components/PostSettingModal'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 import { PageView } from '@/layouts'
-
-import postApi from '@/api/post'
+import apiClient from '@/utils/api-client'
 
 export default {
   mixins: [mixin, mixinDevice, mixinPostEdit],
@@ -78,8 +77,8 @@ export default {
     const postId = to.query.postId
     next(vm => {
       if (postId) {
-        postApi.get(postId).then(response => {
-          vm.postToStage = response.data.data
+        apiClient.post.get(postId).then(response => {
+          vm.postToStage = response.data
         })
       }
     })
@@ -132,8 +131,8 @@ export default {
       if (this.postToStage.id) {
         // Update the post
         if (draftOnly) {
-          postApi
-            .updateDraft(this.postToStage.id, this.postToStage.originalContent)
+          apiClient.post
+            .updateDraftById(this.postToStage.id, this.postToStage.originalContent)
             .then(() => {
               this.handleRestoreSavedStatus()
             })
@@ -146,10 +145,10 @@ export default {
               }, 400)
             })
         } else {
-          postApi
-            .update(this.postToStage.id, this.postToStage, false)
+          apiClient.post
+            .update(this.postToStage.id, this.postToStage)
             .then(response => {
-              this.postToStage = response.data.data
+              this.postToStage = response.data
               this.handleRestoreSavedStatus()
             })
             .catch(() => {
@@ -163,10 +162,10 @@ export default {
         }
       } else {
         // Create the post
-        postApi
-          .create(this.postToStage, false)
+        apiClient.post
+          .create(this.postToStage)
           .then(response => {
-            this.postToStage = response.data.data
+            this.postToStage = response.data
             this.handleRestoreSavedStatus()
           })
           .catch(() => {
@@ -187,10 +186,10 @@ export default {
       this.previewSaving = true
       if (this.postToStage.id) {
         // Update the post
-        postApi.update(this.postToStage.id, this.postToStage, false).then(response => {
-          this.$log.debug('Updated post', response.data.data)
-          postApi
-            .preview(this.postToStage.id)
+        apiClient.post.update(this.postToStage.id, this.postToStage).then(response => {
+          this.$log.debug('Updated post', response.data)
+          apiClient.post
+            .getPreviewLinkById(this.postToStage.id)
             .then(response => {
               window.open(response.data, '_blank')
               this.handleRestoreSavedStatus()
@@ -203,11 +202,11 @@ export default {
         })
       } else {
         // Create the post
-        postApi.create(this.postToStage, false).then(response => {
-          this.$log.debug('Created post', response.data.data)
-          this.postToStage = response.data.data
-          postApi
-            .preview(this.postToStage.id)
+        apiClient.post.create(this.postToStage).then(response => {
+          this.$log.debug('Created post', response.data)
+          this.postToStage = response.data
+          apiClient.post
+            .getPreviewLinkById(this.postToStage.id)
             .then(response => {
               window.open(response.data, '_blank')
               this.handleRestoreSavedStatus()

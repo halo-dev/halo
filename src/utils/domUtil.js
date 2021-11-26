@@ -2,7 +2,7 @@ export const setDocumentTitle = function(title) {
   document.title = title
   const ua = navigator.userAgent
   // eslint-disable-next-line
-    const regex = /\bMicroMessenger\/([\d\.]+)/
+  const regex = /\bMicroMessenger\/([\d\.]+)/
   if (regex.test(ua) && /ip(hone|od|ad)/i.test(ua)) {
     const i = document.createElement('iframe')
     i.src = '/favicon.ico'

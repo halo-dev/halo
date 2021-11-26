@@ -3,13 +3,13 @@
     <!-- Mobile -->
     <a-list
       v-if="isMobile()"
-      itemLayout="vertical"
-      size="large"
-      :pagination="false"
       :dataSource="independentSheets"
       :loading="loading"
+      :pagination="false"
+      itemLayout="vertical"
+      size="large"
     >
-      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+      <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
         <template slot="actions">
           <span>
             <router-link :to="{ name: item.routeName }">
@@ -31,8 +31,8 @@
             slot="title"
             style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
-            <a :href="item.fullPath" target="_blank" v-if="item.available">{{ item.title }}</a>
-            <a :href="item.fullPath" target="_blank" disabled v-else>{{ item.title }}</a>
+            <a v-if="item.available" :href="item.fullPath" target="_blank">{{ item.title }}</a>
+            <a v-else :href="item.fullPath" disabled target="_blank">{{ item.title }}</a>
           </span>
         </a-list-item-meta>
       </a-list-item>
@@ -43,9 +43,9 @@
       v-else
       :columns="independentColumns"
       :dataSource="independentSheets"
+      :loading="loading"
       :pagination="false"
       :rowKey="sheet => sheet.id"
-      :loading="loading"
     >
       <template slot="available" slot-scope="available">
         <span v-if="available">可用</span>
@@ -61,15 +61,16 @@
           <a href="javascript:void(0);">管理</a>
         </router-link>
         <a-divider type="vertical" />
-        <a :href="record.fullPath" target="_blank" v-if="record.available">访问</a>
-        <a :href="record.fullPath" target="_blank" disabled v-else>访问</a>
+        <a v-if="record.available" :href="record.fullPath" target="_blank">访问</a>
+        <a v-else :href="record.fullPath" disabled target="_blank">访问</a>
       </span>
     </a-table>
   </div>
 </template>
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
-import sheetApi from '@/api/sheet'
+import apiClient from '@/utils/api-client'
+
 const independentColumns = [
   {
     title: '页面名称',
@@ -102,21 +103,19 @@ export default {
     }
   },
   created() {
-    this.loadIndependentSheets()
+    this.handleListIndependentSheets()
   },
   methods: {
-    loadIndependentSheets() {
-      this.loading = true
-      sheetApi
-        .listIndependent()
-        .then(response => {
-          this.independentSheets = response.data.data
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.loading = false
-          }, 200)
-        })
+    async handleListIndependentSheets() {
+      try {
+        const { data } = await apiClient.sheet.listIndependents()
+
+        this.independentSheets = data
+      } catch (e) {
+        this.$log.error(e)
+      } finally {
+        this.loading = false
+      }
     }
   }
 }

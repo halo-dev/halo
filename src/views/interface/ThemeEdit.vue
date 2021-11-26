@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import themeApi from '@/api/theme'
+import apiClient from '@/utils/api-client'
 import ThemeFile from './components/ThemeFile'
 import { PageView } from '@/layouts'
 import Codemirror from '@/components/Codemirror/Codemirror'
@@ -90,10 +90,10 @@ export default {
   methods: {
     handleListThemes() {
       this.themes.loading = true
-      themeApi
+      apiClient.theme
         .list()
         .then(response => {
-          this.themes.data = response.data.data
+          this.themes.data = response.data
 
           const activatedTheme = this.themes.data.find(item => item.activated)
 
@@ -109,10 +109,10 @@ export default {
     onSelectTheme(themeId) {
       this.files.data = []
       this.files.loading = true
-      themeApi
+      apiClient.theme
         .listFiles(themeId)
         .then(response => {
-          this.files.data = response.data.data
+          this.files.data = response.data
           this.files.content = ''
           this.files.selected = {}
         })
@@ -140,16 +140,16 @@ export default {
           }
         })
       }
-      themeApi.getContent(this.themes.selectedId, file.path).then(response => {
-        this.files.content = response.data.data
+      apiClient.theme.getTemplateContent(this.themes.selectedId, file.path).then(response => {
+        this.files.content = response.data
         this.files.selected = file
         this.handleInitEditor()
       })
     },
     handlerSaveContent() {
       this.files.saving = true
-      themeApi
-        .saveContent(this.themes.selectedId, this.files.selected.path, this.files.content)
+      apiClient.theme
+        .updateTemplateContent(this.themes.selectedId, { path: this.files.selected.path, content: this.files.content })
         .catch(() => {
           this.files.saveErrored = true
         })

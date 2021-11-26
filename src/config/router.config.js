@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import { BasicLayout, PageView, BlankLayout } from '@/layouts'
+import { BasicLayout, BlankLayout, PageView } from '@/layouts'
 
 export const asyncRouterMap = [
   {

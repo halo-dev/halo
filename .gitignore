@@ -21,3 +21,8 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# NodeJs package manager 
+
+yarn.lock
+package-lock.json

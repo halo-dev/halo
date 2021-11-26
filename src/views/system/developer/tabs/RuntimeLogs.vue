@@ -22,8 +22,8 @@
 <script>
 import Codemirror from '@/components/Codemirror/Codemirror'
 import { java } from '@codemirror/lang-java'
-import adminApi from '@/api/admin'
 import { datetimeFormat } from '@/utils/datetime'
+import apiClient from '@/utils/api-client'
 
 export default {
   name: 'RuntimeLogs',
@@ -47,10 +47,10 @@ export default {
   methods: {
     handleLoadLogsLines() {
       this.loading = true
-      adminApi
-        .getLogFiles(this.logLines)
+      apiClient
+        .getLogFile(this.logLines)
         .then(response => {
-          this.logContent = response.data.data
+          this.logContent = response.data
           this.$nextTick(() => {
             this.$refs.editor.handleInitCodemirror()
             const scrollerView = this.$el.querySelector('.cm-scroller')
@@ -64,10 +64,10 @@ export default {
     handleDownloadLogFile() {
       const hide = this.$message.loading('下载中...', 0)
       this.downloading = true
-      adminApi
-        .getLogFiles(this.logLines)
+      apiClient
+        .getLogFile(this.logLines)
         .then(response => {
-          const blob = new Blob([response.data.data])
+          const blob = new Blob([response.data])
           const downloadElement = document.createElement('a')
           const href = window.URL.createObjectURL(blob)
           downloadElement.href = href

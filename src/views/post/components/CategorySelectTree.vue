@@ -1,11 +1,11 @@
 <template>
   <a-tree-select
+    :allowClear="true"
     :treeData="categoryTreeData"
+    :treeDataSimpleMode="true"
+    :value="categoryIdString"
     placeholder="请选择上级目录，默认为顶级目录"
     treeDefaultExpandAll
-    :treeDataSimpleMode="true"
-    :allowClear="true"
-    :value="categoryIdString"
     @change="handleSelectionChange"
   >
   </a-tree-select>

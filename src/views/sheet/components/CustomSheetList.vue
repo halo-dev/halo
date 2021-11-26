@@ -3,13 +3,13 @@
     <!-- Mobile -->
     <a-list
       v-if="isMobile()"
+      :dataSource="formattedSheets"
+      :loading="list.loading"
+      :pagination="false"
       itemLayout="vertical"
       size="large"
-      :pagination="false"
-      :dataSource="formattedSheets"
-      :loading="loading"
     >
-      <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+      <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
         <template slot="actions">
           <span>
             <a-icon type="eye" />
@@ -19,7 +19,7 @@
             <a-icon type="message" />
             {{ item.commentCount }}
           </span>
-          <a-dropdown placement="topLeft" :trigger="['click']">
+          <a-dropdown :trigger="['click']" placement="topLeft">
             <span>
               <a-icon type="bars" />
             </span>
@@ -30,9 +30,9 @@
               <a-menu-item v-else-if="item.status === 'RECYCLE'">
                 <a-popconfirm
                   :title="'你确定要发布【' + item.title + '】页面？'"
-                  @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
-                  okText="确定"
                   cancelText="取消"
+                  okText="确定"
+                  @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
                 >
                   <a href="javascript:void(0);">还原</a>
                 </a-popconfirm>
@@ -40,9 +40,9 @@
               <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
                 <a-popconfirm
                   :title="'你确定要将【' + item.title + '】页面移到回收站？'"
-                  @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
-                  okText="确定"
                   cancelText="取消"
+                  okText="确定"
+                  @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
                 >
                   <a href="javascript:void(0);">回收站</a>
                 </a-popconfirm>
@@ -50,15 +50,15 @@
               <a-menu-item v-else-if="item.status === 'RECYCLE'">
                 <a-popconfirm
                   :title="'你确定要永久删除【' + item.title + '】页面？'"
-                  @confirm="handleDeleteClick(item.id)"
-                  okText="确定"
                   cancelText="取消"
+                  okText="确定"
+                  @confirm="handleDeleteClick(item.id)"
                 >
                   <a href="javascript:void(0);">删除</a>
                 </a-popconfirm>
               </a-menu-item>
               <a-menu-item>
-                <a rel="noopener noreferrer" href="javascript:void(0);" @click="handleShowSheetSettings(item)">设置</a>
+                <a href="javascript:void(0);" rel="noopener noreferrer" @click="handleShowSheetSettings(item)">设置</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -76,18 +76,18 @@
             slot="title"
             style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
           >
-            <a v-if="item.status === 'PUBLISHED'" :href="item.fullPath" target="_blank" class="no-underline">
-              <a-tooltip placement="top" :title="'点击访问【' + item.title + '】'">{{ item.title }}</a-tooltip>
+            <a v-if="item.status === 'PUBLISHED'" :href="item.fullPath" class="no-underline" target="_blank">
+              <a-tooltip :title="'点击访问【' + item.title + '】'" placement="top">{{ item.title }}</a-tooltip>
             </a>
             <a
               v-else-if="item.status === 'DRAFT'"
-              href="javascript:void(0)"
               class="no-underline"
+              href="javascript:void(0)"
               @click="handlePreview(item.id)"
             >
-              <a-tooltip placement="topLeft" :title="'点击预览【' + item.title + '】'">{{ item.title }}</a-tooltip>
+              <a-tooltip :title="'点击预览【' + item.title + '】'" placement="topLeft">{{ item.title }}</a-tooltip>
             </a>
-            <a v-else href="javascript:void(0);" class="no-underline" disabled>
+            <a v-else class="no-underline" disabled href="javascript:void(0);">
               {{ item.title }}
             </a>
           </span>
@@ -99,26 +99,26 @@
     <!-- Desktop -->
     <a-table
       v-else
-      :rowKey="sheet => sheet.id"
       :columns="customColumns"
       :dataSource="formattedSheets"
+      :loading="list.loading"
       :pagination="false"
-      :loading="loading"
+      :rowKey="sheet => sheet.id"
       :scrollToFirstRowOnChange="true"
     >
       <span slot="sheetTitle" slot-scope="text, record">
-        <a v-if="record.status === 'PUBLISHED'" :href="record.fullPath" target="_blank" class="no-underline">
-          <a-tooltip placement="top" :title="'点击访问【' + text + '】'">{{ text }}</a-tooltip>
+        <a v-if="record.status === 'PUBLISHED'" :href="record.fullPath" class="no-underline" target="_blank">
+          <a-tooltip :title="'点击访问【' + text + '】'" placement="top">{{ text }}</a-tooltip>
         </a>
         <a
           v-else-if="record.status === 'DRAFT'"
-          href="javascript:void(0)"
           class="no-underline"
+          href="javascript:void(0)"
           @click="handlePreview(record.id)"
         >
-          <a-tooltip placement="topLeft" :title="'点击预览【' + text + '】'">{{ text }}</a-tooltip>
+          <a-tooltip :title="'点击预览【' + text + '】'" placement="topLeft">{{ text }}</a-tooltip>
         </a>
-        <a v-else href="javascript:void(0);" class="no-underline" disabled>
+        <a v-else class="no-underline" disabled href="javascript:void(0);">
           {{ text }}
         </a>
       </span>
@@ -130,19 +130,19 @@
       <span
         slot="commentCount"
         slot-scope="text, record"
-        @click="handleShowSheetComments(record)"
         class="cursor-pointer"
+        @click="handleShowSheetComments(record)"
       >
         <a-badge
           :count="record.commentCount"
           :numberStyle="{ backgroundColor: '#f38181' }"
-          :showZero="true"
           :overflowCount="999"
+          :showZero="true"
         />
       </span>
 
       <span slot="visits" slot-scope="visits">
-        <a-badge :count="visits" :numberStyle="{ backgroundColor: '#00e0ff' }" :showZero="true" :overflowCount="9999" />
+        <a-badge :count="visits" :numberStyle="{ backgroundColor: '#00e0ff' }" :overflowCount="9999" :showZero="true" />
       </span>
 
       <span slot="createTime" slot-scope="createTime">
@@ -156,18 +156,18 @@
 
       <span slot="action" slot-scope="text, sheet">
         <a
+          v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
           href="javascript:void(0);"
           @click="handleEditClick(sheet)"
-          v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
           >编辑</a
         >
 
         <a-popconfirm
-          :title="'你确定要发布【' + sheet.title + '】？'"
-          @confirm="handleEditStatusClick(sheet.id, 'PUBLISHED')"
-          okText="确定"
-          cancelText="取消"
           v-else-if="sheet.status === 'RECYCLE'"
+          :title="'你确定要发布【' + sheet.title + '】？'"
+          cancelText="取消"
+          okText="确定"
+          @confirm="handleEditStatusClick(sheet.id, 'PUBLISHED')"
         >
           <a href="javascript:void(0);">还原</a>
         </a-popconfirm>
@@ -175,21 +175,21 @@
         <a-divider type="vertical" />
 
         <a-popconfirm
-          :title="'你确定要将【' + sheet.title + '】页面移到回收站？'"
-          @confirm="handleEditStatusClick(sheet.id, 'RECYCLE')"
-          okText="确定"
-          cancelText="取消"
           v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
+          :title="'你确定要将【' + sheet.title + '】页面移到回收站？'"
+          cancelText="取消"
+          okText="确定"
+          @confirm="handleEditStatusClick(sheet.id, 'RECYCLE')"
         >
           <a href="javascript:void(0);">回收站</a>
         </a-popconfirm>
 
         <a-popconfirm
-          :title="'你确定要永久删除【' + sheet.title + '】页面？'"
-          @confirm="handleDeleteClick(sheet.id)"
-          okText="确定"
-          cancelText="取消"
           v-else-if="sheet.status === 'RECYCLE'"
+          :title="'你确定要永久删除【' + sheet.title + '】页面？'"
+          cancelText="取消"
+          okText="确定"
+          @confirm="handleDeleteClick(sheet.id)"
         >
           <a href="javascript:void(0);">删除</a>
         </a-popconfirm>
@@ -199,34 +199,34 @@
     </a-table>
     <div class="page-wrapper">
       <a-pagination
-        class="pagination"
         :current="pagination.page"
-        :total="pagination.total"
         :defaultPageSize="pagination.size"
-        :pageSizeOptions="['1', '2', '5', '10', '20', '50', '100']"
-        showSizeChanger
-        @showSizeChange="handlePaginationChange"
-        @change="handlePaginationChange"
+        :pageSizeOptions="['10', '20', '50', '100']"
+        :total="pagination.total"
+        class="pagination"
         showLessItems
+        showSizeChanger
+        @change="handlePageChange"
+        @showSizeChange="handlePageSizeChange"
       />
     </div>
     <SheetSettingDrawer
-      :sheet="selectedSheet"
       :metas="selectedMetas"
-      :visible="sheetSettingVisible"
       :needTitle="true"
       :saveDraftButton="false"
+      :sheet="selectedSheet"
+      :visible="sheetSettingVisible"
       @close="onSheetSettingsClose"
       @onRefreshSheet="onRefreshSheetFromSetting"
       @onRefreshSheetMetas="onRefreshSheetMetasFromSetting"
     />
 
     <TargetCommentDrawer
-      :visible="sheetCommentVisible"
-      :title="selectedSheet.title"
+      :id="selectedSheet.id"
       :description="selectedSheet.summary"
       :target="`sheets`"
-      :id="selectedSheet.id"
+      :title="selectedSheet.title"
+      :visible="sheetCommentVisible"
       @close="onSheetCommentsClose"
     />
   </div>
@@ -235,7 +235,7 @@
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import SheetSettingDrawer from './SheetSettingDrawer'
 import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
-import sheetApi from '@/api/sheet'
+import apiClient from '@/utils/api-client'
 
 const customColumns = [
   {
@@ -271,6 +271,25 @@ const customColumns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
+
+const sheetStatus = {
+  PUBLISHED: {
+    color: 'green',
+    status: 'success',
+    text: '已发布'
+  },
+  DRAFT: {
+    color: 'yellow',
+    status: 'warning',
+    text: '草稿'
+  },
+  RECYCLE: {
+    color: 'red',
+    status: 'error',
+    text: '回收站'
+  }
+}
+
 export default {
   name: 'CustomSheetList',
   mixins: [mixin, mixinDevice],
@@ -280,37 +299,39 @@ export default {
   },
   data() {
     return {
-      pagination: {
-        page: 1,
-        size: 10,
-        sort: null,
-        total: 1
-      },
-      queryParam: {
-        page: 0,
-        size: 10,
-        sort: null,
-        keyword: null,
-        categoryId: null,
-        status: null
-      },
-      loading: false,
-      sheetStatus: sheetApi.sheetStatus,
       customColumns,
+      sheetStatus,
+
+      list: {
+        data: [],
+        loading: false,
+        total: 0,
+        hasPrevious: false,
+        hasNext: false,
+        params: {
+          page: 0,
+          size: 10
+        }
+      },
       selectedSheet: {},
       selectedMetas: [],
       sheetSettingVisible: false,
-      sheetCommentVisible: false,
-      sheets: [],
-      menu: {}
+      sheetCommentVisible: false
     }
   },
   computed: {
     formattedSheets() {
-      return this.sheets.map(sheet => {
+      return this.list.data.map(sheet => {
         sheet.statusProperty = this.sheetStatus[sheet.status]
         return sheet
       })
+    },
+    pagination() {
+      return {
+        page: this.list.params.page + 1,
+        size: this.list.params.size,
+        total: this.list.total
+      }
     }
   },
   created() {
@@ -328,31 +349,30 @@ export default {
     next()
   },
   methods: {
-    handleListSheets(enableLoading = true) {
-      if (enableLoading) {
-        this.loading = true
+    async handleListSheets(enableLoading = true) {
+      try {
+        if (enableLoading) {
+          this.list.loading = true
+        }
+
+        const { data } = await apiClient.sheet.list(this.list.params)
+
+        this.list.data = data.content
+        this.list.total = data.total
+        this.list.hasPrevious = data.hasPrevious
+        this.list.hasNext = data.hasNext
+      } catch (e) {
+        this.$log.error(e)
+      } finally {
+        this.list.loading = false
       }
-      this.queryParam.page = this.pagination.page - 1
-      this.queryParam.size = this.pagination.size
-      this.queryParam.sort = this.pagination.sort
-      sheetApi
-        .list(this.queryParam)
-        .then(response => {
-          this.sheets = response.data.data.content
-          this.pagination.total = response.data.data.total
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.loading = false
-          }, 200)
-        })
     },
     handleEditClick(sheet) {
       this.$router.push({ name: 'SheetEdit', query: { sheetId: sheet.id } })
     },
     handleEditStatusClick(sheetId, status) {
-      sheetApi
-        .updateStatus(sheetId, status)
+      apiClient.sheet
+        .updateStatusById(sheetId, status)
         .then(() => {
           this.$message.success('操作成功！')
         })
@@ -361,7 +381,7 @@ export default {
         })
     },
     handleDeleteClick(sheetId) {
-      sheetApi
+      apiClient.sheet
         .delete(sheetId)
         .then(() => {
           this.$message.success('删除成功！')
@@ -371,29 +391,42 @@ export default {
         })
     },
     handleShowSheetSettings(sheet) {
-      sheetApi.get(sheet.id).then(response => {
-        this.selectedSheet = response.data.data
+      apiClient.sheet.get(sheet.id).then(response => {
+        this.selectedSheet = response.data
         this.selectedMetas = this.selectedSheet.metas
         this.sheetSettingVisible = true
       })
     },
     handleShowSheetComments(sheet) {
-      sheetApi.get(sheet.id).then(response => {
-        this.selectedSheet = response.data.data
+      apiClient.sheet.get(sheet.id).then(response => {
+        this.selectedSheet = response.data
         this.sheetCommentVisible = true
       })
     },
     handlePreview(sheetId) {
-      sheetApi.preview(sheetId).then(response => {
+      apiClient.sheet.getPreviewLinkById(sheetId).then(response => {
         window.open(response.data, '_blank')
       })
     },
-    handlePaginationChange(page, pageSize) {
-      this.$log.debug(`Current: ${page}, PageSize: ${pageSize}`)
-      this.pagination.page = page
-      this.pagination.size = pageSize
+
+    /**
+     * Handle page change
+     */
+    handlePageChange(page = 1) {
+      this.list.params.page = page - 1
       this.handleListSheets()
     },
+
+    /**
+     * Handle page size change
+     */
+    handlePageSizeChange(current, size) {
+      this.$log.debug(`Current: ${current}, PageSize: ${size}`)
+      this.list.params.page = 0
+      this.list.params.size = size
+      this.handleListSheets()
+    },
+
     onSheetSettingsClose() {
       this.sheetSettingVisible = false
       this.selectedSheet = {}

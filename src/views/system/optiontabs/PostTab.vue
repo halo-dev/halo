@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-form-model ref="postOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
+    <a-form-model ref="postOptionsForm" :model="options" :rules="rules" :wrapperCol="wrapperCol" layout="vertical">
       <!-- <a-form-model-item label="默认编辑器：">
         <a-select v-model="options.default_editor">
           <a-select-option value="MARKDOWN">Markdown 编辑器</a-select-option>
@@ -17,7 +17,7 @@
       <a-form-model-item label="首页每页文章条数：">
         <a-input-number v-model="options.post_index_page_size" :min="1" style="width:100%" />
       </a-form-model-item>
-      <a-form-model-item label="归档页面每页文章条数：" help="* 包括标签所属文章页面、分类所属文章页面">
+      <a-form-model-item help="* 包括标签所属文章页面、分类所属文章页面" label="归档页面每页文章条数：">
         <a-input-number v-model="options.post_archives_page_size" :min="1" style="width:100%" />
       </a-form-model-item>
       <a-form-model-item label="RSS 内容类型：">
@@ -46,14 +46,14 @@
       </a-form-model-item>
       <a-form-model-item>
         <ReactiveButton
-          type="primary"
-          @click="handleSaveOptions"
-          @callback="$emit('callback')"
-          :loading="saving"
           :errored="errored"
-          text="保存"
-          loadedText="保存成功"
+          :loading="saving"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存"
+          type="primary"
+          @callback="$emit('callback')"
+          @click="handleSaveOptions"
         ></ReactiveButton>
       </a-form-model-item>
     </a-form-model>

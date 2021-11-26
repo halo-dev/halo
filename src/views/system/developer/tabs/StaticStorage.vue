@@ -68,7 +68,7 @@
     >
       <FilePondUpload
         ref="upload"
-        :filed="list.selected.relativePath"
+        :field="list.selected.relativePath"
         :uploadHandler="uploadModal.uploadHandler"
         name="file"
       ></FilePondUpload>
@@ -147,8 +147,9 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import staticApi from '@/api/static'
+import apiClient from '@/utils/api-client'
 import Codemirror from '@/components/Codemirror/Codemirror'
+import { Axios } from '@halo-dev/admin-api'
 
 const columns = [
   {
@@ -190,7 +191,7 @@ export default {
 
       uploadModal: {
         visible: false,
-        uploadHandler: staticApi.upload
+        uploadHandler: (file, options, field) => apiClient.staticStorage.upload(file, options, field)
       },
 
       directoryForm: {
@@ -242,17 +243,17 @@ export default {
   methods: {
     handleListStatics() {
       this.list.loading = true
-      staticApi
+      apiClient.staticStorage
         .list()
         .then(response => {
-          this.list.data = response.data.data
+          this.list.data = response.data
         })
         .finally(() => {
           this.list.loading = false
         })
     },
     handleDelete(path) {
-      staticApi
+      apiClient.staticStorage
         .delete(path)
         .then(() => {
           this.$message.success(`删除成功！`)
@@ -276,8 +277,9 @@ export default {
       this.$refs.directoryForm.validate(valid => {
         if (valid) {
           this.directoryForm.saving = true
-          staticApi
-            .createFolder(this.list.selected.relativePath, this.directoryForm.model.name)
+          const basePath = this.list.selected.relativePath || '/'
+          apiClient.staticStorage
+            .createFolder(basePath, this.directoryForm.model.name)
             .catch(() => {
               this.directoryForm.saveErrored = true
             })
@@ -317,7 +319,7 @@ export default {
       this.$refs.renameForm.validate(valid => {
         if (valid) {
           this.renameForm.saving = true
-          staticApi
+          apiClient.staticStorage
             .rename(this.list.selected.relativePath, this.renameForm.model.name)
             .catch(() => {
               this.renameForm.saveErrored = true
@@ -341,8 +343,8 @@ export default {
     },
     handleOpenEditContentModal(file) {
       this.list.selected = file
-      staticApi.getContent(this.options.blog_url + file.relativePath).then(response => {
-        this.editContentForm.model.content = response.data
+      Axios.get(this.options.blog_url + file.relativePath).then(response => {
+        this.editContentForm.model.content = response.data + ''
         this.editContentForm.visible = true
         this.$nextTick(() => {
           this.$refs.editor.handleInitCodemirror()
@@ -351,8 +353,11 @@ export default {
     },
     handleContentEdit() {
       this.editContentForm.saving = true
-      staticApi
-        .save(this.list.selected.relativePath, this.editContentForm.model.content)
+      apiClient.staticStorage
+        .saveContent({
+          path: this.list.selected.relativePath,
+          content: this.editContentForm.model.content
+        })
         .catch(() => {
           this.editContentForm.saveErrored = true
         })

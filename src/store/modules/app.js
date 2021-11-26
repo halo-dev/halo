@@ -1,15 +1,14 @@
 import Vue from 'vue'
 import {
-  SIDEBAR_TYPE,
-  DEFAULT_THEME,
-  DEFAULT_LAYOUT_MODE,
   DEFAULT_COLOR,
-  DEFAULT_FIXED_HEADER,
-  DEFAULT_FIXED_SIDEMENU,
-  DEFAULT_FIXED_HEADER_HIDDEN,
   DEFAULT_CONTENT_WIDTH_TYPE,
-  API_URL,
-  LAYOUT_SETTING
+  DEFAULT_FIXED_HEADER,
+  DEFAULT_FIXED_HEADER_HIDDEN,
+  DEFAULT_FIXED_SIDEBAR,
+  DEFAULT_LAYOUT_MODE,
+  DEFAULT_THEME,
+  LAYOUT_SETTING,
+  SIDEBAR_TYPE
 } from '@/store/mutation-types'
 
 const app = {
@@ -20,22 +19,13 @@ const app = {
     layout: '',
     contentWidth: '',
     fixedHeader: false,
-    fixSiderbar: false,
+    fixedSidebar: false,
     autoHideHeader: false,
     color: null,
-    apiUrl: null,
     layoutSetting: false,
     loginModal: false
   },
   mutations: {
-    SET_API_URL: (state, apiUrl) => {
-      state.apiUrl = apiUrl
-      Vue.ls.set(API_URL, apiUrl)
-    },
-    RESTORE_API_URL: state => {
-      state.apiUrl = null
-      Vue.ls.set(API_URL, null)
-    },
     SET_SIDEBAR_TYPE: (state, type) => {
       state.sidebar = type
       Vue.ls.set(SIDEBAR_TYPE, type)
@@ -59,9 +49,9 @@ const app = {
       Vue.ls.set(DEFAULT_FIXED_HEADER, fixed)
       state.fixedHeader = fixed
     },
-    TOGGLE_FIXED_SIDERBAR: (state, fixed) => {
-      Vue.ls.set(DEFAULT_FIXED_SIDEMENU, fixed)
-      state.fixSiderbar = fixed
+    TOGGLE_FIXED_SIDEBAR: (state, fixed) => {
+      Vue.ls.set(DEFAULT_FIXED_SIDEBAR, fixed)
+      state.fixedSidebar = fixed
     },
     TOGGLE_FIXED_HEADER_HIDDEN: (state, show) => {
       Vue.ls.set(DEFAULT_FIXED_HEADER_HIDDEN, show)
@@ -87,12 +77,6 @@ const app = {
     setSidebar({ commit }, type) {
       commit('SET_SIDEBAR_TYPE', type)
     },
-    CloseSidebar({ commit }) {
-      commit('CLOSE_SIDEBAR')
-    },
-    ToggleDevice({ commit }, device) {
-      commit('TOGGLE_DEVICE', device)
-    },
     ToggleTheme({ commit }, theme) {
       commit('TOGGLE_THEME', theme)
     },
@@ -105,8 +89,8 @@ const app = {
       }
       commit('TOGGLE_FIXED_HEADER', fixedHeader)
     },
-    ToggleFixSiderbar({ commit }, fixSiderbar) {
-      commit('TOGGLE_FIXED_SIDERBAR', fixSiderbar)
+    ToggleFixedSidebar({ commit }, fixedSidebar) {
+      commit('TOGGLE_FIXED_SIDEBAR', fixedSidebar)
     },
     ToggleFixedHeaderHidden({ commit }, show) {
       commit('TOGGLE_FIXED_HEADER_HIDDEN', show)

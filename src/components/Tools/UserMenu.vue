@@ -16,8 +16,8 @@
     </a>
     <header-comment class="action" />
     <a-dropdown>
-      <span class="action ant-dropdown-link user-dropdown-menu" v-if="user">
-        <a-avatar class="avatar" size="small" :src="user.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'" />
+      <span v-if="user" class="action ant-dropdown-link user-dropdown-menu">
+        <a-avatar :src="user.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'" class="avatar" size="small" />
       </span>
       <a-menu slot="overlay" class="user-dropdown-menu-wrapper">
         <a-menu-item key="0">
@@ -53,25 +53,22 @@ export default {
   methods: {
     ...mapActions(['logout', 'ToggleLayoutSetting']),
     handleLogout() {
-      const that = this
+      const _this = this
 
       this.$confirm({
         title: '提示',
         content: '确定要注销登录吗 ?',
-        onOk() {
-          return that
-            .logout({})
-            .then(() => {
-              window.location.reload()
+        onOk: async () => {
+          try {
+            await _this.logout()
+            window.location.reload()
+          } catch (e) {
+            _this.$message.error({
+              title: '错误',
+              description: e.message
             })
-            .catch(err => {
-              that.$message.error({
-                title: '错误',
-                description: err.message
-              })
-            })
-        },
-        onCancel() {}
+          }
+        }
       })
     },
     handleShowLayoutSetting() {

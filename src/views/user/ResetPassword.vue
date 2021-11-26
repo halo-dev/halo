@@ -1,48 +1,48 @@
 <template>
   <div class="container-wrapper animated fadeIn">
     <div class="halo-logo">
-      <img src="/images/logo.svg" alt="Halo Logo" />
+      <img alt="Halo Logo" src="/images/logo.svg" />
       <span>重置密码</span>
     </div>
     <div>
       <a-form layout="vertical">
         <a-form-item>
-          <a-input placeholder="用户名" v-model="resetParam.username">
-            <a-icon slot="prefix" type="user" style="color: rgba(0, 0, 0, 0.25)" />
+          <a-input v-model="resetParam.username" placeholder="用户名">
+            <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="user" />
           </a-input>
         </a-form-item>
         <a-form-item>
-          <a-input placeholder="邮箱" v-model="resetParam.email">
-            <a-icon slot="prefix" type="mail" style="color: rgba(0, 0, 0, 0.25)" />
+          <a-input v-model="resetParam.email" placeholder="邮箱">
+            <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="mail" />
           </a-input>
         </a-form-item>
         <a-form-item>
-          <a-input v-model="resetParam.code" type="password" placeholder="验证码">
-            <a-icon slot="prefix" type="safety-certificate" style="color: rgba(0, 0, 0, 0.25)" />
-            <a href="javascript:void(0);" slot="addonAfter" @click="handleSendCode"> 获取 </a>
+          <a-input v-model="resetParam.code" placeholder="验证码" type="password">
+            <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="safety-certificate" />
+            <a slot="addonAfter" href="javascript:void(0);" @click="handleSendCode"> 获取 </a>
           </a-input>
         </a-form-item>
 
         <a-form-item>
-          <a-input v-model="resetParam.password" type="password" placeholder="新密码" autocomplete="new-password">
-            <a-icon slot="prefix" type="lock" style="color: rgba(0, 0, 0, 0.25)" />
+          <a-input v-model="resetParam.password" autocomplete="new-password" placeholder="新密码" type="password">
+            <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="lock" />
           </a-input>
         </a-form-item>
         <a-form-item>
           <a-input
             v-model="resetParam.confirmPassword"
-            type="password"
-            placeholder="确认密码"
             autocomplete="new-password"
+            placeholder="确认密码"
+            type="password"
           >
-            <a-icon slot="prefix" type="lock" style="color: rgba(0, 0, 0, 0.25)" />
+            <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="lock" />
           </a-input>
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" :block="true" @click="handleResetPassword">重置密码</a-button>
+          <a-button :block="true" type="primary" @click="handleResetPassword">重置密码</a-button>
         </a-form-item>
       </a-form>
-      <router-link class="tip" :to="{ name: 'Login' }">
+      <router-link :to="{ name: 'Login' }" class="tip">
         返回登录
       </router-link>
     </div>
@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import adminApi from '@/api/admin'
+import apiClient from '@/utils/api-client'
 
 export default {
   data() {
@@ -81,8 +81,8 @@ export default {
         return
       }
       const hide = this.$message.loading('发送中...', 0)
-      adminApi
-        .sendResetCode(this.resetParam)
+      apiClient
+        .sendResetPasswordCode(this.resetParam)
         .then(() => {
           this.$message.success('邮件发送成功，五分钟内有效')
         })
@@ -133,7 +133,7 @@ export default {
         })
         return
       }
-      adminApi.resetPassword(this.resetParam).then(() => {
+      apiClient.resetPassword(this.resetParam).then(() => {
         this.$message.success('密码重置成功！')
         this.$router.push({ name: 'Login' })
       })

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-form-model ref="permalinkOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
+    <a-form-model ref="permalinkOptionsForm" :model="options" :rules="rules" :wrapperCol="wrapperCol" layout="vertical">
       <a-form-model-item label="文章固定链接类型：">
         <template slot="help">
           <span v-if="options.post_permalink_type === 'DEFAULT'"
@@ -21,9 +21,9 @@
           >
         </template>
         <a-select v-model="options.post_permalink_type">
-          <a-select-option v-for="item in Object.keys(postPermalinkType)" :key="item" :value="item">{{
-            postPermalinkType[item].text
-          }}</a-select-option>
+          <a-select-option v-for="item in Object.keys(postPermalinkType)" :key="item" :value="item"
+            >{{ postPermalinkType[item].text }}
+          </a-select-option>
         </a-select>
       </a-form-model-item>
       <a-form-model-item label="归档前缀：">
@@ -54,12 +54,12 @@
           >
         </template>
         <a-select v-model="options.sheet_permalink_type">
-          <a-select-option v-for="item in Object.keys(sheetPermalinkType)" :key="item" :value="item">{{
-            sheetPermalinkType[item].text
-          }}</a-select-option>
+          <a-select-option v-for="item in Object.keys(sheetPermalinkType)" :key="item" :value="item"
+            >{{ sheetPermalinkType[item].text }}
+          </a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="自定义页面前缀：" v-show="options.sheet_permalink_type === 'SECONDARY'">
+      <a-form-model-item v-show="options.sheet_permalink_type === 'SECONDARY'" label="自定义页面前缀：">
         <template slot="help">
           <span>{{ options.blog_url }}/{{ options.sheet_prefix }}/{slug}{{ options.path_suffix }}</span>
         </template>
@@ -91,22 +91,20 @@
       </a-form-model-item>
       <a-form-model-item>
         <ReactiveButton
-          type="primary"
-          @click="handleSaveOptions"
-          @callback="$emit('callback')"
-          :loading="saving"
           :errored="errored"
-          text="保存"
-          loadedText="保存成功"
+          :loading="saving"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存"
+          type="primary"
+          @callback="$emit('callback')"
+          @click="handleSaveOptions"
         ></ReactiveButton>
       </a-form-model-item>
     </a-form-model>
   </div>
 </template>
 <script>
-import postApi from '@/api/post'
-import sheetApi from '@/api/sheet'
 export default {
   name: 'PermalinkTab',
   props: {
@@ -125,8 +123,42 @@ export default {
   },
   data() {
     return {
-      postPermalinkType: postApi.permalinkType,
-      sheetPermalinkType: sheetApi.permalinkType,
+      postPermalinkType: {
+        DEFAULT: {
+          type: 'DEFAULT',
+          text: '默认'
+        },
+        YEAR: {
+          type: 'YEAR',
+          text: '年份型'
+        },
+        DATE: {
+          type: 'DATE',
+          text: '年月型'
+        },
+        DAY: {
+          type: 'DAY',
+          text: '年月日型'
+        },
+        ID: {
+          type: 'ID',
+          text: 'ID 型'
+        },
+        ID_SLUG: {
+          type: 'ID_SLUG',
+          text: 'ID 别名型'
+        }
+      },
+      sheetPermalinkType: {
+        SECONDARY: {
+          type: 'SECONDARY',
+          text: '二级路径'
+        },
+        ROOT: {
+          type: 'ROOT',
+          text: '根路径'
+        }
+      },
       wrapperCol: {
         xl: { span: 8 },
         lg: { span: 8 },

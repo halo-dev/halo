@@ -1,9 +1,8 @@
-import Vue from 'vue'
 import router from '@/router'
 import store from '@/store'
 import NProgress from 'nprogress'
-import { setDocumentTitle, domTitle } from '@/utils/domUtil'
-import adminApi from '@/api/admin'
+import { domTitle, setDocumentTitle } from '@/utils/domUtil'
+import apiClient from '@/utils/api-client'
 
 NProgress.configure({ showSpinner: false, speed: 500 })
 
@@ -16,14 +15,13 @@ router.beforeEach(async (to, from, next) => {
     NProgress.start()
   }, 250)
   to.meta && typeof to.meta.title !== 'undefined' && setDocumentTitle(`${to.meta.title} - ${domTitle}`)
-  Vue.$log.debug('Token', store.getters.token)
   if (store.getters.token) {
     if (to.name === 'Install') {
       next()
       return
     }
-    const response = await adminApi.isInstalled()
-    if (!response.data.data) {
+    const response = await apiClient.isInstalled()
+    if (!response.data) {
       next({
         name: 'Install'
       })

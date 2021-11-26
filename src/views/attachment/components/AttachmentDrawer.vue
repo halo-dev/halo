@@ -1,35 +1,35 @@
 <template>
   <div>
     <a-drawer
-      title="附件库"
+      :afterVisibleChange="handleAfterVisibleChanged"
+      :visible="visible"
       :width="isMobile() ? '100%' : '480'"
       closable
-      :visible="visible"
       destroyOnClose
+      title="附件库"
       @close="onClose"
-      :afterVisibleChange="handleAfterVisibleChanged"
     >
-      <a-row type="flex" align="middle">
-        <a-input-search placeholder="搜索附件" v-model="queryParam.keyword" @search="handleQuery()" enterButton />
+      <a-row align="middle" type="flex">
+        <a-input-search v-model="queryParam.keyword" enterButton placeholder="搜索附件" @search="handleQuery()" />
       </a-row>
       <a-divider />
-      <a-row type="flex" align="middle">
+      <a-row align="middle" type="flex">
         <a-col :span="24">
           <a-spin :spinning="loading" class="attachments-group">
             <a-empty v-if="formattedDatas.length === 0" />
             <div
-              v-else
-              class="attach-item attachments-group-item"
               v-for="(item, index) in formattedDatas"
+              v-else
               :key="index"
+              class="attach-item attachments-group-item"
               @click="handleShowDetailDrawer(item)"
               @contextmenu.prevent="handleContextMenu($event, item)"
             >
               <span v-if="!handleJudgeMediaType(item)" class="attachments-group-item-type">{{ item.suffix }}</span>
               <span
                 v-else
-                class="attachments-group-item-img"
                 :style="`background-image:url(${item.thumbPath})`"
+                class="attachments-group-item-img"
                 loading="lazy"
               />
             </div>
@@ -40,10 +40,10 @@
       <div class="page-wrapper">
         <a-pagination
           :current="pagination.page"
-          :total="pagination.total"
           :defaultPageSize="pagination.size"
-          @change="handlePaginationChange"
+          :total="pagination.total"
           showLessItems
+          @change="handlePaginationChange"
         ></a-pagination>
       </div>
 
@@ -55,20 +55,18 @@
       /> -->
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
-        <a-button @click="uploadVisible = true" type="primary">上传附件</a-button>
+        <a-button type="primary" @click="uploadVisible = true">上传附件</a-button>
       </div>
     </a-drawer>
 
-    <a-modal title="上传附件" v-model="uploadVisible" :footer="null" :afterClose="onUploadClose" destroyOnClose>
-      <FilePondUpload ref="upload" :uploadHandler="uploadHandler"></FilePondUpload>
-    </a-modal>
+    <AttachmentUploadModal :visible.sync="uploadVisible" @close="onUploadClose" />
   </div>
 </template>
 
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 // import AttachmentDetailDrawer from './AttachmentDetailDrawer'
-import attachmentApi from '@/api/attachment'
+import apiClient from '@/utils/api-client'
 
 export default {
   name: 'AttachmentDrawer',
@@ -89,7 +87,44 @@ export default {
   },
   data() {
     return {
-      attachmentType: attachmentApi.type,
+      attachmentType: {
+        LOCAL: {
+          type: 'LOCAL',
+          text: '本地'
+        },
+        SMMS: {
+          type: 'SMMS',
+          text: 'SM.MS'
+        },
+        UPOSS: {
+          type: 'UPOSS',
+          text: '又拍云'
+        },
+        QINIUOSS: {
+          type: 'QINIUOSS',
+          text: '七牛云'
+        },
+        ALIOSS: {
+          type: 'ALIOSS',
+          text: '阿里云'
+        },
+        BAIDUBOS: {
+          type: 'BAIDUBOS',
+          text: '百度云'
+        },
+        TENCENTCOS: {
+          type: 'TENCENTCOS',
+          text: '腾讯云'
+        },
+        HUAWEIOBS: {
+          type: 'HUAWEIOBS',
+          text: '华为云'
+        },
+        MINIO: {
+          type: 'MINIO',
+          text: 'MinIO'
+        }
+      },
       detailVisible: false,
       attachmentDrawerVisible: false,
       uploadVisible: false,
@@ -107,8 +142,7 @@ export default {
         keyword: null
       },
       attachments: [],
-      selectedAttachment: {},
-      uploadHandler: attachmentApi.upload
+      selectedAttachment: {}
     }
   },
   computed: {
@@ -171,16 +205,14 @@ export default {
       this.queryParam.page = this.pagination.page - 1
       this.queryParam.size = this.pagination.size
       this.queryParam.sort = this.pagination.sort
-      attachmentApi
-        .query(this.queryParam)
+      apiClient.attachment
+        .list(this.queryParam)
         .then(response => {
-          this.attachments = response.data.data.content
-          this.pagination.total = response.data.data.total
+          this.attachments = response.data.content
+          this.pagination.total = response.data.total
         })
         .finally(() => {
-          setTimeout(() => {
-            this.loading = false
-          }, 200)
+          this.loading = false
         })
     },
     handleQuery() {
@@ -192,7 +224,6 @@ export default {
       this.handleListAttachments()
     },
     onUploadClose() {
-      this.$refs.upload.handleClearFileList()
       this.handlePaginationChange(1, this.pagination.size)
     },
     handleAfterVisibleChanged(visible) {

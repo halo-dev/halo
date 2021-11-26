@@ -1,8 +1,8 @@
 <template>
   <div class="custom-tab-wrapper">
     <a-tabs :animated="{ inkBar: true, tabPane: false }">
-      <a-tab-pane tab="发信设置" key="smtpoptions">
-        <a-form-model ref="smtpOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
+      <a-tab-pane key="smtpoptions" tab="发信设置">
+        <a-form-model ref="smtpOptionsForm" :model="options" :rules="rules" :wrapperCol="wrapperCol" layout="vertical">
           <a-form-model-item label="是否启用：">
             <a-switch v-model="options.email_enabled" />
           </a-form-model-item>
@@ -21,8 +21,8 @@
           <a-form-model-item label="邮箱密码：" prop="email_password">
             <a-input-password
               v-model="options.email_password"
-              placeholder="部分邮箱可能是授权码"
               autocomplete="new-password"
+              placeholder="部分邮箱可能是授权码"
             />
           </a-form-model-item>
           <a-form-model-item label="发件人：" prop="email_from_name">
@@ -30,25 +30,25 @@
           </a-form-model-item>
           <a-form-model-item>
             <ReactiveButton
-              type="primary"
-              @click="handleSaveOptions"
-              @callback="$emit('callback')"
-              :loading="saving"
               :errored="errored"
-              text="保存"
-              loadedText="保存成功"
+              :loading="saving"
               erroredText="保存失败"
+              loadedText="保存成功"
+              text="保存"
+              type="primary"
+              @callback="$emit('callback')"
+              @click="handleSaveOptions"
             ></ReactiveButton>
           </a-form-model-item>
         </a-form-model>
       </a-tab-pane>
-      <a-tab-pane tab="发送测试" key="smtptest">
+      <a-tab-pane key="smtptest" tab="发送测试">
         <a-form-model
           ref="smtpTestForm"
           :model="mailParam"
           :rules="testRules"
-          layout="vertical"
           :wrapperCol="wrapperCol"
+          layout="vertical"
         >
           <a-form-model-item label="收件人地址：" prop="to">
             <a-input v-model="mailParam.to" />
@@ -57,18 +57,18 @@
             <a-input v-model="mailParam.subject" />
           </a-form-model-item>
           <a-form-model-item label="内容：" prop="content">
-            <a-input type="textarea" :autoSize="{ minRows: 5 }" v-model="mailParam.content" />
+            <a-input v-model="mailParam.content" :autoSize="{ minRows: 5 }" type="textarea" />
           </a-form-model-item>
           <a-form-model-item>
             <ReactiveButton
-              type="primary"
-              @click="handleTestMailClick"
-              @callback="sendErrored = false"
-              :loading="sending"
               :errored="sendErrored"
-              text="发送"
-              loadedText="发送成功"
+              :loading="sending"
               erroredText="发送失败"
+              loadedText="发送成功"
+              text="发送"
+              type="primary"
+              @callback="sendErrored = false"
+              @click="handleTestMailClick"
             ></ReactiveButton>
           </a-form-model-item>
         </a-form-model>
@@ -77,7 +77,8 @@
   </div>
 </template>
 <script>
-import mailApi from '@/api/mail'
+import apiClient from '@/utils/api-client'
+
 export default {
   name: 'SmtpTab',
   props: {
@@ -147,10 +148,10 @@ export default {
       _this.$refs.smtpTestForm.validate(valid => {
         if (valid) {
           this.sending = true
-          mailApi
-            .testMail(this.mailParam)
+          apiClient.mail
+            .testSmtpService(this.mailParam)
             .then(response => {
-              this.$message.info(response.data.message)
+              this.$message.info(response.data)
             })
             .catch(() => {
               this.sendErrored = true

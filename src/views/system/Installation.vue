@@ -1,7 +1,7 @@
 <template>
   <div>
-    <a-row type="flex" justify="center" align="middle" class="h-screen">
-      <a-col :xxl="8" :xl="12" :lg="16" :md="20" :sm="20" :xs="23">
+    <a-row align="middle" class="h-screen" justify="center" type="flex">
+      <a-col :lg="16" :md="20" :sm="20" :xl="12" :xs="23" :xxl="8">
         <div class="card-container animated fadeIn">
           <a-card :bordered="false" style="box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;">
             <div class="halo-logo">
@@ -10,7 +10,7 @@
                 <small>安装向导</small>
               </span>
             </div>
-            <a-alert :message="`欢迎使用 Halo，您正在安装的是 Halo ${VERSION}。`" type="success" show-icon />
+            <a-alert :message="`欢迎使用 Halo，您正在安装的是 Halo ${VERSION}。`" show-icon type="success" />
             <!-- Blogger info -->
             <div class="mt-5 mb-5">
               <a-radio-group v-model="installationMode">
@@ -23,96 +23,96 @@
               </a-radio-group>
             </div>
             <a-form-model
-              class="installationForm animated fadeIn"
+              v-show="isInstallMode"
               ref="installationForm"
               :model="form.model"
               :rules="form.rules"
+              class="installationForm animated fadeIn"
               layout="horizontal"
-              v-show="isInstallMode"
             >
-              <a-divider orientation="left" dashed>
+              <a-divider dashed orientation="left">
                 管理员信息
               </a-divider>
               <a-form-model-item prop="username">
                 <a-input v-model="form.model.username" placeholder="用户名">
-                  <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
+                  <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="user" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="username">
                 <a-input v-model="form.model.nickname" placeholder="用户昵称">
-                  <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
+                  <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="user" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="email">
                 <a-input v-model="form.model.email" placeholder="用户邮箱">
-                  <a-icon slot="prefix" type="mail" style="color: rgba(0,0,0,.25)" />
+                  <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="mail" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="password">
-                <a-input v-model="form.model.password" type="password" placeholder="登录密码（8-100位）">
-                  <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
+                <a-input v-model="form.model.password" placeholder="登录密码（8-100位）" type="password">
+                  <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="lock" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="confirmPassword">
-                <a-input v-model="form.model.confirmPassword" type="password" placeholder="确认登录密码">
-                  <a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.25)" />
+                <a-input v-model="form.model.confirmPassword" placeholder="确认登录密码" type="password">
+                  <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="lock" />
                 </a-input>
               </a-form-model-item>
-              <a-divider orientation="left" dashed>
+              <a-divider dashed orientation="left">
                 站点信息
               </a-divider>
               <a-form-model-item prop="url">
                 <a-input v-model="form.model.url" placeholder="博客地址">
-                  <a-icon slot="prefix" type="link" style="color: rgba(0,0,0,.25)" />
+                  <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="link" />
                 </a-input>
               </a-form-model-item>
               <a-form-model-item prop="title">
                 <a-input v-model="form.model.title" placeholder="博客标题">
-                  <a-icon slot="prefix" type="book" style="color: rgba(0,0,0,.25)" />
+                  <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="book" />
                 </a-input>
               </a-form-model-item>
             </a-form-model>
 
             <!-- Data migration -->
-            <div class="animated fadeIn" v-show="isImportMode">
+            <div v-show="isImportMode" class="animated fadeIn">
               <FilePondUpload
                 ref="upload"
-                name="file"
                 :accepts="['application/json']"
-                label="拖拽或点击选择数据文件<br>请确认是否为 Halo 后台导出的文件。"
                 :multiple="false"
                 :uploadHandler="onImportUpload"
+                label="拖拽或点击选择数据文件<br>请确认是否为 Halo 后台导出的文件。"
+                name="file"
               ></FilePondUpload>
             </div>
 
             <div class="mt-8">
               <ReactiveButton
                 v-if="isInstallMode"
-                icon="check"
-                type="primary"
-                block
-                size="large"
-                @click="handleInstall"
-                @callback="handleInstallCallback"
-                :loading="form.installing"
                 :errored="form.installErrored"
-                text="安装"
-                loadedText="安装成功"
+                :loading="form.installing"
+                block
                 erroredText="安装失败"
+                icon="check"
+                loadedText="安装成功"
+                size="large"
+                text="安装"
+                type="primary"
+                @callback="handleInstallCallback"
+                @click="handleInstall"
               ></ReactiveButton>
               <ReactiveButton
                 v-if="isImportMode"
-                icon="import"
-                type="primary"
-                block
-                size="large"
-                @click="handleImport"
-                @callback="handleImportCallback"
-                :loading="form.importing"
                 :errored="form.importErrored"
-                text="导入"
-                loadedText="导入成功"
+                :loading="form.importing"
+                block
                 erroredText="导入失败"
+                icon="import"
+                loadedText="导入成功"
+                size="large"
+                text="导入"
+                type="primary"
+                @callback="handleImportCallback"
+                @click="handleImport"
               ></ReactiveButton>
             </div>
           </a-card>
@@ -123,8 +123,7 @@
 </template>
 
 <script>
-import adminApi from '@/api/admin'
-import migrateApi from '@/api/migrate'
+import apiClient from '@/utils/api-client'
 import { mapActions } from 'vuex'
 
 export default {
@@ -193,8 +192,8 @@ export default {
   methods: {
     ...mapActions(['installCleanToken']),
     async handleVerifyIsInstall() {
-      const response = await adminApi.isInstalled()
-      if (response.data.data) {
+      const response = await apiClient.isInstalled()
+      if (response.data) {
         await this.$router.push({ name: 'Login' })
       }
     },
@@ -239,7 +238,7 @@ export default {
         return
       }
       this.form.importing = true
-      migrateApi
+      apiClient.migration
         .migrate(this.form.importData)
         .then(() => {
           this.$log.debug('Migrated successfully')
@@ -258,7 +257,7 @@ export default {
         this.form.importErrored = false
       } else {
         this.$message.success('导入成功！')
-        this.$router.push({ name: 'Login' })
+        this.$router.replace({ name: 'Login' })
       }
     }
   }
@@ -270,6 +269,7 @@ export default {
     .ant-divider-inner-text {
       padding-left: 0;
     }
+
     &::before {
       width: 0;
     }

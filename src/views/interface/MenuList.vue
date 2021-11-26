@@ -1,28 +1,28 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col :xl="6" :lg="6" :md="6" :sm="24" :xs="24" class="mb-3">
+      <a-col :lg="6" :md="6" :sm="24" :xl="6" :xs="24" class="mb-3">
         <a-card :bodyStyle="{ padding: '16px' }" title="分组">
           <template slot="extra">
             <ReactiveButton
-              type="default"
-              @click="handleSetDefaultTeam"
-              @callback="handleSetDefaultTeamCallback"
-              :loading="teams.default.saving"
               :errored="teams.default.errored"
-              text="设为默认"
-              loadedText="设置成功"
+              :loading="teams.default.saving"
               erroredText="设置失败"
+              loadedText="设置成功"
+              text="设为默认"
+              type="default"
+              @callback="handleSetDefaultTeamCallback"
+              @click="handleSetDefaultTeam"
             ></ReactiveButton>
           </template>
           <div class="menu-teams">
             <a-spin :spinning="teams.loading">
               <a-empty v-if="teams.data.length === 0 && !teams.loading" />
               <a-menu
+                v-if="teams.data.length > 0"
+                v-model="selectedTeam"
                 class="w-full"
                 mode="inline"
-                v-model="selectedTeam"
-                v-if="teams.data.length > 0"
                 @select="handleSelectedTeam"
               >
                 <a-menu-item v-for="team in teams.data" :key="team">
@@ -33,11 +33,11 @@
           </div>
           <a-popover
             v-model="teams.form.visible"
+            destroyTooltipOnHide
+            placement="bottom"
             title="新增分组"
             trigger="click"
-            placement="bottom"
             @visibleChange="handleTeamFormVisibleChange"
-            destroyTooltipOnHide
           >
             <template slot="content">
               <a-form-model
@@ -56,42 +56,42 @@
                 </a-form-model-item>
               </a-form-model>
             </template>
-            <a-button type="primary" block class="mt-3">
+            <a-button block class="mt-3" type="primary">
               新增分组
             </a-button>
           </a-popover>
         </a-card>
       </a-col>
-      <a-col :xl="18" :lg="18" :md="18" :sm="24" :xs="24" class="pb-3">
+      <a-col :lg="18" :md="18" :sm="24" :xl="18" :xs="24" class="pb-3">
         <a-card :bodyStyle="{ padding: '16px' }">
           <template slot="title">
             <span>
               {{ menuListTitle }}
             </span>
             <a-tooltip
+              v-if="list.data.length <= 0 && !list.loading"
               slot="action"
               title="分组下的菜单为空时，该分组也不会保存"
-              v-if="list.data.length <= 0 && !list.loading"
             >
-              <a-icon type="info-circle-o" class="cursor-pointer" />
+              <a-icon class="cursor-pointer" type="info-circle-o" />
             </a-tooltip>
           </template>
           <template slot="extra">
             <a-space>
               <ReactiveButton
-                @click="handleUpdateBatch"
-                @callback="formBatch.errored = false"
-                :loading="formBatch.saving"
-                :errored="formBatch.errored"
-                text="保存"
-                loadedText="保存成功"
-                erroredText="保存失败"
                 :disabled="list.data.length <= 0"
+                :errored="formBatch.errored"
+                :loading="formBatch.saving"
+                erroredText="保存失败"
+                loadedText="保存成功"
+                text="保存"
+                @callback="formBatch.errored = false"
+                @click="handleUpdateBatch"
               ></ReactiveButton>
-              <a-button v-if="!form.visible" @click="handleOpenCreateMenuForm()" type="primary" ghost>
+              <a-button v-if="!form.visible" ghost type="primary" @click="handleOpenCreateMenuForm()">
                 新增
               </a-button>
-              <a-button v-else @click="handleCloseCreateMenuForm()" type="default">
+              <a-button v-else type="default" @click="handleCloseCreateMenuForm()">
                 取消新增
               </a-button>
               <a-dropdown :trigger="['click']">
@@ -114,8 +114,8 @@
             <MenuForm
               v-if="form.visible"
               :menu="form.model"
-              @succeed="handleCreateMenuSucceed()"
               @cancel="handleCloseCreateMenuForm()"
+              @succeed="handleCreateMenuSucceed()"
             />
             <a-empty v-if="list.data.length === 0 && !list.loading && !form.visible" />
             <MenuTreeNode v-model="list.data" :excludedTeams="excludedTeams" @reload="handleListMenus" />
@@ -142,8 +142,8 @@ import { deepClone } from '@/utils/util'
 import { mapActions, mapGetters } from 'vuex'
 
 // apis
-import menuApi from '@/api/menu'
-import optionApi from '@/api/option'
+import apiClient from '@/utils/api-client'
+
 export default {
   components: { PageView, MenuTreeNode, MenuForm, MenuInternalLinkSelector },
   data() {
@@ -224,33 +224,29 @@ export default {
     ...mapActions(['refreshOptionsCache']),
     handleListTeams(autoSelectTeam = false) {
       this.teams.loading = true
-      menuApi
+      apiClient.menu
         .listTeams()
         .then(response => {
-          this.teams.data = response.data.data
+          this.teams.data = response.data
           if (!this.teams.selected || autoSelectTeam) {
             this.teams.selected = this.teams.data[0]
           }
           this.handleListMenus()
         })
         .finally(() => {
-          setTimeout(() => {
-            this.teams.loading = false
-          }, 200)
+          this.teams.loading = false
         })
     },
     handleListMenus() {
       this.list.data = []
       this.list.loading = true
-      menuApi
-        .listTreeByTeam(this.teams.selected)
+      apiClient.menu
+        .listTreeViewByTeam(this.teams.selected)
         .then(response => {
-          this.list.data = response.data.data
+          this.list.data = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.list.loading = false
-          }, 200)
+          this.list.loading = false
         })
     },
     handleMenuMoved(pid, menus) {
@@ -281,8 +277,8 @@ export default {
     },
     handleUpdateBatch() {
       this.formBatch.saving = true
-      menuApi
-        .updateBatch(this.computedMenusWithoutLevel)
+      apiClient.menu
+        .updateInBatch(this.computedMenusWithoutLevel)
         .catch(() => {
           this.formBatch.errored = true
         })
@@ -299,7 +295,7 @@ export default {
         title: '提示',
         content: '确定要删除当前分组以及所有菜单？',
         onOk() {
-          menuApi.deleteBatch(_this.computedMenuIds).finally(() => {
+          apiClient.menu.deleteInBatch(_this.computedMenuIds).finally(() => {
             _this.handleListTeams(true)
           })
         }
@@ -340,10 +336,12 @@ export default {
     },
     handleSetDefaultTeam() {
       this.teams.default.saving = true
-      optionApi
-        .save({
-          default_menu_team: this.teams.selected
-        })
+      apiClient.option
+        .save([
+          {
+            default_menu_team: this.teams.selected
+          }
+        ])
         .catch(() => {
           this.teams.default.errored = true
         })

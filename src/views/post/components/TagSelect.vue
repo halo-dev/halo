@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import tagApi from '@/api/tag'
+import apiClient from '@/utils/api-client'
 import axios from 'axios'
 
 export default {
@@ -72,8 +72,8 @@ export default {
   },
   methods: {
     handleListTags(callback) {
-      tagApi.listAll(true).then(response => {
-        this.tags = response.data.data
+      apiClient.tag.list({ more: true }).then(response => {
+        this.tags = response.data
         if (callback) {
           callback()
         }
@@ -90,7 +90,7 @@ export default {
         return
       }
 
-      const createPromises = tagNamesToCreate.map(tagName => tagApi.createWithName(tagName))
+      const createPromises = tagNamesToCreate.map(tagName => apiClient.tag.create({ name: tagName }))
 
       axios.all(createPromises).then(
         axios.spread(() => {

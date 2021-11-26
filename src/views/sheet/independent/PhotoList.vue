@@ -1,8 +1,8 @@
 <template>
   <page-view>
-    <a-row :gutter="12" type="flex" align="middle">
+    <a-row :gutter="12" align="middle" type="flex">
       <a-col :span="24" class="pb-3">
-        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
+        <a-card :bodyStyle="{ padding: '16px' }" :bordered="false">
           <div class="table-page-search-wrapper">
             <a-form layout="inline">
               <a-row :gutter="48">
@@ -14,9 +14,9 @@
                 <a-col :md="6" :sm="24">
                   <a-form-item label="分组：">
                     <a-select v-model="list.queryParam.team" @change="handleQuery()">
-                      <a-select-option v-for="(item, index) in computedTeams" :key="index" :value="item">{{
-                        item
-                      }}</a-select-option>
+                      <a-select-option v-for="(item, index) in computedTeams" :key="index" :value="item"
+                        >{{ item }}
+                      </a-select-option>
                     </a-select>
                   </a-form-item>
                 </a-col>
@@ -32,23 +32,23 @@
             </a-form>
           </div>
           <div class="mb-0 table-operator">
-            <a-button type="primary" icon="plus" @click="form.visible = true">添加</a-button>
+            <a-button icon="plus" type="primary" @click="form.visible = true">添加</a-button>
           </div>
         </a-card>
       </a-col>
       <a-col :span="24">
         <a-list
-          :grid="{ gutter: 12, xs: 2, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
           :dataSource="list.data"
+          :grid="{ gutter: 12, xs: 2, sm: 2, md: 4, lg: 6, xl: 6, xxl: 6 }"
           :loading="list.loading"
         >
-          <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+          <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
             <a-card :bodyStyle="{ padding: 0 }" hoverable @click="handleOpenEditForm(item)">
               <div class="photo-thumb">
                 <img :src="item.thumbnail" loading="lazy" />
               </div>
               <a-card-meta class="p-3">
-                <ellipsis :length="isMobile() ? 12 : 16" tooltip slot="description">{{ item.name }}</ellipsis>
+                <ellipsis slot="description" :length="isMobile() ? 12 : 16" tooltip>{{ item.name }}</ellipsis>
               </a-card-meta>
             </a-card>
           </a-list-item>
@@ -58,24 +58,24 @@
     <div class="page-wrapper">
       <a-pagination
         :current="list.pagination.page"
-        :total="list.pagination.total"
         :defaultPageSize="list.pagination.size"
         :pageSizeOptions="['18', '36', '54', '72', '90', '108']"
+        :total="list.pagination.total"
+        showLessItems
         showSizeChanger
         @change="handlePaginationChange"
         @showSizeChange="handlePaginationChange"
-        showLessItems
       />
     </div>
     <div style="position: fixed;bottom: 30px;right: 30px;">
-      <a-button type="primary" shape="circle" icon="setting" size="large" @click="optionFormVisible = true"></a-button>
+      <a-button icon="setting" shape="circle" size="large" type="primary" @click="optionFormVisible = true"></a-button>
     </div>
-    <a-modal v-model="optionFormVisible" title="页面设置" :afterClose="() => (optionFormVisible = false)">
+    <a-modal v-model="optionFormVisible" :afterClose="() => (optionFormVisible = false)" title="页面设置">
       <template slot="footer">
         <a-button key="submit" type="primary" @click="handleSaveOptions()">保存</a-button>
       </template>
       <a-form layout="vertical">
-        <a-form-item label="页面标题：" help="* 需要主题进行适配">
+        <a-form-item help="* 需要主题进行适配" label="页面标题：">
           <a-input v-model="options.photos_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
@@ -85,78 +85,78 @@
     </a-modal>
     <a-drawer
       :title="`图片${form.model.id ? '修改' : '添加'}`"
+      :visible="form.visible"
       :width="isMobile() ? '100%' : '480'"
       closable
-      :visible="form.visible"
       destroyOnClose
       @close="onDrawerClose"
     >
       <a-form-model ref="photoForm" :model="form.model" :rules="form.rules" layout="vertical">
-        <a-form-model-item prop="url" label="图片地址：">
+        <a-form-model-item label="图片地址：" prop="url">
           <div class="pb-2">
             <img
               :src="form.model.url || '/images/placeholder.jpg'"
-              @click="attachmentSelectDrawer.visible = true"
               class="w-full cursor-pointer"
               style="border-radius:4px"
+              @click="attachmentSelectDrawer.visible = true"
             />
           </div>
           <a-input v-model="form.model.url" placeholder="点击封面图选择图片，或者输入外部链接" />
         </a-form-model-item>
-        <a-form-model-item prop="thumbnail" label="缩略图地址：">
+        <a-form-model-item label="缩略图地址：" prop="thumbnail">
           <a-input v-model="form.model.thumbnail" />
         </a-form-model-item>
-        <a-form-model-item prop="name" label="图片名称：">
+        <a-form-model-item label="图片名称：" prop="name">
           <a-input v-model="form.model.name" />
         </a-form-model-item>
-        <a-form-model-item prop="takeTime" label="拍摄日期：">
+        <a-form-model-item label="拍摄日期：" prop="takeTime">
           <a-date-picker
-            showTime
             :defaultValue="takeTimeDefaultValue"
             format="YYYY-MM-DD HH:mm:ss"
+            showTime
             style="width:100%"
             @change="onTakeTimeChange"
             @ok="onTakeTimeSelect"
           />
         </a-form-model-item>
-        <a-form-model-item prop="location" label="拍摄地点：">
+        <a-form-model-item label="拍摄地点：" prop="location">
           <a-input v-model="form.model.location" />
         </a-form-model-item>
-        <a-form-model-item prop="team" label="分组：">
-          <a-auto-complete :dataSource="computedTeams" v-model="form.model.team" allowClear style="width:100%" />
+        <a-form-model-item label="分组：" prop="team">
+          <a-auto-complete v-model="form.model.team" :dataSource="computedTeams" allowClear style="width:100%" />
         </a-form-model-item>
-        <a-form-model-item prop="description" label="描述：">
-          <a-input v-model="form.model.description" type="textarea" :autoSize="{ minRows: 5 }" />
+        <a-form-model-item label="描述：" prop="description">
+          <a-input v-model="form.model.description" :autoSize="{ minRows: 5 }" type="textarea" />
         </a-form-model-item>
       </a-form-model>
       <a-divider class="divider-transparent" />
       <div class="bottom-control">
         <a-space>
           <ReactiveButton
-            @click="handleCreateOrUpdate"
-            @callback="handleCreateOrUpdateCallback"
-            :loading="form.saving"
             :errored="form.saveErrored"
-            :text="`${form.model.id ? '修改' : '添加'}`"
-            :loadedText="`${form.model.id ? '修改' : '添加'}成功`"
             :erroredText="`${form.model.id ? '修改' : '添加'}失败`"
+            :loadedText="`${form.model.id ? '修改' : '添加'}成功`"
+            :loading="form.saving"
+            :text="`${form.model.id ? '修改' : '添加'}`"
+            @callback="handleCreateOrUpdateCallback"
+            @click="handleCreateOrUpdate"
           ></ReactiveButton>
           <a-popconfirm
-            title="你确定要删除该图片？"
-            okText="确定"
-            cancelText="取消"
-            @confirm="handleDelete"
             v-if="form.model.id"
+            cancelText="取消"
+            okText="确定"
+            title="你确定要删除该图片？"
+            @confirm="handleDelete"
           >
             <ReactiveButton
-              type="danger"
-              @click="() => {}"
-              @callback="handleDeleteCallback"
-              :loading="form.deleting"
               :errored="form.deleteErrored"
-              text="删除"
-              loadedText="删除成功"
+              :loading="form.deleting"
               erroredText="删除失败"
+              loadedText="删除成功"
+              text="删除"
+              type="danger"
+              @callback="handleDeleteCallback"
+              @click="() => {}"
             ></ReactiveButton>
           </a-popconfirm>
         </a-space>
@@ -164,8 +164,8 @@
 
       <AttachmentSelectDrawer
         v-model="attachmentSelectDrawer.visible"
-        @listenToSelect="handleAttachmentSelected"
         :drawerWidth="480"
+        @listenToSelect="handleAttachmentSelected"
       />
     </a-drawer>
   </page-view>
@@ -175,8 +175,7 @@
 import { PageView } from '@/layouts'
 import { mapActions } from 'vuex'
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
-import photoApi from '@/api/photo'
-import optionApi from '@/api/option'
+import apiClient from '@/utils/api-client'
 import { datetimeFormat } from '@/utils/datetime'
 
 export default {
@@ -226,14 +225,14 @@ export default {
     }
   },
   created() {
-    this.hanldeListPhotos()
-    this.hanldeListPhotoTeams()
-    this.hanldeListOptions()
+    this.handleListPhotos()
+    this.handleListPhotoTeams()
+    this.handleListOptions()
   },
   computed: {
     takeTimeDefaultValue() {
       if (this.form.model.takeTime) {
-        var date = new Date(this.form.model.takeTime)
+        const date = new Date(this.form.model.takeTime)
         return datetimeFormat(date, 'YYYY-MM-DD HH:mm:ss')
       }
       return datetimeFormat(new Date(), 'YYYY-MM-DD HH:mm:ss')
@@ -246,34 +245,32 @@ export default {
   },
   methods: {
     ...mapActions(['refreshOptionsCache']),
-    hanldeListPhotos() {
+    handleListPhotos() {
       this.list.loading = true
       this.list.queryParam.page = this.list.pagination.page - 1
       this.list.queryParam.size = this.list.pagination.size
       this.list.queryParam.sort = this.list.pagination.sort
-      photoApi
-        .query(this.list.queryParam)
+      apiClient.photo
+        .list(this.list.queryParam)
         .then(response => {
-          this.list.data = response.data.data.content
-          this.list.pagination.total = response.data.data.total
+          this.list.data = response.data.content
+          this.list.pagination.total = response.data.total
         })
         .finally(() => {
-          setTimeout(() => {
-            this.list.loading = false
-          }, 200)
+          this.list.loading = false
         })
     },
     handleQuery() {
       this.handlePaginationChange(1, this.list.pagination.size)
     },
-    hanldeListOptions() {
-      optionApi.listAll().then(response => {
-        this.options = response.data.data
+    handleListOptions() {
+      apiClient.option.list().then(response => {
+        this.options = response.data
       })
     },
-    hanldeListPhotoTeams() {
-      photoApi.listTeams().then(response => {
-        this.teams = response.data.data
+    handleListPhotoTeams() {
+      apiClient.photo.listTeams().then(response => {
+        this.teams = response.data
       })
     },
     handleCreateOrUpdate() {
@@ -282,7 +279,7 @@ export default {
         if (valid) {
           _this.form.saving = true
           if (_this.form.model.id) {
-            photoApi
+            apiClient.photo
               .update(_this.form.model.id, _this.form.model)
               .catch(() => {
                 _this.form.saveErrored = true
@@ -293,7 +290,7 @@ export default {
                 }, 400)
               })
           } else {
-            photoApi
+            apiClient.photo
               .create(_this.form.model)
               .catch(() => {
                 _this.form.saveErrored = true
@@ -313,8 +310,8 @@ export default {
       } else {
         this.form.model = {}
         this.form.visible = false
-        this.hanldeListPhotos()
-        this.hanldeListPhotoTeams()
+        this.handleListPhotos()
+        this.handleListPhotoTeams()
       }
     },
     handleOpenEditForm(photo) {
@@ -325,11 +322,11 @@ export default {
       this.$log.debug(`Current: ${page}, PageSize: ${size}`)
       this.list.pagination.page = page
       this.list.pagination.size = size
-      this.hanldeListPhotos()
+      this.handleListPhotos()
     },
     handleDelete() {
       this.form.deleting = true
-      photoApi
+      apiClient.photo
         .delete(this.form.model.id)
         .catch(() => {
           this.form.deleteErrored = true
@@ -346,8 +343,8 @@ export default {
       } else {
         this.form.model = {}
         this.form.visible = false
-        this.hanldeListPhotos()
-        this.hanldeListPhotoTeams()
+        this.handleListPhotos()
+        this.handleListPhotoTeams()
       }
     },
     handleAttachmentSelected(data) {
@@ -359,21 +356,21 @@ export default {
       this.list.queryParam.keyword = null
       this.list.queryParam.team = null
       this.handlePaginationChange(1, this.list.pagination.size)
-      this.hanldeListPhotoTeams()
+      this.handleListPhotoTeams()
     },
     onDrawerClose() {
       this.form.visible = false
       this.form.model = {}
     },
     handleSaveOptions() {
-      optionApi
+      apiClient.option
         .save(this.options)
         .then(() => {
           this.$message.success('保存成功！')
           this.optionFormVisible = false
         })
         .finally(() => {
-          this.hanldeListOptions()
+          this.handleListOptions()
           this.refreshOptionsCache()
         })
     },

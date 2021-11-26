@@ -1,53 +1,53 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col :xl="10" :lg="10" :md="10" :sm="24" :xs="24" class="pb-3">
-        <a-card :title="title" :bodyStyle="{ padding: '16px' }">
+      <a-col :lg="10" :md="10" :sm="24" :xl="10" :xs="24" class="pb-3">
+        <a-card :bodyStyle="{ padding: '16px' }" :title="title">
           <a-form-model ref="categoryForm" :model="form.model" :rules="form.rules" layout="horizontal">
-            <a-form-model-item label="名称：" help="* 页面上所显示的名称" prop="name">
+            <a-form-model-item help="* 页面上所显示的名称" label="名称：" prop="name">
               <a-input v-model="form.model.name" />
             </a-form-model-item>
-            <a-form-model-item label="别名：" help="* 一般为单个分类页面的标识，最好为英文" prop="slug">
+            <a-form-model-item help="* 一般为单个分类页面的标识，最好为英文" label="别名：" prop="slug">
               <a-input v-model="form.model.slug" />
             </a-form-model-item>
             <a-form-model-item label="上级目录：" prop="parentId">
-              <category-select-tree :categories="table.data" v-model="form.model.parentId" />
+              <category-select-tree v-model="form.model.parentId" :categories="table.data" />
             </a-form-model-item>
-            <a-form-model-item label="封面图：" help="* 在分类页面可展示，需要主题支持" prop="thumbnail">
+            <a-form-model-item help="* 在分类页面可展示，需要主题支持" label="封面图：" prop="thumbnail">
               <a-input v-model="form.model.thumbnail">
-                <a href="javascript:void(0);" slot="addonAfter" @click="thumbnailDrawer.visible = true">
+                <a slot="addonAfter" href="javascript:void(0);" @click="thumbnailDrawer.visible = true">
                   <a-icon type="picture" />
                 </a>
               </a-input>
             </a-form-model-item>
-            <a-form-model-item label="密码：" help="* 分类密码" prop="password">
+            <a-form-model-item help="* 分类密码" label="密码：" prop="password">
               <a-input-password v-model="form.model.password" autocomplete="new-password" />
             </a-form-model-item>
-            <a-form-model-item label="描述：" help="* 分类描述，需要主题支持" prop="description">
-              <a-input type="textarea" v-model="form.model.description" :autoSize="{ minRows: 3 }" />
+            <a-form-model-item help="* 分类描述，需要主题支持" label="描述：" prop="description">
+              <a-input v-model="form.model.description" :autoSize="{ minRows: 3 }" type="textarea" />
             </a-form-model-item>
             <a-form-model-item>
               <ReactiveButton
                 v-if="!isUpdateMode"
-                type="primary"
-                @click="handleCreateOrUpdateCategory"
-                @callback="handleSavedCallback"
-                :loading="form.saving"
                 :errored="form.errored"
-                text="保存"
-                loadedText="保存成功"
+                :loading="form.saving"
                 erroredText="保存失败"
+                loadedText="保存成功"
+                text="保存"
+                type="primary"
+                @callback="handleSavedCallback"
+                @click="handleCreateOrUpdateCategory"
               ></ReactiveButton>
               <a-button-group v-else>
                 <ReactiveButton
-                  type="primary"
-                  @click="handleCreateOrUpdateCategory"
-                  @callback="handleSavedCallback"
-                  :loading="form.saving"
                   :errored="form.errored"
-                  text="更新"
-                  loadedText="更新成功"
+                  :loading="form.saving"
                   erroredText="更新失败"
+                  loadedText="更新成功"
+                  text="更新"
+                  type="primary"
+                  @callback="handleSavedCallback"
+                  @click="handleCreateOrUpdateCategory"
                 ></ReactiveButton>
                 <a-button type="dashed" @click="form.model = {}">返回添加</a-button>
               </a-button-group>
@@ -55,24 +55,24 @@
           </a-form-model>
         </a-card>
       </a-col>
-      <a-col :xl="14" :lg="14" :md="14" :sm="24" :xs="24" class="pb-3">
-        <a-card title="分类列表" :bodyStyle="{ padding: '16px' }">
+      <a-col :lg="14" :md="14" :sm="24" :xl="14" :xs="24" class="pb-3">
+        <a-card :bodyStyle="{ padding: '16px' }" title="分类列表">
           <!-- Mobile -->
           <a-list
             v-if="isMobile()"
-            itemLayout="vertical"
-            size="large"
-            :pagination="false"
             :dataSource="table.data"
             :loading="table.loading"
+            :pagination="false"
+            itemLayout="vertical"
+            size="large"
           >
-            <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
+            <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
               <template slot="actions">
                 <span>
                   <a-icon type="form" />
                   {{ item.postCount }}
                 </span>
-                <a-dropdown placement="topLeft" :trigger="['click']">
+                <a-dropdown :trigger="['click']" placement="topLeft">
                   <span>
                     <a-icon type="bars" />
                   </span>
@@ -83,9 +83,9 @@
                     <a-menu-item>
                       <a-popconfirm
                         :title="'你确定要删除【' + item.name + '】分类？'"
-                        @confirm="handleDeleteCategory(item.id)"
-                        okText="确定"
                         cancelText="取消"
+                        okText="确定"
+                        @confirm="handleDeleteCategory(item.id)"
                       >
                         <a href="javascript:void(0);">删除</a>
                       </a-popconfirm>
@@ -102,8 +102,9 @@
                   style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
                 >
                   {{ item.name }}{{ item.password ? '（加密）' : '' }}
-                </span>
-              </a-list-item-meta>
+                </span></a-list-item-meta
+              >
+              x
               <span>
                 {{ item.description }}
               </span>
@@ -114,8 +115,8 @@
             v-else
             :columns="table.columns"
             :dataSource="table.data"
-            :rowKey="record => record.id"
             :loading="table.loading"
+            :rowKey="record => record.id"
             :scrollToFirstRowOnChange="true"
           >
             <span slot="name" slot-scope="text, record" class="cursor-pointer">
@@ -130,8 +131,8 @@
               <a-badge
                 :count="record.postCount"
                 :numberStyle="{ backgroundColor: '#00e0ff' }"
-                :showZero="true"
                 :overflowCount="9999"
+                :showZero="true"
               />
             </span>
             <span slot="action" slot-scope="text, record">
@@ -139,9 +140,9 @@
               <a-divider type="vertical" />
               <a-popconfirm
                 :title="'你确定要删除【' + record.name + '】分类？'"
-                @confirm="handleDeleteCategory(record.id)"
-                okText="确定"
                 cancelText="取消"
+                okText="确定"
+                @confirm="handleDeleteCategory(record.id)"
               >
                 <a href="javascript:void(0);">删除</a>
               </a-popconfirm>
@@ -153,8 +154,8 @@
 
     <AttachmentSelectDrawer
       v-model="thumbnailDrawer.visible"
-      @listenToSelect="handleSelectThumbnail"
       title="选择封面图"
+      @listenToSelect="handleSelectThumbnail"
     />
   </page-view>
 </template>
@@ -163,7 +164,7 @@
 import { PageView } from '@/layouts'
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import CategorySelectTree from './components/CategorySelectTree'
-import categoryApi from '@/api/category'
+import apiClient from '@/utils/api-client'
 
 const columns = [
   {
@@ -235,19 +236,17 @@ export default {
   methods: {
     handleListCategories() {
       this.table.loading = true
-      categoryApi
-        .listAll(true)
+      apiClient.category
+        .list({ sort: [], more: true })
         .then(response => {
-          this.table.data = response.data.data
+          this.table.data = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.table.loading = false
-          }, 200)
+          this.table.loading = false
         })
     },
     handleDeleteCategory(id) {
-      categoryApi
+      apiClient.category
         .delete(id)
         .then(() => {
           this.$message.success('删除成功！')
@@ -267,7 +266,7 @@ export default {
         if (valid) {
           _this.form.saving = true
           if (_this.isUpdateMode) {
-            categoryApi
+            apiClient.category
               .update(_this.form.model.id, _this.form.model)
               .catch(() => {
                 this.form.errored = true
@@ -278,7 +277,7 @@ export default {
                 }, 400)
               })
           } else {
-            categoryApi
+            apiClient.category
               .create(this.form.model)
               .catch(() => {
                 this.form.errored = true

@@ -1,35 +1,35 @@
 <template>
   <a-drawer
-    title="整站备份"
+    :afterVisibleChange="handleAfterVisibleChanged"
+    :visible="visible"
     :width="isMobile() ? '100%' : '480'"
     closable
-    :visible="visible"
     destroyOnClose
+    title="整站备份"
     @close="onClose"
-    :afterVisibleChange="handleAfterVisibleChanged"
   >
-    <a-row type="flex" align="middle">
+    <a-row align="middle" type="flex">
       <a-col :span="24">
         <a-alert
-          message="注意：备份后生成的压缩文件存储在临时文件中，重启服务器会造成备份文件的丢失，所以请尽快下载。"
           banner
           closable
+          message="注意：备份后生成的压缩文件存储在临时文件中，重启服务器会造成备份文件的丢失，所以请尽快下载。"
         />
         <a-divider>历史备份</a-divider>
-        <a-list itemLayout="vertical" size="small" :dataSource="backups" :loading="loading">
+        <a-list :dataSource="backups" :loading="loading" itemLayout="vertical" size="small">
           <a-list-item slot="renderItem" slot-scope="backup">
             <a-button
               slot="extra"
-              type="link"
-              style="color: red"
-              icon="delete"
               :loading="backup.deleting"
+              icon="delete"
+              style="color: red"
+              type="link"
               @click="handleBackupDeleteClick(backup)"
-              >删除</a-button
-            >
+              >删除
+            </a-button>
             <a-list-item-meta>
               <a slot="title" href="javascript:void(0)" @click="handleDownloadBackupPackage(backup)">
-                <a-icon type="schedule" style="color: #52c41a" />
+                <a-icon style="color: #52c41a" type="schedule" />
                 {{ backup.filename }}
               </a>
               <p slot="description">{{ backup.updateTime | timeAgo }}/{{ backup.fileSize | fileSizeFormat }}</p>
@@ -41,27 +41,27 @@
     <a-divider class="divider-transparent" />
     <div class="bottom-control">
       <a-space>
-        <a-button type="primary" icon="download" @click="handleBackupClick">备份</a-button>
-        <a-button type="dashed" icon="reload" :loading="loading" @click="handleListBackups">刷新</a-button>
+        <a-button icon="download" type="primary" @click="handleBackupClick">备份</a-button>
+        <a-button :loading="loading" icon="reload" type="dashed" @click="handleListBackups">刷新</a-button>
       </a-space>
     </div>
     <a-modal v-model="optionsModal.visible" title="备份选项">
       <template slot="footer">
         <a-button @click="() => (optionsModal.visible = false)">取消</a-button>
         <ReactiveButton
-          type="primary"
-          @click="handleBackupConfirmed"
-          @callback="handleBackupedCallback"
-          :loading="backuping"
           :errored="backupErrored"
-          text="确认"
-          loadedText="备份成功"
+          :loading="backuping"
           erroredText="备份失败"
+          loadedText="备份成功"
+          text="确认"
+          type="primary"
+          @callback="handleBackupedCallback"
+          @click="handleBackupConfirmed"
         ></ReactiveButton>
       </template>
       <a-checkbox-group v-model="optionsModal.selected" style="width: 100%">
         <a-row>
-          <a-col :span="8" v-for="item in optionsModal.options" :key="item">
+          <a-col v-for="item in optionsModal.options" :key="item" :span="8">
             <a-checkbox :value="item">
               {{ item }}
             </a-checkbox>
@@ -73,7 +73,8 @@
 </template>
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
-import backupApi from '@/api/backup'
+import apiClient from '@/utils/api-client'
+
 export default {
   name: 'BackupWorkDirDrawer',
   mixins: [mixin, mixinDevice],
@@ -109,30 +110,28 @@ export default {
     },
     handleListBackups() {
       this.loading = true
-      backupApi
-        .listWorkDirBackups()
+      apiClient.backup
+        .listWorkdirBackups()
         .then(response => {
-          this.backups = response.data.data
+          this.backups = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.loading = false
-          }, 200)
+          this.loading = false
         })
     },
     handleBackupClick() {
-      backupApi.listWorkDirOptions().then(response => {
+      apiClient.backup.getWorkdirBackupOptions().then(response => {
         this.optionsModal = {
           visible: true,
-          options: response.data.data,
-          selected: response.data.data
+          options: response.data,
+          selected: response.data
         }
       })
     },
     handleBackupConfirmed() {
       this.backuping = true
-      backupApi
-        .backupWorkDir(this.optionsModal.selected)
+      apiClient.backup
+        .backupWorkdir(this.optionsModal.selected)
         .catch(() => {
           this.backupErrored = true
         })
@@ -152,7 +151,7 @@ export default {
     },
     handleBackupDeleteClick(backup) {
       backup.deleting = true
-      backupApi.deleteWorkDirBackup(backup.filename).finally(() => {
+      apiClient.backup.deleteWorkdirBackup(backup.filename).finally(() => {
         setTimeout(() => {
           backup.deleting = false
         }, 400)
@@ -160,13 +159,13 @@ export default {
       })
     },
     handleDownloadBackupPackage(item) {
-      backupApi
-        .fetchWorkDir(item.filename)
+      apiClient.backup
+        .getWorkdirBackup(item.filename)
         .then(response => {
           const downloadElement = document.createElement('a')
-          const href = new window.URL(response.data.data.downloadLink)
+          const href = new window.URL(response.data.downloadLink)
           downloadElement.href = href
-          downloadElement.download = response.data.data.filename
+          downloadElement.download = response.data.filename
           document.body.appendChild(downloadElement)
           downloadElement.click()
           document.body.removeChild(downloadElement)

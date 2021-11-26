@@ -2,10 +2,10 @@
   <div>
     <a-modal
       v-model="loginModal"
-      title="重新登录"
       :footer="null"
-      :width="320"
       :maskClosable="false"
+      :width="320"
+      title="重新登录"
       @cancel="handleCancelLogin"
     >
       <LoginForm @success="onLoginSucceed" />
@@ -14,7 +14,8 @@
 </template>
 <script>
 import LoginForm from './LoginForm'
-import { mapGetters, mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'LoginModal',
   components: {

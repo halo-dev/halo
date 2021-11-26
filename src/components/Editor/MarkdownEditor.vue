@@ -14,7 +14,7 @@
 import { toolbars } from '@/core/const'
 import { haloEditor } from 'halo-editor'
 import 'halo-editor/dist/css/index.css'
-import attachmentApi from '@/api/attachment'
+import apiClient from '@/utils/api-client'
 
 export default {
   name: 'MarkdownEditor',
@@ -46,10 +46,10 @@ export default {
     handleAttachmentUpload(pos, $file) {
       const formdata = new FormData()
       formdata.append('file', $file)
-      attachmentApi.upload(formdata).then(response => {
+      apiClient.attachment.upload(formdata).then(response => {
         const responseObject = response.data
         const HaloEditor = this.$refs.md
-        HaloEditor.$img2Url(pos, encodeURI(responseObject.data.path))
+        HaloEditor.$img2Url(pos, encodeURI(responseObject.path))
       })
     },
     handleSaveDraft() {

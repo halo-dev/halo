@@ -120,9 +120,9 @@
         @showSizeChange="handlePageSizeChange"
       />
     </div>
-    <a-modal v-model="upload.visible" :afterClose="onUploadClose" :footer="null" destroyOnClose title="上传附件">
-      <FilePondUpload ref="upload" :uploadHandler="upload.handler"></FilePondUpload>
-    </a-modal>
+
+    <AttachmentUploadModal :visible.sync="upload.visible" @close="onUploadClose" />
+
     <AttachmentDetailModal
       :addToPhoto="true"
       :attachment="list.selected"
@@ -141,8 +141,47 @@
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { PageView } from '@/layouts'
 import AttachmentDetailModal from './components/AttachmentDetailModal.vue'
-import attachmentApi from '@/api/attachment'
+import apiClient from '@/utils/api-client'
 import { mapGetters } from 'vuex'
+
+const attachmentType = {
+  LOCAL: {
+    type: 'LOCAL',
+    text: '本地'
+  },
+  SMMS: {
+    type: 'SMMS',
+    text: 'SM.MS'
+  },
+  UPOSS: {
+    type: 'UPOSS',
+    text: '又拍云'
+  },
+  QINIUOSS: {
+    type: 'QINIUOSS',
+    text: '七牛云'
+  },
+  ALIOSS: {
+    type: 'ALIOSS',
+    text: '阿里云'
+  },
+  BAIDUBOS: {
+    type: 'BAIDUBOS',
+    text: '百度云'
+  },
+  TENCENTCOS: {
+    type: 'TENCENTCOS',
+    text: '腾讯云'
+  },
+  HUAWEIOBS: {
+    type: 'HUAWEIOBS',
+    text: '华为云'
+  },
+  MINIO: {
+    type: 'MINIO',
+    text: 'MinIO'
+  }
+}
 
 export default {
   components: {
@@ -152,7 +191,7 @@ export default {
   mixins: [mixin, mixinDevice],
   filters: {
     typeText(type) {
-      return attachmentApi.type[type].text
+      return attachmentType[type].text
     }
   },
   data() {
@@ -167,9 +206,9 @@ export default {
         params: {
           page: 0,
           size: 18,
-          keyword: null,
-          mediaType: null,
-          attachmentType: null
+          keyword: undefined,
+          mediaType: undefined,
+          attachmentType: undefined
         }
       },
 
@@ -184,7 +223,6 @@ export default {
       },
 
       upload: {
-        handler: attachmentApi.upload,
         visible: false
       },
 
@@ -240,12 +278,12 @@ export default {
       try {
         this.list.loading = true
 
-        const response = await attachmentApi.query(this.list.params)
+        const response = await apiClient.attachment.list(this.list.params)
 
-        this.list.data = response.data.data.content
-        this.list.total = response.data.data.total
-        this.list.hasNext = response.data.data.hasNext
-        this.list.hasPrevious = response.data.data.hasPrevious
+        this.list.data = response.data.content
+        this.list.total = response.data.total
+        this.list.hasNext = response.data.hasNext
+        this.list.hasPrevious = response.data.hasPrevious
       } catch (error) {
         this.$log.error(error)
       } finally {
@@ -260,9 +298,9 @@ export default {
       try {
         this.mediaTypes.loading = true
 
-        const response = await attachmentApi.getMediaTypes()
+        const response = await apiClient.attachment.listMediaTypes()
 
-        this.mediaTypes.data = response.data.data
+        this.mediaTypes.data = response.data
       } catch (error) {
         this.$log.error(error)
       } finally {
@@ -277,9 +315,9 @@ export default {
       try {
         this.types.loading = true
 
-        const response = await attachmentApi.getTypes()
+        const response = await apiClient.attachment.listTypes()
 
-        this.types.data = response.data.data
+        this.types.data = response.data
       } catch (error) {
         this.$log.error(error)
       } finally {
@@ -343,8 +381,8 @@ export default {
                 okText: '确定',
                 cancelText: '取消',
                 onOk: async () => {
-                  await attachmentApi.delete(item.id)
-                  this.handleListAttachments()
+                  await apiClient.attachment.delete(item.id)
+                  await this.handleListAttachments()
                 }
               })
             }
@@ -378,9 +416,9 @@ export default {
      * Reset query params
      */
     handleResetParam() {
-      this.list.params.keyword = null
-      this.list.params.mediaType = null
-      this.list.params.attachmentType = null
+      this.list.params.keyword = undefined
+      this.list.params.mediaType = undefined
+      this.list.params.attachmentType = undefined
       this.handlePageChange()
       this.handleListMediaTypes()
       this.handleListTypes()
@@ -393,7 +431,6 @@ export default {
       this.handlePageChange()
     },
     onUploadClose() {
-      this.$refs.upload.handleClearFileList()
       this.handlePageChange()
       this.handleListMediaTypes()
       this.handleListTypes()
@@ -443,7 +480,7 @@ export default {
         title: '确定要批量删除选中的附件吗?',
         content: '一旦删除不可恢复，请谨慎操作',
         onOk() {
-          attachmentApi
+          apiClient.attachment
             .deleteInBatch(that.batchSelectedAttachments)
             .then(() => {
               that.handleCancelMultipleSelection()

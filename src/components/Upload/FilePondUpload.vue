@@ -2,24 +2,24 @@
   <div>
     <file-pond
       ref="pond"
-      :label-idle="label"
-      :name="name"
-      :allow-multiple="multiple"
-      :allowRevert="false"
       :accepted-file-types="accepts"
-      :maxParallelUploads="maxParallelUploads"
+      :allow-multiple="multiple"
       :allowImagePreview="allowImagePreview"
+      :allowRevert="false"
+      :files="fileList"
+      :label-idle="label"
       :maxFiles="maxFiles"
+      :maxParallelUploads="maxParallelUploads"
+      :name="name"
+      :server="server"
+      fileValidateTypeLabelExpectedTypes="请选择 {lastType} 格式的文件"
       labelFileProcessing="上传中"
-      labelFileProcessingComplete="上传完成"
       labelFileProcessingAborted="取消上传"
+      labelFileProcessingComplete="上传完成"
       labelFileProcessingError="上传错误"
+      labelFileTypeNotAllowed="不支持当前文件格式"
       labelTapToCancel="点击取消"
       labelTapToRetry="点击重试"
-      labelFileTypeNotAllowed="不支持当前文件格式"
-      fileValidateTypeLabelExpectedTypes="请选择 {lastType} 格式的文件"
-      :files="fileList"
-      :server="server"
       @init="handleFilePondInit"
     >
     </file-pond>
@@ -27,7 +27,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import axios from 'axios'
+import { Axios } from '@halo-dev/admin-api'
 
 import vueFilePond from 'vue-filepond'
 import 'filepond/dist/filepond.min.css'
@@ -50,7 +50,7 @@ export default {
       required: false,
       default: 'file'
     },
-    filed: {
+    field: {
       type: String,
       required: false,
       default: ''
@@ -102,22 +102,19 @@ export default {
     return {
       server: {
         process: (fieldName, file, metadata, load, error, progress, abort) => {
-          const formData = new FormData()
-          formData.append(fieldName, file, file.name)
-
-          const CancelToken = axios.CancelToken
+          const CancelToken = Axios.CancelToken
           const source = CancelToken.source()
-
           this.uploadHandler(
-            formData,
-            progressEvent => {
-              if (progressEvent.total > 0) {
-                progress(progressEvent.lengthComputable, progressEvent.loaded, progressEvent.total)
-              }
+            file,
+            {
+              onUploadProgress: progressEvent => {
+                if (progressEvent.total > 0) {
+                  progress(progressEvent.lengthComputable, progressEvent.loaded, progressEvent.total)
+                }
+              },
+              cancelToken: source.token
             },
-            source.token,
-            this.filed,
-            file
+            this.field
           )
             .then(response => {
               load(response)

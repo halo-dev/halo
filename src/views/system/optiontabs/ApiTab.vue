@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-form-model ref="apiOptionsForm" :model="options" :rules="rules" layout="vertical" :wrapperCol="wrapperCol">
+    <a-form-model ref="apiOptionsForm" :model="options" :rules="rules" :wrapperCol="wrapperCol" layout="vertical">
       <a-form-model-item label="API 服务：">
         <a-switch v-model="options.api_enabled" />
       </a-form-model-item>
@@ -9,14 +9,14 @@
       </a-form-model-item>
       <a-form-model-item>
         <ReactiveButton
-          type="primary"
-          @click="handleSaveOptions"
-          @callback="$emit('callback')"
-          :loading="saving"
           :errored="errored"
-          text="保存"
-          loadedText="保存成功"
+          :loading="saving"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存"
+          type="primary"
+          @callback="$emit('callback')"
+          @click="handleSaveOptions"
         ></ReactiveButton>
       </a-form-model-item>
     </a-form-model>

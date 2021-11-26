@@ -1,100 +1,100 @@
 <template>
   <a-drawer
+    :afterVisibleChange="handleAfterVisibleChanged"
     :title="`${theme.name} 主题设置`"
-    width="100%"
-    placement="right"
+    :visible="visible"
     closable
     destroyOnClose
+    placement="right"
+    width="100%"
     @close="onClose"
-    :visible="visible"
-    :afterVisibleChange="handleAfterVisibleChanged"
   >
     <a-row :gutter="12" type="flex">
-      <a-col :xl="12" :lg="12" :md="12" :sm="24" :xs="24" v-if="!viewMode">
+      <a-col v-if="!viewMode" :lg="12" :md="12" :sm="24" :xl="12" :xs="24">
         <a-card :bordered="false">
-          <img :alt="theme.name" :src="theme.screenshots" slot="cover" />
+          <img slot="cover" :alt="theme.name" :src="theme.screenshots" />
           <a-card-meta :description="theme.description">
             <template slot="title">
               <a :href="author.website" target="_blank">{{ author.name }}</a>
             </template>
-            <a-avatar v-if="theme.logo" :src="theme.logo" size="large" slot="avatar" />
-            <a-avatar v-else size="large" slot="avatar">{{ author.name }}</a-avatar>
+            <a-avatar v-if="theme.logo" slot="avatar" :src="theme.logo" size="large" />
+            <a-avatar v-else slot="avatar" size="large">{{ author.name }}</a-avatar>
           </a-card-meta>
         </a-card>
       </a-col>
-      <a-col :xl="formColValue" :lg="formColValue" :md="formColValue" :sm="24" :xs="24" style="padding-bottom: 50px;">
+      <a-col :lg="formColValue" :md="formColValue" :sm="24" :xl="formColValue" :xs="24" style="padding-bottom: 50px;">
         <a-spin :spinning="settingLoading">
-          <div class="card-container" v-if="themeConfigurations.length > 0">
-            <a-tabs type="card" defaultActiveKey="0">
+          <div v-if="themeConfigurations.length > 0" class="card-container">
+            <a-tabs defaultActiveKey="0" type="card">
               <a-tab-pane v-for="(group, index) in themeConfigurations" :key="index.toString()" :tab="group.label">
-                <a-form layout="vertical" :wrapperCol="wrapperCol">
-                  <a-form-item v-for="(item, index1) in group.items" :label="item.label + '：'" :key="index1">
+                <a-form :wrapperCol="wrapperCol" layout="vertical">
+                  <a-form-item v-for="(item, index1) in group.items" :key="index1" :label="item.label + '：'">
                     <p v-if="item.description && item.description !== ''" slot="help" v-html="item.description"></p>
                     <a-input
+                      v-if="item.type === 'TEXT'"
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
                       :placeholder="item.placeholder"
-                      v-if="item.type === 'TEXT'"
                     />
                     <a-input
-                      type="textarea"
-                      :autoSize="{ minRows: 5 }"
-                      v-model="themeSettings[item.name]"
-                      :placeholder="item.placeholder"
                       v-else-if="item.type === 'TEXTAREA'"
+                      v-model="themeSettings[item.name]"
+                      :autoSize="{ minRows: 5 }"
+                      :placeholder="item.placeholder"
+                      type="textarea"
                     />
                     <a-radio-group
+                      v-else-if="item.type === 'RADIO'"
+                      v-model="themeSettings[item.name]"
                       v-decorator="['radio-group']"
                       :defaultValue="item.defaultValue"
-                      v-model="themeSettings[item.name]"
-                      v-else-if="item.type === 'RADIO'"
                     >
-                      <a-radio v-for="(option, index2) in item.options" :key="index2" :value="option.value">{{
-                        option.label
-                      }}</a-radio>
+                      <a-radio v-for="(option, index2) in item.options" :key="index2" :value="option.value"
+                        >{{ option.label }}
+                      </a-radio>
                     </a-radio-group>
                     <a-select
+                      v-else-if="item.type === 'SELECT'"
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
-                      v-else-if="item.type === 'SELECT'"
                     >
-                      <a-select-option v-for="option in item.options" :key="option.value" :value="option.value">{{
-                        option.label
-                      }}</a-select-option>
+                      <a-select-option v-for="option in item.options" :key="option.value" :value="option.value"
+                        >{{ option.label }}
+                      </a-select-option>
                     </a-select>
                     <verte
-                      picker="square"
-                      model="hex"
+                      v-else-if="item.type === 'COLOR'"
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
-                      v-else-if="item.type === 'COLOR'"
+                      model="hex"
+                      picker="square"
                       style="display: inline-block;height: 24px;"
                     ></verte>
                     <a-input
+                      v-else-if="item.type === 'ATTACHMENT'"
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
-                      v-else-if="item.type === 'ATTACHMENT'"
                     >
-                      <a href="javascript:void(0);" slot="addonAfter" @click="handleShowSelectAttachment(item.name)">
+                      <a slot="addonAfter" href="javascript:void(0);" @click="handleShowSelectAttachment(item.name)">
                         <a-icon type="picture" />
                       </a>
                     </a-input>
                     <a-input-number
+                      v-else-if="item.type === 'NUMBER'"
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
-                      v-else-if="item.type === 'NUMBER'"
                       style="width:100%"
                     />
                     <a-switch
+                      v-else-if="item.type === 'SWITCH'"
                       v-model="themeSettings[item.name]"
                       :defaultChecked="item.defaultValue"
-                      v-else-if="item.type === 'SWITCH'"
                     />
                     <a-input
+                      v-else
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
                       :placeholder="item.placeholder"
-                      v-else
                     />
                   </a-form-item>
                 </a-form>
@@ -105,17 +105,17 @@
         </a-spin>
       </a-col>
 
-      <a-col :xl="20" :lg="20" :md="20" :sm="24" :xs="24" v-if="viewMode" style="padding-bottom: 50px;">
-        <a-card :bordered="true" :bodyStyle="{ padding: 0 }">
+      <a-col v-if="viewMode" :lg="20" :md="20" :sm="24" :xl="20" :xs="24" style="padding-bottom: 50px;">
+        <a-card :bodyStyle="{ padding: 0 }" :bordered="true">
           <iframe
             id="themeViewIframe"
-            title="主题预览"
+            :height="clientHeight - 165"
+            :src="options.blog_url"
+            border="0"
             frameborder="0"
             scrolling="auto"
-            border="0"
-            :src="options.blog_url"
+            title="主题预览"
             width="100%"
-            :height="clientHeight - 165"
           >
           </iframe>
         </a-card>
@@ -124,27 +124,27 @@
 
     <AttachmentSelectDrawer
       v-model="attachmentDrawerVisible"
-      @listenToSelect="handleSelectAttachment"
       title="选择附件"
+      @listenToSelect="handleSelectAttachment"
     />
 
     <footer-tool-bar v-if="themeConfigurations.length > 0" class="w-full">
       <a-space>
-        <a-button v-if="!this.isMobile() && theme.activated && viewMode" type="primary" @click="toggleViewMode" ghost
-          >普通模式</a-button
-        >
+        <a-button v-if="!this.isMobile() && theme.activated && viewMode" ghost type="primary" @click="toggleViewMode"
+          >普通模式
+        </a-button>
         <a-button v-else-if="!this.isMobile() && theme.activated && !viewMode" type="dashed" @click="toggleViewMode"
-          >预览模式</a-button
-        >
+          >预览模式
+        </a-button>
         <ReactiveButton
-          type="primary"
-          @click="handleSaveSettings"
-          @callback="saveErrored = false"
-          :loading="saving"
           :errored="saveErrored"
-          text="保存"
-          loadedText="保存成功"
+          :loading="saving"
           erroredText="保存失败"
+          loadedText="保存成功"
+          text="保存"
+          type="primary"
+          @callback="saveErrored = false"
+          @click="handleSaveSettings"
         ></ReactiveButton>
       </a-space>
     </footer-tool-bar>
@@ -156,7 +156,8 @@ import { mapGetters } from 'vuex'
 import FooterToolBar from '@/components/FooterToolbar'
 import Verte from 'verte'
 import 'verte/dist/verte.css'
-import themeApi from '@/api/theme'
+import apiClient from '@/utils/api-client'
+
 export default {
   name: 'ThemeSetting',
   mixins: [mixin, mixinDevice],
@@ -212,26 +213,24 @@ export default {
   methods: {
     async handleFetchConfiguration() {
       this.settingLoading = true
-      await themeApi.fetchConfiguration(this.theme.id).then(response => {
-        this.themeConfigurations = response.data.data
+      await apiClient.theme.listConfigurations(this.theme.id).then(response => {
+        this.themeConfigurations = response.data
       })
       this.handleFetchSettings()
     },
     handleFetchSettings() {
-      themeApi
-        .fetchSettings(this.theme.id)
+      apiClient.theme
+        .listSettings(this.theme.id)
         .then(response => {
-          this.themeSettings = response.data.data
+          this.themeSettings = response.data
         })
         .finally(() => {
-          setTimeout(() => {
-            this.settingLoading = false
-          }, 200)
+          this.settingLoading = false
         })
     },
     handleSaveSettings() {
       this.saving = true
-      themeApi
+      apiClient.theme
         .saveSettings(this.theme.id, this.themeSettings)
         .then(() => {
           if (this.viewMode) {

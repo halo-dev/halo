@@ -37,7 +37,7 @@
   </div>
 </template>
 <script>
-import themeApi from '@/api/theme'
+import apiClient from '@/utils/api-client'
 
 export default {
   name: 'MetaEditor',
@@ -93,8 +93,8 @@ export default {
      */
     async handleListPresetMetasField() {
       try {
-        const response = await themeApi.getActivatedTheme()
-        this.presetFields = response.data.data[`${this.target}MetaField`] || []
+        const response = await apiClient.theme.getActivatedTheme()
+        this.presetFields = response.data[`${this.target}MetaField`] || []
 
         this.handleGenerateMetas()
       } catch (e) {

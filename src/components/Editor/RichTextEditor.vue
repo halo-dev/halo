@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-input type="textarea" v-model="originalContent" :rows="16" />
+    <a-input v-model="originalContent" :rows="16" type="textarea" />
   </div>
 </template>
 <script>

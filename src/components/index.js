@@ -4,6 +4,7 @@ import Ellipsis from '@/components/Ellipsis'
 import FooterToolbar from '@/components/FooterToolbar'
 import FilePondUpload from '@/components/Upload/FilePondUpload'
 import AttachmentSelectDrawer from './Attachment/AttachmentSelectDrawer'
+import AttachmentUploadModal from './Attachment/AttachmentUploadModal'
 import ReactiveButton from './Button/ReactiveButton'
 
 const _components = {
@@ -11,6 +12,7 @@ const _components = {
   FooterToolbar,
   FilePondUpload,
   AttachmentSelectDrawer,
+  AttachmentUploadModal,
   ReactiveButton
 }
 

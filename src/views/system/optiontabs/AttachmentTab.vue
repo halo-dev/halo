@@ -272,8 +272,6 @@
   </div>
 </template>
 <script>
-import attachmentApi from '@/api/attachment'
-
 const tencentCosRegions = [
   {
     text: '北京一区',
@@ -326,6 +324,44 @@ const qiniuOssZones = [
     value: 'as0'
   }
 ]
+const attachmentType = {
+  LOCAL: {
+    type: 'LOCAL',
+    text: '本地'
+  },
+  SMMS: {
+    type: 'SMMS',
+    text: 'SM.MS'
+  },
+  UPOSS: {
+    type: 'UPOSS',
+    text: '又拍云'
+  },
+  QINIUOSS: {
+    type: 'QINIUOSS',
+    text: '七牛云'
+  },
+  ALIOSS: {
+    type: 'ALIOSS',
+    text: '阿里云'
+  },
+  BAIDUBOS: {
+    type: 'BAIDUBOS',
+    text: '百度云'
+  },
+  TENCENTCOS: {
+    type: 'TENCENTCOS',
+    text: '腾讯云'
+  },
+  HUAWEIOBS: {
+    type: 'HUAWEIOBS',
+    text: '华为云'
+  },
+  MINIO: {
+    type: 'MINIO',
+    text: 'MinIO'
+  }
+}
 export default {
   name: 'AttachmentTab',
   props: {
@@ -344,7 +380,7 @@ export default {
   },
   data() {
     return {
-      attachmentType: attachmentApi.type,
+      attachmentType,
       wrapperCol: {
         xl: { span: 8 },
         lg: { span: 8 },

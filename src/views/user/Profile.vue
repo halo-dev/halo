@@ -2,14 +2,14 @@
   <div>
     <a-row :gutter="12">
       <a-col :lg="10" :md="24" class="pb-3">
-        <a-card :bordered="false" :bodyStyle="{ padding: '16px' }">
+        <a-card :bodyStyle="{ padding: '16px' }" :bordered="false">
           <div class="mb-6 text-center">
-            <a-tooltip placement="right" :trigger="['hover']" title="点击可修改头像">
+            <a-tooltip :trigger="['hover']" placement="right" title="点击可修改头像">
               <a-avatar
                 :size="104"
                 :src="userForm.model.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
-                @click="attachmentDrawer.visible = true"
                 class="cursor-pointer"
+                @click="attachmentDrawer.visible = true"
               />
             </a-tooltip>
             <div class="mt-4 mb-1 text-xl font-medium leading-5" style="color: rgba(0, 0, 0, 0.85);">
@@ -19,10 +19,17 @@
           </div>
           <div>
             <p class="mb-3">
-              <a-icon type="link" class="mr-3" /><a :href="options.blog_url" target="method">{{ options.blog_url }}</a>
+              <a-icon class="mr-3" type="link" />
+              <a :href="options.blog_url" target="method">{{ options.blog_url }}</a>
             </p>
-            <p class="mb-3"><a-icon type="mail" class="mr-3" />{{ userForm.model.email }}</p>
-            <p class="mb-3"><a-icon type="calendar" class="mr-3" />{{ statistics.data.establishDays || 0 }} 天</p>
+            <p class="mb-3">
+              <a-icon class="mr-3" type="mail" />
+              {{ userForm.model.email }}
+            </p>
+            <p class="mb-3">
+              <a-icon class="mr-3" type="calendar" />
+              {{ statistics.data.establishDays || 0 }} 天
+            </p>
           </div>
           <a-divider />
           <div>
@@ -55,18 +62,18 @@
                     <a-input v-model="userForm.model.email" />
                   </a-form-model-item>
                   <a-form-model-item label="个人说明：" prop="description">
-                    <a-input :autoSize="{ minRows: 5 }" type="textarea" v-model="userForm.model.description" />
+                    <a-input v-model="userForm.model.description" :autoSize="{ minRows: 5 }" type="textarea" />
                   </a-form-model-item>
                   <a-form-model-item>
                     <ReactiveButton
-                      type="primary"
-                      @click="handleUpdateProfile"
-                      @callback="handleUpdatedProfileCallback"
-                      :loading="userForm.saving"
                       :errored="userForm.errored"
-                      text="保存"
-                      loadedText="保存成功"
+                      :loading="userForm.saving"
                       erroredText="保存失败"
+                      loadedText="保存成功"
+                      text="保存"
+                      type="primary"
+                      @callback="handleUpdatedProfileCallback"
+                      @click="handleUpdateProfile"
                     ></ReactiveButton>
                   </a-form-model-item>
                 </a-form-model>
@@ -90,14 +97,14 @@
                   </a-form-model-item>
                   <a-form-model-item>
                     <ReactiveButton
-                      type="primary"
-                      @click="handleUpdatePassword"
-                      @callback="handleUpdatedPasswordCallback"
-                      :loading="passwordForm.saving"
                       :errored="passwordForm.errored"
-                      text="确认更改"
-                      loadedText="更改成功"
+                      :loading="passwordForm.saving"
                       erroredText="更改失败"
+                      loadedText="更改成功"
+                      text="确认更改"
+                      type="primary"
+                      @callback="handleUpdatedPasswordCallback"
+                      @click="handleUpdatePassword"
                     ></ReactiveButton>
                   </a-form-model-item>
                 </a-form-model>
@@ -117,14 +124,14 @@
                       <a-list-item>
                         <b>Authy</b> 功能丰富 专为两步验证码
                         <a-divider type="vertical" />
-                        <a target="_blank" href="https://authy.com/download/">
+                        <a href="https://authy.com/download/" target="_blank">
                           iOS/Android/Windows/Mac/Linux
                           <a-icon type="link" />
                         </a>
                         <a-divider type="vertical" />
                         <a
-                          target="_blank"
                           href="https://chrome.google.com/webstore/detail/authy/gaedmjdfmmahhbjefcbgaolhhanlaolb?hl=cn"
+                          target="_blank"
                         >
                           Chrome 扩展
                           <a-icon type="link" />
@@ -133,14 +140,14 @@
                       <a-list-item>
                         <b>Google Authenticator</b> 简单易用，但不支持密钥导出备份
                         <a-divider type="vertical" />
-                        <a target="_blank" href="https://apps.apple.com/us/app/google-authenticator/id388497605">
+                        <a href="https://apps.apple.com/us/app/google-authenticator/id388497605" target="_blank">
                           iOS
                           <a-icon type="link" />
                         </a>
                         <a-divider type="vertical" />
                         <a
-                          target="_blank"
                           href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=cn"
+                          target="_blank"
                         >
                           Android
                           <a-icon type="link" />
@@ -149,7 +156,7 @@
                       <a-list-item>
                         <b>Microsoft Authenticator</b> 使用微软全家桶的推荐
                         <a-divider type="vertical" />
-                        <a target="_blank" href="https://www.microsoft.com/zh-cn/account/authenticator">
+                        <a href="https://www.microsoft.com/zh-cn/account/authenticator" target="_blank">
                           iOS/Android
                           <a-icon type="link" />
                         </a>
@@ -157,7 +164,7 @@
                       <a-list-item>
                         <b>1Password</b> 强大安全的密码管理付费应用
                         <a-divider type="vertical" />
-                        <a target="_blank" href="https://1password.com/zh-cn/downloads/">
+                        <a href="https://1password.com/zh-cn/downloads/" target="_blank">
                           iOS/Android/Windows/Mac/Linux/ChromeOS
                           <a-icon type="link" />
                         </a>
@@ -174,22 +181,22 @@
 
     <AttachmentSelectDrawer
       v-model="attachmentDrawer.visible"
+      isChooseAvatar
+      title="选择头像"
       @listenToSelect="handleSelectAvatar"
       @listenToSelectGravatar="handleSelectGravatar"
-      title="选择头像"
-      isChooseAvatar
     />
 
     <a-modal
+      :centered="true"
+      :closable="false"
+      :confirmLoading="false"
+      :destroyOnClose="true"
+      :keyboard="false"
       :title="mfaParam.modal.title"
       :visible="mfaParam.modal.visible"
-      :confirmLoading="false"
-      :closable="false"
-      icon="safety-certificate"
-      :keyboard="false"
-      :centered="true"
-      :destroyOnClose="true"
       :width="400"
+      icon="safety-certificate"
     >
       <template slot="footer">
         <a-button key="back" @click="handleCloseMFAuthModal">
@@ -197,33 +204,33 @@
         </a-button>
         <ReactiveButton
           key="submit"
-          type="primary"
-          @click="handleSetMFAuth"
-          @callback="handleSetMFAuthCallback"
-          :loading="mfaParam.saving"
           :errored="mfaParam.errored"
-          text="确定"
-          loadedText="设置成功"
+          :loading="mfaParam.saving"
           erroredText="设置失败"
+          loadedText="设置成功"
+          text="确定"
+          type="primary"
+          @callback="handleSetMFAuthCallback"
+          @click="handleSetMFAuth"
         ></ReactiveButton>
       </template>
       <a-form-model ref="mfaForm" :model="mfaParam" :rules="mfaParam.rules" layout="vertical">
         <a-form-model-item v-if="mfaUsed" label="两步验证码" prop="authcode">
           <a-input v-model="mfaParam.authcode" :maxLength="6">
-            <a-icon slot="prefix" type="safety-certificate" style="color: rgba(0,0,0,.25)" />
+            <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="safety-certificate" />
           </a-input>
         </a-form-model-item>
-        <a-form-model-item v-if="!mfaUsed" label="1. 请扫描二维码或导入 key" :help="`MFAKey:${mfaParam.mfaKey}`">
+        <a-form-model-item v-if="!mfaUsed" :help="`MFAKey:${mfaParam.mfaKey}`" label="1. 请扫描二维码或导入 key">
           <template slot="extra">
             <span class="text-red-600"
               >* 建议保存此二维码或 MFAKey，验证设备丢失将无法找回，只能通过重置密码关闭二步验证。</span
             >
           </template>
-          <img width="100%" :src="mfaParam.qrImage" />
+          <img :src="mfaParam.qrImage" width="100%" />
         </a-form-model-item>
         <a-form-model-item v-if="!mfaUsed" label="2. 验证两步验证码" prop="authcode">
           <a-input v-model="mfaParam.authcode" :maxLength="6">
-            <a-icon slot="prefix" type="safety-certificate" style="color: rgba(0,0,0,.25)" />
+            <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="safety-certificate" />
           </a-input>
         </a-form-model-item>
       </a-form-model>
@@ -232,9 +239,8 @@
 </template>
 
 <script>
-import userApi from '@/api/user'
-import statisticsApi from '@/api/statistics'
-import { mapMutations, mapGetters } from 'vuex'
+import apiClient from '@/utils/api-client'
+import { mapGetters, mapMutations } from 'vuex'
 import MD5 from 'md5.js'
 
 export default {
@@ -346,17 +352,15 @@ export default {
     ...mapMutations({ setUser: 'SET_USER' }),
     handleLoadStatistics() {
       this.statistics.loading = true
-      statisticsApi
+      apiClient.statistic
         .statisticsWithUser()
         .then(response => {
-          this.userForm.model = response.data.data.user
-          this.statistics.data = response.data.data
+          this.userForm.model = response.data.user
+          this.statistics.data = response.data
           this.mfaParam.mfaType = this.userForm.model.mfaType && this.userForm.model.mfaType
         })
         .finally(() => {
-          setTimeout(() => {
-            this.statistics.loading = false
-          }, 200)
+          this.statistics.loading = false
         })
     },
     handleUpdatePassword() {
@@ -364,8 +368,8 @@ export default {
       _this.$refs.passwordForm.validate(valid => {
         if (valid) {
           this.passwordForm.saving = true
-          userApi
-            .updatePassword(this.passwordForm.model.oldPassword, this.passwordForm.model.newPassword)
+          apiClient.user
+            .updatePassword(this.passwordForm.model)
             .catch(() => {
               this.passwordForm.errored = true
             })
@@ -391,10 +395,10 @@ export default {
       _this.$refs.userForm.validate(valid => {
         if (valid) {
           this.userForm.saving = true
-          userApi
+          apiClient.user
             .updateProfile(this.userForm.model)
             .then(response => {
-              this.userForm.model = response.data.data
+              this.userForm.model = response.data
               this.setUser(Object.assign({}, this.userForm.model))
             })
             .catch(() => {
@@ -434,11 +438,18 @@ export default {
         // show open MFA modal
         this.mfaParam.modal.title = '确认开启两步验证？'
         // generate MFAKey and Qr Image
-        userApi.mfaGenerate('TFA_TOTP').then(response => {
-          this.mfaParam.mfaKey = response.data.data.mfaKey
-          this.mfaParam.qrImage = response.data.data.qrImage
-          this.mfaParam.modal.visible = true
-        })
+        apiClient.user
+          .generateMFAQrImage({
+            mfaType: 'TFA_TOTP'
+          })
+          .then(response => {
+            this.mfaParam.mfaKey = response.data.mfaKey
+            this.mfaParam.qrImage = response.data.qrImage
+            this.mfaParam.modal.visible = true
+          })
+          .catch(() => {
+            this.mfaParam.switch.loading = false
+          })
       }
     },
     handleSetMFAuth() {
@@ -447,8 +458,12 @@ export default {
       _this.$refs.mfaForm.validate(valid => {
         if (valid) {
           _this.mfaParam.saving = true
-          userApi
-            .mfaUpdate(mfaType, _this.mfaParam.mfaKey, _this.mfaParam.authcode)
+          apiClient.user
+            .updateMFAuth({
+              mfaType: mfaType,
+              mfaKey: _this.mfaParam.mfaKey,
+              authcode: _this.mfaParam.authcode
+            })
             .catch(() => {
               _this.mfaParam.errored = true
             })
@@ -461,13 +476,12 @@ export default {
       })
     },
     handleSetMFAuthCallback() {
-      const _this = this
-      if (_this.mfaParam.errored) {
-        _this.mfaParam.errored = false
+      if (this.mfaParam.errored) {
+        this.mfaParam.errored = false
       } else {
-        _this.handleCloseMFAuthModal()
-        _this.handleLoadStatistics()
-        _this.$message.success(_this.mfaUsed ? '两步验证已关闭！' : '两步验证已开启,下次登录生效！')
+        this.handleCloseMFAuthModal()
+        this.handleLoadStatistics()
+        this.$message.success(this.mfaUsed ? '两步验证已关闭！' : '两步验证已开启,下次登录生效！')
       }
     },
     handleCloseMFAuthModal() {
