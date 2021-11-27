@@ -33,14 +33,11 @@
       </a-col>
     </a-row>
 
-    <SheetSettingDrawer
-      :metas="selectedMetas"
-      :sheet="sheetToStage"
-      :visible="sheetSettingVisible"
-      @close="sheetSettingVisible = false"
-      @onRefreshSheet="onRefreshSheetFromSetting"
-      @onRefreshSheetMetas="onRefreshSheetMetasFromSetting"
-      @onSaved="handleRestoreSavedStatus"
+    <SheetSettingModal
+      :post="sheetToStage"
+      :savedCallback="onSheetSavedCallback"
+      :visible.sync="sheetSettingVisible"
+      @onUpdate="onUpdateFromSetting"
     />
 
     <AttachmentDrawer v-model="attachmentDrawerVisible" />
@@ -51,7 +48,7 @@
 import { mixin, mixinDevice, mixinPostEdit } from '@/mixins/mixin.js'
 import { datetimeFormat } from '@/utils/datetime'
 import { PageView } from '@/layouts'
-import SheetSettingDrawer from './components/SheetSettingDrawer'
+import SheetSettingModal from './components/SheetSettingModal'
 import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 import apiClient from '@/utils/api-client'
@@ -60,7 +57,7 @@ export default {
   components: {
     PageView,
     AttachmentDrawer,
-    SheetSettingDrawer,
+    SheetSettingModal,
     MarkdownEditor
   },
   mixins: [mixin, mixinDevice, mixinPostEdit],
@@ -69,7 +66,6 @@ export default {
       attachmentDrawerVisible: false,
       sheetSettingVisible: false,
       sheetToStage: {},
-      selectedMetas: [],
       contentChanges: 0,
       draftSaving: false,
       draftSaveErrored: false,
@@ -83,9 +79,7 @@ export default {
     next(vm => {
       if (sheetId) {
         apiClient.sheet.get(sheetId).then(response => {
-          const sheet = response.data
-          vm.sheetToStage = sheet
-          vm.selectedMetas = sheet.metas
+          vm.sheetToStage = response.data
         })
       }
     })
@@ -234,11 +228,12 @@ export default {
       this.contentChanges++
       this.sheetToStage.originalContent = val
     },
-    onRefreshSheetFromSetting(sheet) {
-      this.sheetToStage = sheet
+    onSheetSavedCallback() {
+      this.contentChanges = 0
+      this.$router.push({ name: 'SheetList', query: { activeKey: 'custom' } })
     },
-    onRefreshSheetMetasFromSetting(metas) {
-      this.selectedMetas = metas
+    onUpdateFromSetting(sheet) {
+      this.sheetToStage = sheet
     }
   }
 }

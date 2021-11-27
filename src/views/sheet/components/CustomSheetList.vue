@@ -210,17 +210,22 @@
         @showSizeChange="handlePageSizeChange"
       />
     </div>
-    <SheetSettingDrawer
-      :metas="selectedMetas"
-      :needTitle="true"
-      :saveDraftButton="false"
-      :sheet="selectedSheet"
-      :visible="sheetSettingVisible"
-      @close="onSheetSettingsClose"
-      @onRefreshSheet="onRefreshSheetFromSetting"
-      @onRefreshSheetMetas="onRefreshSheetMetasFromSetting"
-    />
-
+    <SheetSettingModal
+      :loading="sheetSettingLoading"
+      :post="selectedSheet"
+      :savedCallback="onSheetSavedCallback"
+      :visible.sync="sheetSettingVisible"
+      @onClose="selectedSheet = {}"
+    >
+      <template #extraFooter>
+        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious">
+          上一篇
+        </a-button>
+        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext">
+          下一篇
+        </a-button>
+      </template>
+    </SheetSettingModal>
     <TargetCommentDrawer
       :id="selectedSheet.id"
       :description="selectedSheet.summary"
@@ -233,7 +238,7 @@
 </template>
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
-import SheetSettingDrawer from './SheetSettingDrawer'
+import SheetSettingModal from './SheetSettingModal'
 import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
 import apiClient from '@/utils/api-client'
 
@@ -294,7 +299,7 @@ export default {
   name: 'CustomSheetList',
   mixins: [mixin, mixinDevice],
   components: {
-    SheetSettingDrawer,
+    SheetSettingModal,
     TargetCommentDrawer
   },
   data() {
@@ -314,8 +319,8 @@ export default {
         }
       },
       selectedSheet: {},
-      selectedMetas: [],
       sheetSettingVisible: false,
+      sheetSettingLoading: false,
       sheetCommentVisible: false
     }
   },
@@ -332,6 +337,14 @@ export default {
         size: this.list.params.size,
         total: this.list.total
       }
+    },
+    selectPreviousButtonDisabled() {
+      const index = this.list.data.findIndex(sheet => sheet.id === this.selectedSheet.id)
+      return index === 0 && !this.list.hasPrevious
+    },
+    selectNextButtonDisabled() {
+      const index = this.list.data.findIndex(sheet => sheet.id === this.selectedSheet.id)
+      return index === this.list.data.length - 1 && !this.list.hasNext
     }
   },
   created() {
@@ -393,7 +406,6 @@ export default {
     handleShowSheetSettings(sheet) {
       apiClient.sheet.get(sheet.id).then(response => {
         this.selectedSheet = response.data
-        this.selectedMetas = this.selectedSheet.metas
         this.sheetSettingVisible = true
       })
     },
@@ -426,14 +438,6 @@ export default {
       this.list.params.size = size
       this.handleListSheets()
     },
-
-    onSheetSettingsClose() {
-      this.sheetSettingVisible = false
-      this.selectedSheet = {}
-      setTimeout(() => {
-        this.handleListSheets(false)
-      }, 500)
-    },
     onSheetCommentsClose() {
       this.sheetCommentVisible = false
       this.selectedSheet = {}
@@ -441,11 +445,50 @@ export default {
         this.handleListSheets(false)
       }, 500)
     },
-    onRefreshSheetFromSetting(sheet) {
-      this.selectedSheet = sheet
+    onSheetSavedCallback() {
+      this.handleListSheets(false)
     },
-    onRefreshSheetMetasFromSetting(metas) {
-      this.selectedMetas = metas
+    /**
+     * Select previous sheet
+     */
+    async handleSelectPrevious() {
+      const index = this.list.data.findIndex(post => post.id === this.selectedSheet.id)
+      if (index > 0) {
+        this.sheetSettingLoading = true
+        const response = await apiClient.sheet.get(this.list.data[index - 1].id)
+        this.selectedSheet = response.data
+        this.sheetSettingLoading = false
+        return
+      }
+      if (index === 0 && this.list.hasPrevious) {
+        this.list.params.page--
+        await this.handleListPosts()
+        this.sheetSettingLoading = true
+        const response = await apiClient.sheet.get(this.list.data[this.list.data.length - 1].id)
+        this.selectedSheet = response.data
+        this.sheetSettingLoading = false
+      }
+    },
+    /**
+     * Select next sheet
+     */
+    async handleSelectNext() {
+      const index = this.list.data.findIndex(post => post.id === this.selectedSheet.id)
+      if (index < this.list.data.length - 1) {
+        this.sheetSettingLoading = true
+        const response = await apiClient.sheet.get(this.list.data[index + 1].id)
+        this.selectedSheet = response.data
+        this.sheetSettingLoading = false
+        return
+      }
+      if (index === this.list.data.length - 1 && this.list.hasNext) {
+        this.list.params.page++
+        await this.handleListPosts()
+        this.sheetSettingLoading = true
+        const response = await apiClient.sheet.get(this.list.data[0].id)
+        this.selectedSheet = response.data
+        this.sheetSettingLoading = false
+      }
     }
   }
 }
