@@ -3,7 +3,9 @@ import store from '@/store'
 import { message, notification } from 'ant-design-vue'
 import { isObject } from './util'
 
-const apiUrl = process.env.VUE_APP_API_URL ? process.env.VUE_APP_API_URL : 'http://localhost:8080'
+const storedApiUrl = localStorage.getItem('apiUrl')
+
+const apiUrl = storedApiUrl ? storedApiUrl : process.env.VUE_APP_API_URL
 
 const haloRestApiClient = new HaloRestAPIClient({
   baseUrl: apiUrl
