@@ -168,7 +168,7 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             Path themePath = themeService.getBasePath().resolve(HaloConst.DEFAULT_THEME_ID);
 
             if (themeService.fetchThemePropertyBy(HaloConst.DEFAULT_THEME_ID).isEmpty()) {
-                FileUtils.copyFolder(source.resolve("anatole"), themePath);
+                FileUtils.copyFolder(source.resolve(HaloConst.DEFAULT_THEME_DIR_NAME), themePath);
                 log.info("Copied theme folder from [{}] to [{}]", source, themePath);
             }
         } catch (Exception e) {
