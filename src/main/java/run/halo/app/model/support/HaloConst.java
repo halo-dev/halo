@@ -62,7 +62,7 @@ public class HaloConst {
     /**
      * Default tag color.
      */
-    public static final String DEFAULT_TAG_COLOR = "#52c41a";
+    public static final String DEFAULT_TAG_COLOR = "#cfd3d7";
 
     /**
      * Path separator.
