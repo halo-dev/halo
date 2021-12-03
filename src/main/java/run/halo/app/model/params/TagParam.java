@@ -6,6 +6,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Tag;
+import run.halo.app.model.support.HaloConst;
 import run.halo.app.utils.SlugUtils;
 
 /**
@@ -13,6 +14,7 @@ import run.halo.app.utils.SlugUtils;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-20
  */
 @Data
@@ -24,6 +26,9 @@ public class TagParam implements InputConverter<Tag> {
 
     @Size(max = 255, message = "标签别名的字符长度不能超过 {max}")
     private String slug;
+
+    @Size(max = 20, message = "颜色值字符长度不能超过 {max}")
+    private String color;
 
     @Size(max = 1023, message = "封面图链接的字符长度不能超过 {max}")
     private String thumbnail;
@@ -37,6 +42,10 @@ public class TagParam implements InputConverter<Tag> {
             thumbnail = "";
         }
 
+        if (StringUtils.isBlank(color)) {
+            this.color = HaloConst.DEFAULT_TAG_COLOR;
+        }
+
         return InputConverter.super.convertTo();
     }
 
@@ -47,6 +56,10 @@ public class TagParam implements InputConverter<Tag> {
 
         if (null == thumbnail) {
             thumbnail = "";
+        }
+
+        if (StringUtils.isBlank(color)) {
+            this.color = HaloConst.DEFAULT_TAG_COLOR;
         }
 
         InputConverter.super.update(tag);
