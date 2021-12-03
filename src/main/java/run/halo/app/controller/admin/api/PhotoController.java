@@ -4,6 +4,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -73,6 +74,18 @@ public class PhotoController {
     @ApiOperation("Creates a photo")
     public PhotoDTO createBy(@Valid @RequestBody PhotoParam photoParam) {
         return new PhotoDTO().convertFrom(photoService.createBy(photoParam));
+    }
+
+    @PostMapping("/batch")
+    @ApiOperation("Batch creation photos")
+    public List<PhotoDTO> createBatchBy(@Valid @RequestBody List<PhotoParam> photoParams) {
+        return photoParams.stream()
+            .map(photoParam -> {
+                PhotoDTO photoDto = new PhotoDTO();
+                photoDto.convertFrom(photoService.createBy(photoParam));
+                return photoDto;
+            })
+            .collect(Collectors.toList());
     }
 
     @PutMapping("{photoId:\\d+}")
