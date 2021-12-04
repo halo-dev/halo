@@ -1,7 +1,6 @@
 package run.halo.app.service.impl;
 
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
-
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,13 +8,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -26,12 +29,14 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.projection.CategoryPostCountProjection;
+import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.PostCategoryRepository;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.ServiceUtils;
 
 /**
@@ -304,44 +309,74 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
-    public List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(
-        Sort sort, boolean queryEncryptCategory) {
+    public List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(@NonNull Sort sort,
+        boolean queryEncryptCategory) {
         Assert.notNull(sort, "Sort info must not be null");
         List<Category> categories = categoryService.listAll(sort, queryEncryptCategory);
+        List<CategoryVO> categoryTreeVo = categoryService.listToTree(categories);
+        populatePostCount(categoryTreeVo);
 
+        // Convert and return
+        return flatTreeToList(categoryTreeVo);
+    }
+
+    private List<CategoryWithPostCountDTO> flatTreeToList(List<CategoryVO> categoryTree) {
+        Assert.notNull(categoryTree, "The categoryTree must not be null.");
+        List<CategoryWithPostCountDTO> result = new LinkedList<>();
+        walkCategoryTree(categoryTree, category -> {
+            CategoryWithPostCountDTO categoryWithPostCountDto =
+                new CategoryWithPostCountDTO();
+            BeanUtils.copyProperties(category, categoryWithPostCountDto);
+            String fullPath = categoryService.buildCategoryFullPath(category.getSlug());
+            categoryWithPostCountDto.setFullPath(fullPath);
+            result.add(categoryWithPostCountDto);
+        });
+        return result;
+    }
+
+    private void populatePostCount(List<CategoryVO> categoryTree) {
+        Assert.notNull(categoryTree, "The categoryTree must not be null.");
         // Query category post count
         Map<Integer, Long> categoryPostCountMap = ServiceUtils
             .convertToMap(postCategoryRepository.findPostCount(),
                 CategoryPostCountProjection::getCategoryId,
                 CategoryPostCountProjection::getPostCount);
+        walkCategoryTree(categoryTree, category -> {
+            // Set post count
+            category.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+        });
+        CategoryVO categoryTreeRootNode = new CategoryVO();
+        categoryTreeRootNode.setChildren(categoryTree);
+        updatePostCountInTreeNodeFromBottomToTop(categoryTreeRootNode);
+    }
 
-        // Convert and return
-        return categories.stream()
-            .map(category -> {
-                // Create category post count dto
-                CategoryWithPostCountDTO categoryWithPostCountDTO =
-                    new CategoryWithPostCountDTO().convertFrom(category);
-                // Set post count
-                categoryWithPostCountDTO
-                    .setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+    private void updatePostCountInTreeNodeFromBottomToTop(CategoryVO root) {
+        if (root == null) {
+            return;
+        }
+        List<CategoryVO> children = root.getChildren();
+        if (CollectionUtils.isEmpty(children)) {
+            return;
+        }
+        for (CategoryVO category : children) {
+            updatePostCountInTreeNodeFromBottomToTop(category);
+            // Recalculate the post count.
+            long postCount =
+                Objects.requireNonNullElse(root.getPostCount(), 0L)
+                    + Objects.requireNonNullElse(category.getPostCount(), 0L);
+            root.setPostCount(postCount);
+        }
+    }
 
-                StringBuilder fullPath = new StringBuilder();
-
-                if (optionService.isEnabledAbsolutePath()) {
-                    fullPath.append(optionService.getBlogBaseUrl());
-                }
-
-                fullPath.append(URL_SEPARATOR)
-                    .append(optionService.getCategoriesPrefix())
-                    .append(URL_SEPARATOR)
-                    .append(category.getSlug())
-                    .append(optionService.getPathSuffix());
-
-                categoryWithPostCountDTO.setFullPath(fullPath.toString());
-
-                return categoryWithPostCountDTO;
-            })
-            .collect(Collectors.toList());
+    private void walkCategoryTree(List<CategoryVO> categoryTree, Consumer<CategoryVO> consumer) {
+        Queue<CategoryVO> queue = new ArrayDeque<>(categoryTree);
+        while (!queue.isEmpty()) {
+            CategoryVO category = queue.poll();
+            consumer.accept(category);
+            if (HaloUtils.isNotEmpty(category.getChildren())) {
+                queue.addAll(category.getChildren());
+            }
+        }
     }
 
     @Override
@@ -349,4 +384,5 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notEmpty(categoryIdList, "category id list not empty");
         return postCategoryRepository.findAllByCategoryIdList(categoryIdList);
     }
+
 }

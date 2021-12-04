@@ -816,13 +816,17 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
 
             if (postQuery.getCategoryId() != null) {
+                List<Integer> categoryIds =
+                    categoryService.listAllByParentId(postQuery.getCategoryId())
+                        .stream()
+                        .map(Category::getId)
+                        .collect(Collectors.toList());
                 Subquery<Post> postSubquery = query.subquery(Post.class);
                 Root<PostCategory> postCategoryRoot = postSubquery.from(PostCategory.class);
                 postSubquery.select(postCategoryRoot.get("postId"));
                 postSubquery.where(
                     criteriaBuilder.equal(root.get("id"), postCategoryRoot.get("postId")),
-                    criteriaBuilder
-                        .equal(postCategoryRoot.get("categoryId"), postQuery.getCategoryId()));
+                    postCategoryRoot.get("categoryId").in(categoryIds));
                 predicates.add(criteriaBuilder.exists(postSubquery));
             }
 

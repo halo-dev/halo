@@ -1,5 +1,6 @@
 package run.halo.app.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,6 +17,9 @@ import run.halo.app.model.dto.CategoryDTO;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class CategoryVO extends CategoryDTO {
+
+    @JsonIgnore
+    private Long postCount;
 
     private List<CategoryVO> children;
 }
