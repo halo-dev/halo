@@ -28,7 +28,7 @@ public class TagParam implements InputConverter<Tag> {
     @Size(max = 255, message = "标签别名的字符长度不能超过 {max}")
     private String slug;
 
-    @Size(max = 20, message = "颜色值字符长度不能超过 {max}")
+    @Size(max = 24, message = "颜色值字符长度不能超过 {max}")
     @ApiModelProperty(value = "标签颜色，支持多种颜色模式，"
         + "例如 Hex: #cfd3d7，颜色名称：LightGrey，RGB: rgb(207, 211, 215)，"
         + "RGBA: rgb(207, 211, 215, 0.5)等", name = "color",
