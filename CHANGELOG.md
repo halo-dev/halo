@@ -1,5 +1,13 @@
 # CHANGELOG
 
+# 1.4.14
+
+## Bug Fixes
+
+- 修复文章详情接口中评论数量（commentCount）不正确的问题，将仅统计已审核通过的评论数量。 #1503 @fuzui
+- 修复菜单批量保存接口会导致 `createTime` 置空的问题。 #1526 @guqing
+- 修复首次更新默认主题时，会导致部分静态资源无法获取的问题。 #1549 @guqing
+
 # 1.4.13
 
 ## Breaking changes
