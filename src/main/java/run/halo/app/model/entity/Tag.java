@@ -54,7 +54,7 @@ public class Tag extends BaseEntity {
     /**
      * Tag color.
      */
-    @Column(name = "color", length = 20)
+    @Column(name = "color", length = 25)
     private String color;
 
     /**
