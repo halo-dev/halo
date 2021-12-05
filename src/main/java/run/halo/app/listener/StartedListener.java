@@ -165,10 +165,10 @@ public class StartedListener implements ApplicationListener<ApplicationStartedEv
             }
 
             // Create theme folder
-            Path themePath = themeService.getBasePath();
+            Path themePath = themeService.getBasePath().resolve(HaloConst.DEFAULT_THEME_ID);
 
             if (themeService.fetchThemePropertyBy(HaloConst.DEFAULT_THEME_ID).isEmpty()) {
-                FileUtils.copyFolder(source, themePath);
+                FileUtils.copyFolder(source.resolve(HaloConst.DEFAULT_THEME_DIR_NAME), themePath);
                 log.info("Copied theme folder from [{}] to [{}]", source, themePath);
             }
         } catch (Exception e) {
