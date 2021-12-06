@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,6 @@ import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.projection.CategoryPostCountProjection;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.PostCategoryRepository;
 import run.halo.app.repository.PostRepository;
@@ -314,7 +314,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(sort, "Sort info must not be null");
         List<Category> categories = categoryService.listAll(sort, queryEncryptCategory);
         List<CategoryVO> categoryTreeVo = categoryService.listToTree(categories);
-        populatePostCount(categoryTreeVo);
+        populatePostIds(categoryTreeVo);
 
         // Convert and return
         return flatTreeToList(categoryTreeVo);
@@ -329,28 +329,34 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
             BeanUtils.copyProperties(category, categoryWithPostCountDto);
             String fullPath = categoryService.buildCategoryFullPath(category.getSlug());
             categoryWithPostCountDto.setFullPath(fullPath);
+            // populate post count.
+            int postCount = Objects.requireNonNullElse(category.getPostIds(),
+                Collections.emptySet()).size();
+            categoryWithPostCountDto.setPostCount((long) postCount);
             result.add(categoryWithPostCountDto);
         });
         return result;
     }
 
-    private void populatePostCount(List<CategoryVO> categoryTree) {
+    private void populatePostIds(List<CategoryVO> categoryTree) {
         Assert.notNull(categoryTree, "The categoryTree must not be null.");
-        // Query category post count
-        Map<Integer, Long> categoryPostCountMap = ServiceUtils
-            .convertToMap(postCategoryRepository.findPostCount(),
-                CategoryPostCountProjection::getCategoryId,
-                CategoryPostCountProjection::getPostCount);
+        Map<Integer, Set<Integer>> categoryPostIdsMap = postCategoryRepository.findAll()
+            .stream()
+            .collect(Collectors.groupingBy(PostCategory::getCategoryId,
+                Collectors.mapping(PostCategory::getPostId, Collectors.toSet())));
+
         walkCategoryTree(categoryTree, category -> {
             // Set post count
-            category.setPostCount(categoryPostCountMap.getOrDefault(category.getId(), 0L));
+            Set<Integer> postIds =
+                categoryPostIdsMap.getOrDefault(category.getId(), new LinkedHashSet<>());
+            category.setPostIds(postIds);
         });
         CategoryVO categoryTreeRootNode = new CategoryVO();
         categoryTreeRootNode.setChildren(categoryTree);
-        updatePostCountInTreeNodeFromBottomToTop(categoryTreeRootNode);
+        mergePostIdsFromBottomToTop(categoryTreeRootNode);
     }
 
-    private void updatePostCountInTreeNodeFromBottomToTop(CategoryVO root) {
+    private void mergePostIdsFromBottomToTop(CategoryVO root) {
         if (root == null) {
             return;
         }
@@ -359,12 +365,12 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
             return;
         }
         for (CategoryVO category : children) {
-            updatePostCountInTreeNodeFromBottomToTop(category);
-            // Recalculate the post count.
-            long postCount =
-                Objects.requireNonNullElse(root.getPostCount(), 0L)
-                    + Objects.requireNonNullElse(category.getPostCount(), 0L);
-            root.setPostCount(postCount);
+            mergePostIdsFromBottomToTop(category);
+            if (root.getPostIds() == null) {
+                root.setPostIds(new LinkedHashSet<>());
+            }
+            // merge post ids.
+            root.getPostIds().addAll(category.getPostIds());
         }
     }
 
