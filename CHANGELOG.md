@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 1.4.15
+
+## Bug Fixes
+
+- 修复 1.4.14 中由于 CI 设置版本号错误导致无法正常安装主题的问题。#1571 @JohnNiang
+
 # 1.4.14
 
 ## Bug Fixes

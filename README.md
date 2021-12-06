@@ -29,7 +29,7 @@
 下载最新的 Halo 运行包：
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.4.14/halo-1.4.14.jar --output halo.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.4.15/halo-1.4.15.jar --output halo.jar
 ```
 
 其他地址：<https://docs.halo.run/getting-started/downloads>
