@@ -17,7 +17,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -137,14 +136,17 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         if (CollectionUtils.isEmpty(categories)) {
             return Collections.emptyList();
         }
+        // Do not return category password.
+        desensitizePassword(categories);
 
-        // Create top category
-        CategoryVO topLevelCategory = createTopLevelCategory();
+        return listToTree(categories);
+    }
 
-        // Concrete the tree
-        concreteTree(topLevelCategory, categories, false);
-
-        return topLevelCategory.getChildren();
+    private void desensitizePassword(List<Category> categories) {
+        Assert.notNull(categories, "The categories must not be null.");
+        categories.forEach(category -> {
+            category.setPassword(null);
+        });
     }
 
     @NonNull
@@ -165,76 +167,12 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         return fullPath.toString();
     }
 
-    /**
-     * Concrete category tree.
-     *
-     * @param parentCategory parent category vo must not be null
-     * @param categories a list of category
-     * @param fillPassword whether to fill in the password
-     */
-    private void concreteTree(
-        CategoryVO parentCategory,
-        List<Category> categories,
-        Boolean fillPassword
-    ) {
-        Assert.notNull(parentCategory, "Parent category must not be null");
-
-        if (CollectionUtils.isEmpty(categories)) {
-            return;
-        }
-
-        // Get children for removing after
-        List<Category> children = categories.stream()
-            .filter(category -> Objects.equal(parentCategory.getId(), category.getParentId()))
-            .collect(Collectors.toList());
-
-        children.forEach(category -> {
-            // Convert to child category vo
-            CategoryVO child = convertToCategoryVo(category);
-            // Init children if absent
-            if (parentCategory.getChildren() == null) {
-                parentCategory.setChildren(new LinkedList<>());
-            }
-            if (!fillPassword) {
-                child.setPassword(null);
-            }
-
-            // Add child
-            parentCategory.getChildren().add(child);
-        });
-
-        // Remove all child categories
-        categories.removeAll(children);
-
-        // Foreach children vos
-        if (!CollectionUtils.isEmpty(parentCategory.getChildren())) {
-            parentCategory.getChildren()
-                .forEach(childCategory -> concreteTree(childCategory, categories, fillPassword));
-        }
-    }
-
     @NonNull
     private CategoryVO convertToCategoryVo(Category category) {
         Assert.notNull(category, "The category must not be null.");
         CategoryVO categoryVo = new CategoryVO().convertFrom(category);
         categoryVo.setFullPath(buildCategoryFullPath(categoryVo.getSlug()));
         return categoryVo;
-    }
-
-    /**
-     * Creates a top level category.
-     *
-     * @return top level category with id 0
-     */
-    @NonNull
-    private CategoryVO createTopLevelCategory() {
-        CategoryVO topCategory = new CategoryVO();
-        // Set default value
-        topCategory.setId(0);
-        topCategory.setChildren(new LinkedList<>());
-        topCategory.setParentId(-1);
-
-        return topCategory;
     }
 
     @Override
@@ -359,7 +297,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     }
 
     /**
-     * walk a category tree with root node.
+     * Walk a category tree with root node.
      *
      * @param root a root node of category tree.
      * @return a flattened category list
@@ -372,6 +310,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         queue.add(root);
         while (!queue.isEmpty()) {
             CategoryVO categoryNode = queue.poll();
+
             Category category = new Category();
             BeanUtils.updateProperties(categoryNode, category);
             categories.add(category);
@@ -434,19 +373,15 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             return Collections.emptyList();
         }
 
-        // Concrete the tree
-        CategoryVO topLevelCategory = createTopLevelCategory();
-
-        concreteTree(topLevelCategory, categories, true);
-
-        List<CategoryVO> childrenList = topLevelCategory.getChildren();
+        // list to tree, no password desensitise is required here
+        List<CategoryVO> categoryTree = listToTree(categories);
 
         // filter encrypt category
-        doFilterEncryptCategory(childrenList);
+        doFilterEncryptCategory(categoryTree);
 
         List<Category> collectorList = new ArrayList<>();
 
-        collectAllChild(collectorList, childrenList, true);
+        collectAllChild(collectorList, categoryTree, true);
 
         for (Category category : collectorList) {
             category.setPassword(null);
@@ -612,14 +547,13 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * @param category need encrypt category
      */
     private void doEncryptPost(Category category) {
-        CategoryVO topLevelCategory = createTopLevelCategory();
-
-        concreteTree(topLevelCategory, super.listAll(), true);
+        // list to tree with password
+        List<CategoryVO> categoryTree = listToTree(super.listAll());
 
         List<Category> collectorList = new ArrayList<>();
 
         collectAllChildByCategoryId(collectorList,
-            topLevelCategory.getChildren(), category.getId(), true);
+            categoryTree, category.getId(), true);
 
         Optional.of(collectorList.stream().map(Category::getId).collect(Collectors.toList()))
             .map(categoryIdList -> {
@@ -655,16 +589,14 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             // If the parent category is encrypted, there is no need to update the encryption status
             return;
         }
-
-        CategoryVO topLevelCategory = createTopLevelCategory();
-
-        concreteTree(topLevelCategory, allCategoryList, true);
+        // with password
+        List<CategoryVO> categoryTree = listToTree(allCategoryList);
 
         List<Category> collectorList = new ArrayList<>();
 
         // Only collect unencrypted sub-categories under the category.
         collectAllChildByCategoryId(collectorList,
-            topLevelCategory.getChildren(), category.getId(), false);
+            categoryTree, category.getId(), false);
         // Collect the currently decrypted category
         collectorList.add(category);
 
