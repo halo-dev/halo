@@ -49,7 +49,9 @@ jobs:
       - name: Build with Gradle
         run: |
           # Set the version with tag name when releasing
-          sed -i "s/version=.*-SNAPSHOT$/version=${{ github.event.release.tag_name }}/1" gradle.properties
+          version=${{ github.event.release.tag_name }}
+          version=${version#v}
+          sed -i "s/version=.*-SNAPSHOT$/version=$version/1" gradle.properties
           ./gradlew clean build -x test
       - name: Archive halo jar
         uses: actions/upload-artifact@v2
