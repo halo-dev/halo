@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
  * Halo constants.
  *
  * @author ryanwang
+ * @author guqing
  * @date 2017/12/29
  */
 public class HaloConst {
@@ -59,6 +60,11 @@ public class HaloConst {
     public static final String DEFAULT_ERROR_PATH = "common/error/error";
 
     /**
+     * Default tag color.
+     */
+    public static final String DEFAULT_TAG_COLOR = "#cfd3d7";
+
+    /**
      * Path separator.
      */
     public static final String FILE_SEPARATOR = File.separator;
@@ -67,6 +73,7 @@ public class HaloConst {
      * Post password template name.
      */
     public static final String POST_PASSWORD_TEMPLATE = "post_password";
+
     /**
      * Suffix of freemarker template file.
      */
