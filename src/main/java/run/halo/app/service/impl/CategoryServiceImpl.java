@@ -290,7 +290,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     @Override
     public List<Category> listAllByParentId(@NonNull Integer id) {
         Assert.notNull(id, "Parent id must not be null");
-        List<Category> categories = listAll(Sort.by(Order.asc("name")));
+        List<Category> categories = super.listAll(Sort.by(Order.asc("name")));
         List<CategoryVO> categoryTree = listToTree(categories);
         return findCategoryTreeNodeById(categoryTree, id)
             .map(this::walkCategoryTree)
