@@ -102,7 +102,7 @@ ext {
 dependencies {
     // Aligning log4j dependency versions to 2.15.0
     implementation enforcedPlatform("org.apache.logging.log4j:log4j-core:$log4jVersion")
-    implementation enforcedPlatform("org.apache.logging.log4j:log4j-api:2.15.0")
+    implementation enforcedPlatform("org.apache.logging.log4j:log4j-api:$log4jVersion")
 
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
