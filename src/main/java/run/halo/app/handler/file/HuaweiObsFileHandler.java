@@ -82,7 +82,7 @@ public class HuaweiObsFileHandler implements FileHandler {
 
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
-                .setBasePath(domain)
+                .setBasePath(basePath.toString())
                 .setSubPath(source)
                 .setAutomaticRename(true)
                 .setRenamePredicate(relativePath ->
