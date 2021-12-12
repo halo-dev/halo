@@ -1,5 +1,11 @@
 # CHANGELOG
 
+# 1.4.16
+
+## Security Fixes
+
+- 升级部分依赖中的 log4j2 版本，修复可能由 log4j2 导致的安全漏洞。#1588 @guqing
+
 # 1.4.15
 
 ## Bug Fixes
