@@ -33,7 +33,6 @@ configurations {
     }
 }
 
-
 bootJar {
     manifest {
         attributes "Implementation-Title": "Halo Application",
@@ -97,9 +96,14 @@ ext {
     huaweiObsVersion = "3.19.7"
     templateInheritanceVersion = "0.4.RELEASE"
     jsoupVersion = "1.13.1"
+    log4jVersion = "2.15.0"
 }
 
 dependencies {
+    // Aligning log4j dependency versions to 2.15.0
+    implementation enforcedPlatform("org.apache.logging.log4j:log4j-core:$log4jVersion")
+    implementation enforcedPlatform("org.apache.logging.log4j:log4j-api:$log4jVersion")
+
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
@@ -114,7 +118,8 @@ dependencies {
     implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"
     implementation "com.baidubce:bce-java-sdk:$baiduSdkVersion"
     implementation "com.qcloud:cos_api:$qcloudSdkVersion"
-    implementation "com.huaweicloud:esdk-obs-java:$huaweiObsVersion"
+    // TODO Upgrade huaweicloud sdk dependence to fix log4j 0-day vulnerability
+    implementation("com.huaweicloud:esdk-obs-java:$huaweiObsVersion")
     implementation "io.minio:minio:$minioSdkVersion"
     implementation "io.springfox:springfox-boot-starter:$swaggerVersion"
     implementation "commons-fileupload:commons-fileupload:$commonsFileUploadVersion"
