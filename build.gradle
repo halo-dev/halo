@@ -34,10 +34,10 @@ configurations {
 }
 
 configurations.all {
-    // Aligning log4j dependency versions to 2.15.0
+    // Aligning log4j dependency versions to 2.17.0
     resolutionStrategy.eachDependency { DependencyResolveDetails details ->
         if (details.requested.group == 'org.apache.logging.log4j') {
-            details.useVersion '2.15.0'
+            details.useVersion '2.17.0'
         }
     }
 }
