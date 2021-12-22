@@ -54,7 +54,7 @@ ext {
     upyunSdkVersion = '4.2.3'
     qiniuSdkVersion = '7.8.0'
     aliyunSdkVersion = '3.13.2'
-    baiduSdkVersion = '0.10.185'
+    baiduSdkVersion = '0.10.36'
     qcloudSdkVersion = '5.6.61'
     minioSdkVersion = '8.3.4'
     swaggerVersion = "3.0.0"
