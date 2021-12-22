@@ -33,6 +33,15 @@ configurations {
     }
 }
 
+configurations.all {
+    // Aligning log4j dependency versions to 2.15.0
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.apache.logging.log4j') {
+            details.useVersion '2.15.0'
+        }
+    }
+}
+
 bootJar {
     manifest {
         attributes "Implementation-Title": "Halo Application",
@@ -96,14 +105,9 @@ ext {
     huaweiObsVersion = "3.19.7"
     templateInheritanceVersion = "0.4.RELEASE"
     jsoupVersion = "1.13.1"
-    log4jVersion = "2.15.0"
 }
 
 dependencies {
-    // Aligning log4j dependency versions to 2.15.0
-    implementation enforcedPlatform("org.apache.logging.log4j:log4j-core:$log4jVersion")
-    implementation enforcedPlatform("org.apache.logging.log4j:log4j-api:$log4jVersion")
-
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
