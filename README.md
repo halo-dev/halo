@@ -4,7 +4,7 @@
     </a>
 </p>
 
-> Halo 是一款现代化的个人独立博客系统，给习惯写博客的同学多一个选择。
+<p align="center"><b>Halo</b> [ˈheɪloʊ]，一款现代化的开源博客/CMS系统，值得一试。</p>
 
 <p align="center">
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square" /></a>
@@ -12,15 +12,15 @@
 <a href="https://hub.docker.com/r/halohub/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/halohub/halo?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo.svg?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo/Halo%20CI?style=flat-square" /></a>
+<br></br>
+<a href="https://halo.run">官网</a>
+<a href="https://docs.halo.run">文档</a>
+<a href="https://bbs.halo.run">社区</a>
+<a href="https://gitee.com/halo-dev">Gitee</a>
+<a href="https://t.me/halo_dev">Telegram 频道</a>
 </p>
 
 ------------------------------
-
-## 简介
-
-**Halo** `[ˈheɪloʊ]`，一个优秀的开源博客发布应用，值得一试。
-
-[官网](https://halo.run) | [文档](https://docs.halo.run) | [社区](https://bbs.halo.run) | [Gitee](https://gitee.com/halo-dev) | [Telegram 频道](https://t.me/halo_dev)
 
 ## 快速开始
 
