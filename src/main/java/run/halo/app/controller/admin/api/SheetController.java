@@ -127,7 +127,8 @@ public class SheetController {
         @PathVariable("sheetId") Integer sheetId,
         @RequestBody PostContentParam contentParam) {
         // Update draft content
-        Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(), sheetId);
+        Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(),
+            contentParam.getOriginalContent(), sheetId);
 
         return new BasePostDetailDTO().convertFrom(sheet);
     }

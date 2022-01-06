@@ -103,7 +103,7 @@ public class PostController {
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId) {
-        Post post = postService.getById(postId);
+        Post post = postService.getDraftById(postId);
         return postService.convertToDetailVo(post, true);
     }
 
@@ -131,7 +131,7 @@ public class PostController {
         @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave
     ) {
         // Get the post info
-        Post postToUpdate = postService.getById(postId);
+        Post postToUpdate = postService.getDraftById(postId);
 
         postParam.update(postToUpdate);
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(),
@@ -161,7 +161,7 @@ public class PostController {
         @PathVariable("postId") Integer postId,
         @RequestBody PostContentParam contentParam) {
         // Update draft content
-        Post post = postService.updateDraftContent(contentParam.getContent(), postId);
+        Post post = postService.updateDraftContent(contentParam.getContent(), contentParam.getOriginalContent(), postId);
 
         return new BasePostDetailDTO().convertFrom(post);
     }

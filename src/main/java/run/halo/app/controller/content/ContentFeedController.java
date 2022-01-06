@@ -244,8 +244,8 @@ public class ContentFeedController {
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(
-                RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
+            postDetailVO.setContent(
+                RegExUtils.replaceAll(postDetailVO.getContent(), XML_INVALID_CHAR, ""));
             postDetailVO
                 .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });
@@ -268,8 +268,8 @@ public class ContentFeedController {
             postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(
-                RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
+            postDetailVO.setContent(
+                RegExUtils.replaceAll(postDetailVO.getContent(), XML_INVALID_CHAR, ""));
             postDetailVO
                 .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });

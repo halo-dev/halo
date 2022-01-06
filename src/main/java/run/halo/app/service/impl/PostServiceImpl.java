@@ -16,13 +16,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -40,10 +38,12 @@ import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
+import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.entity.PostComment;
+import run.halo.app.model.entity.PostContent;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
@@ -66,6 +66,8 @@ import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostCommentService;
+import run.halo.app.service.PostContentPatchLogService;
+import run.halo.app.service.PostContentService;
 import run.halo.app.service.PostMetaService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
@@ -89,7 +91,7 @@ import run.halo.app.utils.SlugUtils;
  */
 @Slf4j
 @Service
-public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostService {
+public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> implements PostService {
 
     private final PostRepository postRepository;
 
@@ -98,6 +100,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private final CategoryService categoryService;
 
     private final PostTagService postTagService;
+
+    private final PostContentService postContentService;
 
     private final PostCategoryService postCategoryService;
 
@@ -111,6 +115,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final AuthorizationService authorizationService;
 
+    private final PostContentPatchLogService postContentPatchLogService;
+
     public PostServiceImpl(BasePostRepository<Post> basePostRepository,
         OptionService optionService,
         PostRepository postRepository,
@@ -121,8 +127,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         PostCommentService postCommentService,
         ApplicationEventPublisher eventPublisher,
         PostMetaService postMetaService,
-        AuthorizationService authorizationService) {
-        super(basePostRepository, optionService);
+        AuthorizationService authorizationService,
+        PostContentService postContentService,
+        PostContentPatchLogService postContentPatchLogService) {
+        super(basePostRepository, optionService, postContentService);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;
@@ -133,6 +141,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         this.postMetaService = postMetaService;
         this.optionService = optionService;
         this.authorizationService = authorizationService;
+        this.postContentService = postContentService;
+        this.postContentPatchLogService = postContentPatchLogService;
     }
 
     @Override
@@ -280,6 +290,17 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public Post getBySlug(String slug) {
         return super.getBySlug(slug);
+    }
+
+    @Override
+    public Post getDraftById(Integer postId) {
+        Post post = getById(postId);
+        PostContent postContent = getContentById(postId);
+        // Use the head pointer stored in the post content.
+        PatchedContent patchedContent =
+            postContentPatchLogService.getPatchedContentById(postContent.getHeadPatchLogId());
+        post.setContent(patchedContent);
+        return post;
     }
 
     @Override
@@ -523,7 +544,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         }
 
         content.append("---\n\n");
-        content.append(post.getOriginalContent());
+        PatchedContent postContent = post.getContent();
+        content.append(postContent.getOriginalContent());
         return content.toString();
     }
 
@@ -614,9 +636,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
-            if (StringUtils.isBlank(postListVO.getSummary())) {
-                postListVO.setSummary(generateSummary(post.getFormatContent()));
-            }
+            generateAndSetSummaryIfAbsent(post, postListVO);
 
             Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
 
@@ -678,9 +698,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return posts.stream().map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
-            if (StringUtils.isBlank(postListVO.getSummary())) {
-                postListVO.setSummary(generateSummary(post.getFormatContent()));
-            }
+            generateAndSetSummaryIfAbsent(post, postListVO);
 
             Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
 
@@ -742,9 +760,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
 
         // Set summary
-        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
-            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
-        }
+        generateAndSetSummaryIfAbsent(post, basePostSimpleDTO);
 
         basePostSimpleDTO.setFullPath(buildFullPath(post));
 
@@ -767,10 +783,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Convert to base detail vo
         PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
-
-        if (StringUtils.isBlank(postDetailVO.getSummary())) {
-            postDetailVO.setSummary(generateSummary(post.getFormatContent()));
-        }
+        generateAndSetSummaryIfAbsent(post, postDetailVO);
 
         // Extract ids
         Set<Integer> tagIds = ServiceUtils.fetchProperty(tags, Tag::getId);
@@ -793,6 +806,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             CommentStatus.PUBLISHED, post.getId()));
 
         postDetailVO.setFullPath(buildFullPath(post));
+
+        PatchedContent postContent = post.getContent();
+        postDetailVO.setContent(postContent.getContent());
+        postDetailVO.setOriginalContent(postContent.getOriginalContent());
 
         return postDetailVO;
     }
@@ -903,6 +920,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Remove authorization every time an post is created or updated.
         authorizationService.deletePostAuthorization(post.getId());
 
+        // get draft content by head patch log id
+        PostContent postContent = postContentService.getById(post.getId());
+        post.setContent(
+            postContentPatchLogService.getPatchedContentById(postContent.getHeadPatchLogId()));
         // Convert to post detail vo
         return convertTo(post, tags, categories, postMetaList);
     }
@@ -943,9 +964,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public List<PostMarkdownVO> listPostMarkdowns() {
         List<Post> allPostList = listAll();
-        List<PostMarkdownVO> result = new ArrayList(allPostList.size());
-        for (int i = 0; i < allPostList.size(); i++) {
-            Post post = allPostList.get(i);
+        List<PostMarkdownVO> result = new ArrayList<>(allPostList.size());
+        for (Post post : allPostList) {
             result.add(convertToPostMarkdownVo(post));
         }
         return result;
@@ -988,11 +1008,12 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 tagContent.append(" | ").append(tagName);
             }
         }
-        frontMatter.append("tags: ").append(tagContent.toString()).append("\n");
+        frontMatter.append("tags: ").append(tagContent).append("\n");
 
         frontMatter.append("---\n");
         postMarkdownVO.setFrontMatter(frontMatter.toString());
-        postMarkdownVO.setOriginalContent(post.getOriginalContent());
+        PatchedContent postContent = post.getContent();
+        postMarkdownVO.setOriginalContent(postContent.getOriginalContent());
         postMarkdownVO.setTitle(post.getTitle());
         postMarkdownVO.setSlug(post.getSlug());
         return postMarkdownVO;

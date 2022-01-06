@@ -73,6 +73,7 @@ ext {
     huaweiObsVersion = '3.21.8.1'
     templateInheritanceVersion = "0.4.RELEASE"
     jsoupVersion = '1.14.3'
+    diffUtilsVersion = '4.11'
 }
 
 dependencies {
@@ -121,6 +122,7 @@ dependencies {
     implementation "net.sf.image4j:image4j:$image4jVersion"
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     implementation "com.google.zxing:core:$zxingVersion"
+    implementation "io.github.java-diff-utils:java-diff-utils:$diffUtilsVersion"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"

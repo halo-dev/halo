@@ -13,11 +13,13 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
+import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 
@@ -77,20 +79,6 @@ public class BasePost extends BaseEntity {
     @Column(name = "editor_type")
     @ColumnDefault("0")
     private PostEditorType editorType;
-
-    /**
-     * Original content,not format.
-     */
-    @Column(name = "original_content", nullable = false)
-    @Lob
-    private String originalContent;
-
-    /**
-     * Rendered content.
-     */
-    @Column(name = "format_content")
-    @Lob
-    private String formatContent;
 
     /**
      * Post summary.
@@ -171,6 +159,19 @@ public class BasePost extends BaseEntity {
     @ColumnDefault("0")
     private Long wordCount;
 
+    /**
+     * Post content version.
+     */
+    @ColumnDefault("1")
+    private Integer version;
+
+    /**
+     * This extra field don't correspond to any columns in the <code>Post</code> table because we
+     * don't want to save this value.
+     */
+    @Transient
+    private PatchedContent content;
+
     @Override
     public void prePersist() {
         super.prePersist();
@@ -215,14 +216,6 @@ public class BasePost extends BaseEntity {
             likes = 0L;
         }
 
-        if (originalContent == null) {
-            originalContent = "";
-        }
-
-        if (formatContent == null) {
-            formatContent = "";
-        }
-
         if (editorType == null) {
             editorType = PostEditorType.MARKDOWN;
         }
@@ -230,6 +223,19 @@ public class BasePost extends BaseEntity {
         if (wordCount == null || wordCount < 0) {
             wordCount = 0L;
         }
+
+        if (version == null || version < 0) {
+            version = 1;
+        }
     }
 
+    public PatchedContent getContent() {
+        if (this.content == null) {
+            PatchedContent content = new PatchedContent();
+            content.setOriginalContent("");
+            content.setContent("");
+            return content;
+        }
+        return content;
+    }
 }

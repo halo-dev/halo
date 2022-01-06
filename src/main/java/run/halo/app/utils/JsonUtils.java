@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -69,6 +70,23 @@ public class JsonUtils {
     public static <T> T jsonToObject(@NonNull String json, @NonNull Class<T> type)
         throws IOException {
         return jsonToObject(json, type, DEFAULT_JSON_MAPPER);
+    }
+
+    /**
+     * Converts json to the object specified type.
+     *
+     * @param json json content must not be blank
+     * @param typeReference object type reference must not be null
+     * @param <T> target object type
+     * @return object specified type
+     * @throws IllegalArgumentException throws when fail to convert
+     */
+    public static <T> T jsonToObject(String json, TypeReference<T> typeReference) {
+        try {
+            return DEFAULT_JSON_MAPPER.readValue(json, typeReference);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**

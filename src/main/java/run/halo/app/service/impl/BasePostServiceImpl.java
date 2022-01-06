@@ -26,6 +26,8 @@ import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
+import run.halo.app.model.entity.BaseContent;
+import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
@@ -33,6 +35,7 @@ import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.service.base.BaseContentService;
 import run.halo.app.service.base.BasePostService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
@@ -44,25 +47,30 @@ import run.halo.app.utils.ServiceUtils;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-24
  */
 @Slf4j
-public abstract class BasePostServiceImpl<POST extends BasePost>
+public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends BaseContent>
     extends AbstractCrudService<POST, Integer> implements BasePostService<POST> {
 
     private final BasePostRepository<POST> basePostRepository;
 
     private final OptionService optionService;
 
+    private final BaseContentService<CONTENT> baseContentService;
+
     private static final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
     private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
-        OptionService optionService) {
+        OptionService optionService,
+        BaseContentService<CONTENT> baseContentService) {
         super(basePostRepository);
         this.basePostRepository = basePostRepository;
         this.optionService = optionService;
+        this.baseContentService = baseContentService;
     }
 
     @Override
@@ -80,6 +88,14 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         Assert.notNull(status, "Post status must not be null");
 
         return basePostRepository.countByStatus(status);
+    }
+
+    @Override
+    public POST getById(Integer id) {
+        POST post = super.getById(id);
+        CONTENT content = getContentById(id);
+        post.setContent(new PatchedContent(content));
+        return post;
     }
 
     @Override
@@ -284,30 +300,36 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
 
-        String originalContent = post.getOriginalContent();
+        PatchedContent postContent = post.getContent();
+        String originalContent = postContent.getOriginalContent();
+        if (originalContent != null) {
+            // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
+            // Render content and set word count
+            if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
+                postContent.setContent(MarkdownUtils.renderHtml(originalContent));
 
-        // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
-        // Render content and set word count
-        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
+                post.setWordCount(htmlFormatWordCount(postContent.getContent()));
+            } else {
+                postContent.setContent(originalContent);
 
-            post.setWordCount(htmlFormatWordCount(post.getFormatContent()));
-        } else {
-            post.setFormatContent(originalContent);
-
-            post.setWordCount(htmlFormatWordCount(originalContent));
+                post.setWordCount(htmlFormatWordCount(originalContent));
+            }
+            post.setContent(postContent);
         }
 
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created
-            return create(post);
+            POST savedPost = create(post);
+            baseContentService.createOrUpdateDraftBy(post.getId(),
+                postContent.getContent(), postContent.getOriginalContent());
+            return savedPost;
         }
-
         // The sheet will be updated
         // Set edit time
         post.setEditTime(DateUtils.now());
-
+        baseContentService.createOrUpdateDraftBy(post.getId(),
+            postContent.getContent(), postContent.getOriginalContent());
         // Update it
         return update(post);
     }
@@ -319,8 +341,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         if (StringUtils.isNotBlank(post.getPassword())) {
             String tip = "The post is encrypted by author";
             post.setSummary(tip);
-            post.setOriginalContent(tip);
-            post.setFormatContent(tip);
+
+            CONTENT postContent = baseContentService.createGenericClassInstance();
+            postContent.setContent(tip);
+            postContent.setOriginalContent(tip);
+            post.setContent(new PatchedContent(postContent));
         }
 
         return post;
@@ -358,9 +383,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
 
         // Set summary
-        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
-            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
-        }
+        generateAndSetSummaryIfAbsent(post, basePostSimpleDTO);
 
         return basePostSimpleDTO;
     }
@@ -392,7 +415,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     @Override
     @Transactional
-    public POST updateDraftContent(String content, Integer postId) {
+    public POST updateDraftContent(String content, String originalContent, Integer postId) {
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
 
         if (content == null) {
@@ -400,17 +423,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         }
 
         POST post = getById(postId);
-
-        if (!StringUtils.equals(content, post.getOriginalContent())) {
-            // If content is different with database, then update database
-            int updatedRows = basePostRepository.updateOriginalContent(content, postId);
-            if (updatedRows != 1) {
-                throw new ServiceException(
-                    "Failed to update original content of post with id " + postId);
-            }
-            // Set the content
-            post.setOriginalContent(content);
-        }
+        CONTENT postContent = baseContentService.createOrUpdateDraftBy(postId, content, originalContent);
+        post.setContent(new PatchedContent(postContent));
 
         return post;
     }
@@ -438,15 +452,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         // Sync content
         if (PostStatus.PUBLISHED.equals(status)) {
             // If publish this post, then convert the formatted content
-            String formatContent = MarkdownUtils.renderHtml(post.getOriginalContent());
-            int updatedRows = basePostRepository.updateFormatContent(formatContent, postId);
-
-            if (updatedRows != 1) {
-                throw new ServiceException(
-                    "Failed to update post format content of post with id " + postId);
-            }
-
-            post.setFormatContent(formatContent);
+            CONTENT postContent = baseContentService.publishContent(postId);
+            post.setContent(new PatchedContent(postContent));
         }
 
         return post;
@@ -495,6 +502,12 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         return super.update(post);
     }
 
+    @Override
+    public CONTENT getContentById(Integer postId) {
+        Assert.notNull(postId, "The postId must not be null.");
+        return baseContentService.getById(postId);
+    }
+
     /**
      * Check if the slug is exist.
      *
@@ -533,6 +546,16 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
         return StringUtils.substring(text, 0, summaryLength);
+    }
+
+    protected <T extends BasePostSimpleDTO> void generateAndSetSummaryIfAbsent(POST post, T postVO) {
+        PatchedContent postContent = post.getContent();
+        if (postContent == null) {
+            return;
+        }
+        if (StringUtils.isBlank(postVO.getSummary())) {
+            postVO.setSummary(generateSummary(postContent.getContent()));
+        }
     }
 
     // CS304 issue link : https://github.com/halo-dev/halo/issues/1224

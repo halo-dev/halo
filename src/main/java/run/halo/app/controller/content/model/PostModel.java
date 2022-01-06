@@ -15,7 +15,9 @@ import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.BaseContent;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
@@ -39,6 +41,7 @@ import run.halo.app.utils.MarkdownUtils;
  * Post Model
  *
  * @author ryanwang
+ * @author guqing
  * @date 2020-01-07
  */
 @Component
@@ -118,12 +121,6 @@ public class PostModel {
 
         post = postService.getById(post.getId());
 
-        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
-        } else {
-            post.setFormatContent(post.getOriginalContent());
-        }
-
         postService.publishVisitEvent(post.getId());
 
         postService.getPrevPost(post).ifPresent(
@@ -148,7 +145,7 @@ public class PostModel {
             model.addAttribute("meta_description", post.getMetaDescription());
         } else {
             model.addAttribute("meta_description",
-                postService.generateDescription(post.getFormatContent()));
+                postService.generateDescription(post.getContent().getContent()));
         }
 
         model.addAttribute("is_post", true);

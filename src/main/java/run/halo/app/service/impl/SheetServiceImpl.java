@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,8 +23,10 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.IndependentSheetDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
+import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
+import run.halo.app.model.entity.SheetContent;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.LogType;
@@ -36,6 +37,8 @@ import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.repository.SheetRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
+import run.halo.app.service.SheetContentPatchLogService;
+import run.halo.app.service.SheetContentService;
 import run.halo.app.service.SheetMetaService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
@@ -52,7 +55,7 @@ import run.halo.app.utils.ServiceUtils;
  */
 @Slf4j
 @Service
-public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements SheetService {
+public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent> implements SheetService {
 
     private final SheetRepository sheetRepository;
 
@@ -66,19 +69,24 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
 
     private final OptionService optionService;
 
+    private final SheetContentPatchLogService sheetContentPatchLogService;
+
     public SheetServiceImpl(SheetRepository sheetRepository,
         ApplicationEventPublisher eventPublisher,
         SheetCommentService sheetCommentService,
+        SheetContentService sheetContentService,
         SheetMetaService sheetMetaService,
         ThemeService themeService,
-        OptionService optionService) {
-        super(sheetRepository, optionService);
+        OptionService optionService,
+        SheetContentPatchLogService sheetContentPatchLogService) {
+        super(sheetRepository, optionService, sheetContentService);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;
         this.sheetMetaService = sheetMetaService;
         this.themeService = themeService;
         this.optionService = optionService;
+        this.sheetContentPatchLogService = sheetContentPatchLogService;
     }
 
     @Override
@@ -161,6 +169,17 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
     }
 
     @Override
+    public Sheet getDraftById(Integer postId) {
+        Sheet sheet = getById(postId);
+        SheetContent sheetContent = getContentById(postId);
+        // Use the head pointer stored in the post content.
+        PatchedContent patchedContent =
+            sheetContentPatchLogService.getPatchedContentById(sheetContent.getHeadPatchLogId());
+        sheet.setContent(patchedContent);
+        return sheet;
+    }
+
+    @Override
     public Sheet getBy(PostStatus status, String slug) {
         Assert.notNull(status, "Sheet status must not be null");
         Assert.hasText(slug, "Sheet slug must not be blank");
@@ -208,7 +227,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         content.append("comments: ").append(!sheet.getDisallowComment()).append("\n");
 
         content.append("---\n\n");
-        content.append(sheet.getOriginalContent());
+        content.append(sheet.getContent().getOriginalContent());
         return content.toString();
     }
 
@@ -337,15 +356,16 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet> implements Shee
         sheetDetailVO.setMetaIds(metaIds);
         sheetDetailVO.setMetas(sheetMetaService.convertTo(metas));
 
-        if (StringUtils.isBlank(sheetDetailVO.getSummary())) {
-            sheetDetailVO.setSummary(generateSummary(sheet.getFormatContent()));
-        }
+        generateAndSetSummaryIfAbsent(sheet, sheetDetailVO);
 
         sheetDetailVO.setCommentCount(sheetCommentService.countByStatusAndPostId(
             CommentStatus.PUBLISHED, sheet.getId()));
 
         sheetDetailVO.setFullPath(buildFullPath(sheet));
 
+        PatchedContent sheetContent = sheet.getContent();
+        sheetDetailVO.setContent(sheetContent.getContent());
+        sheetDetailVO.setOriginalContent(sheetContent.getOriginalContent());
         return sheetDetailVO;
     }
 

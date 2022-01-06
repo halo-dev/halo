@@ -10,6 +10,7 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.BaseContent;
 import run.halo.app.model.enums.PostStatus;
 
 /**
@@ -17,6 +18,7 @@ import run.halo.app.model.enums.PostStatus;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-24
  */
 public interface BasePostService<POST extends BasePost> extends CrudService<POST, Integer> {
@@ -51,6 +53,14 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     POST getBySlug(@NonNull String slug);
+
+    /**
+     * Get post with draft content by id.
+     *
+     * @param postId post id.
+     * @return post with draft content.
+     */
+    POST getDraftById(Integer postId);
 
     /**
      * Gets post by post status and slug.
@@ -275,7 +285,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return updated post
      */
     @NonNull
-    POST updateDraftContent(@Nullable String content, @NonNull Integer postId);
+    POST updateDraftContent(@Nullable String content, String originalContent, @NonNull Integer postId);
 
     /**
      * Updates post status.
@@ -304,4 +314,12 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return description
      */
     String generateDescription(@NonNull String content);
+
+    /**
+     * Gets content by post id.
+     *
+     * @param id post id.
+     * @return a content of post.
+     */
+    BaseContent getContentById(Integer id);
 }
