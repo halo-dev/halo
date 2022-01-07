@@ -43,14 +43,15 @@ export default {
     }
   },
   methods: {
-    handleAttachmentUpload(pos, $file) {
-      const formdata = new FormData()
-      formdata.append('file', $file)
-      apiClient.attachment.upload(formdata).then(response => {
+    async handleAttachmentUpload(pos, $file) {
+      try {
+        const response = await apiClient.attachment.upload($file)
         const responseObject = response.data
         const HaloEditor = this.$refs.md
         HaloEditor.$img2Url(pos, encodeURI(responseObject.path))
-      })
+      } catch (e) {
+        this.$log.error('update image error: ', e)
+      }
     },
     handleSaveDraft() {
       this.$emit('onSaveDraft')
