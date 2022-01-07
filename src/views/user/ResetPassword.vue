@@ -5,43 +5,44 @@
       <span>重置密码</span>
     </div>
     <div>
-      <a-form layout="vertical">
-        <a-form-item>
-          <a-input v-model="resetParam.username" placeholder="用户名">
+      <a-form-model ref="sendCodeForm" :model="form.model" :rules="form.sendCodeRules" layout="vertical">
+        <a-form-model-item prop="username">
+          <a-input v-model="form.model.username" placeholder="用户名">
             <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="user" />
           </a-input>
-        </a-form-item>
-        <a-form-item>
-          <a-input v-model="resetParam.email" placeholder="邮箱">
+        </a-form-model-item>
+        <a-form-model-item prop="email">
+          <a-input v-model="form.model.email" placeholder="邮箱">
             <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="mail" />
           </a-input>
-        </a-form-item>
-        <a-form-item>
-          <a-input v-model="resetParam.code" placeholder="验证码" type="password">
+        </a-form-model-item>
+      </a-form-model>
+      <a-form-model ref="passwordForm" :model="form.model" :rules="form.rules" layout="vertical">
+        <a-form-model-item prop="code">
+          <a-input v-model="form.model.code" placeholder="验证码" type="password">
             <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="safety-certificate" />
             <a slot="addonAfter" href="javascript:void(0);" @click="handleSendCode"> 获取 </a>
           </a-input>
-        </a-form-item>
-
-        <a-form-item>
-          <a-input v-model="resetParam.password" autocomplete="new-password" placeholder="新密码" type="password">
+        </a-form-model-item>
+        <a-form-model-item prop="password">
+          <a-input v-model="form.model.password" autocomplete="new-password" placeholder="新密码" type="password">
             <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="lock" />
           </a-input>
-        </a-form-item>
-        <a-form-item>
+        </a-form-model-item>
+        <a-form-model-item prop="confirmPassword">
           <a-input
-            v-model="resetParam.confirmPassword"
+            v-model="form.model.confirmPassword"
             autocomplete="new-password"
             placeholder="确认密码"
             type="password"
           >
             <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="lock" />
           </a-input>
-        </a-form-item>
-        <a-form-item>
+        </a-form-model-item>
+        <a-form-model-item>
           <a-button :block="true" type="primary" @click="handleResetPassword">重置密码</a-button>
-        </a-form-item>
-      </a-form>
+        </a-form-model-item>
+      </a-form-model>
       <router-link :to="{ name: 'Login' }" class="tip">
         返回登录
       </router-link>
@@ -54,88 +55,66 @@ import apiClient from '@/utils/api-client'
 
 export default {
   data() {
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (value && this.form.model.password !== value) {
+        callback(new Error('确认密码与新密码不一致'))
+      } else {
+        callback()
+      }
+    }
     return {
-      resetParam: {
-        username: '',
-        email: '',
-        code: '',
-        password: '',
-        confirmPassword: ''
+      form: {
+        model: {},
+        sendCodeRules: {
+          username: [{ required: true, message: '* 用户名不能为空', trigger: ['change'] }],
+          email: [{ required: true, message: '* 电子邮箱地址不能为空', trigger: ['change'] }]
+        },
+        rules: {
+          code: [{ required: true, message: '* 验证码不能为空', trigger: ['change'] }],
+          password: [
+            { required: true, message: '* 新密码不能为空', trigger: ['change'] },
+            { max: 100, min: 8, message: '* 密码的字符长度必须在 8 - 100 之间', trigger: ['change'] }
+          ],
+          confirmPassword: [
+            { required: true, message: '* 确认密码不能为空', trigger: ['change'] },
+            { validator: validateConfirmPassword, trigger: ['change'] }
+          ]
+        }
       }
     }
   },
   methods: {
     handleSendCode() {
-      if (!this.resetParam.username) {
-        this.$notification['error']({
-          message: '提示',
-          description: '用户名不能为空！'
-        })
-        return
-      }
-      if (!this.resetParam.email) {
-        this.$notification['error']({
-          message: '提示',
-          description: '邮箱不能为空！'
-        })
-        return
-      }
-      const hide = this.$message.loading('发送中...', 0)
-      apiClient
-        .sendResetPasswordCode(this.resetParam)
-        .then(() => {
-          this.$message.success('邮件发送成功，五分钟内有效')
-        })
-        .finally(() => {
-          hide()
-        })
+      this.$refs.sendCodeForm.validate(async valid => {
+        if (valid) {
+          const hideLoading = this.$message.loading('发送中...', 0)
+          try {
+            await apiClient.sendResetPasswordCode(this.form.model)
+            this.$message.success('邮件发送成功，五分钟内有效')
+          } catch (e) {
+            this.$log.error('Failed send code: ', e)
+          } finally {
+            hideLoading()
+          }
+        }
+      })
     },
     handleResetPassword() {
-      if (!this.resetParam.username) {
-        this.$notification['error']({
-          message: '提示',
-          description: '用户名不能为空！'
+      this.$refs.sendCodeForm.validate(sendCodeValid => {
+        if (!sendCodeValid) {
+          return
+        }
+        this.$refs.passwordForm.validate(async valid => {
+          if (valid) {
+            try {
+              await apiClient.resetPassword(this.form.model)
+              await this.$router.push({ name: 'Login' })
+              this.$message.success('密码重置成功！')
+            } catch (e) {
+              this.$log.error('Failed reset password: ', e)
+            }
+          }
         })
-        return
-      }
-      if (!this.resetParam.email) {
-        this.$notification['error']({
-          message: '提示',
-          description: '邮箱不能为空！'
-        })
-        return
-      }
-      if (!this.resetParam.code) {
-        this.$notification['error']({
-          message: '提示',
-          description: '验证码不能为空！'
-        })
-        return
-      }
-      if (!this.resetParam.password) {
-        this.$notification['error']({
-          message: '提示',
-          description: '新密码不能为空！'
-        })
-        return
-      }
-      if (!this.resetParam.confirmPassword) {
-        this.$notification['error']({
-          message: '提示',
-          description: '确认密码不能为空！'
-        })
-        return
-      }
-      if (this.resetParam.confirmPassword !== this.resetParam.password) {
-        this.$notification['error']({
-          message: '提示',
-          description: '确认密码和新密码不匹配！'
-        })
-        return
-      }
-      apiClient.resetPassword(this.resetParam).then(() => {
-        this.$message.success('密码重置成功！')
-        this.$router.push({ name: 'Login' })
       })
     }
   }
