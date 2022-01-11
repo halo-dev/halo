@@ -46,6 +46,14 @@ docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=alwa
 
 详细部署文档请查阅：<https://docs.halo.run/getting-started/install/linux>
 
+## 在线体验
+
+- 环境地址：<https://demo.halo.run>
+- 后台地址：<https://demo.halo.run/admin>
+- 用户名：demo
+- 密码：P@ssw0rd123..
+- 使用前请阅读：<https://demo.halo.run/archives/tips>
+
 ## 生态
 
 | 项目                                                                         | 状态                                                                                                                                                              | 描述                                     |
