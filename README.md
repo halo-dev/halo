@@ -12,7 +12,7 @@
 <a href="https://hub.docker.com/r/halohub/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/halohub/halo?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo.svg?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo/Halo%20CI?style=flat-square" /></a>
-<br></br>
+<br />
 <a href="https://halo.run">官网</a>
 <a href="https://docs.halo.run">文档</a>
 <a href="https://bbs.halo.run">社区</a>
@@ -29,7 +29,7 @@
 下载最新的 Halo 运行包：
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.4.15/halo-1.4.15.jar --output halo.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.4.17/halo-1.4.17.jar --output halo.jar
 ```
 
 其他地址：<https://docs.halo.run/getting-started/downloads>
@@ -73,9 +73,3 @@ Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
 ## 状态
 
 ![Repobeats analytics](https://repobeats.axiom.co/api/embed/ad008b2151c22e7cf734d2688befaa795d593b95.svg "Repobeats analytics image")
-
-## 赞助我们
-
-> 如果 Halo 对您有帮助，不妨赞助我们
-
-<https://docs.halo.run/contribution/sponsor>
