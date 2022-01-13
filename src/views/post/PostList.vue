@@ -201,7 +201,7 @@
             <a-tag
               v-for="(tag, tagIndex) in item.tags"
               :key="'tag_' + tagIndex"
-              color="green"
+              :color="tag.color"
               style="margin-bottom: 8px"
               >{{ tag.name }}
             </a-tag>
@@ -268,7 +268,7 @@
           </span>
 
           <span slot="tags" slot-scope="tags">
-            <a-tag v-for="(tag, index) in tags" :key="index" color="green" style="margin-bottom: 8px">
+            <a-tag v-for="(tag, index) in tags" :key="index" :color="tag.color" style="margin-bottom: 8px">
               {{ tag.name }}
             </a-tag>
           </span>

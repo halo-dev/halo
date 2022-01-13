@@ -6,6 +6,7 @@ import FilePondUpload from '@/components/Upload/FilePondUpload'
 import AttachmentSelectDrawer from './Attachment/AttachmentSelectDrawer'
 import AttachmentUploadModal from './Attachment/AttachmentUploadModal'
 import ReactiveButton from './Button/ReactiveButton'
+import PostTag from './Post/PostTag'
 
 const _components = {
   Ellipsis,
@@ -13,7 +14,8 @@ const _components = {
   FilePondUpload,
   AttachmentSelectDrawer,
   AttachmentUploadModal,
-  ReactiveButton
+  ReactiveButton,
+  PostTag
 }
 
 const components = {}

@@ -10,6 +10,13 @@
             <a-form-model-item help="* 一般为单个标签页面的标识，最好为英文" label="别名：" prop="slug">
               <a-input v-model="form.model.slug" />
             </a-form-model-item>
+            <a-form-model-item label="颜色：" prop="color">
+              <a-input v-model="form.model.color">
+                <template #addonAfter>
+                  <verte v-model="form.model.color" model="hex" picker="square" style="cursor: pointer"></verte>
+                </template>
+              </a-input>
+            </a-form-model-item>
             <a-form-model-item help="* 在标签页面可展示，需要主题支持" label="封面图：" prop="thumbnail">
               <a-input v-model="form.model.thumbnail">
                 <a slot="addonAfter" href="javascript:void(0);" @click="thumbnailDrawer.visible = true">
@@ -63,9 +70,7 @@
               <template slot="title">
                 <span>{{ tag.postCount }} 篇文章</span>
               </template>
-              <a-tag color="blue" style="margin-bottom: 8px;cursor:pointer;" @click="form.model = tag"
-                >{{ tag.name }}
-              </a-tag>
+              <post-tag :tag="tag" style="margin-bottom: 8px;cursor:pointer;" @click.native="form.model = tag" />
             </a-tooltip>
           </a-spin>
         </a-card>
@@ -83,9 +88,15 @@
 <script>
 import { PageView } from '@/layouts'
 import apiClient from '@/utils/api-client'
+import { hexRegExp } from '@/utils/colorUtil'
+import Verte from 'verte'
+import 'verte/dist/verte.css'
 
 export default {
-  components: { PageView },
+  components: {
+    PageView,
+    Verte
+  },
   data() {
     return {
       list: {
@@ -93,7 +104,9 @@ export default {
         loading: false
       },
       form: {
-        model: {},
+        model: {
+          color: '#cfd3d7'
+        },
         saving: false,
         errored: false,
         rules: {
@@ -102,7 +115,8 @@ export default {
             { max: 255, message: '* 标签名称的字符长度不能超过 255', trigger: ['change'] }
           ],
           slug: [{ max: 255, message: '* 标签别名的字符长度不能超过 255', trigger: ['change'] }],
-          thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change'] }]
+          thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change'] }],
+          color: [{ max: 7, pattern: hexRegExp, message: '仅支持 hex 颜色值' }]
         }
       },
       thumbnailDrawer: {
@@ -112,10 +126,7 @@ export default {
   },
   computed: {
     title() {
-      if (this.isUpdateMode) {
-        return '修改标签'
-      }
-      return '添加标签'
+      return this.isUpdateMode ? '修改标签' : '添加标签'
     },
     isUpdateMode() {
       return !!this.form.model.id
@@ -138,7 +149,9 @@ export default {
     },
     handleDeleteTag(tagId) {
       apiClient.tag.delete(tagId).finally(() => {
-        this.form.model = {}
+        this.form.model = {
+          color: '#cfd3d7'
+        }
         this.handleListTags()
       })
     },
@@ -178,7 +191,9 @@ export default {
       if (_this.form.errored) {
         _this.form.errored = false
       } else {
-        _this.form.model = {}
+        _this.form.model = {
+          color: '#cfd3d7'
+        }
         _this.handleListTags()
       }
     },
