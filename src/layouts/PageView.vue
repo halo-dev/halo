@@ -6,6 +6,7 @@
           <a-page-header :breadcrumb="{ props: { routes: breadList } }" :sub-title="subTitle" :title="title">
             <slot slot="extra" name="extra"></slot>
             <slot slot="footer" name="footer"></slot>
+            <slot name="content" />
           </a-page-header>
         </div>
       </div>
@@ -15,6 +16,7 @@
         <a-page-header :breadcrumb="{ props: { routes: breadList } }" :sub-title="subTitle" :title="title">
           <slot slot="extra" name="extra"></slot>
           <slot slot="footer" name="footer"></slot>
+          <slot name="content" />
         </a-page-header>
       </div>
     </div>

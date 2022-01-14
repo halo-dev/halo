@@ -29,7 +29,7 @@
                   <a-icon style="margin-right:3px" type="lock" />
                   启用
                 </div>
-                <div @click="handleOpenThemeSettingDrawer(item)">
+                <div @click="handleRouteToThemeSetting(item)">
                   <a-icon style="margin-right:3px" type="setting" />
                   设置
                 </div>
@@ -49,7 +49,7 @@
                     </a-menu-item>
                     <a-menu-item :key="3" @click="handleOpenLocalUpdateModal(item)">
                       <a-icon style="margin-right:3px" type="file" />
-                      从主题包更新
+                      本地更新
                     </a-menu-item>
                   </a-menu>
                 </a-dropdown>
@@ -125,63 +125,36 @@
         </a-tabs>
       </div>
     </a-modal>
-    <a-modal
-      v-model="localUpdateModel.visible"
-      :afterClose="onThemeInstallModalClose"
-      :footer="null"
-      destroyOnClose
-      title="更新主题"
-    >
-      <FilePondUpload
-        ref="updateByFile"
-        :accepts="['application/x-zip', 'application/x-zip-compressed', 'application/zip']"
-        :field="localUpdateModel.selected.id"
-        :multiple="false"
-        :uploadHandler="localUpdateModel.uploadHandler"
-        label="点击选择主题更新包或将主题更新包拖拽到此处<br>仅支持 ZIP 格式的文件"
-        name="file"
-        @success="handleUploadSucceed"
-      ></FilePondUpload>
-    </a-modal>
-    <a-modal
-      v-model="themeDeleteModal.visible"
-      :afterClose="onThemeDeleteModalClose"
-      :closable="false"
-      :width="416"
-      destroyOnClose
-      title="提示"
-    >
-      <template slot="footer">
-        <a-button @click="themeDeleteModal.visible = false">
-          取消
-        </a-button>
-        <ReactiveButton
-          :errored="themeDeleteModal.deleteErrored"
-          :loading="themeDeleteModal.deleting"
-          erroredText="删除失败"
-          loadedText="删除成功"
-          text="确定"
-          @callback="handleDeleteThemeCallback"
-          @click="handleDeleteTheme(themeDeleteModal.selected.id, themeDeleteModal.deleteSettings)"
-        ></ReactiveButton>
-      </template>
-      <p>确定删除【{{ themeDeleteModal.selected.name }}】主题？</p>
-      <a-checkbox v-model="themeDeleteModal.deleteSettings">
-        同时删除主题配置
-      </a-checkbox>
-    </a-modal>
+
+    <ThemeDeleteConfirmModal
+      :theme="themeDeleteModal.selected"
+      :visible.sync="themeDeleteModal.visible"
+      @onAfterClose="themeDeleteModal.selected = {}"
+      @success="handleListThemes"
+    />
+
+    <ThemeLocalUpgradeModal
+      :theme="localUpgradeModel.selected"
+      :visible.sync="localUpgradeModel.visible"
+      @onAfterClose="localUpgradeModel.selected = {}"
+      @success="handleListThemes"
+    />
   </page-view>
 </template>
 
 <script>
 import ThemeSettingDrawer from './components/ThemeSettingDrawer'
+import ThemeDeleteConfirmModal from './components/ThemeDeleteConfirmModal'
+import ThemeLocalUpgradeModal from './components/ThemeLocalUpgradeModal'
 import { PageView } from '@/layouts'
 import apiClient from '@/utils/api-client'
 
 export default {
   components: {
     PageView,
-    ThemeSettingDrawer
+    ThemeSettingDrawer,
+    ThemeDeleteConfirmModal,
+    ThemeLocalUpgradeModal
   },
   data() {
     return {
@@ -208,18 +181,14 @@ export default {
         }
       },
 
-      localUpdateModel: {
+      localUpgradeModel: {
         visible: false,
-        uploadHandler: (file, options, field) => apiClient.theme.updateByUpload(file, options, field),
         selected: {}
       },
 
       themeDeleteModal: {
         visible: false,
-        deleteSettings: false,
-        selected: {},
-        deleting: false,
-        deleteErrored: false
+        selected: {}
       },
 
       themeSettingDrawer: {
@@ -245,20 +214,6 @@ export default {
   beforeMount() {
     this.handleListThemes()
   },
-  destroyed() {
-    this.$log.debug('Theme list destroyed.')
-    this.themeSettingDrawer.visible = false
-    this.installModal.visible = false
-    this.localUpdateModel.visible = false
-    this.themeDeleteModal.visible = false
-  },
-  beforeRouteLeave(to, from, next) {
-    this.themeSettingDrawer.visible = false
-    this.installModal.visible = false
-    this.localUpdateModel.visible = false
-    this.themeDeleteModal.visible = false
-    next()
-  },
   methods: {
     handleListThemes() {
       this.list.loading = true
@@ -281,30 +236,8 @@ export default {
         this.handleListThemes()
       })
     },
-    handleDeleteTheme(themeId, deleteSettings) {
-      this.themeDeleteModal.deleting = true
-      apiClient.theme
-        .delete(themeId, deleteSettings)
-        .catch(() => {
-          this.themeDeleteModal.deleteErrored = false
-        })
-        .finally(() => {
-          setTimeout(() => {
-            this.themeDeleteModal.deleting = false
-          }, 400)
-        })
-    },
-    handleDeleteThemeCallback() {
-      if (this.themeDeleteModal.deleteErrored) {
-        this.themeDeleteModal.deleteErrored = false
-      } else {
-        this.themeDeleteModal.visible = false
-        this.handleListThemes()
-      }
-    },
     handleUploadSucceed() {
       this.installModal.visible = false
-      this.localUpdateModel.visible = false
       this.handleListThemes()
     },
     handleRemoteFetching() {
@@ -333,12 +266,11 @@ export default {
       }
     },
     handleOpenLocalUpdateModal(item) {
-      this.localUpdateModel.selected = item
-      this.localUpdateModel.visible = true
+      this.localUpgradeModel.selected = item
+      this.localUpgradeModel.visible = true
     },
-    handleOpenThemeSettingDrawer(theme) {
-      this.themeSettingDrawer.selected = theme
-      this.themeSettingDrawer.visible = true
+    handleRouteToThemeSetting(theme) {
+      this.$router.push({ name: 'ThemeSetting', query: { themeId: theme.id } })
     },
     handleOpenThemeDeleteModal(item) {
       this.themeDeleteModal.visible = true
@@ -368,20 +300,12 @@ export default {
       if (this.$refs.upload) {
         this.$refs.upload.handleClearFileList()
       }
-      if (this.$refs.updateByFile) {
-        this.$refs.updateByFile.handleClearFileList()
-      }
       this.installModal.remote.url = null
       this.handleListThemes()
     },
     onThemeSettingsDrawerClose() {
       this.themeSettingDrawer.visible = false
       this.themeSettingDrawer.selected = {}
-    },
-    onThemeDeleteModalClose() {
-      this.themeDeleteModal.visible = false
-      this.themeDeleteModal.deleteSettings = false
-      this.themeDeleteModal.selected = {}
     }
   }
 }

@@ -141,16 +141,22 @@ export const asyncRouterMap = [
             meta: { title: '主题', hiddenHeaderContent: false }
           },
           {
-            path: '/interface/menus',
-            name: 'MenuList',
-            component: () => import('@/views/interface/MenuList'),
-            meta: { title: '菜单', hiddenHeaderContent: false }
+            path: '/interface/themes/setting',
+            name: 'ThemeSetting',
+            component: () => import('@/views/interface/ThemeSetting'),
+            meta: { title: '主题设置', hiddenHeaderContent: false }
           },
           {
             path: '/interface/themes/edit',
             name: 'ThemeEdit',
             component: () => import('@/views/interface/ThemeEdit'),
             meta: { title: '主题编辑', hiddenHeaderContent: false }
+          },
+          {
+            path: '/interface/menus',
+            name: 'MenuList',
+            component: () => import('@/views/interface/MenuList'),
+            meta: { title: '菜单设置', hiddenHeaderContent: false }
           }
         ]
       },

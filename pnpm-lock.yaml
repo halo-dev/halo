@@ -5,7 +5,7 @@ specifiers:
   '@codemirror/basic-setup': ^0.19.0
   '@codemirror/lang-html': ^0.19.3
   '@codemirror/lang-java': ^0.19.1
-  '@halo-dev/admin-api': ^1.0.0-alpha.44
+  '@halo-dev/admin-api': ^1.0.0-alpha.46
   '@vue/cli-plugin-babel': ^3.12.1
   '@vue/cli-plugin-eslint': ^4.5.15
   '@vue/cli-plugin-unit-jest': ^4.5.15
@@ -54,7 +54,7 @@ dependencies:
   '@codemirror/basic-setup': 0.19.0
   '@codemirror/lang-html': 0.19.3
   '@codemirror/lang-java': 0.19.1
-  '@halo-dev/admin-api': 1.0.0-alpha.44
+  '@halo-dev/admin-api': 1.0.0-alpha.46
   ant-design-vue: 1.7.8_9065e7474e033a8e4b95615fc8e6c36c
   crypto-js: 4.1.1
   dayjs: 1.10.7
@@ -1348,32 +1348,33 @@ packages:
       purgecss: 2.3.0
     dev: true
 
-  /@halo-dev/admin-api/1.0.0-alpha.44:
-    resolution: {integrity: sha512-nCJsx4gDxCjkoGJKsBpcgLhAUc8RYrqKMGM1VSi9t64xTFdXDjIJgtcIQuBgJ0b4R58JIp6A6ti5S764vz4BDA==}
+  /@halo-dev/admin-api/1.0.0-alpha.46:
+    resolution: {integrity: sha512-OlDZm2/L/9IKlhCjWWFO1KkqxfEip/nMZrqavMQXghcHomWBqxvMttB4P1vg+0xmoZh65uYhl3De6VSIbL2FsQ==}
     engines: {node: '>=12'}
     dependencies:
-      '@halo-dev/rest-api-client': 1.0.0-alpha.44
+      '@halo-dev/rest-api-client': 1.0.0-alpha.46
+      tslib: 2.3.1
     transitivePeerDependencies:
       - debug
     dev: false
 
-  /@halo-dev/logger/1.0.0-alpha.44:
-    resolution: {integrity: sha512-ORHP6pj8wLb+mwsk+pYqvH9tqNWTr+96AiZgtSMcdwojA1KupFSVzHN0aqpk8HeGfSrBNbMz4VT6ey+OVnWrcQ==}
+  /@halo-dev/logger/1.0.0-alpha.46:
+    resolution: {integrity: sha512-iBLa55wq6i++9l2L4w1X0vY5mMmqOFBbzjvTNv9TcG2ssUNXL1s0uRgasjvlQAI5EDfvmHhth/RW4ACPM+EUnQ==}
     engines: {node: '>=12.0.0'}
     dependencies:
       tslib: 2.3.1
     dev: false
 
-  /@halo-dev/rest-api-client/1.0.0-alpha.44:
-    resolution: {integrity: sha512-fCzh7ihLpI7hrq0S2M9YjROTvoTT5JeEOqv5O/hon4bTfpBqEb7REjjYMONR8lJNgmEI9wzviEhn7Xxg7nX/vA==}
+  /@halo-dev/rest-api-client/1.0.0-alpha.46:
+    resolution: {integrity: sha512-kv88fszMZe26KAVfZXzjIvqZV6wsMWCxMtoWgk9F8DkYs3kQt9n+98g5azmtFgZh2RYh3O4einjcFOUQ44yRxg==}
     engines: {node: '>=12'}
     dependencies:
-      '@halo-dev/logger': 1.0.0-alpha.44
+      '@halo-dev/logger': 1.0.0-alpha.46
       axios: 0.24.0
       form-data: 4.0.0
       js-base64: 3.7.2
-      qs: 6.10.1
-      store: 2.0.12
+      qs: 6.10.3
+      tslib: 2.3.1
     transitivePeerDependencies:
       - debug
     dev: false
@@ -9403,8 +9404,8 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     dev: true
 
-  /qs/6.10.1:
-    resolution: {integrity: sha512-M528Hph6wsSVOBiYUnGf+K/7w0hNshs/duGsNXPUCLH5XAqjEtiPGwNONLV0tBH8NoGb0mvD5JubnUTrujKDTg==}
+  /qs/6.10.3:
+    resolution: {integrity: sha512-wr7M2E0OFRfIfJZjKGieI8lBKb7fRCH4Fv5KNPEs7gJ8jadvotdsS08PzOKR7opXhZ/Xkjtt3WF9g38drmyRqQ==}
     engines: {node: '>=0.6'}
     dependencies:
       side-channel: 1.0.4
@@ -10350,10 +10351,6 @@ packages:
     resolution: {integrity: sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=}
     engines: {node: '>=0.10.0'}
     dev: true
-
-  /store/2.0.12:
-    resolution: {integrity: sha1-jFNOKguDH3K3X8XxEZhXxE711ZM=}
-    dev: false
 
   /stream-browserify/2.0.2:
     resolution: {integrity: sha512-nX6hmklHs/gr2FuxYDltq8fJA1GDlxKQCz8O/IM4atRqBH8OORmBNgfvW5gG10GT/qQ9u0CzIvr2X5Pkt6ntqg==}

@@ -52,7 +52,8 @@ import {
   TimePicker,
   Tooltip,
   Tree,
-  TreeSelect
+  TreeSelect,
+  Descriptions
 } from 'ant-design-vue'
 
 Vue.use(Affix)
@@ -106,6 +107,7 @@ Vue.use(Steps)
 Vue.use(Empty)
 Vue.use(Result)
 Vue.use(Space)
+Vue.use(Descriptions)
 
 // message config
 message.config({

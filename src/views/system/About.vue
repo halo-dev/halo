@@ -27,6 +27,7 @@
               <li>版本：{{ environments.version }}</li>
               <li>数据库：{{ environments.database }}</li>
               <li>运行模式：{{ environments.mode }}</li>
+              <li>启用主题：{{ activatedTheme.name }}</li>
               <li>启动时间：{{ environments.startTime | moment }}</li>
             </ul>
             <a class="mr-3" href="https://halo.run" target="_blank"
@@ -123,7 +124,8 @@ export default {
       checking: false,
       isLatest: false,
       latestData: {},
-      versionContentVisible: false
+      versionContentVisible: false,
+      activatedTheme: {}
     }
   },
   computed: {
@@ -145,19 +147,24 @@ export default {
   },
   created() {
     this.getEnvironments()
+    this.handleGetActivatedTheme()
     this.fetchContributors()
   },
   methods: {
     async getEnvironments() {
-      await apiClient.getEnvironment().then(response => {
-        this.environments = response.data
-      })
+      const { data } = await apiClient.getEnvironment()
+      this.environments = data
       this.checkServerUpdate()
+    },
+    async handleGetActivatedTheme() {
+      const { data } = await apiClient.theme.getActivatedTheme()
+      this.activatedTheme = data
     },
     handleCopyEnvironments() {
       const text = `版本：${this.environments.version}
 数据库：${this.environments.database}
 运行模式：${this.environments.mode}
+启用主题：${this.activatedTheme.name}
 User Agent：${navigator.userAgent}`
       this.$copyText(text)
         .then(message => {

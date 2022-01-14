@@ -7,6 +7,7 @@ import AttachmentSelectDrawer from './Attachment/AttachmentSelectDrawer'
 import AttachmentUploadModal from './Attachment/AttachmentUploadModal'
 import ReactiveButton from './Button/ReactiveButton'
 import PostTag from './Post/PostTag'
+import AttachmentInput from './Input/AttachmentInput'
 
 const _components = {
   Ellipsis,
@@ -15,7 +16,8 @@ const _components = {
   AttachmentSelectDrawer,
   AttachmentUploadModal,
   ReactiveButton,
-  PostTag
+  PostTag,
+  AttachmentInput
 }
 
 const components = {}
