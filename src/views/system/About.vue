@@ -77,7 +77,7 @@
 <script>
 import apiClient from '@/utils/api-client'
 import axios from 'axios'
-import marked from 'marked'
+import { marked } from 'marked'
 import { PageView } from '@/layouts'
 
 const axiosInstance = axios.create({
@@ -136,7 +136,7 @@ export default {
     },
     versionContent() {
       if (this.latestData && this.latestData.body) {
-        return marked(this.latestData.body)
+        return marked.parse(this.latestData.body)
       } else {
         return '暂无内容'
       }

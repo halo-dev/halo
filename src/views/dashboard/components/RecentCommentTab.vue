@@ -45,7 +45,7 @@
 <script>
 import apiClient from '@/utils/api-client'
 
-import marked from 'marked'
+import { marked } from 'marked'
 
 export default {
   name: 'RecentCommentTab',
@@ -68,7 +68,7 @@ export default {
   computed: {
     formmatedCommentData() {
       return this.comments.map(comment => {
-        comment.content = marked(comment.content)
+        comment.content = marked.parse(comment.content)
         return comment
       })
     }

@@ -59,7 +59,7 @@
 
 <script>
 import apiClient from '@/utils/api-client'
-import marked from 'marked'
+import { marked } from 'marked'
 
 export default {
   name: 'HeaderComment',
@@ -76,13 +76,13 @@ export default {
   computed: {
     converttedPostComments() {
       return this.postComments.map(comment => {
-        comment.content = marked(comment.content)
+        comment.content = marked.parse(comment.content)
         return comment
       })
     },
     converttedSheetComments() {
       return this.sheetComments.map(comment => {
-        comment.content = marked(comment.content)
+        comment.content = marked.parse(comment.content)
         return comment
       })
     }
