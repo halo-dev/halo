@@ -66,66 +66,6 @@
       @close="onThemeSettingsDrawerClose"
     />
 
-    <a-modal
-      v-model="installModal.visible"
-      :afterClose="onThemeInstallModalClose"
-      :bodyStyle="{ padding: '0 24px 24px' }"
-      :footer="null"
-      destroyOnClose
-      title="安装主题"
-    >
-      <div class="custom-tab-wrapper">
-        <a-tabs :animated="{ inkBar: true, tabPane: false }">
-          <a-tab-pane key="1" tab="本地上传">
-            <FilePondUpload
-              ref="upload"
-              :accepts="['application/x-zip', 'application/x-zip-compressed', 'application/zip']"
-              :uploadHandler="installModal.local.uploadHandler"
-              label="点击选择主题包或将主题包拖拽到此处<br>仅支持 ZIP 格式的文件"
-              name="file"
-              @success="handleUploadSucceed"
-            ></FilePondUpload>
-            <a-alert closable type="info">
-              <template slot="message">
-                更多主题请访问：
-                <a href="https://halo.run/themes.html" target="_blank">https://halo.run/themes</a>
-              </template>
-            </a-alert>
-          </a-tab-pane>
-          <a-tab-pane key="2" tab="远程下载">
-            <a-form-model
-              ref="remoteInstallForm"
-              :model="installModal.remote"
-              :rules="installModal.remote.rules"
-              layout="vertical"
-            >
-              <a-form-model-item help="* 支持 Git 仓库地址，ZIP 链接。" label="远程地址：" prop="url">
-                <a-input v-model="installModal.remote.url" />
-              </a-form-model-item>
-              <a-form-model-item>
-                <ReactiveButton
-                  :errored="installModal.remote.fetchErrored"
-                  :loading="installModal.remote.fetching"
-                  erroredText="下载失败"
-                  loadedText="下载成功"
-                  text="下载"
-                  type="primary"
-                  @callback="handleRemoteFetchCallback"
-                  @click="handleRemoteFetching"
-                ></ReactiveButton>
-              </a-form-model-item>
-            </a-form-model>
-            <a-alert closable type="info">
-              <template slot="message">
-                目前仅支持远程 Git 仓库和 ZIP 下载链接。更多主题请访问：
-                <a href="https://halo.run/themes.html" target="_blank">https://halo.run/themes</a>
-              </template>
-            </a-alert>
-          </a-tab-pane>
-        </a-tabs>
-      </div>
-    </a-modal>
-
     <ThemeDeleteConfirmModal
       :theme="themeDeleteModal.selected"
       :visible.sync="themeDeleteModal.visible"
@@ -139,6 +79,8 @@
       @onAfterClose="localUpgradeModel.selected = {}"
       @success="handleListThemes"
     />
+
+    <ThemeInstallModal :visible.sync="installModal.visible" @onAfterClose="handleListThemes" />
   </page-view>
 </template>
 
@@ -146,6 +88,7 @@
 import ThemeSettingDrawer from './components/ThemeSettingDrawer'
 import ThemeDeleteConfirmModal from './components/ThemeDeleteConfirmModal'
 import ThemeLocalUpgradeModal from './components/ThemeLocalUpgradeModal'
+import ThemeInstallModal from './components/ThemeInstallModal.vue'
 import { PageView } from '@/layouts'
 import apiClient from '@/utils/api-client'
 
@@ -154,7 +97,8 @@ export default {
     PageView,
     ThemeSettingDrawer,
     ThemeDeleteConfirmModal,
-    ThemeLocalUpgradeModal
+    ThemeLocalUpgradeModal,
+    ThemeInstallModal
   },
   data() {
     return {
@@ -164,21 +108,7 @@ export default {
       },
 
       installModal: {
-        visible: false,
-        local: {
-          uploadHandler: (file, options) => apiClient.theme.upload(file, options)
-        },
-
-        remote: {
-          url: null,
-
-          fetching: false,
-          fetchErrored: false,
-
-          rules: {
-            url: [{ required: true, message: '* 远程地址不能为空', trigger: ['change'] }]
-          }
-        }
+        visible: false
       },
 
       localUpgradeModel: {
@@ -236,35 +166,6 @@ export default {
         this.handleListThemes()
       })
     },
-    handleUploadSucceed() {
-      this.installModal.visible = false
-      this.handleListThemes()
-    },
-    handleRemoteFetching() {
-      this.$refs.remoteInstallForm.validate(valid => {
-        if (valid) {
-          this.installModal.remote.fetching = true
-          apiClient.theme
-            .fetchTheme(this.installModal.remote.url)
-            .catch(() => {
-              this.installModal.remote.fetchErrored = true
-            })
-            .finally(() => {
-              setTimeout(() => {
-                this.installModal.remote.fetching = false
-              }, 400)
-            })
-        }
-      })
-    },
-    handleRemoteFetchCallback() {
-      if (this.installModal.remote.fetchErrored) {
-        this.installModal.remote.fetchErrored = false
-      } else {
-        this.installModal.visible = false
-        this.handleListThemes()
-      }
-    },
     handleOpenLocalUpdateModal(item) {
       this.localUpgradeModel.selected = item
       this.localUpgradeModel.visible = true
@@ -282,26 +183,19 @@ export default {
         title: '提示',
         maskClosable: true,
         content: '确定更新【' + item.name + '】主题？',
-        onOk() {
-          const hide = _this.$message.loading('更新中...', 0)
-          apiClient.theme
-            .updateThemeByFetching(item.id)
-            .then(() => {
-              _this.$message.success('更新成功！')
-            })
-            .finally(() => {
-              hide()
-              _this.handleListThemes()
-            })
+        async onOk() {
+          const hideLoading = _this.$message.loading('更新中...', 0)
+          try {
+            await apiClient.theme.updateThemeByFetching(item.id)
+            _this.$message.success('更新成功！')
+          } catch (e) {
+            _this.$log.error('Failed to update theme: ', e)
+          } finally {
+            hideLoading()
+            _this.handleListThemes()
+          }
         }
       })
-    },
-    onThemeInstallModalClose() {
-      if (this.$refs.upload) {
-        this.$refs.upload.handleClearFileList()
-      }
-      this.installModal.remote.url = null
-      this.handleListThemes()
     },
     onThemeSettingsDrawerClose() {
       this.themeSettingDrawer.visible = false
