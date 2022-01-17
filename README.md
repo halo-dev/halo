@@ -11,6 +11,7 @@
 <a href="https://github.com/halo-dev/halo-admin/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/halo-dev/halo-admin?style=flat-square"></a>
 <a href="https://github.com/halo-dev/halo-admin/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo-admin.svg?style=flat-square"></a>
 <a href="https://github.com/halo-dev/halo-admin/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo-admin/Halo%20Admin%20CI?style=flat-square"/></a>
+<a href="https://gitpod.io/#https://github.com/halo-dev/halo-admin"><img alt="Gitpod ready-to-code" src="https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square"/></a>
 </p>
 
 ------------------------------

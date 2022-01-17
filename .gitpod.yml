@@ -1,0 +1,14 @@
+ports:
+  - port: 8080
+    onOpen: open-browser
+
+tasks:
+  - init: npm install -g pnpm && pnpm install
+    command: pnpm serve
+
+vscode:
+  extensions:
+    - dbaeumer.vscode-eslint
+    - editorconfig.editorconfig
+    - esbenp.prettier-vscode
+    - johnsoncodehk.volar
