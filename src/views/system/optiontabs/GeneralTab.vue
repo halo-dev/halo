@@ -8,18 +8,10 @@
         <a-input v-model="options.blog_url" placeholder="如：https://halo.run" />
       </a-form-model-item>
       <a-form-model-item label="Logo：" prop="blog_logo">
-        <a-input v-model="options.blog_logo">
-          <a slot="addonAfter" href="javascript:void(0);" @click="handleShowLogoSelector">
-            <a-icon type="picture" />
-          </a>
-        </a-input>
+        <AttachmentInput v-model="options.blog_logo" title="选择 Logo" />
       </a-form-model-item>
       <a-form-model-item label="Favicon：" prop="blog_favicon">
-        <a-input v-model="options.blog_favicon">
-          <a slot="addonAfter" href="javascript:void(0);" @click="handleShowFaviconSelector">
-            <a-icon type="picture" />
-          </a>
-        </a-input>
+        <AttachmentInput v-model="options.blog_favicon" title="选择 Favicon" />
       </a-form-model-item>
       <a-form-model-item label="页脚信息：" prop="blog_footer_info">
         <a-input
@@ -42,12 +34,6 @@
         ></ReactiveButton>
       </a-form-model-item>
     </a-form-model>
-
-    <AttachmentSelectDrawer
-      v-model="attachmentSelector.visible"
-      :title="attachmentSelectorTitle"
-      @listenToSelect="handleSelectAttachment"
-    />
   </div>
 </template>
 
@@ -76,10 +62,6 @@ export default {
         sm: { span: 12 },
         xs: { span: 24 }
       },
-      attachmentSelector: {
-        visible: false,
-        field: ''
-      },
       rules: {
         blog_title: [
           { required: true, message: '* 博客标题不能为空', trigger: ['change'] },
@@ -95,27 +77,6 @@ export default {
       }
     }
   },
-  computed: {
-    attachmentSelectorTitle() {
-      if (this.attachmentSelector.field === 'blog_logo') {
-        return '选择 Logo'
-      } else if (this.attachmentSelector.field === 'blog_favicon') {
-        return '选择 Favicon'
-      }
-      return ''
-    }
-  },
-  destroyed: function() {
-    if (this.attachmentSelector.visible) {
-      this.attachmentSelector.visible = false
-    }
-  },
-  beforeRouteLeave(to, from, next) {
-    if (this.attachmentSelector.visible) {
-      this.attachmentSelector.visible = false
-    }
-    next()
-  },
   watch: {
     options(val) {
       this.$emit('onChange', val)
@@ -129,18 +90,6 @@ export default {
           this.$emit('onSave')
         }
       })
-    },
-    handleShowLogoSelector() {
-      this.attachmentSelector.field = 'blog_logo'
-      this.attachmentSelector.visible = true
-    },
-    handleShowFaviconSelector() {
-      this.attachmentSelector.field = 'blog_favicon'
-      this.attachmentSelector.visible = true
-    },
-    handleSelectAttachment(attachment) {
-      this.$set(this.options, this.attachmentSelector.field, encodeURI(attachment.path))
-      this.attachmentSelector.visible = false
     }
   }
 }

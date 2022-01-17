@@ -5,11 +5,7 @@
         <a-icon type="picture" />
       </a>
     </a-input>
-    <AttachmentSelectDrawer
-      v-model="attachmentDrawerVisible"
-      title="选择附件"
-      @listenToSelect="handleSelectAttachment"
-    />
+    <AttachmentSelectDrawer v-model="attachmentDrawerVisible" :title="title" @listenToSelect="handleSelectAttachment" />
   </div>
 </template>
 <script>
@@ -27,6 +23,10 @@ export default {
     placeholder: {
       type: String,
       default: ''
+    },
+    title: {
+      type: String,
+      default: '选择附件'
     }
   },
   data() {

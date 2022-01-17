@@ -18,11 +18,7 @@
               </a-input>
             </a-form-model-item>
             <a-form-model-item help="* 在标签页面可展示，需要主题支持" label="封面图：" prop="thumbnail">
-              <a-input v-model="form.model.thumbnail">
-                <a slot="addonAfter" href="javascript:void(0);" @click="thumbnailDrawer.visible = true">
-                  <a-icon type="picture" />
-                </a>
-              </a-input>
+              <AttachmentInput v-model="form.model.thumbnail" title="选择封面图" />
             </a-form-model-item>
             <a-form-model-item>
               <ReactiveButton
@@ -76,12 +72,6 @@
         </a-card>
       </a-col>
     </a-row>
-
-    <AttachmentSelectDrawer
-      v-model="thumbnailDrawer.visible"
-      title="选择封面图"
-      @listenToSelect="handleSelectThumbnail"
-    />
   </page-view>
 </template>
 
@@ -118,9 +108,6 @@ export default {
           thumbnail: [{ max: 1023, message: '* 封面图链接的字符长度不能超过 1023', trigger: ['change'] }],
           color: [{ max: 7, pattern: hexRegExp, message: '仅支持 hex 颜色值' }]
         }
-      },
-      thumbnailDrawer: {
-        visible: false
       }
     }
   },
@@ -196,10 +183,6 @@ export default {
         }
         _this.handleListTags()
       }
-    },
-    handleSelectThumbnail(data) {
-      this.$set(this.form.model, 'thumbnail', encodeURI(data.path))
-      this.thumbnailDrawer.visible = false
     }
   }
 }
