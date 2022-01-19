@@ -51,7 +51,18 @@
             <a-tabs type="card">
               <a-tab-pane key="1">
                 <span slot="tab"> <a-icon type="idcard" />基本资料 </span>
-                <a-form-model ref="userForm" :model="userForm.model" :rules="userForm.rules" layout="vertical">
+                <a-form-model
+                  :wrapperCol="{
+                    xl: { span: 15 },
+                    lg: { span: 15 },
+                    sm: { span: 15 },
+                    xs: { span: 24 }
+                  }"
+                  ref="userForm"
+                  :model="userForm.model"
+                  :rules="userForm.rules"
+                  layout="vertical"
+                >
                   <a-form-model-item label="用户名：" prop="username">
                     <a-input v-model="userForm.model.username" />
                   </a-form-model-item>
@@ -81,6 +92,12 @@
               <a-tab-pane key="2">
                 <span slot="tab"> <a-icon type="lock" />密码 </span>
                 <a-form-model
+                  :wrapperCol="{
+                    xl: { span: 15 },
+                    lg: { span: 15 },
+                    sm: { span: 15 },
+                    xs: { span: 24 }
+                  }"
                   ref="passwordForm"
                   :model="passwordForm.model"
                   :rules="passwordForm.rules"
