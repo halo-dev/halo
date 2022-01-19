@@ -51,7 +51,12 @@
           <a-card :bodyStyle="{ padding: '16px' }" :bordered="false" :loading="contributorsLoading" title="开发者">
             <a v-for="(item, index) in contributors" :key="index" :href="item.html_url" target="_blank">
               <a-tooltip :title="item.login" placement="top">
-                <a-avatar :src="item.avatar_url" :style="{ marginRight: '10px', marginBottom: '10px' }" size="large" />
+                <a-avatar
+                  :src="item.avatar_url | webpAvatarConvert"
+                  :style="{ marginRight: '10px', marginBottom: '10px' }"
+                  size="large"
+                  :alt="item.login"
+                />
               </a-tooltip>
             </a>
           </a-card>
@@ -257,6 +262,11 @@ User Agent：${navigator.userAgent}`
         return -1
       }
       return major * 1000000 + minor * 1000 + micro
+    }
+  },
+  filters: {
+    webpAvatarConvert(url) {
+      return url.replace('avatars.githubusercontent.com', 'avatars-githubusercontent.webp.se')
     }
   }
 }
