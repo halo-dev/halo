@@ -17,7 +17,6 @@ specifiers:
   babel-eslint: ^10.1.0
   babel-jest: ^26.6.3
   babel-plugin-import: ^1.13.3
-  crypto-js: ^4.1.1
   dayjs: ^1.10.7
   enquire.js: ^2.1.6
   eslint: ^6.8.0
@@ -56,7 +55,6 @@ dependencies:
   '@codemirror/lang-java': 0.19.1
   '@halo-dev/admin-api': 1.0.0-alpha.46
   ant-design-vue: 1.7.8_9065e7474e033a8e4b95615fc8e6c36c
-  crypto-js: 4.1.1
   dayjs: 1.10.7
   enquire.js: 2.1.6
   filepond: 4.30.3
@@ -4157,10 +4155,6 @@ packages:
       randombytes: 2.1.0
       randomfill: 1.0.4
     dev: true
-
-  /crypto-js/4.1.1:
-    resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
-    dev: false
 
   /css-color-names/0.0.4:
     resolution: {integrity: sha1-gIrcLnnPhHOAabZGyyDsJ762KeA=}

@@ -26,7 +26,6 @@
     "@codemirror/lang-java": "^0.19.1",
     "@halo-dev/admin-api": "^1.0.0-alpha.46",
     "ant-design-vue": "^1.7.8",
-    "crypto-js": "^4.1.1",
     "dayjs": "^1.10.7",
     "enquire.js": "^2.1.6",
     "filepond": "^4.30.3",
