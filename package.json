@@ -65,7 +65,7 @@
     "less-loader": "^5.0.0",
     "lint-staged": "^11.2.6",
     "prettier": "^2.5.1",
-    "tailwindcss": "^1.9.6",
+    "tailwindcss": "^3.0.15",
     "vue-template-compiler": "^2.6.14"
   }
 }
