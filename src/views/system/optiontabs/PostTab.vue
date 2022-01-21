@@ -15,10 +15,10 @@
         </a-select>
       </a-form-model-item>
       <a-form-model-item label="首页每页文章条数：">
-        <a-input-number v-model="options.post_index_page_size" :min="1" style="width:100%" />
+        <a-input-number v-model="options.post_index_page_size" :min="1" style="width: 100%" />
       </a-form-model-item>
       <a-form-model-item help="* 包括标签所属文章页面、分类所属文章页面" label="归档页面每页文章条数：">
-        <a-input-number v-model="options.post_archives_page_size" :min="1" style="width:100%" />
+        <a-input-number v-model="options.post_archives_page_size" :min="1" style="width: 100%" />
       </a-form-model-item>
       <a-form-model-item label="RSS 内容类型：">
         <a-select v-model="options.rss_content_type">
@@ -27,10 +27,10 @@
         </a-select>
       </a-form-model-item>
       <a-form-model-item label="RSS 内容条数：">
-        <a-input-number v-model="options.rss_page_size" :min="1" style="width:100%" />
+        <a-input-number v-model="options.rss_page_size" :min="1" style="width: 100%" />
       </a-form-model-item>
       <a-form-model-item label="文章摘要字数：">
-        <a-input-number v-model="options.post_summary_length" style="width:100%" />
+        <a-input-number v-model="options.post_summary_length" style="width: 100%" />
       </a-form-model-item>
       <a-form-model-item label="自动清理回收站文章：">
         <a-switch v-model="options.recycled_post_cleaning_enabled" />

@@ -133,7 +133,7 @@
         </a-card>
       </a-col>
     </a-row>
-    <div style="position: fixed;bottom: 30px;right: 30px;">
+    <div style="position: fixed; bottom: 30px; right: 30px">
       <a-button icon="sync" shape="circle" size="large" type="primary" @click="handleRefresh"></a-button>
     </div>
   </div>

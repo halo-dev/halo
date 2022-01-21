@@ -122,9 +122,7 @@
     </div>
     <template slot="footer">
       <slot name="extraFooter" />
-      <a-button :disabled="loading" @click="modalVisible = false">
-        关闭
-      </a-button>
+      <a-button :disabled="loading" @click="modalVisible = false"> 关闭 </a-button>
       <ReactiveButton
         v-if="!form.model.id"
         :errored="form.draftSaveErrored"

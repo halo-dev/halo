@@ -1,9 +1,7 @@
 <template>
   <a-modal v-model="visible" :bodyStyle="{ padding: '0 24px 24px' }" :width="1024" title="从系统预设链接添加菜单">
     <template slot="footer">
-      <a-button @click="handleCancel">
-        取消
-      </a-button>
+      <a-button @click="handleCancel"> 取消 </a-button>
       <ReactiveButton
         :disabled="menus && menus.length <= 0"
         :errored="saveErrored"

@@ -21,7 +21,7 @@
               v-for="(item, index) in attachments"
               v-else
               :key="index"
-              class="attach-item  attachments-group-item"
+              class="attach-item attachments-group-item"
               @click="handleSelectAttachment(item)"
             >
               <span v-if="!handleJudgeMediaType(item)" class="attachments-group-item-type">{{ item.suffix }}</span>

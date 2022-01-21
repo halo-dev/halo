@@ -6,7 +6,7 @@ export const DEVICE_TYPE = {
   MOBILE: 'mobile'
 }
 
-export const deviceEnquire = function(callback) {
+export const deviceEnquire = function (callback) {
   const matchDesktop = {
     match: () => {
       callback && callback(DEVICE_TYPE.DESKTOP)

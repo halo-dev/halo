@@ -67,7 +67,7 @@
         @showSizeChange="handlePaginationChange"
       />
     </div>
-    <div style="position: fixed;bottom: 30px;right: 30px;">
+    <div style="position: fixed; bottom: 30px; right: 30px">
       <a-button icon="setting" shape="circle" size="large" type="primary" @click="optionFormVisible = true"></a-button>
     </div>
     <a-modal v-model="optionFormVisible" :afterClose="() => (optionFormVisible = false)" title="页面设置">
@@ -79,7 +79,7 @@
           <a-input v-model="options.photos_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
-          <a-input-number v-model="options.photos_page_size" style="width:100%" />
+          <a-input-number v-model="options.photos_page_size" style="width: 100%" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -97,7 +97,7 @@
             <img
               :src="form.model.url || '/images/placeholder.jpg'"
               class="w-full cursor-pointer"
-              style="border-radius:4px"
+              style="border-radius: 4px"
               @click="attachmentSelectDrawer.visible = true"
             />
           </div>
@@ -114,7 +114,7 @@
             :defaultValue="takeTimeDefaultValue"
             format="YYYY-MM-DD HH:mm:ss"
             showTime
-            style="width:100%"
+            style="width: 100%"
             @change="onTakeTimeChange"
             @ok="onTakeTimeSelect"
           />
@@ -123,7 +123,7 @@
           <a-input v-model="form.model.location" />
         </a-form-model-item>
         <a-form-model-item label="分组：" prop="team">
-          <a-auto-complete v-model="form.model.team" :dataSource="computedTeams" allowClear style="width:100%" />
+          <a-auto-complete v-model="form.model.team" :dataSource="computedTeams" allowClear style="width: 100%" />
         </a-form-model-item>
         <a-form-model-item label="描述：" prop="description">
           <a-input v-model="form.model.description" :autoSize="{ minRows: 5 }" type="textarea" />

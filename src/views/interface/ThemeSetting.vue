@@ -111,7 +111,7 @@
                   :defaultValue="item.defaultValue"
                   model="hex"
                   picker="square"
-                  style="display: inline-block;height: 24px;"
+                  style="display: inline-block; height: 24px"
                 ></verte>
                 <AttachmentInput
                   v-else-if="item.type === 'ATTACHMENT'"
@@ -123,7 +123,7 @@
                   v-else-if="item.type === 'NUMBER'"
                   v-model="theme.settings[item.name]"
                   :defaultValue="item.defaultValue"
-                  style="width:100%"
+                  style="width: 100%"
                 />
                 <a-switch
                   v-else-if="item.type === 'SWITCH'"

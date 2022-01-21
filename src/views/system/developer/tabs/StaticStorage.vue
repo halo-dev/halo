@@ -3,12 +3,8 @@
     <a-card :bodyStyle="{ padding: 0 }" :bordered="false">
       <div class="table-operator">
         <a-button icon="cloud-upload" type="primary" @click="uploadModal.visible = true">上传</a-button>
-        <a-button icon="plus" @click="handleOpenCreateDirectoryModal({})">
-          新建文件夹
-        </a-button>
-        <a-button :loading="list.loading" icon="sync" @click="handleListStatics">
-          刷新
-        </a-button>
+        <a-button icon="plus" @click="handleOpenCreateDirectoryModal({})"> 新建文件夹</a-button>
+        <a-button :loading="list.loading" icon="sync" @click="handleListStatics"> 刷新</a-button>
       </div>
       <div class="mt-4">
         <a-table
@@ -235,7 +231,7 @@ export default {
     ...mapGetters(['options']),
     sortedStatics() {
       const data = this.list.data.slice(0)
-      return data.sort(function(a, b) {
+      return data.sort(function (a, b) {
         return a.isFile - b.isFile
       })
     }

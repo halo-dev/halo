@@ -10,10 +10,10 @@ import './core/lazy_use'
 import '@/router/guard/'
 import '@/filters/filter' // global filter
 import './components'
-import { version } from '../package.json'
+import pkg from '../package.json'
 
 Vue.config.productionTip = false
-Vue.prototype.VERSION = version
+Vue.prototype.VERSION = pkg.version
 
 Vue.use(router)
 Vue.use(Contextmenu)

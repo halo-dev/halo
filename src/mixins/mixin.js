@@ -61,12 +61,14 @@ const mixinPostEdit = {
       const toolbarHeight = 64
       const contentMarginTop = 24
       const titleInputHeight = 40
-      return `calc(100vh - ${toolbarHeight +
+      return `calc(100vh - ${
+        toolbarHeight +
         contentMarginTop +
         titleInputHeight +
         this.viewMetas.pageHeaderHeight +
         this.viewMetas.pageFooterHeight +
-        10}px - 1rem)`
+        10
+      }px - 1rem)`
     }
   },
   mounted() {

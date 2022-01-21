@@ -35,19 +35,13 @@
         <a-dropdown v-show="list.params.status != null && list.params.status !== '' && !isMobile()">
           <a-menu slot="overlay">
             <a-menu-item v-if="list.params.status === 'AUDITING'" key="1">
-              <a href="javascript:void(0);" @click="handleEditStatusMore(commentStatus.PUBLISHED.value)">
-                通过
-              </a>
+              <a href="javascript:void(0);" @click="handleEditStatusMore(commentStatus.PUBLISHED.value)"> 通过 </a>
             </a-menu-item>
             <a-menu-item v-if="list.params.status === 'PUBLISHED' || list.params.status === 'AUDITING'" key="2">
-              <a href="javascript:void(0);" @click="handleEditStatusMore(commentStatus.RECYCLE.value)">
-                移到回收站
-              </a>
+              <a href="javascript:void(0);" @click="handleEditStatusMore(commentStatus.RECYCLE.value)"> 移到回收站 </a>
             </a-menu-item>
             <a-menu-item v-if="list.params.status === 'RECYCLE'" key="3">
-              <a href="javascript:void(0);" @click="handleDeleteMore">
-                永久删除
-              </a>
+              <a href="javascript:void(0);" @click="handleDeleteMore"> 永久删除 </a>
             </a-menu-item>
           </a-menu>
           <a-button>
@@ -130,19 +124,19 @@
               <span
                 v-if="item.authorUrl"
                 slot="title"
-                style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
               >
-                <a-icon v-if="item.isAdmin" style="margin-right: 3px;" type="user" />&nbsp;
+                <a-icon v-if="item.isAdmin" style="margin-right: 3px" type="user" />&nbsp;
                 <a :href="item.authorUrl" target="_blank">{{ item.author }}</a>
-                &nbsp;<small style="color:rgba(0, 0, 0, 0.45)">{{ item.createTime | timeAgo }}</small>
+                &nbsp;<small style="color: rgba(0, 0, 0, 0.45)">{{ item.createTime | timeAgo }}</small>
               </span>
               <span
                 v-else
                 slot="title"
-                style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
               >
-                <a-icon v-if="item.isAdmin" style="margin-right: 3px;" type="user" />&nbsp;{{ item.author }}&nbsp;<small
-                  style="color:rgba(0, 0, 0, 0.45)"
+                <a-icon v-if="item.isAdmin" style="margin-right: 3px" type="user" />&nbsp;{{ item.author }}&nbsp;<small
+                  style="color: rgba(0, 0, 0, 0.45)"
                 >
                   {{ item.createTime | timeAgo }}
                 </small>
@@ -167,7 +161,7 @@
           scrollToFirstRowOnChange
         >
           <template slot="author" slot-scope="text, record">
-            <a-icon v-if="record.isAdmin" style="margin-right: 3px;" type="user" />
+            <a-icon v-if="record.isAdmin" style="margin-right: 3px" type="user" />
             <a v-if="record.authorUrl" :href="record.authorUrl" target="_blank">{{ text }}</a>
             <span v-else>{{ text }}</span>
           </template>
@@ -396,7 +390,7 @@ export default {
       type: String,
       required: false,
       default: 'posts',
-      validator: function(value) {
+      validator: function (value) {
         return ['posts', 'sheets', 'journals'].indexOf(value) !== -1
       }
     }

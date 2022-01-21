@@ -50,7 +50,7 @@ export default {
         this.openKeys = this.cachedOpenKeys
       }
     },
-    $route: function() {
+    $route: function () {
       this.updateMenu()
     }
   },

@@ -95,7 +95,13 @@
                 </template>
                 <span
                   slot="title"
-                  style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                  style="
+                    max-width: 300px;
+                    display: block;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
                 >
                   {{ item.name }}{{ item.password ? '（加密）' : '' }}
                 </span></a-list-item-meta

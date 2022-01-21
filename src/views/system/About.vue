@@ -189,7 +189,7 @@ User Agent：${navigator.userAgent}`
         .then(response => {
           _this.contributors = response.data
         })
-        .catch(function(error) {
+        .catch(function (error) {
           _this.$log.error('Fetch contributors error', error)
         })
         .finally(() => {
@@ -236,7 +236,7 @@ User Agent：${navigator.userAgent}`
             }
           })
         })
-        .catch(function(error) {
+        .catch(function (error) {
           this.$log.error('Check update fail', error)
         })
         .finally(() => {

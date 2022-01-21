@@ -49,16 +49,12 @@
                 <a-form-model-item prop="team">
                   <a-input v-model="teams.form.model.team" autoFocus />
                 </a-form-model-item>
-                <a-form-model-item style="margin-bottom:0">
-                  <a-button type="primary" @click="handleCreateTeam">
-                    新增
-                  </a-button>
+                <a-form-model-item style="margin-bottom: 0">
+                  <a-button type="primary" @click="handleCreateTeam"> 新增 </a-button>
                 </a-form-model-item>
               </a-form-model>
             </template>
-            <a-button block class="mt-3" type="primary">
-              新增分组
-            </a-button>
+            <a-button block class="mt-3" type="primary"> 新增分组 </a-button>
           </a-popover>
         </a-card>
       </a-col>
@@ -88,20 +84,12 @@
                 @callback="formBatch.errored = false"
                 @click="handleUpdateBatch"
               ></ReactiveButton>
-              <a-button v-if="!form.visible" ghost type="primary" @click="handleOpenCreateMenuForm()">
-                新增
-              </a-button>
-              <a-button v-else type="default" @click="handleCloseCreateMenuForm()">
-                取消新增
-              </a-button>
+              <a-button v-if="!form.visible" ghost type="primary" @click="handleOpenCreateMenuForm()"> 新增 </a-button>
+              <a-button v-else type="default" @click="handleCloseCreateMenuForm()"> 取消新增 </a-button>
               <a-dropdown :trigger="['click']">
                 <a-menu slot="overlay">
-                  <a-menu-item @click="menuInternalLinkSelector.visible = true">
-                    从系统预设链接添加
-                  </a-menu-item>
-                  <a-menu-item @click="handleDeleteBatch">
-                    删除当前组
-                  </a-menu-item>
+                  <a-menu-item @click="menuInternalLinkSelector.visible = true"> 从系统预设链接添加 </a-menu-item>
+                  <a-menu-item @click="handleDeleteBatch"> 删除当前组 </a-menu-item>
                 </a-menu>
                 <a-button>
                   其他

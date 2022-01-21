@@ -28,12 +28,8 @@
               </span>
             </a-list-item-meta>
             <template slot="actions">
-              <a v-if="!item.formVisible" href="javascript:void(0);" @click="handleOpenEditForm(item)">
-                编辑
-              </a>
-              <a v-else href="javascript:void(0);" @click="handleCloseCreateMenuForm(item)">
-                取消编辑
-              </a>
+              <a v-if="!item.formVisible" href="javascript:void(0);" @click="handleOpenEditForm(item)"> 编辑 </a>
+              <a v-else href="javascript:void(0);" @click="handleCloseCreateMenuForm(item)"> 取消编辑 </a>
             </template>
             <template slot="actions">
               <a href="javascript:void(0);" @click="handleDelete(item.id)">删除</a>
@@ -65,7 +61,7 @@
             @cancel="handleCloseCreateMenuForm(item)"
             @succeed="handleUpdateMenuSucceed(item)"
           />
-          <div class="a-list-nested" style="margin-left: 44px;">
+          <div class="a-list-nested" style="margin-left: 44px">
             <MenuTreeNode :excludedTeams="excludedTeams" :list="item.children" @reload="onReloadEmit" />
           </div>
         </div>

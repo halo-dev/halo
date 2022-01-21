@@ -2,7 +2,7 @@
   <a-row align="middle" class="h-screen" justify="center" type="flex">
     <a-col :lg="16" :md="20" :sm="20" :xl="12" :xs="23" :xxl="8">
       <div class="card-container animated fadeIn">
-        <a-card :bordered="false" style="box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0;">
+        <a-card :bordered="false" style="box-shadow: rgba(99, 99, 99, 0.2) 0 2px 8px 0">
           <div class="halo-logo">
             <img alt="Halo Logo" src="/images/logo.svg" />
             <span>安装向导</span>
@@ -11,12 +11,8 @@
           <!-- Blogger info -->
           <div class="mt-5 mb-5">
             <a-radio-group v-model="installationMode">
-              <a-radio-button value="new">
-                全新安装
-              </a-radio-button>
-              <a-radio-button value="import">
-                数据导入
-              </a-radio-button>
+              <a-radio-button value="new"> 全新安装 </a-radio-button>
+              <a-radio-button value="import"> 数据导入 </a-radio-button>
             </a-radio-group>
           </div>
           <a-form-model
@@ -27,45 +23,41 @@
             class="installationForm animated fadeIn"
             layout="horizontal"
           >
-            <a-divider dashed orientation="left">
-              管理员信息
-            </a-divider>
+            <a-divider dashed orientation="left"> 管理员信息 </a-divider>
             <a-form-model-item prop="username">
               <a-input v-model="form.model.username" placeholder="用户名">
-                <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="user" />
+                <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="user" />
               </a-input>
             </a-form-model-item>
             <a-form-model-item prop="username">
               <a-input v-model="form.model.nickname" placeholder="用户昵称">
-                <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="user" />
+                <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="user" />
               </a-input>
             </a-form-model-item>
             <a-form-model-item prop="email">
               <a-input v-model="form.model.email" placeholder="用户邮箱">
-                <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="mail" />
+                <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="mail" />
               </a-input>
             </a-form-model-item>
             <a-form-model-item prop="password">
               <a-input v-model="form.model.password" placeholder="登录密码（8-100位）" type="password">
-                <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="lock" />
+                <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="lock" />
               </a-input>
             </a-form-model-item>
             <a-form-model-item prop="confirmPassword">
               <a-input v-model="form.model.confirmPassword" placeholder="确认登录密码" type="password">
-                <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="lock" />
+                <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="lock" />
               </a-input>
             </a-form-model-item>
-            <a-divider dashed orientation="left">
-              站点信息
-            </a-divider>
+            <a-divider dashed orientation="left"> 站点信息 </a-divider>
             <a-form-model-item prop="url">
               <a-input v-model="form.model.url" placeholder="博客地址">
-                <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="link" />
+                <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="link" />
               </a-input>
             </a-form-model-item>
             <a-form-model-item prop="title">
               <a-input v-model="form.model.title" placeholder="博客标题">
-                <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="book" />
+                <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="book" />
               </a-input>
             </a-form-model-item>
           </a-form-model>

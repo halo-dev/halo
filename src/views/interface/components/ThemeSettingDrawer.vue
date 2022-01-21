@@ -22,7 +22,7 @@
           </a-card-meta>
         </a-card>
       </a-col>
-      <a-col :lg="formColValue" :md="formColValue" :sm="24" :xl="formColValue" :xs="24" style="padding-bottom: 50px;">
+      <a-col :lg="formColValue" :md="formColValue" :sm="24" :xl="formColValue" :xs="24" style="padding-bottom: 50px">
         <a-spin :spinning="settingLoading">
           <div v-if="themeConfigurations.length > 0" class="card-container">
             <a-tabs defaultActiveKey="0" type="card">
@@ -68,7 +68,7 @@
                       :defaultValue="item.defaultValue"
                       model="hex"
                       picker="square"
-                      style="display: inline-block;height: 24px;"
+                      style="display: inline-block; height: 24px"
                     ></verte>
                     <a-input
                       v-else-if="item.type === 'ATTACHMENT'"
@@ -83,7 +83,7 @@
                       v-else-if="item.type === 'NUMBER'"
                       v-model="themeSettings[item.name]"
                       :defaultValue="item.defaultValue"
-                      style="width:100%"
+                      style="width: 100%"
                     />
                     <a-switch
                       v-else-if="item.type === 'SWITCH'"
@@ -105,7 +105,7 @@
         </a-spin>
       </a-col>
 
-      <a-col v-if="viewMode" :lg="20" :md="20" :sm="24" :xl="20" :xs="24" style="padding-bottom: 50px;">
+      <a-col v-if="viewMode" :lg="20" :md="20" :sm="24" :xl="20" :xs="24" style="padding-bottom: 50px">
         <a-card :bodyStyle="{ padding: 0 }" :bordered="true">
           <iframe
             id="themeViewIframe"

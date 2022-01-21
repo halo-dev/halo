@@ -17,7 +17,7 @@
               <a-auto-complete v-model="form.model.team" :dataSource="computedTeams" allowClear />
             </a-form-model-item>
             <a-form-model-item label="排序编号：" prop="priority">
-              <a-input-number v-model="form.model.priority" :min="0" style="width:100%" />
+              <a-input-number v-model="form.model.priority" :min="0" style="width: 100%" />
             </a-form-model-item>
             <a-form-model-item label="描述：" prop="description">
               <a-input v-model="form.model.description" :autoSize="{ minRows: 5 }" type="textarea" />
@@ -95,7 +95,13 @@
                 </template>
                 <span
                   slot="title"
-                  style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                  style="
+                    max-width: 300px;
+                    display: block;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
                 >
                   {{ item.name }}
                 </span>
@@ -132,7 +138,7 @@
         </a-card>
       </a-col>
     </a-row>
-    <div style="position: fixed;bottom: 30px;right: 30px;">
+    <div style="position: fixed; bottom: 30px; right: 30px">
       <a-button
         icon="setting"
         shape="circle"

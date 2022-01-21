@@ -240,7 +240,7 @@ export default {
       }
     },
     isImage() {
-      return function(attachment) {
+      return function (attachment) {
         if (!attachment || !attachment.mediaType) {
           return false
         }

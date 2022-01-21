@@ -12,7 +12,7 @@
                 @click="attachmentDrawer.visible = true"
               />
             </a-tooltip>
-            <div class="mt-4 mb-1 text-xl font-medium leading-5" style="color: rgba(0, 0, 0, 0.85);">
+            <div class="mt-4 mb-1 text-xl font-medium leading-5" style="color: rgba(0, 0, 0, 0.85)">
               {{ userForm.model.nickname }}
             </div>
             <div>{{ userForm.model.description }}</div>
@@ -216,9 +216,7 @@
       icon="safety-certificate"
     >
       <template slot="footer">
-        <a-button key="back" @click="handleCloseMFAuthModal">
-          取消
-        </a-button>
+        <a-button key="back" @click="handleCloseMFAuthModal"> 取消 </a-button>
         <ReactiveButton
           key="submit"
           :errored="mfaParam.errored"
@@ -234,7 +232,7 @@
       <a-form-model ref="mfaForm" :model="mfaParam" :rules="mfaParam.rules" layout="vertical">
         <a-form-model-item v-if="mfaUsed" label="两步验证码" prop="authcode">
           <a-input v-model="mfaParam.authcode" :maxLength="6">
-            <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="safety-certificate" />
+            <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="safety-certificate" />
           </a-input>
         </a-form-model-item>
         <a-form-model-item v-if="!mfaUsed" :help="`MFAKey:${mfaParam.mfaKey}`" label="1. 请扫描二维码或导入 key">
@@ -247,7 +245,7 @@
         </a-form-model-item>
         <a-form-model-item v-if="!mfaUsed" label="2. 验证两步验证码" prop="authcode">
           <a-input v-model="mfaParam.authcode" :maxLength="6">
-            <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="safety-certificate" />
+            <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="safety-certificate" />
           </a-input>
         </a-form-model-item>
       </a-form-model>

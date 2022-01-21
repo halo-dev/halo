@@ -45,7 +45,7 @@ export default {
     target: {
       type: String,
       default: 'post',
-      validator: function(value) {
+      validator: function (value) {
         return ['post', 'sheet'].indexOf(value) !== -1
       }
     },

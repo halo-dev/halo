@@ -1,6 +1,8 @@
 const pkg = require('./package.json')
 
-module.exports = {
+const { defineConfig } = require('@vue/cli-service')
+
+module.exports = defineConfig({
   publicPath: process.env.PUBLIC_PATH,
 
   chainWebpack: config => {
@@ -24,4 +26,4 @@ module.exports = {
   lintOnSave: false,
   transpileDependencies: [],
   productionSourceMap: false
-}
+})

@@ -63,13 +63,11 @@
           <a-list :split="false">
             <a-list-item>
               <a-tooltip slot="actions">
-                <template slot="title">
-                  该设定仅 [顶部栏导航] 时有效
-                </template>
+                <template slot="title"> 该设定仅 [顶部栏导航] 时有效 </template>
                 <a-select
                   :defaultValue="contentWidth"
                   size="small"
-                  style="width: 80px;"
+                  style="width: 80px"
                   @change="handleContentWidthChange"
                 >
                   <a-select-option value="Fixed">固定</a-select-option>

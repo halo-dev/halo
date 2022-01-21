@@ -1,7 +1,7 @@
 <template>
   <page-view :title="title">
     <template slot="extra">
-      <a-button style="padding:0" type="link" @click="advancedOptions = !advancedOptions">
+      <a-button style="padding: 0" type="link" @click="advancedOptions = !advancedOptions">
         切换到{{ advancedOptions ? '基础选项' : '高级选项' }}
       </a-button>
     </template>

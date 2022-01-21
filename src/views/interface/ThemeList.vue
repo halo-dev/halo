@@ -1,12 +1,8 @@
 <template>
   <page-view :title="activatedTheme ? activatedTheme.name : '无'" affix subTitle="当前启用">
     <template slot="extra">
-      <a-button :loading="list.loading" icon="reload" @click="handleRefreshThemesCache">
-        刷新
-      </a-button>
-      <a-button icon="plus" type="primary" @click="installModal.visible = true">
-        安装
-      </a-button>
+      <a-button :loading="list.loading" icon="reload" @click="handleRefreshThemesCache"> 刷新</a-button>
+      <a-button icon="plus" type="primary" @click="installModal.visible = true"> 安装</a-button>
     </template>
     <a-row :gutter="12" align="middle" type="flex">
       <a-col :span="24">
@@ -20,35 +16,35 @@
               <div class="theme-screenshot">
                 <img :alt="item.name" :src="item.screenshots || '/images/placeholder.jpg'" loading="lazy" />
               </div>
-              <template slot="actions" class="ant-card-actions">
+              <template slot="actions">
                 <div v-if="item.activated">
-                  <a-icon style="margin-right:3px" theme="twoTone" type="unlock" />
+                  <a-icon style="margin-right: 3px" theme="twoTone" type="unlock" />
                   已启用
                 </div>
                 <div v-else @click="handleActiveTheme(item)">
-                  <a-icon style="margin-right:3px" type="lock" />
+                  <a-icon style="margin-right: 3px" type="lock" />
                   启用
                 </div>
                 <div @click="handleRouteToThemeSetting(item)">
-                  <a-icon style="margin-right:3px" type="setting" />
+                  <a-icon style="margin-right: 3px" type="setting" />
                   设置
                 </div>
                 <a-dropdown :trigger="['click']" placement="topCenter">
                   <a class="ant-dropdown-link" href="#">
-                    <a-icon style="margin-right:3px" type="ellipsis" />
+                    <a-icon style="margin-right: 3px" type="ellipsis" />
                     更多
                   </a>
                   <a-menu slot="overlay">
                     <a-menu-item :key="1" :disabled="item.activated" @click="handleOpenThemeDeleteModal(item)">
-                      <a-icon style="margin-right:3px" type="delete" />
+                      <a-icon style="margin-right: 3px" type="delete" />
                       删除
                     </a-menu-item>
                     <a-menu-item v-if="item.repo" :key="2" @click="handleConfirmRemoteUpdate(item)">
-                      <a-icon style="margin-right:3px" type="cloud" />
+                      <a-icon style="margin-right: 3px" type="cloud" />
                       在线更新
                     </a-menu-item>
                     <a-menu-item :key="3" @click="handleOpenLocalUpdateModal(item)">
-                      <a-icon style="margin-right:3px" type="file" />
+                      <a-icon style="margin-right: 3px" type="file" />
                       本地更新
                     </a-menu-item>
                   </a-menu>

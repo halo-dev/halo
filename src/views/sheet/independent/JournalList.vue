@@ -103,7 +103,7 @@
       </a-col>
     </a-row>
 
-    <div style="position: fixed;bottom: 30px;right: 30px;">
+    <div style="position: fixed; bottom: 30px; right: 30px">
       <a-button
         icon="setting"
         shape="circle"
@@ -121,7 +121,7 @@
           <a-input v-model="optionModal.options.journals_title" />
         </a-form-item>
         <a-form-item label="每页显示条数：">
-          <a-input-number v-model="optionModal.options.journals_page_size" style="width:100%" />
+          <a-input-number v-model="optionModal.options.journals_page_size" style="width: 100%" />
         </a-form-item>
       </a-form>
     </a-modal>

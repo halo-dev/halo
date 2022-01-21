@@ -43,9 +43,7 @@
           <a-button :block="true" type="primary" @click="handleResetPassword">重置密码</a-button>
         </a-form-model-item>
       </a-form-model>
-      <router-link :to="{ name: 'Login' }" class="tip">
-        返回登录
-      </router-link>
+      <router-link :to="{ name: 'Login' }" class="tip"> 返回登录 </router-link>
     </div>
   </div>
 </template>

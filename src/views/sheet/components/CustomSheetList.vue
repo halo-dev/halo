@@ -74,7 +74,7 @@
           </template>
           <span
             slot="title"
-            style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+            style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
           >
             <a v-if="item.status === 'PUBLISHED'" :href="item.fullPath" class="no-underline" target="_blank">
               <a-tooltip :title="'点击访问【' + item.title + '】'" placement="top">{{ item.title }}</a-tooltip>
@@ -218,12 +218,8 @@
       @onClose="selectedSheet = {}"
     >
       <template #extraFooter>
-        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious">
-          上一篇
-        </a-button>
-        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext">
-          下一篇
-        </a-button>
+        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious"> 上一篇 </a-button>
+        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext"> 下一篇 </a-button>
       </template>
     </SheetSettingModal>
     <TargetCommentDrawer

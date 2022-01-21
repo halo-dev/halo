@@ -9,17 +9,17 @@
     >
       <a-form-model-item v-if="!form.needAuthCode" prop="username">
         <a-input v-model="form.model.username" placeholder="用户名/邮箱">
-          <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="user" />
+          <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="user" />
         </a-input>
       </a-form-model-item>
       <a-form-model-item v-if="!form.needAuthCode" prop="password">
         <a-input v-model="form.model.password" placeholder="密码" type="password">
-          <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="lock" />
+          <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="lock" />
         </a-input>
       </a-form-model-item>
       <a-form-model-item v-if="form.needAuthCode" prop="authcode">
         <a-input v-model="form.model.authcode" :maxLength="6" placeholder="两步验证码">
-          <a-icon slot="prefix" style="color: rgba(0,0,0,.25)" type="safety-certificate" />
+          <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="safety-certificate" />
         </a-input>
       </a-form-model-item>
       <a-form-model-item>

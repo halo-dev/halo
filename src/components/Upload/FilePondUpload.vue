@@ -98,7 +98,7 @@ export default {
       return 1
     }
   },
-  data: function() {
+  data: function () {
     return {
       server: {
         process: (fieldName, file, metadata, load, error, progress, abort) => {

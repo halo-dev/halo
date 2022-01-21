@@ -11,7 +11,7 @@
       </a-col>
       <a-col :lg="15" :md="24" :sm="24" :xl="15" :xs="24">
         <a-list itemLayout="horizontal">
-          <a-list-item style="padding-top: 0;">
+          <a-list-item style="padding-top: 0">
             <a-list-item-meta>
               <template v-if="editable" slot="description">
                 <a-input ref="nameInput" v-model="attachment.name" @blur="handleUpdateName" />

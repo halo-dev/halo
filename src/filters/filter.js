@@ -7,25 +7,25 @@ import { timeAgo } from '@/utils/datetime'
 
 dayjs.locale('zh-cn')
 
-Vue.filter('moment', function(dataStr, pattern = 'YYYY-MM-DD HH:mm') {
+Vue.filter('moment', function (dataStr, pattern = 'YYYY-MM-DD HH:mm') {
   return dayjs(dataStr).format(pattern)
 })
 
-Vue.filter('moment_post_date', function(dataStr, pattern = '/YYYY/MM/') {
+Vue.filter('moment_post_date', function (dataStr, pattern = '/YYYY/MM/') {
   return dayjs(dataStr).format(pattern)
 })
 
-Vue.filter('moment_post_year', function(dataStr, pattern = '/YYYY/') {
+Vue.filter('moment_post_year', function (dataStr, pattern = '/YYYY/') {
   return dayjs(dataStr).format(pattern)
 })
 
-Vue.filter('moment_post_day', function(dataStr, pattern = '/YYYY/MM/DD/') {
+Vue.filter('moment_post_day', function (dataStr, pattern = '/YYYY/MM/DD/') {
   return dayjs(dataStr).format(pattern)
 })
 
 Vue.filter('timeAgo', timeAgo)
 
-Vue.filter('fileSizeFormat', function(value) {
+Vue.filter('fileSizeFormat', function (value) {
   if (!value) {
     return '0 Bytes'
   }
@@ -37,7 +37,7 @@ Vue.filter('fileSizeFormat', function(value) {
   return size + ' ' + unitArr[index]
 })
 
-Vue.filter('dayTime', function(value) {
+Vue.filter('dayTime', function (value) {
   const days = Math.floor(value / 86400)
   const hours = Math.floor((value % 86400) / 3600)
   const minutes = Math.floor(((value % 86400) % 3600) / 60)

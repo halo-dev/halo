@@ -41,7 +41,7 @@
         </a-popconfirm>
       </template>
       <a slot="author" :href="comment.authorUrl" target="_blank">
-        <a-icon v-if="comment.isAdmin" style="margin-right: 3px;" type="user" />
+        <a-icon v-if="comment.isAdmin" style="margin-right: 3px" type="user" />
         {{ comment.author }}
       </a>
       <a-avatar slot="avatar" :alt="comment.author" :src="comment.avatar" size="large" />

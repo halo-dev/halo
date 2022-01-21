@@ -156,11 +156,11 @@
               </template>
               <span
                 slot="title"
-                style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+                style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
               >
                 <a-icon
                   v-if="item.topPriority !== 0"
-                  style="margin-right: 3px;"
+                  style="margin-right: 3px"
                   theme="twoTone"
                   twoToneColor="red"
                   type="pushpin"
@@ -226,7 +226,7 @@
           <span slot="postTitle" slot-scope="text, record">
             <a-icon
               v-if="record.topPriority !== 0"
-              style="margin-right: 3px;"
+              style="margin-right: 3px"
               theme="twoTone"
               twoToneColor="red"
               type="pushpin"
@@ -260,7 +260,7 @@
               v-for="(category, index) in categoriesOfPost"
               :key="index"
               color="blue"
-              style="margin-bottom: 8px;cursor:pointer"
+              style="margin-bottom: 8px; cursor: pointer"
               @click="handleSelectCategory(category)"
             >
               {{ category.name }}
@@ -276,7 +276,7 @@
           <span
             slot="commentCount"
             slot-scope="text, record"
-            style="cursor: pointer;"
+            style="cursor: pointer"
             @click="handleShowPostComments(record)"
           >
             <a-badge
@@ -373,12 +373,8 @@
       @onClose="selectedPost = {}"
     >
       <template #extraFooter>
-        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious">
-          上一篇
-        </a-button>
-        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext">
-          下一篇
-        </a-button>
+        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious"> 上一篇 </a-button>
+        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext"> 下一篇 </a-button>
       </template>
     </PostSettingModal>
 
@@ -560,7 +556,7 @@ export default {
   watch: {
     'list.params': {
       deep: true,
-      handler: function(newVal) {
+      handler: function (newVal) {
         if (newVal) {
           const params = JSON.parse(JSON.stringify(this.list.params))
           const path = this.$router.history.current.path

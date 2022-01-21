@@ -66,7 +66,7 @@
               <template slot="title">
                 <span>{{ tag.postCount }} 篇文章</span>
               </template>
-              <post-tag :tag="tag" style="margin-bottom: 8px;cursor:pointer;" @click.native="form.model = tag" />
+              <post-tag :tag="tag" style="margin-bottom: 8px; cursor: pointer" @click.native="form.model = tag" />
             </a-tooltip>
           </a-spin>
         </a-card>

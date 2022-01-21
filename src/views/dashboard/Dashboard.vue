@@ -222,7 +222,7 @@ export default {
       })
     }
   },
-  destroyed: function() {
+  destroyed: function () {
     if (this.logListDrawerVisible) {
       this.logListDrawerVisible = false
     }

@@ -36,7 +36,7 @@ export default {
           isLeaf: file.isFile
         },
         nativeOn: {
-          click: function() {
+          click: function () {
             _this.handleSelectFile(file)
           }
         }

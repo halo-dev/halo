@@ -84,7 +84,7 @@ export default {
       }
     })
   },
-  destroyed: function() {
+  destroyed: function () {
     if (this.sheetSettingVisible) {
       this.sheetSettingVisible = false
     }
@@ -118,7 +118,7 @@ export default {
     }
   },
   mounted() {
-    window.onbeforeunload = function(e) {
+    window.onbeforeunload = function (e) {
       e = e || window.event
       if (e) {
         e.returnValue = '当前页面数据未保存，确定要离开吗？'

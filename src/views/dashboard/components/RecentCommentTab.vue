@@ -54,7 +54,7 @@ export default {
       type: String,
       required: false,
       default: 'posts',
-      validator: function(value) {
+      validator: function (value) {
         return ['posts', 'sheets', 'journals'].indexOf(value) !== -1
       }
     }

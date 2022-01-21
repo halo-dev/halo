@@ -49,7 +49,7 @@ export default {
     }
   },
   watch: {
-    number: function(newValue, oldValue) {
+    number: function (newValue, oldValue) {
       this.startNumber = oldValue
     }
   }

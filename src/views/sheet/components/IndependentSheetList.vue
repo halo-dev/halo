@@ -29,7 +29,7 @@
         <a-list-item-meta>
           <span
             slot="title"
-            style="max-width: 300px;display: block;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"
+            style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
           >
             <a v-if="item.available" :href="item.fullPath" target="_blank">{{ item.title }}</a>
             <a v-else :href="item.fullPath" disabled target="_blank">{{ item.title }}</a>

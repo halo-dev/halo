@@ -1,9 +1,7 @@
 <template>
   <a-modal v-model="modalVisible" :afterClose="onAfterClose" :closable="false" :width="416" destroyOnClose title="提示">
     <template slot="footer">
-      <a-button @click="modalVisible = false">
-        取消
-      </a-button>
+      <a-button @click="modalVisible = false"> 取消 </a-button>
       <ReactiveButton
         :errored="deleteErrored"
         :loading="deleting"
@@ -15,9 +13,7 @@
       ></ReactiveButton>
     </template>
     <p>确定删除【{{ theme.name }}】主题？</p>
-    <a-checkbox v-model="deleteSettings">
-      同时删除主题配置
-    </a-checkbox>
+    <a-checkbox v-model="deleteSettings"> 同时删除主题配置 </a-checkbox>
   </a-modal>
 </template>
 <script>
