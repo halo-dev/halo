@@ -95,17 +95,17 @@
       <a-col :lg="8" :md="12" :sm="24" :xl="8" :xs="24" class="mb-3">
         <a-card :bodyStyle="{ padding: '16px' }" :bordered="false">
           <template slot="title">
-            操作记录
+            操作日志
             <a-tooltip slot="action" title="更多">
-              <a href="javascript:void(0);" @click="logListDrawerVisible = true">
+              <router-link :to="{ name: 'SystemActionLogs' }">
                 <a-icon type="ellipsis" />
-              </a>
+              </router-link>
             </a-tooltip>
           </template>
-          <a-list :dataSource="formattedLogDatas" :loading="logLoading">
+          <a-list :dataSource="latestLogs" :loading="logLoading">
             <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
               <a-list-item-meta :description="item.createTime | timeAgo">
-                <span slot="title">{{ item.type }}</span>
+                <span slot="title">{{ item.type | typeConvert }}</span>
               </a-list-item-meta>
               <ellipsis :length="35" tooltip>{{ item.content }}</ellipsis>
             </a-list-item>
@@ -113,8 +113,6 @@
         </a-card>
       </a-col>
     </a-row>
-
-    <LogListDrawer :visible="logListDrawerVisible" @close="handleLogListClose" />
   </page-view>
 </template>
 
@@ -123,9 +121,9 @@ import { PageView } from '@/layouts'
 import AnalysisCard from './components/AnalysisCard'
 import JournalPublishCard from './components/JournalPublishCard'
 import RecentCommentTab from './components/RecentCommentTab'
-import LogListDrawer from './components/LogListDrawer'
 
 import apiClient from '@/utils/api-client'
+import { actionLogTypes } from '@/core/constant'
 
 export default {
   name: 'Dashboard',
@@ -133,73 +131,13 @@ export default {
     PageView,
     AnalysisCard,
     JournalPublishCard,
-    RecentCommentTab,
-    LogListDrawer
+    RecentCommentTab
   },
   data() {
     return {
-      logTypes: {
-        BLOG_INITIALIZED: {
-          value: 0,
-          text: '博客初始化'
-        },
-        POST_PUBLISHED: {
-          value: 5,
-          text: '文章发布'
-        },
-        POST_EDITED: {
-          value: 15,
-          text: '文章修改'
-        },
-        POST_DELETED: {
-          value: 20,
-          text: '文章删除'
-        },
-        LOGGED_IN: {
-          value: 25,
-          text: '用户登录'
-        },
-        LOGGED_OUT: {
-          value: 30,
-          text: '注销登录'
-        },
-        LOGIN_FAILED: {
-          value: 35,
-          text: '登录失败'
-        },
-        PASSWORD_UPDATED: {
-          value: 40,
-          text: '修改密码'
-        },
-        PROFILE_UPDATED: {
-          value: 45,
-          text: '资料修改'
-        },
-        SHEET_PUBLISHED: {
-          value: 50,
-          text: '页面发布'
-        },
-        SHEET_EDITED: {
-          value: 55,
-          text: '页面修改'
-        },
-        SHEET_DELETED: {
-          value: 60,
-          text: '页面删除'
-        },
-        MFA_UPDATED: {
-          value: 65,
-          text: '两步验证'
-        },
-        LOGGED_PRE_CHECK: {
-          value: 70,
-          text: '登录验证'
-        }
-      },
       activityLoading: false,
       logLoading: false,
       statisticsLoading: true,
-      logListDrawerVisible: false,
       latestPosts: [],
       latestLogs: [],
       statisticsData: {},
@@ -214,19 +152,6 @@ export default {
     this.handleListLatestPosts()
     this.handleListLatestLogs()
   },
-  computed: {
-    formattedLogDatas() {
-      return this.latestLogs.map(log => {
-        log.type = this.logTypes[log.type].text
-        return log
-      })
-    }
-  },
-  destroyed: function () {
-    if (this.logListDrawerVisible) {
-      this.logListDrawerVisible = false
-    }
-  },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.interval = setInterval(() => {
@@ -239,9 +164,6 @@ export default {
       clearInterval(this.interval)
       this.interval = null
       this.$log.debug('Cleared interval')
-    }
-    if (this.logListDrawerVisible) {
-      this.logListDrawerVisible = false
     }
     next()
   },
@@ -285,10 +207,12 @@ export default {
       apiClient.post.getPreviewLinkById(postId).then(response => {
         window.open(response.data, '_blank')
       })
-    },
-    handleLogListClose() {
-      this.logListDrawerVisible = false
-      this.handleListLatestLogs()
+    }
+  },
+  filters: {
+    typeConvert(key) {
+      const type = actionLogTypes[key]
+      return type ? type.text : key
     }
   }
 }

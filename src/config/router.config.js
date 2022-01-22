@@ -206,6 +206,13 @@ export const asyncRouterMap = [
             meta: { title: '小工具', hiddenHeaderContent: false }
           },
           {
+            path: '/system/actionlogs',
+            name: 'SystemActionLogs',
+            hidden: true,
+            component: () => import('@/views/system/ActionLogs'),
+            meta: { title: '操作日志', hiddenHeaderContent: false }
+          },
+          {
             path: '/system/about',
             name: 'About',
             component: () => import('@/views/system/About'),
