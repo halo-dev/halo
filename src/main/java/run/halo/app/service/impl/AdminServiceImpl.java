@@ -32,6 +32,7 @@ import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.MFAType;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.params.ResetPasswordParam;
+import run.halo.app.model.params.ResetPasswordSendCodeParam;
 import run.halo.app.model.properties.EmailProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.security.authentication.Authentication;
@@ -184,7 +185,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void sendResetPasswordCode(ResetPasswordParam param) {
+    public void sendResetPasswordCode(ResetPasswordSendCodeParam param) {
         cacheStore.getAny("code", String.class).ifPresent(code -> {
             throw new ServiceException("已经获取过验证码，不能重复获取");
         });
