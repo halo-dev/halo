@@ -1,14 +1,19 @@
 <template>
-  <halo-editor
-    ref="md"
-    v-model="originalContentData"
-    :boxShadow="false"
-    :ishljs="true"
-    :toolbars="toolbars"
-    autofocus
-    @imgAdd="handleAttachmentUpload"
-    @save="handleSaveDraft"
-  />
+  <div class="h-full">
+    <halo-editor
+      ref="md"
+      v-model="originalContentData"
+      :boxShadow="false"
+      :ishljs="true"
+      :toolbars="toolbars"
+      autofocus
+      @imgAdd="handleAttachmentUpload"
+      @openImagePicker="attachmentSelectVisible = true"
+      @save="handleSaveDraft"
+    />
+
+    <AttachmentSelectModal :visible.sync="attachmentSelectVisible" @confirm="handleSelectAttachment" />
+  </div>
 </template>
 <script>
 import { toolbars } from '@/core/const'
@@ -31,7 +36,8 @@ export default {
   data() {
     return {
       toolbars,
-      originalContentData: ''
+      originalContentData: '',
+      attachmentSelectVisible: false
     }
   },
   watch: {
@@ -52,6 +58,13 @@ export default {
       } catch (e) {
         this.$log.error('update image error: ', e)
       }
+    },
+    handleSelectAttachment({ markdown }) {
+      this.$refs.md.insertText(this.$refs.md.getTextareaDom(), {
+        prefix: '',
+        subfix: '',
+        str: markdown.join('\n')
+      })
     },
     handleSaveDraft() {
       this.$emit('onSaveDraft')

@@ -22,7 +22,7 @@ specifiers:
   filepond: ^4.30.3
   filepond-plugin-file-validate-type: ^1.2.6
   filepond-plugin-image-preview: ^4.6.10
-  halo-editor: ^2.8.3
+  halo-editor: ^2.8.4
   husky: ^6.0.0
   less: ^3.13.1
   less-loader: ^5.0.0
@@ -57,7 +57,7 @@ dependencies:
   filepond: 4.30.3
   filepond-plugin-file-validate-type: 1.2.6_filepond@4.30.3
   filepond-plugin-image-preview: 4.6.10_filepond@4.30.3
-  halo-editor: 2.8.3
+  halo-editor: 2.8.4
   marked: 4.0.10
   md5.js: 1.3.5
   nprogress: 0.2.0
@@ -4317,6 +4317,10 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
+  /github-markdown-css/4.0.0:
+    resolution: {integrity: sha512-mH0bcIKv4XAN0mQVokfTdKo2OD5K8WJE9+lbMdM32/q0Ie5tXgVN/2o+zvToRMxSTUuiTRcLg5hzkFfOyBYreg==}
+    dev: false
+
   /glob-parent/5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
@@ -4387,9 +4391,10 @@ packages:
       duplexer: 0.1.2
     dev: true
 
-  /halo-editor/2.8.3:
-    resolution: {integrity: sha512-5vzJdCJxuNNQl0qMgkjuEMXMdRoBLhMjl8NloPof/W7EFYvfoEp/vD8h2JzwXkDEugHM19SDmO5QNyH6oyr8rQ==}
+  /halo-editor/2.8.4:
+    resolution: {integrity: sha512-uRE3zRGgP9HujeU1dbIcGIDNHF2FJMvnuUGAnJx3wFXtqEEAzq+QK/zHqhngsOQa09AS0OJMYfDfWsjASqYXjg==}
     dependencies:
+      github-markdown-css: 4.0.0
       highlight.js: 9.18.5
       highlight.js-async-webpack: 1.0.4
     dev: false

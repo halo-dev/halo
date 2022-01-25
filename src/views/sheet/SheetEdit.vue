@@ -14,7 +14,6 @@
         ></ReactiveButton>
         <a-button :loading="previewSaving" @click="handlePreview">预览</a-button>
         <a-button type="primary" @click="sheetSettingVisible = true">发布</a-button>
-        <a-button type="dashed" @click="attachmentSelectVisible = true">附件库</a-button>
       </a-space>
     </template>
     <a-row :gutter="12">
@@ -39,8 +38,6 @@
       :visible.sync="sheetSettingVisible"
       @onUpdate="onUpdateFromSetting"
     />
-
-    <AttachmentSelectModal :visible.sync="attachmentSelectVisible" @confirm="handleSelectAttachment" />
   </page-view>
 </template>
 
@@ -61,7 +58,6 @@ export default {
   mixins: [mixin, mixinDevice, mixinPostEdit],
   data() {
     return {
-      attachmentSelectVisible: false,
       sheetSettingVisible: false,
       sheetToStage: {},
       contentChanges: 0,
@@ -206,13 +202,6 @@ export default {
             })
         })
       }
-    },
-    handleSelectAttachment({ markdown }) {
-      this.$set(
-        this.sheetToStage,
-        'originalContent',
-        (this.sheetToStage.originalContent || '') + '\n' + markdown.join(`\n`)
-      )
     },
     handleRestoreSavedStatus() {
       this.contentChanges = 0
