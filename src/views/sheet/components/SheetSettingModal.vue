@@ -132,10 +132,10 @@
         @click="handleCreateOrUpdate()"
       ></ReactiveButton>
     </template>
-    <AttachmentSelectDrawer
-      v-model="attachmentSelectVisible"
-      :drawerWidth="480"
-      @listenToSelect="handleSelectSheetThumb"
+    <AttachmentSelectModal
+      :multiSelect="false"
+      :visible.sync="attachmentSelectVisible"
+      @confirm="handleSelectSheetThumbnail"
     />
   </a-modal>
 </template>
@@ -326,8 +326,10 @@ export default {
      * Select sheet thumbnail
      * @param data
      */
-    handleSelectSheetThumb(data) {
-      this.form.model.thumbnail = encodeURI(data.path)
+    handleSelectSheetThumbnail({ raw }) {
+      if (raw.length) {
+        this.form.model.thumbnail = encodeURI(raw[0].path)
+      }
       this.attachmentSelectVisible = false
     },
     /**

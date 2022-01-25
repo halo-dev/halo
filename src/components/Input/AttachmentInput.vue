@@ -1,11 +1,15 @@
 <template>
   <div>
     <a-input :defaultValue="defaultValue" :placeholder="placeholder" :value="value" @change="onInputChange">
-      <a slot="addonAfter" href="javascript:void(0);" @click="attachmentDrawerVisible = true">
+      <a slot="addonAfter" href="javascript:void(0);" @click="attachmentModalVisible = true">
         <a-icon type="picture" />
       </a>
     </a-input>
-    <AttachmentSelectDrawer v-model="attachmentDrawerVisible" :title="title" @listenToSelect="handleSelectAttachment" />
+    <AttachmentSelectModal
+      :multiSelect="false"
+      :visible.sync="attachmentModalVisible"
+      @confirm="handleSelectAttachment"
+    />
   </div>
 </template>
 <script>
@@ -31,16 +35,17 @@ export default {
   },
   data() {
     return {
-      attachmentDrawerVisible: false
+      attachmentModalVisible: false
     }
   },
   methods: {
     onInputChange(e) {
       this.$emit('input', e.target.value)
     },
-    handleSelectAttachment(data) {
-      this.$emit('input', encodeURI(data.path))
-      this.attachmentDrawerVisible = false
+    handleSelectAttachment({ raw }) {
+      if (raw.length) {
+        this.$emit('input', encodeURI(raw[0].path))
+      }
     }
   }
 }

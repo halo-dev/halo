@@ -92,8 +92,12 @@
                   loading="lazy"
                 />
               </div>
-              <a-card-meta class="p-3">
-                <ellipsis slot="description" :length="isMobile() ? 12 : 16" tooltip>{{ item.name }}</ellipsis>
+              <a-card-meta class="p-2">
+                <template #description>
+                  <a-tooltip :title="item.name">
+                    <div class="truncate">{{ item.name }}</div>
+                  </a-tooltip>
+                </template>
               </a-card-meta>
               <a-checkbox
                 v-show="supportMultipleSelection"
@@ -140,58 +144,18 @@
 <script>
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { PageView } from '@/layouts'
-import AttachmentDetailModal from './components/AttachmentDetailModal.vue'
 import apiClient from '@/utils/api-client'
 import { mapGetters } from 'vuex'
-
-const attachmentType = {
-  LOCAL: {
-    type: 'LOCAL',
-    text: '本地'
-  },
-  SMMS: {
-    type: 'SMMS',
-    text: 'SM.MS'
-  },
-  UPOSS: {
-    type: 'UPOSS',
-    text: '又拍云'
-  },
-  QINIUOSS: {
-    type: 'QINIUOSS',
-    text: '七牛云'
-  },
-  ALIOSS: {
-    type: 'ALIOSS',
-    text: '阿里云'
-  },
-  BAIDUBOS: {
-    type: 'BAIDUBOS',
-    text: '百度云'
-  },
-  TENCENTCOS: {
-    type: 'TENCENTCOS',
-    text: '腾讯云'
-  },
-  HUAWEIOBS: {
-    type: 'HUAWEIOBS',
-    text: '华为云'
-  },
-  MINIO: {
-    type: 'MINIO',
-    text: 'MinIO'
-  }
-}
+import { attachmentTypes } from '@/core/constant'
 
 export default {
   components: {
-    PageView,
-    AttachmentDetailModal
+    PageView
   },
   mixins: [mixin, mixinDevice],
   filters: {
     typeText(type) {
-      return attachmentType[type].text
+      return attachmentTypes[type].text
     }
   },
   data() {

@@ -14,7 +14,7 @@
         ></ReactiveButton>
         <a-button :loading="previewSaving" @click="handlePreview">预览</a-button>
         <a-button type="primary" @click="sheetSettingVisible = true">发布</a-button>
-        <a-button type="dashed" @click="attachmentDrawerVisible = true">附件库</a-button>
+        <a-button type="dashed" @click="attachmentSelectVisible = true">附件库</a-button>
       </a-space>
     </template>
     <a-row :gutter="12">
@@ -40,7 +40,7 @@
       @onUpdate="onUpdateFromSetting"
     />
 
-    <AttachmentDrawer v-model="attachmentDrawerVisible" />
+    <AttachmentSelectModal :visible.sync="attachmentSelectVisible" @confirm="handleSelectAttachment" />
   </page-view>
 </template>
 
@@ -49,21 +49,19 @@ import { mixin, mixinDevice, mixinPostEdit } from '@/mixins/mixin.js'
 import { datetimeFormat } from '@/utils/datetime'
 import { PageView } from '@/layouts'
 import SheetSettingModal from './components/SheetSettingModal'
-import AttachmentDrawer from '../attachment/components/AttachmentDrawer'
 import MarkdownEditor from '@/components/Editor/MarkdownEditor'
 import apiClient from '@/utils/api-client'
 
 export default {
   components: {
     PageView,
-    AttachmentDrawer,
     SheetSettingModal,
     MarkdownEditor
   },
   mixins: [mixin, mixinDevice, mixinPostEdit],
   data() {
     return {
-      attachmentDrawerVisible: false,
+      attachmentSelectVisible: false,
       sheetSettingVisible: false,
       sheetToStage: {},
       contentChanges: 0,
@@ -85,23 +83,11 @@ export default {
     })
   },
   destroyed: function () {
-    if (this.sheetSettingVisible) {
-      this.sheetSettingVisible = false
-    }
-    if (this.attachmentDrawerVisible) {
-      this.attachmentDrawerVisible = false
-    }
     if (window.onbeforeunload) {
       window.onbeforeunload = null
     }
   },
   beforeRouteLeave(to, from, next) {
-    if (this.sheetSettingVisible) {
-      this.sheetSettingVisible = false
-    }
-    if (this.attachmentDrawerVisible) {
-      this.attachmentDrawerVisible = false
-    }
     if (this.contentChanges <= 1) {
       next()
     } else {
@@ -220,6 +206,13 @@ export default {
             })
         })
       }
+    },
+    handleSelectAttachment({ markdown }) {
+      this.$set(
+        this.sheetToStage,
+        'originalContent',
+        (this.sheetToStage.originalContent || '') + '\n' + markdown.join(`\n`)
+      )
     },
     handleRestoreSavedStatus() {
       this.contentChanges = 0

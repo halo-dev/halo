@@ -135,7 +135,7 @@
         </a-tooltip>
       </template>
       <template slot="footer">
-        <a-button type="dashed" @click="attachmentDrawer.visible = true">附件库</a-button>
+        <a-button type="dashed" @click="attachmentSelect.visible = true">附件库</a-button>
         <ReactiveButton
           :errored="form.saveErrored"
           :loading="form.saving"
@@ -170,7 +170,7 @@
       @close="onJournalCommentsDrawerClose"
     />
 
-    <AttachmentDrawer v-model="attachmentDrawer.visible" />
+    <AttachmentSelectModal :visible.sync="attachmentSelect.visible" @confirm="handleSelectAttachment" />
   </page-view>
 </template>
 
@@ -178,7 +178,6 @@
 // components
 import { PageView } from '@/layouts'
 import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
-import AttachmentDrawer from '../../attachment/components/AttachmentDrawer'
 
 // libs
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
@@ -187,7 +186,7 @@ import apiClient from '@/utils/api-client'
 
 export default {
   mixins: [mixin, mixinDevice],
-  components: { PageView, TargetCommentDrawer, AttachmentDrawer },
+  components: { PageView, TargetCommentDrawer },
   data() {
     return {
       list: {
@@ -224,7 +223,7 @@ export default {
       journalCommentDrawer: {
         visible: false
       },
-      attachmentDrawer: {
+      attachmentSelect: {
         visible: false
       },
       optionModal: {
@@ -377,6 +376,9 @@ export default {
           this.handleListOptions()
           this.refreshOptionsCache()
         })
+    },
+    handleSelectAttachment({ markdown }) {
+      this.$set(this.form.model, 'sourceContent', (this.form.model.sourceContent || '') + '\n' + markdown.join('\n'))
     }
   }
 }

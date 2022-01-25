@@ -98,7 +98,7 @@
               :src="form.model.url || '/images/placeholder.jpg'"
               class="w-full cursor-pointer"
               style="border-radius: 4px"
-              @click="attachmentSelectDrawer.visible = true"
+              @click="attachmentSelectModal.visible = true"
             />
           </div>
           <a-input v-model="form.model.url" placeholder="点击封面图选择图片，或者输入外部链接" />
@@ -161,11 +161,10 @@
           </a-popconfirm>
         </a-space>
       </div>
-
-      <AttachmentSelectDrawer
-        v-model="attachmentSelectDrawer.visible"
-        :drawerWidth="480"
-        @listenToSelect="handleAttachmentSelected"
+      <AttachmentSelectModal
+        :multiSelect="false"
+        :visible.sync="attachmentSelectModal.visible"
+        @confirm="handleAttachmentSelected"
       />
     </a-drawer>
   </page-view>
@@ -215,7 +214,7 @@ export default {
         deleteErrored: false
       },
 
-      attachmentSelectDrawer: {
+      attachmentSelectModal: {
         visible: false
       },
 
@@ -347,10 +346,12 @@ export default {
         this.handleListPhotoTeams()
       }
     },
-    handleAttachmentSelected(data) {
-      this.form.model.url = encodeURI(data.path)
-      this.form.model.thumbnail = encodeURI(data.thumbPath)
-      this.attachmentSelectDrawer.visible = false
+    handleAttachmentSelected({ raw }) {
+      if (raw.length) {
+        this.form.model.url = encodeURI(raw[0].path)
+        this.form.model.thumbnail = encodeURI(raw[0].thumbPath)
+      }
+      this.attachmentSelectModal.visible = false
     },
     handleResetParam() {
       this.list.queryParam.keyword = null

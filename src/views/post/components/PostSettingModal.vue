@@ -144,10 +144,10 @@
         @click="handleCreateOrUpdate()"
       ></ReactiveButton>
     </template>
-    <AttachmentSelectDrawer
-      v-model="attachmentSelectVisible"
-      :drawerWidth="480"
-      @listenToSelect="handleSelectPostThumb"
+    <AttachmentSelectModal
+      :multiSelect="false"
+      :visible.sync="attachmentSelectVisible"
+      @confirm="handleSelectPostThumbnail"
     />
   </a-modal>
 </template>
@@ -374,8 +374,10 @@ export default {
      * Select post thumbnail
      * @param data
      */
-    handleSelectPostThumb(data) {
-      this.form.model.thumbnail = encodeURI(data.path)
+    handleSelectPostThumbnail({ raw }) {
+      if (raw.length) {
+        this.form.model.thumbnail = encodeURI(raw[0].path)
+      }
       this.attachmentSelectVisible = false
     },
 

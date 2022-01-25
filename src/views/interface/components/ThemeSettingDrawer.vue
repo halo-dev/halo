@@ -122,10 +122,10 @@
       </a-col>
     </a-row>
 
-    <AttachmentSelectDrawer
-      v-model="attachmentDrawerVisible"
-      title="选择附件"
-      @listenToSelect="handleSelectAttachment"
+    <AttachmentSelectModal
+      :multiSelect="false"
+      :visible.sync="attachmentSelectVisible"
+      @confirm="handleSelectAttachment"
     />
 
     <footer-tool-bar v-if="themeConfigurations.length > 0" class="w-full">
@@ -167,7 +167,7 @@ export default {
   },
   data() {
     return {
-      attachmentDrawerVisible: false,
+      attachmentSelectVisible: false,
       themeConfigurations: [],
       themeSettings: [],
       settingLoading: true,
@@ -251,12 +251,14 @@ export default {
     },
     handleShowSelectAttachment(field) {
       this.selectedField = field
-      this.attachmentDrawerVisible = true
+      this.attachmentSelectVisible = true
     },
-    handleSelectAttachment(data) {
-      this.$set(this.themeSettings, this.selectedField, encodeURI(data.path))
+    handleSelectAttachment({ raw }) {
+      if (raw.length) {
+        this.$set(this.themeSettings, this.selectedField, encodeURI(raw[0].path))
+      }
       // this.themeSettings[this.selectedField] = encodeURI(data.path)
-      this.attachmentDrawerVisible = false
+      this.attachmentSelectVisible = false
     },
     handleAfterVisibleChanged(visible) {
       if (visible) {

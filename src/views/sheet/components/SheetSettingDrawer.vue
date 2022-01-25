@@ -94,8 +94,8 @@
       </div>
       <a-divider class="divider-transparent" />
     </div>
-    <AttachmentSelectDrawer v-model="thumbDrawerVisible" :drawerWidth="480" @listenToSelect="handleSelectSheetThumb" />
 
+    <AttachmentSelectModal :multiSelect="false" :visible.sync="thumbDrawerVisible" @confirm="handleSelectSheetThumb" />
     <a-drawer
       :visible="advancedVisible"
       :width="isMobile() ? '100%' : '480'"
@@ -311,8 +311,10 @@ export default {
           this.customTplsLoading = false
         })
     },
-    handleSelectSheetThumb(data) {
-      this.selectedSheet.thumbnail = encodeURI(data.path)
+    handleSelectSheetThumb({ raw }) {
+      if (raw.length) {
+        this.selectedSheet.thumbnail = encodeURI(raw[0].path)
+      }
       this.thumbDrawerVisible = false
     },
     handlePublishClick() {

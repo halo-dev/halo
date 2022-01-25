@@ -56,3 +56,42 @@ export const actionLogTypes = {
     text: '登录验证'
   }
 }
+
+export const attachmentTypes = {
+  LOCAL: {
+    type: 'LOCAL',
+    text: '本地'
+  },
+  SMMS: {
+    type: 'SMMS',
+    text: 'SM.MS'
+  },
+  UPOSS: {
+    type: 'UPOSS',
+    text: '又拍云'
+  },
+  QINIUOSS: {
+    type: 'QINIUOSS',
+    text: '七牛云'
+  },
+  ALIOSS: {
+    type: 'ALIOSS',
+    text: '阿里云'
+  },
+  BAIDUBOS: {
+    type: 'BAIDUBOS',
+    text: '百度云'
+  },
+  TENCENTCOS: {
+    type: 'TENCENTCOS',
+    text: '腾讯云'
+  },
+  HUAWEIOBS: {
+    type: 'HUAWEIOBS',
+    text: '华为云'
+  },
+  MINIO: {
+    type: 'MINIO',
+    text: 'MinIO'
+  }
+}

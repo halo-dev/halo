@@ -9,7 +9,7 @@
                 :size="104"
                 :src="userForm.model.avatar || '//cn.gravatar.com/avatar/?s=256&d=mm'"
                 class="cursor-pointer"
-                @click="attachmentDrawer.visible = true"
+                @click="attachmentSelect.visible = true"
               />
             </a-tooltip>
             <div class="mt-4 mb-1 text-xl font-medium leading-5" style="color: rgba(0, 0, 0, 0.85)">
@@ -52,15 +52,15 @@
               <a-tab-pane key="1">
                 <span slot="tab"> <a-icon type="idcard" />基本资料 </span>
                 <a-form-model
+                  ref="userForm"
+                  :model="userForm.model"
+                  :rules="userForm.rules"
                   :wrapperCol="{
                     xl: { span: 15 },
                     lg: { span: 15 },
                     sm: { span: 15 },
                     xs: { span: 24 }
                   }"
-                  ref="userForm"
-                  :model="userForm.model"
-                  :rules="userForm.rules"
                   layout="vertical"
                 >
                   <a-form-model-item label="用户名：" prop="username">
@@ -92,15 +92,15 @@
               <a-tab-pane key="2">
                 <span slot="tab"> <a-icon type="lock" />密码 </span>
                 <a-form-model
+                  ref="passwordForm"
+                  :model="passwordForm.model"
+                  :rules="passwordForm.rules"
                   :wrapperCol="{
                     xl: { span: 15 },
                     lg: { span: 15 },
                     sm: { span: 15 },
                     xs: { span: 24 }
                   }"
-                  ref="passwordForm"
-                  :model="passwordForm.model"
-                  :rules="passwordForm.rules"
                   layout="vertical"
                 >
                   <a-form-model-item label="原密码：" prop="oldPassword">
@@ -196,14 +196,6 @@
       </a-col>
     </a-row>
 
-    <AttachmentSelectDrawer
-      v-model="attachmentDrawer.visible"
-      isChooseAvatar
-      title="选择头像"
-      @listenToSelect="handleSelectAvatar"
-      @listenToSelectGravatar="handleSelectGravatar"
-    />
-
     <a-modal
       :centered="true"
       :closable="false"
@@ -216,7 +208,7 @@
       icon="safety-certificate"
     >
       <template slot="footer">
-        <a-button key="back" @click="handleCloseMFAuthModal"> 取消 </a-button>
+        <a-button key="back" @click="handleCloseMFAuthModal"> 取消</a-button>
         <ReactiveButton
           key="submit"
           :errored="mfaParam.errored"
@@ -250,6 +242,13 @@
         </a-form-model-item>
       </a-form-model>
     </a-modal>
+
+    <AttachmentSelectModal
+      :multiSelect="false"
+      :visible.sync="attachmentSelect.visible"
+      title="选择头像"
+      @confirm="handleSelectAvatar"
+    />
   </div>
 </template>
 
@@ -268,7 +267,7 @@ export default {
       }
     }
     return {
-      attachmentDrawer: {
+      attachmentSelect: {
         visible: false
       },
       userForm: {
@@ -432,14 +431,16 @@ export default {
         this.userForm.errored = false
       }
     },
-    handleSelectAvatar(data) {
-      this.userForm.model.avatar = encodeURI(data.path)
-      this.attachmentDrawer.visible = false
+    handleSelectAvatar({ raw }) {
+      if (raw.length) {
+        this.userForm.model.avatar = encodeURI(raw[0].path)
+      }
+      this.attachmentSelect.visible = false
     },
     handleSelectGravatar() {
       this.userForm.model.avatar =
         '//cn.gravatar.com/avatar/' + new MD5().update(this.userForm.model.email).digest('hex') + '&d=mm'
-      this.attachmentDrawer.visible = false
+      this.attachmentSelect.visible = false
     },
     handleMFASwitch(useMFAuth) {
       this.mfaParam.switch.loading = true
