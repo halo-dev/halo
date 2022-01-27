@@ -1,7 +1,7 @@
 <template>
   <a-modal v-model="visible" :bodyStyle="{ padding: '0 24px 24px' }" :width="1024" title="从系统预设链接添加菜单">
     <template slot="footer">
-      <a-button @click="handleCancel"> 取消 </a-button>
+      <a-button @click="handleCancel"> 取消</a-button>
       <ReactiveButton
         :disabled="menus && menus.length <= 0"
         :errored="saveErrored"
@@ -21,14 +21,11 @@
               <a-tab-pane key="1" force-render tab="分类目录">
                 <a-list item-layout="horizontal">
                   <a-list-item v-for="(category, index) in categories" :key="index">
-                    <a-list-item-meta>
-                      <span slot="title">{{ category.name }}</span>
-                      <span slot="description">{{ category.fullPath }}</span>
-                    </a-list-item-meta>
+                    <a-list-item-meta :description="category.fullPath" :title="category.name" />
                     <template slot="actions">
-                      <a class="text-base" href="javascript:void(0);">
-                        <a-icon type="plus-circle" @click="handleInsertPre(category.name, category.fullPath)" />
-                      </a>
+                      <a-button class="!p-0" type="link" @click="handleInsertPre(category.name, category.fullPath)">
+                        <a-icon type="plus-circle" />
+                      </a-button>
                     </template>
                   </a-list-item>
                 </a-list>
@@ -36,14 +33,11 @@
               <a-tab-pane key="2" tab="标签">
                 <a-list item-layout="horizontal">
                   <a-list-item v-for="(tag, index) in tags" :key="index">
-                    <a-list-item-meta>
-                      <span slot="title">{{ tag.name }}</span>
-                      <span slot="description">{{ tag.fullPath }}</span>
-                    </a-list-item-meta>
+                    <a-list-item-meta :description="tag.fullPath" :title="tag.name" />
                     <template slot="actions">
-                      <a class="text-base" href="javascript:void(0);">
-                        <a-icon type="plus-circle" @click="handleInsertPre(tag.name, tag.fullPath)" />
-                      </a>
+                      <a-button class="!p-0" type="link" @click="handleInsertPre(tag.name, tag.fullPath)">
+                        <a-icon type="plus-circle" />
+                      </a-button>
                     </template>
                   </a-list-item>
                 </a-list>
@@ -51,14 +45,11 @@
               <a-tab-pane key="3" tab="独立页面">
                 <a-list item-layout="horizontal">
                   <a-list-item v-for="(item, index) in sheet.independents" :key="index">
-                    <a-list-item-meta>
-                      <span slot="title">{{ item.title }}</span>
-                      <span slot="description">{{ item.fullPath }}</span>
-                    </a-list-item-meta>
+                    <a-list-item-meta :description="item.fullPath" :title="item.title" />
                     <template slot="actions">
-                      <a class="text-base" href="javascript:void(0);">
-                        <a-icon type="plus-circle" @click="handleInsertPre(item.title, item.fullPath)" />
-                      </a>
+                      <a-button class="!p-0" type="link" @click="handleInsertPre(item.name, item.fullPath)">
+                        <a-icon type="plus-circle" />
+                      </a-button>
                     </template>
                   </a-list-item>
                 </a-list>
@@ -66,14 +57,11 @@
               <a-tab-pane key="4" tab="自定义页面">
                 <a-list item-layout="horizontal">
                   <a-list-item v-for="(item, index) in sheet.customs.data" :key="index">
-                    <a-list-item-meta>
-                      <span slot="title">{{ item.title }}</span>
-                      <span slot="description">{{ item.fullPath }}</span>
-                    </a-list-item-meta>
+                    <a-list-item-meta :description="item.fullPath" :title="item.title" />
                     <template slot="actions">
-                      <a class="text-base" href="javascript:void(0);">
-                        <a-icon type="plus-circle" @click="handleInsertPre(item.title, item.fullPath)" />
-                      </a>
+                      <a-button class="!p-0" type="link" @click="handleInsertPre(item.name, item.fullPath)">
+                        <a-icon type="plus-circle" />
+                      </a-button>
                     </template>
                   </a-list-item>
                 </a-list>
@@ -94,14 +82,11 @@
               <a-tab-pane key="5" tab="其他">
                 <a-list item-layout="horizontal">
                   <a-list-item v-for="(item, index) in otherInternalLinks" :key="index">
-                    <a-list-item-meta>
-                      <span slot="title">{{ item.name }}</span>
-                      <span slot="description">{{ item.url }}</span>
-                    </a-list-item-meta>
+                    <a-list-item-meta :description="item.url" :title="item.name" />
                     <template slot="actions">
-                      <a class="text-base" href="javascript:void(0);">
-                        <a-icon type="plus-circle" @click="handleInsertPre(item.name, item.url)" />
-                      </a>
+                      <a-button class="!p-0" type="link" @click="handleInsertPre(item.name, item.url)">
+                        <a-icon type="plus-circle" />
+                      </a-button>
                     </template>
                   </a-list-item>
                 </a-list>
@@ -116,14 +101,11 @@
             <a-tab-pane key="1" force-render tab="备选">
               <a-list item-layout="horizontal">
                 <a-list-item v-for="(menu, index) in menus" :key="index">
-                  <a-list-item-meta>
-                    <span slot="title">{{ menu.name }}</span>
-                    <span slot="description">{{ menu.url }}</span>
-                  </a-list-item-meta>
+                  <a-list-item-meta :description="menu.url" :title="menu.name" />
                   <template slot="actions">
-                    <a class="text-base" href="javascript:void(0);" @click="handleRemovePre(index)">
+                    <a-button class="!p-0" type="link" @click="handleRemovePre(index)">
                       <a-icon type="close-circle" />
-                    </a>
+                    </a-button>
                   </template>
                 </a-list-item>
               </a-list>

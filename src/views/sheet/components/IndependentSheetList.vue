@@ -49,8 +49,8 @@
     >
       <template slot="available" slot-scope="available">
         <span v-if="available">可用</span>
-        <span v-else
-          >不可用
+        <span v-else>
+          不可用
           <a-tooltip slot="action" title="当前主题没有对应模板">
             <a-icon type="info-circle-o" />
           </a-tooltip>
@@ -58,7 +58,7 @@
       </template>
       <span slot="action" slot-scope="text, record">
         <router-link :to="{ name: record.routeName }">
-          <a href="javascript:void(0);">管理</a>
+          <a-button class="!p-0" type="link">管理</a-button>
         </router-link>
         <a-divider type="vertical" />
         <a v-if="record.available" :href="record.fullPath" target="_blank">访问</a>

@@ -40,31 +40,23 @@
             <a-list v-else :dataSource="list.data" :loading="list.loading" :pagination="false" itemLayout="vertical">
               <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
                 <template slot="actions">
-                  <span>
-                    <a href="javascript:void(0);">
-                      <a-icon type="like-o" />
-                      {{ item.likes }}
-                    </a>
-                  </span>
-                  <span>
-                    <a href="javascript:void(0);" @click="handleOpenJournalCommentsDrawer(item)">
-                      <a-icon type="message" />
-                      {{ item.commentCount }}
-                    </a>
-                  </span>
-                  <span v-if="item.type === 'INTIMATE'">
-                    <a disabled href="javascript:void(0);">
-                      <a-icon type="lock" />
-                    </a>
-                  </span>
-                  <span v-else>
-                    <a href="javascript:void(0);">
-                      <a-icon type="unlock" />
-                    </a>
-                  </span>
+                  <a-button class="!p-0" type="link">
+                    <a-icon type="like-o" />
+                    {{ item.likes }}
+                  </a-button>
+                  <a-button class="!p-0" type="link" @click="handleOpenJournalCommentsDrawer(item)">
+                    <a-icon type="message" />
+                    {{ item.commentCount }}
+                  </a-button>
+                  <a-button v-if="item.type === 'INTIMATE'" class="!p-0" disabled type="link">
+                    <a-icon type="lock" />
+                  </a-button>
+                  <a-button v-else class="!p-0" type="link">
+                    <a-icon type="unlock" />
+                  </a-button>
                 </template>
                 <template slot="extra">
-                  <a href="javascript:void(0);" @click="handleOpenEditModal(item)">编辑</a>
+                  <a-button class="!p-0" type="link" @click="handleOpenEditModal(item)">编辑</a-button>
                   <a-divider type="vertical" />
                   <a-popconfirm
                     cancelText="取消"
@@ -72,7 +64,7 @@
                     title="你确定要删除这条日志？"
                     @confirm="handleDelete(item.id)"
                   >
-                    <a href="javascript:void(0);">删除</a>
+                    <a-button class="!p-0" type="link">删除</a-button>
                   </a-popconfirm>
                 </template>
 

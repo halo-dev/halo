@@ -21,7 +21,9 @@
         <a-form-model-item prop="code">
           <a-input v-model="form.model.code" placeholder="验证码" type="password">
             <a-icon slot="prefix" style="color: rgba(0, 0, 0, 0.25)" type="safety-certificate" />
-            <a slot="addonAfter" href="javascript:void(0);" @click="handleSendCode"> 获取 </a>
+            <template #addonAfter>
+              <a-button class="!p-0 !h-auto" type="link" @click="handleSendCode">获取</a-button>
+            </template>
           </a-input>
         </a-form-model-item>
         <a-form-model-item prop="password">
@@ -43,7 +45,7 @@
           <a-button :block="true" type="primary" @click="handleResetPassword">重置密码</a-button>
         </a-form-model-item>
       </a-form-model>
-      <router-link :to="{ name: 'Login' }" class="tip"> 返回登录 </router-link>
+      <router-link :to="{ name: 'Login' }" class="tip"> 返回登录</router-link>
     </div>
   </div>
 </template>

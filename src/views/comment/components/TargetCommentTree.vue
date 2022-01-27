@@ -3,14 +3,10 @@
     <a-comment>
       <template slot="actions">
         <a-dropdown v-if="comment.status === 'AUDITING'" :trigger="['click']">
-          <span href="javascript:void(0);">通过</span>
+          <span>通过</span>
           <a-menu slot="overlay">
-            <a-menu-item key="1">
-              <span href="javascript:void(0);" @click="handleEditStatusClick('PUBLISHED')">通过</span>
-            </a-menu-item>
-            <a-menu-item key="2">
-              <span href="javascript:void(0);">通过并回复</span>
-            </a-menu-item>
+            <a-menu-item key="1" @click="handleEditStatusClick('PUBLISHED')"> 通过</a-menu-item>
+            <a-menu-item key="2"> 通过并回复</a-menu-item>
           </a-menu>
         </a-dropdown>
 
@@ -23,7 +19,7 @@
           okText="确定"
           @confirm="handleEditStatusClick('PUBLISHED')"
         >
-          <span>还原</span>
+          还原
         </a-popconfirm>
 
         <a-popconfirm
@@ -33,11 +29,11 @@
           okText="确定"
           @confirm="handleEditStatusClick('RECYCLE')"
         >
-          <span>回收站</span>
+          回收站
         </a-popconfirm>
 
         <a-popconfirm :title="'你确定要永久删除该评论？'" cancelText="取消" okText="确定" @confirm="handleDeleteClick">
-          <span>删除</span>
+          删除
         </a-popconfirm>
       </template>
       <a slot="author" :href="comment.authorUrl" target="_blank">

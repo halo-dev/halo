@@ -24,8 +24,8 @@
               <a-icon type="bars" />
             </span>
             <a-menu slot="overlay">
-              <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
-                <a href="javascript:void(0);" @click="handleEditClick(item)">编辑</a>
+              <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'" @click="handleEditClick(item)">
+                编辑
               </a-menu-item>
               <a-menu-item v-else-if="item.status === 'RECYCLE'">
                 <a-popconfirm
@@ -34,7 +34,7 @@
                   okText="确定"
                   @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
                 >
-                  <a href="javascript:void(0);">还原</a>
+                  还原
                 </a-popconfirm>
               </a-menu-item>
               <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
@@ -44,7 +44,7 @@
                   okText="确定"
                   @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
                 >
-                  <a href="javascript:void(0);">回收站</a>
+                  回收站
                 </a-popconfirm>
               </a-menu-item>
               <a-menu-item v-else-if="item.status === 'RECYCLE'">
@@ -54,12 +54,10 @@
                   okText="确定"
                   @confirm="handleDeleteClick(item.id)"
                 >
-                  <a href="javascript:void(0);">删除</a>
+                  删除
                 </a-popconfirm>
               </a-menu-item>
-              <a-menu-item>
-                <a href="javascript:void(0);" rel="noopener noreferrer" @click="handleShowSheetSettings(item)">设置</a>
-              </a-menu-item>
+              <a-menu-item @click="handleShowSheetSettings(item)">设置</a-menu-item>
             </a-menu>
           </a-dropdown>
         </template>
@@ -72,25 +70,27 @@
           <template slot="description">
             {{ item.createTime | moment }}
           </template>
-          <span
-            slot="title"
-            style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
-          >
-            <a v-if="item.status === 'PUBLISHED'" :href="item.fullPath" class="no-underline" target="_blank">
-              <a-tooltip :title="'点击访问【' + item.title + '】'" placement="top">{{ item.title }}</a-tooltip>
-            </a>
-            <a
-              v-else-if="item.status === 'DRAFT'"
-              class="no-underline"
-              href="javascript:void(0)"
-              @click="handlePreview(item.id)"
+          <template #title>
+            <div
+              style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
             >
-              <a-tooltip :title="'点击预览【' + item.title + '】'" placement="topLeft">{{ item.title }}</a-tooltip>
-            </a>
-            <a v-else class="no-underline" disabled href="javascript:void(0);">
-              {{ item.title }}
-            </a>
-          </span>
+              <a-tooltip v-if="item.status === 'PUBLISHED'" :title="'点击访问【' + item.title + '】'" placement="top">
+                <a :href="item.fullPath" class="no-underline" target="_blank">
+                  {{ item.title }}
+                </a>
+              </a-tooltip>
+
+              <a-tooltip v-else-if="item.status === 'DRAFT'" :title="'点击预览【' + item.title + '】'" placement="top">
+                <a-button class="!p-0" type="link" @click="handlePreview(item.id)">
+                  {{ item.title }}
+                </a-button>
+              </a-tooltip>
+
+              <a-button v-else class="!p-0" disabled type="link">
+                {{ item.title }}
+              </a-button>
+            </div>
+          </template>
         </a-list-item-meta>
         <span> {{ item.summary }}... </span>
       </a-list-item>
@@ -106,22 +106,23 @@
       :rowKey="sheet => sheet.id"
       :scrollToFirstRowOnChange="true"
     >
-      <span slot="sheetTitle" slot-scope="text, record">
-        <a v-if="record.status === 'PUBLISHED'" :href="record.fullPath" class="no-underline" target="_blank">
-          <a-tooltip :title="'点击访问【' + text + '】'" placement="top">{{ text }}</a-tooltip>
-        </a>
-        <a
-          v-else-if="record.status === 'DRAFT'"
-          class="no-underline"
-          href="javascript:void(0)"
-          @click="handlePreview(record.id)"
-        >
-          <a-tooltip :title="'点击预览【' + text + '】'" placement="topLeft">{{ text }}</a-tooltip>
-        </a>
-        <a v-else class="no-underline" disabled href="javascript:void(0);">
+      <template #sheetTitle="text, record">
+        <a-tooltip v-if="record.status === 'PUBLISHED'" :title="'点击访问【' + text + '】'" placement="top">
+          <a :href="record.fullPath" class="no-underline" target="_blank">
+            {{ text }}
+          </a>
+        </a-tooltip>
+
+        <a-tooltip v-else-if="record.status === 'DRAFT'" :title="'点击预览【' + text + '】'" placement="top">
+          <a-button class="!p-0" type="link" @click="handlePreview(record.id)">
+            {{ text }}
+          </a-button>
+        </a-tooltip>
+
+        <a-button v-else class="!p-0" disabled type="link">
           {{ text }}
-        </a>
-      </span>
+        </a-button>
+      </template>
 
       <span slot="status" slot-scope="statusProperty">
         <a-badge :status="statusProperty.status" :text="statusProperty.text" />
@@ -155,12 +156,14 @@
       </span>
 
       <span slot="action" slot-scope="text, sheet">
-        <a
+        <a-button
           v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
-          href="javascript:void(0);"
+          class="!p-0"
+          type="link"
           @click="handleEditClick(sheet)"
-          >编辑</a
         >
+          编辑
+        </a-button>
 
         <a-popconfirm
           v-else-if="sheet.status === 'RECYCLE'"
@@ -169,7 +172,7 @@
           okText="确定"
           @confirm="handleEditStatusClick(sheet.id, 'PUBLISHED')"
         >
-          <a href="javascript:void(0);">还原</a>
+          <a-button class="!p-0" type="link">还原</a-button>
         </a-popconfirm>
 
         <a-divider type="vertical" />
@@ -181,7 +184,7 @@
           okText="确定"
           @confirm="handleEditStatusClick(sheet.id, 'RECYCLE')"
         >
-          <a href="javascript:void(0);">回收站</a>
+          <a-button class="!p-0" type="link">回收站</a-button>
         </a-popconfirm>
 
         <a-popconfirm
@@ -191,10 +194,10 @@
           okText="确定"
           @confirm="handleDeleteClick(sheet.id)"
         >
-          <a href="javascript:void(0);">删除</a>
+          <a-button class="!p-0" type="link">删除</a-button>
         </a-popconfirm>
         <a-divider type="vertical" />
-        <a href="javascript:void(0);" @click="handleShowSheetSettings(sheet)">设置</a>
+        <a-button class="!p-0" type="link" @click="handleShowSheetSettings(sheet)">设置</a-button>
       </span>
     </a-table>
     <div class="page-wrapper">
@@ -218,8 +221,8 @@
       @onClose="selectedSheet = {}"
     >
       <template #extraFooter>
-        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious"> 上一篇 </a-button>
-        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext"> 下一篇 </a-button>
+        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious"> 上一篇</a-button>
+        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext"> 下一篇</a-button>
       </template>
     </SheetSettingModal>
     <TargetCommentDrawer

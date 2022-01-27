@@ -24,14 +24,14 @@
             {{ createTime | moment }}
           </span>
           <span slot="action" slot-scope="text, record">
-            <a v-if="!record.isFile" href="javascript:void(0);" @click="handleUpload(record)">上传</a>
+            <a-button v-if="!record.isFile" class="!p-0" type="link" @click="handleUpload(record)">上传</a-button>
             <a v-else :href="options.blog_url + record.relativePath" target="_blank">访问</a>
             <a-divider type="vertical" />
             <a-dropdown :trigger="['click']">
-              <a class="ant-dropdown-link" href="javascript:void(0);">更多</a>
+              <a-button class="!p-0" type="link">更多</a-button>
               <a-menu slot="overlay">
-                <a-menu-item v-if="!record.isFile" key="1">
-                  <a href="javascript:void(0);" @click="handleOpenCreateDirectoryModal(record)">创建文件夹</a>
+                <a-menu-item v-if="!record.isFile" key="1" @click="handleOpenCreateDirectoryModal(record)">
+                  创建文件夹
                 </a-menu-item>
                 <a-menu-item key="2">
                   <a-popconfirm
@@ -40,14 +40,12 @@
                     okText="确定"
                     @confirm="handleDelete(record.relativePath)"
                   >
-                    <a href="javascript:void(0);">删除</a>
+                    删除
                   </a-popconfirm>
                 </a-menu-item>
-                <a-menu-item key="3">
-                  <a href="javascript:void(0);" @click="handleOpenRenameModal(record)">重命名</a>
-                </a-menu-item>
-                <a-menu-item v-if="record.isFile" key="4">
-                  <a href="javascript:void(0);" @click="handleOpenEditContentModal(record)">编辑</a>
+                <a-menu-item key="3" @click="handleOpenRenameModal(record)">重命名</a-menu-item>
+                <a-menu-item v-if="record.isFile" key="4" @click="handleOpenEditContentModal(record)">
+                  编辑
                 </a-menu-item>
               </a-menu>
             </a-dropdown>

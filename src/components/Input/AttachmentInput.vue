@@ -1,9 +1,11 @@
 <template>
   <div>
     <a-input :defaultValue="defaultValue" :placeholder="placeholder" :value="value" @change="onInputChange">
-      <a slot="addonAfter" href="javascript:void(0);" @click="attachmentModalVisible = true">
-        <a-icon type="picture" />
-      </a>
+      <template #addonAfter>
+        <a-button class="!p-0 !h-auto" type="link" @click="attachmentModalVisible = true">
+          <a-icon type="picture" />
+        </a-button>
+      </template>
     </a-input>
     <AttachmentSelectModal
       :multiSelect="false"

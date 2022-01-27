@@ -62,7 +62,7 @@
             </a-tooltip>
           </span>
           <span slot="action" slot-scope="text, record">
-            <a href="javascript:void(0);" @click="handleOpenEditFormModal(record)">编辑</a>
+            <a-button class="!p-0" type="link" @click="handleOpenEditFormModal(record)">编辑</a-button>
             <a-divider type="vertical" />
             <a-popconfirm
               :title="'你确定要永久删除该变量？'"
@@ -70,7 +70,7 @@
               okText="确定"
               @confirm="handleDeleteOption(record.id)"
             >
-              <a href="javascript:void(0);">删除</a>
+              <a-button class="!p-0" type="link">删除</a-button>
             </a-popconfirm>
           </span>
         </a-table>

@@ -6,9 +6,9 @@
           <a-card :bodyStyle="{ padding: '16px' }" :bordered="false" class="environment-info">
             <template slot="title">
               环境信息
-              <a href="javascript:void(0);" @click="handleCopyEnvironments">
+              <a-button class="!p-0" type="link" @click="handleCopyEnvironments">
                 <a-icon type="copy" />
-              </a>
+              </a-button>
             </template>
             <a-popover slot="extra" :title="isLatest ? '当前为最新版本' : '有新版本'" placement="left">
               <template slot="content">
@@ -52,10 +52,10 @@
             <a v-for="(item, index) in contributors" :key="index" :href="item.html_url" target="_blank">
               <a-tooltip :title="item.login" placement="top">
                 <a-avatar
+                  :alt="item.login"
                   :src="item.avatar_url | webpAvatarConvert"
                   :style="{ marginRight: '10px', marginBottom: '10px' }"
                   size="large"
-                  :alt="item.login"
                 />
               </a-tooltip>
             </a>

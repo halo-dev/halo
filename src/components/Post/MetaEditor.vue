@@ -4,11 +4,17 @@
       <a-form-item v-for="(meta, index) in presetMetas" :key="index">
         <a-row :gutter="5">
           <a-col :span="12">
-            <a-input v-model="meta.key" :disabled="true"><i slot="addonBefore">K</i></a-input>
+            <a-input v-model="meta.key" :disabled="true">
+              <template #addonBefore>
+                <i>K</i>
+              </template>
+            </a-input>
           </a-col>
           <a-col :span="12">
             <a-input v-model="meta.value">
-              <i slot="addonBefore">V</i>
+              <template #addonBefore>
+                <i>V</i>
+              </template>
             </a-input>
           </a-col>
         </a-row>
@@ -18,14 +24,22 @@
       <a-form-item v-for="(meta, index) in customMetas" :key="index">
         <a-row :gutter="5">
           <a-col :span="12">
-            <a-input v-model="meta.key"><i slot="addonBefore">K</i></a-input>
+            <a-input v-model="meta.key">
+              <template #addonBefore>
+                <i>K</i>
+              </template>
+            </a-input>
           </a-col>
           <a-col :span="12">
             <a-input v-model="meta.value">
-              <i slot="addonBefore">V</i>
-              <a slot="addonAfter" href="javascript:void(0);" @click.prevent="handleRemove(index)">
-                <a-icon type="close" />
-              </a>
+              <template #addonBefore>
+                <i>V</i>
+              </template>
+              <template #addonAfter>
+                <a-button class="!p-0 !h-auto" type="link" @click.prevent="handleRemove(index)">
+                  <a-icon type="close" />
+                </a-button>
+              </template>
             </a-input>
           </a-col>
         </a-row>

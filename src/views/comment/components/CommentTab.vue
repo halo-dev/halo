@@ -34,14 +34,22 @@
       <div class="table-operator">
         <a-dropdown v-show="list.params.status != null && list.params.status !== '' && !isMobile()">
           <a-menu slot="overlay">
-            <a-menu-item v-if="list.params.status === 'AUDITING'" key="1">
-              <a href="javascript:void(0);" @click="handleEditStatusMore(commentStatus.PUBLISHED.value)"> 通过 </a>
+            <a-menu-item
+              v-if="list.params.status === 'AUDITING'"
+              key="1"
+              @click="handleEditStatusMore(commentStatus.PUBLISHED.value)"
+            >
+              通过
             </a-menu-item>
-            <a-menu-item v-if="list.params.status === 'PUBLISHED' || list.params.status === 'AUDITING'" key="2">
-              <a href="javascript:void(0);" @click="handleEditStatusMore(commentStatus.RECYCLE.value)"> 移到回收站 </a>
+            <a-menu-item
+              v-if="list.params.status === 'PUBLISHED' || list.params.status === 'AUDITING'"
+              key="2"
+              @click="handleEditStatusMore(commentStatus.RECYCLE.value)"
+            >
+              移到回收站
             </a-menu-item>
-            <a-menu-item v-if="list.params.status === 'RECYCLE'" key="3">
-              <a href="javascript:void(0);" @click="handleDeleteMore"> 永久删除 </a>
+            <a-menu-item v-if="list.params.status === 'RECYCLE'" key="3" @click="handleDeleteMore">
+              永久删除
             </a-menu-item>
           </a-menu>
           <a-button>
@@ -67,14 +75,14 @@
                   <a-icon type="bars" />
                 </span>
                 <a-menu slot="overlay">
-                  <a-menu-item v-if="item.status === 'AUDITING'">
-                    <a href="javascript:void(0);" @click="handleEditStatusClick(item.id, 'PUBLISHED')">通过</a>
+                  <a-menu-item v-if="item.status === 'AUDITING'" @click="handleEditStatusClick(item.id, 'PUBLISHED')">
+                    通过
                   </a-menu-item>
-                  <a-menu-item v-if="item.status === 'AUDITING'">
-                    <a href="javascript:void(0);" @click="handleReplyAndPassClick(item)">通过并回复</a>
+                  <a-menu-item v-if="item.status === 'AUDITING'" @click="handleReplyAndPassClick(item)">
+                    通过并回复
                   </a-menu-item>
-                  <a-menu-item v-else-if="item.status === 'PUBLISHED'">
-                    <a href="javascript:void(0);" @click="handleReplyClick(item)">回复</a>
+                  <a-menu-item v-else-if="item.status === 'PUBLISHED'" @click="handleReplyClick(item)">
+                    回复
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
                     <a-popconfirm
@@ -83,7 +91,7 @@
                       okText="确定"
                       @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
                     >
-                      <a href="javascript:void(0);">还原</a>
+                      还原
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'AUDITING'">
@@ -93,7 +101,7 @@
                       okText="确定"
                       @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
                     >
-                      <a href="javascript:void(0);">回收站</a>
+                      回收站
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
@@ -103,7 +111,7 @@
                       okText="确定"
                       @confirm="handleDeleteClick(item.id)"
                     >
-                      <a href="javascript:void(0);">删除</a>
+                      删除
                     </a-popconfirm>
                   </a-menu-item>
                 </a-menu>
@@ -185,20 +193,21 @@
           </span>
           <span slot="action" slot-scope="text, record">
             <a-dropdown v-if="record.status === 'AUDITING'" :trigger="['click']">
-              <a class="ant-dropdown-link" href="javascript:void(0);">通过</a>
+              <a-button class="!p-0" type="link">通过</a-button>
               <a-menu slot="overlay">
-                <a-menu-item key="1">
-                  <a href="javascript:void(0);" @click="handleEditStatusClick(record.id, 'PUBLISHED')">通过</a>
-                </a-menu-item>
-                <a-menu-item key="2">
-                  <a href="javascript:void(0);" @click="handleReplyAndPassClick(record)">通过并回复</a>
-                </a-menu-item>
+                <a-menu-item key="1" @click="handleEditStatusClick(record.id, 'PUBLISHED')"> 通过 </a-menu-item>
+                <a-menu-item key="2" @click="handleReplyAndPassClick(record)"> 通过并回复 </a-menu-item>
               </a-menu>
             </a-dropdown>
 
-            <a v-else-if="record.status === 'PUBLISHED'" href="javascript:void(0);" @click="handleReplyClick(record)">
+            <a-button
+              v-else-if="record.status === 'PUBLISHED'"
+              class="!p-0"
+              type="link"
+              @click="handleReplyClick(record)"
+            >
               回复
-            </a>
+            </a-button>
 
             <a-popconfirm
               v-else-if="record.status === 'RECYCLE'"
@@ -207,7 +216,7 @@
               okText="确定"
               @confirm="handleEditStatusClick(record.id, 'PUBLISHED')"
             >
-              <a href="javascript:void(0);">还原</a>
+              <a-button class="!p-0" type="link">还原</a-button>
             </a-popconfirm>
 
             <a-divider type="vertical" />
@@ -219,7 +228,7 @@
               okText="确定"
               @confirm="handleEditStatusClick(record.id, 'RECYCLE')"
             >
-              <a href="javascript:void(0);">回收站</a>
+              <a-button class="!p-0" type="link">回收站</a-button>
             </a-popconfirm>
 
             <a-popconfirm
@@ -229,7 +238,7 @@
               okText="确定"
               @confirm="handleDeleteClick(record.id)"
             >
-              <a href="javascript:void(0);">删除</a>
+              <a-button class="!p-0" type="link">删除</a-button>
             </a-popconfirm>
           </span>
         </a-table>

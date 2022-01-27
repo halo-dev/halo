@@ -1,8 +1,11 @@
 <template>
   <div class="logo">
-    <a href="javascript:void(0);" @click="onLogoClick()">
-      <img alt="Halo Logo" src="/images/logo.svg" />
-    </a>
+    <img
+      alt="Halo Logo"
+      class="select-none cursor-pointer hover:brightness-125 transition-all"
+      src="/images/logo.svg"
+      @click="onLogoClick()"
+    />
   </div>
 </template>
 

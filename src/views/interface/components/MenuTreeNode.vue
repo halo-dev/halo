@@ -28,11 +28,13 @@
               </span>
             </a-list-item-meta>
             <template slot="actions">
-              <a v-if="!item.formVisible" href="javascript:void(0);" @click="handleOpenEditForm(item)"> 编辑 </a>
-              <a v-else href="javascript:void(0);" @click="handleCloseCreateMenuForm(item)"> 取消编辑 </a>
+              <a-button v-if="!item.formVisible" class="!p-0" type="link" @click="handleOpenEditForm(item)">
+                编辑
+              </a-button>
+              <a-button v-else class="!p-0" type="link" @click="handleCloseCreateMenuForm(item)">取消编辑</a-button>
             </template>
             <template slot="actions">
-              <a href="javascript:void(0);" @click="handleDelete(item.id)">删除</a>
+              <a-button class="!p-0" type="link" @click="handleDelete(item.id)">删除</a-button>
             </template>
             <template v-if="excludedTeams && excludedTeams.length > 0" slot="actions">
               <a-dropdown :trigger="['click']">

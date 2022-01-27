@@ -52,25 +52,29 @@
         </router-link>
         <a-dropdown v-show="list.params.status != null && list.params.status !== '' && !isMobile()">
           <a-menu slot="overlay">
-            <a-menu-item v-if="['DRAFT', 'RECYCLE'].includes(list.params.status)" key="1">
-              <a href="javascript:void(0);" @click="handleEditStatusMore(postStatus.PUBLISHED.value)">
-                <span>发布</span>
-              </a>
+            <a-menu-item
+              v-if="['DRAFT', 'RECYCLE'].includes(list.params.status)"
+              key="1"
+              @click="handleEditStatusMore(postStatus.PUBLISHED.value)"
+            >
+              发布
             </a-menu-item>
-            <a-menu-item v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(list.params.status)" key="2">
-              <a href="javascript:void(0);" @click="handleEditStatusMore(postStatus.RECYCLE.value)">
-                <span>移到回收站</span>
-              </a>
+            <a-menu-item
+              v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(list.params.status)"
+              key="2"
+              @click="handleEditStatusMore(postStatus.RECYCLE.value)"
+            >
+              移到回收站
             </a-menu-item>
-            <a-menu-item v-if="['RECYCLE', 'PUBLISHED', 'INTIMATE'].includes(list.params.status)" key="3">
-              <a href="javascript:void(0);" @click="handleEditStatusMore(postStatus.DRAFT.value)">
-                <span>草稿</span>
-              </a>
+            <a-menu-item
+              v-if="['RECYCLE', 'PUBLISHED', 'INTIMATE'].includes(list.params.status)"
+              key="3"
+              @click="handleEditStatusMore(postStatus.DRAFT.value)"
+            >
+              草稿
             </a-menu-item>
-            <a-menu-item v-if="['RECYCLE', 'DRAFT'].includes(list.params.status)" key="4">
-              <a href="javascript:void(0);" @click="handleDeleteMore">
-                <span>永久删除</span>
-              </a>
+            <a-menu-item v-if="['RECYCLE', 'DRAFT'].includes(list.params.status)" key="4" @click="handleDeleteMore">
+              永久删除
             </a-menu-item>
           </a-menu>
           <a-button class="ml-2">
@@ -104,8 +108,11 @@
                   <a-icon type="bars" />
                 </span>
                 <a-menu slot="overlay">
-                  <a-menu-item v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(item.status)">
-                    <a href="javascript:void(0);" @click="handleEditClick(item)">编辑</a>
+                  <a-menu-item
+                    v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(item.status)"
+                    @click="handleEditClick(item)"
+                  >
+                    编辑
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
                     <a-popconfirm
@@ -114,7 +121,7 @@
                       okText="确定"
                       @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
                     >
-                      <a href="javascript:void(0);">还原</a>
+                      还原
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(item.status)">
@@ -124,7 +131,7 @@
                       okText="确定"
                       @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
                     >
-                      <a href="javascript:void(0);">回收站</a>
+                      回收站
                     </a-popconfirm>
                   </a-menu-item>
                   <a-menu-item v-else-if="item.status === 'RECYCLE'">
@@ -134,14 +141,10 @@
                       okText="确定"
                       @confirm="handleDeleteClick(item.id)"
                     >
-                      <a href="javascript:void(0);">删除</a>
+                      删除
                     </a-popconfirm>
                   </a-menu-item>
-                  <a-menu-item>
-                    <a href="javascript:void(0);" rel="noopener noreferrer" @click="handleShowPostSettings(item)">
-                      设置
-                    </a>
-                  </a-menu-item>
+                  <a-menu-item @click="handleShowPostSettings(item)">设置</a-menu-item>
                 </a-menu>
               </a-dropdown>
             </template>
@@ -154,37 +157,46 @@
               <template slot="description">
                 {{ item.createTime | moment }}
               </template>
-              <span
-                slot="title"
-                style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
-              >
-                <a-icon
-                  v-if="item.topPriority !== 0"
-                  style="margin-right: 3px"
-                  theme="twoTone"
-                  twoToneColor="red"
-                  type="pushpin"
-                />
-                <a
-                  v-if="['PUBLISHED', 'INTIMATE'].includes(item.status)"
-                  :href="item.fullPath"
-                  class="no-underline"
-                  target="_blank"
+              <template #title>
+                <div
+                  style="
+                    max-width: 300px;
+                    display: block;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  "
                 >
-                  <a-tooltip :title="'点击访问【' + item.title + '】'" placement="top">{{ item.title }}</a-tooltip>
-                </a>
-                <a
-                  v-else-if="item.status === 'DRAFT'"
-                  class="no-underline"
-                  href="javascript:void(0)"
-                  @click="handlePreview(item.id)"
-                >
-                  <a-tooltip :title="'点击预览【' + item.title + '】'" placement="topLeft">{{ item.title }}</a-tooltip>
-                </a>
-                <a v-else class="no-underline" disabled href="javascript:void(0);">
-                  {{ item.title }}
-                </a>
-              </span>
+                  <a-icon
+                    v-if="item.topPriority !== 0"
+                    style="margin-right: 3px"
+                    theme="twoTone"
+                    twoToneColor="red"
+                    type="pushpin"
+                  />
+                  <a-tooltip
+                    v-if="['PUBLISHED', 'INTIMATE'].includes(item.status)"
+                    :title="'点击访问【' + item.title + '】'"
+                    placement="top"
+                  >
+                    <a :href="item.fullPath" class="no-underline" target="_blank">
+                      {{ item.title }}
+                    </a>
+                  </a-tooltip>
+                  <a-tooltip
+                    v-else-if="item.status === 'DRAFT'"
+                    :title="'点击预览【' + item.title + '】'"
+                    placement="top"
+                  >
+                    <a-button class="!p-0" type="link" @click="handlePreview(item.id)">
+                      {{ item.title }}
+                    </a-button>
+                  </a-tooltip>
+                  <a-button v-else class="!p-0" disabled type="link">
+                    {{ item.title }}
+                  </a-button>
+                </div>
+              </template>
             </a-list-item-meta>
             <span> {{ item.summary }}... </span>
             <br />
@@ -223,7 +235,7 @@
           }"
           :scrollToFirstRowOnChange="true"
         >
-          <span slot="postTitle" slot-scope="text, record">
+          <template #postTitle="text, record">
             <a-icon
               v-if="record.topPriority !== 0"
               style="margin-right: 3px"
@@ -231,26 +243,24 @@
               twoToneColor="red"
               type="pushpin"
             />
-            <a
+            <a-tooltip
               v-if="['PUBLISHED', 'INTIMATE'].includes(record.status)"
-              :href="record.fullPath"
-              class="no-underline"
-              target="_blank"
+              :title="'点击访问【' + text + '】'"
+              placement="top"
             >
-              <a-tooltip :title="'点击访问【' + text + '】'" placement="top">{{ text }}</a-tooltip>
-            </a>
-            <a
-              v-else-if="record.status === 'DRAFT'"
-              class="no-underline"
-              href="javascript:void(0)"
-              @click="handlePreview(record.id)"
-            >
-              <a-tooltip :title="'点击预览【' + text + '】'" placement="topLeft">{{ text }}</a-tooltip>
-            </a>
-            <a v-else class="no-underline" disabled href="javascript:void(0);">
+              <a :href="record.fullPath" class="no-underline" target="_blank">
+                {{ text }}
+              </a>
+            </a-tooltip>
+            <a-tooltip v-else-if="record.status === 'DRAFT'" :title="'点击预览【' + text + '】'" placement="top">
+              <a-button class="!p-0" type="link" @click="handlePreview(record.id)">
+                {{ text }}
+              </a-button>
+            </a-tooltip>
+            <a-button v-else class="!p-0" disabled type="link">
               {{ text }}
-            </a>
-          </span>
+            </a-button>
+          </template>
           <span slot="status" slot-scope="statusProperty">
             <a-badge :status="statusProperty.status" :text="statusProperty.text" />
           </span>
@@ -306,11 +316,12 @@
           </span>
 
           <span slot="action" slot-scope="text, post">
-            <a
+            <a-button
               v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(post.status)"
-              href="javascript:void(0);"
+              class="!p-0"
+              type="link"
               @click="handleEditClick(post)"
-              >编辑</a
+              >编辑</a-button
             >
             <a-popconfirm
               v-else-if="post.status === 'RECYCLE'"
@@ -319,7 +330,7 @@
               okText="确定"
               @confirm="handleEditStatusClick(post.id, 'PUBLISHED')"
             >
-              <a href="javascript:void(0);">还原</a>
+              <a-button class="!p-0" type="link">还原</a-button>
             </a-popconfirm>
 
             <a-divider type="vertical" />
@@ -331,7 +342,7 @@
               okText="确定"
               @confirm="handleEditStatusClick(post.id, 'RECYCLE')"
             >
-              <a href="javascript:void(0);">回收站</a>
+              <a-button class="!p-0" type="link">回收站</a-button>
             </a-popconfirm>
 
             <a-popconfirm
@@ -341,12 +352,12 @@
               okText="确定"
               @confirm="handleDeleteClick(post.id)"
             >
-              <a href="javascript:void(0);">删除</a>
+              <a-button class="!p-0" type="link">删除</a-button>
             </a-popconfirm>
 
             <a-divider type="vertical" />
 
-            <a href="javascript:void(0);" @click="handleShowPostSettings(post)">设置</a>
+            <a-button class="!p-0" type="link" @click="handleShowPostSettings(post)">设置</a-button>
           </span>
         </a-table>
         <div class="page-wrapper">
@@ -373,8 +384,8 @@
       @onClose="selectedPost = {}"
     >
       <template #extraFooter>
-        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious"> 上一篇 </a-button>
-        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext"> 下一篇 </a-button>
+        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious"> 上一篇</a-button>
+        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext"> 下一篇</a-button>
       </template>
     </PostSettingModal>
 
@@ -726,7 +737,7 @@ export default {
     },
     handlePreview(postId) {
       apiClient.post.getPreviewLinkById(postId).then(response => {
-        window.open(response.data, '_blank')
+        window.open(response, '_blank')
       })
     },
     handleClearRowKeys() {

@@ -68,9 +68,7 @@
                     <a-icon type="bars" />
                   </span>
                   <a-menu slot="overlay">
-                    <a-menu-item>
-                      <a href="javascript:void(0);" @click="form.model = item">编辑</a>
-                    </a-menu-item>
+                    <a-menu-item @click="form.model = item">编辑</a-menu-item>
                     <a-menu-item>
                       <a-popconfirm
                         :title="'你确定要删除【' + item.name + '】链接？'"
@@ -78,7 +76,7 @@
                         okText="确定"
                         @confirm="handleDeleteLink(item.id)"
                       >
-                        <a href="javascript:void(0);">删除</a>
+                        删除
                       </a-popconfirm>
                     </a-menu-item>
                   </a-menu>
@@ -123,7 +121,7 @@
             </template>
             <ellipsis slot="name" slot-scope="text" :length="15" tooltip>{{ text }}</ellipsis>
             <span slot="action" slot-scope="text, record">
-              <a href="javascript:void(0);" @click="form.model = record">编辑</a>
+              <a-button class="!p-0" type="link" @click="form.model = record">编辑</a-button>
               <a-divider type="vertical" />
               <a-popconfirm
                 :title="'你确定要删除【' + record.name + '】链接？'"
@@ -131,7 +129,7 @@
                 okText="确定"
                 @confirm="handleDeleteLink(record.id)"
               >
-                <a href="javascript:void(0);">删除</a>
+                <a-button class="!p-0" type="link">删除</a-button>
               </a-popconfirm>
             </span>
           </a-table>

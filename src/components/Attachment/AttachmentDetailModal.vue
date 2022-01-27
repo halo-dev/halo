@@ -19,9 +19,9 @@
               <template v-else slot="description">{{ attachment.name }}</template>
               <span slot="title">
                 附件名：
-                <a href="javascript:void(0);">
-                  <a-icon type="edit" @click="handleEditName" />
-                </a>
+                <a-button class="!p-0" type="link" @click="handleEditName">
+                  <a-icon type="edit" />
+                </a-button>
               </span>
             </a-list-item-meta>
           </a-list-item>
@@ -63,9 +63,9 @@
               </template>
               <span slot="title">
                 普通链接：
-                <a href="javascript:void(0);" @click="handleCopyLink(`${encodeURI(attachment.path)}`)">
+                <a-button class="!p-0" type="link" @click="handleCopyLink(`${encodeURI(attachment.path)}`)">
                   <a-icon type="copy" />
-                </a>
+                </a-button>
               </span>
             </a-list-item-meta>
           </a-list-item>
@@ -74,12 +74,13 @@
               <span slot="description">![{{ attachment.name }}]({{ attachment.path }})</span>
               <span slot="title">
                 Markdown 格式：
-                <a
-                  href="javascript:void(0);"
+                <a-button
+                  class="!p-0"
+                  type="link"
                   @click="handleCopyLink(`![${attachment.name}](${encodeURI(attachment.path)})`)"
                 >
                   <a-icon type="copy" />
-                </a>
+                </a-button>
               </span>
             </a-list-item-meta>
           </a-list-item>

@@ -21,10 +21,10 @@
         <analysis-card :number="statisticsData.visitCount" title="阅读量">
           <a-tooltip slot="action">
             <template slot="title"> 文章阅读共 {{ statisticsData.visitCount }} 次</template>
-            <a href="javascript:void(0);">
+            <a-button class="!p-0" type="link">
               <a-icon v-if="statisticsLoading" type="loading" />
               <a-icon v-else type="info-circle-o" />
-            </a>
+            </a-button>
           </a-tooltip>
         </analysis-card>
       </a-col>
@@ -32,10 +32,10 @@
         <analysis-card :number="statisticsData.establishDays" title="建立天数">
           <a-tooltip slot="action">
             <template slot="title">博客建立于 {{ statisticsData.birthday | moment }}</template>
-            <a href="javascript:void(0);">
+            <a-button class="!p-0" type="link">
               <a-icon v-if="statisticsLoading" type="loading" />
               <a-icon v-else type="info-circle-o" />
-            </a>
+            </a-button>
           </a-tooltip>
         </analysis-card>
       </a-col>
@@ -49,25 +49,24 @@
                 <a-list :dataSource="latestPosts" :loading="activityLoading">
                   <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
                     <a-list-item-meta>
-                      <a
-                        v-if="['PUBLISHED', 'INTIMATE'].includes(item.status)"
-                        slot="title"
-                        :href="item.fullPath"
-                        target="_blank"
-                      >
-                        {{ item.title }}
-                      </a>
-                      <a
-                        v-else-if="item.status === 'DRAFT'"
-                        slot="title"
-                        href="javascript:void(0)"
-                        @click="handlePostPreview(item.id)"
-                      >
-                        {{ item.title }}
-                      </a>
-                      <a v-else-if="item.status === 'RECYCLE'" slot="title" disabled href="javascript:void(0);">
-                        {{ item.title }}
-                      </a>
+                      <template #title>
+                        <a v-if="['PUBLISHED', 'INTIMATE'].includes(item.status)" :href="item.fullPath" target="_blank">
+                          {{ item.title }}
+                        </a>
+
+                        <a-button
+                          v-else-if="item.status === 'DRAFT'"
+                          class="!p-0"
+                          type="link"
+                          @click="handlePostPreview(item.id)"
+                        >
+                          {{ item.title }}
+                        </a-button>
+
+                        <a-button v-else-if="item.status === 'RECYCLE'" class="!p-0" disabled type="link">
+                          {{ item.title }}
+                        </a-button>
+                      </template>
                     </a-list-item-meta>
                     <div>{{ item.createTime | timeAgo }}</div>
                   </a-list-item>
@@ -205,7 +204,7 @@ export default {
     },
     handlePostPreview(postId) {
       apiClient.post.getPreviewLinkById(postId).then(response => {
-        window.open(response.data, '_blank')
+        window.open(response, '_blank')
       })
     }
   },
