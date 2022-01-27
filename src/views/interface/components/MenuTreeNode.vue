@@ -46,11 +46,6 @@
                       >{{ team === '' ? '未分组' : team }}
                     </a-menu-item>
                   </a-sub-menu>
-                  <a-sub-menu title="复制到分组">
-                    <a-menu-item v-for="(team, index) in excludedTeams" :key="index" @click="handleCopyMenu(item, team)"
-                      >{{ team === '' ? '未分组' : team }}
-                    </a-menu-item>
-                  </a-sub-menu>
                 </a-menu>
               </a-dropdown>
             </template>
@@ -147,24 +142,32 @@ export default {
     handleCloseCreateMenuForm(item) {
       this.$set(item, 'formVisible', false)
     },
-    handleCopyMenu(item, team) {
+    async handleMoveMenu(item, team) {
       const menu = deepClone(item)
       menu.team = team
       menu.parentId = 0
       menu.priority = 0
-      menu.id = null
-      apiClient.menu.create(menu).then(() => {
+
+      const toFlatList = data => {
+        if (!data || data.length === 0) return []
+
+        return data.reduce((prev, current) => {
+          const children = current.children.length > 0 ? toFlatList(current.children) : []
+          current.team = team
+          return [...prev, current, ...children]
+        }, [])
+      }
+
+      const flatList = [menu, ...toFlatList(menu.children)]
+
+      this.$log.debug('menu list as flat list:', flatList)
+
+      try {
+        await apiClient.menu.updateInBatch(flatList)
         this.$emit('reload')
-      })
-    },
-    handleMoveMenu(item, team) {
-      const menu = deepClone(item)
-      menu.team = team
-      menu.parentId = 0
-      menu.priority = 0
-      apiClient.menu.update(menu.id, menu).then(() => {
-        this.$emit('reload')
-      })
+      } catch (e) {
+        this.$log.error('Fail to update menu in batch', e)
+      }
     },
     onReloadEmit() {
       this.$emit('reload')
