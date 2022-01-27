@@ -56,12 +56,6 @@
       </a-col>
     </a-row>
 
-    <ThemeSettingDrawer
-      v-model="themeSettingDrawer.visible"
-      :theme="themeSettingDrawer.selected"
-      @close="onThemeSettingsDrawerClose"
-    />
-
     <ThemeDeleteConfirmModal
       :theme="themeDeleteModal.selected"
       :visible.sync="themeDeleteModal.visible"
@@ -81,17 +75,18 @@
 </template>
 
 <script>
-import ThemeSettingDrawer from './components/ThemeSettingDrawer'
+// components
 import ThemeDeleteConfirmModal from './components/ThemeDeleteConfirmModal'
 import ThemeLocalUpgradeModal from './components/ThemeLocalUpgradeModal'
 import ThemeInstallModal from './components/ThemeInstallModal.vue'
 import { PageView } from '@/layouts'
+
+// libs
 import apiClient from '@/utils/api-client'
 
 export default {
   components: {
     PageView,
-    ThemeSettingDrawer,
     ThemeDeleteConfirmModal,
     ThemeLocalUpgradeModal,
     ThemeInstallModal
@@ -113,11 +108,6 @@ export default {
       },
 
       themeDeleteModal: {
-        visible: false,
-        selected: {}
-      },
-
-      themeSettingDrawer: {
         visible: false,
         selected: {}
       }
@@ -192,10 +182,6 @@ export default {
           }
         }
       })
-    },
-    onThemeSettingsDrawerClose() {
-      this.themeSettingDrawer.visible = false
-      this.themeSettingDrawer.selected = {}
     }
   }
 }
