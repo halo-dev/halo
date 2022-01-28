@@ -88,8 +88,11 @@
                     class="img"
                     @click="attachmentSelectVisible = true"
                   />
-                  <a-input v-model="form.model.thumbnail" placeholder="点击封面图选择图片，或者输入外部链接"></a-input>
-                  <a-button type="dashed" @click="form.model.thumbnail = null">移除</a-button>
+                  <a-input
+                    v-model="form.model.thumbnail"
+                    allow-clear
+                    placeholder="点击封面图选择图片，或者输入外部链接"
+                  ></a-input>
                 </a-space>
               </div>
             </a-form-item>
@@ -122,7 +125,7 @@
     </div>
     <template slot="footer">
       <slot name="extraFooter" />
-      <a-button :disabled="loading" @click="modalVisible = false"> 关闭 </a-button>
+      <a-button :disabled="loading" @click="modalVisible = false"> 关闭</a-button>
       <ReactiveButton
         v-if="!form.model.id"
         :errored="form.draftSaveErrored"
