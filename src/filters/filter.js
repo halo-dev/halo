@@ -7,6 +7,8 @@ import { timeAgo } from '@/utils/datetime'
 
 dayjs.locale('zh-cn')
 
+import { marked } from 'marked'
+
 Vue.filter('moment', function (dataStr, pattern = 'YYYY-MM-DD HH:mm') {
   return dayjs(dataStr).format(pattern)
 })
@@ -43,4 +45,8 @@ Vue.filter('dayTime', function (value) {
   const minutes = Math.floor(((value % 86400) % 3600) / 60)
   const seconds = Math.floor(((value % 86400) % 3600) % 60)
   return days + 'd ' + hours + 'h ' + minutes + 'm ' + seconds + 's'
+})
+
+Vue.filter('markdownRender', function (value) {
+  return marked.parse(value)
 })

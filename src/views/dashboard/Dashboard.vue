@@ -75,11 +75,14 @@
               <a-tab-pane key="2" tab="最近评论">
                 <div class="custom-tab-wrapper">
                   <a-tabs :animated="{ inkBar: true, tabPane: false }">
-                    <a-tab-pane key="1" tab="文章">
-                      <recent-comment-tab type="posts"></recent-comment-tab>
+                    <a-tab-pane key="posts" tab="文章">
+                      <recent-comment-tab type="posts" />
                     </a-tab-pane>
-                    <a-tab-pane key="2" tab="页面">
-                      <recent-comment-tab type="sheets"></recent-comment-tab>
+                    <a-tab-pane key="sheets" tab="页面">
+                      <recent-comment-tab type="sheets" />
+                    </a-tab-pane>
+                    <a-tab-pane key="journals" tab="日志">
+                      <recent-comment-tab type="journals" />
                     </a-tab-pane>
                   </a-tabs>
                 </div>

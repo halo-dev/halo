@@ -1,53 +1,24 @@
 <template>
   <a-popover
-    v-model="visible"
     :arrowPointAtCenter="true"
     :autoAdjustOverflow="true"
-    :overlayStyle="{ width: '300px', top: '50px' }"
+    :overlayStyle="{ width: '400px', top: '50px' }"
+    overlayClassName="header-comment-popover"
     placement="bottomRight"
     title="待审核评论"
     trigger="click"
   >
-    <template slot="content">
+    <template #content>
       <div class="custom-tab-wrapper">
-        <a-tabs v-model="activeKey" :animated="{ inkBar: true, tabPane: false }" @change="handleTabsChanged">
-          <a-tab-pane key="post" tab="文章">
-            <a-list :dataSource="converttedPostComments" :loading="postCommentsLoading">
-              <a-list-item slot="renderItem" slot-scope="item">
-                <a-list-item-meta>
-                  <a-avatar slot="avatar" :src="item.avatar" class="bg-white" size="large" />
-                  <template slot="title">
-                    <a :href="item.authorUrl" target="_blank">{{ item.author }}</a
-                    >：<span v-html="item.content"></span>
-                  </template>
-                  <template slot="description">
-                    {{ item.createTime | timeAgo }}
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </a-list>
-          </a-tab-pane>
-          <a-tab-pane key="sheet" tab="页面">
-            <a-list :dataSource="converttedSheetComments" :loading="sheetCommentsLoading">
-              <a-list-item slot="renderItem" slot-scope="item">
-                <a-list-item-meta>
-                  <a-avatar slot="avatar" :src="item.avatar" class="bg-white" size="large" />
-                  <template slot="title">
-                    <a :href="item.authorUrl" target="_blank">{{ item.author }}</a
-                    >：<span v-html="item.content"></span>
-                  </template>
-                  <template slot="description">
-                    {{ item.createTime | timeAgo }}
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </a-list>
+        <a-tabs v-model="activeKey" :animated="{ inkBar: true, tabPane: false }" @change="handleListAuditingComments">
+          <a-tab-pane v-for="target in targets" :key="target.key" :tab="target.label">
+            <CommentListView :comments="comments[target.dataKey]" :loading="comments.loading" />
           </a-tab-pane>
         </a-tabs>
       </div>
     </template>
-    <span class="header-comment">
-      <a-badge v-if="postComments.length > 0 || sheetComments.length > 0" dot>
+    <span class="inline-block transition-all">
+      <a-badge v-if="comments.post.length || comments.sheet.length || comments.journal.length" dot>
         <a-icon type="bell" />
       </a-badge>
       <a-badge v-else>
@@ -59,93 +30,64 @@
 
 <script>
 import apiClient from '@/utils/api-client'
-import { marked } from 'marked'
+
+const targets = [
+  {
+    key: 'posts',
+    dataKey: 'post',
+    label: '文章'
+  },
+  {
+    key: 'sheets',
+    dataKey: 'sheet',
+    label: '页面'
+  },
+  {
+    key: 'journals',
+    dataKey: 'journal',
+    label: '日志'
+  }
+]
 
 export default {
   name: 'HeaderComment',
   data() {
     return {
-      activeKey: 'post',
-      visible: false,
-      postComments: [],
-      postCommentsLoading: false,
-      sheetComments: [],
-      sheetCommentsLoading: false
-    }
-  },
-  computed: {
-    converttedPostComments() {
-      return this.postComments.map(comment => {
-        comment.content = marked.parse(comment.content)
-        return comment
-      })
-    },
-    converttedSheetComments() {
-      return this.sheetComments.map(comment => {
-        comment.content = marked.parse(comment.content)
-        return comment
-      })
+      targets: targets,
+      activeKey: 'posts',
+      comments: {
+        post: [],
+        sheet: [],
+        journal: [],
+        loading: false
+      }
     }
   },
   created() {
-    this.handleListPostAuditingComments(false)
-    this.handleListSheetAuditingComments(false)
-  },
-  watch: {
-    visible(value) {
-      if (value) {
-        if (this.activeKey === 'post') {
-          this.handleListPostAuditingComments(false)
-        } else if (this.activeKey === 'sheet') {
-          this.handleListSheetAuditingComments(false)
-        }
-      }
-    }
+    this.handleListAuditingComments()
   },
   methods: {
-    handleListPostAuditingComments(enableLoading = true) {
-      if (enableLoading) {
-        this.postCommentsLoading = true
-      }
-      apiClient.comment
-        .latest('posts', 5, 'AUDITING')
-        .then(response => {
-          this.postComments = response.data
-        })
-        .finally(() => {
-          this.postCommentsLoading = false
-        })
-    },
-    handleListSheetAuditingComments(enableLoading = true) {
-      if (enableLoading) {
-        this.sheetCommentsLoading = true
-      }
-      apiClient.comment
-        .latest('sheets', 5, 'AUDITING')
-        .then(response => {
-          this.sheetComments = response.data
-        })
-        .finally(() => {
-          this.sheetCommentsLoading = false
-        })
-    },
-    handleTabsChanged(activeKey) {
-      if (activeKey === 'post') {
-        this.handleListPostAuditingComments()
-      } else if (activeKey === 'sheet') {
-        this.handleListSheetAuditingComments()
+    async handleListAuditingComments() {
+      try {
+        this.comments.loading = true
+
+        const params = { status: 'AUDITING', size: 20 }
+
+        const responses = await Promise.all(
+          targets.map(target => {
+            return apiClient.comment.list(target.key, params)
+          })
+        )
+
+        this.comments.post = responses[0].data.content
+        this.comments.sheet = responses[1].data.content
+        this.comments.journal = responses[2].data.content
+      } catch (e) {
+        this.$log.error('Failed to get auditing comments', e)
+      } finally {
+        this.comments.loading = false
       }
     }
   }
 }
 </script>
-<style lang="less" scoped>
-.header-comment {
-  display: inline-block;
-  transition: all 0.3s;
-
-  span {
-    vertical-align: initial;
-  }
-}
-</style>

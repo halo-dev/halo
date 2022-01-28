@@ -9,6 +9,7 @@ import AttachmentDetailModal from './Attachment/AttachmentDetailModal'
 import ReactiveButton from './Button/ReactiveButton'
 import PostTag from './Post/PostTag'
 import AttachmentInput from './Input/AttachmentInput'
+import CommentListView from './Comment/CommentListView'
 
 const _components = {
   Ellipsis,
@@ -19,7 +20,8 @@ const _components = {
   AttachmentDetailModal,
   ReactiveButton,
   PostTag,
-  AttachmentInput
+  AttachmentInput,
+  CommentListView
 }
 
 const components = {}
