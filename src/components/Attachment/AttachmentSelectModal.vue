@@ -60,51 +60,49 @@
       :loading="list.loading"
       class="attachments-group"
     >
-      <a-list-item
-        @mouseenter="$set(item, 'hover', true)"
-        @mouseleave="$set(item, 'hover', false)"
-        :key="index"
-        slot="renderItem"
-        slot-scope="item, index"
-        @click="handleItemClick(item)"
-      >
-        <div :class="`${isItemSelect(item) ? 'border-blue-600' : 'border-slate-200'}`" class="border border-solid">
-          <div class="attach-thumb attachments-group-item">
-            <span v-if="!isImage(item)" class="attachments-group-item-type">{{ item.suffix }}</span>
-            <span
-              v-else
-              :style="`background-image:url(${item.thumbPath})`"
-              class="attachments-group-item-img"
-              loading="lazy"
+      <template #renderItem="item, index">
+        <a-list-item
+          @mouseenter="$set(item, 'hover', true)"
+          @mouseleave="$set(item, 'hover', false)"
+          :key="index"
+          @click="handleItemClick(item)"
+        >
+          <div :class="`${isItemSelect(item) ? 'border-blue-600' : 'border-slate-200'}`" class="border border-solid">
+            <div class="attach-thumb attachments-group-item">
+              <span v-if="!isImage(item)" class="attachments-group-item-type">{{ item.suffix }}</span>
+              <span
+                v-else
+                :style="`background-image:url(${item.thumbPath})`"
+                class="attachments-group-item-img"
+                loading="lazy"
+              />
+            </div>
+            <a-card-meta class="p-2 cursor-pointer">
+              <template #description>
+                <a-tooltip :title="item.name">
+                  <div class="truncate">{{ item.name }}</div>
+                </a-tooltip>
+              </template>
+            </a-card-meta>
+            <a-icon
+              v-show="isItemSelect(item) && !item.hover"
+              type="check-circle"
+              theme="twoTone"
+              class="absolute top-1 right-2 font-bold cursor-pointer transition-all"
+              :style="{ fontSize: '18px', color: 'rgb(37 99 235)' }"
+            />
+            <a-icon
+              v-show="item.hover"
+              type="profile"
+              theme="twoTone"
+              class="absolute top-1 right-2 font-bold cursor-pointer transition-all"
+              @click.stop="handleOpenDetail(item)"
+              :style="{ fontSize: '18px' }"
             />
           </div>
-          <a-card-meta class="p-2 cursor-pointer">
-            <template #description>
-              <a-tooltip :title="item.name">
-                <div class="truncate">{{ item.name }}</div>
-              </a-tooltip>
-            </template>
-          </a-card-meta>
-          <a-icon
-            v-show="isItemSelect(item) && !item.hover"
-            type="check-circle"
-            theme="twoTone"
-            class="absolute top-1 right-2 font-bold transition-all"
-            :style="{ fontSize: '18px', color: 'rgb(37 99 235)' }"
-          />
-          <a-icon
-            v-show="item.hover"
-            type="profile"
-            theme="twoTone"
-            class="absolute top-1 right-2 font-bold cursor-pointer hover:text-blue-400 transition-all"
-            @click.stop="handleOpenDetail(item)"
-            :style="{ fontSize: '18px' }"
-          />
-        </div>
-      </a-list-item>
+        </a-list-item>
+      </template>
     </a-list>
-
-    <div class="page-wrapper"></div>
 
     <div class="flex justify-between">
       <a-popover placement="right" title="预览" trigger="click">
@@ -130,13 +128,13 @@
         </a-tooltip>
       </a-popover>
 
-      <div class="flex justify-end self-center">
+      <div class="page-wrapper flex justify-end self-center">
         <a-pagination
           :current="pagination.page"
           :defaultPageSize="pagination.size"
           :pageSizeOptions="['12', '18', '24', '30', '36', '42']"
           :total="pagination.total"
-          class="pagination"
+          class="pagination !mt-0"
           showLessItems
           showSizeChanger
           @change="handlePageChange"
