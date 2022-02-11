@@ -85,6 +85,19 @@ public class AdminControllerTest {
     }
 
     @Test
+    public void resetPasswordShouldOk() throws Exception {
+        ResetPasswordParam param = new ResetPasswordParam();
+        param.setUsername("admin");
+        param.setEmail("example@example.com");
+        param.setPassword("a password");
+        param.setCode("a code");
+        param.setPassword("12345678");
+        resetPasswordPerform(JsonUtils.objectToJson(param))
+            .andDo(print())
+            .andExpect(status().isOk());
+    }
+
+    @Test
     public void resetPasswordAndEmailFieldAbsentShouldReturn4xxError() throws Exception {
         ResetPasswordParam param = new ResetPasswordParam();
         // The email field value in the parent class is missing，verification will also be triggered
