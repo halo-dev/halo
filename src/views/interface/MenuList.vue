@@ -325,11 +325,9 @@ export default {
     handleSetDefaultTeam() {
       this.teams.default.saving = true
       apiClient.option
-        .save([
-          {
-            default_menu_team: this.teams.selected
-          }
-        ])
+        .saveMapView({
+          default_menu_team: this.teams.selected
+        })
         .catch(() => {
           this.teams.default.errored = true
         })
