@@ -1,10 +1,8 @@
 package run.halo.app.service.impl;
 
 import org.springframework.stereotype.Service;
-import run.halo.app.model.entity.SheetContent;
 import run.halo.app.repository.ContentPatchLogRepository;
 import run.halo.app.repository.PostRepository;
-import run.halo.app.repository.SheetContentRepository;
 import run.halo.app.service.SheetContentPatchLogService;
 
 /**
@@ -14,12 +12,12 @@ import run.halo.app.service.SheetContentPatchLogService;
  * @date 2022-01-07
  */
 @Service
-public class SheetContentPatchLogServiceImpl extends BaseContentPatchLogServiceImpl<SheetContent>
+public class SheetContentPatchLogServiceImpl extends BaseContentPatchLogServiceImpl
     implements SheetContentPatchLogService {
 
     public SheetContentPatchLogServiceImpl(
         ContentPatchLogRepository contentPatchLogRepository,
-        PostRepository postRepository, SheetContentRepository sheetContentRepository) {
-        super(contentPatchLogRepository, postRepository, sheetContentRepository);
+        PostRepository postRepository) {
+        super(contentPatchLogRepository, postRepository);
     }
 }

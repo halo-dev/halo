@@ -73,13 +73,14 @@ public class SheetModel {
                 throw new ForbiddenException("您没有该页面的访问权限");
             }
             // render markdown to html when preview sheet
-            PatchedContent sheetContent = sheet.getContent();
+            PatchedContent sheetContent = sheetService.getLatestContentById(sheet.getId());
             if (sheet.getEditorType().equals(PostEditorType.MARKDOWN)) {
                 sheetContent.setContent(
                     MarkdownUtils.renderHtml(sheetContent.getOriginalContent()));
             } else {
                 sheetContent.setContent(sheetContent.getOriginalContent());
             }
+            sheet.setContent(sheetContent);
         }
 
         sheetService.publishVisitEvent(sheet.getId());

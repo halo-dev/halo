@@ -41,10 +41,10 @@ public interface BaseContentPatchLogService {
      */
     ContentDiff generateDiff(Integer postId, String content, String originalContent);
 
-    void createOrUpdate(ContentPatchLog contentPatchLog);
+    void save(ContentPatchLog contentPatchLog);
 
     /**
-     * Get the patch log record of the draft status of the content by post id.
+     * Gets the patch log record of the draft status of the content by post id.
      *
      * @param postId post id.
      * @return content patch log record.
@@ -52,7 +52,7 @@ public interface BaseContentPatchLogService {
     ContentPatchLog getDraftByPostId(Integer postId);
 
     /**
-     * Get content patch log by id.
+     * Gets content patch log by id.
      *
      * @param id id
      * @return a content patch log
@@ -61,7 +61,15 @@ public interface BaseContentPatchLogService {
     ContentPatchLog getById(Integer id);
 
     /**
-     * Get real post content by id.
+     * Gets content patch log by post id.
+     *
+     * @param postId a post id
+     * @return a real content of post.
+     */
+    PatchedContent getByPostId(Integer postId);
+
+    /**
+     * Gets real post content by id.
      *
      * @param id id
      * @return Actual content of patches applied based on V1 version.

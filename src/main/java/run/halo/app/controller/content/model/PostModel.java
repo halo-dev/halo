@@ -15,14 +15,11 @@ import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.Category;
-import run.halo.app.model.entity.BaseContent;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.EncryptTypeEnum;
-import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
@@ -35,7 +32,6 @@ import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
 import run.halo.app.service.ThemeService;
-import run.halo.app.utils.MarkdownUtils;
 
 /**
  * Post Model
@@ -119,7 +115,11 @@ public class PostModel {
             return "common/template/" + POST_PASSWORD_TEMPLATE;
         }
 
-        post = postService.getById(post.getId());
+        if (StringUtils.isNotBlank(token)) {
+            post = postService.getByIdWithLatestContent(post.getId());
+        } else {
+            post = postService.getById(post.getId());
+        }
 
         postService.publishVisitEvent(post.getId());
 

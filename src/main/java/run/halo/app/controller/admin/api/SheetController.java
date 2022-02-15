@@ -63,7 +63,7 @@ public class SheetController {
     @GetMapping("{sheetId:\\d+}")
     @ApiOperation("Gets a sheet")
     public SheetDetailVO getBy(@PathVariable("sheetId") Integer sheetId) {
-        Sheet sheet = sheetService.getById(sheetId);
+        Sheet sheet = sheetService.getByIdWithLatestContent(sheetId);
         return sheetService.convertToDetailVo(sheet);
     }
 
@@ -98,7 +98,7 @@ public class SheetController {
         @RequestBody @Valid SheetParam sheetParam,
         @RequestParam(value = "autoSave", required = false, defaultValue = "false")
             Boolean autoSave) {
-        Sheet sheetToUpdate = sheetService.getById(sheetId);
+        Sheet sheetToUpdate = sheetService.getByIdWithLatestContent(sheetId);
 
         sheetParam.update(sheetToUpdate);
 
@@ -128,7 +128,7 @@ public class SheetController {
         @RequestBody PostContentParam contentParam) {
         // Update draft content
         Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(),
-            contentParam.getOriginalContent(), sheetId);
+            contentParam.getContent(), sheetId);
 
         return new BasePostDetailDTO().convertFrom(sheet);
     }

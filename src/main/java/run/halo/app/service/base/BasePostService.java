@@ -9,8 +9,9 @@ import org.springframework.lang.Nullable;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
-import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.BaseContent;
+import run.halo.app.model.entity.BaseContent.PatchedContent;
+import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.enums.PostStatus;
 
 /**
@@ -55,12 +56,13 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     POST getBySlug(@NonNull String slug);
 
     /**
-     * Get post with draft content by id.
+     * Get post with the latest content by id.
+     * content from patch log.
      *
      * @param postId post id.
-     * @return post with draft content.
+     * @return post with the latest content.
      */
-    POST getDraftById(Integer postId);
+    POST getByIdWithLatestContent(Integer postId);
 
     /**
      * Gets post by post status and slug.
@@ -81,6 +83,23 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     POST getBy(@NonNull PostStatus status, @NonNull Integer id);
+
+    /**
+     * Gets content by post id.
+     *
+     * @param id post id.
+     * @return a content of post.
+     */
+    BaseContent getContentById(Integer id);
+
+    /**
+     * Gets the latest content by id.
+     * content from patch log.
+     *
+     * @param id post id.
+     * @return a latest content from patchLog of post.
+     */
+    PatchedContent getLatestContentById(Integer id);
 
     /**
      * Lists all posts by post status.
@@ -314,12 +333,4 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return description
      */
     String generateDescription(@NonNull String content);
-
-    /**
-     * Gets content by post id.
-     *
-     * @param id post id.
-     * @return a content of post.
-     */
-    BaseContent getContentById(Integer id);
 }

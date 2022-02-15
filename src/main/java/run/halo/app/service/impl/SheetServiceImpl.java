@@ -169,7 +169,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent> i
     }
 
     @Override
-    public Sheet getDraftById(Integer postId) {
+    public Sheet getByIdWithLatestContent(Integer postId) {
         Sheet sheet = getById(postId);
         SheetContent sheetContent = getContentById(postId);
         // Use the head pointer stored in the post content.
@@ -188,6 +188,11 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent> i
 
         return postOptional
             .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
+    }
+
+    @Override
+    public PatchedContent getLatestContentById(Integer id) {
+        return sheetContentPatchLogService.getByPostId(id);
     }
 
     @Override

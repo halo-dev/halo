@@ -280,6 +280,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
     }
 
     @Override
+    public PatchedContent getLatestContentById(Integer id) {
+        return postContentPatchLogService.getByPostId(id);
+    }
+
+    @Override
     public List<Post> removeByIds(Collection<Integer> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
@@ -293,7 +298,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
     }
 
     @Override
-    public Post getDraftById(Integer postId) {
+    public Post getByIdWithLatestContent(Integer postId) {
         Post post = getById(postId);
         PostContent postContent = getContentById(postId);
         // Use the head pointer stored in the post content.

@@ -299,7 +299,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
     @Transactional
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
-
+        PostStatus postStatus = post.getStatus();
         PatchedContent postContent = post.getContent();
         String originalContent = postContent.getOriginalContent();
         if (originalContent != null) {
@@ -317,21 +317,28 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
             post.setContent(postContent);
         }
 
+        POST savedPost;
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created
-            POST savedPost = create(post);
+            savedPost = create(post);
             baseContentService.createOrUpdateDraftBy(post.getId(),
                 postContent.getContent(), postContent.getOriginalContent());
-            return savedPost;
+        } else {
+            // The sheet will be updated
+            // Set edit time
+            post.setEditTime(DateUtils.now());
+            baseContentService.createOrUpdateDraftBy(post.getId(),
+                postContent.getContent(), postContent.getOriginalContent());
+            // Update it
+            savedPost = update(post);
         }
-        // The sheet will be updated
-        // Set edit time
-        post.setEditTime(DateUtils.now());
-        baseContentService.createOrUpdateDraftBy(post.getId(),
-            postContent.getContent(), postContent.getOriginalContent());
-        // Update it
-        return update(post);
+
+        if (PostStatus.PUBLISHED.equals(post.getStatus())
+            || PostStatus.INTIMATE.equals(post.getStatus())) {
+            baseContentService.publishContent(post.getId());
+        }
+        return savedPost;
     }
 
     @Override
@@ -418,12 +425,18 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
     public POST updateDraftContent(String content, String originalContent, Integer postId) {
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
 
-        if (content == null) {
-            content = "";
+        if (originalContent == null) {
+            originalContent = "";
         }
 
         POST post = getById(postId);
-        CONTENT postContent = baseContentService.createOrUpdateDraftBy(postId, content, originalContent);
+        if (PostEditorType.MARKDOWN.equals(post.getEditorType())) {
+            content = MarkdownUtils.renderHtml(originalContent);
+        } else {
+            content = originalContent;
+        }
+        CONTENT postContent =
+            baseContentService.createOrUpdateDraftBy(postId, content, originalContent);
         post.setContent(new PatchedContent(postContent));
 
         return post;
@@ -548,7 +561,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         return StringUtils.substring(text, 0, summaryLength);
     }
 
-    protected <T extends BasePostSimpleDTO> void generateAndSetSummaryIfAbsent(POST post, T postVO) {
+    protected <T extends BasePostSimpleDTO> void generateAndSetSummaryIfAbsent(POST post,
+        T postVO) {
         PatchedContent postContent = post.getContent();
         if (postContent == null) {
             return;

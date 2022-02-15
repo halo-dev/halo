@@ -57,30 +57,20 @@ public abstract class BaseContentServiceImpl<CONTENT extends BaseContent>
     public CONTENT createOrUpdateDraftBy(Integer postId, String content,
         String originalContent) {
         Assert.notNull(postId, "The postId must not be null.");
-        // 1.Judge whether there is a post content record. if there is, modify it.
-        // Otherwise, create it
-        Optional<CONTENT> savedContent = baseContentRepository.findById(postId);
-        if (savedContent.isPresent()) {
-            if (!PostStatus.DRAFT.equals(savedContent.get().getStatus())) {
-                return savedContent.get();
-            }
-            //1).Judge whether there are unpublished draft contents in the content patch logs
-            ContentPatchLog contentPatchLog =
-                contentPatchLogService.createOrUpdate(postId, content, originalContent);
-            CONTENT postContent = baseContentRepository.getById(postId);
-            // Update header pointer
-            postContent.setHeadPatchLogId(contentPatchLog.getId());
-            baseContentRepository.save(postContent);
-            return postContent;
-        }
-        ContentPatchLog contentPatchLog = new ContentPatchLog();
-        // The first creation does not exist V1, so use the original content directly
-        contentPatchLog.setContentDiff(content);
-        contentPatchLog.setOriginalContentDiff(originalContent);
-        contentPatchLog.setPostId(postId);
-        contentPatchLog.setStatus(PostStatus.DRAFT);
-        contentPatchLogService.createOrUpdate(contentPatchLog);
+        // First, we need to save the contentPatchLog
+        ContentPatchLog contentPatchLog =
+            contentPatchLogService.createOrUpdate(postId, content, originalContent);
 
+        // then update the value of headPatchLogId field.
+        Optional<CONTENT> savedContentOptional = baseContentRepository.findById(postId);
+        if (savedContentOptional.isPresent()) {
+            CONTENT savedContent = savedContentOptional.get();
+            savedContent.setHeadPatchLogId(contentPatchLog.getId());
+            baseContentRepository.save(savedContent);
+            return savedContent;
+        }
+
+        // If the content record does not exist, it needs to be created
         CONTENT postContent = createGenericClassInstance();
         postContent.setPatchLogId(contentPatchLog.getId());
         postContent.setContent(content);
@@ -101,9 +91,9 @@ public abstract class BaseContentServiceImpl<CONTENT extends BaseContent>
         }
         contentPatchLog.setStatus(PostStatus.PUBLISHED);
         contentPatchLog.setPublishTime(new Date());
-        contentPatchLogService.createOrUpdate(contentPatchLog);
+        contentPatchLogService.save(contentPatchLog);
 
-        final CONTENT postContent = getById(postId);
+        CONTENT postContent = getById(postId);
         postContent.setPatchLogId(contentPatchLog.getId());
         postContent.setStatus(PostStatus.PUBLISHED);
 

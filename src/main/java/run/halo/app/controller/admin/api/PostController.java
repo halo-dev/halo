@@ -28,7 +28,6 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Post;
-import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
@@ -103,7 +102,7 @@ public class PostController {
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId) {
-        Post post = postService.getDraftById(postId);
+        Post post = postService.getByIdWithLatestContent(postId);
         return postService.convertToDetailVo(post, true);
     }
 
@@ -131,7 +130,7 @@ public class PostController {
         @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave
     ) {
         // Get the post info
-        Post postToUpdate = postService.getDraftById(postId);
+        Post postToUpdate = postService.getByIdWithLatestContent(postId);
 
         postParam.update(postToUpdate);
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(),
@@ -161,7 +160,8 @@ public class PostController {
         @PathVariable("postId") Integer postId,
         @RequestBody PostContentParam contentParam) {
         // Update draft content
-        Post post = postService.updateDraftContent(contentParam.getContent(), contentParam.getOriginalContent(), postId);
+        Post post = postService.updateDraftContent(contentParam.getContent(),
+            contentParam.getContent(), postId);
 
         return new BasePostDetailDTO().convertFrom(post);
     }
