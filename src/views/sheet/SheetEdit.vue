@@ -176,7 +176,7 @@ export default {
           apiClient.sheet
             .getPreviewLinkById(this.sheetToStage.id)
             .then(response => {
-              window.open(response.data, '_blank')
+              window.open(response, '_blank')
               this.handleRestoreSavedStatus()
             })
             .finally(() => {
@@ -192,7 +192,7 @@ export default {
           apiClient.sheet
             .getPreviewLinkById(this.sheetToStage.id)
             .then(response => {
-              window.open(response.data, '_blank')
+              window.open(response, '_blank')
               this.handleRestoreSavedStatus()
             })
             .finally(() => {

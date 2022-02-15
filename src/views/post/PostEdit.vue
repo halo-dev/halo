@@ -180,7 +180,7 @@ export default {
           apiClient.post
             .getPreviewLinkById(this.postToStage.id)
             .then(response => {
-              window.open(response.data, '_blank')
+              window.open(response, '_blank')
               this.handleRestoreSavedStatus()
             })
             .finally(() => {
@@ -197,7 +197,7 @@ export default {
           apiClient.post
             .getPreviewLinkById(this.postToStage.id)
             .then(response => {
-              window.open(response.data, '_blank')
+              window.open(response, '_blank')
               this.handleRestoreSavedStatus()
             })
             .finally(() => {
