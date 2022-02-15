@@ -53,7 +53,7 @@ public class CategoryController {
     @GetMapping
     @ApiOperation("Lists all categories")
     public List<? extends CategoryDTO> listAll(
-        @SortDefault(sort = "createTime", direction = DESC) Sort sort,
+        @SortDefault(sort = "priority", direction = ASC) Sort sort,
         @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
         if (more) {
             return postCategoryService.listCategoryWithPostCountDto(sort, true);
@@ -64,7 +64,8 @@ public class CategoryController {
 
     @GetMapping("tree_view")
     @ApiOperation("List all categories as tree")
-    public List<CategoryVO> listAsTree(@SortDefault(sort = "name", direction = ASC) Sort sort) {
+    public List<CategoryVO> listAsTree(
+        @SortDefault(sort = "priority", direction = ASC) Sort sort) {
         return categoryService.listAsTree(sort);
     }
 

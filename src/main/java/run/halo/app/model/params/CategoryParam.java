@@ -1,5 +1,6 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.Data;
@@ -35,6 +36,9 @@ public class CategoryParam implements InputConverter<Category> {
     private String password;
 
     private Integer parentId = 0;
+
+    @Min(value = 0, message = "排序编号不能低于 {value}")
+    private Integer priority;
 
     @Override
     public Category convertTo() {
