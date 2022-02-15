@@ -38,7 +38,7 @@ public class CategoryParam implements InputConverter<Category> {
     private Integer parentId = 0;
 
     @Min(value = 0, message = "排序编号不能低于 {value}")
-    private Integer sort = 100;
+    private Integer priority = 100;
 
     @Override
     public Category convertTo() {

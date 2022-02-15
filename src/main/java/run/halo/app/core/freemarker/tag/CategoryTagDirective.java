@@ -51,11 +51,11 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
             switch (method) {
                 case "list":
                     env.setVariable("categories", builder.build().wrap(postCategoryService
-                        .listCategoryWithPostCountDto(Sort.by(ASC, "sort"), false)));
+                        .listCategoryWithPostCountDto(Sort.by(ASC, "priority"), false)));
                     break;
                 case "tree":
                     env.setVariable("categories", builder.build()
-                        .wrap(categoryService.listAsTree(Sort.by(ASC, "sort"))));
+                        .wrap(categoryService.listAsTree(Sort.by(ASC, "priority"))));
                     break;
                 case "listByPostId":
                     Integer postId = Integer.parseInt(params.get("postId").toString());

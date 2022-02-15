@@ -76,9 +76,9 @@ public class Category extends BaseEntity {
     /**
      * Sort category.
      */
-    @Column(name = "sort")
+    @Column(name = "priority")
     @ColumnDefault("100")
-    private Integer sort;
+    private Integer priority;
 
     /**
      * Category password.

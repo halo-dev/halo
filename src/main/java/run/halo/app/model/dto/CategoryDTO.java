@@ -37,5 +37,5 @@ public class CategoryDTO implements OutputConverter<CategoryDTO, Category> {
 
     private String fullPath;
 
-    private Integer sort;
+    private Integer priority;
 }
