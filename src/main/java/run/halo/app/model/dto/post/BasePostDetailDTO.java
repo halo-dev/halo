@@ -6,7 +6,6 @@ import lombok.ToString;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.BasePost;
-import run.halo.app.model.entity.BaseContent;
 
 /**
  * Base post detail output dto.

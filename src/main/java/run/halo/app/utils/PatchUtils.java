@@ -44,6 +44,8 @@ public class PatchUtils {
                 case CHANGE:
                     patch.addDelta(new ChangeDelta<>(orgChunk, revChunk));
                     break;
+                default:
+                    throw new IllegalArgumentException("Unsupported delta type.");
             }
         }
         return patch;

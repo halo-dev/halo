@@ -18,10 +18,13 @@ public interface ContentPatchLogRepository extends BaseRepository<ContentPatchLo
 
     ContentPatchLog findFirstByPostIdOrderByVersionDesc(Integer postId);
 
-    @Query("from ContentPatchLog c where c.postId = :postId and c.version <= :version and c.status=:status order by c.version desc")
-    List<ContentPatchLog> findByPostIdAndStatusAndVersionLessThan(Integer postId, Integer version, PostStatus status);
+    @Query("from ContentPatchLog c where c.postId = :postId and c.version <= :version and c"
+        + ".status=:status order by c.version desc")
+    List<ContentPatchLog> findByPostIdAndStatusAndVersionLessThan(Integer postId, Integer version,
+        PostStatus status);
 
     ContentPatchLog findByPostIdAndVersion(Integer postId, Integer version);
 
-    List<ContentPatchLog> findAllByPostIdAndStatusOrderByVersionDesc(Integer postId, PostStatus status);
+    List<ContentPatchLog> findAllByPostIdAndStatusOrderByVersionDesc(Integer postId,
+        PostStatus status);
 }

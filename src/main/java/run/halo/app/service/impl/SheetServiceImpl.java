@@ -55,7 +55,8 @@ import run.halo.app.utils.ServiceUtils;
  */
 @Slf4j
 @Service
-public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent> implements SheetService {
+public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
+    implements SheetService {
 
     private final SheetRepository sheetRepository;
 

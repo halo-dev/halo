@@ -69,23 +69,19 @@ public abstract class BaseContentPatchLogServiceImpl implements
         contentPatchLogRepository.save(contentPatchLog);
     }
 
-    private ContentPatchLog createDraftContent(Integer postId, Integer version, String formatContent,
-        String originalContent) {
-        // Post post = postRepository.findById(postId)
-        //     .orElseThrow(() -> new NotFoundException("Post not found."));
-
-        ContentPatchLog contentPatchLog = buildPatchLog(postId, version, formatContent, originalContent);
-        // Integer sourceId =
-        //     contentRepository.findById(postId).map(BaseContent::getPatchLogId).orElse(0);
-        // contentPatchLog.setSourceId(sourceId);
+    private ContentPatchLog createDraftContent(Integer postId, Integer version,
+        String formatContent, String originalContent) {
+        ContentPatchLog contentPatchLog =
+            buildPatchLog(postId, version, formatContent, originalContent);
         contentPatchLog.setSourceId(0);
         contentPatchLogRepository.save(contentPatchLog);
         return contentPatchLog;
     }
 
-    private ContentPatchLog buildPatchLog(Integer postId, Integer version, String formatContent, String originalContent) {
+    private ContentPatchLog buildPatchLog(Integer postId, Integer version, String formatContent,
+        String originalContent) {
         ContentPatchLog contentPatchLog = new ContentPatchLog();
-        if(Objects.equals(version, BASE_VERSION)) {
+        if (Objects.equals(version, BASE_VERSION)) {
             contentPatchLog.setContentDiff(formatContent);
             contentPatchLog.setOriginalContentDiff(originalContent);
         } else {

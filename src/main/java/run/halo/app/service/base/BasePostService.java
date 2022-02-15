@@ -304,7 +304,8 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return updated post
      */
     @NonNull
-    POST updateDraftContent(@Nullable String content, String originalContent, @NonNull Integer postId);
+    POST updateDraftContent(@Nullable String content, String originalContent,
+        @NonNull Integer postId);
 
     /**
      * Updates post status.
