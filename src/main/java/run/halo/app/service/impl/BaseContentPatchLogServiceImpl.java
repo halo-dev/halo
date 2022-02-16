@@ -2,10 +2,12 @@ package run.halo.app.service.impl;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import org.springframework.data.domain.Example;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.entity.BaseContent;
 import run.halo.app.model.entity.BaseContent.ContentDiff;
 import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.ContentPatchLog;
@@ -34,14 +36,21 @@ public abstract class BaseContentPatchLogServiceImpl implements
         this.contentPatchLogRepository = contentPatchLogRepository;
     }
 
+    /**
+     * Gets post content by post id.
+     *
+     * @param postId post id
+     * @param <T> {@link BaseContent} or it's subtypes
+     * @return a post content of postId
+     */
+    protected abstract <T extends BaseContent> Optional<T> getContentByPostId(Integer postId);
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ContentPatchLog createOrUpdate(Integer postId, String content, String originalContent) {
-        // 不存在草稿，不存在v1，存在v1
         Integer version = getVersionByPostId(postId);
         if (existDraftBy(postId)) {
-            // 存在草稿，直接使用版本号
-            return updateDraftBy(postId, version, content, originalContent);
+            return updateDraftBy(postId, content, originalContent);
         }
         return createDraftContent(postId, version, content, originalContent);
     }
@@ -50,12 +59,17 @@ public abstract class BaseContentPatchLogServiceImpl implements
         Integer version;
         ContentPatchLog latestPatchLog =
             contentPatchLogRepository.findFirstByPostIdOrderByVersionDesc(postId);
+
         if (latestPatchLog == null) {
+            // There is no patchLog record
             version = 1;
         } else if (PostStatus.PUBLISHED.equals(latestPatchLog.getStatus())) {
-            // 不存在草稿，需要创建则version+1
+            // There is no draft, a draft record needs to be created
+            // so the version number needs to be incremented
             version = latestPatchLog.getVersion() + 1;
         } else {
+            // There is a draft record,Only the content needs to be updated
+            // so the version number remains unchanged
             version = latestPatchLog.getVersion();
         }
         return version;
@@ -71,7 +85,13 @@ public abstract class BaseContentPatchLogServiceImpl implements
         String formatContent, String originalContent) {
         ContentPatchLog contentPatchLog =
             buildPatchLog(postId, version, formatContent, originalContent);
-        contentPatchLog.setSourceId(0);
+
+        // Sets the upstream version of the current version.
+        Integer sourceId = getContentByPostId(postId)
+            .map(BaseContent::getPatchLogId)
+            .orElse(0);
+        contentPatchLog.setSourceId(sourceId);
+
         contentPatchLogRepository.save(contentPatchLog);
         return contentPatchLog;
     }
@@ -108,7 +128,7 @@ public abstract class BaseContentPatchLogServiceImpl implements
         return contentPatchLogRepository.exists(example);
     }
 
-    private ContentPatchLog updateDraftBy(Integer postId, Integer version, String formatContent,
+    private ContentPatchLog updateDraftBy(Integer postId, String formatContent,
         String originalContent) {
         ContentPatchLog draftPatchLog =
             contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,

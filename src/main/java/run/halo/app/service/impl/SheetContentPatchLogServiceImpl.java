@@ -1,7 +1,10 @@
 package run.halo.app.service.impl;
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
+import run.halo.app.model.entity.SheetContent;
 import run.halo.app.repository.ContentPatchLogRepository;
+import run.halo.app.repository.SheetContentRepository;
 import run.halo.app.service.SheetContentPatchLogService;
 
 /**
@@ -14,8 +17,17 @@ import run.halo.app.service.SheetContentPatchLogService;
 public class SheetContentPatchLogServiceImpl extends BaseContentPatchLogServiceImpl
     implements SheetContentPatchLogService {
 
+    private final SheetContentRepository sheetContentRepository;
+
     public SheetContentPatchLogServiceImpl(
-        ContentPatchLogRepository contentPatchLogRepository) {
+        ContentPatchLogRepository contentPatchLogRepository,
+        SheetContentRepository sheetContentRepository) {
         super(contentPatchLogRepository);
+        this.sheetContentRepository = sheetContentRepository;
+    }
+
+    @Override
+    protected Optional<SheetContent> getContentByPostId(Integer postId) {
+        return sheetContentRepository.findById(postId);
     }
 }
