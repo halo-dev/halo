@@ -81,6 +81,20 @@ public class BasePost extends BaseEntity {
     private PostEditorType editorType;
 
     /**
+     * Original content,not format.
+     */
+    @Column(name = "original_content")
+    @Lob
+    private String originalContent;
+
+    /**
+     * Rendered content.
+     */
+    @Column(name = "format_content")
+    @Lob
+    private String formatContent;
+
+    /**
      * Post summary.
      */
     @Column(name = "summary")
