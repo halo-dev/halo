@@ -42,4 +42,13 @@ public interface BaseContentService<CONTENT extends BaseContent>
      * @return a created or updated content of post.
      */
     CONTENT createOrUpdateDraftBy(Integer postId, String content, String originalContent);
+
+    /**
+     * There is a draft being drafted.
+     *
+     * @param postId post id
+     * @return {@code true} if find a draft record from {@link ContentPatchLog},
+     *  otherwise {@code false}
+     */
+    Boolean draftingInProgress(Integer postId);
 }

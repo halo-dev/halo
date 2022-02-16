@@ -2,6 +2,7 @@ package run.halo.app.service.impl;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
@@ -112,5 +113,11 @@ public abstract class BaseContentServiceImpl<CONTENT extends BaseContent>
         Assert.notNull(postId, "The postId must not be null.");
         return baseContentRepository.findById(postId)
             .orElseThrow(() -> new NotFoundException("content was not found or has been deleted"));
+    }
+
+    @Override
+    public Boolean draftingInProgress(Integer postId) {
+        ContentPatchLog draft = contentPatchLogService.getDraftByPostId(postId);
+        return Objects.nonNull(draft);
     }
 }

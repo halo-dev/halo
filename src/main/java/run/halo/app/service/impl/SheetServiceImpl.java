@@ -318,6 +318,10 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
 
             sheetListVO.setFullPath(buildFullPath(sheet));
 
+            // Post currently drafting in process
+            Boolean isInProcess = sheetContentService.draftingInProgress(sheet.getId());
+            sheetListVO.setIsInProcess(isInProcess);
+
             return sheetListVO;
         });
     }
@@ -379,6 +383,11 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
         PatchedContent sheetContent = sheet.getContent();
         sheetDetailVO.setContent(sheetContent.getContent());
         sheetDetailVO.setOriginalContent(sheetContent.getOriginalContent());
+
+        // Sheet currently drafting in process
+        Boolean inProgress = sheetContentService.draftingInProgress(sheet.getId());
+        sheetDetailVO.setIsInProcess(inProgress);
+
         return sheetDetailVO;
     }
 

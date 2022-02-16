@@ -392,6 +392,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         // Set summary
         generateAndSetSummaryIfAbsent(post, basePostSimpleDTO);
 
+        // Post currently drafting in process
+        Boolean isInProcess = baseContentService.draftingInProgress(post.getId());
+        basePostSimpleDTO.setIsInProcess(isInProcess);
+
         return basePostSimpleDTO;
     }
 

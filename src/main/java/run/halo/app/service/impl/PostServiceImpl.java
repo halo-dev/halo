@@ -675,6 +675,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
 
             postListVO.setFullPath(buildFullPath(post));
 
+            // Post currently drafting in process
+            Boolean isInProcess = postContentService.draftingInProgress(post.getId());
+            postListVO.setIsInProcess(isInProcess);
+
             return postListVO;
         });
     }
@@ -819,6 +823,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
         PatchedContent postContent = post.getContent();
         postDetailVO.setContent(postContent.getContent());
         postDetailVO.setOriginalContent(postContent.getOriginalContent());
+
+        // Post currently drafting in process
+        Boolean inProgress = postContentService.draftingInProgress(post.getId());
+        postDetailVO.setIsInProcess(inProgress);
 
         return postDetailVO;
     }
