@@ -604,6 +604,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
 
         Post deletedPost = super.removeById(postId);
 
+        // Remove the post first, and then remove the content
+        PostContent postContent = postContentService.removeById(postId);
+        log.debug("Removed post content: [{}]", postContent);
+
         // Log it
         eventPublisher.publishEvent(new LogEvent(this, postId.toString(), LogType.POST_DELETED,
             deletedPost.getTitle()));

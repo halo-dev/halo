@@ -27,4 +27,6 @@ public interface ContentPatchLogRepository extends BaseRepository<ContentPatchLo
 
     List<ContentPatchLog> findAllByPostIdAndStatusOrderByVersionDesc(Integer postId,
         PostStatus status);
+
+    List<ContentPatchLog> findAllByPostId(Integer postId);
 }

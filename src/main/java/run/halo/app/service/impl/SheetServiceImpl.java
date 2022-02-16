@@ -70,6 +70,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
 
     private final OptionService optionService;
 
+    private final SheetContentService sheetContentService;
+
     private final SheetContentPatchLogService sheetContentPatchLogService;
 
     public SheetServiceImpl(SheetRepository sheetRepository,
@@ -87,6 +89,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
         this.sheetMetaService = sheetMetaService;
         this.themeService = themeService;
         this.optionService = optionService;
+        this.sheetContentService = sheetContentService;
         this.sheetContentPatchLogService = sheetContentPatchLogService;
     }
 
@@ -284,6 +287,10 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
         log.debug("Removed sheet comments: [{}]", sheetComments);
 
         Sheet sheet = super.removeById(id);
+
+        // Remove the sheet first, and then remove the content
+        SheetContent sheetContent = sheetContentService.removeById(id);
+        log.debug("Removed sheet content: [{}]", sheetContent);
 
         // Log it
         eventPublisher.publishEvent(

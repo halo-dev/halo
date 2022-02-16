@@ -1,7 +1,9 @@
 package run.halo.app.service.impl;
 
+import java.util.List;
 import java.util.Objects;
 import org.springframework.data.domain.Example;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.BaseContent.ContentDiff;
@@ -9,7 +11,6 @@ import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.ContentPatchLog;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.ContentPatchLogRepository;
-import run.halo.app.repository.PostRepository;
 import run.halo.app.service.base.BaseContentPatchLogService;
 import run.halo.app.utils.PatchUtils;
 
@@ -28,17 +29,13 @@ public abstract class BaseContentPatchLogServiceImpl implements
     public static final int BASE_VERSION = 1;
 
     private final ContentPatchLogRepository contentPatchLogRepository;
-    private final PostRepository postRepository;
-    // private final BaseContentRepository<CONTENT> contentRepository;
 
-    public BaseContentPatchLogServiceImpl(ContentPatchLogRepository contentPatchLogRepository,
-        PostRepository postRepository) {
+    public BaseContentPatchLogServiceImpl(ContentPatchLogRepository contentPatchLogRepository) {
         this.contentPatchLogRepository = contentPatchLogRepository;
-        this.postRepository = postRepository;
-        // this.contentRepository = contentRepository;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public ContentPatchLog createOrUpdate(Integer postId, String content, String originalContent) {
         // 不存在草稿，不存在v1，存在v1
         Integer version = getVersionByPostId(postId);
@@ -65,6 +62,7 @@ public abstract class BaseContentPatchLogServiceImpl implements
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void save(ContentPatchLog contentPatchLog) {
         contentPatchLogRepository.save(contentPatchLog);
     }
@@ -201,5 +199,13 @@ public abstract class BaseContentPatchLogServiceImpl implements
         return contentPatchLogRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(
                 "Post content patch log was not found or has been deleted."));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<ContentPatchLog> removeByPostId(Integer postId) {
+        List<ContentPatchLog> patchLogsToDelete = contentPatchLogRepository.findAllByPostId(postId);
+        contentPatchLogRepository.deleteAllInBatch(patchLogsToDelete);
+        return patchLogsToDelete;
     }
 }

@@ -1,5 +1,6 @@
 package run.halo.app.service.base;
 
+import java.util.List;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.BaseContent.ContentDiff;
 import run.halo.app.model.entity.BaseContent.PatchedContent;
@@ -75,4 +76,12 @@ public interface BaseContentPatchLogService {
      * @return Actual content of patches applied based on V1 version.
      */
     PatchedContent getPatchedContentById(Integer id);
+
+    /**
+     * Permanently delete post contentPatchLog by post id.
+     *
+     * @param postId post id
+     * @return deleted post content patch logs.
+     */
+    List<ContentPatchLog> removeByPostId(Integer postId);
 }
