@@ -19,6 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.lang.NonNull;
 import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
@@ -243,12 +244,18 @@ public class BasePost extends BaseEntity {
         }
     }
 
+    /**
+     * Gets post content.
+     *
+     * @return a {@link PatchedContent} if present,otherwise an empty object
+     */
+    @NonNull
     public PatchedContent getContent() {
         if (this.content == null) {
-            PatchedContent content = new PatchedContent();
-            content.setOriginalContent("");
-            content.setContent("");
-            return content;
+            PatchedContent patchedContent = new PatchedContent();
+            patchedContent.setOriginalContent("");
+            patchedContent.setContent("");
+            return patchedContent;
         }
         return content;
     }

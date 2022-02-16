@@ -10,7 +10,6 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
-import run.halo.app.model.entity.BaseContent;
 import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostContent;
@@ -125,6 +124,6 @@ public class PostParam implements InputConverter<Post> {
             postContent.setContent(postContent.getOriginalContent());
         }
         postContent.setOriginalContent(originalContent);
-        post.setContent(new PatchedContent(postContent));
+        post.setContent(PatchedContent.of(postContent));
     }
 }

@@ -793,6 +793,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
     private PostDetailVO convertTo(@NonNull Post post, @Nullable List<Tag> tags,
         @Nullable List<Category> categories, List<PostMeta> postMetaList) {
         Assert.notNull(post, "Post must not be null");
+        // Assert.notNull(post.getContent(), "Post content must not be null.");
 
         // Convert to base detail vo
         PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);

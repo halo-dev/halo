@@ -63,8 +63,9 @@ public class SheetModel {
 
         if (StringUtils.isEmpty(token)) {
             sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getSlug());
+            //Set sheet content
             BaseContent content = sheetService.getContentById(sheet.getId());
-            sheet.setContent(new PatchedContent(content));
+            sheet.setContent(PatchedContent.of(content));
         } else {
             // verify token
             String cachedToken = cacheStore.getAny(token, String.class)

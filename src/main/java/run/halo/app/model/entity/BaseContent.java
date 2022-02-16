@@ -15,7 +15,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.util.Assert;
 import run.halo.app.model.enums.PostStatus;
 
@@ -138,6 +137,10 @@ public class BaseContent extends BaseEntity {
             Assert.notNull(content, "The content must not be null.");
             this.content = content.getContent();
             this.originalContent = content.getOriginalContent();
+        }
+
+        public static PatchedContent of(BaseContent postContent) {
+            return new PatchedContent(postContent);
         }
     }
 

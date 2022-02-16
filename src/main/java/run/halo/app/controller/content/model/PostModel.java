@@ -15,6 +15,8 @@ import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
+import run.halo.app.model.entity.BaseContent;
+import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
@@ -119,6 +121,9 @@ public class PostModel {
             post = postService.getByIdWithLatestContent(post.getId());
         } else {
             post = postService.getById(post.getId());
+            // Set post content
+            BaseContent postContent = postService.getContentById(post.getId());
+            post.setContent(PatchedContent.of(postContent));
         }
 
         postService.publishVisitEvent(post.getId());

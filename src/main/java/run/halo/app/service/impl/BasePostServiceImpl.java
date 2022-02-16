@@ -91,14 +91,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
     }
 
     @Override
-    public POST getById(Integer id) {
-        POST post = super.getById(id);
-        CONTENT content = getContentById(id);
-        post.setContent(new PatchedContent(content));
-        return post;
-    }
-
-    @Override
     public POST getBySlug(String slug) {
         Assert.hasText(slug, "Slug must not be blank");
 
@@ -352,7 +344,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
             CONTENT postContent = baseContentService.createGenericClassInstance();
             postContent.setContent(tip);
             postContent.setOriginalContent(tip);
-            post.setContent(new PatchedContent(postContent));
+            post.setContent(PatchedContent.of(postContent));
         }
 
         return post;
@@ -441,7 +433,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         }
         CONTENT postContent =
             baseContentService.createOrUpdateDraftBy(postId, content, originalContent);
-        post.setContent(new PatchedContent(postContent));
+        post.setContent(PatchedContent.of(postContent));
 
         return post;
     }
@@ -470,7 +462,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         if (PostStatus.PUBLISHED.equals(status)) {
             // If publish this post, then convert the formatted content
             CONTENT postContent = baseContentService.publishContent(postId);
-            post.setContent(new PatchedContent(postContent));
+            post.setContent(PatchedContent.of(postContent));
         }
 
         return post;
@@ -568,9 +560,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
     protected <T extends BasePostSimpleDTO> void generateAndSetSummaryIfAbsent(POST post,
         T postVO) {
         PatchedContent postContent = post.getContent();
-        if (postContent == null) {
-            return;
-        }
         if (StringUtils.isBlank(postVO.getSummary())) {
             postVO.setSummary(generateSummary(postContent.getContent()));
         }
