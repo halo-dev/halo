@@ -55,7 +55,7 @@ public abstract class BaseContentServiceImpl<CONTENT extends BaseContent>
     }
 
     @Override
-    public CONTENT createOrUpdateDraftBy(Integer postId, String content,
+    public void createOrUpdateDraftBy(Integer postId, String content,
         String originalContent) {
         Assert.notNull(postId, "The postId must not be null.");
         // First, we need to save the contentPatchLog
@@ -68,7 +68,7 @@ public abstract class BaseContentServiceImpl<CONTENT extends BaseContent>
             CONTENT savedContent = savedContentOptional.get();
             savedContent.setHeadPatchLogId(contentPatchLog.getId());
             baseContentRepository.save(savedContent);
-            return savedContent;
+            return;
         }
 
         // If the content record does not exist, it needs to be created
@@ -80,8 +80,6 @@ public abstract class BaseContentServiceImpl<CONTENT extends BaseContent>
         postContent.setStatus(PostStatus.DRAFT);
         postContent.setHeadPatchLogId(contentPatchLog.getId());
         baseContentRepository.save(postContent);
-
-        return postContent;
     }
 
     @Override

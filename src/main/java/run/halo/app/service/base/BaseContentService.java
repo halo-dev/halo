@@ -39,9 +39,8 @@ public interface BaseContentService<CONTENT extends BaseContent>
      * @param postId post id
      * @param content post format content
      * @param originalContent post original content
-     * @return a created or updated content of post.
      */
-    CONTENT createOrUpdateDraftBy(Integer postId, String content, String originalContent);
+    void createOrUpdateDraftBy(Integer postId, String content, String originalContent);
 
     /**
      * There is a draft being drafted.

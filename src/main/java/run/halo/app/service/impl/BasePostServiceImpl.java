@@ -417,7 +417,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public POST updateDraftContent(String content, String originalContent, Integer postId) {
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
 
@@ -431,9 +431,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         } else {
             content = originalContent;
         }
-        CONTENT postContent =
-            baseContentService.createOrUpdateDraftBy(postId, content, originalContent);
-        post.setContent(PatchedContent.of(postContent));
+        baseContentService.createOrUpdateDraftBy(postId, content, originalContent);
+
+        post.setContent(getLatestContentById(postId));
 
         return post;
     }
