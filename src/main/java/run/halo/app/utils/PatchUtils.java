@@ -11,10 +11,9 @@ import com.github.difflib.patch.DeltaType;
 import com.github.difflib.patch.InsertDelta;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
-import java.util.Arrays;
+import com.google.common.base.Splitter;
 import java.util.List;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * Content patch utilities.
@@ -23,6 +22,8 @@ import org.springframework.util.StringUtils;
  * @date 2021-12-19
  */
 public class PatchUtils {
+
+    private static final Splitter lineSplitter = Splitter.on('\n');
 
     public static Patch<String> create(String deltasJson) {
         List<Delta> deltas = JsonUtils.jsonToObject(deltasJson, new TypeReference<>() {});
@@ -75,8 +76,7 @@ public class PatchUtils {
     }
 
     public static List<String> breakLine(String content) {
-        String[] strings = StringUtils.tokenizeToStringArray(content, "\n");
-        return Arrays.asList(strings);
+        return lineSplitter.splitToList(content);
     }
 
     @Data
