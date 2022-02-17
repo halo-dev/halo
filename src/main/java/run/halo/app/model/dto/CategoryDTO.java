@@ -36,4 +36,6 @@ public class CategoryDTO implements OutputConverter<CategoryDTO, Category> {
     private Date createTime;
 
     private String fullPath;
+
+    private Integer priority;
 }
