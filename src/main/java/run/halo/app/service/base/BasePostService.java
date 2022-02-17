@@ -62,7 +62,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @param postId post id.
      * @return post with the latest content.
      */
-    POST getByIdWithLatestContent(Integer postId);
+    POST getWithLatestContentById(Integer postId);
 
     /**
      * Gets post by post status and slug.

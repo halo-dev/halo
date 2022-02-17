@@ -102,7 +102,7 @@ public class PostController {
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId) {
-        Post post = postService.getByIdWithLatestContent(postId);
+        Post post = postService.getWithLatestContentById(postId);
         return postService.convertToDetailVo(post, true);
     }
 
@@ -130,7 +130,7 @@ public class PostController {
         @RequestParam(value = "autoSave", required = false, defaultValue = "false") Boolean autoSave
     ) {
         // Get the post info
-        Post postToUpdate = postService.getByIdWithLatestContent(postId);
+        Post postToUpdate = postService.getWithLatestContentById(postId);
 
         postParam.update(postToUpdate);
         return postService.updateBy(postToUpdate, postParam.getTagIds(), postParam.getCategoryIds(),

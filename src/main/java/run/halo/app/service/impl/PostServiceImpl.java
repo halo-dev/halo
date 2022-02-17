@@ -298,7 +298,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
     }
 
     @Override
-    public Post getByIdWithLatestContent(Integer postId) {
+    public Post getWithLatestContentById(Integer postId) {
         Post post = getById(postId);
         PostContent postContent = getContentById(postId);
         // Use the head pointer stored in the post content.

@@ -118,7 +118,7 @@ public class PostModel {
         }
 
         if (StringUtils.isNotBlank(token)) {
-            post = postService.getByIdWithLatestContent(post.getId());
+            post = postService.getWithLatestContentById(post.getId());
         } else {
             post = postService.getById(post.getId());
             // Set post content

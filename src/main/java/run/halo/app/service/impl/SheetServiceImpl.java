@@ -173,7 +173,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
     }
 
     @Override
-    public Sheet getByIdWithLatestContent(Integer postId) {
+    public Sheet getWithLatestContentById(Integer postId) {
         Sheet sheet = getById(postId);
         SheetContent sheetContent = getContentById(postId);
         // Use the head pointer stored in the post content.
