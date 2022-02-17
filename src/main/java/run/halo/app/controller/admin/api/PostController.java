@@ -162,8 +162,7 @@ public class PostController {
         // Update draft content
         Post post = postService.updateDraftContent(contentParam.getContent(),
             contentParam.getContent(), postId);
-
-        return new BasePostDetailDTO().convertFrom(post);
+        return postService.convertToDetail(post);
     }
 
     @DeleteMapping("{postId:\\d+}")

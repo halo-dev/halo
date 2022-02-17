@@ -413,7 +413,13 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
     public BasePostDetailDTO convertToDetail(POST post) {
         Assert.notNull(post, "Post must not be null");
 
-        return new BasePostDetailDTO().convertFrom(post);
+        BasePostDetailDTO postDetail = new BasePostDetailDTO().convertFrom(post);
+
+        // Post currently drafting in process
+        Boolean isInProcess = baseContentService.draftingInProgress(post.getId());
+        postDetail.setIsInProcess(isInProcess);
+
+        return postDetail;
     }
 
     @Override

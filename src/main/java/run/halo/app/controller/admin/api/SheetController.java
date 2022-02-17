@@ -129,8 +129,7 @@ public class SheetController {
         // Update draft content
         Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(),
             contentParam.getContent(), sheetId);
-
-        return new BasePostDetailDTO().convertFrom(sheet);
+        return sheetService.convertToDetail(sheet);
     }
 
     @DeleteMapping("{sheetId:\\d+}")
