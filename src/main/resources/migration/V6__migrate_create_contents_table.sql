@@ -27,3 +27,7 @@ SELECT p.id,
        p.update_time
 FROM contents c
          INNER JOIN posts p ON p.id = c.post_id;
+
+-- Allow the original_content to be null
+alter table posts
+    modify original_content longtext null;
