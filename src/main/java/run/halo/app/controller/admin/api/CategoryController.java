@@ -1,7 +1,6 @@
 package run.halo.app.controller.admin.api;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
@@ -95,7 +94,7 @@ public class CategoryController {
     @ApiOperation("Updates category in batch")
     public List<CategoryDTO> updateBatchBy(@RequestBody List<@Valid CategoryParam> categoryParams) {
         List<Category> categoriesToUpdate = categoryParams.stream()
-            .filter(categoryParam -> Objects.isNull(categoryParam.getId()))
+            .filter(categoryParam -> Objects.nonNull(categoryParam.getId()))
             .map(categoryParam -> {
                 Category categoryToUpdate = categoryService.getById(categoryParam.getId());
                 categoryParam.update(categoryToUpdate);
