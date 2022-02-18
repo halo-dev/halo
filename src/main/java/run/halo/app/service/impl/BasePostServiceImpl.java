@@ -386,7 +386,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
 
         // Post currently drafting in process
         Boolean isInProcess = baseContentService.draftingInProgress(post.getId());
-        basePostSimpleDTO.setIsInProcess(isInProcess);
+        basePostSimpleDTO.setInProgress(isInProcess);
 
         return basePostSimpleDTO;
     }
@@ -417,7 +417,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
 
         // Post currently drafting in process
         Boolean isInProcess = baseContentService.draftingInProgress(post.getId());
-        postDetail.setIsInProcess(isInProcess);
+        postDetail.setInProgress(isInProcess);
 
         return postDetail;
     }

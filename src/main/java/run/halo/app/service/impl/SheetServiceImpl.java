@@ -320,7 +320,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
 
             // Post currently drafting in process
             Boolean isInProcess = sheetContentService.draftingInProgress(sheet.getId());
-            sheetListVO.setIsInProcess(isInProcess);
+            sheetListVO.setInProgress(isInProcess);
 
             return sheetListVO;
         });
@@ -386,7 +386,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
 
         // Sheet currently drafting in process
         Boolean inProgress = sheetContentService.draftingInProgress(sheet.getId());
-        sheetDetailVO.setIsInProcess(inProgress);
+        sheetDetailVO.setInProgress(inProgress);
 
         return sheetDetailVO;
     }

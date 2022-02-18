@@ -32,7 +32,7 @@ public class BasePostSimpleDTO extends BasePostMinimalDTO {
 
     private Long wordCount;
 
-    private Boolean isInProcess;
+    private Boolean inProgress;
 
     public boolean isTopped() {
         return this.topPriority != null && this.topPriority > 0;

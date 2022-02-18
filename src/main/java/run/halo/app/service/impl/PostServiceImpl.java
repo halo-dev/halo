@@ -677,7 +677,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
 
             // Post currently drafting in process
             Boolean isInProcess = postContentService.draftingInProgress(post.getId());
-            postListVO.setIsInProcess(isInProcess);
+            postListVO.setInProgress(isInProcess);
 
             return postListVO;
         });
@@ -827,7 +827,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
 
         // Post currently drafting in process
         Boolean inProgress = postContentService.draftingInProgress(post.getId());
-        postDetailVO.setIsInProcess(inProgress);
+        postDetailVO.setInProgress(inProgress);
 
         return postDetailVO;
     }
