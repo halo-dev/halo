@@ -42,6 +42,11 @@ public interface BaseContentPatchLogService {
      */
     ContentDiff generateDiff(Integer postId, String content, String originalContent);
 
+    /**
+     * Creates or updates the {@link ContentPatchLog}.
+     *
+     * @param contentPatchLog param to create or update
+     */
     void save(ContentPatchLog contentPatchLog);
 
     /**
