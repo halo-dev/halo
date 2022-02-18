@@ -30,4 +30,6 @@ FROM contents c
 
 -- Allow the original_content to be null
 alter table posts
+    modify format_content longtext null;
+alter table posts
     modify original_content longtext null;
