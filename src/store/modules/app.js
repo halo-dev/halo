@@ -84,9 +84,6 @@ const app = {
       commit('TOGGLE_LAYOUT_MODE', mode)
     },
     ToggleFixedHeader({ commit }, fixedHeader) {
-      if (!fixedHeader) {
-        commit('TOGGLE_FIXED_HEADER_HIDDEN', false)
-      }
       commit('TOGGLE_FIXED_HEADER', fixedHeader)
     },
     ToggleFixedSidebar({ commit }, fixedSidebar) {
