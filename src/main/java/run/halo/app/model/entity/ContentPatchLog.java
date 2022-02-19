@@ -1,26 +1,20 @@
 package run.halo.app.model.entity;
 
 import java.util.Date;
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.Hibernate;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 import run.halo.app.model.enums.PostStatus;
@@ -36,7 +30,10 @@ import run.halo.app.model.enums.PostStatus;
 @ToString
 @RequiredArgsConstructor
 @Entity
-@Table(name = "content_patch_logs")
+@Table(name = "content_patch_logs", indexes = {
+    @Index(name = "idx_post_id", columnList = "post_id"),
+    @Index(name = "idx_status", columnList = "status"),
+    @Index(name = "idx_version", columnList = "version")})
 public class ContentPatchLog extends BaseEntity {
 
     @Id
@@ -45,12 +42,15 @@ public class ContentPatchLog extends BaseEntity {
         + ".CustomIdGenerator")
     private Integer id;
 
+    @Column(name = "post_id")
     private Integer postId;
 
     @Lob
+    @Column(name = "content_diff")
     private String contentDiff;
 
     @Lob
+    @Column(name = "original_content_diff")
     private String originalContentDiff;
 
     @Column(name = "version", nullable = false)
@@ -61,6 +61,7 @@ public class ContentPatchLog extends BaseEntity {
     private PostStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "publish_time")
     private Date publishTime;
 
     /**
