@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.model.dto.CategoryDTO;
-import run.halo.app.model.entity.BaseContent;
 import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostDetailVO;
@@ -261,8 +261,8 @@ public class ContentFeedController {
 
         // Populate post content
         postPage.getContent().forEach(post -> {
-            BaseContent postContent = postService.getContentById(post.getId());
-            post.setContent(BaseContent.PatchedContent.of(postContent));
+            Content postContent = postService.getContentById(post.getId());
+            post.setContent(Content.PatchedContent.of(postContent));
         });
 
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);

@@ -4,8 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.lang.NonNull;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.Content.PatchedContent;
 
 /**
  * Base post detail output dto.

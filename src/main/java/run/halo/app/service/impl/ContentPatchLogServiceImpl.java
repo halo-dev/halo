@@ -4,16 +4,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.entity.BaseContent;
-import run.halo.app.model.entity.BaseContent.ContentDiff;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.ContentDiff;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.ContentPatchLog;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.ContentPatchLogRepository;
-import run.halo.app.service.base.BaseContentPatchLogService;
+import run.halo.app.repository.ContentRepository;
+import run.halo.app.service.ContentPatchLogService;
 import run.halo.app.utils.PatchUtils;
 
 /**
@@ -22,8 +24,8 @@ import run.halo.app.utils.PatchUtils;
  * @author guqing
  * @since 2022-01-04
  */
-public abstract class BaseContentPatchLogServiceImpl implements
-    BaseContentPatchLogService {
+@Service
+public class ContentPatchLogServiceImpl implements ContentPatchLogService {
 
     /**
      * base version of content patch log.
@@ -32,18 +34,23 @@ public abstract class BaseContentPatchLogServiceImpl implements
 
     private final ContentPatchLogRepository contentPatchLogRepository;
 
-    public BaseContentPatchLogServiceImpl(ContentPatchLogRepository contentPatchLogRepository) {
+    private final ContentRepository contentRepository;
+
+    public ContentPatchLogServiceImpl(ContentPatchLogRepository contentPatchLogRepository,
+        ContentRepository contentRepository) {
         this.contentPatchLogRepository = contentPatchLogRepository;
+        this.contentRepository = contentRepository;
     }
 
     /**
      * Gets post content by post id.
      *
      * @param postId post id
-     * @param <T> {@link BaseContent} or it's subtypes
      * @return a post content of postId
      */
-    protected abstract <T extends BaseContent> Optional<T> getContentByPostId(Integer postId);
+    protected Optional<Content> getContentByPostId(Integer postId) {
+        return contentRepository.findById(postId);
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -88,7 +95,7 @@ public abstract class BaseContentPatchLogServiceImpl implements
 
         // Sets the upstream version of the current version.
         Integer sourceId = getContentByPostId(postId)
-            .map(BaseContent::getPatchLogId)
+            .map(Content::getPatchLogId)
             .orElse(0);
         contentPatchLog.setSourceId(sourceId);
 

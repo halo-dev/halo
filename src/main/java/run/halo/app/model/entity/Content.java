@@ -2,8 +2,6 @@ package run.halo.app.model.entity;
 
 import java.util.Objects;
 import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
@@ -30,9 +28,7 @@ import run.halo.app.model.enums.PostStatus;
 @RequiredArgsConstructor
 @Entity
 @Table(name = "contents")
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.INTEGER,
-    columnDefinition = "int default 0")
-public class BaseContent extends BaseEntity {
+public class Content extends BaseEntity {
 
     @Id
     @Column(name = "post_id")
@@ -76,7 +72,7 @@ public class BaseContent extends BaseEntity {
             o)) {
             return false;
         }
-        BaseContent content = (BaseContent) o;
+        Content content = (Content) o;
         return id != null && Objects.equals(id, content.id);
     }
 
@@ -133,13 +129,13 @@ public class BaseContent extends BaseEntity {
             this.originalContent = originalContent;
         }
 
-        public PatchedContent(BaseContent content) {
+        public PatchedContent(Content content) {
             Assert.notNull(content, "The content must not be null.");
             this.content = content.getContent();
             this.originalContent = content.getOriginalContent();
         }
 
-        public static PatchedContent of(BaseContent postContent) {
+        public static PatchedContent of(Content postContent) {
             return new PatchedContent(postContent);
         }
     }

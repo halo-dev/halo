@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
-import run.halo.app.model.entity.BaseContent;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostEditorType;
@@ -64,7 +64,7 @@ public class SheetModel {
         if (StringUtils.isEmpty(token)) {
             sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getSlug());
             //Set sheet content
-            BaseContent content = sheetService.getContentById(sheet.getId());
+            Content content = sheetService.getContentById(sheet.getId());
             sheet.setContent(PatchedContent.of(content));
         } else {
             // verify token

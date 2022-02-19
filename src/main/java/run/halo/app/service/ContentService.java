@@ -1,7 +1,8 @@
-package run.halo.app.service.base;
+package run.halo.app.service;
 
-import run.halo.app.model.entity.BaseContent;
+import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.ContentPatchLog;
+import run.halo.app.service.base.CrudService;
 
 /**
  * Base content service interface.
@@ -9,13 +10,12 @@ import run.halo.app.model.entity.ContentPatchLog;
  * @author guqing
  * @date 2022-01-07
  */
-public interface BaseContentService<CONTENT extends BaseContent>
-    extends CrudService<CONTENT, Integer> {
+public interface ContentService extends CrudService<Content, Integer> {
 
     /**
      * <p>Publish post content.</p>
      * <ul>
-     * <li>Copy the latest record in {@link ContentPatchLog} to the {@link CONTENT}.
+     * <li>Copy the latest record in {@link ContentPatchLog} to the {@link Content}.
      * <li>Set status to PUBLISHED.
      * <li>Set patchLogId to the latest.
      * </ul>
@@ -23,15 +23,7 @@ public interface BaseContentService<CONTENT extends BaseContent>
      * @param postId post id
      * @return published content record.
      */
-    CONTENT publishContent(Integer postId);
-
-    /**
-     * Create a CONTENT instance.
-     *
-     * @return a CONTENT instance.
-     */
-    @SuppressWarnings("unchecked")
-    CONTENT createGenericClassInstance();
+    Content publishContent(Integer postId);
 
     /**
      * If the content record does not exist, it will be created; otherwise, it will be updated.

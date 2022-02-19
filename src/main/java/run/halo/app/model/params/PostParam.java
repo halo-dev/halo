@@ -10,9 +10,9 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Post;
-import run.halo.app.model.entity.PostContent;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
@@ -117,7 +117,7 @@ public class PostParam implements InputConverter<Post> {
     }
 
     private void populateContent(Post post) {
-        PostContent postContent = new PostContent();
+        Content postContent = new Content();
         if (PostEditorType.MARKDOWN.equals(editorType)) {
             postContent.setContent(MarkdownUtils.renderHtml(originalContent));
         } else {

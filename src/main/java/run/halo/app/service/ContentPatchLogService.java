@@ -1,18 +1,18 @@
-package run.halo.app.service.base;
+package run.halo.app.service;
 
 import java.util.List;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.entity.BaseContent.ContentDiff;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
+import run.halo.app.model.entity.Content.ContentDiff;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.ContentPatchLog;
 
 /**
- * Base Content patch log service.
+ * Content patch log service.
  *
  * @author guqing
  * @since 2022-01-04
  */
-public interface BaseContentPatchLogService {
+public interface ContentPatchLogService {
 
     /**
      * Create or update content patch log by post content.

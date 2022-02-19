@@ -26,16 +26,17 @@ import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
-import run.halo.app.model.entity.BaseContent;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
+import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.ContentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
-import run.halo.app.service.base.BaseContentService;
 import run.halo.app.service.base.BasePostService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
@@ -51,14 +52,16 @@ import run.halo.app.utils.ServiceUtils;
  * @date 2019-04-24
  */
 @Slf4j
-public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends BaseContent>
+public abstract class BasePostServiceImpl<POST extends BasePost>
     extends AbstractCrudService<POST, Integer> implements BasePostService<POST> {
 
     private final BasePostRepository<POST> basePostRepository;
 
     private final OptionService optionService;
 
-    private final BaseContentService<CONTENT> baseContentService;
+    private final ContentService contentService;
+
+    private final ContentPatchLogService contentPatchLogService;
 
     private static final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
@@ -66,11 +69,13 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
         OptionService optionService,
-        BaseContentService<CONTENT> baseContentService) {
+        ContentService contentService,
+        ContentPatchLogService contentPatchLogService) {
         super(basePostRepository);
         this.basePostRepository = basePostRepository;
         this.optionService = optionService;
-        this.baseContentService = baseContentService;
+        this.contentService = contentService;
+        this.contentPatchLogService = contentPatchLogService;
     }
 
     @Override
@@ -117,6 +122,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         Optional<POST> postOptional = basePostRepository.getByIdAndStatus(id, status);
 
         return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(id));
+    }
+
+    @Override
+    public PatchedContent getLatestContentById(Integer id) {
+        return contentPatchLogService.getByPostId(id);
     }
 
     @Override
@@ -314,13 +324,13 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created
             savedPost = create(post);
-            baseContentService.createOrUpdateDraftBy(post.getId(),
+            contentService.createOrUpdateDraftBy(post.getId(),
                 postContent.getContent(), postContent.getOriginalContent());
         } else {
             // The sheet will be updated
             // Set edit time
             post.setEditTime(DateUtils.now());
-            baseContentService.createOrUpdateDraftBy(post.getId(),
+            contentService.createOrUpdateDraftBy(post.getId(),
                 postContent.getContent(), postContent.getOriginalContent());
             // Update it
             savedPost = update(post);
@@ -328,7 +338,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
 
         if (PostStatus.PUBLISHED.equals(post.getStatus())
             || PostStatus.INTIMATE.equals(post.getStatus())) {
-            baseContentService.publishContent(post.getId());
+            contentService.publishContent(post.getId());
         }
         return savedPost;
     }
@@ -341,7 +351,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
             String tip = "The post is encrypted by author";
             post.setSummary(tip);
 
-            CONTENT postContent = baseContentService.createGenericClassInstance();
+            Content postContent = new Content();
             postContent.setContent(tip);
             postContent.setOriginalContent(tip);
             post.setContent(PatchedContent.of(postContent));
@@ -385,7 +395,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         generateAndSetSummaryIfAbsent(post, basePostSimpleDTO);
 
         // Post currently drafting in process
-        Boolean isInProcess = baseContentService.draftingInProgress(post.getId());
+        Boolean isInProcess = contentService.draftingInProgress(post.getId());
         basePostSimpleDTO.setInProgress(isInProcess);
 
         return basePostSimpleDTO;
@@ -416,7 +426,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         BasePostDetailDTO postDetail = new BasePostDetailDTO().convertFrom(post);
 
         // Post currently drafting in process
-        Boolean isInProcess = baseContentService.draftingInProgress(post.getId());
+        Boolean isInProcess = contentService.draftingInProgress(post.getId());
         postDetail.setInProgress(isInProcess);
 
         return postDetail;
@@ -437,7 +447,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         } else {
             content = originalContent;
         }
-        baseContentService.createOrUpdateDraftBy(postId, content, originalContent);
+        contentService.createOrUpdateDraftBy(postId, content, originalContent);
 
         post.setContent(getLatestContentById(postId));
 
@@ -467,7 +477,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
         // Sync content
         if (PostStatus.PUBLISHED.equals(status)) {
             // If publish this post, then convert the formatted content
-            CONTENT postContent = baseContentService.publishContent(postId);
+            Content postContent = contentService.publishContent(postId);
             post.setContent(PatchedContent.of(postContent));
         }
 
@@ -518,9 +528,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost, CONTENT extends
     }
 
     @Override
-    public CONTENT getContentById(Integer postId) {
+    public Content getContentById(Integer postId) {
         Assert.notNull(postId, "The postId must not be null.");
-        return baseContentService.getById(postId);
+        return contentService.getById(postId);
     }
 
     /**

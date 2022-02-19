@@ -9,9 +9,9 @@ import org.springframework.lang.Nullable;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
-import run.halo.app.model.entity.BaseContent;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.enums.PostStatus;
 
 /**
@@ -90,7 +90,7 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @param id post id.
      * @return a content of post.
      */
-    BaseContent getContentById(Integer id);
+    Content getContentById(Integer id);
 
     /**
      * Gets the latest content by id.

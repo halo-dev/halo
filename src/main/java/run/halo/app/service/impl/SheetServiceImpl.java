@@ -23,10 +23,10 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.IndependentSheetDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
-import run.halo.app.model.entity.SheetContent;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.LogType;
@@ -35,10 +35,10 @@ import run.halo.app.model.enums.SheetPermalinkType;
 import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.repository.SheetRepository;
+import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.ContentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
-import run.halo.app.service.SheetContentPatchLogService;
-import run.halo.app.service.SheetContentService;
 import run.halo.app.service.SheetMetaService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
@@ -55,7 +55,7 @@ import run.halo.app.utils.ServiceUtils;
  */
 @Slf4j
 @Service
-public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
+public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
     implements SheetService {
 
     private final SheetRepository sheetRepository;
@@ -70,19 +70,19 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
 
     private final OptionService optionService;
 
-    private final SheetContentService sheetContentService;
+    private final ContentService sheetContentService;
 
-    private final SheetContentPatchLogService sheetContentPatchLogService;
+    private final ContentPatchLogService sheetContentPatchLogService;
 
     public SheetServiceImpl(SheetRepository sheetRepository,
         ApplicationEventPublisher eventPublisher,
         SheetCommentService sheetCommentService,
-        SheetContentService sheetContentService,
+        ContentService sheetContentService,
         SheetMetaService sheetMetaService,
         ThemeService themeService,
         OptionService optionService,
-        SheetContentPatchLogService sheetContentPatchLogService) {
-        super(sheetRepository, optionService, sheetContentService);
+        ContentPatchLogService sheetContentPatchLogService) {
+        super(sheetRepository, optionService, sheetContentService, sheetContentPatchLogService);
         this.sheetRepository = sheetRepository;
         this.eventPublisher = eventPublisher;
         this.sheetCommentService = sheetCommentService;
@@ -175,7 +175,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
     @Override
     public Sheet getWithLatestContentById(Integer postId) {
         Sheet sheet = getById(postId);
-        SheetContent sheetContent = getContentById(postId);
+        Content sheetContent = getContentById(postId);
         // Use the head pointer stored in the post content.
         PatchedContent patchedContent =
             sheetContentPatchLogService.getPatchedContentById(sheetContent.getHeadPatchLogId());
@@ -192,11 +192,6 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
 
         return postOptional
             .orElseThrow(() -> new NotFoundException("查询不到该页面的信息").setErrorData(slug));
-    }
-
-    @Override
-    public PatchedContent getLatestContentById(Integer id) {
-        return sheetContentPatchLogService.getByPostId(id);
     }
 
     @Override
@@ -286,11 +281,11 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet, SheetContent>
         List<SheetComment> sheetComments = sheetCommentService.removeByPostId(id);
         log.debug("Removed sheet comments: [{}]", sheetComments);
 
-        Sheet sheet = super.removeById(id);
-
-        // Remove the sheet first, and then remove the content
-        SheetContent sheetContent = sheetContentService.removeById(id);
+        // Remove sheet content
+        Content sheetContent = sheetContentService.removeById(id);
         log.debug("Removed sheet content: [{}]", sheetContent);
+
+        Sheet sheet = super.removeById(id);
 
         // Log it
         eventPublisher.publishEvent(

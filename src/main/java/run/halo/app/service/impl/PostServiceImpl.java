@@ -38,12 +38,12 @@ import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
 import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.entity.PostComment;
-import run.halo.app.model.entity.PostContent;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.PostTag;
 import run.halo.app.model.entity.Tag;
@@ -63,11 +63,11 @@ import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.base.BasePostRepository;
 import run.halo.app.service.AuthorizationService;
 import run.halo.app.service.CategoryService;
+import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.ContentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostCommentService;
-import run.halo.app.service.PostContentPatchLogService;
-import run.halo.app.service.PostContentService;
 import run.halo.app.service.PostMetaService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
@@ -91,7 +91,7 @@ import run.halo.app.utils.SlugUtils;
  */
 @Slf4j
 @Service
-public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> implements PostService {
+public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostService {
 
     private final PostRepository postRepository;
 
@@ -101,7 +101,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
 
     private final PostTagService postTagService;
 
-    private final PostContentService postContentService;
+    private final ContentService postContentService;
 
     private final PostCategoryService postCategoryService;
 
@@ -115,7 +115,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
 
     private final AuthorizationService authorizationService;
 
-    private final PostContentPatchLogService postContentPatchLogService;
+    private final ContentPatchLogService postContentPatchLogService;
 
     public PostServiceImpl(BasePostRepository<Post> basePostRepository,
         OptionService optionService,
@@ -128,9 +128,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
         ApplicationEventPublisher eventPublisher,
         PostMetaService postMetaService,
         AuthorizationService authorizationService,
-        PostContentService postContentService,
-        PostContentPatchLogService postContentPatchLogService) {
-        super(basePostRepository, optionService, postContentService);
+        ContentService contentService,
+        ContentPatchLogService contentPatchLogService) {
+        super(basePostRepository, optionService, contentService, contentPatchLogService);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;
@@ -141,8 +141,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
         this.postMetaService = postMetaService;
         this.optionService = optionService;
         this.authorizationService = authorizationService;
-        this.postContentService = postContentService;
-        this.postContentPatchLogService = postContentPatchLogService;
+        this.postContentService = contentService;
+        this.postContentPatchLogService = contentPatchLogService;
     }
 
     @Override
@@ -300,7 +300,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
     @Override
     public Post getWithLatestContentById(Integer postId) {
         Post post = getById(postId);
-        PostContent postContent = getContentById(postId);
+        Content postContent = getContentById(postId);
         // Use the head pointer stored in the post content.
         PatchedContent patchedContent =
             postContentPatchLogService.getPatchedContentById(postContent.getHeadPatchLogId());
@@ -602,11 +602,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
         List<PostComment> postComments = postCommentService.removeByPostId(postId);
         log.debug("Removed post comments: [{}]", postComments);
 
-        Post deletedPost = super.removeById(postId);
-
-        // Remove the post first, and then remove the content
-        PostContent postContent = postContentService.removeById(postId);
+        // Remove post content
+        Content postContent = postContentService.removeById(postId);
         log.debug("Removed post content: [{}]", postContent);
+
+        Post deletedPost = super.removeById(postId);
 
         // Log it
         eventPublisher.publishEvent(new LogEvent(this, postId.toString(), LogType.POST_DELETED,
@@ -938,7 +938,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post, PostContent> impl
         authorizationService.deletePostAuthorization(post.getId());
 
         // get draft content by head patch log id
-        PostContent postContent = postContentService.getById(post.getId());
+        Content postContent = postContentService.getById(post.getId());
         post.setContent(
             postContentPatchLogService.getPatchedContentById(postContent.getHeadPatchLogId()));
         // Convert to post detail vo

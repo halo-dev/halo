@@ -10,9 +10,9 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
-import run.halo.app.model.entity.BaseContent.PatchedContent;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Sheet;
-import run.halo.app.model.entity.SheetContent;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
@@ -113,7 +113,7 @@ public class SheetParam implements InputConverter<Sheet> {
     }
 
     private void populateContent(Sheet sheet) {
-        SheetContent sheetContent = new SheetContent();
+        Content sheetContent = new Content();
         if (PostEditorType.MARKDOWN.equals(editorType)) {
             sheetContent.setContent(MarkdownUtils.renderHtml(originalContent));
         } else {

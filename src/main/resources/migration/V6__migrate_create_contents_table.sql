@@ -1,5 +1,5 @@
 -- Migrate post content to contents table
-INSERT INTO contents(post_id, status, patch_log_id, head_patch_log_id, content, original_content, type, create_time,
+INSERT INTO contents(post_id, status, patch_log_id, head_patch_log_id, content, original_content, create_time,
                      update_time)
 SELECT id,
        status,
@@ -7,7 +7,6 @@ SELECT id,
        id,
        format_content,
        original_content,
-       type,
        create_time,
        update_time
 FROM posts;
