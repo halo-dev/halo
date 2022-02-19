@@ -1,17 +1,12 @@
 package run.halo.app.model.entity;
 
-import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import org.hibernate.Hibernate;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.util.Assert;
 import run.halo.app.model.enums.PostStatus;
@@ -22,12 +17,10 @@ import run.halo.app.model.enums.PostStatus;
  * @author guqing
  * @date 2021-12-18
  */
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
 @Table(name = "contents")
+@EqualsAndHashCode(callSuper = true)
 public class Content extends BaseEntity {
 
     @Id
@@ -62,24 +55,6 @@ public class Content extends BaseEntity {
 
     @Lob
     private String originalContent;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(
-            o)) {
-            return false;
-        }
-        Content content = (Content) o;
-        return id != null && Objects.equals(id, content.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
 
     @Override
     protected void prePersist() {
@@ -129,6 +104,11 @@ public class Content extends BaseEntity {
             this.originalContent = originalContent;
         }
 
+        /**
+         * Create {@link PatchedContent} from {@link Content}.
+         *
+         * @param content a {@link Content} must not be null
+         */
         public PatchedContent(Content content) {
             Assert.notNull(content, "The content must not be null.");
             this.content = content.getContent();

@@ -11,10 +11,8 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 import run.halo.app.model.enums.PostStatus;
@@ -25,11 +23,9 @@ import run.halo.app.model.enums.PostStatus;
  * @author guqing
  * @date 2021-12-18
  */
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+@Data
 @Entity
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "content_patch_logs", indexes = {
     @Index(name = "idx_post_id", columnList = "post_id"),
     @Index(name = "idx_status", columnList = "status"),
