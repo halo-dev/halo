@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Content;
@@ -38,6 +39,7 @@ public class ContentServiceImpl extends AbstractCrudService<Content, Integer>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void createOrUpdateDraftBy(Integer postId, String content,
         String originalContent) {
         Assert.notNull(postId, "The postId must not be null.");
@@ -66,6 +68,7 @@ public class ContentServiceImpl extends AbstractCrudService<Content, Integer>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Content publishContent(Integer postId) {
         ContentPatchLog contentPatchLog = contentPatchLogService.getDraftByPostId(postId);
         if (contentPatchLog == null) {
