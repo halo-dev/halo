@@ -12,8 +12,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Example;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import run.halo.app.model.entity.Content;
-import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Content.ContentDiff;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.ContentPatchLog;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.ContentPatchLogRepository;
@@ -70,12 +70,12 @@ public class ContentPatchLogServiceImplTest {
         contentPatchLogV2.setStatus(PostStatus.DRAFT);
         contentPatchLogV2.setCreateTime(new Date());
         contentPatchLogV2.setUpdateTime(new Date());
-        contentPatchLogV2.setContentDiff("[{\"source\":{\"position\":2,\"lines\":[]," +
-            "\"changePosition\":null},\"target\":{\"position\":2," +
-            "\"lines\":[\"<p>造化钟神秀，阴阳割昏晓。</p>\"],\"changePosition\":null},\"type\":\"INSERT\"}]");
-        contentPatchLogV2.setOriginalContentDiff("[{\"source\":{\"position\":4,\"lines\":[]," +
-            "\"changePosition\":null},\"target\":{\"position\":4,\"lines\":[\"造化钟神秀，阴阳割昏晓。\"," +
-            "\"\"],\"changePosition\":null},\"type\":\"INSERT\"}]");
+        contentPatchLogV2.setContentDiff("[{\"source\":{\"position\":2,\"lines\":[],"
+            + "\"changePosition\":null},\"target\":{\"position\":2,"
+            + "\"lines\":[\"<p>造化钟神秀，阴阳割昏晓。</p>\"],\"changePosition\":null},\"type\":\"INSERT\"}]");
+        contentPatchLogV2.setOriginalContentDiff("[{\"source\":{\"position\":4,\"lines\":[],"
+            + "\"changePosition\":null},\"target\":{\"position\":4,\"lines\":[\"造化钟神秀，阴阳割昏晓。\","
+            + "\"\"],\"changePosition\":null},\"type\":\"INSERT\"}]");
 
         when(contentRepository.findById(1)).thenReturn(Optional.empty());
         when(contentRepository.findById(2)).thenReturn(Optional.of(content));
@@ -139,20 +139,20 @@ public class ContentPatchLogServiceImplTest {
         contentPatchLogV2.setStatus(PostStatus.DRAFT);
         contentPatchLogV2.setCreateTime(new Date());
         contentPatchLogV2.setUpdateTime(new Date());
-        contentPatchLogV2.setContentDiff("[{\"source\":{\"position\":2,\"lines\":[]," +
-            "\"changePosition\":null},\"target\":{\"position\":2," +
-            "\"lines\":[\"<p>造化钟神秀，阴阳割昏晓。</p>\"],\"changePosition\":null},\"type\":\"INSERT\"}]");
-        contentPatchLogV2.setOriginalContentDiff("[{\"source\":{\"position\":4,\"lines\":[]," +
-            "\"changePosition\":null},\"target\":{\"position\":4,\"lines\":[\"造化钟神秀，阴阳割昏晓。\"," +
-            "\"\"],\"changePosition\":null},\"type\":\"INSERT\"}]");
+        contentPatchLogV2.setContentDiff("[{\"source\":{\"position\":2,\"lines\":[],"
+            + "\"changePosition\":null},\"target\":{\"position\":2,"
+            + "\"lines\":[\"<p>造化钟神秀，阴阳割昏晓。</p>\"],\"changePosition\":null},\"type\":\"INSERT\"}]");
+        contentPatchLogV2.setOriginalContentDiff("[{\"source\":{\"position\":4,\"lines\":[],"
+            + "\"changePosition\":null},\"target\":{\"position\":4,\"lines\":[\"造化钟神秀，阴阳割昏晓。\","
+            + "\"\"],\"changePosition\":null},\"type\":\"INSERT\"}]");
 
         PatchedContent patchedContent =
             contentPatchLogService.applyPatch(contentPatchLogV2);
 
         assertThat(patchedContent).isNotNull();
-        assertThat(patchedContent.getContent()).isEqualTo("<p>望岳</p>\n" +
-            "<p>岱宗夫如何，齐鲁青未了。</p>\n" +
-            "<p>造化钟神秀，阴阳割昏晓。</p>\n");
+        assertThat(patchedContent.getContent()).isEqualTo("<p>望岳</p>\n"
+            + "<p>岱宗夫如何，齐鲁青未了。</p>\n"
+            + "<p>造化钟神秀，阴阳割昏晓。</p>\n");
         assertThat(patchedContent.getOriginalContent()).isEqualTo("望岳\n\n岱宗夫如何，齐鲁青未了。\n"
             + "\n造化钟神秀，阴阳割昏晓。\n");
     }
