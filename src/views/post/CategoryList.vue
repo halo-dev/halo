@@ -1,7 +1,7 @@
 <template>
   <page-view>
     <a-row :gutter="12">
-      <a-col :lg="10" :md="10" :sm="24" :xl="10" :xs="24" class="pb-3">
+      <a-col :lg="8" :md="8" :sm="24" :xl="8" :xs="24" class="pb-3">
         <a-card :bodyStyle="{ padding: '16px' }" :title="title">
           <a-form-model ref="categoryForm" :model="form.model" :rules="form.rules" layout="horizontal">
             <a-form-model-item help="* 页面上所显示的名称" label="名称：" prop="name">
@@ -11,7 +11,7 @@
               <a-input v-model="form.model.slug" />
             </a-form-model-item>
             <a-form-model-item label="上级目录：" prop="parentId">
-              <category-select-tree v-model="form.model.parentId" :categories="table.data" />
+              <category-select-tree :categories="list.data" :category-id.sync="form.model.parentId" />
             </a-form-model-item>
             <a-form-model-item help="* 在分类页面可展示，需要主题支持" label="封面图：" prop="thumbnail">
               <AttachmentInput v-model="form.model.thumbnail" title="选择封面图" />
@@ -51,102 +51,16 @@
           </a-form-model>
         </a-card>
       </a-col>
-      <a-col :lg="14" :md="14" :sm="24" :xl="14" :xs="24" class="pb-3">
+      <a-col :lg="16" :md="16" :sm="24" :xl="16" :xs="24" class="pb-3">
         <a-card :bodyStyle="{ padding: '16px' }" title="分类列表">
-          <!-- Mobile -->
-          <a-list
-            v-if="isMobile()"
-            :dataSource="table.data"
-            :loading="table.loading"
-            :pagination="false"
-            itemLayout="vertical"
-            size="large"
-          >
-            <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
-              <template slot="actions">
-                <span>
-                  <a-icon type="form" />
-                  {{ item.postCount }}
-                </span>
-                <a-dropdown :trigger="['click']" placement="topLeft">
-                  <span>
-                    <a-icon type="bars" />
-                  </span>
-                  <a-menu slot="overlay">
-                    <a-menu-item @click="form.model = item">编辑</a-menu-item>
-                    <a-menu-item>
-                      <a-popconfirm
-                        :title="'你确定要删除【' + item.name + '】分类？'"
-                        cancelText="取消"
-                        okText="确定"
-                        @confirm="handleDeleteCategory(item.id)"
-                      >
-                        删除
-                      </a-popconfirm>
-                    </a-menu-item>
-                  </a-menu>
-                </a-dropdown>
-              </template>
-              <a-list-item-meta>
-                <template slot="description">
-                  {{ item.slug }}
-                </template>
-                <span
-                  slot="title"
-                  style="
-                    max-width: 300px;
-                    display: block;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                  "
-                >
-                  {{ item.name }}{{ item.password ? '（加密）' : '' }}
-                </span></a-list-item-meta
-              >
-              <span>
-                {{ item.description }}
-              </span>
-            </a-list-item>
-          </a-list>
-          <!-- Desktop -->
-          <a-table
-            v-else
-            :columns="table.columns"
-            :dataSource="table.data"
-            :loading="table.loading"
-            :rowKey="record => record.id"
-            :scrollToFirstRowOnChange="true"
-          >
-            <span slot="name" slot-scope="text, record" class="cursor-pointer">
-              {{ record.name }}{{ record.password ? '（加密）' : '' }}
-            </span>
-            <span
-              slot="postCount"
-              slot-scope="text, record"
-              class="cursor-pointer"
-              @click="handleQueryCategoryPosts(record)"
-            >
-              <a-badge
-                :count="record.postCount"
-                :numberStyle="{ backgroundColor: '#00e0ff' }"
-                :overflowCount="9999"
-                :showZero="true"
-              />
-            </span>
-            <span slot="action" slot-scope="text, record">
-              <a-button class="!p-0" type="link" @click="form.model = record"> 编辑 </a-button>
-              <a-divider type="vertical" />
-              <a-popconfirm
-                :title="'你确定要删除【' + record.name + '】分类？'"
-                cancelText="取消"
-                okText="确定"
-                @confirm="handleDeleteCategory(record.id)"
-              >
-                <a-button class="!p-0" type="link">删除</a-button>
-              </a-popconfirm>
-            </span>
-          </a-table>
+          <a-spin :spinning="list.loading">
+            <CategoryTreeNode
+              v-model="list.treeData"
+              @edit="handleEdit"
+              @reload="handleListCategories"
+              @select="handleSelect"
+            />
+          </a-spin>
         </a-card>
       </a-col>
     </a-row>
@@ -154,43 +68,23 @@
 </template>
 
 <script>
+// components
 import { PageView } from '@/layouts'
-import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import CategorySelectTree from './components/CategorySelectTree'
-import apiClient from '@/utils/api-client'
+import CategoryTreeNode from './components/CategoryTreeNode'
 
-const columns = [
-  {
-    title: '名称',
-    ellipsis: true,
-    dataIndex: 'name',
-    scopedSlots: { customRender: 'name' }
-  },
-  {
-    title: '别名',
-    ellipsis: true,
-    dataIndex: 'slug'
-  },
-  {
-    title: '文章数',
-    dataIndex: 'postCount',
-    scopedSlots: { customRender: 'postCount' }
-  },
-  {
-    title: '操作',
-    key: 'action',
-    scopedSlots: { customRender: 'action' }
-  }
-]
+// libs
+import apiClient from '@/utils/api-client'
+import { mixin, mixinDevice } from '@/mixins/mixin.js'
 
 export default {
-  components: { PageView, CategorySelectTree },
+  components: { PageView, CategorySelectTree, CategoryTreeNode },
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      table: {
-        columns,
+      list: {
         data: [],
+        treeData: [],
         loading: false
       },
       form: {
@@ -224,27 +118,58 @@ export default {
     this.handleListCategories()
   },
   methods: {
-    handleListCategories() {
-      this.table.loading = true
-      apiClient.category
-        .list({ sort: [], more: true })
-        .then(response => {
-          this.table.data = response.data
-        })
-        .finally(() => {
-          this.table.loading = false
-        })
+    async handleListCategories() {
+      try {
+        this.list.loading = true
+
+        const { data } = await apiClient.category.list({})
+        this.list.data = data
+        this.list.treeData = this.convertDataToTree(data)
+      } catch (e) {
+        this.$log.error('Failed to get categories', e)
+      } finally {
+        this.list.loading = false
+      }
     },
-    handleDeleteCategory(id) {
-      apiClient.category
-        .delete(id)
-        .then(() => {
-          this.$message.success('删除成功！')
-          this.form.model = {}
-        })
-        .finally(() => {
-          this.handleListCategories()
-        })
+
+    convertDataToTree(categories) {
+      const hashMap = {}
+      const treeData = []
+      categories.forEach(category => (hashMap[category.id] = { ...category, children: [] }))
+      categories.forEach(category => {
+        const current = hashMap[category.id]
+        const parent = hashMap[category.parentId]
+
+        if (current.password) {
+          current.hasPassword = true
+        }
+
+        if (parent && (parent.password || parent.hasPassword)) {
+          current.hasPassword = true
+        }
+
+        if (category.parentId) {
+          hashMap[category.parentId].children.push(current)
+        } else {
+          treeData.push(current)
+        }
+      })
+      return treeData
+    },
+
+    async handleEdit(category) {
+      try {
+        const { data } = await apiClient.category.get(category.id)
+        this.form.model = data
+      } catch (e) {
+        this.$log.error('Failed to get category', e)
+      }
+    },
+
+    handleSelect(category) {
+      this.form.model = {
+        parentId: category.id
+      }
     },
 
     /**
@@ -281,6 +206,7 @@ export default {
         }
       })
     },
+
     handleSavedCallback() {
       if (this.form.errored) {
         this.form.errored = false
@@ -290,6 +216,7 @@ export default {
         _this.handleListCategories()
       }
     },
+
     handleQueryCategoryPosts(category) {
       this.$router.push({ name: 'PostList', query: { categoryId: category.id } })
     }
