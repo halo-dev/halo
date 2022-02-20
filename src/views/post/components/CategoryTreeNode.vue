@@ -23,7 +23,7 @@
           <a-list-item class="menu-item">
             <a-list-item-meta>
               <span slot="title" class="inline-block font-bold title">
-                <!--                                <a-icon class="cursor-move mover mr-1" type="bars" />-->
+                <a-icon class="cursor-move mover mr-1" type="bars" />
                 {{ item.name }}{{ item.hasPassword ? '（加密）' : '' }}
               </span>
               <span slot="description" class="inline-block">
