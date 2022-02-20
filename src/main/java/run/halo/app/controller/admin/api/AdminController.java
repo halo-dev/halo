@@ -20,6 +20,7 @@ import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.MFAType;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.params.ResetPasswordParam;
+import run.halo.app.model.params.ResetPasswordSendCodeParam;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.security.token.AuthToken;
@@ -80,7 +81,7 @@ public class AdminController {
     @ApiOperation("Sends reset password verify code")
     @CacheLock(autoDelete = false)
     @DisableOnCondition
-    public void sendResetCode(@RequestBody @Valid ResetPasswordParam param) {
+    public void sendResetCode(@RequestBody @Valid ResetPasswordSendCodeParam param) {
         adminService.sendResetPasswordCode(param);
     }
 
