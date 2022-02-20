@@ -17,7 +17,7 @@ checkstyle {
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
-    maven { url 'https://maven.aliyun.com/repository/spring/'}
+    maven { url 'https://maven.aliyun.com/repository/spring/' }
     mavenLocal()
     mavenCentral()
 }
@@ -50,7 +50,7 @@ bootJar {
 }
 
 ext {
-    guavaVersion= '31.0.1-jre'
+    guavaVersion = '31.0.1-jre'
     upyunSdkVersion = '4.2.3'
     qiniuSdkVersion = '7.8.0'
     aliyunSdkVersion = '3.13.2'
@@ -73,6 +73,7 @@ ext {
     huaweiObsVersion = '3.21.8.1'
     templateInheritanceVersion = "0.4.RELEASE"
     jsoupVersion = '1.14.3'
+    okHttpVersion = '4.9.3'
 }
 
 dependencies {
@@ -92,7 +93,9 @@ dependencies {
     implementation "com.qcloud:cos_api:$qcloudSdkVersion"
     // TODO Upgrade huaweicloud sdk dependence to fix log4j 0-day vulnerability
     implementation("com.huaweicloud:esdk-obs-java:$huaweiObsVersion")
-    implementation "io.minio:minio:$minioSdkVersion"
+    implementation("io.minio:minio:$minioSdkVersion") {
+        exclude group: "com.squareup.okhttp3", module: "okhttp"
+    }
     implementation "io.springfox:springfox-boot-starter:$swaggerVersion"
     implementation "commons-fileupload:commons-fileupload:$commonsFileUploadVersion"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
@@ -100,6 +103,7 @@ dependencies {
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
     implementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
     implementation "com.google.code.findbugs:annotations:$annotationsVersion"
+    implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
 
     implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
     implementation "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion"
