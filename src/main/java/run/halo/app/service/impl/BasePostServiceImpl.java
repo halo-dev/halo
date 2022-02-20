@@ -574,10 +574,18 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     protected <T extends BasePostSimpleDTO> void generateAndSetSummaryIfAbsent(POST post,
-        T postVO) {
-        PatchedContent postContent = post.getContent();
-        if (StringUtils.isBlank(postVO.getSummary())) {
-            postVO.setSummary(generateSummary(postContent.getContent()));
+        T postVo) {
+        Assert.notNull(post, "The post must not be null.");
+        if (StringUtils.isNotBlank(postVo.getSummary())) {
+            return;
+        }
+
+        PatchedContent patchedContent = post.getContentOfNullable();
+        if (patchedContent == null) {
+            Content postContent = getContentById(post.getId());
+            postVo.setSummary(generateSummary(postContent.getContent()));
+        } else {
+            postVo.setSummary(generateSummary(patchedContent.getContent()));
         }
     }
 

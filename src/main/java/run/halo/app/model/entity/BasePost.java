@@ -20,6 +20,7 @@ import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
@@ -258,5 +259,10 @@ public class BasePost extends BaseEntity {
             return patchedContent;
         }
         return content;
+    }
+
+    @Nullable
+    public PatchedContent getContentOfNullable() {
+        return this.content;
     }
 }
