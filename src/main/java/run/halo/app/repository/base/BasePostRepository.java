@@ -216,18 +216,6 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     int updateLikes(@Param("likes") long likes, @Param("postId") @NonNull Integer postId);
 
     /**
-     * Updates post original content.
-     *
-     * @param content content could be blank but disallow to be null
-     * @param postId post id must not be null
-     * @return updated rows
-     */
-    @Modifying
-    @Query("update BasePost p set p.originalContent = :content where p.id = :postId")
-    int updateOriginalContent(@Param("content") @NonNull String content,
-        @Param("postId") @NonNull Integer postId);
-
-    /**
      * Updates post status by post id.
      *
      * @param status post status must not be null.
@@ -237,17 +225,5 @@ public interface BasePostRepository<POST extends BasePost> extends BaseRepositor
     @Modifying
     @Query("update BasePost p set p.status = :status where p.id = :postId")
     int updateStatus(@Param("status") @NonNull PostStatus status,
-        @Param("postId") @NonNull Integer postId);
-
-    /**
-     * Updates post format content by post id.
-     *
-     * @param formatContent format content must not be null.
-     * @param postId post id must not be null.
-     * @return updated rows.
-     */
-    @Modifying
-    @Query("update BasePost p set p.formatContent = :formatContent where p.id = :postId")
-    int updateFormatContent(@Param("formatContent") @NonNull String formatContent,
         @Param("postId") @NonNull Integer postId);
 }

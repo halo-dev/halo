@@ -10,6 +10,8 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.enums.PostStatus;
 
 /**
@@ -17,6 +19,7 @@ import run.halo.app.model.enums.PostStatus;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-24
  */
 public interface BasePostService<POST extends BasePost> extends CrudService<POST, Integer> {
@@ -53,6 +56,15 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     POST getBySlug(@NonNull String slug);
 
     /**
+     * Get post with the latest content by id.
+     * content from patch log.
+     *
+     * @param postId post id.
+     * @return post with the latest content.
+     */
+    POST getWithLatestContentById(Integer postId);
+
+    /**
      * Gets post by post status and slug.
      *
      * @param status post status must not be null
@@ -71,6 +83,23 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     POST getBy(@NonNull PostStatus status, @NonNull Integer id);
+
+    /**
+     * Gets content by post id.
+     *
+     * @param id post id.
+     * @return a content of post.
+     */
+    Content getContentById(Integer id);
+
+    /**
+     * Gets the latest content by id.
+     * content from patch log.
+     *
+     * @param id post id.
+     * @return a latest content from patchLog of post.
+     */
+    PatchedContent getLatestContentById(Integer id);
 
     /**
      * Lists all posts by post status.
@@ -275,7 +304,8 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return updated post
      */
     @NonNull
-    POST updateDraftContent(@Nullable String content, @NonNull Integer postId);
+    POST updateDraftContent(@Nullable String content, String originalContent,
+        @NonNull Integer postId);
 
     /**
      * Updates post status.

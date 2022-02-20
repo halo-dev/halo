@@ -13,11 +13,15 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 
@@ -81,7 +85,7 @@ public class BasePost extends BaseEntity {
     /**
      * Original content,not format.
      */
-    @Column(name = "original_content", nullable = false)
+    @Column(name = "original_content")
     @Lob
     private String originalContent;
 
@@ -171,6 +175,19 @@ public class BasePost extends BaseEntity {
     @ColumnDefault("0")
     private Long wordCount;
 
+    /**
+     * Post content version.
+     */
+    @ColumnDefault("1")
+    private Integer version;
+
+    /**
+     * This extra field don't correspond to any columns in the <code>Post</code> table because we
+     * don't want to save this value.
+     */
+    @Transient
+    private PatchedContent content;
+
     @Override
     public void prePersist() {
         super.prePersist();
@@ -215,14 +232,6 @@ public class BasePost extends BaseEntity {
             likes = 0L;
         }
 
-        if (originalContent == null) {
-            originalContent = "";
-        }
-
-        if (formatContent == null) {
-            formatContent = "";
-        }
-
         if (editorType == null) {
             editorType = PostEditorType.MARKDOWN;
         }
@@ -230,6 +239,30 @@ public class BasePost extends BaseEntity {
         if (wordCount == null || wordCount < 0) {
             wordCount = 0L;
         }
+
+        if (version == null || version < 0) {
+            version = 1;
+        }
     }
 
+    /**
+     * Gets post content.
+     *
+     * @return a {@link PatchedContent} if present,otherwise an empty object
+     */
+    @NonNull
+    public PatchedContent getContent() {
+        if (this.content == null) {
+            PatchedContent patchedContent = new PatchedContent();
+            patchedContent.setOriginalContent("");
+            patchedContent.setContent("");
+            return patchedContent;
+        }
+        return content;
+    }
+
+    @Nullable
+    public PatchedContent getContentOfNullable() {
+        return this.content;
+    }
 }

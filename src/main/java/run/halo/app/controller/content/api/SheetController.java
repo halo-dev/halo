@@ -78,7 +78,7 @@ public class SheetController {
 
         if (formatDisabled) {
             // Clear the format content
-            sheetDetailVO.setFormatContent(null);
+            sheetDetailVO.setContent(null);
         }
 
         if (sourceDisabled) {
@@ -102,7 +102,7 @@ public class SheetController {
 
         if (formatDisabled) {
             // Clear the format content
-            sheetDetailVO.setFormatContent(null);
+            sheetDetailVO.setContent(null);
         }
 
         if (sourceDisabled) {

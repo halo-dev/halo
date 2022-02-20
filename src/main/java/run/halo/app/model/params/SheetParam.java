@@ -10,10 +10,13 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.SlugUtils;
 
 /**
@@ -21,6 +24,7 @@ import run.halo.app.utils.SlugUtils;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-4-24
  */
 @Data
@@ -75,7 +79,9 @@ public class SheetParam implements InputConverter<Sheet> {
             editorType = PostEditorType.MARKDOWN;
         }
 
-        return InputConverter.super.convertTo();
+        Sheet sheet = InputConverter.super.convertTo();
+        populateContent(sheet);
+        return sheet;
     }
 
     @Override
@@ -89,7 +95,7 @@ public class SheetParam implements InputConverter<Sheet> {
         if (null == editorType) {
             editorType = PostEditorType.MARKDOWN;
         }
-
+        populateContent(sheet);
         InputConverter.super.update(sheet);
     }
 
@@ -104,5 +110,16 @@ public class SheetParam implements InputConverter<Sheet> {
             sheetMetasSet.add(sheetMeta);
         }
         return sheetMetasSet;
+    }
+
+    private void populateContent(Sheet sheet) {
+        Content sheetContent = new Content();
+        if (PostEditorType.MARKDOWN.equals(editorType)) {
+            sheetContent.setContent(MarkdownUtils.renderHtml(originalContent));
+        } else {
+            sheetContent.setContent(sheetContent.getOriginalContent());
+        }
+        sheetContent.setOriginalContent(originalContent);
+        sheet.setContent(PatchedContent.of(sheetContent));
     }
 }

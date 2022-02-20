@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostDetailVO;
@@ -40,6 +41,7 @@ import run.halo.app.service.PostService;
 
 /**
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-21
  */
 @Slf4j
@@ -242,14 +244,35 @@ public class ContentFeedController {
         Assert.notNull(pageable, "Pageable must not be null");
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
+        Page<PostDetailVO> posts = convertToDetailPageVo(postPage);
+        return posts.getContent();
+    }
+
+    /**
+     * Converts to a page of detail vo.
+     * Notes: this method will escape the XML tag characters in the post content and summary.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail vo that content and summary escaped.
+     */
+    @NonNull
+    private Page<PostDetailVO> convertToDetailPageVo(Page<Post> postPage) {
+        Assert.notNull(postPage, "The postPage must not be null.");
+
+        // Populate post content
+        postPage.getContent().forEach(post -> {
+            Content postContent = postService.getContentById(post.getId());
+            post.setContent(Content.PatchedContent.of(postContent));
+        });
+
         Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(
-                RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
+            postDetailVO.setContent(
+                RegExUtils.replaceAll(postDetailVO.getContent(), XML_INVALID_CHAR, ""));
             postDetailVO
                 .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });
-        return posts.getContent();
+        return posts;
     }
 
     /**
@@ -266,13 +289,7 @@ public class ContentFeedController {
 
         Page<Post> postPage =
             postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
-        Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
-        posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(
-                RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
-            postDetailVO
-                .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
-        });
+        Page<PostDetailVO> posts = convertToDetailPageVo(postPage);
         return posts.getContent();
     }
 

@@ -16,13 +16,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -41,6 +39,8 @@ import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.entity.PostComment;
@@ -63,6 +63,8 @@ import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.base.BasePostRepository;
 import run.halo.app.service.AuthorizationService;
 import run.halo.app.service.CategoryService;
+import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.ContentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostCommentService;
@@ -99,6 +101,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final PostTagService postTagService;
 
+    private final ContentService postContentService;
+
     private final PostCategoryService postCategoryService;
 
     private final PostCommentService postCommentService;
@@ -111,6 +115,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final AuthorizationService authorizationService;
 
+    private final ContentPatchLogService postContentPatchLogService;
+
     public PostServiceImpl(BasePostRepository<Post> basePostRepository,
         OptionService optionService,
         PostRepository postRepository,
@@ -121,8 +127,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         PostCommentService postCommentService,
         ApplicationEventPublisher eventPublisher,
         PostMetaService postMetaService,
-        AuthorizationService authorizationService) {
-        super(basePostRepository, optionService);
+        AuthorizationService authorizationService,
+        ContentService contentService,
+        ContentPatchLogService contentPatchLogService) {
+        super(basePostRepository, optionService, contentService, contentPatchLogService);
         this.postRepository = postRepository;
         this.tagService = tagService;
         this.categoryService = categoryService;
@@ -133,6 +141,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         this.postMetaService = postMetaService;
         this.optionService = optionService;
         this.authorizationService = authorizationService;
+        this.postContentService = contentService;
+        this.postContentPatchLogService = contentPatchLogService;
     }
 
     @Override
@@ -270,6 +280,11 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
+    public PatchedContent getLatestContentById(Integer id) {
+        return postContentPatchLogService.getByPostId(id);
+    }
+
+    @Override
     public List<Post> removeByIds(Collection<Integer> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
@@ -280,6 +295,17 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public Post getBySlug(String slug) {
         return super.getBySlug(slug);
+    }
+
+    @Override
+    public Post getWithLatestContentById(Integer postId) {
+        Post post = getById(postId);
+        Content postContent = getContentById(postId);
+        // Use the head pointer stored in the post content.
+        PatchedContent patchedContent =
+            postContentPatchLogService.getPatchedContentById(postContent.getHeadPatchLogId());
+        post.setContent(patchedContent);
+        return post;
     }
 
     @Override
@@ -523,7 +549,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         }
 
         content.append("---\n\n");
-        content.append(post.getOriginalContent());
+        PatchedContent postContent = post.getContent();
+        content.append(postContent.getOriginalContent());
         return content.toString();
     }
 
@@ -575,6 +602,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<PostComment> postComments = postCommentService.removeByPostId(postId);
         log.debug("Removed post comments: [{}]", postComments);
 
+        // Remove post content
+        Content postContent = postContentService.removeById(postId);
+        log.debug("Removed post content: [{}]", postContent);
+
         Post deletedPost = super.removeById(postId);
 
         // Log it
@@ -614,9 +645,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return postPage.map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
-            if (StringUtils.isBlank(postListVO.getSummary())) {
-                postListVO.setSummary(generateSummary(post.getFormatContent()));
-            }
+            generateAndSetSummaryIfAbsent(post, postListVO);
 
             Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
 
@@ -645,6 +674,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             postListVO.setCommentCount(commentCountMap.getOrDefault(post.getId(), 0L));
 
             postListVO.setFullPath(buildFullPath(post));
+
+            // Post currently drafting in process
+            Boolean isInProcess = postContentService.draftingInProgress(post.getId());
+            postListVO.setInProgress(isInProcess);
 
             return postListVO;
         });
@@ -678,9 +711,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         return posts.stream().map(post -> {
             PostListVO postListVO = new PostListVO().convertFrom(post);
 
-            if (StringUtils.isBlank(postListVO.getSummary())) {
-                postListVO.setSummary(generateSummary(post.getFormatContent()));
-            }
+            generateAndSetSummaryIfAbsent(post, postListVO);
 
             Optional.ofNullable(tagListMap.get(post.getId())).orElseGet(LinkedList::new);
 
@@ -742,9 +773,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
 
         // Set summary
-        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
-            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
-        }
+        generateAndSetSummaryIfAbsent(post, basePostSimpleDTO);
 
         basePostSimpleDTO.setFullPath(buildFullPath(post));
 
@@ -767,10 +796,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Convert to base detail vo
         PostDetailVO postDetailVO = new PostDetailVO().convertFrom(post);
-
-        if (StringUtils.isBlank(postDetailVO.getSummary())) {
-            postDetailVO.setSummary(generateSummary(post.getFormatContent()));
-        }
+        generateAndSetSummaryIfAbsent(post, postDetailVO);
 
         // Extract ids
         Set<Integer> tagIds = ServiceUtils.fetchProperty(tags, Tag::getId);
@@ -793,6 +819,14 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             CommentStatus.PUBLISHED, post.getId()));
 
         postDetailVO.setFullPath(buildFullPath(post));
+
+        PatchedContent postContent = post.getContent();
+        postDetailVO.setContent(postContent.getContent());
+        postDetailVO.setOriginalContent(postContent.getOriginalContent());
+
+        // Post currently drafting in process
+        Boolean inProgress = postContentService.draftingInProgress(post.getId());
+        postDetailVO.setInProgress(inProgress);
 
         return postDetailVO;
     }
@@ -903,6 +937,10 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         // Remove authorization every time an post is created or updated.
         authorizationService.deletePostAuthorization(post.getId());
 
+        // get draft content by head patch log id
+        Content postContent = postContentService.getById(post.getId());
+        post.setContent(
+            postContentPatchLogService.getPatchedContentById(postContent.getHeadPatchLogId()));
         // Convert to post detail vo
         return convertTo(post, tags, categories, postMetaList);
     }
@@ -943,9 +981,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Override
     public List<PostMarkdownVO> listPostMarkdowns() {
         List<Post> allPostList = listAll();
-        List<PostMarkdownVO> result = new ArrayList(allPostList.size());
-        for (int i = 0; i < allPostList.size(); i++) {
-            Post post = allPostList.get(i);
+        List<PostMarkdownVO> result = new ArrayList<>(allPostList.size());
+        for (Post post : allPostList) {
             result.add(convertToPostMarkdownVo(post));
         }
         return result;
@@ -988,11 +1025,12 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 tagContent.append(" | ").append(tagName);
             }
         }
-        frontMatter.append("tags: ").append(tagContent.toString()).append("\n");
+        frontMatter.append("tags: ").append(tagContent).append("\n");
 
         frontMatter.append("---\n");
         postMarkdownVO.setFrontMatter(frontMatter.toString());
-        postMarkdownVO.setOriginalContent(post.getOriginalContent());
+        PatchedContent postContent = post.getContent();
+        postMarkdownVO.setOriginalContent(postContent.getOriginalContent());
         postMarkdownVO.setTitle(post.getTitle());
         postMarkdownVO.setSlug(post.getSlug());
         return postMarkdownVO;

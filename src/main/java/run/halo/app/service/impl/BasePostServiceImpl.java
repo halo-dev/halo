@@ -27,10 +27,14 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
+import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.ContentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BasePostService;
@@ -44,6 +48,7 @@ import run.halo.app.utils.ServiceUtils;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-24
  */
 @Slf4j
@@ -54,15 +59,23 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     private final OptionService optionService;
 
+    private final ContentService contentService;
+
+    private final ContentPatchLogService contentPatchLogService;
+
     private static final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
     private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
-        OptionService optionService) {
+        OptionService optionService,
+        ContentService contentService,
+        ContentPatchLogService contentPatchLogService) {
         super(basePostRepository);
         this.basePostRepository = basePostRepository;
         this.optionService = optionService;
+        this.contentService = contentService;
+        this.contentPatchLogService = contentPatchLogService;
     }
 
     @Override
@@ -109,6 +122,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         Optional<POST> postOptional = basePostRepository.getByIdAndStatus(id, status);
 
         return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(id));
+    }
+
+    @Override
+    public PatchedContent getLatestContentById(Integer id) {
+        return contentPatchLogService.getByPostId(id);
     }
 
     @Override
@@ -283,33 +301,46 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     @Transactional
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
+        PostStatus postStatus = post.getStatus();
+        PatchedContent postContent = post.getContent();
+        String originalContent = postContent.getOriginalContent();
+        if (originalContent != null) {
+            // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
+            // Render content and set word count
+            if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
+                postContent.setContent(MarkdownUtils.renderHtml(originalContent));
 
-        String originalContent = post.getOriginalContent();
+                post.setWordCount(htmlFormatWordCount(postContent.getContent()));
+            } else {
+                postContent.setContent(originalContent);
 
-        // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
-        // Render content and set word count
-        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
-
-            post.setWordCount(htmlFormatWordCount(post.getFormatContent()));
-        } else {
-            post.setFormatContent(originalContent);
-
-            post.setWordCount(htmlFormatWordCount(originalContent));
+                post.setWordCount(htmlFormatWordCount(originalContent));
+            }
+            post.setContent(postContent);
         }
 
+        POST savedPost;
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created
-            return create(post);
+            savedPost = create(post);
+            contentService.createOrUpdateDraftBy(post.getId(),
+                postContent.getContent(), postContent.getOriginalContent());
+        } else {
+            // The sheet will be updated
+            // Set edit time
+            post.setEditTime(DateUtils.now());
+            contentService.createOrUpdateDraftBy(post.getId(),
+                postContent.getContent(), postContent.getOriginalContent());
+            // Update it
+            savedPost = update(post);
         }
 
-        // The sheet will be updated
-        // Set edit time
-        post.setEditTime(DateUtils.now());
-
-        // Update it
-        return update(post);
+        if (PostStatus.PUBLISHED.equals(post.getStatus())
+            || PostStatus.INTIMATE.equals(post.getStatus())) {
+            contentService.publishContent(post.getId());
+        }
+        return savedPost;
     }
 
     @Override
@@ -319,8 +350,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         if (StringUtils.isNotBlank(post.getPassword())) {
             String tip = "The post is encrypted by author";
             post.setSummary(tip);
-            post.setOriginalContent(tip);
-            post.setFormatContent(tip);
+
+            Content postContent = new Content();
+            postContent.setContent(tip);
+            postContent.setOriginalContent(tip);
+            post.setContent(PatchedContent.of(postContent));
         }
 
         return post;
@@ -358,9 +392,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
 
         // Set summary
-        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
-            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
-        }
+        generateAndSetSummaryIfAbsent(post, basePostSimpleDTO);
+
+        // Post currently drafting in process
+        Boolean isInProcess = contentService.draftingInProgress(post.getId());
+        basePostSimpleDTO.setInProgress(isInProcess);
 
         return basePostSimpleDTO;
     }
@@ -387,30 +423,33 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     public BasePostDetailDTO convertToDetail(POST post) {
         Assert.notNull(post, "Post must not be null");
 
-        return new BasePostDetailDTO().convertFrom(post);
+        BasePostDetailDTO postDetail = new BasePostDetailDTO().convertFrom(post);
+
+        // Post currently drafting in process
+        Boolean isInProcess = contentService.draftingInProgress(post.getId());
+        postDetail.setInProgress(isInProcess);
+
+        return postDetail;
     }
 
     @Override
-    @Transactional
-    public POST updateDraftContent(String content, Integer postId) {
+    @Transactional(rollbackFor = Exception.class)
+    public POST updateDraftContent(String content, String originalContent, Integer postId) {
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
 
-        if (content == null) {
-            content = "";
+        if (originalContent == null) {
+            originalContent = "";
         }
 
         POST post = getById(postId);
-
-        if (!StringUtils.equals(content, post.getOriginalContent())) {
-            // If content is different with database, then update database
-            int updatedRows = basePostRepository.updateOriginalContent(content, postId);
-            if (updatedRows != 1) {
-                throw new ServiceException(
-                    "Failed to update original content of post with id " + postId);
-            }
-            // Set the content
-            post.setOriginalContent(content);
+        if (PostEditorType.MARKDOWN.equals(post.getEditorType())) {
+            content = MarkdownUtils.renderHtml(originalContent);
+        } else {
+            content = originalContent;
         }
+        contentService.createOrUpdateDraftBy(postId, content, originalContent);
+
+        post.setContent(getLatestContentById(postId));
 
         return post;
     }
@@ -438,15 +477,8 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         // Sync content
         if (PostStatus.PUBLISHED.equals(status)) {
             // If publish this post, then convert the formatted content
-            String formatContent = MarkdownUtils.renderHtml(post.getOriginalContent());
-            int updatedRows = basePostRepository.updateFormatContent(formatContent, postId);
-
-            if (updatedRows != 1) {
-                throw new ServiceException(
-                    "Failed to update post format content of post with id " + postId);
-            }
-
-            post.setFormatContent(formatContent);
+            Content postContent = contentService.publishContent(postId);
+            post.setContent(PatchedContent.of(postContent));
         }
 
         return post;
@@ -495,6 +527,12 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         return super.update(post);
     }
 
+    @Override
+    public Content getContentById(Integer postId) {
+        Assert.notNull(postId, "The postId must not be null.");
+        return contentService.getById(postId);
+    }
+
     /**
      * Check if the slug is exist.
      *
@@ -533,6 +571,22 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
         return StringUtils.substring(text, 0, summaryLength);
+    }
+
+    protected <T extends BasePostSimpleDTO> void generateAndSetSummaryIfAbsent(POST post,
+        T postVo) {
+        Assert.notNull(post, "The post must not be null.");
+        if (StringUtils.isNotBlank(postVo.getSummary())) {
+            return;
+        }
+
+        PatchedContent patchedContent = post.getContentOfNullable();
+        if (patchedContent == null) {
+            Content postContent = getContentById(post.getId());
+            postVo.setSummary(generateSummary(postContent.getContent()));
+        } else {
+            postVo.setSummary(generateSummary(patchedContent.getContent()));
+        }
     }
 
     // CS304 issue link : https://github.com/halo-dev/halo/issues/1224

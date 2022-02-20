@@ -109,7 +109,7 @@ public class PostController {
 
         if (formatDisabled) {
             // Clear the format content
-            postDetailVO.setFormatContent(null);
+            postDetailVO.setContent(null);
         }
 
         if (sourceDisabled) {
@@ -133,7 +133,7 @@ public class PostController {
 
         if (formatDisabled) {
             // Clear the format content
-            postDetailVO.setFormatContent(null);
+            postDetailVO.setContent(null);
         }
 
         if (sourceDisabled) {

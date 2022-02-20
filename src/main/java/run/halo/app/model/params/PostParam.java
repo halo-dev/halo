@@ -10,10 +10,13 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.base.InputConverter;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.SlugUtils;
 
 /**
@@ -80,7 +83,9 @@ public class PostParam implements InputConverter<Post> {
             editorType = PostEditorType.MARKDOWN;
         }
 
-        return InputConverter.super.convertTo();
+        Post post = InputConverter.super.convertTo();
+        populateContent(post);
+        return post;
     }
 
     @Override
@@ -94,7 +99,7 @@ public class PostParam implements InputConverter<Post> {
         if (null == editorType) {
             editorType = PostEditorType.MARKDOWN;
         }
-
+        populateContent(post);
         InputConverter.super.update(post);
     }
 
@@ -109,5 +114,16 @@ public class PostParam implements InputConverter<Post> {
             postMetaSet.add(postMeta);
         }
         return postMetaSet;
+    }
+
+    private void populateContent(Post post) {
+        Content postContent = new Content();
+        if (PostEditorType.MARKDOWN.equals(editorType)) {
+            postContent.setContent(MarkdownUtils.renderHtml(originalContent));
+        } else {
+            postContent.setContent(postContent.getOriginalContent());
+        }
+        postContent.setOriginalContent(originalContent);
+        post.setContent(PatchedContent.of(postContent));
     }
 }

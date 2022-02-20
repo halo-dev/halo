@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostEditorType;
@@ -61,6 +63,9 @@ public class SheetModel {
 
         if (StringUtils.isEmpty(token)) {
             sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getSlug());
+            //Set sheet content
+            Content content = sheetService.getContentById(sheet.getId());
+            sheet.setContent(PatchedContent.of(content));
         } else {
             // verify token
             String cachedToken = cacheStore.getAny(token, String.class)
@@ -69,11 +74,14 @@ public class SheetModel {
                 throw new ForbiddenException("您没有该页面的访问权限");
             }
             // render markdown to html when preview sheet
+            PatchedContent sheetContent = sheetService.getLatestContentById(sheet.getId());
             if (sheet.getEditorType().equals(PostEditorType.MARKDOWN)) {
-                sheet.setFormatContent(MarkdownUtils.renderHtml(sheet.getOriginalContent()));
+                sheetContent.setContent(
+                    MarkdownUtils.renderHtml(sheetContent.getOriginalContent()));
             } else {
-                sheet.setFormatContent(sheet.getOriginalContent());
+                sheetContent.setContent(sheetContent.getOriginalContent());
             }
+            sheet.setContent(sheetContent);
         }
 
         sheetService.publishVisitEvent(sheet.getId());
@@ -94,7 +102,7 @@ public class SheetModel {
             model.addAttribute("meta_description", sheet.getMetaDescription());
         } else {
             model.addAttribute("meta_description",
-                sheetService.generateDescription(sheet.getFormatContent()));
+                sheetService.generateDescription(sheet.getContent().getContent()));
         }
 
         // sheet and post all can use
