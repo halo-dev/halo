@@ -107,6 +107,15 @@
       :scrollToFirstRowOnChange="true"
     >
       <template #sheetTitle="text, record">
+        <a-tooltip v-if="record.inProgress" title="当前有内容已保存，但还未发布。" placement="top">
+          <a-icon
+            class="cursor-pointer"
+            style="margin-right: 3px"
+            theme="twoTone"
+            twoToneColor="#52c41a"
+            type="info-circle"
+          />
+        </a-tooltip>
         <a-tooltip v-if="record.status === 'PUBLISHED'" :title="'点击访问【' + text + '】'" placement="top">
           <a :href="record.fullPath" class="no-underline" target="_blank">
             {{ text }}
