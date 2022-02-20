@@ -243,6 +243,15 @@
               twoToneColor="red"
               type="pushpin"
             />
+            <a-tooltip v-if="record.inProgress" title="当前有内容已保存，但还未发布。" placement="top">
+              <a-icon
+                class="cursor-pointer"
+                style="margin-right: 3px"
+                theme="twoTone"
+                twoToneColor="#52c41a"
+                type="info-circle"
+              />
+            </a-tooltip>
             <a-tooltip
               v-if="['PUBLISHED', 'INTIMATE'].includes(record.status)"
               :title="'点击访问【' + text + '】'"
@@ -411,7 +420,7 @@ const columns = [
   {
     title: '标题',
     dataIndex: 'title',
-    width: '150px',
+    width: '200px',
     ellipsis: true,
     scopedSlots: { customRender: 'postTitle' }
   },

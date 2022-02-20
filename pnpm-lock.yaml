@@ -27,6 +27,7 @@ specifiers:
   less: ^3.13.1
   less-loader: ^5.0.0
   lint-staged: ^11.2.6
+  lodash.debounce: ^4.0.8
   marked: ^4.0.10
   md5.js: ^1.3.5
   nprogress: ^0.2.0
@@ -58,6 +59,7 @@ dependencies:
   filepond-plugin-file-validate-type: 1.2.6_filepond@4.30.3
   filepond-plugin-image-preview: 4.6.10_filepond@4.30.3
   halo-editor: 2.8.4
+  lodash.debounce: 4.0.8
   marked: 4.0.10
   md5.js: 1.3.5
   nprogress: 0.2.0
@@ -5112,7 +5114,6 @@ packages:
 
   /lodash.debounce/4.0.8:
     resolution: {integrity: sha1-gteb/zCmfEAF/9XiUVMArZyk168=}
-    dev: true
 
   /lodash.defaultsdeep/4.6.1:
     resolution: {integrity: sha512-3j8wdDzYuWO3lM3Reg03MuQR957t287Rpcxp1njpEa8oDrikb+FwGdW3n+FELh/A6qib6yPit0j/pv9G/yeAqA==}
