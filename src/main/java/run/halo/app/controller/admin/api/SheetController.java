@@ -126,9 +126,12 @@ public class SheetController {
     public BasePostDetailDTO updateDraftBy(
         @PathVariable("sheetId") Integer sheetId,
         @RequestBody PostContentParam contentParam) {
+        Sheet sheetToUse = sheetService.getById(sheetId);
+        String formattedContent = contentParam.decideContentBy(sheetToUse.getEditorType());
+
         // Update draft content
-        Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(),
-            contentParam.getContent(), sheetId);
+        Sheet sheet = sheetService.updateDraftContent(formattedContent,
+            contentParam.getOriginalContent(), sheetId);
         return sheetService.convertToDetail(sheet);
     }
 
