@@ -185,6 +185,7 @@
                         theme="twoTone"
                         twoToneColor="#52c41a"
                         type="info-circle"
+                        @click="handleEditClick(item)"
                       />
                     </a-tooltip>
                     <a-tooltip
@@ -261,6 +262,7 @@
                 theme="twoTone"
                 twoToneColor="#52c41a"
                 type="info-circle"
+                @click="handleEditClick(record)"
               />
             </a-tooltip>
             <a-tooltip

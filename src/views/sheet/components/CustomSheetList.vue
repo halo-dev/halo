@@ -78,6 +78,17 @@
               <div
                 style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
               >
+                <a-tooltip v-if="item.inProgress" placement="top" title="当前有内容已保存，但还未发布。">
+                  <a-icon
+                    class="cursor-pointer"
+                    style="margin-right: 3px"
+                    theme="twoTone"
+                    twoToneColor="#52c41a"
+                    type="info-circle"
+                    @click="handleEditClick(item)"
+                  />
+                </a-tooltip>
+
                 <a-tooltip v-if="item.status === 'PUBLISHED'" :title="'点击访问【' + item.title + '】'" placement="top">
                   <a :href="item.fullPath" class="no-underline" target="_blank">
                     {{ item.title }}
@@ -125,6 +136,7 @@
             theme="twoTone"
             twoToneColor="#52c41a"
             type="info-circle"
+            @click="handleEditClick(record)"
           />
         </a-tooltip>
         <a-tooltip v-if="record.status === 'PUBLISHED'" :title="'点击访问【' + text + '】'" placement="top">
