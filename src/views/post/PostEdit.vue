@@ -1,7 +1,7 @@
 <template>
   <page-view
-    :title="postToStage.title ? postToStage.title : '新文章'"
     :sub-title="postToStage.inProgress ? '当前内容已保存，但还未发布。' : ''"
+    :title="postToStage.title ? postToStage.title : '新文章'"
     affix
   >
     <template slot="extra">
@@ -17,9 +17,9 @@
         </div>
         <div id="editor" :style="{ height: editorHeight }">
           <MarkdownEditor
-            :originalContent="postToStage.originalContent"
-            @onContentChange="onContentChange"
-            @onSaveDraft="handleSaveDraft()"
+            :originalContent.sync="postToStage.originalContent"
+            @change="onContentChange"
+            @save="handleSaveDraft()"
           />
         </div>
       </a-col>
@@ -101,7 +101,21 @@ export default {
       return '当前页面数据未保存，确定要离开吗？'
     }
   },
+  beforeMount() {
+    document.addEventListener('keydown', this.onRegisterSaveShortcut)
+  },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.onRegisterSaveShortcut)
+  },
   methods: {
+    onRegisterSaveShortcut(e) {
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.keyCode === 83) {
+        e.preventDefault()
+        e.stopPropagation()
+        this.handleSaveDraft()
+      }
+    },
+
     handleSaveDraft: debounce(async function () {
       if (this.postToStage.id) {
         // Update the post content
@@ -173,9 +187,9 @@ export default {
     handleRestoreSavedStatus() {
       this.contentChanges = 0
     },
-    onContentChange(val) {
+    onContentChange({ originalContent }) {
       this.contentChanges++
-      this.postToStage.originalContent = val
+      this.postToStage.originalContent = originalContent
     },
     onPostSavedCallback() {
       this.contentChanges = 0

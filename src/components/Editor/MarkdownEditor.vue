@@ -1,30 +1,30 @@
 <template>
   <div class="h-full">
     <halo-editor
-      ref="md"
+      ref="editor"
       v-model="originalContentData"
       :boxShadow="false"
-      :ishljs="true"
-      :toolbars="toolbars"
+      :toolbars="markdownEditorToolbars"
+      :uploadRequest="handleAttachmentUpload"
       autofocus
-      @imgAdd="handleAttachmentUpload"
+      @change="handleChange"
       @openImagePicker="attachmentSelectVisible = true"
-      @save="handleSaveDraft"
+      @save="handleSave"
     />
 
     <AttachmentSelectModal :visible.sync="attachmentSelectVisible" @confirm="handleSelectAttachment" />
   </div>
 </template>
 <script>
-import { toolbars } from '@/core/const'
-import { haloEditor } from 'halo-editor'
-import 'halo-editor/dist/css/index.css'
+import haloEditor from '@halo-dev/editor'
+import '@halo-dev/editor/dist/lib/style.css'
 import apiClient from '@/utils/api-client'
+import { markdownEditorToolbars } from '@/core/constant'
 
 export default {
   name: 'MarkdownEditor',
   components: {
-    haloEditor
+    haloEditor: haloEditor.editor
   },
   props: {
     originalContent: {
@@ -35,39 +35,50 @@ export default {
   },
   data() {
     return {
-      toolbars,
-      originalContentData: '',
+      markdownEditorToolbars,
       attachmentSelectVisible: false
     }
   },
-  watch: {
-    originalContent(val) {
-      this.originalContentData = val
-    },
-    originalContentData(val) {
-      this.$emit('onContentChange', val)
+  computed: {
+    originalContentData: {
+      get() {
+        return this.originalContent
+      },
+      set(value) {
+        this.$emit('update:originalContent', value)
+      }
     }
   },
   methods: {
-    async handleAttachmentUpload(pos, $file) {
-      try {
-        const response = await apiClient.attachment.upload($file)
-        const responseObject = response.data
-        const HaloEditor = this.$refs.md
-        HaloEditor.$img2Url(pos, encodeURI(responseObject.path))
-      } catch (e) {
-        this.$log.error('update image error: ', e)
-      }
-    },
-    handleSelectAttachment({ markdown }) {
-      this.$refs.md.insertText(this.$refs.md.getTextareaDom(), {
-        prefix: '',
-        subfix: '',
-        str: markdown.join('\n')
+    handleAttachmentUpload(file) {
+      return new Promise((resolve, reject) => {
+        const hideLoading = this.$message.loading('上传中...', 0)
+        apiClient.attachment
+          .upload(file)
+          .then(response => {
+            const attachment = response.data
+            resolve({
+              name: attachment.name,
+              path: encodeURI(attachment.path)
+            })
+          })
+          .catch(e => {
+            this.$log.error('upload image error: ', e)
+            reject(e)
+          })
+          .finally(() => {
+            hideLoading()
+          })
       })
     },
-    handleSaveDraft() {
-      this.$emit('onSaveDraft')
+    handleSelectAttachment({ markdown }) {
+      this.$refs.editor.insetAtCursor(markdown.join('\n'))
+    },
+    handleSave() {
+      this.$emit('save')
+    },
+    handleChange({ originalContent, renderContent }) {
+      this.$emit('change', { originalContent, renderContent })
     }
   }
 }

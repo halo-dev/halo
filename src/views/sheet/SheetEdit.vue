@@ -18,9 +18,9 @@
 
         <div id="editor" :style="{ height: editorHeight }">
           <MarkdownEditor
-            :originalContent="sheetToStage.originalContent"
-            @onContentChange="onContentChange"
-            @onSaveDraft="handleSaveDraft()"
+            :originalContent.sync="sheetToStage.originalContent"
+            @change="onContentChange"
+            @save="handleSaveDraft()"
           />
         </div>
       </a-col>
@@ -103,7 +103,21 @@ export default {
       return '当前页面数据未保存，确定要离开吗？'
     }
   },
+  beforeMount() {
+    document.addEventListener('keydown', this.onRegisterSaveShortcut)
+  },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.onRegisterSaveShortcut)
+  },
   methods: {
+    onRegisterSaveShortcut(e) {
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.keyCode === 83) {
+        e.preventDefault()
+        e.stopPropagation()
+        this.handleSaveDraft()
+      }
+    },
+
     handleSaveDraft: debounce(async function () {
       if (this.sheetToStage.id) {
         try {
@@ -175,9 +189,9 @@ export default {
     handleRestoreSavedStatus() {
       this.contentChanges = 0
     },
-    onContentChange(val) {
+    onContentChange({ originalContent }) {
       this.contentChanges++
-      this.sheetToStage.originalContent = val
+      this.sheetToStage.originalContent = originalContent
     },
     onSheetSavedCallback() {
       this.contentChanges = 0
