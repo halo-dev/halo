@@ -50,7 +50,7 @@ public abstract class BasePostParam {
 
     protected String metaDescription;
 
-    protected Boolean serverSideMarkdownRender;
+    protected Boolean serverSideMarkdownRender = false;
 
     protected <T extends BasePost> void populateContent(T post) {
         Assert.notNull(post, "The post must not be null.");
