@@ -1,5 +1,51 @@
 # CHANGELOG
 
+# 1.5.0-alpha.1
+
+## Breaking changes
+
+- 评论表单中的邮箱地址不再作为必填项。 halo-dev/halo#1535 @jerry-shao
+- 重构文章表结构。
+    - 提供单独的 `contents` 表存储文章内容，将不再使用 `posts` 表中的 `originalContent` 和 `formatContent` 字段。 halo-dev/halo#1617 @guqing
+    - `formatContent` 已经废弃，将在下一个大版本中移除。后续使用 `content` 字段代替。 halo-dev/halo#1617 @guqing
+    - 提供 `content_patch_logs` 表用于存储变更记录。 halo-dev/halo#1617 @guqing
+- 后台使用 @halo-dev/admin-api 进行接口请求。 halo-dev/halo-admin#378 @ruibaby @guqing
+- 修改后台页面标题后缀，由 `Halo Dashboard` 改为 `Halo`。 halo-dev/halo-admin#426 @ruibaby
+- 默认后台布局改为左侧菜单布局。 halo-dev/halo-admin#441 @ruibaby
+- 重构文章/自定义页面编辑逻辑，改为保存前端渲染内容，放弃后端渲染。 halo-dev/halo-admin#439 halo-dev/halo-admin#440 halo-dev/halo-admin#449 halo-dev/halo#1668 @ruibaby @guqing
+
+## Features
+
+- Content API 添加获取所有图库图片分组的接口（PhotoController#listTeams）。 halo-dev/halo#1515 @fuzui
+- Content API 添加根据 `themeId` 获取主题详情和设置的接口。 halo-dev/halo#1660 @guqing
+- 图库支持点赞。 halo-dev/halo#1537 @guqing
+- 文章标签支持设置颜色。 halo-dev/halo#1566 halo-dev/halo-admin#395 @ruibaby @guqing
+- 重构后台文章分类管理，支持排序。 halo-dev/halo#1650 halo-dev/halo#1657 halo-dev/halo-admin#435 @lan-yonghui @ruibaby @guqing
+- 文章设置界面支持重新生成别名。 halo-dev/halo-admin#368 @ruibaby
+
+## Improvements
+
+- 更新 Logo。 halo-dev/halo-admin#366 @ruibaby
+- 重构附件上传的文件命名逻辑，文件作为第一次上传的时候文件名不添加随机字符串。 halo-dev/halo#1500 @guqing
+- 优化后台编辑文章时的预览体验，预览文章或临时保存内容不会修改已经发布的内容。 halo-dev/halo#1617 halo-dev/halo-admin#439 @guqing @ruibaby
+- 重构后台主题设置界面，提供单独的设置页面，支持展示主题的相关信息。 halo-dev/halo-admin#380 @ruibaby
+- 弱化后台登录页面的动画效果。 halo-dev/halo-admin#369 @ruibaby
+- 优化后台附件管理列表预览图片样式。 halo-dev/halo-admin#374 halo-dev/halo-admin#382 @623337308 @cetr
+- 重构后台附件详情界面，取消原有抽屉的设计，改为弹窗。 halo-dev/halo-admin#375 halo-dev/halo-admin#381 @ruibaby
+- 重构后台文章/自定义页面设置界面，取消原有抽屉的设计，改为弹窗。 halo-dev/halo-admin#376 @ruibaby
+- 重构后台操作日志列表界面，取消原有抽屉的设计，提供单独的页面。 halo-dev/halo-admin#419 @ruibaby
+- 重构后台图片选择弹框组件，支持直接插入到编辑器，支持多选。 halo-dev/halo-admin#420 halo-dev/halo-admin#421 @ruibaby
+- 后台文章设置选择标签列表改为根据名称排序。 halo-dev/halo-admin#429 @ruibaby
+- 优化后台附件管理中批量操作附件的逻辑。 halo-dev/halo-admin#431 @ruibaby
+- 后台使用重构版本的编辑器，编辑区域支持高亮语法，优化数学公式和图表等渲染，优化表格的编辑体验。 halo-dev/halo-admin#447 @ruibaby
+
+## Bug Fixes
+
+- 修复修改加密文章或分类时没有清除用户访问权限的问题。 halo-dev/halo#1540 @guqing
+- 修复重置密码没有校验密码长度的问题。 halo-dev/halo#1636 halo-dev/halo-admin#403 @ruibaby @guqing
+- 修复后台文章设置中无法仅选择父级分类的问题。 halo-dev/halo-admin#367 @ruibaby
+- 修复后台菜单管理中移动菜单项到其他分组的时候，导致子菜单丢失的问题。 halo-dev/halo-admin#422 @ruibaby
+
 # 1.4.17
 
 ## Breaking changes
