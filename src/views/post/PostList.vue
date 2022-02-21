@@ -210,13 +210,7 @@
               >{{ category.name }}
             </a-tag>
             <br />
-            <a-tag
-              v-for="(tag, tagIndex) in item.tags"
-              :key="'tag_' + tagIndex"
-              :color="tag.color"
-              style="margin-bottom: 8px"
-              >{{ tag.name }}
-            </a-tag>
+            <post-tag v-for="(tag, tagIndex) in item.tags" :key="tagIndex" :tag="tag" style="margin-bottom: 8px" />
           </a-list-item>
         </a-list>
 
@@ -243,7 +237,7 @@
               twoToneColor="red"
               type="pushpin"
             />
-            <a-tooltip v-if="record.inProgress" title="当前有内容已保存，但还未发布。" placement="top">
+            <a-tooltip v-if="record.inProgress" placement="top" title="当前有内容已保存，但还未发布。">
               <a-icon
                 class="cursor-pointer"
                 style="margin-right: 3px"
@@ -286,11 +280,9 @@
             </a-tag>
           </span>
 
-          <span slot="tags" slot-scope="tags">
-            <a-tag v-for="(tag, index) in tags" :key="index" :color="tag.color" style="margin-bottom: 8px">
-              {{ tag.name }}
-            </a-tag>
-          </span>
+          <template #tags="tags">
+            <post-tag v-for="(tag, index) in tags" :key="index" :tag="tag" style="margin-bottom: 8px" />
+          </template>
 
           <span
             slot="commentCount"
