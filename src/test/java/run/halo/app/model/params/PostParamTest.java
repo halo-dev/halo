@@ -61,7 +61,7 @@ public class PostParamTest {
     }
 
     @Test
-    public void shouldServerSideMarkdown() {
+    public void shouldServerSideRender() {
         PostParam postParam = new PostParam();
         postParam.setSlug("slug");
         // server side rendering
