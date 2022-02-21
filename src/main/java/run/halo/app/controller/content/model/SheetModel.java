@@ -10,7 +10,6 @@ import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
-import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.vo.SheetDetailVO;
@@ -18,7 +17,6 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetMetaService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
-import run.halo.app.utils.MarkdownUtils;
 
 /**
  * Sheet model.
@@ -75,12 +73,6 @@ public class SheetModel {
             }
             // render markdown to html when preview sheet
             PatchedContent sheetContent = sheetService.getLatestContentById(sheet.getId());
-            if (sheet.getEditorType().equals(PostEditorType.MARKDOWN)) {
-                sheetContent.setContent(
-                    MarkdownUtils.renderHtml(sheetContent.getOriginalContent()));
-            } else {
-                sheetContent.setContent(sheetContent.getOriginalContent());
-            }
             sheet.setContent(sheetContent);
         }
 

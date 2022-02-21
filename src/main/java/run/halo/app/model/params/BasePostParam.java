@@ -10,6 +10,7 @@ import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Content;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
+import run.halo.app.service.impl.BasePostServiceImpl;
 import run.halo.app.utils.MarkdownUtils;
 
 /**

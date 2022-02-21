@@ -30,7 +30,6 @@ import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Content.PatchedContent;
-import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
@@ -41,7 +40,6 @@ import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BasePostService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
-import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 /**
@@ -302,23 +300,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     @Transactional
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
-        PostStatus postStatus = post.getStatus();
         PatchedContent postContent = post.getContent();
-        String originalContent = postContent.getOriginalContent();
-        if (originalContent != null) {
-            // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
-            // Render content and set word count
-            if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-                postContent.setContent(MarkdownUtils.renderHtml(originalContent));
-
-                post.setWordCount(htmlFormatWordCount(postContent.getContent()));
-            } else {
-                postContent.setContent(originalContent);
-
-                post.setWordCount(htmlFormatWordCount(originalContent));
-            }
-            post.setContent(postContent);
-        }
+        // word count stat
+        post.setWordCount(htmlFormatWordCount(postContent.getContent()));
+        post.setContent(postContent);
 
         POST savedPost;
         // Create or update post
