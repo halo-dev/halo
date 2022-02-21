@@ -12,8 +12,10 @@ import com.github.difflib.patch.InsertDelta;
 import com.github.difflib.patch.Patch;
 import com.github.difflib.patch.PatchFailedException;
 import com.google.common.base.Splitter;
+import java.util.Collections;
 import java.util.List;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Content patch utilities.
@@ -76,6 +78,9 @@ public class PatchUtils {
     }
 
     public static List<String> breakLine(String content) {
+        if (StringUtils.isBlank(content)) {
+            return Collections.emptyList();
+        }
         return lineSplitter.splitToList(content);
     }
 

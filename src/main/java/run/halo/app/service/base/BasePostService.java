@@ -330,8 +330,8 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     /**
      * Generate description.
      *
-     * @param content html content must not be null.
+     * @param content html content.
      * @return description
      */
-    String generateDescription(@NonNull String content);
+    String generateDescription(@Nullable String content);
 }

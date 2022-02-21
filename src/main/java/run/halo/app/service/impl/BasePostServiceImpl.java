@@ -477,8 +477,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    public String generateDescription(String content) {
-        Assert.notNull(content, "html content must not be null");
+    public String generateDescription(@Nullable String content) {
+        if (StringUtils.isBlank(content)) {
+            return StringUtils.EMPTY;
+        }
 
         String text = HaloUtils.cleanHtmlTag(content);
 
