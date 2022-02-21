@@ -12,8 +12,8 @@
             <a-col :md="6" :sm="24">
               <a-form-item label="文章状态：">
                 <a-select v-model="list.params.status" allowClear placeholder="请选择文章状态" @change="handleQuery()">
-                  <a-select-option v-for="status in Object.keys(postStatus)" :key="status" :value="status">
-                    {{ postStatus[status].text }}
+                  <a-select-option v-for="status in Object.keys(postStatuses)" :key="status" :value="status">
+                    {{ postStatuses[status].text }}
                   </a-select-option>
                 </a-select>
               </a-form-item>
@@ -51,32 +51,34 @@
           <a-button icon="plus" type="primary">写文章</a-button>
         </router-link>
         <a-dropdown v-show="list.params.status != null && list.params.status !== '' && !isMobile()">
-          <a-menu slot="overlay">
-            <a-menu-item
-              v-if="['DRAFT', 'RECYCLE'].includes(list.params.status)"
-              key="1"
-              @click="handleEditStatusMore(postStatus.PUBLISHED.value)"
-            >
-              发布
-            </a-menu-item>
-            <a-menu-item
-              v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(list.params.status)"
-              key="2"
-              @click="handleEditStatusMore(postStatus.RECYCLE.value)"
-            >
-              移到回收站
-            </a-menu-item>
-            <a-menu-item
-              v-if="['RECYCLE', 'PUBLISHED', 'INTIMATE'].includes(list.params.status)"
-              key="3"
-              @click="handleEditStatusMore(postStatus.DRAFT.value)"
-            >
-              草稿
-            </a-menu-item>
-            <a-menu-item v-if="['RECYCLE', 'DRAFT'].includes(list.params.status)" key="4" @click="handleDeleteMore">
-              永久删除
-            </a-menu-item>
-          </a-menu>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item
+                v-if="['DRAFT', 'RECYCLE'].includes(list.params.status)"
+                key="1"
+                @click="handleEditStatusMore(postStatuses.PUBLISHED.value)"
+              >
+                发布
+              </a-menu-item>
+              <a-menu-item
+                v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(list.params.status)"
+                key="2"
+                @click="handleEditStatusMore(postStatuses.RECYCLE.value)"
+              >
+                移到回收站
+              </a-menu-item>
+              <a-menu-item
+                v-if="['RECYCLE', 'PUBLISHED', 'INTIMATE'].includes(list.params.status)"
+                key="3"
+                @click="handleEditStatusMore(postStatuses.DRAFT.value)"
+              >
+                草稿
+              </a-menu-item>
+              <a-menu-item v-if="['RECYCLE', 'DRAFT'].includes(list.params.status)" key="4" @click="handleDeleteMore">
+                永久删除
+              </a-menu-item>
+            </a-menu>
+          </template>
           <a-button class="ml-2">
             批量操作
             <a-icon type="down" />
@@ -87,138 +89,153 @@
         <!-- Mobile -->
         <a-list
           v-if="isMobile()"
-          :dataSource="formattedPosts"
+          :dataSource="list.data"
           :loading="list.loading"
           :pagination="false"
           itemLayout="vertical"
           size="large"
         >
-          <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
-            <template slot="actions">
-              <span>
-                <a-icon type="eye" />
-                {{ item.visits }}
-              </span>
-              <span @click="handleShowPostComments(item)">
-                <a-icon type="message" />
-                {{ item.commentCount }}
-              </span>
-              <a-dropdown :trigger="['click']" placement="topLeft">
+          <template #renderItem="item, index">
+            <a-list-item :key="index">
+              <template #actions>
                 <span>
-                  <a-icon type="bars" />
+                  <a-icon type="eye" />
+                  {{ item.visits }}
                 </span>
-                <a-menu slot="overlay">
-                  <a-menu-item
-                    v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(item.status)"
-                    @click="handleEditClick(item)"
-                  >
-                    编辑
-                  </a-menu-item>
-                  <a-menu-item v-else-if="item.status === 'RECYCLE'">
-                    <a-popconfirm
-                      :title="'你确定要发布【' + item.title + '】文章？'"
-                      cancelText="取消"
-                      okText="确定"
-                      @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
-                    >
-                      还原
-                    </a-popconfirm>
-                  </a-menu-item>
-                  <a-menu-item v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(item.status)">
-                    <a-popconfirm
-                      :title="'你确定要将【' + item.title + '】文章移到回收站？'"
-                      cancelText="取消"
-                      okText="确定"
-                      @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
-                    >
-                      回收站
-                    </a-popconfirm>
-                  </a-menu-item>
-                  <a-menu-item v-else-if="item.status === 'RECYCLE'">
-                    <a-popconfirm
-                      :title="'你确定要永久删除【' + item.title + '】文章？'"
-                      cancelText="取消"
-                      okText="确定"
-                      @confirm="handleDeleteClick(item.id)"
-                    >
-                      删除
-                    </a-popconfirm>
-                  </a-menu-item>
-                  <a-menu-item @click="handleShowPostSettings(item)">设置</a-menu-item>
-                </a-menu>
-              </a-dropdown>
-            </template>
-            <template slot="extra">
-              <span>
-                <a-badge :status="item.statusProperty.status" :text="item.statusProperty.text" />
-              </span>
-            </template>
-            <a-list-item-meta>
-              <template slot="description">
-                {{ item.createTime | moment }}
+                <span @click="handleShowPostComments(item)">
+                  <a-icon type="message" />
+                  {{ item.commentCount }}
+                </span>
+                <a-dropdown :trigger="['click']" placement="topLeft">
+                  <span>
+                    <a-icon type="bars" />
+                  </span>
+
+                  <template #overlay>
+                    <a-menu>
+                      <a-menu-item
+                        v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(item.status)"
+                        @click="handleEditClick(item)"
+                      >
+                        编辑
+                      </a-menu-item>
+                      <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                        <a-popconfirm
+                          :title="'你确定要发布【' + item.title + '】文章？'"
+                          cancelText="取消"
+                          okText="确定"
+                          @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
+                        >
+                          还原
+                        </a-popconfirm>
+                      </a-menu-item>
+                      <a-menu-item v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(item.status)">
+                        <a-popconfirm
+                          :title="'你确定要将【' + item.title + '】文章移到回收站？'"
+                          cancelText="取消"
+                          okText="确定"
+                          @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
+                        >
+                          回收站
+                        </a-popconfirm>
+                      </a-menu-item>
+                      <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                        <a-popconfirm
+                          :title="'你确定要永久删除【' + item.title + '】文章？'"
+                          cancelText="取消"
+                          okText="确定"
+                          @confirm="handleDeleteClick(item.id)"
+                        >
+                          删除
+                        </a-popconfirm>
+                      </a-menu-item>
+                      <a-menu-item @click="handleShowPostSettings(item)">设置</a-menu-item>
+                    </a-menu>
+                  </template>
+                </a-dropdown>
               </template>
-              <template #title>
-                <div
-                  style="
-                    max-width: 300px;
-                    display: block;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                  "
-                >
-                  <a-icon
-                    v-if="item.topPriority !== 0"
-                    style="margin-right: 3px"
-                    theme="twoTone"
-                    twoToneColor="red"
-                    type="pushpin"
-                  />
-                  <a-tooltip
-                    v-if="['PUBLISHED', 'INTIMATE'].includes(item.status)"
-                    :title="'点击访问【' + item.title + '】'"
-                    placement="top"
+              <template #extra>
+                <a-badge :status="postStatuses[item.status].status" :text="item.status | statusText" />
+              </template>
+              <a-list-item-meta>
+                <template #description>
+                  {{ item.createTime | moment }}
+                </template>
+                <template #title>
+                  <div
+                    style="
+                      max-width: 300px;
+                      display: block;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    "
                   >
-                    <a :href="item.fullPath" class="no-underline" target="_blank">
-                      {{ item.title }}
-                    </a>
-                  </a-tooltip>
-                  <a-tooltip
-                    v-else-if="item.status === 'DRAFT'"
-                    :title="'点击预览【' + item.title + '】'"
-                    placement="top"
-                  >
-                    <a-button class="!p-0" type="link" @click="handlePreview(item.id)">
+                    <a-icon
+                      v-if="item.topPriority !== 0"
+                      style="margin-right: 3px"
+                      theme="twoTone"
+                      twoToneColor="red"
+                      type="pushpin"
+                    />
+                    <a-tooltip v-if="item.inProgress" placement="top" title="当前有内容已保存，但还未发布。">
+                      <a-icon
+                        class="cursor-pointer"
+                        style="margin-right: 3px"
+                        theme="twoTone"
+                        twoToneColor="#52c41a"
+                        type="info-circle"
+                      />
+                    </a-tooltip>
+                    <a-tooltip
+                      v-if="['PUBLISHED', 'INTIMATE'].includes(item.status)"
+                      :title="'点击访问【' + item.title + '】'"
+                      placement="top"
+                    >
+                      <a :href="item.fullPath" class="no-underline" target="_blank">
+                        {{ item.title }}
+                      </a>
+                    </a-tooltip>
+                    <a-tooltip
+                      v-else-if="item.status === 'DRAFT'"
+                      :title="'点击预览【' + item.title + '】'"
+                      placement="top"
+                    >
+                      <a class="no-underline" href="javascript:void(0);" @click="handlePreview(item.id)">
+                        {{ item.title }}
+                      </a>
+                    </a-tooltip>
+                    <a-button v-else class="!p-0" disabled type="link">
                       {{ item.title }}
                     </a-button>
-                  </a-tooltip>
-                  <a-button v-else class="!p-0" disabled type="link">
-                    {{ item.title }}
-                  </a-button>
-                </div>
-              </template>
-            </a-list-item-meta>
-            <span> {{ item.summary }}... </span>
-            <br />
-            <br />
-            <a-tag
-              v-for="(category, categoryIndex) in item.categories"
-              :key="'category_' + categoryIndex"
-              color="blue"
-              style="margin-bottom: 8px"
-              @click="handleSelectCategory(category)"
-              >{{ category.name }}
-            </a-tag>
-            <br />
-            <post-tag v-for="(tag, tagIndex) in item.tags" :key="tagIndex" :tag="tag" style="margin-bottom: 8px" />
-          </a-list-item>
+                  </div>
+                </template>
+              </a-list-item-meta>
+
+              <div v-if="item.summary" class="mb-3 block">
+                <span> {{ item.summary }}... </span>
+              </div>
+
+              <div class="block">
+                <a-tag
+                  v-for="(category, categoryIndex) in item.categories"
+                  :key="'category_' + categoryIndex"
+                  color="blue"
+                  style="margin-bottom: 8px"
+                  @click="handleSelectCategory(category)"
+                  >{{ category.name }}
+                </a-tag>
+              </div>
+              <post-tag v-for="(tag, tagIndex) in item.tags" :key="tagIndex" :tag="tag" style="margin-bottom: 8px" />
+            </a-list-item>
+          </template>
         </a-list>
 
         <!-- Desktop -->
         <a-table
           v-else
           :columns="columns"
-          :dataSource="formattedPosts"
+          :dataSource="list.data"
           :loading="list.loading"
           :pagination="false"
           :rowKey="post => post.id"
@@ -264,13 +281,14 @@
               {{ text }}
             </a-button>
           </template>
-          <span slot="status" slot-scope="statusProperty">
-            <a-badge :status="statusProperty.status" :text="statusProperty.text" />
-          </span>
 
-          <span slot="categories" slot-scope="categoriesOfPost">
+          <template #status="status">
+            <a-badge :status="postStatuses[status].status" :text="status | statusText" />
+          </template>
+
+          <template #categories="categories">
             <a-tag
-              v-for="(category, index) in categoriesOfPost"
+              v-for="(category, index) in categories"
               :key="index"
               color="blue"
               style="margin-bottom: 8px; cursor: pointer"
@@ -278,52 +296,50 @@
             >
               {{ category.name }}
             </a-tag>
-          </span>
+          </template>
 
           <template #tags="tags">
             <post-tag v-for="(tag, index) in tags" :key="index" :tag="tag" style="margin-bottom: 8px" />
           </template>
 
-          <span
-            slot="commentCount"
-            slot-scope="text, record"
-            style="cursor: pointer"
-            @click="handleShowPostComments(record)"
-          >
+          <template #commentCount="text, record">
             <a-badge
               :count="record.commentCount"
               :numberStyle="{ backgroundColor: '#f38181' }"
               :overflowCount="999"
               :showZero="true"
+              class="cursor-pointer"
+              @click="handleShowPostComments(record)"
             />
-          </span>
+          </template>
 
-          <span slot="visits" slot-scope="visits">
+          <template #visits="visits">
             <a-badge
               :count="visits"
               :numberStyle="{ backgroundColor: '#00e0ff' }"
               :overflowCount="9999"
               :showZero="true"
+              class="cursor-pointer"
             />
-          </span>
+          </template>
 
-          <span slot="createTime" slot-scope="createTime">
+          <template #createTime="createTime">
             <a-tooltip placement="top">
-              <template slot="title">
+              <template #title>
                 {{ createTime | moment }}
               </template>
               {{ createTime | timeAgo }}
             </a-tooltip>
-          </span>
+          </template>
 
-          <span slot="action" slot-scope="text, post">
+          <template #action="text, post">
             <a-button
               v-if="['PUBLISHED', 'DRAFT', 'INTIMATE'].includes(post.status)"
               class="!p-0"
               type="link"
               @click="handleEditClick(post)"
-              >编辑</a-button
-            >
+              >编辑
+            </a-button>
             <a-popconfirm
               v-else-if="post.status === 'RECYCLE'"
               :title="'你确定要发布【' + post.title + '】文章？'"
@@ -359,7 +375,7 @@
             <a-divider type="vertical" />
 
             <a-button class="!p-0" type="link" @click="handleShowPostSettings(post)">设置</a-button>
-          </span>
+          </template>
         </a-table>
         <div class="page-wrapper">
           <a-pagination
@@ -407,6 +423,7 @@ import { PageView } from '@/layouts'
 import PostSettingModal from './components/PostSettingModal.vue'
 import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
 import apiClient from '@/utils/api-client'
+import { postStatuses } from '@/core/constant'
 
 const columns = [
   {
@@ -418,8 +435,7 @@ const columns = [
   },
   {
     title: '状态',
-    className: 'status',
-    dataIndex: 'statusProperty',
+    dataIndex: 'status',
     width: '100px',
     scopedSlots: { customRender: 'status' }
   },
@@ -457,32 +473,6 @@ const columns = [
     scopedSlots: { customRender: 'action' }
   }
 ]
-const postStatus = {
-  PUBLISHED: {
-    value: 'PUBLISHED',
-    color: 'green',
-    status: 'success',
-    text: '已发布'
-  },
-  DRAFT: {
-    value: 'DRAFT',
-    color: 'yellow',
-    status: 'warning',
-    text: '草稿'
-  },
-  RECYCLE: {
-    value: 'RECYCLE',
-    color: 'red',
-    status: 'error',
-    text: '回收站'
-  },
-  INTIMATE: {
-    value: 'INTIMATE',
-    color: 'blue',
-    status: 'success',
-    text: '私密'
-  }
-}
 export default {
   name: 'PostList',
   components: {
@@ -493,8 +483,8 @@ export default {
   mixins: [mixin, mixinDevice],
   data() {
     return {
-      postStatus,
       columns,
+      postStatuses,
       list: {
         data: [],
         loading: false,
@@ -523,12 +513,6 @@ export default {
     }
   },
   computed: {
-    formattedPosts() {
-      return this.list.data.map(post => {
-        post.statusProperty = this.postStatus[post.status]
-        return post
-      })
-    },
     pagination() {
       return {
         page: this.list.params.page + 1,
@@ -798,6 +782,11 @@ export default {
         this.selectedPost = response.data
         this.postSettingLoading = false
       }
+    }
+  },
+  filters: {
+    statusText(type) {
+      return type ? postStatuses[type].text : ''
     }
   }
 }
