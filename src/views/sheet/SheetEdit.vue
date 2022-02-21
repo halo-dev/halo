@@ -123,7 +123,9 @@ export default {
         try {
           const { data } = await apiClient.sheet.updateDraftById(
             this.sheetToStage.id,
-            this.sheetToStage.originalContent
+            this.sheetToStage.originalContent,
+            this.sheetToStage.content,
+            true
           )
           this.sheetToStage.inProgress = data.inProgress
           this.handleRestoreSavedStatus()
@@ -144,6 +146,7 @@ export default {
         this.sheetToStage.title = datetimeFormat(new Date(), 'YYYY-MM-DD-HH-mm-ss')
       }
       try {
+        this.sheetToStage.keepRaw = true
         const { data } = await apiClient.sheet.create(this.sheetToStage)
         this.sheetToStage = data
         this.handleRestoreSavedStatus()
@@ -164,7 +167,12 @@ export default {
       this.previewSaving = true
       if (this.sheetToStage.id) {
         // Update the sheet content
-        const { data } = await apiClient.sheet.updateDraftById(this.sheetToStage.id, this.sheetToStage.originalContent)
+        const { data } = await apiClient.sheet.updateDraftById(
+          this.sheetToStage.id,
+          this.sheetToStage.originalContent,
+          this.sheetToStage.content,
+          true
+        )
         this.sheetToStage.inProgress = data.inProgress
       } else {
         await this.handleCreateSheet()
@@ -189,9 +197,10 @@ export default {
     handleRestoreSavedStatus() {
       this.contentChanges = 0
     },
-    onContentChange({ originalContent }) {
+    onContentChange({ originalContent, renderContent }) {
       this.contentChanges++
       this.sheetToStage.originalContent = originalContent
+      this.sheetToStage.content = renderContent
     },
     onSheetSavedCallback() {
       this.contentChanges = 0

@@ -258,6 +258,7 @@ export default {
         return
       }
       this.form.model.status = preStatus
+      this.form.model.keepRaw = true
       const { id, status } = this.form.model
       try {
         this.form[status === 'PUBLISHED' ? 'saving' : 'draftSaving'] = true
