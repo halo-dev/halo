@@ -79,10 +79,11 @@ public class PostParamTest {
         postParam.setServerSideMarkdownRender(false);
         postParam.setOriginalContent("两个黄鹂鸣翠柳，一行白鹭上青天。");
 
-        // The serverSideMarkdownRender is not true value
+        // The serverSideMarkdownRender is not true value and edit type is equals to markdown
+        postParam.setContent("front-end rendering");
         Post post1 = postParam.convertTo();
         assertThat(post1).isNotNull();
-        assertThat(post1.getContent().getContent()).isEqualTo(postParam.getOriginalContent());
+        assertThat(post1.getContent().getContent()).isEqualTo(postParam.getContent());
 
         // Edit type not equals to markdown and the serverSideMarkdownRender is false
         postParam.setEditorType(PostEditorType.RICHTEXT);

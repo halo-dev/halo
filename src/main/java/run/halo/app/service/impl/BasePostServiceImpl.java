@@ -441,14 +441,9 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             originalContent = "";
         }
 
-        POST post = getById(postId);
-        if (PostEditorType.MARKDOWN.equals(post.getEditorType())) {
-            content = MarkdownUtils.renderHtml(originalContent);
-        } else {
-            content = originalContent;
-        }
         contentService.createOrUpdateDraftBy(postId, content, originalContent);
 
+        POST post = getById(postId);
         post.setContent(getLatestContentById(postId));
 
         return post;

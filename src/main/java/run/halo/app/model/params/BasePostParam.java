@@ -29,6 +29,8 @@ public abstract class BasePostParam {
 
     protected PostEditorType editorType;
 
+    protected String content;
+
     protected String originalContent;
 
     protected String summary;
@@ -61,8 +63,10 @@ public abstract class BasePostParam {
         if (Objects.equals(serverSideMarkdownRender, true)
             && PostEditorType.MARKDOWN.equals(editorType)) {
             postContent.setContent(MarkdownUtils.renderHtml(originalContent));
-        } else {
+        } else if (PostEditorType.RICHTEXT.equals(editorType)) {
             postContent.setContent(originalContent);
+        } else {
+            postContent.setContent(content);
         }
         post.setContent(Content.PatchedContent.of(postContent));
     }

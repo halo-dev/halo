@@ -159,9 +159,11 @@ public class PostController {
     public BasePostDetailDTO updateDraftBy(
         @PathVariable("postId") Integer postId,
         @RequestBody PostContentParam contentParam) {
+        Post postToUse = postService.getById(postId);
+        String formattedContent = contentParam.decideContentBy(postToUse.getEditorType());
         // Update draft content
-        Post post = postService.updateDraftContent(contentParam.getContent(),
-            contentParam.getContent(), postId);
+        Post post = postService.updateDraftContent(formattedContent,
+            contentParam.getOriginalContent(), postId);
         return postService.convertToDetail(post);
     }
 
