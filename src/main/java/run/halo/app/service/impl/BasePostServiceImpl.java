@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -553,8 +554,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @NonNull
-    protected String generateSummary(@NonNull String htmlContent) {
-        Assert.notNull(htmlContent, "html content must not be null");
+    protected String generateSummary(@Nullable String htmlContent) {
+        if (StringUtils.isBlank(htmlContent)) {
+            return StringUtils.EMPTY;
+        }
 
         String text = HaloUtils.cleanHtmlTag(htmlContent);
 
