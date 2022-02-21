@@ -25,7 +25,7 @@
     "@codemirror/lang-html": "^0.19.4",
     "@codemirror/lang-java": "^0.19.1",
     "@halo-dev/admin-api": "^1.0.0-alpha.48",
-    "@halo-dev/editor": "^3.0.0-alpha.0",
+    "@halo-dev/editor": "^3.0.0-alpha.1",
     "ant-design-vue": "^1.7.8",
     "dayjs": "^1.10.7",
     "enquire.js": "^2.1.6",

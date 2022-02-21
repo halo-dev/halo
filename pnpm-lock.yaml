@@ -7,7 +7,7 @@ specifiers:
   '@codemirror/lang-html': ^0.19.4
   '@codemirror/lang-java': ^0.19.1
   '@halo-dev/admin-api': ^1.0.0-alpha.48
-  '@halo-dev/editor': ^3.0.0-alpha.0
+  '@halo-dev/editor': ^3.0.0-alpha.1
   '@vue/cli-plugin-babel': ~5.0.0-rc.2
   '@vue/cli-plugin-eslint': ~5.0.0-rc.2
   '@vue/cli-plugin-router': ~5.0.0-rc.2
@@ -52,7 +52,7 @@ dependencies:
   '@codemirror/lang-html': 0.19.4
   '@codemirror/lang-java': 0.19.1
   '@halo-dev/admin-api': 1.0.0-alpha.48
-  '@halo-dev/editor': 3.0.0-alpha.0
+  '@halo-dev/editor': 3.0.0-alpha.1
   ant-design-vue: 1.7.8_9065e7474e033a8e4b95615fc8e6c36c
   dayjs: 1.10.7
   enquire.js: 2.1.6
@@ -1578,11 +1578,10 @@ packages:
       - debug
     dev: false
 
-  /@halo-dev/editor/3.0.0-alpha.0:
-    resolution: {integrity: sha512-QZxudk8FvvV5V11uSW+Gp2oIaJ9YT3w1ClI6u5tD6TF4blWbdxUYq2oTeWvR0GWoDa+rQ4rCLZ3AKrxEs1Sd/g==}
+  /@halo-dev/editor/3.0.0-alpha.1:
+    resolution: {integrity: sha512-IRxsmBTOYLzkgSZ2wKO4GNeXSBkGNy4LfnnIwk2regmUwy548xMpGF8Az/tqeKJ3a7NjZ6WFqfxrP9oSUSqaQg==}
     dependencies:
       '@iktakahiro/markdown-it-katex': 4.0.1
-      '@liradb2000/markdown-it-mermaid': 0.4.4
       '@susisu/mte-kernel': 2.1.1
       codemirror: 5.65.1
       github-markdown-css: 5.1.0
@@ -1604,6 +1603,7 @@ packages:
       markdown-it-sup: 1.0.0
       markdown-it-table-of-contents: 0.4.4
       markdown-it-task-lists: 2.1.1
+      mermaid: 8.14.0
       vue: 2.6.14
     dev: false
 
@@ -1691,13 +1691,6 @@ packages:
     resolution: {integrity: sha512-LBqPzUjeW5GRdxHyUlAn6VdpyutV74fIaAtooYdU8dWz5wUjdO5eA1FyHpl1KAhFycoMmjI8D96NJZ0MRNyLJg==}
     dependencies:
       '@lezer/common': 0.15.11
-    dev: false
-
-  /@liradb2000/markdown-it-mermaid/0.4.4:
-    resolution: {integrity: sha512-i+SM6nz+eeGbtAaUFJveF9+/DtCnf6L9fycQEbwK0e+pgDVHPJ1EW3eKZBpWfY54TfiOqIltN77dKngYDoLJYQ==}
-    dependencies:
-      mermaid: 8.14.0
-      npm: 7.24.2
     dev: false
 
   /@nodelib/fs.scandir/2.1.5:
@@ -6178,83 +6171,6 @@ packages:
     dependencies:
       path-key: 3.1.1
     dev: true
-
-  /npm/7.24.2:
-    resolution: {integrity: sha512-120p116CE8VMMZ+hk8IAb1inCPk4Dj3VZw29/n2g6UI77urJKVYb7FZUDW8hY+EBnfsjI/2yrobBgFyzo7YpVQ==}
-    engines: {node: '>=10'}
-    hasBin: true
-    dev: false
-    bundledDependencies:
-      - '@isaacs/string-locale-compare'
-      - '@npmcli/arborist'
-      - '@npmcli/ci-detect'
-      - '@npmcli/config'
-      - '@npmcli/map-workspaces'
-      - '@npmcli/package-json'
-      - '@npmcli/run-script'
-      - abbrev
-      - ansicolors
-      - ansistyles
-      - archy
-      - cacache
-      - chalk
-      - chownr
-      - cli-columns
-      - cli-table3
-      - columnify
-      - fastest-levenshtein
-      - glob
-      - graceful-fs
-      - hosted-git-info
-      - ini
-      - init-package-json
-      - is-cidr
-      - json-parse-even-better-errors
-      - libnpmaccess
-      - libnpmdiff
-      - libnpmexec
-      - libnpmfund
-      - libnpmhook
-      - libnpmorg
-      - libnpmpack
-      - libnpmpublish
-      - libnpmsearch
-      - libnpmteam
-      - libnpmversion
-      - make-fetch-happen
-      - minipass
-      - minipass-pipeline
-      - mkdirp
-      - mkdirp-infer-owner
-      - ms
-      - node-gyp
-      - nopt
-      - npm-audit-report
-      - npm-install-checks
-      - npm-package-arg
-      - npm-pick-manifest
-      - npm-profile
-      - npm-registry-fetch
-      - npm-user-validate
-      - npmlog
-      - opener
-      - pacote
-      - parse-conflict-json
-      - qrcode-terminal
-      - read
-      - read-package-json
-      - read-package-json-fast
-      - readdir-scoped-modules
-      - rimraf
-      - semver
-      - ssri
-      - tar
-      - text-table
-      - tiny-relative-date
-      - treeverse
-      - validate-npm-package-name
-      - which
-      - write-file-atomic
 
   /nprogress/0.2.0:
     resolution: {integrity: sha1-y480xTIT2JVyP8urkH6UIq28r7E=}
