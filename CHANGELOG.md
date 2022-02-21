@@ -1,5 +1,21 @@
 # CHANGELOG
 
+# 1.4.17
+
+## Breaking changes
+
+- 后台静态资源取消使用 jsDelivr CDN。 @ruibaby
+
+## Security Fixes
+
+- 升级部分依赖中的 log4j2 版本，修复可能由 log4j2 导致的安全漏洞。#1595 #1604 #1615 @guqing @HAHH9527
+
+# 1.4.16
+
+## Security Fixes
+
+- 升级部分依赖中的 log4j2 版本，修复可能由 log4j2 导致的安全漏洞。#1588 @guqing
+
 # 1.4.15
 
 ## Bug Fixes
