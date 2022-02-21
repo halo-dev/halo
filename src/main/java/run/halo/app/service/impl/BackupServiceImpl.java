@@ -47,6 +47,8 @@ import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.CommentBlackList;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.ContentPatchLog;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.JournalComment;
 import run.halo.app.model.entity.Link;
@@ -73,6 +75,8 @@ import run.halo.app.service.AttachmentService;
 import run.halo.app.service.BackupService;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.CommentBlackListService;
+import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.ContentService;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.LinkService;
@@ -141,6 +145,10 @@ public class BackupServiceImpl implements BackupService {
 
     private final PostService postService;
 
+    private final ContentService contentService;
+
+    private final ContentPatchLogService contentPatchLogService;
+
     private final PostCategoryService postCategoryService;
 
     private final PostCommentService postCommentService;
@@ -171,7 +179,9 @@ public class BackupServiceImpl implements BackupService {
         CommentBlackListService commentBlackListService, JournalService journalService,
         JournalCommentService journalCommentService, LinkService linkService, LogService logService,
         MenuService menuService, OptionService optionService, PhotoService photoService,
-        PostService postService, PostCategoryService postCategoryService,
+        PostService postService, ContentService contentService,
+        ContentPatchLogService contentPatchLogService,
+        PostCategoryService postCategoryService,
         PostCommentService postCommentService, PostMetaService postMetaService,
         PostTagService postTagService, SheetService sheetService,
         SheetCommentService sheetCommentService, SheetMetaService sheetMetaService,
@@ -189,6 +199,8 @@ public class BackupServiceImpl implements BackupService {
         this.optionService = optionService;
         this.photoService = photoService;
         this.postService = postService;
+        this.contentService = contentService;
+        this.contentPatchLogService = contentPatchLogService;
         this.postCategoryService = postCategoryService;
         this.postCommentService = postCommentService;
         this.postMetaService = postMetaService;
@@ -358,6 +370,8 @@ public class BackupServiceImpl implements BackupService {
         data.put("options", optionService.listAll());
         data.put("photos", photoService.listAll());
         data.put("posts", postService.listAll());
+        data.put("contents", contentService.listAll());
+        data.put("content_patch_logs", contentPatchLogService.listAll());
         data.put("post_categories", postCategoryService.listAll());
         data.put("post_comments", postCommentService.listAll());
         data.put("post_metas", postMetaService.listAll());
@@ -438,6 +452,10 @@ public class BackupServiceImpl implements BackupService {
             };
         HashMap<String, Object> data = mapper.readValue(jsonContent, typeRef);
 
+        if (!HaloConst.HALO_VERSION.equals(data.get("version"))) {
+            throw new IllegalArgumentException("导入数据版本号与当前系统版本号不匹配，不支持导入！");
+        }
+
         List<Attachment> attachments = Arrays.asList(mapper
             .readValue(mapper.writeValueAsString(data.get("attachments")), Attachment[].class));
         attachmentService.createInBatch(attachments);
@@ -489,6 +507,16 @@ public class BackupServiceImpl implements BackupService {
         List<Post> posts = Arrays
             .asList(mapper.readValue(mapper.writeValueAsString(data.get("posts")), Post[].class));
         postService.createInBatch(posts);
+
+        List<Content> contents = Arrays
+            .asList(
+                mapper.readValue(mapper.writeValueAsString(data.get("contents")), Content[].class));
+        contentService.createInBatch(contents);
+
+        List<ContentPatchLog> contentPatchLogs = Arrays
+            .asList(mapper.readValue(mapper.writeValueAsString(data.get("content_patch_logs")),
+                ContentPatchLog[].class));
+        contentPatchLogService.createInBatch(contentPatchLogs);
 
         List<PostCategory> postCategories = Arrays.asList(mapper
             .readValue(mapper.writeValueAsString(data.get("post_categories")),

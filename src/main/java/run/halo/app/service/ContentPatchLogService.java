@@ -1,10 +1,10 @@
 package run.halo.app.service;
 
 import java.util.List;
-import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Content.ContentDiff;
 import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.ContentPatchLog;
+import run.halo.app.service.base.CrudService;
 
 /**
  * Content patch log service.
@@ -12,7 +12,7 @@ import run.halo.app.model.entity.ContentPatchLog;
  * @author guqing
  * @since 2022-01-04
  */
-public interface ContentPatchLogService {
+public interface ContentPatchLogService extends CrudService<ContentPatchLog, Integer> {
 
     /**
      * Create or update content patch log by post content.
@@ -43,28 +43,12 @@ public interface ContentPatchLogService {
     ContentDiff generateDiff(Integer postId, String content, String originalContent);
 
     /**
-     * Creates or updates the {@link ContentPatchLog}.
-     *
-     * @param contentPatchLog param to create or update
-     */
-    void save(ContentPatchLog contentPatchLog);
-
-    /**
      * Gets the patch log record of the draft status of the content by post id.
      *
      * @param postId post id.
      * @return content patch log record.
      */
     ContentPatchLog getDraftByPostId(Integer postId);
-
-    /**
-     * Gets content patch log by id.
-     *
-     * @param id id
-     * @return a content patch log
-     * @throws NotFoundException if record not found.
-     */
-    ContentPatchLog getById(Integer id);
 
     /**
      * Gets content patch log by post id.
