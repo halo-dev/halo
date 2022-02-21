@@ -61,10 +61,11 @@ public class PostParamTest {
     }
 
     @Test
-    public void shouldServiceSideMarkdownRenderTest() {
+    public void shouldServerSideMarkdown() {
         PostParam postParam = new PostParam();
         postParam.setSlug("slug");
-        postParam.setServerSideMarkdownRender(true);
+        // server side rendering
+        postParam.setKeepRaw(false);
         postParam.setOriginalContent("两个黄鹂鸣翠柳，一行白鹭上青天。");
 
         Post post = postParam.convertTo();
@@ -73,26 +74,29 @@ public class PostParamTest {
     }
 
     @Test
-    public void shouldNotServiceSideMarkdownRenderTest() {
+    public void shouldNotServerSideRenderTest() {
         PostParam postParam = new PostParam();
         postParam.setSlug("slug");
-        postParam.setServerSideMarkdownRender(false);
+        // server side render
+        postParam.setKeepRaw(false);
         postParam.setOriginalContent("两个黄鹂鸣翠柳，一行白鹭上青天。");
 
-        // The serverSideMarkdownRender is not true value and edit type is equals to markdown
+        // The keepRaw is true value and edit type is equals to markdown
+        postParam.setKeepRaw(true);
         postParam.setContent("front-end rendering");
         Post post1 = postParam.convertTo();
         assertThat(post1).isNotNull();
         assertThat(post1.getContent().getContent()).isEqualTo(postParam.getContent());
 
-        // Edit type not equals to markdown and the serverSideMarkdownRender is false
+        // Edit type not equals to markdown and keepRaw is true
+        postParam.setKeepRaw(true);
         postParam.setEditorType(PostEditorType.RICHTEXT);
         Post post2 = postParam.convertTo();
         assertThat(post2).isNotNull();
         assertThat(post2.getContent().getContent()).isEqualTo(postParam.getOriginalContent());
 
-        // Edit type not equals to markdown bug serverSideMarkdownRender is true
-        postParam.setServerSideMarkdownRender(true);
+        // Edit type not equals to markdown but want to let server rendering
+        postParam.setKeepRaw(false);
         Post post3 = postParam.convertTo();
         assertThat(post3).isNotNull();
         assertThat(post3.getContent().getContent()).isEqualTo(postParam.getOriginalContent());

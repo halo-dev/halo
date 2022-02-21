@@ -18,7 +18,12 @@ public class PostContentParam {
 
     private String originalContent;
 
-    private Boolean serverSideMarkdownRender = false;
+    /**
+     * if {@code true}, it means is that do not let the back-end render the original content
+     * because the content has been rendered, and you only need to store the original content.
+     * otherwise, need server-side rendering.
+     */
+    private Boolean keepRaw = false;
 
     /**
      * Decide on post content based on {@link PostEditorType} and serverSideMarkdownRender.
@@ -29,7 +34,7 @@ public class PostContentParam {
     public String decideContentBy(PostEditorType editorType) {
         String originalContentToUse = StringUtils.defaultString(originalContent, "");
         String result;
-        if (Objects.equals(serverSideMarkdownRender, true)
+        if (Objects.equals(keepRaw, false)
             && PostEditorType.MARKDOWN.equals(editorType)) {
             result = MarkdownUtils.renderHtml(originalContentToUse);
         } else if (PostEditorType.RICHTEXT.equals(editorType)) {

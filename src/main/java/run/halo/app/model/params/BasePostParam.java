@@ -53,7 +53,11 @@ public abstract class BasePostParam {
 
     protected String metaDescription;
 
-    protected Boolean serverSideMarkdownRender = false;
+    /**
+     * if {@code true}, it means is that do not let the back-end render the original content
+     * because the content has been rendered, and you only need to store the original content.
+     */
+    protected Boolean keepRaw = false;
 
     protected <T extends BasePost> void populateContent(T post) {
         Assert.notNull(post, "The post must not be null.");
@@ -61,7 +65,7 @@ public abstract class BasePostParam {
         Content postContent = new Content();
         postContent.setOriginalContent(originalContent);
 
-        if (Objects.equals(serverSideMarkdownRender, true)
+        if (Objects.equals(keepRaw, false)
             && PostEditorType.MARKDOWN.equals(editorType)) {
             postContent.setContent(MarkdownUtils.renderHtml(originalContent));
         } else if (PostEditorType.RICHTEXT.equals(editorType)) {
