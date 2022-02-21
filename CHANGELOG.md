@@ -522,7 +522,7 @@
 
 ```yaml
 halo:
-    adminPath: <-SUB_PATH->
+  adminPath: <-SUB_PATH->
 ```
 
 `<-SUB_PATH->` 为你想要修改的子路径（默认为 `admin`），仅支持一级，前后无 `/`。
@@ -531,7 +531,7 @@ halo:
 
 ```yaml
 halo:
-    adminPath: manage
+  adminPath: manage
 ```
 
 那么这时候你的后台地址为：`博客地址/manage`。
@@ -540,12 +540,12 @@ halo:
 
 ```yaml
 halo:
-    adminPath: /manage # 不支持
+  adminPath: /manage # 不支持
 ```
 
 ```yaml
 halo:
-    adminPath: manage/admin # 不支持
+  adminPath: manage/admin # 不支持
 ```
 
 ### 如何开启开发者选项
@@ -982,8 +982,8 @@ UPDATE HALO_COMMENT SET COMMENT_CONTENT = replace(COMMENT_CONTENT, '/static/plug
 
 ```yaml
 spring:
-    datasource:
-    -    type: com.alibaba.druid.pool.DruidDataSource
+  datasource:
+-    type: com.alibaba.druid.pool.DruidDataSource
 +    type: com.zaxxer.hikari.HikariDataSource
 ```
 
@@ -1038,61 +1038,61 @@ spring:
 
 ```yaml
 server:
-    port: 8090
-    use-forward-headers: true
-    undertow:
-        io-threads: 2
-        worker-threads: 36
-        buffer-size: 1024
-        directBuffers: true
+  port: 8090
+  use-forward-headers: true
+  undertow:
+    io-threads: 2
+    worker-threads: 36
+    buffer-size: 1024
+    directBuffers: true
 spring:
-    datasource:
-        type: com.alibaba.druid.pool.DruidDataSource
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
 
-        # H2database 配置
-        driver-class-name: org.h2.Driver
-        url: jdbc:h2:file:~/halo/halo
-        username: admin
-        password: 123456
+    # H2database 配置
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:~/halo/halo
+    username: admin
+    password: 123456
 
-        #MySql配置
-    #    driver-class-name: com.mysql.jdbc.Driver
-    #    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false
-    #    username: root
-    #    password: 123456
+    #MySql配置
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://127.0.0.1:3306/halodb?characterEncoding=utf8&useSSL=false
+#    username: root
+#    password: 123456
 
-    h2:
-        console:
-            settings:
-                web-allow-others: true
-            path: /h2-console
-            enabled: true
-    jpa:
-        hibernate:
-            ddl-auto: update
-        show-sql: false
-    freemarker:
-        allow-request-override: false
-        cache: false
-        check-template-location: true
-        charset: utf-8
-        content-type: text/html
-        expose-request-attributes: false
-        expose-session-attributes: false
-        expose-spring-macro-helpers: true
-        suffix: .ftl
-        settings:
-            auto_import: /spring.ftl as spring
-    servlet:
-        multipart:
-            max-file-size: 10MB
-            max-request-size: 10MB
+  h2:
+    console:
+      settings:
+        web-allow-others: true
+      path: /h2-console
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  freemarker:
+    allow-request-override: false
+    cache: false
+    check-template-location: true
+    charset: utf-8
+    content-type: text/html
+    expose-request-attributes: false
+    expose-session-attributes: false
+    expose-spring-macro-helpers: true
+    suffix: .ftl
+    settings:
+      auto_import: /spring.ftl as spring
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
-    # 多语言资源文件路径
-    messages:
-        basename: i18n/messages
+  # 多语言资源文件路径
+  messages:
+    basename: i18n/messages
 logging:
-    file: ./logs/log.log
+  file: ./logs/log.log
 ```
 
 如上代码，修改的地方有：
