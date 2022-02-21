@@ -3,104 +3,115 @@
     <!-- Mobile -->
     <a-list
       v-if="isMobile()"
-      :dataSource="formattedSheets"
+      :dataSource="list.data"
       :loading="list.loading"
       :pagination="false"
       itemLayout="vertical"
       size="large"
     >
-      <a-list-item :key="index" slot="renderItem" slot-scope="item, index">
-        <template slot="actions">
-          <span>
-            <a-icon type="eye" />
-            {{ item.visits }}
-          </span>
-          <span @click="handleShowSheetComments(item)">
-            <a-icon type="message" />
-            {{ item.commentCount }}
-          </span>
-          <a-dropdown :trigger="['click']" placement="topLeft">
+      <template #renderItem="item, index">
+        <a-list-item :key="index">
+          <template #actions>
             <span>
-              <a-icon type="bars" />
+              <a-icon type="eye" />
+              {{ item.visits }}
             </span>
-            <a-menu slot="overlay">
-              <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'" @click="handleEditClick(item)">
-                编辑
-              </a-menu-item>
-              <a-menu-item v-else-if="item.status === 'RECYCLE'">
-                <a-popconfirm
-                  :title="'你确定要发布【' + item.title + '】页面？'"
-                  cancelText="取消"
-                  okText="确定"
-                  @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
-                >
-                  还原
-                </a-popconfirm>
-              </a-menu-item>
-              <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
-                <a-popconfirm
-                  :title="'你确定要将【' + item.title + '】页面移到回收站？'"
-                  cancelText="取消"
-                  okText="确定"
-                  @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
-                >
-                  回收站
-                </a-popconfirm>
-              </a-menu-item>
-              <a-menu-item v-else-if="item.status === 'RECYCLE'">
-                <a-popconfirm
-                  :title="'你确定要永久删除【' + item.title + '】页面？'"
-                  cancelText="取消"
-                  okText="确定"
-                  @confirm="handleDeleteClick(item.id)"
-                >
-                  删除
-                </a-popconfirm>
-              </a-menu-item>
-              <a-menu-item @click="handleShowSheetSettings(item)">设置</a-menu-item>
-            </a-menu>
-          </a-dropdown>
-        </template>
-        <template slot="extra">
-          <span>
-            <a-badge :status="item.statusProperty.status" :text="item.statusProperty.text" />
-          </span>
-        </template>
-        <a-list-item-meta>
-          <template slot="description">
-            {{ item.createTime | moment }}
+            <span @click="handleShowSheetComments(item)">
+              <a-icon type="message" />
+              {{ item.commentCount }}
+            </span>
+            <a-dropdown :trigger="['click']" placement="topLeft">
+              <span>
+                <a-icon type="bars" />
+              </span>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item
+                    v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'"
+                    @click="handleEditClick(item)"
+                  >
+                    编辑
+                  </a-menu-item>
+                  <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                    <a-popconfirm
+                      :title="'你确定要发布【' + item.title + '】页面？'"
+                      cancelText="取消"
+                      okText="确定"
+                      @confirm="handleEditStatusClick(item.id, 'PUBLISHED')"
+                    >
+                      还原
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item v-if="item.status === 'PUBLISHED' || item.status === 'DRAFT'">
+                    <a-popconfirm
+                      :title="'你确定要将【' + item.title + '】页面移到回收站？'"
+                      cancelText="取消"
+                      okText="确定"
+                      @confirm="handleEditStatusClick(item.id, 'RECYCLE')"
+                    >
+                      回收站
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item v-else-if="item.status === 'RECYCLE'">
+                    <a-popconfirm
+                      :title="'你确定要永久删除【' + item.title + '】页面？'"
+                      cancelText="取消"
+                      okText="确定"
+                      @confirm="handleDeleteClick(item.id)"
+                    >
+                      删除
+                    </a-popconfirm>
+                  </a-menu-item>
+                  <a-menu-item @click="handleShowSheetSettings(item)">设置</a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
           </template>
-          <template #title>
-            <div
-              style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
-            >
-              <a-tooltip v-if="item.status === 'PUBLISHED'" :title="'点击访问【' + item.title + '】'" placement="top">
-                <a :href="item.fullPath" class="no-underline" target="_blank">
-                  {{ item.title }}
-                </a>
-              </a-tooltip>
+          <template #extra>
+            <a-badge :status="sheetStatuses[item.status].status" :text="item.status | statusText" />
+          </template>
+          <a-list-item-meta>
+            <template #description>
+              {{ item.createTime | moment }}
+            </template>
+            <template #title>
+              <div
+                style="max-width: 300px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"
+              >
+                <a-tooltip v-if="item.status === 'PUBLISHED'" :title="'点击访问【' + item.title + '】'" placement="top">
+                  <a :href="item.fullPath" class="no-underline" target="_blank">
+                    {{ item.title }}
+                  </a>
+                </a-tooltip>
 
-              <a-tooltip v-else-if="item.status === 'DRAFT'" :title="'点击预览【' + item.title + '】'" placement="top">
-                <a-button class="!p-0" type="link" @click="handlePreview(item.id)">
+                <a-tooltip
+                  v-else-if="item.status === 'DRAFT'"
+                  :title="'点击预览【' + item.title + '】'"
+                  placement="top"
+                >
+                  <a class="no-underline" href="javascript:void(0);" @click="handlePreview(item.id)">
+                    {{ item.title }}
+                  </a>
+                </a-tooltip>
+
+                <a-button v-else class="!p-0" disabled type="link">
                   {{ item.title }}
                 </a-button>
-              </a-tooltip>
-
-              <a-button v-else class="!p-0" disabled type="link">
-                {{ item.title }}
-              </a-button>
-            </div>
-          </template>
-        </a-list-item-meta>
-        <span> {{ item.summary }}... </span>
-      </a-list-item>
+              </div>
+            </template>
+          </a-list-item-meta>
+          <div v-if="item.summary" class="block">
+            <span> {{ item.summary }}... </span>
+          </div>
+        </a-list-item>
+      </template>
     </a-list>
 
     <!-- Desktop -->
     <a-table
       v-else
       :columns="customColumns"
-      :dataSource="formattedSheets"
+      :dataSource="list.data"
       :loading="list.loading"
       :pagination="false"
       :rowKey="sheet => sheet.id"
@@ -133,38 +144,35 @@
         </a-button>
       </template>
 
-      <span slot="status" slot-scope="statusProperty">
-        <a-badge :status="statusProperty.status" :text="statusProperty.text" />
-      </span>
+      <template #status="status">
+        <a-badge :status="sheetStatuses[status].status" :text="status | statusText" />
+      </template>
 
-      <span
-        slot="commentCount"
-        slot-scope="text, record"
-        class="cursor-pointer"
-        @click="handleShowSheetComments(record)"
-      >
+      <template #commentCount="text, record">
         <a-badge
           :count="record.commentCount"
           :numberStyle="{ backgroundColor: '#f38181' }"
           :overflowCount="999"
           :showZero="true"
+          class="cursor-pointer"
+          @click="handleShowSheetComments(record)"
         />
-      </span>
+      </template>
 
-      <span slot="visits" slot-scope="visits">
+      <template #visits="visits">
         <a-badge :count="visits" :numberStyle="{ backgroundColor: '#00e0ff' }" :overflowCount="9999" :showZero="true" />
-      </span>
+      </template>
 
-      <span slot="createTime" slot-scope="createTime">
+      <template #createTime="createTime">
         <a-tooltip placement="top">
-          <template slot="title">
+          <template #title>
             {{ createTime | moment }}
           </template>
           {{ createTime | timeAgo }}
         </a-tooltip>
-      </span>
+      </template>
 
-      <span slot="action" slot-scope="text, sheet">
+      <template #action="text, sheet">
         <a-button
           v-if="sheet.status === 'PUBLISHED' || sheet.status === 'DRAFT'"
           class="!p-0"
@@ -207,7 +215,7 @@
         </a-popconfirm>
         <a-divider type="vertical" />
         <a-button class="!p-0" type="link" @click="handleShowSheetSettings(sheet)">设置</a-button>
-      </span>
+      </template>
     </a-table>
     <div class="page-wrapper">
       <a-pagination
@@ -249,6 +257,7 @@ import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import SheetSettingModal from './SheetSettingModal'
 import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
 import apiClient from '@/utils/api-client'
+import { sheetStatuses } from '@/core/constant'
 
 const customColumns = [
   {
@@ -259,8 +268,7 @@ const customColumns = [
   },
   {
     title: '状态',
-    className: 'status',
-    dataIndex: 'statusProperty',
+    dataIndex: 'status',
     scopedSlots: { customRender: 'status' }
   },
   {
@@ -285,24 +293,6 @@ const customColumns = [
   }
 ]
 
-const sheetStatus = {
-  PUBLISHED: {
-    color: 'green',
-    status: 'success',
-    text: '已发布'
-  },
-  DRAFT: {
-    color: 'yellow',
-    status: 'warning',
-    text: '草稿'
-  },
-  RECYCLE: {
-    color: 'red',
-    status: 'error',
-    text: '回收站'
-  }
-}
-
 export default {
   name: 'CustomSheetList',
   mixins: [mixin, mixinDevice],
@@ -313,7 +303,7 @@ export default {
   data() {
     return {
       customColumns,
-      sheetStatus,
+      sheetStatuses,
 
       list: {
         data: [],
@@ -333,12 +323,6 @@ export default {
     }
   },
   computed: {
-    formattedSheets() {
-      return this.list.data.map(sheet => {
-        sheet.statusProperty = this.sheetStatus[sheet.status]
-        return sheet
-      })
-    },
     pagination() {
       return {
         page: this.list.params.page + 1,
@@ -497,6 +481,11 @@ export default {
         this.selectedSheet = response.data
         this.sheetSettingLoading = false
       }
+    }
+  },
+  filters: {
+    statusText(type) {
+      return type ? sheetStatuses[type].text : ''
     }
   }
 }
