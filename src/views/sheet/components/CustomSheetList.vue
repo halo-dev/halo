@@ -107,7 +107,7 @@
       :scrollToFirstRowOnChange="true"
     >
       <template #sheetTitle="text, record">
-        <a-tooltip v-if="record.inProgress" title="当前有内容已保存，但还未发布。" placement="top">
+        <a-tooltip v-if="record.inProgress" placement="top" title="当前有内容已保存，但还未发布。">
           <a-icon
             class="cursor-pointer"
             style="margin-right: 3px"
@@ -123,9 +123,9 @@
         </a-tooltip>
 
         <a-tooltip v-else-if="record.status === 'DRAFT'" :title="'点击预览【' + text + '】'" placement="top">
-          <a-button class="!p-0" type="link" @click="handlePreview(record.id)">
+          <a class="no-underline" href="javascript:void(0);" @click="handlePreview(record.id)">
             {{ text }}
-          </a-button>
+          </a>
         </a-tooltip>
 
         <a-button v-else class="!p-0" disabled type="link">
@@ -425,7 +425,7 @@ export default {
     },
     handlePreview(sheetId) {
       apiClient.sheet.getPreviewLinkById(sheetId).then(response => {
-        window.open(response.data, '_blank')
+        window.open(response, '_blank')
       })
     },
 

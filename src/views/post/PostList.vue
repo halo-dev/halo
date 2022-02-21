@@ -256,9 +256,9 @@
               </a>
             </a-tooltip>
             <a-tooltip v-else-if="record.status === 'DRAFT'" :title="'点击预览【' + text + '】'" placement="top">
-              <a-button class="!p-0" type="link" @click="handlePreview(record.id)">
+              <a class="no-underline" href="javascript:void(0);" @click="handlePreview(record.id)">
                 {{ text }}
-              </a-button>
+              </a>
             </a-tooltip>
             <a-button v-else class="!p-0" disabled type="link">
               {{ text }}
