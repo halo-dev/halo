@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -100,6 +101,7 @@ import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.FileUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.JsonUtils;
+import run.halo.app.utils.VersionUtil;
 
 /**
  * Backup service implementation.
@@ -452,8 +454,9 @@ public class BackupServiceImpl implements BackupService {
             };
         HashMap<String, Object> data = mapper.readValue(jsonContent, typeRef);
 
-        if (!HaloConst.HALO_VERSION.equals(data.get("version"))) {
-            throw new IllegalArgumentException("导入数据版本号与当前系统版本号不匹配，不支持导入！");
+        String version = (String) Objects.requireNonNullElse(data.get("version"), "");
+        if (!VersionUtil.hasSameMajorAndMinorVersion(HaloConst.HALO_VERSION, version)) {
+            throw new IllegalArgumentException("导入数据的主次版本号与当前系统版本号不匹配，不支持导入！");
         }
 
         List<Attachment> attachments = Arrays.asList(mapper
