@@ -16,7 +16,6 @@
     "prepare": "husky install",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build:jsdelivr": "vue-cli-service build --mode jsdelivr",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
