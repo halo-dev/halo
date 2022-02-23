@@ -36,7 +36,7 @@
             </div>
             <a-descriptions :column="1" layout="horizontal">
               <a-descriptions-item label="作者">
-                <a class="text-inherit" :href="theme.current.author.website || '#'">
+                <a class="text-inherit" :href="theme.current.author.website || '#'" target="_blank">
                   {{ theme.current.author.name }}
                 </a>
               </a-descriptions-item>
@@ -44,12 +44,12 @@
                 {{ theme.current.description || '-' }}
               </a-descriptions-item>
               <a-descriptions-item label="官网">
-                <a class="text-inherit" :href="theme.current.website || '#'">
+                <a class="text-inherit" :href="theme.current.website || '#'" target="_blank">
                   {{ theme.current.website || '-' }}
                 </a>
               </a-descriptions-item>
               <a-descriptions-item label="Git 仓库">
-                <a class="text-inherit" :href="theme.current.repo || '#'">
+                <a class="text-inherit" :href="theme.current.repo || '#'" target="_blank">
                   {{ theme.current.repo || '-' }}
                 </a>
               </a-descriptions-item>
