@@ -408,14 +408,18 @@
       </template>
     </PostSettingModal>
 
-    <TargetCommentDrawer
-      :id="selectedPost.id"
-      :description="selectedPost.summary"
-      :target="`posts`"
-      :title="selectedPost.title"
-      :visible="postCommentVisible"
+    <TargetCommentListModal
+      :target-id="selectedPost.id"
+      :title="`「${selectedPost.title}」的评论`"
+      :visible.sync="postCommentVisible"
+      target="post"
       @close="onPostCommentsClose"
-    />
+    >
+      <template #extraFooter>
+        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious"> 上一篇</a-button>
+        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext"> 下一篇</a-button>
+      </template>
+    </TargetCommentListModal>
   </page-view>
 </template>
 
@@ -423,7 +427,7 @@
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
 import { PageView } from '@/layouts'
 import PostSettingModal from './components/PostSettingModal.vue'
-import TargetCommentDrawer from '../comment/components/TargetCommentDrawer'
+import TargetCommentListModal from '@/components/Comment/TargetCommentListModal'
 import apiClient from '@/utils/api-client'
 import { postStatuses } from '@/core/constant'
 
@@ -480,7 +484,7 @@ export default {
   components: {
     PageView,
     PostSettingModal,
-    TargetCommentDrawer
+    TargetCommentListModal
   },
   mixins: [mixin, mixinDevice],
   data() {
@@ -733,12 +737,11 @@ export default {
     onPostSavedCallback() {
       this.handleListPosts(false)
     },
+
     onPostCommentsClose() {
       this.postCommentVisible = false
       this.selectedPost = {}
-      setTimeout(() => {
-        this.handleListPosts(false)
-      }, 500)
+      this.handleListPosts(false)
     },
 
     /**

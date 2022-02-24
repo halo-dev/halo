@@ -154,22 +154,27 @@
       </a-form-model>
     </a-modal>
 
-    <TargetCommentDrawer
-      :id="list.selected.id"
-      :description="list.selected.content"
-      :target="`journals`"
-      :visible="journalCommentDrawer.visible"
-      @close="onJournalCommentsDrawerClose"
-    />
-
     <AttachmentSelectModal :visible.sync="attachmentSelect.visible" @confirm="handleSelectAttachment" />
+
+    <TargetCommentListModal
+      :target-id="list.selected.id"
+      :title="`「${$options.filters.moment(list.selected.createTime)}」的评论`"
+      :visible.sync="journalCommentDrawer.visible"
+      target="journal"
+      @close="onJournalCommentsDrawerClose"
+    >
+      <template #extraFooter>
+        <a-button :disabled="selectPreviousButtonDisabled" @click="handleSelectPrevious"> 上一篇</a-button>
+        <a-button :disabled="selectNextButtonDisabled" @click="handleSelectNext"> 下一篇</a-button>
+      </template>
+    </TargetCommentListModal>
   </page-view>
 </template>
 
 <script>
 // components
 import { PageView } from '@/layouts'
-import TargetCommentDrawer from '../../comment/components/TargetCommentDrawer'
+import TargetCommentListModal from '@/components/Comment/TargetCommentListModal'
 
 // libs
 import { mixin, mixinDevice } from '@/mixins/mixin.js'
@@ -178,7 +183,7 @@ import apiClient from '@/utils/api-client'
 
 export default {
   mixins: [mixin, mixinDevice],
-  components: { PageView, TargetCommentDrawer },
+  components: { PageView, TargetCommentListModal },
   data() {
     return {
       list: {
@@ -191,6 +196,8 @@ export default {
           keyword: undefined,
           type: undefined
         },
+        hasPrevious: false,
+        hasNext: false,
         selected: {},
         journalType: {
           PUBLIC: {
@@ -239,6 +246,14 @@ export default {
         size: this.list.params.size,
         total: this.list.total
       }
+    },
+    selectPreviousButtonDisabled() {
+      const index = this.list.data.findIndex(journal => journal.id === this.list.selected.id)
+      return index === 0 && !this.list.hasPrevious
+    },
+    selectNextButtonDisabled() {
+      const index = this.list.data.findIndex(journal => journal.id === this.list.selected.id)
+      return index === this.list.data.length - 1 && !this.list.hasNext
     }
   },
   methods: {
@@ -251,6 +266,8 @@ export default {
 
         this.list.data = data.content
         this.list.total = data.total
+        this.list.hasPrevious = data.hasPrevious
+        this.list.hasNext = data.hasNext
       } catch (e) {
         this.$log.error(e)
       } finally {
@@ -356,6 +373,7 @@ export default {
     onJournalCommentsDrawerClose() {
       this.form.model = {}
       this.journalCommentDrawer.visible = false
+      this.handleListJournals()
     },
     handleSaveOptions() {
       apiClient.option
@@ -371,6 +389,38 @@ export default {
     },
     handleSelectAttachment({ markdown }) {
       this.$set(this.form.model, 'sourceContent', (this.form.model.sourceContent || '') + '\n' + markdown.join('\n'))
+    },
+
+    /**
+     * Select previous journal
+     */
+    async handleSelectPrevious() {
+      const index = this.list.data.findIndex(journal => journal.id === this.list.selected.id)
+      if (index > 0) {
+        this.list.selected = this.list.data[index - 1]
+        return
+      }
+      if (index === 0 && this.list.hasPrevious) {
+        this.list.params.page--
+        await this.handleListJournals()
+        this.list.selected = this.list.data[this.list.data.length - 1]
+      }
+    },
+
+    /**
+     * Select next journal
+     */
+    async handleSelectNext() {
+      const index = this.list.data.findIndex(journal => journal.id === this.list.selected.id)
+      if (index < this.list.data.length - 1) {
+        this.list.selected = this.list.data[index + 1]
+        return
+      }
+      if (index === this.list.data.length - 1 && this.list.hasNext) {
+        this.list.params.page++
+        await this.handleListJournals()
+        this.list.selected = this.list.data[0]
+      }
     }
   }
 }
