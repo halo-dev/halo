@@ -348,7 +348,7 @@ public class BackupServiceImpl implements BackupService {
         data.put("version", HaloConst.HALO_VERSION);
         data.put("export_date", DateUtils.now());
         data.put("attachments", attachmentService.listAll());
-        data.put("categories", categoryService.listAll(true));
+        data.put("categories", categoryService.listAll());
         data.put("comment_black_list", commentBlackListService.listAll());
         data.put("journals", journalService.listAll());
         data.put("journal_comments", journalCommentService.listAll());

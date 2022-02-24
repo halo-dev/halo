@@ -76,23 +76,18 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
 
     @Override
     public List<Category> listCategoriesBy(Integer postId) {
-        return listCategoriesBy(postId, false);
-    }
-
-    @Override
-    public List<Category> listCategoriesBy(Integer postId, boolean queryEncryptCategory) {
         Assert.notNull(postId, "Post id must not be null");
 
         // Find all category ids
         Set<Integer> categoryIds = postCategoryRepository.findAllCategoryIdsByPostId(postId);
 
-        return categoryService.listAllByIds(categoryIds, queryEncryptCategory);
+        return categoryService.listAllByIds(categoryIds);
     }
 
 
     @Override
     public Map<Integer, List<Category>> listCategoryListMap(
-        Collection<Integer> postIds, boolean queryEncryptCategory) {
+        Collection<Integer> postIds) {
         if (CollectionUtils.isEmpty(postIds)) {
             return Collections.emptyMap();
         }
@@ -105,7 +100,7 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
             ServiceUtils.fetchProperty(postCategories, PostCategory::getCategoryId);
 
         // Find all categories
-        List<Category> categories = categoryService.listAllByIds(categoryIds, queryEncryptCategory);
+        List<Category> categories = categoryService.listAllByIds(categoryIds);
 
         // Convert to category map
         Map<Integer, Category> categoryMap = ServiceUtils.convertToMap(categories, Category::getId);
@@ -309,10 +304,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
     }
 
     @Override
-    public List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(@NonNull Sort sort,
-        boolean queryEncryptCategory) {
+    public List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
-        List<Category> categories = categoryService.listAll(sort, queryEncryptCategory);
+        List<Category> categories = categoryService.listAll(sort);
         List<CategoryVO> categoryTreeVo = categoryService.listToTree(categories);
         populatePostIds(categoryTreeVo);
 

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.controller.content.auth.PostAuthentication;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Category;
@@ -25,7 +26,6 @@ import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.AuthenticationService;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
@@ -63,7 +63,7 @@ public class PostModel {
 
     private final AbstractStringCacheStore cacheStore;
 
-    private final AuthenticationService authenticationService;
+    private final PostAuthentication postAuthentication;
 
     public PostModel(PostService postService,
         ThemeService themeService,
@@ -74,7 +74,7 @@ public class PostModel {
         TagService tagService,
         OptionService optionService,
         AbstractStringCacheStore cacheStore,
-        AuthenticationService authenticationService) {
+        PostAuthentication postAuthentication) {
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -84,7 +84,7 @@ public class PostModel {
         this.tagService = tagService;
         this.optionService = optionService;
         this.cacheStore = cacheStore;
-        this.authenticationService = authenticationService;
+        this.postAuthentication = postAuthentication;
     }
 
     public String content(Post post, String token, Model model) {
@@ -105,7 +105,7 @@ public class PostModel {
             // Drafts are not allowed bo be accessed by outsiders.
             throw new NotFoundException("查询不到该文章的信息");
         } else if (PostStatus.INTIMATE.equals(post.getStatus())
-            && !authenticationService.postAuthentication(post, null)
+            && !postAuthentication.isAuthenticated(post.getId())
         ) {
             // Encrypted articles must has the correct password before they can be accessed.
 
@@ -133,7 +133,7 @@ public class PostModel {
         postService.getNextPost(post).ifPresent(
             nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
 
-        List<Category> categories = postCategoryService.listCategoriesBy(post.getId(), false);
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         List<PostMeta> metas = postMetaService.listBy(post.getId());
 

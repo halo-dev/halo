@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.controller.content.CategoryFacade;
+import run.halo.app.controller.content.auth.CategoryAuthentication;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.AuthenticationService;
-import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 
@@ -36,22 +36,22 @@ import run.halo.app.service.PostService;
 @RequestMapping("/api/content/categories")
 public class CategoryController {
 
-    private final CategoryService categoryService;
+    private final CategoryFacade categoryFacade;
 
     private final PostCategoryService postCategoryService;
 
     private final PostService postService;
 
-    private final AuthenticationService authenticationService;
+    private final CategoryAuthentication categoryAuthentication;
 
-    public CategoryController(CategoryService categoryService,
+    public CategoryController(CategoryFacade categoryFacade,
         PostCategoryService postCategoryService,
         PostService postService,
-        AuthenticationService authenticationService) {
-        this.categoryService = categoryService;
+        CategoryAuthentication categoryAuthentication) {
+        this.categoryFacade = categoryFacade;
         this.postCategoryService = postCategoryService;
         this.postService = postService;
-        this.authenticationService = authenticationService;
+        this.categoryAuthentication = categoryAuthentication;
     }
 
     @GetMapping
@@ -60,21 +60,20 @@ public class CategoryController {
         @SortDefault(sort = "updateTime", direction = DESC) Sort sort,
         @RequestParam(name = "more", required = false, defaultValue = "false") Boolean more) {
         if (more) {
-            return postCategoryService.listCategoryWithPostCountDto(sort, false);
+            return postCategoryService.listCategoryWithPostCountDto(sort);
         }
-        return categoryService.convertTo(categoryService.listAll(sort));
+        return categoryFacade.convertTo(categoryFacade.listAll(sort));
     }
 
     @GetMapping("{slug}/posts")
     @ApiOperation("Lists posts by category slug")
     public Page<PostListVO> listPostsBy(@PathVariable("slug") String slug,
-        @RequestParam(value = "password", required = false) String password,
         @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC)
             Pageable pageable) {
         // Get category by slug
-        Category category = categoryService.getBySlugOfNonNull(slug, true);
+        Category category = categoryFacade.getBySlugOfNonNull(slug);
 
-        if (!authenticationService.categoryAuthentication(category.getId(), password)) {
+        if (!categoryAuthentication.isAuthenticated(category.getId())) {
             throw new ForbiddenException("您没有该分类的访问权限");
         }
 

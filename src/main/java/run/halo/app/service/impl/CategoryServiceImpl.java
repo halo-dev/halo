@@ -4,7 +4,6 @@ import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 import com.google.common.base.Objects;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -18,9 +17,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.lang.NonNull;
@@ -28,9 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.event.category.CategoryUpdatedEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.exception.UnsupportedException;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
@@ -38,8 +36,6 @@ import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.CategoryRepository;
-import run.halo.app.service.AuthenticationService;
-import run.halo.app.service.AuthorizationService;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
@@ -68,23 +64,19 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     private final OptionService optionService;
 
-    private final AuthorizationService authorizationService;
-
     private PostService postService;
 
-    private final AuthenticationService authenticationService;
+    private final ApplicationContext applicationContext;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository,
         PostCategoryService postCategoryService,
         OptionService optionService,
-        AuthenticationService authenticationService,
-        AuthorizationService authorizationService) {
+        ApplicationContext applicationContext) {
         super(categoryRepository);
         this.categoryRepository = categoryRepository;
         this.postCategoryService = postCategoryService;
         this.optionService = optionService;
-        this.authenticationService = authenticationService;
-        this.authorizationService = authorizationService;
+        this.applicationContext = applicationContext;
     }
 
     @Lazy
@@ -124,6 +116,19 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
         // Create it
         return super.create(category);
+    }
+
+    @Override
+    public Category update(Category category) {
+        Category updated = super.update(category);
+        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
+        return updated;
+    }
+
+    @Override
+    public void remove(Category category) {
+        super.remove(category);
+        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
     }
 
     @Override
@@ -167,6 +172,11 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         return fullPath.toString();
     }
 
+    @Override
+    public Category getBySlug(String slug) {
+        return categoryRepository.getBySlug(slug).orElse(null);
+    }
+
     @NonNull
     private CategoryVO convertToCategoryVo(Category category) {
         Assert.notNull(category, "The category must not be null.");
@@ -176,59 +186,15 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     }
 
     @Override
-    public Category getBySlug(String slug) {
-        Optional<Category> bySlug = categoryRepository.getBySlug(slug);
-        if (bySlug.isEmpty()) {
-            return null;
-        }
-
-        Category category = bySlug.get();
-
-        if (authenticationService.categoryAuthentication(category.getId(), null)) {
-            return category;
-        }
-
-        return null;
-    }
-
-    @Override
     public Category getBySlugOfNonNull(String slug) {
-
-        Category category = categoryRepository
+        return categoryRepository
             .getBySlug(slug)
             .orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
-
-        if (authenticationService.categoryAuthentication(category.getId(), null)) {
-            return category;
-        }
-
-        throw new NotFoundException("查询不到该分类的信息").setErrorData(slug);
-    }
-
-    @Override
-    public Category getBySlugOfNonNull(String slug, boolean queryEncryptCategory) {
-        if (queryEncryptCategory) {
-            return categoryRepository.getBySlug(slug)
-                .orElseThrow(() -> new NotFoundException("查询不到该分类的信息").setErrorData(slug));
-        } else {
-            return this.getBySlugOfNonNull(slug);
-        }
     }
 
     @Override
     public Category getByName(String name) {
-        Optional<Category> byName = categoryRepository.getByName(name);
-        if (byName.isEmpty()) {
-            return null;
-        }
-
-        Category category = byName.get();
-
-        if (authenticationService.categoryAuthentication(category.getId(), null)) {
-            return category;
-        }
-
-        return null;
+        return categoryRepository.getByName(name).orElse(null);
     }
 
     @Override
@@ -304,7 +270,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * @return a flattened category list
      */
     @NonNull
-    private List<Category> walkCategoryTree(CategoryVO root) {
+    public List<Category> walkCategoryTree(CategoryVO root) {
         Assert.notNull(root, "The category 'root' must not be null");
         List<Category> categories = new LinkedList<>();
         Queue<CategoryVO> queue = new ArrayDeque<>();
@@ -330,7 +296,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * @param categoryId category id to be found.
      * @return the root node of the subtree.
      */
-    private Optional<CategoryVO> findCategoryTreeNodeById(List<CategoryVO> categoryVos,
+    public Optional<CategoryVO> findCategoryTreeNodeById(List<CategoryVO> categoryVos,
         Integer categoryId) {
         Assert.notNull(categoryId, "categoryId id must not be null");
         Queue<CategoryVO> queue = new ArrayDeque<>(categoryVos);
@@ -366,259 +332,6 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         return categories.stream()
             .map(this::convertTo)
             .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Category> filterEncryptCategory(List<Category> categories) {
-        if (CollectionUtils.isEmpty(categories)) {
-            return Collections.emptyList();
-        }
-
-        // list to tree, no password desensitise is required here
-        List<CategoryVO> categoryTree = listToTree(categories);
-
-        // filter encrypt category
-        doFilterEncryptCategory(categoryTree);
-
-        List<Category> collectorList = new ArrayList<>();
-
-        collectAllChild(collectorList, categoryTree, true);
-
-        for (Category category : collectorList) {
-            category.setPassword(null);
-        }
-
-        return collectorList;
-    }
-
-    /**
-     * do filter encrypt category
-     *
-     * @param categoryList category list
-     */
-    private void doFilterEncryptCategory(List<CategoryVO> categoryList) {
-        if (CollectionUtils.isEmpty(categoryList)) {
-            return;
-        }
-
-        for (CategoryVO categoryVO : categoryList) {
-            if (!authenticationService.categoryAuthentication(categoryVO.getId(), null)) {
-                // if parent category is not certified, the child category is not displayed.
-                categoryVO.setChildren(null);
-            } else {
-                doFilterEncryptCategory(categoryVO.getChildren());
-            }
-        }
-    }
-
-    /**
-     * Collect all child from tree
-     *
-     * @param collectorList collector
-     * @param childrenList contains categories of children
-     * @param doNotCollectEncryptedCategory true is not collect, false is collect
-     */
-    private void collectAllChild(List<Category> collectorList,
-        List<CategoryVO> childrenList,
-        Boolean doNotCollectEncryptedCategory) {
-        if (CollectionUtils.isEmpty(childrenList)) {
-            return;
-        }
-
-        for (CategoryVO categoryVO : childrenList) {
-
-            Category category = new Category();
-            BeanUtils.updateProperties(categoryVO, category);
-
-            collectorList.add(category);
-
-            if (doNotCollectEncryptedCategory
-                && !authenticationService.categoryAuthentication(category.getId(), null)) {
-                continue;
-            }
-
-            if (HaloUtils.isNotEmpty(categoryVO.getChildren())) {
-                collectAllChild(collectorList,
-                    categoryVO.getChildren(), doNotCollectEncryptedCategory);
-            }
-
-        }
-    }
-
-    /**
-     * Collect sub-categories under the specified category.
-     *
-     * @param collectorList collector
-     * @param childrenList contains categories of children
-     * @param categoryId category id
-     * @param doNotCollectEncryptedCategory true is not collect, false is collect
-     */
-    private void collectAllChildByCategoryId(List<Category> collectorList,
-        List<CategoryVO> childrenList,
-        Integer categoryId,
-        Boolean doNotCollectEncryptedCategory) {
-        if (CollectionUtils.isEmpty(childrenList)) {
-            return;
-        }
-
-        for (CategoryVO categoryVO : childrenList) {
-            if (categoryVO.getId().equals(categoryId)) {
-                collectAllChild(collectorList,
-                    categoryVO.getChildren(), doNotCollectEncryptedCategory);
-                break;
-            }
-        }
-    }
-
-    @Override
-    public List<Category> listAll(Sort sort, boolean queryEncryptCategory) {
-        if (queryEncryptCategory) {
-            return super.listAll(sort);
-        } else {
-            return this.listAll(sort);
-        }
-    }
-
-    @Override
-    public List<Category> listAll(boolean queryEncryptCategory) {
-        if (queryEncryptCategory) {
-            return super.listAll();
-        } else {
-            return this.listAll();
-        }
-    }
-
-    @Override
-    public List<Category> listAll() {
-        return filterEncryptCategory(super.listAll());
-    }
-
-    @Override
-    public List<Category> listAll(Sort sort) {
-        return filterEncryptCategory(super.listAll(sort));
-    }
-
-    @Override
-    public Page<Category> listAll(Pageable pageable) {
-        // To prevent developers from querying encrypted categories,
-        // so paging query operations are not supported here. If you
-        // really need to use this method, refactor this method to do memory paging.
-        throw new UnsupportedException("Does not support business layer paging query.");
-    }
-
-    @Override
-    public List<Category> listAllByIds(Collection<Integer> integers, boolean queryEncryptCategory) {
-        if (queryEncryptCategory) {
-            return super.listAllByIds(integers);
-        } else {
-            return this.listAllByIds(integers);
-        }
-    }
-
-    @Override
-    public List<Category> listAllByIds(Collection<Integer> integers) {
-        return filterEncryptCategory(super.listAllByIds(integers));
-    }
-
-    @Override
-    public List<Category> listAllByIds(Collection<Integer> integers, Sort sort) {
-        return filterEncryptCategory(super.listAllByIds(integers, sort));
-    }
-
-    @Override
-    @Transactional
-    public Category update(Category category) {
-        Category update = super.update(category);
-
-        if (StringUtils.isNotBlank(category.getPassword())) {
-            doEncryptPost(category);
-        } else {
-            doDecryptPost(category);
-        }
-
-        // Remove authorization every time an category is updated.
-        authorizationService.deleteCategoryAuthorization(category.getId());
-
-        return update;
-    }
-
-    /**
-     * Encrypting a category requires encrypting all articles under the category
-     *
-     * @param category need encrypt category
-     */
-    private void doEncryptPost(Category category) {
-        // list to tree with password
-        List<CategoryVO> categoryTree = listToTree(super.listAll());
-
-        List<Category> collectorList = new ArrayList<>();
-
-        collectAllChildByCategoryId(collectorList,
-            categoryTree, category.getId(), true);
-
-        Optional.of(collectorList.stream().map(Category::getId).collect(Collectors.toList()))
-            .map(categoryIdList -> {
-                categoryIdList.add(category.getId());
-                return categoryIdList;
-            })
-            .map(postCategoryService::listByCategoryIdList)
-
-            .filter(postCategoryList -> !postCategoryList.isEmpty())
-            .map(postCategoryList -> postCategoryList
-                .stream().map(PostCategory::getPostId).distinct().collect(Collectors.toList()))
-
-            .filter(postIdList -> !postIdList.isEmpty())
-            .map(postIdList -> postService.listAllByIds(postIdList))
-
-            .filter(postList -> !postList.isEmpty())
-            .map(postList -> postList.stream()
-                .filter(post -> PostStatus.PUBLISHED.equals(post.getStatus()))
-                .map(Post::getId).collect(Collectors.toList()))
-
-            .filter(postIdList -> !postIdList.isEmpty())
-            .map(postIdList -> postService.updateStatusByIds(postIdList, PostStatus.INTIMATE));
-    }
-
-    private void doDecryptPost(Category category) {
-
-        List<Category> allCategoryList = super.listAll();
-
-        Map<Integer, Category> idToCategoryMap = allCategoryList.stream().collect(
-            Collectors.toMap(Category::getId, Function.identity()));
-
-        if (doCategoryHasEncrypt(idToCategoryMap, category.getParentId())) {
-            // If the parent category is encrypted, there is no need to update the encryption status
-            return;
-        }
-        // with password
-        List<CategoryVO> categoryTree = listToTree(allCategoryList);
-
-        List<Category> collectorList = new ArrayList<>();
-
-        // Only collect unencrypted sub-categories under the category.
-        collectAllChildByCategoryId(collectorList,
-            categoryTree, category.getId(), false);
-        // Collect the currently decrypted category
-        collectorList.add(category);
-
-        Optional.of(collectorList.stream().map(Category::getId).collect(Collectors.toList()))
-            .map(postCategoryService::listByCategoryIdList)
-
-            .filter(postCategoryList -> !postCategoryList.isEmpty())
-            .map(postCategoryList -> postCategoryList
-                .stream().map(PostCategory::getPostId).distinct().collect(Collectors.toList()))
-
-            .filter(postIdList -> !postIdList.isEmpty())
-            .map(postIdList -> postService.listAllByIds(postIdList))
-
-            .filter(postList -> !postList.isEmpty())
-            .map(postList -> postList.stream()
-                .filter(post -> StringUtils.isBlank(post.getPassword()))
-                .filter(post -> PostStatus.INTIMATE.equals(post.getStatus()))
-                .map(Post::getId).collect(Collectors.toList()))
-
-            .filter(postIdList -> !postIdList.isEmpty())
-            .map(postIdList -> postService.updateStatusByIds(postIdList, PostStatus.PUBLISHED));
     }
 
     @Override
