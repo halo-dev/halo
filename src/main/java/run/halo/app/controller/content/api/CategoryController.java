@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -79,23 +80,38 @@ public class CategoryController {
         @RequestParam(value = "password", required = false) String password,
         @PageableDefault(sort = {"topPriority", "updateTime"}, direction = DESC)
             Pageable pageable) {
-        Set<PostStatus> statusesToQuery = Sets.immutableEnumSet(PostStatus.PUBLISHED);
         // Get category by slug
         Category category = categoryService.getBySlugOfNonNull(slug);
-        if (password != null) {
-            statusesToQuery = Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE);
 
-            ContentAuthenticationRequest authRequest =
-                ContentAuthenticationRequest.of(category.getId(), password,
-                    EncryptTypeEnum.CATEGORY.getName());
-            // authenticate this request
-            contentAuthenticationManager.authenticate(authRequest);
-        } else if (!categoryAuthentication.isAuthenticated(category.getId())) {
-            throw new ForbiddenException("您没有该分类的访问权限");
+        Set<PostStatus> statusesToQuery = Sets.immutableEnumSet(PostStatus.PUBLISHED);
+        if (allowIntimatePosts(category.getId(), password)) {
+            statusesToQuery = Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE);
         }
 
         Page<Post> postPage =
             postCategoryService.pagePostBy(category.getId(), statusesToQuery, pageable);
         return postService.convertToListVo(postPage);
+    }
+
+    private boolean allowIntimatePosts(Integer categoryId, String password) {
+        Assert.notNull(categoryId, "The categoryId must not be null.");
+
+        if (!categoryService.isPrivate(categoryId)) {
+            return false;
+        }
+
+        if (categoryAuthentication.isAuthenticated(categoryId)) {
+            return true;
+        }
+
+        if (password != null) {
+            ContentAuthenticationRequest authRequest =
+                ContentAuthenticationRequest.of(categoryId, password,
+                    EncryptTypeEnum.CATEGORY.getName());
+            // authenticate this request,throw an error if authenticate failed
+            contentAuthenticationManager.authenticate(authRequest);
+            return true;
+        }
+        throw new ForbiddenException("您没有该分类的访问权限");
     }
 }
