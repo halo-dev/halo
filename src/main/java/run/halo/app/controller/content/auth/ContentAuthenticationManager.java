@@ -81,7 +81,7 @@ public class ContentAuthenticationManager {
         }
         // Finds the first encrypted parent category to authenticate
         Category parentCategory =
-            categoryAuthentication.findFirstEncryptedCategoryByDfs(authRequest.getId())
+            categoryService.lookupFirstEncryptedBy(authRequest.getId())
                 .orElseThrow(() -> new AuthenticationException("密码不正确"));
         if (!Objects.equals(parentCategory.getPassword(), authRequest.getPassword())) {
             throw new AuthenticationException("密码不正确");

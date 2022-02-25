@@ -38,6 +38,7 @@ import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.enums.SheetPermalinkType;
+import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
@@ -45,6 +46,7 @@ import run.halo.app.service.ThemeService;
 
 /**
  * @author ryanwang
+ * @author guqing
  * @date 2020-01-07
  */
 @Slf4j
@@ -72,7 +74,7 @@ public class ContentContentController {
 
     private final SheetService sheetService;
 
-    private final CategoryFacade categoryFacade;
+    private final CategoryService categoryService;
 
     private final ThemeService themeService;
 
@@ -88,7 +90,7 @@ public class ContentContentController {
         OptionService optionService,
         PostService postService,
         SheetService sheetService,
-        CategoryFacade categoryFacade,
+        CategoryService categoryService,
         ThemeService themeService,
         ContentAuthenticationManager providerManager) {
         this.postModel = postModel;
@@ -101,7 +103,7 @@ public class ContentContentController {
         this.optionService = optionService;
         this.postService = postService;
         this.sheetService = sheetService;
-        this.categoryFacade = categoryFacade;
+        this.categoryService = categoryService;
         this.themeService = themeService;
         this.providerManager = providerManager;
     }
@@ -282,12 +284,12 @@ public class ContentContentController {
         HttpServletRequest request) {
         ContentAuthenticationRequest authRequest = new ContentAuthenticationRequest();
         authRequest.setPassword(password);
-        Category category = categoryFacade.getBySlugOfNonNull(slug);
+        Category category = categoryService.getBySlugOfNonNull(slug);
         authRequest.setId(category.getId());
         authRequest.setPrincipal(EncryptTypeEnum.CATEGORY.getName());
         try {
             providerManager.authenticate(authRequest);
-            CategoryDTO categoryDto = categoryFacade.convertTo(category);
+            CategoryDTO categoryDto = categoryService.convertTo(category);
             return "redirect:" + buildRedirectUrl(categoryDto.getFullPath());
         } catch (AuthenticationException e) {
             request.setAttribute("errorMsg", e.getMessage());

@@ -122,8 +122,17 @@ public interface CategoryService extends CrudService<Category, Integer> {
      * @param categoryId category id
      * @return whether to encrypt
      */
-    @NonNull
-    Boolean categoryHasEncrypt(Integer categoryId);
+    boolean isPrivate(Integer categoryId);
+
+    /**
+     * This method will first query all categories and create a tree, then start from the node
+     * whose ID is <code>categoryId</code> and recursively look up the first encryption category.
+     *
+     * @param categoryId categoryId to look up
+     * @return encrypted immediate parent category If it is found,otherwise an empty
+     * {@code Optional}.
+     */
+    Optional<Category> lookupFirstEncryptedBy(Integer categoryId);
 
     /**
      * Use <code>categories</code> to build a category tree.

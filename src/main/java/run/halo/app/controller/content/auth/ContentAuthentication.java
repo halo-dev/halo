@@ -72,7 +72,7 @@ public interface ContentAuthentication {
     default String getSessionId() {
         Optional<HttpServletRequest> currentRequest = ServletUtils.getCurrentRequest();
         if (currentRequest.isEmpty()) {
-            throw new IllegalArgumentException("Could not found HttpServletRequest.");
+            return StringUtils.EMPTY;
         }
         return currentRequest.get().getRequestedSessionId();
     }

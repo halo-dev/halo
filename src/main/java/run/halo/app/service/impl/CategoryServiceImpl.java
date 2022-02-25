@@ -2,17 +2,16 @@ package run.halo.app.service.impl;
 
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
-import com.google.common.base.Objects;
 import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -233,7 +232,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             } else {
                 postCategoryService.listByPostId(postId)
                     .stream().map(PostCategory::getCategoryId)
-                    .filter(this::categoryHasEncrypt)
+                    .filter(this::isPrivate)
                     .findAny()
                     .ifPresent(id -> post.setStatus(PostStatus.INTIMATE));
             }
@@ -302,7 +301,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         Queue<CategoryVO> queue = new ArrayDeque<>(categoryVos);
         while (!queue.isEmpty()) {
             CategoryVO category = queue.poll();
-            if (Objects.equal(category.getId(), categoryId)) {
+            if (Objects.equals(category.getId(), categoryId)) {
                 return Optional.of(category);
             }
             if (HaloUtils.isNotEmpty(category.getChildren())) {
@@ -335,13 +334,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     }
 
     @Override
-    public Boolean categoryHasEncrypt(Integer categoryId) {
-        List<Category> allCategoryList = super.listAll();
-
-        Map<Integer, Category> idToCategoryMap = allCategoryList.stream().collect(
-            Collectors.toMap(Category::getId, Function.identity()));
-
-        return doCategoryHasEncrypt(idToCategoryMap, categoryId);
+    public boolean isPrivate(Integer categoryId) {
+        return lookupFirstEncryptedBy(categoryId).isPresent();
     }
 
     @Override
@@ -371,29 +365,37 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             .collect(Collectors.toList());
     }
 
+    @Override
+    public Optional<Category> lookupFirstEncryptedBy(Integer categoryId) {
+        List<Category> categories = listAll();
+        Map<Integer, Category> categoryMap =
+            ServiceUtils.convertToMap(categories, Category::getId);
+        return Optional.ofNullable(findFirstEncryptedCategoryBy(categoryMap, categoryId));
+    }
+
     /**
      * Find whether the parent category is encrypted.
+     * If it is found, the result will be returned immediately.
+     * Otherwise, it will be found recursively according to parentId.
      *
      * @param idToCategoryMap find category by id
      * @param categoryId category id
      * @return whether to encrypt
      */
-    private boolean doCategoryHasEncrypt(
-        Map<Integer, Category> idToCategoryMap, Integer categoryId) {
-
-        if (categoryId == 0) {
-            return false;
-        }
-
+    private Category findFirstEncryptedCategoryBy(Map<Integer, Category> idToCategoryMap,
+        Integer categoryId) {
         Category category = idToCategoryMap.get(categoryId);
 
-        if (StringUtils.isNotBlank(category.getPassword())) {
-            return true;
+        if (categoryId == 0 || category == null) {
+            return null;
         }
 
-        return doCategoryHasEncrypt(idToCategoryMap, category.getParentId());
-    }
+        if (StringUtils.isNotBlank(category.getPassword())) {
+            return category;
+        }
 
+        return findFirstEncryptedCategoryBy(idToCategoryMap, category.getParentId());
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

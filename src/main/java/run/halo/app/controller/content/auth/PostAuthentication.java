@@ -39,6 +39,11 @@ public class PostAuthentication implements ContentAuthentication {
         }
 
         String sessionId = getSessionId();
+        // No session is represent a client request
+        if (StringUtils.isEmpty(sessionId)) {
+            return false;
+        }
+
         String cacheKey =
             buildCacheKey(sessionId, getPrincipal().toString(), String.valueOf(postId));
         return cacheStore.get(cacheKey).isPresent();
@@ -47,6 +52,11 @@ public class PostAuthentication implements ContentAuthentication {
     @Override
     public void setAuthenticated(Integer resourceId, boolean isAuthenticated) {
         String sessionId = getSessionId();
+        // No session is represent a client request
+        if (StringUtils.isEmpty(sessionId)) {
+            return;
+        }
+
         String cacheKey =
             buildCacheKey(sessionId, getPrincipal().toString(), String.valueOf(resourceId));
         if (isAuthenticated) {

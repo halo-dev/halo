@@ -1,11 +1,6 @@
 package run.halo.app.controller.content.auth;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -44,12 +39,17 @@ public class CategoryAuthentication implements ContentAuthentication {
         Category category = categoryService.getById(categoryId);
         if (category.getPassword() == null) {
             // All parent category is not encrypted
-            if (findFirstEncryptedCategoryByDfs(category.getId()).isEmpty()) {
+            if (categoryService.lookupFirstEncryptedBy(category.getId()).isEmpty()) {
                 return true;
             }
         }
 
         String sessionId = getSessionId();
+        // No session is represent a client request
+        if (StringUtils.isEmpty(sessionId)) {
+            return false;
+        }
+
         String cacheKey =
             buildCacheKey(sessionId, getPrincipal().toString(), String.valueOf(categoryId));
         return cacheStore.get(cacheKey).isPresent();
@@ -58,6 +58,11 @@ public class CategoryAuthentication implements ContentAuthentication {
     @Override
     public void setAuthenticated(Integer resourceId, boolean isAuthenticated) {
         String sessionId = getSessionId();
+        // No session is represent a client request
+        if (StringUtils.isEmpty(sessionId)) {
+            return;
+        }
+
         String cacheKey =
             buildCacheKey(sessionId, getPrincipal().toString(), String.valueOf(resourceId));
         if (isAuthenticated) {
@@ -76,28 +81,5 @@ public class CategoryAuthentication implements ContentAuthentication {
                 cacheStore.delete(key);
             }
         });
-    }
-
-    public Optional<Category> findFirstEncryptedCategoryByDfs(Integer targetCategoryId) {
-        List<Category> categories = categoryService.listAll();
-        Map<Integer, Category> categoryMap = categories.stream().collect(
-            Collectors.toMap(Category::getId, Function.identity()));
-
-        return Optional.ofNullable(findFirstEncryptedCategoryBy(categoryMap, targetCategoryId));
-    }
-
-    private Category findFirstEncryptedCategoryBy(
-        Map<Integer, Category> idToCategoryMap, Integer categoryId) {
-        Category category = idToCategoryMap.get(categoryId);
-
-        if (categoryId == 0) {
-            return null;
-        }
-
-        if (StringUtils.isNotBlank(category.getPassword())) {
-            return category;
-        }
-
-        return findFirstEncryptedCategoryBy(idToCategoryMap, category.getParentId());
     }
 }

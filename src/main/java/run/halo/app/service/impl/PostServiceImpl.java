@@ -886,7 +886,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             .filter(HaloUtils::isNotEmpty)
             .map(categoryIdSet -> {
                 for (Integer categoryId : categoryIdSet) {
-                    if (categoryService.categoryHasEncrypt(categoryId)) {
+                    if (categoryService.isPrivate(categoryId)) {
                         return true;
                     }
                 }
