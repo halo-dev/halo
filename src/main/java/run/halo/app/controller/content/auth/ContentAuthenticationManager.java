@@ -73,9 +73,17 @@ public class ContentAuthenticationManager {
 
     private CategoryAuthentication authenticateCategory(ContentAuthenticationRequest authRequest) {
         Category category = categoryService.getById(authRequest.getId());
+        if (category.getPassword() == null) {
+            String parentPassword = categoryService.lookupFirstEncryptedBy(category.getId())
+                .map(Category::getPassword)
+                .orElse(null);
+            if (parentPassword == null) {
+                return categoryAuthentication;
+            }
+            category.setPassword(parentPassword);
+        }
 
-        if (category.getPassword() == null
-            || StringUtils.equals(category.getPassword(), authRequest.getPassword())) {
+        if (StringUtils.equals(category.getPassword(), authRequest.getPassword())) {
             categoryAuthentication.setAuthenticated(category.getId(), true);
             return categoryAuthentication;
         }
