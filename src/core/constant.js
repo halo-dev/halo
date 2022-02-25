@@ -166,3 +166,24 @@ export const sheetStatuses = {
     text: '回收站'
   }
 }
+
+export const commentStatuses = {
+  PUBLISHED: {
+    value: 'PUBLISHED',
+    color: 'green',
+    status: 'success',
+    text: '已发布'
+  },
+  AUDITING: {
+    value: 'AUDITING',
+    color: 'yellow',
+    status: 'warning',
+    text: '待审核'
+  },
+  RECYCLE: {
+    value: 'RECYCLE',
+    color: 'red',
+    status: 'error',
+    text: '回收站'
+  }
+}

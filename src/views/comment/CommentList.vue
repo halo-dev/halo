@@ -3,10 +3,10 @@
     <div class="card-container">
       <a-tabs type="card">
         <a-tab-pane key="1" tab="文章">
-          <comment-tab type="posts"></comment-tab>
+          <comment-tab target="post"></comment-tab>
         </a-tab-pane>
         <a-tab-pane key="2" tab="页面">
-          <comment-tab type="sheets"></comment-tab>
+          <comment-tab target="sheet"></comment-tab>
         </a-tab-pane>
       </a-tabs>
     </div>
