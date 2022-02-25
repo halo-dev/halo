@@ -4,6 +4,7 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -110,6 +111,22 @@ public class PhotoController {
 
         // Update menu in database
         return new PhotoDTO().convertFrom(photoService.update(photo));
+    }
+
+    @PutMapping("/batch")
+    @ApiOperation("Updates photo in batch")
+    public List<PhotoDTO> updateBatchBy(@RequestBody List<@Valid PhotoParam> photoParams) {
+        List<Photo> photosToUpdate = photoParams.stream()
+            .filter(photoParam -> Objects.nonNull(photoParam.getId()))
+            .map(photoParam -> {
+                Photo photoToUpdate = photoService.getById(photoParam.getId());
+                photoParam.update(photoToUpdate);
+                return photoToUpdate;
+            })
+            .collect(Collectors.toList());
+        return photoService.updateInBatch(photosToUpdate).stream()
+            .map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo))
+            .collect(Collectors.toList());
     }
 
     @PutMapping("{photoId:\\d+}/likes")
