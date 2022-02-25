@@ -80,21 +80,20 @@
               <a-input-password v-model="form.model.password" autocomplete="new-password" />
             </a-form-item>
             <a-form-item label="封面图：">
-              <div class="post-thumb">
-                <a-space direction="vertical">
-                  <img
-                    :src="form.model.thumbnail || '/images/placeholder.jpg'"
-                    alt="Post cover thumbnail"
-                    class="img"
-                    @click="attachmentSelectVisible = true"
-                  />
-                  <a-input
-                    v-model="form.model.thumbnail"
-                    allow-clear
-                    placeholder="点击封面图选择图片，或者输入外部链接"
-                  ></a-input>
-                </a-space>
-              </div>
+              <a-space direction="vertical">
+                <img
+                  :src="form.model.thumbnail || '/images/placeholder.jpg'"
+                  alt="Post cover thumbnail"
+                  class="w-1/2 cursor-pointer"
+                  style="border-radius: 4px"
+                  @click="attachmentSelectVisible = true"
+                />
+                <a-input
+                  v-model="form.model.thumbnail"
+                  allow-clear
+                  placeholder="点击封面图选择图片，或者输入外部链接"
+                ></a-input>
+              </a-space>
             </a-form-item>
           </a-form>
         </a-tab-pane>
@@ -125,7 +124,6 @@
     </div>
     <template slot="footer">
       <slot name="extraFooter" />
-      <a-button :disabled="loading" @click="modalVisible = false"> 关闭</a-button>
       <ReactiveButton
         v-if="!form.model.id"
         :errored="form.draftSaveErrored"
@@ -146,6 +144,7 @@
         @callback="handleSavedCallback"
         @click="handleCreateOrUpdate()"
       ></ReactiveButton>
+      <a-button :disabled="loading" @click="modalVisible = false">关闭</a-button>
     </template>
     <AttachmentSelectModal
       :multiSelect="false"
