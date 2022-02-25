@@ -72,6 +72,14 @@ public class PhotoController {
         photoService.removeById(photoId);
     }
 
+    @DeleteMapping("/batch")
+    @ApiOperation("Deletes photos permanently in batch by id array")
+    public List<PhotoDTO> deletePermanentlyInBatch(@RequestBody List<Integer> ids) {
+        return ids.stream().map(photoService::removeById)
+            .map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo))
+            .collect(Collectors.toList());
+    }
+
     @PostMapping
     @ApiOperation("Creates a photo")
     public PhotoDTO createBy(@Valid @RequestBody PhotoParam photoParam) {
