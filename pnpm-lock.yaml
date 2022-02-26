@@ -6,7 +6,7 @@ specifiers:
   '@codemirror/basic-setup': ^0.19.1
   '@codemirror/lang-html': ^0.19.4
   '@codemirror/lang-java': ^0.19.1
-  '@halo-dev/admin-api': ^1.0.0-alpha.49
+  '@halo-dev/admin-api': ^1.0.0-alpha.50
   '@halo-dev/editor': ^3.0.0-alpha.2
   '@vue/cli-plugin-babel': ~5.0.1
   '@vue/cli-plugin-eslint': ~5.0.1
@@ -51,7 +51,7 @@ dependencies:
   '@codemirror/basic-setup': 0.19.1
   '@codemirror/lang-html': 0.19.4
   '@codemirror/lang-java': 0.19.1
-  '@halo-dev/admin-api': 1.0.0-alpha.49
+  '@halo-dev/admin-api': 1.0.0-alpha.50
   '@halo-dev/editor': 3.0.0-alpha.2
   ant-design-vue: 1.7.8_9065e7474e033a8e4b95615fc8e6c36c
   dayjs: 1.10.7
@@ -1575,11 +1575,11 @@ packages:
       - supports-color
     dev: true
 
-  /@halo-dev/admin-api/1.0.0-alpha.49:
-    resolution: {integrity: sha512-549LNmiVDyjLfg9uvVYYCCJmfge8+hrNDk4Q9M0BUT9XB9xeQcV0S06Tz2MKR/3IAZhq8h2V3g5gIqaY7N9e9A==}
+  /@halo-dev/admin-api/1.0.0-alpha.50:
+    resolution: {integrity: sha512-/kfkBPRqnhMRCMhKWMWz+rboUAxGCM5Tcv13BaBKlG04wEY7ewgrXrFMvxfYd0luIik+knluwKj1OwWix+2ZhA==}
     engines: {node: '>=12'}
     dependencies:
-      '@halo-dev/rest-api-client': 1.0.0-alpha.49
+      '@halo-dev/rest-api-client': 1.0.0-alpha.50
       tslib: 2.3.1
     transitivePeerDependencies:
       - debug
@@ -1614,18 +1614,18 @@ packages:
       vue: 2.6.14
     dev: false
 
-  /@halo-dev/logger/1.0.0-alpha.49:
-    resolution: {integrity: sha512-gshHffq0ntrPjAHCwRt6J3NJYvQfnlZsRgbBjnFyI5TQOSB5uFZ2dcxRAc75wDLTRFi2Brpsdm//odRe7PWGpg==}
+  /@halo-dev/logger/1.0.0-alpha.50:
+    resolution: {integrity: sha512-Wl+MA6LfdCWecvmOdQkNzpWpddnfv3LlsM2AdmH8t5tznK984EAp2Zs+JgsIKyqyNdaFg3H70qoyAMiZQyzUVA==}
     engines: {node: '>=12.0.0'}
     dependencies:
       tslib: 2.3.1
     dev: false
 
-  /@halo-dev/rest-api-client/1.0.0-alpha.49:
-    resolution: {integrity: sha512-tv2y4EvfJt55iAuUASKjqVv3Qt6xhh4oTG/qO+vr+Z+DEcMos+iX/fpeZwHW5/LmR0wdercBncOEP1qgOX9L0g==}
+  /@halo-dev/rest-api-client/1.0.0-alpha.50:
+    resolution: {integrity: sha512-aEmCQAgboJ4rsjtSz3bCM2I97198bnxXvVAzpljReIUBk+W3bY1MNrJsvnqwBGGQqfcmjYnOoX2IPs7STyriKg==}
     engines: {node: '>=12'}
     dependencies:
-      '@halo-dev/logger': 1.0.0-alpha.49
+      '@halo-dev/logger': 1.0.0-alpha.50
       axios: 0.24.0
       form-data: 4.0.0
       js-base64: 3.7.2

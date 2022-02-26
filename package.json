@@ -23,7 +23,7 @@
     "@codemirror/basic-setup": "^0.19.1",
     "@codemirror/lang-html": "^0.19.4",
     "@codemirror/lang-java": "^0.19.1",
-    "@halo-dev/admin-api": "^1.0.0-alpha.49",
+    "@halo-dev/admin-api": "^1.0.0-alpha.50",
     "@halo-dev/editor": "^3.0.0-alpha.2",
     "ant-design-vue": "^1.7.8",
     "dayjs": "^1.10.7",
