@@ -157,7 +157,8 @@ public class PostController {
         Post post = postService.getById(postId);
         Post prevPost =
             postService.getPrevPost(post).orElseThrow(() -> new NotFoundException("查询不到该文章的信息"));
-        prevPost.setContent(Content.PatchedContent.of(postService.getContentById(prevPost.getId())));
+        prevPost.setContent(
+            Content.PatchedContent.of(postService.getContentById(prevPost.getId())));
         return postService.convertToDetailVo(prevPost);
     }
 
@@ -167,7 +168,8 @@ public class PostController {
         Post post = postService.getById(postId);
         Post nextPost =
             postService.getNextPost(post).orElseThrow(() -> new NotFoundException("查询不到该文章的信息"));
-        nextPost.setContent(Content.PatchedContent.of(postService.getContentById(nextPost.getId())));
+        nextPost.setContent(
+            Content.PatchedContent.of(postService.getContentById(nextPost.getId())));
         return postService.convertToDetailVo(nextPost);
     }
 
