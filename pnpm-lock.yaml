@@ -7,7 +7,7 @@ specifiers:
   '@codemirror/lang-html': ^0.19.4
   '@codemirror/lang-java': ^0.19.1
   '@halo-dev/admin-api': ^1.0.0-alpha.49
-  '@halo-dev/editor': ^3.0.0-alpha.1
+  '@halo-dev/editor': ^3.0.0-alpha.2
   '@vue/cli-plugin-babel': ~5.0.1
   '@vue/cli-plugin-eslint': ~5.0.1
   '@vue/cli-plugin-router': ~5.0.1
@@ -52,7 +52,7 @@ dependencies:
   '@codemirror/lang-html': 0.19.4
   '@codemirror/lang-java': 0.19.1
   '@halo-dev/admin-api': 1.0.0-alpha.49
-  '@halo-dev/editor': 3.0.0-alpha.1
+  '@halo-dev/editor': 3.0.0-alpha.2
   ant-design-vue: 1.7.8_9065e7474e033a8e4b95615fc8e6c36c
   dayjs: 1.10.7
   enquire.js: 2.1.6
@@ -1585,8 +1585,8 @@ packages:
       - debug
     dev: false
 
-  /@halo-dev/editor/3.0.0-alpha.1:
-    resolution: {integrity: sha512-IRxsmBTOYLzkgSZ2wKO4GNeXSBkGNy4LfnnIwk2regmUwy548xMpGF8Az/tqeKJ3a7NjZ6WFqfxrP9oSUSqaQg==}
+  /@halo-dev/editor/3.0.0-alpha.2:
+    resolution: {integrity: sha512-er9X+WP0vBpbDdGVMu9k/aUd3pQIeV047YHXONIp5GWnueJcBxg4jvNa4UPLWIBttsWNVeto7/maYiYVzz69IA==}
     dependencies:
       '@iktakahiro/markdown-it-katex': 4.0.1
       '@susisu/mte-kernel': 2.1.1
