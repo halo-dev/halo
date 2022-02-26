@@ -27,7 +27,7 @@
     </a-row>
 
     <SheetSettingModal
-      :post="sheetToStage"
+      :sheet="sheetToStage"
       :savedCallback="onSheetSavedCallback"
       :visible.sync="sheetSettingVisible"
       @onUpdate="onUpdateFromSetting"

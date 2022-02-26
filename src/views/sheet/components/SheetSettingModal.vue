@@ -68,21 +68,20 @@
               </a-select>
             </a-form-item>
             <a-form-item label="封面图：">
-              <div class="post-thumb">
-                <a-space direction="vertical">
-                  <img
-                    :src="form.model.thumbnail || '/images/placeholder.jpg'"
-                    alt="Post cover thumbnail"
-                    class="img"
-                    @click="attachmentSelectVisible = true"
-                  />
-                  <a-input
-                    v-model="form.model.thumbnail"
-                    allow-clear
-                    placeholder="点击封面图选择图片，或者输入外部链接"
-                  ></a-input>
-                </a-space>
-              </div>
+              <a-space direction="vertical">
+                <img
+                  :src="form.model.thumbnail || '/images/placeholder.jpg'"
+                  alt="Sheet cover thumbnail"
+                  class="w-1/2 cursor-pointer"
+                  style="border-radius: 4px"
+                  @click="attachmentSelectVisible = true"
+                />
+                <a-input
+                  v-model="form.model.thumbnail"
+                  allow-clear
+                  placeholder="点击封面图选择图片，或者输入外部链接"
+                ></a-input>
+              </a-space>
             </a-form-item>
           </a-form>
         </a-tab-pane>
@@ -113,7 +112,6 @@
     </div>
     <template slot="footer">
       <slot name="extraFooter" />
-      <a-button :disabled="loading" @click="modalVisible = false"> 关闭</a-button>
       <ReactiveButton
         v-if="!form.model.id"
         :errored="form.draftSaveErrored"
@@ -134,6 +132,7 @@
         @callback="handleSavedCallback"
         @click="handleCreateOrUpdate()"
       ></ReactiveButton>
+      <a-button :disabled="loading" @click="modalVisible = false">关闭</a-button>
     </template>
     <AttachmentSelectModal
       :multiSelect="false"
@@ -168,7 +167,7 @@ export default {
       type: Boolean,
       default: false
     },
-    post: {
+    sheet: {
       type: Object,
       default: () => ({})
     },
@@ -229,13 +228,13 @@ export default {
   watch: {
     modalVisible(value) {
       if (value) {
-        this.form.model = Object.assign({}, this.post)
+        this.form.model = Object.assign({}, this.sheet)
         if (!this.form.model.slug && !this.form.model.id) {
           this.handleGenerateSlug()
         }
       }
     },
-    post: {
+    sheet: {
       deep: true,
       handler(value) {
         this.form.model = Object.assign({}, value)
@@ -247,7 +246,7 @@ export default {
   },
   methods: {
     /**
-     * Creates or updates a post
+     * Creates or updates a sheet
      */
     async handleCreateOrUpdate(preStatus = 'PUBLISHED') {
       if (!this.form.model.title) {

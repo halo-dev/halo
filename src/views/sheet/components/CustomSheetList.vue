@@ -244,7 +244,7 @@
     </div>
     <SheetSettingModal
       :loading="sheetSettingLoading"
-      :post="selectedSheet"
+      :sheet="selectedSheet"
       :savedCallback="onSheetSavedCallback"
       :visible.sync="sheetSettingVisible"
       @onClose="selectedSheet = {}"
