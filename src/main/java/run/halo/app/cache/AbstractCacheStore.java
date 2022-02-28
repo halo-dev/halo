@@ -65,6 +65,7 @@ public abstract class AbstractCacheStore<K, V> implements CacheStore<K, V> {
                 // Return null
                 return null;
             }
+
             return cacheWrapper.getData();
         });
     }

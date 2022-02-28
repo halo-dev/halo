@@ -48,6 +48,7 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
     @NonNull
     Optional<CacheWrapper<String>> getInternal(@NonNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
+
         return Optional.ofNullable(CACHE_CONTAINER.get(key));
     }
 

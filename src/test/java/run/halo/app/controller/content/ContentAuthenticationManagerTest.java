@@ -19,6 +19,7 @@ import run.halo.app.exception.AuthenticationException;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.service.CategoryService;
+import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 
 /**
@@ -41,13 +42,16 @@ public class ContentAuthenticationManagerTest {
     @MockBean
     private PostAuthentication postAuthentication;
 
+    @MockBean
+    private PostCategoryService postCategoryService;
+
     private ContentAuthenticationManager contentAuthenticationManager;
 
     @BeforeEach
     public void setUp() {
         contentAuthenticationManager =
             new ContentAuthenticationManager(categoryService, categoryAuthentication, postService,
-                postAuthentication);
+                postAuthentication, postCategoryService);
     }
 
     @Test
