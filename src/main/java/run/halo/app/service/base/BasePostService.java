@@ -225,15 +225,6 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     POST createOrUpdateBy(@NonNull POST post);
 
     /**
-     * Filters post content if the password is not blank.
-     *
-     * @param post original post must not be null
-     * @return filtered post
-     */
-    @NonNull
-    POST filterIfEncrypt(@NonNull POST post);
-
-    /**
      * Convert POST to minimal dto.
      *
      * @param post post must not be null.

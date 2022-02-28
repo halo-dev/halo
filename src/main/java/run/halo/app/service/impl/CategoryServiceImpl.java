@@ -15,9 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.lang.NonNull;
@@ -30,15 +28,11 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
-import run.halo.app.model.entity.Post;
-import run.halo.app.model.entity.PostCategory;
-import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
-import run.halo.app.service.PostService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.BeanUtils;
 import run.halo.app.utils.HaloUtils;
@@ -63,8 +57,6 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     private final OptionService optionService;
 
-    private PostService postService;
-
     private final ApplicationContext applicationContext;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository,
@@ -76,12 +68,6 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         this.postCategoryService = postCategoryService;
         this.optionService = optionService;
         this.applicationContext = applicationContext;
-    }
-
-    @Lazy
-    @Autowired
-    public void setPostService(PostService postService) {
-        this.postService = postService;
     }
 
     @Override
@@ -122,12 +108,6 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         Category updated = super.update(category);
         applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
         return updated;
-    }
-
-    @Override
-    public void remove(Category category) {
-        super.remove(category);
-        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
     }
 
     @Override
@@ -208,42 +188,11 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         }
 
         // Remove category
-        removeById(categoryId);
+        Category category = removeById(categoryId);
         // Remove post categories
-        List<Integer> affectedPostIdList = postCategoryService.removeByCategoryId(categoryId)
-            .stream().map(PostCategory::getPostId).collect(Collectors.toList());
+        postCategoryService.removeByCategoryId(categoryId);
 
-        refreshPostStatus(affectedPostIdList);
-    }
-
-    @Override
-    public void refreshPostStatus(List<Integer> affectedPostIdList) {
-        if (CollectionUtils.isEmpty(affectedPostIdList)) {
-            return;
-        }
-
-        for (Integer postId : affectedPostIdList) {
-            Post post = postService.getById(postId);
-
-            post.setStatus(null);
-
-            if (StringUtils.isNotBlank(post.getPassword())) {
-                post.setStatus(PostStatus.INTIMATE);
-            } else {
-                postCategoryService.listByPostId(postId)
-                    .stream().map(PostCategory::getCategoryId)
-                    .filter(this::isPrivate)
-                    .findAny()
-                    .ifPresent(id -> post.setStatus(PostStatus.INTIMATE));
-            }
-
-            if (post.getStatus() == null) {
-                post.setStatus(PostStatus.PUBLISHED);
-            }
-
-            postService.update(post);
-        }
-
+        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
     }
 
     @Override
@@ -411,8 +360,12 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             .map(categoryToUpdate -> {
                 Category categoryParam = idCategoryParamMap.get(categoryToUpdate.getId());
                 BeanUtils.updateProperties(categoryParam, categoryToUpdate);
-                return update(categoryToUpdate);
+                Category categoryUpdated = update(categoryToUpdate);
+                applicationContext.publishEvent(new CategoryUpdatedEvent(this, categoryUpdated));
+                return categoryUpdated;
             })
             .collect(Collectors.toList());
     }
+
+
 }

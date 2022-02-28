@@ -881,21 +881,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Set<Integer> categoryIds, Set<PostMeta> metas) {
         Assert.notNull(post, "Post param must not be null");
 
-        // Create or update post
-        Boolean needEncrypt = Optional.ofNullable(categoryIds)
-            .filter(HaloUtils::isNotEmpty)
-            .map(categoryIdSet -> {
-                for (Integer categoryId : categoryIdSet) {
-                    if (categoryService.isPrivate(categoryId)) {
-                        return true;
-                    }
-                }
-                return false;
-            }).orElse(Boolean.FALSE);
-
-        // if password is not empty or parent category has encrypt, change status to intimate
+        // if password is not empty
         if (post.getStatus() != PostStatus.DRAFT
-            && (StringUtils.isNotEmpty(post.getPassword()) || needEncrypt)
+            && (StringUtils.isNotEmpty(post.getPassword()))
         ) {
             post.setStatus(PostStatus.INTIMATE);
         }
@@ -939,27 +927,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             postContentPatchLogService.getPatchedContentById(postContent.getHeadPatchLogId()));
         // Convert to post detail vo
         return convertTo(post, tags, categories, postMetaList);
-    }
-
-    @Override
-    @Transactional
-    public Post updateStatus(PostStatus status, Integer postId) {
-        super.updateStatus(status, postId);
-        if (PostStatus.PUBLISHED.equals(status)) {
-            // When the update status is published, it is necessary to determine whether
-            // the post status should be converted to a intimate post
-            categoryService.refreshPostStatus(Collections.singletonList(postId));
-        }
-        return getById(postId);
-    }
-
-    @Override
-    @Transactional
-    public List<Post> updateStatusByIds(List<Integer> ids, PostStatus status) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return ids.stream().map(id -> updateStatus(status, id)).collect(Collectors.toList());
     }
 
     @Override

@@ -330,23 +330,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    public POST filterIfEncrypt(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        if (StringUtils.isNotBlank(post.getPassword())) {
-            String tip = "The post is encrypted by author";
-            post.setSummary(tip);
-
-            Content postContent = new Content();
-            postContent.setContent(tip);
-            postContent.setOriginalContent(tip);
-            post.setContent(PatchedContent.of(postContent));
-        }
-
-        return post;
-    }
-
-    @Override
     public BasePostMinimalDTO convertToMinimal(POST post) {
         Assert.notNull(post, "Post must not be null");
 
