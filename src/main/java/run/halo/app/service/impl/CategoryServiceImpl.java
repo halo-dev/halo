@@ -218,7 +218,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * @return a flattened category list
      */
     @NonNull
-    public List<Category> walkCategoryTree(CategoryVO root) {
+    private List<Category> walkCategoryTree(CategoryVO root) {
         Assert.notNull(root, "The category 'root' must not be null");
         List<Category> categories = new LinkedList<>();
         Queue<CategoryVO> queue = new ArrayDeque<>();
@@ -244,7 +244,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
      * @param categoryId category id to be found.
      * @return the root node of the subtree.
      */
-    public Optional<CategoryVO> findCategoryTreeNodeById(List<CategoryVO> categoryVos,
+    private Optional<CategoryVO> findCategoryTreeNodeById(List<CategoryVO> categoryVos,
         Integer categoryId) {
         Assert.notNull(categoryId, "categoryId id must not be null");
         Queue<CategoryVO> queue = new ArrayDeque<>(categoryVos);

@@ -133,22 +133,4 @@ public interface CategoryService extends CrudService<Category, Integer> {
      * @return a tree of category.
      */
     List<CategoryVO> listToTree(List<Category> categories);
-
-    /**
-     * Finds category node by parentId.
-     *
-     * @param categoryVos category tree
-     * @param categoryId category id to find
-     * @return category node.
-     */
-    Optional<CategoryVO> findCategoryTreeNodeById(List<CategoryVO> categoryVos,
-        Integer categoryId);
-
-    /**
-     * Walks category tree and make the category tree flat.
-     *
-     * @param root root node
-     * @return category list flatted
-     */
-    List<Category> walkCategoryTree(CategoryVO root);
 }
