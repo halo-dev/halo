@@ -3,6 +3,7 @@ package run.halo.app.model.params;
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -47,6 +48,7 @@ public class PostParam extends BasePostParam implements InputConverter<Post> {
 
     @Override
     @Size(max = 255, message = "文章密码的字符长度不能超过 {max}")
+    @Pattern(regexp = "^[^\\s]+(\\s+[^\\s]+)*$", message = "密码开头和结尾不能包含空字符串")
     public String getPassword() {
         return super.getPassword();
     }
