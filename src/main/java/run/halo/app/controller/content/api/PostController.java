@@ -25,6 +25,7 @@ import run.halo.app.cache.lock.CacheParam;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
+import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
@@ -105,7 +106,9 @@ public class PostController {
             Boolean formatDisabled,
         @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false")
             Boolean sourceDisabled) {
-        PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getById(postId));
+        Post post = postService.getById(postId);
+        post.setContent(Content.PatchedContent.of(postService.getContentById(postId)));
+        PostDetailVO postDetailVO = postService.convertToDetailVo(post);
 
         if (formatDisabled) {
             // Clear the format content
@@ -129,7 +132,9 @@ public class PostController {
             Boolean formatDisabled,
         @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false")
             Boolean sourceDisabled) {
-        PostDetailVO postDetailVO = postService.convertToDetailVo(postService.getBySlug(slug));
+        Post post = postService.getBySlug(slug);
+        post.setContent(Content.PatchedContent.of(postService.getContentById(post.getId())));
+        PostDetailVO postDetailVO = postService.convertToDetailVo(post);
 
         if (formatDisabled) {
             // Clear the format content
@@ -152,6 +157,8 @@ public class PostController {
         Post post = postService.getById(postId);
         Post prevPost =
             postService.getPrevPost(post).orElseThrow(() -> new NotFoundException("查询不到该文章的信息"));
+        prevPost.setContent(
+            Content.PatchedContent.of(postService.getContentById(prevPost.getId())));
         return postService.convertToDetailVo(prevPost);
     }
 
@@ -161,6 +168,8 @@ public class PostController {
         Post post = postService.getById(postId);
         Post nextPost =
             postService.getNextPost(post).orElseThrow(() -> new NotFoundException("查询不到该文章的信息"));
+        nextPost.setContent(
+            Content.PatchedContent.of(postService.getContentById(nextPost.getId())));
         return postService.convertToDetailVo(nextPost);
     }
 

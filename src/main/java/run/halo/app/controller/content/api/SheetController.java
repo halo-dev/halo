@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
+import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.enums.CommentStatus;
@@ -74,7 +75,9 @@ public class SheetController {
             Boolean formatDisabled,
         @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false")
             Boolean sourceDisabled) {
-        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheetService.getById(sheetId));
+        Sheet sheet = sheetService.getById(sheetId);
+        sheet.setContent(Content.PatchedContent.of(sheetService.getContentById(sheetId)));
+        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
 
         if (formatDisabled) {
             // Clear the format content
@@ -98,7 +101,9 @@ public class SheetController {
             Boolean formatDisabled,
         @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false")
             Boolean sourceDisabled) {
-        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheetService.getBySlug(slug));
+        Sheet sheet = sheetService.getBySlug(slug);
+        sheet.setContent(Content.PatchedContent.of(sheetService.getContentById(sheet.getId())));
+        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
 
         if (formatDisabled) {
             // Clear the format content

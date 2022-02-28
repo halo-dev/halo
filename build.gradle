@@ -1,5 +1,5 @@
 plugins {
-    id "org.springframework.boot" version "2.5.9"
+    id "org.springframework.boot" version "2.5.10"
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id "checkstyle"
     id "java"
@@ -17,7 +17,7 @@ checkstyle {
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
-    maven { url 'https://maven.aliyun.com/repository/spring/'}
+    maven { url 'https://maven.aliyun.com/repository/spring/' }
     mavenLocal()
     mavenCentral()
 }
@@ -50,13 +50,13 @@ bootJar {
 }
 
 ext {
-    guavaVersion= '31.0.1-jre'
+    guavaVersion = '31.0.1-jre'
     upyunSdkVersion = '4.2.3'
     qiniuSdkVersion = '7.8.0'
     aliyunSdkVersion = '3.13.2'
     baiduSdkVersion = '0.10.36'
     qcloudSdkVersion = '5.6.61'
-    minioSdkVersion = '8.3.4'
+    minioSdkVersion = '7.1.4'
     swaggerVersion = "3.0.0"
     commonsFileUploadVersion = "1.4"
     commonsLangVersion = '3.12.0'

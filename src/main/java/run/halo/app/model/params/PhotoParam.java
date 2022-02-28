@@ -15,6 +15,8 @@ import run.halo.app.model.entity.Photo;
 @Data
 public class PhotoParam implements InputConverter<Photo> {
 
+    private Integer id;
+
     @NotBlank(message = "照片名称不能为空")
     private String name;
 
