@@ -2,12 +2,12 @@ package run.halo.app.model.params;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Category;
+import run.halo.app.model.support.NotAllowSpaceOnly;
 import run.halo.app.utils.SlugUtils;
 
 /**
@@ -37,7 +37,7 @@ public class CategoryParam implements InputConverter<Category> {
     private String thumbnail;
 
     @Size(max = 255, message = "分类密码的字符长度不能超过 {max}")
-    @Pattern(regexp = "^[^\\s]+(\\s+[^\\s]+)*$", message = "密码开头和结尾不能包含空字符串")
+    @NotAllowSpaceOnly(message = "密码开头和结尾不能包含空字符串")
     private String password;
 
     private Integer parentId = 0;
