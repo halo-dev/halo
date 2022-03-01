@@ -70,7 +70,8 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
         if (latestPatchLog == null) {
             // There is no patchLog record
             version = 1;
-        } else if (PostStatus.PUBLISHED.equals(latestPatchLog.getStatus())) {
+        } else if (PostStatus.PUBLISHED.equals(latestPatchLog.getStatus())
+            || PostStatus.INTIMATE.equals(latestPatchLog.getStatus())) {
             // There is no draft, a draft record needs to be created
             // so the version number needs to be incremented
             version = latestPatchLog.getVersion() + 1;
