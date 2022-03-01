@@ -195,7 +195,8 @@ public class PostModel {
 
         Page<PostListVO> posts = postRenderAssembler.convertToListVo(postPage);
 
-        List<ArchiveYearVO> archives = postRenderAssembler.convertToYearArchives(postPage.getContent());
+        List<ArchiveYearVO> archives =
+            postRenderAssembler.convertToYearArchives(postPage.getContent());
 
         model.addAttribute("is_archives", true);
         model.addAttribute("posts", posts);
