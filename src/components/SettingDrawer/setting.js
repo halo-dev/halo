@@ -82,7 +82,7 @@ const updateTheme = primaryColor => {
         javascriptEnabled: true
       };
     `
-    lessScriptNode.src = 'https://cdn.jsdelivr.net/npm/less@3.8.1/dist/less.min.js'
+    lessScriptNode.src = 'https://unpkg.com/less@3.8.1/dist/less.min.js'
     lessScriptNode.async = true
     lessScriptNode.onload = () => {
       buildIt()
