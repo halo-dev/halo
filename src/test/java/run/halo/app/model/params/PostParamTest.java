@@ -44,6 +44,34 @@ public class PostParamTest {
     }
 
     @Test
+    public void validatePassword() {
+        PostParam postParam = new PostParam();
+        postParam.setTitle("Title");
+        postParam.setSlug("Slug");
+        postParam.setPassword(" 123");
+        postParam.setTopPriority(0);
+
+        Set<ConstraintViolation<PostParam>> validate = validator.validate(postParam);
+        assertThat(validate).isNotNull();
+        assertThat(validate).hasSize(1);
+        assertThat(validate.iterator().next().getMessage()).isEqualTo("密码开头和结尾不能包含空字符串");
+
+        postParam.setPassword("123 ");
+        validate = validator.validate(postParam);
+        assertThat(validate).isNotNull();
+        assertThat(validate).hasSize(1);
+        assertThat(validate.iterator().next().getMessage()).isEqualTo("密码开头和结尾不能包含空字符串");
+
+        postParam.setPassword("");
+        validate = validator.validate(postParam);
+        assertThat(validate).isEmpty();
+
+        postParam.setPassword("123 hello");
+        validate = validator.validate(postParam);
+        assertThat(validate).isEmpty();
+    }
+
+    @Test
     public void convertToTest() {
         PostParam postParam = new PostParam();
         postParam.setTitle("Title");

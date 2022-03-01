@@ -287,15 +287,6 @@ public interface PostService extends BasePostService<Post> {
     List<PostListVO> convertToListVo(@NonNull List<Post> posts);
 
     /**
-     * Converts to a list of post list vo.
-     *
-     * @param posts post must not be null
-     * @param queryEncryptCategory whether to query encryption category
-     * @return a list of post list vo
-     */
-    List<PostListVO> convertToListVo(List<Post> posts, boolean queryEncryptCategory);
-
-    /**
      * Publish a post visit event.
      *
      * @param postId postId must not be null

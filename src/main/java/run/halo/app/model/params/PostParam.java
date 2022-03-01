@@ -12,6 +12,7 @@ import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.enums.PostEditorType;
+import run.halo.app.model.support.NotAllowSpaceOnly;
 import run.halo.app.utils.SlugUtils;
 
 /**
@@ -47,6 +48,7 @@ public class PostParam extends BasePostParam implements InputConverter<Post> {
 
     @Override
     @Size(max = 255, message = "文章密码的字符长度不能超过 {max}")
+    @NotAllowSpaceOnly(message = "密码开头和结尾不能包含空字符串")
     public String getPassword() {
         return super.getPassword();
     }

@@ -57,10 +57,10 @@ public class CategoryController {
         @SortDefault(sort = "priority", direction = ASC) Sort sort,
         @RequestParam(name = "more", required = false, defaultValue = "false") boolean more) {
         if (more) {
-            return postCategoryService.listCategoryWithPostCountDto(sort, true);
+            return postCategoryService.listCategoryWithPostCountDto(sort);
         }
 
-        return categoryService.convertTo(categoryService.listAll(sort, true));
+        return categoryService.convertTo(categoryService.listAll(sort));
     }
 
     @GetMapping("tree_view")

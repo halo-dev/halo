@@ -160,6 +160,7 @@
             <span class="top"></span>
             <span class="left"></span>
         </div>
+        <div style="margin-top: 8px;color: red;">${errorMsg!}</div>
         <div class="submit-input">
             <button type="submit">验证</button>
         </div>

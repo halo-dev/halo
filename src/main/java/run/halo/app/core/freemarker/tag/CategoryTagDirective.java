@@ -51,7 +51,7 @@ public class CategoryTagDirective implements TemplateDirectiveModel {
             switch (method) {
                 case "list":
                     env.setVariable("categories", builder.build().wrap(postCategoryService
-                        .listCategoryWithPostCountDto(Sort.by(ASC, "priority"), false)));
+                        .listCategoryWithPostCountDto(Sort.by(ASC, "priority"))));
                     break;
                 case "tree":
                     env.setVariable("categories", builder.build()

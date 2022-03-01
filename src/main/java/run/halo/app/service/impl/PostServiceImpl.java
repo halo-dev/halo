@@ -22,6 +22,7 @@ import javax.persistence.criteria.Subquery;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
+import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.event.post.PostVisitEvent;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
@@ -61,7 +63,6 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.model.vo.PostMarkdownVO;
 import run.halo.app.repository.PostRepository;
 import run.halo.app.repository.base.BasePostRepository;
-import run.halo.app.service.AuthorizationService;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.ContentPatchLogService;
 import run.halo.app.service.ContentService;
@@ -113,9 +114,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     private final OptionService optionService;
 
-    private final AuthorizationService authorizationService;
-
     private final ContentPatchLogService postContentPatchLogService;
+
+    private final ApplicationContext applicationContext;
 
     public PostServiceImpl(BasePostRepository<Post> basePostRepository,
         OptionService optionService,
@@ -127,9 +128,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         PostCommentService postCommentService,
         ApplicationEventPublisher eventPublisher,
         PostMetaService postMetaService,
-        AuthorizationService authorizationService,
         ContentService contentService,
-        ContentPatchLogService contentPatchLogService) {
+        ContentPatchLogService contentPatchLogService,
+        ApplicationContext applicationContext) {
         super(basePostRepository, optionService, contentService, contentPatchLogService);
         this.postRepository = postRepository;
         this.tagService = tagService;
@@ -140,9 +141,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         this.eventPublisher = eventPublisher;
         this.postMetaService = postMetaService;
         this.optionService = optionService;
-        this.authorizationService = authorizationService;
         this.postContentService = contentService;
         this.postContentPatchLogService = contentPatchLogService;
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -565,7 +566,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         // List categories
         List<Category> categories = postCategoryService
-            .listCategoriesBy(post.getId(), queryEncryptCategory);
+            .listCategoriesBy(post.getId());
         // List metas
         List<PostMeta> metas = postMetaService.listBy(post.getId());
         // Convert to detail vo
@@ -633,7 +634,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Get category list map
         Map<Integer, List<Category>> categoryListMap = postCategoryService
-            .listCategoryListMap(postIds, queryEncryptCategory);
+            .listCategoryListMap(postIds);
 
         // Get comment count
         Map<Integer, Long> commentCountMap = postCommentService.countByStatusAndPostIds(
@@ -685,11 +686,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
     @Override
     public List<PostListVO> convertToListVo(List<Post> posts) {
-        return convertToListVo(posts, false);
-    }
-
-    @Override
-    public List<PostListVO> convertToListVo(List<Post> posts, boolean queryEncryptCategory) {
         Assert.notNull(posts, "Post page must not be null");
 
         Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
@@ -699,7 +695,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
 
         // Get category list map
         Map<Integer, List<Category>> categoryListMap = postCategoryService
-            .listCategoryListMap(postIds, queryEncryptCategory);
+            .listCategoryListMap(postIds);
 
         // Get comment count
         Map<Integer, Long> commentCountMap =
@@ -885,21 +881,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Set<Integer> categoryIds, Set<PostMeta> metas) {
         Assert.notNull(post, "Post param must not be null");
 
-        // Create or update post
-        Boolean needEncrypt = Optional.ofNullable(categoryIds)
-            .filter(HaloUtils::isNotEmpty)
-            .map(categoryIdSet -> {
-                for (Integer categoryId : categoryIdSet) {
-                    if (categoryService.categoryHasEncrypt(categoryId)) {
-                        return true;
-                    }
-                }
-                return false;
-            }).orElse(Boolean.FALSE);
-
-        // if password is not empty or parent category has encrypt, change status to intimate
+        // if password is not empty
         if (post.getStatus() != PostStatus.DRAFT
-            && (StringUtils.isNotEmpty(post.getPassword()) || needEncrypt)
+            && (StringUtils.isNotEmpty(post.getPassword()))
         ) {
             post.setStatus(PostStatus.INTIMATE);
         }
@@ -914,7 +898,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Tag> tags = tagService.listAllByIds(tagIds);
 
         // List all categories
-        List<Category> categories = categoryService.listAllByIds(categoryIds, true);
+        List<Category> categories = categoryService.listAllByIds(categoryIds);
 
         // Create post tags
         List<PostTag> postTags = postTagService.mergeOrCreateByIfAbsent(post.getId(),
@@ -934,8 +918,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             .createOrUpdateByPostId(post.getId(), metas);
         log.debug("Created post metas: [{}]", postMetaList);
 
-        // Remove authorization every time an post is created or updated.
-        authorizationService.deletePostAuthorization(post.getId());
+        // Publish post updated event.
+        applicationContext.publishEvent(new PostUpdatedEvent(this, post));
 
         // get draft content by head patch log id
         Content postContent = postContentService.getById(post.getId());
@@ -943,27 +927,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             postContentPatchLogService.getPatchedContentById(postContent.getHeadPatchLogId()));
         // Convert to post detail vo
         return convertTo(post, tags, categories, postMetaList);
-    }
-
-    @Override
-    @Transactional
-    public Post updateStatus(PostStatus status, Integer postId) {
-        super.updateStatus(status, postId);
-        if (PostStatus.PUBLISHED.equals(status)) {
-            // When the update status is published, it is necessary to determine whether
-            // the post status should be converted to a intimate post
-            categoryService.refreshPostStatus(Collections.singletonList(postId));
-        }
-        return getById(postId);
-    }
-
-    @Override
-    @Transactional
-    public List<Post> updateStatusByIds(List<Integer> ids, PostStatus status) {
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
-        }
-        return ids.stream().map(id -> updateStatus(status, id)).collect(Collectors.toList());
     }
 
     @Override
