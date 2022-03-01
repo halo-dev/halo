@@ -20,9 +20,9 @@ import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * Content tag controller.
@@ -39,14 +39,14 @@ public class TagController {
 
     private final PostTagService postTagService;
 
-    private final PostService postService;
+    private final PostRenderAssembler postRenderAssembler;
 
     public TagController(TagService tagService,
         PostTagService postTagService,
-        PostService postService) {
+        PostRenderAssembler postRenderAssembler) {
         this.tagService = tagService;
         this.postTagService = postTagService;
-        this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
     }
 
     @GetMapping
@@ -72,6 +72,6 @@ public class TagController {
         // Get posts, convert and return
         Page<Post> postPage =
             postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
-        return postService.convertToListVo(postPage);
+        return postRenderAssembler.convertToListVo(postPage);
     }
 }

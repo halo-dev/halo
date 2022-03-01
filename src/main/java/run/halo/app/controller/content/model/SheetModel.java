@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.exception.ForbiddenException;
-import run.halo.app.model.entity.Content;
-import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostStatus;
@@ -17,6 +15,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetMetaService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.assembler.SheetRenderAssembler;
 
 /**
  * Sheet model.
@@ -29,6 +28,8 @@ public class SheetModel {
 
     private final SheetService sheetService;
 
+    private final SheetRenderAssembler sheetRenderAssembler;
+
     private final SheetMetaService sheetMetaService;
 
     private final AbstractStringCacheStore cacheStore;
@@ -38,11 +39,13 @@ public class SheetModel {
     private final OptionService optionService;
 
     public SheetModel(SheetService sheetService,
+        SheetRenderAssembler sheetRenderAssembler,
         SheetMetaService sheetMetaService,
         AbstractStringCacheStore cacheStore,
         ThemeService themeService,
         OptionService optionService) {
         this.sheetService = sheetService;
+        this.sheetRenderAssembler = sheetRenderAssembler;
         this.sheetMetaService = sheetMetaService;
         this.cacheStore = cacheStore;
         this.themeService = themeService;
@@ -58,12 +61,10 @@ public class SheetModel {
      * @return template name
      */
     public String content(Sheet sheet, String token, Model model) {
-
+        SheetDetailVO sheetDetailVo;
         if (StringUtils.isEmpty(token)) {
             sheet = sheetService.getBy(PostStatus.PUBLISHED, sheet.getSlug());
-            //Set sheet content
-            Content content = sheetService.getContentById(sheet.getId());
-            sheet.setContent(PatchedContent.of(content));
+            sheetDetailVo = sheetRenderAssembler.convertToDetailVo(sheet);
         } else {
             // verify token
             String cachedToken = cacheStore.getAny(token, String.class)
@@ -71,14 +72,10 @@ public class SheetModel {
             if (!cachedToken.equals(token)) {
                 throw new ForbiddenException("您没有该页面的访问权限");
             }
-            // render markdown to html when preview sheet
-            PatchedContent sheetContent = sheetService.getLatestContentById(sheet.getId());
-            sheet.setContent(sheetContent);
+            sheetDetailVo = sheetRenderAssembler.convertToPreviewDetailVo(sheet);
         }
 
         sheetService.publishVisitEvent(sheet.getId());
-
-        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
 
         List<SheetMeta> metas = sheetMetaService.listBy(sheet.getId());
 
@@ -98,8 +95,8 @@ public class SheetModel {
         }
 
         // sheet and post all can use
-        model.addAttribute("sheet", sheetDetailVO);
-        model.addAttribute("post", sheetDetailVO);
+        model.addAttribute("sheet", sheetDetailVo);
+        model.addAttribute("post", sheetDetailVo);
         model.addAttribute("is_sheet", true);
         model.addAttribute("metas", sheetMetaService.convertToMap(metas));
 

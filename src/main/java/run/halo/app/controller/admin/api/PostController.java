@@ -35,6 +35,7 @@ import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
+import run.halo.app.service.assembler.PostAssembler;
 import run.halo.app.utils.HaloUtils;
 
 /**
@@ -55,12 +56,16 @@ public class PostController {
 
     private final OptionService optionService;
 
+    private final PostAssembler postAssembler;
+
     public PostController(PostService postService,
         AbstractStringCacheStore cacheStore,
-        OptionService optionService) {
+        OptionService optionService,
+        PostAssembler postAssembler) {
         this.postService = postService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
+        this.postAssembler = postAssembler;
     }
 
     @GetMapping
@@ -71,17 +76,17 @@ public class PostController {
         @RequestParam(value = "more", defaultValue = "true") Boolean more) {
         Page<Post> postPage = postService.pageBy(postQuery, pageable);
         if (more) {
-            return postService.convertToListVo(postPage, true);
+            return postAssembler.convertToListVo(postPage);
         }
 
-        return postService.convertToSimple(postPage);
+        return postAssembler.convertToSimple(postPage);
     }
 
     @GetMapping("latest")
     @ApiOperation("Pages latest post")
     public List<BasePostMinimalDTO> pageLatest(
         @RequestParam(name = "top", defaultValue = "10") int top) {
-        return postService.convertToMinimal(postService.pageLatest(top).getContent());
+        return postAssembler.convertToMinimal(postService.pageLatest(top).getContent());
     }
 
     @GetMapping("status/{status}")
@@ -93,17 +98,17 @@ public class PostController {
         Page<Post> posts = postService.pageBy(status, pageable);
 
         if (more) {
-            return postService.convertToListVo(posts, true);
+            return postAssembler.convertToListVo(posts);
         }
 
-        return postService.convertToSimple(posts);
+        return postAssembler.convertToSimple(posts);
     }
 
     @GetMapping("{postId:\\d+}")
     @ApiOperation("Gets a post")
     public PostDetailVO getBy(@PathVariable("postId") Integer postId) {
         Post post = postService.getWithLatestContentById(postId);
-        return postService.convertToDetailVo(post, true);
+        return postAssembler.convertToDetailVo(post);
     }
 
     @PutMapping("{postId:\\d+}/likes")
@@ -164,7 +169,7 @@ public class PostController {
         // Update draft content
         Post post = postService.updateDraftContent(formattedContent,
             contentParam.getOriginalContent(), postId);
-        return postService.convertToDetail(post);
+        return postAssembler.convertToDetail(post);
     }
 
     @DeleteMapping("{postId:\\d+}")
@@ -187,7 +192,7 @@ public class PostController {
 
         post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8.name()));
 
-        BasePostMinimalDTO postMinimalDTO = postService.convertToMinimal(post);
+        BasePostMinimalDTO postMinimalDTO = postAssembler.convertToMinimal(post);
 
         String token = HaloUtils.simpleUUID();
 

@@ -14,10 +14,10 @@ import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
-import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * Tag Model.
@@ -30,7 +30,7 @@ public class TagModel {
 
     private final TagService tagService;
 
-    private final PostService postService;
+    private final PostRenderAssembler postRenderAssembler;
 
     private final PostTagService postTagService;
 
@@ -38,10 +38,13 @@ public class TagModel {
 
     private final ThemeService themeService;
 
-    public TagModel(TagService tagService, PostService postService, PostTagService postTagService,
-        OptionService optionService, ThemeService themeService) {
+    public TagModel(TagService tagService,
+        PostRenderAssembler postRenderAssembler,
+        PostTagService postTagService,
+        OptionService optionService,
+        ThemeService themeService) {
         this.tagService = tagService;
-        this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
         this.postTagService = postTagService;
         this.optionService = optionService;
         this.themeService = themeService;
@@ -63,7 +66,7 @@ public class TagModel {
             .of(page - 1, optionService.getArchivesPageSize(), Sort.by(DESC, "createTime"));
         Page<Post> postPage =
             postTagService.pagePostsBy(tag.getId(), PostStatus.PUBLISHED, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
+        Page<PostListVO> posts = postRenderAssembler.convertToListVo(postPage);
 
         model.addAttribute("is_tag", true);
         model.addAttribute("posts", posts);
