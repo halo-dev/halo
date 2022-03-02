@@ -97,7 +97,7 @@ public class CategoryModel {
         }
 
         Set<PostStatus> statuses = Sets.immutableEnumSet(PostStatus.PUBLISHED);
-        if (StringUtils.isNotBlank(category.getPassword())) {
+        if (categoryService.isPrivate(category.getId())) {
             statuses = Sets.immutableEnumSet(PostStatus.INTIMATE);
         }
 
