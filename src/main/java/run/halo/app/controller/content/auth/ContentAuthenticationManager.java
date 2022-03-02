@@ -95,6 +95,18 @@ public class ContentAuthenticationManager {
                     return postAuthentication;
                 }
             }
+
+            for (Category category : encryptedCategories) {
+                boolean authenticated = categoryService.lookupFirstEncryptedBy(category.getId())
+                    .filter(parentCategory -> StringUtils.equals(parentCategory.getPassword(),
+                        authRequest.getPassword()))
+                    .isPresent();
+
+                if (authenticated) {
+                    postAuthentication.setAuthenticated(post.getId(), true);
+                    return postAuthentication;
+                }
+            }
             throw new AuthenticationException("密码不正确");
         }
     }
