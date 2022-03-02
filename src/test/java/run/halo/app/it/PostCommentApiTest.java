@@ -20,7 +20,7 @@ public class PostCommentApiTest extends BaseApiTest {
         "d41d8cd98f00b204e9800998ecf8427e";
 
     private static final String COMMENT_NULL_EMAIL_AVATAR =
-        "//gravatar.com/avatar/" + COMMENT_NULL_EMAIL_GRAVATAR_MD5 + "?s=256&d= ";
+        "//gravatar.com/avatar/" + COMMENT_NULL_EMAIL_GRAVATAR_MD5 + "?s=256&d=";
 
     private static final String COMMENT_AUTHOR_TEST = "TestAuthor";
 
