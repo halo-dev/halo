@@ -23,7 +23,7 @@ public enum PrimaryProperties implements PropertyEnum {
     /**
      * blog birthday
      */
-    BIRTHDAY("birthday", Long.class, ""),
+    BIRTHDAY("birthday", Long.class, "0"),
 
     /**
      * developer mode.

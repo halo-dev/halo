@@ -213,10 +213,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
                 .forEach(key -> {
                     PropertyEnum propertyEnum = propertyEnumMap.get(key);
 
-                    if (StringUtils.isBlank(propertyEnum.defaultValue())) {
-                        return;
-                    }
-
                     result.put(key,
                         PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
                 });
