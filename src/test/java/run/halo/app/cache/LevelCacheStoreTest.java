@@ -37,7 +37,8 @@ public class LevelCacheStoreTest {
 
         // Simulate corrupt cache structure
         DB levelDb = (DB) ReflectionTestUtils.getField(cacheStore, "LEVEL_DB");
-        levelDb.put("B".getBytes(StandardCharsets.UTF_8), "NOT_JSON".getBytes(StandardCharsets.UTF_8));
+        levelDb.put("B".getBytes(StandardCharsets.UTF_8),
+            "NOT_JSON".getBytes(StandardCharsets.UTF_8));
 
         Optional<CacheWrapper> bOpt = cacheStore.getAny("B", CacheWrapper.class);
         assertThat(bOpt).isNotNull();
