@@ -16,6 +16,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.ContentPatchLogRepository;
 import run.halo.app.repository.ContentRepository;
 import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.PatchUtils;
 
 /**
@@ -25,7 +26,8 @@ import run.halo.app.utils.PatchUtils;
  * @since 2022-01-04
  */
 @Service
-public class ContentPatchLogServiceImpl implements ContentPatchLogService {
+public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatchLog, Integer>
+    implements ContentPatchLogService {
 
     /**
      * base version of content patch log.
@@ -38,6 +40,7 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
 
     public ContentPatchLogServiceImpl(ContentPatchLogRepository contentPatchLogRepository,
         ContentRepository contentRepository) {
+        super(contentPatchLogRepository);
         this.contentPatchLogRepository = contentPatchLogRepository;
         this.contentRepository = contentRepository;
     }
@@ -81,12 +84,6 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
             version = latestPatchLog.getVersion();
         }
         return version;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void save(ContentPatchLog contentPatchLog) {
-        contentPatchLogRepository.save(contentPatchLog);
     }
 
     private ContentPatchLog createDraftContent(Integer postId, Integer version,

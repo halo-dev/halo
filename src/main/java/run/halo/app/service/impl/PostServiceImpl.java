@@ -645,6 +645,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         List<Post> allPostList = listAll();
         List<PostMarkdownVO> result = new ArrayList<>(allPostList.size());
         for (Post post : allPostList) {
+            Content postContent = getContentById(post.getId());
+            post.setContent(PatchedContent.of(postContent));
             result.add(convertToPostMarkdownVo(post));
         }
         return result;

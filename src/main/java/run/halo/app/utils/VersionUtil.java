@@ -29,4 +29,17 @@ public final class VersionUtil {
         return leftVersion.compareTo(rightVersion) >= 0;
     }
 
+    /**
+     * Compare two versions to see if they have the same major and minor versions.
+     *
+     * @param left version A to compare
+     * @param right version B to compare
+     * @return {@code true} if they have the same major and minor version.
+     */
+    public static boolean hasSameMajorAndMinorVersion(String left, String right) {
+        Version leftVersion = Version.resolve(left).orElse(Version.emptyVersion());
+        Version rightVersion = Version.resolve(right).orElse(Version.emptyVersion());
+        return leftVersion.getMajor() == rightVersion.getMajor()
+            && leftVersion.getMinor() == rightVersion.getMinor();
+    }
 }
