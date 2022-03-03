@@ -1,0 +1,8 @@
+${AnsiColor.BLUE}
+    __  __      __
+   / / / /___ _/ /___
+  / /_/ / __ `/ / __ \
+ / __  / /_/ / / /_/ /
+/_/ /_/\__,_/_/\____/
+${AnsiColor.BRIGHT_YELLOW}
+Version: ${application.version}${AnsiColor.DEFAULT}
