@@ -124,14 +124,6 @@ public class ControllerExceptionHandler {
         return response;
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<?> handleIllegalArgumentException(IllegalArgumentException e) {
-        BaseResponse<Object> response = handleBaseException(e);
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        return response;
-    }
-
     @ExceptionHandler(AbstractHaloException.class)
     public ResponseEntity<BaseResponse<?>> handleHaloException(AbstractHaloException e) {
         BaseResponse<Object> baseResponse = handleBaseException(e);

@@ -456,7 +456,7 @@ public class BackupServiceImpl implements BackupService {
 
         String version = (String) Objects.requireNonNullElse(data.get("version"), "");
         if (!VersionUtil.hasSameMajorAndMinorVersion(HaloConst.HALO_VERSION, version)) {
-            throw new IllegalArgumentException("导入数据的主次版本号与当前系统版本号不匹配，不支持导入！");
+            throw new BadRequestException("导入数据的主次版本号与当前系统版本号不匹配，不支持导入！");
         }
 
         List<Attachment> attachments = Arrays.asList(mapper
