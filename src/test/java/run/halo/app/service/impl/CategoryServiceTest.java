@@ -1,15 +1,22 @@
 package run.halo.app.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.vo.CategoryVO;
+import run.halo.app.repository.CategoryRepository;
+import run.halo.app.service.OptionService;
+import run.halo.app.service.PostCategoryService;
 import run.halo.app.utils.JsonUtils;
 
 /**
@@ -18,12 +25,34 @@ import run.halo.app.utils.JsonUtils;
  * @author guqing
  * @date 2021-12-04
  */
-@ActiveProfiles("test")
-@SpringBootTest
+@ExtendWith(SpringExtension.class)
 public class CategoryServiceTest {
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @MockBean
+    private CategoryRepository categoryRepository;
+
+    @MockBean
+    private PostCategoryService postCategoryService;
+
+    @MockBean
+    private OptionService optionService;
+
     private CategoryServiceImpl categoryService;
+
+    @BeforeEach
+    public void setUp() {
+        categoryService =
+            new CategoryServiceImpl(categoryRepository, postCategoryService, optionService,
+                applicationContext);
+
+        when(optionService.isEnabledAbsolutePath()).thenReturn(true);
+        when(optionService.getBlogBaseUrl()).thenReturn("http://127.0.0.1:8090");
+        when(optionService.getCategoriesPrefix()).thenReturn("categories");
+        when(optionService.getPathSuffix()).thenReturn("");
+    }
 
     @Test
     void listToTree() throws JsonProcessingException {

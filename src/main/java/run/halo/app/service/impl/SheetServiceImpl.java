@@ -1,39 +1,28 @@
 package run.halo.app.service.impl;
 
-import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
-
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.SheetVisitEvent;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.IndependentSheetDTO;
-import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.entity.SheetMeta;
-import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.enums.LogType;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.enums.SheetPermalinkType;
-import run.halo.app.model.vo.SheetDetailVO;
-import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.repository.SheetRepository;
 import run.halo.app.service.ContentPatchLogService;
 import run.halo.app.service.ContentService;
@@ -295,95 +284,8 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
     }
 
     @Override
-    public Page<SheetListVO> convertToListVo(Page<Sheet> sheetPage) {
-        Assert.notNull(sheetPage, "Sheet page must not be null");
-
-        // Get all sheet id
-        List<Sheet> sheets = sheetPage.getContent();
-
-        Set<Integer> sheetIds = ServiceUtils.fetchProperty(sheets, Sheet::getId);
-
-        // key: sheet id, value: comment count
-        Map<Integer, Long> sheetCommentCountMap = sheetCommentService.countByStatusAndPostIds(
-            CommentStatus.PUBLISHED, sheetIds);
-
-        return sheetPage.map(sheet -> {
-            SheetListVO sheetListVO = new SheetListVO().convertFrom(sheet);
-            sheetListVO.setCommentCount(sheetCommentCountMap.getOrDefault(sheet.getId(), 0L));
-
-            sheetListVO.setFullPath(buildFullPath(sheet));
-
-            // Post currently drafting in process
-            Boolean isInProcess = sheetContentService.draftingInProgress(sheet.getId());
-            sheetListVO.setInProgress(isInProcess);
-
-            return sheetListVO;
-        });
-    }
-
-    @Override
     public void publishVisitEvent(Integer sheetId) {
         eventPublisher.publishEvent(new SheetVisitEvent(this, sheetId));
-    }
-
-    @Override
-    public SheetDetailVO convertToDetailVo(Sheet sheet) {
-        // List metas
-        List<SheetMeta> metas = sheetMetaService.listBy(sheet.getId());
-        // Convert to detail vo
-        return convertTo(sheet, metas);
-    }
-
-    @Override
-    public BasePostMinimalDTO convertToMinimal(Sheet sheet) {
-        Assert.notNull(sheet, "Sheet must not be null");
-        BasePostMinimalDTO basePostMinimalDTO = new BasePostMinimalDTO().convertFrom(sheet);
-
-        basePostMinimalDTO.setFullPath(buildFullPath(sheet));
-
-        return basePostMinimalDTO;
-    }
-
-    @Override
-    public List<BasePostMinimalDTO> convertToMinimal(List<Sheet> sheets) {
-        if (CollectionUtils.isEmpty(sheets)) {
-            return Collections.emptyList();
-        }
-
-        return sheets.stream()
-            .map(this::convertToMinimal)
-            .collect(Collectors.toList());
-    }
-
-    @NonNull
-    private SheetDetailVO convertTo(@NonNull Sheet sheet, List<SheetMeta> metas) {
-        Assert.notNull(sheet, "Sheet must not be null");
-
-        // Convert to base detail vo
-        SheetDetailVO sheetDetailVO = new SheetDetailVO().convertFrom(sheet);
-
-        Set<Long> metaIds = ServiceUtils.fetchProperty(metas, SheetMeta::getId);
-
-        // Get sheet meta ids
-        sheetDetailVO.setMetaIds(metaIds);
-        sheetDetailVO.setMetas(sheetMetaService.convertTo(metas));
-
-        generateAndSetSummaryIfAbsent(sheet, sheetDetailVO);
-
-        sheetDetailVO.setCommentCount(sheetCommentService.countByStatusAndPostId(
-            CommentStatus.PUBLISHED, sheet.getId()));
-
-        sheetDetailVO.setFullPath(buildFullPath(sheet));
-
-        PatchedContent sheetContent = sheet.getContent();
-        sheetDetailVO.setContent(sheetContent.getContent());
-        sheetDetailVO.setOriginalContent(sheetContent.getOriginalContent());
-
-        // Sheet currently drafting in process
-        Boolean inProgress = sheetContentService.draftingInProgress(sheet.getId());
-        sheetDetailVO.setInProgress(inProgress);
-
-        return sheetDetailVO;
     }
 
     @Override
@@ -405,29 +307,4 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
             throw new AlreadyExistsException("页面别名 " + sheet.getSlug() + " 已存在");
         }
     }
-
-    private String buildFullPath(Sheet sheet) {
-        StringBuilder fullPath = new StringBuilder();
-
-        SheetPermalinkType permalinkType = optionService.getSheetPermalinkType();
-
-        if (optionService.isEnabledAbsolutePath()) {
-            fullPath.append(optionService.getBlogBaseUrl());
-        }
-
-        if (permalinkType.equals(SheetPermalinkType.SECONDARY)) {
-            fullPath.append(URL_SEPARATOR)
-                .append(optionService.getSheetPrefix())
-                .append(URL_SEPARATOR)
-                .append(sheet.getSlug())
-                .append(optionService.getPathSuffix());
-        } else if (permalinkType.equals(SheetPermalinkType.ROOT)) {
-            fullPath.append(URL_SEPARATOR)
-                .append(sheet.getSlug())
-                .append(optionService.getPathSuffix());
-        }
-
-        return fullPath.toString();
-    }
-
 }

@@ -33,6 +33,7 @@ import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetService;
+import run.halo.app.service.assembler.SheetAssembler;
 import run.halo.app.utils.HaloUtils;
 
 /**
@@ -52,19 +53,23 @@ public class SheetController {
 
     private final OptionService optionService;
 
+    private final SheetAssembler sheetAssembler;
+
     public SheetController(SheetService sheetService,
         AbstractStringCacheStore cacheStore,
-        OptionService optionService) {
+        OptionService optionService,
+        SheetAssembler sheetAssembler) {
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
+        this.sheetAssembler = sheetAssembler;
     }
 
     @GetMapping("{sheetId:\\d+}")
     @ApiOperation("Gets a sheet")
     public SheetDetailVO getBy(@PathVariable("sheetId") Integer sheetId) {
         Sheet sheet = sheetService.getWithLatestContentById(sheetId);
-        return sheetService.convertToDetailVo(sheet);
+        return sheetAssembler.convertToDetailVo(sheet);
     }
 
     @GetMapping
@@ -72,7 +77,7 @@ public class SheetController {
     public Page<SheetListVO> pageBy(
         @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Sheet> sheetPage = sheetService.pageBy(pageable);
-        return sheetService.convertToListVo(sheetPage);
+        return sheetAssembler.convertToListVo(sheetPage);
     }
 
     @GetMapping("independent")
@@ -88,7 +93,7 @@ public class SheetController {
             Boolean autoSave) {
         Sheet sheet =
             sheetService.createBy(sheetParam.convertTo(), sheetParam.getSheetMetas(), autoSave);
-        return sheetService.convertToDetailVo(sheet);
+        return sheetAssembler.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}")
@@ -104,7 +109,7 @@ public class SheetController {
 
         Sheet sheet = sheetService.updateBy(sheetToUpdate, sheetParam.getSheetMetas(), autoSave);
 
-        return sheetService.convertToDetailVo(sheet);
+        return sheetAssembler.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}/{status}")
@@ -132,14 +137,14 @@ public class SheetController {
         // Update draft content
         Sheet sheet = sheetService.updateDraftContent(formattedContent,
             contentParam.getOriginalContent(), sheetId);
-        return sheetService.convertToDetail(sheet);
+        return sheetAssembler.convertToDetail(sheet);
     }
 
     @DeleteMapping("{sheetId:\\d+}")
     @ApiOperation("Deletes a sheet")
     public SheetDetailVO deleteBy(@PathVariable("sheetId") Integer sheetId) {
         Sheet sheet = sheetService.removeById(sheetId);
-        return sheetService.convertToDetailVo(sheet);
+        return sheetAssembler.convertToDetailVo(sheet);
     }
 
     @GetMapping("preview/{sheetId:\\d+}")
@@ -150,7 +155,7 @@ public class SheetController {
 
         sheet.setSlug(URLEncoder.encode(sheet.getSlug(), StandardCharsets.UTF_8.name()));
 
-        BasePostMinimalDTO sheetMinimalDTO = sheetService.convertToMinimal(sheet);
+        BasePostMinimalDTO sheetMinimalDTO = sheetAssembler.convertToMinimal(sheet);
 
         String token = HaloUtils.simpleUUID();
 

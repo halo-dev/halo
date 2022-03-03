@@ -2,14 +2,11 @@ package run.halo.app.service;
 
 import java.util.List;
 import java.util.Set;
-import org.springframework.data.domain.Page;
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.IndependentSheetDTO;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetMeta;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.model.vo.SheetDetailVO;
-import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.base.BasePostService;
 
 /**
@@ -17,6 +14,7 @@ import run.halo.app.service.base.BasePostService;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-24
  */
 public interface SheetService extends BasePostService<Sheet> {
@@ -107,28 +105,9 @@ public interface SheetService extends BasePostService<Sheet> {
     List<IndependentSheetDTO> listIndependentSheets();
 
     /**
-     * Converts to list dto page.
-     *
-     * @param sheetPage sheet page must not be nulls
-     * @return a page of sheet list dto
-     */
-    @NonNull
-    Page<SheetListVO> convertToListVo(@NonNull Page<Sheet> sheetPage);
-
-    /**
-     * Converts to detail vo.
-     *
-     * @param sheet sheet must not be null
-     * @return sheet detail vo
-     */
-    @NonNull
-    SheetDetailVO convertToDetailVo(@NonNull Sheet sheet);
-
-    /**
      * Publish a sheet visit event.
      *
      * @param sheetId sheetId must not be null
      */
     void publishVisitEvent(@NonNull Integer sheetId);
-
 }

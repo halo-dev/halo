@@ -6,9 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
-import run.halo.app.model.dto.post.BasePostMinimalDTO;
-import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Content.PatchedContent;
@@ -223,69 +220,6 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     POST createOrUpdateBy(@NonNull POST post);
-
-    /**
-     * Convert POST to minimal dto.
-     *
-     * @param post post must not be null.
-     * @return minimal dto.
-     */
-    @NonNull
-    BasePostMinimalDTO convertToMinimal(@NonNull POST post);
-
-    /**
-     * Convert list of POST to minimal dto of list.
-     *
-     * @param posts posts must not be null.
-     * @return a list of minimal dto.
-     */
-    @NonNull
-    List<BasePostMinimalDTO> convertToMinimal(@Nullable List<POST> posts);
-
-    /**
-     * Convert page of POST to minimal dto of page.
-     *
-     * @param postPage postPage must not be null.
-     * @return a page of minimal dto.
-     */
-    @NonNull
-    Page<BasePostMinimalDTO> convertToMinimal(@NonNull Page<POST> postPage);
-
-    /**
-     * Convert POST to simple dto.
-     *
-     * @param post post must not be null.
-     * @return simple dto.
-     */
-    @NonNull
-    BasePostSimpleDTO convertToSimple(@NonNull POST post);
-
-    /**
-     * Convert list of POST to list of simple dto.
-     *
-     * @param posts posts must not be null.
-     * @return a list of simple dto.
-     */
-    @NonNull
-    List<BasePostSimpleDTO> convertToSimple(@Nullable List<POST> posts);
-
-    /**
-     * Convert page of POST to page of simple dto.
-     *
-     * @param postPage postPage must not be null.
-     * @return a page of simple dto.
-     */
-    @NonNull
-    Page<BasePostSimpleDTO> convertToSimple(@NonNull Page<POST> postPage);
-
-    /**
-     * Convert POST to detail dto.
-     *
-     * @param post post must not be null.
-     * @return detail dto.
-     */
-    @NonNull
-    BasePostDetailDTO convertToDetail(@NonNull POST post);
 
     /**
      * Updates draft content.

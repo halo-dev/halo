@@ -1,6 +1,7 @@
 package run.halo.app.cache;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -22,8 +23,8 @@ public abstract class AbstractStringCacheStore extends AbstractCacheStore<String
         Assert.hasText(json, "json value must not be null");
         CacheWrapper<String> cacheWrapper = null;
         try {
-            cacheWrapper = JsonUtils.jsonToObject(json, CacheWrapper.class);
-        } catch (IOException e) {
+            cacheWrapper = JsonUtils.jsonToObject(json, new TypeReference<>() {});
+        } catch (Exception e) {
             log.debug("Failed to convert json to wrapper value bytes: [{}]", json, e);
         }
         return Optional.ofNullable(cacheWrapper);

@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
-import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostDetailVO;
@@ -38,6 +37,7 @@ import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * @author ryanwang
@@ -58,6 +58,8 @@ public class ContentFeedController {
 
     private final PostService postService;
 
+    private final PostRenderAssembler postRenderAssembler;
+
     private final CategoryService categoryService;
 
     private final PostCategoryService postCategoryService;
@@ -67,11 +69,12 @@ public class ContentFeedController {
     private final FreeMarkerConfigurer freeMarker;
 
     public ContentFeedController(PostService postService,
-        CategoryService categoryService,
+        PostRenderAssembler postRenderAssembler, CategoryService categoryService,
         PostCategoryService postCategoryService,
         OptionService optionService,
         FreeMarkerConfigurer freeMarker) {
         this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
         this.optionService = optionService;
@@ -258,14 +261,7 @@ public class ContentFeedController {
     @NonNull
     private Page<PostDetailVO> convertToDetailPageVo(Page<Post> postPage) {
         Assert.notNull(postPage, "The postPage must not be null.");
-
-        // Populate post content
-        postPage.getContent().forEach(post -> {
-            Content postContent = postService.getContentById(post.getId());
-            post.setContent(Content.PatchedContent.of(postContent));
-        });
-
-        Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
+        Page<PostDetailVO> posts = postRenderAssembler.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
             postDetailVO.setContent(
                 RegExUtils.replaceAll(postDetailVO.getContent(), XML_INVALID_CHAR, ""));
