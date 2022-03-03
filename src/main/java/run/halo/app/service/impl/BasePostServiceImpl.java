@@ -24,8 +24,6 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
-import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Content;
@@ -303,7 +301,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         PatchedContent postContent = post.getContent();
         // word count stat
         post.setWordCount(htmlFormatWordCount(postContent.getContent()));
-        post.setContent(postContent);
 
         POST savedPost;
         // Create or update post
@@ -327,78 +324,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             contentService.publishContent(post.getId());
         }
         return savedPost;
-    }
-
-    @Override
-    public BasePostMinimalDTO convertToMinimal(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        return new BasePostMinimalDTO().convertFrom(post);
-    }
-
-    @Override
-    public List<BasePostMinimalDTO> convertToMinimal(List<POST> posts) {
-        if (CollectionUtils.isEmpty(posts)) {
-            return Collections.emptyList();
-        }
-
-        return posts.stream()
-            .map(this::convertToMinimal)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<BasePostMinimalDTO> convertToMinimal(Page<POST> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(this::convertToMinimal);
-    }
-
-    @Override
-    public BasePostSimpleDTO convertToSimple(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
-
-        // Set summary
-        generateAndSetSummaryIfAbsent(post, basePostSimpleDTO);
-
-        // Post currently drafting in process
-        Boolean isInProcess = contentService.draftingInProgress(post.getId());
-        basePostSimpleDTO.setInProgress(isInProcess);
-
-        return basePostSimpleDTO;
-    }
-
-    @Override
-    public List<BasePostSimpleDTO> convertToSimple(List<POST> posts) {
-        if (CollectionUtils.isEmpty(posts)) {
-            return Collections.emptyList();
-        }
-
-        return posts.stream()
-            .map(this::convertToSimple)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<BasePostSimpleDTO> convertToSimple(Page<POST> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(this::convertToSimple);
-    }
-
-    @Override
-    public BasePostDetailDTO convertToDetail(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        BasePostDetailDTO postDetail = new BasePostDetailDTO().convertFrom(post);
-
-        // Post currently drafting in process
-        Boolean isInProcess = contentService.draftingInProgress(post.getId());
-        postDetail.setInProgress(isInProcess);
-
-        return postDetail;
     }
 
     @Override

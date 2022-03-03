@@ -19,6 +19,7 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * Search controller.
@@ -32,13 +33,17 @@ public class ContentSearchController {
 
     private final PostService postService;
 
+    private final PostRenderAssembler postRenderAssembler;
+
     private final OptionService optionService;
 
     private final ThemeService themeService;
 
-    public ContentSearchController(PostService postService, OptionService optionService,
+    public ContentSearchController(PostService postService,
+        PostRenderAssembler postRenderAssembler, OptionService optionService,
         ThemeService themeService) {
         this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
         this.optionService = optionService;
         this.themeService = themeService;
     }
@@ -71,7 +76,7 @@ public class ContentSearchController {
         final Pageable pageable = PageRequest.of(page - 1, optionService.getPostPageSize(), sort);
         final Page<Post> postPage = postService.pageBy(keyword, pageable);
 
-        final Page<PostListVO> posts = postService.convertToListVo(postPage);
+        final Page<PostListVO> posts = postRenderAssembler.convertToListVo(postPage);
 
         model.addAttribute("is_search", true);
         model.addAttribute("keyword", HtmlUtils.htmlEscape(keyword));

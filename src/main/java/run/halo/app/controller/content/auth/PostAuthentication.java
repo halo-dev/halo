@@ -1,11 +1,15 @@
 package run.halo.app.controller.content.auth;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.EncryptTypeEnum;
+import run.halo.app.service.CategoryService;
+import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 
 /**
@@ -18,12 +22,21 @@ import run.halo.app.service.PostService;
 public class PostAuthentication implements ContentAuthentication {
 
     private final PostService postService;
+    private final CategoryService categoryService;
+    private final PostCategoryService postCategoryService;
     private final AbstractStringCacheStore cacheStore;
+    private final CategoryAuthentication categoryAuthentication;
 
     public PostAuthentication(PostService postService,
-        AbstractStringCacheStore cacheStore) {
+        CategoryService categoryService,
+        PostCategoryService postCategoryService,
+        AbstractStringCacheStore cacheStore,
+        CategoryAuthentication categoryAuthentication) {
         this.postService = postService;
+        this.categoryService = categoryService;
+        this.postCategoryService = postCategoryService;
         this.cacheStore = cacheStore;
+        this.categoryAuthentication = categoryAuthentication;
     }
 
     @Override
@@ -34,8 +47,20 @@ public class PostAuthentication implements ContentAuthentication {
     @Override
     public boolean isAuthenticated(Integer postId) {
         Post post = postService.getById(postId);
-        if (post.getPassword() == null) {
-            return true;
+        if (StringUtils.isBlank(post.getPassword())) {
+            List<PostCategory> postCategories = postCategoryService.listByPostId(postId);
+            boolean categoryEncrypted = postCategories.stream()
+                .anyMatch(postCategory -> categoryService.isPrivate(postCategory.getCategoryId()));
+            if (!categoryEncrypted) {
+                return true;
+            }
+
+            boolean anyCategoryAuthenticated = postCategories.stream()
+                .anyMatch(postCategory ->
+                    categoryAuthentication.isAuthenticated(postCategory.getCategoryId()));
+            if (anyCategoryAuthenticated) {
+                return true;
+            }
         }
 
         String sessionId = getSessionId();

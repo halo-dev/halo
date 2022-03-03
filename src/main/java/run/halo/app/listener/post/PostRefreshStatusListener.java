@@ -46,13 +46,13 @@ public class PostRefreshStatusListener {
             return;
         }
         boolean isPrivate = categoryService.isPrivate(category.getId());
-        if (!isPrivate) {
-            return;
-        }
+
         List<Post> posts = postCategoryService.listPostBy(category.getId());
-        posts.forEach(post -> {
-            post.setStatus(PostStatus.INTIMATE);
-        });
+        if (isPrivate) {
+            posts.forEach(post -> post.setStatus(PostStatus.INTIMATE));
+        } else {
+            posts.forEach(post -> post.setStatus(PostStatus.DRAFT));
+        }
         postService.updateInBatch(posts);
     }
 

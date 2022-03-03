@@ -23,13 +23,14 @@ import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
-import run.halo.app.service.PostService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * Category Model.
  *
  * @author ryanwang
+ * @author guqing
  * @date 2020-01-11
  */
 @Component
@@ -41,7 +42,7 @@ public class CategoryModel {
 
     private final PostCategoryService postCategoryService;
 
-    private final PostService postService;
+    private final PostRenderAssembler postRenderAssembler;
 
     private final OptionService optionService;
 
@@ -50,13 +51,12 @@ public class CategoryModel {
     public CategoryModel(CategoryService categoryService,
         ThemeService themeService,
         PostCategoryService postCategoryService,
-        PostService postService,
-        OptionService optionService,
+        PostRenderAssembler postRenderAssembler, OptionService optionService,
         CategoryAuthentication categoryAuthentication) {
         this.categoryService = categoryService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
-        this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
         this.optionService = optionService;
         this.categoryAuthentication = categoryAuthentication;
     }
@@ -97,7 +97,7 @@ public class CategoryModel {
         }
 
         Set<PostStatus> statuses = Sets.immutableEnumSet(PostStatus.PUBLISHED);
-        if (StringUtils.isNotBlank(category.getPassword())) {
+        if (categoryService.isPrivate(category.getId())) {
             statuses = Sets.immutableEnumSet(PostStatus.INTIMATE);
         }
 
@@ -108,7 +108,7 @@ public class CategoryModel {
             Sort.by(DESC, "topPriority", "createTime"));
         Page<Post> postPage =
             postCategoryService.pagePostBy(category.getId(), statuses, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
+        Page<PostListVO> posts = postRenderAssembler.convertToListVo(postPage);
 
         // Generate meta description.
         if (StringUtils.isNotEmpty(category.getDescription())) {

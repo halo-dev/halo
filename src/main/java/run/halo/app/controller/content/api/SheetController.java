@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.model.dto.BaseCommentDTO;
-import run.halo.app.model.entity.Content;
 import run.halo.app.model.entity.Sheet;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.enums.CommentStatus;
@@ -35,6 +34,7 @@ import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
+import run.halo.app.service.assembler.SheetRenderAssembler;
 
 /**
  * Content sheet controller.
@@ -49,13 +49,18 @@ public class SheetController {
 
     private final SheetService sheetService;
 
+    private final SheetRenderAssembler sheetRenderAssembler;
+
     private final SheetCommentService sheetCommentService;
 
     private final OptionService optionService;
 
-    public SheetController(SheetService sheetService, SheetCommentService sheetCommentService,
+    public SheetController(SheetService sheetService,
+        SheetRenderAssembler sheetRenderAssembler,
+        SheetCommentService sheetCommentService,
         OptionService optionService) {
         this.sheetService = sheetService;
+        this.sheetRenderAssembler = sheetRenderAssembler;
         this.sheetCommentService = sheetCommentService;
         this.optionService = optionService;
     }
@@ -65,7 +70,7 @@ public class SheetController {
     public Page<SheetListVO> pageBy(
         @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Sheet> sheetPage = sheetService.pageBy(PostStatus.PUBLISHED, pageable);
-        return sheetService.convertToListVo(sheetPage);
+        return sheetRenderAssembler.convertToListVo(sheetPage);
     }
 
     @GetMapping("{sheetId:\\d+}")
@@ -76,8 +81,8 @@ public class SheetController {
         @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false")
             Boolean sourceDisabled) {
         Sheet sheet = sheetService.getById(sheetId);
-        sheet.setContent(Content.PatchedContent.of(sheetService.getContentById(sheetId)));
-        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
+
+        SheetDetailVO sheetDetailVO = sheetRenderAssembler.convertToDetailVo(sheet);
 
         if (formatDisabled) {
             // Clear the format content
@@ -102,8 +107,7 @@ public class SheetController {
         @RequestParam(value = "sourceDisabled", required = false, defaultValue = "false")
             Boolean sourceDisabled) {
         Sheet sheet = sheetService.getBySlug(slug);
-        sheet.setContent(Content.PatchedContent.of(sheetService.getContentById(sheet.getId())));
-        SheetDetailVO sheetDetailVO = sheetService.convertToDetailVo(sheet);
+        SheetDetailVO sheetDetailVO = sheetRenderAssembler.convertToDetailVo(sheet);
 
         if (formatDisabled) {
             // Clear the format content

@@ -43,6 +43,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * @author ryanwang
@@ -78,6 +79,8 @@ public class ContentContentController {
 
     private final ThemeService themeService;
 
+    private final PostRenderAssembler postRenderAssembler;
+
     private final ContentAuthenticationManager providerManager;
 
     public ContentContentController(PostModel postModel,
@@ -92,6 +95,7 @@ public class ContentContentController {
         SheetService sheetService,
         CategoryService categoryService,
         ThemeService themeService,
+        PostRenderAssembler postRenderAssembler,
         ContentAuthenticationManager providerManager) {
         this.postModel = postModel;
         this.sheetModel = sheetModel;
@@ -105,6 +109,7 @@ public class ContentContentController {
         this.sheetService = sheetService;
         this.categoryService = categoryService;
         this.themeService = themeService;
+        this.postRenderAssembler = postRenderAssembler;
         this.providerManager = providerManager;
     }
 
@@ -270,7 +275,7 @@ public class ContentContentController {
         authRequest.setPrincipal(EncryptTypeEnum.POST.getName());
         try {
             providerManager.authenticate(authRequest);
-            BasePostMinimalDTO basePostMinimal = postService.convertToMinimal(post);
+            BasePostMinimalDTO basePostMinimal = postRenderAssembler.convertToMinimal(post);
             return "redirect:" + buildRedirectUrl(basePostMinimal.getFullPath());
         } catch (AuthenticationException e) {
             request.setAttribute("errorMsg", e.getMessage());

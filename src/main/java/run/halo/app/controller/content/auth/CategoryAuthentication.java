@@ -37,7 +37,7 @@ public class CategoryAuthentication implements ContentAuthentication {
     @Override
     public boolean isAuthenticated(Integer categoryId) {
         Category category = categoryService.getById(categoryId);
-        if (category.getPassword() == null) {
+        if (StringUtils.isBlank(category.getPassword())) {
             // All parent category is not encrypted
             if (categoryService.lookupFirstEncryptedBy(category.getId()).isEmpty()) {
                 return true;

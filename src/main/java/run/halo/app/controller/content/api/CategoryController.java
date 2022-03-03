@@ -29,7 +29,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
-import run.halo.app.service.PostService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * Content category controller.
@@ -45,7 +45,7 @@ public class CategoryController {
 
     private final PostCategoryService postCategoryService;
 
-    private final PostService postService;
+    private final PostRenderAssembler postRenderAssembler;
 
     private final CategoryAuthentication categoryAuthentication;
 
@@ -53,12 +53,12 @@ public class CategoryController {
 
     public CategoryController(CategoryService categoryService,
         PostCategoryService postCategoryService,
-        PostService postService,
+        PostRenderAssembler postRenderAssembler,
         CategoryAuthentication categoryAuthentication,
         ContentAuthenticationManager contentAuthenticationManager) {
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
-        this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
         this.categoryAuthentication = categoryAuthentication;
         this.contentAuthenticationManager = contentAuthenticationManager;
     }
@@ -90,7 +90,7 @@ public class CategoryController {
 
         Page<Post> postPage =
             postCategoryService.pagePostBy(category.getId(), statusesToQuery, pageable);
-        return postService.convertToListVo(postPage);
+        return postRenderAssembler.convertToListVo(postPage);
     }
 
     private boolean allowIntimatePosts(Integer categoryId, String password) {
