@@ -1,8 +1,5 @@
 server:
   port: 8090
-  forward-headers-strategy: native
-  compression:
-    enabled: true
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss

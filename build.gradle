@@ -1,12 +1,12 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.4'
+    id 'org.springframework.boot' version '3.0.0-M1'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id "checkstyle"
     id 'java'
 }
 
 group = "run.halo.app"
-sourceCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
 
 checkstyle {
     toolVersion = "9.3"
@@ -17,9 +17,10 @@ checkstyle {
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
     maven { url 'https://maven.aliyun.com/repository/spring/' }
+    maven { url 'https://repo.spring.io/milestone' }
     mavenLocal()
     mavenCentral()
-};''
+}
 
 configurations {
     implementation {
@@ -58,10 +59,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.flywaydb:flyway-core:$versions.flyway"
     implementation "org.flywaydb:flyway-mysql:$versions.flyway"
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-    implementation "org.springdoc:springdoc-openapi-ui:$versions.springDoc"
-    implementation "org.springdoc:springdoc-openapi-webmvc-core:$versions.springDoc"
-
     compileOnly 'org.projectlombok:lombok'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
