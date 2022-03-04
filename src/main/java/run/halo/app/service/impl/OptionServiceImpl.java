@@ -373,11 +373,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
 
     @Override
     public long getBirthday() {
-        return getByProperty(PrimaryProperties.BIRTHDAY, Long.class).orElseGet(() -> {
-            long currentTime = DateUtils.now().getTime();
-            saveProperty(PrimaryProperties.BIRTHDAY, String.valueOf(currentTime));
-            return currentTime;
-        });
+        return Long.parseLong(getByPropertyOrDefault(PrimaryProperties.BIRTHDAY, String.class));
     }
 
     @Override

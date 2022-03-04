@@ -7,7 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static run.halo.app.service.OptionService.OPTIONS_KEY;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,7 +18,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import run.halo.app.cache.AbstractStringCacheStore;
+import run.halo.app.model.properties.AliOssProperties;
+import run.halo.app.model.properties.CommentProperties;
+import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.security.service.OneTimeTokenService;
+import run.halo.app.service.impl.ClientOptionServiceImpl;
+import run.halo.app.utils.DateUtils;
+import java.util.HashMap;
+import java.util.Map;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @ActiveProfiles("test")
@@ -30,6 +40,19 @@ class OneTimeTokenTest {
 
     @Autowired
     OneTimeTokenService oneTimeTokenService;
+
+    @Autowired
+    AbstractStringCacheStore cacheStore;
+
+    Map<String, Object> map = new HashMap<>();
+
+    {
+        map.put(PrimaryProperties.BIRTHDAY.getValue(), String.valueOf(DateUtils.now().getTime()));
+    }
+    @BeforeEach
+    void setUp() {
+        cacheStore.putAny(OPTIONS_KEY, map);
+    }
 
     @Test
     void provideNonExistOneTimeTokenTest() throws Exception {
