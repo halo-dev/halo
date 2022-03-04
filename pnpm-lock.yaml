@@ -14,6 +14,7 @@ specifiers:
   eslint: ^8.5.0
   eslint-plugin-cypress: ^2.12.1
   eslint-plugin-vue: ^8.2.0
+  husky: ^7.0.4
   jsdom: ^19.0.0
   pinia: ^2.0.11
   prettier: ^2.5.1
@@ -44,6 +45,7 @@ devDependencies:
   eslint: 8.10.0
   eslint-plugin-cypress: 2.12.1_eslint@8.10.0
   eslint-plugin-vue: 8.5.0_eslint@8.10.0
+  husky: 7.0.4
   jsdom: 19.0.0
   prettier: 2.5.1
   start-server-and-test: 1.14.0
@@ -2425,6 +2427,12 @@ packages:
   /human-signals/2.1.0:
     resolution: {integrity: sha512-B4FFZ6q/T2jhhksgkbEW3HBvWIfDW85snkQgawt07S7J5QXTk6BkNV+0yAeZrM5QpMAdYlocGoljn0sJ/WQkFw==}
     engines: {node: '>=10.17.0'}
+    dev: true
+
+  /husky/7.0.4:
+    resolution: {integrity: sha512-vbaCKN2QLtP/vD4yvs6iz6hBEo6wkSzs8HpRah1Z6aGmF2KW5PdYuAd7uX5a+OyBZHBhd+TFLqgjUgytQr4RvQ==}
+    engines: {node: '>=12'}
+    hasBin: true
     dev: true
 
   /iconv-lite/0.6.3:
