@@ -43,6 +43,7 @@ import run.halo.app.service.PostCommentService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.UserService;
+import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.ValidationUtils;
 
 /**
@@ -296,6 +297,7 @@ public class InstallController {
             StringUtils.isBlank(installParam.getUrl()) ? optionService.getBlogBaseUrl() :
                 installParam.getUrl());
         properties.put(OtherProperties.GLOBAL_ABSOLUTE_PATH_ENABLED, Boolean.FALSE.toString());
+        properties.put(PrimaryProperties.BIRTHDAY, String.valueOf(DateUtils.now().getTime()));
 
         // Create properties
         optionService.saveProperties(properties);
