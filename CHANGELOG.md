@@ -1,5 +1,42 @@
 # CHANGELOG
 
+# 1.5.0-alpha.2
+
+## Features
+
+- Admin API 提供批量删除图库图片的接口。 halo-dev/halo#1680 @ruibaby
+- Admin API 提供批量更新图库图片的接口。 halo-dev/halo#1679 @ruibaby
+- 后台评论管理提供日志评论管理的界面。 halo-dev/halo-admin#480 @cetr
+
+## Improvements
+
+- 优化文章加密和分类加密的逻辑。 halo-dev/halo#1678 @guqing
+- 优化后台登录页面样式。  halo-dev/halo-admin#456 @ruibaby
+- 后台主题详情中的链接打开方式修改为打开新窗口。 halo-dev/halo-admin#461 @cetr
+- 重构后台文章评论列表弹窗。  halo-dev/halo-admin#463 @ruibaby
+- 优化后台文章/自定义页面设置弹窗中缩略图的样式。 halo-dev/halo-admin#470 halo-dev/halo-admin#471 @ruibaby
+- 重构后台图库管理页面，支持批量操作图片以及批量从附件库添加图片。 halo-dev/halo-admin#468 @ruibaby
+- 重构后台文章管理页面，文章列表将不再展示回收站状态的文章，提供单独的回收站入口。 halo-dev/halo-admin#475 @ruibaby
+- 优化后台文章/自定义页面设置的保存逻辑，提供转为发布/草稿的按钮。保存按钮不再影响到文章状态。 halo-dev/halo-admin#476 @ruibaby
+
+## Bug Fixes
+
+- 更新默认主题的 submodule 提交，修复模板中部分因为数字中带逗号导致的渲染异常。 halo-dev/halo#1682 @ruibaby
+- 修复 Content API 的 post 和 sheet 详情接口中内容为空的问题。 halo-dev/halo#1686 @fuzui
+- 修复评论默认头像因为修改了默认类型但 options 接口没有返回字段导致评论头像无法显示的问题。 halo-dev/halo#1692 @lan-yonghui
+- 修复使用 leveldb 的情况下，解析错误而没有清空缓存导致无法正常使用系统的问题。 halo-dev/halo#1695 @guqing
+- 修复 1.5.0-alpha.1 中修改了表结构但是没有修改备份数据和导入数据结构的问题。 halo-dev/halo#1669 @guqing
+- 修复后台在文章编辑页面切换左侧菜单收缩的时候出现的样式异常。 halo-dev/halo-admin#465 @ruibaby
+- 修复后台在 1.5.0-alpha.1 版本中，附件图片链接中包含特殊字符导致图片无法显示的问题。 halo-dev/halo-admin#474 @ruibaby
+
+## Dependencies
+
+- 修复因为 1.5.0-alpha.1 版本中更新 minio sdk 依赖导致无法正常上传文件的问题。 halo-dev/halo#1666 @JarvisPongSky
+- 升级 Spring Boot 版本到 2.5.10。 halo-dev/halo#1677 @ruibaby
+- 升级 Gradle 版本到 7.4。 halo-dev/halo#1697 @guqing
+- `halo-dev/halo-admin` 常规依赖升级。 halo-dev/halo-admin#453 @ruibaby
+- `halo-dev/halo-admin` 修改用于切换后台样式的 less 依赖 CDN 为 unpkg。
+
 # 1.5.0-alpha.1
 
 ## Breaking changes
