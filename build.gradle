@@ -41,13 +41,7 @@ bootJar {
     }
 }
 
-ext {
-    versions = [
-        h2: '2.1.210',
-        springDoc: '1.6.6',
-        flyway: '8.5.1'
-    ]
-}
+ext['h2.version'] = '2.1.210'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -57,13 +51,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "org.springframework.boot:spring-boot-starter-jetty"
-    implementation "org.flywaydb:flyway-core:$versions.flyway"
-    implementation "org.flywaydb:flyway-mysql:$versions.flyway"
+    implementation "org.flywaydb:flyway-core"
+    implementation "org.flywaydb:flyway-mysql"
     compileOnly 'org.projectlombok:lombok'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    runtimeOnly "com.h2database:h2:$versions.h2"
+    runtimeOnly "com.h2database:h2"
     runtimeOnly 'mysql:mysql-connector-java'
     runtimeOnly 'org.postgresql:postgresql'
 
