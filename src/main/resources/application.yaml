@@ -1,0 +1,47 @@
+server:
+  port: 8090
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  output:
+    ansi:
+      enabled: always
+  devtools:
+    restart:
+      enabled: true
+      log-condition-evaluation-delta: false
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+
+    # H2 database configuration.
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:file:~/halo-next/db/halo;AUTO_SERVER=TRUE
+    username: admin
+    password: 123456
+
+    # MySQL database configuration.
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://127.0.0.1:3306/halo_next?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+#    username: root
+#    password: 123456
+
+    # PostgreSQL database configuration.
+#    driver-class-name: org.postgresql.Driver
+#    url: jdbc:postgresql://127.0.0.1:5432/halo_next?charSet=UTF8&ssl=false
+#    username: postgres
+#    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations:
+      - classpath:db/migration/common
+      - classpath:db/migration/{vendor}
+logging:
+  level:
+    run.halo.app: DEBUG
+    org.hibernate: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+    org.hibernate.type.descriptor.sql.BasicExtractor: INFO

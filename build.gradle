@@ -1,0 +1,73 @@
+plugins {
+    id 'org.springframework.boot' version '3.0.0-M1'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id "checkstyle"
+    id 'java'
+}
+
+group = "run.halo.app"
+sourceCompatibility = JavaVersion.VERSION_17
+
+checkstyle {
+    toolVersion = "9.3"
+    showViolations = false
+    ignoreFailures = false
+}
+
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+    maven { url 'https://maven.aliyun.com/repository/spring/' }
+    maven { url 'https://repo.spring.io/milestone' }
+    mavenLocal()
+    mavenCentral()
+}
+
+configurations {
+    implementation {
+        exclude module: "spring-boot-starter-tomcat"
+        exclude module: "slf4j-log4j12"
+        exclude module: 'junit'
+    }
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+bootJar {
+    launchScript()
+    manifest {
+        attributes "Implementation-Title": "Halo Application",
+                "Implementation-Version": archiveVersion
+    }
+}
+
+ext['h2.version'] = '2.1.210'
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation "org.springframework.boot:spring-boot-starter-jetty"
+    implementation "org.flywaydb:flyway-core"
+    implementation "org.flywaydb:flyway-mysql"
+    compileOnly 'org.projectlombok:lombok'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    runtimeOnly "com.h2database:h2"
+    runtimeOnly 'mysql:mysql-connector-java'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    testLogging.showStandardStreams = true
+}
