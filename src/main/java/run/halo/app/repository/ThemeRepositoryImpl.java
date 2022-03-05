@@ -4,7 +4,6 @@ import static run.halo.app.model.properties.PrimaryProperties.THEME;
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 import static run.halo.app.utils.FileUtils.copyFolder;
 import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
-import static run.halo.app.utils.VersionUtil.compareVersion;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,6 +31,7 @@ import run.halo.app.model.entity.Option;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.theme.ThemePropertyScanner;
 import run.halo.app.utils.FileUtils;
+import run.halo.app.utils.Version;
 
 /**
  * Theme repository implementation.
@@ -187,9 +187,10 @@ public class ThemeRepositoryImpl
     @Override
     public boolean checkThemePropertyCompatibility(ThemeProperty themeProperty) {
         // check version compatibility
-        // Not support current halo version.
-        return StringUtils.isNotEmpty(themeProperty.getRequire())
-            && !compareVersion(HaloConst.HALO_VERSION, themeProperty.getRequire());
+        String requiredVersion = themeProperty.getRequire();
+        return Version.resolve(HaloConst.HALO_VERSION)
+            .map(current -> current.compatible(requiredVersion))
+            .orElse(false);
     }
 
     private Path getThemeRootPath() {

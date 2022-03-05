@@ -17,19 +17,6 @@ public final class VersionUtil {
     }
 
     /**
-     * Compare version.
-     *
-     * @param current current version.
-     * @param require require version.
-     * @return true or false.
-     */
-    public static boolean compareVersion(String current, String require) {
-        Version leftVersion = Version.resolve(current).orElse(Version.emptyVersion());
-        Version rightVersion = Version.resolve(require).orElse(Version.emptyVersion());
-        return leftVersion.compareTo(rightVersion) >= 0;
-    }
-
-    /**
      * Compare two versions to see if they have the same major and minor versions.
      *
      * @param left version A to compare

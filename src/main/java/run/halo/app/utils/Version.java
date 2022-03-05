@@ -1,5 +1,7 @@
 package run.halo.app.utils;
 
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +23,7 @@ import run.halo.app.model.support.HaloConst;
 @ToString
 @EqualsAndHashCode
 @Slf4j
-public class Version implements Comparable<Version> {
+public class Version {
 
     /**
      * Regex expression.
@@ -156,25 +158,59 @@ public class Version implements Comparable<Version> {
             StringUtils.isNotBlank(preReleaseMajor) ? Long.parseLong(preReleaseMajor) : null));
     }
 
-    @Override
-    public int compareTo(@NonNull Version anotherVersion) {
+    /**
+     * Check if the current version is compatible with the target version.
+     *
+     * @param target target version must not be blank.
+     * @return true if the current version is compatible with the target version; false otherwise.
+     */
+    public boolean compatible(String target) {
+        Version targetVersion = resolve(target).orElse(emptyVersion());
         // compare major
-        int majorCompare = Long.compare(major, anotherVersion.major);
+        int majorCompare = Long.compare(major, targetVersion.major);
         if (majorCompare != 0) {
-            return majorCompare;
+            return majorCompare > 0;
         }
         // compare minor
-        int minorCompare = Long.compare(minor, anotherVersion.minor);
+        int minorCompare = Long.compare(minor, targetVersion.minor);
         if (minorCompare != 0) {
-            return minorCompare;
+            return minorCompare > 0;
         }
         // compare patch
-        int patchCompare = Long.compare(patch, anotherVersion.patch);
+        int patchCompare = Long.compare(patch, targetVersion.patch);
         if (patchCompare != 0) {
-            return patchCompare;
+            return patchCompare > 0;
         }
-        // if all the major, minor and patch are the same, then compare pre release number
-        return Long.compare(preReleaseMajor, anotherVersion.preReleaseMajor);
+
+        // here means that all major, minor and patch number are the same.
+        if (!this.isPreRelease() || !targetVersion.isPreRelease()) {
+            return true;
+        }
+        // compare pre-release tag
+        int preReleaseTagCompare =
+            PreRelease.ALPHA.compare(
+                Objects.requireNonNull(this.preRelease),
+                Objects.requireNonNull(targetVersion.preRelease));
+        if (preReleaseTagCompare != 0) {
+            return preReleaseTagCompare > 0;
+        }
+
+        // compare pre-release number
+        long preReleaseNumberCompare = this.preReleaseMajor - targetVersion.preReleaseMajor;
+        if (preReleaseNumberCompare != 0) {
+            return preReleaseNumberCompare > 0;
+        }
+        return true;
+    }
+
+
+    /**
+     * Check if current version is a pre-release version.
+     *
+     * @return true if current version is a pre-release version; false otherwise.
+     */
+    public boolean isPreRelease() {
+        return preRelease != null;
     }
 
     /**
@@ -182,22 +218,32 @@ public class Version implements Comparable<Version> {
      *
      * @author johnniang
      */
-    public enum PreRelease {
-
-        /**
-         * Beta.
-         */
-        BETA,
+    public enum PreRelease implements Comparator<PreRelease> {
 
         /**
          * Alpha.
          */
-        ALPHA,
+        ALPHA(1),
+
+        /**
+         * Beta.
+         */
+        BETA(2),
 
         /**
          * Release candidate.
          */
-        RC;
+        RC(3);
+
+        /**
+         * Lower priority means the pre-release is earlier than others.
+         * Compare order: ALPHA < BETA < RC
+         */
+        private final int priority;
+
+        PreRelease(int priority) {
+            this.priority = priority;
+        }
 
         @Nullable
         static PreRelease of(@Nullable String preReleaseStr) {
@@ -208,6 +254,11 @@ public class Version implements Comparable<Version> {
                 }
             }
             return null;
+        }
+
+        @Override
+        public int compare(PreRelease left, PreRelease right) {
+            return left.priority - right.priority;
         }
     }
 }
