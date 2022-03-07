@@ -275,6 +275,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
         log.debug("Removed sheet content: [{}]", sheetContent);
 
         Sheet sheet = super.removeById(id);
+        sheet.setContent(PatchedContent.of(sheetContent));
 
         // Log it
         eventPublisher.publishEvent(

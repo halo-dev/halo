@@ -518,6 +518,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         log.debug("Removed post content: [{}]", postContent);
 
         Post deletedPost = super.removeById(postId);
+        deletedPost.setContent(PatchedContent.of(postContent));
 
         // Log it
         eventPublisher.publishEvent(new LogEvent(this, postId.toString(), LogType.POST_DELETED,
