@@ -27,6 +27,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.event.comment.CommentNewEvent;
@@ -304,6 +305,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
     @Override
     @NonNull
+    @Transactional(rollbackFor = Exception.class)
     public COMMENT create(@NonNull COMMENT comment) {
         Assert.notNull(comment, "Domain must not be null");
 
@@ -369,6 +371,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
     @Override
     @NonNull
+    @Transactional(rollbackFor = Exception.class)
     public COMMENT createBy(@NonNull BaseCommentParam<COMMENT> commentParam) {
         Assert.notNull(commentParam, "Comment param must not be null");
 
@@ -402,6 +405,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
     @Override
     @NonNull
+    @Transactional(rollbackFor = Exception.class)
     public COMMENT updateStatus(@NonNull Long commentId, @NonNull CommentStatus status) {
         Assert.notNull(commentId, "Comment id must not be null");
         Assert.notNull(status, "Comment status must not be null");
@@ -418,6 +422,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
     @Override
     @NonNull
+    @Transactional(rollbackFor = Exception.class)
     public List<COMMENT> updateStatusByIds(@NonNull List<Long> ids, @NonNull CommentStatus status) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
@@ -428,6 +433,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<COMMENT> removeByPostId(@NonNull Integer postId) {
         Assert.notNull(postId, "Post id must not be null");
         return baseCommentRepository.deleteByPostId(postId);
@@ -435,6 +441,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
     @Override
     @NonNull
+    @Transactional(rollbackFor = Exception.class)
     public COMMENT removeById(@NonNull Long id) {
         Assert.notNull(id, "Comment id must not be null");
 
@@ -455,6 +462,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
     @Override
     @NonNull
+    @Transactional(rollbackFor = Exception.class)
     public List<COMMENT> removeByIds(@NonNull Collection<Long> ids) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();

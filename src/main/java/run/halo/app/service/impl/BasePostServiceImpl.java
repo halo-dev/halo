@@ -264,13 +264,13 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseVisit(Integer postId) {
         increaseVisit(1L, postId);
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseLike(long likes, Integer postId) {
         Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
         Assert.notNull(postId, "Post id must not be null");
@@ -285,7 +285,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseLike(Integer postId) {
         increaseLike(1L, postId);
     }
@@ -295,7 +295,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
      * @return post with handled data
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
         PatchedContent postContent = post.getContent();
@@ -344,7 +344,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public POST updateStatus(PostStatus status, Integer postId) {
         Assert.notNull(status, "Post status must not be null");
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
@@ -374,7 +374,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<POST> updateStatusByIds(List<Integer> ids, PostStatus status) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
@@ -403,6 +403,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public POST create(POST post) {
         // Check title
         slugMustNotExist(post);
@@ -411,6 +412,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public POST update(POST post) {
         // Check title
         slugMustNotExist(post);

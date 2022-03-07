@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import run.halo.app.event.logger.LogEvent;
 import run.halo.app.event.post.SheetVisitEvent;
@@ -83,6 +84,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Sheet createBy(Sheet sheet, boolean autoSave) {
         Sheet createdSheet = createOrUpdateBy(sheet);
         if (!autoSave) {
@@ -96,6 +98,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Sheet createBy(Sheet sheet, Set<SheetMeta> metas, boolean autoSave) {
         Sheet createdSheet = createOrUpdateBy(sheet);
 
@@ -115,6 +118,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Sheet updateBy(Sheet sheet, boolean autoSave) {
         Sheet updatedSheet = createOrUpdateBy(sheet);
         if (!autoSave) {
@@ -128,6 +132,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Sheet updateBy(Sheet sheet, Set<SheetMeta> metas, boolean autoSave) {
         Sheet updatedSheet = createOrUpdateBy(sheet);
 
@@ -260,6 +265,7 @@ public class SheetServiceImpl extends BasePostServiceImpl<Sheet>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Sheet removeById(Integer id) {
 
         // Remove sheet metas
