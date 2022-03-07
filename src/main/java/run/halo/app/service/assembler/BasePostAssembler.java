@@ -179,8 +179,12 @@ public class BasePostAssembler<POST extends BasePost> {
 
         PatchedContent patchedContent = post.getContentOfNullable();
         if (patchedContent == null) {
-            Content postContent = contentService.getById(post.getId());
-            postVo.setSummary(generateSummary(postContent.getContent()));
+            Content postContent = contentService.getByIdOfNullable(post.getId());
+            if (postContent != null) {
+                postVo.setSummary(generateSummary(postContent.getContent()));
+            } else {
+                postVo.setSummary(StringUtils.EMPTY);
+            }
         } else {
             postVo.setSummary(generateSummary(patchedContent.getContent()));
         }
