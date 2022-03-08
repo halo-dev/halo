@@ -4,3 +4,5 @@
 pnpm test:unit
 pnpm typecheck
 pnpm lint
+
+git add .
