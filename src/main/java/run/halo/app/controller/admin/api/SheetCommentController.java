@@ -30,6 +30,7 @@ import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.SheetCommentWithSheetVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
+import run.halo.app.service.assembler.comment.SheetCommentAssembler;
 
 /**
  * Sheet comment controller.
@@ -42,12 +43,17 @@ import run.halo.app.service.SheetCommentService;
 @RequestMapping("/api/admin/sheets/comments")
 public class SheetCommentController {
 
+    private final SheetCommentAssembler sheetCommentAssembler;
+
     private final SheetCommentService sheetCommentService;
 
     private final OptionService optionService;
 
-    public SheetCommentController(SheetCommentService sheetCommentService,
+    public SheetCommentController(
+        SheetCommentAssembler sheetCommentAssembler,
+        SheetCommentService sheetCommentService,
         OptionService optionService) {
+        this.sheetCommentAssembler = sheetCommentAssembler;
         this.sheetCommentService = sheetCommentService;
         this.optionService = optionService;
     }
@@ -58,7 +64,7 @@ public class SheetCommentController {
         @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
         CommentQuery commentQuery) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageBy(commentQuery, pageable);
-        return sheetCommentService.convertToWithSheetVo(sheetCommentPage);
+        return sheetCommentAssembler.convertToWithSheetVo(sheetCommentPage);
     }
 
     @GetMapping("latest")
@@ -67,7 +73,7 @@ public class SheetCommentController {
         @RequestParam(name = "top", defaultValue = "10") int top,
         @RequestParam(name = "status", required = false) CommentStatus status) {
         Page<SheetComment> sheetCommentPage = sheetCommentService.pageLatest(top, status);
-        return sheetCommentService.convertToWithSheetVo(sheetCommentPage.getContent());
+        return sheetCommentAssembler.convertToWithSheetVo(sheetCommentPage.getContent());
     }
 
     @GetMapping("{sheetId:\\d+}/tree_view")
@@ -92,7 +98,7 @@ public class SheetCommentController {
     @ApiOperation("Creates a sheet comment (new or reply)")
     public BaseCommentDTO createBy(@RequestBody SheetCommentParam commentParam) {
         SheetComment createdComment = sheetCommentService.createBy(commentParam);
-        return sheetCommentService.convertTo(createdComment);
+        return sheetCommentAssembler.convertTo(createdComment);
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")
@@ -101,7 +107,7 @@ public class SheetCommentController {
         @PathVariable("status") CommentStatus status) {
         // Update comment status
         SheetComment updatedSheetComment = sheetCommentService.updateStatus(commentId, status);
-        return sheetCommentService.convertTo(updatedSheetComment);
+        return sheetCommentAssembler.convertTo(updatedSheetComment);
     }
 
     @PutMapping("status/{status}")
@@ -110,7 +116,7 @@ public class SheetCommentController {
         @PathVariable(name = "status") CommentStatus status,
         @RequestBody List<Long> ids) {
         List<SheetComment> comments = sheetCommentService.updateStatusByIds(ids, status);
-        return sheetCommentService.convertTo(comments);
+        return sheetCommentAssembler.convertTo(comments);
     }
 
 
@@ -118,7 +124,7 @@ public class SheetCommentController {
     @ApiOperation("Deletes sheet comment permanently and recursively")
     public BaseCommentDTO deletePermanently(@PathVariable("commentId") Long commentId) {
         SheetComment deletedSheetComment = sheetCommentService.removeById(commentId);
-        return sheetCommentService.convertTo(deletedSheetComment);
+        return sheetCommentAssembler.convertTo(deletedSheetComment);
     }
 
     @DeleteMapping
@@ -131,7 +137,7 @@ public class SheetCommentController {
     @ApiOperation("Gets a sheet comment by comment id")
     public SheetCommentWithSheetVO getBy(@PathVariable("commentId") Long commentId) {
         SheetComment comment = sheetCommentService.getById(commentId);
-        return sheetCommentService.convertToWithSheetVo(comment);
+        return sheetCommentAssembler.convertToWithSheetVo(comment);
     }
 
     @PutMapping("{commentId:\\d+}")
@@ -142,6 +148,6 @@ public class SheetCommentController {
 
         commentParam.update(commentToUpdate);
 
-        return sheetCommentService.convertTo(sheetCommentService.update(commentToUpdate));
+        return sheetCommentAssembler.convertTo(sheetCommentService.update(commentToUpdate));
     }
 }
