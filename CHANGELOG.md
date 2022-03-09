@@ -1,5 +1,30 @@
 # CHANGELOG
 
+# 1.5.0-alpha.3
+
+## Breaking changes
+
+- Content API 的评论列表接口不再返回 `ipAddress` 和 `email` 字段。 halo-dev/halo#1729 @guqing
+
+## Features
+
+- 后台文章设置弹框支持创建新分类。 halo-dev/halo-admin#489 @ruibaby
+
+## Improvements
+
+- 优化后台折叠菜单的体验，解决折叠时 Logo 和 菜单动画不同步的问题。 halo-dev/halo-admin#493 @ruibaby
+- 缓存后台折叠菜单的状态，刷新页面不再会恢复到初始状态。 halo-dev/halo-admin#493 @ruibaby
+- 优化后台判断是否初始化的逻辑，修改为每次页面加载只请求一次，切换路由不再请求。 halo-dev/halo-admin#495 @ruibaby
+
+## Bug Fixes
+
+- 修复当前版本如果为 `alpha` 版本，安装主题无法通过版本验证的问题。 halo-dev/halo#1705 @JohnNiang
+- 修复 alpha.2 版本中当文章内容为空时，删除文章报错的问题。 halo-dev/halo#1715 @guqing
+- 修复评论部分因为没有添加事务，导致批量删除评论等操作时报错的问题。 halo-dev/halo#1716 @guqing
+- 修改后台全局的 Local Storage 的前缀，修复 alpha.2 中因为后台布局配置变化导致升级后布局混乱的问题。 halo-dev/halo-admin#490 @ruibaby
+- 修复后台点击后台 Halo Logo 进入开发者选项过快可能会导致计数为负的问题。 halo-dev/halo-admin#492 @ruibaby
+- 修复后台附件列表分页之后，可能会导致无法正常更新图片 dom 导致图片显示为上一页图片的问题。 halo-dev/halo-admin#496 @ruibaby
+
 # 1.5.0-alpha.2
 
 ## Features
