@@ -1,11 +1,13 @@
 package run.halo.app.service.assembler.comment;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.model.support.CommentPage;
 import run.halo.app.model.vo.BaseCommentVO;
+import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.service.OptionService;
 
 /**
@@ -253,12 +256,51 @@ public abstract class BaseCommentAssembler<COMMENT extends BaseComment> {
     /**
      * clear sensitive field value for theme render.
      *
-     * @param comment comment
-     * @param <V> comment dto or subclass.
+     * @param comment comment tree
      */
-    public <V extends BaseCommentDTO> void clearSensitiveField(@Nullable V comment) {
+    public void clearSensitiveField(@Nullable BaseCommentDTO comment) {
         if (comment == null) {
             return;
+        }
+        comment.setIpAddress(null);
+        comment.setEmail(null);
+    }
+
+    /**
+     * clear sensitive field value for theme render.
+     *
+     * @param commentTree comment tree
+     */
+    public void clearSensitiveField(@Nullable BaseCommentVO commentTree) {
+        if (commentTree == null) {
+            return;
+        }
+        Queue<BaseCommentVO> queue = new ArrayDeque<>();
+        queue.add(commentTree);
+        while (!queue.isEmpty()) {
+            BaseCommentVO comment = queue.poll();
+            comment.setIpAddress(null);
+            comment.setEmail(null);
+
+            if (!CollectionUtils.isEmpty(comment.getChildren())) {
+                queue.addAll(comment.getChildren());
+            }
+        }
+    }
+
+    /**
+     * clear sensitive field value for theme render.
+     *
+     * @param comment comment
+     */
+    public void clearSensitiveField(@Nullable BaseCommentWithParentVO comment) {
+        if (comment == null) {
+            return;
+        }
+        BaseCommentWithParentVO parent = comment.getParent();
+        if (parent != null) {
+            parent.setIpAddress(null);
+            parent.setEmail(null);
         }
         comment.setIpAddress(null);
         comment.setEmail(null);
