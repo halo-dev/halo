@@ -15,12 +15,13 @@ import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.PostCommentService;
-import run.halo.app.service.assembler.comment.PostCommentAssembler;
+import run.halo.app.service.assembler.comment.PostCommentRenderAssembler;
 
 /**
  * Freemarker custom tag of comment.
  *
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-22
  */
 @Component
@@ -28,12 +29,12 @@ public class CommentTagDirective implements TemplateDirectiveModel {
 
     private final PostCommentService postCommentService;
 
-    private final PostCommentAssembler postCommentAssembler;
+    private final PostCommentRenderAssembler postCommentRenderAssembler;
 
     public CommentTagDirective(Configuration configuration, PostCommentService postCommentService,
-        PostCommentAssembler postCommentAssembler) {
+        PostCommentRenderAssembler postCommentRenderAssembler) {
         this.postCommentService = postCommentService;
-        this.postCommentAssembler = postCommentAssembler;
+        this.postCommentRenderAssembler = postCommentRenderAssembler;
         configuration.setSharedVariable("commentTag", this);
     }
 
@@ -52,7 +53,7 @@ public class CommentTagDirective implements TemplateDirectiveModel {
                         postCommentService.pageLatest(top, CommentStatus.PUBLISHED);
                     env.setVariable("comments",
                         builder.build()
-                            .wrap(postCommentAssembler.convertToWithPostVo(postComments)));
+                            .wrap(postCommentRenderAssembler.convertToWithPostVo(postComments)));
                     break;
                 case "count":
                     env.setVariable("count", builder.build().wrap(postCommentService.count()));

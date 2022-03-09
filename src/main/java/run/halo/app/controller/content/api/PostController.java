@@ -42,7 +42,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.assembler.PostRenderAssembler;
-import run.halo.app.service.assembler.comment.PostCommentAssembler;
+import run.halo.app.service.assembler.comment.PostCommentRenderAssembler;
 
 /**
  * Content post controller.
@@ -58,7 +58,7 @@ public class PostController {
 
     private final PostService postService;
 
-    private final PostCommentAssembler postCommentAssembler;
+    private final PostCommentRenderAssembler postCommentRenderAssembler;
 
     private final PostCommentService postCommentService;
 
@@ -69,12 +69,12 @@ public class PostController {
     private final PostAuthentication postAuthentication;
 
     public PostController(PostService postService,
-        PostCommentAssembler postCommentAssembler,
+        PostCommentRenderAssembler postCommentRenderAssembler,
         PostCommentService postCommentService,
         OptionService optionService, PostRenderAssembler postRenderAssembler,
         PostAuthentication postAuthentication) {
         this.postService = postService;
-        this.postCommentAssembler = postCommentAssembler;
+        this.postCommentRenderAssembler = postCommentRenderAssembler;
         this.postCommentService = postCommentService;
         this.optionService = optionService;
         this.postRenderAssembler = postRenderAssembler;
@@ -194,8 +194,11 @@ public class PostController {
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         checkAuthenticate(postId);
-        return postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<CommentWithHasChildrenVO> comments =
+            postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(postCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{postId:\\d+}/comments/{commentParentId:\\d+}/children")
@@ -208,7 +211,7 @@ public class PostController {
             .listChildrenBy(postId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
 
-        return postCommentAssembler.convertTo(postComments);
+        return postCommentRenderAssembler.convertTo(postComments);
     }
 
     @GetMapping("{postId:\\d+}/comments/tree_view")
@@ -217,8 +220,10 @@ public class PostController {
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         checkAuthenticate(postId);
-        return postCommentService
+        Page<BaseCommentVO> comments = postCommentService
             .pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(postCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{postId:\\d+}/comments/list_view")
@@ -227,8 +232,11 @@ public class PostController {
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         checkAuthenticate(postId);
-        return postCommentService.pageWithParentVoBy(postId,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentWithParentVO> comments =
+            postCommentService.pageWithParentVoBy(postId,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(postCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @PostMapping("comments")
@@ -241,7 +249,7 @@ public class PostController {
         // Escape content
         postCommentParam.setContent(HtmlUtils
             .htmlEscape(postCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
-        return postCommentAssembler.convertTo(postCommentService.createBy(postCommentParam));
+        return postCommentRenderAssembler.convertTo(postCommentService.createBy(postCommentParam));
     }
 
     @PostMapping("{postId:\\d+}/likes")

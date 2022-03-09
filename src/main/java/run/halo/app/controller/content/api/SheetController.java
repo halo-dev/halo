@@ -35,7 +35,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.assembler.SheetRenderAssembler;
-import run.halo.app.service.assembler.comment.SheetCommentAssembler;
+import run.halo.app.service.assembler.comment.SheetCommentRenderAssembler;
 
 /**
  * Content sheet controller.
@@ -48,7 +48,7 @@ import run.halo.app.service.assembler.comment.SheetCommentAssembler;
 @RequestMapping("/api/content/sheets")
 public class SheetController {
 
-    private final SheetCommentAssembler sheetCommentAssembler;
+    private final SheetCommentRenderAssembler sheetCommentRenderAssembler;
 
     private final SheetService sheetService;
 
@@ -59,12 +59,12 @@ public class SheetController {
     private final OptionService optionService;
 
     public SheetController(
-        SheetCommentAssembler sheetCommentAssembler,
+        SheetCommentRenderAssembler sheetCommentRenderAssembler,
         SheetService sheetService,
         SheetRenderAssembler sheetRenderAssembler,
         SheetCommentService sheetCommentService,
         OptionService optionService) {
-        this.sheetCommentAssembler = sheetCommentAssembler;
+        this.sheetCommentRenderAssembler = sheetCommentRenderAssembler;
         this.sheetService = sheetService;
         this.sheetRenderAssembler = sheetRenderAssembler;
         this.sheetCommentService = sheetCommentService;
@@ -134,8 +134,11 @@ public class SheetController {
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("sheetId") Integer sheetId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return sheetCommentService.pageTopCommentsBy(sheetId, CommentStatus.PUBLISHED,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<CommentWithHasChildrenVO> comments =
+            sheetCommentService.pageTopCommentsBy(sheetId, CommentStatus.PUBLISHED,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.forEach(sheetCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{sheetId:\\d+}/comments/{commentParentId:\\d+}/children")
@@ -146,7 +149,7 @@ public class SheetController {
         List<SheetComment> sheetComments = sheetCommentService
             .listChildrenBy(sheetId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
-        return sheetCommentAssembler.convertTo(sheetComments);
+        return sheetCommentRenderAssembler.convertTo(sheetComments);
     }
 
 
@@ -155,8 +158,10 @@ public class SheetController {
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("sheetId") Integer sheetId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return sheetCommentService
+        Page<BaseCommentVO> comments = sheetCommentService
             .pageVosBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(sheetCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{sheetId:\\d+}/comments/list_view")
@@ -164,8 +169,11 @@ public class SheetController {
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return sheetCommentService.pageWithParentVoBy(sheetId,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentWithParentVO> comments =
+            sheetCommentService.pageWithParentVoBy(sheetId,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(sheetCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @PostMapping("comments")
@@ -176,6 +184,7 @@ public class SheetController {
         // Escape content
         sheetCommentParam.setContent(HtmlUtils
             .htmlEscape(sheetCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
-        return sheetCommentAssembler.convertTo(sheetCommentService.createBy(sheetCommentParam));
+        return sheetCommentRenderAssembler.convertTo(
+            sheetCommentService.createBy(sheetCommentParam));
     }
 }
