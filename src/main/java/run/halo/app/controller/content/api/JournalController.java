@@ -34,7 +34,7 @@ import run.halo.app.model.vo.CommentWithHasChildrenVO;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.OptionService;
-import run.halo.app.service.assembler.comment.JournalCommentAssembler;
+import run.halo.app.service.assembler.comment.JournalCommentRenderAssembler;
 
 /**
  * Content journal controller.
@@ -49,18 +49,18 @@ public class JournalController {
 
     private final JournalService journalService;
 
-    private  final JournalCommentAssembler journalCommentAssembler;
+    private  final JournalCommentRenderAssembler journalCommentRenderAssembler;
 
     private final JournalCommentService journalCommentService;
 
     private final OptionService optionService;
 
     public JournalController(JournalService journalService,
-        JournalCommentAssembler journalCommentAssembler,
+        JournalCommentRenderAssembler journalCommentRenderAssembler,
         JournalCommentService journalCommentService,
         OptionService optionService) {
         this.journalService = journalService;
-        this.journalCommentAssembler = journalCommentAssembler;
+        this.journalCommentRenderAssembler = journalCommentRenderAssembler;
         this.journalCommentService = journalCommentService;
         this.optionService = optionService;
     }
@@ -97,7 +97,7 @@ public class JournalController {
         List<JournalComment> postComments = journalCommentService
             .listChildrenBy(journalId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
-        return journalCommentAssembler.convertTo(postComments);
+        return journalCommentRenderAssembler.convertTo(postComments);
     }
 
     @GetMapping("{journalId:\\d+}/comments/tree_view")
@@ -126,7 +126,7 @@ public class JournalController {
         // Escape content
         journalCommentParam.setContent(HtmlUtils
             .htmlEscape(journalCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
-        return journalCommentAssembler.convertTo(
+        return journalCommentRenderAssembler.convertTo(
             journalCommentService.createBy(journalCommentParam));
     }
 

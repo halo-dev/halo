@@ -35,7 +35,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.assembler.SheetRenderAssembler;
-import run.halo.app.service.assembler.comment.SheetCommentAssembler;
+import run.halo.app.service.assembler.comment.SheetCommentRenderAssembler;
 
 /**
  * Content sheet controller.
@@ -48,7 +48,7 @@ import run.halo.app.service.assembler.comment.SheetCommentAssembler;
 @RequestMapping("/api/content/sheets")
 public class SheetController {
 
-    private final SheetCommentAssembler sheetCommentAssembler;
+    private final SheetCommentRenderAssembler sheetCommentRenderAssembler;
 
     private final SheetService sheetService;
 
@@ -59,12 +59,12 @@ public class SheetController {
     private final OptionService optionService;
 
     public SheetController(
-        SheetCommentAssembler sheetCommentAssembler,
+        SheetCommentRenderAssembler sheetCommentRenderAssembler,
         SheetService sheetService,
         SheetRenderAssembler sheetRenderAssembler,
         SheetCommentService sheetCommentService,
         OptionService optionService) {
-        this.sheetCommentAssembler = sheetCommentAssembler;
+        this.sheetCommentRenderAssembler = sheetCommentRenderAssembler;
         this.sheetService = sheetService;
         this.sheetRenderAssembler = sheetRenderAssembler;
         this.sheetCommentService = sheetCommentService;
@@ -146,7 +146,7 @@ public class SheetController {
         List<SheetComment> sheetComments = sheetCommentService
             .listChildrenBy(sheetId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
-        return sheetCommentAssembler.convertTo(sheetComments);
+        return sheetCommentRenderAssembler.convertTo(sheetComments);
     }
 
 
@@ -176,6 +176,7 @@ public class SheetController {
         // Escape content
         sheetCommentParam.setContent(HtmlUtils
             .htmlEscape(sheetCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
-        return sheetCommentAssembler.convertTo(sheetCommentService.createBy(sheetCommentParam));
+        return sheetCommentRenderAssembler.convertTo(
+            sheetCommentService.createBy(sheetCommentParam));
     }
 }

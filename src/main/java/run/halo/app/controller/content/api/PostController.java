@@ -42,7 +42,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.assembler.PostRenderAssembler;
-import run.halo.app.service.assembler.comment.PostCommentAssembler;
+import run.halo.app.service.assembler.comment.PostCommentRenderAssembler;
 
 /**
  * Content post controller.
@@ -58,7 +58,7 @@ public class PostController {
 
     private final PostService postService;
 
-    private final PostCommentAssembler postCommentAssembler;
+    private final PostCommentRenderAssembler postCommentRenderAssembler;
 
     private final PostCommentService postCommentService;
 
@@ -69,12 +69,12 @@ public class PostController {
     private final PostAuthentication postAuthentication;
 
     public PostController(PostService postService,
-        PostCommentAssembler postCommentAssembler,
+        PostCommentRenderAssembler postCommentRenderAssembler,
         PostCommentService postCommentService,
         OptionService optionService, PostRenderAssembler postRenderAssembler,
         PostAuthentication postAuthentication) {
         this.postService = postService;
-        this.postCommentAssembler = postCommentAssembler;
+        this.postCommentRenderAssembler = postCommentRenderAssembler;
         this.postCommentService = postCommentService;
         this.optionService = optionService;
         this.postRenderAssembler = postRenderAssembler;
@@ -208,7 +208,7 @@ public class PostController {
             .listChildrenBy(postId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
 
-        return postCommentAssembler.convertTo(postComments);
+        return postCommentRenderAssembler.convertTo(postComments);
     }
 
     @GetMapping("{postId:\\d+}/comments/tree_view")
@@ -241,7 +241,7 @@ public class PostController {
         // Escape content
         postCommentParam.setContent(HtmlUtils
             .htmlEscape(postCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
-        return postCommentAssembler.convertTo(postCommentService.createBy(postCommentParam));
+        return postCommentRenderAssembler.convertTo(postCommentService.createBy(postCommentParam));
     }
 
     @PostMapping("{postId:\\d+}/likes")

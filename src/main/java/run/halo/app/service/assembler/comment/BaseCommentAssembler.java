@@ -165,4 +165,17 @@ public abstract class BaseCommentAssembler<COMMENT extends BaseComment> {
 
         return gravatarSource + gravatarMd5 + "?s=256&d=" + gravatarDefault;
     }
+
+    /**
+     * clear sensitive field value for theme render.
+     *
+     * @param comment comment
+     */
+    public void clearSensitiveField(@Nullable COMMENT comment) {
+        if (comment == null) {
+            return;
+        }
+        comment.setIpAddress("");
+        comment.setEmail("");
+    }
 }
