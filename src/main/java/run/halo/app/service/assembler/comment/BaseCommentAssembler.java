@@ -175,7 +175,7 @@ public abstract class BaseCommentAssembler<COMMENT extends BaseComment> {
         if (comment == null) {
             return;
         }
-        comment.setIpAddress("");
-        comment.setEmail("");
+        comment.setIpAddress(null);
+        comment.setEmail(null);
     }
 }

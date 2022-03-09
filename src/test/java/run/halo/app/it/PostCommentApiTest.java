@@ -112,6 +112,6 @@ public class PostCommentApiTest extends BaseApiTest {
         Assertions.assertEquals(HttpStatus.OK, result.getStatusCode());
         Assertions.assertEquals(COMMENT_AUTHOR_TEST, comment.getAuthor());
         Assertions.assertEquals(COMMENT_CONTENT_TEST, comment.getContent());
-        Assertions.assertEquals(COMMENT_VALID_EMAIL_TEST, comment.getEmail());
+        Assertions.assertNull(comment.getEmail());
     }
 }
