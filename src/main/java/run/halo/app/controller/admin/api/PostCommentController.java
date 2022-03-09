@@ -30,6 +30,7 @@ import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.PostCommentWithPostVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCommentService;
+import run.halo.app.service.assembler.comment.PostCommentAssembler;
 
 /**
  * Post comment controller.
@@ -42,12 +43,17 @@ import run.halo.app.service.PostCommentService;
 @RequestMapping("/api/admin/posts/comments")
 public class PostCommentController {
 
+    private final PostCommentAssembler postCommentAssembler;
+
     private final PostCommentService postCommentService;
 
     private final OptionService optionService;
 
-    public PostCommentController(PostCommentService postCommentService,
+    public PostCommentController(
+        PostCommentAssembler postCommentAssembler,
+        PostCommentService postCommentService,
         OptionService optionService) {
+        this.postCommentAssembler = postCommentAssembler;
         this.postCommentService = postCommentService;
         this.optionService = optionService;
     }
@@ -58,7 +64,7 @@ public class PostCommentController {
         @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable,
         CommentQuery commentQuery) {
         Page<PostComment> commentPage = postCommentService.pageBy(commentQuery, pageable);
-        return postCommentService.convertToWithPostVo(commentPage);
+        return postCommentAssembler.convertToWithPostVo(commentPage);
     }
 
     @GetMapping("latest")
@@ -70,7 +76,7 @@ public class PostCommentController {
         List<PostComment> content = postCommentService.pageLatest(top, status).getContent();
 
         // Convert and return
-        return postCommentService.convertToWithPostVo(content);
+        return postCommentAssembler.convertToWithPostVo(content);
     }
 
     @GetMapping("{postId:\\d+}/tree_view")
@@ -95,7 +101,7 @@ public class PostCommentController {
     @ApiOperation("Creates a post comment (new or reply)")
     public BaseCommentDTO createBy(@RequestBody PostCommentParam postCommentParam) {
         PostComment createdPostComment = postCommentService.createBy(postCommentParam);
-        return postCommentService.convertTo(createdPostComment);
+        return postCommentAssembler.convertTo(createdPostComment);
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")
@@ -104,7 +110,7 @@ public class PostCommentController {
         @PathVariable("status") CommentStatus status) {
         // Update comment status
         PostComment updatedPostComment = postCommentService.updateStatus(commentId, status);
-        return postCommentService.convertTo(updatedPostComment);
+        return postCommentAssembler.convertTo(updatedPostComment);
     }
 
     @PutMapping("status/{status}")
@@ -113,14 +119,14 @@ public class PostCommentController {
         @PathVariable(name = "status") CommentStatus status,
         @RequestBody List<Long> ids) {
         List<PostComment> comments = postCommentService.updateStatusByIds(ids, status);
-        return postCommentService.convertTo(comments);
+        return postCommentAssembler.convertTo(comments);
     }
 
     @DeleteMapping("{commentId:\\d+}")
     @ApiOperation("Deletes post comment permanently and recursively")
     public BaseCommentDTO deletePermanently(@PathVariable("commentId") Long commentId) {
         PostComment deletedPostComment = postCommentService.removeById(commentId);
-        return postCommentService.convertTo(deletedPostComment);
+        return postCommentAssembler.convertTo(deletedPostComment);
     }
 
     @DeleteMapping
@@ -133,7 +139,7 @@ public class PostCommentController {
     @ApiOperation("Gets a post comment by comment id")
     public PostCommentWithPostVO getBy(@PathVariable("commentId") Long commentId) {
         PostComment comment = postCommentService.getById(commentId);
-        return postCommentService.convertToWithPostVo(comment);
+        return postCommentAssembler.convertToWithPostVo(comment);
     }
 
     @PutMapping("{commentId:\\d+}")
@@ -144,6 +150,6 @@ public class PostCommentController {
 
         commentParam.update(commentToUpdate);
 
-        return postCommentService.convertTo(postCommentService.update(commentToUpdate));
+        return postCommentAssembler.convertTo(postCommentService.update(commentToUpdate));
     }
 }

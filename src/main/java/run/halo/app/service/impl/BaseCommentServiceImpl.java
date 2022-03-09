@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +33,6 @@ import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
-import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.enums.CommentStatus;
@@ -53,6 +51,7 @@ import run.halo.app.security.authentication.Authentication;
 import run.halo.app.security.context.SecurityContextHolder;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
+import run.halo.app.service.assembler.comment.BaseCommentAssembler;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BaseCommentService;
 import run.halo.app.utils.HaloUtils;
@@ -75,15 +74,18 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
     protected final UserService userService;
     protected final ApplicationEventPublisher eventPublisher;
     private final BaseCommentRepository<COMMENT> baseCommentRepository;
+    private final BaseCommentAssembler<COMMENT> commentAssembler;
 
     public BaseCommentServiceImpl(BaseCommentRepository<COMMENT> baseCommentRepository,
         OptionService optionService,
-        UserService userService, ApplicationEventPublisher eventPublisher) {
+        UserService userService, ApplicationEventPublisher eventPublisher,
+        BaseCommentAssembler<COMMENT> commentAssembler) {
         super(baseCommentRepository);
         this.baseCommentRepository = baseCommentRepository;
         this.optionService = optionService;
         this.userService = userService;
         this.eventPublisher = eventPublisher;
+        this.commentAssembler = commentAssembler;
     }
 
     @Override
@@ -154,7 +156,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
             buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime")));
 
         // Convert to vo
-        List<BaseCommentVO> topComments = convertToVo(comments, commentComparator);
+        List<BaseCommentVO> topComments = commentAssembler.convertToVo(comments, commentComparator);
 
         List<BaseCommentVO> pageContent;
 
@@ -229,7 +231,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
             BaseCommentWithParentVO commentWithParentVo =
                 new BaseCommentWithParentVO().convertFrom(comment);
 
-            commentWithParentVo.setAvatar(buildAvatarUrl(commentWithParentVo.getGravatarMd5()));
+            commentWithParentVo.setAvatar(
+                commentAssembler.buildAvatarUrl(commentWithParentVo.getGravatarMd5()));
 
             // Get parent comment vo from cache
             BaseCommentWithParentVO parentCommentVo = parentCommentVoMap.get(comment.getParentId());
@@ -242,7 +245,8 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
                     // Convert to parent comment vo
                     parentCommentVo = new BaseCommentWithParentVO().convertFrom(parentComment);
 
-                    parentCommentVo.setAvatar(buildAvatarUrl(parentComment.getGravatarMd5()));
+                    parentCommentVo.setAvatar(
+                        commentAssembler.buildAvatarUrl(parentComment.getGravatarMd5()));
 
                     // Cache the parent comment vo
                     parentCommentVoMap.put(parentComment.getId(), parentCommentVo);
@@ -470,37 +474,6 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         return ids.stream().map(this::removeById).collect(Collectors.toList());
     }
 
-    @Override
-    @NonNull
-    public List<BaseCommentDTO> convertTo(@NonNull List<COMMENT> comments) {
-        if (CollectionUtils.isEmpty(comments)) {
-            return Collections.emptyList();
-        }
-        return comments.stream()
-            .map(this::convertTo)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    @NonNull
-    public Page<BaseCommentDTO> convertTo(@NonNull Page<COMMENT> commentPage) {
-        Assert.notNull(commentPage, "Comment page must not be null");
-
-        return commentPage.map(this::convertTo);
-    }
-
-    @Override
-    @NonNull
-    public BaseCommentDTO convertTo(@NonNull COMMENT comment) {
-        Assert.notNull(comment, "Comment must not be null");
-
-        BaseCommentDTO baseCommentDto = new BaseCommentDTO().convertFrom(comment);
-
-        baseCommentDto.setAvatar(buildAvatarUrl(comment.getGravatarMd5()));
-
-        return baseCommentDto;
-    }
-
     @NonNull
     protected Specification<COMMENT> buildSpecByQuery(@NonNull CommentQuery commentQuery) {
         Assert.notNull(commentQuery, "Comment query must not be null");
@@ -553,25 +526,6 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         };
     }
 
-    @NonNull
-    @Override
-    public List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments,
-        @Nullable Comparator<BaseCommentVO> comparator) {
-        if (CollectionUtils.isEmpty(comments)) {
-            return Collections.emptyList();
-        }
-
-        // Init the top virtual comment
-        BaseCommentVO topVirtualComment = new BaseCommentVO();
-        topVirtualComment.setId(0L);
-        topVirtualComment.setChildren(new LinkedList<>());
-
-        // Concrete the comment tree
-        concreteTree(topVirtualComment, new LinkedList<>(comments), comparator);
-
-        return topVirtualComment.getChildren();
-    }
-
     @Override
     @NonNull
     public Page<CommentWithHasChildrenVO> pageTopCommentsBy(@NonNull Integer targetId,
@@ -609,7 +563,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
                 new CommentWithHasChildrenVO().convertFrom(topComment);
             comment
                 .setHasChildren(commentChildrenCountMap.getOrDefault(topComment.getId(), 0L) > 0);
-            comment.setAvatar(buildAvatarUrl(topComment.getGravatarMd5()));
+            comment.setAvatar(commentAssembler.buildAvatarUrl(topComment.getGravatarMd5()));
             return comment;
         });
     }
@@ -723,69 +677,5 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
 
         // Add direct children to children result
         children.addAll(topComments);
-    }
-
-    /**
-     * Concretes comment tree.
-     *
-     * @param parentComment parent comment vo must not be null
-     * @param comments comment list must not null
-     * @param commentComparator comment vo comparator
-     */
-    protected void concreteTree(@NonNull BaseCommentVO parentComment,
-        @Nullable Collection<COMMENT> comments,
-        @Nullable Comparator<BaseCommentVO> commentComparator) {
-        Assert.notNull(parentComment, "Parent comment must not be null");
-
-        if (CollectionUtils.isEmpty(comments)) {
-            return;
-        }
-
-        // Get children
-        List<COMMENT> children = comments.stream()
-            .filter(comment -> Objects.equals(parentComment.getId(), comment.getParentId()))
-            .collect(Collectors.toList());
-
-        // Add children
-        children.forEach(comment -> {
-            // Convert to comment vo
-            BaseCommentVO commentVo = new BaseCommentVO().convertFrom(comment);
-
-            commentVo.setAvatar(buildAvatarUrl(commentVo.getGravatarMd5()));
-
-            if (parentComment.getChildren() == null) {
-                parentComment.setChildren(new LinkedList<>());
-            }
-
-            parentComment.getChildren().add(commentVo);
-        });
-
-        // Remove children
-        comments.removeAll(children);
-
-        if (!CollectionUtils.isEmpty(parentComment.getChildren())) {
-            // Recursively concrete the children
-            parentComment.getChildren()
-                .forEach(childComment -> concreteTree(childComment, comments, commentComparator));
-            // Sort the children
-            if (commentComparator != null) {
-                parentComment.getChildren().sort(commentComparator);
-            }
-        }
-    }
-
-    /**
-     * Build avatar url by gravatarMd5
-     *
-     * @param gravatarMd5 gravatarMd5
-     * @return avatar url
-     */
-    public String buildAvatarUrl(String gravatarMd5) {
-        final String gravatarSource =
-            optionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_SOURCE, String.class);
-        final String gravatarDefault =
-            optionService.getByPropertyOrDefault(CommentProperties.GRAVATAR_DEFAULT, String.class);
-
-        return gravatarSource + gravatarMd5 + "?s=256&d=" + gravatarDefault;
     }
 }

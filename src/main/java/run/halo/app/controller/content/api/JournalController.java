@@ -22,7 +22,6 @@ import org.springframework.web.util.HtmlUtils;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.cache.lock.CacheParam;
 import run.halo.app.model.dto.BaseCommentDTO;
-import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.JournalComment;
@@ -35,6 +34,7 @@ import run.halo.app.model.vo.CommentWithHasChildrenVO;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.assembler.comment.JournalCommentAssembler;
 
 /**
  * Content journal controller.
@@ -49,14 +49,18 @@ public class JournalController {
 
     private final JournalService journalService;
 
+    private  final JournalCommentAssembler journalCommentAssembler;
+
     private final JournalCommentService journalCommentService;
 
     private final OptionService optionService;
 
     public JournalController(JournalService journalService,
+        JournalCommentAssembler journalCommentAssembler,
         JournalCommentService journalCommentService,
         OptionService optionService) {
         this.journalService = journalService;
+        this.journalCommentAssembler = journalCommentAssembler;
         this.journalCommentService = journalCommentService;
         this.optionService = optionService;
     }
@@ -93,7 +97,7 @@ public class JournalController {
         List<JournalComment> postComments = journalCommentService
             .listChildrenBy(journalId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
-        return journalCommentService.convertTo(postComments);
+        return journalCommentAssembler.convertTo(postComments);
     }
 
     @GetMapping("{journalId:\\d+}/comments/tree_view")
@@ -122,7 +126,8 @@ public class JournalController {
         // Escape content
         journalCommentParam.setContent(HtmlUtils
             .htmlEscape(journalCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
-        return journalCommentService.convertTo(journalCommentService.createBy(journalCommentParam));
+        return journalCommentAssembler.convertTo(
+            journalCommentService.createBy(journalCommentParam));
     }
 
     @PostMapping("{id:\\d+}/likes")

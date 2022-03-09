@@ -35,6 +35,7 @@ import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.assembler.SheetRenderAssembler;
+import run.halo.app.service.assembler.comment.SheetCommentAssembler;
 
 /**
  * Content sheet controller.
@@ -47,6 +48,8 @@ import run.halo.app.service.assembler.SheetRenderAssembler;
 @RequestMapping("/api/content/sheets")
 public class SheetController {
 
+    private final SheetCommentAssembler sheetCommentAssembler;
+
     private final SheetService sheetService;
 
     private final SheetRenderAssembler sheetRenderAssembler;
@@ -55,10 +58,13 @@ public class SheetController {
 
     private final OptionService optionService;
 
-    public SheetController(SheetService sheetService,
+    public SheetController(
+        SheetCommentAssembler sheetCommentAssembler,
+        SheetService sheetService,
         SheetRenderAssembler sheetRenderAssembler,
         SheetCommentService sheetCommentService,
         OptionService optionService) {
+        this.sheetCommentAssembler = sheetCommentAssembler;
         this.sheetService = sheetService;
         this.sheetRenderAssembler = sheetRenderAssembler;
         this.sheetCommentService = sheetCommentService;
@@ -140,7 +146,7 @@ public class SheetController {
         List<SheetComment> sheetComments = sheetCommentService
             .listChildrenBy(sheetId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
-        return sheetCommentService.convertTo(sheetComments);
+        return sheetCommentAssembler.convertTo(sheetComments);
     }
 
 
@@ -170,6 +176,6 @@ public class SheetController {
         // Escape content
         sheetCommentParam.setContent(HtmlUtils
             .htmlEscape(sheetCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
-        return sheetCommentService.convertTo(sheetCommentService.createBy(sheetCommentParam));
+        return sheetCommentAssembler.convertTo(sheetCommentService.createBy(sheetCommentParam));
     }
 }

@@ -20,6 +20,7 @@ import run.halo.app.repository.PostRepository;
 import run.halo.app.service.CommentBlackListService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
+import run.halo.app.service.assembler.comment.PostCommentAssembler;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -58,18 +59,23 @@ public class PostCommentServiceImplTest {
 
     private PostCommentServiceImpl postCommentService;
 
+    private PostCommentAssembler postCommentAssembler;
+
     private PostCommentParam postCommentParam;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
+        postCommentAssembler = new PostCommentAssembler(mockOptionService, mockPostRepository);
+
         postCommentService = new PostCommentServiceImpl(
             mockPostCommentRepository,
             mockPostRepository,
             mockUserService,
             mockOptionService,
             mockCommentBlackListService,
-            mockApplicationEventPublisher
+            mockApplicationEventPublisher,
+            postCommentAssembler
         );
         postCommentParam = new PostCommentParam();
     }
@@ -118,7 +124,7 @@ public class PostCommentServiceImplTest {
             String.class)).thenReturn(GRAVATAR_DEFAULT_TEST);
 
         // Act
-        BaseCommentDTO result = postCommentService.convertTo(mockPostComment);
+        BaseCommentDTO result = postCommentAssembler.convertTo(mockPostComment);
 
         // Assert
         Assertions.assertEquals(
