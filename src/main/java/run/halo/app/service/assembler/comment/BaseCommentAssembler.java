@@ -7,7 +7,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -15,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.properties.CommentProperties;
+import run.halo.app.model.support.CommentPage;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.service.OptionService;
 
@@ -24,6 +28,7 @@ import run.halo.app.service.OptionService;
  * @author guqing
  * @date 2022-03-08
  */
+@Slf4j
 public abstract class BaseCommentAssembler<COMMENT extends BaseComment> {
 
     private final OptionService optionService;
@@ -103,6 +108,47 @@ public abstract class BaseCommentAssembler<COMMENT extends BaseComment> {
     }
 
     /**
+     * Lists comment vos by list of COMMENT.
+     *
+     * @param comments comments must not be null
+     * @param pageable page info must not be null
+     * @return a page of comment vo
+     */
+    @NonNull
+    public Page<BaseCommentVO> pageVosBy(@NonNull List<COMMENT> comments,
+        @NonNull Pageable pageable) {
+        Assert.notNull(comments, "Comments must not be null");
+        Assert.notNull(pageable, "Page info must not be null");
+
+        Comparator<BaseCommentVO> commentComparator =
+            buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime")));
+
+        // Convert to vo
+        List<BaseCommentVO> topComments = convertToVo(comments, commentComparator);
+
+        List<BaseCommentVO> pageContent;
+
+        // Calc the shear index
+        int startIndex = pageable.getPageNumber() * pageable.getPageSize();
+        if (startIndex >= topComments.size() || startIndex < 0) {
+            pageContent = Collections.emptyList();
+        } else {
+            int endIndex = startIndex + pageable.getPageSize();
+            if (endIndex > topComments.size()) {
+                endIndex = topComments.size();
+            }
+
+            log.debug("Top comments size: [{}]", topComments.size());
+            log.debug("Start index: [{}]", startIndex);
+            log.debug("End index: [{}]", endIndex);
+
+            pageContent = topComments.subList(startIndex, endIndex);
+        }
+
+        return new CommentPage<>(pageContent, pageable, topComments.size(), comments.size());
+    }
+
+    /**
      * Concretes comment tree.
      *
      * @param parentComment parent comment vo must not be null
@@ -167,11 +213,50 @@ public abstract class BaseCommentAssembler<COMMENT extends BaseComment> {
     }
 
     /**
+     * Builds a comment comparator.
+     *
+     * @param sort sort info
+     * @return comment comparator
+     */
+    protected Comparator<BaseCommentVO> buildCommentComparator(Sort sort) {
+        return (currentComment, toCompareComment) -> {
+            Assert.notNull(currentComment, "Current comment must not be null");
+            Assert.notNull(toCompareComment, "Comment to compare must not be null");
+
+            // Get sort order
+            Sort.Order order = sort.filter(anOrder -> "id".equals(anOrder.getProperty()))
+                .get()
+                .findFirst()
+                .orElseGet(() -> Sort.Order.desc("id"));
+
+            // Init sign
+            int sign = order.getDirection().isAscending() ? 1 : -1;
+
+            // Compare id property
+            return sign * currentComment.getId().compareTo(toCompareComment.getId());
+        };
+    }
+
+    /**
      * clear sensitive field value for theme render.
      *
      * @param comment comment
      */
     public void clearSensitiveField(@Nullable COMMENT comment) {
+        if (comment == null) {
+            return;
+        }
+        comment.setIpAddress(null);
+        comment.setEmail(null);
+    }
+
+    /**
+     * clear sensitive field value for theme render.
+     *
+     * @param comment comment
+     * @param <V> comment dto or subclass.
+     */
+    public <V extends BaseCommentDTO> void clearSensitiveField(@Nullable V comment) {
         if (comment == null) {
             return;
         }

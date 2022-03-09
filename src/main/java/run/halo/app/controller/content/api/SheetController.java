@@ -134,8 +134,11 @@ public class SheetController {
     public Page<CommentWithHasChildrenVO> listTopComments(@PathVariable("sheetId") Integer sheetId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return sheetCommentService.pageTopCommentsBy(sheetId, CommentStatus.PUBLISHED,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<CommentWithHasChildrenVO> comments =
+            sheetCommentService.pageTopCommentsBy(sheetId, CommentStatus.PUBLISHED,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.forEach(sheetCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{sheetId:\\d+}/comments/{commentParentId:\\d+}/children")
@@ -155,8 +158,10 @@ public class SheetController {
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("sheetId") Integer sheetId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return sheetCommentService
+        Page<BaseCommentVO> comments = sheetCommentService
             .pageVosBy(sheetId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(sheetCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{sheetId:\\d+}/comments/list_view")
@@ -164,8 +169,11 @@ public class SheetController {
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("sheetId") Integer sheetId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return sheetCommentService.pageWithParentVoBy(sheetId,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentWithParentVO> comments =
+            sheetCommentService.pageWithParentVoBy(sheetId,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(sheetCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @PostMapping("comments")

@@ -3,6 +3,7 @@ package run.halo.app.service.assembler.comment;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -78,5 +79,13 @@ public class PostCommentRenderAssembler extends PostCommentAssembler {
             postComments.forEach(this::clearSensitiveField);
         }
         return super.convertToWithPostVo(postComments);
+    }
+
+    @NonNull
+    @Override
+    public Page<BaseCommentVO> pageVosBy(@NonNull List<PostComment> postComments,
+        @NonNull Pageable pageable) {
+        postComments.forEach(this::clearSensitiveField);
+        return super.pageVosBy(postComments, pageable);
     }
 }

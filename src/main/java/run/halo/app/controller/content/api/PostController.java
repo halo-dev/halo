@@ -194,8 +194,11 @@ public class PostController {
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         checkAuthenticate(postId);
-        return postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<CommentWithHasChildrenVO> comments =
+            postCommentService.pageTopCommentsBy(postId, CommentStatus.PUBLISHED,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(postCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{postId:\\d+}/comments/{commentParentId:\\d+}/children")
@@ -217,8 +220,10 @@ public class PostController {
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         checkAuthenticate(postId);
-        return postCommentService
+        Page<BaseCommentVO> comments = postCommentService
             .pageVosBy(postId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(postCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{postId:\\d+}/comments/list_view")
@@ -227,8 +232,11 @@ public class PostController {
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
         checkAuthenticate(postId);
-        return postCommentService.pageWithParentVoBy(postId,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentWithParentVO> comments =
+            postCommentService.pageWithParentVoBy(postId,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(postCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @PostMapping("comments")

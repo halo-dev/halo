@@ -42,7 +42,6 @@ import run.halo.app.model.projection.CommentChildrenCountProjection;
 import run.halo.app.model.projection.CommentCountProjection;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.CommentProperties;
-import run.halo.app.model.support.CommentPage;
 import run.halo.app.model.vo.BaseCommentVO;
 import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.CommentWithHasChildrenVO;
@@ -142,42 +141,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         // List all the top comments (Caution: This list will be cleared)
         List<COMMENT> comments = baseCommentRepository.findAllByPostId(postId);
 
-        return pageVosBy(comments, pageable);
-    }
-
-    @Override
-    @NonNull
-    public Page<BaseCommentVO> pageVosBy(@NonNull List<COMMENT> comments,
-        @NonNull Pageable pageable) {
-        Assert.notNull(comments, "Comments must not be null");
-        Assert.notNull(pageable, "Page info must not be null");
-
-        Comparator<BaseCommentVO> commentComparator =
-            buildCommentComparator(pageable.getSortOr(Sort.by(Sort.Direction.DESC, "createTime")));
-
-        // Convert to vo
-        List<BaseCommentVO> topComments = commentAssembler.convertToVo(comments, commentComparator);
-
-        List<BaseCommentVO> pageContent;
-
-        // Calc the shear index
-        int startIndex = pageable.getPageNumber() * pageable.getPageSize();
-        if (startIndex >= topComments.size() || startIndex < 0) {
-            pageContent = Collections.emptyList();
-        } else {
-            int endIndex = startIndex + pageable.getPageSize();
-            if (endIndex > topComments.size()) {
-                endIndex = topComments.size();
-            }
-
-            log.debug("Top comments size: [{}]", topComments.size());
-            log.debug("Start index: [{}]", startIndex);
-            log.debug("End index: [{}]", endIndex);
-
-            pageContent = topComments.subList(startIndex, endIndex);
-        }
-
-        return new CommentPage<>(pageContent, pageable, topComments.size(), comments.size());
+        return commentAssembler.pageVosBy(comments, pageable);
     }
 
     @Override
@@ -192,7 +156,7 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         List<COMMENT> comments =
             baseCommentRepository.findAllByPostIdAndStatus(postId, CommentStatus.PUBLISHED);
 
-        return pageVosBy(comments, pageable);
+        return commentAssembler.pageVosBy(comments, pageable);
     }
 
     @Override
@@ -498,31 +462,6 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
             }
 
             return query.where(predicates.toArray(new Predicate[0])).getRestriction();
-        };
-    }
-
-    /**
-     * Builds a comment comparator.
-     *
-     * @param sort sort info
-     * @return comment comparator
-     */
-    protected Comparator<BaseCommentVO> buildCommentComparator(Sort sort) {
-        return (currentComment, toCompareComment) -> {
-            Assert.notNull(currentComment, "Current comment must not be null");
-            Assert.notNull(toCompareComment, "Comment to compare must not be null");
-
-            // Get sort order
-            Sort.Order order = sort.filter(anOrder -> "id".equals(anOrder.getProperty()))
-                .get()
-                .findFirst()
-                .orElseGet(() -> Sort.Order.desc("id"));
-
-            // Init sign
-            int sign = order.getDirection().isAscending() ? 1 : -1;
-
-            // Compare id property
-            return sign * currentComment.getId().compareTo(toCompareComment.getId());
         };
     }
 
