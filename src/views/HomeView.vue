@@ -1,3 +1,3 @@
 <template>
-  <main>Hello Halo!</main>
+  <main class="text-red-600">Hello Halo!</main>
 </template>
