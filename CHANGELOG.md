@@ -1,5 +1,31 @@
 # CHANGELOG
 
+# 1.5.0-beta.1
+
+## Features
+
+- 后台菜单分组支持修改分组名。 halo-dev/halo-admin#499 @ruibaby
+- 后台个人资料头像修改支持输入链接。 halo-dev/halo-admin#505 @ruibaby
+
+## Improvements
+
+- 重构后台主题设置保存预览功能。 halo-dev/halo-admin#502 @ruibaby
+- 重构日志发布功能，使用 Markdown 编辑器替换 textarea，并支持保存前端渲染的 Markdown 结果。 halo-dev/halo#1739 halo-dev/halo-admin#506 @guqing @ruibaby
+
+## Bug Fixes
+
+- 修复后台分类/标签/友情链接修改表单切换修改对象之后没有清除表单验证的问题。 halo-dev/halo-admin#501 halo-dev/halo-admin#503 @Yorksh1re
+- 修复当前版本如果为 `alpha` 版本，安装主题无法通过版本验证的问题。 halo-dev/halo#1747 @JohnNiang
+
+## Dependencies
+
+- 后台更新 @halo-dev/editor 版本。 halo-dev/halo-admin#507 @ruibaby
+    - 修复嵌套列表语法的渲染问题。
+    - 添加 attrs 和 mark 语法的插件。
+    - 优化列表语法的编写，可以自动添加序号。
+    - 添加打开图片选择的快捷键。
+    - 统一使用 @halo-dev/markdown-renderer 库进行 Markdown 渲染。
+
 # 1.5.0-alpha.3
 
 ## Breaking changes
