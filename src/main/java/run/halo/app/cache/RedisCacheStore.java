@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
 public class RedisCacheStore extends AbstractStringCacheStore {
 
     @Autowired
-    private RedisTemplate<String, CacheWrapper<String>> redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     private static final String REDIS_PREFIX = "halo.redis.";
 
@@ -28,8 +28,10 @@ public class RedisCacheStore extends AbstractStringCacheStore {
     @NonNull
     Optional<CacheWrapper<String>> getInternal(@NonNull String key) {
         Assert.hasText(REDIS_PREFIX + key, "Cache key must not be blank");
-
-        return Optional.ofNullable(redisTemplate.opsForValue().get(REDIS_PREFIX + key));
+        String value = redisTemplate.opsForValue().get(REDIS_PREFIX + key);
+        CacheWrapper<String> cacheStore = new CacheWrapper<>();
+        cacheStore.setData(value);
+        return Optional.of(cacheStore);
     }
 
     @Override
@@ -39,9 +41,9 @@ public class RedisCacheStore extends AbstractStringCacheStore {
         if (cacheWrapper.getExpireAt() != null) {
             long expire = cacheWrapper.getExpireAt().getTime() - System.currentTimeMillis();
             redisTemplate.opsForValue().set(
-                REDIS_PREFIX + key, cacheWrapper, expire, TimeUnit.MILLISECONDS);
+                REDIS_PREFIX + key, cacheWrapper.getData(), expire, TimeUnit.MILLISECONDS);
         } else {
-            redisTemplate.opsForValue().set(REDIS_PREFIX + key, cacheWrapper);
+            redisTemplate.opsForValue().set(REDIS_PREFIX + key, cacheWrapper.getData());
         }
 
         log.debug("Put [{}] cache : [{}]", key, cacheWrapper);
@@ -66,6 +68,13 @@ public class RedisCacheStore extends AbstractStringCacheStore {
     }
 
     @Override
+    public Optional<String> get(String key) {
+        Assert.notNull(key, "Cache key must not be blank");
+
+        return getInternal(key).map(CacheWrapper::getData);
+    }
+
+    @Override
     public void delete(@NonNull String key) {
         Assert.hasText(key, "Cache key must not be blank");
 
@@ -79,10 +88,9 @@ public class RedisCacheStore extends AbstractStringCacheStore {
     public LinkedHashMap<String, String> toMap() {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         Set<String> keys = redisTemplate.keys(REDIS_PREFIX + "*");
-        for (String key : keys) {
-            CacheWrapper<String> cacheWrapper = redisTemplate.opsForValue().get(key);
-            if (cacheWrapper != null) {
-                map.put(key, cacheWrapper.getData());
+        if (keys != null && !keys.isEmpty()) {
+            for (String key : keys) {
+                map.put(key, redisTemplate.opsForValue().get(key));
             }
         }
         return map;
