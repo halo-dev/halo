@@ -18,7 +18,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
-public class CacheWrapper<V> implements Serializable {
+class CacheWrapper<V> implements Serializable {
 
     /**
      * Cache data
