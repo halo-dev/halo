@@ -133,8 +133,7 @@ public class ThemeRepositoryImpl
         }
 
         // 2. check version compatibility
-        // Not support current halo version.
-        if (checkThemePropertyCompatibility(newProperty)) {
+        if (!checkThemePropertyCompatibility(newProperty)) {
             throw new ThemeNotSupportException(
                 "当前主题仅支持 Halo " + newProperty.getRequire() + " 及以上的版本");
         }
