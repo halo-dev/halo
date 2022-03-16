@@ -73,6 +73,7 @@ ext {
     huaweiObsVersion = '3.21.8.1'
     templateInheritanceVersion = "0.4.RELEASE"
     jsoupVersion = '1.14.3'
+    embeddedRedisVersion = '0.6'
     diffUtilsVersion = '4.11'
 }
 
@@ -139,6 +140,10 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation "org.jsoup:jsoup:$jsoupVersion"
+
+    testImplementation ("com.github.kstyrc:embedded-redis:$embeddedRedisVersion") {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
 }

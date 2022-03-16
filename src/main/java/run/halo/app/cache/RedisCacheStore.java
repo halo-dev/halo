@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 /**
  * redis cache store.
@@ -24,10 +25,20 @@ public class RedisCacheStore extends AbstractStringCacheStore {
 
     private static final String REDIS_PREFIX = "halo.redis.";
 
+    public RedisCacheStore(){
+
+    }
+
+    public RedisCacheStore(StringRedisTemplate template) {
+        if (null == redisTemplate) {
+            redisTemplate = template;
+        }
+    }
+
     @Override
     @NonNull
     Optional<CacheWrapper<String>> getInternal(@NonNull String key) {
-        Assert.hasText(REDIS_PREFIX + key, "Cache key must not be blank");
+        Assert.hasText(key, "Cache key must not be blank");
         String value = redisTemplate.opsForValue().get(REDIS_PREFIX + key);
         CacheWrapper<String> cacheStore = new CacheWrapper<>();
         cacheStore.setData(value);
@@ -88,11 +99,10 @@ public class RedisCacheStore extends AbstractStringCacheStore {
     public LinkedHashMap<String, String> toMap() {
         LinkedHashMap<String, String> map = new LinkedHashMap<>();
         Set<String> keys = redisTemplate.keys(REDIS_PREFIX + "*");
-        if (keys != null && !keys.isEmpty()) {
-            for (String key : keys) {
-                map.put(key, redisTemplate.opsForValue().get(key));
-            }
+        if (CollectionUtils.isEmpty(keys)) {
+            return map;
         }
+        keys.forEach(key -> map.put(key, redisTemplate.opsForValue().get(key)));
         return map;
     }
 
