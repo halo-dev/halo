@@ -13,6 +13,9 @@ module.exports = {
     node: true,
     "vue/setup-compiler-macros": true,
   },
+  rules: {
+    "vue/multi-word-component-names": 0,
+  },
   overrides: [
     {
       files: ["cypress/integration/**.spec.{js,ts,jsx,tsx}"],
