@@ -15,7 +15,7 @@ specifiers:
   eslint: ^8.10.0
   eslint-plugin-cypress: ^2.12.1
   eslint-plugin-vue: ^8.5.0
-  histoire: ^0.1.1
+  histoire: ^0.1.3
   husky: ^7.0.4
   jsdom: ^19.0.0
   pinia: ^2.0.11
@@ -24,6 +24,7 @@ specifiers:
   sass: ^1.49.9
   start-server-and-test: ^1.14.0
   tailwindcss: ^3.0.23
+  tailwindcss-themeable: ^1.3.0
   typescript: ~4.5.5
   vite: ^2.8.6
   vitest: ^0.5.9
@@ -51,7 +52,7 @@ devDependencies:
   eslint: 8.10.0
   eslint-plugin-cypress: 2.12.1_eslint@8.10.0
   eslint-plugin-vue: 8.5.0_eslint@8.10.0
-  histoire: 0.1.1_cd0dd645aa5dde4c3c337175f134c2cd
+  histoire: 0.1.3_cd0dd645aa5dde4c3c337175f134c2cd
   husky: 7.0.4
   jsdom: 19.0.0
   postcss: 8.4.8
@@ -59,6 +60,7 @@ devDependencies:
   sass: 1.49.9
   start-server-and-test: 1.14.0
   tailwindcss: 3.0.23_autoprefixer@10.4.2
+  tailwindcss-themeable: 1.3.0
   typescript: 4.5.5
   vite: 2.8.6_sass@1.49.9
   vitest: 0.5.9_jsdom@19.0.0+sass@1.49.9
@@ -466,8 +468,8 @@ packages:
       '@hapi/hoek': 9.2.1
     dev: true
 
-  /@histoire/controls/0.1.1:
-    resolution: {integrity: sha512-e84lJFsP/VcCxFM6YaMk9uBwBvpkuprPBevn1Q/sRJ72t5hcT49BSH4MVeKVmN52p6jQLF+G6NvS7sLDZl+DZA==}
+  /@histoire/controls/0.1.3:
+    resolution: {integrity: sha512-yCoNHfVInr9KzdSCkgfQR0CNuuAznr3pY9kWsAsDqUYN90AU0g4URKyPkxN/F3kykqZiS1oSq49LC+ekDjS+jw==}
     dev: true
 
   /@humanwhocodes/config-array/0.9.5:
@@ -1007,8 +1009,8 @@ packages:
       '@types/node': 16.11.26
     dev: true
 
-  /@vueuse/core/7.7.1_vue@3.2.31:
-    resolution: {integrity: sha512-PRRgbATMpoeUmkCEBtUeJgOwtew8s+4UsEd+Pm7MhkjL2ihCNrSqxNVtM6NFE4uP2sWnkGcZpCjPuNSxowJ1Ow==}
+  /@vueuse/core/8.1.1_vue@3.2.31:
+    resolution: {integrity: sha512-NmpizOcQXW0OHV0qa6YwFtw5hQBe0RxMuxQoIIbCa6jRT16MTweFPecIM6VgA1e5vZJtAO7p//TgLSpzi3joZQ==}
     peerDependencies:
       '@vue/composition-api': ^1.1.0
       vue: ^2.6.0 || ^3.2.0
@@ -1018,13 +1020,18 @@ packages:
       vue:
         optional: true
     dependencies:
-      '@vueuse/shared': 7.7.1_vue@3.2.31
+      '@vueuse/metadata': 8.1.1
+      '@vueuse/shared': 8.1.1_vue@3.2.31
       vue: 3.2.31
       vue-demi: 0.12.1_vue@3.2.31
     dev: true
 
-  /@vueuse/shared/7.7.1_vue@3.2.31:
-    resolution: {integrity: sha512-rN2qd22AUl7VdBxihagWyhUNHCyVk9IpvBTTfHoLH9G7rGE552X1f+zeCfehuno0zXif13jPw+icW/wn2a0rnQ==}
+  /@vueuse/metadata/8.1.1:
+    resolution: {integrity: sha512-TSmA3UaSmBcV8pJ7fnHAL7NjSE1RQZlpJklg6YysFxwxDb0MZlo+Q8j9U1hLBZT1fnAjwZMaoxilanHN8ZwugQ==}
+    dev: true
+
+  /@vueuse/shared/8.1.1_vue@3.2.31:
+    resolution: {integrity: sha512-lWRcK8W9+q1t1XMxW9JIljXFQLIViInTOEF7wUHcISQNAYwHtHgr0z+U5SRM8tA4eJd/dVs/2BV1/z2DG7aKEg==}
     peerDependencies:
       '@vue/composition-api': ^1.1.0
       vue: ^2.6.0 || ^3.2.0
@@ -2676,18 +2683,17 @@ packages:
     hasBin: true
     dev: true
 
-  /histoire/0.1.1_cd0dd645aa5dde4c3c337175f134c2cd:
-    resolution: {integrity: sha512-BeskOejR5c2XaYLFAU9XETOLsLqRuY7nmSH0iEsuCKiVj8HHezRtp5Y50yVFZ+/T1X6Fqo7dLdD2E5glCi8R5A==}
+  /histoire/0.1.3_cd0dd645aa5dde4c3c337175f134c2cd:
+    resolution: {integrity: sha512-5/92wzzpUpXIiobiMJ0vUpCeMpgHo3YfzObkz7l28HNmHZYQ6cNMnmoX4KG9GIPmYEs25jygKN0N4NYHYZwVyw==}
     hasBin: true
     peerDependencies:
-      '@vue/runtime-core': ^3.2.31
       vite: ^2.8.3
       vue: ^3.2.31
     dependencies:
-      '@histoire/controls': 0.1.1
+      '@histoire/controls': 0.1.3
       '@iconify/vue': 3.1.4_vue@3.2.31
       '@vitejs/plugin-vue': 2.2.4_vite@2.8.6+vue@3.2.31
-      '@vueuse/core': 7.7.1_vue@3.2.31
+      '@vueuse/core': 8.1.1_vue@3.2.31
       case: 1.6.3
       chokidar: 3.5.3
       defu: 5.0.1
@@ -4102,6 +4108,10 @@ packages:
     resolution: {integrity: sha512-J8jTXuZzRlvU7HemDgHi3pGnh/rkoqR/OZSjhTyyZrEkkYQbk7Z33AXp37mkPfPpfdOuj7Ex3H/TJM1z48uPQw==}
     dependencies:
       get-port: 3.2.0
+    dev: true
+
+  /tailwindcss-themeable/1.3.0:
+    resolution: {integrity: sha512-AmZrk3yAZaJqfrbGast24KrFDtD21rwil05xuqNMFPWTswCHyFugetPk9vy1X+KD4ZTAFWZwW2ULov6VUeK/1A==}
     dev: true
 
   /tailwindcss/3.0.23_autoprefixer@10.4.2:

@@ -1,5 +1,5 @@
 <template>
-  <button :class="[`btn-${size}`, `btn-${type}`]">
+  <button :class="[`btn-${size}`, `btn-${type}`]" class="btn">
     <slot />
   </button>
 </template>
@@ -23,8 +23,19 @@ defineProps({
 });
 </script>
 <style>
+.btn {
+  border-radius: 2px;
+  @apply cursor-pointer;
+  @apply border-none;
+}
+
 .btn-secondary {
-  @apply bg-black;
+  @apply bg-themeable-secondary;
   @apply text-white;
+}
+
+.btn-primary {
+  @apply bg-themeable-primary;
+  @apply text-black;
 }
 </style>

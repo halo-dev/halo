@@ -1,22 +1,15 @@
 <template>
   <Story title="Button">
-    <Variant :init-state="initState" title="playground">
-      <template #default="{ state }">
-        <VButton :type="state.type"> Hello world </VButton>
+    <Variant title="Type">
+      <template #default>
+        <div class="themeable-default">
+          <VButton type="primary"> Hello world </VButton>
+          <VButton type="secondary"> Hello world </VButton>
+        </div>
       </template>
-    </Variant>
-
-    <Variant icon="carbon:star-filled" icon-color="#10B981" title="secondary">
-      <VButton type="secondary"> Hello world </VButton>
     </Variant>
   </Story>
 </template>
 <script setup>
 import { VButton } from "./index";
-
-function initState() {
-  return {
-    type: "primary",
-  };
-}
 </script>
