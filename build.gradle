@@ -73,6 +73,7 @@ ext {
     huaweiObsVersion = '3.21.8.1'
     templateInheritanceVersion = "0.4.RELEASE"
     jsoupVersion = '1.14.3'
+    embeddedRedisVersion = '0.6'
     diffUtilsVersion = '4.11'
 }
 
@@ -82,7 +83,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.springframework.boot:spring-boot-starter-freemarker"
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
     implementation "com.sun.mail:jakarta.mail"
     implementation "com.google.guava:guava:$guavaVersion"
@@ -138,6 +140,10 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation "org.jsoup:jsoup:$jsoupVersion"
+
+    testImplementation ("com.github.kstyrc:embedded-redis:$embeddedRedisVersion") {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
 }
