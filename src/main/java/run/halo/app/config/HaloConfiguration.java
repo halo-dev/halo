@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -45,8 +46,12 @@ public class HaloConfiguration {
 
     private final HaloProperties haloProperties;
 
-    public HaloConfiguration(HaloProperties haloProperties) {
+    private final StringRedisTemplate stringRedisTemplate;
+
+    public HaloConfiguration(HaloProperties haloProperties,
+        StringRedisTemplate stringRedisTemplate) {
         this.haloProperties = haloProperties;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Bean
@@ -74,7 +79,7 @@ public class HaloConfiguration {
                 stringCacheStore = new LevelCacheStore(this.haloProperties);
                 break;
             case "redis":
-                stringCacheStore = new RedisCacheStore();
+                stringCacheStore = new RedisCacheStore(stringRedisTemplate);
                 break;
             case "memory":
             default:
@@ -83,6 +88,5 @@ public class HaloConfiguration {
         }
         log.info("Halo cache store load impl : [{}]", stringCacheStore.getClass());
         return stringCacheStore;
-
     }
 }

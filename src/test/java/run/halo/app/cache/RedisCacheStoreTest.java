@@ -1,12 +1,16 @@
 package run.halo.app.cache;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +23,10 @@ import redis.embedded.RedisServer;
  * RedisCacheStoreTest.
  *
  * @author luoxx
+ * @author guqing
  * @date 3/16/22
  */
+@Slf4j
 @SpringBootTest
 class RedisCacheStoreTest {
 
@@ -38,6 +44,7 @@ class RedisCacheStoreTest {
             .build();
         redisServer.start();
         cacheStore = new RedisCacheStore(redisTemplate);
+        clearAllCache();
     }
 
 
@@ -59,7 +66,6 @@ class RedisCacheStoreTest {
     void getByNullKeyTest() {
         assertThrows(IllegalArgumentException.class, () -> cacheStore.get(null));
     }
-
 
     @Test
     void getNullTest() {
@@ -115,22 +121,36 @@ class RedisCacheStoreTest {
 
     @Test
     void toMapTest() {
-        InMemoryCacheStore localCacheStore = new InMemoryCacheStore();
-        localCacheStore.clear();
         String key1 = "test_key_1";
         String value1 = "test_value_1";
 
         // Put the cache
-        localCacheStore.put(key1, value1);
-        assertEquals("{test_key_1=test_value_1}", localCacheStore.toMap().toString());
+        cacheStore.put(key1, value1);
+        LinkedHashMap<String, String> map = cacheStore.toMap();
+        assertThat(map).isNotNull();
+        assertThat(map.size()).isEqualTo(1);
+        assertThat(map.get("halo.redis.test_key_1")).isEqualTo("test_value_1");
 
         String key2 = "test_key_2";
         String value2 = "test_value_2";
 
         // Put the cache
-        localCacheStore.put(key2, value2);
-        assertEquals("{test_key_2=test_value_2, test_key_1=test_value_1}",
-            localCacheStore.toMap().toString());
+        cacheStore.put(key2, value2);
+
+        map = cacheStore.toMap();
+        assertThat(map).isNotNull();
+        assertThat(map.size()).isEqualTo(2);
+        assertThat(map.get("halo.redis.test_key_1")).isEqualTo("test_value_1");
+        assertThat(map.get("halo.redis.test_key_1")).isEqualTo("test_value_1");
+    }
+
+    public void clearAllCache() {
+        Set<String> keys = redisTemplate.keys("*");
+        if (keys == null) {
+            return;
+        }
+        log.debug("Clear all cache.");
+        redisTemplate.delete(keys);
     }
 
     @AfterEach

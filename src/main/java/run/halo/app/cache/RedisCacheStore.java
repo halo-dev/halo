@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
@@ -20,19 +19,12 @@ import org.springframework.util.CollectionUtils;
 @Slf4j
 public class RedisCacheStore extends AbstractStringCacheStore {
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
-
     private static final String REDIS_PREFIX = "halo.redis.";
 
-    public RedisCacheStore(){
+    private final StringRedisTemplate redisTemplate;
 
-    }
-
-    public RedisCacheStore(StringRedisTemplate template) {
-        if (null == redisTemplate) {
-            redisTemplate = template;
-        }
+    public RedisCacheStore(StringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
