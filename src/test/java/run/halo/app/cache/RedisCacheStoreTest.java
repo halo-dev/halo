@@ -1,10 +1,12 @@
 package run.halo.app.cache;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -124,7 +126,10 @@ class RedisCacheStoreTest {
 
         // Put the cache
         cacheStore.put(key1, value1);
-        assertEquals("{halo.redis.test_key_1=test_value_1}", cacheStore.toMap().toString());
+        LinkedHashMap<String, String> map = cacheStore.toMap();
+        assertThat(map).isNotNull();
+        assertThat(map.size()).isEqualTo(1);
+        assertThat(map.get("halo.redis.test_key_1")).isEqualTo("test_value_1");
 
         String key2 = "test_key_2";
         String value2 = "test_value_2";
@@ -132,8 +137,11 @@ class RedisCacheStoreTest {
         // Put the cache
         cacheStore.put(key2, value2);
 
-        assertEquals("{halo.redis.test_key_2=test_value_2, halo.redis.test_key_1=test_value_1}",
-            cacheStore.toMap().toString());
+        map = cacheStore.toMap();
+        assertThat(map).isNotNull();
+        assertThat(map.size()).isEqualTo(2);
+        assertThat(map.get("halo.redis.test_key_1")).isEqualTo("test_value_1");
+        assertThat(map.get("halo.redis.test_key_1")).isEqualTo("test_value_1");
     }
 
     public void clearAllCache() {
