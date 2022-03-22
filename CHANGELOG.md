@@ -1,5 +1,88 @@
 # CHANGELOG
 
+# 1.5.0
+
+## Breaking changes
+
+- 评论表单中的邮箱地址不再作为必填项。 halo-dev/halo#1535 @jerry-shao
+- 重构文章表结构。
+    - 提供单独的 `contents` 表存储文章内容，将不再使用 `posts` 表中的 `originalContent` 和 `formatContent` 字段。 halo-dev/halo#1617 @guqing
+    - `formatContent` 已经废弃，将在下一个大版本中移除。后续使用 `content` 字段代替。 halo-dev/halo#1617 @guqing
+    - 提供 `content_patch_logs` 表用于存储变更记录。 halo-dev/halo#1617 @guqing
+- 后台使用 @halo-dev/admin-api 进行接口请求。 halo-dev/halo-admin#378 @ruibaby @guqing
+- 修改后台页面标题后缀，由 `Halo Dashboard` 改为 `Halo`。 halo-dev/halo-admin#426 @ruibaby
+- 默认后台布局改为左侧菜单布局。 halo-dev/halo-admin#441 @ruibaby
+- 重构文章/自定义页面编辑逻辑，改为保存前端渲染内容，放弃后端渲染。 halo-dev/halo-admin#439 halo-dev/halo-admin#440 halo-dev/halo-admin#449 halo-dev/halo#1668 @ruibaby @guqing
+- Content API 的评论列表接口不再返回 `ipAddress` 和 `email` 字段。 halo-dev/halo#1729 @guqing
+
+## Features
+
+- Content API 添加获取所有图库图片分组的接口（PhotoController#listTeams）。 halo-dev/halo#1515 @fuzui
+- Content API 添加根据 `themeId` 获取主题详情和设置的接口。 halo-dev/halo#1660 @guqing
+- 图库支持点赞。 halo-dev/halo#1537 @guqing
+- 文章标签支持设置颜色。 halo-dev/halo#1566 halo-dev/halo-admin#395 @ruibaby @guqing
+- 重构后台文章分类管理，支持排序。 halo-dev/halo#1650 halo-dev/halo#1657 halo-dev/halo-admin#435 @lan-yonghui @ruibaby @guqing
+- 文章设置界面支持重新生成别名。 halo-dev/halo-admin#368 @ruibaby
+- Admin API 提供批量删除图库图片的接口。 halo-dev/halo#1680 @ruibaby
+- Admin API 提供批量更新图库图片的接口。 halo-dev/halo#1679 @ruibaby
+- 后台评论管理提供日志评论管理的界面。 halo-dev/halo-admin#480 @ruibaby
+- 后台菜单分组支持修改分组名。 halo-dev/halo-admin#499 @ruibaby
+- 后台个人资料头像修改支持输入链接。 halo-dev/halo-admin#505 @ruibaby
+- 后台待审核评论弹框点击评论支持进入评论管理。 halo-dev/halo-admin#517 @ruibaby
+- 支持配置 Redis 缓存。 halo-dev/halo#1751 @luoxmc @guqing
+
+## Improvements
+
+- 更新 Logo。 halo-dev/halo-admin#366 @ruibaby
+- 重构附件上传的文件命名逻辑，文件作为第一次上传的时候文件名不添加随机字符串。 halo-dev/halo#1500 @guqing
+- 优化后台编辑文章时的预览体验，预览文章或临时保存内容不会修改已经发布的内容。 halo-dev/halo#1617 halo-dev/halo-admin#439 @guqing @ruibaby
+- 重构后台主题设置界面，提供单独的设置页面，支持展示主题的相关信息。 halo-dev/halo-admin#380 @ruibaby
+- 弱化后台登录页面的动画效果。 halo-dev/halo-admin#369 @ruibaby
+- 优化后台附件管理列表预览图片样式。 halo-dev/halo-admin#374 halo-dev/halo-admin#382 @623337308 @cetr
+- 重构后台附件详情界面，取消原有抽屉的设计，改为弹窗。 halo-dev/halo-admin#375 halo-dev/halo-admin#381 @ruibaby
+- 重构后台文章/自定义页面设置界面，取消原有抽屉的设计，改为弹窗。 halo-dev/halo-admin#376 @ruibaby
+- 重构后台操作日志列表界面，取消原有抽屉的设计，提供单独的页面。 halo-dev/halo-admin#419 @ruibaby
+- 重构后台图片选择弹框组件，支持直接插入到编辑器，支持多选。 halo-dev/halo-admin#420 halo-dev/halo-admin#421 @ruibaby
+- 后台文章设置选择标签列表改为根据名称排序。 halo-dev/halo-admin#429 @ruibaby
+- 优化后台附件管理中批量操作附件的逻辑。 halo-dev/halo-admin#431 @ruibaby
+- 后台使用重构版本的编辑器，编辑区域支持高亮语法，优化数学公式和图表等渲染，优化表格的编辑体验。 halo-dev/halo-admin#447 @ruibaby
+- 优化文章加密和分类加密的逻辑。 halo-dev/halo#1678 @guqing
+- 优化后台登录页面样式。  halo-dev/halo-admin#456 @ruibaby
+- 重构后台文章评论列表弹窗。  halo-dev/halo-admin#463 @ruibaby
+- 重构后台图库管理页面，支持批量操作图片以及批量从附件库添加图片。 halo-dev/halo-admin#468 @ruibaby
+- 重构后台文章管理页面，文章列表将不再展示回收站状态的文章，提供单独的回收站入口。 halo-dev/halo-admin#475 @ruibaby
+- 优化后台文章/自定义页面设置的保存逻辑，提供转为发布/草稿的按钮。保存按钮不再影响到文章状态。 halo-dev/halo-admin#476 @ruibaby
+- 优化后台折叠菜单的体验，解决折叠时 Logo 和 菜单动画不同步的问题。 halo-dev/halo-admin#493 @ruibaby
+- 缓存后台折叠菜单的状态，刷新页面不再会恢复到初始状态。 halo-dev/halo-admin#493 @ruibaby
+- 优化后台判断是否初始化的逻辑，修改为每次页面加载只请求一次，切换路由不再请求。 halo-dev/halo-admin#495 @ruibaby
+- 重构后台主题设置保存预览功能。 halo-dev/halo-admin#502 @ruibaby
+- 重构日志发布功能，使用 Markdown 编辑器替换 textarea，并支持保存前端渲染的 Markdown 结果。 halo-dev/halo#1739 halo-dev/halo-admin#506 @guqing @ruibaby
+
+## Bug Fixes
+
+- 修复修改加密文章或分类时没有清除用户访问权限的问题。 halo-dev/halo#1540 @guqing
+- 修复重置密码没有校验密码长度的问题。 halo-dev/halo#1636 halo-dev/halo-admin#403 @ruibaby @guqing
+- 修复后台文章设置中无法仅选择父级分类的问题。 halo-dev/halo-admin#367 @ruibaby
+- 修复后台菜单管理中移动菜单项到其他分组的时候，导致子菜单丢失的问题。 halo-dev/halo-admin#422 @ruibaby
+- 更新默认主题的 submodule 提交，修复模板中部分因为数字中带逗号导致的渲染异常。 halo-dev/halo#1682 @ruibaby
+- 修复评论默认头像因为修改了默认类型但 options 接口没有返回字段导致评论头像无法显示的问题。 halo-dev/halo#1692 @lan-yonghui
+- 修复使用 leveldb 的情况下，解析错误而没有清空缓存导致无法正常使用系统的问题。 halo-dev/halo#1695 @guqing
+- 修复后台在文章编辑页面切换左侧菜单收缩的时候出现的样式异常。 halo-dev/halo-admin#465 @ruibaby
+- 修复当前版本如果为 `alpha` 版本，安装主题无法通过版本验证的问题。 halo-dev/halo#1705 @JohnNiang
+- 修复评论部分因为没有添加事务，导致批量删除评论等操作时报错的问题。 halo-dev/halo#1716 @guqing
+- 修复后台点击后台 Halo Logo 进入开发者选项过快可能会导致计数为负的问题。 halo-dev/halo-admin#492 @ruibaby
+- 修复后台附件列表分页之后，可能会导致无法正常更新图片 dom 导致图片显示为上一页图片的问题。 halo-dev/halo-admin#496 @ruibaby
+- 修复后台分类/标签/友情链接修改表单切换修改对象之后没有清除表单验证的问题。 halo-dev/halo-admin#501 halo-dev/halo-admin#503 @Yorksh1re
+- 修复当前版本如果为 `alpha` 版本，安装主题无法通过版本验证的问题。 halo-dev/halo#1747 @JohnNiang
+
+## Dependencies
+
+- 升级 Spring Boot 版本。 halo-dev/halo#1635 halo-dev/halo#1677 @ruibaby @JohnNiang
+- 升级 Gradle 版本到 7.4。 halo-dev/halo#1697 @guqing
+- `halo-dev/halo-admin` 常规依赖升级。 halo-dev/halo-admin#453 halo-dev/halo-admin#513 @ruibaby
+- `halo-dev/halo-admin` 修改用于切换后台样式的 less 依赖 CDN 为 unpkg。
+- 后台更新 @halo-dev/editor 版本。 halo-dev/halo-admin#507 @ruibaby
+
 # 1.5.0-beta.1
 
 ## Features
