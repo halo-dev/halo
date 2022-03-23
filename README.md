@@ -29,7 +29,7 @@
 下载最新的 Halo 运行包：
 
 ```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v1.4.17/halo-1.4.17.jar --output halo.jar
+curl -L https://github.com/halo-dev/halo/releases/download/v1.5.0/halo-1.5.0.jar --output halo.jar
 ```
 
 其他地址：<https://docs.halo.run/getting-started/downloads>
@@ -41,7 +41,7 @@ java -jar halo.jar
 ### Docker
 
 ```bash
-docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=always halohub/halo
+docker run -it -d --name halo -p 8090:8090 -v ~/.halo:/root/.halo --restart=always halohub/halo:1.5.0
 ```
 
 详细部署文档请查阅：<https://docs.halo.run/getting-started/install/linux>
