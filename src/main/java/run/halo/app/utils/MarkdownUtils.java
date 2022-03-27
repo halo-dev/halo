@@ -16,6 +16,7 @@ import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.ext.yaml.front.matter.AbstractYamlFrontMatterVisitor;
 import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
+import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterNode;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
@@ -28,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.utils.footnotes.FootnoteExtension;
 
@@ -139,10 +141,22 @@ public class MarkdownUtils {
         if (!markdown.startsWith("---\n")) {
             markdown = "---\n" + markdown;
         }
-        AbstractYamlFrontMatterVisitor visitor = new AbstractYamlFrontMatterVisitor();
+        HaloYamlFrontMatterVisitor visitor = new HaloYamlFrontMatterVisitor();
         Node document = PARSER.parse(markdown);
         visitor.visit(document);
         return visitor.getData();
+    }
+
+    static class HaloYamlFrontMatterVisitor extends AbstractYamlFrontMatterVisitor {
+        @Override
+        public void visit(YamlFrontMatterNode node) {
+            List<String> nodeValues = node.getValues();
+            if (CollectionUtils.isEmpty(nodeValues)) {
+                super.getData().put(node.getKey(), nodeValues);
+            }
+            String value = nodeValues.get(0);
+            super.getData().put(node.getKey(), Arrays.asList(value.split(" \\| ")));
+        }
     }
 
     /**

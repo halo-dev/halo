@@ -95,4 +95,16 @@ class MarkdownUtilsTest {
         frontMatter = MarkdownUtils.getFrontMatter(markdown);
         assertEquals("\"test remove\"", frontMatter.get("title").get(0));
     }
+
+    @Test
+    void getMultiLabelFrontMatter() {
+        String markdown = "---\n"
+            + "title: test MultiLabel\n"
+            + "tags: JavaScript | Java\n"
+            + "---";
+        Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        assertEquals("test MultiLabel", frontMatter.get("title").get(0));
+        assertEquals("JavaScript", frontMatter.get("tags").get(0));
+        assertEquals("Java", frontMatter.get("tags").get(1));
+    }
 }
