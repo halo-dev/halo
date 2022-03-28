@@ -1,16 +1,22 @@
 package run.halo.app.listener.post;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.event.category.CategoryUpdatedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
+import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
+import run.halo.app.utils.ServiceUtils;
 
 /**
  * Post status management.
@@ -47,13 +53,24 @@ public class PostRefreshStatusListener {
         }
         boolean isPrivate = categoryService.isPrivate(category.getId());
 
-        List<Post> posts = postCategoryService.listPostBy(category.getId());
+        List<Post> posts = findPostsByCategoryIdRecursively(category.getId());
         if (isPrivate) {
             posts.forEach(post -> post.setStatus(PostStatus.INTIMATE));
         } else {
             posts.forEach(post -> post.setStatus(PostStatus.DRAFT));
         }
         postService.updateInBatch(posts);
+    }
+
+    @NonNull
+    private List<Post> findPostsByCategoryIdRecursively(Integer categoryId) {
+        Set<Integer> categoryIds =
+            ServiceUtils.fetchProperty(categoryService.listAllByParentId(categoryId),
+                Category::getId);
+        List<PostCategory> postCategories =
+            postCategoryService.listByCategoryIdList(new ArrayList<>(categoryIds));
+        Set<Integer> postIds = ServiceUtils.fetchProperty(postCategories, PostCategory::getPostId);
+        return postService.listAllByIds(postIds);
     }
 
     /**
@@ -71,7 +88,7 @@ public class PostRefreshStatusListener {
             .stream()
             .anyMatch(postCategory -> categoryService.isPrivate(postCategory.getCategoryId()));
 
-        if (isPrivate) {
+        if (isPrivate || StringUtils.isNotBlank(post.getPassword())) {
             post.setStatus(PostStatus.INTIMATE);
             postService.update(post);
         }
