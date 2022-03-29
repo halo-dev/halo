@@ -364,10 +364,11 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
             .map(categoryToUpdate -> {
                 // 将持久化状态的对象转非session管理对象否则数据会被更新
                 Category categoryBefore = BeanUtils.transformFrom(categoryToUpdate, Category.class);
-
+                System.out.println("before: " + categoryBefore);
                 Category categoryParam = idCategoryParamMap.get(categoryToUpdate.getId());
                 BeanUtils.updateProperties(categoryParam, categoryToUpdate);
                 Category categoryUpdated = update(categoryToUpdate);
+                System.out.println("after: " + categoryUpdated);
                 applicationContext.publishEvent(
                     new CategoryUpdatedEvent(this, categoryUpdated, categoryBefore));
                 return categoryUpdated;

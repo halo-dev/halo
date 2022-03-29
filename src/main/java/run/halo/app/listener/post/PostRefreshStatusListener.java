@@ -61,8 +61,7 @@ public class PostRefreshStatusListener {
         if (isPrivate) {
             posts.forEach(post -> post.setStatus(PostStatus.INTIMATE));
         } else {
-            if (RecordState.UPDATED.equals(recordState)
-                && passwordFromNonEmptyToEmpty(beforeUpdated, category)) {
+            if (RecordState.UPDATED.equals(recordState)) {
                 Set<Integer> encryptedCategories =
                     pickUpEncryptedFromUpdatedRecord(category.getId());
                 for (Post post : posts) {
@@ -123,14 +122,6 @@ public class PostRefreshStatusListener {
         return findFirstEncryptedCategoryBy(idToCategoryMap, category.getParentId());
     }
 
-    private boolean passwordFromNonEmptyToEmpty(Category before, Category updated) {
-        if (before == null || updated == null) {
-            return false;
-        }
-        return StringUtils.isNotBlank(before.getPassword())
-            && StringUtils.isBlank(updated.getPassword());
-    }
-
     private RecordState determineRecordState(Category before, Category updated) {
         if (before == null) {
             if (updated != null) {
@@ -183,15 +174,23 @@ public class PostRefreshStatusListener {
         if (!postService.existsById(post.getId())) {
             return;
         }
+
+        PostStatus status = post.getStatus();
         boolean isPrivate = postCategoryService.listByPostId(post.getId())
             .stream()
             .anyMatch(postCategory -> categoryService.isPrivate(postCategory.getCategoryId()));
-
-        if (isPrivate || StringUtils.isNotBlank(post.getPassword())) {
-            post.setStatus(PostStatus.INTIMATE);
-        } else {
-            post.setStatus(PostStatus.PUBLISHED);
+        if (post.getStatus() != PostStatus.DRAFT) {
+            if (StringUtils.isNotEmpty(post.getPassword())) {
+                status = PostStatus.INTIMATE;
+            } else if (isPrivate) {
+                status = PostStatus.INTIMATE;
+            } else {
+                status = PostStatus.PUBLISHED;
+            }
+        } else if (!isPrivate && StringUtils.isBlank(post.getPassword())) {
+            status = PostStatus.DRAFT;
         }
+        post.setStatus(status);
         postService.update(post);
     }
 }

@@ -583,12 +583,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private PostDetailVO createOrUpdate(@NonNull Post post, Set<Integer> tagIds,
         Set<Integer> categoryIds, Set<PostMeta> metas) {
         Assert.notNull(post, "Post param must not be null");
-        // if password is not empty
-        if (post.getStatus() != PostStatus.DRAFT
-            && (StringUtils.isNotEmpty(post.getPassword()))
-        ) {
-            post.setStatus(PostStatus.INTIMATE);
-        }
 
         post = super.createOrUpdateBy(post);
 
