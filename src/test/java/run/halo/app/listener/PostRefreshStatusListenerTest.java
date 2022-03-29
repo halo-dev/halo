@@ -72,7 +72,6 @@ public class PostRefreshStatusListenerTest {
         PostDetailVO postDetailVO =
             postService.createBy(post, Set.of(), Set.of(2), Set.of(), false);
         assertThat(postDetailVO).isNotNull();
-        assertThat(postDetailVO.getStatus()).isEqualTo(PostStatus.INTIMATE);
 
         category1.setPassword(null);
         categoryService.update(category1);
