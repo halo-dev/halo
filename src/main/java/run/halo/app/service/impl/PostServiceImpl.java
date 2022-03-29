@@ -584,13 +584,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         Set<Integer> categoryIds, Set<PostMeta> metas) {
         Assert.notNull(post, "Post param must not be null");
 
-        // if password is not empty
-        if (post.getStatus() != PostStatus.DRAFT
-            && (StringUtils.isNotEmpty(post.getPassword()))
-        ) {
-            post.setStatus(PostStatus.INTIMATE);
-        }
-
         post = super.createOrUpdateBy(post);
 
         postTagService.removeByPostId(post.getId());
