@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.utils.JsonUtils;
 
@@ -20,7 +21,9 @@ import run.halo.app.utils.JsonUtils;
 public abstract class AbstractStringCacheStore extends AbstractCacheStore<String, String> {
 
     protected Optional<CacheWrapper<String>> jsonToCacheWrapper(String json) {
-        Assert.hasText(json, "json value must not be null");
+        if (!StringUtils.hasText(json)) {
+            return Optional.empty();
+        }
         CacheWrapper<String> cacheWrapper = null;
         try {
             cacheWrapper = JsonUtils.jsonToObject(json, new TypeReference<>() {});
