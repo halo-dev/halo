@@ -71,7 +71,9 @@ public class PostRefreshStatusListener {
                 Set<Integer> encryptedCategories =
                     pickUpEncryptedFromUpdatedRecord(category.getId());
                 for (Post post : posts) {
-                    if (!isEncryptedPost(post.getId(), encryptedCategories)
+                    boolean belongsToEncryptedCategory =
+                        postBelongsToEncryptedCategory(post.getId(), encryptedCategories);
+                    if (!belongsToEncryptedCategory && StringUtils.isBlank(post.getPassword())
                         && beforeIsPrivate
                         && post.getStatus() == PostStatus.INTIMATE) {
                         post.setStatus(PostStatus.PUBLISHED);
@@ -82,7 +84,8 @@ public class PostRefreshStatusListener {
         postService.updateInBatch(posts);
     }
 
-    private boolean isEncryptedPost(Integer postId, Set<Integer> encryptedCategories) {
+    private boolean postBelongsToEncryptedCategory(Integer postId,
+        Set<Integer> encryptedCategories) {
         Set<Integer> categoryIds =
             postCategoryService.listCategoryIdsByPostId(postId);
 
