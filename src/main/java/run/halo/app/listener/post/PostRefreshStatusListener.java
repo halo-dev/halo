@@ -51,22 +51,30 @@ public class PostRefreshStatusListener {
     public void categoryUpdatedListener(CategoryUpdatedEvent event) {
         Category category = event.getCategory();
         Category beforeUpdated = event.getBeforeUpdated();
+        boolean beforeIsPrivate = event.isBeforeIsPrivate();
         RecordState recordState = determineRecordState(beforeUpdated, category);
         if (RecordState.DELETED.equals(recordState) || category == null) {
             return;
         }
 
+        // now
         boolean isPrivate = categoryService.isPrivate(category.getId());
         List<Post> posts = findPostsByCategoryIdRecursively(category.getId());
         if (isPrivate) {
-            posts.forEach(post -> post.setStatus(PostStatus.INTIMATE));
+            posts.forEach(post -> {
+                if (post.getStatus() == PostStatus.PUBLISHED) {
+                    post.setStatus(PostStatus.INTIMATE);
+                }
+            });
         } else {
             if (RecordState.UPDATED.equals(recordState)) {
                 Set<Integer> encryptedCategories =
                     pickUpEncryptedFromUpdatedRecord(category.getId());
                 for (Post post : posts) {
-                    if (!isEncryptedPost(post.getId(), encryptedCategories)) {
-                        post.setStatus(PostStatus.DRAFT);
+                    if (!isEncryptedPost(post.getId(), encryptedCategories)
+                        && beforeIsPrivate
+                        && post.getStatus() == PostStatus.INTIMATE) {
+                        post.setStatus(PostStatus.PUBLISHED);
                     }
                 }
             }

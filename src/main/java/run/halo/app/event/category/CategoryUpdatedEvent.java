@@ -14,11 +14,14 @@ public class CategoryUpdatedEvent extends ApplicationEvent {
 
     private final Category beforeUpdated;
     private final Category category;
+    private final boolean beforeIsPrivate;
 
-    public CategoryUpdatedEvent(Object source, Category category, Category beforeUpdated) {
+    public CategoryUpdatedEvent(Object source, Category category,
+        Category beforeUpdated, boolean beforeIsPrivate) {
         super(source);
         this.category = category;
         this.beforeUpdated = beforeUpdated;
+        this.beforeIsPrivate = beforeIsPrivate;
     }
 
     @Nullable
@@ -29,5 +32,9 @@ public class CategoryUpdatedEvent extends ApplicationEvent {
     @Nullable
     public Category getBeforeUpdated() {
         return beforeUpdated;
+    }
+
+    public boolean isBeforeIsPrivate() {
+        return beforeIsPrivate;
     }
 }
