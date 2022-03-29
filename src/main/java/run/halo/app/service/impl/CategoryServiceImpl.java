@@ -105,8 +105,12 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     @Override
     public Category update(Category category) {
+        Category persisted = getById(category.getId());
+        Category beforeUpdated = new Category();
+        BeanUtils.updateProperties(persisted, beforeUpdated);
+
         Category updated = super.update(category);
-        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
+        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category, beforeUpdated));
         return updated;
     }
 
@@ -192,7 +196,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         // Remove post categories
         postCategoryService.removeByCategoryId(categoryId);
 
-        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
+        applicationContext.publishEvent(new CategoryUpdatedEvent(this, null, category));
     }
 
     @Override
@@ -358,10 +362,14 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         return categoryRepository.findAllById(categoryIds)
             .stream()
             .map(categoryToUpdate -> {
+                // 将持久化状态的对象转非session管理对象否则数据会被更新
+                Category categoryBefore = BeanUtils.transformFrom(categoryToUpdate, Category.class);
+
                 Category categoryParam = idCategoryParamMap.get(categoryToUpdate.getId());
                 BeanUtils.updateProperties(categoryParam, categoryToUpdate);
                 Category categoryUpdated = update(categoryToUpdate);
-                applicationContext.publishEvent(new CategoryUpdatedEvent(this, categoryUpdated));
+                applicationContext.publishEvent(
+                    new CategoryUpdatedEvent(this, categoryUpdated, categoryBefore));
                 return categoryUpdated;
             })
             .collect(Collectors.toList());

@@ -1,7 +1,9 @@
 package run.halo.app.listener.post;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
@@ -48,18 +50,115 @@ public class PostRefreshStatusListener {
     @EventListener(CategoryUpdatedEvent.class)
     public void categoryUpdatedListener(CategoryUpdatedEvent event) {
         Category category = event.getCategory();
-        if (!categoryService.existsById(category.getId())) {
+        Category beforeUpdated = event.getBeforeUpdated();
+        RecordState recordState = determineRecordState(beforeUpdated, category);
+        if (RecordState.DELETED.equals(recordState) || category == null) {
             return;
         }
-        boolean isPrivate = categoryService.isPrivate(category.getId());
 
+        boolean isPrivate = categoryService.isPrivate(category.getId());
         List<Post> posts = findPostsByCategoryIdRecursively(category.getId());
         if (isPrivate) {
             posts.forEach(post -> post.setStatus(PostStatus.INTIMATE));
         } else {
-            posts.forEach(post -> post.setStatus(PostStatus.DRAFT));
+            if (RecordState.UPDATED.equals(recordState)
+                && passwordFromNonEmptyToEmpty(beforeUpdated, category)) {
+                Set<Integer> encryptedCategories =
+                    pickUpEncryptedFromUpdatedRecord(category.getId());
+                for (Post post : posts) {
+                    if (!isEncryptedPost(post.getId(), encryptedCategories)) {
+                        post.setStatus(PostStatus.DRAFT);
+                    }
+                }
+            }
         }
         postService.updateInBatch(posts);
+    }
+
+    private boolean isEncryptedPost(Integer postId, Set<Integer> encryptedCategories) {
+        Set<Integer> categoryIds =
+            postCategoryService.listCategoryIdsByPostId(postId);
+
+        boolean encrypted = false;
+        for (Integer categoryId : categoryIds) {
+            if (encryptedCategories.contains(categoryId)) {
+                encrypted = true;
+                break;
+            }
+        }
+        return encrypted;
+    }
+
+    private Set<Integer> pickUpEncryptedFromUpdatedRecord(Integer categoryId) {
+        Set<Integer> privateCategories = new HashSet<>();
+
+        List<Category> categories = categoryService.listAllByParentId(categoryId);
+        Map<Integer, Category> categoryMap =
+            ServiceUtils.convertToMap(categories, Category::getId);
+        categories.forEach(category -> {
+            boolean privateBy = isPrivateBy(category.getId(), categoryMap);
+            if (privateBy) {
+                privateCategories.add(category.getId());
+            }
+        });
+        return privateCategories;
+    }
+
+    private boolean isPrivateBy(Integer categoryId, Map<Integer, Category> categoryMap) {
+        return findFirstEncryptedCategoryBy(categoryMap, categoryId) != null;
+    }
+
+    private Category findFirstEncryptedCategoryBy(Map<Integer, Category> idToCategoryMap,
+        Integer categoryId) {
+        Category category = idToCategoryMap.get(categoryId);
+
+        if (categoryId == 0 || category == null) {
+            return null;
+        }
+
+        if (StringUtils.isNotBlank(category.getPassword())) {
+            return category;
+        }
+
+        return findFirstEncryptedCategoryBy(idToCategoryMap, category.getParentId());
+    }
+
+    private boolean passwordFromNonEmptyToEmpty(Category before, Category updated) {
+        if (before == null || updated == null) {
+            return false;
+        }
+        return StringUtils.isNotBlank(before.getPassword())
+            && StringUtils.isBlank(updated.getPassword());
+    }
+
+    private RecordState determineRecordState(Category before, Category updated) {
+        if (before == null) {
+            if (updated != null) {
+                // created: null -> record
+                return RecordState.CREATED;
+            } else {
+                // unchanged: null -> null
+                return RecordState.UNCHANGED;
+            }
+        } else {
+            if (updated == null) {
+                // deleted: record -> null
+                return RecordState.DELETED;
+            } else {
+                // updated: record -> record
+                return RecordState.UPDATED;
+            }
+        }
+    }
+
+    /**
+     * effective state for database record.
+     */
+    enum RecordState {
+        CREATED,
+        UPDATED,
+        DELETED,
+        UNCHANGED
     }
 
     @NonNull
@@ -90,7 +189,9 @@ public class PostRefreshStatusListener {
 
         if (isPrivate || StringUtils.isNotBlank(post.getPassword())) {
             post.setStatus(PostStatus.INTIMATE);
-            postService.update(post);
+        } else {
+            post.setStatus(PostStatus.PUBLISHED);
         }
+        postService.update(post);
     }
 }
