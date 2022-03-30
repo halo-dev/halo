@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        maven { url 'https://plugins.gradle.org/m2/' }
         maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
         maven { url 'https://maven.aliyun.com/repository/spring-plugin' }
         maven { url 'https://repo.spring.io/milestone' }
