@@ -42,7 +42,7 @@ public class GitThemeUpdater implements ThemeUpdater {
         // get theme property
         final var oldThemeProperty = themeRepository.fetchThemePropertyByThemeId(themeId)
             .orElseThrow(
-                () -> new NotFoundException("主题 " + themeId + " 不存在或以删除！").setErrorData(themeId));
+                () -> new NotFoundException("主题 " + themeId + " 不存在或已删除！").setErrorData(themeId));
 
         // get update config
         final var gitRepo = oldThemeProperty.getRepo();

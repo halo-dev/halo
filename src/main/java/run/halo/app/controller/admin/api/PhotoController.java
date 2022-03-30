@@ -4,12 +4,15 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.cache.lock.CacheLock;
+import run.halo.app.cache.lock.CacheParam;
 import run.halo.app.model.dto.PhotoDTO;
 import run.halo.app.model.entity.Photo;
 import run.halo.app.model.params.PhotoParam;
@@ -30,6 +35,7 @@ import run.halo.app.service.PhotoService;
  * @author ryanwang
  * @date 2019-03-21
  */
+@Validated
 @RestController
 @RequestMapping("/api/admin/photos")
 public class PhotoController {
@@ -67,10 +73,30 @@ public class PhotoController {
         photoService.removeById(photoId);
     }
 
+    @DeleteMapping("/batch")
+    @ApiOperation("Deletes photos permanently in batch by id array")
+    public List<PhotoDTO> deletePermanentlyInBatch(@RequestBody List<Integer> ids) {
+        return ids.stream().map(photoService::removeById)
+            .map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo))
+            .collect(Collectors.toList());
+    }
+
     @PostMapping
     @ApiOperation("Creates a photo")
     public PhotoDTO createBy(@Valid @RequestBody PhotoParam photoParam) {
         return new PhotoDTO().convertFrom(photoService.createBy(photoParam));
+    }
+
+    @PostMapping("/batch")
+    @ApiOperation("Batch creation photos")
+    public List<PhotoDTO> createBatchBy(@RequestBody List<@Valid PhotoParam> photoParams) {
+        return photoParams.stream()
+            .map(photoParam -> {
+                PhotoDTO photoDto = new PhotoDTO();
+                photoDto.convertFrom(photoService.createBy(photoParam));
+                return photoDto;
+            })
+            .collect(Collectors.toList());
     }
 
     @PutMapping("{photoId:\\d+}")
@@ -85,6 +111,29 @@ public class PhotoController {
 
         // Update menu in database
         return new PhotoDTO().convertFrom(photoService.update(photo));
+    }
+
+    @PutMapping("/batch")
+    @ApiOperation("Updates photo in batch")
+    public List<PhotoDTO> updateBatchBy(@RequestBody List<@Valid PhotoParam> photoParams) {
+        List<Photo> photosToUpdate = photoParams.stream()
+            .filter(photoParam -> Objects.nonNull(photoParam.getId()))
+            .map(photoParam -> {
+                Photo photoToUpdate = photoService.getById(photoParam.getId());
+                photoParam.update(photoToUpdate);
+                return photoToUpdate;
+            })
+            .collect(Collectors.toList());
+        return photoService.updateInBatch(photosToUpdate).stream()
+            .map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo))
+            .collect(Collectors.toList());
+    }
+
+    @PutMapping("{photoId:\\d+}/likes")
+    @ApiOperation("Likes a photo")
+    @CacheLock(autoDelete = false, traceRequest = true)
+    public void likes(@PathVariable @CacheParam Integer photoId) {
+        photoService.increaseLike(photoId);
     }
 
     @GetMapping("teams")

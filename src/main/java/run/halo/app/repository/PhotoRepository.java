@@ -3,6 +3,7 @@ package run.halo.app.repository;
 import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import run.halo.app.model.entity.Photo;
 import run.halo.app.repository.base.BaseRepository;
@@ -12,6 +13,7 @@ import run.halo.app.repository.base.BaseRepository;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-03
  */
 public interface PhotoRepository
@@ -33,4 +35,15 @@ public interface PhotoRepository
      */
     @Query(value = "select distinct p.team from Photo p")
     List<String> findAllTeams();
+
+    /**
+     * Updates photo likes.
+     *
+     * @param likes likes delta
+     * @param photoId photo id must not be null
+     * @return updated rows
+     */
+    @Modifying
+    @Query("update Photo p set p.likes = p.likes + :likes where p.id = :photoId")
+    int updateLikes(long likes, Integer photoId);
 }

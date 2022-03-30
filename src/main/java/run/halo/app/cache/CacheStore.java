@@ -1,5 +1,6 @@
 package run.halo.app.cache;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.springframework.lang.NonNull;
@@ -61,4 +62,9 @@ public interface CacheStore<K, V> {
      */
     void delete(@NonNull K key);
 
+    /**
+     * Returns a view of the entries stored in this cache as a none thread-safe map.
+     * Modifications made to the map do not directly affect the cache.
+     */
+    LinkedHashMap<K, V> toMap();
 }

@@ -41,4 +41,13 @@ public interface AttachmentRepository
      * @return count of the given path
      */
     long countByPath(@NonNull String path);
+
+    /**
+     * Counts by attachment file key and type.
+     *
+     * @param fileKey attachment file key must not be blank
+     * @param type attachment type must not be null
+     * @return count of the given path and type
+     */
+    long countByFileKeyAndType(@NonNull String fileKey, @NonNull AttachmentType type);
 }

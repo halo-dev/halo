@@ -71,7 +71,7 @@ public class MarkdownUtils {
     private static final Parser PARSER = Parser.builder(OPTIONS).build();
 
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
-    private static final Pattern FRONT_MATTER = Pattern.compile("^---[\\s\\S]*?---");
+    private static final Pattern FRONT_MATTER = Pattern.compile("^(---)?[\\s\\S]*?---");
 
     //    /**
     //     * Render html document to markdown document.
@@ -136,6 +136,9 @@ public class MarkdownUtils {
                 return row;
             }
         }).collect(Collectors.joining("\n"));
+        if (!markdown.startsWith("---\n")) {
+            markdown = "---\n" + markdown;
+        }
         AbstractYamlFrontMatterVisitor visitor = new AbstractYamlFrontMatterVisitor();
         Node document = PARSER.parse(markdown);
         visitor.visit(document);

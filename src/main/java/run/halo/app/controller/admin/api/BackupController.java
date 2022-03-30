@@ -6,8 +6,12 @@ import static run.halo.app.service.BackupService.BackupType.WHOLE_SITE;
 
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -81,8 +85,19 @@ public class BackupController {
     @PostMapping("work-dir")
     @ApiOperation("Backups work directory")
     @DisableOnCondition
-    public BackupDTO backupHalo() {
-        return backupService.backupWorkDirectory();
+    public BackupDTO backupHalo(@RequestBody List<String> options) {
+        return backupService.backupWorkDirectory(options);
+    }
+
+    @GetMapping("work-dir/options")
+    @ApiOperation("Gets items that can be backed up")
+    public List<String> listBackupItems() throws IOException {
+        return Files.list(Paths.get(haloProperties.getWorkDir()))
+            .map(Path::getFileName)
+            .filter(Objects::nonNull)
+            .map(Path::toString)
+            .sorted()
+            .collect(Collectors.toList());
     }
 
     @GetMapping("work-dir")

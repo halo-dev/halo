@@ -2,10 +2,15 @@ package run.halo.app.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static run.halo.app.utils.Version.PreRelease.ALPHA;
+import static run.halo.app.utils.Version.PreRelease.BETA;
+import static run.halo.app.utils.Version.PreRelease.RC;
 
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.Data;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.lang.NonNull;
@@ -118,13 +123,13 @@ class VersionTest {
         String version = major + "." + minor + "." + patch + "-alpha." + preReleaseMajor;
         Optional<Version> versionOpt = Version.resolve(version);
         assertTrue(versionOpt.isPresent());
-        assertEquals(new Version(major, minor, patch, Version.PreRelease.ALPHA, preReleaseMajor),
+        assertEquals(new Version(major, minor, patch, ALPHA, preReleaseMajor),
             versionOpt.get());
 
         version = major + "." + minor + "." + patch + "-beta." + preReleaseMajor;
         versionOpt = Version.resolve(version);
         assertTrue(versionOpt.isPresent());
-        assertEquals(new Version(major, minor, patch, Version.PreRelease.BETA, preReleaseMajor),
+        assertEquals(new Version(major, minor, patch, BETA, preReleaseMajor),
             versionOpt.get());
 
         version = major + "." + minor + "." + patch + "-rc." + preReleaseMajor;
@@ -141,44 +146,72 @@ class VersionTest {
             unknownVersionOpt.get());
     }
 
-    @Test
-    void compareTest() {
-        final Version leftVersion = getVersion("1.2.3");
-        // compare with own
-        assertEquals(0, leftVersion.compareTo(leftVersion));
-
-        // compare with others
-        Version rightVersion = getVersion("1.2.4");
-        assertTrue(leftVersion.compareTo(rightVersion) < 0);
-
-        rightVersion = getVersion("1.3.3");
-        assertTrue(leftVersion.compareTo(rightVersion) < 0);
-
-        rightVersion = getVersion("2.2.3");
-        assertTrue(leftVersion.compareTo(rightVersion) < 0);
-
-        rightVersion = getVersion("0.2.3");
-        assertTrue(leftVersion.compareTo(rightVersion) > 0);
-
-        rightVersion = getVersion("1.1.3");
-        assertTrue(leftVersion.compareTo(rightVersion) > 0);
-
-        rightVersion = getVersion("1.2.2");
-        assertTrue(leftVersion.compareTo(rightVersion) > 0);
-
-        rightVersion = getVersion("1.2.3-alpha.0");
-        assertTrue(leftVersion.compareTo(rightVersion) > 0);
-
-        rightVersion = getVersion("1.2.4-alpha.0");
-        assertTrue(leftVersion.compareTo(rightVersion) < 0);
-
-        // compare with unknown version
-        assertTrue(leftVersion.compareTo(getVersion(HaloConst.UNKNOWN_VERSION)) < 0);
-    }
-
     @NonNull
     Version getVersion(String version) {
         return Version.resolve(version)
             .orElseThrow(() -> new IllegalArgumentException("Invalid version"));
+    }
+
+    @Test
+    void compatibleTest() {
+        @Data
+        class Table {
+            final String current;
+            final String required;
+            final boolean wantCompatible;
+        }
+
+        for (Table tt : new Table[] {
+            // compatible
+            new Table("1.5.0", "1.5.0", true),
+            new Table("1.5.0", "1.4.0", true),
+            new Table("1.5.0", "0.5.0", true),
+            new Table("1.5.0-alpha.1", "1.5.0", true),
+            new Table("1.5.0-beta.1", "1.5.0", true),
+            new Table("1.5.0-rc.1", "1.5.0", true),
+            new Table("1.5.0-alpha.2", "1.5.0-alpha.1", true),
+            new Table("1.5.0-beta.1", "1.5.0-alpha.2", true),
+            new Table("1.5.0-rc.1", "1.5.0-beta.2", true),
+            new Table("1.5.0", "1.5.0-alpha.1", true),
+            new Table("1.5.0", "1.5.0-beta.1", true),
+            new Table("1.5.0", "1.5.0-rc.1", true),
+            new Table("1.5.0", "1.5.0-rc.1", true),
+            new Table("1.5.0", "", true),
+            new Table("1.5.0", null, true),
+            new Table(HaloConst.UNKNOWN_VERSION, "1.5.0", true),
+
+            // incompatible
+            new Table("1.5.0", "1.5.1", false),
+            new Table("1.5.0", "1.6.0", false),
+            new Table("1.5.0", "2.5.0", false),
+            new Table("1.5.0-alpha.1", "1.5.0-alpha.2", false),
+            new Table("1.5.0-alpha.2", "1.5.0-beta.1", false),
+            new Table("1.5.0-beta.2", "1.5.0-rc.1", false),
+        }) {
+            Version current = Version.resolve(tt.current).orElse(null);
+            assertNotNull(current);
+            boolean compatible = current.compatible(tt.required);
+            assertEquals(tt.wantCompatible, compatible,
+                () -> String.format("Want: %s, but got compatible: %s", tt, compatible));
+        }
+    }
+
+    @Test
+    void isPreRelease() {
+        assertFalse(new Version(0, 0, 0, null, 0L).isPreRelease());
+        assertTrue(new Version(0, 0, 0, ALPHA, 0L).isPreRelease());
+    }
+
+    @Test
+    void preReleaseTagCompare() {
+        assertTrue(ALPHA.compare(ALPHA, BETA) < 0);
+        assertTrue(ALPHA.compare(ALPHA, RC) < 0);
+        assertTrue(ALPHA.compare(BETA, ALPHA) > 0);
+        assertTrue(ALPHA.compare(BETA, RC) < 0);
+        assertTrue(ALPHA.compare(RC, ALPHA) > 0);
+        assertTrue(ALPHA.compare(RC, BETA) > 0);
+        assertEquals(0, ALPHA.compare(ALPHA, ALPHA));
+        assertEquals(0, ALPHA.compare(BETA, BETA));
+        assertEquals(0, ALPHA.compare(RC, RC));
     }
 }

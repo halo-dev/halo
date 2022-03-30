@@ -2,7 +2,6 @@ package run.halo.app.controller.admin.api;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
-import cn.hutool.core.util.IdUtil;
 import io.swagger.annotations.ApiOperation;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -34,6 +33,8 @@ import run.halo.app.model.vo.SheetDetailVO;
 import run.halo.app.model.vo.SheetListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.SheetService;
+import run.halo.app.service.assembler.SheetAssembler;
+import run.halo.app.utils.HaloUtils;
 
 /**
  * Sheet controller.
@@ -52,19 +53,23 @@ public class SheetController {
 
     private final OptionService optionService;
 
+    private final SheetAssembler sheetAssembler;
+
     public SheetController(SheetService sheetService,
         AbstractStringCacheStore cacheStore,
-        OptionService optionService) {
+        OptionService optionService,
+        SheetAssembler sheetAssembler) {
         this.sheetService = sheetService;
         this.cacheStore = cacheStore;
         this.optionService = optionService;
+        this.sheetAssembler = sheetAssembler;
     }
 
     @GetMapping("{sheetId:\\d+}")
     @ApiOperation("Gets a sheet")
     public SheetDetailVO getBy(@PathVariable("sheetId") Integer sheetId) {
-        Sheet sheet = sheetService.getById(sheetId);
-        return sheetService.convertToDetailVo(sheet);
+        Sheet sheet = sheetService.getWithLatestContentById(sheetId);
+        return sheetAssembler.convertToDetailVo(sheet);
     }
 
     @GetMapping
@@ -72,7 +77,7 @@ public class SheetController {
     public Page<SheetListVO> pageBy(
         @PageableDefault(sort = "createTime", direction = DESC) Pageable pageable) {
         Page<Sheet> sheetPage = sheetService.pageBy(pageable);
-        return sheetService.convertToListVo(sheetPage);
+        return sheetAssembler.convertToListVo(sheetPage);
     }
 
     @GetMapping("independent")
@@ -88,7 +93,7 @@ public class SheetController {
             Boolean autoSave) {
         Sheet sheet =
             sheetService.createBy(sheetParam.convertTo(), sheetParam.getSheetMetas(), autoSave);
-        return sheetService.convertToDetailVo(sheet);
+        return sheetAssembler.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}")
@@ -98,13 +103,13 @@ public class SheetController {
         @RequestBody @Valid SheetParam sheetParam,
         @RequestParam(value = "autoSave", required = false, defaultValue = "false")
             Boolean autoSave) {
-        Sheet sheetToUpdate = sheetService.getById(sheetId);
+        Sheet sheetToUpdate = sheetService.getWithLatestContentById(sheetId);
 
         sheetParam.update(sheetToUpdate);
 
         Sheet sheet = sheetService.updateBy(sheetToUpdate, sheetParam.getSheetMetas(), autoSave);
 
-        return sheetService.convertToDetailVo(sheet);
+        return sheetAssembler.convertToDetailVo(sheet);
     }
 
     @PutMapping("{sheetId:\\d+}/{status}")
@@ -126,17 +131,20 @@ public class SheetController {
     public BasePostDetailDTO updateDraftBy(
         @PathVariable("sheetId") Integer sheetId,
         @RequestBody PostContentParam contentParam) {
-        // Update draft content
-        Sheet sheet = sheetService.updateDraftContent(contentParam.getContent(), sheetId);
+        Sheet sheetToUse = sheetService.getById(sheetId);
+        String formattedContent = contentParam.decideContentBy(sheetToUse.getEditorType());
 
-        return new BasePostDetailDTO().convertFrom(sheet);
+        // Update draft content
+        Sheet sheet = sheetService.updateDraftContent(formattedContent,
+            contentParam.getOriginalContent(), sheetId);
+        return sheetAssembler.convertToDetail(sheet);
     }
 
     @DeleteMapping("{sheetId:\\d+}")
     @ApiOperation("Deletes a sheet")
     public SheetDetailVO deleteBy(@PathVariable("sheetId") Integer sheetId) {
         Sheet sheet = sheetService.removeById(sheetId);
-        return sheetService.convertToDetailVo(sheet);
+        return sheetAssembler.convertToDetailVo(sheet);
     }
 
     @GetMapping("preview/{sheetId:\\d+}")
@@ -147,9 +155,9 @@ public class SheetController {
 
         sheet.setSlug(URLEncoder.encode(sheet.getSlug(), StandardCharsets.UTF_8.name()));
 
-        BasePostMinimalDTO sheetMinimalDTO = sheetService.convertToMinimal(sheet);
+        BasePostMinimalDTO sheetMinimalDTO = sheetAssembler.convertToMinimal(sheet);
 
-        String token = IdUtil.simpleUUID();
+        String token = HaloUtils.simpleUUID();
 
         // cache preview token
         cacheStore.putAny(token, token, 10, TimeUnit.MINUTES);

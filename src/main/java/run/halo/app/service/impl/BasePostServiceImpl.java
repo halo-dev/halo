@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -23,20 +24,20 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
-import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
-import run.halo.app.model.enums.PostEditorType;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.repository.base.BasePostRepository;
+import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.ContentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.service.base.BasePostService;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
-import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 /**
@@ -44,6 +45,7 @@ import run.halo.app.utils.ServiceUtils;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-24
  */
 @Slf4j
@@ -54,15 +56,23 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     private final OptionService optionService;
 
+    private final ContentService contentService;
+
+    private final ContentPatchLogService contentPatchLogService;
+
     private static final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
     private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
-        OptionService optionService) {
+        OptionService optionService,
+        ContentService contentService,
+        ContentPatchLogService contentPatchLogService) {
         super(basePostRepository);
         this.basePostRepository = basePostRepository;
         this.optionService = optionService;
+        this.contentService = contentService;
+        this.contentPatchLogService = contentPatchLogService;
     }
 
     @Override
@@ -109,6 +119,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         Optional<POST> postOptional = basePostRepository.getByIdAndStatus(id, status);
 
         return postOptional.orElseThrow(() -> new NotFoundException("查询不到该文章的信息").setErrorData(id));
+    }
+
+    @Override
+    public PatchedContent getLatestContentById(Integer id) {
+        return contentPatchLogService.getByPostId(id);
     }
 
     @Override
@@ -249,13 +264,13 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseVisit(Integer postId) {
         increaseVisit(1L, postId);
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseLike(long likes, Integer postId) {
         Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
         Assert.notNull(postId, "Post id must not be null");
@@ -270,7 +285,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseLike(Integer postId) {
         increaseLike(1L, postId);
     }
@@ -280,143 +295,56 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
      * @return post with handled data
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
+        PatchedContent postContent = post.getContent();
+        // word count stat
+        post.setWordCount(htmlFormatWordCount(postContent.getContent()));
 
-        String originalContent = post.getOriginalContent();
-
-        // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
-        // Render content and set word count
-        if (post.getEditorType().equals(PostEditorType.MARKDOWN)) {
-            post.setFormatContent(MarkdownUtils.renderHtml(post.getOriginalContent()));
-
-            post.setWordCount(htmlFormatWordCount(post.getFormatContent()));
-        } else {
-            post.setFormatContent(originalContent);
-
-            post.setWordCount(htmlFormatWordCount(originalContent));
-        }
-
+        POST savedPost;
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
             // The sheet will be created
-            return create(post);
+            savedPost = create(post);
+            contentService.createOrUpdateDraftBy(post.getId(),
+                postContent.getContent(), postContent.getOriginalContent());
+        } else {
+            // The sheet will be updated
+            // Set edit time
+            post.setEditTime(DateUtils.now());
+            contentService.createOrUpdateDraftBy(post.getId(),
+                postContent.getContent(), postContent.getOriginalContent());
+            // Update it
+            savedPost = update(post);
         }
 
-        // The sheet will be updated
-        // Set edit time
-        post.setEditTime(DateUtils.now());
-
-        // Update it
-        return update(post);
-    }
-
-    @Override
-    public POST filterIfEncrypt(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        if (StringUtils.isNotBlank(post.getPassword())) {
-            String tip = "The post is encrypted by author";
-            post.setSummary(tip);
-            post.setOriginalContent(tip);
-            post.setFormatContent(tip);
+        if (PostStatus.PUBLISHED.equals(post.getStatus())
+            || PostStatus.INTIMATE.equals(post.getStatus())) {
+            contentService.publishContent(post.getId());
         }
-
-        return post;
+        return savedPost;
     }
 
     @Override
-    public BasePostMinimalDTO convertToMinimal(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        return new BasePostMinimalDTO().convertFrom(post);
-    }
-
-    @Override
-    public List<BasePostMinimalDTO> convertToMinimal(List<POST> posts) {
-        if (CollectionUtils.isEmpty(posts)) {
-            return Collections.emptyList();
-        }
-
-        return posts.stream()
-            .map(this::convertToMinimal)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<BasePostMinimalDTO> convertToMinimal(Page<POST> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(this::convertToMinimal);
-    }
-
-    @Override
-    public BasePostSimpleDTO convertToSimple(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
-
-        // Set summary
-        if (StringUtils.isBlank(basePostSimpleDTO.getSummary())) {
-            basePostSimpleDTO.setSummary(generateSummary(post.getFormatContent()));
-        }
-
-        return basePostSimpleDTO;
-    }
-
-    @Override
-    public List<BasePostSimpleDTO> convertToSimple(List<POST> posts) {
-        if (CollectionUtils.isEmpty(posts)) {
-            return Collections.emptyList();
-        }
-
-        return posts.stream()
-            .map(this::convertToSimple)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<BasePostSimpleDTO> convertToSimple(Page<POST> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(this::convertToSimple);
-    }
-
-    @Override
-    public BasePostDetailDTO convertToDetail(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        return new BasePostDetailDTO().convertFrom(post);
-    }
-
-    @Override
-    @Transactional
-    public POST updateDraftContent(String content, Integer postId) {
+    @Transactional(rollbackFor = Exception.class)
+    public POST updateDraftContent(String content, String originalContent, Integer postId) {
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
 
-        if (content == null) {
-            content = "";
+        if (originalContent == null) {
+            originalContent = "";
         }
+
+        contentService.createOrUpdateDraftBy(postId, content, originalContent);
 
         POST post = getById(postId);
-
-        if (!StringUtils.equals(content, post.getOriginalContent())) {
-            // If content is different with database, then update database
-            int updatedRows = basePostRepository.updateOriginalContent(content, postId);
-            if (updatedRows != 1) {
-                throw new ServiceException(
-                    "Failed to update original content of post with id " + postId);
-            }
-            // Set the content
-            post.setOriginalContent(content);
-        }
+        post.setContent(getLatestContentById(postId));
 
         return post;
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public POST updateStatus(PostStatus status, Integer postId) {
         Assert.notNull(status, "Post status must not be null");
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
@@ -438,22 +366,15 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         // Sync content
         if (PostStatus.PUBLISHED.equals(status)) {
             // If publish this post, then convert the formatted content
-            String formatContent = MarkdownUtils.renderHtml(post.getOriginalContent());
-            int updatedRows = basePostRepository.updateFormatContent(formatContent, postId);
-
-            if (updatedRows != 1) {
-                throw new ServiceException(
-                    "Failed to update post format content of post with id " + postId);
-            }
-
-            post.setFormatContent(formatContent);
+            Content postContent = contentService.publishContent(postId);
+            post.setContent(PatchedContent.of(postContent));
         }
 
         return post;
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<POST> updateStatusByIds(List<Integer> ids, PostStatus status) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
@@ -464,8 +385,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    public String generateDescription(String content) {
-        Assert.notNull(content, "html content must not be null");
+    public String generateDescription(@Nullable String content) {
+        if (StringUtils.isBlank(content)) {
+            return StringUtils.EMPTY;
+        }
 
         String text = HaloUtils.cleanHtmlTag(content);
 
@@ -480,6 +403,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public POST create(POST post) {
         // Check title
         slugMustNotExist(post);
@@ -488,11 +412,18 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public POST update(POST post) {
         // Check title
         slugMustNotExist(post);
 
         return super.update(post);
+    }
+
+    @Override
+    public Content getContentById(Integer postId) {
+        Assert.notNull(postId, "The postId must not be null.");
+        return contentService.getById(postId);
     }
 
     /**
@@ -520,8 +451,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @NonNull
-    protected String generateSummary(@NonNull String htmlContent) {
-        Assert.notNull(htmlContent, "html content must not be null");
+    protected String generateSummary(@Nullable String htmlContent) {
+        if (StringUtils.isBlank(htmlContent)) {
+            return StringUtils.EMPTY;
+        }
 
         String text = HaloUtils.cleanHtmlTag(htmlContent);
 
@@ -533,6 +466,22 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             optionService.getByPropertyOrDefault(PostProperties.SUMMARY_LENGTH, Integer.class, 150);
 
         return StringUtils.substring(text, 0, summaryLength);
+    }
+
+    protected <T extends BasePostSimpleDTO> void generateAndSetSummaryIfAbsent(POST post,
+        T postVo) {
+        Assert.notNull(post, "The post must not be null.");
+        if (StringUtils.isNotBlank(postVo.getSummary())) {
+            return;
+        }
+
+        PatchedContent patchedContent = post.getContentOfNullable();
+        if (patchedContent == null) {
+            Content postContent = getContentById(post.getId());
+            postVo.setSummary(generateSummary(postContent.getContent()));
+        } else {
+            postVo.setSummary(generateSummary(patchedContent.getContent()));
+        }
     }
 
     // CS304 issue link : https://github.com/halo-dev/halo/issues/1224

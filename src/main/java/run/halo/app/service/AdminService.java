@@ -6,6 +6,7 @@ import run.halo.app.model.dto.LoginPreCheckDTO;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.params.LoginParam;
 import run.halo.app.model.params.ResetPasswordParam;
+import run.halo.app.model.params.ResetPasswordSendCodeParam;
 import run.halo.app.security.token.AuthToken;
 
 /**
@@ -54,7 +55,7 @@ public interface AdminService {
      *
      * @param param param must not be null
      */
-    void sendResetPasswordCode(@NonNull ResetPasswordParam param);
+    void sendResetPasswordCode(@NonNull ResetPasswordSendCodeParam param);
 
     /**
      * Reset password by code.

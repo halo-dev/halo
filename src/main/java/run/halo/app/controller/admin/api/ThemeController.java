@@ -3,6 +3,7 @@ package run.halo.app.controller.admin.api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,17 +19,20 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.handler.theme.config.support.Group;
+import run.halo.app.handler.theme.config.support.Item;
 import run.halo.app.handler.theme.config.support.ThemeProperty;
 import run.halo.app.model.params.ThemeContentParam;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.model.support.ThemeFile;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.ThemeSettingService;
+import run.halo.app.utils.ServiceUtils;
 
 /**
  * Theme controller.
  *
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-20
  */
 @RestController
@@ -137,6 +141,19 @@ public class ThemeController {
         return themeService.fetchConfig(themeId);
     }
 
+    @GetMapping("{themeId:.+}/configurations/groups/{group}")
+    @ApiOperation("Fetches theme configuration by theme id and group name")
+    public Set<Item> fetchConfigByGroup(@PathVariable("themeId") String themeId,
+        @PathVariable String group) {
+        return themeService.fetchConfigItemsBy(themeId, group);
+    }
+
+    @GetMapping("{themeId:.+}/configurations/groups")
+    @ApiOperation("Fetches theme configuration group names by theme id")
+    public Set<String> fetchConfigGroups(@PathVariable("themeId") String themeId) {
+        return ServiceUtils.fetchProperty(themeService.fetchConfig(themeId), Group::getName);
+    }
+
     @GetMapping("activation/settings")
     @ApiOperation("Lists activated theme settings")
     public Map<String, Object> listSettingsBy() {
@@ -147,6 +164,13 @@ public class ThemeController {
     @ApiOperation("Lists theme settings by theme id")
     public Map<String, Object> listSettingsBy(@PathVariable("themeId") String themeId) {
         return themeSettingService.listAsMapBy(themeId);
+    }
+
+    @GetMapping("{themeId:.+}/groups/{group}/settings")
+    @ApiOperation("Lists theme settings by theme id and group name")
+    public Map<String, Object> listSettingsBy(@PathVariable("themeId") String themeId,
+        @PathVariable String group) {
+        return themeSettingService.listAsMapBy(themeId, group);
     }
 
     @PostMapping("activation/settings")

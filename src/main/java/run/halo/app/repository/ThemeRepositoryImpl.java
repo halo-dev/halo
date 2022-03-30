@@ -4,7 +4,6 @@ import static run.halo.app.model.properties.PrimaryProperties.THEME;
 import static run.halo.app.model.support.HaloConst.DEFAULT_THEME_ID;
 import static run.halo.app.utils.FileUtils.copyFolder;
 import static run.halo.app.utils.FileUtils.deleteFolderQuietly;
-import static run.halo.app.utils.VersionUtil.compareVersion;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -32,6 +31,7 @@ import run.halo.app.model.entity.Option;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.theme.ThemePropertyScanner;
 import run.halo.app.utils.FileUtils;
+import run.halo.app.utils.Version;
 
 /**
  * Theme repository implementation.
@@ -61,7 +61,9 @@ public class ThemeRepositoryImpl
 
     @Override
     public String getActivatedThemeId() {
-        return getActivatedThemeProperty().getId();
+        return this.optionRepository.findByKey(THEME.getValue())
+            .map(Option::getValue)
+            .orElse(DEFAULT_THEME_ID);
     }
 
     @Override
@@ -72,13 +74,11 @@ public class ThemeRepositoryImpl
             synchronized (this) {
                 if (this.currentTheme == null) {
                     // get current theme id
-                    String currentThemeId = this.optionRepository.findByKey(THEME.getValue())
-                        .map(Option::getValue)
-                        .orElse(DEFAULT_THEME_ID);
+                    String currentThemeId = getActivatedThemeId();
 
                     // fetch current theme
                     this.currentTheme =
-                        this.fetchThemeByThemeId(currentThemeId).orElseGet(() -> {
+                        this.fetchThemePropertyByThemeId(currentThemeId).orElseGet(() -> {
                             if (!StringUtils.equalsIgnoreCase(currentThemeId, DEFAULT_THEME_ID)) {
                                 fallbackTheme.set(true);
                                 return this.getThemeByThemeId(DEFAULT_THEME_ID);
@@ -98,7 +98,7 @@ public class ThemeRepositoryImpl
 
     @Override
     public Optional<ThemeProperty> fetchThemePropertyByThemeId(String themeId) {
-        return ThemePropertyScanner.INSTANCE.scan(getThemeRootPath(), null)
+        return listAll()
             .stream()
             .filter(property -> Objects.equals(themeId, property.getId()))
             .findFirst();
@@ -127,14 +127,13 @@ public class ThemeRepositoryImpl
     @Override
     public ThemeProperty attemptToAdd(ThemeProperty newProperty) {
         // 1. check existence
-        final var alreadyExist = fetchThemeByThemeId(newProperty.getId()).isPresent();
+        final var alreadyExist = fetchThemePropertyByThemeId(newProperty.getId()).isPresent();
         if (alreadyExist) {
             throw new AlreadyExistsException("当前安装的主题已存在");
         }
 
         // 2. check version compatibility
-        // Not support current halo version.
-        if (checkThemePropertyCompatibility(newProperty)) {
+        if (!checkThemePropertyCompatibility(newProperty)) {
             throw new ThemeNotSupportException(
                 "当前主题仅支持 Halo " + newProperty.getRequire() + " 及以上的版本");
         }
@@ -187,9 +186,10 @@ public class ThemeRepositoryImpl
     @Override
     public boolean checkThemePropertyCompatibility(ThemeProperty themeProperty) {
         // check version compatibility
-        // Not support current halo version.
-        return StringUtils.isNotEmpty(themeProperty.getRequire())
-            && !compareVersion(HaloConst.HALO_VERSION, themeProperty.getRequire());
+        String requiredVersion = themeProperty.getRequire();
+        return Version.resolve(HaloConst.HALO_VERSION)
+            .map(current -> current.compatible(requiredVersion))
+            .orElse(false);
     }
 
     private Path getThemeRootPath() {
@@ -206,15 +206,8 @@ public class ThemeRepositoryImpl
 
     @NonNull
     protected ThemeProperty getThemeByThemeId(String themeId) {
-        return fetchThemeByThemeId(themeId).orElseThrow(
+        return fetchThemePropertyByThemeId(themeId).orElseThrow(
             () -> new ThemeNotFoundException("Failed to find theme with id: " + themeId));
     }
 
-    @NonNull
-    protected Optional<ThemeProperty> fetchThemeByThemeId(String themeId) {
-        return ThemePropertyScanner.INSTANCE.scan(getThemeRootPath(), null)
-            .stream()
-            .filter(property -> Objects.equals(themeId, property.getId()))
-            .findFirst();
-    }
 }

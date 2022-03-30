@@ -30,8 +30,8 @@ import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.properties.QiniuOssProperties;
 import run.halo.app.model.support.UploadResult;
+import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.OptionService;
-import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 import run.halo.app.utils.JsonUtils;
 
@@ -40,6 +40,7 @@ import run.halo.app.utils.JsonUtils;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-27
  */
 @Slf4j
@@ -47,9 +48,12 @@ import run.halo.app.utils.JsonUtils;
 public class QiniuOssFileHandler implements FileHandler {
 
     private final OptionService optionService;
+    private final AttachmentRepository attachmentRepository;
 
-    public QiniuOssFileHandler(OptionService optionService) {
+    public QiniuOssFileHandler(OptionService optionService,
+        AttachmentRepository attachmentRepository) {
         this.optionService = optionService;
+        this.attachmentRepository = attachmentRepository;
     }
 
     @Override
@@ -96,20 +100,15 @@ public class QiniuOssFileHandler implements FileHandler {
             .append(URL_SEPARATOR);
 
         try {
-            String basename =
-                FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
-            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-            String timestamp = String.valueOf(System.currentTimeMillis());
-            StringBuilder upFilePath = new StringBuilder();
-            if (StringUtils.isNotEmpty(source)) {
-                upFilePath.append(source)
-                    .append(URL_SEPARATOR);
-            }
-            upFilePath.append(basename)
-                .append("_")
-                .append(timestamp)
-                .append(".")
-                .append(extension);
+            FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
+                .setBasePath(basePath.toString())
+                .setSubPath(source)
+                .setAutomaticRename(true)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.QINIUOSS) > 0)
+                .setOriginalName(file.getOriginalFilename())
+                .build();
 
             // Get file recorder for temp directory
             FileRecorder fileRecorder = new FileRecorder(tmpPath.toFile());
@@ -117,7 +116,8 @@ public class QiniuOssFileHandler implements FileHandler {
             UploadManager uploadManager = new UploadManager(configuration, fileRecorder);
             // Put the file
             Response response = uploadManager
-                .put(file.getInputStream(), upFilePath.toString(), uploadToken, null, null);
+                .put(file.getInputStream(), pathDescriptor.getRelativePath(), uploadToken, null,
+                    null);
 
             if (log.isDebugEnabled()) {
                 log.debug("Qiniu oss response: [{}]", response.toString());
@@ -128,25 +128,26 @@ public class QiniuOssFileHandler implements FileHandler {
             PutSet putSet = JsonUtils.jsonToObject(response.bodyString(), PutSet.class);
 
             // Get file full path
-            String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
+            String fullPath = pathDescriptor.getFullPath();
 
             // Build upload result
             UploadResult result = new UploadResult();
-            result.setFilename(basename);
-            result.setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
-            result.setKey(upFilePath.toString());
-            result.setSuffix(extension);
+            result.setFilename(pathDescriptor.getName());
+
+            result.setFilePath(StringUtils.isBlank(styleRule) ? fullPath : fullPath + styleRule);
+            result.setKey(pathDescriptor.getRelativePath());
+            result.setSuffix(pathDescriptor.getExtension());
             result.setWidth(putSet.getWidth());
             result.setHeight(putSet.getHeight());
             result.setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             result.setSize(file.getSize());
 
             if (isImageType(file)) {
-                if (ImageUtils.EXTENSION_ICO.equals(extension)) {
-                    result.setThumbPath(filePath);
+                if (ImageUtils.EXTENSION_ICO.equals(pathDescriptor.getExtension())) {
+                    result.setThumbPath(fullPath);
                 } else {
-                    result.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? filePath :
-                        filePath + thumbnailStyleRule);
+                    result.setThumbPath(StringUtils.isBlank(thumbnailStyleRule) ? fullPath :
+                        fullPath + thumbnailStyleRule);
                 }
             }
 

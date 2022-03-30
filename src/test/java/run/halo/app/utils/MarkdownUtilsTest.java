@@ -1,13 +1,18 @@
 package run.halo.app.utils;
 
-import cn.hutool.core.lang.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author zhixiang.yuan
- * @since 2020/07/19 20:22:58
+ * @author guqing
+ * @date 2020/07/19 20:22:58
  */
 @Slf4j
 class MarkdownUtilsTest {
@@ -17,19 +22,28 @@ class MarkdownUtilsTest {
         String markdown = "---\n"
             + "title: \"test remove\"\n"
             + "---";
-        Assert.isTrue("".equals(MarkdownUtils.removeFrontMatter(markdown)));
+        assertEquals("", MarkdownUtils.removeFrontMatter(markdown));
 
         markdown = "---\n"
             + "title: \"test remove\"\n"
             + "---"
             + "test";
-        Assert.isTrue("test".equals(MarkdownUtils.removeFrontMatter(markdown)));
+        assertEquals("test", MarkdownUtils.removeFrontMatter(markdown));
 
         markdown = "---\n"
             + "title: \"test remove\"\n"
             + "---"
             + "test---";
-        Assert.isTrue("test---".equals(MarkdownUtils.removeFrontMatter(markdown)));
+        assertEquals("test---", MarkdownUtils.removeFrontMatter(markdown));
+
+        markdown = "title: \"test remove\"\n"
+            + "test---";
+        assertEquals("", MarkdownUtils.removeFrontMatter(markdown));
+
+        markdown = "title: \"test remove\"\n"
+            + "---"
+            + "test---";
+        assertEquals("test---", MarkdownUtils.removeFrontMatter(markdown));
     }
 
     @Test
@@ -37,7 +51,7 @@ class MarkdownUtilsTest {
         String markdown1 = "驿外[^1]断桥边，寂寞开无主。已是黄昏独自愁，更着风和雨\n"
             + "[^1]: 驿（yì）外：指荒僻、冷清之地。驿，驿站。";
         String s1 = MarkdownUtils.renderHtml(markdown1);
-        Assert.isTrue(StringUtils.isNotBlank(s1));
+        assertTrue(StringUtils.isNotBlank(s1));
         String s1Expected = "<p>驿外<sup class=\"footnote-ref\"><a id=\"fnref1\" "
             + "href=\"#fn1\">[1]</a></sup>断桥边，寂寞开无主。已是黄昏独自愁，更着风和雨</p>\n"
             + "<hr class=\"footnotes-sep\" />\n"
@@ -49,7 +63,7 @@ class MarkdownUtilsTest {
             + "</li>\n"
             + "</ol>\n"
             + "</section>\n";
-        Assert.isTrue(StringUtils.equals(s1Expected, s1));
+        assertTrue(StringUtils.equals(s1Expected, s1));
 
         String markdown2 = "Paragraph with a footnote reference[^1]\n"
             + "[^1]: Footnote text added at the bottom of the document";
@@ -65,6 +79,20 @@ class MarkdownUtilsTest {
             + "</li>\n"
             + "</ol>\n"
             + "</section>\n";
-        Assert.isTrue(StringUtils.equals(s2Expected, s2));
+        assertTrue(StringUtils.equals(s2Expected, s2));
+    }
+
+    @Test
+    void getFrontMatter() {
+        String markdown = "---\n"
+            + "title: \"test remove\"\n"
+            + "---";
+        Map<String, List<String>> frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        assertEquals("\"test remove\"", frontMatter.get("title").get(0));
+
+        markdown = "title: \"test remove\"\n"
+            + "---";
+        frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        assertEquals("\"test remove\"", frontMatter.get("title").get(0));
     }
 }

@@ -16,6 +16,7 @@ import org.hibernate.annotations.GenericGenerator;
  * Tag entity
  *
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-12
  */
 @Data
@@ -49,6 +50,12 @@ public class Tag extends BaseEntity {
      */
     @Column(name = "slug", unique = true)
     private String slug;
+
+    /**
+     * Tag color.
+     */
+    @Column(name = "color", length = 25)
+    private String color;
 
     /**
      * Cover thumbnail of the tag.

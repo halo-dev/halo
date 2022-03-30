@@ -17,14 +17,15 @@ import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.properties.HuaweiObsProperties;
 import run.halo.app.model.support.UploadResult;
+import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.OptionService;
-import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
 /**
  * Huawei obs file handler.
  *
  * @author qilin
+ * @author guqing
  * @date 2020-04-03
  */
 @Slf4j
@@ -32,9 +33,12 @@ import run.halo.app.utils.ImageUtils;
 public class HuaweiObsFileHandler implements FileHandler {
 
     private final OptionService optionService;
+    private final AttachmentRepository attachmentRepository;
 
-    public HuaweiObsFileHandler(OptionService optionService) {
+    public HuaweiObsFileHandler(OptionService optionService,
+        AttachmentRepository attachmentRepository) {
         this.optionService = optionService;
+        this.attachmentRepository = attachmentRepository;
     }
 
     @Override
@@ -77,51 +81,44 @@ public class HuaweiObsFileHandler implements FileHandler {
         }
 
         try {
-            String basename =
-                FilenameUtils.getBasename(Objects.requireNonNull(file.getOriginalFilename()));
-            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-            String timestamp = String.valueOf(System.currentTimeMillis());
-            StringBuilder upFilePath = new StringBuilder();
-
-            if (StringUtils.isNotEmpty(source)) {
-                upFilePath.append(source)
-                    .append(URL_SEPARATOR);
-            }
-
-            upFilePath.append(basename)
-                .append("_")
-                .append(timestamp)
-                .append(".")
-                .append(extension);
-
-            String filePath = StringUtils.join(basePath.toString(), upFilePath.toString());
+            FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
+                .setBasePath(basePath.toString())
+                .setSubPath(source)
+                .setAutomaticRename(true)
+                .setRenamePredicate(relativePath ->
+                    attachmentRepository
+                        .countByFileKeyAndType(relativePath, AttachmentType.HUAWEIOBS) > 0)
+                .setOriginalName(file.getOriginalFilename())
+                .build();
 
             log.info(basePath.toString());
 
             // Upload
             PutObjectResult putObjectResult =
-                obsClient.putObject(bucketName, upFilePath.toString(), file.getInputStream());
+                obsClient.putObject(bucketName, pathDescriptor.getRelativePath(),
+                    file.getInputStream());
             if (putObjectResult == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到华为云失败 ");
             }
 
             // Response result
             UploadResult uploadResult = new UploadResult();
-            uploadResult.setFilename(basename);
+            uploadResult.setFilename(pathDescriptor.getName());
+            String fullPath = pathDescriptor.getFullPath();
             uploadResult
-                .setFilePath(StringUtils.isBlank(styleRule) ? filePath : filePath + styleRule);
-            uploadResult.setKey(upFilePath.toString());
+                .setFilePath(StringUtils.isBlank(styleRule) ? fullPath : fullPath + styleRule);
+            uploadResult.setKey(pathDescriptor.getRelativePath());
             uploadResult
                 .setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
-            uploadResult.setSuffix(extension);
+            uploadResult.setSuffix(pathDescriptor.getExtension());
             uploadResult.setSize(file.getSize());
 
             handleImageMetadata(file, uploadResult, () -> {
-                if (ImageUtils.EXTENSION_ICO.equals(extension)) {
-                    return filePath;
+                if (ImageUtils.EXTENSION_ICO.equals(pathDescriptor.getExtension())) {
+                    return fullPath;
                 } else {
-                    return StringUtils.isBlank(thumbnailStyleRule) ? filePath :
-                        filePath + thumbnailStyleRule;
+                    return StringUtils.isBlank(thumbnailStyleRule) ? fullPath :
+                        fullPath + thumbnailStyleRule;
                 }
             });
 

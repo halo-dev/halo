@@ -1,5 +1,6 @@
 package run.halo.app.cache;
 
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -58,7 +59,6 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
 
         // Put the cache wrapper
         CacheWrapper<String> putCacheWrapper = CACHE_CONTAINER.put(key, cacheWrapper);
-
         log.debug("Put [{}] cache result: [{}], original cache wrapper: [{}]", key, putCacheWrapper,
             cacheWrapper);
     }
@@ -98,6 +98,13 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
         log.debug("Removed key: [{}]", key);
     }
 
+    @Override
+    public LinkedHashMap<String, String> toMap() {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        CACHE_CONTAINER.forEach((key, value) -> map.put(key, value.getData()));
+        return map;
+    }
+
     @PreDestroy
     public void preDestroy() {
         log.debug("Cancelling all timer tasks");
@@ -105,7 +112,7 @@ public class InMemoryCacheStore extends AbstractStringCacheStore {
         clear();
     }
 
-    private void clear() {
+    public void clear() {
         CACHE_CONTAINER.clear();
     }
 

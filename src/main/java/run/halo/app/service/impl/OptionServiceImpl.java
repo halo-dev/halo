@@ -1,8 +1,6 @@
 package run.halo.app.service.impl;
 
-import com.qiniu.common.Zone;
 import com.qiniu.storage.Region;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import javax.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -28,28 +25,22 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.event.options.OptionUpdatedEvent;
-import run.halo.app.exception.MissingPropertyException;
-import run.halo.app.model.dto.OptionDTO;
 import run.halo.app.model.dto.OptionSimpleDTO;
 import run.halo.app.model.entity.Option;
 import run.halo.app.model.enums.PostPermalinkType;
 import run.halo.app.model.enums.SheetPermalinkType;
-import run.halo.app.model.enums.ValueEnum;
 import run.halo.app.model.params.OptionParam;
 import run.halo.app.model.params.OptionQuery;
 import run.halo.app.model.properties.BlogProperties;
 import run.halo.app.model.properties.CommentProperties;
-import run.halo.app.model.properties.OtherProperties;
 import run.halo.app.model.properties.PermalinkProperties;
 import run.halo.app.model.properties.PostProperties;
 import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.properties.PropertyEnum;
 import run.halo.app.model.properties.QiniuOssProperties;
-import run.halo.app.model.properties.SeoProperties;
 import run.halo.app.repository.OptionRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
-import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.ServiceUtils;
 import run.halo.app.utils.ValidationUtils;
 
@@ -213,10 +204,6 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
                 .forEach(key -> {
                     PropertyEnum propertyEnum = propertyEnumMap.get(key);
 
-                    if (StringUtils.isBlank(propertyEnum.defaultValue())) {
-                        return;
-                    }
-
                     result.put(key,
                         PropertyEnum.convertTo(propertyEnum.defaultValue(), propertyEnum));
                 });
@@ -377,11 +364,7 @@ public class OptionServiceImpl extends AbstractCrudService<Option, Integer>
 
     @Override
     public long getBirthday() {
-        return getByProperty(PrimaryProperties.BIRTHDAY, Long.class).orElseGet(() -> {
-            long currentTime = DateUtils.now().getTime();
-            saveProperty(PrimaryProperties.BIRTHDAY, String.valueOf(currentTime));
-            return currentTime;
-        });
+        return Long.parseLong(getByPropertyOrDefault(PrimaryProperties.BIRTHDAY, String.class));
     }
 
     @Override

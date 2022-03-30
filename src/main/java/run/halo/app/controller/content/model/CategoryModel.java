@@ -13,23 +13,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import run.halo.app.controller.content.auth.CategoryAuthentication;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.PostListVO;
-import run.halo.app.service.AuthenticationService;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
-import run.halo.app.service.PostService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * Category Model.
  *
  * @author ryanwang
+ * @author guqing
  * @date 2020-01-11
  */
 @Component
@@ -41,24 +42,23 @@ public class CategoryModel {
 
     private final PostCategoryService postCategoryService;
 
-    private final PostService postService;
+    private final PostRenderAssembler postRenderAssembler;
 
     private final OptionService optionService;
 
-    private final AuthenticationService authenticationService;
+    private final CategoryAuthentication categoryAuthentication;
 
     public CategoryModel(CategoryService categoryService,
         ThemeService themeService,
         PostCategoryService postCategoryService,
-        PostService postService,
-        OptionService optionService,
-        AuthenticationService authenticationService) {
+        PostRenderAssembler postRenderAssembler, OptionService optionService,
+        CategoryAuthentication categoryAuthentication) {
         this.categoryService = categoryService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
-        this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
         this.optionService = optionService;
-        this.authenticationService = authenticationService;
+        this.categoryAuthentication = categoryAuthentication;
     }
 
     /**
@@ -85,9 +85,9 @@ public class CategoryModel {
     public String listPost(Model model, String slug, Integer page) {
 
         // Get category by slug
-        final Category category = categoryService.getBySlugOfNonNull(slug, true);
+        final Category category = categoryService.getBySlugOfNonNull(slug);
 
-        if (!authenticationService.categoryAuthentication(category.getId(), null)) {
+        if (!categoryAuthentication.isAuthenticated(category.getId())) {
             model.addAttribute("slug", category.getSlug());
             model.addAttribute("type", EncryptTypeEnum.CATEGORY.getName());
             if (themeService.templateExists(POST_PASSWORD_TEMPLATE + SUFFIX_FTL)) {
@@ -97,7 +97,7 @@ public class CategoryModel {
         }
 
         Set<PostStatus> statuses = Sets.immutableEnumSet(PostStatus.PUBLISHED);
-        if (StringUtils.isNotBlank(category.getPassword())) {
+        if (categoryService.isPrivate(category.getId())) {
             statuses = Sets.immutableEnumSet(PostStatus.INTIMATE);
         }
 
@@ -108,7 +108,7 @@ public class CategoryModel {
             Sort.by(DESC, "topPriority", "createTime"));
         Page<Post> postPage =
             postCategoryService.pagePostBy(category.getId(), statuses, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
+        Page<PostListVO> posts = postRenderAssembler.convertToListVo(postPage);
 
         // Generate meta description.
         if (StringUtils.isNotEmpty(category.getDescription())) {

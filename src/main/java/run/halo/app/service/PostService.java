@@ -15,7 +15,6 @@ import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.ArchiveMonthVO;
 import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
-import run.halo.app.model.vo.PostListVO;
 import run.halo.app.model.vo.PostMarkdownVO;
 import run.halo.app.service.base.BasePostService;
 
@@ -188,22 +187,6 @@ public interface PostService extends BasePostService<Post> {
     List<ArchiveMonthVO> listMonthArchives();
 
     /**
-     * Convert to year archives
-     *
-     * @param posts posts must not be null
-     * @return list of ArchiveYearVO
-     */
-    List<ArchiveYearVO> convertToYearArchives(@NonNull List<Post> posts);
-
-    /**
-     * Convert to month archives
-     *
-     * @param posts posts must not be null
-     * @return list of ArchiveMonthVO
-     */
-    List<ArchiveMonthVO> convertToMonthArchives(@NonNull List<Post> posts);
-
-    /**
      * Import post from markdown document.
      *
      * @param markdown markdown document.
@@ -230,70 +213,6 @@ public interface PostService extends BasePostService<Post> {
      */
     @NonNull
     String exportMarkdown(@NonNull Post post);
-
-    /**
-     * Converts to detail vo.
-     *
-     * @param post post must not be null
-     * @return post detail vo
-     */
-    @NonNull
-    PostDetailVO convertToDetailVo(@NonNull Post post);
-
-    /**
-     * Converts to a page of detail vo.
-     *
-     * @param postPage post page must not be null
-     * @return a page of post detail vo
-     */
-    Page<PostDetailVO> convertToDetailVo(@NonNull Page<Post> postPage);
-
-    /**
-     * Converts to detail vo.
-     *
-     * @param post post must not be null
-     * @param queryEncryptCategory whether to query encryption category
-     * @return post detail vo
-     */
-    @NonNull
-    PostDetailVO convertToDetailVo(@NonNull Post post, @NonNull boolean queryEncryptCategory);
-
-    /**
-     * Converts to a page of post list vo.
-     *
-     * @param postPage post page must not be null
-     * @return a page of post list vo
-     */
-    @NonNull
-    Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage);
-
-    /**
-     * Converts to a page of post list vo.
-     *
-     * @param postPage post page must not be null
-     * @param queryEncryptCategory whether to query encryption category
-     * @return a page of post list vo
-     */
-    @NonNull
-    Page<PostListVO> convertToListVo(@NonNull Page<Post> postPage, boolean queryEncryptCategory);
-
-    /**
-     * Converts to a list of post list vo.
-     *
-     * @param posts post must not be null
-     * @return a list of post list vo
-     */
-    @NonNull
-    List<PostListVO> convertToListVo(@NonNull List<Post> posts);
-
-    /**
-     * Converts to a list of post list vo.
-     *
-     * @param posts post must not be null
-     * @param queryEncryptCategory whether to query encryption category
-     * @return a list of post list vo
-     */
-    List<PostListVO> convertToListVo(List<Post> posts, boolean queryEncryptCategory);
 
     /**
      * Publish a post visit event.

@@ -22,6 +22,7 @@ import run.halo.app.service.base.CrudService;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-19
  */
 public interface PostCategoryService extends CrudService<PostCategory, Integer> {
@@ -36,25 +37,13 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
     List<Category> listCategoriesBy(@NonNull Integer postId);
 
     /**
-     * Lists category by post id.
-     *
-     * @param postId post id must not be null
-     * @param queryEncryptCategory whether to query encryption category
-     * @return a list of category
-     */
-    @NonNull
-    List<Category> listCategoriesBy(@NonNull Integer postId, @NonNull boolean queryEncryptCategory);
-
-    /**
      * List category list map by post id collection.
      *
      * @param postIds post id collection
-     * @param queryEncryptCategory whether to query encryption category
      * @return a category list map (key: postId, value: a list of category)
      */
     @NonNull
-    Map<Integer, List<Category>> listCategoryListMap(
-        @Nullable Collection<Integer> postIds, @NonNull boolean queryEncryptCategory);
+    Map<Integer, List<Category>> listCategoryListMap(@Nullable Collection<Integer> postIds);
 
     /**
      * Lists post by category id.
@@ -201,12 +190,10 @@ public interface PostCategoryService extends CrudService<PostCategory, Integer> 
      * Lists category with post count.
      *
      * @param sort sort info
-     * @param queryEncryptCategory whether to query encryption category
      * @return a list of category dto
      */
     @NonNull
-    List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(
-        @NonNull Sort sort, @NonNull boolean queryEncryptCategory);
+    List<CategoryWithPostCountDTO> listCategoryWithPostCountDto(@NonNull Sort sort);
 
     /**
      * Lists by category id.

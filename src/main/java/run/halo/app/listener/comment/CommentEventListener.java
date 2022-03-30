@@ -1,7 +1,5 @@
 package run.halo.app.listener.comment;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.text.StrBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +27,9 @@ import run.halo.app.service.SheetCommentService;
 import run.halo.app.service.SheetService;
 import run.halo.app.service.ThemeService;
 import run.halo.app.service.UserService;
+import run.halo.app.service.assembler.PostAssembler;
+import run.halo.app.service.assembler.SheetAssembler;
+import run.halo.app.utils.ValidationUtils;
 
 /**
  * PostComment event listener.
@@ -53,7 +54,11 @@ public class CommentEventListener {
 
     private final PostService postService;
 
+    private final PostAssembler postAssembler;
+
     private final SheetService sheetService;
+
+    private final SheetAssembler sheetAssembler;
 
     private final JournalService journalService;
 
@@ -64,7 +69,9 @@ public class CommentEventListener {
     public CommentEventListener(MailService mailService, OptionService optionService,
         PostCommentService postCommentService, SheetCommentService sheetCommentService,
         JournalCommentService journalCommentService, PostService postService,
-        SheetService sheetService, JournalService journalService, UserService userService,
+        PostAssembler postAssembler, SheetService sheetService,
+        SheetAssembler sheetAssembler, JournalService journalService,
+        UserService userService,
         ThemeService themeService) {
         this.mailService = mailService;
         this.optionService = optionService;
@@ -72,7 +79,9 @@ public class CommentEventListener {
         this.sheetCommentService = sheetCommentService;
         this.journalCommentService = journalCommentService;
         this.postService = postService;
+        this.postAssembler = postAssembler;
         this.sheetService = sheetService;
+        this.sheetAssembler = sheetAssembler;
         this.journalService = journalService;
         this.userService = userService;
         this.themeService = themeService;
@@ -110,7 +119,7 @@ public class CommentEventListener {
             log.debug("Got post comment: [{}]", postComment);
 
             BasePostMinimalDTO post =
-                postService.convertToMinimal(postService.getById(postComment.getPostId()));
+                postAssembler.convertToMinimal(postService.getById(postComment.getPostId()));
 
             data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() :
                 optionService.getBlogBaseUrl() + post.getFullPath());
@@ -128,7 +137,7 @@ public class CommentEventListener {
             log.debug("Got sheet comment: [{}]", sheetComment);
 
             BasePostMinimalDTO sheet =
-                sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
+                sheetAssembler.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
 
             data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() :
                 optionService.getBlogBaseUrl() + sheet.getFullPath());
@@ -146,10 +155,10 @@ public class CommentEventListener {
 
             Journal journal = journalService.getById(journalComment.getPostId());
 
-            StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
+            StringBuilder url = new StringBuilder(optionService.getBlogBaseUrl())
                 .append("/")
                 .append(optionService.getJournalsPrefix());
-            data.put("pageFullPath", url.toString());
+            data.put("pageFullPath", url);
             data.put("pageTitle", journal.getCreateTime());
             data.put("author", journalComment.getAuthor());
             data.put("content", journalComment.getContent());
@@ -201,7 +210,7 @@ public class CommentEventListener {
             PostComment baseComment = postCommentService.getById(postComment.getParentId());
 
             if (StringUtils.isEmpty(baseComment.getEmail())
-                && !Validator.isEmail(baseComment.getEmail())) {
+                && !ValidationUtils.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -212,7 +221,7 @@ public class CommentEventListener {
             baseAuthorEmail = baseComment.getEmail();
 
             BasePostMinimalDTO post =
-                postService.convertToMinimal(postService.getById(postComment.getPostId()));
+                postAssembler.convertToMinimal(postService.getById(postComment.getPostId()));
 
             data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() :
                 optionService.getBlogBaseUrl() + post.getFullPath());
@@ -234,7 +243,7 @@ public class CommentEventListener {
             SheetComment baseComment = sheetCommentService.getById(sheetComment.getParentId());
 
             if (StringUtils.isEmpty(baseComment.getEmail())
-                && !Validator.isEmail(baseComment.getEmail())) {
+                && !ValidationUtils.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -245,7 +254,7 @@ public class CommentEventListener {
             baseAuthorEmail = baseComment.getEmail();
 
             BasePostMinimalDTO sheet =
-                sheetService.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
+                sheetAssembler.convertToMinimal(sheetService.getById(sheetComment.getPostId()));
 
             data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() :
                 optionService.getBlogBaseUrl() + sheet.getFullPath());
@@ -268,7 +277,7 @@ public class CommentEventListener {
                 journalCommentService.getById(journalComment.getParentId());
 
             if (StringUtils.isEmpty(baseComment.getEmail())
-                && !Validator.isEmail(baseComment.getEmail())) {
+                && !ValidationUtils.isEmail(baseComment.getEmail())) {
                 return;
             }
 
@@ -280,7 +289,7 @@ public class CommentEventListener {
 
             Journal journal = journalService.getById(journalComment.getPostId());
 
-            StrBuilder url = new StrBuilder(optionService.getBlogBaseUrl())
+            StringBuilder url = new StringBuilder(optionService.getBlogBaseUrl())
                 .append("/")
                 .append(optionService.getJournalsPrefix());
             data.put("pageFullPath", url);

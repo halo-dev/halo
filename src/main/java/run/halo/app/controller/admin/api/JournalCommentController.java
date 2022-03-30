@@ -29,23 +29,29 @@ import run.halo.app.model.vo.BaseCommentWithParentVO;
 import run.halo.app.model.vo.JournalCommentWithJournalVO;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.assembler.comment.JournalCommentAssembler;
 
 /**
  * Journal comment controller.
  *
  * @author johnniang
+ * @author guqing
  * @date 2019-04-25
  */
 @RestController
 @RequestMapping("/api/admin/journals/comments")
 public class JournalCommentController {
+    private final JournalCommentAssembler journalCommentAssembler;
 
     private final JournalCommentService journalCommentService;
 
     private final OptionService optionService;
 
-    public JournalCommentController(JournalCommentService journalCommentService,
+    public JournalCommentController(
+        JournalCommentAssembler journalCommentAssembler,
+        JournalCommentService journalCommentService,
         OptionService optionService) {
+        this.journalCommentAssembler = journalCommentAssembler;
         this.journalCommentService = journalCommentService;
         this.optionService = optionService;
     }
@@ -58,7 +64,7 @@ public class JournalCommentController {
         Page<JournalComment> journalCommentPage =
             journalCommentService.pageBy(commentQuery, pageable);
 
-        return journalCommentService.convertToWithJournalVo(journalCommentPage);
+        return journalCommentAssembler.convertToWithJournalVo(journalCommentPage);
     }
 
     @GetMapping("latest")
@@ -68,7 +74,7 @@ public class JournalCommentController {
         @RequestParam(name = "status", required = false) CommentStatus status) {
         List<JournalComment> latestComments =
             journalCommentService.pageLatest(top, status).getContent();
-        return journalCommentService.convertToWithJournalVo(latestComments);
+        return journalCommentAssembler.convertToWithJournalVo(latestComments);
     }
 
     @GetMapping("{journalId:\\d+}/tree_view")
@@ -93,7 +99,7 @@ public class JournalCommentController {
     @ApiOperation("Creates a journal comment")
     public BaseCommentDTO createCommentBy(@RequestBody JournalCommentParam journalCommentParam) {
         JournalComment journalComment = journalCommentService.createBy(journalCommentParam);
-        return journalCommentService.convertTo(journalComment);
+        return journalCommentAssembler.convertTo(journalComment);
     }
 
     @PutMapping("{commentId:\\d+}/status/{status}")
@@ -103,13 +109,23 @@ public class JournalCommentController {
         // Update comment status
         JournalComment updatedJournalComment =
             journalCommentService.updateStatus(commentId, status);
-        return journalCommentService.convertTo(updatedJournalComment);
+        return journalCommentAssembler.convertTo(updatedJournalComment);
+    }
+
+    @PutMapping("/{commentId:\\d+}")
+    @ApiOperation("Updates a journal comment by comment id")
+    public BaseCommentDTO updateCommentBy(@PathVariable Long commentId,
+        @RequestBody JournalCommentParam journalCommentParam) {
+        JournalComment commentToUpdate = journalCommentService.getById(commentId);
+        journalCommentParam.update(commentToUpdate);
+
+        return journalCommentAssembler.convertTo(journalCommentService.update(commentToUpdate));
     }
 
     @DeleteMapping("{commentId:\\d+}")
     @ApiOperation("Deletes comment permanently and recursively")
     public BaseCommentDTO deleteBy(@PathVariable("commentId") Long commentId) {
         JournalComment deletedJournalComment = journalCommentService.removeById(commentId);
-        return journalCommentService.convertTo(deletedJournalComment);
+        return journalCommentAssembler.convertTo(deletedJournalComment);
     }
 }

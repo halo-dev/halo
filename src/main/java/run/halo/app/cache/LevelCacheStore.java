@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Timer;
@@ -115,6 +116,22 @@ public class LevelCacheStore extends AbstractStringCacheStore {
     public void delete(@NonNull String key) {
         LEVEL_DB.delete(stringToBytes(key));
         log.debug("cache remove key: [{}]", key);
+    }
+
+    @Override
+    public LinkedHashMap<String, String> toMap() {
+        LinkedHashMap<String, String> map = new LinkedHashMap<>();
+        LEVEL_DB.forEach(entry -> {
+            String key = bytesToString(entry.getKey());
+            String valueJson = bytesToString(entry.getValue());
+            Optional<CacheWrapper<String>> cacheWrapperOptional = jsonToCacheWrapper(valueJson);
+            if (cacheWrapperOptional.isPresent()) {
+                map.put(key, cacheWrapperOptional.get().getData());
+            } else {
+                map.put(key, null);
+            }
+        });
+        return map;
     }
 
 

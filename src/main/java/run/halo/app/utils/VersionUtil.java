@@ -17,16 +17,16 @@ public final class VersionUtil {
     }
 
     /**
-     * Compare version.
+     * Compare two versions to see if they have the same major and minor versions.
      *
-     * @param current current version.
-     * @param require require version.
-     * @return true or false.
+     * @param left version A to compare
+     * @param right version B to compare
+     * @return {@code true} if they have the same major and minor version.
      */
-    public static boolean compareVersion(String current, String require) {
-        Version leftVersion = Version.resolve(current).orElse(Version.emptyVersion());
-        Version rightVersion = Version.resolve(require).orElse(Version.emptyVersion());
-        return leftVersion.compareTo(rightVersion) >= 0;
+    public static boolean hasSameMajorAndMinorVersion(String left, String right) {
+        Version leftVersion = Version.resolve(left).orElse(Version.emptyVersion());
+        Version rightVersion = Version.resolve(right).orElse(Version.emptyVersion());
+        return leftVersion.getMajor() == rightVersion.getMajor()
+            && leftVersion.getMinor() == rightVersion.getMinor();
     }
-
 }

@@ -1,10 +1,13 @@
 package run.halo.app.utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -183,6 +186,23 @@ public class FileUtils {
     }
 
     /**
+     * Zips folder or file with filter.
+     *
+     * @param pathToZip file path to zip must not be null
+     * @param pathOfArchive zip file path to archive must not be null
+     * @param filter folder or file filter
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive,
+        @Nullable Predicate<Path> filter) throws IOException {
+        try (OutputStream outputStream = Files.newOutputStream(pathOfArchive)) {
+            try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
+                zip(pathToZip, zipOut, filter);
+            }
+        }
+    }
+
+    /**
      * Zips folder or file.
      *
      * @param pathToZip file path to zip must not be null
@@ -196,6 +216,20 @@ public class FileUtils {
     }
 
     /**
+     * Zips folder or file with filter.
+     *
+     * @param pathToZip file path to zip must not be null
+     * @param zipOut zip output stream must not be null
+     * @param filter directory or file filter
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut,
+        Predicate<Path> filter) throws IOException {
+        // Zip file
+        zip(pathToZip, pathToZip.getFileName().toString(), zipOut, filter);
+    }
+
+    /**
      * Zips folder or file.
      *
      * @param fileToZip file path to zip must not be null
@@ -205,6 +239,20 @@ public class FileUtils {
      */
     private static void zip(@NonNull Path fileToZip, @NonNull String fileName,
         @NonNull ZipOutputStream zipOut) throws IOException {
+        zip(fileToZip, fileName, zipOut, null);
+    }
+
+    /**
+     * Zips folder or file with path filter.
+     *
+     * @param fileToZip file path to zip must not be null
+     * @param fileName file name must not be blank
+     * @param zipOut zip output stream must not be null
+     * @param filter directory or file filter
+     * @throws IOException throws when failed to access file to be zipped
+     */
+    private static void zip(@NonNull Path fileToZip, @NonNull String fileName,
+        @NonNull ZipOutputStream zipOut, @Nullable Predicate<Path> filter) throws IOException {
         if (Files.isDirectory(fileToZip)) {
             log.debug("Try to zip folder: [{}]", fileToZip);
             // Append with '/' if missing
@@ -219,10 +267,12 @@ public class FileUtils {
             try (Stream<Path> subPathStream = Files.list(fileToZip)) {
                 // There should not use foreach for stream as internal zip method will throw
                 // IOException
-                List<Path> subFiles = subPathStream.collect(Collectors.toList());
+                List<Path> subFiles =
+                    filter != null ? subPathStream.filter(filter).collect(Collectors.toList())
+                        : subPathStream.collect(Collectors.toList());
                 for (Path subFileToZip : subFiles) {
                     // Zip children
-                    zip(subFileToZip, folderName + subFileToZip.getFileName(), zipOut);
+                    zip(subFileToZip, folderName + subFileToZip.getFileName(), zipOut, filter);
                 }
             }
         } else {
@@ -512,4 +562,28 @@ public class FileUtils {
         return tempDirectory;
     }
 
+    /**
+     * Convert an InputStream to a String.
+     *
+     * @param inputStream input stream
+     * @return the string content read through the input stream without closing the InputStream
+     */
+    public static String readString(InputStream inputStream) {
+        return new BufferedReader(
+            new InputStreamReader(inputStream, StandardCharsets.UTF_8))
+            .lines()
+            .collect(Collectors.joining("\n"));
+    }
+
+    /**
+     * Writes a String to a file creating the file if it does not exist using the UTF_8 encoding.
+     * NOTE: the parent directories of the file will be created if they do not exist.
+     *
+     * @param file the file to write
+     * @param content the content to write to the file
+     * @throws IOException in case of an I/O error
+     */
+    public static void writeStringToFile(File file, String content) throws IOException {
+        org.apache.commons.io.FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
+    }
 }

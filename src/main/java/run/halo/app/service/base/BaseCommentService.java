@@ -1,7 +1,6 @@
 package run.halo.app.service.base;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import run.halo.app.model.dto.BaseCommentDTO;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.params.BaseCommentParam;
@@ -27,7 +25,7 @@ import run.halo.app.model.vo.CommentWithHasChildrenVO;
  */
 public interface BaseCommentService<COMMENT extends BaseComment>
     extends CrudService<COMMENT, Long> {
-    
+
     /**
      * Lists comments by post id.
      *
@@ -97,16 +95,6 @@ public interface BaseCommentService<COMMENT extends BaseComment>
     Page<BaseCommentVO> pageVosBy(@NonNull Integer postId, @NonNull Pageable pageable);
 
     /**
-     * Lists comment vos by list of COMMENT.
-     *
-     * @param comments comments must not be null
-     * @param pageable page info must not be null
-     * @return a page of comment vo
-     */
-    @NonNull
-    Page<BaseCommentVO> pageVosBy(@NonNull List<COMMENT> comments, @NonNull Pageable pageable);
-
-    /**
      * Lists comment with parent vo.
      *
      * @param postId post id must not be null
@@ -143,6 +131,15 @@ public interface BaseCommentService<COMMENT extends BaseComment>
      * @return comments count
      */
     long countByPostId(@NonNull Integer postId);
+
+    /**
+     * Count comments by comment status and post id.
+     *
+     * @param status status must not be null.
+     * @param postId post id must not be null.
+     * @return comments count
+     */
+    long countByStatusAndPostId(@NonNull CommentStatus status, @NonNull Integer postId);
 
     /**
      * Counts by comment status.
@@ -208,42 +205,6 @@ public interface BaseCommentService<COMMENT extends BaseComment>
     @NonNull
     List<COMMENT> removeByIds(@NonNull Collection<Long> ids);
 
-    /**
-     * Converts to base comment dto.
-     *
-     * @param comment comment must not be null
-     * @return base comment dto
-     */
-    @NonNull
-    BaseCommentDTO convertTo(@NonNull COMMENT comment);
-
-    /**
-     * Converts to base comment dto list.
-     *
-     * @param comments comment list must not be null
-     * @return a list of base comment dto
-     */
-    @NonNull
-    List<BaseCommentDTO> convertTo(@NonNull List<COMMENT> comments);
-
-    /**
-     * Converts to base comment dto page.
-     *
-     * @param commentPage comment page must not be null
-     * @return a page of base comment dto
-     */
-    @NonNull
-    Page<BaseCommentDTO> convertTo(@NonNull Page<COMMENT> commentPage);
-
-    /**
-     * Converts to base comment vo tree.
-     *
-     * @param comments comments list could be null
-     * @param comparator comment comparator could be null
-     * @return a comment vo tree
-     */
-    List<BaseCommentVO> convertToVo(@Nullable List<COMMENT> comments,
-        @Nullable Comparator<BaseCommentVO> comparator);
 
     /**
      * Target validation.

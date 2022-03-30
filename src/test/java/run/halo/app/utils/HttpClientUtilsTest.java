@@ -3,7 +3,6 @@ package run.halo.app.utils;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import cn.hutool.core.lang.Tuple;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 
@@ -15,20 +14,20 @@ public class HttpClientUtilsTest {
             HttpClientUtils.class.getDeclaredMethod("resolveHttpProxy", String.class);
         resolveHttpProxy.setAccessible(true);
 
-        Tuple result = (Tuple) resolveHttpProxy.invoke(null, "http://127.0.0.1");
-        assertEquals(result.get(0), "http://127.0.0.1:80");
+        Object[] result = (Object[]) resolveHttpProxy.invoke(null, "http://127.0.0.1");
+        assertEquals("http://127.0.0.1:80", result[0]);
 
-        result = (Tuple) resolveHttpProxy.invoke(null, "https://127.0.0.1");
-        assertEquals(result.get(0), "https://127.0.0.1:443");
+        result = (Object[]) resolveHttpProxy.invoke(null, "https://127.0.0.1");
+        assertEquals("https://127.0.0.1:443", result[0]);
 
-        result = (Tuple) resolveHttpProxy.invoke(null, "https://127.0.0.1:123");
-        assertEquals(result.get(0), "https://127.0.0.1:123");
+        result = (Object[]) resolveHttpProxy.invoke(null, "https://127.0.0.1:123");
+        assertEquals("https://127.0.0.1:123", result[0]);
 
-        result = (Tuple) resolveHttpProxy.invoke(null, "https://u:p@127.0.0.1:123");
-        assertArrayEquals(result.getMembers(), new Object[] {"https://127.0.0.1:123", "u", "p"});
+        result = (Object[]) resolveHttpProxy.invoke(null, "https://u:p@127.0.0.1:123");
+        assertArrayEquals(new Object[] {"https://127.0.0.1:123", "u", "p"}, result);
 
-        result = (Tuple) resolveHttpProxy.invoke(null, "https://u@127.0.0.1");
-        assertArrayEquals(result.getMembers(), new Object[] {"https://127.0.0.1:443", "u", null});
+        result = (Object[]) resolveHttpProxy.invoke(null, "https://u@127.0.0.1");
+        assertArrayEquals(new Object[] {"https://127.0.0.1:443", "u", null}, result);
     }
 
 }

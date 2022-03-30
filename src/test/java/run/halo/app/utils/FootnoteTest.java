@@ -1,6 +1,7 @@
 package run.halo.app.utils;
 
-import cn.hutool.core.lang.Assert;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.vladsch.flexmark.ext.emoji.EmojiExtension;
 import com.vladsch.flexmark.ext.emoji.EmojiImageType;
 import com.vladsch.flexmark.ext.emoji.EmojiShortcutType;
@@ -54,7 +55,7 @@ public class FootnoteTest {
             + "with continuation";
         String s = renderHtml(markdown);
         System.out.println(s);
-        Assert.isTrue(StringUtils.equals(s, "<p>text <sup class=\"footnote-ref\"><a id=\"fnref1\""
+        assertTrue(StringUtils.equals(s, "<p>text <sup class=\"footnote-ref\"><a id=\"fnref1\""
             + " href=\"#fn1\">[1]</a></sup> embedded.</p>\n"
             + "<hr class=\"footnotes-sep\" />\n"
             + "<section class=\"footnotes\">\n"
@@ -78,7 +79,7 @@ public class FootnoteTest {
             + "[^another]: footnote text\n"
             + "with continuation";
         String s = renderHtml(markdown);
-        Assert.isTrue(StringUtils.equals(s, "<p>text <sup class=\"footnote-ref\"><a id=\"fnref1\""
+        assertTrue(StringUtils.equals(s, "<p>text <sup class=\"footnote-ref\"><a id=\"fnref1\""
             + " href=\"#fn1\">[1]</a></sup> embedded.</p>\n"
             + "<hr class=\"footnotes-sep\" />\n"
             + "<section class=\"footnotes\">\n"
@@ -107,7 +108,7 @@ public class FootnoteTest {
             + "[^another]: footnote text with [^another] embedded footnote\n"
             + "with continuation";
         String s = renderHtml(markdown);
-        Assert.isTrue(StringUtils.equals(s, "<p>text <sup class=\"footnote-ref\"><a id=\"fnref1\""
+        assertTrue(StringUtils.equals(s, "<p>text <sup class=\"footnote-ref\"><a id=\"fnref1\""
             + " href=\"#fn1\">[1]</a></sup> embedded.</p>\n"
             + "<hr class=\"footnotes-sep\" />\n"
             + "<section class=\"footnotes\">\n"
@@ -142,7 +143,7 @@ public class FootnoteTest {
             + "    - item 2\n"
             + ".";
         String s = renderHtml(markdown);
-        Assert.isTrue(StringUtils.equals(s, "<p>This paragraph has a footnote<sup "
+        assertTrue(StringUtils.equals(s, "<p>This paragraph has a footnote<sup "
             + "class=\"footnote-ref\"><a id=\"fnref1\" href=\"#fn1\">[1]</a></sup>.</p>\n"
             + "<hr class=\"footnotes-sep\" />\n"
             + "<section class=\"footnotes\">\n"
@@ -180,7 +181,7 @@ public class FootnoteTest {
             + "    - item 2\n"
             + ".";
         String s = renderHtml(markdown);
-        Assert.isTrue(StringUtils.equals(s, "<p>This paragraph has no footnote[ ^footnote].</p>\n"
+        assertTrue(StringUtils.equals(s, "<p>This paragraph has no footnote[ ^footnote].</p>\n"
             + "<p>[ ^footnote]: This is the body of the footnote.<br />\n"
             + "with continuation text. Inline <em>italic</em> and<br />\n"
             + "<strong>bold</strong>.</p>\n"
@@ -213,7 +214,7 @@ public class FootnoteTest {
             + "    - item 2\n"
             + ".";
         String s = renderHtml(markdown);
-        Assert.isTrue(StringUtils.equals(s, "<p>This paragraph has a footnote<sup "
+        assertTrue(StringUtils.equals(s, "<p>This paragraph has a footnote<sup "
             + "class=\"footnote-ref\"><a id=\"fnref1\" href=\"#fn1\">[1]</a></sup>.</p>\n"
             + "<hr class=\"footnotes-sep\" />\n"
             + "<section class=\"footnotes\">\n"
@@ -251,7 +252,7 @@ public class FootnoteTest {
             + "    - item 2\n"
             + ".";
         String s = renderHtml(markdown);
-        Assert.isTrue(StringUtils
+        assertTrue(StringUtils
             .equals(s, "<p>This paragraph has a footnote[^<strong>footnote</strong>].</p>\n"));
     }
 
@@ -275,7 +276,7 @@ public class FootnoteTest {
             + "    - item 2\n"
             + ".";
         String s = renderHtml(markdown);
-        Assert.isTrue(StringUtils.equals(s, "<p>This paragraph has a footnote<sup "
+        assertTrue(StringUtils.equals(s, "<p>This paragraph has a footnote<sup "
             + "class=\"footnote-ref\"><a id=\"fnref1\" href=\"#fn1\">[1]</a></sup>. Followed by "
             + "another<sup class=\"footnote-ref\"><a id=\"fnref2\" href=\"#fn2\">[2]</a></sup>"
             + ".</p>\n"
@@ -325,7 +326,7 @@ public class FootnoteTest {
             + "    **bold**.\n"
             + ".";
         String s = renderHtml(markdown);
-        Assert.isTrue(StringUtils.equals(s, "<p>This paragraph has a footnote<sup "
+        assertTrue(StringUtils.equals(s, "<p>This paragraph has a footnote<sup "
             + "class=\"footnote-ref\"><a id=\"fnref1\" href=\"#fn1\">[1]</a></sup>.</p>\n"
             + "<hr class=\"footnotes-sep\" />\n"
             + "<section class=\"footnotes\">\n"

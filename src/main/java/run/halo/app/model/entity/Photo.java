@@ -13,6 +13,7 @@ import javax.persistence.TemporalType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -79,6 +80,13 @@ public class Photo extends BaseEntity {
     @Column(name = "team")
     private String team;
 
+    /**
+     * Likes.
+     */
+    @Column(name = "likes", nullable = false)
+    @ColumnDefault("0")
+    private Long likes;
+
     @Override
     public void prePersist() {
         super.prePersist();
@@ -101,6 +109,10 @@ public class Photo extends BaseEntity {
 
         if (team == null) {
             team = "";
+        }
+
+        if (likes == null || likes < 0) {
+            likes = 0L;
         }
     }
 }

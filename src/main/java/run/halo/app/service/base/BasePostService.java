@@ -6,10 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
-import run.halo.app.model.dto.post.BasePostMinimalDTO;
-import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
+import run.halo.app.model.entity.Content;
+import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.enums.PostStatus;
 
 /**
@@ -17,6 +16,7 @@ import run.halo.app.model.enums.PostStatus;
  *
  * @author johnniang
  * @author ryanwang
+ * @author guqing
  * @date 2019-04-24
  */
 public interface BasePostService<POST extends BasePost> extends CrudService<POST, Integer> {
@@ -53,6 +53,15 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     POST getBySlug(@NonNull String slug);
 
     /**
+     * Get post with the latest content by id.
+     * content from patch log.
+     *
+     * @param postId post id.
+     * @return post with the latest content.
+     */
+    POST getWithLatestContentById(Integer postId);
+
+    /**
      * Gets post by post status and slug.
      *
      * @param status post status must not be null
@@ -71,6 +80,23 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      */
     @NonNull
     POST getBy(@NonNull PostStatus status, @NonNull Integer id);
+
+    /**
+     * Gets content by post id.
+     *
+     * @param id post id.
+     * @return a content of post.
+     */
+    Content getContentById(Integer id);
+
+    /**
+     * Gets the latest content by id.
+     * content from patch log.
+     *
+     * @param id post id.
+     * @return a latest content from patchLog of post.
+     */
+    PatchedContent getLatestContentById(Integer id);
 
     /**
      * Lists all posts by post status.
@@ -196,78 +222,6 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     POST createOrUpdateBy(@NonNull POST post);
 
     /**
-     * Filters post content if the password is not blank.
-     *
-     * @param post original post must not be null
-     * @return filtered post
-     */
-    @NonNull
-    POST filterIfEncrypt(@NonNull POST post);
-
-    /**
-     * Convert POST to minimal dto.
-     *
-     * @param post post must not be null.
-     * @return minimal dto.
-     */
-    @NonNull
-    BasePostMinimalDTO convertToMinimal(@NonNull POST post);
-
-    /**
-     * Convert list of POST to minimal dto of list.
-     *
-     * @param posts posts must not be null.
-     * @return a list of minimal dto.
-     */
-    @NonNull
-    List<BasePostMinimalDTO> convertToMinimal(@Nullable List<POST> posts);
-
-    /**
-     * Convert page of POST to minimal dto of page.
-     *
-     * @param postPage postPage must not be null.
-     * @return a page of minimal dto.
-     */
-    @NonNull
-    Page<BasePostMinimalDTO> convertToMinimal(@NonNull Page<POST> postPage);
-
-    /**
-     * Convert POST to simple dto.
-     *
-     * @param post post must not be null.
-     * @return simple dto.
-     */
-    @NonNull
-    BasePostSimpleDTO convertToSimple(@NonNull POST post);
-
-    /**
-     * Convert list of POST to list of simple dto.
-     *
-     * @param posts posts must not be null.
-     * @return a list of simple dto.
-     */
-    @NonNull
-    List<BasePostSimpleDTO> convertToSimple(@Nullable List<POST> posts);
-
-    /**
-     * Convert page of POST to page of simple dto.
-     *
-     * @param postPage postPage must not be null.
-     * @return a page of simple dto.
-     */
-    @NonNull
-    Page<BasePostSimpleDTO> convertToSimple(@NonNull Page<POST> postPage);
-
-    /**
-     * Convert POST to detail dto.
-     *
-     * @param post post must not be null.
-     * @return detail dto.
-     */
-    @NonNull
-    BasePostDetailDTO convertToDetail(@NonNull POST post);
-
-    /**
      * Updates draft content.
      *
      * @param content draft content could be blank
@@ -275,7 +229,8 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
      * @return updated post
      */
     @NonNull
-    POST updateDraftContent(@Nullable String content, @NonNull Integer postId);
+    POST updateDraftContent(@Nullable String content, String originalContent,
+        @NonNull Integer postId);
 
     /**
      * Updates post status.
@@ -300,8 +255,8 @@ public interface BasePostService<POST extends BasePost> extends CrudService<POST
     /**
      * Generate description.
      *
-     * @param content html content must not be null.
+     * @param content html content.
      * @return description
      */
-    String generateDescription(@NonNull String content);
+    String generateDescription(@Nullable String content);
 }

@@ -37,9 +37,11 @@ import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * @author ryanwang
+ * @author guqing
  * @date 2019-03-21
  */
 @Slf4j
@@ -56,6 +58,8 @@ public class ContentFeedController {
 
     private final PostService postService;
 
+    private final PostRenderAssembler postRenderAssembler;
+
     private final CategoryService categoryService;
 
     private final PostCategoryService postCategoryService;
@@ -65,11 +69,12 @@ public class ContentFeedController {
     private final FreeMarkerConfigurer freeMarker;
 
     public ContentFeedController(PostService postService,
-        CategoryService categoryService,
+        PostRenderAssembler postRenderAssembler, CategoryService categoryService,
         PostCategoryService postCategoryService,
         OptionService optionService,
         FreeMarkerConfigurer freeMarker) {
         this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
         this.categoryService = categoryService;
         this.postCategoryService = postCategoryService;
         this.optionService = optionService;
@@ -242,14 +247,28 @@ public class ContentFeedController {
         Assert.notNull(pageable, "Pageable must not be null");
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
+        Page<PostDetailVO> posts = convertToDetailPageVo(postPage);
+        return posts.getContent();
+    }
+
+    /**
+     * Converts to a page of detail vo.
+     * Notes: this method will escape the XML tag characters in the post content and summary.
+     *
+     * @param postPage post page must not be null
+     * @return a page of post detail vo that content and summary escaped.
+     */
+    @NonNull
+    private Page<PostDetailVO> convertToDetailPageVo(Page<Post> postPage) {
+        Assert.notNull(postPage, "The postPage must not be null.");
+        Page<PostDetailVO> posts = postRenderAssembler.convertToDetailVo(postPage);
         posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(
-                RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
+            postDetailVO.setContent(
+                RegExUtils.replaceAll(postDetailVO.getContent(), XML_INVALID_CHAR, ""));
             postDetailVO
                 .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
         });
-        return posts.getContent();
+        return posts;
     }
 
     /**
@@ -266,13 +285,7 @@ public class ContentFeedController {
 
         Page<Post> postPage =
             postCategoryService.pagePostBy(category.getId(), PostStatus.PUBLISHED, pageable);
-        Page<PostDetailVO> posts = postService.convertToDetailVo(postPage);
-        posts.getContent().forEach(postDetailVO -> {
-            postDetailVO.setFormatContent(
-                RegExUtils.replaceAll(postDetailVO.getFormatContent(), XML_INVALID_CHAR, ""));
-            postDetailVO
-                .setSummary(RegExUtils.replaceAll(postDetailVO.getSummary(), XML_INVALID_CHAR, ""));
-        });
+        Page<PostDetailVO> posts = convertToDetailPageVo(postPage);
         return posts.getContent();
     }
 

@@ -1,6 +1,5 @@
 package run.halo.app.core;
 
-import cn.hutool.extra.servlet.ServletUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.lang.reflect.Method;
 import java.util.Objects;
@@ -22,6 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.utils.JsonUtils;
+import run.halo.app.utils.ServletUtils;
 
 /**
  * @author johnniang
@@ -82,7 +82,7 @@ public class ControllerLogAop {
             request.getRequestURL(),
             request.getRequestURI(),
             request.getMethod(),
-            ServletUtil.getClientIP(request));
+            ServletUtils.getClientIP(request));
 
         if (args == null || !log.isDebugEnabled()) {
             return;
