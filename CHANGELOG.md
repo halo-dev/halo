@@ -1,5 +1,25 @@
 # CHANGELOG
 
+# 1.5.1
+
+## Bug Fixes
+
+- 修复文章加密和分类加密功能的逻辑问题。 halo-dev/halo#1781 halo-dev/halo#1785 @guqing @qiany-sui
+- 修复文章和分类的链接带有中文时从密码页重定向到详情页面提示 404 的问题。 halo-dev/halo#1786 @guqing @hotspring-zwb
+- 修复使用 leveldb 缓存策略时，可能因为未清空缓存导致无法发布文章的问题。 halo-dev/halo#1787 @guqing
+- 修复后台菜单管理 `从系统预设链接添加菜单` 中选择独立页面无法创建菜单的问题。 halo-dev/halo-admin#520 @QuentinHsu
+- 修复后台布局设置中，`亮色菜单风格` 所使用的图标不正确的问题。 halo-dev/halo-admin#524 @QuentinHsu @wangzhen-fit2cloud
+- 修复后台首次创建文章时是否置顶按钮无法切换的问题。 halo-dev/halo-admin#525 halo-dev/halo-admin#530 @QuentinHsu @ruibaby @guqing
+- 修复后台在 SMTP 设置中测试邮件发送时，提示有误的问题。 halo-dev/halo-admin#526 @QuentinHsu @hapke24
+- 修复后台分类管理中当父分类为加密状态时，超过第二级子分类没有显示加密状态的问题。 halo-dev/halo-admin#527
+
+## Dependencies
+
+- 升级 Spring Boot 版本至 2.5.11，处理 [CVE-2022-22950: Spring Expression DoS Vulnerability](https://tanzu.vmware.com/security/cve-2022-22950) 中的安全性问题。 halo-dev/halo#1792 @guqing
+- 更新后台 @halo-dev/editor 版本。 halo-dev/halo-admin#529 @ruibaby
+    - 统一编辑器字体在各个系统的表现。
+    - 修复使用中文输入法的时候，候选框挡住当前行文字的问题。
+
 # 1.5.0
 
 ## Breaking changes
