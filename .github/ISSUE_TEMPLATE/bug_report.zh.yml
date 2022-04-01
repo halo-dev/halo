@@ -62,7 +62,7 @@ body:
     id: logs
     attributes:
       label: "相关日志输出"
-      description: "请复制并粘贴任何相关的日志输出。 这将自动格式化为代码，因此无需反引号。"
+      description: "请复制并粘贴任何相关的日志输出。 这将自动格式化为代码，因此无需反引号。获取日志的方法可参考：https://docs.halo.run/user-guide/faq#如何查看运行日志"
       render: shell
   - type: textarea
     id: additional-information
