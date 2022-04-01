@@ -59,13 +59,21 @@ public class ContentAuthenticationManager {
     @EventListener(CategoryUpdatedEvent.class)
     public void categoryUpdatedListener(CategoryUpdatedEvent event) {
         Category category = event.getCategory();
-        categoryAuthentication.clearByResourceId(category.getId());
+        // updated category is null when remove event emited
+        if (category == null) {
+            category = event.getBeforeUpdated();
+        }
+        if (category != null) {
+            categoryAuthentication.clearByResourceId(category.getId());
+        }
     }
 
     @EventListener(PostUpdatedEvent.class)
     public void postUpdatedListener(PostUpdatedEvent event) {
         Post post = event.getPost();
-        postAuthentication.clearByResourceId(post.getId());
+        if (post != null) {
+            postAuthentication.clearByResourceId(post.getId());
+        }
     }
 
     private PostAuthentication authenticatePost(ContentAuthenticationRequest authRequest) {
