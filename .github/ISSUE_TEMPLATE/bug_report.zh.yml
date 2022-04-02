@@ -11,7 +11,7 @@ body:
     id: checklist
     attributes:
       label: 检查清单
-      description: 为了保证同样的问题不被重新创建，建议先进行下面的操作。
+      description: 为了保证同样的问题不被重复创建，建议先进行下面的操作。
       options:
         - label: 已经在 [GitHub Issues](https://github.com/halo-dev/halo/issues) 中搜索过该问题
           required: true
