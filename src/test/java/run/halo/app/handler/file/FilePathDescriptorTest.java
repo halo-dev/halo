@@ -102,8 +102,8 @@ public class FilePathDescriptorTest {
 
         assertThat(descriptor).isNotNull();
 
-        assertThat(descriptor.getFullPath()).isEqualTo("C:\\Users\\Halo NiuBi\\" +
-            ".halo\\upload\\2022\\04\\hello.jpg");
+        assertThat(descriptor.getFullPath()).isEqualTo("C:\\Users\\Halo NiuBi\\"
+            + ".halo\\upload\\2022\\04\\hello.jpg");
         assertThat(descriptor.getRelativePath()).isEqualTo("upload\\2022\\04\\hello.jpg");
 
         assertThat(descriptor.getBasePath()).isEqualTo("C:\\Users\\Halo NiuBi\\.halo\\");
