@@ -10,7 +10,7 @@ body:
     id: checklist
     attributes:
       label: Checklist
-      description: To ensure that the same problem is not recreated, it is recommended to do the following first.
+      description: To avoid duplicate issues, it is recommended to do the following first.
       options:
         - label: The issue has been searched in [GitHub Issues](https://github.com/halo-dev/halo/issues)
           required: true
