@@ -149,7 +149,7 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
     private ContentPatchLog updateDraftBy(Integer postId, String formatContent,
         String originalContent) {
         ContentPatchLog draftPatchLog = findLatestDraftBy(postId);
-        if(draftPatchLog == null) {
+        if (draftPatchLog == null) {
             throw new NotFoundException("The latest draft version must not be null to update.");
         }
         // Is the draft version 1
