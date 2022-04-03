@@ -190,8 +190,7 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     @Transactional(rollbackFor = Exception.class)
     public void removeCategoryAndPostCategoryBy(Integer categoryId) {
         final boolean beforeIsPrivate = isPrivate(categoryId);
-        Set<Integer> postIds = listPostIdsByCategoryIdRecursively(categoryId);
-        postCategoryService.listPostBy(categoryId);
+        final Set<Integer> postIds = listPostIdsByCategoryIdRecursively(categoryId);
         List<Category> categories = listByParentId(categoryId);
         if (null != categories && categories.size() > 0) {
             categories.forEach(category -> {
