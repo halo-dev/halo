@@ -690,17 +690,18 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
         frontMatter.append("date: ").append(post.getCreateTime()).append("\n");
         frontMatter.append("updated: ").append(post.getUpdateTime()).append("\n");
 
-        //set fullPath
+        // set fullPath
         frontMatter.append("url: ").append(postAssembler.buildFullPath(post)).append("\n");
 
-        //set category
+        // set category
+        // classification with hierarchies has not been processed yet
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         StringBuilder categoryContent = new StringBuilder();
         categories.forEach(category -> categoryContent.append("- ").append(category.getName())
             .append("\n"));
         frontMatter.append("categories: ").append("\n").append(categoryContent);
 
-        //set tags
+        // set tags
         List<Tag> tags = postTagService.listTagsBy(post.getId());
         StringBuilder tagContent = new StringBuilder();
         tags.forEach(tag -> tagContent.append("- ").append(tag.getName()).append("\n"));
