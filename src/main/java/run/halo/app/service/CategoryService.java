@@ -2,6 +2,7 @@ package run.halo.app.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -133,4 +134,13 @@ public interface CategoryService extends CrudService<Category, Integer> {
      * @return a tree of category.
      */
     List<CategoryVO> listToTree(List<Category> categories);
+
+    /**
+     * Recursively query the associated post ids according to the category id.
+     *
+     * @param categoryId category id
+     * @return a collection of post ids
+     */
+    @NonNull
+    Set<Integer> listPostIdsByCategoryIdRecursively(@NonNull Integer categoryId);
 }

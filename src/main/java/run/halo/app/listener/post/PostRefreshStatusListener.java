@@ -1,24 +1,19 @@
 package run.halo.app.listener.post;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.event.category.CategoryUpdatedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Post;
-import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
-import run.halo.app.utils.ServiceUtils;
 
 /**
  * Post status management.
@@ -53,84 +48,60 @@ public class PostRefreshStatusListener {
         Category beforeUpdated = event.getBeforeUpdated();
         boolean beforeIsPrivate = event.isBeforeIsPrivate();
         RecordState recordState = determineRecordState(beforeUpdated, category);
+
+        List<Post> posts = postService.listAllByIds(event.getPostIds());
+
+        // handle delete action
         if (RecordState.DELETED.equals(recordState) || category == null) {
+            if (beforeUpdated == null || !beforeIsPrivate) {
+                return;
+            }
+            // Cancel the encryption status of the posts
+            changeStatusToPublishIfNecessary(posts, beforeUpdated.getId());
             return;
         }
 
         // now
         boolean isPrivate = categoryService.isPrivate(category.getId());
-        List<Post> posts = findPostsByCategoryIdRecursively(category.getId());
         if (isPrivate) {
+            List<Post> postsToUpdate = new ArrayList<>();
             posts.forEach(post -> {
                 if (post.getStatus() == PostStatus.PUBLISHED) {
                     post.setStatus(PostStatus.INTIMATE);
+                    postsToUpdate.add(post);
                 }
             });
-        } else {
-            if (RecordState.UPDATED.equals(recordState)) {
-                Set<Integer> encryptedCategories =
-                    pickUpEncryptedFromUpdatedRecord(category.getId());
-                for (Post post : posts) {
-                    boolean belongsToEncryptedCategory =
-                        postBelongsToEncryptedCategory(post.getId(), encryptedCategories);
-                    if (!belongsToEncryptedCategory && StringUtils.isBlank(post.getPassword())
-                        && beforeIsPrivate
-                        && post.getStatus() == PostStatus.INTIMATE) {
-                        post.setStatus(PostStatus.PUBLISHED);
-                    }
-                }
-            }
+            postService.updateInBatch(postsToUpdate);
+        } else if (beforeIsPrivate && RecordState.UPDATED.equals(recordState)) {
+            // Cancel the encryption status of the posts
+            changeStatusToPublishIfNecessary(posts, category.getId());
         }
-        postService.updateInBatch(posts);
     }
 
-    private boolean postBelongsToEncryptedCategory(Integer postId,
-        Set<Integer> encryptedCategories) {
-        Set<Integer> categoryIds =
-            postCategoryService.listCategoryIdsByPostId(postId);
+    private void changeStatusToPublishIfNecessary(List<Post> posts, Integer categoryId) {
+        List<Post> postsToUpdate = new ArrayList<>();
+        for (Post post : posts) {
+            boolean belongsToEncryptedCategory = postBelongsToEncryptedCategory(post.getId());
+            if (!belongsToEncryptedCategory && StringUtils.isBlank(post.getPassword())
+                && post.getStatus() == PostStatus.INTIMATE) {
+                post.setStatus(PostStatus.PUBLISHED);
+                postsToUpdate.add(post);
+            }
+        }
+        postService.updateInBatch(postsToUpdate);
+    }
+
+    private boolean postBelongsToEncryptedCategory(Integer postId) {
+        Set<Integer> categoryIds = postCategoryService.listCategoryIdsByPostId(postId);
 
         boolean encrypted = false;
         for (Integer categoryId : categoryIds) {
-            if (encryptedCategories.contains(categoryId)) {
+            if (categoryService.isPrivate(categoryId)) {
                 encrypted = true;
                 break;
             }
         }
         return encrypted;
-    }
-
-    private Set<Integer> pickUpEncryptedFromUpdatedRecord(Integer categoryId) {
-        Set<Integer> privateCategories = new HashSet<>();
-
-        List<Category> categories = categoryService.listAllByParentId(categoryId);
-        Map<Integer, Category> categoryMap =
-            ServiceUtils.convertToMap(categories, Category::getId);
-        categories.forEach(category -> {
-            boolean privateBy = isPrivateBy(category.getId(), categoryMap);
-            if (privateBy) {
-                privateCategories.add(category.getId());
-            }
-        });
-        return privateCategories;
-    }
-
-    private boolean isPrivateBy(Integer categoryId, Map<Integer, Category> categoryMap) {
-        return findFirstEncryptedCategoryBy(categoryMap, categoryId) != null;
-    }
-
-    private Category findFirstEncryptedCategoryBy(Map<Integer, Category> idToCategoryMap,
-        Integer categoryId) {
-        Category category = idToCategoryMap.get(categoryId);
-
-        if (categoryId == 0 || category == null) {
-            return null;
-        }
-
-        if (StringUtils.isNotBlank(category.getPassword())) {
-            return category;
-        }
-
-        return findFirstEncryptedCategoryBy(idToCategoryMap, category.getParentId());
     }
 
     private RecordState determineRecordState(Category before, Category updated) {
@@ -153,25 +124,14 @@ public class PostRefreshStatusListener {
         }
     }
 
-    /**
-     * effective state for database record.
-     */
     enum RecordState {
+        /**
+         * effective state for database record.
+         */
         CREATED,
         UPDATED,
         DELETED,
         UNCHANGED
-    }
-
-    @NonNull
-    private List<Post> findPostsByCategoryIdRecursively(Integer categoryId) {
-        Set<Integer> categoryIds =
-            ServiceUtils.fetchProperty(categoryService.listAllByParentId(categoryId),
-                Category::getId);
-        List<PostCategory> postCategories =
-            postCategoryService.listByCategoryIdList(new ArrayList<>(categoryIds));
-        Set<Integer> postIds = ServiceUtils.fetchProperty(postCategories, PostCategory::getPostId);
-        return postService.listAllByIds(postIds);
     }
 
     /**
