@@ -3,6 +3,7 @@ package run.halo.app.service.impl;
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.service.CategoryService;
@@ -111,8 +113,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         boolean beforeIsPrivate = isPrivate(category.getId());
 
         Category updated = super.update(category);
+
+        Set<Integer> postIds = listPostIdsByCategoryIdRecursively(category.getId());
         applicationContext.publishEvent(
-            new CategoryUpdatedEvent(this, category, beforeUpdated, beforeIsPrivate));
+            new CategoryUpdatedEvent(this, category, beforeUpdated, beforeIsPrivate, postIds));
         return updated;
     }
 
@@ -183,8 +187,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void removeCategoryAndPostCategoryBy(Integer categoryId) {
+        final boolean beforeIsPrivate = isPrivate(categoryId);
+        final Set<Integer> postIds = listPostIdsByCategoryIdRecursively(categoryId);
         List<Category> categories = listByParentId(categoryId);
         if (null != categories && categories.size() > 0) {
             categories.forEach(category -> {
@@ -198,7 +204,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         // Remove post categories
         postCategoryService.removeByCategoryId(categoryId);
 
-        applicationContext.publishEvent(new CategoryUpdatedEvent(this, null, category, false));
+        applicationContext.publishEvent(
+            new CategoryUpdatedEvent(this, null, category, beforeIsPrivate, postIds));
     }
 
     @Override
@@ -371,12 +378,26 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
                 Category categoryParam = idCategoryParamMap.get(categoryToUpdate.getId());
                 BeanUtils.updateProperties(categoryParam, categoryToUpdate);
                 Category categoryUpdated = update(categoryToUpdate);
+
+                Set<Integer> postIds = listPostIdsByCategoryIdRecursively(categoryUpdated.getId());
                 applicationContext.publishEvent(new CategoryUpdatedEvent(this,
-                    categoryUpdated, categoryBefore, beforeIsPrivate));
+                    categoryUpdated, categoryBefore, beforeIsPrivate, postIds));
                 return categoryUpdated;
             })
             .collect(Collectors.toList());
     }
 
+    @NonNull
+    @Override
+    public Set<Integer> listPostIdsByCategoryIdRecursively(@NonNull Integer categoryId) {
+        Set<Integer> categoryIds = ServiceUtils.fetchProperty(listAllByParentId(categoryId),
+            Category::getId);
+        if (CollectionUtils.isEmpty(categoryIds)) {
+            return Collections.emptySet();
+        }
+        List<PostCategory> postCategories =
+            postCategoryService.listByCategoryIdList(new ArrayList<>(categoryIds));
+        return ServiceUtils.fetchProperty(postCategories, PostCategory::getPostId);
+    }
 
 }
