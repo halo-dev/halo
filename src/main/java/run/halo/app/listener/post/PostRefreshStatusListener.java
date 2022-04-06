@@ -153,9 +153,9 @@ public class PostRefreshStatusListener {
         if (post.getStatus() != PostStatus.DRAFT) {
             if (StringUtils.isNotEmpty(post.getPassword())) {
                 status = PostStatus.INTIMATE;
-            } else if (isPrivate) {
+            } else if (isPrivate && !PostStatus.RECYCLE.equals(status)) {
                 status = PostStatus.INTIMATE;
-            } else {
+            } else if (!PostStatus.RECYCLE.equals(status)) {
                 status = PostStatus.PUBLISHED;
             }
         } else if (!isPrivate && StringUtils.isBlank(post.getPassword())) {
