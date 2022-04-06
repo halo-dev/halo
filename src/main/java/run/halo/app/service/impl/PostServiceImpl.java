@@ -207,6 +207,7 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Post updateStatus(PostStatus status, Integer postId) {
         Post post = super.updateStatus(status, postId);
         eventPublisher.publishEvent(new PostUpdatedEvent(this, post));
