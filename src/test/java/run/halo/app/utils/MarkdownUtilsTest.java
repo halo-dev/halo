@@ -83,7 +83,7 @@ class MarkdownUtilsTest {
     }
 
     @Test
-    void getFrontMatter() {
+    void getFrontMatterYaml() {
         String markdown = "---\n"
             + "title: \"test remove\"\n"
             + "---";
@@ -94,5 +94,20 @@ class MarkdownUtilsTest {
             + "---";
         frontMatter = MarkdownUtils.getFrontMatter(markdown);
         assertEquals("\"test remove\"", frontMatter.get("title").get(0));
+
+        // halo
+        markdown = "---\n"
+            + "title: Hello Halo\n"
+            + "date: 2021-12-04 17:27:26.114\n"
+            + "updated: 2021-12-04 17:27:26.114\n"
+            + "url: /archives/hello-halo\n"
+            + "categories: \n"
+            + "- default category\n"
+            + "- multi category\n"
+            + "tags: \n"
+            + "---\n";
+        frontMatter = MarkdownUtils.getFrontMatter(markdown);
+        assertEquals("default category", frontMatter.get("categories").get(0));
+        assertEquals("multi category", frontMatter.get("categories").get(1));
     }
 }

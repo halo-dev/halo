@@ -652,48 +652,62 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     private PostMarkdownVO convertToPostMarkdownVo(Post post) {
         PostMarkdownVO postMarkdownVO = new PostMarkdownVO();
 
-        StringBuilder frontMatter = new StringBuilder("---\n");
-        frontMatter.append("title: ").append(post.getTitle()).append("\n");
-        frontMatter.append("date: ").append(post.getCreateTime()).append("\n");
-        frontMatter.append("updated: ").append(post.getUpdateTime()).append("\n");
-
-        //set fullPath
-        frontMatter.append("url: ").append(postAssembler.buildFullPath(post)).append("\n");
-
-        //set category
-        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
-        StringBuilder categoryContent = new StringBuilder();
-        for (int i = 0; i < categories.size(); i++) {
-            Category category = categories.get(i);
-            String categoryName = category.getName();
-            if (i == 0) {
-                categoryContent.append(categoryName);
-            } else {
-                categoryContent.append(" | ").append(categoryName);
-            }
-        }
-        frontMatter.append("categories: ").append(categoryContent.toString()).append("\n");
-
-        //set tags
-        List<Tag> tags = postTagService.listTagsBy(post.getId());
-        StringBuilder tagContent = new StringBuilder();
-        for (int i = 0; i < tags.size(); i++) {
-            Tag tag = tags.get(i);
-            String tagName = tag.getName();
-            if (i == 0) {
-                tagContent.append(tagName);
-            } else {
-                tagContent.append(" | ").append(tagName);
-            }
-        }
-        frontMatter.append("tags: ").append(tagContent).append("\n");
-
-        frontMatter.append("---\n");
+        // set frontMatter
+        StringBuilder frontMatter = getFrontMatterYaml(post);
         postMarkdownVO.setFrontMatter(frontMatter.toString());
+
+        // set content
         PatchedContent postContent = post.getContent();
         postMarkdownVO.setOriginalContent(postContent.getOriginalContent());
         postMarkdownVO.setTitle(post.getTitle());
         postMarkdownVO.setSlug(post.getSlug());
         return postMarkdownVO;
+    }
+
+    /**
+     * frontMatter has a variety of parsing methods, but the most commonly used is the yaml type.
+     * yaml is used here, and public methods can be extracted if needed for extensions.
+     * <p>
+     * Example: <br>
+     * title: default title. <br>
+     * date: 2022-04-03 19:00:00.000 <br>
+     * updated: 2022-04-03 19:00:00.000 <br>
+     * description: default description <br>
+     * categories: <br>
+     * - Java <br>
+     * - Halo <br>
+     * tags: <br>
+     * - tag <br>
+     * - doc <br>
+     * </p>
+     *
+     * @param post post not be null
+     * @return frontMatter
+     */
+    private StringBuilder getFrontMatterYaml(Post post) {
+        StringBuilder frontMatter = new StringBuilder("---\n");
+        frontMatter.append("title: ").append(post.getTitle()).append("\n");
+        frontMatter.append("date: ").append(post.getCreateTime()).append("\n");
+        frontMatter.append("updated: ").append(post.getUpdateTime()).append("\n");
+
+        // set fullPath
+        frontMatter.append("url: ").append(postAssembler.buildFullPath(post)).append("\n");
+
+        // set category
+        // classification with hierarchies has not been processed yet
+        List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
+        StringBuilder categoryContent = new StringBuilder();
+        categories.forEach(category -> categoryContent.append("- ").append(category.getName())
+            .append("\n"));
+        frontMatter.append("categories: ").append("\n").append(categoryContent);
+
+        // set tags
+        List<Tag> tags = postTagService.listTagsBy(post.getId());
+        StringBuilder tagContent = new StringBuilder();
+        tags.forEach(tag -> tagContent.append("- ").append(tag.getName()).append("\n"));
+        frontMatter.append("tags: ").append("\n").append(tagContent);
+
+        frontMatter.append("---\n");
+        return frontMatter;
     }
 }
