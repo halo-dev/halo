@@ -336,6 +336,11 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(categoryTree, "The categoryTree must not be null.");
         Map<Integer, Set<Integer>> categoryPostIdsMap = postCategoryRepository.findAll()
             .stream()
+            .filter(postCategory -> {
+                // Filter posts in the recycle
+                Post post = postRepository.findById(postCategory.getPostId()).orElseThrow();
+                return !PostStatus.RECYCLE.equals(post.getStatus());
+            })
             .collect(Collectors.groupingBy(PostCategory::getCategoryId,
                 Collectors.mapping(PostCategory::getPostId, Collectors.toSet())));
 
