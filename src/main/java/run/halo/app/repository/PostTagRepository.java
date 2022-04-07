@@ -114,7 +114,8 @@ public interface PostTagRepository extends BaseRepository<PostTag, Integer> {
      * @return a list of tag post count projection
      */
     @Query("select new run.halo.app.model.projection.TagPostPostCountProjection(count(pt.postId),"
-        + " pt.tagId) from PostTag pt group by pt.tagId")
+        + " pt.tagId) from PostTag pt inner join Post p on p.id=pt.postId and"
+        + " p.status<>2 group by pt.tagId")
     @NonNull
     List<TagPostPostCountProjection> findPostCount();
 }
