@@ -47,18 +47,15 @@ public class PostAuthentication implements ContentAuthentication {
     @Override
     public boolean isAuthenticated(Integer postId) {
         Post post = postService.getById(postId);
-        if (StringUtils.isBlank(post.getPassword())) {
-            List<PostCategory> postCategories = postCategoryService.listByPostId(postId);
-            boolean categoryEncrypted = postCategories.stream()
-                .anyMatch(postCategory -> categoryService.isPrivate(postCategory.getCategoryId()));
-            if (!categoryEncrypted) {
-                return true;
+        if (!isPrivate(post)) {
+            return true;
+        }
+        List<PostCategory> postCategories = postCategoryService.listByPostId(postId);
+        for (PostCategory postCategory : postCategories) {
+            if (!categoryService.isPrivate(postCategory.getCategoryId())) {
+                continue;
             }
-
-            boolean anyCategoryAuthenticated = postCategories.stream()
-                .anyMatch(postCategory ->
-                    categoryAuthentication.isAuthenticated(postCategory.getCategoryId()));
-            if (anyCategoryAuthenticated) {
+            if (categoryAuthentication.isAuthenticated(postCategory.getCategoryId())) {
                 return true;
             }
         }
@@ -72,6 +69,15 @@ public class PostAuthentication implements ContentAuthentication {
         String cacheKey =
             buildCacheKey(sessionId, getPrincipal().toString(), String.valueOf(postId));
         return cacheStore.get(cacheKey).isPresent();
+    }
+
+    private boolean isPrivate(Post post) {
+        if (StringUtils.isNotBlank(post.getPassword())) {
+            return true;
+        }
+        List<PostCategory> postCategories = postCategoryService.listByPostId(post.getId());
+        return postCategories.stream()
+            .anyMatch(postCategory -> categoryService.isPrivate(postCategory.getCategoryId()));
     }
 
     @Override
@@ -93,12 +99,13 @@ public class PostAuthentication implements ContentAuthentication {
 
     @Override
     public void clearByResourceId(Integer resourceId) {
-        String resourceCachePrefix =
-            StringUtils.joinWith(":", CACHE_PREFIX, getPrincipal(), resourceId);
-        cacheStore.toMap().forEach((key, value) -> {
-            if (StringUtils.startsWith(key, resourceCachePrefix)) {
-                cacheStore.delete(key);
-            }
-        });
+        String sessionId = getSessionId();
+        if (StringUtils.isBlank(sessionId)) {
+            return;
+        }
+        String cacheKey =
+            buildCacheKey(sessionId, getPrincipal().toString(), String.valueOf(resourceId));
+        // clean category cache
+        cacheStore.delete(cacheKey);
     }
 }

@@ -1,6 +1,8 @@
 package run.halo.app.controller.content.auth;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -37,11 +39,8 @@ public class CategoryAuthentication implements ContentAuthentication {
     @Override
     public boolean isAuthenticated(Integer categoryId) {
         Category category = categoryService.getById(categoryId);
-        if (StringUtils.isBlank(category.getPassword())) {
-            // All parent category is not encrypted
-            if (categoryService.lookupFirstEncryptedBy(category.getId()).isEmpty()) {
-                return true;
-            }
+        if (!isPrivate(category)) {
+            return true;
         }
 
         String sessionId = getSessionId();
@@ -53,6 +52,13 @@ public class CategoryAuthentication implements ContentAuthentication {
         String cacheKey =
             buildCacheKey(sessionId, getPrincipal().toString(), String.valueOf(categoryId));
         return cacheStore.get(cacheKey).isPresent();
+    }
+
+    private boolean isPrivate(Category category) {
+        if (StringUtils.isNotBlank(category.getPassword())) {
+            return true;
+        }
+        return categoryService.lookupFirstEncryptedBy(category.getId()).isPresent();
     }
 
     @Override
@@ -74,12 +80,21 @@ public class CategoryAuthentication implements ContentAuthentication {
 
     @Override
     public void clearByResourceId(Integer resourceId) {
-        String resourceCachePrefix =
-            StringUtils.joinWith(":", CACHE_PREFIX, getPrincipal(), resourceId);
-        cacheStore.toMap().forEach((key, value) -> {
-            if (StringUtils.startsWith(key, resourceCachePrefix)) {
-                cacheStore.delete(key);
-            }
-        });
+        String sessionId = getSessionId();
+        if (StringUtils.isBlank(sessionId)) {
+            return;
+        }
+        String categoryCacheKey =
+            buildCacheKey(sessionId, getPrincipal().toString(), String.valueOf(resourceId));
+        // clean category cache
+        cacheStore.delete(categoryCacheKey);
+
+        Set<Integer> postIds = categoryService.listPostIdsByCategoryIdRecursively(resourceId);
+        Set<String> postCacheKeys = postIds.stream()
+            .map(postId ->
+                buildCacheKey(sessionId, EncryptTypeEnum.POST.getName(), String.valueOf(postId)))
+            .collect(Collectors.toSet());
+        // clean category post cache
+        postCacheKeys.forEach(cacheStore::delete);
     }
 }
