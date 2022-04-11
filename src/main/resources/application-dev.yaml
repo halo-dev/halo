@@ -11,7 +11,7 @@ spring:
       enabled: always
   devtools:
     restart:
-      eanbled: true
+      enabled: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 
