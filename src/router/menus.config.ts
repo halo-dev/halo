@@ -18,7 +18,7 @@ export const menus: MenuGroupType[] = [
     items: [
       {
         name: "仪表盘",
-        path: "/dashboard",
+        path: "/",
         icon: IconDashboard,
       },
     ],
@@ -33,12 +33,12 @@ export const menus: MenuGroupType[] = [
         children: [
           {
             name: "分类",
-            path: "/categories",
+            path: "/posts/categories",
             icon: IconDashboard,
           },
           {
             name: "标签",
-            path: "/tags",
+            path: "/posts/tags",
             icon: IconDashboard,
           },
         ],

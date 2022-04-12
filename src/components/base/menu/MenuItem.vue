@@ -11,6 +11,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  active: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(["select"]);
@@ -26,7 +30,7 @@ if (openIds?.includes(props.id)) {
 }
 
 const hasSubmenus = computed(() => {
-  return slots.default;
+  return slots.default && slots.default().length > 0;
 });
 
 function handleClick() {
@@ -40,11 +44,11 @@ function handleClick() {
 
 <template>
   <li
-    class="menu-item"
     :class="{ 'has-submenus': hasSubmenus }"
+    class="menu-item"
     @click.stop="handleClick"
   >
-    <div class="menu-item-title">
+    <div :class="{ active }" class="menu-item-title">
       <span v-if="$slots.icon" class="menu-icon self-center mr-3">
         <slot name="icon" />
       </span>

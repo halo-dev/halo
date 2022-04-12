@@ -1,6 +1,11 @@
+<script lang="ts" setup>
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+</script>
+
 <template>
   <div class="about">
-    <h1>About</h1>
-    <p>This is the about page.</p>
+    <pre>Route: {{ route }}</pre>
   </div>
 </template>

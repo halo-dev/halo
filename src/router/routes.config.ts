@@ -3,15 +3,75 @@ import type { RouteRecordRaw } from "vue-router";
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "home",
-    component: () => import("../views/HomeView.vue"),
+    name: "Dashboard",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/about",
+    name: "about",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/posts",
+    name: "Posts",
+    component: () => import("../views/AboutView.vue"),
     children: [
       {
-        path: "/about",
-        name: "about",
+        path: "/posts/categories",
+        name: "Categories",
+        component: () => import("../views/AboutView.vue"),
+      },
+      {
+        path: "/posts/tags",
+        name: "Tags",
         component: () => import("../views/AboutView.vue"),
       },
     ],
+  },
+  {
+    path: "/sheets",
+    name: "Sheets",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/comment",
+    name: "Comment",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/attachment",
+    name: "Attachment",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/themes",
+    name: "Themes",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/menus",
+    name: "Menus",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/visual",
+    name: "Visual",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/plugins",
+    name: "Plugins",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/users",
+    name: "Users",
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
+    path: "/settings",
+    name: "Settings",
+    component: () => import("../views/AboutView.vue"),
   },
 ];
 

@@ -1,65 +1,13 @@
 <script lang="ts" setup>
 import { RouterView } from "vue-router";
-import { VMenu, VMenuItem, VMenuLabel } from "@/components/base/menu";
-import { IconDashboard } from "@/core/icons";
+import { VRoutesMenu } from "@/components/base/menu";
+import { menus } from "@/router/menus.config";
 </script>
 
 <template>
   <div class="flex">
     <div class="navbar h-screen w-72 p-4" style="background: #fff">
-      <VMenu :open-ids="['dashboard']">
-        <VMenuLabel>首页</VMenuLabel>
-        <VMenuItem id="dashboard" title="仪表盘">
-          <template #icon>
-            <Component :is="IconDashboard" />
-          </template>
-          <VMenuItem title="子菜单">
-            <template #icon>
-              <Component :is="IconDashboard" />
-            </template>
-          </VMenuItem>
-          <VMenuItem title="子菜单">
-            <template #icon>
-              <Component :is="IconDashboard" />
-            </template>
-            <VMenuItem title="子菜单">
-              <template #icon>
-                <Component :is="IconDashboard" />
-              </template>
-            </VMenuItem>
-          </VMenuItem>
-          <VMenuItem title="子菜单">
-            <template #icon>
-              <Component :is="IconDashboard" />
-            </template>
-          </VMenuItem>
-        </VMenuItem>
-        <VMenuItem title="仪表盘">
-          <template #icon>
-            <Component :is="IconDashboard" />
-          </template>
-        </VMenuItem>
-        <VMenuItem title="仪表盘">
-          <template #icon>
-            <Component :is="IconDashboard" />
-          </template>
-          <VMenuItem title="子菜单1">
-            <template #icon>
-              <Component :is="IconDashboard" />
-            </template>
-          </VMenuItem>
-          <VMenuItem title="子菜单1">
-            <template #icon>
-              <Component :is="IconDashboard" />
-            </template>
-          </VMenuItem>
-          <VMenuItem title="子菜单1">
-            <template #icon>
-              <Component :is="IconDashboard" />
-            </template>
-          </VMenuItem>
-        </VMenuItem>
-      </VMenu>
+      <VRoutesMenu :menus="menus" />
     </div>
     <div class="flex-1">
       <RouterView />
