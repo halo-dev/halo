@@ -5,6 +5,7 @@ import { mount } from "@vue/test-utils";
 describe("Button", () => {
   it("should render", () => {
     expect(mount(VButton).html()).contains("button");
+    expect(mount(VButton).html()).toMatchSnapshot();
   });
 
   it("should render with text", () => {
@@ -19,6 +20,8 @@ describe("Button", () => {
 
     ["primary", "secondary", "danger"].forEach((type) => {
       const button = mount(VButton, { props: { type } });
+
+      expect(button.html()).toMatchSnapshot();
       expect(button.find(".btn").classes()).toContain(`btn-${type}`);
       button.unmount();
     });
@@ -30,6 +33,8 @@ describe("Button", () => {
 
     ["lg", "sm", "xs"].forEach((size) => {
       const button = mount(VButton, { props: { size } });
+
+      expect(button.html()).toMatchSnapshot();
       expect(button.find(".btn").classes()).toContain(`btn-${size}`);
       button.unmount();
     });
@@ -42,6 +47,7 @@ describe("Button", () => {
     expect(button.find(".btn").classes()).not.toContain("btn-circle");
 
     await button.setProps({ circle: true });
+    expect(button.html()).toMatchSnapshot();
     expect(button.find(".btn").classes()).toContain("btn-circle");
   });
 
@@ -52,6 +58,7 @@ describe("Button", () => {
     expect(button.find(".btn").classes()).not.toContain("btn-block");
 
     await button.setProps({ block: true });
+    expect(button.html()).toMatchSnapshot();
     expect(button.find(".btn").classes()).toContain("btn-block");
   });
 
@@ -69,6 +76,8 @@ describe("Button", () => {
     onClick.mockReset();
     await button.setProps({ disabled: true });
     await button.trigger("click");
+
+    expect(button.html()).toMatchSnapshot();
     expect(onClick).not.toHaveBeenCalled();
   });
 });

@@ -1,0 +1,21 @@
+// Vitest Snapshot v1
+
+exports[`Button > should render 1`] = `"<button class=\\"btn btn-md btn-default\\"></button>"`;
+
+exports[`Button > should work with block prop 1`] = `"<button class=\\"btn btn-md btn-default btn-block\\"></button>"`;
+
+exports[`Button > should work with circle prop 1`] = `"<button class=\\"btn btn-md btn-default btn-circle\\"></button>"`;
+
+exports[`Button > should work with disabled prop 1`] = `"<button class=\\"btn btn-md btn-default\\" disabled=\\"\\"></button>"`;
+
+exports[`Button > should work with size prop 1`] = `"<button class=\\"btn btn-lg btn-default\\"></button>"`;
+
+exports[`Button > should work with size prop 2`] = `"<button class=\\"btn btn-sm btn-default\\"></button>"`;
+
+exports[`Button > should work with size prop 3`] = `"<button class=\\"btn btn-xs btn-default\\"></button>"`;
+
+exports[`Button > should work with type prop 1`] = `"<button class=\\"btn btn-md btn-primary\\"></button>"`;
+
+exports[`Button > should work with type prop 2`] = `"<button class=\\"btn btn-md btn-secondary\\"></button>"`;
+
+exports[`Button > should work with type prop 3`] = `"<button class=\\"btn btn-md btn-danger\\"></button>"`;
