@@ -39,6 +39,12 @@ spring:
     locations:
       - classpath:db/migration/common
       - classpath:db/migration/{vendor}
+halo:
+  security:
+    oauth2:
+      jwt:
+        public-key-location: classpath:app.pub
+        private-key-location: classpath:app.key
 logging:
   level:
     run.halo.app: DEBUG
