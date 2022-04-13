@@ -20,10 +20,12 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
         AuthenticationException authException) throws IOException, ServletException {
         log.warn("Unauthorized error: {}", authException.getMessage());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         if (HaloUtils.isAjaxRequest(request)) {
             response.getWriter().write(HttpStatus.UNAUTHORIZED.getReasonPhrase());
             return;
         }
-        response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase());
+        response.sendError(HttpStatus.UNAUTHORIZED.value(),
+            HttpStatus.UNAUTHORIZED.getReasonPhrase());
     }
 }

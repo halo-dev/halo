@@ -30,7 +30,8 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         }
         if (this.errorPage == null) {
             log.debug("Responding with 403 status code");
-            response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase());
+            response.sendError(HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase());
             return;
         }
         // Put exception into request scope (perhaps of use to a view)
@@ -49,7 +50,8 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     public void setErrorPage(String errorPage) {
-        Assert.isTrue(errorPage == null || errorPage.startsWith("/"), "errorPage must begin with '/'");
+        Assert.isTrue(errorPage == null || errorPage.startsWith("/"),
+            "errorPage must begin with '/'");
         this.errorPage = errorPage;
     }
 }
