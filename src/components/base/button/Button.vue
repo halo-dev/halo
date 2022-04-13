@@ -73,6 +73,7 @@ function handleClick() {
   @apply h-9;
   @apply px-4;
   @apply outline-0;
+  @apply border-none;
 
   &:hover {
     @apply opacity-90;

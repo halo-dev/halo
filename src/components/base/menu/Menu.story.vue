@@ -3,11 +3,10 @@
     <Variant title="Playground">
       <template #default>
         <VMenu>
-          <VMenuItem>
+          <VMenuItem title="仪表盘">
             <template #icon>
               <Component :is="IconDashboard" />
             </template>
-            仪表盘
           </VMenuItem>
         </VMenu>
       </template>

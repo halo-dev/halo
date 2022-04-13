@@ -9,7 +9,7 @@
     </Variant>
     <Variant title="Size">
       <template #default>
-        <VButton type="secondary" size="lg"> lg </VButton>
+        <VButton type="secondary" size="lg"> Large </VButton>
         <VButton type="secondary"> default </VButton>
         <VButton type="secondary" size="sm"> sm </VButton>
         <VButton type="secondary" size="xs"> xs </VButton>
