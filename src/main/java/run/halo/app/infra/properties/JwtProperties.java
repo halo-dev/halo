@@ -21,6 +21,12 @@ import org.springframework.util.StreamUtils;
 public class JwtProperties {
 
     /**
+     * URI that can either be an OpenID Connect discovery endpoint or an OAuth 2.0
+     * Authorization Server Metadata endpoint defined by RFC 8414.
+     */
+    private String issuerUri;
+
+    /**
      * JSON Web Algorithm used for verifying the digital signatures.
      */
     private String jwsAlgorithm = "RS256";
@@ -31,6 +37,14 @@ public class JwtProperties {
     private Resource publicKeyLocation;
 
     private Resource privateKeyLocation;
+
+    public String getIssuerUri() {
+        return issuerUri;
+    }
+
+    public void setIssuerUri(String issuerUri) {
+        this.issuerUri = issuerUri;
+    }
 
     public String getJwsAlgorithm() {
         return this.jwsAlgorithm;
