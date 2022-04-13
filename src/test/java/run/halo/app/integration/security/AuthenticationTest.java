@@ -55,7 +55,7 @@ public class AuthenticationTest {
     }
 
     @Test
-    public void scuredApiTest() throws Exception {
+    public void securedApiTest() throws Exception {
         mockMvc.perform(get("/api/secured"))
             .andDo(print())
             .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
