@@ -1,4 +1,5 @@
 import { IconDashboard } from "@/core/icons";
+import type { Component } from "vue";
 
 declare interface MenuGroupType {
   name?: string;
@@ -8,7 +9,7 @@ declare interface MenuGroupType {
 declare interface MenuItemType {
   name: string;
   path: string;
-  icon?: string;
+  icon?: Component;
   meta?: Record<string, unknown>;
   children?: MenuItemType[];
 }
