@@ -42,6 +42,9 @@ bootJar {
 }
 
 ext['h2.version'] = '2.1.210'
+ext {
+    commonsLang3 = "3.12.0"
+}
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -54,6 +57,9 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-jetty"
     implementation "org.flywaydb:flyway-core"
     implementation "org.flywaydb:flyway-mysql"
+
+    implementation "org.apache.commons:commons-lang3:$commonsLang3"
+
     compileOnly 'org.projectlombok:lombok'
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
