@@ -12,13 +12,15 @@ import org.springframework.util.Assert;
  * @author guqing
  * @date 2022-04-14
  */
-public interface OAuth2TokenContext extends Context{
+public interface OAuth2TokenContext extends Context {
 
     /**
-     * Returns the {@link Authentication} representing the {@code Principal} resource owner (or client).
+     * Returns the {@link Authentication} representing the {@code Principal} resource owner (or
+     * client).
      *
      * @param <T> the type of the {@code Authentication}
-     * @return the {@link Authentication} representing the {@code Principal} resource owner (or client)
+     * @return the {@link Authentication} representing the {@code Principal} resource owner (or
+     * client)
      */
     default <T extends Authentication> T getPrincipal() {
         return get(AbstractBuilder.PRINCIPAL_AUTHENTICATION_KEY);
@@ -40,8 +42,8 @@ public interface OAuth2TokenContext extends Context{
      * @return the authorized scope(s)
      */
     default Set<String> getAuthorizedScopes() {
-        return hasKey(AbstractBuilder.AUTHORIZATION_SCOPE_AUTHENTICATION_KEY) ?
-            get(AbstractBuilder.AUTHORIZATION_SCOPE_AUTHENTICATION_KEY) :
+        return hasKey(AbstractBuilder.AUTHORIZATION_SCOPE_AUTHENTICATION_KEY)
+            ? get(AbstractBuilder.AUTHORIZATION_SCOPE_AUTHENTICATION_KEY) :
             Collections.emptySet();
     }
 
@@ -68,9 +70,11 @@ public interface OAuth2TokenContext extends Context{
         private final Map<Object, Object> context = new HashMap<>();
 
         /**
-         * Sets the {@link Authentication} representing the {@code Principal} resource owner (or client).
+         * Sets the {@link Authentication} representing the {@code Principal} resource owner (or
+         * client).
          *
-         * @param principal the {@link Authentication} representing the {@code Principal} resource owner (or client)
+         * @param principal the {@link Authentication} representing the {@code Principal}
+         * resource owner (or client)
          * @return the {@link AbstractBuilder} for further configuration
          */
         public B principal(Authentication principal) {

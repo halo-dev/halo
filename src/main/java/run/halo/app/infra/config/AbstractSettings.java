@@ -63,15 +63,14 @@ public abstract class AbstractSettings implements Serializable {
 
     @Override
     public String toString() {
-        return "AbstractSettings {" +
-            "settings=" + this.settings +
-            '}';
+        return "AbstractSettings {" + "settings=" + this.settings + '}';
     }
 
     /**
      * A builder for subclasses of {@link AbstractSettings}.
      */
-    protected static abstract class AbstractBuilder<T extends AbstractSettings, B extends AbstractBuilder<T, B>> {
+    protected abstract static class AbstractBuilder<T extends AbstractSettings,
+        B extends AbstractBuilder<T, B>> {
         private final Map<String, Object> settings = new HashMap<>();
 
         protected AbstractBuilder() {

@@ -40,8 +40,8 @@ public record JwtGenerator(JwtEncoder jwtEncoder) implements OAuth2TokenGenerato
     @Nullable
     @Override
     public Jwt generate(OAuth2TokenContext context) {
-        if (context.getTokenType() == null ||
-            !OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
+        if (context.getTokenType() == null
+            || !OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
             return null;
         }
         Instant issuedAt = Instant.now();
@@ -54,7 +54,6 @@ public record JwtGenerator(JwtEncoder jwtEncoder) implements OAuth2TokenGenerato
             issuer = context.getProviderContext().getIssuer();
         }
 
-        // @formatter:off
         JwtClaimsSet.Builder claimsBuilder = JwtClaimsSet.builder();
         if (StringUtils.hasText(issuer)) {
             claimsBuilder.issuer(issuer);
@@ -71,7 +70,6 @@ public record JwtGenerator(JwtEncoder jwtEncoder) implements OAuth2TokenGenerato
                 claimsBuilder.claim(OAuth2ParameterNames.SCOPE, context.getAuthorizedScopes());
             }
         }
-        // @formatter:on
         JwsHeader headers = JwsHeader.with(SignatureAlgorithm.RS256).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(headers, claimsBuilder.build()));
     }

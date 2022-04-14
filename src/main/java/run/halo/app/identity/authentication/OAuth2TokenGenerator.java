@@ -5,11 +5,6 @@ import org.springframework.security.oauth2.core.ClaimAccessor;
 import org.springframework.security.oauth2.core.OAuth2Token;
 
 /**
- * @author guqing
- * @date 2022-04-14
- */
-
-/**
  * Implementations of this interface are responsible for generating an {@link OAuth2Token}
  * using the attributes contained in the {@link OAuth2TokenContext}.
  *
@@ -27,11 +22,13 @@ public interface OAuth2TokenGenerator<T extends OAuth2Token> {
      * or return {@code null} if the {@link OAuth2TokenContext#getTokenType()} is not supported.
      *
      * <p>
-     * If the returned {@link OAuth2Token} has a set of claims, it should implement {@link ClaimAccessor}
+     * If the returned {@link OAuth2Token} has a set of claims, it should implement
+     * {@link ClaimAccessor}
      * in order for it to be stored with the {@link OAuth2Authorization}.
      *
      * @param context the context containing the OAuth 2.0 Token attributes
-     * @return an {@link OAuth2Token} or {@code null} if the {@link OAuth2TokenContext#getTokenType()} is not supported
+     * @return an {@link OAuth2Token} or {@code null} if the
+     * {@link OAuth2TokenContext#getTokenType()} is not supported
      */
     @Nullable
     T generate(OAuth2TokenContext context);

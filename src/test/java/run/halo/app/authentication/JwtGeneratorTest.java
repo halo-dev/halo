@@ -56,11 +56,9 @@ public class JwtGeneratorTest {
 
     @Test
     public void generateWhenUnsupportedTokenTypeThenReturnNull() {
-        // @formatter:off
         OAuth2TokenContext tokenContext = DefaultOAuth2TokenContext.builder()
             .tokenType(new OAuth2TokenType("unsupported_token_type"))
             .build();
-        // @formatter:on
 
         assertThat(this.jwtGenerator.generate(tokenContext)).isNull();
     }
@@ -72,14 +70,13 @@ public class JwtGeneratorTest {
         Set<String> scope = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .collect(Collectors.toSet());
-        // @formatter:off
+
         OAuth2TokenContext tokenContext = DefaultOAuth2TokenContext.builder()
             .principal(authentication)
             .providerContext(this.providerContext)
             .authorizedScopes(scope)
             .tokenType(OAuth2TokenType.ACCESS_TOKEN)
             .build();
-        // @formatter:on
 
         assertGeneratedTokenType(tokenContext);
     }

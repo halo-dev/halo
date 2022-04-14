@@ -41,8 +41,8 @@ public record ProviderContext(ProviderSettings providerSettings,
      * @return the {@code URL} of the Provider's issuer identifier
      */
     public String getIssuer() {
-        return this.issuerSupplier != null ?
-            this.issuerSupplier.get() :
+        return this.issuerSupplier != null
+            ? this.issuerSupplier.get() :
             providerSettings().getIssuer();
     }
 }

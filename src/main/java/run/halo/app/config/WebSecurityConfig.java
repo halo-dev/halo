@@ -50,7 +50,6 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // @formatter:off
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .antMatchers("/api/**", "/apis/**").authenticated()
@@ -63,20 +62,17 @@ public class WebSecurityConfig {
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .accessDeniedHandler(new JwtAccessDeniedHandler())
             );
-        // @formatter:on
         return http.build();
     }
 
     @Bean
     UserDetailsService users() {
-        // @formatter:off
         return new InMemoryUserDetailsManager(
             User.withUsername("user")
                 .password("{noop}password")
                 .authorities("app")
                 .build()
         );
-        // @formatter:on
     }
 
     @Bean

@@ -22,7 +22,6 @@ public class JwtClaimsSetTest {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(1, ChronoUnit.HOURS);
 
-        // @formatter:off
         return JwtClaimsSet.builder()
             .issuer(issuer)
             .subject("subject")
@@ -32,7 +31,6 @@ public class JwtClaimsSetTest {
             .expiresAt(expiresAt)
             .id("jti")
             .claim("custom-claim-name", "custom-claim-value");
-        // @formatter:on
     }
 
     @Test
