@@ -7,19 +7,17 @@ import org.springframework.util.Assert;
  * @author guqing
  * @date 2022-04-14
  */
-public class OAuth2TokenType implements Serializable {
+public record OAuth2TokenType(String value) implements Serializable {
     public static final OAuth2TokenType ACCESS_TOKEN = new OAuth2TokenType("access_token");
     public static final OAuth2TokenType REFRESH_TOKEN = new OAuth2TokenType("refresh_token");
-    private final String value;
 
     /**
      * Constructs an {@code OAuth2TokenType} using the provided value.
      *
      * @param value the value of the token type
      */
-    public OAuth2TokenType(String value) {
+    public OAuth2TokenType {
         Assert.hasText(value, "value cannot be empty");
-        this.value = value;
     }
 
     /**
@@ -27,7 +25,8 @@ public class OAuth2TokenType implements Serializable {
      *
      * @return the value of the token type
      */
-    public String getValue() {
+    @Override
+    public String value() {
         return this.value;
     }
 
@@ -40,11 +39,11 @@ public class OAuth2TokenType implements Serializable {
             return false;
         }
         OAuth2TokenType that = (OAuth2TokenType) obj;
-        return getValue().equals(that.getValue());
+        return value().equals(that.value());
     }
 
     @Override
     public int hashCode() {
-        return getValue().hashCode();
+        return value().hashCode();
     }
 }
