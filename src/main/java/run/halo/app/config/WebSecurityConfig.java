@@ -73,15 +73,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             );
     }
 
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(jwtDaoAuthenticationProvider());
+    }
+
     @Bean
     @Override
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(jwtDaoAuthenticationProvider());
     }
 
     @Bean

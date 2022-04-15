@@ -142,10 +142,10 @@ public class OAuth2Authorization implements Serializable {
             return false;
         }
         OAuth2Authorization that = (OAuth2Authorization) obj;
-        return Objects.equals(this.id, that.id) &&
-            Objects.equals(this.principalName, that.principalName) &&
-            Objects.equals(this.tokens, that.tokens) &&
-            Objects.equals(this.attributes, that.attributes);
+        return Objects.equals(this.id, that.id)
+            && Objects.equals(this.principalName, that.principalName)
+            && Objects.equals(this.tokens, that.tokens)
+            && Objects.equals(this.attributes, that.attributes);
     }
 
     @Override
@@ -303,8 +303,8 @@ public class OAuth2Authorization implements Serializable {
                 return false;
             }
             Token<?> that = (Token<?>) obj;
-            return Objects.equals(this.token, that.token) &&
-                Objects.equals(this.metadata, that.metadata);
+            return Objects.equals(this.token, that.token)
+                && Objects.equals(this.metadata, that.metadata);
         }
 
         @Override
