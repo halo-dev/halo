@@ -11,14 +11,16 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -26,7 +28,11 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import run.halo.app.identity.authentication.JwtDaoAuthenticationProvider;
+import run.halo.app.identity.authentication.JwtGenerator;
+import run.halo.app.identity.authentication.JwtUsernamePasswordAuthenticationFilter;
+import run.halo.app.identity.authentication.OAuth2AuthorizationService;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
@@ -37,7 +43,7 @@ import run.halo.app.infra.properties.JwtProperties;
  */
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtProperties.class)
-public class WebSecurityConfig {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final RSAPublicKey key;
 
@@ -48,31 +54,34 @@ public class WebSecurityConfig {
         this.priv = jwtProperties.readPrivateKey();
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authorize) -> authorize
+                .antMatchers("/api/v1/oauth2/login").permitAll()
                 .antMatchers("/api/**", "/apis/**").authenticated()
             )
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults())
+            .addFilterBefore(new JwtUsernamePasswordAuthenticationFilter(authenticationManager()),
+                UsernamePasswordAuthenticationFilter.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling((exceptions) -> exceptions
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .accessDeniedHandler(new JwtAccessDeniedHandler())
             );
-        return http.build();
     }
 
     @Bean
-    UserDetailsService users() {
-        return new InMemoryUserDetailsManager(
-            User.withUsername("user")
-                .password("{noop}password")
-                .authorities("app")
-                .build()
-        );
+    @Override
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(jwtDaoAuthenticationProvider());
     }
 
     @Bean
@@ -93,9 +102,23 @@ public class WebSecurityConfig {
     }
 
     @Bean
+    JwtDaoAuthenticationProvider jwtDaoAuthenticationProvider() {
+        JwtDaoAuthenticationProvider authenticationProvider =
+            new JwtDaoAuthenticationProvider(jwtGenerator(), new OAuth2AuthorizationService());
+        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
+    }
+
+    @Bean
+    JwtGenerator jwtGenerator() {
+        return new JwtGenerator(jwtEncoder());
+    }
+
+    @Bean
     public InMemoryUserDetailsManager userDetailsService() {
         UserDetails user = User.withUsername("user")
-            .password("password")
+            .password(passwordEncoder().encode("123456"))
             .roles("USER")
             .build();
         return new InMemoryUserDetailsManager(user);
