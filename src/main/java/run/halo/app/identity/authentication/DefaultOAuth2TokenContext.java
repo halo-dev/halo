@@ -1,7 +1,5 @@
 package run.halo.app.identity.authentication;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -14,7 +12,7 @@ import org.springframework.util.Assert;
  */
 public record DefaultOAuth2TokenContext(Map<Object, Object> context) implements OAuth2TokenContext {
     public DefaultOAuth2TokenContext {
-        context = Collections.unmodifiableMap(new HashMap<>(context));
+        context = Map.copyOf(context);
     }
 
     @SuppressWarnings("unchecked")

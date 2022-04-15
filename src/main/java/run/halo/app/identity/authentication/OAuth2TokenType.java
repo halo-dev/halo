@@ -19,31 +19,4 @@ public record OAuth2TokenType(String value) implements Serializable {
     public OAuth2TokenType {
         Assert.hasText(value, "value cannot be empty");
     }
-
-    /**
-     * Returns the value of the token type.
-     *
-     * @return the value of the token type
-     */
-    @Override
-    public String value() {
-        return this.value;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || this.getClass() != obj.getClass()) {
-            return false;
-        }
-        OAuth2TokenType that = (OAuth2TokenType) obj;
-        return value().equals(that.value());
-    }
-
-    @Override
-    public int hashCode() {
-        return value().hashCode();
-    }
 }
