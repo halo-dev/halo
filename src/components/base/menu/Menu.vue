@@ -13,7 +13,7 @@ provide<string[] | undefined>("openIds", props.openIds);
 </script>
 
 <template>
-  <div class="menu-container w-full h-full">
+  <div class="menu-container p-3 w-full">
     <ul>
       <slot />
     </ul>

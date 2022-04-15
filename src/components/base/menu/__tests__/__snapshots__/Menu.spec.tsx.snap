@@ -1,7 +1,7 @@
 // Vitest Snapshot v1
 
 exports[`Menu > should render 1`] = `
-"<div class=\\"menu-container w-full h-full\\">
+"<div class=\\"menu-container p-3 w-full\\">
   <ul></ul>
 </div>"
 `;
@@ -19,7 +19,7 @@ exports[`Menu > should render 2`] = `
 `;
 
 exports[`Menu > should work with openIds prop 1`] = `
-"<div class=\\"menu-container w-full h-full\\">
+"<div class=\\"menu-container p-3 w-full\\">
   <ul>
     <li class=\\"menu-item\\">
       <div class=\\"menu-item-title\\">
@@ -62,7 +62,7 @@ exports[`Menu > should work with openIds prop 1`] = `
 `;
 
 exports[`Menu > should work with sub menus 1`] = `
-"<div class=\\"menu-container w-full h-full\\">
+"<div class=\\"menu-container p-3 w-full\\">
   <ul>
     <li class=\\"menu-item\\">
       <div class=\\"menu-item-title\\">
