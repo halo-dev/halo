@@ -16,7 +16,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
@@ -28,6 +27,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import run.halo.app.identity.authentication.JwtDaoAuthenticationProvider;
 import run.halo.app.identity.authentication.JwtGenerator;
@@ -43,19 +43,23 @@ import run.halo.app.infra.properties.JwtProperties;
  */
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtProperties.class)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
     private final RSAPublicKey key;
 
     private final RSAPrivateKey priv;
 
-    public WebSecurityConfig(JwtProperties jwtProperties) throws IOException {
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
+    public WebSecurityConfig(JwtProperties jwtProperties,
+        AuthenticationManagerBuilder authenticationManagerBuilder) throws IOException {
         this.key = jwtProperties.readPublicKey();
         this.priv = jwtProperties.readPrivateKey();
+        this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .antMatchers("/api/v1/oauth2/login").permitAll()
@@ -71,17 +75,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .accessDeniedHandler(new JwtAccessDeniedHandler())
             );
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(jwtDaoAuthenticationProvider());
+        return http.build();
     }
 
     @Bean
-    @Override
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
+    AuthenticationManager authenticationManager() throws Exception {
+        authenticationManagerBuilder.authenticationProvider(jwtDaoAuthenticationProvider());
+        return authenticationManagerBuilder.getOrBuild();
     }
 
     @Bean
