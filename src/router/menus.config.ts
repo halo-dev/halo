@@ -31,18 +31,6 @@ export const menus: MenuGroupType[] = [
         name: "文章",
         path: "/posts",
         icon: IconDashboard,
-        children: [
-          {
-            name: "分类",
-            path: "/posts/categories",
-            icon: IconDashboard,
-          },
-          {
-            name: "标签",
-            path: "/posts/tags",
-            icon: IconDashboard,
-          },
-        ],
       },
       {
         name: "页面",
