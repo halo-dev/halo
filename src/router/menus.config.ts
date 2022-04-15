@@ -1,4 +1,9 @@
-import { IconDashboard } from "@/core/icons";
+import {
+  IconDashboard,
+  IconBookRead,
+  IconPages,
+  IconMessage,
+} from "@/core/icons";
 import type { Component } from "vue";
 
 declare interface MenuGroupType {
@@ -30,17 +35,17 @@ export const menus: MenuGroupType[] = [
       {
         name: "文章",
         path: "/posts",
-        icon: IconDashboard,
+        icon: IconBookRead,
       },
       {
         name: "页面",
         path: "/sheets",
-        icon: IconDashboard,
+        icon: IconPages,
       },
       {
         name: "评论",
         path: "/comment",
-        icon: IconDashboard,
+        icon: IconMessage,
       },
       {
         name: "附件",
