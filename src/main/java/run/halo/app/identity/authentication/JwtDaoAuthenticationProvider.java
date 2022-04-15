@@ -26,6 +26,9 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
         "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
     private final OAuth2AuthorizationService authorizationService;
+    /**
+     * TODO from token settings
+     */
     private static final boolean isReuseRefreshTokens = false;
 
     public JwtDaoAuthenticationProvider(
@@ -56,12 +59,13 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
         Set<String> scopes = usernamePasswordAuthenticationToken.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
-        // @formatter:off
+
+        ProviderContext providerContext =
+            new ProviderContext(ProviderSettings.builder().build(), () -> "/issuer");
         DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder()
             .principal(authentication)
-            .providerContext(ProviderContextHolder.getProviderContext())
+            .providerContext(providerContext)
             .authorizedScopes(scopes);
-        // @formatter:on
 
         OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.from(authorization);
 
@@ -92,12 +96,14 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
         if (!isReuseRefreshTokens) {
             tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.REFRESH_TOKEN).build();
             OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(tokenContext);
-            if (!(generatedRefreshToken instanceof OAuth2RefreshToken)) {
+            if (generatedRefreshToken == null) {
                 OAuth2Error error = new OAuth2Error(OAuth2ErrorCodes.SERVER_ERROR,
                     "The token generator failed to generate the refresh token.", ERROR_URI);
                 throw new OAuth2AuthenticationException(error);
             }
-            currentRefreshToken = (OAuth2RefreshToken) generatedRefreshToken;
+            currentRefreshToken = new OAuth2RefreshToken(
+                generatedRefreshToken.getTokenValue(), generatedRefreshToken.getIssuedAt(),
+                generatedRefreshToken.getExpiresAt());
             authorizationBuilder.refreshToken(currentRefreshToken);
         }
 

@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.core.OAuth2RefreshToken;
  */
 public class OAuth2AuthorizationService {
     OAuth2Authorization findByUsername(String username, OAuth2TokenType oAuth2TokenType) {
+        // TODO to be implementation
         return new OAuth2Authorization.Builder().id("id")
             .accessToken(new OAuth2AccessToken(
                 OAuth2AccessToken.TokenType.BEARER, "token", Instant.now(),
@@ -21,5 +22,6 @@ public class OAuth2AuthorizationService {
     }
 
     void save(OAuth2Authorization authorization) {
+        // TODO to be implementation
     }
 }
