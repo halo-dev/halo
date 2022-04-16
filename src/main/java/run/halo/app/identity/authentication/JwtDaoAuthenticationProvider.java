@@ -60,11 +60,9 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
         Set<String> scopes = usernamePasswordAuthenticationToken.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
 
-        ProviderContext providerContext =
-            new ProviderContext(ProviderSettings.builder().build(), () -> "/issuer");
         DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder()
             .principal(authentication)
-            .providerContext(providerContext)
+            .providerContext(ProviderContextHolder.getProviderContext())
             .authorizedScopes(scopes);
 
         OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.from(authorization);

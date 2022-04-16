@@ -29,10 +29,13 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import run.halo.app.identity.authentication.JwtDaoAuthenticationProvider;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.JwtUsernamePasswordAuthenticationFilter;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
+import run.halo.app.identity.authentication.ProviderContextFilter;
+import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
@@ -60,6 +63,8 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        ProviderSettings providerSettings = providerSettings();
+        ProviderContextFilter providerContextFilter = new ProviderContextFilter(providerSettings);
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .antMatchers("/api/v1/oauth2/login").permitAll()
@@ -69,6 +74,7 @@ public class WebSecurityConfig {
             .httpBasic(Customizer.withDefaults())
             .addFilterBefore(new JwtUsernamePasswordAuthenticationFilter(authenticationManager()),
                 UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling((exceptions) -> exceptions
@@ -122,5 +128,10 @@ public class WebSecurityConfig {
             .roles("USER")
             .build();
         return new InMemoryUserDetailsManager(user);
+    }
+
+    @Bean
+    ProviderSettings providerSettings() {
+        return ProviderSettings.builder().build();
     }
 }
