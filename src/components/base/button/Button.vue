@@ -85,6 +85,7 @@ function handleClick() {
 
   &:disabled {
     @apply opacity-50;
+    @apply cursor-not-allowed;
   }
 }
 

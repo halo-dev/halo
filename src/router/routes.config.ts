@@ -73,6 +73,11 @@ export const routes: Array<RouteRecordRaw> = [
     name: "Settings",
     component: () => import("../views/AboutView.vue"),
   },
+  {
+    path: "/components",
+    name: "Components",
+    component: () => import("../views/ViewComponents.vue"),
+  },
 ];
 
 export default routes;

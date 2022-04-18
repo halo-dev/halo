@@ -8,5 +8,31 @@ import IconBookRead from "~icons/ri/book-read-line";
 import IconPages from "~icons/ri/pages-line";
 // @ts-ignore
 import IconMessage from "~icons/ri/message-3-line";
-
-export { IconDashboard, IconArrowRight, IconBookRead, IconPages, IconMessage };
+// @ts-ignore
+import IconPalette from "~icons/ri/palette-line";
+// @ts-ignore
+import IconListSettings from "~icons/ri/list-settings-line";
+// @ts-ignore
+import IconMagic from "~icons/ri/magic-line";
+// @ts-ignore
+import IconUserSettings from "~icons/ri/user-settings-line";
+// @ts-ignore
+import IconSettings from "~icons/ri/settings-4-line";
+// @ts-ignore
+import IconPlug from "~icons/ri/plug-2-line";
+// @ts-ignore
+import IconEye from "~icons/ri/eye-line";
+export {
+  IconDashboard,
+  IconArrowRight,
+  IconBookRead,
+  IconPages,
+  IconMessage,
+  IconPalette,
+  IconListSettings,
+  IconMagic,
+  IconUserSettings,
+  IconSettings,
+  IconPlug,
+  IconEye,
+};

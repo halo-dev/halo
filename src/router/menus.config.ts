@@ -1,8 +1,15 @@
 import {
-  IconDashboard,
   IconBookRead,
-  IconPages,
+  IconDashboard,
+  IconEye,
+  IconListSettings,
+  IconMagic,
   IconMessage,
+  IconPages,
+  IconPalette,
+  IconPlug,
+  IconSettings,
+  IconUserSettings,
 } from "@/core/icons";
 import type { Component } from "vue";
 
@@ -60,17 +67,17 @@ export const menus: MenuGroupType[] = [
       {
         name: "主题",
         path: "/themes",
-        icon: IconDashboard,
+        icon: IconPalette,
       },
       {
         name: "菜单",
         path: "/menus",
-        icon: IconDashboard,
+        icon: IconListSettings,
       },
       {
         name: "可视化",
         path: "/visual",
-        icon: IconDashboard,
+        icon: IconEye,
       },
     ],
   },
@@ -80,17 +87,22 @@ export const menus: MenuGroupType[] = [
       {
         name: "插件",
         path: "/plugins",
-        icon: IconDashboard,
+        icon: IconPlug,
       },
       {
         name: "用户",
         path: "/users",
-        icon: IconDashboard,
+        icon: IconUserSettings,
       },
       {
         name: "设置",
         path: "/settings",
-        icon: IconDashboard,
+        icon: IconSettings,
+      },
+      {
+        name: "组件",
+        path: "/components",
+        icon: IconMagic,
       },
     ],
   },

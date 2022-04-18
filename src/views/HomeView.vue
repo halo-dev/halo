@@ -1,6 +1,5 @@
 <template>
   <FilledLayout>
-    <main class="text-red-600">Hello Halo!</main>
     <VInput v-model="value" />
     {{ value }}
   </FilledLayout>
