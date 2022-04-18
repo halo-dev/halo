@@ -36,11 +36,6 @@ import run.halo.app.identity.authentication.JwtUsernamePasswordAuthenticationFil
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
 import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import run.halo.app.identity.authentication.JwtDaoAuthenticationProvider;
-import run.halo.app.identity.authentication.JwtGenerator;
-import run.halo.app.identity.authentication.JwtUsernamePasswordAuthenticationFilter;
-import run.halo.app.identity.authentication.OAuth2AuthorizationService;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
