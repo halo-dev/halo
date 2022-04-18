@@ -3,9 +3,9 @@ package run.halo.app;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerTypePredicate;
-import run.halo.app.identity.authentication.OauthController;
 
 /**
  * Test case for api path prefix predicate.
@@ -24,7 +24,13 @@ public class PathPrefixPredicateTest {
 
         boolean result = HandlerTypePredicate.forAnnotation(RestController.class)
             .and(HandlerTypePredicate.forBasePackage(Application.class.getPackageName()))
-            .test(OauthController.class);
+            .test(TestController.class);
         assertThat(result).isTrue();
+    }
+
+    @RestController
+    @RequestMapping("/test-prefix")
+    public static class TestController {
+
     }
 }

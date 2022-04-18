@@ -41,7 +41,8 @@ public record JwtGenerator(JwtEncoder jwtEncoder) implements OAuth2TokenGenerato
     @Override
     public Jwt generate(OAuth2TokenContext context) {
         if (context.getTokenType() == null
-            || !OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
+            || (!OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())
+            && !OAuth2TokenType.REFRESH_TOKEN.equals(context.getTokenType()))) {
             return null;
         }
         Instant issuedAt = Instant.now();
