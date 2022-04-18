@@ -1,7 +1,6 @@
 package run.halo.app.identity.authentication;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
@@ -21,11 +20,11 @@ import run.halo.app.infra.utils.HaloUtils;
  * used for an {@link OAuth2AccessToken}.
  *
  * @author guqing
- * @date 2022-04-14
  * @see OAuth2TokenGenerator
  * @see Jwt
  * @see JwtEncoder
  * @see OAuth2AccessToken
+ * @since 2.0.0
  */
 public record JwtGenerator(JwtEncoder jwtEncoder) implements OAuth2TokenGenerator<Jwt> {
     /**
@@ -46,9 +45,16 @@ public record JwtGenerator(JwtEncoder jwtEncoder) implements OAuth2TokenGenerato
             return null;
         }
         Instant issuedAt = Instant.now();
-        // TODO Allow configuration for ID Token time-to-live
-        Instant expiresAt = issuedAt.plus(30, ChronoUnit.MINUTES);
-        ;
+
+        ProviderSettings providerSettings = context.getProviderContext().providerSettings();
+
+        Instant expiresAt;
+        if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
+            expiresAt = issuedAt.plus(providerSettings.getAccessTokenTimeToLive());
+        } else {
+            // refresh token
+            expiresAt = issuedAt.plus(providerSettings.getRefreshTokenTimeToLive());
+        }
 
         String issuer = null;
         if (context.getProviderContext() != null) {

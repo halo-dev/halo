@@ -60,14 +60,6 @@ public class ConfigurationSettingNames {
             TOKEN_SETTINGS_NAMESPACE.concat("access-token-time-to-live");
 
         /**
-         * Set the {@link OAuth2TokenFormat token format} for an access token.
-         *
-         * @since 0.2.3
-         */
-        public static final String ACCESS_TOKEN_FORMAT =
-            TOKEN_SETTINGS_NAMESPACE.concat("access-token-format");
-
-        /**
          * Set to {@code true} if refresh tokens are reused when returning the access token
          * response,
          * or {@code false} if a new refresh token is issued.

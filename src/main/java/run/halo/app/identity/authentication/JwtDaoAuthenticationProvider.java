@@ -26,10 +26,6 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
         "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
     private final OAuth2AuthorizationService authorizationService;
-    /**
-     * TODO from token settings
-     */
-    private static final boolean isReuseRefreshTokens = false;
 
     public JwtDaoAuthenticationProvider(
         OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator,
@@ -89,9 +85,12 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
             authorizationBuilder.accessToken(accessToken);
         }
 
+        ProviderSettings providerSettings =
+            ProviderContextHolder.getProviderContext().providerSettings();
+
         // ----- Refresh token -----
         OAuth2RefreshToken currentRefreshToken = refreshToken.getToken();
-        if (!isReuseRefreshTokens) {
+        if (!providerSettings.isReuseRefreshTokens()) {
             tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.REFRESH_TOKEN).build();
             OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(tokenContext);
             if (generatedRefreshToken == null) {
