@@ -68,25 +68,7 @@ public abstract class AbstractMailService implements MailService {
             try {
                 mailSender.testConnection();
             } catch (MessagingException e) {
-                String message;
-                if (e instanceof com.sun.mail.util.MailConnectException) {
-                    if (e.getCause() instanceof java.net.UnknownHostException) {
-                        message = "smtp服务器解析错误，请检查smtp服务器地址";
-                    } else if (e.getCause() instanceof java.net.ConnectException) {
-                        message = "无法连接至邮件服务器，请检查地址和端口号";
-                    } else if (e.getCause() instanceof java.net.SocketException) {
-                        message = "网络连接超时，请检查网络连通性";
-                    } else {
-                        message = "无法连接至邮件服务器，请检查地址和端口号";
-                    }
-                } else if (e instanceof javax.mail.NoSuchProviderException) {
-                    message = "发送协议配置错误，请检查发送协议";
-                } else if (e instanceof javax.mail.AuthenticationFailedException) {
-                    message = "邮箱账号密码验证失败，请检查密码是否应为授权码";
-                } else {
-                    message = "出现未知错误，请检查系统日志";
-                }
-                throw new EmailException(message, e);
+                throw new EmailException(e.getMessage(), e);
             }
         }
     }

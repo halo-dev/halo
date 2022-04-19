@@ -31,11 +31,7 @@ public class MailController {
     @ApiOperation("Tests the SMTP service")
     @DisableOnCondition
     public BaseResponse<String> testMail(@Valid @RequestBody MailParam mailParam) {
-        try {
-            mailService.testConnection();
-        } catch (Throwable e) {
-            return BaseResponse.ok(e.getMessage());
-        }
+        mailService.testConnection();
         mailService.sendTextMail(mailParam.getTo(), mailParam.getSubject(), mailParam.getContent());
         return BaseResponse.ok("已发送，请查收。若确认没有收到邮件，请检查服务器日志");
     }
