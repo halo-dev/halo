@@ -8,6 +8,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClaimAccessor;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -21,7 +22,6 @@ import org.springframework.security.oauth2.core.OAuth2Token;
  * @since 2.0.0
  */
 public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
-    private static final OAuth2TokenType PASSWORD_TOKEN = new OAuth2TokenType("password");
     private static final String ERROR_URI =
         "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
@@ -41,18 +41,6 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
             (UsernamePasswordAuthenticationToken) super.createSuccessAuthentication(principal,
                 authentication, user);
 
-        OAuth2Authorization authorization = this.authorizationService.findByUsername(
-            usernamePasswordAuthenticationToken.getName(), PASSWORD_TOKEN);
-
-        OAuth2Authorization.Token<OAuth2RefreshToken> refreshToken =
-            authorization.getRefreshToken();
-        if (refreshToken == null || !refreshToken.isActive()) {
-            // As per https://tools.ietf.org/html/rfc6749#section-5.2
-            // invalid_grant: The provided authorization grant (e.g., authorization code,
-            // resource owner credentials) or refresh token is invalid, expired, revoked [...].
-            throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
-        }
-
         Set<String> scopes = usernamePasswordAuthenticationToken.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
 
@@ -61,7 +49,10 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
             .providerContext(ProviderContextHolder.getProviderContext())
             .authorizedScopes(scopes);
 
-        OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.from(authorization);
+        OAuth2Authorization.Builder authorizationBuilder = new OAuth2Authorization.Builder()
+            .principalName(authentication.getName())
+            .authorizationGrantType(AuthorizationGrantType.PASSWORD)
+            .attribute(OAuth2Authorization.AUTHORIZED_SCOPE_ATTRIBUTE_NAME, scopes);
 
         // ----- Access token -----
         OAuth2TokenContext tokenContext =
@@ -89,7 +80,7 @@ public class JwtDaoAuthenticationProvider extends DaoAuthenticationProvider {
             ProviderContextHolder.getProviderContext().providerSettings();
 
         // ----- Refresh token -----
-        OAuth2RefreshToken currentRefreshToken = refreshToken.getToken();
+        OAuth2RefreshToken currentRefreshToken = null;
         if (!providerSettings.isReuseRefreshTokens()) {
             tokenContext = tokenContextBuilder.tokenType(OAuth2TokenType.REFRESH_TOKEN).build();
             OAuth2Token generatedRefreshToken = this.tokenGenerator.generate(tokenContext);

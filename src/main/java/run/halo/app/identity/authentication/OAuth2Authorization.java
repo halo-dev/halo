@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 import org.springframework.lang.Nullable;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.OAuth2Token;
@@ -31,6 +32,7 @@ public class OAuth2Authorization implements Serializable {
 
     private String id;
     private String principalName;
+    private AuthorizationGrantType authorizationGrantType;
     private Map<Class<? extends OAuth2Token>, Token<?>> tokens;
     private Map<String, Object> attributes;
 
@@ -53,6 +55,16 @@ public class OAuth2Authorization implements Serializable {
      */
     public String getPrincipalName() {
         return this.principalName;
+    }
+
+    /**
+     * Returns the {@link AuthorizationGrantType authorization grant type} used for the
+     * authorization.
+     *
+     * @return the {@link AuthorizationGrantType} used for the authorization
+     */
+    public AuthorizationGrantType getAuthorizationGrantType() {
+        return this.authorizationGrantType;
     }
 
     /**
@@ -319,6 +331,7 @@ public class OAuth2Authorization implements Serializable {
     public static class Builder implements Serializable {
         private String id;
         private String principalName;
+        private AuthorizationGrantType authorizationGrantType;
         private Map<Class<? extends OAuth2Token>, Token<?>> tokens = new HashMap<>();
         private final Map<String, Object> attributes = new HashMap<>();
 
@@ -341,6 +354,18 @@ public class OAuth2Authorization implements Serializable {
          */
         public Builder principalName(String principalName) {
             this.principalName = principalName;
+            return this;
+        }
+
+        /**
+         * Sets the {@link AuthorizationGrantType authorization grant type} used for the
+         * authorization.
+         *
+         * @param authorizationGrantType the {@link AuthorizationGrantType}
+         * @return the {@link Builder}
+         */
+        public Builder authorizationGrantType(AuthorizationGrantType authorizationGrantType) {
+            this.authorizationGrantType = authorizationGrantType;
             return this;
         }
 
@@ -444,6 +469,7 @@ public class OAuth2Authorization implements Serializable {
             }
             authorization.id = this.id;
             authorization.principalName = this.principalName;
+            authorization.authorizationGrantType = this.authorizationGrantType;
             authorization.tokens = Collections.unmodifiableMap(this.tokens);
             authorization.attributes = Collections.unmodifiableMap(this.attributes);
             return authorization;
