@@ -12,7 +12,7 @@ import org.springframework.util.Assert;
  * Base implementation for configuration settings.
  *
  * @author guqing
- * @date 2022-04-14
+ * @since 2.0.0
  */
 public abstract class AbstractSettings implements Serializable {
     private final Map<String, Object> settings;

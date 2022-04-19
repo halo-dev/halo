@@ -1,5 +1,6 @@
 package run.halo.app.identity.authentication;
 
+import java.time.Duration;
 import java.util.Map;
 import org.springframework.util.Assert;
 import run.halo.app.infra.config.AbstractSettings;
@@ -9,7 +10,7 @@ import run.halo.app.infra.config.ConfigurationSettingNames;
  * A facility for provider configuration settings.
  *
  * @author guqing
- * @date 2022-04-14
+ * @since 2.0.0
  */
 public final class ProviderSettings extends AbstractSettings {
     private ProviderSettings(Map<String, Object> settings) {
@@ -54,15 +55,44 @@ public final class ProviderSettings extends AbstractSettings {
     }
 
     /**
+     * Returns the time-to-live for an access token. The default is 5 minutes.
+     *
+     * @return the time-to-live for an access token
+     */
+    public Duration getAccessTokenTimeToLive() {
+        return getSetting(ConfigurationSettingNames.Token.ACCESS_TOKEN_TIME_TO_LIVE);
+    }
+
+    /**
+     * Returns {@code true} if refresh tokens are reused when returning the access token response,
+     * or {@code false} if a new refresh token is issued. The default is {@code true}.
+     */
+    public boolean isReuseRefreshTokens() {
+        return getSetting(ConfigurationSettingNames.Token.REUSE_REFRESH_TOKENS);
+    }
+
+    /**
+     * Returns the time-to-live for a refresh token. The default is 60 minutes.
+     *
+     * @return the time-to-live for a refresh token
+     */
+    public Duration getRefreshTokenTimeToLive() {
+        return getSetting(ConfigurationSettingNames.Token.REFRESH_TOKEN_TIME_TO_LIVE);
+    }
+
+    /**
      * Constructs a new {@link Builder} with the default settings.
      *
      * @return the {@link Builder}
      */
     public static Builder builder() {
         return new Builder()
-            .authorizationEndpoint("/oauth2/authorize")
-            .tokenEndpoint("/oauth2/token")
-            .jwkSetEndpoint("/oauth2/jwks");
+            .authorizationEndpoint("/api/v1/oauth2/authorize")
+            .tokenEndpoint("/api/v1/oauth2/token")
+            .jwkSetEndpoint("/api/v1/oauth2/jwks")
+            .accessTokenTimeToLive(Duration.ofMinutes(5L))
+            .refreshTokenTimeToLive(Duration.ofMinutes(60))
+            .reuseRefreshTokens(false);
     }
 
     /**
@@ -124,6 +154,48 @@ public final class ProviderSettings extends AbstractSettings {
          */
         public Builder jwkSetEndpoint(String jwkSetEndpoint) {
             return setting(ConfigurationSettingNames.Provider.JWK_SET_ENDPOINT, jwkSetEndpoint);
+        }
+
+        /**
+         * Set the time-to-live for an access token. Must be greater than {@code Duration.ZERO}.
+         *
+         * @param accessTokenTimeToLive the time-to-live for an access token
+         * @return the {@link Builder} for further configuration
+         */
+        public Builder accessTokenTimeToLive(Duration accessTokenTimeToLive) {
+            Assert.notNull(accessTokenTimeToLive, "accessTokenTimeToLive cannot be null");
+            Assert.isTrue(accessTokenTimeToLive.getSeconds() > 0,
+                "accessTokenTimeToLive must be greater than Duration.ZERO");
+            return setting(ConfigurationSettingNames.Token.ACCESS_TOKEN_TIME_TO_LIVE,
+                accessTokenTimeToLive);
+        }
+
+        /**
+         * Set to {@code true} if refresh tokens are reused when returning the access token
+         * response,
+         * or {@code false} if a new refresh token is issued.
+         *
+         * @param reuseRefreshTokens {@code true} to reuse refresh tokens, {@code false} to issue
+         * new refresh tokens
+         * @return the {@link Builder} for further configuration
+         */
+        public Builder reuseRefreshTokens(boolean reuseRefreshTokens) {
+            return setting(ConfigurationSettingNames.Token.REUSE_REFRESH_TOKENS,
+                reuseRefreshTokens);
+        }
+
+        /**
+         * Set the time-to-live for a refresh token. Must be greater than {@code Duration.ZERO}.
+         *
+         * @param refreshTokenTimeToLive the time-to-live for a refresh token
+         * @return the {@link Builder} for further configuration
+         */
+        public Builder refreshTokenTimeToLive(Duration refreshTokenTimeToLive) {
+            Assert.notNull(refreshTokenTimeToLive, "refreshTokenTimeToLive cannot be null");
+            Assert.isTrue(refreshTokenTimeToLive.getSeconds() > 0,
+                "refreshTokenTimeToLive must be greater than Duration.ZERO");
+            return setting(ConfigurationSettingNames.Token.REFRESH_TOKEN_TIME_TO_LIVE,
+                refreshTokenTimeToLive);
         }
 
         /**

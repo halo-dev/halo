@@ -6,7 +6,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,7 +99,15 @@ public class JwtGeneratorTest {
             tokenContext.getPrincipal().getName());
 
         Instant issuedAt = Instant.now();
-        Instant expiresAt = issuedAt.plus(30, ChronoUnit.MINUTES);
+
+        ProviderSettings providerSettings = tokenContext.getProviderContext().providerSettings();
+        Instant expiresAt;
+        if (OAuth2TokenType.ACCESS_TOKEN.equals(tokenContext.getTokenType())) {
+            expiresAt = issuedAt.plus(providerSettings.getAccessTokenTimeToLive());
+        } else {
+            expiresAt = issuedAt.plus(providerSettings.getAccessTokenTimeToLive());
+        }
+
         assertThat(jwtClaimsSet.getIssuedAt()).isBetween(issuedAt.minusSeconds(1),
             issuedAt.plusSeconds(1));
         assertThat(jwtClaimsSet.getExpiresAt()).isBetween(expiresAt.minusSeconds(1),

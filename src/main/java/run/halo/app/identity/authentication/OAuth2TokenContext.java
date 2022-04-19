@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author guqing
- * @date 2022-04-14
+ * @since 2.0.0
  */
 public interface OAuth2TokenContext extends Context {
 
