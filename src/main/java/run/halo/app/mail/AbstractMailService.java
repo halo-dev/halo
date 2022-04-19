@@ -68,7 +68,16 @@ public abstract class AbstractMailService implements MailService {
             try {
                 mailSender.testConnection();
             } catch (MessagingException e) {
-                throw new EmailException(e.getMessage(), e);
+                String message;
+                message = e.getMessage();
+                if (message.contains("No provider for")) {
+                    message = "发送协议配置错误，请检查发送协议";
+                } else if (message.contains("Couldn't connect to host")) {
+                    message = "无法连接至邮件服务器，请检查地址和端口号";
+                } else {
+                    message = "邮箱账号密码验证失败，请检查密码是否应为授权码";
+                }
+                throw new EmailException(message, e);
                 //throw new EmailException("无法连接到邮箱服务器，请检查邮箱配置.[" + e.getMessage() + "]", e);
             }
         }
