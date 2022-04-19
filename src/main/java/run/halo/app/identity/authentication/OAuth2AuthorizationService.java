@@ -1,27 +1,45 @@
 package run.halo.app.identity.authentication;
 
-import java.time.Instant;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.lang.Nullable;
 
 /**
  * @author guqing
  * @since 2.0.0
  */
-public class OAuth2AuthorizationService {
-    OAuth2Authorization findByUsername(String username, OAuth2TokenType oauth2TokenType) {
-        // TODO to be implementation
-        return new OAuth2Authorization.Builder().id("id")
-            .accessToken(new OAuth2AccessToken(
-                OAuth2AccessToken.TokenType.BEARER, "token", Instant.now(),
-                Instant.now().plusMillis(123)))
-            .refreshToken(
-                new OAuth2RefreshToken("refresh_token", Instant.now()))
-            .principalName("guqing")
-            .build();
-    }
+public interface OAuth2AuthorizationService {
+    /**
+     * Returns the {@link OAuth2Authorization} containing the provided {@code token},
+     * or {@code null} if not found.
+     *
+     * @param token the token credential
+     * @param tokenType the {@link OAuth2TokenType token type}
+     * @return the {@link OAuth2Authorization} if found, otherwise {@code null}
+     */
+    @Nullable
+    OAuth2Authorization findByToken(String token, @Nullable OAuth2TokenType tokenType);
 
-    void save(OAuth2Authorization authorization) {
-        // TODO to be implementation
-    }
+    /**
+     * Saves the {@link OAuth2Authorization}.
+     *
+     * @param authorization the {@link OAuth2Authorization}
+     */
+    void save(OAuth2Authorization authorization);
+
+    /**
+     * Removes the {@link OAuth2Authorization}.
+     *
+     * @param authorization the {@link OAuth2Authorization}
+     */
+    void remove(OAuth2Authorization authorization);
+
+    /**
+     * Returns the {@link OAuth2Authorization} identified by the provided {@code id},
+     * or {@code null} if not found.
+     *
+     * @param id the authorization identifier
+     * @return the {@link OAuth2Authorization} if found, otherwise {@code null}
+     */
+    @Nullable
+    OAuth2Authorization findById(String id);
+
 }

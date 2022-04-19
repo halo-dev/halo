@@ -30,10 +30,10 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtDaoAuthenticationProvider;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.JwtUsernamePasswordAuthenticationFilter;
-import run.halo.app.identity.authentication.OAuth2AuthorizationService;
 import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
@@ -110,7 +110,8 @@ public class WebSecurityConfig {
     @Bean
     JwtDaoAuthenticationProvider jwtDaoAuthenticationProvider() {
         JwtDaoAuthenticationProvider authenticationProvider =
-            new JwtDaoAuthenticationProvider(jwtGenerator(), new OAuth2AuthorizationService());
+            new JwtDaoAuthenticationProvider(jwtGenerator(),
+                new InMemoryOAuth2AuthorizationService());
         authenticationProvider.setUserDetailsService(userDetailsService());
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
