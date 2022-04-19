@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed } from "vue";
 import type { PropType } from "vue";
-import type { Size } from "@/components/base/input/interface";
+import type { Size } from "./interface";
+import { computed } from "vue";
+import Option from "@/components/base/select/Option.vue";
 
 const props = defineProps({
   modelValue: {
@@ -23,44 +24,40 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const classes = computed(() => {
-  return [`input-${props.size}`];
+  return [`select-${props.size}`];
 });
 
-function handleInput(e: Event) {
-  const { value } = e.target as HTMLInputElement;
+function handleChange(e: Event) {
+  const { value } = e.target as HTMLSelectElement;
   emit("update:modelValue", value);
 }
 </script>
 <template>
-  <div class="input-wrapper">
-    <div v-if="$slots.prefix" class="input-prefix">
-      <slot name="prefix" />
-    </div>
-    <input
-      :class="classes"
-      :disabled="disabled"
-      :placeholder="placeholder"
+  <div class="select-wrapper">
+    <select
       :value="modelValue"
-      type="text"
-      @input="handleInput"
-    />
-    <div v-if="$slots.suffix" class="input-suffix">
-      <slot name="suffix" />
-    </div>
+      @change="handleChange"
+      :disabled="disabled"
+      :class="classes"
+    >
+      <option v-if="placeholder" value="" key="placeholder" disabled hidden>
+        {{ placeholder }}
+      </option>
+      <slot />
+    </select>
   </div>
 </template>
-
 <style lang="scss">
-.input-wrapper {
+.select-wrapper {
   @apply box-border;
   @apply relative;
   @apply w-full;
   @apply inline-flex;
-  input {
+
+  select {
     @apply outline-0;
     @apply bg-white;
     @apply antialiased;
-    @apply resize-none;
     @apply w-full;
     @apply text-black;
     @apply block;
@@ -82,48 +79,29 @@ function handleInput(e: Event) {
       @apply cursor-not-allowed;
     }
 
-    &.input-lg {
+    &.select-lg {
       @apply h-11;
       @apply px-4;
       @apply text-lg;
     }
 
-    &.input-md {
+    &.select-md {
       @apply h-9;
       @apply px-3;
       @apply text-sm;
     }
 
-    &.input-sm {
+    &.select-sm {
       @apply h-7;
       @apply px-3;
       @apply text-xs;
     }
 
-    &.input-xs {
+    &.select-xs {
       @apply h-6;
       @apply px-2;
       @apply text-xs;
     }
-  }
-
-  .input-prefix {
-    position: absolute;
-    display: flex;
-    top: 50%;
-    transform: translateY(-50%);
-    align-items: center;
-    justify-content: center;
-  }
-
-  .input-suffix {
-    position: absolute;
-    display: flex;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    align-items: center;
-    justify-content: center;
   }
 }
 </style>

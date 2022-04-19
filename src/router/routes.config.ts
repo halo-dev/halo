@@ -1,82 +1,85 @@
 import type { RouteRecordRaw } from "vue-router";
+import HomeView from "../views/HomeView.vue";
+import AboutView from "../views/AboutView.vue";
+import ViewComponents from "../views/ViewComponents.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Dashboard",
-    component: () => import("../views/HomeView.vue"),
+    component: HomeView,
   },
   {
     path: "/about",
     name: "about",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/posts",
     name: "Posts",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
     children: [
       {
         path: "/posts/categories",
         name: "Categories",
-        component: () => import("../views/AboutView.vue"),
+        component: AboutView,
       },
       {
         path: "/posts/tags",
         name: "Tags",
-        component: () => import("../views/AboutView.vue"),
+        component: AboutView,
       },
     ],
   },
   {
     path: "/sheets",
     name: "Sheets",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/comment",
     name: "Comment",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/attachment",
     name: "Attachment",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/themes",
     name: "Themes",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/menus",
     name: "Menus",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/visual",
     name: "Visual",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/plugins",
     name: "Plugins",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/users",
     name: "Users",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/settings",
     name: "Settings",
-    component: () => import("../views/AboutView.vue"),
+    component: AboutView,
   },
   {
     path: "/components",
     name: "Components",
-    component: () => import("../views/ViewComponents.vue"),
+    component: ViewComponents,
   },
 ];
 

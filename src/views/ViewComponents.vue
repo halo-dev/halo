@@ -37,29 +37,71 @@
           <VButton disabled type="danger"> Danger</VButton>
         </div>
       </section>
-      <section class="box border-2 rounded p-2">
+      <section class="box border-2 rounded p-2 mb-3">
         <h1 class="text-xl font-bold mb-2">Input</h1>
         <h2 class="mb-1">Size:</h2>
         <div class="mb-3">
-          <VInput class="mb-2" placeholder="请输入邮箱" size="lg" />
-          <VInput class="mb-2" placeholder="请输入邮箱" size="md" />
-          <VInput class="mb-2" placeholder="请输入邮箱" size="sm" />
-          <VInput placeholder="请输入邮箱" size="xs" />
+          <VInput
+            class="mb-2"
+            v-model="inputValue"
+            placeholder="请输入邮箱"
+            size="lg"
+          />
+          <VInput
+            class="mb-2"
+            v-model="inputValue"
+            placeholder="请输入邮箱"
+            size="md"
+          />
+          <VInput
+            class="mb-2"
+            v-model="inputValue"
+            placeholder="请输入邮箱"
+            size="sm"
+          />
+          <VInput v-model="inputValue" placeholder="请输入邮箱" size="xs" />
         </div>
-        <h2 class="mb-1">With Icon:</h2>
+        <!--        <h2 class="mb-1">With Icon:</h2>-->
+        <!--        <div class="mb-3">-->
+        <!--          <VInput v-model="inputValue" class="mb-2" size="md">-->
+        <!--            <template #prefix>-->
+        <!--              <IconDashboard />-->
+        <!--            </template>-->
+        <!--            <template #suffix>-->
+        <!--              <IconDashboard />-->
+        <!--            </template>-->
+        <!--          </VInput>-->
+        <!--        </div>-->
+        <h2 class="mb-1">Disabled:</h2>
         <div class="mb-3">
-          <VInput class="mb-2" size="md">
-            <template #prefix>
-              <IconDashboard />
-            </template>
-            <template #suffix>
-              <IconDashboard />
-            </template>
-          </VInput>
+          <VInput v-model="inputValue" disabled />
+        </div>
+      </section>
+      <section class="box border-2 rounded p-2">
+        <h1 class="text-xl font-bold mb-2">Select</h1>
+        <h2 class="mb-1">Size:</h2>
+        <div class="mb-3">
+          <VSelect v-model="selectValue">
+            <VOption
+              v-for="(option, index) in selectData"
+              :value="option.value"
+              :key="index"
+            >
+              {{ option.label }}
+            </VOption>
+          </VSelect>
         </div>
         <h2 class="mb-1">Disabled:</h2>
         <div class="mb-3">
-          <VInput disabled />
+          <VSelect v-model="selectValue" disabled>
+            <VOption
+              v-for="(option, index) in selectData"
+              :value="option.value"
+              :key="index"
+            >
+              {{ option.label }}
+            </VOption>
+          </VSelect>
         </div>
       </section>
     </div>
@@ -70,5 +112,20 @@
 import { FilledLayout } from "../layouts";
 import { VButton } from "@/components/base/button";
 import { VInput } from "@/components/base/input";
-import { IconDashboard } from "@/core/icons";
+import { VSelect, VOption } from "@/components/base/select";
+import { ref } from "vue";
+
+const inputValue = ref();
+const selectValue = ref();
+
+const selectData = [
+  {
+    value: "1",
+    label: "1",
+  },
+  {
+    value: "2",
+    label: "2",
+  },
+];
 </script>

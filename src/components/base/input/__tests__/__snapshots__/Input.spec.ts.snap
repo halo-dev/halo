@@ -1,0 +1,8 @@
+// Vitest Snapshot v1
+
+exports[`Input > should render 1`] = `
+"<div class=\\"input-wrapper\\">
+  <!--v-if--><input class=\\"input-md\\" type=\\"text\\">
+  <!--v-if-->
+</div>"
+`;

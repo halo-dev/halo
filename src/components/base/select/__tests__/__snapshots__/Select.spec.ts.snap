@@ -1,0 +1,31 @@
+// Vitest Snapshot v1
+
+exports[`Select > should render 1`] = `
+"<div class=\\"select-wrapper\\"><select class=\\"select-md\\">
+    <!--v-if-->
+  </select></div>"
+`;
+
+exports[`Select > should work with size prop 1`] = `
+"<div class=\\"select-wrapper\\"><select class=\\"select-lg\\">
+    <!--v-if-->
+  </select></div>"
+`;
+
+exports[`Select > should work with size prop 2`] = `
+"<div class=\\"select-wrapper\\"><select class=\\"select-md\\">
+    <!--v-if-->
+  </select></div>"
+`;
+
+exports[`Select > should work with size prop 3`] = `
+"<div class=\\"select-wrapper\\"><select class=\\"select-sm\\">
+    <!--v-if-->
+  </select></div>"
+`;
+
+exports[`Select > should work with size prop 4`] = `
+"<div class=\\"select-wrapper\\"><select class=\\"select-xs\\">
+    <!--v-if-->
+  </select></div>"
+`;
