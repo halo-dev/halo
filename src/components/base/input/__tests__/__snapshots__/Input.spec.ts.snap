@@ -6,3 +6,31 @@ exports[`Input > should render 1`] = `
   <!--v-if-->
 </div>"
 `;
+
+exports[`Input > should work with size prop 1`] = `
+"<div class=\\"input-wrapper\\">
+  <!--v-if--><input class=\\"input-lg\\" type=\\"text\\">
+  <!--v-if-->
+</div>"
+`;
+
+exports[`Input > should work with size prop 2`] = `
+"<div class=\\"input-wrapper\\">
+  <!--v-if--><input class=\\"input-md\\" type=\\"text\\">
+  <!--v-if-->
+</div>"
+`;
+
+exports[`Input > should work with size prop 3`] = `
+"<div class=\\"input-wrapper\\">
+  <!--v-if--><input class=\\"input-sm\\" type=\\"text\\">
+  <!--v-if-->
+</div>"
+`;
+
+exports[`Input > should work with size prop 4`] = `
+"<div class=\\"input-wrapper\\">
+  <!--v-if--><input class=\\"input-xs\\" type=\\"text\\">
+  <!--v-if-->
+</div>"
+`;
