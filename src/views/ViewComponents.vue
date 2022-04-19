@@ -77,6 +77,19 @@
           <VInput v-model="inputValue" disabled />
         </div>
       </section>
+      <section class="box border-2 rounded p-2 mb-3">
+        <h1 class="text-xl font-bold mb-2">Textarea</h1>
+        <div class="mb-3">
+          <VTextarea
+            v-model="inputValue"
+            placeholder="Please input your description"
+          />
+        </div>
+        <h2 class="mb-1">Disabled:</h2>
+        <div class="mb-3">
+          <VTextarea v-model="inputValue" disabled :rows="4" />
+        </div>
+      </section>
       <section class="box border-2 rounded p-2">
         <h1 class="text-xl font-bold mb-2">Select</h1>
         <h2 class="mb-1">Size:</h2>
@@ -113,6 +126,7 @@ import { FilledLayout } from "../layouts";
 import { VButton } from "@/components/base/button";
 import { VInput } from "@/components/base/input";
 import { VSelect, VOption } from "@/components/base/select";
+import { VTextarea } from "@/components/base/textarea";
 import { ref } from "vue";
 
 const inputValue = ref();

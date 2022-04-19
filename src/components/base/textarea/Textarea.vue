@@ -1,0 +1,73 @@
+<script lang="ts" setup>
+defineProps({
+  modelValue: {
+    type: String,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+  },
+  rows: {
+    type: Number,
+    default: 3,
+  },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+function handleInput(e: Event) {
+  const { value } = e.target as HTMLInputElement;
+  emit("update:modelValue", value);
+}
+</script>
+<template>
+  <div class="textarea-wrapper">
+    <textarea
+      :placeholder="placeholder"
+      :value="modelValue"
+      @input="handleInput"
+      :disabled="disabled"
+      :rows="rows"
+    >
+    </textarea>
+  </div>
+</template>
+<style lang="scss">
+.textarea-wrapper {
+  @apply box-border;
+  @apply relative;
+  @apply w-full;
+  @apply inline-flex;
+  textarea {
+    @apply outline-0;
+    @apply bg-white;
+    @apply antialiased;
+    @apply w-full;
+    @apply text-black;
+    @apply block;
+    @apply transition-all;
+    @apply appearance-none;
+
+    @apply p-3;
+    @apply text-sm;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+
+    &:active {
+      border-color: #4ccba0;
+    }
+
+    &:focus {
+      border-color: #4ccba0;
+    }
+
+    &:disabled {
+      @apply opacity-50;
+      @apply cursor-not-allowed;
+    }
+  }
+}
+</style>

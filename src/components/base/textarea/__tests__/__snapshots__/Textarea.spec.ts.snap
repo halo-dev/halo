@@ -1,0 +1,6 @@
+// Vitest Snapshot v1
+
+exports[`Textarea > should render 1`] = `
+"<div class=\\"textarea-wrapper\\"><textarea rows=\\"3\\">
+    </textarea></div>"
+`;
