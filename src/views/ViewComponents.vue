@@ -42,20 +42,20 @@
         <h2 class="mb-1">Size:</h2>
         <div class="mb-3">
           <VInput
-            class="mb-2"
             v-model="inputValue"
+            class="mb-2"
             placeholder="请输入邮箱"
             size="lg"
           />
           <VInput
-            class="mb-2"
             v-model="inputValue"
+            class="mb-2"
             placeholder="请输入邮箱"
             size="md"
           />
           <VInput
-            class="mb-2"
             v-model="inputValue"
+            class="mb-2"
             placeholder="请输入邮箱"
             size="sm"
           />
@@ -87,7 +87,7 @@
         </div>
         <h2 class="mb-1">Disabled:</h2>
         <div class="mb-3">
-          <VTextarea v-model="inputValue" disabled :rows="4" />
+          <VTextarea v-model="inputValue" :rows="4" disabled />
         </div>
       </section>
       <section class="box border-2 rounded p-2">
@@ -97,8 +97,8 @@
           <VSelect v-model="selectValue">
             <VOption
               v-for="(option, index) in selectData"
-              :value="option.value"
               :key="index"
+              :value="option.value"
             >
               {{ option.label }}
             </VOption>
@@ -109,12 +109,30 @@
           <VSelect v-model="selectValue" disabled>
             <VOption
               v-for="(option, index) in selectData"
-              :value="option.value"
               :key="index"
+              :value="option.value"
             >
               {{ option.label }}
             </VOption>
           </VSelect>
+        </div>
+      </section>
+      <section class="box border-2 rounded p-2">
+        <h1 class="text-xl font-bold mb-2">Radio</h1>
+        <h2 class="mb-1">Radio:</h2>
+        <div class="mb-3">
+          <VRadio
+            v-for="(option, index) in radioData"
+            :key="index"
+            v-model="radioValue"
+            :label="option.label"
+            :value="option.value"
+            name="fruit"
+          ></VRadio>
+        </div>
+        <h2 class="mb-1">Radio Group:</h2>
+        <div class="mb-3">
+          <VRadioGroup v-model="radioValue" :options="radioData"> </VRadioGroup>
         </div>
       </section>
     </div>
@@ -125,12 +143,14 @@
 import { FilledLayout } from "../layouts";
 import { VButton } from "@/components/base/button";
 import { VInput } from "@/components/base/input";
-import { VSelect, VOption } from "@/components/base/select";
+import { VOption, VSelect } from "@/components/base/select";
 import { VTextarea } from "@/components/base/textarea";
+import { VRadio, VRadioGroup } from "@/components/base/radio";
 import { ref } from "vue";
 
 const inputValue = ref();
 const selectValue = ref();
+const radioValue = ref("apple");
 
 const selectData = [
   {
@@ -140,6 +160,21 @@ const selectData = [
   {
     value: "2",
     label: "2",
+  },
+];
+
+const radioData = [
+  {
+    value: "banana",
+    label: "Banana",
+  },
+  {
+    value: "apple",
+    label: "Apple",
+  },
+  {
+    value: "orange",
+    label: "Orange",
   },
 ];
 </script>

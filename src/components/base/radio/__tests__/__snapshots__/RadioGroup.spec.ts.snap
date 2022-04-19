@@ -1,0 +1,12 @@
+// Vitest Snapshot v1
+
+exports[`RadioGroup > should render 1`] = `
+"<div class=\\"radio-group-wrapper\\">
+  <div class=\\"radio-wrapper\\">
+    <div class=\\"radio-inner\\"><input type=\\"radio\\" id=\\"radio-foo\\" value=\\"foo\\"></div><label class=\\"radio-label\\" for=\\"radio-foo\\">foo</label>
+  </div>
+  <div class=\\"radio-wrapper\\">
+    <div class=\\"radio-inner\\"><input type=\\"radio\\" id=\\"radio-bar\\" value=\\"bar\\"></div><label class=\\"radio-label\\" for=\\"radio-bar\\">bar</label>
+  </div>
+</div>"
+`;
