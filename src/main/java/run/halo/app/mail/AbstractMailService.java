@@ -213,12 +213,7 @@ public abstract class AbstractMailService implements MailService {
                 optionService.getByPropertyOrDefault(EmailProperties.PASSWORD, String.class));
             mailProperties.setProtocol(
                 optionService.getByPropertyOrDefault(EmailProperties.PROTOCOL, String.class));
-            // check whether starttls is required to be enabled
-            String serverCheck =
-                optionService.getByPropertyOrDefault(EmailProperties.HOST, String.class);
-            if (serverCheck.contains("outlook.com") || serverCheck.contains("office365.com")
-                || serverCheck.contains("live.com") || serverCheck.contains("mail.me.com")
-                || serverCheck.contains("hotmail.com")) {
+            if (optionService.getByPropertyOrDefault(EmailProperties.STARTTLS, Boolean.class)) {
                 Map<String, String> starttls = new HashMap<>();
                 starttls.put("mail.smtp.starttls.enable", "true");
                 starttls.put("mail.smtp.auth", "true");
