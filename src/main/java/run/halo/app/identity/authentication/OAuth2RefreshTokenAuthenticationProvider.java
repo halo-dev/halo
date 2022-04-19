@@ -54,10 +54,6 @@ public class OAuth2RefreshTokenAuthenticationProvider implements AuthenticationP
         OAuth2RefreshTokenAuthenticationToken refreshTokenAuthentication =
             (OAuth2RefreshTokenAuthenticationToken) authentication;
 
-        if (!refreshTokenAuthentication.isAuthenticated()) {
-            throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_CLIENT);
-        }
-
         OAuth2Authorization authorization = this.authorizationService.findByToken(
             refreshTokenAuthentication.getRefreshToken(), OAuth2TokenType.REFRESH_TOKEN);
         if (authorization == null) {
