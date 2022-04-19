@@ -67,7 +67,7 @@ public abstract class AbstractMailService implements MailService {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) javaMailSender;
             try {
                 mailSender.testConnection();
-            } catch (MessagingException e) {
+            } catch (Throwable e) {
                 throw new EmailException(e.getMessage(), e);
             }
         }

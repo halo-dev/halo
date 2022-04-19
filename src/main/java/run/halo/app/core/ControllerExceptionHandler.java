@@ -147,12 +147,11 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(EmailException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public BaseResponse<?> handleMessagingException(MessagingException e) {
-        System.out.println(1);
         BaseResponse<?> baseResponse = handleBaseException(e);
         String message;
         if (e instanceof com.sun.mail.util.MailConnectException) {
             if (e.getCause() instanceof java.net.UnknownHostException) {
-                message = "smtp服务器解析错误，请检查smtp服务器地址";
+                message = "SMTP 服务器解析错误，请检查 SMTP 服务器地址";
             } else if (e.getCause() instanceof java.net.ConnectException) {
                 message = "无法连接至邮件服务器，请检查地址和端口号";
             } else if (e.getCause() instanceof java.net.SocketException) {
