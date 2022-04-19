@@ -2,7 +2,6 @@
 import type { PropType } from "vue";
 import type { Size } from "./interface";
 import { computed } from "vue";
-import Option from "@/components/base/select/Option.vue";
 
 const props = defineProps({
   modelValue: {
