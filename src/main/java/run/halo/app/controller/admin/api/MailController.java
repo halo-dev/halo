@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.annotation.DisableOnCondition;
-import run.halo.app.exception.EmailException;
 import run.halo.app.mail.MailService;
 import run.halo.app.model.params.MailParam;
 import run.halo.app.model.support.BaseResponse;
@@ -34,7 +33,7 @@ public class MailController {
     public BaseResponse<String> testMail(@Valid @RequestBody MailParam mailParam) {
         try {
             mailService.testConnection();
-        } catch (EmailException e) {
+        } catch (Throwable e) {
             return BaseResponse.ok(e.getMessage());
         }
         mailService.sendTextMail(mailParam.getTo(), mailParam.getSubject(), mailParam.getContent());

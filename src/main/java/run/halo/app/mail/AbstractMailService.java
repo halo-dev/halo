@@ -78,7 +78,6 @@ public abstract class AbstractMailService implements MailService {
                     message = "邮箱账号密码验证失败，请检查密码是否应为授权码";
                 }
                 throw new EmailException(message, e);
-                //throw new EmailException("无法连接到邮箱服务器，请检查邮箱配置.[" + e.getMessage() + "]", e);
             }
         }
     }
