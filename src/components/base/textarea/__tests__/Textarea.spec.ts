@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { VTextarea } from "../index";
 import { mount } from "@vue/test-utils";
 
@@ -48,7 +48,7 @@ describe("Textarea", () => {
         };
       },
       template: `
-        <v-textarea v-model="value" />
+        <v-textarea v-model="value"/>
       `,
       components: { VTextarea },
     });

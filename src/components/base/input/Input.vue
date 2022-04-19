@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed } from "vue";
 import type { PropType } from "vue";
+import { computed } from "vue";
 import type { Size } from "@/components/base/input/interface";
 
 const props = defineProps({
