@@ -44,7 +44,7 @@ import run.halo.app.infra.properties.JwtProperties;
 
 /**
  * @author guqing
- * @date 2022-04-12
+ * @since 2022-04-12
  */
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtProperties.class)
@@ -69,12 +69,13 @@ public class WebSecurityConfig {
         ProviderContextFilter providerContextFilter = new ProviderContextFilter(providerSettings);
         http
             .authorizeHttpRequests((authorize) -> authorize
-                .antMatchers("/api/v1/oauth2/token").permitAll()
+                .antMatchers(providerSettings.getTokenEndpoint()).permitAll()
                 .antMatchers("/api/**", "/apis/**").authenticated()
             )
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults())
-            .addFilterBefore(new OAuth2TokenEndpointFilter(authenticationManager()),
+            .addFilterBefore(new OAuth2TokenEndpointFilter(authenticationManager(),
+                    providerSettings.getTokenEndpoint()),
                 FilterSecurityInterceptor.class)
             .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
             .sessionManagement(
