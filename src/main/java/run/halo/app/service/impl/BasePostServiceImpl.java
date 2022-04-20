@@ -64,6 +64,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
 
+    private static final String CHINESE_REGEX = "[\u4e00-\u9fa5]";
+
+    private static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}\\p{Z}\\s]+";
+
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
         OptionService optionService,
         ContentService contentService,
@@ -301,7 +305,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         PatchedContent postContent = post.getContent();
         // word count stat
         post.setWordCount(htmlFormatWordCount(postContent.getContent()));
-
+        post.setCharCount(htmlFormatCharacterCount(postContent.getContent()));
         POST savedPost;
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
@@ -492,6 +496,32 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
      */
 
     public static long htmlFormatWordCount(String htmlContent) {
+        if (htmlContent == null) {
+            return 0;
+        }
+
+        String cleanContent = HaloUtils.cleanHtmlTag(htmlContent);
+
+        String otherString = cleanContent.replaceAll(CHINESE_REGEX, "");
+
+        int chinesWordCount = cleanContent.length() - otherString.length();
+
+        String[] otherWords = otherString.split(PUNCTUATION_REGEX);
+
+        int otherWordLength = otherWords.length;
+
+        if (otherWordLength > 0 && otherWords[0].length() == 0) {
+            otherWordLength--;
+        }
+
+        if (otherWords.length > 1 && otherWords[otherWords.length - 1].length() == 0) {
+            otherWordLength--;
+        }
+
+        return chinesWordCount + otherWordLength;
+    }
+
+    public static long htmlFormatCharacterCount(String htmlContent) {
         if (htmlContent == null) {
             return 0;
         }

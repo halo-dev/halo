@@ -59,6 +59,10 @@ public class HTMLWordCountTest {
 
     String emptyString = "";
 
+    String englishString = "I have a red apple";
+
+    String hybridString = "I have a red apple哈哈";
+
     @Test
     void pictureTest() {
         assertEquals("图片字数测试".length(),
@@ -127,5 +131,29 @@ public class HTMLWordCountTest {
     void emptyTest() {
         assertEquals(0,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(emptyString)));
+    }
+
+    @Test
+    void englishTest() {
+        assertEquals(5,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(englishString)));
+    }
+
+    @Test
+    void hybridTest() {
+        assertEquals(7,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(hybridString)));
+    }
+
+    @Test
+    void englishCharacterTest(){
+        assertEquals(14,
+            BasePostServiceImpl.htmlFormatCharacterCount(MarkdownUtils.renderHtml(englishString)));
+    }
+
+    @Test
+    void hybridCharacterTest() {
+        assertEquals(16,
+            BasePostServiceImpl.htmlFormatCharacterCount(MarkdownUtils.renderHtml(hybridString)));
     }
 }
