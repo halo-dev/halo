@@ -5,7 +5,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author guqing
- * @date 2022-04-14
+ * @since 2.0.0
  */
 public record OAuth2TokenType(String value) implements Serializable {
     public static final OAuth2TokenType ACCESS_TOKEN = new OAuth2TokenType("access_token");
