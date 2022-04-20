@@ -8,7 +8,10 @@ import static run.halo.app.utils.FileUtils.checkDirectoryTraversal;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.pool.HikariPool;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -28,6 +31,9 @@ import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.core.util.ReflectionUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -228,6 +234,9 @@ public class BackupServiceImpl implements BackupService {
         return postService.importMarkdown(markdown, file.getOriginalFilename());
     }
 
+    @Autowired
+    private ApplicationContext appContext;
+
     @Override
     public BackupDTO backupWorkDirectory(List<String> options) {
         if (CollectionUtils.isEmpty(options)) {
@@ -246,6 +255,18 @@ public class BackupServiceImpl implements BackupService {
             }
             Path haloZipPath = Files.createFile(haloZipFilePath);
 
+            if (options.contains("db")) {
+                HikariDataSource dataSource = appContext.getBean(HikariDataSource.class);
+                try {
+                    Field poolField = HikariDataSource.class.getDeclaredField(
+                        "pool");
+                    HikariPool pool =
+                        (HikariPool) ReflectionUtil.getFieldValue(poolField, dataSource);
+                    pool.shutdown();
+                } catch (InterruptedException | NoSuchFieldException e) {
+                    throw new ServiceException("Failed to close H2 database", e);
+                }
+            }
             // Zip halo
             run.halo.app.utils.FileUtils
                 .zip(Paths.get(this.haloProperties.getWorkDir()), haloZipPath,
@@ -260,6 +281,16 @@ public class BackupServiceImpl implements BackupService {
                         return false;
                     });
 
+            if (options.contains("db")) {
+                try {
+                    Field poolField = HikariDataSource.class.getDeclaredField(
+                        "pool");
+                    HikariDataSource dataSource = appContext.getBean(HikariDataSource.class);
+                    ReflectionUtil.setFieldValue(poolField, dataSource, new HikariPool(dataSource));
+                } catch (NoSuchFieldException e) {
+                    throw new ServiceException("Failed to reopen H2 database", e);
+                }
+            }
             // Build backup dto
             return buildBackupDto(BACKUP_RESOURCE_BASE_URI, haloZipPath);
         } catch (IOException e) {
