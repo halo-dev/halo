@@ -67,8 +67,8 @@ public abstract class AbstractMailService implements MailService {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) javaMailSender;
             try {
                 mailSender.testConnection();
-            } catch (MessagingException e) {
-                throw new EmailException("无法连接到邮箱服务器，请检查邮箱配置.[" + e.getMessage() + "]", e);
+            } catch (Throwable e) {
+                throw new EmailException(e.getMessage(), e);
             }
         }
     }
@@ -239,5 +239,4 @@ public abstract class AbstractMailService implements MailService {
         this.cachedMailProperties = null;
         log.debug("Cleared all mail caches");
     }
-
 }
