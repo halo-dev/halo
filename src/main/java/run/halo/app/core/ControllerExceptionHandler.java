@@ -1,6 +1,7 @@
 package run.halo.app.core;
 
 import java.util.Map;
+import javax.mail.MessagingException;
 import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import run.halo.app.exception.AbstractHaloException;
+import run.halo.app.exception.EmailException;
 import run.halo.app.model.support.BaseResponse;
 import run.halo.app.utils.ExceptionUtils;
 import run.halo.app.utils.ValidationUtils;
@@ -139,6 +141,32 @@ public class ControllerExceptionHandler {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         baseResponse.setStatus(status.value());
         baseResponse.setMessage(status.getReasonPhrase());
+        return baseResponse;
+    }
+
+    @ExceptionHandler(EmailException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public BaseResponse<?> handleMessagingException(MessagingException e) {
+        BaseResponse<?> baseResponse = handleBaseException(e);
+        String message;
+        if (e instanceof com.sun.mail.util.MailConnectException) {
+            if (e.getCause() instanceof java.net.UnknownHostException) {
+                message = "SMTP 服务器解析错误，请检查 SMTP 服务器地址";
+            } else if (e.getCause() instanceof java.net.ConnectException) {
+                message = "无法连接至邮件服务器，请检查地址和端口号";
+            } else if (e.getCause() instanceof java.net.SocketException) {
+                message = "网络连接超时，请检查网络连通性";
+            } else {
+                message = "无法连接至邮件服务器，请检查地址和端口号";
+            }
+        } else if (e instanceof javax.mail.NoSuchProviderException) {
+            message = "发送协议配置错误，请检查发送协议";
+        } else if (e instanceof javax.mail.AuthenticationFailedException) {
+            message = "邮箱账号密码验证失败，请检查密码是否应为授权码";
+        } else {
+            message = "出现未知错误，请检查系统日志";
+        }
+        baseResponse.setMessage(message);
         return baseResponse;
     }
 
