@@ -146,7 +146,7 @@ public class HTMLWordCountTest {
     }
 
     @Test
-    void englishCharacterTest(){
+    void englishCharacterTest() {
         assertEquals(14,
             BasePostServiceImpl.htmlFormatCharacterCount(MarkdownUtils.renderHtml(englishString)));
     }

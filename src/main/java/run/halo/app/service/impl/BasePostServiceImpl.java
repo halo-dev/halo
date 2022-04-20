@@ -64,7 +64,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
 
-    private static final String CHINESE_REGEX = "[\u4e00-\u9fa5]";
+    private static final String CHINESE_REGEX = "[^\\x00-\\xff]";
 
     private static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}\\p{Z}\\s]+";
 
@@ -488,7 +488,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         }
     }
 
-    // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
+    // CS304 issue link : https://github.com/halo-dev/halo/issues/1759
 
     /**
      * @param htmlContent the markdown style content
@@ -520,6 +520,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
         return chinesWordCount + otherWordLength;
     }
+
+    /**
+     * @param htmlContent the markdown style content
+     * @return character count except space and line separator
+     */
 
     public static long htmlFormatCharacterCount(String htmlContent) {
         if (htmlContent == null) {
