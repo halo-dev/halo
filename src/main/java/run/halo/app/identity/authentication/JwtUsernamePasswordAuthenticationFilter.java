@@ -14,10 +14,12 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.core.http.converter.OAuth2ErrorHttpMessageConverter;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -47,7 +49,7 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
     /**
      * The default endpoint {@code URI} for access token requests.
      */
-    private static final String DEFAULT_TOKEN_ENDPOINT_URI = "/api/v1/oauth2/login";
+    private static final String DEFAULT_TOKEN_ENDPOINT_URI = "/api/v1/oauth2/token";
     private final HttpMessageConverter<OAuth2AccessTokenResponse> accessTokenHttpResponseConverter =
         new OAuth2AccessTokenResponseHttpMessageConverter();
     private final HttpMessageConverter<OAuth2Error> errorHttpResponseConverter =
@@ -86,6 +88,10 @@ public class JwtUsernamePasswordAuthenticationFilter extends UsernamePasswordAut
         if (this.postOnly && !HttpMethod.POST.name().equals(request.getMethod())) {
             throw new AuthenticationServiceException(
                 "Authentication method not supported: " + request.getMethod());
+        }
+        String grantType = request.getParameter(OAuth2ParameterNames.GRANT_TYPE);
+        if (!AuthorizationGrantType.PASSWORD.getValue().equals(grantType)) {
+            return null;
         }
         String username = obtainUsername(request);
         username = (username != null) ? username : "";

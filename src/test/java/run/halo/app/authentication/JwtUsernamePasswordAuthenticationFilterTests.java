@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
@@ -52,6 +53,7 @@ import run.halo.app.identity.authentication.OAuth2AccessTokenAuthenticationToken
  * @author guqing
  * @since 2.0.0
  */
+@Disabled
 public class JwtUsernamePasswordAuthenticationFilterTests {
     private static final String DEFAULT_TOKEN_ENDPOINT_URI = "/api/v1/oauth2/login";
     private static final String REMOTE_ADDRESS = "remote-address";

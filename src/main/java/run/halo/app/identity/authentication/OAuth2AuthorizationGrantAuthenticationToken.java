@@ -51,12 +51,12 @@ public class OAuth2AuthorizationGrantAuthenticationToken extends AbstractAuthent
     }
 
     @Override
-    public Object getCredentials() {
+    public Object getPrincipal() {
         return "";
     }
 
     @Override
-    public Object getPrincipal() {
+    public Object getCredentials() {
         return "";
     }
 

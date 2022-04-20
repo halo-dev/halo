@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.util.Assert;
 
 /**
@@ -37,6 +39,16 @@ public interface OAuth2TokenContext extends Context {
     }
 
     /**
+     * Returns the {@link OAuth2Authorization authorization}.
+     *
+     * @return the {@link OAuth2Authorization}, or {@code null} if not available
+     */
+    @Nullable
+    default OAuth2Authorization getAuthorization() {
+        return get(OAuth2Authorization.class);
+    }
+
+    /**
      * Returns the authorized scope(s).
      *
      * @return the authorized scope(s)
@@ -57,6 +69,25 @@ public interface OAuth2TokenContext extends Context {
     }
 
     /**
+     * Returns the {@link AuthorizationGrantType authorization grant type}.
+     *
+     * @return the {@link AuthorizationGrantType}
+     */
+    default AuthorizationGrantType getAuthorizationGrantType() {
+        return get(AuthorizationGrantType.class);
+    }
+
+    /**
+     * Returns the {@link Authentication} representing the authorization grant.
+     *
+     * @param <T> the type of the {@code Authentication}
+     * @return the {@link Authentication} representing the authorization grant
+     */
+    default <T extends Authentication> T getAuthorizationGrant() {
+        return get(AbstractBuilder.AUTHORIZATION_GRANT_AUTHENTICATION_KEY);
+    }
+
+    /**
      * Base builder for implementations of {@link OAuth2TokenContext}.
      *
      * @param <T> the type of the context
@@ -66,7 +97,9 @@ public interface OAuth2TokenContext extends Context {
         private static final String PRINCIPAL_AUTHENTICATION_KEY =
             Authentication.class.getName().concat(".PRINCIPAL");
         private static final String AUTHORIZATION_SCOPE_AUTHENTICATION_KEY =
-            Authentication.class.getName().concat(".AUTHORIZATION_SCOPE");
+            Authentication.class.getName().concat(".AUTHORIZED_SCOPE");
+        private static final String AUTHORIZATION_GRANT_AUTHENTICATION_KEY =
+            Authentication.class.getName().concat(".AUTHORIZATION_GRANT");
         private final Map<Object, Object> context = new HashMap<>();
 
         /**
@@ -93,6 +126,16 @@ public interface OAuth2TokenContext extends Context {
         }
 
         /**
+         * Sets the {@link OAuth2Authorization authorization}.
+         *
+         * @param authorization the {@link OAuth2Authorization}
+         * @return the {@link AbstractBuilder} for further configuration
+         */
+        public B authorization(OAuth2Authorization authorization) {
+            return put(OAuth2Authorization.class, authorization);
+        }
+
+        /**
          * Sets the authorized scope(s).
          *
          * @param authorizedScopes the authorized scope(s)
@@ -110,6 +153,26 @@ public interface OAuth2TokenContext extends Context {
          */
         public B tokenType(OAuth2TokenType tokenType) {
             return put(OAuth2TokenType.class, tokenType);
+        }
+
+        /**
+         * Sets the {@link AuthorizationGrantType authorization grant type}.
+         *
+         * @param authorizationGrantType the {@link AuthorizationGrantType}
+         * @return the {@link AbstractBuilder} for further configuration
+         */
+        public B authorizationGrantType(AuthorizationGrantType authorizationGrantType) {
+            return put(AuthorizationGrantType.class, authorizationGrantType);
+        }
+
+        /**
+         * Sets the {@link Authentication} representing the authorization grant.
+         *
+         * @param authorizationGrant the {@link Authentication} representing the authorization grant
+         * @return the {@link AbstractBuilder} for further configuration
+         */
+        public B authorizationGrant(Authentication authorizationGrant) {
+            return put(AUTHORIZATION_GRANT_AUTHENTICATION_KEY, authorizationGrant);
         }
 
         /**
