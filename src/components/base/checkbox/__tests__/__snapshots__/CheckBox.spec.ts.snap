@@ -1,0 +1,8 @@
+// Vitest Snapshot v1
+
+exports[`CheckBox > should render 1`] = `
+"<div class=\\"checkbox-wrapper\\">
+  <div class=\\"checkbox-inner\\"><input id=\\"checkbox\\" type=\\"checkbox\\" value=\\"false\\"></div>
+  <!--v-if-->
+</div>"
+`;

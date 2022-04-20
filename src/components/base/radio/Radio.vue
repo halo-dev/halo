@@ -31,18 +31,18 @@ function handleChange(e: Event) {
 }
 </script>
 <template>
-  <div class="radio-wrapper" :class="{ 'radio-wrapper-checked': checked }">
+  <div :class="{ 'radio-wrapper-checked': checked }" class="radio-wrapper">
     <div class="radio-inner">
       <input
-        type="radio"
         :id="id"
-        :value="value"
         :checked="checked"
         :name="name"
+        :value="value"
+        type="radio"
         @change="handleChange"
       />
     </div>
-    <label class="radio-label" :for="id" v-if="label">
+    <label v-if="label" :for="id" class="radio-label">
       {{ label }}
     </label>
   </div>

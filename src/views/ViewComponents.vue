@@ -90,7 +90,7 @@
           <VTextarea v-model="inputValue" :rows="4" disabled />
         </div>
       </section>
-      <section class="box border-2 rounded p-2">
+      <section class="box border-2 rounded p-2 mb-3">
         <h1 class="text-xl font-bold mb-2">Select</h1>
         <h2 class="mb-1">Size:</h2>
         <div class="mb-3">
@@ -117,7 +117,7 @@
           </VSelect>
         </div>
       </section>
-      <section class="box border-2 rounded p-2">
+      <section class="box border-2 rounded p-2 mb-3">
         <h1 class="text-xl font-bold mb-2">Radio</h1>
         <h2 class="mb-1">Radio:</h2>
         <div class="mb-3">
@@ -132,7 +132,25 @@
         </div>
         <h2 class="mb-1">Radio Group:</h2>
         <div class="mb-3">
-          <VRadioGroup v-model="radioValue" :options="radioData"> </VRadioGroup>
+          <VRadioGroup v-model="radioValue" :options="radioData"></VRadioGroup>
+        </div>
+      </section>
+      <section class="box border-2 rounded p-2 mb-3">
+        <h1 class="text-xl font-bold mb-2">CheckBox</h1>
+        <h2 class="mb-1">CheckBox:</h2>
+        <div class="mb-3">
+          <VCheckbox v-model:checked="checkboxValue" label="Apple" />
+        </div>
+        <h2 class="mb-1">CheckBox Group:</h2>
+        <div class="mb-3">
+          <VCheckboxGroup
+            v-model="checkboxGroupValue"
+            :options="checkboxData"
+            name="fruit"
+          />
+          <span class="mr-1 text-gray-500">
+            Checked: {{ checkboxGroupValue }}
+          </span>
         </div>
       </section>
     </div>
@@ -146,11 +164,14 @@ import { VInput } from "@/components/base/input";
 import { VOption, VSelect } from "@/components/base/select";
 import { VTextarea } from "@/components/base/textarea";
 import { VRadio, VRadioGroup } from "@/components/base/radio";
+import { VCheckbox, VCheckboxGroup } from "@/components/base/checkbox";
 import { ref } from "vue";
 
 const inputValue = ref();
 const selectValue = ref();
 const radioValue = ref("apple");
+const checkboxValue = ref(false);
+const checkboxGroupValue = ref(["apple"]);
 
 const selectData = [
   {
@@ -171,6 +192,21 @@ const radioData = [
   {
     value: "apple",
     label: "Apple",
+  },
+  {
+    value: "orange",
+    label: "Orange",
+  },
+];
+
+const checkboxData = [
+  {
+    value: "apple",
+    label: "Apple",
+  },
+  {
+    value: "banana",
+    label: "Banana",
   },
   {
     value: "orange",
