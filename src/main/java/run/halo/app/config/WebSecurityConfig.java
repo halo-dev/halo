@@ -28,11 +28,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
+import run.halo.app.identity.authentication.OAuth2PasswordAuthenticationProvider;
 import run.halo.app.identity.authentication.OAuth2RefreshTokenAuthenticationProvider;
 import run.halo.app.identity.authentication.OAuth2TokenEndpointFilter;
 import run.halo.app.identity.authentication.ProviderContextFilter;
@@ -74,7 +75,7 @@ public class WebSecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults())
             .addFilterBefore(new OAuth2TokenEndpointFilter(authenticationManager()),
-                AbstractPreAuthenticatedProcessingFilter.class)
+                FilterSecurityInterceptor.class)
             .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -87,7 +88,8 @@ public class WebSecurityConfig {
 
     @Bean
     AuthenticationManager authenticationManager() throws Exception {
-        authenticationManagerBuilder.authenticationProvider(refreshTokenAuthenticationProvider());
+        authenticationManagerBuilder.authenticationProvider(passwordAuthenticationProvider())
+            .authenticationProvider(oauth2RefreshTokenAuthenticationProvider());
         return authenticationManagerBuilder.getOrBuild();
     }
 
@@ -109,14 +111,23 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    OAuth2RefreshTokenAuthenticationProvider refreshTokenAuthenticationProvider() {
-        return new OAuth2RefreshTokenAuthenticationProvider(oauth2AuthorizationService(),
-            jwtGenerator());
+    OAuth2AuthorizationService oauth2AuthorizationService() {
+        return new InMemoryOAuth2AuthorizationService();
     }
 
     @Bean
-    OAuth2AuthorizationService oauth2AuthorizationService() {
-        return new InMemoryOAuth2AuthorizationService();
+    OAuth2PasswordAuthenticationProvider passwordAuthenticationProvider() {
+        OAuth2PasswordAuthenticationProvider authenticationProvider =
+            new OAuth2PasswordAuthenticationProvider(jwtGenerator(), oauth2AuthorizationService());
+        authenticationProvider.setUserDetailsService(userDetailsService());
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
+    }
+
+    @Bean
+    OAuth2RefreshTokenAuthenticationProvider oauth2RefreshTokenAuthenticationProvider() {
+        return new OAuth2RefreshTokenAuthenticationProvider(oauth2AuthorizationService(),
+            jwtGenerator());
     }
 
     @Bean

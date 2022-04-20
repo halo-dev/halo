@@ -1,11 +1,15 @@
 package run.halo.app.identity.authentication;
 
-import java.security.Principal;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClaimAccessor;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
@@ -17,32 +21,24 @@ import org.springframework.security.oauth2.core.OAuth2Token;
 import org.springframework.util.Assert;
 
 /**
- * An {@link AuthenticationProvider} implementation for the OAuth 2.0 Refresh Token Grant.
+ * An {@link AuthenticationProvider} implementation for the OAuth 2.0 Password Grant.
  *
  * @author guqing
- * @see OAuth2RefreshTokenAuthenticationToken
- * @see OAuth2AccessTokenAuthenticationToken
+ * @see OAuth2PasswordAuthenticationProvider
  * @see OAuth2AuthorizationService
  * @see OAuth2TokenGenerator
  * @see
- * <a href="https://datatracker.ietf.org/doc/html/rfc6749#section-1.5">Section 1.5 Refresh Token Grant</a>
- * @see
- * <a href="https://datatracker.ietf.org/doc/html/rfc6749#section-6">Section 6 Refreshing an Access Token</a>
+ * <a href="https://datatracker.ietf.org/doc/html/rfc6749#section-4.3">Section-4.3 Password Credentials Grant</a>
  * @since 2.0.0
  */
-public class OAuth2RefreshTokenAuthenticationProvider implements AuthenticationProvider {
+public class OAuth2PasswordAuthenticationProvider extends DaoAuthenticationProvider
+    implements AuthenticationProvider {
     private final OAuth2AuthorizationService authorizationService;
     private final OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator;
 
-    /**
-     * Constructs an {@code OAuth2RefreshTokenAuthenticationProvider} using the provided parameters.
-     *
-     * @param authorizationService the authorization service
-     * @param tokenGenerator the token generator
-     * @since 0.2.3
-     */
-    public OAuth2RefreshTokenAuthenticationProvider(OAuth2AuthorizationService authorizationService,
-        OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator) {
+    public OAuth2PasswordAuthenticationProvider(
+        OAuth2TokenGenerator<? extends OAuth2Token> tokenGenerator,
+        OAuth2AuthorizationService authorizationService) {
         Assert.notNull(authorizationService, "authorizationService cannot be null");
         Assert.notNull(tokenGenerator, "tokenGenerator cannot be null");
         this.authorizationService = authorizationService;
@@ -50,49 +46,39 @@ public class OAuth2RefreshTokenAuthenticationProvider implements AuthenticationP
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws
-        AuthenticationException {
-        OAuth2RefreshTokenAuthenticationToken refreshTokenAuthentication =
-            (OAuth2RefreshTokenAuthenticationToken) authentication;
+    public Authentication authenticate(Authentication authentication)
+        throws AuthenticationException {
+        OAuth2PasswordAuthenticationToken passwordAuthentication =
+            (OAuth2PasswordAuthenticationToken) authentication;
+        // Convert to UsernamePasswordAuthenticationToken type
+        UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(passwordAuthentication.getUsername(),
+                passwordAuthentication.getPassword());
+        // and call the authenticate method of the super.
+        // then super#authenticate() method will call this#createSuccessAuthentication()
+        return super.authenticate(authenticationToken);
+    }
 
-        OAuth2Authorization authorization = this.authorizationService.findByToken(
-            refreshTokenAuthentication.getRefreshToken(), OAuth2TokenType.REFRESH_TOKEN);
-        if (authorization == null) {
-            throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
-        }
+    @Override
+    protected Authentication createSuccessAuthentication(Object principal,
+        Authentication authentication, UserDetails user) {
+        // convert to UsernamePasswordAuthenticationToken
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+            (UsernamePasswordAuthenticationToken) super.createSuccessAuthentication(principal,
+                authentication, user);
 
-        OAuth2Authorization.Token<OAuth2RefreshToken> refreshToken =
-            authorization.getRefreshToken();
-        if (refreshToken == null || !refreshToken.isActive()) {
-            // As per https://tools.ietf.org/html/rfc6749#section-5.2
-            // invalid_grant: The provided authorization grant (e.g., authorization code,
-            // resource owner credentials) or refresh token is invalid, expired, revoked [...].
-            throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_GRANT);
-        }
-
-        // As per https://tools.ietf.org/html/rfc6749#section-6
-        // The requested scope MUST NOT include any scope not originally granted by the resource
-        // owner,
-        // and if omitted is treated as equal to the scope originally granted by the resource owner.
-        Set<String> scopes = refreshTokenAuthentication.getScopes();
-        Set<String> authorizedScopes =
-            authorization.getAttribute(OAuth2Authorization.AUTHORIZED_SCOPE_ATTRIBUTE_NAME);
-        if (!authorizedScopes.containsAll(scopes)) {
-            throw new OAuth2AuthenticationException(OAuth2ErrorCodes.INVALID_SCOPE);
-        }
-        if (scopes.isEmpty()) {
-            scopes = authorizedScopes;
-        }
+        Set<String> scopes = usernamePasswordAuthenticationToken.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority).collect(Collectors.toSet());
 
         DefaultOAuth2TokenContext.Builder tokenContextBuilder = DefaultOAuth2TokenContext.builder()
-            .principal(authorization.getAttribute(Principal.class.getName()))
+            .principal(authentication)
             .providerContext(ProviderContextHolder.getProviderContext())
-            .authorization(authorization)
-            .authorizedScopes(scopes)
-            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-            .authorizationGrant(refreshTokenAuthentication);
+            .authorizedScopes(scopes);
 
-        OAuth2Authorization.Builder authorizationBuilder = OAuth2Authorization.from(authorization);
+        OAuth2Authorization.Builder authorizationBuilder = new OAuth2Authorization.Builder()
+            .principalName(authentication.getName())
+            .authorizationGrantType(AuthorizationGrantType.PASSWORD)
+            .attribute(OAuth2Authorization.AUTHORIZED_SCOPE_ATTRIBUTE_NAME, scopes);
 
         // ----- Access token -----
         OAuth2TokenContext tokenContext =
@@ -137,16 +123,14 @@ public class OAuth2RefreshTokenAuthenticationProvider implements AuthenticationP
             authorizationBuilder.refreshToken(currentRefreshToken);
         }
 
-        authorization = authorizationBuilder.build();
+        this.authorizationService.save(authorizationBuilder.build());
 
-        this.authorizationService.save(authorization);
-
-        return new OAuth2AccessTokenAuthenticationToken(refreshTokenAuthentication, accessToken,
+        return new OAuth2AccessTokenAuthenticationToken(authentication, accessToken,
             currentRefreshToken, Collections.emptyMap());
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return OAuth2RefreshTokenAuthenticationToken.class.isAssignableFrom(authentication);
+        return OAuth2PasswordAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }

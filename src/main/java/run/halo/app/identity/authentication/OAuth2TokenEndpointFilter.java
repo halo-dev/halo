@@ -85,7 +85,8 @@ public class OAuth2TokenEndpointFilter extends OncePerRequestFilter {
         this.tokenEndpointMatcher =
             new AntPathRequestMatcher(tokenEndpointUri, HttpMethod.POST.name());
         this.authenticationConverter = new DelegatingAuthenticationConverter(
-            List.of(new OAuth2RefreshTokenAuthenticationConverter())
+            List.of(new OAuth2RefreshTokenAuthenticationConverter(),
+                new OAuth2PasswordAuthenticationConverter())
         );
     }
 
