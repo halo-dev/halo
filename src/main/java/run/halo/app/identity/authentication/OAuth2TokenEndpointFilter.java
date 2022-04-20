@@ -47,8 +47,6 @@ public class OAuth2TokenEndpointFilter extends OncePerRequestFilter {
      */
     private static final String DEFAULT_TOKEN_ENDPOINT_URI = "/api/v1/oauth2/token";
 
-    private static final String DEFAULT_ERROR_URI =
-        "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
     private final AuthenticationManager authenticationManager;
     private final RequestMatcher tokenEndpointMatcher;
     private final HttpMessageConverter<OAuth2AccessTokenResponse> accessTokenHttpResponseConverter =
@@ -103,14 +101,15 @@ public class OAuth2TokenEndpointFilter extends OncePerRequestFilter {
         try {
             String[] grantTypes = request.getParameterValues(OAuth2ParameterNames.GRANT_TYPE);
             if (grantTypes == null || grantTypes.length != 1) {
-                throwError(OAuth2ErrorCodes.INVALID_REQUEST, OAuth2ParameterNames.GRANT_TYPE);
+                OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
+                    OAuth2ParameterNames.GRANT_TYPE, OAuth2EndpointUtils.ERROR_URI);
             }
 
             Authentication authorizationGrantAuthentication =
                 this.authenticationConverter.convert(request);
             if (authorizationGrantAuthentication == null) {
-                throwError(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE,
-                    OAuth2ParameterNames.GRANT_TYPE);
+                OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.UNSUPPORTED_GRANT_TYPE,
+                    OAuth2ParameterNames.GRANT_TYPE, OAuth2EndpointUtils.ERROR_URI);
             }
             if (authorizationGrantAuthentication instanceof AbstractAuthenticationToken) {
                 ((AbstractAuthenticationToken) authorizationGrantAuthentication)
@@ -220,11 +219,5 @@ public class OAuth2TokenEndpointFilter extends OncePerRequestFilter {
         ServletServerHttpResponse httpResponse = new ServletServerHttpResponse(response);
         httpResponse.setStatusCode(HttpStatus.BAD_REQUEST);
         this.errorHttpResponseConverter.write(error, null, httpResponse);
-    }
-
-    private static void throwError(String errorCode, String parameterName) {
-        OAuth2Error error =
-            new OAuth2Error(errorCode, "OAuth 2.0 Parameter: " + parameterName, DEFAULT_ERROR_URI);
-        throw new OAuth2AuthenticationException(error);
     }
 }

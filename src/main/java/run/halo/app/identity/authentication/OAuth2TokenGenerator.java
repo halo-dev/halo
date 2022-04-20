@@ -10,7 +10,7 @@ import org.springframework.security.oauth2.core.OAuth2Token;
  *
  * @param <T> the type of the OAuth 2.0 Token
  * @author guqing
- * @date 2022-04-14
+ * @since 2.0.0
  * @see OAuth2Token
  * @see OAuth2TokenContext
  * @see ClaimAccessor

@@ -28,8 +28,6 @@ import org.springframework.util.StringUtils;
  * @since 2.0.0
  */
 public class OAuth2RefreshTokenAuthenticationConverter implements AuthenticationConverter {
-    static final String ACCESS_TOKEN_REQUEST_ERROR_URI =
-        "https://datatracker.ietf.org/doc/html/rfc6749#section-5.2";
 
     @Nullable
     @Override
@@ -48,7 +46,7 @@ public class OAuth2RefreshTokenAuthenticationConverter implements Authentication
             || parameters.get(OAuth2ParameterNames.REFRESH_TOKEN).size() != 1) {
             OAuth2EndpointUtils.throwError(OAuth2ErrorCodes.INVALID_REQUEST,
                 OAuth2ParameterNames.REFRESH_TOKEN,
-                ACCESS_TOKEN_REQUEST_ERROR_URI);
+                OAuth2EndpointUtils.ERROR_URI);
         }
 
         // scope (OPTIONAL)
@@ -58,7 +56,7 @@ public class OAuth2RefreshTokenAuthenticationConverter implements Authentication
             OAuth2EndpointUtils.throwError(
                 OAuth2ErrorCodes.INVALID_REQUEST,
                 OAuth2ParameterNames.SCOPE,
-                ACCESS_TOKEN_REQUEST_ERROR_URI);
+                OAuth2EndpointUtils.ERROR_URI);
         }
         Set<String> requestedScopes = null;
         if (StringUtils.hasText(scope)) {

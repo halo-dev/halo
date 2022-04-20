@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
  * Default implementation of {@link OAuth2TokenContext}.
  *
  * @author guqing
- * @date 2022-04-14
+ * @since 2.0.0
  */
 public record DefaultOAuth2TokenContext(Map<Object, Object> context) implements OAuth2TokenContext {
     public DefaultOAuth2TokenContext {

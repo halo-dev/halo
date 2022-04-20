@@ -8,7 +8,7 @@ import org.springframework.util.Assert;
  * A context that holds information of the Provider.
  *
  * @author guqing
- * @date 2022-04-14
+ * @since 2.0.0
  */
 public record ProviderContext(ProviderSettings providerSettings,
                               @Nullable Supplier<String> issuerSupplier) {
