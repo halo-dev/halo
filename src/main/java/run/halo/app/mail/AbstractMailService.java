@@ -2,6 +2,8 @@ package run.halo.app.mail;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -211,6 +213,12 @@ public abstract class AbstractMailService implements MailService {
                 optionService.getByPropertyOrDefault(EmailProperties.PASSWORD, String.class));
             mailProperties.setProtocol(
                 optionService.getByPropertyOrDefault(EmailProperties.PROTOCOL, String.class));
+            if (optionService.getByPropertyOrDefault(EmailProperties.STARTTLS, Boolean.class)) {
+                Map<String, String> starttls = new HashMap<>();
+                starttls.put("mail.smtp.starttls.enable", "true");
+                starttls.put("mail.smtp.auth", "true");
+                mailProperties.setProperties(starttls);
+            }
             this.cachedMailProperties = mailProperties;
         }
 
