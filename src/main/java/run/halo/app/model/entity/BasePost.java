@@ -188,6 +188,11 @@ public class BasePost extends BaseEntity {
     @Transient
     private PatchedContent content;
 
+    /**
+     * Content character count
+     */
+    private Long charCount;
+
     @Override
     public void prePersist() {
         super.prePersist();
@@ -242,6 +247,10 @@ public class BasePost extends BaseEntity {
 
         if (version == null || version < 0) {
             version = 1;
+        }
+
+        if (charCount == null || charCount < 0) {
+            charCount = 0L;
         }
         // Clear the value of the deprecated attributes
         this.originalContent = "";
