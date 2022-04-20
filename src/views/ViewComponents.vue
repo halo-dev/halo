@@ -12,7 +12,7 @@
         </div>
         <h2 class="mb-1">Size:</h2>
         <div class="mb-3">
-          <VButton class="mr-2" size="lg" type="secondary"> Large</VButton>
+          <VButton class="mr-2" size="lg" type="secondary">Large</VButton>
           <VButton class="mr-2" type="secondary"> Default</VButton>
           <VButton class="mr-2" size="sm" type="secondary"> sm</VButton>
           <VButton size="xs" type="secondary"> xs</VButton>
@@ -35,6 +35,46 @@
           <VButton class="mr-2" disabled type="primary"> Primary</VButton>
           <VButton class="mr-2" disabled type="secondary"> Secondary</VButton>
           <VButton disabled type="danger"> Danger</VButton>
+        </div>
+        <h2 class="mb-1">Loading:</h2>
+        <div class="mb-3">
+          <VButton class="mr-2" type="primary" :loading="buttonLoading">
+            Primary
+          </VButton>
+          <VButton class="mr-2" type="secondary" :loading="buttonLoading">
+            Secondary
+          </VButton>
+          <VButton class="mr-2" type="danger" :loading="buttonLoading">
+            Danger
+          </VButton>
+          <VButton type="default" :loading="buttonLoading"> Default </VButton>
+        </div>
+        <h2 class="mb-1">Icon:</h2>
+        <div class="mb-3">
+          <VButton class="mr-2" size="lg" type="secondary">
+            <template #icon>
+              <IconSettings />
+            </template>
+            Large
+          </VButton>
+          <VButton class="mr-2" type="secondary">
+            <template #icon>
+              <IconSettings />
+            </template>
+            Default
+          </VButton>
+          <VButton class="mr-2" size="sm" type="secondary">
+            <template #icon>
+              <IconSettings />
+            </template>
+            sm
+          </VButton>
+          <VButton size="xs" type="secondary">
+            <template #icon>
+              <IconSettings />
+            </template>
+            xs
+          </VButton>
         </div>
       </section>
       <section class="box border-2 rounded p-2 mb-3">
@@ -158,6 +198,7 @@
 </template>
 
 <script lang="ts" setup>
+import { IconSettings } from "@/core/icons";
 import { FilledLayout } from "../layouts";
 import { VButton } from "@/components/base/button";
 import { VInput } from "@/components/base/input";
@@ -167,6 +208,7 @@ import { VRadio, VRadioGroup } from "@/components/base/radio";
 import { VCheckbox, VCheckboxGroup } from "@/components/base/checkbox";
 import { ref } from "vue";
 
+const buttonLoading = ref(true);
 const inputValue = ref();
 const selectValue = ref();
 const radioValue = ref("apple");

@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full">
     <aside class="navbar h-full" style="background: #fff">
-      <div class="logo flex justify-center py-6">
+      <div class="logo flex justify-center py-6 animate-pulse">
         <img :src="logo" style="width: 80px" alt="Halo Logo" />
       </div>
       <VRoutesMenu :menus="menus" />
