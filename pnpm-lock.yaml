@@ -4,7 +4,7 @@ specifiers:
   '@iconify-json/ri': ^1.1.1
   '@rushstack/eslint-patch': ^1.1.3
   '@types/jsdom': ^16.2.14
-  '@types/node': ^17.0.24
+  '@types/node': ^17.0.25
   '@vitejs/plugin-vue': ^2.3.1
   '@vitejs/plugin-vue-jsx': ^1.3.10
   '@vue/eslint-config-prettier': ^7.0.0
@@ -17,13 +17,13 @@ specifiers:
   eslint: ^8.13.0
   eslint-plugin-cypress: ^2.12.1
   eslint-plugin-vue: ^8.6.0
-  histoire: ^0.2.3
+  histoire: ^0.2.4
   husky: ^7.0.4
   jsdom: ^19.0.0
   pinia: ^2.0.13
   postcss: ^8.4.12
   prettier: ^2.6.2
-  sass: ^1.50.0
+  sass: ^1.50.1
   start-server-and-test: ^1.14.0
   tailwindcss: ^3.0.24
   tailwindcss-themeable: ^1.3.0
@@ -44,32 +44,32 @@ devDependencies:
   '@iconify-json/ri': 1.1.1
   '@rushstack/eslint-patch': 1.1.3
   '@types/jsdom': 16.2.14
-  '@types/node': 17.0.24
+  '@types/node': 17.0.25
   '@vitejs/plugin-vue': 2.3.1_vite@2.9.5+vue@3.2.33
   '@vitejs/plugin-vue-jsx': 1.3.10
   '@vue/eslint-config-prettier': 7.0.0_eslint@8.13.0+prettier@2.6.2
   '@vue/eslint-config-typescript': 10.0.0_a62cbc2f4797496d74696b1f6538012a
   '@vue/test-utils': 2.0.0-rc.20_vue@3.2.33
-  '@vue/tsconfig': 0.1.3_@types+node@17.0.24
+  '@vue/tsconfig': 0.1.3_@types+node@17.0.25
   autoprefixer: 10.4.4_postcss@8.4.12
   c8: 7.11.0
   cypress: 9.5.4
   eslint: 8.13.0
   eslint-plugin-cypress: 2.12.1_eslint@8.13.0
   eslint-plugin-vue: 8.6.0_eslint@8.13.0
-  histoire: 0.2.3_0827a15bc15791d2de6c31b3ea94a448
+  histoire: 0.2.4_470c9fb72f69752b7738379dbac6ab3d
   husky: 7.0.4
   jsdom: 19.0.0
   postcss: 8.4.12
   prettier: 2.6.2
-  sass: 1.50.0
+  sass: 1.50.1
   start-server-and-test: 1.14.0
   tailwindcss: 3.0.24
   tailwindcss-themeable: 1.3.0
   typescript: 4.6.3
   unplugin-icons: 0.14.1_vite@2.9.5
-  vite: 2.9.5_sass@1.50.0
-  vitest: 0.9.3_39aeabd420cf4e1004f43b8be80a240c
+  vite: 2.9.5_sass@1.50.1
+  vitest: 0.9.3_40eeb18efc0a382653524b81f64824b7
   vue-tsc: 0.31.4_typescript@4.6.3
 
 packages:
@@ -506,8 +506,8 @@ packages:
       '@hapi/hoek': 9.2.1
     dev: true
 
-  /@histoire/controls/0.2.3_vue@3.2.33:
-    resolution: {integrity: sha512-pkEW5lnMaDrwko/EXXO5muLzQ1TMo3ssrIE1NFW6qWwPuHEMaqxa08lDWlErjYm1qF8KnANiVhJB28QhmlYDOA==}
+  /@histoire/controls/0.2.4_vue@3.2.33:
+    resolution: {integrity: sha512-w16oZSxNwquPxu4c00gXdgWja7et9UX4LWBOonM+Ioqi5fWmHKcdAxWEbmQgxO7pYgHP0taoiBrR/GXEbeqhlg==}
     dependencies:
       '@iconify/vue': 3.2.1_vue@3.2.33
       '@vueuse/core': 8.2.5_vue@3.2.33
@@ -653,13 +653,13 @@ packages:
   /@types/concat-stream/1.6.1:
     resolution: {integrity: sha512-eHE4cQPoj6ngxBZMvVf6Hw7Mh4jMW4U9lpGmS5GBPB9RYxlFg+CHaVN7ErNY4W9XfLIEn20b4VDYaIrbq0q4uA==}
     dependencies:
-      '@types/node': 17.0.24
+      '@types/node': 17.0.25
     dev: true
 
   /@types/form-data/0.0.33:
     resolution: {integrity: sha1-yayFsqX9GENbjIXZ7LUObWyJP/g=}
     dependencies:
-      '@types/node': 17.0.24
+      '@types/node': 17.0.25
     dev: true
 
   /@types/istanbul-lib-coverage/2.0.4:
@@ -669,7 +669,7 @@ packages:
   /@types/jsdom/16.2.14:
     resolution: {integrity: sha512-6BAy1xXEmMuHeAJ4Fv4yXKwBDTGTOseExKE3OaHiNycdHdZw59KfYzrt0DkDluvwmik1HRt6QS7bImxUmpSy+w==}
     dependencies:
-      '@types/node': 17.0.24
+      '@types/node': 17.0.25
       '@types/parse5': 6.0.3
       '@types/tough-cookie': 4.0.1
     dev: true
@@ -686,8 +686,8 @@ packages:
     resolution: {integrity: sha512-q4jlIR71hUpWTnGhXWcakgkZeHa3CCjcQcnuzU8M891BAWA2jHiziiWEPEkdS5pFsz7H9HJiy8BrK7tBRNrY7A==}
     dev: true
 
-  /@types/node/17.0.24:
-    resolution: {integrity: sha512-aveCYRQbgTH9Pssp1voEP7HiuWlD2jW2BO56w+bVrJn04i61yh6mRfoKO6hEYQD9vF+W8Chkwc6j1M36uPkx4g==}
+  /@types/node/17.0.25:
+    resolution: {integrity: sha512-wANk6fBrUwdpY4isjWrKTufkrXdu1D2YHCot2fD/DfWxF5sMrVSA+KN7ydckvaTCh0HiqX9IVl0L5/ZoXg5M7w==}
     dev: true
 
   /@types/node/8.10.66:
@@ -718,7 +718,7 @@ packages:
     resolution: {integrity: sha512-8uALY5LTvSuHgloDVUvWP3pIauILm+8/0pDMokuDYIoNsOkSwd5AiHBTSEJjKTDcZr5z8UpgOWZkxBF4iJftoA==}
     requiresBuild: true
     dependencies:
-      '@types/node': 17.0.24
+      '@types/node': 17.0.25
     dev: true
     optional: true
 
@@ -869,7 +869,7 @@ packages:
       vite: ^2.5.10
       vue: ^3.2.25
     dependencies:
-      vite: 2.9.5_sass@1.50.0
+      vite: 2.9.5_sass@1.50.1
       vue: 3.2.33
     dev: true
 
@@ -1078,7 +1078,7 @@ packages:
       vue: 3.2.33
     dev: true
 
-  /@vue/tsconfig/0.1.3_@types+node@17.0.24:
+  /@vue/tsconfig/0.1.3_@types+node@17.0.25:
     resolution: {integrity: sha512-kQVsh8yyWPvHpb8gIc9l/HIDiiVUy1amynLNpCy8p+FoCiZXCo6fQos5/097MmnNZc9AtseDsCrfkhqCrJ8Olg==}
     peerDependencies:
       '@types/node': '*'
@@ -1086,7 +1086,7 @@ packages:
       '@types/node':
         optional: true
     dependencies:
-      '@types/node': 17.0.24
+      '@types/node': 17.0.25
     dev: true
 
   /@vueuse/core/8.2.5_vue@3.2.33:
@@ -2848,14 +2848,14 @@ packages:
     hasBin: true
     dev: true
 
-  /histoire/0.2.3_0827a15bc15791d2de6c31b3ea94a448:
-    resolution: {integrity: sha512-9JjlV1fw2cDwn7doDATC9dma/soy/tvZH2tXYSMoWaqdBxQZi9ieiiAEDZjP/Y6q36lS5bmR25CGAnhbVPdhYQ==}
+  /histoire/0.2.4_470c9fb72f69752b7738379dbac6ab3d:
+    resolution: {integrity: sha512-ZG/BNAWME24MZNW8jh1AXLxjoT8xFYZ1t4ZXl/zK+2ue93IfBbcht/cQ4g8dQTevILawYiK1yoW7KuP2R5ZNrw==}
     hasBin: true
     peerDependencies:
       vite: ^2.9.0
       vue: ^3.2.31
     dependencies:
-      '@histoire/controls': 0.2.3_vue@3.2.33
+      '@histoire/controls': 0.2.4_vue@3.2.33
       '@iconify/vue': 3.2.1_vue@3.2.33
       '@vitejs/plugin-vue': 2.3.1_vite@2.9.5+vue@3.2.33
       '@vueuse/core': 8.2.5_vue@3.2.33
@@ -2882,8 +2882,8 @@ packages:
       shiki: 0.10.1
       sirv: 2.0.2
       tinypool: 0.1.2
-      vite: 2.9.5_sass@1.50.0
-      vite-node: 0.7.6_sass@1.50.0
+      vite: 2.9.5_sass@1.50.1
+      vite-node: 0.7.6_sass@1.50.1
       vue: 3.2.33
       vue-router: 4.0.14_vue@3.2.33
     transitivePeerDependencies:
@@ -4101,8 +4101,8 @@ packages:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
     dev: true
 
-  /sass/1.50.0:
-    resolution: {integrity: sha512-cLsD6MEZ5URXHStxApajEh7gW189kkjn4Rc8DQweMyF+o5HF5nfEz8QYLMlPsTOD88DknatTmBWkOcw5/LnJLQ==}
+  /sass/1.50.1:
+    resolution: {integrity: sha512-noTnY41KnlW2A9P8sdwESpDmo+KBNkukI1i8+hOK3footBUcohNHtdOJbckp46XO95nuvcHDDZ+4tmOnpK3hjw==}
     engines: {node: '>=12.0.0'}
     hasBin: true
     dependencies:
@@ -4624,7 +4624,7 @@ packages:
         optional: true
     dependencies:
       chokidar: 3.5.3
-      vite: 2.9.5_sass@1.50.0
+      vite: 2.9.5_sass@1.50.1
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.4.3
     dev: true
@@ -4681,7 +4681,7 @@ packages:
       extsprintf: 1.3.0
     dev: true
 
-  /vite-node/0.7.6_sass@1.50.0:
+  /vite-node/0.7.6_sass@1.50.1:
     resolution: {integrity: sha512-WeBR3JOHX3MD4SzJDwIjrJHd+lpaPHpcQf1sbDDgm7k98JqdTGiz9X+C/17EwHUwCd1lgPf5Nu4L3asIGPuXYw==}
     engines: {node: '>=14.14.0'}
     hasBin: true
@@ -4690,14 +4690,14 @@ packages:
       minimist: 1.2.6
       mlly: 0.4.3
       pathe: 0.2.0
-      vite: 2.9.5_sass@1.50.0
+      vite: 2.9.5_sass@1.50.1
     transitivePeerDependencies:
       - less
       - sass
       - stylus
     dev: true
 
-  /vite/2.9.5_sass@1.50.0:
+  /vite/2.9.5_sass@1.50.1:
     resolution: {integrity: sha512-dvMN64X2YEQgSXF1lYabKXw3BbN6e+BL67+P3Vy4MacnY+UzT1AfkHiioFSi9+uiDUiaDy7Ax/LQqivk6orilg==}
     engines: {node: '>=12.2.0'}
     hasBin: true
@@ -4717,12 +4717,12 @@ packages:
       postcss: 8.4.12
       resolve: 1.22.0
       rollup: 2.69.0
-      sass: 1.50.0
+      sass: 1.50.1
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.9.3_39aeabd420cf4e1004f43b8be80a240c:
+  /vitest/0.9.3_40eeb18efc0a382653524b81f64824b7:
     resolution: {integrity: sha512-hKjqdBI732cV5giNLERyAsaJBebstrX5mvTbZr+jUDYUHnX1O4DpAJcHtqBOutuBi7lVIGQ5IF8eWvHHqbCHBA==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
@@ -4749,7 +4749,7 @@ packages:
       local-pkg: 0.4.1
       tinypool: 0.1.2
       tinyspy: 0.3.2
-      vite: 2.9.5_sass@1.50.0
+      vite: 2.9.5_sass@1.50.1
     transitivePeerDependencies:
       - less
       - sass
