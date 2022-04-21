@@ -10,6 +10,7 @@ import {
   IconPlug,
   IconSettings,
   IconUserSettings,
+  IconFolder,
 } from "@/core/icons";
 import type { Component } from "vue";
 
@@ -57,7 +58,7 @@ export const menus: MenuGroupType[] = [
       {
         name: "附件",
         path: "/attachment",
-        icon: IconDashboard,
+        icon: IconFolder,
       },
     ],
   },

@@ -5,76 +5,89 @@
         <h1 class="text-xl font-bold mb-2">Button</h1>
         <h2 class="mb-1">Type:</h2>
         <div class="mb-3">
-          <VButton class="mr-2" type="primary">Primary</VButton>
-          <VButton class="mr-2" type="secondary">Secondary</VButton>
-          <VButton class="mr-2" type="danger">Danger</VButton>
-          <VButton type="default">Default</VButton>
+          <VSpace>
+            <VButton type="primary">Primary</VButton>
+            <VButton type="secondary">Secondary</VButton>
+            <VButton type="danger">Danger</VButton>
+            <VButton type="default">Default</VButton>
+          </VSpace>
         </div>
         <h2 class="mb-1">Size:</h2>
         <div class="mb-3">
-          <VButton class="mr-2" size="lg" type="secondary">Large</VButton>
-          <VButton class="mr-2" type="secondary"> Default</VButton>
-          <VButton class="mr-2" size="sm" type="secondary"> sm</VButton>
-          <VButton size="xs" type="secondary"> xs</VButton>
+          <VSpace>
+            <VButton size="lg" type="secondary">Large</VButton>
+            <VButton type="secondary"> Default</VButton>
+            <VButton size="sm" type="secondary"> sm</VButton>
+            <VButton size="xs" type="secondary"> xs</VButton>
+          </VSpace>
         </div>
         <h2 class="mb-1">Circle:</h2>
         <div class="mb-3">
-          <VButton circle class="mr-2" size="lg" type="secondary"> lg</VButton>
-          <VButton circle class="mr-2" type="secondary"> d</VButton>
-          <VButton circle class="mr-2" size="sm" type="secondary"> sm</VButton>
-          <VButton circle size="xs" type="secondary"> xs</VButton>
+          <VSpace>
+            <VButton circle size="lg" type="secondary"> lg</VButton>
+            <VButton circle type="secondary"> d</VButton>
+            <VButton circle size="sm" type="secondary"> sm</VButton>
+            <VButton circle size="xs" type="secondary"> xs</VButton>
+          </VSpace>
         </div>
         <h2 class="mb-1">Block:</h2>
         <div class="mb-3">
-          <VButton block class="mb-2" type="primary"> Primary</VButton>
-          <VButton block class="mb-2" type="secondary"> Secondary</VButton>
-          <VButton block type="danger"> Danger</VButton>
+          <VSpace direction="column" class="w-full">
+            <VButton block type="primary"> Primary</VButton>
+            <VButton block type="secondary"> Secondary</VButton>
+            <VButton block type="danger"> Danger</VButton>
+          </VSpace>
         </div>
         <h2 class="mb-1">Disabled:</h2>
         <div>
-          <VButton class="mr-2" disabled type="primary"> Primary</VButton>
-          <VButton class="mr-2" disabled type="secondary"> Secondary</VButton>
-          <VButton disabled type="danger"> Danger</VButton>
+          <VSpace>
+            <VButton disabled type="primary"> Primary</VButton>
+            <VButton disabled type="secondary"> Secondary</VButton>
+            <VButton disabled type="danger"> Danger</VButton>
+          </VSpace>
         </div>
         <h2 class="mb-1">Loading:</h2>
         <div class="mb-3">
-          <VButton class="mr-2" type="primary" :loading="buttonLoading">
-            Primary
-          </VButton>
-          <VButton class="mr-2" type="secondary" :loading="buttonLoading">
-            Secondary
-          </VButton>
-          <VButton class="mr-2" type="danger" :loading="buttonLoading">
-            Danger
-          </VButton>
-          <VButton type="default" :loading="buttonLoading"> Default </VButton>
+          <VSpace>
+            <VButton type="default" @click="buttonLoading = !buttonLoading">
+              {{ buttonLoading ? "停止" : "启动" }}
+            </VButton>
+            <VButton type="primary" :loading="buttonLoading"> Primary </VButton>
+            <VButton type="secondary" :loading="buttonLoading">
+              Secondary
+            </VButton>
+            <VButton type="danger" :loading="buttonLoading"> Danger </VButton>
+            <VButton type="default" :loading="buttonLoading"> Default </VButton>
+          </VSpace>
         </div>
         <h2 class="mb-1">Icon:</h2>
         <div class="mb-3">
-          <VButton class="mr-2" size="lg" type="secondary">
-            <template #icon>
-              <IconSettings />
-            </template>
-            Large
-          </VButton>
-          <VButton class="mr-2" type="secondary">
-            <template #icon>
-              <IconSettings />
-            </template>
-            Default
-          </VButton>
-          <VButton class="mr-2" size="sm" type="secondary">
-            <template #icon>
-              <IconSettings />
-            </template>
-            sm
-          </VButton>
-          <VButton size="xs" type="secondary">
-            <template #icon>
-              <IconSettings />
-            </template>
-            xs
-          </VButton>
+          <VSpace>
+            <VButton size="lg" type="secondary">
+              <template #icon>
+                <IconSettings />
+              </template>
+              Large
+            </VButton>
+            <VButton type="secondary">
+              <template #icon>
+                <IconSettings />
+              </template>
+              Default
+            </VButton>
+            <VButton size="sm" type="secondary">
+              <template #icon>
+                <IconSettings />
+              </template>
+              sm
+            </VButton>
+            <VButton size="xs" type="secondary">
+              <template #icon>
+                <IconSettings />
+              </template>
+              xs
+            </VButton>
+          </VSpace>
         </div>
       </section>
       <section class="box border-2 rounded p-2 mb-3">
@@ -193,6 +206,44 @@
           </span>
         </div>
       </section>
+      <section class="box border-2 rounded p-2 mb-3">
+        <h1 class="text-xl font-bold mb-2">Space</h1>
+        <div class="mb-3">
+          <VRadio
+            v-for="(option, index) in ['row', 'column']"
+            :key="index"
+            v-model="spaceState.direction"
+            :label="option"
+            :value="option"
+            name="direction"
+          ></VRadio>
+          <VRadio
+            v-for="(option, index) in ['start', 'center', 'end', 'stretch']"
+            :key="index"
+            v-model="spaceState.align"
+            :label="option"
+            :value="option"
+            name="align"
+          ></VRadio>
+          <VRadio
+            v-for="(option, index) in ['xs', 'sm', 'md', 'lg']"
+            :key="index"
+            v-model="spaceState.spacing"
+            :label="option"
+            :value="option"
+            name="spacing"
+          ></VRadio>
+          <VSpace
+            :direction="spaceState.direction"
+            :spacing="spaceState.spacing"
+            :align="spaceState.align"
+          >
+            <div>Control：</div>
+            <VButton type="primary">确定</VButton>
+            <VButton>取消</VButton>
+          </VSpace>
+        </div>
+      </section>
     </div>
   </FilledLayout>
 </template>
@@ -206,7 +257,13 @@ import { VOption, VSelect } from "@/components/base/select";
 import { VTextarea } from "@/components/base/textarea";
 import { VRadio, VRadioGroup } from "@/components/base/radio";
 import { VCheckbox, VCheckboxGroup } from "@/components/base/checkbox";
-import { ref } from "vue";
+import { VSpace } from "@/components/base/space";
+import { reactive, ref } from "vue";
+import type {
+  Align,
+  Direction,
+  Spacing,
+} from "@/components/base/space/interface";
 
 const buttonLoading = ref(true);
 const inputValue = ref();
@@ -214,6 +271,16 @@ const selectValue = ref();
 const radioValue = ref("apple");
 const checkboxValue = ref(false);
 const checkboxGroupValue = ref(["apple"]);
+
+const spaceState = reactive<{
+  direction: Direction;
+  spacing: Spacing;
+  align: Align;
+}>({
+  direction: "row",
+  spacing: "xs",
+  align: "center",
+});
 
 const selectData = [
   {

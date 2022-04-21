@@ -22,6 +22,8 @@ import IconSettings from "~icons/ri/settings-4-line";
 import IconPlug from "~icons/ri/plug-2-line";
 // @ts-ignore
 import IconEye from "~icons/ri/eye-line";
+// @ts-ignore
+import IconFolder from "~icons/ri/folder-2-line";
 export {
   IconDashboard,
   IconArrowRight,
@@ -35,4 +37,5 @@ export {
   IconSettings,
   IconPlug,
   IconEye,
+  IconFolder,
 };

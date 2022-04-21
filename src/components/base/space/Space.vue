@@ -1,0 +1,65 @@
+<script lang="ts" setup>
+import type { Align, Direction, Spacing } from "./interface";
+import { SpacingSize } from "./interface";
+import type { PropType } from "vue";
+import { computed } from "vue";
+
+const props = defineProps({
+  spacing: {
+    type: String as PropType<Spacing>,
+    default: "xs",
+  },
+  direction: {
+    type: String as PropType<Direction>,
+    default: "row",
+  },
+  align: {
+    type: String as PropType<Align>,
+    default: "center",
+  },
+});
+
+const wrapperClasses = computed(() => {
+  const { direction, align } = props;
+  return [`space-direction-${direction}`, `space-align-${align}`];
+});
+</script>
+<template>
+  <div
+    class="space-wrapper"
+    :class="wrapperClasses"
+    :style="`gap: ${SpacingSize[spacing]}px`"
+  >
+    <slot />
+  </div>
+</template>
+<style lang="scss">
+.space-wrapper {
+  @apply inline-flex;
+  @apply box-border;
+
+  &.space-direction-row {
+    @apply flex-row;
+  }
+
+  &.space-direction-column {
+    @apply flex-col;
+  }
+
+  &.space-align-center {
+    @apply items-center;
+  }
+
+  &.space-align-start {
+    @apply items-start;
+  }
+
+  &.space-align-end {
+    @apply items-end;
+  }
+
+  &.space-align-stretch {
+    @apply items-stretch;
+  }
+}
+</style>
