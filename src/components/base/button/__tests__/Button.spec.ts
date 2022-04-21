@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { VButton } from "../index";
 import { mount } from "@vue/test-utils";
+import { IconSettings } from "../../../../core/icons";
 
 describe("Button", () => {
   it("should render", () => {
@@ -79,5 +80,61 @@ describe("Button", () => {
 
     expect(button.html()).toMatchSnapshot();
     expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it("should work with loading prop", async function () {
+    const wrapper = mount({
+      data() {
+        return {
+          loading: true,
+        };
+      },
+      template: `
+        <v-button :loading="loading" >
+          Hello
+        </v-button>
+      `,
+      components: {
+        VButton,
+      },
+    });
+
+    expect(wrapper.find(".btn").classes()).toContain("btn-loading");
+    expect(wrapper.find(".btn-icon").exists()).toBe(true);
+
+    // set loading = false
+    await wrapper.setData({ loading: false });
+    expect(wrapper.find(".btn").classes()).not.toContain("btn-loading");
+    expect(wrapper.find(".btn-icon").exists()).toBe(false);
+  });
+
+  it("should work with loading prop and icon slot", async function () {
+    const wrapper = mount({
+      data() {
+        return {
+          loading: false,
+        };
+      },
+      template: `
+        <v-button :loading="loading">
+        <template #icon>
+          IconSettings
+        </template>
+        Hello
+        </v-button>
+      `,
+      components: {
+        VButton,
+        IconSettings,
+      },
+    });
+
+    expect(wrapper.find(".btn-icon").exists()).toBe(true);
+    expect(wrapper.find(".btn").classes()).not.toContain("btn-loading");
+
+    await wrapper.setData({ loading: true });
+
+    expect(wrapper.find(".btn-icon").exists()).toBe(true);
+    expect(wrapper.find(".btn").classes()).toContain("btn-loading");
   });
 });
