@@ -58,6 +58,18 @@
             </VButton>
             <VButton type="danger" :loading="buttonLoading"> Danger </VButton>
             <VButton type="default" :loading="buttonLoading"> Default </VButton>
+            <VButton size="lg" type="secondary" :loading="buttonLoading"
+              >Large</VButton
+            >
+            <VButton type="secondary" :loading="buttonLoading">
+              Default</VButton
+            >
+            <VButton size="sm" type="secondary" :loading="buttonLoading">
+              sm</VButton
+            >
+            <VButton size="xs" type="secondary" :loading="buttonLoading">
+              xs</VButton
+            >
           </VSpace>
         </div>
         <h2 class="mb-1">Icon:</h2>
@@ -244,6 +256,47 @@
           </VSpace>
         </div>
       </section>
+      <section class="box border-2 rounded p-2 mb-3">
+        <h1 class="text-xl font-bold mb-2">Tag</h1>
+        <h2 class="mb-1">Themes:</h2>
+        <div class="mb-3">
+          <VSpace>
+            <VTag theme="default">Halo</VTag>
+            <VTag theme="primary">Halo</VTag>
+            <VTag theme="secondary">Halo</VTag>
+            <VTag theme="danger">Halo</VTag>
+          </VSpace>
+        </div>
+        <h2 class="mb-1">With Icon:</h2>
+        <div class="mb-3">
+          <VSpace>
+            <VTag theme="default" rounded>
+              <template #leftIcon>
+                <IconSettings />
+              </template>
+              Halo
+            </VTag>
+            <VTag theme="primary" rounded>
+              <template #leftIcon>
+                <IconSettings />
+              </template>
+              Halo
+            </VTag>
+            <VTag theme="secondary">
+              <template #leftIcon>
+                <IconSettings />
+              </template>
+              Halo
+            </VTag>
+            <VTag theme="danger">
+              <template #leftIcon>
+                <IconSettings />
+              </template>
+              Halo
+            </VTag>
+          </VSpace>
+        </div>
+      </section>
     </div>
   </FilledLayout>
 </template>
@@ -258,6 +311,7 @@ import { VTextarea } from "@/components/base/textarea";
 import { VRadio, VRadioGroup } from "@/components/base/radio";
 import { VCheckbox, VCheckboxGroup } from "@/components/base/checkbox";
 import { VSpace } from "@/components/base/space";
+import { VTag } from "@/components/base/tag";
 import { reactive, ref } from "vue";
 import type {
   Align,
