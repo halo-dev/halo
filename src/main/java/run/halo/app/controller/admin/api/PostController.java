@@ -173,7 +173,7 @@ public class PostController {
     }
 
     @DeleteMapping("{postId:\\d+}")
-    @ApiOperation("Deletes a photo permanently")
+    @ApiOperation("Deletes a post permanently")
     public void deletePermanently(@PathVariable("postId") Integer postId) {
         postService.removeById(postId);
     }
