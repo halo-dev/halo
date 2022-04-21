@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.core.util.ReflectionUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
@@ -184,6 +184,8 @@ public class BackupServiceImpl implements BackupService {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final ApplicationContext appContext;
+
     public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService,
         CommentBlackListService commentBlackListService, JournalService journalService,
         JournalCommentService journalCommentService, LinkService linkService, LogService logService,
@@ -196,7 +198,7 @@ public class BackupServiceImpl implements BackupService {
         SheetCommentService sheetCommentService, SheetMetaService sheetMetaService,
         TagService tagService, ThemeSettingService themeSettingService, UserService userService,
         OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties,
-        ApplicationEventPublisher eventPublisher) {
+        ApplicationEventPublisher eventPublisher, ApplicationContext appContext) {
         this.attachmentService = attachmentService;
         this.categoryService = categoryService;
         this.commentBlackListService = commentBlackListService;
@@ -223,6 +225,7 @@ public class BackupServiceImpl implements BackupService {
         this.oneTimeTokenService = oneTimeTokenService;
         this.haloProperties = haloProperties;
         this.eventPublisher = eventPublisher;
+        this.appContext = appContext;
     }
 
     @Override
@@ -234,9 +237,6 @@ public class BackupServiceImpl implements BackupService {
         // TODO sheet import
         return postService.importMarkdown(markdown, file.getOriginalFilename());
     }
-
-    @Autowired
-    private ApplicationContext appContext;
 
     @Override
     public BackupDTO backupWorkDirectory(List<String> options) {
@@ -258,18 +258,23 @@ public class BackupServiceImpl implements BackupService {
 
             boolean dbClosed = false;
             if (options.contains("db") && SystemUtils.IS_OS_WINDOWS) {
-                HikariDataSource dataSource = appContext.getBean(HikariDataSource.class);
-                if (dataSource.getDriverClassName().equals("org.h2.Driver")) {
-                    try {
-                        Field poolField = HikariDataSource.class.getDeclaredField(
-                            "pool");
-                        HikariPool pool =
-                            (HikariPool) ReflectionUtil.getFieldValue(poolField, dataSource);
-                        pool.shutdown();
-                        dbClosed = true;
-                    } catch (InterruptedException | NoSuchFieldException e) {
-                        throw new ServiceException("Failed to close H2 database", e);
+                try {
+                    var temp = appContext.getBean(ZipOutputStream.class);
+                    HikariDataSource dataSource = appContext.getBean(HikariDataSource.class);
+                    if (dataSource.getDriverClassName().equals("org.h2.Driver")) {
+                        try {
+                            Field poolField = HikariDataSource.class.getDeclaredField(
+                                "pool");
+                            HikariPool pool =
+                                (HikariPool) ReflectionUtil.getFieldValue(poolField, dataSource);
+                            pool.shutdown();
+                            dbClosed = true;
+                        } catch (InterruptedException | NoSuchFieldException e) {
+                            throw new ServiceException("Failed to close H2 database", e);
+                        }
                     }
+                } catch (NoSuchBeanDefinitionException e) {
+                    throw new ServiceException("Bean HikariDataSource doesn't exists");
                 }
             }
             // Zip halo
