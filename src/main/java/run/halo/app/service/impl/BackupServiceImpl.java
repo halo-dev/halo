@@ -31,6 +31,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.core.util.ReflectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -255,16 +256,20 @@ public class BackupServiceImpl implements BackupService {
             }
             Path haloZipPath = Files.createFile(haloZipFilePath);
 
-            if (options.contains("db")) {
+            boolean dbClosed = false;
+            if (options.contains("db") && SystemUtils.IS_OS_WINDOWS) {
                 HikariDataSource dataSource = appContext.getBean(HikariDataSource.class);
-                try {
-                    Field poolField = HikariDataSource.class.getDeclaredField(
-                        "pool");
-                    HikariPool pool =
-                        (HikariPool) ReflectionUtil.getFieldValue(poolField, dataSource);
-                    pool.shutdown();
-                } catch (InterruptedException | NoSuchFieldException e) {
-                    throw new ServiceException("Failed to close H2 database", e);
+                if (dataSource.getDriverClassName().equals("org.h2.Driver")) {
+                    try {
+                        Field poolField = HikariDataSource.class.getDeclaredField(
+                            "pool");
+                        HikariPool pool =
+                            (HikariPool) ReflectionUtil.getFieldValue(poolField, dataSource);
+                        pool.shutdown();
+                        dbClosed = true;
+                    } catch (InterruptedException | NoSuchFieldException e) {
+                        throw new ServiceException("Failed to close H2 database", e);
+                    }
                 }
             }
             // Zip halo
@@ -281,7 +286,7 @@ public class BackupServiceImpl implements BackupService {
                         return false;
                     });
 
-            if (options.contains("db")) {
+            if (dbClosed) {
                 try {
                     Field poolField = HikariDataSource.class.getDeclaredField(
                         "pool");
