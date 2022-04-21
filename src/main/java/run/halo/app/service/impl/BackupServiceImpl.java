@@ -259,7 +259,6 @@ public class BackupServiceImpl implements BackupService {
             boolean dbClosed = false;
             if (options.contains("db") && SystemUtils.IS_OS_WINDOWS) {
                 try {
-                    var temp = appContext.getBean(ZipOutputStream.class);
                     HikariDataSource dataSource = appContext.getBean(HikariDataSource.class);
                     if (dataSource.getDriverClassName().equals("org.h2.Driver")) {
                         try {
