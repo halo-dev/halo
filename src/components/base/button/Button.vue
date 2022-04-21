@@ -5,14 +5,10 @@
     class="btn"
     @click="handleClick"
   >
-    <span
-      v-if="$slots.icon || loading"
-      :class="{ 'mr-3': !!$slots.default }"
-      class="btn-icon"
-    >
+    <span v-if="$slots.icon || loading" class="btn-icon">
       <svg
         v-if="loading"
-        class="animate-spin h-5 w-5 text-white"
+        class="animate-spin"
         fill="none"
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"
@@ -124,6 +120,9 @@ function handleClick() {
 
 .btn-default {
   border: 1px solid #d9d9d9;
+  .btn-icon {
+    color: #0e1731;
+  }
 }
 
 .btn-primary {
@@ -145,6 +144,12 @@ function handleClick() {
   @apply w-full;
 }
 
+.btn-icon {
+  @apply h-5 w-5;
+  @apply text-white;
+  @apply mr-3;
+}
+
 .btn-loading {
   @apply cursor-not-allowed;
   &:hover {
@@ -162,12 +167,22 @@ function handleClick() {
   @apply h-7;
   @apply px-3;
   @apply text-xs;
+
+  .btn-icon {
+    @apply h-3 w-3;
+    @apply mr-2;
+  }
 }
 
 .btn-xs {
   @apply h-6;
   @apply px-2;
   @apply text-xs;
+
+  .btn-icon {
+    @apply h-3 w-3;
+    @apply mr-2;
+  }
 }
 
 .btn-circle {

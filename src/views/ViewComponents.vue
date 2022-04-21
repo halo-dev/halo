@@ -77,25 +77,25 @@
           <VSpace>
             <VButton size="lg" type="secondary">
               <template #icon>
-                <IconSettings />
+                <IconSettings class="w-full h-full" />
               </template>
               Large
             </VButton>
             <VButton type="secondary">
               <template #icon>
-                <IconSettings />
+                <IconSettings class="w-full h-full" />
               </template>
               Default
             </VButton>
             <VButton size="sm" type="secondary">
               <template #icon>
-                <IconSettings />
+                <IconSettings class="w-full h-full" />
               </template>
               sm
             </VButton>
             <VButton size="xs" type="secondary">
               <template #icon>
-                <IconSettings />
+                <IconSettings class="w-full h-full" />
               </template>
               xs
             </VButton>
