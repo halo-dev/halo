@@ -90,6 +90,15 @@ public class FilePathDescriptorTest {
     }
 
     @Test
+    public void nameWithIllegalChar() {
+        FilePathDescriptor descriptor = descriptorBuilder.setOriginalName("1%-1#101.png").build();
+        assertEquals("1‰-1井101", descriptor.getName());
+        assertEquals("1‰-1井101.png", descriptor.getFullName());
+        assertEquals("/home/halo/2021/10/1‰-1井101.png", descriptor.getFullPath());
+        assertEquals("2021/10/1‰-1井101.png", descriptor.getRelativePath());
+    }
+
+    @Test
     public void windowsSystem() {
         FilePathDescriptor descriptor = new FilePathDescriptor.Builder()
             .setBasePath("C:\\Users\\Halo NiuBi\\.halo\\")
