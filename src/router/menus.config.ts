@@ -2,15 +2,14 @@ import {
   IconBookRead,
   IconDashboard,
   IconEye,
+  IconFolder,
   IconListSettings,
-  IconMagic,
   IconMessage,
   IconPages,
   IconPalette,
   IconPlug,
   IconSettings,
   IconUserSettings,
-  IconFolder,
 } from "@/core/icons";
 import type { Component } from "vue";
 
@@ -99,11 +98,6 @@ export const menus: MenuGroupType[] = [
         name: "设置",
         path: "/settings",
         icon: IconSettings,
-      },
-      {
-        name: "组件",
-        path: "/components",
-        icon: IconMagic,
       },
     ],
   },

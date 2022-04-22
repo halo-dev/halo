@@ -1,0 +1,49 @@
+<template>
+  <Story title="Tag">
+    <Variant title="Theme">
+      <template #default>
+        <VSpace>
+          <VTag theme="default">Halo</VTag>
+          <VTag theme="primary">Halo</VTag>
+          <VTag theme="secondary">Halo</VTag>
+          <VTag theme="danger">Halo</VTag>
+        </VSpace>
+      </template>
+    </Variant>
+    <Variant title="Icon">
+      <template #default>
+        <VSpace>
+          <VTag theme="default" rounded>
+            <template #leftIcon>
+              <IconSettings />
+            </template>
+            Halo
+          </VTag>
+          <VTag theme="primary" rounded>
+            <template #leftIcon>
+              <IconSettings />
+            </template>
+            Halo
+          </VTag>
+          <VTag theme="secondary">
+            <template #leftIcon>
+              <IconSettings />
+            </template>
+            Halo
+          </VTag>
+          <VTag theme="danger">
+            <template #leftIcon>
+              <IconSettings />
+            </template>
+            Halo
+          </VTag>
+        </VSpace>
+      </template>
+    </Variant>
+  </Story>
+</template>
+<script lang="ts" setup>
+import { VTag } from "@/components/base/tag/index";
+import { VSpace } from "@/components/base/space/index";
+import { IconSettings } from "@/core/icons";
+</script>
