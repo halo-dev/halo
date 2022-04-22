@@ -70,3 +70,8 @@ halo:
   download-timeout: 5m
   cache: memory
   work-dir: ${user.home}/.halo/
+
+xss:
+  enabled: true
+  excludes: /open/*,/open2/*
+  urlPatterns: /*
