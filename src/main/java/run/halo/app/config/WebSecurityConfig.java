@@ -6,12 +6,14 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +31,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
@@ -38,6 +41,8 @@ import run.halo.app.identity.authentication.OAuth2RefreshTokenAuthenticationProv
 import run.halo.app.identity.authentication.OAuth2TokenEndpointFilter;
 import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
+import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
+import run.halo.app.identity.authentication.verifier.JwtProvidedDecoderAuthenticationManagerResolver;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
@@ -77,6 +82,8 @@ public class WebSecurityConfig {
             .addFilterBefore(new OAuth2TokenEndpointFilter(authenticationManager(),
                     providerSettings.getTokenEndpoint()),
                 FilterSecurityInterceptor.class)
+            .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManagerResolver()),
+                BasicAuthenticationFilter.class)
             .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -85,6 +92,10 @@ public class WebSecurityConfig {
                 .accessDeniedHandler(new JwtAccessDeniedHandler())
             );
         return http.build();
+    }
+
+    AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver() {
+        return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder());
     }
 
     @Bean
