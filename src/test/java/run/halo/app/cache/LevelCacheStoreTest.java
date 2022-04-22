@@ -25,7 +25,6 @@ public class LevelCacheStoreTest {
     @BeforeEach
     void setUp() throws IOException {
         String testDir = FileUtils.createTempDirectory().toString();
-        System.out.println(testDir);
         haloProperties.setWorkDir(testDir + FILE_SEPARATOR);
         cacheStore = new LevelCacheStore(haloProperties);
         cacheStore.init();

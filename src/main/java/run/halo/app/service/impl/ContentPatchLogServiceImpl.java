@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.data.domain.Example;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -73,8 +74,7 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
         if (latestPatchLog == null) {
             // There is no patchLog record
             version = 1;
-        } else if (PostStatus.PUBLISHED.equals(latestPatchLog.getStatus())
-            || PostStatus.INTIMATE.equals(latestPatchLog.getStatus())) {
+        } else if (shouldUpgradeVersion(latestPatchLog)) {
             // There is no draft, a draft record needs to be created
             // so the version number needs to be incremented
             version = latestPatchLog.getVersion() + 1;
@@ -116,7 +116,7 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
         contentPatchLog.setStatus(PostStatus.DRAFT);
         ContentPatchLog latestPatchLog =
             contentPatchLogRepository.findFirstByPostIdOrderByVersionDesc(postId);
-        if (latestPatchLog != null) {
+        if (shouldUpgradeVersion(latestPatchLog)) {
             contentPatchLog.setVersion(latestPatchLog.getVersion() + 1);
         } else {
             contentPatchLog.setVersion(BASE_VERSION);
@@ -125,19 +125,33 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
         return contentPatchLog;
     }
 
+    private boolean shouldUpgradeVersion(ContentPatchLog latestPatchLog) {
+        if (latestPatchLog == null) {
+            return false;
+        }
+        return PostStatus.PUBLISHED.equals(latestPatchLog.getStatus())
+            || PostStatus.INTIMATE.equals(latestPatchLog.getStatus());
+    }
+
     private boolean existDraftBy(Integer postId) {
         ContentPatchLog contentPatchLog = new ContentPatchLog();
         contentPatchLog.setPostId(postId);
         contentPatchLog.setStatus(PostStatus.DRAFT);
         Example<ContentPatchLog> example = Example.of(contentPatchLog);
-        return contentPatchLogRepository.exists(example);
+        boolean exists = contentPatchLogRepository.exists(example);
+        if (exists) {
+            return true;
+        }
+        contentPatchLog.setStatus(PostStatus.RECYCLE);
+        return contentPatchLogRepository.exists(Example.of(contentPatchLog));
     }
 
     private ContentPatchLog updateDraftBy(Integer postId, String formatContent,
         String originalContent) {
-        ContentPatchLog draftPatchLog =
-            contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,
-                PostStatus.DRAFT);
+        ContentPatchLog draftPatchLog = findLatestDraftBy(postId);
+        if (draftPatchLog == null) {
+            throw new NotFoundException("The latest draft version must not be null to update.");
+        }
         // Is the draft version 1
         if (Objects.equals(draftPatchLog.getVersion(), BASE_VERSION)) {
             // If it is V1, modify the content directly.
@@ -151,6 +165,18 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
         draftPatchLog.setContentDiff(contentDiff.getDiff());
         draftPatchLog.setOriginalContentDiff(contentDiff.getOriginalDiff());
         contentPatchLogRepository.save(draftPatchLog);
+        return draftPatchLog;
+    }
+
+    private ContentPatchLog findLatestDraftBy(Integer postId) {
+        ContentPatchLog draftPatchLog =
+            contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,
+                PostStatus.DRAFT);
+        if (draftPatchLog == null) {
+            draftPatchLog =
+                contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,
+                    PostStatus.RECYCLE);
+        }
         return draftPatchLog;
     }
 
@@ -198,8 +224,7 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
 
     @Override
     public ContentPatchLog getDraftByPostId(Integer postId) {
-        return contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,
-            PostStatus.DRAFT);
+        return findLatestDraftBy(postId);
     }
 
     @Override
@@ -219,8 +244,9 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
         return applyPatch(contentPatchLog);
     }
 
+    @NonNull
     @Override
-    public ContentPatchLog getById(Integer id) {
+    public ContentPatchLog getById(@NonNull Integer id) {
         return contentPatchLogRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(
                 "Post content patch log was not found or has been deleted."));

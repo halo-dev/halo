@@ -6,7 +6,7 @@ server:
 spring:
   devtools:
     restart:
-      eanbled: false
+      enabled: false
   mvc:
     pathmatch:
       use-suffix-pattern: true

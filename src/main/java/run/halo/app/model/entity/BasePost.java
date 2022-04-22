@@ -243,6 +243,17 @@ public class BasePost extends BaseEntity {
         if (version == null || version < 0) {
             version = 1;
         }
+        // Clear the value of the deprecated attributes
+        this.originalContent = "";
+        this.formatContent = "";
+    }
+
+    @Override
+    protected void preUpdate() {
+        super.preUpdate();
+        // Clear the value of the deprecated attributes
+        this.originalContent = "";
+        this.formatContent = "";
     }
 
     /**

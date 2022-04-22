@@ -1,6 +1,5 @@
 package run.halo.app.core.freemarker.tag;
 
-import com.google.common.collect.Sets;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapperBuilder;
@@ -84,15 +83,12 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
                     env.setVariable("posts", builder.build()
                         .wrap(postRenderAssembler.convertToListVo(
-                            postCategoryService.listPostBy(categoryId,
-                                Sets.immutableEnumSet(PostStatus.PUBLISHED,
-                                    PostStatus.INTIMATE)))));
+                            postCategoryService.listPostBy(categoryId, PostStatus.PUBLISHED))));
                     break;
                 case "listByCategorySlug":
                     String categorySlug = params.get("categorySlug").toString();
                     List<Post> posts =
-                        postCategoryService.listPostBy(categorySlug,
-                            Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE));
+                        postCategoryService.listPostBy(categorySlug, PostStatus.PUBLISHED);
                     env.setVariable("posts",
                         builder.build().wrap(postRenderAssembler.convertToListVo(posts)));
                     break;

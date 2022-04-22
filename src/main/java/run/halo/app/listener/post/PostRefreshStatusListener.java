@@ -1,6 +1,9 @@
 package run.halo.app.listener.post;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import run.halo.app.event.category.CategoryUpdatedEvent;
@@ -42,18 +45,93 @@ public class PostRefreshStatusListener {
     @EventListener(CategoryUpdatedEvent.class)
     public void categoryUpdatedListener(CategoryUpdatedEvent event) {
         Category category = event.getCategory();
-        if (!categoryService.existsById(category.getId())) {
+        Category beforeUpdated = event.getBeforeUpdated();
+        boolean beforeIsPrivate = event.isBeforeIsPrivate();
+        RecordState recordState = determineRecordState(beforeUpdated, category);
+
+        List<Post> posts = postService.listAllByIds(event.getPostIds());
+
+        // handle delete action
+        if (RecordState.DELETED.equals(recordState) || category == null) {
+            if (beforeUpdated == null || !beforeIsPrivate) {
+                return;
+            }
+            // Cancel the encryption status of the posts
+            changeStatusToPublishIfNecessary(posts, beforeUpdated.getId());
             return;
         }
-        boolean isPrivate = categoryService.isPrivate(category.getId());
 
-        List<Post> posts = postCategoryService.listPostBy(category.getId());
+        // now
+        boolean isPrivate = categoryService.isPrivate(category.getId());
         if (isPrivate) {
-            posts.forEach(post -> post.setStatus(PostStatus.INTIMATE));
-        } else {
-            posts.forEach(post -> post.setStatus(PostStatus.DRAFT));
+            List<Post> postsToUpdate = new ArrayList<>();
+            posts.forEach(post -> {
+                if (post.getStatus() == PostStatus.PUBLISHED) {
+                    post.setStatus(PostStatus.INTIMATE);
+                    postsToUpdate.add(post);
+                }
+            });
+            postService.updateInBatch(postsToUpdate);
+        } else if (beforeIsPrivate && RecordState.UPDATED.equals(recordState)) {
+            // Cancel the encryption status of the posts
+            changeStatusToPublishIfNecessary(posts, category.getId());
         }
-        postService.updateInBatch(posts);
+    }
+
+    private void changeStatusToPublishIfNecessary(List<Post> posts, Integer categoryId) {
+        List<Post> postsToUpdate = new ArrayList<>();
+        for (Post post : posts) {
+            boolean belongsToEncryptedCategory = postBelongsToEncryptedCategory(post.getId());
+            if (!belongsToEncryptedCategory && StringUtils.isBlank(post.getPassword())
+                && post.getStatus() == PostStatus.INTIMATE) {
+                post.setStatus(PostStatus.PUBLISHED);
+                postsToUpdate.add(post);
+            }
+        }
+        postService.updateInBatch(postsToUpdate);
+    }
+
+    private boolean postBelongsToEncryptedCategory(Integer postId) {
+        Set<Integer> categoryIds = postCategoryService.listCategoryIdsByPostId(postId);
+
+        boolean encrypted = false;
+        for (Integer categoryId : categoryIds) {
+            if (categoryService.isPrivate(categoryId)) {
+                encrypted = true;
+                break;
+            }
+        }
+        return encrypted;
+    }
+
+    private RecordState determineRecordState(Category before, Category updated) {
+        if (before == null) {
+            if (updated != null) {
+                // created: null -> record
+                return RecordState.CREATED;
+            } else {
+                // unchanged: null -> null
+                return RecordState.UNCHANGED;
+            }
+        } else {
+            if (updated == null) {
+                // deleted: record -> null
+                return RecordState.DELETED;
+            } else {
+                // updated: record -> record
+                return RecordState.UPDATED;
+            }
+        }
+    }
+
+    enum RecordState {
+        /**
+         * effective state for database record.
+         */
+        CREATED,
+        UPDATED,
+        DELETED,
+        UNCHANGED
     }
 
     /**
@@ -67,13 +145,24 @@ public class PostRefreshStatusListener {
         if (!postService.existsById(post.getId())) {
             return;
         }
+
+        PostStatus status = post.getStatus();
+        if (PostStatus.RECYCLE.equals(status)) {
+            return;
+        }
         boolean isPrivate = postCategoryService.listByPostId(post.getId())
             .stream()
             .anyMatch(postCategory -> categoryService.isPrivate(postCategory.getCategoryId()));
-
-        if (isPrivate) {
-            post.setStatus(PostStatus.INTIMATE);
-            postService.update(post);
+        if (post.getStatus() != PostStatus.DRAFT) {
+            if (isPrivate || StringUtils.isNotEmpty(post.getPassword())) {
+                status = PostStatus.INTIMATE;
+            } else {
+                status = PostStatus.PUBLISHED;
+            }
+        } else if (!isPrivate && StringUtils.isBlank(post.getPassword())) {
+            status = PostStatus.DRAFT;
         }
+        post.setStatus(status);
+        postService.update(post);
     }
 }

@@ -19,6 +19,11 @@ public enum EmailProperties implements PropertyEnum {
     PROTOCOL("email_protocol", String.class, "smtp"),
 
     /**
+     * Is starttls enabled
+     */
+    STARTTLS("email_starttls", Boolean.class, "false"),
+
+    /**
      * SSL port
      */
     SSL_PORT("email_ssl_port", Integer.class, "465"),

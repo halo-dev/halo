@@ -4,6 +4,8 @@ import static run.halo.app.model.support.HaloConst.POST_PASSWORD_TEMPLATE;
 import static run.halo.app.model.support.HaloConst.SUFFIX_FTL;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -271,6 +273,8 @@ public class ContentContentController {
         ContentAuthenticationRequest authRequest = new ContentAuthenticationRequest();
         authRequest.setPassword(password);
         Post post = postService.getBy(PostStatus.INTIMATE, slug);
+        post.setSlug(URLEncoder.encode(post.getSlug(), StandardCharsets.UTF_8));
+
         authRequest.setId(post.getId());
         authRequest.setPrincipal(EncryptTypeEnum.POST.getName());
         try {
@@ -290,6 +294,8 @@ public class ContentContentController {
         ContentAuthenticationRequest authRequest = new ContentAuthenticationRequest();
         authRequest.setPassword(password);
         Category category = categoryService.getBySlugOfNonNull(slug);
+        category.setSlug(URLEncoder.encode(category.getSlug(), StandardCharsets.UTF_8));
+
         authRequest.setId(category.getId());
         authRequest.setPrincipal(EncryptTypeEnum.CATEGORY.getName());
         try {
