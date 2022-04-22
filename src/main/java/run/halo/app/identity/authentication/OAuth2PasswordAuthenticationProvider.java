@@ -1,5 +1,6 @@
 package run.halo.app.identity.authentication;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -78,7 +79,8 @@ public class OAuth2PasswordAuthenticationProvider extends DaoAuthenticationProvi
         OAuth2Authorization.Builder authorizationBuilder = new OAuth2Authorization.Builder()
             .principalName(authentication.getName())
             .authorizationGrantType(AuthorizationGrantType.PASSWORD)
-            .attribute(OAuth2Authorization.AUTHORIZED_SCOPE_ATTRIBUTE_NAME, scopes);
+            .attribute(OAuth2Authorization.AUTHORIZED_SCOPE_ATTRIBUTE_NAME, scopes)
+            .attribute(Principal.class.getName(), authentication);
 
         // ----- Access token -----
         OAuth2TokenContext tokenContext =
