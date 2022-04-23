@@ -1,15 +1,9 @@
 package run.halo.app.wrapper;
 
-import org.apache.commons.text.StringEscapeUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import org.apache.commons.text.StringEscapeUtils;
+
 
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
@@ -17,7 +11,7 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
      * Constructs a request object wrapping the given request.
      *
      * @param request the {@link HttpServletRequest} to be wrapped.
-     * @throws IllegalArgumentException if the request is null
+     *
      */
 
     public XssHttpServletRequestWrapper(HttpServletRequest request) {

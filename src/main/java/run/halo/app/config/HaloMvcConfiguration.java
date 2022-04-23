@@ -48,8 +48,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import run.halo.app.config.serializer.XssJacksonDeserializer;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.config.serializer.XssJacksonDeserializer;
 import run.halo.app.config.serializer.XssJacksonSerializer;
 import run.halo.app.core.PageJacksonSerializer;
 import run.halo.app.core.freemarker.inheritance.ThemeExtendsDirective;
@@ -74,6 +74,10 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
     private final HaloProperties haloProperties;
     @Value("${springfox.documentation.swagger-ui.base-url:}")
     private String swaggerBaseUrl;
+
+    @Value("${xss.enabled}")
+    private String xssEnabled;
+
 
     public HaloMvcConfiguration(PageableHandlerMethodArgumentResolver pageableResolver,
         SortHandlerMethodArgumentResolver sortResolver,
@@ -151,10 +155,13 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
                 Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
                 JsonComponentModule module = new JsonComponentModule();
                 module.addSerializer(PageImpl.class, new PageJacksonSerializer());
-                SimpleModule simpleModule = new SimpleModule();
-                simpleModule.addDeserializer(String.class, new XssJacksonDeserializer());
-                simpleModule.addSerializer(String.class,new XssJacksonSerializer());
-                ObjectMapper objectMapper = builder.modules(module,simpleModule).build();
+                ObjectMapper objectMapper = builder.modules(module).build();
+                if ("true".equals(xssEnabled)) {
+                    SimpleModule xssModule = new SimpleModule();
+                    xssModule.addDeserializer(String.class, new XssJacksonDeserializer());
+                    xssModule.addSerializer(String.class, new XssJacksonSerializer());
+                    objectMapper.registerModule(xssModule);
+                }
                 mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
             });
     }
@@ -212,5 +219,9 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverterFactory(new StringToEnumConverterFactory());
+    }
+
+    public Boolean getXssEnabled() {
+        return "true".equals(xssEnabled);
     }
 }
