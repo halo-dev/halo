@@ -2,6 +2,7 @@ package run.halo.app.utils;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -16,20 +17,15 @@ class VmUtilsTest {
 
     @Test
     void testGetSameLaunchCommand() {
-        String cmd = VmUtils.getSameLaunchCommand();
-        assertTrue(StringUtils.isNotBlank(cmd));
-        // 测试命令的可执行性
-        assertDoesNotThrow(()->{
-            final Process exec = Runtime.getRuntime().exec(cmd);
-            exec.destroy();
-        });
+        final List<String> cmd = VmUtils.getSameLaunchCommand();
+        assertFalse(cmd.isEmpty());
     }
 
     @Test
     void testGetJvmExecutablePath() {
         String actualJvmExecutablePath = VmUtils.getJvmExecutablePath();
         assertTrue(StringUtils.isNotBlank(actualJvmExecutablePath));
-        assertDoesNotThrow(()->{
+        assertDoesNotThrow(() -> {
             new ProcessBuilder(actualJvmExecutablePath).start();
         });
     }
@@ -40,6 +36,7 @@ class VmUtilsTest {
         final List<String> vmArguments = VmUtils.getVmArguments();
         assertEquals(bean.getInputArguments(), vmArguments);
     }
+
     @Test
     void testGetClassPath() {
         String actualClassPath = VmUtils.getClassPath();

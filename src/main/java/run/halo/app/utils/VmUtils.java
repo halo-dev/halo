@@ -15,16 +15,21 @@ import run.halo.app.model.enums.SystemType;
  * @author Chen_Kunqiu
  */
 public class VmUtils {
-    private static RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
+    private static final RuntimeMXBean RUNTIME_MX_BEAN = ManagementFactory.getRuntimeMXBean();
     public static final List<String> PROGRAM_ARGS = new ArrayList<>();
     public static final Path CURR_JAR;
     public static final Path CURR_JAR_DIR;
 
     static {
-        final String path =
+        String path =
             VmUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        // As the special package form of Spring, the path would start with "file:"
+        if (path.startsWith("file:")) {
+            path = path.substring(5);
+        }
         // If not containing ".jar", it is test scenario.
         final int idx = path.contains(".jar") ? path.indexOf(".jar") + 4 : path.length();
+
         CURR_JAR = new File(path.substring(0, idx)).toPath();
         CURR_JAR_DIR = CURR_JAR.getParent();
     }
@@ -58,7 +63,7 @@ public class VmUtils {
      *
      * @return the full command
      */
-    public static String getSameLaunchCommand() {
+    public static List<String> getSameLaunchCommand() {
         List<String> cmd = new ArrayList<>();
         cmd.add(getJvmExecutablePath());
         cmd.addAll(getVmArguments());
@@ -67,7 +72,7 @@ public class VmUtils {
         cmd.add("-jar");
         cmd.add(getRunningJar());
         cmd.addAll(PROGRAM_ARGS);
-        return String.join(" ", cmd);
+        return cmd;
     }
 
     /**
@@ -135,7 +140,7 @@ public class VmUtils {
      * @return the VM arguments
      */
     public static List<String> getVmArguments() {
-        return bean.getInputArguments();
+        return RUNTIME_MX_BEAN.getInputArguments();
     }
 
     /**
@@ -144,7 +149,7 @@ public class VmUtils {
      * @return the class path
      */
     public static String getClassPath() {
-        return bean.getClassPath();
+        return RUNTIME_MX_BEAN.getClassPath();
     }
 
     /**

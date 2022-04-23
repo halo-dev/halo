@@ -1,12 +1,13 @@
 package run.halo.app.service.impl;
 
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -17,20 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.system.ApplicationHome;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-import run.halo.app.Application;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.VersionInfoDTO;
-import run.halo.app.model.enums.SystemType;
 import run.halo.app.model.entity.GithubApiVersionJson;
+import run.halo.app.model.enums.SystemType;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.HaloVersionCtrlService;
 import run.halo.app.utils.VmUtils;
@@ -71,6 +69,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
 
 
     private ApplicationContext context;
+
     @Autowired
     private RestTemplate restTemplate;
     // @Autowired
@@ -84,7 +83,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         }
         try {
             Path target = Files.list(dir).filter(i ->
-                !StringUtils.hasText(tagName) || i.getFileName().toString().equals(tagName))
+                    !StringUtils.hasText(tagName) || i.getFileName().toString().equals(tagName))
                 .findFirst().orElse(null);
             if (target == null) {
                 return false;
@@ -186,7 +185,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         }
         final Path curJar = VmUtils.CURR_JAR;
         // If not launched in jar, return.
-        if (curJar == null) {
+        if (!curJar.toString().endsWith(".jar")) {
             return;
         }
         // If local storage exist specified jar, copy to work dir and get the Path of the copy.
@@ -272,29 +271,37 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         final String jarUrl = releaseInfo.getDownloadUrl();
         final String jarName = releaseInfo.getJarName();
         Assert.hasText(jarUrl, "Jar url must not be blank");
-        log.info("Downloading [{}]", jarUrl);
-
-        // final RestTemplate restTemplate = builder.build();
-        final ResponseEntity<byte[]> downloadResp =
-            restTemplate.getForEntity(jarUrl, byte[].class);
-        log.info("Download response: [{}]", downloadResp.getStatusCode());
-        if (downloadResp.getStatusCode().isError() || downloadResp.getBody() == null) {
-            throw new ServiceException("下载失败 "
-                + jarUrl
-                + ", 状态码: "
-                + downloadResp.getStatusCode());
-        }
-
-        log.info("Downloaded [{}]", jarUrl);
         Path tar = Paths.get(dstDir).resolve(jarName);
-        try {
-            Files.write(tar, Objects.requireNonNull(downloadResp.getBody()),
-                StandardOpenOption.CREATE);
-        } catch (IOException e) {
-            throw new ServiceException("jar包存储失败, 目标路径 "
-                + tar);
-        }
+        download(jarUrl, tar);
         return tar.toString();
+    }
+
+
+    /**
+     * Download resource to specified file.
+     *
+     * <p>As the jar file is very big, it is not appropriate to load it as byte[] in memory,
+     * so that directly forwarded it to the file system.
+     *
+     * @param url the url to download resource
+     * @param tarFile target file
+     */
+    private void download(String url, Path tarFile) {
+        restTemplate.execute(url, HttpMethod.GET, null,
+            resp -> {
+                log.info("Downloading [{}]", url);
+                try (final BufferedInputStream is = new BufferedInputStream(resp.getBody());
+                     final BufferedOutputStream os = new BufferedOutputStream(
+                         new FileOutputStream(tarFile.toFile()))) {
+                    is.transferTo(os);
+                } catch (Exception e) {
+                    throw new ServiceException("下载失败 "
+                        + url
+                        + ", 状态码: "
+                        + resp.getStatusCode());
+                }
+                return tarFile;
+            });
     }
 
 
@@ -310,7 +317,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         final Path dir = JAR_DIR.resolve(REPO_DIR);
         Path target =
             Files.list(dir).filter(i ->
-                !StringUtils.hasText(tagName) || i.getFileName().toString().equals(tagName))
+                    !StringUtils.hasText(tagName) || i.getFileName().toString().equals(tagName))
                 .findFirst().orElse(null);
         if (target == null) {
             return null;
@@ -399,7 +406,9 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
             () -> {
                 try {
                     final Process process = pb.inheritIO().start();
-                    log.info("New process PID: {}", process.pid());
+                    System.out.println(
+                        "\n------------------------------\nNew process PID: " + process.pid()
+                            + "\n------------------------------\n");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -407,8 +416,6 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         ));
 
     }
-
-
 
 
 }
