@@ -75,11 +75,11 @@ ext {
     jsoupVersion = '1.14.3'
     embeddedRedisVersion = '0.6'
     diffUtilsVersion = '4.11'
+    commonsTextVersion = '1.9'
 }
 
 dependencies {
 
-    implementation group: 'cn.hutool', name: 'hutool-all', version: '5.7.22'
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-web"
@@ -88,6 +88,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
+
+    implementation "org.apache.commons:commons-text:$commonsTextVersion"
     implementation "com.sun.mail:jakarta.mail"
     implementation "com.google.guava:guava:$guavaVersion"
     implementation "com.upyun:java-sdk:$upyunSdkVersion"

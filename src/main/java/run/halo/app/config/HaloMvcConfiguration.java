@@ -6,6 +6,7 @@ import static run.halo.app.utils.HaloUtils.ensureBoth;
 import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import freemarker.template.TemplateModel;
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,7 +48,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import run.halo.app.config.serializer.XssJacksonDeserializer;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.config.serializer.XssJacksonSerializer;
 import run.halo.app.core.PageJacksonSerializer;
 import run.halo.app.core.freemarker.inheritance.ThemeExtendsDirective;
 import run.halo.app.factory.StringToEnumConverterFactory;
@@ -148,7 +151,10 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
                 Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.json();
                 JsonComponentModule module = new JsonComponentModule();
                 module.addSerializer(PageImpl.class, new PageJacksonSerializer());
-                ObjectMapper objectMapper = builder.modules(module).build();
+                SimpleModule simpleModule = new SimpleModule();
+                simpleModule.addDeserializer(String.class, new XssJacksonDeserializer());
+                simpleModule.addSerializer(String.class,new XssJacksonSerializer());
+                ObjectMapper objectMapper = builder.modules(module,simpleModule).build();
                 mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
             });
     }
