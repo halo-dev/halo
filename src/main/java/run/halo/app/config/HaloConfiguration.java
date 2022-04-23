@@ -1,12 +1,10 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.EnableCaching;
@@ -25,7 +23,6 @@ import run.halo.app.cache.InMemoryCacheStore;
 import run.halo.app.cache.LevelCacheStore;
 import run.halo.app.cache.RedisCacheStore;
 import run.halo.app.config.attributeconverter.AttributeConverterAutoGenerateConfiguration;
-import run.halo.app.config.deserializer.XssStringJsonDeserializer;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.repository.base.BaseRepositoryImpl;
 import run.halo.app.utils.HttpClientUtils;
@@ -59,21 +56,7 @@ public class HaloConfiguration {
     @Bean
     ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
         builder.failOnEmptyBeans(false);
-        //解析器
-        ObjectMapper objectMapper = builder.createXmlMapper(false).build();
-        //注册xss解析器
-        SimpleModule xssModule = new SimpleModule("XssStringJsonDeserializer");
-
-        //入参和出参过滤选一个就好了，没必要两个都加
-        //这里为了和XssHttpServletRequestWrapper统一,建议对入参进行处理
-        //注册入参转义
-        xssModule.addDeserializer(String.class, new XssStringJsonDeserializer());
-        //注册出参转义
-        //xssModule.addSerializer(new XssStringJsonSerializer());
-        objectMapper.registerModule(xssModule);
-        //返回
-        return objectMapper;
-        // return builder.build();
+        return builder.build();
     }
 
     @Bean
@@ -87,7 +70,6 @@ public class HaloConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
     AbstractStringCacheStore stringCacheStore() {
         AbstractStringCacheStore stringCacheStore;
         switch (haloProperties.getCache()) {

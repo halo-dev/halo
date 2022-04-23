@@ -1,5 +1,6 @@
 package run.halo.app.filter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,37 +17,50 @@ import org.springframework.web.filter.GenericFilterBean;
 import run.halo.app.wrapper.XssHttpServletRequestWrapper;
 
 /**
- * 防止XSS攻击的过滤器
+ * @author: Ljfanny, Yhcrown
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 public class XssFilter extends GenericFilterBean {
+
+    @Value("${xss.enabled}")
+    private String tempEnabled;
+
+    @Value("${xss.excludes}")
+    private String tempExcludes;
+
+    private boolean enabled;
+
     private List<String> excludes = new ArrayList<>();
-    private boolean enabled = true;
+
+    @Override
+    protected void initFilterBean() throws ServletException {
+        super.initFilterBean();
+        enabled = Boolean.parseBoolean(tempEnabled);
+        String[] urls = tempExcludes.split(",");
+        Collections.addAll(excludes, urls);
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
         FilterChain chain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) request;
-        // for (String key : req.getParameterMap().keySet()) {
-        //     System.out.println(key + ": " + Arrays.toString(req.getParameterMap().get(key)));
-        // }
-        XssHttpServletRequestWrapper xssRequest =
-            new XssHttpServletRequestWrapper(req);
-        // for (String key : req.getParameterMap().keySet()) {
-        //     System.out.println(key + ": " + Arrays.toString(req.getParameterMap().get(key)));
-        // }
-        chain.doFilter(xssRequest, response);
+        if (!checkXss(req)) {
+            XssHttpServletRequestWrapper xssRequest = new XssHttpServletRequestWrapper(req);
+            chain.doFilter(xssRequest, response);
+        } else {
+            chain.doFilter(request, response);
+        }
     }
 
     /**
-     * 判断当前路径是否需要过滤
+     * check if there is need to do filter.
      */
-    private boolean handleExcludeUrl(HttpServletRequest request) {
+    private boolean checkXss(HttpServletRequest request) {
         if (!enabled) {
             return true;
         }
-        if (excludes == null || excludes.isEmpty()) {
+        if (excludes.isEmpty() || excludes.get(0).length() == 0) {
             return false;
         }
         String url = request.getServletPath();
