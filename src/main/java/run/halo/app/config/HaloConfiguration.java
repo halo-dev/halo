@@ -53,12 +53,6 @@ public class HaloConfiguration {
         this.stringRedisTemplate = stringRedisTemplate;
     }
 
-    // @Bean
-    // ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
-    //     builder.failOnEmptyBeans(false);
-    //     return builder.build();
-    // }
-
     @Bean
     RestTemplate httpsRestTemplate(RestTemplateBuilder builder)
         throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
