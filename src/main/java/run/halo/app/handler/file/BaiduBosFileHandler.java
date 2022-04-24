@@ -4,6 +4,8 @@ import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
 import com.baidubce.services.bos.model.PutObjectResponse;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +15,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.properties.BaiduBosProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
@@ -44,21 +47,23 @@ public class BaiduBosFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
+        boolean ifRemoveEXIF = (boolean) optionService
+            .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         Object protocol = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_PROTOCOL);
         String domain =
-            optionService.getByPropertyOrDefault(BaiduBosProperties.BOS_DOMAIN, String.class, "");
+            optionService.getByPropertyOrDefault(BaiduBosProperties.BOS_DOMAIN, String.class, "").trim();
         String endPoint =
-            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString();
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ACCESS_KEY).toString();
         String secretKey =
             optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_SECRET_KEY).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString().trim();
         String styleRule = optionService
-            .getByPropertyOrDefault(BaiduBosProperties.BOS_STYLE_RULE, String.class, "");
+            .getByPropertyOrDefault(BaiduBosProperties.BOS_STYLE_RULE, String.class, "").trim();
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(BaiduBosProperties.BOS_THUMBNAIL_STYLE_RULE, String.class, "");
+            .getByPropertyOrDefault(BaiduBosProperties.BOS_THUMBNAIL_STYLE_RULE, String.class, "").trim();
         String source = StringUtils.join(protocol, bucketName, "." + endPoint);
 
         BosClientConfiguration config = new BosClientConfiguration();
@@ -69,6 +74,12 @@ public class BaiduBosFileHandler implements FileHandler {
         BosClient client = new BosClient(config);
 
         domain = protocol + domain;
+
+        //Get image without EXIF information if it is required
+        File withoutEXIF = null;
+        if (ifRemoveEXIF) {
+            withoutEXIF = removeEXIF(file);
+        }
 
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
@@ -82,8 +93,15 @@ public class BaiduBosFileHandler implements FileHandler {
                 .build();
 
             // Upload
-            PutObjectResponse putObjectResponseFromInputStream =
-                client.putObject(bucketName, pathDescriptor.getFullName(), file.getInputStream());
+            PutObjectResponse putObjectResponseFromInputStream = null;
+            if (withoutEXIF != null) {
+                putObjectResponseFromInputStream =
+                    client.putObject(bucketName, pathDescriptor.getFullName(), new FileInputStream(withoutEXIF));
+                withoutEXIF.delete();
+            } else {
+                putObjectResponseFromInputStream =
+                    client.putObject(bucketName, pathDescriptor.getFullName(), file.getInputStream());
+            }
             if (putObjectResponseFromInputStream == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到百度云失败 ");
             }
@@ -124,13 +142,13 @@ public class BaiduBosFileHandler implements FileHandler {
 
         // Get config
         String endPoint =
-            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString();
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ACCESS_KEY).toString();
         String secretKey =
             optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_SECRET_KEY).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString().trim();
 
         BosClientConfiguration config = new BosClientConfiguration();
         config.setCredentials(new DefaultBceCredentials(accessKey, secretKey));

@@ -6,6 +6,8 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.PutObjectResult;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.properties.AliOssProperties;
+import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.OptionService;
@@ -48,24 +51,26 @@ public class AliOssFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
+        boolean ifRemoveEXIF = (boolean) optionService
+            .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         String protocol =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_DOMAIN, String.class, "");
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_DOMAIN, String.class, "").trim();
         String source =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_SOURCE, String.class, "");
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_SOURCE, String.class, "").trim();
         String endPoint =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString().trim();
         String styleRule =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_STYLE_RULE, String.class, "");
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_STYLE_RULE, String.class, "").trim();
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(AliOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
+            .getByPropertyOrDefault(AliOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "").trim();
 
         // Init OSS client
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
@@ -82,6 +87,12 @@ public class AliOssFileHandler implements FileHandler {
                 .append(URL_SEPARATOR);
         }
 
+        //Get image without EXIF information if it is required
+        File withoutEXIF = null;
+        if (ifRemoveEXIF) {
+            withoutEXIF = removeEXIF(file);
+        }
+
         try {
             FilePathDescriptor uploadFilePath = new FilePathDescriptor.Builder()
                 .setBasePath(basePath.toString())
@@ -96,12 +107,20 @@ public class AliOssFileHandler implements FileHandler {
             log.info(basePath.toString());
 
             // Upload
-            final PutObjectResult putObjectResult = ossClient.putObject(bucketName,
-                uploadFilePath.getRelativePath(),
-                file.getInputStream());
-
+            final PutObjectResult putObjectResult;
+            if (withoutEXIF != null) {
+                putObjectResult = ossClient.putObject(bucketName,
+                    uploadFilePath.getRelativePath(),
+                    new FileInputStream(withoutEXIF));
+                withoutEXIF.delete();
+            } else {
+                putObjectResult = ossClient.putObject(bucketName,
+                    uploadFilePath.getRelativePath(),
+                    file.getInputStream());
+            }
             if (putObjectResult == null) {
-                throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ");
+                throw new FileOperationException(
+                    "上传附件 " + file.getOriginalFilename() + " 到阿里云失败 ");
             }
 
             // Response result
@@ -141,13 +160,13 @@ public class AliOssFileHandler implements FileHandler {
 
         // Get config
         String endPoint =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString().trim();
 
         // Init OSS client
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);

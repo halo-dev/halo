@@ -30,6 +30,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.properties.QiniuOssProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
@@ -64,6 +65,8 @@ public class QiniuOssFileHandler implements FileHandler {
 
         Region region = optionService.getQiniuRegion();
 
+        boolean ifRemoveEXIF = (boolean) optionService
+            .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         String accessKey =
             optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_ACCESS_KEY).toString();
         String secretKey =
@@ -75,11 +78,13 @@ public class QiniuOssFileHandler implements FileHandler {
         String domain =
             optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_DOMAIN).toString().trim();
         String source =
-            optionService.getByPropertyOrDefault(QiniuOssProperties.OSS_SOURCE, String.class, "").trim();
+            optionService.getByPropertyOrDefault(QiniuOssProperties.OSS_SOURCE, String.class, "")
+                .trim();
         String styleRule = optionService
             .getByPropertyOrDefault(QiniuOssProperties.OSS_STYLE_RULE, String.class, "").trim();
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(QiniuOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "").trim();
+            .getByPropertyOrDefault(QiniuOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "")
+            .trim();
 
         // Create configuration
         Configuration configuration = new Configuration(region);
@@ -101,8 +106,12 @@ public class QiniuOssFileHandler implements FileHandler {
             .append(domain)
             .append(URL_SEPARATOR);
 
-        //Get image without EXIF information
-        File withoutEXIF = removeEXIF(file);
+        //Get image without EXIF information if it is required
+        File withoutEXIF = null;
+        if (ifRemoveEXIF) {
+            withoutEXIF = removeEXIF(file);
+        }
+
 
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()

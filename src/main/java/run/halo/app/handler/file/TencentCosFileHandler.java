@@ -20,6 +20,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.properties.TencentCosProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
@@ -51,6 +52,8 @@ public class TencentCosFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
+        boolean ifRemoveEXIF = (boolean) optionService
+            .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         String protocol =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_PROTOCOL).toString();
         String domain =
@@ -92,7 +95,10 @@ public class TencentCosFileHandler implements FileHandler {
         }
 
         //Get image without EXIF information
-        File withoutEXIF = removeEXIF(file);
+        File withoutEXIF = null;
+        if (ifRemoveEXIF) {
+            withoutEXIF = removeEXIF(file);
+        }
 
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()

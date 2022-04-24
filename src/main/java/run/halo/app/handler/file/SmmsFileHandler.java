@@ -1,7 +1,10 @@
 package run.halo.app.handler.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Objects;
 import lombok.Data;
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.properties.SmmsProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.model.support.UploadResult;
@@ -75,6 +79,8 @@ public class SmmsFileHandler implements FileHandler {
     public UploadResult upload(MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
+        boolean ifRemoveEXIF = (boolean) optionService
+            .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         String apiSecretToken =
             optionService.getByPropertyOfNonNull(SmmsProperties.SMMS_API_SECRET_TOKEN).toString();
 
@@ -93,9 +99,20 @@ public class SmmsFileHandler implements FileHandler {
 
         LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
+        //Get image without EXIF information
+        File withoutEXIF = null;
+        if (ifRemoveEXIF) {
+            withoutEXIF = removeEXIF(file);
+        }
         try {
-            body.add("smfile", new HttpClientUtils.MultipartFileResource(file.getBytes(),
-                file.getOriginalFilename()));
+            if (!ifRemoveEXIF) {
+                body.add("smfile", new HttpClientUtils.MultipartFileResource(file.getBytes(),
+                    file.getOriginalFilename()));
+            } else {
+                body.add("smfile", new HttpClientUtils.MultipartFileResource(Files.readAllBytes(
+                    Paths.get(withoutEXIF.getAbsolutePath())),
+                    file.getOriginalFilename()));
+            }
         } catch (IOException e) {
             log.error("Failed to get file input stream", e);
             throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到 SM.MS 失败",

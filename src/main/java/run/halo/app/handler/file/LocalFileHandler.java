@@ -36,8 +36,10 @@ import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
+import run.halo.app.service.OptionService;
 import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.ImageUtils;
 
@@ -74,10 +76,13 @@ public class LocalFileHandler implements FileHandler {
 
     private final String workDir;
 
-    public LocalFileHandler(AttachmentRepository attachmentRepository,
-        HaloProperties haloProperties) {
-        this.attachmentRepository = attachmentRepository;
+    private final OptionService optionService;
 
+    public LocalFileHandler(AttachmentRepository attachmentRepository,
+        HaloProperties haloProperties,
+        OptionService optionService) {
+        this.attachmentRepository = attachmentRepository;
+        this.optionService = optionService;
         // Get work dir
         workDir = FileHandler.normalizeDirectory(haloProperties.getWorkDir());
 
@@ -105,6 +110,8 @@ public class LocalFileHandler implements FileHandler {
     public UploadResult upload(@NonNull MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
+        boolean ifRemoveEXIF = (boolean) optionService
+            .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         FilePathDescriptor uploadFilePath = new FilePathDescriptor.Builder()
             .setBasePath(workDir)
             .setSubPath(generatePath())
@@ -140,6 +147,7 @@ public class LocalFileHandler implements FileHandler {
             uploadResult.setSize(file.getSize());
 
             // Remove personal EXIF information
+
             try {
                 File orgFile = new File(localFileFullPath.toString());
                 TiffOutputSet outputSet = null;
@@ -153,9 +161,10 @@ public class LocalFileHandler implements FileHandler {
                             outputSet = exif.getOutputSet();
                         } catch (ImageWriteException e) {
                             LoggerFactory
-                                .getLogger(getClass()).warn("Failed to fetch image EXIF data", e);
+                                .getLogger(getClass())
+                                .warn("Failed to fetch image EXIF data", e);
                         }
-                        // Remove all EXIF information except for orientation
+                        // Get all EXIF information
                         if (outputSet != null) {
                             final List<TiffOutputDirectory> directories =
                                 outputSet.getDirectories();
@@ -167,26 +176,35 @@ public class LocalFileHandler implements FileHandler {
                                         outputSet.removeField(field.tagInfo);
                                     } else {
                                         orientation =
-                                            ((Short) exif.getFieldValue(field.tagInfo)).intValue();
+                                            ((Short) exif.getFieldValue(field.tagInfo))
+                                                .intValue();
                                     }
                                 }
                             }
-                            BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(
-                                localFileFullPath.getParent().toString() + FILE_SEPARATOR +
-                                    "temp"));
-                            new ExifRewriter().updateExifMetadataLossless(orgFile, os, outputSet);
-                            File withEXIF = new File(localFileFullPath.toString());
-                            File withoutEXIF = new File(
-                                localFileFullPath.getParent().toString() + FILE_SEPARATOR + "temp");
-                            withEXIF.delete();
-                            withoutEXIF.renameTo(withEXIF);
-                            withoutEXIF.delete();
+
+                            //Remove all EXIF information except for orientation
+                            if (ifRemoveEXIF) {
+                                BufferedOutputStream os =
+                                    new BufferedOutputStream(new FileOutputStream(
+                                        localFileFullPath.getParent().toString() + FILE_SEPARATOR +
+                                            "temp"));
+                                new ExifRewriter()
+                                    .updateExifMetadataLossless(orgFile, os, outputSet);
+                                File withEXIF = new File(localFileFullPath.toString());
+                                File withoutEXIF = new File(
+                                    localFileFullPath.getParent().toString() + FILE_SEPARATOR +
+                                        "temp");
+                                withEXIF.delete();
+                                withoutEXIF.renameTo(withEXIF);
+                                withoutEXIF.delete();
+                            }
                         }
                     }
                 }
             } catch (IOException | OutOfMemoryError | ImageReadException | ImageWriteException e) {
                 // ignore IOException and OOM
-                LoggerFactory.getLogger(getClass()).warn("Failed to remove image personal EXIF", e);
+                LoggerFactory.getLogger(getClass())
+                    .warn("Failed to remove image personal EXIF", e);
             }
 
             // TODO refactor this: if image is svg ext. extension
@@ -296,7 +314,8 @@ public class LocalFileHandler implements FileHandler {
             } else if (orientation == 3) {
                 rotationDegree = 180;
             }
-            Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).rotate(rotationDegree).keepAspectRatio(true)
+            Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).rotate(rotationDegree)
+                .keepAspectRatio(true)
                 .toFile(thumbPath.toFile());
             log.info("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath);
             result = true;

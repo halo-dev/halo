@@ -4,6 +4,8 @@ import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 import com.obs.services.ObsClient;
 import com.obs.services.model.PutObjectResult;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.properties.HuaweiObsProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
@@ -46,24 +49,26 @@ public class HuaweiObsFileHandler implements FileHandler {
         Assert.notNull(file, "Multipart file must not be null");
 
         // Get config
+        boolean ifRemoveEXIF = (boolean) optionService
+            .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         String protocol =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOrDefault(HuaweiObsProperties.OSS_DOMAIN, String.class, "");
+            optionService.getByPropertyOrDefault(HuaweiObsProperties.OSS_DOMAIN, String.class, "").trim();
         String source =
-            optionService.getByPropertyOrDefault(HuaweiObsProperties.OSS_SOURCE, String.class, "");
+            optionService.getByPropertyOrDefault(HuaweiObsProperties.OSS_SOURCE, String.class, "").trim();
         String endPoint =
-            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ENDPOINT).toString();
+            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_BUCKET_NAME).toString().trim();
         String styleRule = optionService
-            .getByPropertyOrDefault(HuaweiObsProperties.OSS_STYLE_RULE, String.class, "");
+            .getByPropertyOrDefault(HuaweiObsProperties.OSS_STYLE_RULE, String.class, "").trim();
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(HuaweiObsProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
+            .getByPropertyOrDefault(HuaweiObsProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "").trim();
 
         // Init OSS client
         final ObsClient obsClient = new ObsClient(accessKey, accessSecret, endPoint);
@@ -80,6 +85,12 @@ public class HuaweiObsFileHandler implements FileHandler {
                 .append(URL_SEPARATOR);
         }
 
+        //Get image without EXIF information
+        File withoutEXIF = null;
+        if (ifRemoveEXIF) {
+            withoutEXIF = removeEXIF(file);
+        }
+
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
                 .setBasePath(basePath.toString())
@@ -94,12 +105,21 @@ public class HuaweiObsFileHandler implements FileHandler {
             log.info(basePath.toString());
 
             // Upload
-            PutObjectResult putObjectResult =
-                obsClient.putObject(bucketName, pathDescriptor.getRelativePath(),
+            PutObjectResult putObjectResult;
+            if (withoutEXIF != null) {
+                putObjectResult = obsClient.putObject(bucketName,
+                    pathDescriptor.getRelativePath(),
+                    new FileInputStream(withoutEXIF));
+                withoutEXIF.delete();
+            } else {
+                putObjectResult = obsClient.putObject(bucketName,
+                    pathDescriptor.getRelativePath(),
                     file.getInputStream());
+            }
             if (putObjectResult == null) {
                 throw new FileOperationException("上传附件 " + file.getOriginalFilename() + " 到华为云失败 ");
             }
+
 
             // Response result
             UploadResult uploadResult = new UploadResult();
@@ -142,13 +162,13 @@ public class HuaweiObsFileHandler implements FileHandler {
 
         // Get config
         String endPoint =
-            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ENDPOINT).toString();
+            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_BUCKET_NAME).toString().trim();
 
         // Init OSS client
         final ObsClient obsClient = new ObsClient(accessKey, accessSecret, endPoint);

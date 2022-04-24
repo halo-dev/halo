@@ -18,6 +18,7 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.model.enums.AttachmentType;
+import run.halo.app.model.properties.AttachmentProperties;
 import run.halo.app.model.properties.UpOssProperties;
 import run.halo.app.model.support.UploadResult;
 import run.halo.app.service.OptionService;
@@ -45,6 +46,8 @@ public class UpOssFileHandler implements FileHandler {
     public UploadResult upload(MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
 
+        boolean ifRemoveEXIF = (boolean) optionService
+            .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         String source = optionService.getByPropertyOfNonNull(UpOssProperties.OSS_SOURCE).toString().trim();
         String password =
             optionService.getByPropertyOfNonNull(UpOssProperties.OSS_PASSWORD).toString();
@@ -67,7 +70,10 @@ public class UpOssFileHandler implements FileHandler {
         Map<String, String> params = new HashMap<>();
 
         //Get image without EXIF information
-        File withoutEXIF = removeEXIF(file);
+        File withoutEXIF = null;
+        if (ifRemoveEXIF) {
+            withoutEXIF = removeEXIF(file);
+        }
 
         try {
             // Get file basename
