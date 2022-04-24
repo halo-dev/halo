@@ -30,10 +30,8 @@ Issue。这样可避免两位贡献者在同一个问题上花时间。
 2. Clone 仓库到本地
 
    ```bash
-   git clone https://github.com/{YOUR_USERNAME}/halo
-   # 或者 git clone git@github.com:{YOUR_USERNAME}/halo.git
-   git submodule init
-   git submodule update
+   git clone https://github.com/{YOUR_USERNAME}/halo --recursive
+   # 或者 git clone git@github.com:{YOUR_USERNAME}/halo.git --recursive 
    ```
 
 3. 添加主仓库
@@ -41,7 +39,8 @@ Issue。这样可避免两位贡献者在同一个问题上花时间。
    添加主仓库方便未来同步主仓库最新的 commits 以及创建新的分支。
 
     ```bash
-    git remote add upstream git@github.com:halo-dev/halo.git
+    git remote add upstream https://github.com/halo-dev/halo.git
+    # 或者 git remote add upstream git@github.com:halo-dev/halo.git
     git fetch upstream master
     ```
 
