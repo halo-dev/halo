@@ -29,7 +29,6 @@ import org.springframework.web.client.RestTemplate;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.VersionInfoDTO;
 import run.halo.app.model.entity.GithubApiVersionJson;
-import run.halo.app.model.enums.SystemType;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.HaloVersionCtrlService;
 import run.halo.app.utils.VmUtils;
@@ -63,10 +62,6 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
      */
     private static final Path JAR_DIR = VmUtils.CURR_JAR_DIR;
 
-    /**
-     * Operating system type.
-     */
-    private static final SystemType SYSTEM_TYPE = VmUtils.getSystemType();
 
 
     private ApplicationContext context;
@@ -214,7 +209,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         } catch (IOException e) {
             throw new ServiceException("备份失败, 备份路径: " + backupTarget);
         }
-        log.info("backup finish: {}, OS: {}", backupTarget, SYSTEM_TYPE);
+        log.info("backup finish: {}", backupTarget);
 
         // launch the new version jar with the same arguments
         startNewVersionApp(target);

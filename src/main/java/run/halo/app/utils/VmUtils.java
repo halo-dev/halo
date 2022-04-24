@@ -34,26 +34,6 @@ public class VmUtils {
         CURR_JAR_DIR = CURR_JAR.getParent();
     }
 
-    /**
-     * Get OS type.
-     *
-     *  <p>The type of the operating system (Windows, Linux, MacOS)
-     *
-     * @return system type
-     */
-    public static SystemType getSystemType() {
-        final String osName = System.getProperty("os.name").toLowerCase();
-        if (osName.startsWith("window")) {
-            return SystemType.WINDOWS;
-        }
-        if (osName.startsWith("linux")) {
-            return SystemType.LINUX;
-        }
-        if (osName.startsWith("macos")) {
-            return SystemType.MACOS;
-        }
-        return SystemType.ELSE;
-    }
 
     /**
      * Get the command to launch the halo jar.
