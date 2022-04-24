@@ -31,6 +31,7 @@ specifiers:
   typescript: ~4.6.3
   unplugin-icons: ^0.14.1
   vite: ^2.9.5
+  vite-compression-plugin: ^0.0.3
   vitest: ^0.9.4
   vue: ^3.2.33
   vue-router: ^4.0.14
@@ -71,6 +72,7 @@ devDependencies:
   typescript: 4.6.3
   unplugin-icons: 0.14.1_vite@2.9.5
   vite: 2.9.5_sass@1.50.1
+  vite-compression-plugin: 0.0.3
   vitest: 0.9.4_2f3c27121f62934692d33844851ba7e1
   vue-tsc: 0.31.4_typescript@4.6.3
 
@@ -4705,6 +4707,14 @@ packages:
       assert-plus: 1.0.0
       core-util-is: 1.0.2
       extsprintf: 1.3.0
+    dev: true
+
+  /vite-compression-plugin/0.0.3:
+    resolution: {integrity: sha512-Y4KuMiARtLLkhQCOO2O46fGV4a6Hvull62o7yXo7NBPDukEiTgXouUeDdLoq0qHojCxgWYIT3gccDwV9lMKykw==}
+    dependencies:
+      chalk: 4.1.2
+      fast-glob: 3.2.11
+      fs-extra: 10.0.1
     dev: true
 
   /vite-node/0.7.6_sass@1.50.1:

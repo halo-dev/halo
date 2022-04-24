@@ -51,6 +51,7 @@
     "typescript": "~4.6.3",
     "unplugin-icons": "^0.14.1",
     "vite": "^2.9.5",
+    "vite-compression-plugin": "^0.0.3",
     "vitest": "^0.9.4",
     "vue-tsc": "^0.31.4"
   }
