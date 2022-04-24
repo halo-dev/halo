@@ -59,12 +59,6 @@ class PostServiceImplTest {
     }
 
     @Test
-    void searchCase() {
-        String exportMarkdown = postService.exportMarkdown(1);
-        log.debug(exportMarkdown);
-    }
-
-    @Test
     @Transactional
     void markdownImportTest() {
         PostDetailVO standardPost = postService.importMarkdown(standardMdContent, "standard");
