@@ -294,7 +294,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
                      final BufferedOutputStream os = new BufferedOutputStream(
                          new FileOutputStream(tarFile.toFile()))) {
                     is.transferTo(os);
-                } catch (Exception e) {
+                } catch (IOException e) {
                     throw new ServiceException("下载失败 "
                         + url
                         + ", 状态码: "

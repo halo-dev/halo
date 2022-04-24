@@ -3,6 +3,7 @@ package run.halo.app.utils;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -19,6 +20,15 @@ class VmUtilsTest {
     void testGetSameLaunchCommand() {
         final List<String> cmd = VmUtils.getSameLaunchCommand();
         assertFalse(cmd.isEmpty());
+        // In junit test. its size should > 3
+        assertTrue(cmd.size() > 3);
+    }
+
+    @Test
+    void testGetSameLaunchCommand2() {
+        final List<String> cmd = VmUtils.getSameLaunchCommand();
+        System.out.println(cmd.get(0));
+        assertTrue(cmd.get(0).matches(".*java.*"));
     }
 
     @Test
@@ -30,9 +40,20 @@ class VmUtilsTest {
         });
     }
 
+    @Test
+    void testGetJvmExecutablePath2() {
+        String actualJvmExecutablePath = VmUtils.getJvmExecutablePath();
+        assertTrue(actualJvmExecutablePath.matches(".*java.*"));
+    }
+
 
     @Test
     void testGetVmArguments() {
+        final List<String> vmArguments = VmUtils.getVmArguments();
+        assertNotNull(vmArguments);
+    }
+    @Test
+    void testGetVmArguments2() {
         final List<String> vmArguments = VmUtils.getVmArguments();
         assertEquals(bean.getInputArguments(), vmArguments);
     }
@@ -44,12 +65,32 @@ class VmUtilsTest {
     }
 
     @Test
+    void testGetClassPath2() {
+        String actualClassPath = VmUtils.getClassPath();
+        final String separator = System.getProperty("path.separator");
+        final String[] classSource = actualClassPath.split(separator);
+        for (String s : classSource) {
+            assertTrue(new File(s).exists());
+        }
+    }
+
+    @Test
     void testGetNonVmPartOfCmd() {
         assertEquals(System.getProperty("sun.java.command"), VmUtils.getNonVmPartOfCmd());
+    }
+    @Test
+    void testGetNonVmPartOfCmd2() {
+        final String args = VmUtils.getNonVmPartOfCmd();
+        assertTrue(StringUtils.isNotBlank(args));
     }
 
     @Test
     void testGetRunningJar() {
+        final String runningJar = VmUtils.getRunningJar();
+        assertTrue(StringUtils.isNotBlank(runningJar));
+    }
+    @Test
+    void testGetRunningJar2() {
         final String runningJar = VmUtils.getRunningJar();
         final File file = new File(runningJar);
         assertTrue(file.exists());
@@ -58,6 +99,11 @@ class VmUtilsTest {
     @Test
     void testGetUserDir() {
         assertEquals(System.getProperty("user.dir"), VmUtils.getUserDir());
+    }
+    @Test
+    void testGetUserDir2() {
+        final String userDir = VmUtils.getUserDir();
+        assertTrue(new File(userDir).exists());
     }
 }
 
