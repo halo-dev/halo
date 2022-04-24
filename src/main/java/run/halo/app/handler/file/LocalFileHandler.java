@@ -3,15 +3,31 @@ package run.halo.app.handler.file;
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputField;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -102,6 +118,8 @@ public class LocalFileHandler implements FileHandler {
         log.info("Uploading file: [{}] to directory: [{}]", file.getOriginalFilename(),
             uploadFilePath.getRelativePath());
         Path localFileFullPath = Paths.get(uploadFilePath.getFullPath());
+
+        int orientation = 1;
         try {
             // TODO Synchronize here
             // Create directory
@@ -121,7 +139,58 @@ public class LocalFileHandler implements FileHandler {
                 .setMediaType(MediaType.valueOf(Objects.requireNonNull(file.getContentType())));
             uploadResult.setSize(file.getSize());
 
+            // Remove personal EXIF information
+            try {
+                File orgFile = new File(localFileFullPath.toString());
+                TiffOutputSet outputSet = null;
+                final ImageMetadata metadata = Imaging.getMetadata(orgFile);
+
+                if (metadata instanceof JpegImageMetadata) {
+                    final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+                    final TiffImageMetadata exif = jpegMetadata.getExif();
+                    if (exif != null) {
+                        try {
+                            outputSet = exif.getOutputSet();
+                        } catch (ImageWriteException e) {
+                            LoggerFactory
+                                .getLogger(getClass()).warn("Failed to fetch image EXIF data", e);
+                        }
+                        // Remove all EXIF information except for orientation
+                        if (outputSet != null) {
+                            final List<TiffOutputDirectory> directories =
+                                outputSet.getDirectories();
+                            for (final TiffOutputDirectory directory : directories) {
+                                final List<TiffOutputField> fields = directory.getFields();
+                                for (final TiffOutputField field : fields) {
+                                    if (!StringUtils
+                                        .equalsIgnoreCase("Orientation", field.tagInfo.name)) {
+                                        outputSet.removeField(field.tagInfo);
+                                    } else {
+                                        orientation =
+                                            ((Short) exif.getFieldValue(field.tagInfo)).intValue();
+                                    }
+                                }
+                            }
+                            BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(
+                                localFileFullPath.getParent().toString() + FILE_SEPARATOR +
+                                    "temp"));
+                            new ExifRewriter().updateExifMetadataLossless(orgFile, os, outputSet);
+                            File withEXIF = new File(localFileFullPath.toString());
+                            File withoutEXIF = new File(
+                                localFileFullPath.getParent().toString() + FILE_SEPARATOR + "temp");
+                            withEXIF.delete();
+                            withoutEXIF.renameTo(withEXIF);
+                            withoutEXIF.delete();
+                        }
+                    }
+                }
+            } catch (IOException | OutOfMemoryError | ImageReadException | ImageWriteException e) {
+                // ignore IOException and OOM
+                LoggerFactory.getLogger(getClass()).warn("Failed to remove image personal EXIF", e);
+            }
+
             // TODO refactor this: if image is svg ext. extension
+            int finalOrientation = orientation;
             handleImageMetadata(file, uploadResult, () -> {
                 // Upload a thumbnail
                 FilePathDescriptor thumbnailFilePath = new FilePathDescriptor.Builder()
@@ -137,7 +206,7 @@ public class LocalFileHandler implements FileHandler {
                     BufferedImage originalImage =
                         ImageUtils.getImageFromFile(is, uploadFilePath.getExtension());
                     boolean result = generateThumbnail(originalImage, thumbnailPath,
-                        uploadFilePath.getExtension());
+                        uploadFilePath.getExtension(), finalOrientation);
                     if (result) {
                         // Set thumb path
                         return thumbnailFilePath.getRelativePath();
@@ -209,7 +278,7 @@ public class LocalFileHandler implements FileHandler {
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath,
-        String extension) {
+        String extension, int orientation) {
         Assert.notNull(originalImage, "Image must not be null");
         Assert.notNull(thumbPath, "Thumb path must not be null");
 
@@ -219,7 +288,15 @@ public class LocalFileHandler implements FileHandler {
             Files.createFile(thumbPath);
             // Convert to thumbnail and copy the thumbnail
             log.debug("Trying to generate thumbnail: [{}]", thumbPath);
-            Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).keepAspectRatio(true)
+            int rotationDegree = 0;
+            if (orientation == 6) {
+                rotationDegree = 90;
+            } else if (orientation == 8) {
+                rotationDegree = -90;
+            } else if (orientation == 3) {
+                rotationDegree = 180;
+            }
+            Thumbnails.of(originalImage).size(THUMB_WIDTH, THUMB_HEIGHT).rotate(rotationDegree).keepAspectRatio(true)
                 .toFile(thumbPath.toFile());
             log.info("Generated thumbnail image, and wrote the thumbnail to [{}]", thumbPath);
             result = true;
