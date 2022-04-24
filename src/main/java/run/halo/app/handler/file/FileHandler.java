@@ -1,12 +1,31 @@
 package run.halo.app.handler.file;
 
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
+import static run.halo.app.model.support.HaloConst.USER_HOME;
+import static run.halo.app.utils.HaloUtils.ensureSuffix;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.function.Supplier;
 import javax.imageio.ImageReader;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
+import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputField;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -100,6 +119,69 @@ public interface FileHandler {
         if (StringUtils.isBlank(uploadResult.getThumbPath())) {
             uploadResult.setThumbPath(uploadResult.getFilePath());
         }
+    }
+
+    /**
+     * Remove EXIF information and return an image file.
+     *
+     * @param file multipart file must not be null
+     */
+    default File removeEXIF(@NonNull MultipartFile file) {
+        //Let .halo be a temp directory to store the image after removing the EXIF information
+        File withoutEXIF = null;
+        String tempDir =
+            ensureSuffix(USER_HOME, FILE_SEPARATOR) + ".halo";
+        Path tempPath = Paths.get(tempDir);
+
+        if (!Files.isDirectory(tempPath)
+            || !Files.isReadable(tempPath)
+            || !Files.isWritable(tempPath)) {
+            return null;
+        }
+
+        //Remove EXIF information except for orientation
+        try {
+            TiffOutputSet outputSet = null;
+            final ImageMetadata metadata =
+                Imaging.getMetadata(file.getInputStream(), file.getOriginalFilename());
+
+            if (metadata instanceof JpegImageMetadata) {
+                final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+                final TiffImageMetadata exif = jpegMetadata.getExif();
+                if (exif != null) {
+                    try {
+                        outputSet = exif.getOutputSet();
+                    } catch (ImageWriteException e) {
+                        LoggerFactory
+                            .getLogger(getClass()).warn("Failed to fetch image EXIF data", e);
+                    }
+                    // Remove all EXIF information except for orientation
+                    if (outputSet != null) {
+                        final List<TiffOutputDirectory> directories =
+                            outputSet.getDirectories();
+                        for (final TiffOutputDirectory directory : directories) {
+                            final List<TiffOutputField> fields = directory.getFields();
+                            for (final TiffOutputField field : fields) {
+                                if (!StringUtils
+                                    .equalsIgnoreCase("Orientation", field.tagInfo.name)) {
+                                    outputSet.removeField(field.tagInfo);
+                                }
+                            }
+                        }
+                        BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(
+                            tempPath.toString() + FILE_SEPARATOR + "temp"));
+                        new ExifRewriter()
+                            .updateExifMetadataLossless(file.getInputStream(), os, outputSet);
+                        withoutEXIF = new File(
+                            tempPath.toString() + FILE_SEPARATOR + "temp");
+                    }
+                }
+            }
+        } catch (IOException | OutOfMemoryError | ImageReadException | ImageWriteException e) {
+            // ignore IOException and OOM
+            LoggerFactory.getLogger(getClass()).warn("Failed to remove image personal EXIF", e);
+        }
+        return withoutEXIF;
     }
 
     /**
