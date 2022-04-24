@@ -79,8 +79,8 @@ public class LocalFileHandler implements FileHandler {
     private final OptionService optionService;
 
     public LocalFileHandler(AttachmentRepository attachmentRepository,
-        HaloProperties haloProperties,
-        OptionService optionService) {
+                            HaloProperties haloProperties,
+                            OptionService optionService) {
         this.attachmentRepository = attachmentRepository;
         this.optionService = optionService;
         // Get work dir
@@ -186,14 +186,16 @@ public class LocalFileHandler implements FileHandler {
                             if (ifRemoveEXIF) {
                                 BufferedOutputStream os =
                                     new BufferedOutputStream(new FileOutputStream(
-                                        localFileFullPath.getParent().toString() + FILE_SEPARATOR +
-                                            "temp"));
+                                        localFileFullPath.getParent().toString()
+                                            + FILE_SEPARATOR
+                                            + "temp"));
                                 new ExifRewriter()
                                     .updateExifMetadataLossless(orgFile, os, outputSet);
                                 File withEXIF = new File(localFileFullPath.toString());
                                 File withoutEXIF = new File(
-                                    localFileFullPath.getParent().toString() + FILE_SEPARATOR +
-                                        "temp");
+                                    localFileFullPath.getParent().toString()
+                                        + FILE_SEPARATOR
+                                        + "temp");
                                 withEXIF.delete();
                                 withoutEXIF.renameTo(withEXIF);
                                 withoutEXIF.delete();
@@ -296,7 +298,7 @@ public class LocalFileHandler implements FileHandler {
     }
 
     private boolean generateThumbnail(BufferedImage originalImage, Path thumbPath,
-        String extension, int orientation) {
+                                      String extension, int orientation) {
         Assert.notNull(originalImage, "Image must not be null");
         Assert.notNull(thumbPath, "Thumb path must not be null");
 

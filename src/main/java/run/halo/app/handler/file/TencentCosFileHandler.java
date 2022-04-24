@@ -42,7 +42,7 @@ public class TencentCosFileHandler implements FileHandler {
     private final AttachmentRepository attachmentRepository;
 
     public TencentCosFileHandler(OptionService optionService,
-        AttachmentRepository attachmentRepository) {
+                                 AttachmentRepository attachmentRepository) {
         this.optionService = optionService;
         this.attachmentRepository = attachmentRepository;
     }
@@ -57,7 +57,8 @@ public class TencentCosFileHandler implements FileHandler {
         String protocol =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOrDefault(TencentCosProperties.COS_DOMAIN, String.class, "").trim();
+            optionService.getByPropertyOrDefault(TencentCosProperties.COS_DOMAIN, String.class, "")
+                .trim();
         String region =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_REGION).toString();
         String secretId =
@@ -65,9 +66,11 @@ public class TencentCosFileHandler implements FileHandler {
         String secretKey =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_KEY).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString().trim();
+            optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString()
+                .trim();
         String source =
-            optionService.getByPropertyOrDefault(TencentCosProperties.COS_SOURCE, String.class, "").trim();
+            optionService.getByPropertyOrDefault(TencentCosProperties.COS_SOURCE, String.class, "")
+                .trim();
         String styleRule = optionService
             .getByPropertyOrDefault(TencentCosProperties.COS_STYLE_RULE, String.class, "").trim();
         String thumbnailStyleRule = optionService
@@ -120,7 +123,8 @@ public class TencentCosFileHandler implements FileHandler {
             PutObjectResult putObjectResponseFromInputStream;
             if (withoutEXIF != null) {
                 putObjectResponseFromInputStream = cosClient
-                    .putObject(bucketName, pathDescriptor.getRelativePath(), new FileInputStream(withoutEXIF),
+                    .putObject(bucketName, pathDescriptor.getRelativePath(),
+                        new FileInputStream(withoutEXIF),
                         objectMetadata);
                 withoutEXIF.delete();
             } else {
@@ -174,7 +178,8 @@ public class TencentCosFileHandler implements FileHandler {
         String secretKey =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_KEY).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString().trim();
+            optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString()
+                .trim();
 
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         Region regionConfig = new Region(region);

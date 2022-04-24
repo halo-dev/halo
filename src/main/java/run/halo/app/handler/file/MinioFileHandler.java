@@ -37,7 +37,7 @@ public class MinioFileHandler implements FileHandler {
     private final AttachmentRepository attachmentRepository;
 
     public MinioFileHandler(OptionService optionService,
-        AttachmentRepository attachmentRepository) {
+                            AttachmentRepository attachmentRepository) {
         this.optionService = optionService;
         this.attachmentRepository = attachmentRepository;
     }
@@ -49,7 +49,8 @@ public class MinioFileHandler implements FileHandler {
         // Get config
         boolean ifRemoveEXIF = (boolean) optionService
             .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
-        String endpoint = optionService.getByPropertyOfNonNull(MinioProperties.ENDPOINT).toString().trim();
+        String endpoint =
+            optionService.getByPropertyOfNonNull(MinioProperties.ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_KEY).toString();
         String accessSecret =
@@ -95,8 +96,7 @@ public class MinioFileHandler implements FileHandler {
                     .object(pathDescriptor.getRelativePath())
                     .build();
                 withoutEXIF.delete();
-            }
-            else {
+            } else {
                 putObjectArgs = PutObjectArgs.builder()
                     .contentType(file.getContentType())
                     .bucket(bucketName)

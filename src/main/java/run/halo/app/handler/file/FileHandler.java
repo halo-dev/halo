@@ -85,13 +85,13 @@ public interface FileHandler {
     /**
      * Update Metadata for image object.
      *
-     * @param uploadResult updated result must not be null
-     * @param file multipart file must not be null
+     * @param uploadResult      updated result must not be null
+     * @param file              multipart file must not be null
      * @param thumbnailSupplier thumbnail supplier
      */
     default void handleImageMetadata(@NonNull MultipartFile file,
-        @NonNull UploadResult uploadResult,
-        @Nullable Supplier<String> thumbnailSupplier) {
+                                     @NonNull UploadResult uploadResult,
+                                     @Nullable Supplier<String> thumbnailSupplier) {
         if (isImageType(file)) {
             // Handle image
             try (InputStream is = file.getInputStream()) {

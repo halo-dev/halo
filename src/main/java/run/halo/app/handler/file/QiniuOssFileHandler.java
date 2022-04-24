@@ -54,7 +54,7 @@ public class QiniuOssFileHandler implements FileHandler {
     private final AttachmentRepository attachmentRepository;
 
     public QiniuOssFileHandler(OptionService optionService,
-        AttachmentRepository attachmentRepository) {
+                               AttachmentRepository attachmentRepository) {
         this.optionService = optionService;
         this.attachmentRepository = attachmentRepository;
     }
