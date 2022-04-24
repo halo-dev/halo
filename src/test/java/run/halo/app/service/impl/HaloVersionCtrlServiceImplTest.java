@@ -37,9 +37,10 @@ class HaloVersionCtrlServiceImplTest {
     @Test
     void testIsInLocal() {
         assertFalse(this.versionCtrlService.isInLocal("Tag Name"));
-        Path DIR = VmUtils.CURR_JAR_DIR;
-        Path repo = DIR.resolve(HaloVersionCtrlServiceImpl.REPO_DIR);
-        Path test = null, tempFile = null;
+        Path dir = VmUtils.CURR_JAR_DIR;
+        Path repo = dir.resolve(HaloVersionCtrlServiceImpl.REPO_DIR);
+        Path test = null;
+        Path tempFile = null;
         final boolean exists = Files.exists(repo);
         try {
             if (!exists) {

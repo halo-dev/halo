@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -359,34 +360,41 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         Files.copy(curJar, backupTarget, StandardCopyOption.REPLACE_EXISTING);
         ProcessBuilder pb = new ProcessBuilder();
         pb.directory(USER_DIR.toFile());
-        switch (SYSTEM_TYPE) {
-            case WINDOWS:
-                pb.command("cmd", "/c",
-                    "ping localhost -n 10 > nul && del " + curJar.toAbsolutePath());
-                break;
-            case LINUX:
-            case MACOS:
-                /*
-                 * On Unix-like operating systems, there is no file locking,
-                 * thus you can directly change the name of the current JAR.
-                 * If you do so, however, `SpringApplication.exit` will not
-                 * terminate the program properly
-                 * */
-                pb.command("sh", "-c", "sleep 10s && rm -f " + curJar.toAbsolutePath());
-                break;
-            case ELSE:
-            default:
-                break;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            pb.command("cmd", "/c",
+                "ping localhost -n 10 > nul && del " + curJar.toAbsolutePath());
+        } else if (SystemUtils.IS_OS_LINUX) {
+            /*
+             * On Unix-like operating systems, there is no file locking,
+             * thus you can directly change the name of the current JAR.
+             * If you do so, however, `SpringApplication.exit` will not
+             * terminate the program properly
+             * */
+            pb.command("sh", "-c", "sleep 10s && rm -f " + curJar.toAbsolutePath());
+        } else if (SystemUtils.IS_OS_MAC) {
+            /*
+             * On Unix-like operating systems, there is no file locking,
+             * thus you can directly change the name of the current JAR.
+             * If you do so, however, `SpringApplication.exit` will not
+             * terminate the program properly
+             * */
+            pb.command("sh", "-c", "sleep 10s && rm -f " + curJar.toAbsolutePath());
+        } else {
+            pb = null;
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(
-            () -> {
-                try {
-                    pb.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
+        if (pb != null) {
+            ProcessBuilder finalPb = pb;
+            Runtime.getRuntime().addShutdownHook(new Thread(
+                () -> {
+                    try {
+                        finalPb.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        ));
+            ));
+        }
+
     }
 
     /**
