@@ -14,6 +14,8 @@ import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.persistent.FileRecorder;
 import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,17 +69,17 @@ public class QiniuOssFileHandler implements FileHandler {
         String secretKey =
             optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_SECRET_KEY).toString();
         String bucket =
-            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString();
+            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString().trim();
         String protocol =
             optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_DOMAIN).toString();
+            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_DOMAIN).toString().trim();
         String source =
-            optionService.getByPropertyOrDefault(QiniuOssProperties.OSS_SOURCE, String.class, "");
+            optionService.getByPropertyOrDefault(QiniuOssProperties.OSS_SOURCE, String.class, "").trim();
         String styleRule = optionService
-            .getByPropertyOrDefault(QiniuOssProperties.OSS_STYLE_RULE, String.class, "");
+            .getByPropertyOrDefault(QiniuOssProperties.OSS_STYLE_RULE, String.class, "").trim();
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(QiniuOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
+            .getByPropertyOrDefault(QiniuOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "").trim();
 
         // Create configuration
         Configuration configuration = new Configuration(region);
@@ -99,6 +101,9 @@ public class QiniuOssFileHandler implements FileHandler {
             .append(domain)
             .append(URL_SEPARATOR);
 
+        //Get image without EXIF information
+        File withoutEXIF = removeEXIF(file);
+
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
                 .setBasePath(basePath.toString())
@@ -115,9 +120,17 @@ public class QiniuOssFileHandler implements FileHandler {
             // Get upload manager
             UploadManager uploadManager = new UploadManager(configuration, fileRecorder);
             // Put the file
-            Response response = uploadManager
-                .put(file.getInputStream(), pathDescriptor.getRelativePath(), uploadToken, null,
-                    null);
+            Response response;
+            if (withoutEXIF != null) {
+                response = uploadManager
+                    .put(new FileInputStream(withoutEXIF), pathDescriptor.getRelativePath(),
+                        uploadToken, null, null);
+                withoutEXIF.delete();
+            } else {
+                response = uploadManager
+                    .put(file.getInputStream(), pathDescriptor.getRelativePath(), uploadToken, null,
+                        null);
+            }
 
             if (log.isDebugEnabled()) {
                 log.debug("Qiniu oss response: [{}]", response.toString());
@@ -172,7 +185,7 @@ public class QiniuOssFileHandler implements FileHandler {
         String secretKey =
             optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_SECRET_KEY).toString();
         String bucket =
-            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString();
+            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString().trim();
 
         // Create configuration
         Configuration configuration = new Configuration(region);
