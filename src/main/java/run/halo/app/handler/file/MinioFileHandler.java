@@ -3,6 +3,8 @@ package run.halo.app.handler.file;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,15 +46,15 @@ public class MinioFileHandler implements FileHandler {
     public UploadResult upload(@NonNull MultipartFile file) {
         Assert.notNull(file, "Multipart file must not be null");
         // Get config
-        String endpoint = optionService.getByPropertyOfNonNull(MinioProperties.ENDPOINT).toString();
+        String endpoint = optionService.getByPropertyOfNonNull(MinioProperties.ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString().trim();
         String source =
-            optionService.getByPropertyOrDefault(MinioProperties.SOURCE, String.class, "");
+            optionService.getByPropertyOrDefault(MinioProperties.SOURCE, String.class, "").trim();
         String region =
             optionService.getByPropertyOrDefault(MinioProperties.REGION, String.class, "us-east-1");
 
@@ -63,6 +65,9 @@ public class MinioFileHandler implements FileHandler {
             .credentials(accessKey, accessSecret)
             .region(region)
             .build();
+
+        //Get image without EXIF information
+        File withoutEXIF = removeEXIF(file);
 
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
@@ -75,12 +80,25 @@ public class MinioFileHandler implements FileHandler {
                 .setOriginalName(file.getOriginalFilename())
                 .build();
 
-            PutObjectArgs putObjectArgs = PutObjectArgs.builder()
-                .contentType(file.getContentType())
-                .bucket(bucketName)
-                .stream(file.getInputStream(), file.getSize(), -1)
-                .object(pathDescriptor.getRelativePath())
-                .build();
+            PutObjectArgs putObjectArgs;
+            if (withoutEXIF != null) {
+                putObjectArgs = PutObjectArgs.builder()
+                    .contentType(file.getContentType())
+                    .bucket(bucketName)
+                    .stream(new FileInputStream(withoutEXIF), file.getSize(), -1)
+                    .object(pathDescriptor.getRelativePath())
+                    .build();
+                withoutEXIF.delete();
+            }
+            else {
+                putObjectArgs = PutObjectArgs.builder()
+                    .contentType(file.getContentType())
+                    .bucket(bucketName)
+                    .stream(file.getInputStream(), file.getSize(), -1)
+                    .object(pathDescriptor.getRelativePath())
+                    .build();
+            }
+
             minioClient.ignoreCertCheck();
             minioClient.putObject(putObjectArgs);
 
@@ -116,7 +134,7 @@ public class MinioFileHandler implements FileHandler {
         String accessSecret =
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString().trim();
         String region =
             optionService.getByPropertyOrDefault(MinioProperties.REGION, String.class, "us-east-1");
 
