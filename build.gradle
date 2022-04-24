@@ -60,6 +60,7 @@ ext {
     swaggerVersion = "3.0.0"
     commonsFileUploadVersion = "1.4"
     commonsLangVersion = '3.12.0'
+    commonsImagingVersion = "1.0-alpha1"
     httpclientVersion = '4.5.13'
     jgitVersion = "5.9.0.202009080501-r"
     flexmarkVersion = "0.62.2"
@@ -99,6 +100,7 @@ dependencies {
     implementation "io.springfox:springfox-boot-starter:$swaggerVersion"
     implementation "commons-fileupload:commons-fileupload:$commonsFileUploadVersion"
     implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
+    implementation "org.apache.commons:commons-imaging:$commonsImagingVersion"
     implementation "org.apache.httpcomponents:httpclient:$httpclientVersion"
     implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
     implementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
