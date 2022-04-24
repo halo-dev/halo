@@ -583,9 +583,9 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
                 Subquery<Post> postSubquery = query.subquery(Post.class);
                 Root<Content> contentRoot = postSubquery.from(Content.class);
                 postSubquery.select(contentRoot.get("id"))
-                    .where(criteriaBuilder.like(criteriaBuilder.lower(root.get("originalContent")), likeCondition.toLowerCase()));
+                    .where(criteriaBuilder.like(root.get("originalContent"), likeCondition));
 
-                Predicate titleLike = criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), likeCondition.toLowerCase());
+                Predicate titleLike = criteriaBuilder.like(root.get("title"), likeCondition);
 
                 predicates.add(
                     criteriaBuilder.or(titleLike, criteriaBuilder.in(root).value(postSubquery)));

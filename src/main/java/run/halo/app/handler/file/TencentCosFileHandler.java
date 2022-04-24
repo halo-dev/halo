@@ -57,8 +57,7 @@ public class TencentCosFileHandler implements FileHandler {
         String protocol =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOrDefault(TencentCosProperties.COS_DOMAIN, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(TencentCosProperties.COS_DOMAIN, String.class, "");
         String region =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_REGION).toString();
         String secretId =
@@ -66,16 +65,14 @@ public class TencentCosFileHandler implements FileHandler {
         String secretKey =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_KEY).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString();
         String source =
-            optionService.getByPropertyOrDefault(TencentCosProperties.COS_SOURCE, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(TencentCosProperties.COS_SOURCE, String.class, "");
         String styleRule = optionService
-            .getByPropertyOrDefault(TencentCosProperties.COS_STYLE_RULE, String.class, "").trim();
+            .getByPropertyOrDefault(TencentCosProperties.COS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService
             .getByPropertyOrDefault(TencentCosProperties.COS_THUMBNAIL_STYLE_RULE, String.class,
-                "").trim();
+                "");
 
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         Region regionConfig = new Region(region);
@@ -178,8 +175,7 @@ public class TencentCosFileHandler implements FileHandler {
         String secretKey =
             optionService.getByPropertyOfNonNull(TencentCosProperties.COS_SECRET_KEY).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(TencentCosProperties.COS_BUCKET_NAME).toString();
 
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         Region regionConfig = new Region(region);

@@ -51,22 +51,19 @@ public class BaiduBosFileHandler implements FileHandler {
             .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         Object protocol = optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_PROTOCOL);
         String domain =
-            optionService.getByPropertyOrDefault(BaiduBosProperties.BOS_DOMAIN, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(BaiduBosProperties.BOS_DOMAIN, String.class, "");
         String endPoint =
-            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString().trim();
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString();
         String accessKey =
             optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ACCESS_KEY).toString();
         String secretKey =
             optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_SECRET_KEY).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString();
         String styleRule = optionService
-            .getByPropertyOrDefault(BaiduBosProperties.BOS_STYLE_RULE, String.class, "").trim();
+            .getByPropertyOrDefault(BaiduBosProperties.BOS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(BaiduBosProperties.BOS_THUMBNAIL_STYLE_RULE, String.class, "")
-            .trim();
+            .getByPropertyOrDefault(BaiduBosProperties.BOS_THUMBNAIL_STYLE_RULE, String.class, "");
         String source = StringUtils.join(protocol, bucketName, "." + endPoint);
 
         BosClientConfiguration config = new BosClientConfiguration();
@@ -147,14 +144,13 @@ public class BaiduBosFileHandler implements FileHandler {
 
         // Get config
         String endPoint =
-            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString().trim();
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ENDPOINT).toString();
         String accessKey =
             optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_ACCESS_KEY).toString();
         String secretKey =
             optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_SECRET_KEY).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(BaiduBosProperties.BOS_BUCKET_NAME).toString();
 
         BosClientConfiguration config = new BosClientConfiguration();
         config.setCredentials(new DefaultBceCredentials(accessKey, secretKey));

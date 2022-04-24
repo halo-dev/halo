@@ -54,26 +54,21 @@ public class HuaweiObsFileHandler implements FileHandler {
         String protocol =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOrDefault(HuaweiObsProperties.OSS_DOMAIN, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(HuaweiObsProperties.OSS_DOMAIN, String.class, "");
         String source =
-            optionService.getByPropertyOrDefault(HuaweiObsProperties.OSS_SOURCE, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(HuaweiObsProperties.OSS_SOURCE, String.class, "");
         String endPoint =
-            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ENDPOINT).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ENDPOINT).toString();
         String accessKey =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_BUCKET_NAME).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_BUCKET_NAME).toString();
         String styleRule = optionService
-            .getByPropertyOrDefault(HuaweiObsProperties.OSS_STYLE_RULE, String.class, "").trim();
+            .getByPropertyOrDefault(HuaweiObsProperties.OSS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(HuaweiObsProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "")
-            .trim();
+            .getByPropertyOrDefault(HuaweiObsProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Init OSS client
         final ObsClient obsClient = new ObsClient(accessKey, accessSecret, endPoint);
@@ -167,15 +162,13 @@ public class HuaweiObsFileHandler implements FileHandler {
 
         // Get config
         String endPoint =
-            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ENDPOINT).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ENDPOINT).toString();
         String accessKey =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_BUCKET_NAME).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(HuaweiObsProperties.OSS_BUCKET_NAME).toString();
 
         // Init OSS client
         final ObsClient obsClient = new ObsClient(accessKey, accessSecret, endPoint);

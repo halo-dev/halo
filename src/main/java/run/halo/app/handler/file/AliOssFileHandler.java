@@ -56,26 +56,21 @@ public class AliOssFileHandler implements FileHandler {
         String protocol =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_DOMAIN, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_DOMAIN, String.class, "");
         String source =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_SOURCE, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_SOURCE, String.class, "");
         String endPoint =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString().trim();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
         String accessKey =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
         String styleRule =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_STYLE_RULE, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(AliOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "")
-            .trim();
+            .getByPropertyOrDefault(AliOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Init OSS client
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
@@ -91,6 +86,7 @@ public class AliOssFileHandler implements FileHandler {
                 .append(endPoint)
                 .append(URL_SEPARATOR);
         }
+
 
         //Get image without EXIF information if it is required
         File withoutEXIF = null;
@@ -165,14 +161,13 @@ public class AliOssFileHandler implements FileHandler {
 
         // Get config
         String endPoint =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString().trim();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
         String accessKey =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString()
-                .trim();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
 
         // Init OSS client
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);

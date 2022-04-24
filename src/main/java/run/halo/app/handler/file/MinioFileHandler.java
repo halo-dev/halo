@@ -50,15 +50,15 @@ public class MinioFileHandler implements FileHandler {
         boolean ifRemoveEXIF = (boolean) optionService
             .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         String endpoint =
-            optionService.getByPropertyOfNonNull(MinioProperties.ENDPOINT).toString().trim();
+            optionService.getByPropertyOfNonNull(MinioProperties.ENDPOINT).toString();
         String accessKey =
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString().trim();
+            optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString();
         String source =
-            optionService.getByPropertyOrDefault(MinioProperties.SOURCE, String.class, "").trim();
+            optionService.getByPropertyOrDefault(MinioProperties.SOURCE, String.class, "");
         String region =
             optionService.getByPropertyOrDefault(MinioProperties.REGION, String.class, "us-east-1");
 
@@ -140,7 +140,7 @@ public class MinioFileHandler implements FileHandler {
         String accessSecret =
             optionService.getByPropertyOfNonNull(MinioProperties.ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString().trim();
+            optionService.getByPropertyOfNonNull(MinioProperties.BUCKET_NAME).toString();
         String region =
             optionService.getByPropertyOrDefault(MinioProperties.REGION, String.class, "us-east-1");
 

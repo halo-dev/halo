@@ -72,19 +72,17 @@ public class QiniuOssFileHandler implements FileHandler {
         String secretKey =
             optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_SECRET_KEY).toString();
         String bucket =
-            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString().trim();
+            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString();
         String protocol =
             optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_DOMAIN).toString().trim();
+            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_DOMAIN).toString();
         String source =
-            optionService.getByPropertyOrDefault(QiniuOssProperties.OSS_SOURCE, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(QiniuOssProperties.OSS_SOURCE, String.class, "");
         String styleRule = optionService
-            .getByPropertyOrDefault(QiniuOssProperties.OSS_STYLE_RULE, String.class, "").trim();
+            .getByPropertyOrDefault(QiniuOssProperties.OSS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(QiniuOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "")
-            .trim();
+            .getByPropertyOrDefault(QiniuOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         // Create configuration
         Configuration configuration = new Configuration(region);
@@ -194,7 +192,7 @@ public class QiniuOssFileHandler implements FileHandler {
         String secretKey =
             optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_SECRET_KEY).toString();
         String bucket =
-            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString().trim();
+            optionService.getByPropertyOfNonNull(QiniuOssProperties.OSS_BUCKET).toString();
 
         // Create configuration
         Configuration configuration = new Configuration(region);

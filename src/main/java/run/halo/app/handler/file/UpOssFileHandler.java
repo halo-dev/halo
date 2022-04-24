@@ -49,24 +49,22 @@ public class UpOssFileHandler implements FileHandler {
         boolean ifRemoveEXIF = (boolean) optionService
             .getByPropertyOfNonNull(AttachmentProperties.IMAGE_EXIF_REMOVE_ENABLE);
         String source =
-            optionService.getByPropertyOfNonNull(UpOssProperties.OSS_SOURCE).toString().trim();
+            optionService.getByPropertyOfNonNull(UpOssProperties.OSS_SOURCE).toString();
         String password =
             optionService.getByPropertyOfNonNull(UpOssProperties.OSS_PASSWORD).toString();
         String bucket =
-            optionService.getByPropertyOfNonNull(UpOssProperties.OSS_BUCKET).toString().trim();
+            optionService.getByPropertyOfNonNull(UpOssProperties.OSS_BUCKET).toString();
         String protocol =
             optionService.getByPropertyOfNonNull(UpOssProperties.OSS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOfNonNull(UpOssProperties.OSS_DOMAIN).toString().trim();
+            optionService.getByPropertyOfNonNull(UpOssProperties.OSS_DOMAIN).toString();
         String operator =
             optionService.getByPropertyOfNonNull(UpOssProperties.OSS_OPERATOR).toString();
         // style rule can be null
         String styleRule =
-            optionService.getByPropertyOrDefault(UpOssProperties.OSS_STYLE_RULE, String.class, "")
-                .trim();
+            optionService.getByPropertyOrDefault(UpOssProperties.OSS_STYLE_RULE, String.class, "");
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(UpOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "")
-            .trim();
+            .getByPropertyOrDefault(UpOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
 
         RestManager manager = new RestManager(bucket, operator, password);
         manager.setTimeout(60 * 10);
@@ -144,7 +142,7 @@ public class UpOssFileHandler implements FileHandler {
         String password =
             optionService.getByPropertyOfNonNull(UpOssProperties.OSS_PASSWORD).toString();
         String bucket =
-            optionService.getByPropertyOfNonNull(UpOssProperties.OSS_BUCKET).toString().trim();
+            optionService.getByPropertyOfNonNull(UpOssProperties.OSS_BUCKET).toString();
         String operator =
             optionService.getByPropertyOfNonNull(UpOssProperties.OSS_OPERATOR).toString();
 
