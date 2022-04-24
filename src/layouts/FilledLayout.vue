@@ -1,8 +1,8 @@
 <template>
   <div class="flex h-full">
-    <aside class="navbar h-full" style="background: #fff">
-      <div class="logo flex justify-center py-6 animate-pulse">
-        <img :src="logo" style="width: 80px" alt="Halo Logo" />
+    <aside class="navbar fixed h-full overflow-y-auto" style="background: #fff">
+      <div class="logo flex justify-center py-5">
+        <img :src="logo" alt="Halo Logo" style="width: 78px" />
       </div>
       <VRoutesMenu :menus="menus" />
     </aside>
@@ -20,6 +20,9 @@ import logo from "@/assets/logo.svg";
 
 <style lang="scss">
 .navbar {
-  flex: 0 0 270px;
+  width: 260px;
+}
+.content {
+  margin-left: 260px;
 }
 </style>

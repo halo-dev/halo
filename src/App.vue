@@ -8,6 +8,30 @@ import { RouterView } from "vue-router";
 
 <style lang="scss">
 body {
+  overflow-y: overlay;
   background: #eff4f9;
+}
+*::-webkit-scrollbar-track-piece {
+  background-color: #f8f8f8;
+  -webkit-border-radius: 2em;
+  -moz-border-radius: 2em;
+  border-radius: 2em;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  background-clip: padding-box;
+  -webkit-border-radius: 2em;
+  -moz-border-radius: 2em;
+  border-radius: 2em;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #bbb;
 }
 </style>

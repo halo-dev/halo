@@ -85,7 +85,7 @@ function handleClick() {
   @apply relative;
 
   border-radius: 4px;
-  padding: 8px 10px;
+  padding: 6px 10px;
 
   &:hover,
   &.active {
