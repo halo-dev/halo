@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import FilledLayout from "@/layouts/FilledLayout.vue";
 import { VButton } from "@/components/base/button";
+import { VTag } from "@/components/base/tag";
 import { IconBookRead } from "@/core/icons";
 </script>
 <template>
@@ -21,54 +22,22 @@ import { IconBookRead } from "@/core/icons";
     <div class="p-4">
       <div class="table-container">
         <div class="table-item">
-          <div class="table-cell font-bold">key</div>
-          <div class="table-cell font-bold">value</div>
-          <div class="table-cell font-bold">value</div>
-          <div class="table-cell font-bold">value</div>
-          <div class="table-cell font-bold">value</div>
+          <div class="table-cell font-bold"></div>
+          <div class="table-cell font-bold">作者</div>
+          <div class="table-cell font-bold">评论</div>
+          <div class="table-cell font-bold">访问量</div>
+          <div class="table-cell font-bold">发布时间</div>
         </div>
-        <div class="table-item">
-          <div class="table-cell">message</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-        </div>
-        <div class="table-item hover:bg-black hover:text-white">
-          <div class="table-cell">message</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-        </div>
-        <div class="table-item">
-          <div class="table-cell">message</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell w-72">
-            消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字消息文字
+        <div v-for="i in 10" :key="i" class="table-item">
+          <div class="table-cell">
+            <div>Halo 1.5.2 发布</div>
+            <VTag>#Halo</VTag>
           </div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-        </div>
-        <div class="table-item">
-          <div class="table-cell">message</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字消息文字消息文字消息文字消息文字</div>
-          <div class="table-cell">消息文字</div>
-        </div>
-        <div class="table-item">
-          <div class="table-cell">message</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-        </div>
-        <div class="table-item">
-          <div class="table-cell">message</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
-          <div class="table-cell">消息文字</div>
+          <div class="table-cell">
+            <img src="https://halo.run/avatar" class="rounded-full w-5" />
+          </div>
+          <div class="table-cell">0</div>
+          <div class="table-cell">123</div>
           <div class="table-cell">消息文字</div>
         </div>
       </div>
@@ -87,6 +56,12 @@ import { IconBookRead } from "@/core/icons";
 
   .table-item {
     @apply table-row;
+    @apply cursor-pointer;
+    @apply transition-all;
+
+    &:hover {
+      @apply bg-gray-100;
+    }
   }
 
   .table-cell {
