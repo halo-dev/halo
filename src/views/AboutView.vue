@@ -8,8 +8,8 @@ const route = useRoute();
 <template>
   <FilledLayout>
     <div>
-      <pre class="overflow-auto w-3/4">Route: {{ route }}</pre>
-      <pre class="overflow-auto w-3/4">Route: {{ route }}</pre>
+      <pre class="overflow-auto">Route: {{ route }}</pre>
+      <pre class="overflow-auto">Route: {{ route }}</pre>
     </div>
   </FilledLayout>
 </template>

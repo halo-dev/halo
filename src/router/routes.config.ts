@@ -1,6 +1,7 @@
 import type { RouteRecordRaw } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import AboutView from "../views/AboutView.vue";
+import PostList from "../views/posts/PostList.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -16,7 +17,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/posts",
     name: "Posts",
-    component: AboutView,
+    component: PostList,
     children: [
       {
         path: "/posts/categories",

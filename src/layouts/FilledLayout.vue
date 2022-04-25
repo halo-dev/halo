@@ -21,8 +21,14 @@ import logo from "@/assets/logo.svg";
 <style lang="scss">
 .navbar {
   width: 260px;
+  z-index: 999;
+  box-shadow: 0 4px 4px #f6c6ce;
 }
 .content {
   margin-left: 260px;
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  overflow-x: hidden;
 }
 </style>
