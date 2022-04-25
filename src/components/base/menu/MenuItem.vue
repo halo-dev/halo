@@ -83,13 +83,14 @@ function handleClick() {
   @apply flex;
   @apply select-none;
   @apply relative;
+  @apply p-2;
+  @apply font-normal;
 
   border-radius: 4px;
-  padding: 6px 10px;
 
   &:hover,
   &.active {
-    background: #f4f5f7;
+    @apply bg-gray-100;
     @apply font-medium;
   }
 
