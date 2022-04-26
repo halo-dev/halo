@@ -7,7 +7,6 @@ import static run.halo.app.utils.HaloUtils.ensureSuffix;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -168,8 +167,8 @@ public interface FileHandler {
                                 }
                             }
                         }
-                        BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(
-                            tempPath.toString() + FILE_SEPARATOR + "temp"));
+                        BufferedOutputStream os = new BufferedOutputStream(Files.newOutputStream(
+                            Path.of(tempPath.toString() + FILE_SEPARATOR + "temp")));
                         new ExifRewriter()
                             .updateExifMetadataLossless(file.getInputStream(), os, outputSet);
                         withoutEXIF = new File(

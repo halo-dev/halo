@@ -4,7 +4,7 @@ import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -70,12 +70,6 @@ public class MinioFileHandler implements FileHandler {
             .region(region)
             .build();
 
-        //Get image without EXIF information
-        File withoutEXIF = null;
-        if (ifRemoveEXIF) {
-            withoutEXIF = removeEXIF(file);
-        }
-
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
                 .setBasePath(endpoint + bucketName)
@@ -87,15 +81,28 @@ public class MinioFileHandler implements FileHandler {
                 .setOriginalName(file.getOriginalFilename())
                 .build();
 
+            //upload
             PutObjectArgs putObjectArgs;
-            if (withoutEXIF != null) {
-                putObjectArgs = PutObjectArgs.builder()
-                    .contentType(file.getContentType())
-                    .bucket(bucketName)
-                    .stream(new FileInputStream(withoutEXIF), file.getSize(), -1)
-                    .object(pathDescriptor.getRelativePath())
-                    .build();
-                withoutEXIF.delete();
+            if (ifRemoveEXIF) {
+                //Get image without EXIF information if it is required
+                File withoutEXIF = removeEXIF(file);
+                if (withoutEXIF != null) {
+                    putObjectArgs = PutObjectArgs.builder()
+                        .contentType(file.getContentType())
+                        .bucket(bucketName)
+                        .stream(Files.newInputStream(withoutEXIF.toPath()), file.getSize(), -1)
+                        .object(pathDescriptor.getRelativePath())
+                        .build();
+                    Files.delete(withoutEXIF.toPath());
+                } else {
+                    log.warn("Remove EXIF failed, upload file with EXIF");
+                    putObjectArgs = PutObjectArgs.builder()
+                        .contentType(file.getContentType())
+                        .bucket(bucketName)
+                        .stream(file.getInputStream(), file.getSize(), -1)
+                        .object(pathDescriptor.getRelativePath())
+                        .build();
+                }
             } else {
                 putObjectArgs = PutObjectArgs.builder()
                     .contentType(file.getContentType())

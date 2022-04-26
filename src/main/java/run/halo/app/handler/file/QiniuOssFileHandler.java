@@ -15,8 +15,8 @@ import com.qiniu.storage.persistent.FileRecorder;
 import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -104,13 +104,6 @@ public class QiniuOssFileHandler implements FileHandler {
             .append(domain)
             .append(URL_SEPARATOR);
 
-        //Get image without EXIF information if it is required
-        File withoutEXIF = null;
-        if (ifRemoveEXIF) {
-            withoutEXIF = removeEXIF(file);
-        }
-
-
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
                 .setBasePath(basePath.toString())
@@ -128,11 +121,22 @@ public class QiniuOssFileHandler implements FileHandler {
             UploadManager uploadManager = new UploadManager(configuration, fileRecorder);
             // Put the file
             Response response;
-            if (withoutEXIF != null) {
-                response = uploadManager
-                    .put(new FileInputStream(withoutEXIF), pathDescriptor.getRelativePath(),
-                        uploadToken, null, null);
-                withoutEXIF.delete();
+            if (ifRemoveEXIF) {
+                //Get image without EXIF information if it is required
+                File withoutEXIF = removeEXIF(file);
+                if (withoutEXIF != null) {
+                    response = uploadManager
+                        .put(Files.newInputStream(withoutEXIF.toPath()),
+                            pathDescriptor.getRelativePath(),
+                            uploadToken, null, null);
+                    Files.delete(withoutEXIF.toPath());
+                } else {
+                    log.warn("Remove EXIF failed, upload file with EXIF");
+                    response = uploadManager
+                        .put(file.getInputStream(), pathDescriptor.getRelativePath(), uploadToken,
+                            null,
+                            null);
+                }
             } else {
                 response = uploadManager
                     .put(file.getInputStream(), pathDescriptor.getRelativePath(), uploadToken, null,

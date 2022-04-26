@@ -3,8 +3,8 @@ package run.halo.app.handler.file;
 import com.upyun.RestManager;
 import com.upyun.UpException;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -72,12 +72,6 @@ public class UpOssFileHandler implements FileHandler {
 
         Map<String, String> params = new HashMap<>();
 
-        //Get image without EXIF information
-        File withoutEXIF = null;
-        if (ifRemoveEXIF) {
-            withoutEXIF = removeEXIF(file);
-        }
-
         try {
             // Get file basename
             String basename =
@@ -93,9 +87,18 @@ public class UpOssFileHandler implements FileHandler {
             params.put(RestManager.PARAMS.CONTENT_MD5.getValue(), md5OfFile);
             // Write file
             Response result;
-            if (withoutEXIF != null) {
-                result = manager.writeFile(upFilePath, new FileInputStream(withoutEXIF), params);
-                withoutEXIF.delete();
+            if (ifRemoveEXIF) {
+                //Get image without EXIF information
+                File withoutEXIF = removeEXIF(file);
+                if (withoutEXIF != null) {
+                    result =
+                        manager.writeFile(upFilePath, Files.newInputStream(withoutEXIF.toPath()),
+                            params);
+                    Files.delete(withoutEXIF.toPath());
+                } else {
+                    log.warn("Remove EXIF failed, upload file with EXIF");
+                    result = manager.writeFile(upFilePath, file.getInputStream(), params);
+                }
             } else {
                 result = manager.writeFile(upFilePath, file.getInputStream(), params);
             }

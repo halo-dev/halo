@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Objects;
 import lombok.Data;
@@ -99,19 +98,24 @@ public class SmmsFileHandler implements FileHandler {
 
         LinkedMultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 
-        //Get image without EXIF information
-        File withoutEXIF = null;
-        if (ifRemoveEXIF) {
-            withoutEXIF = removeEXIF(file);
-        }
         try {
             if (!ifRemoveEXIF) {
                 body.add("smfile", new HttpClientUtils.MultipartFileResource(file.getBytes(),
                     file.getOriginalFilename()));
             } else {
-                body.add("smfile", new HttpClientUtils.MultipartFileResource(Files.readAllBytes(
-                    Paths.get(withoutEXIF.getAbsolutePath())),
-                    file.getOriginalFilename()));
+                //Get image without EXIF information
+                File withoutEXIF = removeEXIF(file);
+                if (withoutEXIF != null) {
+                    body.add("smfile", new HttpClientUtils.MultipartFileResource(Files.readAllBytes(
+                        withoutEXIF.toPath()),
+                        file.getOriginalFilename()));
+                    Files.delete(withoutEXIF.toPath());
+                } else {
+                    log.warn("Remove EXIF failed, upload file with EXIF");
+                    body.add("smfile", new HttpClientUtils.MultipartFileResource(file.getBytes(),
+                        file.getOriginalFilename()));
+                }
+
             }
         } catch (IOException e) {
             log.error("Failed to get file input stream", e);

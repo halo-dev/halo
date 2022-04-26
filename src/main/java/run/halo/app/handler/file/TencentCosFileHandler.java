@@ -10,7 +10,7 @@ import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.region.Region;
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -94,12 +94,6 @@ public class TencentCosFileHandler implements FileHandler {
                 .append(URL_SEPARATOR);
         }
 
-        //Get image without EXIF information
-        File withoutEXIF = null;
-        if (ifRemoveEXIF) {
-            withoutEXIF = removeEXIF(file);
-        }
-
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
                 .setBasePath(basePath.toString())
@@ -118,12 +112,22 @@ public class TencentCosFileHandler implements FileHandler {
             // 设置 Content type, 默认是 application/octet-stream
             objectMetadata.setContentType(file.getContentType());
             PutObjectResult putObjectResponseFromInputStream;
-            if (withoutEXIF != null) {
-                putObjectResponseFromInputStream = cosClient
-                    .putObject(bucketName, pathDescriptor.getRelativePath(),
-                        new FileInputStream(withoutEXIF),
-                        objectMetadata);
-                withoutEXIF.delete();
+            if (ifRemoveEXIF) {
+                //Get image without EXIF information
+                File withoutEXIF = removeEXIF(file);
+                if (withoutEXIF != null) {
+                    putObjectResponseFromInputStream = cosClient
+                        .putObject(bucketName, pathDescriptor.getRelativePath(),
+                            Files.newInputStream(withoutEXIF.toPath()),
+                            objectMetadata);
+                    Files.delete(withoutEXIF.toPath());
+                } else {
+                    log.warn("Remove EXIF failed, upload file with EXIF");
+                    putObjectResponseFromInputStream = cosClient
+                        .putObject(bucketName, pathDescriptor.getRelativePath(),
+                            file.getInputStream(),
+                            objectMetadata);
+                }
             } else {
                 putObjectResponseFromInputStream = cosClient
                     .putObject(bucketName, pathDescriptor.getRelativePath(), file.getInputStream(),

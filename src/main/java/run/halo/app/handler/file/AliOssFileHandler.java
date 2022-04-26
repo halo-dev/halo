@@ -7,7 +7,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.PutObjectResult;
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -87,13 +87,6 @@ public class AliOssFileHandler implements FileHandler {
                 .append(URL_SEPARATOR);
         }
 
-
-        //Get image without EXIF information if it is required
-        File withoutEXIF = null;
-        if (ifRemoveEXIF) {
-            withoutEXIF = removeEXIF(file);
-        }
-
         try {
             FilePathDescriptor uploadFilePath = new FilePathDescriptor.Builder()
                 .setBasePath(basePath.toString())
@@ -109,11 +102,20 @@ public class AliOssFileHandler implements FileHandler {
 
             // Upload
             final PutObjectResult putObjectResult;
-            if (withoutEXIF != null) {
-                putObjectResult = ossClient.putObject(bucketName,
-                    uploadFilePath.getRelativePath(),
-                    new FileInputStream(withoutEXIF));
-                withoutEXIF.delete();
+            if (ifRemoveEXIF) {
+                //Get image without EXIF information if it is required
+                File withoutEXIF = removeEXIF(file);
+                if (withoutEXIF != null) {
+                    putObjectResult = ossClient.putObject(bucketName,
+                        uploadFilePath.getRelativePath(),
+                        Files.newInputStream(withoutEXIF.toPath()));
+                    Files.delete(withoutEXIF.toPath());
+                } else {
+                    log.warn("Remove EXIF failed, upload file with EXIF");
+                    putObjectResult = ossClient.putObject(bucketName,
+                        uploadFilePath.getRelativePath(),
+                        file.getInputStream());
+                }
             } else {
                 putObjectResult = ossClient.putObject(bucketName,
                     uploadFilePath.getRelativePath(),

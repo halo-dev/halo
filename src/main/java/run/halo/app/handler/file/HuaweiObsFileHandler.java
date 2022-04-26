@@ -5,8 +5,8 @@ import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 import com.obs.services.ObsClient;
 import com.obs.services.model.PutObjectResult;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -85,12 +85,6 @@ public class HuaweiObsFileHandler implements FileHandler {
                 .append(URL_SEPARATOR);
         }
 
-        //Get image without EXIF information
-        File withoutEXIF = null;
-        if (ifRemoveEXIF) {
-            withoutEXIF = removeEXIF(file);
-        }
-
         try {
             FilePathDescriptor pathDescriptor = new FilePathDescriptor.Builder()
                 .setBasePath(basePath.toString())
@@ -106,11 +100,20 @@ public class HuaweiObsFileHandler implements FileHandler {
 
             // Upload
             PutObjectResult putObjectResult;
-            if (withoutEXIF != null) {
-                putObjectResult = obsClient.putObject(bucketName,
-                    pathDescriptor.getRelativePath(),
-                    new FileInputStream(withoutEXIF));
-                withoutEXIF.delete();
+            if (ifRemoveEXIF) {
+                //Get image without EXIF information if it is required
+                File withoutEXIF = removeEXIF(file);
+                if (withoutEXIF != null) {
+                    putObjectResult = obsClient.putObject(bucketName,
+                        pathDescriptor.getRelativePath(),
+                        Files.newInputStream(withoutEXIF.toPath()));
+                    Files.delete(withoutEXIF.toPath());
+                } else {
+                    log.warn("Remove EXIF failed, upload file with EXIF");
+                    putObjectResult = obsClient.putObject(bucketName,
+                        pathDescriptor.getRelativePath(),
+                        file.getInputStream());
+                }
             } else {
                 putObjectResult = obsClient.putObject(bucketName,
                     pathDescriptor.getRelativePath(),

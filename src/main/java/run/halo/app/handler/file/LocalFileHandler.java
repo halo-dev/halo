@@ -5,7 +5,6 @@ import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -185,10 +184,10 @@ public class LocalFileHandler implements FileHandler {
                             //Remove all EXIF information except for orientation
                             if (ifRemoveEXIF) {
                                 BufferedOutputStream os =
-                                    new BufferedOutputStream(new FileOutputStream(
-                                        localFileFullPath.getParent().toString()
+                                    new BufferedOutputStream(Files.newOutputStream(
+                                        Path.of(localFileFullPath.getParent().toString()
                                             + FILE_SEPARATOR
-                                            + "temp"));
+                                            + "temp")));
                                 new ExifRewriter()
                                     .updateExifMetadataLossless(orgFile, os, outputSet);
                                 File withEXIF = new File(localFileFullPath.toString());
@@ -196,9 +195,9 @@ public class LocalFileHandler implements FileHandler {
                                     localFileFullPath.getParent().toString()
                                         + FILE_SEPARATOR
                                         + "temp");
-                                withEXIF.delete();
-                                withoutEXIF.renameTo(withEXIF);
-                                withoutEXIF.delete();
+                                Files.delete(withEXIF.toPath());
+                                Files.move(withoutEXIF.toPath(), withEXIF.toPath());
+                                Files.delete(withoutEXIF.toPath());
                             }
                         }
                     }
