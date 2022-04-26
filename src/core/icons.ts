@@ -26,6 +26,9 @@ import IconEye from "~icons/ri/eye-line";
 import IconFolder from "~icons/ri/folder-2-line";
 // @ts-ignore
 import IconMore from "~icons/ri/more-line";
+// @ts-ignore
+import IconClose from "~icons/ri/close-line";
+
 export {
   IconDashboard,
   IconArrowRight,
@@ -41,4 +44,5 @@ export {
   IconEye,
   IconFolder,
   IconMore,
+  IconClose,
 };
