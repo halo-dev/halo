@@ -124,6 +124,8 @@ public interface FileHandler {
      * Remove EXIF information and return an image file.
      *
      * @param file multipart file must not be null
+     *
+     * @return an image without EXIF            
      */
     default File removeEXIF(@NonNull MultipartFile file) {
         //Let .halo be a temp directory to store the image after removing the EXIF information
