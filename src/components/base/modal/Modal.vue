@@ -41,44 +41,46 @@ function handleClose() {
 }
 </script>
 <template>
-  <transition
-    enter-active-class="ease-out"
-    enter-from-class="opacity-0"
-    enter-to-class="opacity-100"
-    leave-active-class="ease-in"
-    leave-from-class="opacity-100"
-    leave-to-class="opacity-0"
-  >
-    <div
-      v-show="visible"
-      :class="wrapperClasses"
-      aria-modal="true"
-      class="modal-wrapper transform transition-all duration-200"
-      role="dialog"
-      tabindex="0"
-      @keyup.esc="handleClose()"
+  <Teleport to="body">
+    <transition
+      enter-active-class="ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
     >
-      <div class="modal-layer" @click="handleClose()" />
-      <div :style="contentStyles" class="modal-content">
-        <div class="modal-header">
-          <div class="modal-header-title">{{ title }}</div>
-          <div class="modal-header-actions">
-            <div class="modal-header-action" @click="handleClose()">
-              <IconClose />
+      <div
+        v-show="visible"
+        :class="wrapperClasses"
+        aria-modal="true"
+        class="modal-wrapper transform transition-all duration-200"
+        role="dialog"
+        tabindex="0"
+        @keyup.esc="handleClose()"
+      >
+        <div class="modal-layer" @click="handleClose()" />
+        <div :style="contentStyles" class="modal-content">
+          <div class="modal-header">
+            <div class="modal-header-title">{{ title }}</div>
+            <div class="modal-header-actions">
+              <div class="modal-header-action" @click="handleClose()">
+                <IconClose />
+              </div>
             </div>
           </div>
-        </div>
-        <div class="modal-body">
-          <slot />
-        </div>
-        <div class="modal-footer">
-          <slot name="footer">
-            <VButton @click="handleClose">关闭</VButton>
-          </slot>
+          <div class="modal-body">
+            <slot />
+          </div>
+          <div class="modal-footer">
+            <slot name="footer">
+              <VButton @click="handleClose">关闭</VButton>
+            </slot>
+          </div>
         </div>
       </div>
-    </div>
-  </transition>
+    </transition>
+  </Teleport>
 </template>
 
 <style lang="scss">
@@ -138,6 +140,7 @@ function handleClose() {
 
     .modal-body {
       @apply overflow-x-hidden overflow-y-auto;
+      @apply flex-1;
       word-wrap: break-word;
       padding: 12px 16px;
     }

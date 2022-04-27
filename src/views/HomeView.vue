@@ -9,6 +9,7 @@
           <VButton type="secondary" @click="visible = true">打开</VButton>
         </div>
       </div>
+      <p></p>
     </VModal>
     <VButton type="secondary" @click="visible = true">打开</VButton>
   </FilledLayout>
@@ -18,5 +19,6 @@ import { FilledLayout } from "@/layouts";
 import { VModal } from "@/components/base/modal";
 import { VButton } from "@/components/base/button";
 import { ref } from "vue";
+
 const visible = ref(false);
 </script>
