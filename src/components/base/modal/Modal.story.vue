@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { VButton } from "@/components/base/button";
 import { VModal } from "@/components/base/modal";
+import { VSpace } from "@/components/base/space";
 
 function initState() {
   return {
@@ -26,7 +27,15 @@ function initState() {
           <img src="https://ryanc.cc/avatar" class="w-full" />
           <img src="https://halo.run/logo" class="w-full" />
         </div>
-        <VButton type="secondary" @click="state.visible = false">关闭</VButton>
+
+        <template #footer>
+          <VSpace>
+            <VButton type="primary" @click="state.visible = false" loading
+              >确定</VButton
+            >
+            <VButton @click="state.visible = false">取消</VButton>
+          </VSpace>
+        </template>
       </VModal>
     </template>
     <template #controls="{ state }">

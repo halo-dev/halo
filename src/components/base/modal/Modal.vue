@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { VButton } from "../button";
 import { computed } from "vue";
 import { IconClose } from "@/core/icons";
 
@@ -72,10 +71,8 @@ function handleClose() {
           <div class="modal-body">
             <slot />
           </div>
-          <div class="modal-footer">
-            <slot name="footer">
-              <VButton @click="handleClose">关闭</VButton>
-            </slot>
+          <div v-if="$slots.footer" class="modal-footer">
+            <slot name="footer" />
           </div>
         </div>
       </div>
