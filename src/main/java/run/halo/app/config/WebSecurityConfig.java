@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,9 +44,16 @@ import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
 import run.halo.app.identity.authentication.verifier.JwtProvidedDecoderAuthenticationManagerResolver;
+import run.halo.app.identity.authorization.AuthorizationFilter;
+import run.halo.app.identity.authorization.PolicyRule;
+import run.halo.app.identity.authorization.Role;
+import run.halo.app.identity.authorization.RoleBinding;
+import run.halo.app.identity.authorization.RoleRef;
+import run.halo.app.identity.authorization.Subject;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
+import run.halo.app.infra.types.ObjectMeta;
 
 /**
  * @author guqing
@@ -85,6 +93,7 @@ public class WebSecurityConfig {
             .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManagerResolver()),
                 BasicAuthenticationFilter.class)
             .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
+            .addFilterBefore(authorizationFilter(), FilterSecurityInterceptor.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling((exceptions) -> exceptions
@@ -92,6 +101,47 @@ public class WebSecurityConfig {
                 .accessDeniedHandler(new JwtAccessDeniedHandler())
             );
         return http.build();
+    }
+
+    public AuthorizationFilter authorizationFilter() {
+        return new AuthorizationFilter(name -> {
+            // role getter
+            Role role = new Role();
+            List<PolicyRule> rules = List.of(
+                new PolicyRule.Builder().apiGroups("").resources("posts").verbs("list", "get")
+                    .build(),
+                new PolicyRule.Builder().apiGroups("").resources("categories").verbs("*")
+                    .build(),
+                new PolicyRule.Builder().nonResourceURLs("/healthy").verbs("get", "post", "head")
+                    .build()
+            );
+            role.setRules(rules);
+            ObjectMeta objectMeta = new ObjectMeta();
+            objectMeta.setName("ruleReadPost");
+            role.setObjectMeta(objectMeta);
+            return role;
+        }, () -> {
+            // role binding lister
+            RoleBinding roleBinding = new RoleBinding();
+
+            ObjectMeta objectMeta = new ObjectMeta();
+            objectMeta.setName("userRoleBinding");
+            roleBinding.setObjectMeta(objectMeta);
+
+            Subject subject = new Subject();
+            subject.setName("user");
+            subject.setKind("User");
+            subject.setApiGroup("");
+            roleBinding.setSubjects(List.of(subject));
+
+            RoleRef roleRef = new RoleRef();
+            roleRef.setKind("Role");
+            roleRef.setName("ruleReadPost");
+            roleRef.setApiGroup("");
+            roleBinding.setRoleRef(roleRef);
+
+            return List.of(roleBinding);
+        });
     }
 
     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver() {

@@ -6,7 +6,6 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author guqing
  * @since 2.0.0
  */
-@FunctionalInterface
 public interface AuthorizationRuleResolver {
 
     /**
@@ -19,4 +18,14 @@ public interface AuthorizationRuleResolver {
      * @param user authenticated user info
      */
     PolicyRuleList rulesFor(UserDetails user);
+
+    /**
+     * visitRulesFor invokes visitor() with each rule that applies to a given user
+     * and each error encountered resolving those rules. Rule may be null if err is non-nil.
+     * If visitor() returns false, visiting is short-circuited.
+     *
+     * @param user user info
+     * @param visitor visitor
+     */
+    void visitRulesFor(UserDetails user, RuleAccumulator visitor);
 }

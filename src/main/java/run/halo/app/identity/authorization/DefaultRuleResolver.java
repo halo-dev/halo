@@ -1,5 +1,6 @@
 package run.halo.app.identity.authorization;
 
+import java.util.Collections;
 import java.util.List;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -22,39 +23,70 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
     @Override
     public PolicyRuleList rulesFor(UserDetails user) {
-        return visitRulesFor(user);
+        PolicyRuleList policyRules = new PolicyRuleList();
+        visitRulesFor(user, (source, rule, err) -> {
+            if (rule != null) {
+                policyRules.add(rule);
+            }
+            if (err != null) {
+                policyRules.addError(err);
+            }
+            return true;
+        });
+        return policyRules;
     }
 
-    protected PolicyRuleList visitRulesFor(UserDetails user) {
-        PolicyRuleList rules = new PolicyRuleList();
+    @Override
+    public void visitRulesFor(UserDetails user, RuleAccumulator visitor) {
+        List<RoleBinding> roleBindings = Collections.emptyList();
         try {
-            List<RoleBinding> roleBindings = roleBindingLister.listRoleBindings();
-            for (RoleBinding roleBinding : roleBindings) {
-                boolean applies = appliesTo(user, roleBinding.subjects);
-                if (!applies) {
-                    continue;
-                }
-                Role role = roleGetter.getRole(roleBinding.roleRef.name);
-                if (role == null) {
-                    return rules;
-                }
-                rules.addAll(role.getRules());
-            }
+            roleBindings = roleBindingLister.listRoleBindings();
         } catch (Exception e) {
-            // ignore throws
-            rules.addError(e);
+            if (visitor.visit(null, null, e)) {
+                return;
+            }
         }
 
-        return rules;
+        for (RoleBinding roleBinding : roleBindings) {
+            AppliesResult appliesResult = appliesTo(user, roleBinding.subjects);
+            if (!appliesResult.applies) {
+                continue;
+            }
+
+            Subject subject = roleBinding.subjects.get(appliesResult.subjectIndex);
+
+            List<PolicyRule> rules = Collections.emptyList();
+            try {
+                Role role = roleGetter.getRole(roleBinding.roleRef.name);
+                rules = role.getRules();
+            } catch (Exception e) {
+                if (visitor.visit(null, null, e)) {
+                    return;
+                }
+            }
+
+            String source = roleBindingDescriber(roleBinding, subject);
+            for (PolicyRule rule : rules) {
+                if (!visitor.visit(source, rule, null)) {
+                    return;
+                }
+            }
+        }
     }
 
-    boolean appliesTo(UserDetails user, List<Subject> bindingSubjects) {
-        for (Subject bindingSubject : bindingSubjects) {
-            if (appliesToUser(user, bindingSubject)) {
-                return true;
+    String roleBindingDescriber(RoleBinding roleBinding, Subject subject) {
+        String describeSubject = String.format("%s %s", subject.kind, subject.name);
+        return String.format("RoleBinding %s of %s %s to %s", roleBinding.getName(),
+            roleBinding.roleRef.getKind(), roleBinding.roleRef.getName(), describeSubject);
+    }
+
+    AppliesResult appliesTo(UserDetails user, List<Subject> bindingSubjects) {
+        for (int i = 0; i < bindingSubjects.size(); i++) {
+            if (appliesToUser(user, bindingSubjects.get(i))) {
+                return new AppliesResult(true, i);
             }
         }
-        return false;
+        return new AppliesResult(false, 0);
     }
 
     boolean appliesToUser(UserDetails user, Subject subject) {
@@ -62,5 +94,8 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
             return StringUtils.equals(user.getUsername(), subject.name);
         }
         return false;
+    }
+
+    record AppliesResult(boolean applies, int subjectIndex) {
     }
 }

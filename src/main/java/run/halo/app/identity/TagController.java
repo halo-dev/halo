@@ -12,16 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2.0.0
  */
 @RestController
-@RequestMapping("/posts")
-public class HelloController {
+@RequestMapping("/tags")
+public class TagController {
 
     @GetMapping
     public String hello() {
-        return "Now you see me.";
+        return "Tag you see me.";
     }
 
     @GetMapping("/{name}")
     public String getByName(@PathVariable String name) {
-        return "Name:" + name + "-->Now you see me.";
+        return "Tag name:" + name + "-->Now you see me.";
     }
 }

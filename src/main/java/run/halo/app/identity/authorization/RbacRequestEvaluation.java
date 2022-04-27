@@ -17,7 +17,7 @@ public class RbacRequestEvaluation {
         String NonResourceAll = "*";
     }
 
-    public boolean rulesAllow(RequestInfo requestAttributes, List<PolicyRule> rules) {
+    public boolean rulesAllow(Attributes requestAttributes, List<PolicyRule> rules) {
         for (PolicyRule rule : rules) {
             if (ruleAllows(requestAttributes, rule)) {
                 return true;
@@ -26,7 +26,7 @@ public class RbacRequestEvaluation {
         return false;
     }
 
-    protected boolean ruleAllows(RequestInfo requestAttributes, PolicyRule rule) {
+    protected boolean ruleAllows(Attributes requestAttributes, PolicyRule rule) {
         if (requestAttributes.isResourceRequest()) {
             String combinedResource = requestAttributes.getResource();
             if (StringUtils.isNotBlank(requestAttributes.getSubresource())) {

@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import run.halo.app.identity.authorization.AttributesRecord;
 import run.halo.app.identity.authorization.DefaultRuleResolver;
 import run.halo.app.identity.authorization.PolicyRule;
 import run.halo.app.identity.authorization.RbacRequestEvaluation;
@@ -163,9 +164,10 @@ public class RequestInfoResolverTest {
             MockHttpServletRequest request = new MockHttpServletRequest();
             request.setMethod(requestResolveCase.method);
             request.setRequestURI(requestResolveCase.url);
-
             RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
-            boolean allowed = rbacRequestEvaluation.rulesAllow(requestInfo, rules);
+
+            AttributesRecord attributes = new AttributesRecord(user, requestInfo);
+            boolean allowed = rbacRequestEvaluation.rulesAllow(attributes, rules);
             assertThat(allowed).isEqualTo(requestResolveCase.expected);
         }
     }

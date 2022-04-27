@@ -2,6 +2,7 @@ package run.halo.app.identity.authorization;
 
 import java.util.List;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import run.halo.app.infra.types.ObjectMeta;
 import run.halo.app.infra.types.TypeMeta;
 
@@ -33,4 +34,11 @@ public class RoleBinding {
      * If the RoleRef cannot be resolved, the Authorizer must return an error.
      */
     RoleRef roleRef;
+
+    public String getName() {
+        if (objectMeta == null) {
+            return StringUtils.EMPTY;
+        }
+        return objectMeta.getName();
+    }
 }
