@@ -1,0 +1,61 @@
+<script lang="ts" setup>
+defineProps({
+  title: {
+    type: String,
+  },
+});
+</script>
+
+<template>
+  <div class="card-wrapper">
+    <div v-if="title" class="card-header">
+      <div class="card-header-title">
+        {{ title }}
+      </div>
+      <div class="card-header-actions">
+        <slot name="actions" />
+      </div>
+    </div>
+    <div class="card-body">
+      <slot />
+    </div>
+    <div v-if="$slots.footer" class="card-footer">
+      <slot name="footer" />
+    </div>
+  </div>
+</template>
+<style lang="scss">
+.card-wrapper {
+  @apply flex flex-col box-border;
+  @apply bg-white;
+  @apply shadow-sm;
+  border-radius: 4px;
+  border: 1px solid #eaecf0;
+
+  .card-header {
+    @apply flex;
+    @apply justify-between;
+    border-bottom: 1px solid #eaecf0;
+
+    .card-header-title {
+      @apply self-center;
+      @apply text-base;
+      @apply font-bold;
+      padding: 12px 16px;
+    }
+
+    .card-header-actions {
+      @apply self-center;
+    }
+  }
+
+  .card-body {
+    padding: 12px 16px;
+  }
+
+  .card-footer {
+    border-top: 1px solid #eaecf0;
+    padding: 12px 16px;
+  }
+}
+</style>
