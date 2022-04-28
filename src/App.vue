@@ -11,6 +11,12 @@ body {
   overflow-y: overlay;
   background: #eff4f9;
 }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 *::-webkit-scrollbar-track-piece {
   background-color: #f8f8f8;
   -webkit-border-radius: 2em;
