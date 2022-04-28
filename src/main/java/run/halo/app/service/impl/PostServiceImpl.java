@@ -544,6 +544,8 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
      * @param postQuery post query must not be null
      * @return a post specification
      */
+
+    // CS304 issue: https://github.com/halo-dev/halo/issues/1842
     @NonNull
     private Specification<Post> buildSpecByQuery(@NonNull PostQuery postQuery) {
         Assert.notNull(postQuery, "Post query must not be null");
@@ -572,16 +574,21 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
             }
 
             if (postQuery.getKeyword() != null) {
+
                 // Format like condition
                 String likeCondition = String
                     .format("%%%s%%", StringUtils.strip(postQuery.getKeyword()));
 
                 // Build like predicate
-                Predicate titleLike = criteriaBuilder.like(root.get("title"), likeCondition);
-                Predicate originalContentLike = criteriaBuilder
-                    .like(root.get("originalContent"), likeCondition);
+                Subquery<Post> postSubquery = query.subquery(Post.class);
+                Root<Content> contentRoot = postSubquery.from(Content.class);
+                postSubquery.select(contentRoot.get("id"))
+                    .where(criteriaBuilder.like(contentRoot.get("originalContent"), likeCondition));
 
-                predicates.add(criteriaBuilder.or(titleLike, originalContentLike));
+                Predicate titleLike = criteriaBuilder.like(root.get("title"), likeCondition);
+
+                predicates.add(
+                    criteriaBuilder.or(titleLike, criteriaBuilder.in(root).value(postSubquery)));
             }
 
             return query.where(predicates.toArray(new Predicate[0])).getRestriction();
