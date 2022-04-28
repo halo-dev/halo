@@ -28,6 +28,14 @@ import IconFolder from "~icons/ri/folder-2-line";
 import IconMore from "~icons/ri/more-line";
 // @ts-ignore
 import IconClose from "~icons/ri/close-line";
+// @ts-ignore
+import IconErrorWarning from "~icons/ri/error-warning-line";
+// @ts-ignore
+import IconCheckboxCircle from "~icons/ri/checkbox-circle-line";
+// @ts-ignore
+import IconInformation from "~icons/ri/information-line";
+// @ts-ignore
+import IconCloseCircle from "~icons/ri/close-circle-line";
 
 export {
   IconDashboard,
@@ -45,4 +53,8 @@ export {
   IconFolder,
   IconMore,
   IconClose,
+  IconErrorWarning,
+  IconCheckboxCircle,
+  IconInformation,
+  IconCloseCircle,
 };
