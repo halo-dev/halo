@@ -10,8 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.context.TestPropertySource;
@@ -21,16 +27,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import run.halo.app.config.WebSecurityConfig;
+import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
+import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 
 /**
  * @author guqing
  * @date 2022-04-12
  */
-@TestPropertySource(properties = {"halo.security.oauth2.jwt.public-key-location=classpath:app.pub",
-    "halo.security.oauth2.jwt.private-key-location=classpath:app.key"})
 @WebMvcTest
-@Import(WebSecurityConfig.class)
+@Import(TestWebSecurityConfig.class)
+@TestPropertySource(properties = {"spring.main.allow-bean-definition-overriding=true"})
 public class AuthenticationTest {
 
     private MockMvc mockMvc;
@@ -58,7 +64,7 @@ public class AuthenticationTest {
     public void securedApiTest() throws Exception {
         mockMvc.perform(get("/api/secured"))
             .andDo(print())
-            .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
+            .andExpect(status().is(401))
             .andExpect(content().string("Unauthorized"));
     }
 
@@ -78,6 +84,27 @@ public class AuthenticationTest {
         @GetMapping
         public String hello() {
             return "You can't see me.";
+        }
+    }
+
+    @EnableWebSecurity
+    @TestConfiguration
+    static class TestWebSecurityConfig {
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                .authorizeHttpRequests((authorize) -> authorize
+                    .antMatchers("/api/**", "/apis/**").authenticated()
+                )
+                .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(
+                    (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling((exceptions) -> exceptions
+                    .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                    .accessDeniedHandler(new JwtAccessDeniedHandler())
+                );
+            return http.build();
         }
     }
 }
