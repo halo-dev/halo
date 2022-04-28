@@ -8,6 +8,7 @@ import lombok.Data;
  * Structures that are versioned or persisted should inline TypeMeta.
  *
  * @author guqing
+ * @see <a href="https://github.com/kubernetes/kubernetes/blob/537941765fe1304dd096c1a2d4d4e70f10768218/staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/types.go#L41">types#TypeMeta</a>
  * @since 2.0.0
  */
 @Data
@@ -19,7 +20,7 @@ public class TypeMeta {
      * Cannot be updated.
      * In CamelCase.
      * More info:
-     * <a href="https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds>types-kinds</a>
+     * <a href="https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds">types-kinds</a>
      * +optional
      */
     String kind;

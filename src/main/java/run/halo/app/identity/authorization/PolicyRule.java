@@ -6,9 +6,11 @@ import lombok.NoArgsConstructor;
 
 /**
  * PolicyRule holds information that describes a policy rule, but does not contain information
- * about who the rule applies to or which namespace the rule applies to.
+ * about whom the rule applies to or which namespace the rule applies to.
  *
  * @author guqing
+ * @see
+ * <a href="https://github.com/kubernetes/kubernetes/blob/537941765fe1304dd096c1a2d4d4e70f10768218/pkg/apis/rbac/types.go#L45">types#PolicyRule</a>
  * @since 2.0.0
  */
 @Data

@@ -6,13 +6,11 @@ import run.halo.app.infra.types.ObjectMeta;
 import run.halo.app.infra.types.TypeMeta;
 
 /**
- * // RoleBinding references a role, but does not contain it.  It can reference a Role in the
- * same namespace or a ClusterRole in the global namespace.
- * // It adds who information via Subjects and namespace information by which namespace it exists
- * in.  RoleBindings in a given
- * // namespace only have effect in that namespace.
+ * RoleBinding references a role, but does not contain it.
  *
  * @author guqing
+ * @see
+ * <a href="https://github.com/kubernetes/kubernetes/blob/537941765fe1304dd096c1a2d4d4e70f10768218/pkg/apis/rbac/types.go#L109">types#RoleBinding</a>
  * @since 2.0.0
  */
 @Data

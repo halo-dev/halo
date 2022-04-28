@@ -9,6 +9,8 @@ import lombok.Data;
  * users must create.
  *
  * @author guqing
+ * @see
+ * <a href="https://github.com/kubernetes/kubernetes/blob/537941765fe1304dd096c1a2d4d4e70f10768218/staging/src/k8s.io/apimachinery/pkg/apis/meta/v1/types.go#L110">types#ObjectMeta</a>
  * @since 2.0.0
  */
 @Data

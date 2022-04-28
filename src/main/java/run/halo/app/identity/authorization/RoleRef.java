@@ -6,6 +6,8 @@ import lombok.Data;
  * RoleRef contains information that points to the role being used
  *
  * @author guqing
+ * @see
+ * <a href="https://github.com/kubernetes/kubernetes/blob/537941765fe1304dd096c1a2d4d4e70f10768218/pkg/apis/rbac/types.go#L83">types#RoleRef</a>
  * @since 2.0.0
  */
 @Data

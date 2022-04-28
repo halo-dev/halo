@@ -3,7 +3,13 @@ package run.halo.app.identity.authorization;
 import lombok.Data;
 
 /**
+ * Subject contains a reference to the object or user identities a role binding applies to.  This
+ * can either hold a direct API object reference,
+ * or a value for non-objects such as user and group names.
+ *
  * @author guqing
+ * @see
+ * <a href="https://github.com/kubernetes/kubernetes/blob/537941765fe1304dd096c1a2d4d4e70f10768218/pkg/apis/rbac/types.go#L67">types#Subject</a>
  * @since 2.0.0
  */
 @Data
