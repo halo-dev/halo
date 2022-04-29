@@ -501,9 +501,11 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
         String cleanContent = HaloUtils.cleanHtmlTag(htmlContent);
 
-        String otherString = cleanContent.replaceAll(CHINESE_REGEX, "");
+        String tempString = cleanContent.replaceAll(CHINESE_REGEX, "");
 
-        int chinesWordCount = cleanContent.length() - otherString.length();
+        String otherString = cleanContent.replaceAll(CHINESE_REGEX, " ");
+
+        int chineseWordCount = cleanContent.length() - tempString.length();
 
         String[] otherWords = otherString.split(PUNCTUATION_REGEX);
 
@@ -517,7 +519,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
             otherWordLength--;
         }
 
-        return chinesWordCount + otherWordLength;
+        return chineseWordCount + otherWordLength;
     }
 
     /**
