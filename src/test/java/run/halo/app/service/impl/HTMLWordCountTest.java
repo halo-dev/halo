@@ -68,9 +68,9 @@ public class HTMLWordCountTest {
 
     String complexText3 = "The company had a meeting yesterday。Why did you ask for leave？";
 
-    String complexText4 = "这是一个句子，但是只有中文。对了，还有标点符号。";
+    String complexText4 = "这是一个句子，但是只有中文。";
 
-    String complexText5 = "The wind and the moon are all beautiful, love and hate are romantic.";
+    String complexText5 = "The wind and the moon are all beautiful, love and hate are all romantic.";
 
     @Test
     void pictureTest() {
@@ -172,9 +172,9 @@ public class HTMLWordCountTest {
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText2)));
         assertEquals(14,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText3)));
-        assertEquals(24,
+        assertEquals(14,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText4)));
-        assertEquals(13,
+        assertEquals(14,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText5)));
     }
 
