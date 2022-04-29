@@ -63,23 +63,14 @@ public class HTMLWordCountTest {
 
     String hybridString = "I have a red apple哈哈";
 
-    String complexText2 = "Hi，您好啊！\n"
-        + "\n"
-        + "Wow，Nice PR。\n"
-        + "\n"
-        + "今天天气非常不错！";
 
-    String complexText3 = "这个project的schedule有些问题，尤其是buffer不多。另外，cost也偏高。目前我们没法confirm手上的resource"
-        + "能完全take得了。anyway我们还是先pilot一下，再follow "
-        + "up最终的output，看能不能run的比较smoothly，更重要的是evaluate所有的cost能不能完全被cover掉。\n";
+    String complexText2 = "Hi，Jessica！这个project的schedule有些问题。";
 
-    String complexText4 = "一，我与春风皆过客，你携秋水揽星河。\n"
-        + "I and the spring breeze are passing by, you take the autumn water to take the galaxy.\n"
-        + "二，下次你路过，人间已无我。\n"
-        + "The next time you pass by, there is no me.\n"
-        + "三，风月都好看，爱恨皆浪漫。\n"
-        + "The wind and the moon are all beautiful, love and hate are romantic.\n";
+    String complexText3 = "The company had a meeting yesterday。Why did you ask for leave？";
 
+    String complexText4 = "这是一个句子，但是只有中文。对了，还有标点符号。";
+
+    String complexText5 = "The wind and the moon are all beautiful, love and hate are romantic.";
 
     @Test
     void pictureTest() {
@@ -177,12 +168,14 @@ public class HTMLWordCountTest {
 
     @Test
     void moreComplexTest() {
-        assertEquals(20,
+        assertEquals(14,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText2)));
-        assertEquals(90,
+        assertEquals(14,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText3)));
-        assertEquals(86,
+        assertEquals(24,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText4)));
+        assertEquals(13,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText5)));
     }
 
 
