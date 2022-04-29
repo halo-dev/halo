@@ -70,7 +70,8 @@ public class HTMLWordCountTest {
 
     String complexText4 = "这是一个句子，但是只有中文。";
 
-    String complexText5 = "The wind and the moon are all beautiful, love and hate are all romantic.";
+    String complexText5 =
+        "The wind and the moon are all beautiful, love and hate are all romantic.";
 
     @Test
     void pictureTest() {
