@@ -4,7 +4,7 @@ import { computed } from "vue";
 import type { Type } from "./interface";
 
 const props = defineProps({
-  active: {
+  activeId: {
     type: [Number, String],
   },
   items: {
@@ -14,9 +14,9 @@ const props = defineProps({
     type: String as PropType<Type>,
     default: "default",
   },
-  valueKey: {
+  idKey: {
     type: String,
-    default: "value",
+    default: "id",
   },
   labelKey: {
     type: String,
@@ -24,15 +24,15 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:active", "change"]);
+const emit = defineEmits(["update:activeId", "change"]);
 
 const classes = computed(() => {
   return [`tabbar-${props.type}`];
 });
 
-const handleChange = (value: number | string) => {
-  emit("update:active", value);
-  emit("change", value);
+const handleChange = (id: number | string) => {
+  emit("update:activeId", id);
+  emit("change", id);
 };
 </script>
 <template>
@@ -42,8 +42,8 @@ const handleChange = (value: number | string) => {
         v-for="(item, index) in items"
         :key="index"
         class="tabbar-item"
-        :class="{ 'tabbar-item-active': item[valueKey] === active }"
-        @click="handleChange(item[valueKey])"
+        :class="{ 'tabbar-item-active': item[idKey] === activeId }"
+        @click="handleChange(item[idKey])"
       >
         <div v-if="item.icon" class="tabbar-item-icon">
           <component :is="item.icon" />

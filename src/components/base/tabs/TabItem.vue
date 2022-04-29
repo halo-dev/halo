@@ -1,5 +1,25 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { computed, inject } from "vue";
+import type { ComputedRef } from "vue";
+
+const props = defineProps({
+  id: {
+    type: String,
+  },
+  label: {
+    type: String,
+  },
+});
+
+const activeId = inject<ComputedRef<string | number | undefined>>("activeId");
+
+const isActive = computed(() => {
+  return activeId?.value === props.id;
+});
+</script>
 <template>
-  <div>tab item</div>
+  <div v-if="isActive">
+    <slot />
+  </div>
 </template>
 <style lang="scss"></style>
