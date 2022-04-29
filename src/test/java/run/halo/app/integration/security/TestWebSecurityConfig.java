@@ -1,4 +1,4 @@
-package run.halo.app.config;
+package run.halo.app.integration.security;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -12,6 +12,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
@@ -34,6 +35,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.test.context.TestPropertySource;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
@@ -50,26 +52,26 @@ import run.halo.app.identity.authorization.Role;
 import run.halo.app.identity.authorization.RoleBinding;
 import run.halo.app.identity.authorization.RoleRef;
 import run.halo.app.identity.authorization.Subject;
-import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
-import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.infra.types.ObjectMeta;
 
 /**
  * @author guqing
- * @since 2022-04-12
+ * @since 2.0.0
  */
+@TestConfiguration
 @EnableWebSecurity
+@TestPropertySource(properties = {"halo.security.oauth2.jwt.public-key-location=classpath:app.pub",
+    "halo.security.oauth2.jwt.private-key-location=classpath:app.key"})
 @EnableConfigurationProperties(JwtProperties.class)
-public class WebSecurityConfig {
-
+public class TestWebSecurityConfig {
     private final RSAPublicKey key;
 
     private final RSAPrivateKey priv;
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
-    public WebSecurityConfig(JwtProperties jwtProperties,
+    public TestWebSecurityConfig(JwtProperties jwtProperties,
         AuthenticationManagerBuilder authenticationManagerBuilder) throws IOException {
         this.key = jwtProperties.readPublicKey();
         this.priv = jwtProperties.readPrivateKey();
@@ -95,17 +97,11 @@ public class WebSecurityConfig {
             .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
             .addFilterBefore(authorizationFilter(), FilterSecurityInterceptor.class)
             .sessionManagement(
-                (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling((exceptions) -> exceptions
-                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                .accessDeniedHandler(new JwtAccessDeniedHandler())
-            );
+                (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
     public AuthorizationFilter authorizationFilter() {
-        // TODO fake role and role bindings, only used for testing/development
-        //  It'll be deleted next time
         return new AuthorizationFilter(name -> {
             // role getter
             Role role = new Role();
@@ -131,7 +127,7 @@ public class WebSecurityConfig {
             roleBinding.setObjectMeta(objectMeta);
 
             Subject subject = new Subject();
-            subject.setName("user");
+            subject.setName("test_user");
             subject.setKind("User");
             subject.setApiGroup("");
             roleBinding.setSubjects(List.of(subject));
@@ -201,11 +197,9 @@ public class WebSecurityConfig {
 
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
-        // TODO fake role and role bindings, only used for testing/development
-        //  It'll be deleted next time
-        UserDetails user = User.withUsername("user")
+        UserDetails user = User.withUsername("test_user")
             .password(passwordEncoder().encode("123456"))
-            .roles("USER")
+            .roles("ruleReadPost")
             .build();
         return new InMemoryUserDetailsManager(user);
     }
