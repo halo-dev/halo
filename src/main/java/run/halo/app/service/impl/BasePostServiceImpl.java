@@ -305,7 +305,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         PatchedContent postContent = post.getContent();
         // word count stat
         post.setWordCount(htmlFormatWordCount(postContent.getContent()));
-        post.setCharCount(htmlFormatCharacterCount(postContent.getContent()));
         POST savedPost;
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
