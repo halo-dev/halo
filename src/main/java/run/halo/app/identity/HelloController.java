@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * A controller should ONLY be used during testing for this PR.
+ * TODO It'll be deleted next time
  *
  * @author guqing
  * @since 2.0.0

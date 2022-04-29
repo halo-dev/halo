@@ -104,6 +104,8 @@ public class WebSecurityConfig {
     }
 
     public AuthorizationFilter authorizationFilter() {
+        // TODO fake role and role bindings, only used for testing/development
+        //  It'll be deleted next time
         return new AuthorizationFilter(name -> {
             // role getter
             Role role = new Role();
@@ -199,6 +201,8 @@ public class WebSecurityConfig {
 
     @Bean
     public InMemoryUserDetailsManager userDetailsService() {
+        // TODO fake role and role bindings, only used for testing/development
+        //  It'll be deleted next time
         UserDetails user = User.withUsername("user")
             .password(passwordEncoder().encode("123456"))
             .roles("USER")
