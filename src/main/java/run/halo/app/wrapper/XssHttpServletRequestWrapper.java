@@ -2,7 +2,7 @@ package run.halo.app.wrapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.web.util.HtmlUtils;
 
 
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
@@ -11,7 +11,6 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
      * Constructs a request object wrapping the given request.
      *
      * @param request the {@link HttpServletRequest} to be wrapped.
-     *
      */
 
     public XssHttpServletRequestWrapper(HttpServletRequest request) {
@@ -21,13 +20,21 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
     @Override
     public String getHeader(String name) {
         String value = super.getHeader(name);
-        return StringEscapeUtils.escapeHtml4(value);
+        if (value == null) {
+            return null;
+        } else {
+            return HtmlUtils.htmlEscape(value);
+        }
     }
 
     @Override
     public String getParameter(String name) {
         String value = super.getParameter(name);
-        return StringEscapeUtils.escapeHtml4(value);
+        if (value == null) {
+            return null;
+        } else {
+            return HtmlUtils.htmlEscape(value);
+        }
     }
 
     @Override
@@ -37,7 +44,11 @@ public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
             int length = values.length;
             String[] escapeValues = new String[length];
             for (int i = 0; i < length; i++) {
-                escapeValues[i] = StringEscapeUtils.escapeHtml4(values[i]);
+                if (values[i] != null) {
+                    escapeValues[i] = HtmlUtils.htmlEscape(values[i]);
+                } else {
+                    escapeValues[i] = null;
+                }
             }
             return escapeValues;
         }

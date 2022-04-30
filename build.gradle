@@ -75,7 +75,6 @@ ext {
     jsoupVersion = '1.14.3'
     embeddedRedisVersion = '0.6'
     diffUtilsVersion = '4.11'
-    commonsTextVersion = '1.9'
 }
 
 dependencies {
@@ -89,7 +88,6 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
 
-    implementation "org.apache.commons:commons-text:$commonsTextVersion"
     implementation "com.sun.mail:jakarta.mail"
     implementation "com.google.guava:guava:$guavaVersion"
     implementation "com.upyun:java-sdk:$upyunSdkVersion"

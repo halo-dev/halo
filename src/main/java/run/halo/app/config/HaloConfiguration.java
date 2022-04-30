@@ -4,6 +4,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cache.annotation.EnableCaching;
@@ -62,6 +63,7 @@ public class HaloConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     AbstractStringCacheStore stringCacheStore() {
         AbstractStringCacheStore stringCacheStore;
         switch (haloProperties.getCache()) {

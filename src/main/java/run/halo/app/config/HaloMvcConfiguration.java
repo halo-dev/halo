@@ -50,7 +50,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.config.serializer.XssJacksonDeserializer;
-import run.halo.app.config.serializer.XssJacksonSerializer;
 import run.halo.app.core.PageJacksonSerializer;
 import run.halo.app.core.freemarker.inheritance.ThemeExtendsDirective;
 import run.halo.app.factory.StringToEnumConverterFactory;
@@ -159,7 +158,6 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
                 if ("true".equals(xssEnabled)) {
                     SimpleModule xssModule = new SimpleModule();
                     xssModule.addDeserializer(String.class, new XssJacksonDeserializer());
-                    xssModule.addSerializer(String.class, new XssJacksonSerializer());
                     objectMapper.registerModule(xssModule);
                 }
                 mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
@@ -221,7 +219,4 @@ public class HaloMvcConfiguration implements WebMvcConfigurer {
         registry.addConverterFactory(new StringToEnumConverterFactory());
     }
 
-    public Boolean getXssEnabled() {
-        return "true".equals(xssEnabled);
-    }
 }
