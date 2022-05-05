@@ -10,6 +10,7 @@ import run.halo.app.config.properties.HaloProperties;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.properties.BlogProperties;
+import run.halo.app.model.properties.PrimaryProperties;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.UserService;
@@ -63,10 +64,14 @@ public class MainController {
 
     @GetMapping("install")
     public void installation(HttpServletResponse response) throws IOException {
-        String installRedirectUri =
-            StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/")
-                + INSTALL_REDIRECT_URI;
-        response.sendRedirect(installRedirectUri);
+        boolean isInstalled = optionService
+            .getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
+        if (!isInstalled) {
+            String installRedirectUri =
+                StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/")
+                    + INSTALL_REDIRECT_URI;
+            response.sendRedirect(installRedirectUri);
+        }
     }
 
     @GetMapping("avatar")
