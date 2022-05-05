@@ -66,7 +66,7 @@ public class MainController {
     public void installation(HttpServletResponse response) throws IOException {
         boolean isInstalled = optionService
             .getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
-        if (!isInstalled){
+        if (!isInstalled) {
             String installRedirectUri =
                 StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/")
                     + INSTALL_REDIRECT_URI;
