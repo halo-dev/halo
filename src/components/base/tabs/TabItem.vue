@@ -18,8 +18,7 @@ const isActive = computed(() => {
 });
 </script>
 <template>
-  <div v-if="isActive">
+  <div v-if="isActive" class="tabs-item-wrapper">
     <slot />
   </div>
 </template>
-<style lang="scss"></style>

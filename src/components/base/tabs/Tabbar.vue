@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
 import { computed } from "vue";
-import type { Type } from "./interface";
+import type { Direction, Type } from "./interface";
 
 const props = defineProps({
   activeId: {
@@ -13,6 +13,10 @@ const props = defineProps({
   type: {
     type: String as PropType<Type>,
     default: "default",
+  },
+  direction: {
+    type: String as PropType<Direction>,
+    default: "row",
   },
   idKey: {
     type: String,
@@ -27,7 +31,7 @@ const props = defineProps({
 const emit = defineEmits(["update:activeId", "change"]);
 
 const classes = computed(() => {
-  return [`tabbar-${props.type}`];
+  return [`tabbar-${props.type}`, `tabbar-direction-${props.direction}`];
 });
 
 const handleChange = (id: number | string) => {
@@ -60,6 +64,7 @@ const handleChange = (id: number | string) => {
   .tabbar-items {
     @apply flex;
     @apply items-center;
+    @apply flex-row;
   }
 
   .tabbar-item {
@@ -152,6 +157,39 @@ const handleChange = (id: number | string) => {
 
       &:hover {
         @apply bg-white;
+      }
+    }
+  }
+
+  &.tabbar-direction-row {
+    .tabbar-items {
+      @apply flex-row;
+    }
+  }
+
+  &.tabbar-direction-column {
+    .tabbar-items {
+      @apply flex-col;
+    }
+
+    &.tabbar-default {
+      border-bottom-width: 0;
+      @apply border-b-0;
+      border-right-width: 2px;
+      @apply border-r-gray-100;
+
+      .tabbar-items {
+        margin-bottom: 0;
+        margin-right: -2px;
+      }
+
+      .tabbar-item {
+        border-bottom-width: 0;
+        border-right-width: 2px;
+
+        &.tabbar-item-active {
+          border-right-color: #0e1731;
+        }
       }
     }
   }

@@ -2,7 +2,7 @@
 import { computed, provide, useSlots } from "vue";
 import type { PropType, ComputedRef } from "vue";
 import { VTabbar } from "./index";
-import type { Type } from "@/components/base/tabs/interface";
+import type { Type, Direction } from "@/components/base/tabs/interface";
 
 const props = defineProps({
   activeId: {
@@ -11,6 +11,10 @@ const props = defineProps({
   type: {
     type: String as PropType<Type>,
     default: "default",
+  },
+  direction: {
+    type: String as PropType<Direction>,
+    default: "row",
   },
   idKey: {
     type: String,
@@ -40,18 +44,23 @@ const tabItems = computed(() => {
   });
 });
 
+const classes = computed(() => {
+  return [`tabs-direction-${props.direction}`];
+});
+
 const handleChange = (id: string | number) => {
   emit("update:activeId", id);
   emit("change", id);
 };
 </script>
 <template>
-  <div class="tabs-wrapper">
+  <div class="tabs-wrapper" :class="classes">
     <div class="tabs-bar-wrapper">
       <VTabbar
         :activeId="activeId"
         :items="tabItems"
         :type="type"
+        :direction="direction"
         @change="handleChange"
       />
     </div>
@@ -60,4 +69,25 @@ const handleChange = (id: string | number) => {
     </div>
   </div>
 </template>
-<style lang="scss"></style>
+<style lang="scss">
+.tabs-wrapper {
+  @apply flex;
+
+  .tabs-items-wrapper {
+    @apply flex;
+  }
+
+  &.tabs-direction-row {
+    @apply flex-col;
+
+    .tabs-items-wrapper {
+      @apply mt-2;
+    }
+  }
+  &.tabs-direction-column {
+    .tabs-items-wrapper {
+      @apply ml-2;
+    }
+  }
+}
+</style>
