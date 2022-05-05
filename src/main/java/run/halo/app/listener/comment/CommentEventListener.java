@@ -7,6 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.ServiceException;
@@ -94,6 +96,7 @@ public class CommentEventListener {
      */
     @Async
     @EventListener
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public void handleCommentNewEvent(CommentNewEvent newEvent) {
         Boolean newCommentNotice = optionService
             .getByPropertyOrDefault(CommentProperties.NEW_NOTICE, Boolean.class, false);
@@ -182,6 +185,7 @@ public class CommentEventListener {
      */
     @Async
     @EventListener
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public void handleCommentReplyEvent(CommentReplyEvent replyEvent) {
         Boolean replyCommentNotice = optionService
             .getByPropertyOrDefault(CommentProperties.REPLY_NOTICE, Boolean.class, false);
