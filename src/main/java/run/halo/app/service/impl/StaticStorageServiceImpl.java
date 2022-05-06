@@ -53,7 +53,12 @@ public class StaticStorageServiceImpl
 
     @Override
     public List<StaticFile> listStaticFolder() {
-        return listStaticFileTree(staticDir);
+
+        List<StaticFile> staticFiles = listStaticFileTree(staticDir);
+
+        onChange(); // To update the mapping of local files.
+
+        return staticFiles;
     }
 
     @Nullable
