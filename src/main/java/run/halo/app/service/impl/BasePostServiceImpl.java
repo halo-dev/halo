@@ -64,6 +64,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
 
     private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
 
+    private static final String CHINESE_REGEX = "[^\\x00-\\xff]";
+
+    private static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}\\p{Z}\\s]+";
+
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
         OptionService optionService,
         ContentService contentService,
@@ -301,7 +305,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         PatchedContent postContent = post.getContent();
         // word count stat
         post.setWordCount(htmlFormatWordCount(postContent.getContent()));
-
         POST savedPost;
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
@@ -484,7 +487,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         }
     }
 
-    // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
+    // CS304 issue link : https://github.com/halo-dev/halo/issues/1759
 
     /**
      * @param htmlContent the markdown style content
@@ -492,6 +495,39 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
      */
 
     public static long htmlFormatWordCount(String htmlContent) {
+        if (htmlContent == null) {
+            return 0;
+        }
+
+        String cleanContent = HaloUtils.cleanHtmlTag(htmlContent);
+
+        String tempString = cleanContent.replaceAll(CHINESE_REGEX, "");
+
+        String otherString = cleanContent.replaceAll(CHINESE_REGEX, " ");
+
+        int chineseWordCount = cleanContent.length() - tempString.length();
+
+        String[] otherWords = otherString.split(PUNCTUATION_REGEX);
+
+        int otherWordLength = otherWords.length;
+
+        if (otherWordLength > 0 && otherWords[0].length() == 0) {
+            otherWordLength--;
+        }
+
+        if (otherWords.length > 1 && otherWords[otherWords.length - 1].length() == 0) {
+            otherWordLength--;
+        }
+
+        return chineseWordCount + otherWordLength;
+    }
+
+    /**
+     * @param htmlContent the markdown style content
+     * @return character count except space and line separator
+     */
+
+    public static long htmlFormatCharacterCount(String htmlContent) {
         if (htmlContent == null) {
             return 0;
         }

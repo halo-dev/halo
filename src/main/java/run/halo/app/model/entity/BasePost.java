@@ -143,7 +143,7 @@ public class BasePost extends BaseEntity {
     private Integer topPriority;
 
     /**
-     * Likes
+     * Likes.
      */
     @Column(name = "likes")
     @ColumnDefault("0")
@@ -169,7 +169,7 @@ public class BasePost extends BaseEntity {
     private String metaDescription;
 
     /**
-     * Content word count
+     * Content word count.
      */
     @Column(name = "word_count")
     @ColumnDefault("0")
@@ -187,6 +187,7 @@ public class BasePost extends BaseEntity {
      */
     @Transient
     private PatchedContent content;
+
 
     @Override
     public void prePersist() {
@@ -243,6 +244,7 @@ public class BasePost extends BaseEntity {
         if (version == null || version < 0) {
             version = 1;
         }
+
         // Clear the value of the deprecated attributes
         this.originalContent = "";
         this.formatContent = "";

@@ -59,6 +59,20 @@ public class HTMLWordCountTest {
 
     String emptyString = "";
 
+    String englishString = "I have a red apple";
+
+    String hybridString = "I have a red apple哈哈";
+
+
+    String complexText2 = "Hi，Jessica！这个project的schedule有些问题。";
+
+    String complexText3 = "The company had a meeting yesterday。Why did you ask for leave？";
+
+    String complexText4 = "这是一个句子，但是只有中文。";
+
+    String complexText5 =
+        "The wind and the moon are all beautiful, love and hate are all romantic.";
+
     @Test
     void pictureTest() {
         assertEquals("图片字数测试".length(),
@@ -128,4 +142,42 @@ public class HTMLWordCountTest {
         assertEquals(0,
             BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(emptyString)));
     }
+
+    @Test
+    void englishTest() {
+        assertEquals(5,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(englishString)));
+    }
+
+    @Test
+    void hybridTest() {
+        assertEquals(7,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(hybridString)));
+    }
+
+    @Test
+    void englishCharacterTest() {
+        assertEquals(14,
+            BasePostServiceImpl.htmlFormatCharacterCount(MarkdownUtils.renderHtml(englishString)));
+    }
+
+    @Test
+    void hybridCharacterTest() {
+        assertEquals(16,
+            BasePostServiceImpl.htmlFormatCharacterCount(MarkdownUtils.renderHtml(hybridString)));
+    }
+
+    @Test
+    void moreComplexTest() {
+        assertEquals(14,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText2)));
+        assertEquals(14,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText3)));
+        assertEquals(14,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText4)));
+        assertEquals(14,
+            BasePostServiceImpl.htmlFormatWordCount(MarkdownUtils.renderHtml(complexText5)));
+    }
+
+
 }
