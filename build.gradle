@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '3.0.0-M1'
+    id 'org.springframework.boot' version '3.0.0-M2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id "checkstyle"
     id 'java'
