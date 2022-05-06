@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 import run.halo.app.event.comment.CommentNewEvent;
 import run.halo.app.event.comment.CommentReplyEvent;
 import run.halo.app.exception.ServiceException;
@@ -88,12 +88,12 @@ public class CommentEventListener {
     }
 
     /**
-     * Received a new new comment event.
+     * Received a new comment event.
      *
      * @param newEvent new comment event.
      */
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleCommentNewEvent(CommentNewEvent newEvent) {
         Boolean newCommentNotice = optionService
             .getByPropertyOrDefault(CommentProperties.NEW_NOTICE, Boolean.class, false);
@@ -181,7 +181,7 @@ public class CommentEventListener {
      * @param replyEvent reply comment event.
      */
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void handleCommentReplyEvent(CommentReplyEvent replyEvent) {
         Boolean replyCommentNotice = optionService
             .getByPropertyOrDefault(CommentProperties.REPLY_NOTICE, Boolean.class, false);
