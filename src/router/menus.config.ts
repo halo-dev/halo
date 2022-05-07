@@ -103,6 +103,34 @@ export const menus: MenuGroupType[] = [
   },
 ];
 
+export const minimenus: MenuItemType[] = [
+  {
+    name: "仪表盘",
+    path: "/",
+    icon: IconDashboard,
+  },
+  {
+    name: "文章",
+    path: "/posts",
+    icon: IconBookRead,
+  },
+  {
+    name: "评论",
+    path: "/comment",
+    icon: IconMessage,
+  },
+  {
+    name: "附件",
+    path: "/attachment",
+    icon: IconFolder,
+  },
+  {
+    name: "用户",
+    path: "/users",
+    icon: IconUserSettings,
+  },
+];
+
 export type { MenuItemType, MenuGroupType };
 
 export default menus;

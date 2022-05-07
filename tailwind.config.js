@@ -6,6 +6,7 @@ module.exports = {
     extend: {},
   },
   plugins: [
+    require("tailwindcss-safe-area"),
     themeable({
       defaultTheme: "default",
       themes: [

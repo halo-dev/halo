@@ -18,7 +18,9 @@
     "story:build": "histoire build"
   },
   "dependencies": {
+    "@vueuse/core": "^8.4.2",
     "pinia": "^2.0.13",
+    "tailwindcss-safe-area": "^0.2.2",
     "tippy.js": "^6.3.7",
     "vue": "^3.2.33",
     "vue-router": "^4.0.15"
