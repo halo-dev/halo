@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import AboutView from "../views/AboutView.vue";
 import PostList from "../views/posts/PostList.vue";
+import Profile from "../views/users/Profile.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -69,7 +70,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/users",
     name: "Users",
-    component: AboutView,
+    component: Profile,
   },
   {
     path: "/settings",

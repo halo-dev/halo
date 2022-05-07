@@ -7,7 +7,7 @@
       <VRoutesMenu :menus="menus" />
       <div class="current-profile">
         <div class="profile-avatar">
-          <img class="h-11 w-11 rounded-full" src="https://halo.run/logo" />
+          <img class="h-11 w-11 rounded-full" src="https://ryanc.cc/avatar" />
         </div>
         <div class="profile-name">
           <div class="flex font-medium text-sm">Ryan Wang</div>

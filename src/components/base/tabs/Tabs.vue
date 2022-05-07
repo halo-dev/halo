@@ -73,10 +73,6 @@ const handleChange = (id: string | number) => {
 .tabs-wrapper {
   @apply flex;
 
-  .tabs-items-wrapper {
-    @apply flex;
-  }
-
   &.tabs-direction-row {
     @apply flex-col;
 

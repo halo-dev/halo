@@ -73,7 +73,6 @@ const handleChange = (id: number | string) => {
     @apply self-center;
     @apply transition-all;
     @apply text-base;
-    @apply w-full;
     @apply justify-center;
 
     .tabbar-item-label,
