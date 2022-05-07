@@ -15,7 +15,12 @@
             class="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
           >
             <div class="block mt-6 min-w-0 flex-1">
-              <span>i@ryanc.cc</span>
+              <VTag theme="primary">
+                <template #leftIcon>
+                  <IconUserSettings />
+                </template>
+                管理员
+              </VTag>
               <h1 class="text-xl font-bold text-gray-900 truncate">
                 Ryan Wang
               </h1>
@@ -168,7 +173,9 @@ import { FilledLayout } from "@/layouts";
 import { VButton } from "@/components/base/button";
 import { VInput } from "@/components/base/input";
 import { VTextarea } from "@/components/base/textarea";
+import { VTag } from "@/components/base/tag";
 import { VTabItem, VTabs } from "@/components/base/tabs";
+import { IconUserSettings } from "@/core/icons";
 import { ref } from "vue";
 
 const activeTab = ref("general");
