@@ -14,7 +14,7 @@
 - 修复在 Windows 平台下，因为 H2 Database 文件被占用导致无法全站备份的问题。 halo-dev/halo#1867 @anshangPro
 - 修复在 1.5.x 版本中，文章搜索没有关联查询内容（contents）的问题。 halo-dev/halo#1873 @Yhcrown @guqing
 - 修复本地上传附件过程中如果发生异常，没有完整打印异常信息栈的问题。 halo-dev/halo#1913 @JohnNiang
-- 修复在系统初始化之后，任然可以通过 `/install` 跳转到登录页面的问题。 halo-dev/halo#1908 @Ljfanny @littlesleep
+- 修复在系统初始化之后，仍然可以通过 `/install` 跳转到登录页面的问题。 halo-dev/halo#1908 @Ljfanny @littlesleep
 - 修复评论通知无法正常发送邮件的问题。 halo-dev/halo#1916 @JohnNiang @hapke24
 - 修复后台仪表盘中最近文章的标题过长导致样式异常的问题。 halo-dev/halo-admin#545 @Aanko @hotspring-zwb
 - 修复后台带有分页的数据列表中，删除最后一页的所有数据后导致分页页码异常的问题。 halo-dev/halo-admin#550 @QuentinHsu @luohongqu
