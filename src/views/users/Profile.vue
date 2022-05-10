@@ -15,14 +15,14 @@
             class="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
           >
             <div class="block mt-6 min-w-0 flex-1">
-              <VTag theme="primary">
-                <template #leftIcon>
-                  <IconUserSettings />
-                </template>
-                管理员
-              </VTag>
               <h1 class="text-xl font-bold text-gray-900 truncate">
-                Ryan Wang
+                <span class="mr-1">Ryan Wang</span>
+                <VTag theme="default">
+                  <template #leftIcon>
+                    <IconUserSettings />
+                  </template>
+                  管理员
+                </VTag>
               </h1>
             </div>
             <div

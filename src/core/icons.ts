@@ -36,6 +36,8 @@ import IconCheckboxCircle from "~icons/ri/checkbox-circle-line";
 import IconInformation from "~icons/ri/information-line";
 // @ts-ignore
 import IconCloseCircle from "~icons/ri/close-circle-line";
+// @ts-ignore
+import IconDeleteBin from "~icons/ri/delete-bin-2-line";
 
 export {
   IconDashboard,
@@ -57,4 +59,5 @@ export {
   IconCheckboxCircle,
   IconInformation,
   IconCloseCircle,
+  IconDeleteBin,
 };

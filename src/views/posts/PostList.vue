@@ -3,6 +3,25 @@ import FilledLayout from "@/layouts/FilledLayout.vue";
 import { VButton } from "@/components/base/button";
 import { VTag } from "@/components/base/tag";
 import { IconBookRead } from "@/core/icons";
+import { posts } from "./posts-mock";
+import { ref } from "vue";
+
+const postsRef = ref(
+  posts.map((item) => {
+    return {
+      ...item,
+      checked: false,
+    };
+  })
+);
+
+const checkAll = ref(false);
+
+const handleCheckAll = () => {
+  postsRef.value.forEach((item) => {
+    item.checked = checkAll.value;
+  });
+};
 </script>
 <template>
   <FilledLayout>
@@ -12,33 +31,131 @@ import { IconBookRead } from "@/core/icons";
           <IconBookRead class="self-center mr-2" />
           <span>文章</span>
         </h2>
-        <span class="text-gray-600 mt-8 text-sm">当前 10 篇已发布文章</span>
       </div>
       <div class="self-center">
         <VButton type="secondary">发布</VButton>
       </div>
     </div>
 
-    <div class="p-4">
-      <div class="table-container">
-        <div class="table-item">
-          <div class="table-cell font-bold"></div>
-          <div class="table-cell font-bold">作者</div>
-          <div class="table-cell font-bold">评论</div>
-          <div class="table-cell font-bold">访问量</div>
-          <div class="table-cell font-bold">发布时间</div>
-        </div>
-        <div v-for="i in 10" :key="i" class="table-item">
-          <div class="table-cell">
-            <div>Halo 1.5.2 发布</div>
-            <VTag>#Halo</VTag>
+    <div class="m-4">
+      <div class="flex flex-col">
+        <div class="overflow-x-auto">
+          <div class="inline-block min-w-full py-2 align-middle">
+            <div
+              class="relative overflow-hidden shadow-sm"
+              style="border-radius: 4px"
+            >
+              <div
+                v-show="checkAll"
+                class="absolute top-0 left-12 flex h-12 items-center space-x-3 bg-gray-50 sm:left-16"
+              >
+                <VButton size="sm" type="danger"> 删除 </VButton>
+                <VButton size="sm" type="default"> 更多 </VButton>
+              </div>
+
+              <table class="min-w-full table-fixed divide-y divide-gray-300">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="relative w-12 px-6 sm:w-16 sm:px-8" scope="col">
+                      <input
+                        v-model="checkAll"
+                        class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-themeable-primary-600 focus:ring-themeable-primary-500 sm:left-6"
+                        type="checkbox"
+                        @change="handleCheckAll"
+                      />
+                    </th>
+                    <th
+                      class="min-w-[12rem] py-3.5 pr-3 text-left text-sm font-semibold text-gray-900"
+                      scope="col"
+                    >
+                      标题
+                    </th>
+                    <th
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      scope="col"
+                    >
+                      分类
+                    </th>
+                    <th
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      scope="col"
+                    >
+                      标签
+                    </th>
+                    <th
+                      class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      scope="col"
+                    >
+                      作者
+                    </th>
+                    <th
+                      class="relative py-3.5 pl-3 pr-4 sm:pr-6 text-right"
+                      scope="col"
+                    >
+                      操作
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                  <tr
+                    v-for="(post, index) in postsRef"
+                    :key="index"
+                    class="cursor-pointer hover:bg-gray-100"
+                  >
+                    <td class="relative w-12 px-6 sm:w-16 sm:px-8">
+                      <div
+                        v-if="post.checked"
+                        class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
+                      ></div>
+
+                      <input
+                        v-model="post.checked"
+                        class="absolute cursor-pointer left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-themeable-primary-600 focus:ring-themeable-primary-500 sm:left-6"
+                        type="checkbox"
+                      />
+                    </td>
+                    <td
+                      class="whitespace-nowrap py-4 pr-3 text-sm font-medium text-gray-900"
+                    >
+                      <span class="mr-1 self-center">{{ post.title }}</span>
+                      <VTag v-if="index === 0" class="self-center">草稿</VTag>
+
+                      <dl class="font-normal lg:hidden">
+                        <dt class="sr-only">Title</dt>
+                        <dd class="mt-1 truncate text-gray-700">
+                          Front-end Developer
+                        </dd>
+                        <dt class="sr-only sm:hidden">Email</dt>
+                        <dd class="mt-1 truncate text-gray-500 sm:hidden">
+                          lindsay.walton@example.com
+                        </dd>
+                      </dl>
+                    </td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                    >
+                      分类
+                    </td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                    >
+                      标签
+                    </td>
+                    <td
+                      class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
+                    >
+                      作者
+                    </td>
+                    <td
+                      class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
+                    >
+                      操作
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div class="table-cell">
-            <img src="https://halo.run/avatar" class="rounded-full w-5" />
-          </div>
-          <div class="table-cell">0</div>
-          <div class="table-cell">123</div>
-          <div class="table-cell">消息文字</div>
         </div>
       </div>
     </div>
