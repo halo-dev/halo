@@ -36,6 +36,7 @@ defineProps({
   @apply flex flex-col box-border;
   @apply bg-white;
   @apply shadow-sm;
+  @apply overflow-hidden;
   border-radius: 4px;
   border: 1px solid #eaecf0;
 

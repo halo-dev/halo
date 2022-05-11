@@ -2,7 +2,10 @@ import type { RouteRecordRaw } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import AboutView from "../views/AboutView.vue";
 import PostList from "../views/posts/PostList.vue";
+import PageList from "../views/posts/PageList.vue";
 import Profile from "../views/users/Profile.vue";
+import Themes from "../views/interface/Themes.vue";
+import Attachments from "../views/attachments/Attachments.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -35,7 +38,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/sheets",
     name: "Sheets",
-    component: AboutView,
+    component: PageList,
   },
   {
     path: "/comment",
@@ -45,12 +48,12 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: "/attachment",
     name: "Attachment",
-    component: AboutView,
+    component: Attachments,
   },
   {
     path: "/themes",
     name: "Themes",
-    component: AboutView,
+    component: Themes,
   },
   {
     path: "/menus",

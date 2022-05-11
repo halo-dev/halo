@@ -6,7 +6,7 @@ import { VSpace } from "@/components/base/space";
 import { VTag } from "@/components/base/tag";
 import { VInput } from "@/components/base/input";
 import { VPageHeader } from "@/components/base/header";
-import { IconBookRead, IconSettings } from "@/core/icons";
+import { IconPages, IconSettings } from "@/core/icons";
 import { posts } from "./posts-mock";
 import { ref } from "vue";
 
@@ -30,9 +30,9 @@ handleCheckAll();
 </script>
 <template>
   <FilledLayout>
-    <VPageHeader title="文章">
+    <VPageHeader title="页面">
       <template #icon>
-        <IconBookRead class="self-center mr-2" />
+        <IconPages class="self-center mr-2" />
       </template>
       <template #actions>
         <VButton type="secondary">发布</VButton>

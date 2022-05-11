@@ -7,6 +7,7 @@ module.exports = {
   },
   plugins: [
     require("tailwindcss-safe-area"),
+    require("@tailwindcss/aspect-ratio"),
     themeable({
       defaultTheme: "default",
       themes: [
