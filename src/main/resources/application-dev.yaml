@@ -15,29 +15,21 @@ spring:
     username: admin
     password: 123456
 
-    # MySQL database configuration.
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://127.0.0.1:3306/halo_next?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-#    username: root
-#    password: 123456
-
-    # PostgreSQL database configuration.
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://127.0.0.1:5432/halo_next?charSet=UTF8&ssl=false
-#    username: postgres
-#    password: 123456
   jpa:
     hibernate:
       ddl-auto: update
     open-in-view: false
-
+    show-sql: true
 halo:
   security:
     oauth2:
       jwt:
         public-key-location: classpath:app.pub
         private-key-location: classpath:app.key
+logging:
+  level:
+    run.halo.app: DEBUG
 
 springdoc:
   api-docs:
-    enabled: false
+    enabled: true

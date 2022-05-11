@@ -83,7 +83,10 @@ public class WebSecurityConfig {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .antMatchers(providerSettings.getTokenEndpoint()).permitAll()
+                // for static path
                 .antMatchers("/static/js/**").permitAll()
+                // for swagger ui
+                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .antMatchers("/api/**", "/apis/**").access(requestInfoAuthorizationManager())
                 .anyRequest().access(requestInfoAuthorizationManager())
             )
