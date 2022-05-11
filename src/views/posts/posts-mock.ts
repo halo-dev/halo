@@ -1,7 +1,7 @@
 export const posts = [
   {
     id: 514,
-    title: "Halo 1.5.3 发布",
+    title: "Halo 1.5.3 发布了",
     status: "PUBLISHED",
     slug: "halo-153-released",
     editorType: "MARKDOWN",

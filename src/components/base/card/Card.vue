@@ -1,22 +1,29 @@
 <script lang="ts" setup>
+import type { PropType } from "vue";
+
 defineProps({
   title: {
     type: String,
+  },
+  bodyClass: {
+    type: Object as PropType<string[]>,
   },
 });
 </script>
 
 <template>
   <div class="card-wrapper">
-    <div v-if="title" class="card-header">
-      <div class="card-header-title">
-        {{ title }}
-      </div>
-      <div class="card-header-actions">
-        <slot name="actions" />
-      </div>
+    <div v-if="title || $slots.header" class="card-header">
+      <slot name="header">
+        <div class="card-header-title">
+          {{ title }}
+        </div>
+        <div class="card-header-actions">
+          <slot name="actions" />
+        </div>
+      </slot>
     </div>
-    <div class="card-body">
+    <div :class="bodyClass" class="card-body">
       <slot />
     </div>
     <div v-if="$slots.footer" class="card-footer">
