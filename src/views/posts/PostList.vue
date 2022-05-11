@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import FilledLayout from "@/layouts/FilledLayout.vue";
-import {VButton} from "@/components/base/button";
-import {VCard} from "@/components/base/card";
-import {VSpace} from "@/components/base/space";
-import {VTag} from "@/components/base/tag";
-import {VInput} from "@/components/base/input";
-import {IconBookRead, IconSettings} from "@/core/icons";
-import {posts} from "./posts-mock";
-import {ref} from "vue";
+import { VButton } from "@/components/base/button";
+import { VCard } from "@/components/base/card";
+import { VSpace } from "@/components/base/space";
+import { VTag } from "@/components/base/tag";
+import { VInput } from "@/components/base/input";
+import { IconBookRead, IconSettings } from "@/core/icons";
+import { posts } from "./posts-mock";
+import { ref } from "vue";
 
 const postsRef = ref(
   posts.map((item) => {
@@ -25,14 +25,14 @@ const handleCheckAll = () => {
     item.checked = checkAll.value;
   });
 };
-handleCheckAll()
+handleCheckAll();
 </script>
 <template>
   <FilledLayout>
     <div class="flex items-center justify-between p-4 bg-white">
       <div class="flex-1 self-center min-w-0">
         <h2 class="flex text-xl font-bold text-gray-800 truncate">
-          <IconBookRead class="self-center mr-2"/>
+          <IconBookRead class="self-center mr-2" />
           <span>文章</span>
         </h2>
       </div>
@@ -48,7 +48,7 @@ handleCheckAll()
             class="flex flex-col w-full p-4 items-stretch sm:flex-row sm:items-center"
           >
             <div class="flex-1">
-              <VInput placeholder="输入关键词搜索"/>
+              <VInput placeholder="输入关键词搜索" />
             </div>
             <div class="flex flex-row gap-3">
               <div>分类</div>
@@ -86,10 +86,10 @@ handleCheckAll()
                   <div class="flex mt-1">
                     <VSpace>
                       <span class="text-xs text-gray-500"
-                      >阅读 {{ post.visits }}</span
+                        >阅读 {{ post.visits }}</span
                       >
                       <span class="text-xs text-gray-500"
-                      >评论 {{ post.commentCount }}</span
+                        >评论 {{ post.commentCount }}</span
                       >
                     </VSpace>
                   </div>
@@ -106,7 +106,7 @@ handleCheckAll()
                       2020-01-07
                     </time>
                     <span>
-                      <IconSettings/>
+                      <IconSettings />
                     </span>
                   </div>
                 </div>
