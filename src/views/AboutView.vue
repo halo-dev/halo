@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import { FilledLayout } from "@/layouts";
+import { BasicLayout } from "@/layouts";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 </script>
 
 <template>
-  <FilledLayout>
+  <BasicLayout>
     <div>
       <pre class="overflow-auto">Route: {{ route }}</pre>
       <pre class="overflow-auto">Route: {{ route }}</pre>
     </div>
-  </FilledLayout>
+  </BasicLayout>
 </template>

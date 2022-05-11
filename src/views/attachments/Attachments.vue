@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { FilledLayout } from "@/layouts";
+import { BasicLayout } from "@/layouts";
 import { VPageHeader } from "@/components/base/header";
 import { VButton } from "@/components/base/button";
 import { IconPalette } from "@/core/icons";
 import { VCard } from "@/components/base/card";
 </script>
 <template>
-  <FilledLayout>
+  <BasicLayout>
     <VPageHeader title="附件库">
       <template #icon>
         <IconPalette class="self-center mr-2" />
@@ -41,5 +41,5 @@ import { VCard } from "@/components/base/card";
         </li>
       </ul>
     </div>
-  </FilledLayout>
+  </BasicLayout>
 </template>

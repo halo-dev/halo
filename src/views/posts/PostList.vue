@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import FilledLayout from "@/layouts/FilledLayout.vue";
+import BasicLayout from "@/layouts/BasicLayout.vue";
 import { VButton } from "@/components/base/button";
 import { VCard } from "@/components/base/card";
 import { VSpace } from "@/components/base/space";
@@ -29,7 +29,7 @@ const handleCheckAll = () => {
 handleCheckAll();
 </script>
 <template>
-  <FilledLayout>
+  <BasicLayout>
     <VPageHeader title="文章">
       <template #icon>
         <IconBookRead class="self-center mr-2" />
@@ -235,7 +235,7 @@ handleCheckAll();
         </template>
       </VCard>
     </div>
-  </FilledLayout>
+  </BasicLayout>
 </template>
 
 <style lang="scss">

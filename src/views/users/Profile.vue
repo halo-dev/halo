@@ -1,5 +1,5 @@
 <template>
-  <FilledLayout>
+  <BasicLayout>
     <header class="bg-white">
       <div class="h-48 bg-gradient-to-r from-gray-800 to-red-500"></div>
       <div class="px-4 sm:px-6 lg:px-8">
@@ -166,10 +166,10 @@
         </VTabItem>
       </VTabs>
     </section>
-  </FilledLayout>
+  </BasicLayout>
 </template>
 <script lang="ts" setup>
-import { FilledLayout } from "@/layouts";
+import { BasicLayout } from "@/layouts";
 import { VButton } from "@/components/base/button";
 import { VInput } from "@/components/base/input";
 import { VTextarea } from "@/components/base/textarea";

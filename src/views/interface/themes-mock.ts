@@ -90,7 +90,8 @@ export const themes = [
     themePath: "/root/.halo/templates/themes/louie_senpai_siren",
     folderName: "louie_senpai_siren",
     hasOptions: true,
-    screenshots: "https://demo.halo.run/themes/louie_senpai_siren/screenshot.png",
+    screenshots:
+      "https://demo.halo.run/themes/louie_senpai_siren/screenshot.png",
     postMetaField: null,
     sheetMetaField: null,
     activated: false,
@@ -186,7 +187,8 @@ export const themes = [
     themePath: "/root/.halo/templates/themes/codelunatic_simple",
     folderName: "codelunatic_simple",
     hasOptions: true,
-    screenshots: "https://demo.halo.run/themes/codelunatic_simple/screenshot.png",
+    screenshots:
+      "https://demo.halo.run/themes/codelunatic_simple/screenshot.png",
     postMetaField: null,
     sheetMetaField: null,
     activated: false,
@@ -306,7 +308,8 @@ export const themes = [
     themePath: "/root/.halo/templates/themes/fastbyte01_keepit",
     folderName: "fastbyte01_keepit",
     hasOptions: true,
-    screenshots: "https://demo.halo.run/themes/fastbyte01_keepit/screenshot.png",
+    screenshots:
+      "https://demo.halo.run/themes/fastbyte01_keepit/screenshot.png",
     postMetaField: null,
     sheetMetaField: null,
     activated: false,
@@ -523,7 +526,8 @@ export const themes = [
     themePath: "/root/.halo/templates/themes/SumiMakito_Journal",
     folderName: "SumiMakito_Journal",
     hasOptions: true,
-    screenshots: "https://demo.halo.run/themes/SumiMakito_Journal/screenshot.png",
+    screenshots:
+      "https://demo.halo.run/themes/SumiMakito_Journal/screenshot.png",
     postMetaField: null,
     sheetMetaField: null,
     activated: false,

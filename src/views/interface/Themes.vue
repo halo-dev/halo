@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { FilledLayout } from "@/layouts";
+import { BasicLayout } from "@/layouts";
 import { VPageHeader } from "@/components/base/header";
 import { VButton } from "@/components/base/button";
 import { VCard } from "@/components/base/card";
@@ -7,7 +7,7 @@ import { IconPalette } from "@/core/icons";
 import { themes } from "@/views/interface/themes-mock";
 </script>
 <template>
-  <FilledLayout>
+  <BasicLayout>
     <VPageHeader title="主题">
       <template #icon>
         <IconPalette class="self-center mr-2" />
@@ -42,5 +42,5 @@ import { themes } from "@/views/interface/themes-mock";
         </li>
       </ul>
     </div>
-  </FilledLayout>
+  </BasicLayout>
 </template>
