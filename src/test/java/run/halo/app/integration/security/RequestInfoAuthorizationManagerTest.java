@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import run.halo.app.identity.authorization.AuthorizationFilter;
+import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
 
 /**
- * Tests for {@link AuthorizationFilter}.
+ * Tests for {@link RequestInfoAuthorizationManager}.
  *
  * @author guqing
  * @since 2.0.0
  */
-public class AuthorizationFilterTest extends AuthorizationTestSuit {
+public class RequestInfoAuthorizationManagerTest extends AuthorizationTestSuit {
 
     private MockMvc mockMvc;
 
@@ -95,6 +95,22 @@ public class AuthorizationFilterTest extends AuthorizationTestSuit {
     }
 
     @Test
+    public void cssResourceCanAlwaysAccess() throws Exception {
+        mockMvc.perform(get("/static/test.css"))
+            .andDo(print())
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(content().string("body { text-align: center; }"));
+    }
+
+    @Test
+    public void jsResourceCanAlwaysAccess() throws Exception {
+        mockMvc.perform(get("/static/test.js"))
+            .andDo(print())
+            .andExpect(status().is2xxSuccessful())
+            .andExpect(content().string("console.log('hello world!')"));
+    }
+
+    @Test
     public void nonResourceRequestWhenHaveNoRightShould403() throws Exception {
         mockMvc.perform(get("/healthy/halo")
                 .headers(withBearerToken(accessToken)))
@@ -133,19 +149,28 @@ public class AuthorizationFilterTest extends AuthorizationTestSuit {
     }
 
     @Controller
-    @RequestMapping("/healthy")
+    @ResponseBody
+    @RequestMapping
     public static class HealthyController {
 
-        @GetMapping
-        @ResponseBody
+        @GetMapping("/healthy")
         public String check() {
             return "ok.";
         }
 
-        @ResponseBody
-        @GetMapping("/{name}")
+        @GetMapping("/healthy/{name}")
         public String check(@PathVariable String name) {
             return name + ": should not be seen.";
+        }
+
+        @GetMapping("/static/test.js")
+        public String fakeJs() {
+            return "console.log('hello world!')";
+        }
+
+        @GetMapping("/static/test.css")
+        public String fakeCss() {
+            return "body { text-align: center; }";
         }
     }
 

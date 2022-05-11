@@ -46,8 +46,8 @@ import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
 import run.halo.app.identity.authentication.verifier.JwtProvidedDecoderAuthenticationManagerResolver;
-import run.halo.app.identity.authorization.AuthorizationFilter;
 import run.halo.app.identity.authorization.PolicyRule;
+import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
 import run.halo.app.identity.authorization.Role;
 import run.halo.app.identity.authorization.RoleBinding;
 import run.halo.app.identity.authorization.RoleRef;
@@ -85,7 +85,9 @@ public class TestWebSecurityConfig {
         http
             .authorizeHttpRequests((authorize) -> authorize
                 .antMatchers(providerSettings.getTokenEndpoint()).permitAll()
-                .antMatchers("/api/**", "/apis/**").authenticated()
+                .antMatchers("/static/**").permitAll()
+                .antMatchers("/api/**", "/apis/**").access(requestInfoAuthorizationManager())
+                .anyRequest().access(requestInfoAuthorizationManager())
             )
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults())
@@ -95,14 +97,13 @@ public class TestWebSecurityConfig {
             .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManagerResolver()),
                 BasicAuthenticationFilter.class)
             .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
-            .addFilterBefore(authorizationFilter(), FilterSecurityInterceptor.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
-    public AuthorizationFilter authorizationFilter() {
-        return new AuthorizationFilter(name -> {
+    public RequestInfoAuthorizationManager requestInfoAuthorizationManager() {
+        return new RequestInfoAuthorizationManager(name -> {
             // role getter
             Role role = new Role();
             List<PolicyRule> rules = List.of(
