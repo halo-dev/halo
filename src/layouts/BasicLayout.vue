@@ -31,7 +31,7 @@
       </div>
     </aside>
     <main class="content w-full overflow-y-auto mb-safe pb-12 md:pb-0">
-      <slot />
+      <RouterView />
     </main>
 
     <!--bottom nav bar-->
@@ -89,7 +89,7 @@ import { VModal } from "@/components/base/modal";
 import { menus, minimenus } from "@/router/menus.config";
 import logo from "@/assets/logo.svg";
 import { IconMore, IconUserSettings } from "@/core/icons";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter, RouterView } from "vue-router";
 import { ref } from "vue";
 
 const route = useRoute();

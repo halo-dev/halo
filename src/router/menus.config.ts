@@ -31,7 +31,7 @@ export const menus: MenuGroupType[] = [
     items: [
       {
         name: "仪表盘",
-        path: "/",
+        path: "/dashboard",
         icon: IconDashboard,
       },
     ],
@@ -51,12 +51,12 @@ export const menus: MenuGroupType[] = [
       },
       {
         name: "评论",
-        path: "/comment",
+        path: "/comments",
         icon: IconMessage,
       },
       {
         name: "附件",
-        path: "/attachment",
+        path: "/attachments",
         icon: IconFolder,
       },
     ],
@@ -91,7 +91,7 @@ export const menus: MenuGroupType[] = [
       },
       {
         name: "用户",
-        path: "/users",
+        path: "/users/profile",
         icon: IconUserSettings,
       },
       {
@@ -116,17 +116,17 @@ export const minimenus: MenuItemType[] = [
   },
   {
     name: "评论",
-    path: "/comment",
+    path: "/comments",
     icon: IconMessage,
   },
   {
     name: "附件",
-    path: "/attachment",
+    path: "/attachments",
     icon: IconFolder,
   },
   {
     name: "用户",
-    path: "/users",
+    path: "/users/profile",
     icon: IconUserSettings,
   },
 ];
