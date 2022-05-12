@@ -19,6 +19,7 @@ export default defineConfig({
         name: "Halo",
         short_name: "Halo",
         description: "Web Client For Halo",
+        theme_color: "#fff",
       },
     }),
   ],
