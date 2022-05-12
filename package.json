@@ -57,6 +57,7 @@
     "unplugin-icons": "^0.14.3",
     "vite": "^2.9.8",
     "vite-compression-plugin": "^0.0.3",
+    "vite-plugin-dts": "^1.1.1",
     "vite-plugin-pwa": "^0.12.0",
     "vitest": "^0.12.3",
     "vue-tsc": "^0.34.11"
