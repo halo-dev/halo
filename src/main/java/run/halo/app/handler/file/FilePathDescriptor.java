@@ -101,7 +101,6 @@ public final class FilePathDescriptor {
         }
 
         String buildName() {
-            this.name = this.name.replace("%", "‰").replace("#", "井");
             StringBuilder sb = new StringBuilder()
                 .append(this.name);
             if (shouldRename()) {
