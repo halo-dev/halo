@@ -31,7 +31,8 @@
       </div>
     </aside>
     <main class="content w-full overflow-y-auto mb-safe pb-12 md:pb-0">
-      <RouterView />
+      <slot v-if="$slots.default" />
+      <RouterView v-else />
     </main>
 
     <!--bottom nav bar-->

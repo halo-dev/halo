@@ -96,7 +96,7 @@ export const menus: MenuGroupType[] = [
       },
       {
         name: "设置",
-        path: "/settings",
+        path: "/settings/general",
         icon: IconSettings,
       },
     ],

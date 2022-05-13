@@ -54,7 +54,7 @@ const VRoutesMenu = defineComponent({
                   icon: () => renderIcon(item.icon),
                 }}
                 onSelect={handleSelect}
-                active={route.path === item.path}
+                active={openIds.value.includes(item.path)}
               />
             )}
           </>

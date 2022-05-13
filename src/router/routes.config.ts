@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from "vue-router";
-import { BasicLayout, BlankLayout } from "@/layouts";
+import { BasicLayout, BlankLayout, SystemSettingsLayout } from "@/layouts";
 
 import Dashboard from "../views/dashboard/Dashboard.vue";
 
@@ -18,7 +18,8 @@ import Visual from "../views/interface/visual/Visual.vue";
 import PluginList from "../views/system/plugins/PluginList.vue";
 import UserList from "../views/system/users/UserList.vue";
 import Profile from "../views/system/users/Profile.vue";
-import Settings from "../views/system/settings/Settings.vue";
+import GeneralSettings from "../views/system/settings/GeneralSettings.vue";
+import NotificationSettings from "../views/system/settings/NotificationSettings.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -167,12 +168,18 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/settings",
-    component: BasicLayout,
+    component: SystemSettingsLayout,
+    redirect: "/settings/general",
     children: [
       {
-        path: "",
-        name: "Settings",
-        component: Settings,
+        path: "general",
+        name: "GeneralSettings",
+        component: GeneralSettings,
+      },
+      {
+        path: "notification",
+        name: "NotificationSettings",
+        component: NotificationSettings,
       },
     ],
   },
