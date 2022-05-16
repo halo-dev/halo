@@ -106,7 +106,7 @@ export const menus: MenuGroupType[] = [
 export const minimenus: MenuItemType[] = [
   {
     name: "仪表盘",
-    path: "/",
+    path: "/dashboard",
     icon: IconDashboard,
   },
   {

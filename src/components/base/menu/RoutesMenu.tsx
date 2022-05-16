@@ -12,7 +12,8 @@ const VRoutesMenu = defineComponent({
       type: Object as PropType<MenuGroupType[]>,
     },
   },
-  setup(props) {
+  emits: ["select"],
+  setup(props, { emit }) {
     const route = useRoute();
     const { push } = useRouter();
 
@@ -21,6 +22,7 @@ const VRoutesMenu = defineComponent({
     });
 
     async function handleSelect(id: string) {
+      emit("select", id);
       await push(id);
     }
 

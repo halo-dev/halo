@@ -76,9 +76,51 @@
           </div>
         </div>
       </div>
-      <VModal v-model:visible="moreMenuVisible" title="菜单">
-        <VRoutesMenu :menus="menus" class="p-0" />
-      </VModal>
+
+      <Teleport to="body">
+        <div
+          v-show="moreMenuRootVisible"
+          class="drawer-wrapper fixed top-0 left-0 w-full h-full flex flex-row items-end justify-center z-[99999]"
+        >
+          <transition
+            enter-active-class="ease-out duration-200"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="ease-in duration-100"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+            @before-enter="moreMenuRootVisible = true"
+            @after-leave="moreMenuRootVisible = false"
+          >
+            <div
+              v-show="moreMenuVisible"
+              class="drawer-layer flex-none absolute top-0 left-0 w-full h-full transition-opacity bg-gray-500 bg-opacity-75"
+              @click="moreMenuVisible = false"
+            ></div>
+          </transition>
+          <transition
+            enter-active-class="transform transition ease-in-out duration-500 sm:duration-700"
+            enter-from-class="translate-y-full"
+            enter-to-class="translate-y-0"
+            leave-active-class="transform transition ease-in-out duration-500 sm:duration-700"
+            leave-from-class="translate-y-0"
+            leave-to-class="translate-y-full"
+          >
+            <div
+              v-show="moreMenuVisible"
+              class="drawer-content flex flex-col relative bg-white items-stretch shadow-xl w-screen h-3/4 rounded-t-md overflow-y-auto"
+            >
+              <div class="drawer-body">
+                <VRoutesMenu
+                  :menus="menus"
+                  class="p-0"
+                  @select="moreMenuVisible = false"
+                />
+              </div>
+            </div>
+          </transition>
+        </div>
+      </Teleport>
     </div>
   </div>
 </template>
@@ -86,17 +128,17 @@
 <script lang="ts" setup>
 import { VRoutesMenu } from "@/components/base/menu";
 import { VTag } from "@/components/base/tag";
-import { VModal } from "@/components/base/modal";
 import { menus, minimenus } from "@/router/menus.config";
 import logo from "@/assets/logo.svg";
 import { IconMore, IconUserSettings } from "@/core/icons";
-import { useRoute, useRouter, RouterView } from "vue-router";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
 
 const route = useRoute();
 const router = useRouter();
 
 const moreMenuVisible = ref(false);
+const moreMenuRootVisible = ref(false);
 </script>
 
 <style lang="scss">
