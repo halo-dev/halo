@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { IconClose } from "@/core/icons";
 
 const props = defineProps({
@@ -22,6 +22,8 @@ const props = defineProps({
 
 const emit = defineEmits(["update:visible", "close"]);
 
+const rootVisible = ref(false);
+
 const wrapperClasses = computed(() => {
   return {
     "modal-wrapper-fullscreen": props.fullscreen,
@@ -42,6 +44,7 @@ function handleClose() {
 <template>
   <Teleport to="body">
     <div
+      v-show="rootVisible"
       :class="wrapperClasses"
       aria-modal="true"
       class="modal-wrapper"
@@ -56,6 +59,8 @@ function handleClose() {
         leave-active-class="ease-in duration-100"
         leave-from-class="opacity-100"
         leave-to-class="opacity-0"
+        @before-enter="rootVisible = true"
+        @after-leave="rootVisible = false"
       >
         <div v-show="visible" class="modal-layer" @click="handleClose()" />
       </transition>
