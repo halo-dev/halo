@@ -41,25 +41,37 @@ function handleClose() {
 </script>
 <template>
   <Teleport to="body">
-    <transition
-      enter-active-class="ease-out"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="ease-in"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+    <div
+      :class="wrapperClasses"
+      aria-modal="true"
+      class="modal-wrapper"
+      role="dialog"
+      tabindex="0"
+      @keyup.esc="handleClose()"
     >
-      <div
-        v-show="visible"
-        :class="wrapperClasses"
-        aria-modal="true"
-        class="modal-wrapper transform transition-all duration-200"
-        role="dialog"
-        tabindex="0"
-        @keyup.esc="handleClose()"
+      <transition
+        enter-active-class="ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="ease-in duration-100"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
       >
-        <div class="modal-layer" @click="handleClose()" />
-        <div :style="contentStyles" class="modal-content">
+        <div v-show="visible" class="modal-layer" @click="handleClose()" />
+      </transition>
+      <transition
+        enter-active-class="ease-out duration-200"
+        enter-from-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+        enter-to-class="opacity-100 translate-y-0 sm:scale-100"
+        leave-active-class="ease-in duration-100"
+        leave-from-class="opacity-100 translate-y-0 sm:scale-100"
+        leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+      >
+        <div
+          v-show="visible"
+          :style="contentStyles"
+          class="modal-content transform transition-all"
+        >
           <div class="modal-header">
             <div class="modal-header-title">{{ title }}</div>
             <div class="modal-header-actions">
@@ -75,8 +87,8 @@ function handleClose() {
             <slot name="footer" />
           </div>
         </div>
-      </div>
-    </transition>
+      </transition>
+    </div>
   </Teleport>
 </template>
 
@@ -94,8 +106,9 @@ function handleClose() {
     @apply absolute;
     @apply top-0 left-0;
     @apply w-full h-full;
-    background: #9e9eaa;
-    opacity: 0.6;
+    @apply transition-opacity;
+    @apply bg-gray-500;
+    @apply bg-opacity-75;
   }
 
   .modal-content {
