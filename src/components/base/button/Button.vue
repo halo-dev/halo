@@ -37,6 +37,8 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
 import { computed } from "vue";
+import type { RouteLocationRaw } from "vue-router";
+import { useRouter } from "vue-router";
 import type { Size, Type } from "@/components/base/button/interface";
 
 const props = defineProps({
@@ -64,8 +66,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  route: {
+    type: Object as PropType<RouteLocationRaw>,
+  },
 });
 
+const router = useRouter();
 const emit = defineEmits(["click"]);
 
 const classes = computed(() => {
@@ -80,6 +86,9 @@ const classes = computed(() => {
 
 function handleClick() {
   if (props.disabled || props.loading) return;
+  if (props.route) {
+    router.push(props.route);
+  }
   emit("click");
 }
 </script>
@@ -120,6 +129,7 @@ function handleClick() {
 
 .btn-default {
   border: 1px solid #d9d9d9;
+
   .btn-icon {
     color: #0e1731;
   }
