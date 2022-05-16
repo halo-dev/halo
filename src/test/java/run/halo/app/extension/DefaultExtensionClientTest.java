@@ -67,26 +67,21 @@ class DefaultExtensionClientTest {
     void shouldThrowSchemeNotFoundExceptionWhenSchemeNotRegistered() {
         class UnRegisteredExtension extends AbstractExtension {
         }
+
         assertThrows(SchemeNotFoundException.class,
             () -> client.list(UnRegisteredExtension.class, null, null));
         assertThrows(SchemeNotFoundException.class,
             () -> client.page(UnRegisteredExtension.class, null, null, 0, 10));
-
-
         assertThrows(SchemeNotFoundException.class,
             () -> client.fetch(UnRegisteredExtension.class, "fake"));
-
-        assertThrows(SchemeNotFoundException.class,
-            () -> {
-                when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
-                client.create(createFakeExtension("fake", null));
-            });
-
-        assertThrows(SchemeNotFoundException.class,
-            () -> {
-                when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
-                client.update(createFakeExtension("fake", 1L));
-            });
+        assertThrows(SchemeNotFoundException.class, () -> {
+            when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
+            client.create(createFakeExtension("fake", null));
+        });
+        assertThrows(SchemeNotFoundException.class, () -> {
+            when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
+            client.update(createFakeExtension("fake", 1L));
+        });
         assertThrows(SchemeNotFoundException.class, () -> {
             when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
             client.delete(createFakeExtension("fake", 1L));
@@ -111,9 +106,8 @@ class DefaultExtensionClientTest {
         when(
             converter.convertFrom(FakeExtension.class, createExtensionStore("fake-02"))).thenReturn(
             fake2);
-        when(storeClient.listByNamePrefix(anyString())).thenReturn(List.of(
-            createExtensionStore("fake-01"),
-            createExtensionStore("fake-02")));
+        when(storeClient.listByNamePrefix(anyString())).thenReturn(
+            List.of(createExtensionStore("fake-01"), createExtensionStore("fake-02")));
 
         // without filter and sorter
         var fakes = client.list(FakeExtension.class, null, null);
@@ -148,10 +142,9 @@ class DefaultExtensionClientTest {
             converter.convertFrom(FakeExtension.class, createExtensionStore("fake-03"))).thenReturn(
             fake3);
 
-        when(storeClient.listByNamePrefix(anyString())).thenReturn(List.of(
-            createExtensionStore("fake-01"),
-            createExtensionStore("fake-02"),
-            createExtensionStore("fake-03")));
+        when(storeClient.listByNamePrefix(anyString())).thenReturn(
+            List.of(createExtensionStore("fake-01"), createExtensionStore("fake-02"),
+                createExtensionStore("fake-03")));
 
         // without filter and sorter.
         var fakes = client.page(FakeExtension.class, null, null, 0, 10);
@@ -162,8 +155,9 @@ class DefaultExtensionClientTest {
         assertEquals(new PageImpl<>(emptyList(), PageRequest.of(100, 10), 3), fakes);
 
         // with filter only
-        fakes = client.page(FakeExtension.class,
-            fake -> "fake-03".equals(fake.getMetadata().getName()), null, 0, 10);
+        fakes =
+            client.page(FakeExtension.class, fake -> "fake-03".equals(fake.getMetadata().getName()),
+                null, 0, 10);
         assertEquals(new PageImpl<>(List.of(fake3), PageRequest.of(0, 10), 1), fakes);
 
         // with sorter only
@@ -189,8 +183,9 @@ class DefaultExtensionClientTest {
         when(storeClient.fetchByName(storeName)).thenReturn(
             Optional.of(createExtensionStore(storeName)));
 
-        when(converter.convertFrom(FakeExtension.class, createExtensionStore(storeName)))
-            .thenReturn(createFakeExtension("fake", 1L));
+        when(
+            converter.convertFrom(FakeExtension.class, createExtensionStore(storeName))).thenReturn(
+            createFakeExtension("fake", 1L));
 
         Optional<FakeExtension> fake = client.fetch(FakeExtension.class, "fake");
         assertEquals(Optional.of(createFakeExtension("fake", 1L)), fake);

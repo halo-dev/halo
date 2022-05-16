@@ -26,6 +26,7 @@ class SchemesTest {
     void shouldThrowExceptionWithoutGVKAnnotation() {
         class WithoutGVKExtension extends AbstractExtension {
         }
+
         assertThrows(ExtensionException.class,
             () -> Schemes.INSTANCE.register(WithoutGVKExtension.class));
     }

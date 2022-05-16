@@ -1,9 +1,9 @@
 package run.halo.app.extension.store;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * An implementation of ExtensionStoreClient using JPA.

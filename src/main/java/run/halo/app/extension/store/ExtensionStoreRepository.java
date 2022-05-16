@@ -1,8 +1,8 @@
 package run.halo.app.extension.store;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import java.util.List;
 
 /**
  * This repository contains some basic operations on ExtensionStore entity.
