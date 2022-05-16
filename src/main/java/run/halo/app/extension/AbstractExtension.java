@@ -9,7 +9,7 @@ import lombok.Data;
  * @author johnniang
  */
 @Data
-public class AbstractExtension implements Extension {
+public abstract class AbstractExtension implements Extension {
 
     @Schema(required = true)
     private String apiVersion;

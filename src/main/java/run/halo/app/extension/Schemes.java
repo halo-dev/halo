@@ -43,6 +43,17 @@ public enum Schemes {
     }
 
     /**
+     * Clear registered schemes.
+     * <p>
+     * This method is only for test.
+     */
+    void clear() {
+        schemes.clear();
+        typeToScheme.clear();
+        gvkToType.clear();
+    }
+
+    /**
      * Registers an Extension using its type.
      *
      * @param type is Extension type.
