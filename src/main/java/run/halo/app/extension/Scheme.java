@@ -1,7 +1,6 @@
 package run.halo.app.extension;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.Data;
 import org.springframework.util.Assert;
 
 /**
