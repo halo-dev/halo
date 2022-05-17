@@ -60,7 +60,7 @@ public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
         new NullSecurityContextRepository();
 
     /**
-     * Construct a {@code BearerTokenAuthenticationFilter} using the provided parameter(s)
+     * Construct a {@code BearerTokenAuthenticationFilter} using the provided parameter(s).
      *
      * @param authenticationManagerResolver authentication manager resolver
      */
@@ -72,7 +72,7 @@ public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Construct a {@code BearerTokenAuthenticationFilter} using the provided parameter(s)
+     * Construct a {@code BearerTokenAuthenticationFilter} using the provided parameter(s).
      *
      * @param authenticationManager authentication manager
      */

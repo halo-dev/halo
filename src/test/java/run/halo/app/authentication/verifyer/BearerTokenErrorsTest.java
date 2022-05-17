@@ -9,7 +9,7 @@ import run.halo.app.identity.authentication.verifier.BearerTokenErrorCodes;
 import run.halo.app.identity.authentication.verifier.BearerTokenErrors;
 
 /**
- * Tests for {@link BearerTokenErrors}
+ * Tests for {@link BearerTokenErrors}.
  *
  * @author guqing
  * @since 2.0.0

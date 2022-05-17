@@ -61,7 +61,7 @@ public class JwtAuthenticationToken extends AbstractOAuth2TokenAuthenticationTok
     }
 
     /**
-     * The principal name which is, by default, the {@link Jwt}'s subject
+     * The principal name which is, by default, the {@link Jwt}'s subject.
      */
     @Override
     public String getName() {

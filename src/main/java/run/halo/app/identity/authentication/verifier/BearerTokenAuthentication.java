@@ -23,7 +23,7 @@ public class BearerTokenAuthentication
     private final Map<String, Object> attributes;
 
     /**
-     * Constructs a {@link BearerTokenAuthentication} with the provided arguments
+     * Constructs a {@link BearerTokenAuthentication} with the provided arguments.
      *
      * @param principal The OAuth 2.0 attributes
      * @param credentials The verified token

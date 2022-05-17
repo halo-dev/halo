@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import run.halo.app.identity.authentication.verifier.BearerTokenError;
 
 /**
- * Tests for {@link BearerTokenError}
+ * Tests for {@link BearerTokenError}.
  *
  * @author guqing
  * @see <a href="https://tools.ietf.org/html/rfc6750#section-3.1">Bearer Token Error</a>

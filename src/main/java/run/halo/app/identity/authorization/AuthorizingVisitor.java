@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * authorizing visitor short-circuits once allowed, and collects any resolution errors encountered
+ * authorizing visitor short-circuits once allowed, and collects any resolution errors encountered.
  *
  * @author guqing
  * @since 2.0.0

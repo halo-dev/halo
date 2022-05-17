@@ -26,7 +26,7 @@ import run.halo.app.identity.authentication.verifier.JwtAuthenticationProvider;
 import run.halo.app.identity.authentication.verifier.JwtAuthenticationToken;
 
 /**
- * Tests for {@link JwtAuthenticationProvider}
+ * Tests for {@link JwtAuthenticationProvider}.
  *
  * @author guqing
  * @since 2.0.0

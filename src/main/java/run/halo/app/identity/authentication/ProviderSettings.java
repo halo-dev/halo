@@ -18,7 +18,7 @@ public final class ProviderSettings extends AbstractSettings {
     }
 
     /**
-     * Returns the URL of the Provider's Issuer Identifier
+     * Returns the URL of the Provider's Issuer Identifier.
      *
      * @return the URL of the Provider's Issuer Identifier
      */

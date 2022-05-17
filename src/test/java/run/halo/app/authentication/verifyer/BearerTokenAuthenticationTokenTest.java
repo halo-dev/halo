@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationToken;
 
 /**
- * Tests for {@link BearerTokenAuthenticationToken}
+ * Tests for {@link BearerTokenAuthenticationToken}.
  *
  * @author guqing
  * @since 2.0.0

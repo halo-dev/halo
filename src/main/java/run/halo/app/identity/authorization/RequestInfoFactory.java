@@ -15,11 +15,12 @@ public class RequestInfoFactory {
         new RequestInfoFactory(Set.of("api", "apis"), Set.of("api"));
 
     /**
-     * without leading and trailing slashes
+     * without leading and trailing slashes.
      */
     final Set<String> apiPrefixes;
+
     /**
-     * without leading and trailing slashes
+     * without leading and trailing slashes.
      */
     final Set<String> grouplessApiPrefixes;
 
