@@ -281,7 +281,7 @@ handleCheckAll();
         <VButton :loading="saving" type="secondary" @click="saving = !saving">
           保存
         </VButton>
-        <VButton type="default">取消</VButton>
+        <VButton type="default" @click="postSettings = false">取消</VButton>
       </VSpace>
     </template>
   </VModal>
