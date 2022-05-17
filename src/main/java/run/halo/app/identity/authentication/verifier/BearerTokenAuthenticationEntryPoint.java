@@ -58,7 +58,7 @@ public class BearerTokenAuthenticationEntryPoint implements AuthenticationEntryP
     }
 
     /**
-     * Set the default realm name to use in the bearer token error response
+     * Set the default realm name to use in the bearer token error response.
      *
      * @param realmName realm name
      */

@@ -22,7 +22,7 @@ public final class BearerTokenError extends OAuth2Error {
     private final String scope;
 
     /**
-     * Create a {@code BearerTokenError} using the provided parameters
+     * Create a {@code BearerTokenError} using the provided parameters.
      *
      * @param errorCode the error code
      * @param httpStatus the HTTP status
@@ -33,7 +33,7 @@ public final class BearerTokenError extends OAuth2Error {
     }
 
     /**
-     * Create a {@code BearerTokenError} using the provided parameters
+     * Create a {@code BearerTokenError} using the provided parameters.
      *
      * @param errorCode the error code
      * @param httpStatus the HTTP status
