@@ -22,7 +22,7 @@ import org.springframework.security.oauth2.core.OAuth2TokenIntrospectionClaimNam
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthentication;
 
 /**
- * Tests for {@link BearerTokenAuthentication}
+ * Tests for {@link BearerTokenAuthentication}.
  *
  * @author guqing
  * @since 2.0.0

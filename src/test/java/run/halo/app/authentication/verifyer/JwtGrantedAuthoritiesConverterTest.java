@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import run.halo.app.identity.authentication.verifier.JwtGrantedAuthoritiesConverter;
 
 /**
- * Tests for {@link JwtGrantedAuthoritiesConverter}
+ * Tests for {@link JwtGrantedAuthoritiesConverter}.
  *
  * @author guqing
  * @since 2.0.0

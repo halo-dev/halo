@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 /**
  * A factory for creating {@link BearerTokenError} instances that correspond to the
- * registered <a href="https://tools.ietf.org/html/rfc6750#section-3.1">Bearer Token Error Codes</a>
+ * registered <a href="https://tools.ietf.org/html/rfc6750#section-3.1">Bearer Token Error Codes</a>.
  *
  * @author guqing
  * @since 2.0.0
@@ -24,7 +24,7 @@ public class BearerTokenErrors {
     }
 
     /**
-     * Create a {@link BearerTokenError} caused by an invalid request
+     * Create a {@link BearerTokenError} caused by an invalid request.
      *
      * @param message a description of the error
      * @return a {@link BearerTokenError}
@@ -42,7 +42,7 @@ public class BearerTokenErrors {
     }
 
     /**
-     * Create a {@link BearerTokenError} caused by an invalid token
+     * Create a {@link BearerTokenError} caused by an invalid token.
      *
      * @param message a description of the error
      * @return a {@link BearerTokenError}
@@ -60,7 +60,7 @@ public class BearerTokenErrors {
     }
 
     /**
-     * Create a {@link BearerTokenError} caused by an invalid token
+     * Create a {@link BearerTokenError} caused by an invalid token.
      *
      * @param scope the scope attribute to use in the error
      * @return a {@link BearerTokenError}
