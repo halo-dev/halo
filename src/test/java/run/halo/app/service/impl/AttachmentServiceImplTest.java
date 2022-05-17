@@ -3,16 +3,17 @@ package run.halo.app.service.impl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.handler.file.FileHandlers;
+import run.halo.app.model.dto.AttachmentDTO;
 import run.halo.app.model.entity.Attachment;
+import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.OptionService;
-import run.halo.app.model.dto.AttachmentDTO;
-import run.halo.app.model.enums.AttachmentType;
+
 
 /**
  * Test for Attachment Service implementation
@@ -105,12 +106,12 @@ class AttachmentServiceImplTest {
         AttachmentDTO attachmentDTO = attachmentService.convertToDto(attachment);
 
         Assertions.assertEquals(
-            "/upload/2022/04/%E4%B9%8B%E5%89%8D%E7%89%88%E6%9C%AC%E4%B8%8A%E4%BC%A0%E7%9A%84%E5" +
-                "%9B%BE%E7%89%87.png",
+            "/upload/2022/04/%E4%B9%8B%E5%89%8D%E7%89%88%E6%9C%AC%E4%B8%8A%E4%BC%A0%E7%9A%84%E5"
+                + "%9B%BE%E7%89%87.png",
             attachmentDTO.getPath());
         Assertions.assertEquals(
-            "/upload/2022/04/%E4%B9%8B%E5%89%8D%E7%89%88%E6%9C%AC%E4%B8%8A%E4%BC%A0%E7%9A%84%E5" +
-                "%9B%BE%E7%89%87-thumbnail.png",
+            "/upload/2022/04/%E4%B9%8B%E5%89%8D%E7%89%88%E6%9C%AC%E4%B8%8A%E4%BC%A0%E7%9A%84%E5"
+                + "%9B%BE%E7%89%87-thumbnail.png",
             attachmentDTO.getThumbPath());
         Mockito.verify(optionService, Mockito.times(1)).getBlogBaseUrl();
     }
