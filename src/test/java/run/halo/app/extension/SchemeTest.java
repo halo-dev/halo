@@ -23,9 +23,10 @@ class SchemeTest {
         assertThrows(IllegalArgumentException.class,
             () -> new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"),
                 "fakes", "", null));
-
-        new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "fakes",
-            "fake", null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "fakes",
+                "fake", null);
+        });
         new Scheme(FakeExtension.class, new GroupVersionKind("", "v1alpha1", "Fake"), "fakes",
             "fake", new ObjectNode(null));
     }

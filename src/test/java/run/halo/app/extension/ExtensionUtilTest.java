@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,12 +18,12 @@ class ExtensionUtilTest {
             new GroupVersionKind("fake.halo.run", "v1alpha1", "Fake"),
             "fakes",
             "fake",
-            null);
+            new ObjectNode(null));
         grouplessScheme = new Scheme(FakeExtension.class,
             new GroupVersionKind("", "v1alpha1", "Fake"),
             "fakes",
             "fake",
-            null);
+            new ObjectNode(null));
     }
 
     @Test
