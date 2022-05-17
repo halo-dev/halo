@@ -1,5 +1,10 @@
 package run.halo.app.extension;
 
+import com.github.victools.jsonschema.generator.OptionPreset;
+import com.github.victools.jsonschema.generator.SchemaGenerator;
+import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
+import com.github.victools.jsonschema.generator.SchemaVersion;
+import com.github.victools.jsonschema.module.swagger2.Swagger2Module;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -69,9 +74,17 @@ public enum Schemes {
                     type.getName()));
         }
 
-        // TODO Generate the JSON schema here
+        // generate JSON schema
+        var module = new Swagger2Module();
+        var config =
+            new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2019_09, OptionPreset.PLAIN_JSON)
+                .with(module)
+                .build();
+        var generator = new SchemaGenerator(config);
+        var jsonSchema = generator.generateSchema(type);
+
         var scheme = new Scheme(type, new GroupVersionKind(gvk.group(), gvk.version(), gvk.kind()),
-            gvk.plural(), gvk.singular(), null);
+            gvk.plural(), gvk.singular(), jsonSchema);
 
         register(scheme);
     }

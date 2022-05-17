@@ -23,9 +23,7 @@ public record Scheme(Class<? extends Extension> type,
         Assert.notNull(groupVersionKind, "GroupVersionKind of Extension must not be null");
         Assert.hasText(plural, "Plural name of Extension must not be blank");
         Assert.hasText(singular, "Singular name of Extension must not be blank");
-
-        //TODO Validate the json schema when we plan to integrate Extension validation.
-        // Assert.notNull(jsonSchema, "Json Schema must not be null");
+        Assert.notNull(jsonSchema, "Json Schema must not be null");
     }
 
 }

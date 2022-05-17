@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.extension.exception.ExtensionConvertException;
+import run.halo.app.extension.exception.SchemaViolationException;
 import run.halo.app.extension.store.ExtensionStore;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,7 +58,7 @@ class JSONExtensionConverterTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenDataIsInvalid() {
+    void shouldThrowConvertExceptionWhenDataIsInvalid() {
         var store = new ExtensionStore();
         store.setName("/registry/fake.halo.run/fakes/fake");
         store.setVersion(20L);
@@ -67,6 +68,18 @@ class JSONExtensionConverterTest {
             () -> converter.convertFrom(FakeExtension.class, store));
     }
 
+    @Test
+    void shouldThrowSchemaViolationExceptionWhenNameNotSet() {
+        var fake = new FakeExtension();
+        Metadata metadata = new Metadata();
+        fake.setMetadata(metadata);
+        fake.setApiVersion("fake.halo.run/v1alpha1");
+        fake.setKind("Fake");
+        var error = assertThrows(SchemaViolationException.class, () -> converter.convertTo(fake));
+        assertEquals(1, error.getErrors().size());
+        assertEquals("$.metadata.name: null found, string expected",
+            error.getErrors().iterator().next().getMessage());
+    }
 
     FakeExtension createFakeExtension(String name, Long version) {
         var fake = new FakeExtension();
