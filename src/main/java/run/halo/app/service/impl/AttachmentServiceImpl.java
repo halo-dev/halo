@@ -1,5 +1,6 @@
 package run.halo.app.service.impl;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.handler.file.FileHandlers;
 import run.halo.app.model.dto.AttachmentDTO;
@@ -30,6 +32,7 @@ import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.AttachmentService;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.base.AbstractCrudService;
+import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
 
 /**
@@ -124,7 +127,8 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         // Convert separator
         attachment.setPath(HaloUtils.changeFileSeparatorToUrlSeparator(uploadResult.getFilePath()));
         attachment.setFileKey(uploadResult.getKey());
-        attachment.setThumbPath(uploadResult.getThumbPath());
+        attachment.setThumbPath(
+            HaloUtils.changeFileSeparatorToUrlSeparator(uploadResult.getThumbPath()));
         attachment.setMediaType(uploadResult.getMediaType().toString());
         attachment.setSuffix(uploadResult.getSuffix());
         attachment.setWidth(uploadResult.getWidth());
@@ -173,11 +177,26 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
         AttachmentDTO attachmentDTO = new AttachmentDTO().convertFrom(attachment);
 
         if (Objects.equals(attachmentDTO.getType(), AttachmentType.LOCAL)) {
+
+            // 将 local 存储的链接中的文件名替换为编码后的文件名
+            String path = attachmentDTO.getPath()
+                .replace(attachmentDTO.getName(), encodeValue(attachmentDTO.getName()));
+
+            String basename = FilenameUtils.getBasename(attachmentDTO.getName());
+            String extension = FilenameUtils.getExtension(attachmentDTO.getName());
+            // 得到 thumbnail name
+            String thumbnailName = String.format("%s-thumbnail%s", basename, extension);
+            String thumbnailPath = attachmentDTO.getThumbPath()
+                .replace(thumbnailName, encodeValue(thumbnailName));
+
             // Append blog base url to path and thumbnail
             String fullPath = StringUtils
-                .join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getPath());
+                .join(enabledAbsolutePath ? blogBaseUrl : "", "/", path);
             String fullThumbPath = StringUtils
-                .join(enabledAbsolutePath ? blogBaseUrl : "", "/", attachmentDTO.getThumbPath());
+                .join(enabledAbsolutePath ? blogBaseUrl : "", "/", thumbnailPath);
+
+            // 对于之前上传的链接，需要将文件名替换为编码后的文件名
+            fullThumbPath = HaloUtils.changeFileSeparatorToUrlSeparator(fullThumbPath);
 
             // Set full path and full thumb path
             attachmentDTO.setPath(fullPath);
@@ -186,6 +205,11 @@ public class AttachmentServiceImpl extends AbstractCrudService<Attachment, Integ
 
         return attachmentDTO;
     }
+
+    private String encodeValue(String value) {
+        return UriUtils.encode(value, StandardCharsets.UTF_8);
+    }
+
 
     @Override
     public List<String> listAllMediaType() {
