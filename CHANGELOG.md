@@ -1,5 +1,30 @@
 # CHANGELOG
 
+# 1.5.3
+
+## Improvements
+
+- 优化邮件发送异常信息处理。 halo-dev/halo#1860 @ntdgy @superdgy
+- 优化静态存储的资源映射处理逻辑，支持手动操作 `.halo/static` 目录后，在后台通过刷新按钮更新资源映射。 halo-dev/halo#1907 @Yhcrown @muyunil
+- 优化文章字数统计的算法。将中文和其他字符分开统计，中文按照字数计数，其他的语言默认按照标点分割来计数。 halo-dev/halo#1865 @Yhcrown @Tanhex
+- 优化后台部分弹窗中表单在移动端的布局。 halo-dev/halo-admin#564 @ruibaby
+
+## Bug Fixes
+
+- 修复在 Windows 平台下，因为 H2 Database 文件被占用导致无法全站备份的问题。 halo-dev/halo#1867 @anshangPro
+- 修复在 1.5.x 版本中，文章搜索没有关联查询内容（contents）的问题。 halo-dev/halo#1873 @Yhcrown @guqing
+- 修复本地上传附件过程中如果发生异常，没有完整打印异常信息栈的问题。 halo-dev/halo#1913 @JohnNiang
+- 修复在系统初始化之后，仍然可以通过 `/install` 跳转到登录页面的问题。 halo-dev/halo#1908 @Ljfanny @littlesleep
+- 修复评论通知无法正常发送邮件的问题。 halo-dev/halo#1916 @JohnNiang @hapke24
+- 修复后台仪表盘中最近文章的标题过长导致样式异常的问题。 halo-dev/halo-admin#545 @Aanko @hotspring-zwb
+- 修复后台带有分页的数据列表中，删除最后一页的所有数据后导致分页页码异常的问题。 halo-dev/halo-admin#550 @QuentinHsu @luohongqu
+- 修复后台修复因为缓存数据，重新安装会出现循环进入 install 路由的问题。 halo-dev/halo-admin#558 @ruibaby  @Ljfanny
+
+## Dependencies
+
+- 更新后台 @halo-dev/editor 版本。 halo-dev/halo-admin#562 @ruibaby
+    - 修复在改变编辑器布局后导致重复初始化编辑器的问题。
+
 # 1.5.2
 
 ## Improvements
