@@ -1,6 +1,8 @@
 // @ts-ignore
 import IconDashboard from "~icons/ri/dashboard-3-line";
 // @ts-ignore
+import IconArrowLeft from "~icons/ri/arrow-left-s-line";
+// @ts-ignore
 import IconArrowRight from "~icons/ri/arrow-right-s-line";
 // @ts-ignore
 import IconBookRead from "~icons/ri/book-read-line";
@@ -41,6 +43,7 @@ import IconDeleteBin from "~icons/ri/delete-bin-2-line";
 
 export {
   IconDashboard,
+  IconArrowLeft,
   IconArrowRight,
   IconBookRead,
   IconPages,

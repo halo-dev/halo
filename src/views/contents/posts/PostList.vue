@@ -5,12 +5,22 @@ import { VSpace } from "@/components/base/space";
 import { VTag } from "@/components/base/tag";
 import { VInput } from "@/components/base/input";
 import { VPageHeader } from "@/components/base/header";
-import { IconBookRead, IconSettings } from "@/core/icons";
+import { VModal } from "@/components/base/modal";
+import { VTabItem, VTabs } from "@/components/base/tabs";
+import { VTextarea } from "@/components/base/textarea";
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconBookRead,
+  IconSettings,
+} from "@/core/icons";
 import { posts } from "./posts-mock";
 import { ref } from "vue";
+import type { Post } from "@halo-dev/admin-api";
 
 const postsRef = ref(
-  posts.map((item) => {
+  // eslint-disable-next-line
+  posts.map((item: any) => {
     return {
       ...item,
       checked: false,
@@ -19,21 +29,268 @@ const postsRef = ref(
 );
 
 const checkAll = ref(false);
+const postSettings = ref(false);
+const settingActiveId = ref("general");
+// eslint-disable-next-line
+const selected = ref<Post | Record<string, any>>({});
+const saving = ref(false);
 
 const handleCheckAll = () => {
   postsRef.value.forEach((item) => {
     item.checked = checkAll.value;
   });
 };
+
+// eslint-disable-next-line
+const handleSelect = (post: any) => {
+  selected.value = post;
+  postSettings.value = true;
+};
+
+const handleSelectPrevious = () => {
+  const currentIndex = posts.findIndex((post) => post.id === selected.value.id);
+  if (currentIndex > 0) {
+    selected.value = posts[currentIndex - 1];
+  }
+};
+
+const handleSelectNext = () => {
+  const currentIndex = posts.findIndex((post) => post.id === selected.value.id);
+  if (currentIndex < posts.length - 1) {
+    selected.value = posts[currentIndex + 1];
+  }
+};
 handleCheckAll();
 </script>
 <template>
+  <VModal v-model:visible="postSettings" :width="680" title="文章设置">
+    <template #actions>
+      <div class="modal-header-action" @click="handleSelectPrevious">
+        <IconArrowLeft />
+      </div>
+      <div class="modal-header-action" @click="handleSelectNext">
+        <IconArrowRight />
+      </div>
+    </template>
+
+    <VTabs v-model:active-id="settingActiveId" type="outline">
+      <VTabItem id="general" label="常规">
+        <form>
+          <div class="divide-y-0 sm:divide-y sm:divide-gray-200 space-y-6">
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                标题
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput v-model="selected.title"></VInput>
+              </div>
+            </div>
+
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                别名
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput v-model="selected.slug"></VInput>
+              </div>
+            </div>
+
+            <div
+              class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-center sm:pt-5"
+            >
+              <label class="block text-sm font-medium text-gray-700">
+                分类目录
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput></VInput>
+              </div>
+            </div>
+
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                标签
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput></VInput>
+              </div>
+            </div>
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                摘要
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VTextarea v-model="selected.summary"></VTextarea>
+              </div>
+            </div>
+          </div>
+        </form>
+      </VTabItem>
+      <VTabItem id="advanced" label="高级">
+        <form>
+          <div class="divide-y-0 sm:divide-y sm:divide-gray-200 space-y-6">
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                禁止评论
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput v-model="selected.disallowComment"></VInput>
+              </div>
+            </div>
+
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                是否置顶
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput v-model="selected.topPriority"></VInput>
+              </div>
+            </div>
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                发表时间
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput></VInput>
+              </div>
+            </div>
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                自定义模板
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput v-model="selected.template"></VInput>
+              </div>
+            </div>
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                访问密码
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VInput v-model="selected.password"></VInput>
+              </div>
+            </div>
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                封面图
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VSpace align="start" class="w-full" direction="column">
+                  <div class="w-full sm:w-1/2">
+                    <div
+                      class="block aspect-w-10 aspect-h-7 bg-gray-100 overflow-hidden cursor-pointer rounded"
+                    >
+                      <img
+                        :src="selected.thumbnail"
+                        alt=""
+                        class="object-cover pointer-events-none"
+                      />
+                    </div>
+                  </div>
+                  <VInput v-model="selected.thumbnail"></VInput>
+                </VSpace>
+              </div>
+            </div>
+          </div>
+        </form>
+      </VTabItem>
+      <VTabItem id="seo" label="SEO">
+        <form>
+          <div class="divide-y-0 sm:divide-y sm:divide-gray-200 space-y-6">
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                自定义关键词
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VTextarea
+                  v-model="selected.metaKeywords"
+                  :rows="5"
+                ></VTextarea>
+              </div>
+            </div>
+
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                自定义描述
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VTextarea
+                  v-model="selected.metaDescription"
+                  :rows="5"
+                ></VTextarea>
+              </div>
+            </div>
+          </div>
+        </form>
+      </VTabItem>
+      <VTabItem id="metas" label="元数据"></VTabItem>
+      <VTabItem id="inject-code" label="代码注入">
+        <form>
+          <div class="divide-y-0 sm:divide-y sm:divide-gray-200 space-y-6">
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                CSS
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VTextarea :rows="5"></VTextarea>
+              </div>
+            </div>
+
+            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                JavaScript
+              </label>
+              <div class="mt-1 sm:mt-0 sm:col-span-2">
+                <VTextarea :rows="5"></VTextarea>
+              </div>
+            </div>
+          </div>
+        </form>
+      </VTabItem>
+    </VTabs>
+
+    <template #footer>
+      <VSpace>
+        <VButton :loading="saving" type="secondary" @click="saving = !saving">
+          保存
+        </VButton>
+        <VButton type="default">取消</VButton>
+      </VSpace>
+    </template>
+  </VModal>
   <VPageHeader title="文章">
     <template #icon>
       <IconBookRead class="self-center mr-2" />
     </template>
     <template #actions>
-      <VButton type="secondary">发布</VButton>
+      <VButton :route="{ name: 'PostEditor' }" type="secondary">发布</VButton>
     </template>
   </VPageHeader>
 
@@ -57,6 +314,10 @@ handleCheckAll();
       <ul class="divide-y divide-gray-100 box-border w-full h-full" role="list">
         <li v-for="(post, index) in postsRef" :key="index">
           <div
+            :class="{
+              'border-l-2 border-themeable-primary bg-gray-100':
+                selected.id === post.id,
+            }"
             class="px-4 py-3 block hover:bg-gray-50 cursor-pointer transition-all"
           >
             <div class="flex flex-row items-center relative">
@@ -95,8 +356,8 @@ handleCheckAll();
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
                     2020-01-07
                   </time>
-                  <span>
-                    <IconSettings />
+                  <span class="cursor-pointer">
+                    <IconSettings @click="handleSelect(post)" />
                   </span>
                 </div>
               </div>

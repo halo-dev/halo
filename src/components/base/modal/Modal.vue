@@ -79,7 +79,8 @@ function handleClose() {
         >
           <div class="modal-header">
             <div class="modal-header-title">{{ title }}</div>
-            <div class="modal-header-actions">
+            <div class="modal-header-actions flex flex-row">
+              <slot name="actions"></slot>
               <div class="modal-header-action" @click="handleClose()">
                 <IconClose />
               </div>
