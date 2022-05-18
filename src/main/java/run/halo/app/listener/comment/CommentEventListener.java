@@ -124,13 +124,7 @@ public class CommentEventListener {
             data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() :
                 optionService.getBlogBaseUrl() + post.getFullPath());
             data.put("pageTitle", post.getTitle());
-            data.put("author", postComment.getAuthor());
-            data.put("content", postComment.getContent());
-            data.put("email", postComment.getEmail());
-            data.put("ip", postComment.getIpAddress());
-            data.put("status", postComment.getStatus());
-            data.put("time", postComment.getCreateTime());
-            data.put("authorUrl", postComment.getAuthorUrl());
+            data.put("comment", postComment);
 
             subject.append("您的博客文章《")
                 .append(post.getTitle())
@@ -147,13 +141,7 @@ public class CommentEventListener {
             data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() :
                 optionService.getBlogBaseUrl() + sheet.getFullPath());
             data.put("pageTitle", sheet.getTitle());
-            data.put("author", sheetComment.getAuthor());
-            data.put("content", sheetComment.getContent());
-            data.put("email", sheetComment.getEmail());
-            data.put("ip", sheetComment.getIpAddress());
-            data.put("status", sheetComment.getStatus());
-            data.put("time", sheetComment.getCreateTime());
-            data.put("authorUrl", sheetComment.getAuthorUrl());
+            data.put("comment", sheetComment);
 
             subject.append("您的博客页面《")
                 .append(sheet.getTitle())
@@ -170,13 +158,7 @@ public class CommentEventListener {
                 .append(optionService.getJournalsPrefix());
             data.put("pageFullPath", url);
             data.put("pageTitle", journal.getCreateTime());
-            data.put("author", journalComment.getAuthor());
-            data.put("content", journalComment.getContent());
-            data.put("email", journalComment.getEmail());
-            data.put("ip", journalComment.getIpAddress());
-            data.put("status", journalComment.getStatus());
-            data.put("time", journalComment.getCreateTime());
-            data.put("authorUrl", journalComment.getAuthorUrl());
+            data.put("comment", journalComment);
 
             subject.append("您的博客日志有了新的评论");
         }
@@ -241,14 +223,8 @@ public class CommentEventListener {
             data.put("pageFullPath", enabledAbsolutePath ? post.getFullPath() :
                 optionService.getBlogBaseUrl() + post.getFullPath());
             data.put("pageTitle", post.getTitle());
-            data.put("baseAuthor", baseComment.getAuthor());
-            data.put("baseContent", baseComment.getContent());
-            data.put("replyAuthor", postComment.getAuthor());
-            data.put("replyContent", postComment.getContent());
-            data.put("baseAuthorEmail", baseComment.getEmail());
-            data.put("replyAuthorEmail", postComment.getEmail());
-            data.put("time", postComment.getCreateTime());
-            data.put("authorUrl", postComment.getAuthorUrl());
+            data.put("baseComment", baseComment);
+            data.put("replyComment", postComment);
 
             subject.append("您在【")
                 .append(blogTitle)
@@ -278,14 +254,8 @@ public class CommentEventListener {
             data.put("pageFullPath", enabledAbsolutePath ? sheet.getFullPath() :
                 optionService.getBlogBaseUrl() + sheet.getFullPath());
             data.put("pageTitle", sheet.getTitle());
-            data.put("baseAuthor", baseComment.getAuthor());
-            data.put("baseContent", baseComment.getContent());
-            data.put("replyAuthor", sheetComment.getAuthor());
-            data.put("replyContent", sheetComment.getContent());
-            data.put("baseAuthorEmail", baseComment.getEmail());
-            data.put("replyAuthorEmail", sheetComment.getEmail());
-            data.put("time", sheetComment.getCreateTime());
-            data.put("authorUrl", sheetComment.getAuthorUrl());
+            data.put("baseComment", baseComment);
+            data.put("replyComment", sheetComment);
 
             subject.append("您在【")
                 .append(blogTitle)
@@ -317,14 +287,8 @@ public class CommentEventListener {
                 .append(optionService.getJournalsPrefix());
             data.put("pageFullPath", url);
             data.put("pageTitle", journal.getContent());
-            data.put("baseAuthor", baseComment.getAuthor());
-            data.put("baseContent", baseComment.getContent());
-            data.put("replyAuthor", journalComment.getAuthor());
-            data.put("replyContent", journalComment.getContent());
-            data.put("baseAuthorEmail", baseComment.getEmail());
-            data.put("replyAuthorEmail", journalComment.getEmail());
-            data.put("time", journalComment.getCreateTime());
-            data.put("authorUrl", journalComment.getAuthorUrl());
+            data.put("baseComment", baseComment);
+            data.put("replyComment", journalComment);
 
             subject.append("您在【")
                 .append(blogTitle)
