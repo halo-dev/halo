@@ -5,6 +5,8 @@ import IconArrowLeft from "~icons/ri/arrow-left-s-line";
 // @ts-ignore
 import IconArrowRight from "~icons/ri/arrow-right-s-line";
 // @ts-ignore
+import IconArrowDown from "~icons/ri/arrow-down-s-fill";
+// @ts-ignore
 import IconBookRead from "~icons/ri/book-read-line";
 // @ts-ignore
 import IconPages from "~icons/ri/pages-line";
@@ -45,6 +47,7 @@ export {
   IconDashboard,
   IconArrowLeft,
   IconArrowRight,
+  IconArrowDown,
   IconBookRead,
   IconPages,
   IconMessage,

@@ -13,9 +13,10 @@ import {
   IconArrowRight,
   IconBookRead,
   IconSettings,
+  IconArrowDown,
 } from "@/core/icons";
 import { posts } from "./posts-mock";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import type { Post } from "@halo-dev/admin-api";
 
 const postsRef = ref(
@@ -34,6 +35,10 @@ const settingActiveId = ref("general");
 // eslint-disable-next-line
 const selected = ref<Post | Record<string, any>>({});
 const saving = ref(false);
+
+const checkedCount = computed(() => {
+  return postsRef.value.filter((post) => post.checked).length;
+});
 
 const handleCheckAll = () => {
   postsRef.value.forEach((item) => {
@@ -60,7 +65,6 @@ const handleSelectNext = () => {
     selected.value = posts[currentIndex + 1];
   }
 };
-handleCheckAll();
 </script>
 <template>
   <VModal v-model:visible="postSettings" :width="680" title="文章设置">
@@ -297,17 +301,65 @@ handleCheckAll();
   <div class="m-0 md:m-4">
     <VCard :body-class="['!p-0']">
       <template #header>
-        <div
-          class="flex flex-col w-full p-4 items-stretch sm:flex-row sm:items-center"
-        >
-          <div class="flex-1">
-            <VInput placeholder="输入关键词搜索" />
-          </div>
-          <div class="flex flex-row gap-3">
-            <div>分类</div>
-            <div>标签</div>
-            <div>作者</div>
-            <div>排序</div>
+        <div class="px-4 py-3 block w-full bg-gray-50">
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center relative"
+          >
+            <div class="hidden sm:flex items-center mr-4">
+              <input
+                v-model="checkAll"
+                class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                type="checkbox"
+                @change="handleCheckAll()"
+              />
+            </div>
+            <div class="w-full sm:w-auto flex flex-1">
+              <VInput
+                v-if="checkedCount <= 0"
+                class="w-full sm:w-72"
+                placeholder="输入关键词搜索"
+              />
+              <VSpace v-else>
+                <VButton type="default">设置</VButton>
+                <VButton type="danger">删除</VButton>
+              </VSpace>
+            </div>
+            <div class="mt-4 sm:mt-0 flex">
+              <VSpace spacing="lg">
+                <div
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center"
+                >
+                  <span class="mr-0.5">分类</span>
+                  <span>
+                    <IconArrowDown />
+                  </span>
+                </div>
+                <div
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center"
+                >
+                  <span class="mr-0.5">标签</span>
+                  <span>
+                    <IconArrowDown />
+                  </span>
+                </div>
+                <div
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center"
+                >
+                  <span class="mr-0.5">作者</span>
+                  <span>
+                    <IconArrowDown />
+                  </span>
+                </div>
+                <div
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center"
+                >
+                  <span class="mr-0.5">排序</span>
+                  <span>
+                    <IconArrowDown />
+                  </span>
+                </div>
+              </VSpace>
+            </div>
           </div>
         </div>
       </template>
@@ -315,12 +367,22 @@ handleCheckAll();
         <li v-for="(post, index) in postsRef" :key="index">
           <div
             :class="{
-              'border-l-2 border-themeable-primary bg-gray-100':
-                selected.id === post.id,
+              'bg-gray-100': selected.id === post.id || post.checked,
             }"
-            class="px-4 py-3 block hover:bg-gray-50 cursor-pointer transition-all"
+            class="px-4 py-3 block hover:bg-gray-50 cursor-pointer transition-all relative"
           >
+            <div
+              v-show="selected.id === post.id || post.checked"
+              class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
+            ></div>
             <div class="flex flex-row items-center relative">
+              <div class="hidden mr-4 sm:flex items-center">
+                <input
+                  v-model="post.checked"
+                  class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                  type="checkbox"
+                />
+              </div>
               <div class="flex-1">
                 <div class="flex flex-col sm:flex-row">
                   <span
@@ -367,35 +429,8 @@ handleCheckAll();
       </ul>
 
       <template #footer>
-        <div class="bg-white flex items-center justify-between">
-          <div class="flex-1 flex justify-between sm:hidden">
-            <a
-              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              href="#"
-            >
-              Previous
-            </a>
-            <a
-              class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-              href="#"
-            >
-              Next
-            </a>
-          </div>
-          <div
-            class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between"
-          >
-            <div>
-              <p class="text-sm text-gray-700">
-                Showing
-                <span class="font-medium">1</span>
-                to
-                <span class="font-medium">10</span>
-                of
-                <span class="font-medium">97</span>
-                results
-              </p>
-            </div>
+        <div class="bg-white flex items-center justify-end">
+          <div class="flex-1 flex items-center justify-end">
             <div>
               <nav
                 aria-label="Pagination"
@@ -433,12 +468,6 @@ handleCheckAll();
                 >
                   2
                 </a>
-                <a
-                  class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"
-                  href="#"
-                >
-                  3
-                </a>
                 <span
                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
                 >
@@ -448,19 +477,7 @@ handleCheckAll();
                   class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"
                   href="#"
                 >
-                  8
-                </a>
-                <a
-                  class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                  href="#"
-                >
-                  9
-                </a>
-                <a
-                  class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                  href="#"
-                >
-                  10
+                  4
                 </a>
                 <a
                   class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
