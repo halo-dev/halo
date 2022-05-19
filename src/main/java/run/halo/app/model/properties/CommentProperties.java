@@ -48,7 +48,7 @@ public enum CommentProperties implements PropertyEnum {
      * Dependent comment js.
      */
     INTERNAL_PLUGIN_JS("comment_internal_plugin_js", String.class,
-        "//cdn.jsdelivr.net/npm/halo-comment@latest/dist/halo-comment.min.js"),
+        "https://unpkg.com/halo-comment@latest/dist/halo-comment.min.js"),
 
     /**
      * Gravatar mirror source base url.
