@@ -51,21 +51,21 @@ public class AliOssFileHandler implements FileHandler {
         String protocol =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_PROTOCOL).toString();
         String domain =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_DOMAIN, String.class, "");
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_DOMAIN, String.class, "").trim();
         String source =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_SOURCE, String.class, "");
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_SOURCE, String.class, "").trim();
         String endPoint =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString().trim();
         String styleRule =
-            optionService.getByPropertyOrDefault(AliOssProperties.OSS_STYLE_RULE, String.class, "");
+            optionService.getByPropertyOrDefault(AliOssProperties.OSS_STYLE_RULE, String.class, "").trim();
         String thumbnailStyleRule = optionService
-            .getByPropertyOrDefault(AliOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "");
+            .getByPropertyOrDefault(AliOssProperties.OSS_THUMBNAIL_STYLE_RULE, String.class, "").trim();
 
         // Init OSS client
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
@@ -141,13 +141,13 @@ public class AliOssFileHandler implements FileHandler {
 
         // Get config
         String endPoint =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ENDPOINT).toString().trim();
         String accessKey =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_KEY).toString();
         String accessSecret =
             optionService.getByPropertyOfNonNull(AliOssProperties.OSS_ACCESS_SECRET).toString();
         String bucketName =
-            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString();
+            optionService.getByPropertyOfNonNull(AliOssProperties.OSS_BUCKET_NAME).toString().trim();
 
         // Init OSS client
         OSS ossClient = new OSSClientBuilder().build(endPoint, accessKey, accessSecret);
