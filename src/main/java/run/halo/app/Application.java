@@ -15,9 +15,6 @@ import run.halo.app.utils.VmUtils;
 public class Application {
 
     public static void main(String[] args) {
-        // Store the program args to construct launch command in version switch.
-        VmUtils.PROGRAM_ARGS.addAll(List.of(args));
-
         // Customize the spring config location
         System.setProperty("spring.config.additional-location",
             "optional:file:${user.home}/.halo/,optional:file:${user.home}/halo-dev/");

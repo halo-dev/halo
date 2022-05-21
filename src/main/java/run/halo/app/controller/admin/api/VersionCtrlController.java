@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.VersionInfoDTO;
 import run.halo.app.service.HaloVersionCtrlService;
 
+/**
+ * Version Control Controller
+ *
+ * @author Chen_Kunqiu
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/version")

@@ -5,20 +5,24 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Component;
 import run.halo.app.exception.ServiceException;
-import run.halo.app.model.enums.SystemType;
 
 /**
  * The utils to get some info of JVM.
  *
  * @author Chen_Kunqiu
  */
+@Component
 public class VmUtils {
     private static final RuntimeMXBean RUNTIME_MX_BEAN = ManagementFactory.getRuntimeMXBean();
-    public static final List<String> PROGRAM_ARGS = new ArrayList<>();
     public static final Path CURR_JAR;
     public static final Path CURR_JAR_DIR;
+    private static ApplicationArguments appArgs;
 
     static {
         String path =
@@ -34,6 +38,10 @@ public class VmUtils {
         CURR_JAR_DIR = CURR_JAR.getParent();
     }
 
+    @Autowired
+    private void setAppArgs(ApplicationArguments appArgs) {
+        VmUtils.appArgs = appArgs;
+    }
 
     /**
      * Get the command to launch the halo jar.
@@ -46,12 +54,12 @@ public class VmUtils {
     public static List<String> getSameLaunchCommand() {
         List<String> cmd = new ArrayList<>();
         cmd.add(getJvmExecutablePath());
-        cmd.addAll(getVmArguments());
+        cmd.addAll(getVmOptions());
         cmd.add("-classpath");
         cmd.add(getClassPath());
         cmd.add("-jar");
         cmd.add(getRunningJar());
-        cmd.addAll(PROGRAM_ARGS);
+        cmd.addAll(getProgramArgs());
         return cmd;
     }
 
@@ -67,14 +75,15 @@ public class VmUtils {
     public static List<String> getNewLaunchCommand(String newTarget) {
         List<String> cmd = new ArrayList<>();
         cmd.add(getJvmExecutablePath());
-        cmd.addAll(getVmArguments());
+        cmd.addAll(getVmOptions());
         cmd.add("-classpath");
         String classPath = getClassPath();
         final String nonVmPartOfCmd = getNonVmPartOfCmd();
-        if (CURR_JAR == null || CURR_JAR.getFileName() == null) {
+        final Path fileName = CURR_JAR.getFileName();
+        if (fileName == null) {
             throw new ServiceException("无法获取当前运行的JAR");
         }
-        final String jarName = CURR_JAR.getFileName().toString();
+        final String jarName = fileName.toString();
 
         final int endIdx = nonVmPartOfCmd.indexOf(jarName) + jarName.length();
         /*
@@ -88,7 +97,7 @@ public class VmUtils {
         cmd.add(classPath);
         cmd.add("-jar");
         cmd.add(newTarget);
-        cmd.addAll(PROGRAM_ARGS);
+        cmd.addAll(getProgramArgs());
         return cmd;
     }
 
@@ -119,8 +128,23 @@ public class VmUtils {
      *
      * @return the VM arguments
      */
-    public static List<String> getVmArguments() {
+    public static List<String> getVmOptions() {
         return RUNTIME_MX_BEAN.getInputArguments();
+    }
+
+
+    /**
+     * Get the program arguments passed to JVM.
+     *
+     * <p>For example, <br>
+     * {@code java -jar -Da=1 Test.jar b=2} <br>
+     * --> <br>
+     * {@code b=2}
+     *
+     * @return the VM arguments
+     */
+    public static List<String> getProgramArgs() {
+        return Arrays.asList(appArgs.getSourceArgs());
     }
 
     /**

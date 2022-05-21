@@ -49,12 +49,12 @@ class VmUtilsTest {
 
     @Test
     void testGetVmArguments() {
-        final List<String> vmArguments = VmUtils.getVmArguments();
+        final List<String> vmArguments = VmUtils.getVmOptions();
         assertNotNull(vmArguments);
     }
     @Test
     void testGetVmArguments2() {
-        final List<String> vmArguments = VmUtils.getVmArguments();
+        final List<String> vmArguments = VmUtils.getVmOptions();
         assertEquals(bean.getInputArguments(), vmArguments);
     }
 
