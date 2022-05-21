@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -99,7 +101,7 @@ public class FileUtils {
      * Renames file or folder.
      *
      * @param pathToRename file path to rename must not be null
-     * @param newName new name must not be null
+     * @param newName      new name must not be null
      */
     public static void rename(@NonNull Path pathToRename, @NonNull String newName)
         throws IOException {
@@ -117,7 +119,7 @@ public class FileUtils {
     /**
      * Unzips content to the target path.
      *
-     * @param zis zip input stream must not be null
+     * @param zis        zip input stream must not be null
      * @param targetPath target path must not be null and not empty
      * @throws IOException throws when failed to access file to be unzipped
      */
@@ -158,7 +160,7 @@ public class FileUtils {
     /**
      * Unzips content to the target path.
      *
-     * @param bytes zip bytes array must not be null
+     * @param bytes      zip bytes array must not be null
      * @param targetPath target path must not be null and not empty
      * @throws IOException io exception
      */
@@ -172,7 +174,7 @@ public class FileUtils {
     /**
      * Zips folder or file.
      *
-     * @param pathToZip file path to zip must not be null
+     * @param pathToZip     file path to zip must not be null
      * @param pathOfArchive zip file path to archive must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
@@ -188,9 +190,9 @@ public class FileUtils {
     /**
      * Zips folder or file with filter.
      *
-     * @param pathToZip file path to zip must not be null
+     * @param pathToZip     file path to zip must not be null
      * @param pathOfArchive zip file path to archive must not be null
-     * @param filter folder or file filter
+     * @param filter        folder or file filter
      * @throws IOException throws when failed to access file to be zipped
      */
     public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive,
@@ -206,7 +208,7 @@ public class FileUtils {
      * Zips folder or file.
      *
      * @param pathToZip file path to zip must not be null
-     * @param zipOut zip output stream must not be null
+     * @param zipOut    zip output stream must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
     public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut)
@@ -219,8 +221,8 @@ public class FileUtils {
      * Zips folder or file with filter.
      *
      * @param pathToZip file path to zip must not be null
-     * @param zipOut zip output stream must not be null
-     * @param filter directory or file filter
+     * @param zipOut    zip output stream must not be null
+     * @param filter    directory or file filter
      * @throws IOException throws when failed to access file to be zipped
      */
     public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut,
@@ -233,8 +235,8 @@ public class FileUtils {
      * Zips folder or file.
      *
      * @param fileToZip file path to zip must not be null
-     * @param fileName file name must not be blank
-     * @param zipOut zip output stream must not be null
+     * @param fileName  file name must not be blank
+     * @param zipOut    zip output stream must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
     private static void zip(@NonNull Path fileToZip, @NonNull String fileName,
@@ -246,13 +248,14 @@ public class FileUtils {
      * Zips folder or file with path filter.
      *
      * @param fileToZip file path to zip must not be null
-     * @param fileName file name must not be blank
-     * @param zipOut zip output stream must not be null
-     * @param filter directory or file filter
+     * @param fileName  file name must not be blank
+     * @param zipOut    zip output stream must not be null
+     * @param filter    directory or file filter
      * @throws IOException throws when failed to access file to be zipped
      */
     private static void zip(@NonNull Path fileToZip, @NonNull String fileName,
-        @NonNull ZipOutputStream zipOut, @Nullable Predicate<Path> filter) throws IOException {
+        @NonNull ZipOutputStream zipOut, @Nullable Predicate<Path> filter)
+        throws IOException {
         if (Files.isDirectory(fileToZip)) {
             log.debug("Try to zip folder: [{}]", fileToZip);
             // Append with '/' if missing
@@ -292,7 +295,7 @@ public class FileUtils {
     /**
      * Find root path.
      *
-     * @param path super root path starter
+     * @param path          super root path starter
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
@@ -307,8 +310,8 @@ public class FileUtils {
     /**
      * Find root path.
      *
-     * @param path super root path starter
-     * @param maxDepth max loop depth
+     * @param path          super root path starter
+     * @param maxDepth      max loop depth
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
@@ -324,7 +327,7 @@ public class FileUtils {
     /**
      * Find path.
      *
-     * @param path super root path starter
+     * @param path          super root path starter
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
@@ -339,7 +342,7 @@ public class FileUtils {
     /**
      * Find path.
      *
-     * @param path super root path starter
+     * @param path          super root path starter
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
@@ -463,7 +466,7 @@ public class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath parent path must not be null.
+     * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull String parentPath,
@@ -474,7 +477,7 @@ public class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath parent path must not be null.
+     * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull Path parentPath,
@@ -485,7 +488,7 @@ public class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath parent path must not be null.
+     * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull Path parentPath,
@@ -579,11 +582,23 @@ public class FileUtils {
      * Writes a String to a file creating the file if it does not exist using the UTF_8 encoding.
      * NOTE: the parent directories of the file will be created if they do not exist.
      *
-     * @param file the file to write
+     * @param file    the file to write
      * @param content the content to write to the file
      * @throws IOException in case of an I/O error
      */
     public static void writeStringToFile(File file, String content) throws IOException {
         org.apache.commons.io.FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
+    }
+
+    public static boolean isLegalMdFilename(String mdFileName, String[] legalMdSuffixes) {
+        return StringUtils.isNotEmpty(mdFileName)
+            && (
+            legalMdSuffixes == null
+                || ArrayUtils.isEmpty(legalMdSuffixes)
+                || Arrays.stream(legalMdSuffixes)
+                .map(String::trim)
+                .map(suffix -> suffix.startsWith(".") ? suffix : "." + suffix)
+                .anyMatch(mdFileName::endsWith)
+        );
     }
 }
