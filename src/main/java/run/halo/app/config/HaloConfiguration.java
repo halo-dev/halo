@@ -1,10 +1,14 @@
 package run.halo.app.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import lombok.extern.slf4j.Slf4j;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -49,7 +53,7 @@ public class HaloConfiguration {
     private final StringRedisTemplate stringRedisTemplate;
 
     public HaloConfiguration(HaloProperties haloProperties,
-        StringRedisTemplate stringRedisTemplate) {
+                             StringRedisTemplate stringRedisTemplate) {
         this.haloProperties = haloProperties;
         this.stringRedisTemplate = stringRedisTemplate;
     }
@@ -68,6 +72,19 @@ public class HaloConfiguration {
             new HttpComponentsClientHttpRequestFactory(HttpClientUtils.createHttpsClient(
                 (int) haloProperties.getDownloadTimeout().toMillis())));
         return httpsRestTemplate;
+    }
+
+    @Bean
+    GHRepository haloRepo() {
+        final GitHub github;
+        GHRepository repo = null;
+        try {
+            github = new GitHubBuilder().build();
+            repo = github.getRepository("halo-dev/halo");
+        } catch (IOException e) {
+            log.info("无法连接Github，请检查网络");
+        }
+        return repo;
     }
 
     @Bean

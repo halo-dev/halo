@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -17,6 +16,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SystemUtils;
 import org.jetbrains.annotations.NotNull;
+import org.kohsuke.github.GHRelease;
+import org.kohsuke.github.GHRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -28,7 +29,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.dto.VersionInfoDTO;
-import run.halo.app.model.entity.GithubApiVersionJson;
 import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.HaloVersionCtrlService;
 import run.halo.app.utils.VmUtils;
@@ -41,6 +41,10 @@ import run.halo.app.utils.VmUtils;
 @Service
 @Slf4j
 public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, ApplicationContextAware {
+
+    @Autowired
+    GHRepository haloRepo;
+
     public static final String GITHUB_RELEASES_API =
         "https://api.github.com/repos/halo-dev/halo/releases";
     public static final String GITHUB_RELEASES_LATEST_API =
@@ -61,7 +65,6 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
      * The directory where current running halo-jar exists.
      */
     private static final Path JAR_DIR = VmUtils.CURR_JAR_DIR;
-
 
 
     private ApplicationContext context;
@@ -99,17 +102,18 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
 
     @Override
     public List<VersionInfoDTO> getAllReleasesInfo() {
-        // final RestTemplate restTemplate = builder.build();
-        final GithubApiVersionJson[] data =
-            restTemplate.getForObject(GITHUB_RELEASES_API, GithubApiVersionJson[].class);
-        if (data == null) {
+
+        try {
+            final List<GHRelease> releases = haloRepo.listReleases().toList();
+            return releases.stream().map(data -> {
+                final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(data);
+                versionInfo.setInLocal(isInLocal(data.getTagName()));
+                return versionInfo;
+            }).collect(Collectors.toList());
+        } catch (IOException e) {
             throw new ServiceException("从github api中拉取版本信息失败, url: " + GITHUB_RELEASES_API);
         }
-        return Arrays.stream(data).map(json -> {
-            final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(json);
-            versionInfo.setInLocal(isInLocal(json.getTagName()));
-            return versionInfo;
-        }).collect(Collectors.toList());
+
     }
 
     @Override
@@ -117,29 +121,29 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         if (!tagName.startsWith("v")) {
             tagName = "v" + tagName;
         }
-        String url = GITHUB_RELEASES_TAG_API_BASE + tagName;
-        // final RestTemplate restTemplate = builder.build();
-        final GithubApiVersionJson json =
-            restTemplate.getForObject(url, GithubApiVersionJson.class);
-        if (json == null) {
+        try {
+            final GHRelease release = haloRepo.getReleaseByTagName(tagName);
+            final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(release);
+            versionInfo.setInLocal(isInLocal(tagName));
+            return versionInfo;
+        } catch (IOException e) {
+            String url = GITHUB_RELEASES_TAG_API_BASE + tagName;
             throw new ServiceException("从github api中拉取版本信息失败, url: " + url);
         }
-        final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(json);
-        versionInfo.setInLocal(isInLocal(tagName));
-        return versionInfo;
     }
 
     @Override
     public VersionInfoDTO getLatestReleaseInfo() {
         // final RestTemplate restTemplate = builder.build();
-        final GithubApiVersionJson json =
-            restTemplate.getForObject(GITHUB_RELEASES_LATEST_API, GithubApiVersionJson.class);
-        if (json == null) {
+        try {
+            final GHRelease release = haloRepo.getLatestRelease();
+            final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(release);
+            versionInfo.setInLocal(isInLocal(release.getTagName()));
+            return versionInfo;
+        } catch (IOException e) {
             throw new ServiceException("从github api中拉取版本信息失败, url: " + GITHUB_RELEASES_LATEST_API);
         }
-        final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(json);
-        versionInfo.setInLocal(isInLocal(json.getTagName()));
-        return versionInfo;
+
     }
 
     @Override
@@ -258,7 +262,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
      * Download the specified jar by tagName into the given destination directory.
      *
      * @param tagName the specified tag name of the release
-     * @param dstDir destination directory
+     * @param dstDir  destination directory
      * @return the final path of the downloaded jar
      */
     private String downloadSpecifiedJar(String tagName, String dstDir) {
@@ -279,7 +283,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
      * <p>As the jar file is very big, it is not appropriate to load it as byte[] in memory,
      * so that directly forwarded it to the file system.
      *
-     * @param url the url to download resource
+     * @param url     the url to download resource
      * @param tarFile target file
      */
     private void download(String url, Path tarFile) {
@@ -344,7 +348,7 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
      * Backup and delete the specified jar file.
      * The implementation in Windows differs as the file lock in Windows.
      *
-     * @param curJar the specified jar path
+     * @param curJar       the specified jar path
      * @param backupTarget the path of the backup
      * @throws IOException the exception may arise in the process of backup
      */
