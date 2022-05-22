@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,14 +41,16 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull List<LinkDTO> listDtos(@NonNull Sort sort) {
+    public @NonNull
+    List<LinkDTO> listDtos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
     }
 
     @Override
-    public @NonNull List<LinkTeamVO> listTeamVos(@NonNull Sort sort) {
+    public @NonNull
+    List<LinkTeamVO> listTeamVos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all links
@@ -61,7 +64,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
             ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
 
         List<LinkTeamVO> result = new LinkedList<>();
-
+        Map<LinkTeamVO, Integer> teamPriorities = new HashMap<>();
         // Wrap link team vo list
         teamLinkListMap.forEach((team, linkList) -> {
             // Build link team vo
@@ -69,15 +72,33 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
             linkTeamVO.setTeam(team);
             linkTeamVO.setLinks(linkList);
 
+            teamPriorities.put(linkTeamVO, getTeamPriority(linkTeamVO));
             // Add it to result
             result.add(linkTeamVO);
         });
 
+        result.sort((a, b) -> teamPriorities.get(b) - teamPriorities.get(a));
+
         return result;
     }
 
+
+    /**
+     * Get the priority of a link team, which is the maximum priority of its link members.
+     *
+     * @param linkTeam A team of links.
+     * @return the priority of a link team.
+     */
+    private Integer getTeamPriority(LinkTeamVO linkTeam) {
+        return linkTeam.getLinks().stream()
+            .mapToInt(LinkDTO::getPriority)
+            .max()
+            .orElse(-1);
+    }
+
     @Override
-    public @NonNull List<LinkTeamVO> listTeamVosByRandom(@NonNull Sort sort) {
+    public @NonNull
+    List<LinkTeamVO> listTeamVosByRandom(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
         List<LinkDTO> links = listDtos(sort);
         Set<String> teams = ServiceUtils.fetchProperty(links, LinkDTO::getTeam);
@@ -95,7 +116,8 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull Link createBy(@NonNull LinkParam linkParam) {
+    public @NonNull
+    Link createBy(@NonNull LinkParam linkParam) {
         Assert.notNull(linkParam, "Link param must not be null");
 
         // Check the name
@@ -118,7 +140,8 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull Link updateBy(Integer id, @NonNull LinkParam linkParam) {
+    public @NonNull
+    Link updateBy(Integer id, @NonNull LinkParam linkParam) {
         Assert.notNull(id, "Id must not be null");
         Assert.notNull(linkParam, "Link param must not be null");
 
@@ -166,7 +189,8 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull List<Link> listAllByRandom() {
+    public @NonNull
+    List<Link> listAllByRandom() {
         List<Link> allLink = linkRepository.findAll();
         Collections.shuffle(allLink);
         return allLink;
