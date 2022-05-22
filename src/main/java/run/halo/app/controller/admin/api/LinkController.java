@@ -19,12 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import run.halo.app.model.dto.LinkDTO;
-import run.halo.app.model.dto.MenuDTO;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Link;
-import run.halo.app.model.entity.Menu;
 import run.halo.app.model.params.LinkParam;
-import run.halo.app.model.params.MenuParam;
 import run.halo.app.service.LinkService;
 
 /**
