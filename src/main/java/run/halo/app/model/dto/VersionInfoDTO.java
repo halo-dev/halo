@@ -37,9 +37,11 @@ public class VersionInfoDTO {
     public static VersionInfoDTO convertFrom(GHRelease release) {
         final VersionInfoDTO versionInfoDTO =
             VersionInfoDTO.builder().version(release.getTagName()).desc(release.getBody())
-                .githubUrl(release.getHtmlUrl().toString()).jarName(release.getName()).build();
+                .githubUrl(release.getHtmlUrl().toString())
+                .jarName("halo.jar").build();
         try {
             final GHAsset asset = release.listAssets().iterator().next();
+            versionInfoDTO.setJarName(asset.getName());
             versionInfoDTO.setSize(asset.getSize());
             versionInfoDTO.setDownloadUrl(asset.getBrowserDownloadUrl());
         } catch (IOException e) {

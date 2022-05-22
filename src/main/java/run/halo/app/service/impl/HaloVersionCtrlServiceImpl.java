@@ -12,12 +12,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.SystemUtils;
 import org.jetbrains.annotations.NotNull;
 import org.kohsuke.github.GHRelease;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.GitHubRateLimitHandler;
+import org.kohsuke.github.connector.GitHubConnectorResponse;
+import org.kohsuke.github.extras.okhttp3.OkHttpGitHubConnector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -42,8 +48,7 @@ import run.halo.app.utils.VmUtils;
 @Slf4j
 public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, ApplicationContextAware {
 
-    @Autowired
-    GHRepository haloRepo;
+    private GHRepository haloRepo;
 
     public static final String GITHUB_RELEASES_API =
         "https://api.github.com/repos/halo-dev/halo/releases";
@@ -71,8 +76,18 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
 
     @Autowired
     private RestTemplate restTemplate;
-    // @Autowired
-    // private RestTemplateBuilder builder;
+
+
+    public HaloVersionCtrlServiceImpl(ApplicationContext context,
+                                      RestTemplate restTemplate) {
+        this.context = context;
+        this.restTemplate = restTemplate;
+        try {
+            haloRepo = connect2github();
+        } catch (ServiceException e) {
+            haloRepo = null;
+        }
+    }
 
     @Override
     public boolean isInLocal(String tagName) {
@@ -104,6 +119,9 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
     public List<VersionInfoDTO> getAllReleasesInfo() {
 
         try {
+            if (haloRepo == null) {
+                haloRepo = connect2github();
+            }
             final List<GHRelease> releases = haloRepo.listReleases().toList();
             return releases.stream().map(data -> {
                 final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(data);
@@ -122,6 +140,9 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
             tagName = "v" + tagName;
         }
         try {
+            if (haloRepo == null) {
+                haloRepo = connect2github();
+            }
             final GHRelease release = haloRepo.getReleaseByTagName(tagName);
             final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(release);
             versionInfo.setInLocal(isInLocal(tagName));
@@ -136,6 +157,9 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
     public VersionInfoDTO getLatestReleaseInfo() {
         // final RestTemplate restTemplate = builder.build();
         try {
+            if (haloRepo == null) {
+                haloRepo = connect2github();
+            }
             final GHRelease release = haloRepo.getLatestRelease();
             final VersionInfoDTO versionInfo = VersionInfoDTO.convertFrom(release);
             versionInfo.setInLocal(isInLocal(release.getTagName()));
@@ -258,6 +282,28 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         context = applicationContext;
     }
 
+    private GHRepository connect2github() {
+        try {
+            log.info("Connect to Github.");
+            final OkHttpClient httpClient =
+                new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS).build();
+            return new GitHubBuilder()
+                .withConnector(new OkHttpGitHubConnector(httpClient))
+                .withRateLimitHandler(new GitHubRateLimitHandler() {
+                    @Override
+                    public void onError(@NotNull GitHubConnectorResponse githubResp)
+                        throws IOException {
+                        throw new ServiceException("无法访问Github API，可能访问频次过高. URL: "
+                            + githubResp.request().url());
+                    }
+                })
+                .build().getRepository("halo-dev/halo");
+        } catch (IOException e) {
+            throw new ServiceException("无法连接Github，请检查网络.");
+        }
+    }
+
     /**
      * Download the specified jar by tagName into the given destination directory.
      *
@@ -271,9 +317,9 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
         final String jarUrl = releaseInfo.getDownloadUrl();
         final String jarName = releaseInfo.getJarName();
         Assert.hasText(jarUrl, "Jar url must not be blank");
-        Path tar = Paths.get(dstDir).resolve(jarName);
-        download(jarUrl, tar);
-        return tar.toString();
+        Path target = Paths.get(dstDir).resolve(jarName);
+        download(jarUrl, target);
+        return target.toString();
     }
 
 
@@ -414,7 +460,9 @@ public class HaloVersionCtrlServiceImpl implements HaloVersionCtrlService, Appli
                 try {
                     final Process process = pb.inheritIO().start();
                     System.out.println(
-                        "\n------------------------------\nNew process PID: " + process.pid()
+                        "\n------------------------------\n"
+                            + "New process PID: " + process.pid() + "\n"
+                            + "Command to launch: " + String.join(" ", cmd)
                             + "\n------------------------------\n");
                 } catch (IOException e) {
                     e.printStackTrace();

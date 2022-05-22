@@ -129,7 +129,7 @@ dependencies {
     implementation "io.github.java-diff-utils:java-diff-utils:$diffUtilsVersion"
 
     implementation "org.kohsuke:github-api:$githubApiVersion"
-    implementation "com.spotify:github-client:$githubClientVersion"
+
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"

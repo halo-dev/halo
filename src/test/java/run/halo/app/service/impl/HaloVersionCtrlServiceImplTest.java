@@ -34,6 +34,8 @@ class HaloVersionCtrlServiceImplTest {
     @Autowired
     HaloVersionCtrlService versionCtrlService;
 
+
+
     @Test
     void testIsInLocal() {
         assertFalse(this.versionCtrlService.isInLocal("Tag Name"));
