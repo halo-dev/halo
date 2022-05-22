@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.core.util.ReflectionUtil;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
@@ -117,7 +118,7 @@ import run.halo.app.utils.VersionUtil;
  * @author ryanwang
  * @author Raremaa
  * @author guqing
- * @date  2019-04-26
+ * @date 2019-04-26
  */
 @Service
 @Slf4j
@@ -131,6 +132,16 @@ public class BackupServiceImpl implements BackupService {
     private static final String DATA_EXPORT_BASE_URI = "/api/admin/backups/data";
 
     private static final String UPLOAD_SUB_DIR = "upload/";
+
+
+    @Value("${halo.file.legal-md-suffix:txt,md,markdown}")
+    private String[] legalMdSuffixes;
+
+    /**
+     * Max size of md file to upload, in terms of KB.
+     */
+    @Value("${halo.file.max-md-size:#{1024 * 24}}")
+    private Double maxMdSize;
 
     private final AttachmentService attachmentService;
 
@@ -187,18 +198,24 @@ public class BackupServiceImpl implements BackupService {
     private final ApplicationContext appContext;
 
     public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService,
-        CommentBlackListService commentBlackListService, JournalService journalService,
-        JournalCommentService journalCommentService, LinkService linkService, LogService logService,
-        MenuService menuService, OptionService optionService, PhotoService photoService,
+        CommentBlackListService commentBlackListService,
+        JournalService journalService,
+        JournalCommentService journalCommentService, LinkService linkService,
+        LogService logService,
+        MenuService menuService, OptionService optionService,
+        PhotoService photoService,
         PostService postService, ContentService contentService,
         ContentPatchLogService contentPatchLogService,
         PostCategoryService postCategoryService,
         PostCommentService postCommentService, PostMetaService postMetaService,
         PostTagService postTagService, SheetService sheetService,
-        SheetCommentService sheetCommentService, SheetMetaService sheetMetaService,
-        TagService tagService, ThemeSettingService themeSettingService, UserService userService,
+        SheetCommentService sheetCommentService,
+        SheetMetaService sheetMetaService,
+        TagService tagService, ThemeSettingService themeSettingService,
+        UserService userService,
         OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties,
-        ApplicationEventPublisher eventPublisher, ApplicationContext appContext) {
+        ApplicationEventPublisher eventPublisher,
+        ApplicationContext appContext) {
         this.attachmentService = attachmentService;
         this.categoryService = categoryService;
         this.commentBlackListService = commentBlackListService;
@@ -231,11 +248,24 @@ public class BackupServiceImpl implements BackupService {
     @Override
     public BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException {
 
+        final String mdFileName = file.getOriginalFilename();
+
+        if (!FileUtils.isLegalMdFilename(mdFileName, legalMdSuffixes)) {
+            throw new ServiceException(
+                "上传的markdown文件后缀不正确，目前支持的后缀为: " + String.join(", ", legalMdSuffixes));
+        }
+
+        if (file.getSize() > maxMdSize * 1024) {
+            throw new ServiceException(
+                "上传的markdown文件过大，目前仅支持 " + maxMdSize + " KB 的md文件"
+            );
+        }
+
         // Read markdown content.
         String markdown = FileUtils.readString(file.getInputStream());
 
         // TODO sheet import
-        return postService.importMarkdown(markdown, file.getOriginalFilename());
+        return postService.importMarkdown(markdown, mdFileName);
     }
 
     @Override
