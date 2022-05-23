@@ -41,16 +41,14 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull
-    List<LinkDTO> listDtos(@NonNull Sort sort) {
+    public @NonNull List<LinkDTO> listDtos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         return convertTo(listAll(sort));
     }
 
     @Override
-    public @NonNull
-    List<LinkTeamVO> listTeamVos(@NonNull Sort sort) {
+    public @NonNull List<LinkTeamVO> listTeamVos(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
         // List all links
@@ -97,8 +95,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull
-    List<LinkTeamVO> listTeamVosByRandom(@NonNull Sort sort) {
+    public @NonNull List<LinkTeamVO> listTeamVosByRandom(@NonNull Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
         List<LinkDTO> links = listDtos(sort);
         Set<String> teams = ServiceUtils.fetchProperty(links, LinkDTO::getTeam);
@@ -116,8 +113,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull
-    Link createBy(@NonNull LinkParam linkParam) {
+    public @NonNull Link createBy(@NonNull LinkParam linkParam) {
         Assert.notNull(linkParam, "Link param must not be null");
 
         // Check the name
@@ -140,8 +136,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull
-    Link updateBy(Integer id, @NonNull LinkParam linkParam) {
+    public @NonNull Link updateBy(Integer id, @NonNull LinkParam linkParam) {
         Assert.notNull(id, "Id must not be null");
         Assert.notNull(linkParam, "Link param must not be null");
 

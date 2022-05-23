@@ -89,7 +89,8 @@ public class LinkController {
      * @return the links after updated.
      */
     @PutMapping("/batch")
-    public List<LinkDTO> updateBatchBy(@RequestBody @Valid List<LinkParam> linkParams) {
+    @ApiOperation("Updates links in batch")
+    public List<LinkDTO> updateBatchBy(@RequestBody List<@Valid LinkParam> linkParams) {
         List<Link> links = linkParams
             .stream()
             .filter(linkParam -> Objects.nonNull(linkParam.getId()))
