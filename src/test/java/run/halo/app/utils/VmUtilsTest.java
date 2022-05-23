@@ -17,21 +17,6 @@ class VmUtilsTest {
     private static RuntimeMXBean bean = ManagementFactory.getRuntimeMXBean();
 
     @Test
-    void testGetSameLaunchCommand() {
-        final List<String> cmd = VmUtils.getSameLaunchCommand();
-        assertFalse(cmd.isEmpty());
-        // In junit test. its size should > 3
-        assertTrue(cmd.size() > 3);
-    }
-
-    @Test
-    void testGetSameLaunchCommand2() {
-        final List<String> cmd = VmUtils.getSameLaunchCommand();
-        System.out.println(cmd.get(0));
-        assertTrue(cmd.get(0).matches(".*java.*"));
-    }
-
-    @Test
     void testGetJvmExecutablePath() {
         String actualJvmExecutablePath = VmUtils.getJvmExecutablePath();
         assertTrue(StringUtils.isNotBlank(actualJvmExecutablePath));
@@ -52,6 +37,7 @@ class VmUtilsTest {
         final List<String> vmArguments = VmUtils.getVmOptions();
         assertNotNull(vmArguments);
     }
+
     @Test
     void testGetVmArguments2() {
         final List<String> vmArguments = VmUtils.getVmOptions();
@@ -78,6 +64,7 @@ class VmUtilsTest {
     void testGetNonVmPartOfCmd() {
         assertEquals(System.getProperty("sun.java.command"), VmUtils.getNonVmPartOfCmd());
     }
+
     @Test
     void testGetNonVmPartOfCmd2() {
         final String args = VmUtils.getNonVmPartOfCmd();
@@ -100,6 +87,7 @@ class VmUtilsTest {
     void testGetUserDir() {
         assertEquals(System.getProperty("user.dir"), VmUtils.getUserDir());
     }
+
     @Test
     void testGetUserDir2() {
         final String userDir = VmUtils.getUserDir();
