@@ -9,11 +9,12 @@ import { VModal } from "@/components/base/modal";
 import { VTabItem, VTabs } from "@/components/base/tabs";
 import { VTextarea } from "@/components/base/textarea";
 import {
+  IconAddCircle,
+  IconArrowDown,
   IconArrowLeft,
   IconArrowRight,
   IconBookRead,
   IconSettings,
-  IconArrowDown,
 } from "@/core/icons";
 import { posts } from "./posts-mock";
 import { computed, ref } from "vue";
@@ -294,7 +295,12 @@ const handleSelectNext = () => {
       <IconBookRead class="self-center mr-2" />
     </template>
     <template #actions>
-      <VButton :route="{ name: 'PostEditor' }" type="secondary">发布</VButton>
+      <VButton :route="{ name: 'PostEditor' }" type="secondary">
+        <template #icon>
+          <IconAddCircle class="w-full h-full" />
+        </template>
+        新建
+      </VButton>
     </template>
   </VPageHeader>
 

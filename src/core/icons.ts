@@ -42,6 +42,10 @@ import IconInformation from "~icons/ri/information-line";
 import IconCloseCircle from "~icons/ri/close-circle-line";
 // @ts-ignore
 import IconDeleteBin from "~icons/ri/delete-bin-2-line";
+// @ts-ignore
+import IconAddCircle from "~icons/ri/add-circle-line";
+// @ts-ignore
+import IconSave from "~icons/ri/save-line";
 
 export {
   IconDashboard,
@@ -66,4 +70,6 @@ export {
   IconInformation,
   IconCloseCircle,
   IconDeleteBin,
+  IconAddCircle,
+  IconSave,
 };

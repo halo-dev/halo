@@ -4,9 +4,11 @@ import { VButton } from "@/components/base/button";
 import { VModal } from "@/components/base/modal";
 import { IconPalette, IconSettings } from "@/core/icons";
 import { VCard } from "@/components/base/card";
+import { VSpace } from "@/components/base/space";
 import { ref } from "vue";
 
 const strategyVisible = ref(false);
+const attachmentSelectVisible = ref(false);
 
 const strategies = ref([
   {
@@ -34,11 +36,51 @@ const selected = ref(strategies.value[0].id);
       <IconPalette class="self-center mr-2" />
     </template>
     <template #actions>
-      <VButton type="secondary">上传</VButton>
+      <VSpace>
+        <VButton type="default" @click="attachmentSelectVisible = true"
+          >选择</VButton
+        >
+        <VButton type="secondary">上传</VButton>
+      </VSpace>
     </template>
   </VPageHeader>
 
   <VModal v-model:visible="strategyVisible" title="添加存储策略"></VModal>
+
+  <VModal
+    v-model:visible="attachmentSelectVisible"
+    :width="1240"
+    title="选择附件"
+  >
+    <div class="w-full">
+      <ul
+        class="grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-2 xl:grid-cols-8 2xl:grid-cols-8"
+        role="list"
+      >
+        <li v-for="i in 40" :key="i" class="relative">
+          <VCard :body-class="['!p-0']">
+            <div
+              class="group block w-full aspect-w-10 aspect-h-7 bg-gray-100 overflow-hidden cursor-pointer"
+            >
+              <img
+                :src="`https://picsum.photos/1000/700?random=${i}`"
+                alt=""
+                class="object-cover pointer-events-none group-hover:opacity-75"
+              />
+            </div>
+            <p
+              class="block text-sm font-medium text-gray-700 truncate pointer-events-none px-2 py-1"
+            >
+              {{ i * 100 }}
+            </p>
+          </VCard>
+        </li>
+      </ul>
+    </div>
+    <template #footer>
+      <VButton type="secondary">确定</VButton>
+    </template>
+  </VModal>
 
   <div class="m-4">
     <div class="flex-col flex sm:flex-row gap-2">
