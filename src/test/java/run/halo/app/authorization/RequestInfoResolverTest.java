@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+import run.halo.app.extension.Metadata;
 import run.halo.app.identity.authorization.AttributesRecord;
 import run.halo.app.identity.authorization.DefaultRuleResolver;
 import run.halo.app.identity.authorization.PolicyRule;
@@ -23,7 +24,6 @@ import run.halo.app.identity.authorization.Role;
 import run.halo.app.identity.authorization.RoleBinding;
 import run.halo.app.identity.authorization.RoleRef;
 import run.halo.app.identity.authorization.Subject;
-import run.halo.app.infra.types.ObjectMeta;
 
 /**
  * Tests for {@link RequestInfoFactory}.
@@ -131,13 +131,16 @@ public class RequestInfoResolverTest {
                     .build()
             );
             role.setRules(rules);
-            ObjectMeta objectMeta = new ObjectMeta();
-            objectMeta.setName("ruleReadPost");
-            role.setObjectMeta(objectMeta);
+            Metadata metadata = new Metadata();
+            metadata.setName("ruleReadPost");
+            role.setMetadata(metadata);
             return role;
         }, () -> {
             // role binding lister
             RoleBinding roleBinding = new RoleBinding();
+            Metadata metadata = new Metadata();
+            metadata.setName("admin_ruleReadPost");
+            roleBinding.setMetadata(metadata);
 
             Subject subject = new Subject();
             subject.setName("admin");
