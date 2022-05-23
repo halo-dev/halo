@@ -3,21 +3,17 @@ package run.halo.app.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerTypePredicate;
-import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.reactive.config.PathMatchConfigurer;
+import org.springframework.web.reactive.config.WebFluxConfigurer;
 import run.halo.app.Application;
 
-/**
- * Spring web mvc config.
- *
- * @author guqing
- * @date 2022-04-12
- */
 @Configuration
-public class WebMvcConfig implements WebMvcConfigurer {
+@EnableWebFlux
+public class WebFluxConfig implements WebFluxConfigurer {
 
     @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
+    public void configurePathMatching(PathMatchConfigurer configurer) {
         configurer.addPathPrefix("/api/v1",
             c -> HandlerTypePredicate.forAnnotation(RestController.class)
                 .and(HandlerTypePredicate.forBasePackage(Application.class.getPackageName()))

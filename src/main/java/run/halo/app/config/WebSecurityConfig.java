@@ -15,12 +15,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -30,19 +31,15 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authorization.AuthorizationContext;
+import reactor.core.publisher.Mono;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
 import run.halo.app.identity.authentication.OAuth2PasswordAuthenticationProvider;
 import run.halo.app.identity.authentication.OAuth2RefreshTokenAuthenticationProvider;
-import run.halo.app.identity.authentication.OAuth2TokenEndpointFilter;
-import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
-import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
 import run.halo.app.identity.authentication.verifier.JwtProvidedDecoderAuthenticationManagerResolver;
 import run.halo.app.identity.authorization.PolicyRule;
 import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
@@ -50,8 +47,6 @@ import run.halo.app.identity.authorization.Role;
 import run.halo.app.identity.authorization.RoleBinding;
 import run.halo.app.identity.authorization.RoleRef;
 import run.halo.app.identity.authorization.Subject;
-import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
-import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.infra.types.ObjectMeta;
 
@@ -59,7 +54,8 @@ import run.halo.app.infra.types.ObjectMeta;
  * @author guqing
  * @since 2022-04-12
  */
-@EnableWebSecurity
+// @EnableWebSecurity
+@EnableWebFluxSecurity
 @EnableConfigurationProperties(JwtProperties.class)
 public class WebSecurityConfig {
 
@@ -77,34 +73,57 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        ProviderSettings providerSettings = providerSettings();
-        ProviderContextFilter providerContextFilter = new ProviderContextFilter(providerSettings);
-        http
-            .authorizeHttpRequests((authorize) -> authorize
-                .antMatchers(providerSettings.getTokenEndpoint()).permitAll()
-                // for static path
-                .antMatchers("/static/js/**").permitAll()
-                // for swagger ui
-                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .antMatchers("/api/**", "/apis/**").access(requestInfoAuthorizationManager())
-                .anyRequest().access(requestInfoAuthorizationManager())
-            )
-            .csrf(AbstractHttpConfigurer::disable)
-            .httpBasic(Customizer.withDefaults())
-            .addFilterBefore(new OAuth2TokenEndpointFilter(authenticationManager(),
-                    providerSettings.getTokenEndpoint()),
-                FilterSecurityInterceptor.class)
-            .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManagerResolver()),
-                BasicAuthenticationFilter.class)
-            .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
-            .sessionManagement(
-                (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling((exceptions) -> exceptions
-                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-                .accessDeniedHandler(new JwtAccessDeniedHandler())
-            );
+    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
+
+        http.x509(Customizer.withDefaults())
+            .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
+            .authorizeExchange(exchanges ->
+                exchanges.pathMatchers("/api/**", "/apis/**")
+                    .access(null)
+                    .anyExchange().access(null));
+
         return http.build();
+
+        // ProviderSettings providerSettings = providerSettings();
+        // ProviderContextFilter providerContextFilter = new ProviderContextFilter
+        // (providerSettings);
+        // http
+        //     .authorizeHttpRequests((authorize) -> authorize
+        //         .antMatchers(providerSettings.getTokenEndpoint()).permitAll()
+        //         // for static path
+        //         .antMatchers("/static/js/**").permitAll()
+        //         // for swagger ui
+        //         .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+        //         .antMatchers("/api/**", "/apis/**").access(requestInfoAuthorizationManager())
+        //         .anyRequest().access(requestInfoAuthorizationManager())
+        //     )
+        //     .csrf(AbstractHttpConfigurer::disable)
+        //     .httpBasic(Customizer.withDefaults())
+        //     .addFilterBefore(new OAuth2TokenEndpointFilter(authenticationManager(),
+        //             providerSettings.getTokenEndpoint()),
+        //         FilterSecurityInterceptor.class)
+        //     .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManagerResolver
+        //     ()),
+        //         BasicAuthenticationFilter.class)
+        //     .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
+        //     .sessionManagement(
+        //         (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        //     .exceptionHandling((exceptions) -> exceptions
+        //         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+        //         .accessDeniedHandler(new JwtAccessDeniedHandler())
+        //     );
+        // return http.build();
+    }
+
+    public ReactiveAuthorizationManager<AuthorizationContext> requestInfoAuthorizationManager2() {
+        return new ReactiveAuthorizationManager<AuthorizationContext>() {
+
+            @Override
+            public Mono<AuthorizationDecision> check(Mono<Authentication> authentication,
+                AuthorizationContext object) {
+                return null;
+            }
+        };
     }
 
     public RequestInfoAuthorizationManager requestInfoAuthorizationManager() {
