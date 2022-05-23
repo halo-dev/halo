@@ -8,7 +8,7 @@ defineProps({
 <template>
   <div class="flex items-center justify-between p-4 bg-white">
     <div class="flex-1 self-center min-w-0">
-      <h2 class="flex text-xl font-bold text-gray-800 truncate">
+      <h2 class="flex text-xl font-bold text-gray-800 truncate items-center">
         <slot name="icon" />
         <span>{{ title }}</span>
       </h2>

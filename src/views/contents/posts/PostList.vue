@@ -333,7 +333,7 @@ const handleSelectNext = () => {
             <div class="mt-4 sm:mt-0 flex">
               <VSpace spacing="lg">
                 <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center"
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
                 >
                   <span class="mr-0.5">分类</span>
                   <span>
@@ -341,7 +341,7 @@ const handleSelectNext = () => {
                   </span>
                 </div>
                 <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center"
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
                 >
                   <span class="mr-0.5">标签</span>
                   <span>
@@ -349,7 +349,7 @@ const handleSelectNext = () => {
                   </span>
                 </div>
                 <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center"
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
                 >
                   <span class="mr-0.5">作者</span>
                   <span>
@@ -357,7 +357,7 @@ const handleSelectNext = () => {
                   </span>
                 </div>
                 <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center"
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
                 >
                   <span class="mr-0.5">排序</span>
                   <span>

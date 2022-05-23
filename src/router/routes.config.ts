@@ -16,6 +16,7 @@ import MenuList from "../views/interface/menus/MenuList.vue";
 import Visual from "../views/interface/visual/Visual.vue";
 
 import PluginList from "../views/system/plugins/PluginList.vue";
+import PluginDetail from "../views/system/plugins/PluginDetail.vue";
 import UserList from "../views/system/users/UserList.vue";
 import Profile from "../views/system/users/Profile.vue";
 import GeneralSettings from "../views/system/settings/GeneralSettings.vue";
@@ -146,6 +147,11 @@ export const routes: Array<RouteRecordRaw> = [
         path: "",
         name: "Plugins",
         component: PluginList,
+      },
+      {
+        path: ":id",
+        name: "PluginDetail",
+        component: PluginDetail,
       },
     ],
   },
