@@ -14,8 +14,7 @@ import org.springframework.util.Assert;
  * Base class for {@link AbstractAuthenticationToken} implementations that expose common
  * attributes between different OAuth 2.0 Access Token Formats.
  *
- * <p>
- * For example, a {@link Jwt} could expose its {@link Jwt#getClaims() claims} via
+ * <p>For example, a {@link Jwt} could expose its {@link Jwt#getClaims() claims} via
  * {@link #getTokenAttributes()} or an &quot;Introspected&quot; OAuth 2.0 Access Token
  * could expose the attributes of the Introspection Response via
  * {@link #getTokenAttributes()}.
