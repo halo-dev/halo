@@ -56,7 +56,6 @@ dependencies {
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation "org.springframework.boot:spring-boot-starter-jetty"
 
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M2'
     implementation "org.flywaydb:flyway-core"

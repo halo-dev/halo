@@ -1,5 +1,7 @@
 package run.halo.app.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -13,12 +15,9 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.Authentication;
@@ -63,24 +62,20 @@ public class WebSecurityConfig {
 
     private final RSAPrivateKey priv;
 
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
-    public WebSecurityConfig(JwtProperties jwtProperties,
-        AuthenticationManagerBuilder authenticationManagerBuilder) throws IOException {
+    public WebSecurityConfig(JwtProperties jwtProperties) throws IOException {
         this.key = jwtProperties.readPublicKey();
         this.priv = jwtProperties.readPrivateKey();
-        this.authenticationManagerBuilder = authenticationManagerBuilder;
+        // this.authenticationManagerBuilder = authenticationManagerBuilder;
     }
 
     @Bean
     public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
 
-        http.x509(Customizer.withDefaults())
-            .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
-            .authorizeExchange(exchanges ->
-                exchanges.pathMatchers("/api/**", "/apis/**")
-                    .access(null)
-                    .anyExchange().access(null));
+        http.x509(withDefaults())
+            .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
+            .httpBasic(withDefaults())
+            .formLogin(withDefaults())
+            .logout(withDefaults());
 
         return http.build();
 
@@ -173,12 +168,12 @@ public class WebSecurityConfig {
         return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder());
     }
 
-    @Bean
-    AuthenticationManager authenticationManager() throws Exception {
-        authenticationManagerBuilder.authenticationProvider(passwordAuthenticationProvider())
-            .authenticationProvider(oauth2RefreshTokenAuthenticationProvider());
-        return authenticationManagerBuilder.getOrBuild();
-    }
+    // @Bean
+    // AuthenticationManager authenticationManager() {
+    //     authenticationManagerBuilder.authenticationProvider(passwordAuthenticationProvider())
+    //         .authenticationProvider(oauth2RefreshTokenAuthenticationProvider());
+    //     return authenticationManagerBuilder.getOrBuild();
+    // }
 
     @Bean
     JwtDecoder jwtDecoder() {
