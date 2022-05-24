@@ -16,23 +16,4 @@ public abstract class AbstractExtension implements Extension {
 
     private MetadataOperator metadata;
 
-    @Override
-    public void groupVersionKind(GroupVersionKind gvk) {
-        this.apiVersion = gvk.groupVersion().toString();
-        this.kind = gvk.kind();
-    }
-
-    @Override
-    public GroupVersionKind groupVersionKind() {
-        return GroupVersionKind.fromAPIVersionAndKind(this.apiVersion, this.kind);
-    }
-
-    public MetadataOperator getMetadata() {
-        return metadata;
-    }
-
-    @Override
-    public void setMetadata(MetadataOperator metadata) {
-        this.metadata = metadata;
-    }
 }

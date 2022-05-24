@@ -6,18 +6,4 @@ package run.halo.app.extension;
  */
 public interface Extension extends ExtensionOperator {
 
-    /**
-     * Sets GroupVersionKind of the Extension.
-     *
-     * @param gvk is GroupVersionKind data.
-     */
-    void groupVersionKind(GroupVersionKind gvk);
-
-    /**
-     * Gets GroupVersionKind of the Extension.
-     *
-     * @return GroupVersionKind of the Extension.
-     */
-    GroupVersionKind groupVersionKind();
-
 }

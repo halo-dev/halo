@@ -1,5 +1,6 @@
 package run.halo.app.extension;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -27,5 +28,26 @@ public interface ExtensionOperator {
     void setKind(String kind);
 
     void setMetadata(MetadataOperator metadata);
+
+
+    /**
+     * Sets GroupVersionKind of the Extension.
+     *
+     * @param gvk is GroupVersionKind data.
+     */
+    default void groupVersionKind(GroupVersionKind gvk) {
+        setApiVersion(gvk.groupVersion().toString());
+        setKind(gvk.kind());
+    }
+
+    /**
+     * Gets GroupVersionKind of the Extension.
+     *
+     * @return GroupVersionKind of the Extension.
+     */
+    @JsonIgnore
+    default GroupVersionKind groupVersionKind() {
+        return GroupVersionKind.fromAPIVersionAndKind(getApiVersion(), getKind());
+    }
 
 }
