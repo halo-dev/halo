@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
+import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +35,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import run.halo.app.identity.apitoken.DefaultPersonalAccessTokenDecoder;
+import run.halo.app.identity.apitoken.PersonalAccessTokenDecoder;
+import run.halo.app.identity.apitoken.PersonalAccessTokenUtils;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
@@ -54,6 +58,7 @@ import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.infra.types.ObjectMeta;
+import run.halo.app.infra.utils.HaloUtils;
 
 /**
  * @author guqing
@@ -151,7 +156,8 @@ public class WebSecurityConfig {
     }
 
     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver() {
-        return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder());
+        return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder(),
+            personalAccessTokenDecoder());
     }
 
     @Bean
@@ -159,6 +165,13 @@ public class WebSecurityConfig {
         authenticationManagerBuilder.authenticationProvider(passwordAuthenticationProvider())
             .authenticationProvider(oauth2RefreshTokenAuthenticationProvider());
         return authenticationManagerBuilder.getOrBuild();
+    }
+
+    @Bean
+    PersonalAccessTokenDecoder personalAccessTokenDecoder() {
+        String salt = HaloUtils.readClassPathResourceAsString("apiToken.salt");
+        SecretKey secretKey = PersonalAccessTokenUtils.convertStringToSecretKey(salt);
+        return new DefaultPersonalAccessTokenDecoder(oauth2AuthorizationService(), secretKey);
     }
 
     @Bean

@@ -144,7 +144,7 @@ public class TestWebSecurityConfig {
     }
 
     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver() {
-        return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder());
+        return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder(), null);
     }
 
     @Bean
