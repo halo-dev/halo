@@ -46,7 +46,7 @@ public class DefaultRoleBindingLister implements RoleBindingLister {
 
         List<String> roleNames = roleNamesFromAuthentication();
 
-        List<RoleBinding> roleBindings = new ArrayList<>();
+        List<RoleBinding> roleBindings = new ArrayList<>(roleNames.size());
         for (String roleName : roleNames) {
             RoleBinding roleBinding = new RoleBinding();
             // metadata
