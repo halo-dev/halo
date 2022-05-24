@@ -91,7 +91,7 @@ export const menus: MenuGroupType[] = [
       },
       {
         name: "用户",
-        path: "/users/profile",
+        path: "/users",
         icon: IconUserSettings,
       },
       {

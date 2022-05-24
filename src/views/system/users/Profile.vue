@@ -1,3 +1,25 @@
+<script lang="ts" setup>
+import { VButton } from "@/components/base/button";
+import { VInput } from "@/components/base/input";
+import { VTextarea } from "@/components/base/textarea";
+import { VTag } from "@/components/base/tag";
+import { VTabItem, VTabs } from "@/components/base/tabs";
+import { IconUserSettings } from "@/core/icons";
+import { ref } from "vue";
+import { useRoute } from "vue-router";
+import { users } from "./users-mock";
+
+const activeTab = ref("general");
+const user = ref();
+
+const route = useRoute();
+
+if (route.params.username) {
+  user.value = users.find((u) => u.username === route.params.username);
+} else {
+  user.value = users[0];
+}
+</script>
 <template>
   <header class="bg-white">
     <div class="h-48 bg-gradient-to-r from-gray-800 to-red-500"></div>
@@ -5,9 +27,9 @@
       <div class="-mt-12 sm:-mt-16 flex items-end space-x-5">
         <div class="flex">
           <img
+            :src="user.avatar"
             alt="Avatar"
             class="h-24 w-24 rounded-full ring-4 ring-white sm:h-32 sm:w-32 drop-shadow-lg"
-            src="https://ryanc.cc/avatar"
           />
         </div>
         <div
@@ -15,12 +37,12 @@
         >
           <div class="block mt-6 min-w-0 flex-1">
             <h1 class="text-xl font-bold text-gray-900 truncate">
-              <span class="mr-1">Ryan Wang</span>
+              <span class="mr-1">{{ user.name }}</span>
               <VTag theme="default">
                 <template #leftIcon>
                   <IconUserSettings />
                 </template>
-                管理员
+                {{ user.role }}
               </VTag>
             </h1>
           </div>
@@ -49,7 +71,7 @@
                 </label>
                 <div class="mt-1 sm:mt-0 sm:col-span-2">
                   <div class="max-w-lg flex shadow-sm">
-                    <VInput modelValue="ryanwang" />
+                    <VInput :modelValue="user.username" />
                   </div>
                 </div>
               </div>
@@ -63,7 +85,7 @@
                 </label>
                 <div class="mt-1 sm:mt-0 sm:col-span-2">
                   <div class="max-w-lg flex shadow-sm">
-                    <VInput modelValue="Ryan Wang" />
+                    <VInput :modelValue="user.name" />
                   </div>
                 </div>
               </div>
@@ -78,7 +100,7 @@
                 </label>
                 <div class="mt-1 sm:mt-0 sm:col-span-2">
                   <div class="max-w-lg flex shadow-sm">
-                    <VInput modelValue="i@ryanc.cc" />
+                    <VInput :modelValue="user.email" />
                   </div>
                 </div>
               </div>
@@ -166,14 +188,3 @@
     </VTabs>
   </section>
 </template>
-<script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VInput } from "@/components/base/input";
-import { VTextarea } from "@/components/base/textarea";
-import { VTag } from "@/components/base/tag";
-import { VTabItem, VTabs } from "@/components/base/tabs";
-import { IconUserSettings } from "@/core/icons";
-import { ref } from "vue";
-
-const activeTab = ref("general");
-</script>

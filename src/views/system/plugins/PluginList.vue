@@ -80,6 +80,14 @@ const handleRouteToDetail = (plugin: any) => {
                 <div
                   class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
                 >
+                  <span class="mr-0.5">类别</span>
+                  <span>
+                    <IconArrowDown />
+                  </span>
+                </div>
+                <div
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
+                >
                   <span class="mr-0.5">提供方</span>
                   <span>
                     <IconArrowDown />

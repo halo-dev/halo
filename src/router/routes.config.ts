@@ -166,6 +166,11 @@ export const routes: Array<RouteRecordRaw> = [
         component: UserList,
       },
       {
+        path: ":username",
+        name: "UserDetail",
+        component: Profile,
+      },
+      {
         path: "profile",
         name: "Profile",
         component: Profile,

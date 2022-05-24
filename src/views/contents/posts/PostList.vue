@@ -18,6 +18,7 @@ import {
 } from "@/core/icons";
 import { posts } from "./posts-mock";
 import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import type { Post } from "@halo-dev/admin-api";
 
 const postsRef = ref(
@@ -30,6 +31,7 @@ const postsRef = ref(
   })
 );
 
+const router = useRouter();
 const checkAll = ref(false);
 const postSettings = ref(false);
 const settingActiveId = ref("general");
@@ -65,6 +67,16 @@ const handleSelectNext = () => {
   if (currentIndex < posts.length - 1) {
     selected.value = posts[currentIndex + 1];
   }
+};
+
+// eslint-disable-next-line
+const handleRouteToEditor = (post: any) => {
+  router.push({
+    name: "PostEditor",
+    params: {
+      id: post.id,
+    },
+  });
 };
 </script>
 <template>
@@ -370,7 +382,11 @@ const handleSelectNext = () => {
         </div>
       </template>
       <ul class="divide-y divide-gray-100 box-border w-full h-full" role="list">
-        <li v-for="(post, index) in postsRef" :key="index">
+        <li
+          v-for="(post, index) in postsRef"
+          :key="index"
+          @click="handleRouteToEditor(post)"
+        >
           <div
             :class="{
               'bg-gray-100': selected.id === post.id || post.checked,
@@ -425,7 +441,7 @@ const handleSelectNext = () => {
                     2020-01-07
                   </time>
                   <span class="cursor-pointer">
-                    <IconSettings @click="handleSelect(post)" />
+                    <IconSettings @click.stop="handleSelect(post)" />
                   </span>
                 </div>
               </div>

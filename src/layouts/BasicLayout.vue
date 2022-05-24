@@ -25,6 +25,7 @@
         </div>
         <div
           class="profile-control transition-all hover:bg-gray-100 rounded cursor-pointer p-1"
+          @click="handleRouteToProfile"
         >
           <IconMore />
         </div>
@@ -139,6 +140,10 @@ const router = useRouter();
 
 const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
+
+const handleRouteToProfile = () => {
+  router.push({ name: "Profile" });
+};
 </script>
 
 <style lang="scss">
