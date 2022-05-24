@@ -5,16 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.time.Instant;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class UnstructuredTest {
 
-    ObjectMapper objectMapper;
+    ObjectMapper objectMapper = Unstructured.OBJECT_MAPPER;
 
     String extensionJson = """
         {
@@ -35,12 +33,6 @@ class UnstructuredTest {
     @BeforeAll
     static void setUpGlobally() {
         Schemes.INSTANCE.register(FakeExtension.class);
-    }
-
-    @BeforeEach
-    void setUp() {
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -70,8 +62,7 @@ class UnstructuredTest {
 
     @Test
     void shouldSetExtensionCorrectly() {
-        var objectNode = objectMapper.createObjectNode();
-        var extension = new Unstructured(objectNode);
+        var extension = new Unstructured();
         extension.setApiVersion("fake.halo.run/v1alpha1");
         extension.setKind("Fake");
         extension.setMetadata(createMetadata());

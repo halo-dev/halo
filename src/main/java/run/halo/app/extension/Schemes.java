@@ -40,12 +40,12 @@ public enum Schemes {
     /**
      * The map mapping GroupVersionKind and type of Extension.
      */
-    private final Map<GroupVersionKind, Class<? extends Extension>> gvkToType;
+    private final Map<GroupVersionKind, Scheme> gvkToScheme;
 
     Schemes() {
         schemes = new HashSet<>();
         typeToScheme = new HashMap<>();
-        gvkToType = new HashMap<>();
+        gvkToScheme = new HashMap<>();
     }
 
     /**
@@ -55,7 +55,7 @@ public enum Schemes {
     void clear() {
         schemes.clear();
         typeToScheme.clear();
-        gvkToType.clear();
+        gvkToScheme.clear();
     }
 
     /**
@@ -74,6 +74,7 @@ public enum Schemes {
                     type.getName()));
         }
 
+        // TODO Move the generation logic outside.
         // generate JSON schema
         var module = new Swagger2Module();
         var config =
@@ -108,7 +109,7 @@ public enum Schemes {
             return;
         }
         typeToScheme.put(scheme.type(), scheme);
-        gvkToType.put(scheme.groupVersionKind(), scheme.type());
+        gvkToScheme.put(scheme.groupVersionKind(), scheme);
     }
 
     /**
@@ -122,6 +123,10 @@ public enum Schemes {
     }
 
 
+    public Optional<Scheme> fetch(GroupVersionKind gvk) {
+        return Optional.ofNullable(gvkToScheme.get(gvk));
+    }
+
     /**
      * Gets a scheme using Extension type.
      *
@@ -132,6 +137,11 @@ public enum Schemes {
     public Scheme get(Class<? extends Extension> type) {
         return fetch(type).orElseThrow(() -> new SchemeNotFoundException(
             "Scheme was not found for Extension " + type.getSimpleName()));
+    }
+
+    public Scheme get(GroupVersionKind gvk) {
+        return fetch(gvk).orElseThrow(() -> new SchemeNotFoundException(
+            "Scheme was not found for GVK " + gvk));
     }
 
 }

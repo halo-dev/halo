@@ -33,7 +33,8 @@ public class JSONExtensionConverter implements ExtensionConverter {
 
     @Override
     public <E extends Extension> ExtensionStore convertTo(E extension) {
-        var scheme = Schemes.INSTANCE.get(extension.getClass());
+        var gvk = extension.groupVersionKind();
+        var scheme = Schemes.INSTANCE.get(gvk);
         var storeName = ExtensionUtil.buildStoreName(scheme, extension.getMetadata().getName());
         try {
             if (logger.isDebugEnabled()) {

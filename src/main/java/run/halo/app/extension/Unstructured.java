@@ -32,6 +32,10 @@ public class Unstructured implements Extension {
 
     private final ObjectNode extension;
 
+    public Unstructured() {
+        this(OBJECT_MAPPER.createObjectNode());
+    }
+
     public Unstructured(ObjectNode extension) {
         this.extension = extension;
     }
