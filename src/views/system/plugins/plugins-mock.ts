@@ -6,6 +6,7 @@ import wechat from "@/assets/logo-mock/wechat.svg";
 import github from "@/assets/logo-mock/github.svg";
 import redis from "@/assets/logo-mock/redis.svg";
 import elasticsearch from "@/assets/logo-mock/elasticsearch.svg";
+import algolia from "@/assets/logo-mock/algolia.svg";
 
 export const plugins = [
   {
@@ -259,6 +260,29 @@ export const plugins = [
       homepage: "https://github.com/halo-dev/halo-plugin-elasticsearch",
       shortDescription: "this is a test plugin",
       description: "接入 ElasticSearch 作为全文搜索系统",
+      license: "GPL V3",
+    },
+  },
+  {
+    apiVersion: "v1",
+    kind: "Plugin",
+    metadata: {
+      name: "Algolia",
+      enabled: true,
+      labels: {
+        "extensions.halo.run/category": "search-engine",
+      },
+    },
+    spec: {
+      version: "1.0.0",
+      requires: ">=2.0.0",
+      author: "halo-dev",
+      logo: algolia,
+      pluginClass: "run.halo.plugins.algolia",
+      pluginDependencies: {},
+      homepage: "https://github.com/halo-dev/halo-plugin-algolia",
+      shortDescription: "this is a test plugin",
+      description: "接入 Algolia 作为全文搜索系统",
       license: "GPL V3",
     },
   },
