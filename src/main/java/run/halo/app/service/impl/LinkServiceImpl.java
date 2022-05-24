@@ -184,8 +184,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
     }
 
     @Override
-    public @NonNull
-    List<Link> listAllByRandom() {
+    public @NonNull List<Link> listAllByRandom() {
         List<Link> allLink = linkRepository.findAll();
         Collections.shuffle(allLink);
         return allLink;
