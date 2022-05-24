@@ -6,6 +6,7 @@ export const users = [
     role: "Super Administrator",
     email: "i@ryanc.cc",
     avatar: "https://ryanc.cc/avatar",
+    cover: "from-gray-800 to-red-500",
   },
   {
     id: 2,
@@ -14,6 +15,7 @@ export const users = [
     role: "Super Administrator",
     email: "johnniang@halo.run",
     avatar: "https://johnniang.me/avatar",
+    cover: "from-gray-800 to-green-500",
   },
   {
     id: 3,
@@ -22,6 +24,7 @@ export const users = [
     role: "Super Administrator",
     email: "guqing@halo.run",
     avatar: "https://guqing.xyz/avatar",
+    cover: "from-gray-800 to-blue-500",
   },
   {
     id: 4,

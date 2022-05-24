@@ -22,7 +22,7 @@ if (route.params.username) {
 </script>
 <template>
   <header class="bg-white">
-    <div class="h-48 bg-gradient-to-r from-gray-800 to-red-500"></div>
+    <div :class="user.cover" class="h-48 bg-gradient-to-r"></div>
     <div class="px-4 sm:px-6 lg:px-8">
       <div class="-mt-12 sm:-mt-16 flex items-end space-x-5">
         <div class="flex">
