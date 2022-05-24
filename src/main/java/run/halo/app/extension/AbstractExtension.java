@@ -1,6 +1,5 @@
 package run.halo.app.extension;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -11,14 +10,11 @@ import lombok.Data;
 @Data
 public abstract class AbstractExtension implements Extension {
 
-    @Schema(required = true)
     private String apiVersion;
 
-    @Schema(required = true)
     private String kind;
 
-    @Schema(required = true)
-    private Metadata metadata;
+    private MetadataOperator metadata;
 
     @Override
     public void groupVersionKind(GroupVersionKind gvk) {
@@ -31,13 +27,12 @@ public abstract class AbstractExtension implements Extension {
         return GroupVersionKind.fromAPIVersionAndKind(this.apiVersion, this.kind);
     }
 
-    @Override
-    public void metadata(Metadata metadata) {
-        this.metadata = metadata;
+    public MetadataOperator getMetadata() {
+        return metadata;
     }
 
     @Override
-    public Metadata metadata() {
-        return this.metadata;
+    public void setMetadata(MetadataOperator metadata) {
+        this.metadata = metadata;
     }
 }

@@ -45,7 +45,7 @@ class AbstractExtensionTest {
 
         Metadata metadata = new Metadata();
         metadata.setName("fake");
-        extension.metadata(metadata);
+        extension.setMetadata(metadata);
 
         assertEquals(metadata, extension.getMetadata());
     }

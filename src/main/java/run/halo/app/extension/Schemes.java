@@ -1,5 +1,6 @@
 package run.halo.app.extension;
 
+import com.github.victools.jsonschema.generator.Option;
 import com.github.victools.jsonschema.generator.OptionPreset;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
@@ -49,7 +50,6 @@ public enum Schemes {
 
     /**
      * Clear registered schemes.
-     * <p>
      * This method is only for test.
      */
     void clear() {
@@ -78,6 +78,12 @@ public enum Schemes {
         var module = new Swagger2Module();
         var config =
             new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2019_09, OptionPreset.PLAIN_JSON)
+                .with(
+                    // See https://victools.github.io/jsonschema-generator/#generator-options
+                    // fore more.
+                    Option.INLINE_ALL_SCHEMAS,
+                    Option.MAP_VALUES_AS_ADDITIONAL_PROPERTIES
+                )
                 .with(module)
                 .build();
         var generator = new SchemaGenerator(config);
