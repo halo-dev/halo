@@ -17,7 +17,7 @@ public interface LinkRepository extends BaseRepository<Link, Integer> {
      *
      * @return a list of teams
      */
-    @Query(value = "select distinct a.team from Link a")
+    @Query(value = "select a.team from Link a group by a.team order by max(a.priority) DESC")
     List<String> findAllTeams();
 
     boolean existsByNameAndIdNot(String name, Integer id);
