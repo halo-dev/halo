@@ -25,9 +25,8 @@ import org.springframework.util.Assert;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Authenticates requests that contain an OAuth 2.0
- * <a href="https://tools.ietf.org/html/rfc6750#section-1.2">Bearer Token</a>.
- * <p>
+ * <p>Authenticates requests that contain an OAuth 2.0
+ * <a href="https://tools.ietf.org/html/rfc6750#section-1.2">Bearer Token</a>.</p>
  * This filter should be wired with an {@link AuthenticationManager} that can authenticate
  * a {@link BearerTokenAuthenticationToken}.
  *

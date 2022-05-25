@@ -25,14 +25,18 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.identity.apitoken.DefaultPersonalAccessTokenDecoder;
@@ -48,6 +52,8 @@ import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
 import run.halo.app.identity.authentication.verifier.TokenAuthenticationManagerResolver;
+import run.halo.app.identity.authentication.verifier.JwtAccessTokenNonBlockedValidator;
+import run.halo.app.identity.authentication.verifier.JwtProvidedDecoderAuthenticationManagerResolver;
 import run.halo.app.identity.authorization.DefaultRoleBindingLister;
 import run.halo.app.identity.authorization.DefaultRoleGetter;
 import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
@@ -55,6 +61,7 @@ import run.halo.app.identity.authorization.RoleBindingLister;
 import run.halo.app.identity.authorization.RoleGetter;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
+import run.halo.app.identity.entrypoint.Oauth2LogoutHandler;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.infra.utils.HaloUtils;
 
@@ -94,16 +101,21 @@ public class WebSecurityConfig {
                 .antMatchers("/static/js/**").permitAll()
                 // for swagger ui
                 .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .antMatchers("/logout").authenticated()
                 .antMatchers("/api/**", "/apis/**").access(requestInfoAuthorizationManager())
                 .anyRequest().access(requestInfoAuthorizationManager())
             )
             .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults())
+            .logout(logoutConfigurer -> {
+                logoutConfigurer.addLogoutHandler(oauth2LogoutHandler())
+                    .clearAuthentication(true);
+            })
             .addFilterBefore(new OAuth2TokenEndpointFilter(authenticationManager(),
                     providerSettings.getTokenEndpoint()),
                 FilterSecurityInterceptor.class)
             .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManagerResolver()),
-                BasicAuthenticationFilter.class)
+                LogoutFilter.class)
             .addFilterAfter(providerContextFilter, SecurityContextHolderFilter.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -112,6 +124,11 @@ public class WebSecurityConfig {
                 .accessDeniedHandler(new JwtAccessDeniedHandler())
             );
         return http.build();
+    }
+
+    @Bean
+    Oauth2LogoutHandler oauth2LogoutHandler() {
+        return new Oauth2LogoutHandler(oauth2AuthorizationService());
     }
 
     RequestInfoAuthorizationManager requestInfoAuthorizationManager() {
@@ -126,7 +143,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    AuthenticationManager authenticationManager() throws Exception {
+    AuthenticationManager authenticationManager() {
         authenticationManagerBuilder.authenticationProvider(passwordAuthenticationProvider())
             .authenticationProvider(oauth2RefreshTokenAuthenticationProvider());
         return authenticationManagerBuilder.getOrBuild();
@@ -141,7 +158,16 @@ public class WebSecurityConfig {
 
     @Bean
     JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(this.key).build();
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withPublicKey(this.key).build();
+
+        JwtAccessTokenNonBlockedValidator jwtAccessTokenNonBlockedValidator =
+            new JwtAccessTokenNonBlockedValidator(oauth2AuthorizationService());
+        OAuth2TokenValidator<Jwt> jwtValidator = new DelegatingOAuth2TokenValidator<>(
+            new JwtTimestampValidator(),
+            jwtAccessTokenNonBlockedValidator);
+
+        jwtDecoder.setJwtValidator(jwtValidator);
+        return jwtDecoder;
     }
 
     @Bean
