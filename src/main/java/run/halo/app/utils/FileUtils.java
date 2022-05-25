@@ -101,7 +101,7 @@ public class FileUtils {
      * Renames file or folder.
      *
      * @param pathToRename file path to rename must not be null
-     * @param newName      new name must not be null
+     * @param newName new name must not be null
      */
     public static void rename(@NonNull Path pathToRename, @NonNull String newName)
         throws IOException {
@@ -119,7 +119,7 @@ public class FileUtils {
     /**
      * Unzips content to the target path.
      *
-     * @param zis        zip input stream must not be null
+     * @param zis zip input stream must not be null
      * @param targetPath target path must not be null and not empty
      * @throws IOException throws when failed to access file to be unzipped
      */
@@ -160,7 +160,7 @@ public class FileUtils {
     /**
      * Unzips content to the target path.
      *
-     * @param bytes      zip bytes array must not be null
+     * @param bytes zip bytes array must not be null
      * @param targetPath target path must not be null and not empty
      * @throws IOException io exception
      */
@@ -174,7 +174,7 @@ public class FileUtils {
     /**
      * Zips folder or file.
      *
-     * @param pathToZip     file path to zip must not be null
+     * @param pathToZip file path to zip must not be null
      * @param pathOfArchive zip file path to archive must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
@@ -190,9 +190,9 @@ public class FileUtils {
     /**
      * Zips folder or file with filter.
      *
-     * @param pathToZip     file path to zip must not be null
+     * @param pathToZip file path to zip must not be null
      * @param pathOfArchive zip file path to archive must not be null
-     * @param filter        folder or file filter
+     * @param filter folder or file filter
      * @throws IOException throws when failed to access file to be zipped
      */
     public static void zip(@NonNull Path pathToZip, @NonNull Path pathOfArchive,
@@ -208,7 +208,7 @@ public class FileUtils {
      * Zips folder or file.
      *
      * @param pathToZip file path to zip must not be null
-     * @param zipOut    zip output stream must not be null
+     * @param zipOut zip output stream must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
     public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut)
@@ -221,8 +221,8 @@ public class FileUtils {
      * Zips folder or file with filter.
      *
      * @param pathToZip file path to zip must not be null
-     * @param zipOut    zip output stream must not be null
-     * @param filter    directory or file filter
+     * @param zipOut zip output stream must not be null
+     * @param filter directory or file filter
      * @throws IOException throws when failed to access file to be zipped
      */
     public static void zip(@NonNull Path pathToZip, @NonNull ZipOutputStream zipOut,
@@ -235,8 +235,8 @@ public class FileUtils {
      * Zips folder or file.
      *
      * @param fileToZip file path to zip must not be null
-     * @param fileName  file name must not be blank
-     * @param zipOut    zip output stream must not be null
+     * @param fileName file name must not be blank
+     * @param zipOut zip output stream must not be null
      * @throws IOException throws when failed to access file to be zipped
      */
     private static void zip(@NonNull Path fileToZip, @NonNull String fileName,
@@ -248,9 +248,9 @@ public class FileUtils {
      * Zips folder or file with path filter.
      *
      * @param fileToZip file path to zip must not be null
-     * @param fileName  file name must not be blank
-     * @param zipOut    zip output stream must not be null
-     * @param filter    directory or file filter
+     * @param fileName file name must not be blank
+     * @param zipOut zip output stream must not be null
+     * @param filter directory or file filter
      * @throws IOException throws when failed to access file to be zipped
      */
     private static void zip(@NonNull Path fileToZip, @NonNull String fileName,
@@ -295,7 +295,7 @@ public class FileUtils {
     /**
      * Find root path.
      *
-     * @param path          super root path starter
+     * @param path super root path starter
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
@@ -310,8 +310,8 @@ public class FileUtils {
     /**
      * Find root path.
      *
-     * @param path          super root path starter
-     * @param maxDepth      max loop depth
+     * @param path super root path starter
+     * @param maxDepth max loop depth
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
@@ -327,7 +327,7 @@ public class FileUtils {
     /**
      * Find path.
      *
-     * @param path          super root path starter
+     * @param path super root path starter
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
@@ -342,7 +342,7 @@ public class FileUtils {
     /**
      * Find path.
      *
-     * @param path          super root path starter
+     * @param path super root path starter
      * @param pathPredicate path predicate
      * @return empty if path is not a directory or the given path predicate is null
      * @throws IOException IO exception
@@ -466,7 +466,7 @@ public class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull String parentPath,
@@ -477,7 +477,7 @@ public class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull Path parentPath,
@@ -488,7 +488,7 @@ public class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath  parent path must not be null.
+     * @param parentPath parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull Path parentPath,
@@ -582,7 +582,7 @@ public class FileUtils {
      * Writes a String to a file creating the file if it does not exist using the UTF_8 encoding.
      * NOTE: the parent directories of the file will be created if they do not exist.
      *
-     * @param file    the file to write
+     * @param file the file to write
      * @param content the content to write to the file
      * @throws IOException in case of an I/O error
      */
@@ -593,7 +593,7 @@ public class FileUtils {
     /**
      * Check if the file to be uploaded is an acceptable file type.
      *
-     * @param mdFileName    the name of the file to be uploaded
+     * @param mdFileName the name of the file to be uploaded
      * @param legalMdSuffixes acceptable file type
      * @return check results
      */
