@@ -46,6 +46,10 @@ import IconDeleteBin from "~icons/ri/delete-bin-2-line";
 import IconAddCircle from "~icons/ri/add-circle-line";
 // @ts-ignore
 import IconSave from "~icons/ri/save-line";
+// @ts-ignore
+import IconList from "~icons/ri/list-unordered";
+// @ts-ignore
+import IconGrid from "~icons/ri/grid-line";
 
 export {
   IconDashboard,
@@ -72,4 +76,6 @@ export {
   IconDeleteBin,
   IconAddCircle,
   IconSave,
+  IconList,
+  IconGrid,
 };
