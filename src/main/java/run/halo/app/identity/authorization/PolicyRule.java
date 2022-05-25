@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * PolicyRule holds information that describes a policy rule, but does not contain information
- * about who the rule applies to or which namespace the rule applies to.
+ * about whom the rule applies to or which namespace the rule applies to.
  *
  * @author guqing
  * @since 2.0.0
