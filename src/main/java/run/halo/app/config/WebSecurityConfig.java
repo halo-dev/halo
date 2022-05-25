@@ -36,7 +36,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
@@ -110,7 +110,7 @@ public class WebSecurityConfig {
                 FilterSecurityInterceptor.class)
             .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManagerResolver()),
                 LogoutFilter.class)
-            .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
+            .addFilterAfter(providerContextFilter, SecurityContextHolderFilter.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling((exceptions) -> exceptions
@@ -136,7 +136,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    AuthenticationManager authenticationManager() throws Exception {
+    AuthenticationManager authenticationManager() {
         authenticationManagerBuilder.authenticationProvider(passwordAuthenticationProvider())
             .authenticationProvider(oauth2RefreshTokenAuthenticationProvider());
         return authenticationManagerBuilder.getOrBuild();
