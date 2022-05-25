@@ -17,6 +17,8 @@ import run.halo.app.model.entity.Link;
 @Data
 public class LinkParam implements InputConverter<Link> {
 
+    private Integer id;
+
     @NotBlank(message = "友情链接名称不能为空")
     @Size(max = 255, message = "友情链接名称的字符长度不能超过 {max}")
     private String name;

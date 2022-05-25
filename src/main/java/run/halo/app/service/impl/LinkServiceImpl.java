@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
             ServiceUtils.convertToListMap(teams, links, LinkDTO::getTeam);
 
         List<LinkTeamVO> result = new LinkedList<>();
-
+        Map<LinkTeamVO, Integer> teamPriorities = new HashMap<>();
         // Wrap link team vo list
         teamLinkListMap.forEach((team, linkList) -> {
             // Build link team vo
@@ -69,11 +70,28 @@ public class LinkServiceImpl extends AbstractCrudService<Link, Integer> implemen
             linkTeamVO.setTeam(team);
             linkTeamVO.setLinks(linkList);
 
+            teamPriorities.put(linkTeamVO, getTeamPriority(linkTeamVO));
             // Add it to result
             result.add(linkTeamVO);
         });
 
+        result.sort((a, b) -> teamPriorities.get(b) - teamPriorities.get(a));
+
         return result;
+    }
+
+
+    /**
+     * Get the priority of a link team, which is the maximum priority of its link members.
+     *
+     * @param linkTeam A team of links.
+     * @return the priority of a link team.
+     */
+    private Integer getTeamPriority(LinkTeamVO linkTeam) {
+        return linkTeam.getLinks().stream()
+            .mapToInt(LinkDTO::getPriority)
+            .max()
+            .orElse(-1);
     }
 
     @Override
