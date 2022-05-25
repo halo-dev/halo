@@ -118,7 +118,7 @@ import run.halo.app.utils.VersionUtil;
  * @author ryanwang
  * @author Raremaa
  * @author guqing
- * @date 2019-04-26
+ * @date  2019-04-26
  */
 @Service
 @Slf4j
@@ -140,7 +140,7 @@ public class BackupServiceImpl implements BackupService {
     /**
      * Max size of md file to upload, in terms of KB.
      */
-    @Value("${halo.file.max-md-size:#{1024 * 24}}")
+    @Value("${halo.file.max-md-size:#{65534}}")
     private Double maxMdSize;
 
     private final AttachmentService attachmentService;
@@ -255,9 +255,9 @@ public class BackupServiceImpl implements BackupService {
                 "上传的markdown文件后缀不正确，目前支持的后缀为: " + String.join(", ", legalMdSuffixes));
         }
 
-        if (file.getSize() > maxMdSize * 1024) {
+        if (file.getSize() > maxMdSize ) {
             throw new ServiceException(
-                "上传的markdown文件过大，目前仅支持 " + maxMdSize + " KB 的md文件"
+                "上传的markdown文件过大，目前仅支持 " + 64 + " KB 的md文件"
             );
         }
 
