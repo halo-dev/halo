@@ -40,6 +40,7 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.test.context.TestPropertySource;
+import run.halo.app.extension.Metadata;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
@@ -59,7 +60,6 @@ import run.halo.app.identity.authorization.RoleRef;
 import run.halo.app.identity.authorization.Subject;
 import run.halo.app.identity.entrypoint.Oauth2LogoutHandler;
 import run.halo.app.infra.properties.JwtProperties;
-import run.halo.app.infra.types.ObjectMeta;
 
 /**
  * @author guqing
@@ -131,17 +131,17 @@ public class TestWebSecurityConfig {
                     .build()
             );
             role.setRules(rules);
-            ObjectMeta objectMeta = new ObjectMeta();
-            objectMeta.setName("ruleReadPost");
-            role.setObjectMeta(objectMeta);
+            Metadata metadata = new Metadata();
+            metadata.setName("ruleReadPost");
+            role.setMetadata(metadata);
             return role;
         }, () -> {
             // role binding lister
             RoleBinding roleBinding = new RoleBinding();
 
-            ObjectMeta objectMeta = new ObjectMeta();
-            objectMeta.setName("userRoleBinding");
-            roleBinding.setObjectMeta(objectMeta);
+            Metadata metadata = new Metadata();
+            metadata.setName("userRoleBinding");
+            roleBinding.setMetadata(metadata);
 
             Subject subject = new Subject();
             subject.setName("test_user");
