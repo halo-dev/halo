@@ -7,24 +7,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * Tests for {@link LogoutHandler}.
+ *
  * @author guqing
  * @since 2.0.0
  */
 public class LogoutHandlerTest extends AuthorizationTestSuit {
 
     private MockMvc mockMvc;
-
-    @Autowired
-    SecurityFilterChain securityFilterChain;
 
     private String accessToken;
 
