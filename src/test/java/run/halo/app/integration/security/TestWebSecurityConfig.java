@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
+import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,10 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.test.context.TestPropertySource;
+import run.halo.app.extension.Metadata;
+import run.halo.app.identity.apitoken.DefaultPersonalAccessTokenDecoder;
+import run.halo.app.identity.apitoken.PersonalAccessTokenDecoder;
+import run.halo.app.identity.apitoken.PersonalAccessTokenUtils;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
@@ -45,7 +50,7 @@ import run.halo.app.identity.authentication.OAuth2TokenEndpointFilter;
 import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
-import run.halo.app.identity.authentication.verifier.JwtProvidedDecoderAuthenticationManagerResolver;
+import run.halo.app.identity.authentication.verifier.TokenAuthenticationManagerResolver;
 import run.halo.app.identity.authorization.PolicyRule;
 import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
 import run.halo.app.identity.authorization.Role;
@@ -53,7 +58,7 @@ import run.halo.app.identity.authorization.RoleBinding;
 import run.halo.app.identity.authorization.RoleRef;
 import run.halo.app.identity.authorization.Subject;
 import run.halo.app.infra.properties.JwtProperties;
-import run.halo.app.infra.types.ObjectMeta;
+import run.halo.app.infra.utils.HaloUtils;
 
 /**
  * @author guqing
@@ -115,17 +120,17 @@ public class TestWebSecurityConfig {
                     .build()
             );
             role.setRules(rules);
-            ObjectMeta objectMeta = new ObjectMeta();
-            objectMeta.setName("ruleReadPost");
-            role.setObjectMeta(objectMeta);
+            Metadata metadata = new Metadata();
+            metadata.setName("ruleReadPost");
+            role.setMetadata(metadata);
             return role;
         }, () -> {
             // role binding lister
             RoleBinding roleBinding = new RoleBinding();
 
-            ObjectMeta objectMeta = new ObjectMeta();
-            objectMeta.setName("userRoleBinding");
-            roleBinding.setObjectMeta(objectMeta);
+            Metadata metadata = new Metadata();
+            metadata.setName("userRoleBinding");
+            roleBinding.setMetadata(metadata);
 
             Subject subject = new Subject();
             subject.setName("test_user");
@@ -144,11 +149,18 @@ public class TestWebSecurityConfig {
     }
 
     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver() {
-        return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder(), null);
+        return new TokenAuthenticationManagerResolver(jwtDecoder(), personalAccessTokenDecoder());
     }
 
     @Bean
-    AuthenticationManager authenticationManager() throws Exception {
+    PersonalAccessTokenDecoder personalAccessTokenDecoder() {
+        String salt = HaloUtils.readClassPathResourceAsString("apiToken.salt");
+        SecretKey secretKey = PersonalAccessTokenUtils.convertStringToSecretKey(salt);
+        return new DefaultPersonalAccessTokenDecoder(oauth2AuthorizationService(), secretKey);
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager() {
         authenticationManagerBuilder.authenticationProvider(passwordAuthenticationProvider())
             .authenticationProvider(oauth2RefreshTokenAuthenticationProvider());
         return authenticationManagerBuilder.getOrBuild();

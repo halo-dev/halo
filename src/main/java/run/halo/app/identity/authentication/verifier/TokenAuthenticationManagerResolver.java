@@ -5,36 +5,49 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationManagerResolver;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.util.Assert;
 import run.halo.app.identity.apitoken.PersonalAccessTokenDecoder;
 import run.halo.app.identity.apitoken.PersonalAccessTokenProvider;
+import run.halo.app.identity.apitoken.PersonalTokenTypeUtils;
 
 /**
- * A jwt resolver for {@link AuthenticationManager} use {@link JwtDecoder}.
+ * A token resolver for {@link AuthenticationManager} use {@link JwtDecoder} and
+ * {@link PersonalAccessTokenDecoder}.
  *
  * @author guqing
  * @since 2.0.0
  */
-public record JwtProvidedDecoderAuthenticationManagerResolver(JwtDecoder jwtDecoder, PersonalAccessTokenDecoder personalAccessTokenDecoder)
+public record TokenAuthenticationManagerResolver(JwtDecoder jwtDecoder,
+                                                 PersonalAccessTokenDecoder personalTokenDecoder)
     implements AuthenticationManagerResolver<HttpServletRequest> {
 
-    public JwtProvidedDecoderAuthenticationManagerResolver {
+    private static final DefaultBearerTokenResolver defaultBearerTokenResolver =
+        new DefaultBearerTokenResolver();
+
+    public TokenAuthenticationManagerResolver {
         Assert.notNull(jwtDecoder, "jwtDecoder cannot be null");
+        Assert.notNull(personalTokenDecoder, "personalAccessTokenDecoder cannot be null");
     }
 
     @Override
     public AuthenticationManager resolve(HttpServletRequest request) {
-        DefaultBearerTokenResolver defaultBearerTokenResolver = new DefaultBearerTokenResolver();
+
         String bearerToken = defaultBearerTokenResolver.resolve(request);
-        if (isJwt(bearerToken)) {
+
+        if (useJwt(bearerToken)) {
             return new JwtAuthenticationProvider(jwtDecoder)::authenticate;
-        } else {
-            return new PersonalAccessTokenProvider(personalAccessTokenDecoder)::authenticate;
+        } else if (PersonalTokenTypeUtils.isPersonalAccessToken(bearerToken)) {
+            return new PersonalAccessTokenProvider(personalTokenDecoder)::authenticate;
         }
+
+        return authentication -> {
+            throw new AuthenticationServiceException("Cannot authenticate " + authentication);
+        };
     }
 
-    private boolean isJwt(String token) {
+    private boolean useJwt(String token) {
         try {
             JWTParser.parse(token);
             return true;

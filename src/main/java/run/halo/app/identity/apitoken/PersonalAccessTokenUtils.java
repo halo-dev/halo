@@ -26,14 +26,15 @@ public class PersonalAccessTokenUtils {
      * @param secretKey The secretKey is used to generate a salt
      * @return personal access token
      */
-    public static String generate(SecretKey secretKey) {
+    public static String generate(PersonalAccessTokenType tokenType, SecretKey secretKey) {
         // Generate 32-bit random API token.
         String apiToken = new String(Hex.encode(KeyGenerators.secureRandom(16).generateKey()));
         // crc32(apiToken + salt)
         String salt = convertSecretKeyToString(secretKey);
         String checksum = crc32((apiToken + salt).getBytes());
         // Encode it as base62
-        return Base62.encode(apiToken + checksum);
+        String encodedValue = Base62.encode(apiToken + checksum);
+        return String.format("%s_%s", tokenType.value(), encodedValue);
     }
 
     /**
@@ -47,7 +48,8 @@ public class PersonalAccessTokenUtils {
      * it returns {@code false}
      */
     public static boolean verifyChecksum(String personalAccessToken, SecretKey secretKey) {
-        String decodedToken = Base62.decodeToString(personalAccessToken);
+        String tokenValue = PersonalTokenTypeUtils.removeTypePrefix(personalAccessToken);
+        String decodedToken = Base62.decodeToString(tokenValue);
 
         int length = decodedToken.length();
         // Gets api token and checksum from decodedToken.

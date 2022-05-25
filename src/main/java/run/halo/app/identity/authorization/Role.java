@@ -1,20 +1,23 @@
 package run.halo.app.identity.authorization;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
-import run.halo.app.infra.types.ObjectMeta;
-import run.halo.app.infra.types.TypeMeta;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.GVK;
 
 /**
  * @author guqing
  * @since 2.0.0
  */
 @Data
-public class Role {
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+@GVK(group = "", version = "v1alpha1", kind = "Role", plural = "roles", singular = "role")
+public class Role extends AbstractExtension {
 
-    TypeMeta typeMeta;
-
-    ObjectMeta objectMeta;
-
+    @Schema(minLength = 1)
     List<PolicyRule> rules;
 }

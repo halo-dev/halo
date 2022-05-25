@@ -8,5 +8,6 @@ import java.util.List;
  */
 @FunctionalInterface
 public interface RoleBindingLister {
+
     List<RoleBinding> listRoleBindings();
 }

@@ -76,7 +76,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
     String roleBindingDescriber(RoleBinding roleBinding, Subject subject) {
         String describeSubject = String.format("%s %s", subject.kind, subject.name);
-        return String.format("RoleBinding %s of %s %s to %s", roleBinding.getName(),
+        return String.format("RoleBinding %s of %s %s to %s", roleBinding.metadata().getName(),
             roleBinding.roleRef.getKind(), roleBinding.roleRef.getName(), describeSubject);
     }
 

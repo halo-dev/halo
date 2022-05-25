@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.List;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +33,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
+import run.halo.app.extension.ExtensionClient;
 import run.halo.app.identity.apitoken.DefaultPersonalAccessTokenDecoder;
 import run.halo.app.identity.apitoken.PersonalAccessTokenDecoder;
 import run.halo.app.identity.apitoken.PersonalAccessTokenUtils;
@@ -47,17 +47,15 @@ import run.halo.app.identity.authentication.OAuth2TokenEndpointFilter;
 import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
-import run.halo.app.identity.authentication.verifier.JwtProvidedDecoderAuthenticationManagerResolver;
-import run.halo.app.identity.authorization.PolicyRule;
+import run.halo.app.identity.authentication.verifier.TokenAuthenticationManagerResolver;
+import run.halo.app.identity.authorization.DefaultRoleBindingLister;
+import run.halo.app.identity.authorization.DefaultRoleGetter;
 import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
-import run.halo.app.identity.authorization.Role;
-import run.halo.app.identity.authorization.RoleBinding;
-import run.halo.app.identity.authorization.RoleRef;
-import run.halo.app.identity.authorization.Subject;
+import run.halo.app.identity.authorization.RoleBindingLister;
+import run.halo.app.identity.authorization.RoleGetter;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.infra.properties.JwtProperties;
-import run.halo.app.infra.types.ObjectMeta;
 import run.halo.app.infra.utils.HaloUtils;
 
 /**
@@ -74,11 +72,15 @@ public class WebSecurityConfig {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
+    private final ExtensionClient extensionClient;
+
     public WebSecurityConfig(JwtProperties jwtProperties,
-        AuthenticationManagerBuilder authenticationManagerBuilder) throws IOException {
+        AuthenticationManagerBuilder authenticationManagerBuilder,
+        ExtensionClient extensionClient) throws IOException {
         this.key = jwtProperties.readPublicKey();
         this.priv = jwtProperties.readPrivateKey();
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.extensionClient = extensionClient;
     }
 
     @Bean
@@ -102,7 +104,7 @@ public class WebSecurityConfig {
                 FilterSecurityInterceptor.class)
             .addFilterBefore(new BearerTokenAuthenticationFilter(authenticationManagerResolver()),
                 BasicAuthenticationFilter.class)
-            .addFilterAfter(providerContextFilter, SecurityContextPersistenceFilter.class)
+            .addFilterAfter(providerContextFilter, SecurityContextHolderFilter.class)
             .sessionManagement(
                 (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .exceptionHandling((exceptions) -> exceptions
@@ -112,51 +114,14 @@ public class WebSecurityConfig {
         return http.build();
     }
 
-    public RequestInfoAuthorizationManager requestInfoAuthorizationManager() {
-        // TODO fake role and role bindings, only used for testing/development
-        //  It'll be deleted next time
-        return new RequestInfoAuthorizationManager(name -> {
-            // role getter
-            Role role = new Role();
-            List<PolicyRule> rules = List.of(
-                new PolicyRule.Builder().apiGroups("").resources("posts").verbs("list", "get")
-                    .build(),
-                new PolicyRule.Builder().apiGroups("").resources("categories").verbs("*")
-                    .build(),
-                new PolicyRule.Builder().nonResourceURLs("/healthy").verbs("get", "post", "head")
-                    .build()
-            );
-            role.setRules(rules);
-            ObjectMeta objectMeta = new ObjectMeta();
-            objectMeta.setName("ruleReadPost");
-            role.setObjectMeta(objectMeta);
-            return role;
-        }, () -> {
-            // role binding lister
-            RoleBinding roleBinding = new RoleBinding();
-
-            ObjectMeta objectMeta = new ObjectMeta();
-            objectMeta.setName("userRoleBinding");
-            roleBinding.setObjectMeta(objectMeta);
-
-            Subject subject = new Subject();
-            subject.setName("user");
-            subject.setKind("User");
-            subject.setApiGroup("");
-            roleBinding.setSubjects(List.of(subject));
-
-            RoleRef roleRef = new RoleRef();
-            roleRef.setKind("Role");
-            roleRef.setName("ruleReadPost");
-            roleRef.setApiGroup("");
-            roleBinding.setRoleRef(roleRef);
-
-            return List.of(roleBinding);
-        });
+    RequestInfoAuthorizationManager requestInfoAuthorizationManager() {
+        RoleBindingLister roleBindingLister = new DefaultRoleBindingLister();
+        RoleGetter roleGetter = new DefaultRoleGetter(extensionClient);
+        return new RequestInfoAuthorizationManager(roleGetter, roleBindingLister);
     }
 
     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver() {
-        return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder(),
+        return new TokenAuthenticationManagerResolver(jwtDecoder(),
             personalAccessTokenDecoder());
     }
 
@@ -222,7 +187,7 @@ public class WebSecurityConfig {
         //  It'll be deleted next time
         UserDetails user = User.withUsername("user")
             .password(passwordEncoder().encode("123456"))
-            .roles("USER")
+            .authorities("readPostRole")
             .build();
         return new InMemoryUserDetailsManager(user);
     }
