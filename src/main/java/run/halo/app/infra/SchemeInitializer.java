@@ -49,7 +49,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
 
     private void initRoleForTesting() {
         Role role = new Role();
-        role.setApiVersion("v1");
+        role.setApiVersion("v1alpha1");
         role.setKind("Role");
         Metadata metadata = new Metadata();
         metadata.setName("readPostRole");
