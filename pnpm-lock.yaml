@@ -21,6 +21,7 @@ specifiers:
   eslint: ^8.16.0
   eslint-plugin-cypress: ^2.12.1
   eslint-plugin-vue: ^8.7.1
+  floating-vue: 2.0.0-beta.16
   histoire: ^0.4.6
   husky: ^8.0.1
   jsdom: ^19.0.0
@@ -47,6 +48,7 @@ specifiers:
 dependencies:
   '@halo-dev/admin-api': 1.0.0
   '@vueuse/core': 8.5.0_vue@3.2.36
+  floating-vue: 2.0.0-beta.16_vue@3.2.36
   pinia: 2.0.14_7gwbvmtszsbbeay4sidijbp26i
   tippy.js: 6.3.7
   vue: 3.2.36
@@ -1397,13 +1399,11 @@ packages:
 
   /@floating-ui/core/0.3.1:
     resolution: {integrity: sha512-ensKY7Ub59u16qsVIFEo2hwTCqZ/r9oZZFh51ivcLGHfUwTn8l1Xzng8RJUe91H/UP8PeqeBronAGx0qmzwk2g==}
-    dev: true
 
   /@floating-ui/dom/0.1.10:
     resolution: {integrity: sha512-4kAVoogvQm2N0XE0G6APQJuCNuErjOfPW8Ux7DFxh8+AfugWflwVJ5LDlHOwrwut7z/30NUvdtHzQ3zSip4EzQ==}
     dependencies:
       '@floating-ui/core': 0.3.1
-    dev: true
 
   /@halo-dev/admin-api/1.0.0:
     resolution: {integrity: sha512-DkuNK91Let+jPLx9YclhaU0XWKMA96LJNzGtYUq3e5VGuvPYqPY8AJKfQ8DNLA/3gmkF2b20nUCSDsZRz/ZObQ==}
@@ -3912,7 +3912,6 @@ packages:
       '@floating-ui/dom': 0.1.10
       vue: 3.2.36
       vue-resize: 2.0.0-alpha.1_vue@3.2.36
-    dev: true
 
   /follow-redirects/1.14.9:
     resolution: {integrity: sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w==}
@@ -6573,7 +6572,6 @@ packages:
       vue: ^3.0.0
     dependencies:
       vue: 3.2.36
-    dev: true
 
   /vue-router/4.0.15_vue@3.2.36:
     resolution: {integrity: sha512-xa+pIN9ZqORdIW1MkN2+d9Ui2pCM1b/UMgwYUCZOiFYHAvz/slKKBDha8DLrh5aCG/RibtrpyhKjKOZ85tYyWg==}

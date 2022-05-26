@@ -5,7 +5,9 @@ import { VModal } from "@/components/base/modal";
 import { VCard } from "@/components/base/card";
 import { VSpace } from "@/components/base/space";
 import { VInput } from "@/components/base/input";
+import { VTag } from "@/components/base/tag";
 import { ref } from "vue";
+import { users } from "@/views/system/users/users-mock";
 import {
   IconArrowDown,
   IconArrowLeft,
@@ -299,14 +301,62 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                 </div>
                 <div class="mt-4 sm:mt-0 flex">
                   <VSpace spacing="lg">
-                    <div
-                      class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
-                    >
-                      <span class="mr-0.5">上传者</span>
-                      <span>
-                        <IconArrowDown />
-                      </span>
-                    </div>
+                    <FloatingDropdown>
+                      <div
+                        class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                      >
+                        <span class="mr-0.5">上传者</span>
+                        <span>
+                          <IconArrowDown />
+                        </span>
+                      </div>
+                      <template #popper>
+                        <div class="p-4 w-80 h-96">
+                          <div class="bg-white">
+                            <!--TODO: Auto Focus-->
+                            <VInput placeholder="根据关键词搜索"></VInput>
+                          </div>
+                          <div class="mt-2">
+                            <ul class="divide-y divide-gray-200" role="list">
+                              <li
+                                v-for="(user, index) in users"
+                                :key="index"
+                                class="py-4 cursor-pointer hover:bg-gray-50"
+                              >
+                                <div class="flex items-center space-x-4">
+                                  <div class="flex items-center">
+                                    <input
+                                      class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                      type="checkbox"
+                                    />
+                                  </div>
+                                  <div class="flex-shrink-0">
+                                    <img
+                                      :alt="user.name"
+                                      :src="user.avatar"
+                                      class="h-10 w-10 rounded"
+                                    />
+                                  </div>
+                                  <div class="flex-1 min-w-0">
+                                    <p
+                                      class="text-sm font-medium text-gray-900 truncate"
+                                    >
+                                      {{ user.name }}
+                                    </p>
+                                    <p class="text-sm text-gray-500 truncate">
+                                      @{{ user.username }}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <VTag>{{ index + 1 }} 篇</VTag>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
                     <div
                       class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
                     >
@@ -323,14 +373,42 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                         <IconArrowDown />
                       </span>
                     </div>
-                    <div
-                      class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
-                    >
-                      <span class="mr-0.5">排序</span>
-                      <span>
-                        <IconArrowDown />
-                      </span>
-                    </div>
+                    <FloatingDropdown>
+                      <div
+                        class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                      >
+                        <span class="mr-0.5">排序</span>
+                        <span>
+                          <IconArrowDown />
+                        </span>
+                      </div>
+                      <template #popper>
+                        <div class="p-4 w-72">
+                          <ul class="space-y-1">
+                            <li
+                              class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                            >
+                              <span class="truncate">较近上传</span>
+                            </li>
+                            <li
+                              class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                            >
+                              <span class="truncate">较晚上传</span>
+                            </li>
+                            <li
+                              class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                            >
+                              <span class="truncate">文件大小降序</span>
+                            </li>
+                            <li
+                              class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                            >
+                              <span class="truncate">文件大小升序</span>
+                            </li>
+                          </ul>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
                     <div class="flex flex-row gap-2">
                       <div
                         v-for="(item, index) in viewTypes"

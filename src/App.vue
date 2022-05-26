@@ -35,4 +35,8 @@ body {
 *::-webkit-scrollbar-thumb:hover {
   background-color: #bbb;
 }
+
+.v-popper__popper {
+  outline: none;
+}
 </style>

@@ -69,38 +69,118 @@ const handleRouteToDetail = (plugin: any) => {
             </div>
             <div class="mt-4 sm:mt-0 flex">
               <VSpace spacing="lg">
+                <FloatingDropdown>
+                  <div
+                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                  >
+                    <span class="mr-0.5">启用状态</span>
+                    <span>
+                      <IconArrowDown />
+                    </span>
+                  </div>
+                  <template #popper>
+                    <div class="p-4 w-52">
+                      <ul class="space-y-1">
+                        <li
+                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                        >
+                          <span class="truncate">已启用</span>
+                        </li>
+                        <li
+                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                        >
+                          <span class="truncate">未启用</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FloatingDropdown>
                 <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
-                >
-                  <span class="mr-0.5">启用状态</span>
-                  <span>
-                    <IconArrowDown />
-                  </span>
-                </div>
-                <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
+                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
                 >
                   <span class="mr-0.5">类别</span>
                   <span>
                     <IconArrowDown />
                   </span>
                 </div>
-                <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
-                >
-                  <span class="mr-0.5">提供方</span>
-                  <span>
-                    <IconArrowDown />
-                  </span>
-                </div>
-                <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
-                >
-                  <span class="mr-0.5">排序</span>
-                  <span>
-                    <IconArrowDown />
-                  </span>
-                </div>
+                <FloatingDropdown>
+                  <div
+                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                  >
+                    <span class="mr-0.5">提供方</span>
+                    <span>
+                      <IconArrowDown />
+                    </span>
+                  </div>
+                  <template #popper>
+                    <div class="p-4 w-80 h-96">
+                      <div class="bg-white">
+                        <!--TODO: Auto Focus-->
+                        <VInput placeholder="根据关键词搜索"></VInput>
+                      </div>
+                      <div class="mt-2">
+                        <ul class="divide-y divide-gray-200" role="list">
+                          <li class="py-4 cursor-pointer hover:bg-gray-50">
+                            <div class="flex items-center space-x-4">
+                              <div class="flex items-center">
+                                <input
+                                  class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                  type="checkbox"
+                                />
+                              </div>
+                              <div class="flex-shrink-0">
+                                <img
+                                  alt="halo-dev"
+                                  class="h-10 w-10 rounded"
+                                  src="https://halo.run/logo"
+                                />
+                              </div>
+                              <div class="flex-1 min-w-0">
+                                <p
+                                  class="text-sm font-medium text-gray-900 truncate"
+                                >
+                                  Halo
+                                </p>
+                                <p class="text-sm text-gray-500 truncate">
+                                  https://halo.run
+                                </p>
+                              </div>
+                              <div>
+                                <VTag>2 个</VTag>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </template>
+                </FloatingDropdown>
+                <FloatingDropdown>
+                  <div
+                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                  >
+                    <span class="mr-0.5">排序</span>
+                    <span>
+                      <IconArrowDown />
+                    </span>
+                  </div>
+                  <template #popper>
+                    <div class="p-4 w-72">
+                      <ul class="space-y-1">
+                        <li
+                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                        >
+                          <span class="truncate">较近安装</span>
+                        </li>
+                        <li
+                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                        >
+                          <span class="truncate">较晚安装</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FloatingDropdown>
               </VSpace>
             </div>
           </div>

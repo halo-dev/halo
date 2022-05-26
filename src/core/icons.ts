@@ -7,6 +7,10 @@ import IconArrowRight from "~icons/ri/arrow-right-s-line";
 // @ts-ignore
 import IconArrowDown from "~icons/ri/arrow-down-s-fill";
 // @ts-ignore
+import IconArrowUpLine from "~icons/ri/arrow-up-s-line";
+// @ts-ignore
+import IconArrowDownLine from "~icons/ri/arrow-down-s-line";
+// @ts-ignore
 import IconBookRead from "~icons/ri/book-read-line";
 // @ts-ignore
 import IconPages from "~icons/ri/pages-line";
@@ -82,4 +86,6 @@ export {
   IconList,
   IconGrid,
   IconCheckboxFill,
+  IconArrowUpLine,
+  IconArrowDownLine,
 };

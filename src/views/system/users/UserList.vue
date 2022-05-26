@@ -65,14 +65,32 @@ const handleRouteToDetail = (username: string) => {
             </div>
             <div class="mt-4 sm:mt-0 flex">
               <VSpace spacing="lg">
-                <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
-                >
-                  <span class="mr-0.5">状态</span>
-                  <span>
-                    <IconArrowDown />
-                  </span>
-                </div>
+                <FloatingDropdown>
+                  <div
+                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                  >
+                    <span class="mr-0.5">状态</span>
+                    <span>
+                      <IconArrowDown />
+                    </span>
+                  </div>
+                  <template #popper>
+                    <div class="p-4 w-52">
+                      <ul class="space-y-1">
+                        <li
+                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                        >
+                          <span class="truncate">正常</span>
+                        </li>
+                        <li
+                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                        >
+                          <span class="truncate">已禁用</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FloatingDropdown>
                 <div
                   class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
                 >
@@ -81,14 +99,32 @@ const handleRouteToDetail = (username: string) => {
                     <IconArrowDown />
                   </span>
                 </div>
-                <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
-                >
-                  <span class="mr-0.5">排序</span>
-                  <span>
-                    <IconArrowDown />
-                  </span>
-                </div>
+                <FloatingDropdown>
+                  <div
+                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                  >
+                    <span class="mr-0.5">排序</span>
+                    <span>
+                      <IconArrowDown />
+                    </span>
+                  </div>
+                  <template #popper>
+                    <div class="p-4 w-72">
+                      <ul class="space-y-1">
+                        <li
+                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                        >
+                          <span class="truncate">较近登录</span>
+                        </li>
+                        <li
+                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                        >
+                          <span class="truncate">较晚登录</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FloatingDropdown>
               </VSpace>
             </div>
           </div>
