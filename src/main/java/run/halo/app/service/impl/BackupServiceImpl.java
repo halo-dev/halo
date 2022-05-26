@@ -237,11 +237,16 @@ public class BackupServiceImpl implements BackupService {
             );
         }
 
-        // Read markdown content.
-        String markdown = FileUtils.readString(file.getInputStream());
+        try {
+            // Read markdown content.
+            String markdown = FileUtils.readString(file.getInputStream());
+            // TODO sheet import
+            return postService.importMarkdown(markdown, file.getOriginalFilename());
+        } catch (OutOfMemoryError error) {
+            throw new ServiceException(
+                "文件内容过大，无法导入。", error);
+        }
 
-        // TODO sheet import
-        return postService.importMarkdown(markdown, file.getOriginalFilename());
     }
 
     @Override
