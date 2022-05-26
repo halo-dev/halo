@@ -1,5 +1,6 @@
 package run.halo.app.infra.utils;
 
+import io.seruco.encoding.base62.Base62;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringUtils;
@@ -10,8 +11,9 @@ import org.apache.commons.lang3.StringUtils;
  * @author guqing
  * @since 2.0.0
  */
-public class Base62 {
+public class Base62Utils {
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
+    private static final Base62 INSTANCE = Base62.createInstance();
 
     public static String encode(String source) {
         return encode(source, DEFAULT_CHARSET);
@@ -29,7 +31,7 @@ public class Base62 {
     }
 
     public static String encode(byte[] source) {
-        return new String(Base62Codec.INSTANCE.encode(source));
+        return new String(INSTANCE.encode(source));
     }
 
     /**
@@ -43,7 +45,7 @@ public class Base62 {
     }
 
     public static byte[] decode(byte[] base62bytes) {
-        return Base62Codec.INSTANCE.decode(base62bytes);
+        return INSTANCE.decode(base62bytes);
     }
 
     public static String decodeToString(String source) {

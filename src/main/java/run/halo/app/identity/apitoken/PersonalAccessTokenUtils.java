@@ -9,12 +9,14 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.security.crypto.keygen.KeyGenerators;
-import run.halo.app.infra.utils.Base62;
+import run.halo.app.infra.utils.Base62Utils;
 
 /**
  * Tool class for generating and verifying personal access token.
  *
  * @author guqing
+ * @see
+ * <a href="https://github.blog/2021-04-05-behind-githubs-new-authentication-token-formats/">githubs-new-authentication-token-formats</a>
  * @since 2.0.0
  */
 public class PersonalAccessTokenUtils {
@@ -33,7 +35,7 @@ public class PersonalAccessTokenUtils {
         String salt = convertSecretKeyToString(secretKey);
         String checksum = crc32((apiToken + salt).getBytes());
         // Encode it as base62
-        String encodedValue = Base62.encode(apiToken + checksum);
+        String encodedValue = Base62Utils.encode(apiToken + checksum);
         return String.format("%s_%s", tokenType.value(), encodedValue);
     }
 
@@ -49,7 +51,7 @@ public class PersonalAccessTokenUtils {
      */
     public static boolean verifyChecksum(String personalAccessToken, SecretKey secretKey) {
         String tokenValue = PersonalTokenTypeUtils.removeTypePrefix(personalAccessToken);
-        String decodedToken = Base62.decodeToString(tokenValue);
+        String decodedToken = Base62Utils.decodeToString(tokenValue);
 
         int length = decodedToken.length();
         // Gets api token and checksum from decodedToken.
