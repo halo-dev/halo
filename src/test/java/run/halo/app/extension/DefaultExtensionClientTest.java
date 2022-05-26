@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
@@ -58,9 +59,33 @@ class DefaultExtensionClientTest {
     }
 
     ExtensionStore createExtensionStore(String name) {
+        return createExtensionStore(name, null);
+    }
+
+    ExtensionStore createExtensionStore(String name, Long version) {
         var extensionStore = new ExtensionStore();
         extensionStore.setName(name);
+        extensionStore.setVersion(version);
         return extensionStore;
+    }
+
+    Unstructured createUnstructured() throws JsonProcessingException {
+        String extensionJson = """
+            {
+                "apiVersion": "fake.halo.run/v1alpha1",
+                "kind": "Fake",
+                "metadata": {
+                    "labels": {
+                        "category": "fake",
+                        "default": "true"
+                    },
+                    "name": "fake",
+                    "creationTimestamp": "2011-12-03T10:15:30Z",
+                    "version": 12345
+                }
+            }
+            """;
+        return Unstructured.OBJECT_MAPPER.readValue(extensionJson, Unstructured.class);
     }
 
     @Test
@@ -205,8 +230,24 @@ class DefaultExtensionClientTest {
 
         client.create(fake);
 
-        verify(converter, times(1)).convertTo(any());
-        verify(storeClient, times(1)).create(any(), any());
+        verify(converter, times(1)).convertTo(eq(fake));
+        verify(storeClient, times(1)).create(eq("/registry/fake.halo.run/fakes/fake"), any());
+        assertNotNull(fake.getMetadata().getCreationTimestamp());
+    }
+
+    @Test
+    void shouldCreateUsingUnstructuredSuccessfully() throws JsonProcessingException {
+        var fake = createUnstructured();
+
+        when(converter.convertTo(any())).thenReturn(
+            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+        when(storeClient.create(any(), any())).thenReturn(
+            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+
+        client.create(fake);
+
+        verify(converter, times(1)).convertTo(eq(fake));
+        verify(storeClient, times(1)).create(eq("/registry/fake.halo.run/fakes/fake"), any());
         assertNotNull(fake.getMetadata().getCreationTimestamp());
     }
 
@@ -214,14 +255,30 @@ class DefaultExtensionClientTest {
     void shouldUpdateSuccessfully() {
         var fake = createFakeExtension("fake", 2L);
         when(converter.convertTo(any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+            createExtensionStore("/registry/fake.halo.run/fakes/fake", 2L));
         when(storeClient.update(any(), any(), any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+            createExtensionStore("/registry/fake.halo.run/fakes/fake", 2L));
 
         client.update(fake);
 
-        verify(converter, times(1)).convertTo(any());
-        verify(storeClient, times(1)).update(any(), any(), any());
+        verify(converter, times(1)).convertTo(eq(fake));
+        verify(storeClient, times(1))
+            .update(eq("/registry/fake.halo.run/fakes/fake"), eq(2L), any());
+    }
+
+    @Test
+    void shouldUpdateUnstructuredSuccessfully() throws JsonProcessingException {
+        var fake = createUnstructured();
+        when(converter.convertTo(any())).thenReturn(
+            createExtensionStore("/registry/fake.halo.run/fakes/fake", 12345L));
+        when(storeClient.update(any(), any(), any())).thenReturn(
+            createExtensionStore("/registry/fake.halo.run/fakes/fake", 12345L));
+
+        client.update(fake);
+
+        verify(converter, times(1)).convertTo(eq(fake));
+        verify(storeClient, times(1))
+            .update(eq("/registry/fake.halo.run/fakes/fake"), eq(12345L), any());
     }
 
     @Test
