@@ -230,13 +230,6 @@ public class BackupServiceImpl implements BackupService {
 
     @Override
     public BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException {
-
-        if (file.getSize() > 1994391530) {
-            throw new ServiceException(
-                "上传的markdown文件过大，目前仅支持不超过 " + 1.85 + " GB 的md文件"
-            );
-        }
-
         try {
             // Read markdown content.
             String markdown = FileUtils.readString(file.getInputStream());
