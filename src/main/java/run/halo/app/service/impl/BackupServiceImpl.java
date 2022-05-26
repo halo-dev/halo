@@ -255,7 +255,7 @@ public class BackupServiceImpl implements BackupService {
                 "上传的markdown文件后缀不正确，目前支持的后缀为: " + String.join(", ", legalMdSuffixes));
         }
 
-        if (file.getSize() > maxMdSize ) {
+        if (file.getSize() > maxMdSize) {
             throw new ServiceException(
                 "上传的markdown文件过大，目前仅支持 " + 64 + " KB 的md文件"
             );
