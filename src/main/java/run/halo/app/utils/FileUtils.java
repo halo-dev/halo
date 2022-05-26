@@ -254,8 +254,7 @@ public class FileUtils {
      * @throws IOException throws when failed to access file to be zipped
      */
     private static void zip(@NonNull Path fileToZip, @NonNull String fileName,
-        @NonNull ZipOutputStream zipOut, @Nullable Predicate<Path> filter)
-        throws IOException {
+        @NonNull ZipOutputStream zipOut, @Nullable Predicate<Path> filter) throws IOException {
         if (Files.isDirectory(fileToZip)) {
             log.debug("Try to zip folder: [{}]", fileToZip);
             // Append with '/' if missing
@@ -290,7 +289,6 @@ public class FileUtils {
             zipOut.closeEntry();
         }
     }
-
 
     /**
      * Find root path.

@@ -34,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.core.util.ReflectionUtil;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.Resource;
@@ -188,24 +187,18 @@ public class BackupServiceImpl implements BackupService {
     private final ApplicationContext appContext;
 
     public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService,
-        CommentBlackListService commentBlackListService,
-        JournalService journalService,
-        JournalCommentService journalCommentService, LinkService linkService,
-        LogService logService,
-        MenuService menuService, OptionService optionService,
-        PhotoService photoService,
+        CommentBlackListService commentBlackListService, JournalService journalService,
+        JournalCommentService journalCommentService, LinkService linkService, LogService logService,
+        MenuService menuService, OptionService optionService, PhotoService photoService,
         PostService postService, ContentService contentService,
         ContentPatchLogService contentPatchLogService,
         PostCategoryService postCategoryService,
         PostCommentService postCommentService, PostMetaService postMetaService,
         PostTagService postTagService, SheetService sheetService,
-        SheetCommentService sheetCommentService,
-        SheetMetaService sheetMetaService,
-        TagService tagService, ThemeSettingService themeSettingService,
-        UserService userService,
+        SheetCommentService sheetCommentService, SheetMetaService sheetMetaService,
+        TagService tagService, ThemeSettingService themeSettingService, UserService userService,
         OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties,
-        ApplicationEventPublisher eventPublisher,
-        ApplicationContext appContext) {
+        ApplicationEventPublisher eventPublisher, ApplicationContext appContext) {
         this.attachmentService = attachmentService;
         this.categoryService = categoryService;
         this.commentBlackListService = commentBlackListService;
