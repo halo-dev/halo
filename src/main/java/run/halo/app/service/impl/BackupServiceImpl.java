@@ -133,16 +133,6 @@ public class BackupServiceImpl implements BackupService {
 
     private static final String UPLOAD_SUB_DIR = "upload/";
 
-
-    @Value("${halo.file.legal-md-suffix:txt,md,markdown}")
-    private String[] legalMdSuffixes;
-
-    /**
-     * Max size of md file to upload, in terms of KB.
-     */
-    @Value("${halo.file.max-md-size:#{65534}}")
-    private Double maxMdSize;
-
     private final AttachmentService attachmentService;
 
     private final CategoryService categoryService;
@@ -250,14 +240,9 @@ public class BackupServiceImpl implements BackupService {
 
         final String mdFileName = file.getOriginalFilename();
 
-        if (!FileUtils.isLegalMdFilename(mdFileName, legalMdSuffixes)) {
+        if (file.getSize() > 1994391530) {
             throw new ServiceException(
-                "上传的markdown文件后缀不正确，目前支持的后缀为: " + String.join(", ", legalMdSuffixes));
-        }
-
-        if (file.getSize() > maxMdSize) {
-            throw new ServiceException(
-                "上传的markdown文件过大，目前仅支持 " + 64 + " KB 的md文件"
+                "上传的markdown文件过大，目前仅支持不超过 " + 1.85 + " GB 的md文件"
             );
         }
 
