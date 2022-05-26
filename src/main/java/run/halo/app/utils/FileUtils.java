@@ -589,23 +589,4 @@ public class FileUtils {
     public static void writeStringToFile(File file, String content) throws IOException {
         org.apache.commons.io.FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
     }
-
-    /**
-     * Check if the file to be uploaded is an acceptable file type.
-     *
-     * @param mdFileName the name of the file to be uploaded
-     * @param legalMdSuffixes acceptable file type
-     * @return check results
-     */
-    public static boolean isLegalMdFilename(String mdFileName, String[] legalMdSuffixes) {
-        return StringUtils.isNotEmpty(mdFileName)
-            && (
-            legalMdSuffixes == null
-                || ArrayUtils.isEmpty(legalMdSuffixes)
-                || Arrays.stream(legalMdSuffixes)
-                .map(String::trim)
-                .map(suffix -> suffix.startsWith(".") ? suffix : "." + suffix)
-                .anyMatch(mdFileName::endsWith)
-                );
-    }
 }
