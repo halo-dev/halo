@@ -141,7 +141,9 @@ public class BackupController {
         backupService.deleteWorkDirBackup(filename);
     }
 
-    @PostMapping("markdown/import")
+    @PostMapping(value = "markdown/import", consumes = {
+        MediaType.TEXT_PLAIN_VALUE,
+        MediaType.TEXT_MARKDOWN_VALUE})
     @ApiOperation("Imports markdown")
     public BasePostDetailDTO backupMarkdowns(@RequestPart("file") MultipartFile file)
         throws IOException {
