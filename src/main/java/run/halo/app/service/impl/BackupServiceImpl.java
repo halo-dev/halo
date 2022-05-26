@@ -231,8 +231,6 @@ public class BackupServiceImpl implements BackupService {
     @Override
     public BasePostDetailDTO importMarkdown(MultipartFile file) throws IOException {
 
-        final String mdFileName = file.getOriginalFilename();
-
         if (file.getSize() > 1994391530) {
             throw new ServiceException(
                 "上传的markdown文件过大，目前仅支持不超过 " + 1.85 + " GB 的md文件"
@@ -243,7 +241,7 @@ public class BackupServiceImpl implements BackupService {
         String markdown = FileUtils.readString(file.getInputStream());
 
         // TODO sheet import
-        return postService.importMarkdown(markdown, mdFileName);
+        return postService.importMarkdown(markdown, file.getOriginalFilename());
     }
 
     @Override
