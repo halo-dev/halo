@@ -10,6 +10,7 @@ import {
   IconArrowDown,
   IconArrowLeft,
   IconArrowRight,
+  IconCheckboxFill,
   IconGrid,
   IconList,
   IconPalette,
@@ -193,6 +194,14 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
           <div
             class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
+            <dt class="text-sm font-medium text-gray-900">上传者</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              Ryan Wang
+            </dd>
+          </div>
+          <div
+            class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+          >
             <dt class="text-sm font-medium text-gray-900">上传时间</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
               2020-01-01 12:00:00
@@ -369,6 +378,11 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                 >
                   {{ attachment.name }}
                 </p>
+
+                <IconCheckboxFill
+                  v-if="checkAll"
+                  class="absolute top-0.5 right-0.5"
+                />
               </div>
             </VCard>
           </div>

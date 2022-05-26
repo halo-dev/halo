@@ -528,29 +528,3 @@ const handleRouteToEditor = (post: any) => {
     </VCard>
   </div>
 </template>
-
-<style lang="scss">
-.table-container {
-  @apply table;
-  @apply w-full;
-  border: 1px solid #fff;
-  background: #fff;
-
-  border-radius: 4px;
-
-  .table-item {
-    @apply table-row;
-    @apply cursor-pointer;
-    @apply transition-all;
-
-    &:hover {
-      @apply bg-gray-100;
-    }
-  }
-
-  .table-cell {
-    display: table-cell;
-    padding: 10px;
-  }
-}
-</style>

@@ -35,6 +35,7 @@ import IconClose from "~icons/ri/close-line";
 // @ts-ignore
 import IconErrorWarning from "~icons/ri/error-warning-line";
 // @ts-ignore
+// @ts-ignore
 import IconCheckboxCircle from "~icons/ri/checkbox-circle-line";
 // @ts-ignore
 import IconInformation from "~icons/ri/information-line";
@@ -50,6 +51,8 @@ import IconSave from "~icons/ri/save-line";
 import IconList from "~icons/ri/list-unordered";
 // @ts-ignore
 import IconGrid from "~icons/ri/grid-line";
+// @ts-ignore
+import IconCheckboxFill from "~icons/ri/checkbox-circle-fill";
 
 export {
   IconDashboard,
@@ -78,4 +81,5 @@ export {
   IconSave,
   IconList,
   IconGrid,
+  IconCheckboxFill,
 };
