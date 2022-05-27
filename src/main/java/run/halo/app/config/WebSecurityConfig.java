@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,6 +39,9 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.identity.apitoken.DefaultPersonalAccessTokenDecoder;
+import run.halo.app.identity.apitoken.PersonalAccessTokenDecoder;
+import run.halo.app.identity.apitoken.PersonalAccessTokenUtils;
 import run.halo.app.identity.authentication.InMemoryOAuth2AuthorizationService;
 import run.halo.app.identity.authentication.JwtGenerator;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
@@ -48,7 +52,7 @@ import run.halo.app.identity.authentication.ProviderContextFilter;
 import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
 import run.halo.app.identity.authentication.verifier.JwtAccessTokenNonBlockedValidator;
-import run.halo.app.identity.authentication.verifier.JwtProvidedDecoderAuthenticationManagerResolver;
+import run.halo.app.identity.authentication.verifier.TokenAuthenticationManagerResolver;
 import run.halo.app.identity.authorization.DefaultRoleBindingLister;
 import run.halo.app.identity.authorization.DefaultRoleGetter;
 import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
@@ -58,6 +62,7 @@ import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
 import run.halo.app.identity.entrypoint.Oauth2LogoutHandler;
 import run.halo.app.infra.properties.JwtProperties;
+import run.halo.app.infra.utils.HaloUtils;
 
 /**
  * @author guqing
@@ -132,7 +137,8 @@ public class WebSecurityConfig {
     }
 
     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver() {
-        return new JwtProvidedDecoderAuthenticationManagerResolver(jwtDecoder());
+        return new TokenAuthenticationManagerResolver(jwtDecoder(),
+            personalAccessTokenDecoder());
     }
 
     @Bean
@@ -140,6 +146,13 @@ public class WebSecurityConfig {
         authenticationManagerBuilder.authenticationProvider(passwordAuthenticationProvider())
             .authenticationProvider(oauth2RefreshTokenAuthenticationProvider());
         return authenticationManagerBuilder.getOrBuild();
+    }
+
+    @Bean
+    PersonalAccessTokenDecoder personalAccessTokenDecoder() {
+        String salt = HaloUtils.readClassPathResourceAsString("apiToken.salt");
+        SecretKey secretKey = PersonalAccessTokenUtils.convertStringToSecretKey(salt);
+        return new DefaultPersonalAccessTokenDecoder(oauth2AuthorizationService(), secretKey);
     }
 
     @Bean
@@ -199,7 +212,7 @@ public class WebSecurityConfig {
         //  It'll be deleted next time
         UserDetails user = User.withUsername("user")
             .password(passwordEncoder().encode("123456"))
-            .roles("USER")
+            .authorities("readPostRole")
             .build();
         return new InMemoryUserDetailsManager(user);
     }
