@@ -2,9 +2,10 @@ package run.halo.app.identity.authorization;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.Assert;
 
 /**
  * @author guqing
@@ -12,13 +13,13 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 @Data
 public class DefaultRuleResolver implements AuthorizationRuleResolver {
-    private static final String USER_KIND = "User";
-    RoleGetter roleGetter;
-    RoleBindingLister roleBindingLister;
 
-    public DefaultRuleResolver(RoleGetter roleGetter, RoleBindingLister roleBindingLister) {
+    private RoleGetter roleGetter;
+
+    private RoleBindingLister roleBindingLister = new DefaultRoleBindingLister();
+
+    public DefaultRuleResolver(RoleGetter roleGetter) {
         this.roleGetter = roleGetter;
-        this.roleBindingLister = roleBindingLister;
     }
 
     @Override
@@ -38,26 +39,12 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
     @Override
     public void visitRulesFor(UserDetails user, RuleAccumulator visitor) {
-        List<RoleBinding> roleBindings = Collections.emptyList();
-        try {
-            roleBindings = roleBindingLister.listRoleBindings();
-        } catch (Exception e) {
-            if (visitor.visit(null, null, e)) {
-                return;
-            }
-        }
+        Set<String> roleNames = roleBindingLister.listBoundRoleNames();
 
-        for (RoleBinding roleBinding : roleBindings) {
-            AppliesResult appliesResult = appliesTo(user, roleBinding.subjects);
-            if (!appliesResult.applies) {
-                continue;
-            }
-
-            Subject subject = roleBinding.subjects.get(appliesResult.subjectIndex);
-
-            List<PolicyRule> rules = Collections.emptyList();
+        List<PolicyRule> rules = Collections.emptyList();
+        for (String roleName : roleNames) {
             try {
-                Role role = roleGetter.getRole(roleBinding.roleRef.name);
+                Role role = roleGetter.getRole(roleName);
                 rules = role.getRules();
             } catch (Exception e) {
                 if (visitor.visit(null, null, e)) {
@@ -65,7 +52,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
                 }
             }
 
-            String source = roleBindingDescriber(roleBinding, subject);
+            String source = roleBindingDescriber(roleName, user.getUsername());
             for (PolicyRule rule : rules) {
                 if (!visitor.visit(source, rule, null)) {
                     return;
@@ -74,28 +61,12 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         }
     }
 
-    String roleBindingDescriber(RoleBinding roleBinding, Subject subject) {
-        String describeSubject = String.format("%s %s", subject.kind, subject.name);
-        return String.format("RoleBinding %s of %s %s to %s", roleBinding.getMetadata().getName(),
-            roleBinding.roleRef.getKind(), roleBinding.roleRef.getName(), describeSubject);
+    String roleBindingDescriber(String roleName, String subject) {
+        return String.format("Binding role [%s] to [%s]", roleName, subject);
     }
 
-    AppliesResult appliesTo(UserDetails user, List<Subject> bindingSubjects) {
-        for (int i = 0; i < bindingSubjects.size(); i++) {
-            if (appliesToUser(user, bindingSubjects.get(i))) {
-                return new AppliesResult(true, i);
-            }
-        }
-        return new AppliesResult(false, 0);
-    }
-
-    boolean appliesToUser(UserDetails user, Subject subject) {
-        if (USER_KIND.equals(subject.kind)) {
-            return StringUtils.equals(user.getUsername(), subject.name);
-        }
-        return false;
-    }
-
-    record AppliesResult(boolean applies, int subjectIndex) {
+    public void setRoleBindingLister(RoleBindingLister roleBindingLister) {
+        Assert.notNull(roleBindingLister, "The roleBindingLister must not be null.");
+        this.roleBindingLister = roleBindingLister;
     }
 }

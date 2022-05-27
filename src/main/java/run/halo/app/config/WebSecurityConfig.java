@@ -53,10 +53,8 @@ import run.halo.app.identity.authentication.ProviderSettings;
 import run.halo.app.identity.authentication.verifier.BearerTokenAuthenticationFilter;
 import run.halo.app.identity.authentication.verifier.JwtAccessTokenNonBlockedValidator;
 import run.halo.app.identity.authentication.verifier.TokenAuthenticationManagerResolver;
-import run.halo.app.identity.authorization.DefaultRoleBindingLister;
 import run.halo.app.identity.authorization.DefaultRoleGetter;
 import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
-import run.halo.app.identity.authorization.RoleBindingLister;
 import run.halo.app.identity.authorization.RoleGetter;
 import run.halo.app.identity.entrypoint.JwtAccessDeniedHandler;
 import run.halo.app.identity.entrypoint.JwtAuthenticationEntryPoint;
@@ -131,9 +129,8 @@ public class WebSecurityConfig {
     }
 
     RequestInfoAuthorizationManager requestInfoAuthorizationManager() {
-        RoleBindingLister roleBindingLister = new DefaultRoleBindingLister();
         RoleGetter roleGetter = new DefaultRoleGetter(extensionClient);
-        return new RequestInfoAuthorizationManager(roleGetter, roleBindingLister);
+        return new RequestInfoAuthorizationManager(roleGetter);
     }
 
     AuthenticationManagerResolver<HttpServletRequest> authenticationManagerResolver() {

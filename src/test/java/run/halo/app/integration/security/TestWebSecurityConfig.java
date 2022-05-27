@@ -59,9 +59,6 @@ import run.halo.app.identity.authentication.verifier.TokenAuthenticationManagerR
 import run.halo.app.identity.authorization.PolicyRule;
 import run.halo.app.identity.authorization.RequestInfoAuthorizationManager;
 import run.halo.app.identity.authorization.Role;
-import run.halo.app.identity.authorization.RoleBinding;
-import run.halo.app.identity.authorization.RoleRef;
-import run.halo.app.identity.authorization.Subject;
 import run.halo.app.identity.entrypoint.Oauth2LogoutHandler;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.infra.utils.HaloUtils;
@@ -140,27 +137,6 @@ public class TestWebSecurityConfig {
             metadata.setName("ruleReadPost");
             role.setMetadata(metadata);
             return role;
-        }, () -> {
-            // role binding lister
-            RoleBinding roleBinding = new RoleBinding();
-
-            Metadata metadata = new Metadata();
-            metadata.setName("userRoleBinding");
-            roleBinding.setMetadata(metadata);
-
-            Subject subject = new Subject();
-            subject.setName("test_user");
-            subject.setKind("User");
-            subject.setApiGroup("");
-            roleBinding.setSubjects(List.of(subject));
-
-            RoleRef roleRef = new RoleRef();
-            roleRef.setKind("Role");
-            roleRef.setName("ruleReadPost");
-            roleRef.setApiGroup("");
-            roleBinding.setRoleRef(roleRef);
-
-            return List.of(roleBinding);
         });
     }
 
