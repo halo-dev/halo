@@ -42,6 +42,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
     public void onApplicationEvent(ApplicationStartedEvent event) {
         Schemes.INSTANCE.register(Role.class);
 
+        // TODO These test only methods will be removed in the future
         initRoleForTesting();
         initPersonalAccessTokenForTesting();
     }
