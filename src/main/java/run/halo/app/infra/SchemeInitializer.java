@@ -1,25 +1,29 @@
 package run.halo.app.infra;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
 import javax.crypto.SecretKey;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Schemes;
+import run.halo.app.extension.Unstructured;
 import run.halo.app.identity.apitoken.PersonalAccessToken;
 import run.halo.app.identity.apitoken.PersonalAccessTokenType;
 import run.halo.app.identity.apitoken.PersonalAccessTokenUtils;
 import run.halo.app.identity.authentication.OAuth2Authorization;
 import run.halo.app.identity.authentication.OAuth2AuthorizationService;
-import run.halo.app.identity.authorization.PolicyRule;
 import run.halo.app.identity.authorization.Role;
 import run.halo.app.infra.utils.HaloUtils;
+import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
 /**
  * @author guqing
@@ -42,30 +46,12 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
     public void onApplicationEvent(ApplicationStartedEvent event) {
         Schemes.INSTANCE.register(Role.class);
 
+        // TODO The read location of the configuration file needs to be considered later
+        createUnstructured();
+
         // TODO These test only methods will be removed in the future
-        initRoleForTesting();
         initPersonalAccessTokenForTesting();
-    }
 
-
-    private void initRoleForTesting() {
-        Role role = new Role();
-        role.setApiVersion("v1alpha1");
-        role.setKind("Role");
-        Metadata metadata = new Metadata();
-        metadata.setName("readPostRole");
-        role.setMetadata(metadata);
-        List<PolicyRule> rules = List.of(
-            new PolicyRule.Builder().apiGroups("").resources("posts").verbs("list", "get")
-                .build(),
-            new PolicyRule.Builder().apiGroups("").resources("categories").verbs("*")
-                .build(),
-            new PolicyRule.Builder().nonResourceURLs("/healthy").verbs("get", "post", "head")
-                .build()
-        );
-        role.setRules(rules);
-
-        extensionClient.create(role);
     }
 
     private void initPersonalAccessTokenForTesting() {
@@ -74,7 +60,8 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         String tokenValue =
             PersonalAccessTokenUtils.generate(PersonalAccessTokenType.ADMIN_TOKEN, secretKey);
 
-        Set<String> roles = Set.of("readPostRole");
+        Set<String> roles =
+            Set.of("role-template-view-categories", "role-template-view-nonresources");
         OAuth2AccessToken personalAccessToken =
             new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, tokenValue, Instant.now(),
                 Instant.now().plus(2, ChronoUnit.HOURS), roles);
@@ -90,5 +77,30 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
             .authorizationGrantType(PersonalAccessToken.PERSONAL_ACCESS_TOKEN)
             .build();
         oauth2AuthorizationService.save(authorization);
+    }
+
+    private void createUnstructured() {
+        try {
+            List<Unstructured> unstructuredList = loadClassPathResourcesToUnstructured();
+            for (Unstructured unstructured : unstructuredList) {
+                extensionClient.create(unstructured);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<Unstructured> loadClassPathResourcesToUnstructured() throws IOException {
+        PathMatchingResourcePatternResolver resourcePatternResolver =
+            new PathMatchingResourcePatternResolver();
+        // Gets yaml resources
+        Resource[] yamlResources =
+            resourcePatternResolver.getResources("classpath*:extensions/*.yaml");
+        Resource[] ymlResources =
+            resourcePatternResolver.getResources("classpath*:extensions/*.yml");
+
+        YamlUnstructuredLoader yamlUnstructuredLoader =
+            new YamlUnstructuredLoader(ArrayUtils.addAll(ymlResources, yamlResources));
+        return yamlUnstructuredLoader.load();
     }
 }

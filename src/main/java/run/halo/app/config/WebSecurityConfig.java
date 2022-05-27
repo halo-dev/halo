@@ -212,7 +212,7 @@ public class WebSecurityConfig {
         //  It'll be deleted next time
         UserDetails user = User.withUsername("user")
             .password(passwordEncoder().encode("123456"))
-            .authorities("readPostRole")
+            .authorities("role-template-view-posts", "role-template-manage-posts")
             .build();
         return new InMemoryUserDetailsManager(user);
     }
