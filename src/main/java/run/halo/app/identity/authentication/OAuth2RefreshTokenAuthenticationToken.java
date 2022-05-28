@@ -5,10 +5,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.util.Assert;
 
 /**
+ * An {@link Authentication} implementation used for the OAuth 2.0 Refresh Token Grant.
+ *
  * @author guqing
  * @since 2.0.0
  */

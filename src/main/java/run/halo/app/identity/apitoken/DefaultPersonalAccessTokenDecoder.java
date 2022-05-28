@@ -75,18 +75,21 @@ public class DefaultPersonalAccessTokenDecoder implements PersonalAccessTokenDec
             throw new PersonalAccessTokenException(String.format(DECODING_ERROR_MESSAGE_TEMPLATE,
                 "Failed to retrieve personal access token"));
         }
+        return createPersonalAccessToken(oauth2Authorization);
+    }
+
+    private PersonalAccessToken createPersonalAccessToken(OAuth2Authorization oauth2Authorization) {
         OAuth2Authorization.Token<OAuth2AccessToken> accessTokenToken =
             oauth2Authorization.getToken(OAuth2AccessToken.class);
         if (accessTokenToken == null) {
             throw new PersonalAccessTokenException(String.format(DECODING_ERROR_MESSAGE_TEMPLATE,
                 "Failed to retrieve personal access token"));
         }
-        return createPersonalAccessToken(accessTokenToken.getToken());
-    }
-
-    private PersonalAccessToken createPersonalAccessToken(OAuth2AccessToken token) {
-        return new PersonalAccessToken(token.getTokenValue(), token.getIssuedAt(),
-            token.getExpiresAt(), token.getScopes());
+        return PersonalAccessToken.builder()
+            .principalName(oauth2Authorization.getPrincipalName())
+            .token(accessTokenToken.getToken())
+            .attributes(accessTokenToken.getClaims())
+            .build();
     }
 
     private PersonalAccessToken validate(PersonalAccessToken token) {

@@ -57,7 +57,8 @@ public class PersonalAccessTokenProvider implements AuthenticationProvider {
             .stream()
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
-        return new PersonalAccessTokenAuthenticationToken(accessToken, authorities);
+        return new PersonalAccessTokenAuthenticationToken(accessToken, authorities,
+            accessToken.getPrincipalName(), accessToken.getClaims());
     }
 
     private PersonalAccessToken getPersonalAccessToken(String tokenValue) {

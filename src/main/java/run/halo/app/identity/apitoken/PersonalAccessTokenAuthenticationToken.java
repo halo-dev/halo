@@ -1,12 +1,16 @@
 package run.halo.app.identity.apitoken;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.Transient;
 import run.halo.app.identity.authentication.verifier.AbstractOAuth2TokenAuthenticationToken;
 
 /**
+ * An {@link Authentication} implementation used for the Personal Access Token Grant.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -16,14 +20,16 @@ public class PersonalAccessTokenAuthenticationToken extends
 
     private final String name;
 
+    private final Map<String, Object> tokenAttributes;
+
     /**
      * Constructs a {@code PersonalAccessToken} using the provided parameters.
      *
      * @param personalAccessToken the PersonalAccessToken
      */
     public PersonalAccessTokenAuthenticationToken(PersonalAccessToken personalAccessToken) {
-        super(personalAccessToken);
-        this.name = personalAccessToken.getTokenValue();
+        this(personalAccessToken, Collections.emptyList(), personalAccessToken.getPrincipalName(),
+            Collections.emptyMap());
     }
 
 
@@ -35,9 +41,8 @@ public class PersonalAccessTokenAuthenticationToken extends
      */
     public PersonalAccessTokenAuthenticationToken(PersonalAccessToken personalAccessToken,
         Collection<? extends GrantedAuthority> authorities) {
-        super(personalAccessToken, authorities);
-        this.setAuthenticated(true);
-        this.name = personalAccessToken.getTokenValue();
+        this(personalAccessToken, authorities, personalAccessToken.getPrincipalName(),
+            Collections.emptyMap());
     }
 
     /**
@@ -45,14 +50,15 @@ public class PersonalAccessTokenAuthenticationToken extends
      *
      * @param personalAccessToken the PersonalAccessToken
      * @param authorities the authorities assigned to the PersonalAccessToken
-     * @param name the principal name
+     * @param principleName the principal name
      */
     public PersonalAccessTokenAuthenticationToken(PersonalAccessToken personalAccessToken,
         Collection<? extends GrantedAuthority> authorities,
-        String name) {
+        String principleName, Map<String, Object> claims) {
         super(personalAccessToken, authorities);
         this.setAuthenticated(true);
-        this.name = name;
+        this.name = principleName;
+        this.tokenAttributes = claims;
     }
 
     @Override
@@ -62,7 +68,7 @@ public class PersonalAccessTokenAuthenticationToken extends
 
     @Override
     public Map<String, Object> getTokenAttributes() {
-        return Map.of();
+        return this.tokenAttributes;
     }
 
     /**

@@ -3,6 +3,7 @@ package run.halo.app.infra;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.crypto.SecretKey;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -85,8 +86,12 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
 
         OAuth2Authorization authorization = new OAuth2Authorization.Builder()
             .id(HaloUtils.simpleUUID())
-            .token(personalAccessToken)
-            .principalName(tokenValue)
+            .token(personalAccessToken, metadata -> {
+                metadata.put(OAuth2Authorization.Token.CLAIMS_METADATA_NAME,
+                    Map.of("claim-1", "claim-value-1"));
+                metadata.put(OAuth2Authorization.Token.INVALIDATED_METADATA_NAME, false);
+            })
+            .principalName("user")
             .authorizationGrantType(PersonalAccessToken.PERSONAL_ACCESS_TOKEN)
             .build();
         oauth2AuthorizationService.save(authorization);
