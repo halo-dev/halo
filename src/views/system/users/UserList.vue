@@ -11,6 +11,7 @@ import {
   IconAddCircle,
   IconArrowDown,
   IconSettings,
+  IconUserFollow,
   IconUserSettings,
 } from "@/core/icons";
 import { ref } from "vue";
@@ -29,12 +30,20 @@ const handleRouteToDetail = (username: string) => {
       <IconUserSettings class="self-center mr-2" />
     </template>
     <template #actions>
-      <VButton type="secondary">
-        <template #icon>
-          <IconAddCircle class="w-full h-full" />
-        </template>
-        添加用户
-      </VButton>
+      <VSpace>
+        <VButton size="sm" type="default">
+          <template #icon>
+            <IconUserFollow class="w-full h-full" />
+          </template>
+          角色管理
+        </VButton>
+        <VButton type="secondary">
+          <template #icon>
+            <IconAddCircle class="w-full h-full" />
+          </template>
+          添加用户
+        </VButton>
+      </VSpace>
     </template>
   </VPageHeader>
 

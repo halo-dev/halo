@@ -522,7 +522,7 @@ const handleRouteToEditor = (post: any) => {
                 <div class="flex mt-1">
                   <VSpace>
                     <span class="text-xs text-gray-500"
-                      >阅读 {{ post.visits }}</span
+                      >访问量 {{ post.visits }}</span
                     >
                     <span class="text-xs text-gray-500"
                       >评论 {{ post.commentCount }}</span

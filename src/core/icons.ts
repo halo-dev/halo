@@ -65,6 +65,8 @@ import IconComputer from "~icons/ri/computer-line";
 import IconPhone from "~icons/ri/smartphone-line";
 // @ts-ignore
 import IconTablet from "~icons/ri/tablet-line";
+// @ts-ignore
+import IconUserFollow from "~icons/ri/user-follow-line";
 
 export {
   IconDashboard,
@@ -99,5 +101,6 @@ export {
   IconSearch,
   IconComputer,
   IconPhone,
-  IconTablet
+  IconTablet,
+  IconUserFollow,
 };
