@@ -36,8 +36,8 @@ function handleChange(value: string | number | boolean) {
       :key="index"
       :label="option[labelKey] + ''"
       :model-value="modelValue"
-      :value="option[valueKey]"
       :name="name"
+      :value="option[valueKey]"
       @change="handleChange"
     />
   </div>

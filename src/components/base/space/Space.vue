@@ -26,9 +26,9 @@ const wrapperClasses = computed(() => {
 </script>
 <template>
   <div
-    class="space-wrapper"
     :class="wrapperClasses"
     :style="`gap: ${SpacingSize[spacing]}px`"
+    class="space-wrapper"
   >
     <slot />
   </div>

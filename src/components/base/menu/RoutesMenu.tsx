@@ -1,9 +1,9 @@
+import type { Component, PropType } from "vue";
 import { computed, defineComponent } from "vue";
-import type { PropType, Component } from "vue";
 import type { MenuGroupType, MenuItemType } from "@/router/menus.config";
 import { VMenu, VMenuItem, VMenuLabel } from "@/components/base/menu/index";
-import { useRoute, useRouter } from "vue-router";
 import type { RouteLocationMatched } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const VRoutesMenu = defineComponent({
   name: "VRoutesMenu",

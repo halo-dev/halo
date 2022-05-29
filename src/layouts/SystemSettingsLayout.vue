@@ -5,7 +5,7 @@ import { VButton } from "@/components/base/button";
 import { VTabbar } from "@/components/base/tabs";
 import { IconSettings } from "@/core/icons";
 import { onMounted, ref } from "vue";
-import { useRouter, RouterView, useRoute } from "vue-router";
+import { RouterView, useRoute, useRouter } from "vue-router";
 
 const SettingTabs = [
   {
@@ -42,7 +42,7 @@ const handleTabChange = (id: string) => {
   <BasicLayout>
     <VPageHeader title="设置">
       <template #icon>
-        <IconSettings class="self-center mr-2" />
+        <IconSettings class="mr-2 self-center" />
       </template>
       <template #actions>
         <VButton type="secondary">安装</VButton>
@@ -53,8 +53,8 @@ const handleTabChange = (id: string) => {
       <VTabbar
         v-model:active-id="activeTab"
         :items="SettingTabs"
-        @change="handleTabChange"
         type="outline"
+        @change="handleTabChange"
       ></VTabbar>
 
       <div>

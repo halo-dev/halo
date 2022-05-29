@@ -22,8 +22,8 @@ const iframeClasses = computed(() => {
 });
 </script>
 <template>
-  <div class="h-screen flex">
-    <div class="h-full bg-white w-96 drop-shadow-sm overflow-y-auto">
+  <div class="flex h-screen">
+    <div class="h-full w-96 overflow-y-auto bg-white drop-shadow-sm">
       <VTabs v-model:active-id="activeId">
         <VTabItem id="general" class="p-3" label="基础设置">
           <form>
@@ -36,7 +36,7 @@ const iframeClasses = computed(() => {
                   >
                     Halo 当前版本：
                   </label>
-                  <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <div class="mt-1 sm:col-span-2 sm:mt-0">
                     <VInput model-value="1.5.3"></VInput>
                   </div>
                 </div>
@@ -48,7 +48,7 @@ const iframeClasses = computed(() => {
                   >
                     首页图片：
                   </label>
-                  <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <div class="mt-1 sm:col-span-2 sm:mt-0">
                     <VInput
                       model-value="https://halo.run/upload/2022/03/support-team.svg"
                     ></VInput>
@@ -69,7 +69,7 @@ const iframeClasses = computed(() => {
                   >
                     文章代码高亮语言：
                   </label>
-                  <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <div class="mt-1 sm:col-span-2 sm:mt-0">
                     <VTextarea></VTextarea>
                   </div>
                 </div>
@@ -81,7 +81,7 @@ const iframeClasses = computed(() => {
                   >
                     文章代码高亮主题：
                   </label>
-                  <div class="mt-1 sm:mt-0 sm:col-span-2">
+                  <div class="mt-1 sm:col-span-2 sm:mt-0">
                     <VSelect>
                       <VOption value="java">Java</VOption>
                       <VOption value="c">C</VOption>
@@ -98,10 +98,10 @@ const iframeClasses = computed(() => {
     </div>
     <div class="flex-1">
       <div
-        class="flex items-center justify-between p-2 bg-white h-16 drop-shadow-sm"
+        class="flex h-16 items-center justify-between bg-white p-2 drop-shadow-sm"
       >
         <div>
-          <h2 class="text-xl font-bold text-gray-800 truncate">
+          <h2 class="truncate text-xl font-bold text-gray-800">
             <span>Anatole</span>
           </h2>
         </div>
@@ -130,12 +130,12 @@ const iframeClasses = computed(() => {
         </div>
       </div>
       <div
-        class="h-full flex justify-center items-center"
+        class="flex h-full items-center justify-center"
         style="height: calc(100vh - 4rem)"
       >
         <iframe
           :class="iframeClasses"
-          class="border-none"
+          class="border-none transition-all duration-200"
           src="http://localhost:8090"
         ></iframe>
       </div>

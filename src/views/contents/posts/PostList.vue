@@ -94,57 +94,57 @@ const handleRouteToEditor = (post: any) => {
     <VTabs v-model:active-id="settingActiveId" type="outline">
       <VTabItem id="general" label="常规">
         <form>
-          <div class="divide-y-0 sm:divide-y sm:divide-gray-200 space-y-6">
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 标题
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput v-model="selected.title"></VInput>
               </div>
             </div>
 
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 别名
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput v-model="selected.slug"></VInput>
               </div>
             </div>
 
             <div
-              class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-center sm:pt-5"
+              class="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:pt-5"
             >
               <label class="block text-sm font-medium text-gray-700">
                 分类目录
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput></VInput>
               </div>
             </div>
 
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 标签
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput></VInput>
               </div>
             </div>
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 摘要
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VTextarea v-model="selected.summary"></VTextarea>
               </div>
             </div>
@@ -153,74 +153,74 @@ const handleRouteToEditor = (post: any) => {
       </VTabItem>
       <VTabItem id="advanced" label="高级">
         <form>
-          <div class="divide-y-0 sm:divide-y sm:divide-gray-200 space-y-6">
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 禁止评论
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput v-model="selected.disallowComment"></VInput>
               </div>
             </div>
 
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 是否置顶
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput v-model="selected.topPriority"></VInput>
               </div>
             </div>
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 发表时间
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput></VInput>
               </div>
             </div>
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 自定义模板
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput v-model="selected.template"></VInput>
               </div>
             </div>
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 访问密码
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VInput v-model="selected.password"></VInput>
               </div>
             </div>
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 封面图
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VSpace align="start" class="w-full" direction="column">
                   <div class="w-full sm:w-1/2">
                     <div
-                      class="block aspect-w-10 aspect-h-7 bg-gray-100 overflow-hidden cursor-pointer rounded"
+                      class="aspect-w-10 aspect-h-7 block cursor-pointer overflow-hidden rounded bg-gray-100"
                     >
                       <img
                         :src="selected.thumbnail"
                         alt=""
-                        class="object-cover pointer-events-none"
+                        class="pointer-events-none object-cover"
                       />
                     </div>
                   </div>
@@ -233,14 +233,14 @@ const handleRouteToEditor = (post: any) => {
       </VTabItem>
       <VTabItem id="seo" label="SEO">
         <form>
-          <div class="divide-y-0 sm:divide-y sm:divide-gray-200 space-y-6">
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 自定义关键词
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VTextarea
                   v-model="selected.metaKeywords"
                   :rows="5"
@@ -248,13 +248,13 @@ const handleRouteToEditor = (post: any) => {
               </div>
             </div>
 
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 自定义描述
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VTextarea
                   v-model="selected.metaDescription"
                   :rows="5"
@@ -267,25 +267,25 @@ const handleRouteToEditor = (post: any) => {
       <VTabItem id="metas" label="元数据"></VTabItem>
       <VTabItem id="inject-code" label="代码注入">
         <form>
-          <div class="divide-y-0 sm:divide-y sm:divide-gray-200 space-y-6">
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 CSS
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VTextarea :rows="5"></VTextarea>
               </div>
             </div>
 
-            <div class="sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:pt-5">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 JavaScript
               </label>
-              <div class="mt-1 sm:mt-0 sm:col-span-2">
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
                 <VTextarea :rows="5"></VTextarea>
               </div>
             </div>
@@ -305,12 +305,12 @@ const handleRouteToEditor = (post: any) => {
   </VModal>
   <VPageHeader title="文章">
     <template #icon>
-      <IconBookRead class="self-center mr-2" />
+      <IconBookRead class="mr-2 self-center" />
     </template>
     <template #actions>
       <VButton :route="{ name: 'PostEditor' }" type="secondary">
         <template #icon>
-          <IconAddCircle class="w-full h-full" />
+          <IconAddCircle class="h-full w-full" />
         </template>
         新建
       </VButton>
@@ -320,19 +320,19 @@ const handleRouteToEditor = (post: any) => {
   <div class="m-0 md:m-4">
     <VCard :body-class="['!p-0']">
       <template #header>
-        <div class="px-4 py-3 block w-full bg-gray-50">
+        <div class="block w-full bg-gray-50 px-4 py-3">
           <div
-            class="flex flex-col sm:flex-row items-start sm:items-center relative"
+            class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
-            <div class="hidden sm:flex items-center mr-4">
+            <div class="mr-4 hidden items-center sm:flex">
               <input
                 v-model="checkAll"
-                class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
                 @change="handleCheckAll()"
               />
             </div>
-            <div class="w-full sm:w-auto flex flex-1">
+            <div class="flex w-full flex-1 sm:w-auto">
               <VInput
                 v-if="checkedCount <= 0"
                 class="w-full sm:w-72"
@@ -343,11 +343,11 @@ const handleRouteToEditor = (post: any) => {
                 <VButton type="danger">删除</VButton>
               </VSpace>
             </div>
-            <div class="mt-4 sm:mt-0 flex">
+            <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
                 <FloatingDropdown>
                   <div
-                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">分类</span>
                     <span>
@@ -355,14 +355,14 @@ const handleRouteToEditor = (post: any) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="p-4 w-80 h-96">
+                    <div class="h-96 w-80 p-4">
                       <VInput placeholder="根据关键词搜索"></VInput>
                     </div>
                   </template>
                 </FloatingDropdown>
                 <FloatingDropdown>
                   <div
-                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">标签</span>
                     <span>
@@ -370,14 +370,14 @@ const handleRouteToEditor = (post: any) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="p-4 w-80 h-96">
+                    <div class="h-96 w-80 p-4">
                       <VInput placeholder="根据关键词搜索"></VInput>
                     </div>
                   </template>
                 </FloatingDropdown>
                 <FloatingDropdown>
                   <div
-                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">作者</span>
                     <span>
@@ -385,7 +385,7 @@ const handleRouteToEditor = (post: any) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="p-4 w-80 h-96">
+                    <div class="h-96 w-80 p-4">
                       <div class="bg-white">
                         <!--TODO: Auto Focus-->
                         <VInput placeholder="根据关键词搜索"></VInput>
@@ -395,12 +395,12 @@ const handleRouteToEditor = (post: any) => {
                           <li
                             v-for="(user, index) in users"
                             :key="index"
-                            class="py-4 cursor-pointer hover:bg-gray-50"
+                            class="cursor-pointer py-4 hover:bg-gray-50"
                           >
                             <div class="flex items-center space-x-4">
                               <div class="flex items-center">
                                 <input
-                                  class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                                   type="checkbox"
                                 />
                               </div>
@@ -411,13 +411,13 @@ const handleRouteToEditor = (post: any) => {
                                   class="h-10 w-10 rounded"
                                 />
                               </div>
-                              <div class="flex-1 min-w-0">
+                              <div class="min-w-0 flex-1">
                                 <p
-                                  class="text-sm font-medium text-gray-900 truncate"
+                                  class="truncate text-sm font-medium text-gray-900"
                                 >
                                   {{ user.name }}
                                 </p>
-                                <p class="text-sm text-gray-500 truncate">
+                                <p class="truncate text-sm text-gray-500">
                                   @{{ user.username }}
                                 </p>
                               </div>
@@ -433,7 +433,7 @@ const handleRouteToEditor = (post: any) => {
                 </FloatingDropdown>
                 <FloatingDropdown>
                   <div
-                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">排序</span>
                     <span>
@@ -441,35 +441,35 @@ const handleRouteToEditor = (post: any) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="p-4 w-72">
+                    <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">较近发布</span>
                         </li>
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">较晚发布</span>
                         </li>
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">浏览量最多</span>
                         </li>
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">浏览量最少</span>
                         </li>
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">评论量最多</span>
                         </li>
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">评论量最少</span>
                         </li>
@@ -482,7 +482,7 @@ const handleRouteToEditor = (post: any) => {
           </div>
         </div>
       </template>
-      <ul class="divide-y divide-gray-100 box-border w-full h-full" role="list">
+      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li
           v-for="(post, index) in postsRef"
           :key="index"
@@ -492,24 +492,24 @@ const handleRouteToEditor = (post: any) => {
             :class="{
               'bg-gray-100': selected.id === post.id || post.checked,
             }"
-            class="px-4 py-3 block hover:bg-gray-50 cursor-pointer transition-all relative"
+            class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
           >
             <div
               v-show="selected.id === post.id || post.checked"
               class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
             ></div>
-            <div class="flex flex-row items-center relative">
-              <div class="hidden mr-4 sm:flex items-center">
+            <div class="relative flex flex-row items-center">
+              <div class="mr-4 hidden items-center sm:flex">
                 <input
                   v-model="post.checked"
-                  class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   type="checkbox"
                 />
               </div>
               <div class="flex-1">
                 <div class="flex flex-col sm:flex-row">
                   <span
-                    class="mr-0 sm:mr-2 text-sm font-medium truncate text-gray-900"
+                    class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
                   >
                     {{ post.title }}
                   </span>
@@ -519,7 +519,7 @@ const handleRouteToEditor = (post: any) => {
                     </VTag>
                   </VSpace>
                 </div>
-                <div class="flex mt-1">
+                <div class="mt-1 flex">
                   <VSpace>
                     <span class="text-xs text-gray-500"
                       >访问量 {{ post.visits }}</span
@@ -532,10 +532,10 @@ const handleRouteToEditor = (post: any) => {
               </div>
               <div class="flex">
                 <div
-                  class="inline-flex flex-col items-end gap-4 flex-col-reverse sm:flex-row sm:items-center sm:gap-6"
+                  class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
                   <img
-                    class="hidden sm:inline-block h-6 w-6 rounded-full ring-2 ring-white"
+                    class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
                     src="https://ryanc.cc/avatar"
                   />
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
@@ -552,15 +552,15 @@ const handleRouteToEditor = (post: any) => {
       </ul>
 
       <template #footer>
-        <div class="bg-white flex items-center justify-end">
-          <div class="flex-1 flex items-center justify-end">
+        <div class="flex items-center justify-end bg-white">
+          <div class="flex flex-1 items-center justify-end">
             <div>
               <nav
                 aria-label="Pagination"
-                class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
               >
                 <a
-                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                   href="#"
                 >
                   <span class="sr-only">Previous</span>
@@ -580,30 +580,30 @@ const handleRouteToEditor = (post: any) => {
                 </a>
                 <a
                   aria-current="page"
-                  class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  class="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600"
                   href="#"
                 >
                   1
                 </a>
                 <a
-                  class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                   href="#"
                 >
                   2
                 </a>
                 <span
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700"
                 >
                   ...
                 </span>
                 <a
-                  class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"
+                  class="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 md:inline-flex"
                   href="#"
                 >
                   4
                 </a>
                 <a
-                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                   href="#"
                 >
                   <span class="sr-only">Next</span>

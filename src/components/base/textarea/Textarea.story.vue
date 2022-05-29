@@ -1,13 +1,13 @@
 <template>
-  <Story title="Textarea" :init-state="initState">
+  <Story :init-state="initState" title="Textarea">
     <template #default="{ state }">
       <div class="w-1/2">
         <VTextarea
           v-model="state.value"
           :disabled="state.disabled"
           :placeholder="state.placeholder"
-          :size="state.size"
           :rows="state.rows"
+          :size="state.size"
         />
       </div>
     </template>

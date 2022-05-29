@@ -6,9 +6,9 @@ defineProps({
 });
 </script>
 <template>
-  <div class="flex items-center justify-between p-4 bg-white">
-    <div class="flex-1 self-center min-w-0">
-      <h2 class="flex text-xl font-bold text-gray-800 truncate items-center">
+  <div class="flex items-center justify-between bg-white p-4">
+    <div class="min-w-0 flex-1 self-center">
+      <h2 class="flex items-center truncate text-xl font-bold text-gray-800">
         <slot name="icon" />
         <span>{{ title }}</span>
       </h2>

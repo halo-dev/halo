@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full">
     <aside
-      class="hidden md:block navbar fixed h-full overflow-y-auto"
+      class="navbar fixed hidden h-full overflow-y-auto md:block"
       style="background: #fff"
     >
       <div class="logo flex justify-center py-5">
@@ -9,12 +9,12 @@
       </div>
       <div class="px-3">
         <div
-          class="flex p-2 text-gray-400 items-center transition-all bg-gray-100 rounded cursor-pointer hover:text-gray-900"
+          class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
         >
           <span class="mr-3">
             <IconSearch />
           </span>
-          <span class="flex-1 text-base select-none font-normal">搜索</span>
+          <span class="flex-1 select-none text-base font-normal">搜索</span>
           <div class="text-sm">⌘+K</div>
         </div>
       </div>
@@ -24,7 +24,7 @@
           <img class="h-11 w-11 rounded-full" src="https://ryanc.cc/avatar" />
         </div>
         <div class="profile-name">
-          <div class="flex font-medium text-sm">Ryan Wang</div>
+          <div class="flex text-sm font-medium">Ryan Wang</div>
           <div class="flex">
             <VTag>
               <template #leftIcon>
@@ -35,21 +35,21 @@
           </div>
         </div>
         <div
-          class="profile-control transition-all hover:bg-gray-100 rounded cursor-pointer p-1"
+          class="profile-control cursor-pointer rounded p-1 transition-all hover:bg-gray-100"
           @click="handleRouteToProfile"
         >
           <IconMore />
         </div>
       </div>
     </aside>
-    <main class="content w-full overflow-y-auto mb-safe pb-12 md:pb-0">
+    <main class="content w-full overflow-y-auto pb-12 mb-safe md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
     </main>
 
     <!--bottom nav bar-->
     <div
-      class="md:hidden bottom-nav-bar grid grid-cols-6 fixed left-0 bottom-0 right-0 border-t-2 border-black drop-shadow-2xl pb-safe mt-safe"
+      class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black drop-shadow-2xl mt-safe pb-safe md:hidden"
       style="background: #0e1731"
     >
       <div
@@ -60,15 +60,15 @@
         @click="router.push(menu.path)"
       >
         <div
-          class="p-1 w-full cursor-pointer flex items-center justify-center text-white"
+          class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
         >
           <div
-            class="w-10 h-10 flex flex-col justify-center items-center is-active is-active0"
+            class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
           >
             <div class="text-base">
               <Component :is="menu.icon" />
             </div>
-            <div class="text-xs mt-0.5">
+            <div class="mt-0.5 text-xs">
               {{ menu.name }}
             </div>
           </div>
@@ -76,15 +76,15 @@
       </div>
       <div class="nav-item" @click="moreMenuVisible = true">
         <div
-          class="p-1 w-full cursor-pointer flex items-center justify-center text-white"
+          class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
         >
           <div
-            class="w-10 h-10 flex flex-col justify-center items-center is-active is-active0"
+            class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
           >
             <div class="text-base">
               <IconMore />
             </div>
-            <div class="text-xs mt-0.5">更多</div>
+            <div class="mt-0.5 text-xs">更多</div>
           </div>
         </div>
       </div>
@@ -92,7 +92,7 @@
       <Teleport to="body">
         <div
           v-show="moreMenuRootVisible"
-          class="drawer-wrapper fixed top-0 left-0 w-full h-full flex flex-row items-end justify-center z-[99999]"
+          class="drawer-wrapper fixed top-0 left-0 z-[99999] flex h-full w-full flex-row items-end justify-center"
         >
           <transition
             enter-active-class="ease-out duration-200"
@@ -106,7 +106,7 @@
           >
             <div
               v-show="moreMenuVisible"
-              class="drawer-layer flex-none absolute top-0 left-0 w-full h-full transition-opacity bg-gray-500 bg-opacity-75"
+              class="drawer-layer absolute top-0 left-0 h-full w-full flex-none bg-gray-500 bg-opacity-75 transition-opacity"
               @click="moreMenuVisible = false"
             ></div>
           </transition>
@@ -120,7 +120,7 @@
           >
             <div
               v-show="moreMenuVisible"
-              class="drawer-content flex flex-col relative bg-white items-stretch shadow-xl w-screen h-3/4 rounded-t-md overflow-y-auto"
+              class="drawer-content relative flex h-3/4 w-screen flex-col items-stretch overflow-y-auto rounded-t-md bg-white shadow-xl"
             >
               <div class="drawer-body">
                 <VRoutesMenu

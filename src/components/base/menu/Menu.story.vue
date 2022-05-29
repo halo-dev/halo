@@ -4,7 +4,7 @@
       <template #default>
         <div class="w-1/3">
           <VMenu>
-            <VMenuItem title="仪表盘" active>
+            <VMenuItem active title="仪表盘">
               <template #icon>
                 <Component :is="IconDashboard" />
               </template>
@@ -39,10 +39,10 @@
 <script lang="ts" setup>
 import { VMenu, VMenuItem, VMenuLabel } from "./index";
 import {
-  IconDashboard,
   IconBookRead,
-  IconPages,
-  IconMessage,
+  IconDashboard,
   IconFolder,
+  IconMessage,
+  IconPages,
 } from "@/core/icons";
 </script>

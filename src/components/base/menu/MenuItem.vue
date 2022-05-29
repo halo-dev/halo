@@ -49,10 +49,10 @@ function handleClick() {
     @click.stop="handleClick"
   >
     <div :class="{ active }" class="menu-item-title">
-      <span v-if="$slots.icon" class="menu-icon self-center mr-3">
+      <span v-if="$slots.icon" class="menu-icon mr-3 self-center">
         <slot name="icon" />
       </span>
-      <span class="menu-title self-center flex-1">
+      <span class="menu-title flex-1 self-center">
         {{ title }}
       </span>
       <span

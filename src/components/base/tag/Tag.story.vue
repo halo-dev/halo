@@ -13,13 +13,13 @@
     <Variant title="Icon">
       <template #default>
         <VSpace>
-          <VTag theme="default" rounded>
+          <VTag rounded theme="default">
             <template #leftIcon>
               <IconSettings />
             </template>
             Halo
           </VTag>
-          <VTag theme="primary" rounded>
+          <VTag rounded theme="primary">
             <template #leftIcon>
               <IconSettings />
             </template>

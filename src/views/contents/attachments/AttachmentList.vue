@@ -74,7 +74,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
 <template>
   <VPageHeader title="附件库">
     <template #icon>
-      <IconPalette class="self-center mr-2" />
+      <IconPalette class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
@@ -90,23 +90,23 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
     <div class="w-full sm:w-96">
       <VCard :bodyClass="['!p-0']" title="存储策略">
         <fieldset>
-          <div class="bg-white -space-y-px divide-y divide-gray-100">
+          <div class="-space-y-px divide-y divide-gray-100 bg-white">
             <label
               v-for="(strategy, index) in strategies"
               :key="index"
               :class="{
                 'bg-gray-50': selected === strategy.id,
               }"
-              class="relative p-4 flex cursor-pointer focus:outline-none"
+              class="relative flex cursor-pointer p-4 focus:outline-none"
             >
               <input
                 v-model="selected"
                 :value="strategy.id"
-                class="h-4 w-4 mt-0.5 cursor-pointer shrink-0 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                class="mt-0.5 h-4 w-4 shrink-0 cursor-pointer border-gray-300 text-indigo-600 focus:ring-indigo-500"
                 name="privacy"
                 type="radio"
               />
-              <span class="ml-3 flex flex-col flex-1">
+              <span class="ml-3 flex flex-1 flex-col">
                 <span
                   :class="{ 'font-bold': selected === strategy.id }"
                   class="block text-sm font-medium"
@@ -119,7 +119,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
               </span>
               <div class="self-center">
                 <IconSettings
-                  class="hover:text-blue-600 cursor-pointer transition-all"
+                  class="cursor-pointer transition-all hover:text-blue-600"
                   @click.stop="strategyVisible = true"
                 />
               </div>
@@ -147,16 +147,16 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
         <IconArrowRight />
       </div>
     </template>
-    <div class="bg-white overflow-hidden">
+    <div class="overflow-hidden bg-white">
       <div>
         <dl>
           <div
             class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">原始内容</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               <img
-                class="w-full sm:w-1/2 rounded"
+                class="w-full rounded sm:w-1/2"
                 src="https://picsum.photos/1000/700?random=1"
               />
             </dd>
@@ -165,7 +165,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">存储策略</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               阿里云/bucket/blog-attachments
             </dd>
           </div>
@@ -173,7 +173,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">文件名称</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               attachment-0
             </dd>
           </div>
@@ -181,7 +181,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">文件类型</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               image/jpeg
             </dd>
           </div>
@@ -189,7 +189,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">文件大小</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               1.2 MB
             </dd>
           </div>
@@ -197,7 +197,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">上传者</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               Ryan Wang
             </dd>
           </div>
@@ -205,7 +205,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">上传时间</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               2020-01-01 12:00:00
             </dd>
           </div>
@@ -213,7 +213,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">原始链接</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               https://picsum.photos/1000/700?random=1
             </dd>
           </div>
@@ -221,7 +221,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">引用位置</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               https://picsum.photos/1000/700?random=1
             </dd>
           </div>
@@ -250,16 +250,16 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
         >
           <VCard :body-class="['!p-0']">
             <div
-              class="group block w-full aspect-w-10 aspect-h-7 bg-gray-100 overflow-hidden cursor-pointer"
+              class="group aspect-w-10 aspect-h-7 block w-full cursor-pointer overflow-hidden bg-gray-100"
             >
               <img
                 :src="attachment.url"
                 alt=""
-                class="object-cover pointer-events-none group-hover:opacity-75"
+                class="pointer-events-none object-cover group-hover:opacity-75"
               />
             </div>
             <p
-              class="block text-sm font-medium text-gray-700 truncate pointer-events-none px-2 py-1"
+              class="pointer-events-none block truncate px-2 py-1 text-sm font-medium text-gray-700"
             >
               {{ attachment.name }}
             </p>
@@ -273,22 +273,22 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
   </VModal>
 
   <div class="m-0 md:m-4">
-    <div class="flex-col flex sm:flex-row gap-2">
+    <div class="flex flex-col gap-2 sm:flex-row">
       <div class="w-full">
         <VCard :body-class="[viewType === 'list' ? '!p-0' : '']">
           <template #header>
-            <div class="px-4 py-3 block w-full bg-gray-50">
+            <div class="block w-full bg-gray-50 px-4 py-3">
               <div
-                class="flex flex-col sm:flex-row items-start sm:items-center relative"
+                class="relative flex flex-col items-start sm:flex-row sm:items-center"
               >
-                <div class="hidden sm:flex items-center mr-4">
+                <div class="mr-4 hidden items-center sm:flex">
                   <input
                     v-model="checkAll"
-                    class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                    class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                     type="checkbox"
                   />
                 </div>
-                <div class="w-full sm:w-auto flex flex-1">
+                <div class="flex w-full flex-1 sm:w-auto">
                   <VInput
                     v-if="!checkAll"
                     class="w-full sm:w-72"
@@ -299,11 +299,11 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                     <VButton type="danger">删除</VButton>
                   </VSpace>
                 </div>
-                <div class="mt-4 sm:mt-0 flex">
+                <div class="mt-4 flex sm:mt-0">
                   <VSpace spacing="lg">
                     <FloatingDropdown>
                       <div
-                        class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
                         <span class="mr-0.5">上传者</span>
                         <span>
@@ -311,7 +311,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                         </span>
                       </div>
                       <template #popper>
-                        <div class="p-4 w-80 h-96">
+                        <div class="h-96 w-80 p-4">
                           <div class="bg-white">
                             <!--TODO: Auto Focus-->
                             <VInput placeholder="根据关键词搜索"></VInput>
@@ -321,12 +321,12 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                               <li
                                 v-for="(user, index) in users"
                                 :key="index"
-                                class="py-4 cursor-pointer hover:bg-gray-50"
+                                class="cursor-pointer py-4 hover:bg-gray-50"
                               >
                                 <div class="flex items-center space-x-4">
                                   <div class="flex items-center">
                                     <input
-                                      class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                      class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                                       type="checkbox"
                                     />
                                   </div>
@@ -337,13 +337,13 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                                       class="h-10 w-10 rounded"
                                     />
                                   </div>
-                                  <div class="flex-1 min-w-0">
+                                  <div class="min-w-0 flex-1">
                                     <p
-                                      class="text-sm font-medium text-gray-900 truncate"
+                                      class="truncate text-sm font-medium text-gray-900"
                                     >
                                       {{ user.name }}
                                     </p>
-                                    <p class="text-sm text-gray-500 truncate">
+                                    <p class="truncate text-sm text-gray-500">
                                       @{{ user.username }}
                                     </p>
                                   </div>
@@ -358,7 +358,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                       </template>
                     </FloatingDropdown>
                     <div
-                      class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
+                      class="flex cursor-pointer items-center text-sm text-gray-700 hover:text-black"
                     >
                       <span class="mr-0.5">引用位置</span>
                       <span>
@@ -366,7 +366,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                       </span>
                     </div>
                     <div
-                      class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
+                      class="flex cursor-pointer items-center text-sm text-gray-700 hover:text-black"
                     >
                       <span class="mr-0.5">标签</span>
                       <span>
@@ -375,7 +375,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                     </div>
                     <FloatingDropdown>
                       <div
-                        class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
                         <span class="mr-0.5">排序</span>
                         <span>
@@ -383,25 +383,25 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                         </span>
                       </div>
                       <template #popper>
-                        <div class="p-4 w-72">
+                        <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
-                              class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">较近上传</span>
                             </li>
                             <li
-                              class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">较晚上传</span>
                             </li>
                             <li
-                              class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">文件大小降序</span>
                             </li>
                             <li
-                              class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">文件大小升序</span>
                             </li>
@@ -414,10 +414,10 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                         v-for="(item, index) in viewTypes"
                         :key="index"
                         :class="{
-                          'bg-gray-200 text-black font-bold':
+                          'bg-gray-200 font-bold text-black':
                             viewType === item.name,
                         }"
-                        class="p-1 rounded cursor-pointer hover:bg-gray-200"
+                        class="cursor-pointer rounded p-1 hover:bg-gray-200"
                         @click="viewType = item.name"
                       >
                         <component :is="item.icon" />
@@ -431,7 +431,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
 
           <div
             v-if="viewType === 'grid'"
-            class="grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12 mt-2"
+            class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
             role="list"
           >
             <VCard
@@ -443,16 +443,16 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             >
               <div class="relative bg-white">
                 <div
-                  class="group block w-full h-full aspect-w-10 aspect-h-8 bg-gray-100 overflow-hidden cursor-pointer"
+                  class="group aspect-w-10 aspect-h-8 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
                 >
                   <img
                     :src="attachment.url"
                     alt=""
-                    class="object-cover pointer-events-none group-hover:opacity-75"
+                    class="pointer-events-none object-cover group-hover:opacity-75"
                   />
                 </div>
                 <p
-                  class="block text-xs font-medium text-gray-700 truncate text-center pointer-events-none px-2 py-1"
+                  class="pointer-events-none block truncate px-2 py-1 text-center text-xs font-medium text-gray-700"
                 >
                   {{ attachment.name }}
                 </p>
@@ -467,7 +467,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
 
           <ul
             v-if="viewType === 'list'"
-            class="divide-y divide-gray-100 box-border w-full h-full"
+            class="box-border h-full w-full divide-y divide-gray-100"
             role="list"
           >
             <li v-for="(attachment, index) in attachments" :key="index">
@@ -475,29 +475,29 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                 :class="{
                   'bg-gray-100': checkAll,
                 }"
-                class="px-4 py-3 block hover:bg-gray-50 cursor-pointer transition-all relative"
+                class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
               >
                 <div
                   v-show="checkAll"
                   class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
                 ></div>
-                <div class="flex flex-row items-center relative">
-                  <div class="hidden mr-4 sm:flex items-center">
+                <div class="relative flex flex-row items-center">
+                  <div class="mr-4 hidden items-center sm:flex">
                     <input
                       v-model="checkAll"
-                      class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                      class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                       type="checkbox"
                     />
                   </div>
                   <div class="flex-1">
                     <div class="flex flex-col sm:flex-row">
                       <span
-                        class="mr-0 sm:mr-2 text-sm font-medium truncate text-gray-900"
+                        class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
                       >
                         {{ attachment.name }}
                       </span>
                     </div>
-                    <div class="flex mt-1">
+                    <div class="mt-1 flex">
                       <VSpace>
                         <span class="text-xs text-gray-500">image/png</span>
                         <span class="text-xs text-gray-500">1.2 MB</span>
@@ -506,10 +506,10 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                   </div>
                   <div class="flex">
                     <div
-                      class="inline-flex flex-col items-end gap-4 flex-col-reverse sm:flex-row sm:items-center sm:gap-6"
+                      class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                     >
                       <img
-                        class="hidden sm:inline-block h-6 w-6 rounded-full ring-2 ring-white"
+                        class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
                         src="https://ryanc.cc/avatar"
                       />
                       <time class="text-sm text-gray-500" datetime="2020-01-07">
@@ -526,15 +526,15 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
           </ul>
 
           <template #footer>
-            <div class="bg-white flex items-center justify-end">
-              <div class="flex-1 flex items-center justify-end">
+            <div class="flex items-center justify-end bg-white">
+              <div class="flex flex-1 items-center justify-end">
                 <div>
                   <nav
                     aria-label="Pagination"
-                    class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
                   >
                     <a
-                      class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                       href="#"
                     >
                       <span class="sr-only">Previous</span>
@@ -554,30 +554,30 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                     </a>
                     <a
                       aria-current="page"
-                      class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                      class="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600"
                       href="#"
                     >
                       1
                     </a>
                     <a
-                      class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                      class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                       href="#"
                     >
                       2
                     </a>
                     <span
-                      class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                      class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700"
                     >
                       ...
                     </span>
                     <a
-                      class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"
+                      class="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 md:inline-flex"
                       href="#"
                     >
                       4
                     </a>
                     <a
-                      class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                      class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                       href="#"
                     >
                       <span class="sr-only">Next</span>

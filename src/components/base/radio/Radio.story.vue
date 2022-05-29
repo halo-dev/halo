@@ -1,5 +1,5 @@
 <template>
-  <Story title="Radio" :init-state="initState">
+  <Story :init-state="initState" title="Radio">
     <template #default="{ state }">
       <VRadioGroup v-model="state.value" :options="radioData"></VRadioGroup>
 
@@ -15,7 +15,7 @@
   </Story>
 </template>
 <script lang="ts" setup>
-import { VRadioGroup, VRadio } from "@/components/base/radio/index";
+import { VRadio, VRadioGroup } from "@/components/base/radio/index";
 
 function initState() {
   return {

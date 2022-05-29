@@ -7,12 +7,12 @@ import { IconBookRead, IconSave } from "@/core/icons";
 <template>
   <VPageHeader title="文章">
     <template #icon>
-      <IconBookRead class="self-center mr-2" />
+      <IconBookRead class="mr-2 self-center" />
     </template>
     <template #actions>
       <VButton :route="{ name: 'PostEditor' }" type="secondary">
         <template #icon>
-          <IconSave class="w-full h-full" />
+          <IconSave class="h-full w-full" />
         </template>
         发布
       </VButton>
@@ -21,7 +21,7 @@ import { IconBookRead, IconSave } from "@/core/icons";
   <div class="editor">
     <!--mock-->
     <iframe
-      class="w-full h-screen border-0"
+      class="h-screen w-full border-0"
       src="https://stackedit.io/app"
     ></iframe>
   </div>

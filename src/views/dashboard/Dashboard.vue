@@ -1,20 +1,20 @@
 <template>
   <VPageHeader title="仪表盘">
     <template #icon>
-      <IconDashboard class="self-center mr-2" />
+      <IconDashboard class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
         <VButton v-if="settings" @click="widgetsModal = true">
           <template #icon>
-            <IconAddCircle class="w-full h-full" />
+            <IconAddCircle class="h-full w-full" />
           </template>
           添加组件
         </VButton>
         <VButton type="secondary" @click="settings = !settings">
           <template #icon>
-            <IconSettings v-if="!settings" class="w-full h-full" />
-            <IconSave v-else class="w-full h-full" />
+            <IconSettings v-if="!settings" class="h-full w-full" />
+            <IconSave v-else class="h-full w-full" />
           </template>
           {{ settings ? "完成" : "设置" }}
         </VButton>
@@ -22,7 +22,7 @@
     </template>
   </VPageHeader>
 
-  <div class="m-4 dashboard">
+  <div class="dashboard m-4">
     <grid-layout
       v-model:layout="layout"
       :col-num="12"
@@ -46,7 +46,7 @@
         <component :is="item.widget" />
         <div v-if="settings" class="absolute top-2 right-2">
           <IconCloseCircle
-            class="text-gray-500 hover:text-gray-900 cursor-pointer text-lg"
+            class="cursor-pointer text-lg text-gray-500 hover:text-gray-900"
             @click="handleRemove(item)"
           />
         </div>

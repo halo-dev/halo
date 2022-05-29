@@ -18,22 +18,22 @@ function initState() {
     <Variant title="Show Cases">
       <template #default>
         <div class="p-3">
-          <VAlert type="default" title="default" />
+          <VAlert title="default" type="default" />
         </div>
         <div class="p-3">
-          <VAlert type="success" title="default" />
+          <VAlert title="default" type="success" />
         </div>
         <div class="p-3">
-          <VAlert type="info" title="default" />
+          <VAlert title="default" type="info" />
         </div>
         <div class="p-3">
-          <VAlert type="warning" title="default" />
+          <VAlert title="default" type="warning" />
         </div>
         <div class="p-3">
-          <VAlert type="error" title="default" />
+          <VAlert title="default" type="error" />
         </div>
         <div class="p-3">
-          <VAlert type="default" title="提示">
+          <VAlert title="提示" type="default">
             <template #description>
               目前仅支持远程 Git 仓库和 ZIP 下载链接。更多主题可以访问：
               <a href="https://halo.run/themes">https://halo.run/themes</a>
@@ -48,14 +48,14 @@ function initState() {
       </template>
     </Variant>
 
-    <Variant title="Playground" :init-state="initState">
+    <Variant :init-state="initState" title="Playground">
       <template #default="{ state }">
         <div class="p-3">
           <VAlert
-            :type="state.type"
-            :title="state.title"
-            :description="state.description"
             :closable="state.closable"
+            :description="state.description"
+            :title="state.title"
+            :type="state.type"
           />
         </div>
       </template>
@@ -71,7 +71,7 @@ function initState() {
     <Variant title="Slots">
       <template #default>
         <div class="p-3">
-          <VAlert type="default" title="你有新的消息">
+          <VAlert title="你有新的消息" type="default">
             <template #icon>
               <IconMessage />
             </template>

@@ -11,7 +11,7 @@ import { IconSettings } from "@/core/icons";
     <template #default>
       <div class="p-3">
         <VCard title="登录">
-          <VSpace direction="column" class="w-full">
+          <VSpace class="w-full" direction="column">
             <VInput placeholder="用户名"></VInput>
             <VInput placeholder="密码"></VInput>
           </VSpace>
@@ -33,260 +33,260 @@ import { IconSettings } from "@/core/icons";
       <!--      https://lofiui.co/-->
       <div class="p-3">
         <VCard title="Page Views">
-          <div class="flex flex-col items-center w-full bg-white">
-            <div class="flex items-end flex-grow w-full space-x-2 sm:space-x-3">
+          <div class="flex w-full flex-col items-center bg-white">
+            <div class="flex w-full flex-grow items-end space-x-2 sm:space-x-3">
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$37,500</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-8 bg-indigo-200"
+                    class="relative flex h-8 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-6 bg-indigo-300"
+                    class="relative flex h-6 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-16 bg-indigo-400"
+                    class="relative flex h-16 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Jan</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$45,000</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-10 bg-indigo-200"
+                    class="relative flex h-10 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-6 bg-indigo-300"
+                    class="relative flex h-6 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-20 bg-indigo-400"
+                    class="relative flex h-20 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Feb</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$47,500</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-10 bg-indigo-200"
+                    class="relative flex h-10 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-8 bg-indigo-300"
+                    class="relative flex h-8 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-20 bg-indigo-400"
+                    class="relative flex h-20 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Mar</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$50,000</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-10 bg-indigo-200"
+                    class="relative flex h-10 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-6 bg-indigo-300"
+                    class="relative flex h-6 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-24 bg-indigo-400"
+                    class="relative flex h-24 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Apr</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$47,500</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-10 bg-indigo-200"
+                    class="relative flex h-10 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-8 bg-indigo-300"
+                    class="relative flex h-8 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-20 bg-indigo-400"
+                    class="relative flex h-20 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">May</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$55,000</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-12 bg-indigo-200"
+                    class="relative flex h-12 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-8 bg-indigo-300"
+                    class="relative flex h-8 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-24 bg-indigo-400"
+                    class="relative flex h-24 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Jun</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$60,000</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-12 bg-indigo-200"
+                    class="relative flex h-12 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-16 bg-indigo-300"
+                    class="relative flex h-16 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-20 bg-indigo-400"
+                    class="relative flex h-20 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Jul</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$57,500</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-12 bg-indigo-200"
+                    class="relative flex h-12 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-10 bg-indigo-300"
+                    class="relative flex h-10 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-24 bg-indigo-400"
+                    class="relative flex h-24 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Aug</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$67,500</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-12 bg-indigo-200"
+                    class="relative flex h-12 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-10 bg-indigo-300"
+                    class="relative flex h-10 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-32 bg-indigo-400"
+                    class="relative flex h-32 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Sep</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$65,000</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-12 bg-indigo-200"
+                    class="relative flex h-12 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-12 bg-indigo-300"
+                    class="relative flex h-12 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow bg-indigo-400 h-28"
+                    class="relative flex h-28 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Oct</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$70,000</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-8 bg-indigo-200"
+                    class="relative flex h-8 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-8 bg-indigo-300"
+                    class="relative flex h-8 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-40 bg-indigo-400"
+                    class="relative flex h-40 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Nov</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$75,000</span
                 >
-                <div class="flex items-end w-full">
+                <div class="flex w-full items-end">
                   <div
-                    class="relative flex justify-center flex-grow h-12 bg-indigo-200"
+                    class="relative flex h-12 flex-grow justify-center bg-indigo-200"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-8 bg-indigo-300"
+                    class="relative flex h-8 flex-grow justify-center bg-indigo-300"
                   ></div>
                   <div
-                    class="relative flex justify-center flex-grow h-40 bg-indigo-400"
+                    class="relative flex h-40 flex-grow justify-center bg-indigo-400"
                   ></div>
                 </div>
                 <span class="absolute bottom-0 text-xs font-bold">Dec</span>
               </div>
             </div>
-            <div class="flex w-full mt-3">
-              <div class="flex items-center ml-auto">
-                <span class="block w-4 h-4 bg-indigo-400"></span>
+            <div class="mt-3 flex w-full">
+              <div class="ml-auto flex items-center">
+                <span class="block h-4 w-4 bg-indigo-400"></span>
                 <span class="ml-1 text-xs font-medium">Existing</span>
               </div>
-              <div class="flex items-center ml-4">
-                <span class="block w-4 h-4 bg-indigo-300"></span>
+              <div class="ml-4 flex items-center">
+                <span class="block h-4 w-4 bg-indigo-300"></span>
                 <span class="ml-1 text-xs font-medium">Upgrades</span>
               </div>
-              <div class="flex items-center ml-4">
-                <span class="block w-4 h-4 bg-indigo-200"></span>
+              <div class="ml-4 flex items-center">
+                <span class="block h-4 w-4 bg-indigo-200"></span>
                 <span class="ml-1 text-xs font-medium">New</span>
               </div>
             </div>
@@ -297,236 +297,236 @@ import { IconSettings } from "@/core/icons";
       <!--      https://lofiui.co/-->
       <div class="p-3">
         <VCard title="Page Views">
-          <div class="flex flex-col items-center w-full bg-white">
-            <div class="flex items-end flex-grow w-full space-x-2 sm:space-x-3">
+          <div class="flex w-full flex-col items-center bg-white">
+            <div class="flex w-full flex-grow items-end space-x-2 sm:space-x-3">
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$37,500</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-8 bg-indigo-200"
+                  class="relative flex h-8 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-6 bg-indigo-300"
+                  class="relative flex h-6 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-16 bg-indigo-400"
+                  class="relative flex h-16 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Jan</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$45,000</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-10 bg-indigo-200"
+                  class="relative flex h-10 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-6 bg-indigo-300"
+                  class="relative flex h-6 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-20 bg-indigo-400"
+                  class="relative flex h-20 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Feb</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$47,500</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-10 bg-indigo-200"
+                  class="relative flex h-10 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-8 bg-indigo-300"
+                  class="relative flex h-8 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-20 bg-indigo-400"
+                  class="relative flex h-20 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Mar</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$50,000</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-10 bg-indigo-200"
+                  class="relative flex h-10 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-6 bg-indigo-300"
+                  class="relative flex h-6 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-24 bg-indigo-400"
+                  class="relative flex h-24 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Apr</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$47,500</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-10 bg-indigo-200"
+                  class="relative flex h-10 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-8 bg-indigo-300"
+                  class="relative flex h-8 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-20 bg-indigo-400"
+                  class="relative flex h-20 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">May</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$55,000</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-12 bg-indigo-200"
+                  class="relative flex h-12 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-8 bg-indigo-300"
+                  class="relative flex h-8 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-24 bg-indigo-400"
+                  class="relative flex h-24 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Jun</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$60,000</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-12 bg-indigo-200"
+                  class="relative flex h-12 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-16 bg-indigo-300"
+                  class="relative flex h-16 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-20 bg-indigo-400"
+                  class="relative flex h-20 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Jul</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$57,500</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-12 bg-indigo-200"
+                  class="relative flex h-12 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-10 bg-indigo-300"
+                  class="relative flex h-10 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-24 bg-indigo-400"
+                  class="relative flex h-24 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Aug</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$67,500</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-12 bg-indigo-200"
+                  class="relative flex h-12 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-10 bg-indigo-300"
+                  class="relative flex h-10 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-32 bg-indigo-400"
+                  class="relative flex h-32 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Sep</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$65,000</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-12 bg-indigo-200"
+                  class="relative flex h-12 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-12 bg-indigo-300"
+                  class="relative flex h-12 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full bg-indigo-400 h-28"
+                  class="relative flex h-28 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Oct</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$70,000</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-8 bg-indigo-200"
+                  class="relative flex h-8 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-8 bg-indigo-300"
+                  class="relative flex h-8 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-40 bg-indigo-400"
+                  class="relative flex h-40 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Nov</span>
               </div>
               <div
-                class="relative flex flex-col items-center flex-grow pb-5 group"
+                class="group relative flex flex-grow flex-col items-center pb-5"
               >
                 <span
-                  class="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block"
+                  class="absolute top-0 -mt-6 hidden text-xs font-bold group-hover:block"
                   >$75,000</span
                 >
                 <div
-                  class="relative flex justify-center w-full h-12 bg-indigo-200"
+                  class="relative flex h-12 w-full justify-center bg-indigo-200"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-8 bg-indigo-300"
+                  class="relative flex h-8 w-full justify-center bg-indigo-300"
                 ></div>
                 <div
-                  class="relative flex justify-center w-full h-40 bg-indigo-400"
+                  class="relative flex h-40 w-full justify-center bg-indigo-400"
                 ></div>
                 <span class="absolute bottom-0 text-xs font-bold">Dec</span>
               </div>
             </div>
-            <div class="flex w-full mt-3">
-              <div class="flex items-center ml-auto">
-                <span class="block w-4 h-4 bg-indigo-400"></span>
+            <div class="mt-3 flex w-full">
+              <div class="ml-auto flex items-center">
+                <span class="block h-4 w-4 bg-indigo-400"></span>
                 <span class="ml-1 text-xs font-medium">Existing</span>
               </div>
-              <div class="flex items-center ml-4">
-                <span class="block w-4 h-4 bg-indigo-300"></span>
+              <div class="ml-4 flex items-center">
+                <span class="block h-4 w-4 bg-indigo-300"></span>
                 <span class="ml-1 text-xs font-medium">Upgrades</span>
               </div>
-              <div class="flex items-center ml-4">
-                <span class="block w-4 h-4 bg-indigo-200"></span>
+              <div class="ml-4 flex items-center">
+                <span class="block h-4 w-4 bg-indigo-200"></span>
                 <span class="ml-1 text-xs font-medium">New</span>
               </div>
             </div>
@@ -535,30 +535,30 @@ import { IconSettings } from "@/core/icons";
       </div>
 
       <div class="p-3">
-        <div class="grid lg:grid-cols-3 md:grid-cols-2 gap-6 w-full">
+        <div class="grid w-full gap-6 md:grid-cols-2 lg:grid-cols-3">
           <VCard>
             <div class="flex items-center bg-white">
               <div
-                class="flex flex-shrink-0 items-center justify-center bg-green-200 h-16 w-16 rounded"
+                class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded bg-green-200"
               >
                 <svg
-                  class="w-6 h-6 fill-current text-green-700"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                  class="h-6 w-6 fill-current text-green-700"
                   fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    fill-rule="evenodd"
-                    d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
                     clip-rule="evenodd"
+                    d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                    fill-rule="evenodd"
                   />
                 </svg>
               </div>
-              <div class="flex-grow flex flex-col ml-4">
+              <div class="ml-4 flex flex-grow flex-col">
                 <span class="text-xl font-bold">$8,430</span>
                 <div class="flex items-center justify-between">
                   <span class="text-gray-500">Revenue last 30 days</span>
-                  <span class="text-green-500 text-sm font-semibold ml-2"
+                  <span class="ml-2 text-sm font-semibold text-green-500"
                     >+12.6%</span
                   >
                 </div>
@@ -569,26 +569,26 @@ import { IconSettings } from "@/core/icons";
           <VCard>
             <div class="flex items-center bg-white">
               <div
-                class="flex flex-shrink-0 items-center justify-center bg-red-200 h-16 w-16 rounded"
+                class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded bg-red-200"
               >
                 <svg
-                  class="w-6 h-6 fill-current text-red-700"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                  class="h-6 w-6 fill-current text-red-700"
                   fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    fill-rule="evenodd"
-                    d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
                     clip-rule="evenodd"
+                    d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z"
+                    fill-rule="evenodd"
                   />
                 </svg>
               </div>
-              <div class="flex-grow flex flex-col ml-4">
+              <div class="ml-4 flex flex-grow flex-col">
                 <span class="text-xl font-bold">211</span>
                 <div class="flex items-center justify-between">
                   <span class="text-gray-500">Sales last 30 days</span>
-                  <span class="text-red-500 text-sm font-semibold ml-2"
+                  <span class="ml-2 text-sm font-semibold text-red-500"
                     >-8.1%</span
                   >
                 </div>
@@ -599,26 +599,26 @@ import { IconSettings } from "@/core/icons";
           <VCard>
             <div class="flex items-center bg-white">
               <div
-                class="flex flex-shrink-0 items-center justify-center bg-green-200 h-16 w-16 rounded"
+                class="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded bg-green-200"
               >
                 <svg
-                  class="w-6 h-6 fill-current text-green-700"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
+                  class="h-6 w-6 fill-current text-green-700"
                   fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    fill-rule="evenodd"
-                    d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
                     clip-rule="evenodd"
+                    d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                    fill-rule="evenodd"
                   />
                 </svg>
               </div>
-              <div class="flex-grow flex flex-col ml-4">
+              <div class="ml-4 flex flex-grow flex-col">
                 <span class="text-xl font-bold">140</span>
                 <div class="flex items-center justify-between">
                   <span class="text-gray-500">Customers last 30 days</span>
-                  <span class="text-green-500 text-sm font-semibold ml-2"
+                  <span class="ml-2 text-sm font-semibold text-green-500"
                     >+28.4%</span
                   >
                 </div>

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
-import type { Theme } from "@/components/base/tag/interface";
 import { computed } from "vue";
+import type { Theme } from "@/components/base/tag/interface";
 
 const props = defineProps({
   theme: {
@@ -19,7 +19,7 @@ const classes = computed(() => {
 });
 </script>
 <template>
-  <div class="tag-wrapper" :class="classes">
+  <div :class="classes" class="tag-wrapper">
     <div v-if="$slots.leftIcon" class="tag-left-icon">
       <slot name="leftIcon" />
     </div>

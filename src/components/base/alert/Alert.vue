@@ -119,7 +119,7 @@ const handleClose = () => {
 
   .alert-actions {
     @apply border-t;
-    @apply pt-2 mt-3;
+    @apply mt-3 pt-2;
   }
 
   &.alert-default {

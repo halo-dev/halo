@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
-import type { Size } from "./interface";
 import { computed } from "vue";
+import type { Size } from "./interface";
 
 const props = defineProps({
   modelValue: {
@@ -34,12 +34,12 @@ function handleChange(e: Event) {
 <template>
   <div class="select-wrapper">
     <select
+      :class="classes"
+      :disabled="disabled"
       :value="modelValue"
       @change="handleChange"
-      :disabled="disabled"
-      :class="classes"
     >
-      <option v-if="placeholder" value="" key="placeholder" disabled hidden>
+      <option v-if="placeholder" key="placeholder" disabled hidden value="">
         {{ placeholder }}
       </option>
       <slot />

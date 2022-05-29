@@ -1,5 +1,5 @@
 <template>
-  <Story title="CheckBox" :init-state="initState">
+  <Story :init-state="initState" title="CheckBox">
     <template #default="{ state }">
       <VCheckboxGroup
         v-model="state.value"

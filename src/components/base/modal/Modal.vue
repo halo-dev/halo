@@ -102,7 +102,7 @@ function handleClose() {
 .modal-wrapper {
   @apply fixed;
   @apply top-0 left-0;
-  @apply w-full h-full;
+  @apply h-full w-full;
   @apply flex flex-row;
   @apply items-center justify-center;
   z-index: 99999;
@@ -111,7 +111,7 @@ function handleClose() {
     @apply flex-none;
     @apply absolute;
     @apply top-0 left-0;
-    @apply w-full h-full;
+    @apply h-full w-full;
     @apply transition-opacity;
     @apply bg-gray-500;
     @apply bg-opacity-75;
@@ -155,7 +155,7 @@ function handleClose() {
     }
 
     .modal-body {
-      @apply overflow-x-hidden overflow-y-auto;
+      @apply overflow-y-auto overflow-x-hidden;
       @apply flex-1;
       word-wrap: break-word;
       padding: 12px 16px;

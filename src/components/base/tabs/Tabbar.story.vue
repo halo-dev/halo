@@ -13,23 +13,23 @@ function initState() {
 }
 </script>
 <template>
-  <Story title="Tabbar" :init-state="initState">
+  <Story :init-state="initState" title="Tabbar">
     <template #default="{ state }">
       <div class="p-3">
-        <VTabbar :items="state.items" v-model:activeId="state.activeId" />
+        <VTabbar v-model:activeId="state.activeId" :items="state.items" />
       </div>
       <div class="p-3">
         <VTabbar
-          type="pills"
-          :items="state.items"
           v-model:activeId="state.activeId"
+          :items="state.items"
+          type="pills"
         />
       </div>
       <div class="p-3">
         <VTabbar
-          type="outline"
-          :items="state.items"
           v-model:activeId="state.activeId"
+          :items="state.items"
+          type="outline"
         />
       </div>
     </template>

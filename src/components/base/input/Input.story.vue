@@ -1,5 +1,5 @@
 <template>
-  <Story title="Input" :init-state="initState">
+  <Story :init-state="initState" title="Input">
     <template #default="{ state }">
       <div class="w-1/2">
         <VInput

@@ -27,19 +27,19 @@ const handleRouteToDetail = (username: string) => {
 <template>
   <VPageHeader title="用户">
     <template #icon>
-      <IconUserSettings class="self-center mr-2" />
+      <IconUserSettings class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
         <VButton size="sm" type="default">
           <template #icon>
-            <IconUserFollow class="w-full h-full" />
+            <IconUserFollow class="h-full w-full" />
           </template>
           角色管理
         </VButton>
         <VButton type="secondary">
           <template #icon>
-            <IconAddCircle class="w-full h-full" />
+            <IconAddCircle class="h-full w-full" />
           </template>
           添加用户
         </VButton>
@@ -50,18 +50,18 @@ const handleRouteToDetail = (username: string) => {
   <div class="m-0 md:m-4">
     <VCard :body-class="['!p-0']">
       <template #header>
-        <div class="px-4 py-3 block w-full bg-gray-50">
+        <div class="block w-full bg-gray-50 px-4 py-3">
           <div
-            class="flex flex-col sm:flex-row items-start sm:items-center relative"
+            class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
-            <div class="hidden sm:flex items-center mr-4">
+            <div class="mr-4 hidden items-center sm:flex">
               <input
                 v-model="checkAll"
-                class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
               />
             </div>
-            <div class="w-full sm:w-auto flex flex-1">
+            <div class="flex w-full flex-1 sm:w-auto">
               <VInput
                 v-if="!checkAll"
                 class="w-full sm:w-72"
@@ -72,11 +72,11 @@ const handleRouteToDetail = (username: string) => {
                 <VButton type="danger">删除</VButton>
               </VSpace>
             </div>
-            <div class="mt-4 sm:mt-0 flex">
+            <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
                 <FloatingDropdown>
                   <div
-                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">状态</span>
                     <span>
@@ -84,15 +84,15 @@ const handleRouteToDetail = (username: string) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="p-4 w-52">
+                    <div class="w-52 p-4">
                       <ul class="space-y-1">
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">正常</span>
                         </li>
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">已禁用</span>
                         </li>
@@ -101,7 +101,7 @@ const handleRouteToDetail = (username: string) => {
                   </template>
                 </FloatingDropdown>
                 <div
-                  class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm"
+                  class="flex cursor-pointer items-center text-sm text-gray-700 hover:text-black"
                 >
                   <span class="mr-0.5">角色</span>
                   <span>
@@ -110,7 +110,7 @@ const handleRouteToDetail = (username: string) => {
                 </div>
                 <FloatingDropdown>
                   <div
-                    class="text-gray-700 hover:text-black cursor-pointer flex items-center text-sm select-none"
+                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">排序</span>
                     <span>
@@ -118,15 +118,15 @@ const handleRouteToDetail = (username: string) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="p-4 w-72">
+                    <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">较近登录</span>
                         </li>
                         <li
-                          class="cursor-pointer text-gray-600 hover:bg-gray-100 hover:text-gray-900 flex items-center px-3 py-2 text-sm rounded"
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">较晚登录</span>
                         </li>
@@ -139,7 +139,7 @@ const handleRouteToDetail = (username: string) => {
           </div>
         </div>
       </template>
-      <ul class="divide-y divide-gray-100 box-border w-full h-full" role="list">
+      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li
           v-for="(user, index) in users"
           :key="index"
@@ -149,39 +149,39 @@ const handleRouteToDetail = (username: string) => {
             :class="{
               'bg-gray-100': checkAll,
             }"
-            class="px-4 py-3 block hover:bg-gray-50 cursor-pointer transition-all relative"
+            class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
           >
             <div
               v-show="checkAll"
               class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
             ></div>
-            <div class="flex flex-row items-center relative">
-              <div class="hidden mr-4 sm:flex items-center">
+            <div class="relative flex flex-row items-center">
+              <div class="mr-4 hidden items-center sm:flex">
                 <input
                   v-model="checkAll"
-                  class="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   type="checkbox"
                 />
               </div>
               <div v-if="user.avatar" class="mr-4">
                 <div
-                  class="w-12 h-12 border rounded hover:shadow-sm bg-white overflow-hidden"
+                  class="h-12 w-12 overflow-hidden rounded border bg-white hover:shadow-sm"
                 >
                   <img
                     :alt="user.name"
                     :src="user.avatar"
-                    class="w-full h-full"
+                    class="h-full w-full"
                   />
                 </div>
               </div>
               <div class="flex-1">
                 <div class="flex flex-row items-center">
-                  <span class="mr-2 text-sm font-medium truncate text-gray-900">
+                  <span class="mr-2 truncate text-sm font-medium text-gray-900">
                     {{ user.name }}
                   </span>
                   <VTag class="sm:hidden">{{ user.role }}</VTag>
                 </div>
-                <div class="flex mt-1">
+                <div class="mt-1 flex">
                   <VSpace align="start" direction="column" spacing="xs">
                     <span class="text-xs text-gray-500">
                       {{ user.username }}
@@ -191,7 +191,7 @@ const handleRouteToDetail = (username: string) => {
               </div>
               <div class="flex">
                 <div
-                  class="inline-flex flex-col items-end gap-4 flex-col-reverse sm:flex-row sm:items-center sm:gap-6"
+                  class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
                   <span class="hidden sm:block">
                     <VTag>
@@ -212,15 +212,15 @@ const handleRouteToDetail = (username: string) => {
       </ul>
 
       <template #footer>
-        <div class="bg-white flex items-center justify-end">
-          <div class="flex-1 flex items-center justify-end">
+        <div class="flex items-center justify-end bg-white">
+          <div class="flex flex-1 items-center justify-end">
             <div>
               <nav
                 aria-label="Pagination"
-                class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                class="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
               >
                 <a
-                  class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                   href="#"
                 >
                   <span class="sr-only">Previous</span>
@@ -240,30 +240,30 @@ const handleRouteToDetail = (username: string) => {
                 </a>
                 <a
                   aria-current="page"
-                  class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  class="relative z-10 inline-flex items-center border border-indigo-500 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-600"
                   href="#"
                 >
                   1
                 </a>
                 <a
-                  class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                   href="#"
                 >
                   2
                 </a>
                 <span
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
+                  class="relative inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700"
                 >
                   ...
                 </span>
                 <a
-                  class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"
+                  class="relative hidden items-center border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 md:inline-flex"
                   href="#"
                 >
                   4
                 </a>
                 <a
-                  class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50"
                   href="#"
                 >
                   <span class="sr-only">Next</span>

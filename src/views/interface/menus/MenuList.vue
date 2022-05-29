@@ -80,14 +80,14 @@ const menus = ref([
 <template>
   <VPageHeader title="菜单">
     <template #icon>
-      <IconListSettings class="self-center mr-2" />
+      <IconListSettings class="mr-2 self-center" />
     </template>
     <template #actions>
       <VButton type="secondary">重建索引</VButton>
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
-    <div class="flex-col flex sm:flex-row gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row">
       <div class="w-full sm:w-96">
         <VCard title="分组">
           <VMenu class="!p-0">
@@ -102,14 +102,14 @@ const menus = ref([
       <div class="flex-1">
         <VCard :body-class="['!p-0']">
           <template #header>
-            <div class="px-4 py-3 block w-full bg-gray-50">
+            <div class="block w-full bg-gray-50 px-4 py-3">
               <div
-                class="flex flex-col sm:flex-row items-start sm:items-center relative"
+                class="relative flex flex-col items-start sm:flex-row sm:items-center"
               >
-                <div class="w-full sm:w-auto flex flex-1">
+                <div class="flex w-full flex-1 sm:w-auto">
                   <span class="text-base font-medium">未分组</span>
                 </div>
-                <div class="mt-4 sm:mt-0 flex">
+                <div class="mt-4 flex sm:mt-0">
                   <VSpace>
                     <VButton size="xs" type="primary">保存</VButton>
                     <VButton size="xs" type="default">新增</VButton>
@@ -119,27 +119,27 @@ const menus = ref([
             </div>
           </template>
           <ul
-            class="divide-y divide-gray-100 box-border w-full h-full"
+            class="box-border h-full w-full divide-y divide-gray-100"
             role="list"
           >
             <li v-for="(menu, index) in menus" :key="index">
               <div
-                class="px-4 py-3 block hover:bg-gray-50 cursor-pointer transition-all relative"
+                class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
               >
-                <div class="flex flex-row items-center relative">
-                  <div class="hidden mr-4 sm:flex items-center cursor-move">
+                <div class="relative flex flex-row items-center">
+                  <div class="mr-4 hidden cursor-move items-center sm:flex">
                     <IconListSettings />
                   </div>
                   <div class="flex-1">
                     <div class="flex flex-row items-center">
                       <span
-                        class="mr-2 text-sm font-medium truncate text-gray-900"
+                        class="mr-2 truncate text-sm font-medium text-gray-900"
                       >
                         {{ menu.name }}
                       </span>
                       <VTag class="sm:hidden">asd</VTag>
                     </div>
-                    <div class="flex mt-1">
+                    <div class="mt-1 flex">
                       <VSpace align="start" direction="column" spacing="xs">
                         <a
                           :href="menu.url"
@@ -153,7 +153,7 @@ const menus = ref([
                   </div>
                   <div class="flex">
                     <div
-                      class="inline-flex flex-col items-end gap-4 flex-col-reverse sm:flex-row sm:items-center sm:gap-6"
+                      class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                     >
                       <span class="cursor-pointer text-sm hover:text-red-600">
                         <IconDeleteBin />

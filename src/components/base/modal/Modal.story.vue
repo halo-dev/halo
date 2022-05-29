@@ -23,16 +23,16 @@ function initState() {
         :width="state.width"
       >
         <div class="flex flex-col">
-          <img src="https://ryanc.cc/avatar" class="w-full" />
-          <img src="https://ryanc.cc/avatar" class="w-full" />
-          <img src="https://halo.run/logo" class="w-full" />
+          <img class="w-full" src="https://ryanc.cc/avatar" />
+          <img class="w-full" src="https://ryanc.cc/avatar" />
+          <img class="w-full" src="https://halo.run/logo" />
         </div>
 
         <template #footer>
           <VSpace>
-            <VButton type="primary" @click="state.visible = false" loading
-              >确定</VButton
-            >
+            <VButton loading type="primary" @click="state.visible = false"
+              >确定
+            </VButton>
             <VButton @click="state.visible = false">取消</VButton>
           </VSpace>
         </template>

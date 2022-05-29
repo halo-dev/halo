@@ -9,19 +9,19 @@ import { posts } from "@/views/contents/posts/posts-mock";
     class="h-full"
     title="最近发布"
   >
-    <div class="p-4 h-full">
+    <div class="h-full p-4">
       <ul class="divide-y divide-gray-200" role="list">
         <li
           v-for="(post, index) in posts"
           :key="index"
-          class="py-4 cursor-pointer hover:bg-gray-50"
+          class="cursor-pointer py-4 hover:bg-gray-50"
         >
           <div class="flex items-center space-x-4">
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900 truncate">
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium text-gray-900">
                 {{ post.title }}
               </p>
-              <div class="flex mt-1">
+              <div class="mt-1 flex">
                 <VSpace>
                   <span class="text-xs text-gray-500">
                     阅读 {{ post.visits }}

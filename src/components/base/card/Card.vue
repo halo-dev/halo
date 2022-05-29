@@ -33,7 +33,7 @@ defineProps({
 </template>
 <style lang="scss">
 .card-wrapper {
-  @apply flex flex-col box-border;
+  @apply box-border flex flex-col;
   @apply bg-white;
   @apply shadow-sm;
   @apply overflow-hidden;

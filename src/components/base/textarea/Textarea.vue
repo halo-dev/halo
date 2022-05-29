@@ -26,11 +26,11 @@ function handleInput(e: Event) {
 <template>
   <div class="textarea-wrapper">
     <textarea
+      :disabled="disabled"
       :placeholder="placeholder"
+      :rows="rows"
       :value="modelValue"
       @input="handleInput"
-      :disabled="disabled"
-      :rows="rows"
     >
     </textarea>
   </div>

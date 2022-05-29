@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import type { ComputedRef, PropType } from "vue";
 import { computed, provide, useSlots } from "vue";
-import type { PropType, ComputedRef } from "vue";
 import { VTabbar } from "./index";
-import type { Type, Direction } from "@/components/base/tabs/interface";
+import type { Direction, Type } from "@/components/base/tabs/interface";
 
 const props = defineProps({
   activeId: {
@@ -54,13 +54,13 @@ const handleChange = (id: string | number) => {
 };
 </script>
 <template>
-  <div class="tabs-wrapper" :class="classes">
+  <div :class="classes" class="tabs-wrapper">
     <div class="tabs-bar-wrapper">
       <VTabbar
         :activeId="activeId"
+        :direction="direction"
         :items="tabItems"
         :type="type"
-        :direction="direction"
         @change="handleChange"
       />
     </div>
@@ -80,6 +80,7 @@ const handleChange = (id: string | number) => {
       @apply mt-2;
     }
   }
+
   &.tabs-direction-column {
     .tabs-items-wrapper {
       @apply ml-2;

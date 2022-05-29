@@ -1,45 +1,45 @@
 <script lang="ts" setup>
-import { VTabs, VTabItem } from "./index";
+import { VTabItem, VTabs } from "./index";
 </script>
 
 <template>
-  <Story title="Tabs" :init-state="() => ({ activeId: 'ryanwang' })">
+  <Story :init-state="() => ({ activeId: 'ryanwang' })" title="Tabs">
     <template #default="{ state }">
       <div class="p-3">
         <VTabs v-model:activeId="state.activeId">
-          <VTabItem label="JohnNiang" id="johnniang">
+          <VTabItem id="johnniang" label="JohnNiang">
             This is JohnNiang's Item
           </VTabItem>
-          <VTabItem label="Ryan Wang" id="ryanwang">
+          <VTabItem id="ryanwang" label="Ryan Wang">
             This is Ryan Wang's Item
           </VTabItem>
-          <VTabItem label="guqing" id="guqing">
+          <VTabItem id="guqing" label="guqing">
             This is guqing's Item
           </VTabItem>
         </VTabs>
       </div>
       <div class="p-3">
         <VTabs v-model:activeId="state.activeId" type="pills">
-          <VTabItem label="JohnNiang" id="johnniang">
+          <VTabItem id="johnniang" label="JohnNiang">
             This is JohnNiang's Item
           </VTabItem>
-          <VTabItem label="Ryan Wang" id="ryanwang">
+          <VTabItem id="ryanwang" label="Ryan Wang">
             This is Ryan Wang's Item
           </VTabItem>
-          <VTabItem label="guqing" id="guqing">
+          <VTabItem id="guqing" label="guqing">
             This is guqing's Item
           </VTabItem>
         </VTabs>
       </div>
       <div class="p-3">
         <VTabs v-model:activeId="state.activeId" type="outline">
-          <VTabItem label="JohnNiang" id="johnniang">
+          <VTabItem id="johnniang" label="JohnNiang">
             This is JohnNiang's Item
           </VTabItem>
-          <VTabItem label="Ryan Wang" id="ryanwang">
+          <VTabItem id="ryanwang" label="Ryan Wang">
             This is Ryan Wang's Item
           </VTabItem>
-          <VTabItem label="guqing" id="guqing">
+          <VTabItem id="guqing" label="guqing">
             This is guqing's Item
           </VTabItem>
         </VTabs>

@@ -1,5 +1,5 @@
 <template>
-  <Story title="Space" :init-state="initState">
+  <Story :init-state="initState" title="Space">
     <template #default="{ state }">
       <VRadio
         v-for="(option, index) in ['row', 'column']"
@@ -26,9 +26,9 @@
         name="spacing"
       ></VRadio>
       <VSpace
+        :align="state.align"
         :direction="state.direction"
         :spacing="state.spacing"
-        :align="state.align"
       >
         <div>Control：</div>
         <VButton type="primary">确定</VButton>
