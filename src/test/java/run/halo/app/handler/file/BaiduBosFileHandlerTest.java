@@ -1,28 +1,11 @@
 package run.halo.app.handler.file;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import run.halo.app.model.support.UploadResult;
-
-/**
- * BaiduBosFileHandler Tester.
- *
- * @author <Authors name>
- * @since <pre>4�� 24, 2022</pre>
- * @version 1.0
- */
-public class BaiduBosFileHandlerTest {
-
-
-    /**
-     *
-     * Method: upload(MultipartFile file)
-     *
-     */
+class BaiduBosFileHandlerTest {
     @Test
-    public void testUpload() throws Exception {
+    void testWithBasepathUpload() throws Exception {
         String protocol = "https://";
         String endPoint = "gz.bcebos.com";
         String bucketName = "koroblog";
@@ -46,7 +29,20 @@ public class BaiduBosFileHandlerTest {
         String fullPath2 = pathDescriptor2.getFullPath();
         assertEquals("https://koroblog.gz.bcebos.com/blhx-background_and_shouhou.png",fullPath2);
     }
-
-
+    @Test
+    void testWithoutBasepathUpload() throws Exception {
+        String protocol = "https://";
+        String endPoint = "gz.bcebos.com";
+        String bucketName = "koroblog";
+        String source = StringUtils.join(protocol, bucketName, "." + endPoint);
+        UploadResult uploadResult = new UploadResult();
+        String domain2 = "";
+        FilePathDescriptor pathDescriptor2 = new FilePathDescriptor.Builder()
+            .setBasePath(domain2)
+            .setSubPath(source)
+            .setOriginalName("blhx-background_and_shouhou.png")
+            .build();
+        String fullPath2 = pathDescriptor2.getFullPath();
+        assertEquals("https://koroblog.gz.bcebos.com/blhx-background_and_shouhou.png",fullPath2);
+    }
 }
-

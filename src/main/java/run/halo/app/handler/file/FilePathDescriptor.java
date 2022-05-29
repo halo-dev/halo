@@ -122,7 +122,7 @@ public final class FilePathDescriptor {
         String getFullPath() {
             if (StringUtils.isNotBlank(this.basePath)) {
                 return getPath(this.basePath, this.getFullName());
-            }else {
+            } else {
                 return getPath(this.subPath, this.getFullName());
             }
         }
