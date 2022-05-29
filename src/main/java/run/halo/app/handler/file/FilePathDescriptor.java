@@ -121,10 +121,9 @@ public final class FilePathDescriptor {
 
         String getFullPath() {
             if (StringUtils.isNotBlank(this.basePath)) {
-                return getPath(this.basePath, this.getFullName());
-            } else {
-                return getPath(this.subPath, this.getFullName());
+                return getPath(this.basePath, this.subPath, this.getFullName());
             }
+            return getPath(this.subPath, this.getFullName());
         }
 
         String getRelativePath() {
@@ -152,7 +151,7 @@ public final class FilePathDescriptor {
                 sb.append(first);
                 for (String segment : more) {
                     if (StringUtils.isNotBlank(segment)) {
-                        if (sb.length() > 0) {
+                        if (sb.length() > 0 && !endsWith(sb, separator)) {
                             sb.append(separator);
                         }
                         sb.append(segment);
@@ -161,6 +160,14 @@ public final class FilePathDescriptor {
                 path = sb.toString();
             }
             return path;
+        }
+
+        static boolean endsWith(StringBuilder sb, String str) {
+            Assert.notNull(sb, "The stringBuilder must not be null.");
+            Assert.notNull(str, "The str must not be null.");
+            int len = sb.length();
+            int strLen = str.length();
+            return (len >= strLen && sb.substring(len - strLen).equals(str));
         }
 
         /**
