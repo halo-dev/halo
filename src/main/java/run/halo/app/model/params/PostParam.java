@@ -68,7 +68,6 @@ public class PostParam extends BasePostParam implements InputConverter<Post> {
 
     @Override
     public Post convertTo() {
-        // slug = StringUtils.isBlank(slug) ? SlugUtils.slug(title) : SlugUtils.slug(slug);
         if (StringUtils.isBlank(slug)) {
             slug = SlugUtils.slug(slug);
         }
