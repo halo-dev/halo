@@ -130,7 +130,7 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/visual",
-    component: BasicLayout,
+    component: BlankLayout,
     children: [
       {
         path: "",

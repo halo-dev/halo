@@ -57,6 +57,14 @@ import IconList from "~icons/ri/list-unordered";
 import IconGrid from "~icons/ri/grid-line";
 // @ts-ignore
 import IconCheckboxFill from "~icons/ri/checkbox-circle-fill";
+// @ts-ignore
+import IconSearch from "~icons/ri/search-2-line";
+// @ts-ignore
+import IconComputer from "~icons/ri/computer-line";
+// @ts-ignore
+import IconPhone from "~icons/ri/smartphone-line";
+// @ts-ignore
+import IconTablet from "~icons/ri/tablet-line";
 
 export {
   IconDashboard,
@@ -88,4 +96,8 @@ export {
   IconCheckboxFill,
   IconArrowUpLine,
   IconArrowDownLine,
+  IconSearch,
+  IconComputer,
+  IconPhone,
+  IconTablet
 };

@@ -40,19 +40,19 @@ const handleChange = (id: number | string) => {
 };
 </script>
 <template>
-  <div class="tabbar-wrapper" :class="classes">
+  <div :class="classes" class="tabbar-wrapper">
     <div class="tabbar-items">
       <div
         v-for="(item, index) in items"
         :key="index"
-        class="tabbar-item"
         :class="{ 'tabbar-item-active': item[idKey] === activeId }"
+        class="tabbar-item"
         @click="handleChange(item[idKey])"
       >
         <div v-if="item.icon" class="tabbar-item-icon">
           <component :is="item.icon" />
         </div>
-        <div class="tabbar-item-label">
+        <div v-if="item[labelKey]" class="tabbar-item-label">
           {{ item[labelKey] }}
         </div>
       </div>
@@ -74,14 +74,11 @@ const handleChange = (id: number | string) => {
     @apply transition-all;
     @apply text-base;
     @apply justify-center;
+    @apply gap-2;
 
     .tabbar-item-label,
     .tabbar-item-icon {
       @apply self-center;
-    }
-
-    .tabbar-item-icon {
-      @apply mr-2;
     }
   }
 
@@ -93,6 +90,7 @@ const handleChange = (id: number | string) => {
       margin-bottom: -2px;
       justify-content: flex-start;
     }
+
     .tabbar-item {
       @apply h-10;
       @apply px-5;
@@ -113,6 +111,7 @@ const handleChange = (id: number | string) => {
       @apply gap-1;
       justify-content: flex-start;
     }
+
     .tabbar-item {
       @apply h-10;
       @apply px-9;

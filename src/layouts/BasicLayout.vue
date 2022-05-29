@@ -7,6 +7,17 @@
       <div class="logo flex justify-center py-5">
         <img :src="logo" alt="Halo Logo" style="width: 78px" />
       </div>
+      <div class="px-3">
+        <div
+          class="flex p-2 text-gray-400 items-center transition-all bg-gray-100 rounded cursor-pointer hover:text-gray-900"
+        >
+          <span class="mr-3">
+            <IconSearch />
+          </span>
+          <span class="flex-1 text-base select-none font-normal">搜索</span>
+          <div class="text-sm">⌘+K</div>
+        </div>
+      </div>
       <VRoutesMenu :menus="menus" />
       <div class="current-profile">
         <div class="profile-avatar">
@@ -131,7 +142,7 @@ import { VRoutesMenu } from "@/components/base/menu";
 import { VTag } from "@/components/base/tag";
 import { menus, minimenus } from "@/router/menus.config";
 import logo from "@/assets/logo.svg";
-import { IconMore, IconUserSettings } from "@/core/icons";
+import { IconMore, IconSearch, IconUserSettings } from "@/core/icons";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
 
