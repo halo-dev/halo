@@ -6,7 +6,12 @@ import { VTag } from "@/components/base/tag";
 import { VTabItem, VTabs } from "@/components/base/tabs";
 import { VInput } from "@/components/base/input";
 import { VPageHeader } from "@/components/base/header";
-import { IconArrowDown, IconPages, IconSettings } from "@/core/icons";
+import {
+  IconAddCircle,
+  IconArrowDown,
+  IconPages,
+  IconSettings,
+} from "@/core/icons";
 import { ref } from "vue";
 import { users } from "@/views/system/users/users-mock";
 import halo from "@/assets/logo-mock/halo.png";
@@ -62,7 +67,12 @@ const activeId = ref("advanced");
       <IconPages class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton type="secondary">发布</VButton>
+      <VButton type="secondary">
+        <template #icon>
+          <IconAddCircle class="h-full w-full" />
+        </template>
+        新建
+      </VButton>
     </template>
   </VPageHeader>
 

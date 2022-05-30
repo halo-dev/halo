@@ -73,6 +73,10 @@ import IconExchange from "~icons/ri/exchange-line";
 import IconGitHub from "~icons/ri/github-fill";
 // @ts-ignore
 import IconUpload from "~icons/ri/upload-cloud-2-line";
+// @ts-ignore
+import IconShieldUser from "~icons/ri/shield-user-line";
+// @ts-ignore
+import IconGitBranch from "~icons/ri/git-branch-line";
 
 export {
   IconDashboard,
@@ -112,4 +116,6 @@ export {
   IconExchange,
   IconGitHub,
   IconUpload,
+  IconShieldUser,
+  IconGitBranch,
 };

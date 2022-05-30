@@ -24,6 +24,7 @@ import PluginList from "../views/system/plugins/PluginList.vue";
 import PluginDetail from "../views/system/plugins/PluginDetail.vue";
 import UserList from "../views/system/users/UserList.vue";
 import RoleList from "../views/system/roles/RoleList.vue";
+import RoleDetail from "../views/system/roles/RoleDetail.vue";
 import UserDetail from "../views/system/users/UserDetail.vue";
 import ProfileModification from "../views/system/users/ProfileModification.vue";
 import PasswordChange from "../views/system/users/PasswordChange.vue";
@@ -208,6 +209,11 @@ export const routes: Array<RouteRecordRaw> = [
             path: "roles",
             name: "Roles",
             component: RoleList,
+          },
+          {
+            path: "roles/:id",
+            name: "RoleDetail",
+            component: RoleDetail,
           },
         ],
       },

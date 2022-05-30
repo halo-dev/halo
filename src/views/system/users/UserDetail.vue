@@ -2,8 +2,11 @@
 import { VTag } from "@/components/base/tag";
 import { IconUserSettings } from "@/core/icons";
 import { inject } from "vue";
+import { useRouter } from "vue-router";
 
 const user = inject("user");
+
+const router = useRouter();
 </script>
 <template>
   <div class="border-t border-gray-200">
@@ -37,7 +40,7 @@ const user = inject("user");
       >
         <dt class="text-sm font-medium text-gray-900">角色</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-          <VTag>
+          <VTag @click="router.push({ name: 'RoleDetail', params: { id: 1 } })">
             <template #leftIcon>
               <IconUserSettings class="h-full w-full" />
             </template>

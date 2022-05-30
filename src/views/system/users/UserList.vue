@@ -100,14 +100,42 @@ const handleRouteToDetail = (username: string) => {
                     </div>
                   </template>
                 </FloatingDropdown>
-                <div
-                  class="flex cursor-pointer items-center text-sm text-gray-700 hover:text-black"
-                >
-                  <span class="mr-0.5">角色</span>
-                  <span>
-                    <IconArrowDown />
-                  </span>
-                </div>
+                <FloatingDropdown>
+                  <div
+                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+                  >
+                    <span class="mr-0.5">角色</span>
+                    <span>
+                      <IconArrowDown />
+                    </span>
+                  </div>
+                  <template #popper>
+                    <div class="w-52 p-4">
+                      <ul class="space-y-1">
+                        <li
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          <span class="truncate">Super Administrator</span>
+                        </li>
+                        <li
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          <span class="truncate">Administrator</span>
+                        </li>
+                        <li
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          <span class="truncate">Editor</span>
+                        </li>
+                        <li
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          <span class="truncate">Guest</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FloatingDropdown>
                 <FloatingDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"

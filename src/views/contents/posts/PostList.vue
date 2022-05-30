@@ -14,6 +14,7 @@ import {
   IconArrowLeft,
   IconArrowRight,
   IconBookRead,
+  IconDeleteBin,
   IconSettings,
 } from "@/core/icons";
 import { posts } from "./posts-mock";
@@ -308,12 +309,20 @@ const handleRouteToEditor = (post: any) => {
       <IconBookRead class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton :route="{ name: 'PostEditor' }" type="secondary">
-        <template #icon>
-          <IconAddCircle class="h-full w-full" />
-        </template>
-        新建
-      </VButton>
+      <VSpace>
+        <VButton size="sm">
+          <template #icon>
+            <IconDeleteBin class="h-full w-full" />
+          </template>
+          回收站
+        </VButton>
+        <VButton :route="{ name: 'PostEditor' }" type="secondary">
+          <template #icon>
+            <IconAddCircle class="h-full w-full" />
+          </template>
+          新建
+        </VButton>
+      </VSpace>
     </template>
   </VPageHeader>
 
@@ -345,6 +354,42 @@ const handleRouteToEditor = (post: any) => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
+                <FloatingDropdown>
+                  <div
+                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+                  >
+                    <span class="mr-0.5">状态</span>
+                    <span>
+                      <IconArrowDown />
+                    </span>
+                  </div>
+                  <template #popper>
+                    <div class="w-72 p-4">
+                      <ul class="space-y-1">
+                        <li
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          <span class="truncate">全部</span>
+                        </li>
+                        <li
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          <span class="truncate">已发布</span>
+                        </li>
+                        <li
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          <span class="truncate">草稿</span>
+                        </li>
+                        <li
+                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        >
+                          <span class="truncate">未审核</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </FloatingDropdown>
                 <FloatingDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
