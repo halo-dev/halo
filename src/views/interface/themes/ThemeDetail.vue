@@ -134,7 +134,7 @@ const handleChangeTheme = (theme: any) => {
             { id: 'detail', label: '详情' },
             { id: 'settings', label: '基础设置' },
           ]"
-          class="w-full"
+          class="w-full !rounded-none"
           type="outline"
         ></VTabbar>
       </template>

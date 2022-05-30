@@ -1,10 +1,15 @@
 <script lang="ts" setup>
 import { VPageHeader } from "@/components/base/header";
 import { VButton } from "@/components/base/button";
+import { VTabbar } from "@/components/base/tabs";
 import { useRoute } from "vue-router";
 import { plugins } from "./plugins-mock";
 import { VTag } from "@/components/base/tag";
+import { VInput } from "@/components/base/input";
 import { VCard } from "@/components/base/card";
+import { ref } from "vue";
+
+const pluginActiveId = ref("detail");
 
 const { params } = useRoute();
 
@@ -27,78 +32,137 @@ console.log(plugin);
 
   <div class="m-0 md:m-4">
     <VCard :body-class="['!p-0']">
-      <div class="px-4 py-5 sm:px-6">
-        <h3 class="text-lg font-medium leading-6 text-gray-900">插件信息</h3>
-        <p class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500">
-          <span>{{ plugin.spec.version }}</span>
-          <VTag>
-            {{ plugin.metadata.enabled ? "已启用" : "未启用" }}
-          </VTag>
-        </p>
+      <template #header>
+        <VTabbar
+          v-model:active-id="pluginActiveId"
+          :items="[
+            { id: 'detail', label: '详情' },
+            { id: 'settings', label: '基础设置' },
+          ]"
+          class="w-full !rounded-none"
+          type="outline"
+        ></VTabbar>
+      </template>
+
+      <div v-if="pluginActiveId === 'detail'">
+        <div class="px-4 py-4 sm:px-6">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">插件信息</h3>
+          <p
+            class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500"
+          >
+            <span>{{ plugin.spec.version }}</span>
+            <VTag>
+              {{ plugin.metadata.enabled ? "已启用" : "未启用" }}
+            </VTag>
+          </p>
+        </div>
+        <div class="border-t border-gray-200">
+          <dl class="divide-y divide-gray-100">
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">名称</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                {{ plugin.metadata.name }}
+              </dd>
+            </div>
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">插件类别</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                <VTag>
+                  extensions.halo.run/category/{{
+                    plugin.metadata.labels["extensions.halo.run/category"]
+                  }}
+                </VTag>
+              </dd>
+            </div>
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">版本</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                {{ plugin.spec.version }}
+              </dd>
+            </div>
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                {{ plugin.spec.requires }}
+              </dd>
+            </div>
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">提供方</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                <a :href="plugin.spec.homepage" target="_blank">
+                  @{{ plugin.spec.author }}
+                </a>
+              </dd>
+            </div>
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">协议</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                {{ plugin.spec.license }}
+              </dd>
+            </div>
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">模型定义</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                无
+              </dd>
+            </div>
+          </dl>
+        </div>
       </div>
-      <div class="border-t border-gray-200">
-        <dl class="divide-y divide-gray-100">
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">名称</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {{ plugin.metadata.name }}
-            </dd>
+
+      <div v-if="pluginActiveId === 'settings'">
+        <form>
+          <div class="space-y-6 divide-y divide-gray-100 sm:space-y-5">
+            <div
+              class="px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
+            >
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                设置项 1
+              </label>
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
+                <div class="flex max-w-lg shadow-sm">
+                  <VInput />
+                </div>
+              </div>
+            </div>
+            <div
+              class="px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
+            >
+              <label
+                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+              >
+                设置项 2
+              </label>
+              <div class="mt-1 sm:col-span-2 sm:mt-0">
+                <div class="flex max-w-lg shadow-sm">
+                  <VInput />
+                </div>
+              </div>
+            </div>
           </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">插件类别</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <VTag>
-                extensions.halo.run/category/{{
-                  plugin.metadata.labels["extensions.halo.run/category"]
-                }}
-              </VTag>
-            </dd>
+
+          <div class="pt-5">
+            <div class="flex justify-start p-4">
+              <VButton type="secondary"> 保存</VButton>
+            </div>
           </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">版本</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {{ plugin.spec.version }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {{ plugin.spec.requires }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">提供方</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <a :href="plugin.spec.homepage" target="_blank">
-                @{{ plugin.spec.author }}
-              </a>
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">协议</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {{ plugin.spec.license }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">模型定义</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">无</dd>
-          </div>
-        </dl>
+        </form>
       </div>
     </VCard>
   </div>
