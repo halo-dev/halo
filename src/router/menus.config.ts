@@ -120,7 +120,7 @@ export const minimenus: MenuItemType[] = [
   },
   {
     name: "用户",
-    path: "/users/profile",
+    path: "/users/profile/detail",
     icon: IconUserSettings,
   },
 ];

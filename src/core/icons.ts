@@ -71,6 +71,8 @@ import IconUserFollow from "~icons/ri/user-follow-line";
 import IconExchange from "~icons/ri/exchange-line";
 // @ts-ignore
 import IconGitHub from "~icons/ri/github-fill";
+// @ts-ignore
+import IconUpload from "~icons/ri/upload-cloud-2-line";
 
 export {
   IconDashboard,
@@ -109,4 +111,5 @@ export {
   IconUserFollow,
   IconExchange,
   IconGitHub,
+  IconUpload,
 };

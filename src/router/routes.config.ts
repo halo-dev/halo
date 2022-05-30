@@ -1,5 +1,10 @@
 import type { RouteRecordRaw } from "vue-router";
-import { BasicLayout, BlankLayout, SystemSettingsLayout } from "@/layouts";
+import {
+  BasicLayout,
+  BlankLayout,
+  SystemSettingsLayout,
+  UserProfileLayout,
+} from "@/layouts";
 
 import Dashboard from "../views/dashboard/Dashboard.vue";
 
@@ -19,7 +24,9 @@ import PluginList from "../views/system/plugins/PluginList.vue";
 import PluginDetail from "../views/system/plugins/PluginDetail.vue";
 import UserList from "../views/system/users/UserList.vue";
 import RoleList from "../views/system/roles/RoleList.vue";
-import Profile from "../views/system/users/Profile.vue";
+import UserDetail from "../views/system/users/UserDetail.vue";
+import ProfileModification from "../views/system/users/ProfileModification.vue";
+import PasswordChange from "../views/system/users/PasswordChange.vue";
 import GeneralSettings from "../views/system/settings/GeneralSettings.vue";
 import NotificationSettings from "../views/system/settings/NotificationSettings.vue";
 
@@ -158,28 +165,51 @@ export const routes: Array<RouteRecordRaw> = [
   },
   {
     path: "/users",
-    component: BasicLayout,
-    redirect: "/users/profile",
+    component: BlankLayout,
     children: [
       {
         path: "",
-        name: "Users",
-        component: UserList,
+        component: BasicLayout,
+        children: [
+          {
+            path: "",
+            name: "Users",
+            component: UserList,
+          },
+        ],
       },
       {
         path: ":username",
-        name: "UserDetail",
-        component: Profile,
+        component: UserProfileLayout,
+        alias: ["profile"],
+        children: [
+          {
+            path: "detail",
+            name: "UserDetail",
+            component: UserDetail,
+          },
+          {
+            path: "profile-modification",
+            name: "ProfileModification",
+            component: ProfileModification,
+          },
+          {
+            path: "password-change",
+            name: "PasswordChange",
+            component: PasswordChange,
+          },
+        ],
       },
       {
-        path: "profile",
-        name: "Profile",
-        component: Profile,
-      },
-      {
-        path: "roles",
-        name: "Roles",
-        component: RoleList,
+        path: "",
+        component: BasicLayout,
+        children: [
+          {
+            path: "roles",
+            name: "Roles",
+            component: RoleList,
+          },
+        ],
       },
     ],
   },

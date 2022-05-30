@@ -17,7 +17,7 @@ const moreMenuRootVisible = ref(false);
 const spotlight = ref(false);
 
 const handleRouteToProfile = () => {
-  router.push({ name: "Profile" });
+  router.push({ path: "/users/profile/detail" });
 };
 </script>
 
