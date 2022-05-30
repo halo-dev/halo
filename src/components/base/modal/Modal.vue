@@ -82,13 +82,15 @@ function handleClose() {
           class="modal-content transform transition-all"
         >
           <div class="modal-header">
-            <div class="modal-header-title">{{ title }}</div>
-            <div class="modal-header-actions flex flex-row">
-              <slot name="actions"></slot>
-              <div class="modal-header-action" @click="handleClose()">
-                <IconClose />
+            <slot name="header">
+              <div class="modal-header-title">{{ title }}</div>
+              <div class="modal-header-actions flex flex-row">
+                <slot name="actions"></slot>
+                <div class="modal-header-action" @click="handleClose()">
+                  <IconClose />
+                </div>
               </div>
-            </div>
+            </slot>
           </div>
           <div :class="bodyClass" class="modal-body">
             <slot />

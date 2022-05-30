@@ -34,7 +34,7 @@ const handleChangeTheme = (theme: any) => {
     v-model:visible="changeTheme"
     :body-class="['!p-0']"
     :width="888"
-    title="切换主题"
+    title="已安装的主题"
   >
     <ul class="flex flex-col divide-y divide-gray-100" role="list">
       <li

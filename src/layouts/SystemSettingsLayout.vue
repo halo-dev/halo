@@ -2,6 +2,7 @@
 import { BasicLayout } from "@/layouts";
 import { VPageHeader } from "@/components/base/header";
 import { VButton } from "@/components/base/button";
+import { VCard } from "@/components/base/card";
 import { VTabbar } from "@/components/base/tabs";
 import { IconSettings } from "@/core/icons";
 import { onMounted, ref } from "vue";
@@ -49,17 +50,19 @@ const handleTabChange = (id: string) => {
       </template>
     </VPageHeader>
 
-    <div class="p-4">
-      <VTabbar
-        v-model:active-id="activeTab"
-        :items="SettingTabs"
-        type="outline"
-        @change="handleTabChange"
-      ></VTabbar>
-
-      <div>
+    <div class="m-0 md:m-4">
+      <VCard>
+        <template #header>
+          <VTabbar
+            v-model:active-id="activeTab"
+            :items="SettingTabs"
+            class="w-full !rounded-none"
+            type="outline"
+            @change="handleTabChange"
+          ></VTabbar>
+        </template>
         <RouterView></RouterView>
-      </div>
+      </VCard>
     </div>
   </BasicLayout>
 </template>

@@ -1,3 +1,26 @@
+<script lang="ts" setup>
+import { VRoutesMenu } from "@/components/base/menu";
+import { VTag } from "@/components/base/tag";
+import { VModal } from "@/components/base/modal";
+import { VInput } from "@/components/base/input";
+import { menus, minimenus } from "@/router/menus.config";
+import logo from "@/assets/logo.svg";
+import { IconMore, IconSearch, IconUserSettings } from "@/core/icons";
+import { RouterView, useRoute, useRouter } from "vue-router";
+import { ref } from "vue";
+
+const route = useRoute();
+const router = useRouter();
+
+const moreMenuVisible = ref(false);
+const moreMenuRootVisible = ref(false);
+const spotlight = ref(false);
+
+const handleRouteToProfile = () => {
+  router.push({ name: "Profile" });
+};
+</script>
+
 <template>
   <div class="flex h-full">
     <aside
@@ -10,6 +33,7 @@
       <div class="px-3">
         <div
           class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
+          @click="spotlight = true"
         >
           <span class="mr-3">
             <IconSearch />
@@ -135,27 +159,13 @@
       </Teleport>
     </div>
   </div>
+
+  <VModal v-model:visible="spotlight" :width="600">
+    <template #header>
+      <VInput placeholder="全局搜索" size="lg"></VInput>
+    </template>
+  </VModal>
 </template>
-
-<script lang="ts" setup>
-import { VRoutesMenu } from "@/components/base/menu";
-import { VTag } from "@/components/base/tag";
-import { menus, minimenus } from "@/router/menus.config";
-import logo from "@/assets/logo.svg";
-import { IconMore, IconSearch, IconUserSettings } from "@/core/icons";
-import { RouterView, useRoute, useRouter } from "vue-router";
-import { ref } from "vue";
-
-const route = useRoute();
-const router = useRouter();
-
-const moreMenuVisible = ref(false);
-const moreMenuRootVisible = ref(false);
-
-const handleRouteToProfile = () => {
-  router.push({ name: "Profile" });
-};
-</script>
 
 <style lang="scss">
 .navbar {

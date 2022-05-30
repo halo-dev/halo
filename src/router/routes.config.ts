@@ -13,7 +13,7 @@ import AttachmentList from "../views/contents/attachments/AttachmentList.vue";
 
 import ThemeDetail from "../views/interface/themes/ThemeDetail.vue";
 import MenuList from "../views/interface/menus/MenuList.vue";
-import Visual from "../views/interface/visual/Visual.vue";
+import Visual from "../views/interface/themes/Visual.vue";
 
 import PluginList from "../views/system/plugins/PluginList.vue";
 import PluginDetail from "../views/system/plugins/PluginDetail.vue";
