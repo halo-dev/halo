@@ -26,9 +26,8 @@ public class RequestInfoAuthorizationManager
 
     private AuthorizationRuleResolver ruleResolver;
 
-    public RequestInfoAuthorizationManager(RoleGetter roleGetter,
-        RoleBindingLister roleBindingLister) {
-        this.ruleResolver = new DefaultRuleResolver(roleGetter, roleBindingLister);
+    public RequestInfoAuthorizationManager(RoleGetter roleGetter) {
+        this.ruleResolver = new DefaultRuleResolver(roleGetter);
     }
 
     @Override

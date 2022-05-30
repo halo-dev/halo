@@ -1,6 +1,6 @@
 package run.halo.app.identity.authorization;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author guqing
@@ -9,5 +9,5 @@ import java.util.List;
 @FunctionalInterface
 public interface RoleBindingLister {
 
-    List<RoleBinding> listRoleBindings();
+    Set<String> listBoundRoleNames();
 }
