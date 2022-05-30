@@ -1,7 +1,6 @@
 import {
   IconBookRead,
   IconDashboard,
-  IconEye,
   IconFolder,
   IconListSettings,
   IconMessage,
@@ -66,18 +65,13 @@ export const menus: MenuGroupType[] = [
     items: [
       {
         name: "主题",
-        path: "/themes",
+        path: "/theme",
         icon: IconPalette,
       },
       {
         name: "菜单",
         path: "/menus",
         icon: IconListSettings,
-      },
-      {
-        name: "可视化",
-        path: "/visual",
-        icon: IconEye,
       },
     ],
   },

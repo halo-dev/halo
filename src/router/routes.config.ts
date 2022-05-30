@@ -11,13 +11,14 @@ import TagList from "../views/contents/posts/tags/TagList.vue";
 import CommentList from "../views/contents/comments/CommentList.vue";
 import AttachmentList from "../views/contents/attachments/AttachmentList.vue";
 
-import ThemeList from "../views/interface/themes/ThemeList.vue";
+import ThemeDetail from "../views/interface/themes/ThemeDetail.vue";
 import MenuList from "../views/interface/menus/MenuList.vue";
 import Visual from "../views/interface/visual/Visual.vue";
 
 import PluginList from "../views/system/plugins/PluginList.vue";
 import PluginDetail from "../views/system/plugins/PluginDetail.vue";
 import UserList from "../views/system/users/UserList.vue";
+import RoleList from "../views/system/roles/RoleList.vue";
 import Profile from "../views/system/users/Profile.vue";
 import GeneralSettings from "../views/system/settings/GeneralSettings.vue";
 import NotificationSettings from "../views/system/settings/NotificationSettings.vue";
@@ -107,13 +108,24 @@ export const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: "/themes",
+    path: "/theme",
     component: BasicLayout,
     children: [
       {
         path: "",
-        name: "Themes",
-        component: ThemeList,
+        name: "Theme",
+        component: ThemeDetail,
+      },
+    ],
+  },
+  {
+    path: "/theme/visual",
+    component: BlankLayout,
+    children: [
+      {
+        path: "",
+        name: "ThemeVisual",
+        component: Visual,
       },
     ],
   },
@@ -125,17 +137,6 @@ export const routes: Array<RouteRecordRaw> = [
         path: "",
         name: "Menus",
         component: MenuList,
-      },
-    ],
-  },
-  {
-    path: "/visual",
-    component: BlankLayout,
-    children: [
-      {
-        path: "",
-        name: "Visual",
-        component: Visual,
       },
     ],
   },
@@ -174,6 +175,11 @@ export const routes: Array<RouteRecordRaw> = [
         path: "profile",
         name: "Profile",
         component: Profile,
+      },
+      {
+        path: "roles",
+        name: "Roles",
+        component: RoleList,
       },
     ],
   },

@@ -67,6 +67,10 @@ import IconPhone from "~icons/ri/smartphone-line";
 import IconTablet from "~icons/ri/tablet-line";
 // @ts-ignore
 import IconUserFollow from "~icons/ri/user-follow-line";
+// @ts-ignore
+import IconExchange from "~icons/ri/exchange-line";
+// @ts-ignore
+import IconGitHub from "~icons/ri/github-fill";
 
 export {
   IconDashboard,
@@ -103,4 +107,6 @@ export {
   IconPhone,
   IconTablet,
   IconUserFollow,
+  IconExchange,
+  IconGitHub,
 };

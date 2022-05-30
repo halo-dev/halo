@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { PropType } from "vue";
 import { computed, ref } from "vue";
 import { IconClose } from "@/core/icons";
 
@@ -17,6 +18,9 @@ const props = defineProps({
   fullscreen: {
     type: Boolean,
     default: false,
+  },
+  bodyClass: {
+    type: Object as PropType<string[]>,
   },
 });
 
@@ -86,7 +90,7 @@ function handleClose() {
               </div>
             </div>
           </div>
-          <div class="modal-body">
+          <div :class="bodyClass" class="modal-body">
             <slot />
           </div>
           <div v-if="$slots.footer" class="modal-footer">

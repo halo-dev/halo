@@ -31,7 +31,7 @@ const handleRouteToDetail = (username: string) => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton size="sm" type="default">
+        <VButton :route="{ name: 'Roles' }" size="sm" type="default">
           <template #icon>
             <IconUserFollow class="h-full w-full" />
           </template>
