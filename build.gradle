@@ -47,6 +47,7 @@ ext {
     jsonschemaGenerator = "4.24.3"
     jsonschemaValidator = "1.0.69"
     base62 = "0.1.3"
+    pf4j = "3.6.0"
 }
 
 dependencies {
@@ -68,7 +69,7 @@ dependencies {
     implementation "com.networknt:json-schema-validator:$jsonschemaValidator"
     implementation "org.apache.commons:commons-lang3:$commonsLang3"
     implementation "io.seruco.encoding:base62:$base62"
-
+    implementation "org.pf4j:pf4j:$pf4j"
     compileOnly 'org.projectlombok:lombok'
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
