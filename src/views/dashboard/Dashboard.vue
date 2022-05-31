@@ -155,7 +155,10 @@ const widgetsGroup = [
   {
     id: "other",
     label: "其他",
-    widgets: [{ x: 0, y: 0, w: 3, h: 3, i: 0, widget: "ViewsStatsWidget" }],
+    widgets: [
+      { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "ViewsStatsWidget" },
+      { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "QuickLinkWidget" },
+    ],
   },
 ];
 

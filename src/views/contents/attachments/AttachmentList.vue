@@ -8,6 +8,11 @@ import { VInput } from "@/components/base/input";
 import { VTag } from "@/components/base/tag";
 import { ref } from "vue";
 import { users } from "@/views/system/users/users-mock";
+import vueFilePond from "vue-filepond";
+import "filepond/dist/filepond.min.css";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
+
 import {
   IconArrowDown,
   IconArrowLeft,
@@ -29,6 +34,8 @@ const viewTypes = [
     icon: IconGrid,
   },
 ];
+
+const FilePond = vueFilePond(FilePondPluginImagePreview);
 
 const viewType = ref("grid");
 
@@ -86,57 +93,104 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
     </template>
   </VPageHeader>
 
-  <VModal v-model:visible="uploadVisible" :width="800" title="上传附件">
-    <div class="w-full sm:w-96">
-      <VCard :bodyClass="['!p-0']" title="存储策略">
-        <fieldset>
-          <div class="-space-y-px divide-y divide-gray-100 bg-white">
-            <label
-              v-for="(strategy, index) in strategies"
-              :key="index"
-              :class="{
-                'bg-gray-50': selected === strategy.id,
-              }"
-              class="relative flex cursor-pointer p-4 focus:outline-none"
-            >
-              <input
-                v-model="selected"
-                :value="strategy.id"
-                class="mt-0.5 h-4 w-4 shrink-0 cursor-pointer border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                name="privacy"
-                type="radio"
-              />
-              <span class="ml-3 flex flex-1 flex-col">
-                <span
-                  :class="{ 'font-bold': selected === strategy.id }"
-                  class="block text-sm font-medium"
-                >
-                  {{ strategy.name }}
-                </span>
-                <span class="block text-sm text-gray-400">
-                  {{ strategy.description }}
-                </span>
-              </span>
-              <div class="self-center">
-                <IconSettings
-                  class="cursor-pointer transition-all hover:text-blue-600"
-                  @click.stop="strategyVisible = true"
+  <VModal
+    v-model:visible="uploadVisible"
+    :body-class="['!p-0']"
+    :width="1024"
+    title="上传附件"
+  >
+    <div class="w-full">
+      <div class="flex flex-row">
+        <VCard
+          :bodyClass="['!p-0']"
+          class="border-r-1 w-72 border-t-0 border-l-0 border-b-0"
+        >
+          <fieldset>
+            <div class="-space-y-px divide-y divide-gray-100 bg-white">
+              <label
+                v-for="(strategy, index) in strategies"
+                :key="index"
+                :class="{
+                  'bg-gray-50': selected === strategy.id,
+                }"
+                class="relative flex cursor-pointer p-4 focus:outline-none"
+              >
+                <input
+                  v-model="selected"
+                  :value="strategy.id"
+                  class="mt-0.5 h-4 w-4 shrink-0 cursor-pointer border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                  name="privacy"
+                  type="radio"
                 />
-              </div>
-            </label>
-          </div>
-        </fieldset>
+                <span class="ml-3 flex flex-1 flex-col">
+                  <span
+                    :class="{ 'font-bold': selected === strategy.id }"
+                    class="block text-sm font-medium"
+                  >
+                    {{ strategy.name }}
+                  </span>
+                  <span class="block text-sm text-gray-400">
+                    {{ strategy.description }}
+                  </span>
+                </span>
+                <div class="self-center">
+                  <IconSettings
+                    class="cursor-pointer transition-all hover:text-blue-600"
+                    @click.stop="strategyVisible = true"
+                  />
+                </div>
+              </label>
+            </div>
+          </fieldset>
 
-        <template #footer>
-          <VButton block type="secondary" @click="strategyVisible = true">
-            添加策略
-          </VButton>
-        </template>
-      </VCard>
+          <template #footer>
+            <FloatingDropdown>
+              <VButton block type="secondary"> 添加策略</VButton>
+              <template #popper>
+                <div class="w-72 p-4">
+                  <ul class="space-y-1">
+                    <li
+                      class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      <span class="truncate">本地</span>
+                    </li>
+                    <li
+                      class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      @click="strategyVisible = true"
+                    >
+                      <span class="truncate">阿里云 OSS</span>
+                    </li>
+                    <li
+                      class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      <span class="truncate">Amazon S3</span>
+                    </li>
+                  </ul>
+                </div>
+              </template>
+            </FloatingDropdown>
+          </template>
+        </VCard>
+
+        <div class="flex-1 p-4">
+          <file-pond
+            ref="pond"
+            accepted-file-types="image/jpeg, image/png"
+            label-idle="Drop files here..."
+            name="test"
+            server="/api"
+            v-bind:allow-multiple="true"
+          />
+        </div>
+      </div>
     </div>
   </VModal>
 
-  <VModal v-model:visible="strategyVisible" title="添加存储策略"></VModal>
+  <VModal
+    v-model:visible="strategyVisible"
+    :width="820"
+    title="添加存储策略"
+  ></VModal>
 
   <VModal v-model:visible="detailVisible" :width="1000" title="attachment-0">
     <template #actions>
@@ -170,7 +224,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             </dd>
           </div>
           <div
-            class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">文件名称</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -186,7 +240,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             </dd>
           </div>
           <div
-            class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">文件大小</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -210,7 +264,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
             </dd>
           </div>
           <div
-            class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
           >
             <dt class="text-sm font-medium text-gray-900">原始链接</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -222,7 +276,46 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
           >
             <dt class="text-sm font-medium text-gray-900">引用位置</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              https://picsum.photos/1000/700?random=1
+              <ul class="mt-2 space-y-2">
+                <li>
+                  <div
+                    class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-themeable-primary"
+                  >
+                    <RouterLink
+                      :to="{
+                        name: 'Posts',
+                      }"
+                      class="font-medium text-gray-900 hover:text-blue-400"
+                    >
+                      Halo 1.5.3 发布了
+                    </RouterLink>
+                    <div class="text-xs">
+                      <VSpace>
+                        <VTag>文章</VTag>
+                      </VSpace>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-themeable-primary"
+                  >
+                    <RouterLink
+                      :to="{
+                        name: 'Posts',
+                      }"
+                      class="font-medium text-gray-900 hover:text-blue-400"
+                    >
+                      Halo 1.5.2 发布
+                    </RouterLink>
+                    <div class="text-xs">
+                      <VSpace>
+                        <VTag>文章</VTag>
+                      </VSpace>
+                    </div>
+                  </div>
+                </li>
+              </ul>
             </dd>
           </div>
         </dl>
@@ -305,6 +398,37 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
+                        <span class="mr-0.5">存储策略</span>
+                        <span>
+                          <IconArrowDown />
+                        </span>
+                      </div>
+                      <template #popper>
+                        <div class="w-72 p-4">
+                          <ul class="space-y-1">
+                            <li
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            >
+                              <span class="truncate">本地</span>
+                            </li>
+                            <li
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            >
+                              <span class="truncate">阿里云 OSS</span>
+                            </li>
+                            <li
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            >
+                              <span class="truncate">Amazon S3</span>
+                            </li>
+                          </ul>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
+                    <FloatingDropdown>
+                      <div
+                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+                      >
                         <span class="mr-0.5">上传者</span>
                         <span>
                           <IconArrowDown />
@@ -357,14 +481,32 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                         </div>
                       </template>
                     </FloatingDropdown>
-                    <div
-                      class="flex cursor-pointer items-center text-sm text-gray-700 hover:text-black"
-                    >
-                      <span class="mr-0.5">引用位置</span>
-                      <span>
-                        <IconArrowDown />
-                      </span>
-                    </div>
+                    <FloatingDropdown>
+                      <div
+                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+                      >
+                        <span class="mr-0.5">引用位置</span>
+                        <span>
+                          <IconArrowDown />
+                        </span>
+                      </div>
+                      <template #popper>
+                        <div class="w-72 p-4">
+                          <ul class="space-y-1">
+                            <li
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            >
+                              <span class="truncate">未被引用</span>
+                            </li>
+                            <li
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                            >
+                              <span class="truncate">文章</span>
+                            </li>
+                          </ul>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
                     <div
                       class="flex cursor-pointer items-center text-sm text-gray-700 hover:text-black"
                     >

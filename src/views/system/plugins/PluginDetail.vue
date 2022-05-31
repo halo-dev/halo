@@ -27,7 +27,7 @@ console.log(plugin);
       <img :src="plugin.spec.logo" class="mr-2 h-8 w-8" />
     </template>
     <template #actions>
-      <VButton type="secondary"> 安装</VButton>
+      <VButton class="opacity-0" type="secondary"> 安装</VButton>
     </template>
   </VPageHeader>
 
@@ -60,7 +60,7 @@ console.log(plugin);
         <div class="border-t border-gray-200">
           <dl class="divide-y divide-gray-100">
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">名称</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -68,7 +68,7 @@ console.log(plugin);
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">插件类别</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -80,7 +80,7 @@ console.log(plugin);
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">版本</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -88,7 +88,7 @@ console.log(plugin);
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -96,7 +96,7 @@ console.log(plugin);
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">提供方</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -106,7 +106,7 @@ console.log(plugin);
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">协议</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
@@ -114,7 +114,7 @@ console.log(plugin);
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">模型定义</dt>
               <dd class="mt-1 sm:col-span-2 sm:mt-0">
@@ -146,10 +146,10 @@ console.log(plugin);
               </dd>
             </div>
             <div
-              class="bg-gray-50 px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-gray-50 px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">权限定义</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-5 sm:mt-0">
                 <dl class="divide-y divide-gray-100">
                   <div
                     class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
@@ -252,31 +252,31 @@ console.log(plugin);
       </div>
 
       <div v-if="pluginActiveId === 'settings'">
-        <form>
-          <div class="space-y-6 divide-y divide-gray-100 sm:space-y-5">
+        <form class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+          <div class="space-y-6 space-y-5 divide-y divide-gray-100">
             <div
-              class="px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
+              class="px-4 sm:grid sm:grid-cols-6 sm:items-start sm:gap-4 sm:pt-5"
             >
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 设置项 1
               </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
+              <div class="mt-1 sm:col-span-3 sm:mt-0">
                 <div class="flex max-w-lg shadow-sm">
                   <VInput />
                 </div>
               </div>
             </div>
             <div
-              class="px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
+              class="px-4 sm:grid sm:grid-cols-6 sm:items-start sm:gap-4 sm:pt-5"
             >
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 设置项 2
               </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
+              <div class="mt-1 sm:col-span-3 sm:mt-0">
                 <div class="flex max-w-lg shadow-sm">
                   <VInput />
                 </div>

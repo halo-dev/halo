@@ -7,6 +7,7 @@ import ViewsStatsWidget from "./ViewsStatsWidget.vue";
 import RecentLoginWidget from "./RecentLoginWidget.vue";
 import RecentPublishedWidget from "./RecentPublishedWidget.vue";
 import JournalPublishWidget from "./JournalPublishWidget.vue";
+import QuickLinkWidget from "./QuickLinkWidget.vue";
 
 const install = (app: App) => {
   app.component("PostStatsWidget", PostStatsWidget);
@@ -16,6 +17,7 @@ const install = (app: App) => {
   app.component("RecentLoginWidget", RecentLoginWidget);
   app.component("RecentPublishedWidget", RecentPublishedWidget);
   app.component("JournalPublishWidget", JournalPublishWidget);
+  app.component("QuickLinkWidget", QuickLinkWidget);
 };
 
 export default install;

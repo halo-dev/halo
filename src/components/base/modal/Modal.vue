@@ -111,7 +111,7 @@ function handleClose() {
   @apply h-full w-full;
   @apply flex flex-row;
   @apply items-center justify-center;
-  z-index: 99999;
+  z-index: 999;
 
   .modal-layer {
     @apply flex-none;

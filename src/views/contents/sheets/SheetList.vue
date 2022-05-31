@@ -3,7 +3,7 @@ import { VButton } from "@/components/base/button";
 import { VCard } from "@/components/base/card";
 import { VSpace } from "@/components/base/space";
 import { VTag } from "@/components/base/tag";
-import { VTabItem, VTabs } from "@/components/base/tabs";
+import { VTabbar } from "@/components/base/tabs";
 import { VInput } from "@/components/base/input";
 import { VPageHeader } from "@/components/base/header";
 import {
@@ -77,50 +77,62 @@ const activeId = ref("advanced");
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VTabs v-model:active-id="activeId" type="outline">
-      <VTabItem id="advanced" label="功能页面">
-        <VCard :body-class="['!p-0']">
-          <ul
-            class="box-border h-full w-full divide-y divide-gray-100"
-            role="list"
-          >
-            <li v-for="(sheet, index) in advancedSheets" :key="index">
-              <div
-                class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-              >
-                <div class="relative flex flex-row items-center">
-                  <div class="flex-1">
-                    <div class="flex flex-row">
-                      <span
-                        class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
-                      >
-                        {{ sheet.name }}
-                      </span>
-                      <VTag>{{ sheet.url }}</VTag>
-                    </div>
-                  </div>
-                  <div class="flex">
-                    <div
-                      class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+    <VCard :body-class="['!p-0']">
+      <template #header>
+        <VTabbar
+          v-model:active-id="activeId"
+          :items="[
+            { id: 'advanced', label: '功能页面' },
+            { id: 'custom', label: '自定义页面' },
+          ]"
+          class="w-full !rounded-none"
+          type="outline"
+        ></VTabbar>
+      </template>
+      <div v-if="activeId === 'advanced'">
+        <ul
+          class="box-border h-full w-full divide-y divide-gray-100"
+          role="list"
+        >
+          <li v-for="(sheet, index) in advancedSheets" :key="index">
+            <div
+              class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
+            >
+              <div class="relative flex flex-row items-center">
+                <div class="flex-1">
+                  <div class="flex flex-row">
+                    <span
+                      class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
                     >
-                      <img
-                        v-tooltip="`由${sheet.name}插件提供`"
-                        :src="sheet.logo"
-                        class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
-                      />
-                      <span class="cursor-pointer">
-                        <IconSettings />
-                      </span>
-                    </div>
+                      {{ sheet.name }}
+                    </span>
+                    <VTag>{{ sheet.url }}</VTag>
+                  </div>
+                </div>
+                <div class="flex">
+                  <div
+                    class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                  >
+                    <img
+                      v-tooltip="`由${sheet.name}插件提供`"
+                      :src="sheet.logo"
+                      class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
+                    />
+                    <span class="cursor-pointer">
+                      <IconSettings />
+                    </span>
                   </div>
                 </div>
               </div>
-            </li>
-          </ul>
-        </VCard>
-      </VTabItem>
-      <VTabItem id="custom" label="自定义页面">
-        <VCard :body-class="['!p-0']">
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div v-if="activeId === 'custom'">
+        <VCard
+          :body-class="['!p-0']"
+          class="rounded-none border-none shadow-none"
+        >
           <template #header>
             <div class="block w-full bg-gray-50 px-4 py-3">
               <div
@@ -393,7 +405,7 @@ const activeId = ref("advanced");
             </div>
           </template>
         </VCard>
-      </VTabItem>
-    </VTabs>
+      </div>
+    </VCard>
   </div>
 </template>

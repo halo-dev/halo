@@ -46,7 +46,7 @@ const handleTabChange = (id: string) => {
         <IconSettings class="mr-2 self-center" />
       </template>
       <template #actions>
-        <VButton type="secondary">安装</VButton>
+        <VButton type="secondary" class="opacity-0">安装</VButton>
       </template>
     </VPageHeader>
 

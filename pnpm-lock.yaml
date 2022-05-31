@@ -22,6 +22,8 @@ specifiers:
   eslint: ^8.16.0
   eslint-plugin-cypress: ^2.12.1
   eslint-plugin-vue: ^8.7.1
+  filepond: ^4.30.3
+  filepond-plugin-image-preview: ^4.6.11
   floating-vue: 2.0.0-beta.16
   histoire: ^0.4.6
   husky: ^8.0.1
@@ -45,6 +47,7 @@ specifiers:
   vite-plugin-pwa: ^0.12.0
   vitest: ^0.12.9
   vue: ^3.2.36
+  vue-filepond: ^7.0.3
   vue-grid-layout: 3.0.0-beta1
   vue-router: ^4.0.15
   vue-tsc: ^0.34.16
@@ -52,11 +55,14 @@ specifiers:
 dependencies:
   '@halo-dev/admin-api': 1.0.0
   '@vueuse/core': 8.5.0_vue@3.2.36
+  filepond: 4.30.3
+  filepond-plugin-image-preview: 4.6.11_filepond@4.30.3
   floating-vue: 2.0.0-beta.16_vue@3.2.36
   lodash.clonedeep: 4.5.0
   pinia: 2.0.14_7gwbvmtszsbbeay4sidijbp26i
   tippy.js: 6.3.7
   vue: 3.2.36
+  vue-filepond: 7.0.3_filepond@4.30.3+vue@3.2.36
   vue-grid-layout: 3.0.0-beta1
   vue-router: 4.0.15_vue@3.2.36
 
@@ -4095,6 +4101,18 @@ packages:
       minimatch: 5.0.1
     dev: true
 
+  /filepond-plugin-image-preview/4.6.11_filepond@4.30.3:
+    resolution: {integrity: sha512-0EmQ9HnOb/X0xc5rLcNRhhmdUbp7oiicRwQrcr90ZfVmPJOOZoX3ZGUEsEPj7luMI55huguhcVozdESxtqnuRw==}
+    peerDependencies:
+      filepond: '>=4.x <5.x'
+    dependencies:
+      filepond: 4.30.3
+    dev: false
+
+  /filepond/4.30.3:
+    resolution: {integrity: sha512-G2b1LEe90Sq2vH0SYDASTB+vVU735NBctzIaFPlZtb14QAgi/AL89WyQ6LhTfqgyrMyuZur2O9yHAmzS2E9ZnA==}
+    dev: false
+
   /fill-range/7.0.1:
     resolution: {integrity: sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==}
     engines: {node: '>=8'}
@@ -6818,6 +6836,16 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /vue-filepond/7.0.3_filepond@4.30.3+vue@3.2.36:
+    resolution: {integrity: sha512-pYZ5TxGwFiiiVlRdzlJl0AyHE0/rEZiHm/0sYhIleFjV2VdGWTyxSqErN/AQwrwv32AeiNbui46vVB06Dl07ow==}
+    peerDependencies:
+      filepond: '>=4.7.4 < 5.x'
+      vue: '>=3 < 4'
+    dependencies:
+      filepond: 4.30.3
+      vue: 3.2.36
+    dev: false
 
   /vue-grid-layout/3.0.0-beta1:
     resolution: {integrity: sha512-MsW0yfYNtnAO/uDhfZvkP6effxSJxvhAFbIL37x6Rn3vW9xf0WHVefKaSbQMLpSq3mXnR6ut0pg2Cd5lqIIZzg==}

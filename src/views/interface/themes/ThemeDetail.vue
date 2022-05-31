@@ -16,7 +16,9 @@ import {
   IconPalette,
 } from "@/core/icons";
 import { ref } from "vue";
+import { RouterLink } from "vue-router";
 import { themes } from "@/views/interface/themes/themes-mock";
+import Alert from "@/components/base/alert/Alert.vue";
 
 const currentTheme = ref(themes[0]);
 const changeTheme = ref(false);
@@ -171,71 +173,110 @@ const handleChangeTheme = (theme: any) => {
         <div class="border-t border-gray-200">
           <dl class="divide-y divide-gray-100">
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">ID</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 {{ currentTheme.id }}
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">作者</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 {{ currentTheme.author.name }}
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">网站</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 <a :href="currentTheme.website" target="_blank">
                   {{ currentTheme.website }}
                 </a>
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">源码仓库</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 <a :href="currentTheme.repo" target="_blank">
                   {{ currentTheme.repo }}
                 </a>
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">当前版本</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 {{ currentTheme.version }}
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 {{ currentTheme.require }}
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">存储位置</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 {{ currentTheme.themePath }}
               </dd>
             </div>
             <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">插件依赖</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                无
+              <dd class="mt-1 text-sm sm:col-span-3 sm:mt-0">
+                <Alert
+                  description="当前有 1 个插件还未安装"
+                  title="提示"
+                ></Alert>
+                <ul class="mt-2 space-y-2">
+                  <li>
+                    <div
+                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-themeable-primary"
+                    >
+                      <RouterLink
+                        :to="{
+                          name: 'PluginDetail',
+                          params: { id: 'run.halo.plugins.links' },
+                        }"
+                        class="font-medium text-gray-900 hover:text-blue-400"
+                      >
+                        run.halo.plugins.links
+                      </RouterLink>
+                      <div class="text-xs">
+                        <VSpace>
+                          <VTag> 已安装</VTag>
+                        </VSpace>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div
+                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-themeable-primary"
+                    >
+                      <span class="font-medium hover:text-blue-400">
+                        run.halo.plugins.photos
+                      </span>
+                      <div class="text-xs">
+                        <VSpace>
+                          <VTag>未安装</VTag>
+                        </VSpace>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
               </dd>
             </div>
           </dl>
@@ -243,31 +284,31 @@ const handleChangeTheme = (theme: any) => {
       </div>
 
       <div v-if="themeActiveId === 'settings'">
-        <form>
-          <div class="space-y-6 divide-y divide-gray-100 sm:space-y-5">
+        <form class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
+          <div class="space-y-6 space-y-5 divide-y divide-gray-100">
             <div
-              class="px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
+              class="px-4 sm:grid sm:grid-cols-6 sm:items-start sm:gap-4 sm:pt-5"
             >
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 侧边栏宽度
               </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
+              <div class="mt-1 sm:col-span-3 sm:mt-0">
                 <div class="flex max-w-lg shadow-sm">
                   <VInput />
                 </div>
               </div>
             </div>
             <div
-              class="px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
+              class="px-4 sm:grid sm:grid-cols-6 sm:items-start sm:gap-4 sm:pt-5"
             >
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 侧边栏背景图
               </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
+              <div class="mt-1 sm:col-span-3 sm:mt-0">
                 <div class="flex max-w-lg shadow-sm">
                   <VInput />
                 </div>
@@ -275,28 +316,28 @@ const handleChangeTheme = (theme: any) => {
             </div>
 
             <div
-              class="px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
+              class="px-4 sm:grid sm:grid-cols-6 sm:items-start sm:gap-4 sm:pt-5"
             >
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 右上角图标
               </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
+              <div class="mt-1 sm:col-span-3 sm:mt-0">
                 <div class="flex max-w-lg shadow-sm">
                   <VInput />
                 </div>
               </div>
             </div>
             <div
-              class="px-4 sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
+              class="px-4 sm:grid sm:grid-cols-6 sm:items-start sm:gap-4 sm:pt-5"
             >
               <label
                 class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
               >
                 文章代码高亮语言
               </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
+              <div class="mt-1 sm:col-span-3 sm:mt-0">
                 <div class="flex max-w-lg shadow-sm">
                   <VTextarea modelValue="Halo" />
                 </div>
