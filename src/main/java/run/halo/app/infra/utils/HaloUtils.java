@@ -1,15 +1,16 @@
 package run.halo.app.infra.utils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.UUID;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
  * @author guqing
  * @date 2022-04-12
  */
 public class HaloUtils {
-    public static boolean isAjaxRequest(HttpServletRequest request) {
-        String requestedWith = request.getHeader("x-requested-with");
+
+    public static boolean isAjaxRequest(ServerHttpRequest request) {
+        String requestedWith = request.getHeaders().getFirst("x-requested-with");
         return requestedWith == null || requestedWith.equalsIgnoreCase("XMLHttpRequest");
     }
 

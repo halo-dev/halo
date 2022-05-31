@@ -20,10 +20,20 @@ spring:
       ddl-auto: update
     open-in-view: false
     show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: google-client-id
+            client-secret: google-client-secret
+
 halo:
   security:
     oauth2:
       jwt:
+        jwsAlgorithm: rs512
         public-key-location: classpath:app.pub
         private-key-location: classpath:app.key
 logging:
@@ -33,3 +43,6 @@ logging:
 springdoc:
   api-docs:
     enabled: true
+  swagger-ui:
+    enabled: true
+  show-login-endpoint: true

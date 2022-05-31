@@ -1,0 +1,4 @@
+@startuml
+ExceptionHandlingWebHandler -> FilteringWebHandler
+FilteringWebHandler contains filters and DispatcherHandler
+@enduml
