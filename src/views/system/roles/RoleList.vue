@@ -4,6 +4,7 @@ import { VButton } from "@/components/base/button";
 import { VCard } from "@/components/base/card";
 import { VInput } from "@/components/base/input";
 import { VTag } from "@/components/base/tag";
+import { VModal } from "@/components/base/modal";
 import { VSpace } from "@/components/base/space";
 import {
   IconAddCircle,
@@ -13,6 +14,9 @@ import {
 } from "@/core/icons";
 import { roles } from "./roles-mock";
 import { useRouter } from "vue-router";
+import { ref } from "vue";
+
+const createVisible = ref(false);
 
 const router = useRouter();
 
@@ -21,12 +25,14 @@ const handleRouteToDetail = (id: number) => {
 };
 </script>
 <template>
+  <VModal v-model:visible="createVisible" title="新建角色"></VModal>
+
   <VPageHeader title="角色">
     <template #icon>
       <IconShieldUser class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton type="secondary">
+      <VButton type="secondary" @click="createVisible = true">
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>

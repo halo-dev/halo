@@ -42,7 +42,7 @@ const router = useRouter();
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
           <VTag @click="router.push({ name: 'RoleDetail', params: { id: 1 } })">
             <template #leftIcon>
-              <IconUserSettings class="h-full w-full" />
+              <IconUserSettings />
             </template>
             {{ user.role }}
           </VTag>

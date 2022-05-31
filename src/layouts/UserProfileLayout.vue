@@ -14,6 +14,11 @@ const tabs = [
     routeName: "UserDetail",
   },
   {
+    id: "tokens",
+    label: "个人令牌",
+    routeName: "PersonalAccessTokens",
+  },
+  {
     id: "profile-modification",
     label: "资料修改",
     routeName: "ProfileModification",

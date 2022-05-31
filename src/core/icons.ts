@@ -77,6 +77,8 @@ import IconUpload from "~icons/ri/upload-cloud-2-line";
 import IconShieldUser from "~icons/ri/shield-user-line";
 // @ts-ignore
 import IconGitBranch from "~icons/ri/git-branch-line";
+// @ts-ignore
+import IconStopCircle from "~icons/ri/stop-circle-line";
 
 export {
   IconDashboard,
@@ -118,4 +120,5 @@ export {
   IconUpload,
   IconShieldUser,
   IconGitBranch,
+  IconStopCircle,
 };

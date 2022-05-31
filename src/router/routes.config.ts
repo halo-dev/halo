@@ -28,6 +28,7 @@ import RoleDetail from "../views/system/roles/RoleDetail.vue";
 import UserDetail from "../views/system/users/UserDetail.vue";
 import ProfileModification from "../views/system/users/ProfileModification.vue";
 import PasswordChange from "../views/system/users/PasswordChange.vue";
+import PersonalAccessTokens from "../views/system/users/PersonalAccessTokens.vue";
 import GeneralSettings from "../views/system/settings/GeneralSettings.vue";
 import NotificationSettings from "../views/system/settings/NotificationSettings.vue";
 
@@ -198,6 +199,11 @@ export const routes: Array<RouteRecordRaw> = [
             path: "password-change",
             name: "PasswordChange",
             component: PasswordChange,
+          },
+          {
+            path: "tokens",
+            name: "PersonalAccessTokens",
+            component: PersonalAccessTokens,
           },
         ],
       },
