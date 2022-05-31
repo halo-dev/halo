@@ -341,6 +341,53 @@ const handleRouteToUser = (username: string) => {
                 </ul>
               </dd>
             </div>
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt
+                class="flex flex-col gap-y-3 text-sm font-medium text-gray-900"
+              >
+                <span> Discussions Management </span>
+                <span class="text-xs text-gray-400"> 由社区插件提供 </span>
+              </dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                <ul class="space-y-2">
+                  <li>
+                    <div
+                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                    >
+                      <input
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        type="checkbox"
+                      />
+                      <div class="inline-flex flex-col gap-y-3">
+                        <span class="font-medium text-gray-900">
+                          Discussions Management
+                        </span>
+                        <span class="text-xs text-gray-400">
+                          依赖于 Discussions View
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                  <li>
+                    <div
+                      class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                    >
+                      <input
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        type="checkbox"
+                      />
+                      <div class="inline-flex flex-col gap-y-3">
+                        <span class="font-medium text-gray-900">
+                          Discussions View
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </dd>
+            </div>
           </dl>
           <div class="p-4">
             <VButton type="secondary">保存</VButton>

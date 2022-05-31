@@ -6,6 +6,7 @@ import { useRoute } from "vue-router";
 import { plugins } from "./plugins-mock";
 import { VTag } from "@/components/base/tag";
 import { VInput } from "@/components/base/input";
+import { VSpace } from "@/components/base/space";
 import { VCard } from "@/components/base/card";
 import { ref } from "vue";
 
@@ -116,8 +117,134 @@ console.log(plugin);
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">模型定义</dt>
+              <dd class="mt-1 sm:col-span-2 sm:mt-0">
+                <ul v-if="plugin.extensions" class="space-y-2">
+                  <li
+                    v-for="(extension, index) in plugin.extensions"
+                    :key="index"
+                  >
+                    <div
+                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-themeable-primary"
+                    >
+                      <span class="font-medium text-gray-900">
+                        {{ extension.name }}
+                      </span>
+                      <div class="text-xs text-gray-400">
+                        <VSpace>
+                          <VTag
+                            v-for="(field, fieldIndex) in extension.fields"
+                            :key="fieldIndex"
+                          >
+                            {{ field }}
+                          </VTag>
+                        </VSpace>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+                <span v-else>无</span>
+              </dd>
+            </div>
+            <div
+              class="bg-gray-50 px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">权限定义</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                无
+                <dl class="divide-y divide-gray-100">
+                  <div
+                    class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  >
+                    <dt class="text-sm font-medium text-gray-900">
+                      Discussions Management
+                    </dt>
+                    <dd
+                      class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+                    >
+                      <ul class="space-y-2">
+                        <li>
+                          <div
+                            class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                          >
+                            <input
+                              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                              type="checkbox"
+                            />
+                            <div class="inline-flex flex-col gap-y-3">
+                              <span class="font-medium text-gray-900">
+                                Discussions Management
+                              </span>
+                              <span class="text-xs text-gray-400">
+                                依赖于 Discussions View
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                        <li>
+                          <div
+                            class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                          >
+                            <input
+                              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                              type="checkbox"
+                            />
+                            <div class="inline-flex flex-col gap-y-3">
+                              <span class="font-medium text-gray-900">
+                                Discussions View
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </dd>
+                  </div>
+
+                  <div
+                    class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+                  >
+                    <dt class="text-sm font-medium text-gray-900">
+                      Posts Management
+                    </dt>
+                    <dd
+                      class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
+                    >
+                      <ul class="space-y-2">
+                        <li>
+                          <div
+                            class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                          >
+                            <input
+                              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                              type="checkbox"
+                            />
+                            <div class="inline-flex flex-col gap-y-3">
+                              <span class="font-medium text-gray-900">
+                                Posts Management
+                              </span>
+                              <span class="text-xs text-gray-400">
+                                依赖于 Posts View
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                        <li>
+                          <div
+                            class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                          >
+                            <input
+                              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                              type="checkbox"
+                            />
+                            <div class="inline-flex flex-col gap-y-3">
+                              <span class="font-medium text-gray-900">
+                                Posts View
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </dd>
+                  </div>
+                </dl>
               </dd>
             </div>
           </dl>

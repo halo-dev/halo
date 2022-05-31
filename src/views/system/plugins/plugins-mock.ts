@@ -170,6 +170,18 @@ export const plugins = [
       description: "提供一个社区/论坛应有的所有模块",
       license: "GPL V3",
     },
+    extensions: [
+      {
+        name: "posts",
+        displayName: "帖子",
+        fields: ["id", "title", "content", "author", "createdAt"],
+      },
+      {
+        name: "discussions",
+        displayName: "评论",
+        fields: ["id", "content", "author", "createdAt"],
+      },
+    ],
   },
   {
     apiVersion: "v1",
