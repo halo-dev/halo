@@ -34,10 +34,10 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.jwt.TokenAuthenticationConverter;
 import run.halo.app.security.jwt.TokenAuthenticationFailureHandler;
-import run.halo.app.security.jwt.TokenAuthenticationFilter;
 import run.halo.app.security.jwt.TokenAuthenticationSuccessHandler;
 
 /**
@@ -48,15 +48,23 @@ import run.halo.app.security.jwt.TokenAuthenticationSuccessHandler;
 @EnableWebFluxSecurity
 public class WebServerSecurityConfig {
 
+    private final JwtProperties jwtProp;
+
+    public WebServerSecurityConfig(JwtProperties jwtProp) {
+        this.jwtProp = jwtProp;
+    }
+
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http, ServerCodecConfigurer codec) {
+    SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http,
+        ServerCodecConfigurer codec,
+        ServerResponse.Context context) {
         http.csrf().disable()
             .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/api/**"))
             .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
             .oauth2ResourceServer().jwt();
 
-        http.addFilterAt(tokenFilter(codec), SecurityWebFiltersOrder.FORM_LOGIN);
+        http.addFilterAt(tokenFilter(codec, context), SecurityWebFiltersOrder.FORM_LOGIN);
 
         return http.build();
     }
@@ -74,8 +82,9 @@ public class WebServerSecurityConfig {
     }
 
     // @Bean
-    AuthenticationWebFilter tokenFilter(ServerCodecConfigurer codec) {
-        var filter = new TokenAuthenticationFilter(
+    AuthenticationWebFilter tokenFilter(ServerCodecConfigurer codec,
+        ServerResponse.Context context) {
+        var filter = new AuthenticationWebFilter(
             authenticationManager(userDetailsService(), passwordEncoder()));
 
         var requiresMatcher = new AndServerWebExchangeMatcher(
@@ -84,8 +93,9 @@ public class WebServerSecurityConfig {
         filter.setRequiresAuthenticationMatcher(requiresMatcher);
         filter.setServerAuthenticationConverter(
             new TokenAuthenticationConverter(codec.getReaders()));
-        filter.setAuthenticationSuccessHandler(new TokenAuthenticationSuccessHandler());
-        filter.setAuthenticationFailureHandler(new TokenAuthenticationFailureHandler());
+        filter.setAuthenticationSuccessHandler(
+            new TokenAuthenticationSuccessHandler(jwtEncoder(), jwtProp, context));
+        filter.setAuthenticationFailureHandler(new TokenAuthenticationFailureHandler(context));
         return filter;
     }
 
@@ -119,18 +129,18 @@ public class WebServerSecurityConfig {
     }
 
     @Bean
-    ReactiveJwtDecoder jwtDecoder(JwtProperties jwt) {
+    ReactiveJwtDecoder jwtDecoder() {
         return new SupplierReactiveJwtDecoder(
-            () -> NimbusReactiveJwtDecoder.withPublicKey(jwt.getPublicKey())
-                .signatureAlgorithm(jwt.getJwsAlgorithm())
+            () -> NimbusReactiveJwtDecoder.withPublicKey(jwtProp.getPublicKey())
+                .signatureAlgorithm(jwtProp.getJwsAlgorithm())
                 .build());
     }
 
     @Bean
-    JwtEncoder jwtEncoder(JwtProperties jwt) {
-        var rsaKey = new RSAKey.Builder(jwt.getPublicKey())
-            .privateKey(jwt.getPrivateKey())
-            .algorithm(JWSAlgorithm.parse(jwt.getJwsAlgorithm().getName()))
+    JwtEncoder jwtEncoder() {
+        var rsaKey = new RSAKey.Builder(jwtProp.getPublicKey())
+            .privateKey(jwtProp.getPrivateKey())
+            .algorithm(JWSAlgorithm.parse(jwtProp.getJwsAlgorithm().getName()))
             .build();
         var jwks = new ImmutableJWKSet<>(new JWKSet(rsaKey));
         return new NimbusJwtEncoder(jwks);

@@ -21,9 +21,6 @@ public class TokenAuthenticationConverter implements ServerAuthenticationConvert
 
     @Override
     public Mono<Authentication> convert(ServerWebExchange exchange) {
-        // get username and password
-        // request.getBody()
-        //TODO Implement the converter
         return ServerRequest.create(exchange, this.reader)
             .bodyToMono(UsernamePasswordRequest.class)
             .map(request -> unauthenticated(request.getUsername(), request.getPassword()));
