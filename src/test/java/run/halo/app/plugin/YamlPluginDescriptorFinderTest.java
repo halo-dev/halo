@@ -7,9 +7,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.PluginDescriptor;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -31,10 +33,10 @@ class YamlPluginDescriptorFinderTest {
     }
 
     @Test
-    void findTest() throws JsonProcessingException {
+    void findTest() throws JsonProcessingException, JSONException {
         PluginDescriptor pluginDescriptor = descriptorFinder.find(testPath);
         assertThat(pluginDescriptor).isNotNull();
-        assertThat(JsonUtils.objectToJson(pluginDescriptor)).isEqualToIgnoringWhitespace("""
+        JSONAssert.assertEquals("""
             {
                 "spec": {
                     "displayName": "a name to show",
@@ -60,7 +62,9 @@ class YamlPluginDescriptorFinderTest {
                     "deletionTimestamp": null
                 }
             }
-            """);
+            """,
+            JsonUtils.objectToJson(pluginDescriptor),
+            false);
     }
 
     @Test
