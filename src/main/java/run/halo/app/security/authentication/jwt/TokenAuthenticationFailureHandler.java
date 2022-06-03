@@ -1,4 +1,4 @@
-package run.halo.app.security.jwt;
+package run.halo.app.security.authentication.jwt;
 
 import java.util.Map;
 import org.springframework.http.MediaType;

@@ -1,4 +1,4 @@
-package run.halo.app.security.jwt;
+package run.halo.app.security.authentication.jwt;
 
 import static org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated;
 

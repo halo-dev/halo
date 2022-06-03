@@ -33,12 +33,15 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.infra.properties.JwtProperties;
-import run.halo.app.security.jwt.TokenAuthenticationConverter;
-import run.halo.app.security.jwt.TokenAuthenticationFailureHandler;
-import run.halo.app.security.jwt.TokenAuthenticationSuccessHandler;
+import run.halo.app.security.authentication.jwt.TokenAuthenticationConverter;
+import run.halo.app.security.authentication.jwt.TokenAuthenticationFailureHandler;
+import run.halo.app.security.authentication.jwt.TokenAuthenticationSuccessHandler;
+import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
+import run.halo.app.security.authorization.RoleGetter;
 
 /**
  * Security configuration for WebFlux.
@@ -58,10 +61,16 @@ public class WebServerSecurityConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http,
         ServerCodecConfigurer codec,
-        ServerResponse.Context context) {
+        ServerResponse.Context context,
+        RoleGetter roleGetter) {
         http.csrf().disable()
-            .securityMatcher(new PathPatternParserServerWebExchangeMatcher("/api/**"))
-            .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
+            .securityMatcher(new OrServerWebExchangeMatcher(
+                new PathPatternParserServerWebExchangeMatcher("/api/**"),
+                new PathPatternParserServerWebExchangeMatcher("/apis/**")
+            ))
+            .authorizeExchange(exchanges ->
+                exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleGetter)))
+            // for reuse the JWT authentication
             .oauth2ResourceServer().jwt();
 
         http.addFilterAt(tokenFilter(codec, context), SecurityWebFiltersOrder.FORM_LOGIN);

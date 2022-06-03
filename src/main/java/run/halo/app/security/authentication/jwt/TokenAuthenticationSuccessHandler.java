@@ -1,10 +1,12 @@
-package run.halo.app.security.jwt;
+package run.halo.app.security.authentication.jwt;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -43,6 +45,9 @@ public class TokenAuthenticationSuccessHandler implements ServerAuthenticationSu
             .expiresAt(expiresAt)
             // the principal is the username
             .subject(authentication.getName())
+            .claim("scope", authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()))
             .build();
 
         var jwt = jwtEncoder.encode(JwtEncoderParameters.from(headers, claims));

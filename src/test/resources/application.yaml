@@ -1,0 +1,34 @@
+server:
+  port: 8090
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+  output:
+    ansi:
+      enabled: detect
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:halo
+    username: admin
+    password: 123456
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: true
+
+halo:
+  security:
+    oauth2:
+      jwt:
+        public-key-location: classpath:app.pub
+        private-key-location: classpath:app.key
+
+springdoc:
+  api-docs:
+    enabled: false
+logging:
+  level:
+    run.halo.app: debug
