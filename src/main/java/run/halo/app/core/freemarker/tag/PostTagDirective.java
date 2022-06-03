@@ -1,6 +1,5 @@
 package run.halo.app.core.freemarker.tag;
 
-import com.google.common.collect.Sets;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapperBuilder;
@@ -18,6 +17,7 @@ import run.halo.app.model.support.HaloConst;
 import run.halo.app.service.PostCategoryService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * Freemarker custom tag of post.
@@ -30,15 +30,19 @@ public class PostTagDirective implements TemplateDirectiveModel {
 
     private final PostService postService;
 
+    private final PostRenderAssembler postRenderAssembler;
+
     private final PostTagService postTagService;
 
     private final PostCategoryService postCategoryService;
 
     public PostTagDirective(Configuration configuration,
         PostService postService,
+        PostRenderAssembler postRenderAssembler,
         PostTagService postTagService,
         PostCategoryService postCategoryService) {
         this.postService = postService;
+        this.postRenderAssembler = postRenderAssembler;
         this.postTagService = postTagService;
         this.postCategoryService = postCategoryService;
         configuration.setSharedVariable("postTag", this);
@@ -55,7 +59,7 @@ public class PostTagDirective implements TemplateDirectiveModel {
                 case "latest":
                     int top = Integer.parseInt(params.get("top").toString());
                     env.setVariable("posts", builder.build()
-                        .wrap(postService.convertToListVo(postService.listLatest(top))));
+                        .wrap(postRenderAssembler.convertToListVo(postService.listLatest(top))));
                     break;
                 case "count":
                     env.setVariable("count",
@@ -77,27 +81,31 @@ public class PostTagDirective implements TemplateDirectiveModel {
                     break;
                 case "listByCategoryId":
                     Integer categoryId = Integer.parseInt(params.get("categoryId").toString());
-                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(
-                        postCategoryService.listPostBy(categoryId,
-                            Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE)))));
+                    env.setVariable("posts", builder.build()
+                        .wrap(postRenderAssembler.convertToListVo(
+                            postCategoryService.listPostBy(categoryId, PostStatus.PUBLISHED))));
                     break;
                 case "listByCategorySlug":
                     String categorySlug = params.get("categorySlug").toString();
                     List<Post> posts =
-                        postCategoryService.listPostBy(categorySlug,
-                            Sets.immutableEnumSet(PostStatus.PUBLISHED, PostStatus.INTIMATE));
+                        postCategoryService.listPostBy(categorySlug, PostStatus.PUBLISHED);
                     env.setVariable("posts",
-                        builder.build().wrap(postService.convertToListVo(posts)));
+                        builder.build().wrap(postRenderAssembler.convertToListVo(posts)));
                     break;
                 case "listByTagId":
                     Integer tagId = Integer.parseInt(params.get("tagId").toString());
-                    env.setVariable("posts", builder.build().wrap(postService
+                    env.setVariable("posts", builder.build().wrap(postRenderAssembler
                         .convertToListVo(postTagService.listPostsBy(tagId, PostStatus.PUBLISHED))));
                     break;
                 case "listByTagSlug":
                     String tagSlug = params.get("tagSlug").toString();
-                    env.setVariable("posts", builder.build().wrap(postService.convertToListVo(
-                        postTagService.listPostsBy(tagSlug, PostStatus.PUBLISHED))));
+                    env.setVariable("posts", builder.build()
+                        .wrap(
+                            postRenderAssembler.convertToListVo(
+                                postTagService.listPostsBy(tagSlug, PostStatus.PUBLISHED)
+                            )
+                        )
+                    );
                     break;
                 default:
                     break;

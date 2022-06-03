@@ -6,6 +6,18 @@ body:
     id: preface
     attributes:
       value: "Thanks for taking the time to fill out this bug report!"
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: To avoid duplicate issues, it is recommended to do the following first.
+      options:
+        - label: The issue has been searched in [GitHub Issues](https://github.com/halo-dev/halo/issues)
+          required: true
+        - label: The issue has been searched in the [bbs.halo.run](https://bbs.halo.run/)
+          required: true
+        - label: Already consulted [document](https://docs.halo.run/)
+          required: true
   - type: markdown
     id: environment
     attributes:
@@ -61,7 +73,7 @@ body:
     id: logs
     attributes:
       label: "Relevant log output"
-      description: "Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks."
+      description: "Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks. The way to get the logs can be found at https://docs.halo.run/user-guide/faq#如何查看运行日志"
       render: shell
   - type: textarea
     id: additional-information

@@ -76,7 +76,7 @@ public class ContentServiceImpl extends AbstractCrudService<Content, Integer>
         }
         contentPatchLog.setStatus(PostStatus.PUBLISHED);
         contentPatchLog.setPublishTime(new Date());
-        contentPatchLogService.save(contentPatchLog);
+        contentPatchLogService.create(contentPatchLog);
 
         Content postContent = getById(postId);
         postContent.setPatchLogId(contentPatchLog.getId());

@@ -22,7 +22,6 @@ import org.springframework.web.util.HtmlUtils;
 import run.halo.app.cache.lock.CacheLock;
 import run.halo.app.cache.lock.CacheParam;
 import run.halo.app.model.dto.BaseCommentDTO;
-import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.JournalComment;
@@ -35,6 +34,7 @@ import run.halo.app.model.vo.CommentWithHasChildrenVO;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.OptionService;
+import run.halo.app.service.assembler.comment.JournalCommentRenderAssembler;
 
 /**
  * Content journal controller.
@@ -49,14 +49,18 @@ public class JournalController {
 
     private final JournalService journalService;
 
+    private  final JournalCommentRenderAssembler journalCommentRenderAssembler;
+
     private final JournalCommentService journalCommentService;
 
     private final OptionService optionService;
 
     public JournalController(JournalService journalService,
+        JournalCommentRenderAssembler journalCommentRenderAssembler,
         JournalCommentService journalCommentService,
         OptionService optionService) {
         this.journalService = journalService;
+        this.journalCommentRenderAssembler = journalCommentRenderAssembler;
         this.journalCommentService = journalCommentService;
         this.optionService = optionService;
     }
@@ -81,8 +85,11 @@ public class JournalController {
         @PathVariable("journalId") Integer journalId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService.pageTopCommentsBy(journalId, CommentStatus.PUBLISHED,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<CommentWithHasChildrenVO> comments =
+            journalCommentService.pageTopCommentsBy(journalId, CommentStatus.PUBLISHED,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.forEach(journalCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{journalId:\\d+}/comments/{commentParentId:\\d+}/children")
@@ -93,7 +100,7 @@ public class JournalController {
         List<JournalComment> postComments = journalCommentService
             .listChildrenBy(journalId, commentParentId, CommentStatus.PUBLISHED, sort);
         // Convert to base comment dto
-        return journalCommentService.convertTo(postComments);
+        return journalCommentRenderAssembler.convertTo(postComments);
     }
 
     @GetMapping("{journalId:\\d+}/comments/tree_view")
@@ -101,8 +108,10 @@ public class JournalController {
     public Page<BaseCommentVO> listCommentsTree(@PathVariable("journalId") Integer journalId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService
+        Page<BaseCommentVO> comments = journalCommentService
             .pageVosBy(journalId, PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(journalCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @GetMapping("{journalId:\\d+}/comments/list_view")
@@ -110,8 +119,11 @@ public class JournalController {
     public Page<BaseCommentWithParentVO> listComments(@PathVariable("journalId") Integer journalId,
         @RequestParam(name = "page", required = false, defaultValue = "0") int page,
         @SortDefault(sort = "createTime", direction = DESC) Sort sort) {
-        return journalCommentService.pageWithParentVoBy(journalId,
-            PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        Page<BaseCommentWithParentVO> comments =
+            journalCommentService.pageWithParentVoBy(journalId,
+                PageRequest.of(page, optionService.getCommentPageSize(), sort));
+        comments.getContent().forEach(journalCommentRenderAssembler::clearSensitiveField);
+        return comments;
     }
 
     @PostMapping("comments")
@@ -122,7 +134,8 @@ public class JournalController {
         // Escape content
         journalCommentParam.setContent(HtmlUtils
             .htmlEscape(journalCommentParam.getContent(), StandardCharsets.UTF_8.displayName()));
-        return journalCommentService.convertTo(journalCommentService.createBy(journalCommentParam));
+        return journalCommentRenderAssembler.convertTo(
+            journalCommentService.createBy(journalCommentParam));
     }
 
     @PostMapping("{id:\\d+}/likes")

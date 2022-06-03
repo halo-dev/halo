@@ -17,8 +17,6 @@ import run.halo.app.controller.content.auth.PostAuthentication;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.Category;
-import run.halo.app.model.entity.Content;
-import run.halo.app.model.entity.Content.PatchedContent;
 import run.halo.app.model.entity.Post;
 import run.halo.app.model.entity.PostMeta;
 import run.halo.app.model.entity.Tag;
@@ -34,6 +32,7 @@ import run.halo.app.service.PostService;
 import run.halo.app.service.PostTagService;
 import run.halo.app.service.TagService;
 import run.halo.app.service.ThemeService;
+import run.halo.app.service.assembler.PostRenderAssembler;
 
 /**
  * Post Model
@@ -44,6 +43,8 @@ import run.halo.app.service.ThemeService;
  */
 @Component
 public class PostModel {
+
+    private final PostRenderAssembler postRenderAssembler;
 
     private final PostService postService;
 
@@ -65,7 +66,8 @@ public class PostModel {
 
     private final PostAuthentication postAuthentication;
 
-    public PostModel(PostService postService,
+    public PostModel(PostRenderAssembler postRenderAssembler,
+        PostService postService,
         ThemeService themeService,
         PostCategoryService postCategoryService,
         CategoryService categoryService,
@@ -75,6 +77,7 @@ public class PostModel {
         OptionService optionService,
         AbstractStringCacheStore cacheStore,
         PostAuthentication postAuthentication) {
+        this.postRenderAssembler = postRenderAssembler;
         this.postService = postService;
         this.themeService = themeService;
         this.postCategoryService = postCategoryService;
@@ -117,21 +120,16 @@ public class PostModel {
             return "common/template/" + POST_PASSWORD_TEMPLATE;
         }
 
-        if (StringUtils.isNotBlank(token)) {
-            post = postService.getWithLatestContentById(post.getId());
-        } else {
-            post = postService.getById(post.getId());
-            // Set post content
-            Content postContent = postService.getContentById(post.getId());
-            post.setContent(PatchedContent.of(postContent));
-        }
+        post = postService.getById(post.getId());
 
         postService.publishVisitEvent(post.getId());
 
-        postService.getPrevPost(post).ifPresent(
-            prevPost -> model.addAttribute("prevPost", postService.convertToDetailVo(prevPost)));
-        postService.getNextPost(post).ifPresent(
-            nextPost -> model.addAttribute("nextPost", postService.convertToDetailVo(nextPost)));
+        postService.getPrevPost(post)
+            .ifPresent(prevPost -> model.addAttribute("prevPost",
+                postRenderAssembler.convertToDetailVo(prevPost)));
+        postService.getNextPost(post)
+            .ifPresent(nextPost -> model.addAttribute("nextPost",
+                postRenderAssembler.convertToDetailVo(nextPost)));
 
         List<Category> categories = postCategoryService.listCategoriesBy(post.getId());
         List<Tag> tags = postTagService.listTagsBy(post.getId());
@@ -154,7 +152,13 @@ public class PostModel {
         }
 
         model.addAttribute("is_post", true);
-        model.addAttribute("post", postService.convertToDetailVo(post));
+
+        if (StringUtils.isNotBlank(token)) {
+            model.addAttribute("post", postRenderAssembler.convertToPreviewDetailVo(post));
+        } else {
+            model.addAttribute("post", postRenderAssembler.convertToDetailVo(post));
+        }
+
         model.addAttribute("categories", categoryService.convertTo(categories));
         model.addAttribute("tags", tagService.convertTo(tags));
         model.addAttribute("metas", postMetaService.convertToMap(metas));
@@ -173,7 +177,7 @@ public class PostModel {
             .of(page >= 1 ? page - 1 : page, pageSize, postService.getPostDefaultSort());
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
+        Page<PostListVO> posts = postRenderAssembler.convertToListVo(postPage);
 
         model.addAttribute("is_index", true);
         model.addAttribute("posts", posts);
@@ -189,9 +193,10 @@ public class PostModel {
 
         Page<Post> postPage = postService.pageBy(PostStatus.PUBLISHED, pageable);
 
-        Page<PostListVO> posts = postService.convertToListVo(postPage);
+        Page<PostListVO> posts = postRenderAssembler.convertToListVo(postPage);
 
-        List<ArchiveYearVO> archives = postService.convertToYearArchives(postPage.getContent());
+        List<ArchiveYearVO> archives =
+            postRenderAssembler.convertToYearArchives(postPage.getContent());
 
         model.addAttribute("is_archives", true);
         model.addAttribute("posts", posts);

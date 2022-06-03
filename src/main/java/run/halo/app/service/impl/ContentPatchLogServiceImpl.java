@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.data.domain.Example;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -16,6 +17,7 @@ import run.halo.app.model.enums.PostStatus;
 import run.halo.app.repository.ContentPatchLogRepository;
 import run.halo.app.repository.ContentRepository;
 import run.halo.app.service.ContentPatchLogService;
+import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.PatchUtils;
 
 /**
@@ -25,7 +27,8 @@ import run.halo.app.utils.PatchUtils;
  * @since 2022-01-04
  */
 @Service
-public class ContentPatchLogServiceImpl implements ContentPatchLogService {
+public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatchLog, Integer>
+    implements ContentPatchLogService {
 
     /**
      * base version of content patch log.
@@ -38,6 +41,7 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
 
     public ContentPatchLogServiceImpl(ContentPatchLogRepository contentPatchLogRepository,
         ContentRepository contentRepository) {
+        super(contentPatchLogRepository);
         this.contentPatchLogRepository = contentPatchLogRepository;
         this.contentRepository = contentRepository;
     }
@@ -70,7 +74,7 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
         if (latestPatchLog == null) {
             // There is no patchLog record
             version = 1;
-        } else if (PostStatus.PUBLISHED.equals(latestPatchLog.getStatus())) {
+        } else if (shouldUpgradeVersion(latestPatchLog)) {
             // There is no draft, a draft record needs to be created
             // so the version number needs to be incremented
             version = latestPatchLog.getVersion() + 1;
@@ -80,12 +84,6 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
             version = latestPatchLog.getVersion();
         }
         return version;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void save(ContentPatchLog contentPatchLog) {
-        contentPatchLogRepository.save(contentPatchLog);
     }
 
     private ContentPatchLog createDraftContent(Integer postId, Integer version,
@@ -118,7 +116,7 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
         contentPatchLog.setStatus(PostStatus.DRAFT);
         ContentPatchLog latestPatchLog =
             contentPatchLogRepository.findFirstByPostIdOrderByVersionDesc(postId);
-        if (latestPatchLog != null) {
+        if (shouldUpgradeVersion(latestPatchLog)) {
             contentPatchLog.setVersion(latestPatchLog.getVersion() + 1);
         } else {
             contentPatchLog.setVersion(BASE_VERSION);
@@ -127,19 +125,33 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
         return contentPatchLog;
     }
 
+    private boolean shouldUpgradeVersion(ContentPatchLog latestPatchLog) {
+        if (latestPatchLog == null) {
+            return false;
+        }
+        return PostStatus.PUBLISHED.equals(latestPatchLog.getStatus())
+            || PostStatus.INTIMATE.equals(latestPatchLog.getStatus());
+    }
+
     private boolean existDraftBy(Integer postId) {
         ContentPatchLog contentPatchLog = new ContentPatchLog();
         contentPatchLog.setPostId(postId);
         contentPatchLog.setStatus(PostStatus.DRAFT);
         Example<ContentPatchLog> example = Example.of(contentPatchLog);
-        return contentPatchLogRepository.exists(example);
+        boolean exists = contentPatchLogRepository.exists(example);
+        if (exists) {
+            return true;
+        }
+        contentPatchLog.setStatus(PostStatus.RECYCLE);
+        return contentPatchLogRepository.exists(Example.of(contentPatchLog));
     }
 
     private ContentPatchLog updateDraftBy(Integer postId, String formatContent,
         String originalContent) {
-        ContentPatchLog draftPatchLog =
-            contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,
-                PostStatus.DRAFT);
+        ContentPatchLog draftPatchLog = findLatestDraftBy(postId);
+        if (draftPatchLog == null) {
+            throw new NotFoundException("The latest draft version must not be null to update.");
+        }
         // Is the draft version 1
         if (Objects.equals(draftPatchLog.getVersion(), BASE_VERSION)) {
             // If it is V1, modify the content directly.
@@ -153,6 +165,18 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
         draftPatchLog.setContentDiff(contentDiff.getDiff());
         draftPatchLog.setOriginalContentDiff(contentDiff.getOriginalDiff());
         contentPatchLogRepository.save(draftPatchLog);
+        return draftPatchLog;
+    }
+
+    private ContentPatchLog findLatestDraftBy(Integer postId) {
+        ContentPatchLog draftPatchLog =
+            contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,
+                PostStatus.DRAFT);
+        if (draftPatchLog == null) {
+            draftPatchLog =
+                contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,
+                    PostStatus.RECYCLE);
+        }
         return draftPatchLog;
     }
 
@@ -200,8 +224,7 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
 
     @Override
     public ContentPatchLog getDraftByPostId(Integer postId) {
-        return contentPatchLogRepository.findFirstByPostIdAndStatusOrderByVersionDesc(postId,
-            PostStatus.DRAFT);
+        return findLatestDraftBy(postId);
     }
 
     @Override
@@ -221,8 +244,9 @@ public class ContentPatchLogServiceImpl implements ContentPatchLogService {
         return applyPatch(contentPatchLog);
     }
 
+    @NonNull
     @Override
-    public ContentPatchLog getById(Integer id) {
+    public ContentPatchLog getById(@NonNull Integer id) {
         return contentPatchLogRepository.findById(id)
             .orElseThrow(() -> new NotFoundException(
                 "Post content patch log was not found or has been deleted."));

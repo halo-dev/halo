@@ -6,7 +6,7 @@ server:
 spring:
   devtools:
     restart:
-      eanbled: false
+      enabled: false
   mvc:
     pathmatch:
       use-suffix-pattern: true
@@ -42,12 +42,19 @@ spring:
       - file:///${halo.work-dir}/templates/
       - classpath:/templates/
     expose-spring-macro-helpers: false
+  data:
+    redis:
+      repositories:
+        enabled: false
 management:
   endpoints:
     web:
       base-path: /api/admin/actuator
       exposure:
         include: [ 'httptrace', 'metrics', 'env', 'logfile', 'health' ]
+  health:
+    redis:
+      enabled: false
 logging:
   level:
     run.halo.app: INFO

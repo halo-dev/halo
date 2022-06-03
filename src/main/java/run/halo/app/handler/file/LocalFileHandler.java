@@ -152,7 +152,8 @@ public class LocalFileHandler implements FileHandler {
                 file.getOriginalFilename(), uploadFilePath.getFullPath());
             return uploadResult;
         } catch (IOException e) {
-            throw new FileOperationException("上传附件失败").setErrorData(uploadFilePath.getFullPath());
+            throw new FileOperationException("上传附件失败", e)
+                .setErrorData(uploadFilePath.getFullPath());
         }
     }
 

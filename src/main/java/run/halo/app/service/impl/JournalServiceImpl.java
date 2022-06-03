@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.exception.BadRequestException;
-import run.halo.app.model.dto.JournalDTO;
 import run.halo.app.model.dto.JournalWithCmtCountDTO;
 import run.halo.app.model.entity.Journal;
 import run.halo.app.model.entity.JournalComment;
@@ -31,7 +30,6 @@ import run.halo.app.repository.JournalRepository;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
 import run.halo.app.service.base.AbstractCrudService;
-import run.halo.app.utils.MarkdownUtils;
 import run.halo.app.utils.ServiceUtils;
 
 /**
@@ -62,7 +60,6 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer>
         Assert.notNull(journalParam, "Journal param must not be null");
 
         Journal journal = journalParam.convertTo();
-        journal.setContent(MarkdownUtils.renderHtml(journal.getSourceContent()));
 
         return create(journal);
     }
@@ -70,9 +67,6 @@ public class JournalServiceImpl extends AbstractCrudService<Journal, Integer>
     @Override
     public Journal updateBy(Journal journal) {
         Assert.notNull(journal, "Journal must not be null");
-
-        journal.setContent(MarkdownUtils.renderHtml(journal.getSourceContent()));
-
         return update(journal);
     }
 

@@ -1,5 +1,6 @@
 package run.halo.app.handler.file;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static run.halo.app.model.support.HaloConst.FILE_SEPARATOR;
@@ -86,5 +87,30 @@ public class FilePathDescriptorTest {
         assertEquals("1.4.9.png", descriptor.getFullName());
         assertEquals("/home/halo/2021/10/1.4.9.png", descriptor.getFullPath());
         assertEquals("2021/10/1.4.9.png", descriptor.getRelativePath());
+    }
+
+    @Test
+    public void windowsSystem() {
+        FilePathDescriptor descriptor = new FilePathDescriptor.Builder()
+            .setBasePath("C:\\Users\\Halo NiuBi\\.halo\\")
+            .setSubPath("upload\\2022\\04\\")
+            .setSeparator("\\")
+            .setAutomaticRename(false)
+            .setRenamePredicate(builder -> true)
+            .setOriginalName("hello.jpg")
+            .build();
+
+        assertThat(descriptor).isNotNull();
+
+        assertThat(descriptor.getFullPath()).isEqualTo("C:\\Users\\Halo NiuBi\\"
+            + ".halo\\upload\\2022\\04\\hello.jpg");
+        assertThat(descriptor.getRelativePath()).isEqualTo("upload\\2022\\04\\hello.jpg");
+
+        assertThat(descriptor.getBasePath()).isEqualTo("C:\\Users\\Halo NiuBi\\.halo\\");
+        assertThat(descriptor.getSubPath()).isEqualTo("upload\\2022\\04\\");
+
+        assertThat(descriptor.getExtension()).isEqualTo("jpg");
+        assertThat(descriptor.getName()).isEqualTo("hello");
+        assertThat(descriptor.getFullName()).isEqualTo("hello.jpg");
     }
 }

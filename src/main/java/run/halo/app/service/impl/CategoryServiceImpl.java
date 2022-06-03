@@ -3,6 +3,7 @@ package run.halo.app.service.impl;
 import static run.halo.app.model.support.HaloConst.URL_SEPARATOR;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.entity.Category;
+import run.halo.app.model.entity.PostCategory;
 import run.halo.app.model.vo.CategoryVO;
 import run.halo.app.repository.CategoryRepository;
 import run.halo.app.service.CategoryService;
@@ -105,8 +107,16 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
 
     @Override
     public Category update(Category category) {
+        Category persisted = getById(category.getId());
+        Category beforeUpdated = new Category();
+        BeanUtils.updateProperties(persisted, beforeUpdated);
+        boolean beforeIsPrivate = isPrivate(category.getId());
+
         Category updated = super.update(category);
-        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
+
+        Set<Integer> postIds = listPostIdsByCategoryIdRecursively(category.getId());
+        applicationContext.publishEvent(
+            new CategoryUpdatedEvent(this, category, beforeUpdated, beforeIsPrivate, postIds));
         return updated;
     }
 
@@ -177,8 +187,10 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void removeCategoryAndPostCategoryBy(Integer categoryId) {
+        final boolean beforeIsPrivate = isPrivate(categoryId);
+        final Set<Integer> postIds = listPostIdsByCategoryIdRecursively(categoryId);
         List<Category> categories = listByParentId(categoryId);
         if (null != categories && categories.size() > 0) {
             categories.forEach(category -> {
@@ -192,7 +204,8 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         // Remove post categories
         postCategoryService.removeByCategoryId(categoryId);
 
-        applicationContext.publishEvent(new CategoryUpdatedEvent(this, category));
+        applicationContext.publishEvent(
+            new CategoryUpdatedEvent(this, null, category, beforeIsPrivate, postIds));
     }
 
     @Override
@@ -358,14 +371,33 @@ public class CategoryServiceImpl extends AbstractCrudService<Category, Integer>
         return categoryRepository.findAllById(categoryIds)
             .stream()
             .map(categoryToUpdate -> {
+                // 将持久化状态的对象转非session管理对象否则数据会被更新
+                Category categoryBefore = BeanUtils.transformFrom(categoryToUpdate, Category.class);
+                boolean beforeIsPrivate = isPrivate(categoryToUpdate.getId());
+
                 Category categoryParam = idCategoryParamMap.get(categoryToUpdate.getId());
                 BeanUtils.updateProperties(categoryParam, categoryToUpdate);
                 Category categoryUpdated = update(categoryToUpdate);
-                applicationContext.publishEvent(new CategoryUpdatedEvent(this, categoryUpdated));
+
+                Set<Integer> postIds = listPostIdsByCategoryIdRecursively(categoryUpdated.getId());
+                applicationContext.publishEvent(new CategoryUpdatedEvent(this,
+                    categoryUpdated, categoryBefore, beforeIsPrivate, postIds));
                 return categoryUpdated;
             })
             .collect(Collectors.toList());
     }
 
+    @NonNull
+    @Override
+    public Set<Integer> listPostIdsByCategoryIdRecursively(@NonNull Integer categoryId) {
+        Set<Integer> categoryIds = ServiceUtils.fetchProperty(listAllByParentId(categoryId),
+            Category::getId);
+        if (CollectionUtils.isEmpty(categoryIds)) {
+            return Collections.emptySet();
+        }
+        List<PostCategory> postCategories =
+            postCategoryService.listByCategoryIdList(new ArrayList<>(categoryIds));
+        return ServiceUtils.fetchProperty(postCategories, PostCategory::getPostId);
+    }
 
 }

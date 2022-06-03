@@ -7,6 +7,18 @@ body:
     attributes:
       value: |
         感谢你花时间填写此错误报告！在开始之前，我们非常推荐阅读一遍[《开源最佳实践》](https://github.com/LinuxSuRen/open-source-best-practice)，这会在很大程度上提高我们彼此的效率。
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 检查清单
+      description: 为了保证同样的问题不被重复创建，建议先进行下面的操作。
+      options:
+        - label: 已经在 [GitHub Issues](https://github.com/halo-dev/halo/issues) 中搜索过该问题
+          required: true
+        - label: 已经在[论坛](https://bbs.halo.run/)中搜索过该问题
+          required: true
+        - label: 已经查阅过[文档](https://docs.halo.run/)
+          required: true
   - type: markdown
     id: environment
     attributes:
@@ -62,7 +74,7 @@ body:
     id: logs
     attributes:
       label: "相关日志输出"
-      description: "请复制并粘贴任何相关的日志输出。 这将自动格式化为代码，因此无需反引号。"
+      description: "请复制并粘贴任何相关的日志输出。 这将自动格式化为代码，因此无需反引号。获取日志的方法可参考：https://docs.halo.run/user-guide/faq#如何查看运行日志"
       render: shell
   - type: textarea
     id: additional-information

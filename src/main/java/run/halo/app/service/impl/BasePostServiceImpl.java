@@ -24,8 +24,6 @@ import run.halo.app.exception.AlreadyExistsException;
 import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
-import run.halo.app.model.dto.post.BasePostDetailDTO;
-import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Content;
@@ -65,6 +63,10 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     private static final Pattern summaryPattern = Pattern.compile("\t|\r|\n");
 
     private static final Pattern BLANK_PATTERN = Pattern.compile("\\s");
+
+    private static final String CHINESE_REGEX = "[^\\x00-\\xff]";
+
+    private static final String PUNCTUATION_REGEX = "[\\p{P}\\p{S}\\p{Z}\\s]+";
 
     public BasePostServiceImpl(BasePostRepository<POST> basePostRepository,
         OptionService optionService,
@@ -266,13 +268,13 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseVisit(Integer postId) {
         increaseVisit(1L, postId);
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseLike(long likes, Integer postId) {
         Assert.isTrue(likes > 0, "Likes to increase must not be less than 1");
         Assert.notNull(postId, "Post id must not be null");
@@ -287,7 +289,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void increaseLike(Integer postId) {
         increaseLike(1L, postId);
     }
@@ -297,14 +299,12 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
      * @return post with handled data
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public POST createOrUpdateBy(POST post) {
         Assert.notNull(post, "Post must not be null");
         PatchedContent postContent = post.getContent();
         // word count stat
         post.setWordCount(htmlFormatWordCount(postContent.getContent()));
-        post.setContent(postContent);
-
         POST savedPost;
         // Create or update post
         if (ServiceUtils.isEmptyId(post.getId())) {
@@ -330,78 +330,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    public BasePostMinimalDTO convertToMinimal(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        return new BasePostMinimalDTO().convertFrom(post);
-    }
-
-    @Override
-    public List<BasePostMinimalDTO> convertToMinimal(List<POST> posts) {
-        if (CollectionUtils.isEmpty(posts)) {
-            return Collections.emptyList();
-        }
-
-        return posts.stream()
-            .map(this::convertToMinimal)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<BasePostMinimalDTO> convertToMinimal(Page<POST> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(this::convertToMinimal);
-    }
-
-    @Override
-    public BasePostSimpleDTO convertToSimple(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        BasePostSimpleDTO basePostSimpleDTO = new BasePostSimpleDTO().convertFrom(post);
-
-        // Set summary
-        generateAndSetSummaryIfAbsent(post, basePostSimpleDTO);
-
-        // Post currently drafting in process
-        Boolean isInProcess = contentService.draftingInProgress(post.getId());
-        basePostSimpleDTO.setInProgress(isInProcess);
-
-        return basePostSimpleDTO;
-    }
-
-    @Override
-    public List<BasePostSimpleDTO> convertToSimple(List<POST> posts) {
-        if (CollectionUtils.isEmpty(posts)) {
-            return Collections.emptyList();
-        }
-
-        return posts.stream()
-            .map(this::convertToSimple)
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public Page<BasePostSimpleDTO> convertToSimple(Page<POST> postPage) {
-        Assert.notNull(postPage, "Post page must not be null");
-
-        return postPage.map(this::convertToSimple);
-    }
-
-    @Override
-    public BasePostDetailDTO convertToDetail(POST post) {
-        Assert.notNull(post, "Post must not be null");
-
-        BasePostDetailDTO postDetail = new BasePostDetailDTO().convertFrom(post);
-
-        // Post currently drafting in process
-        Boolean isInProcess = contentService.draftingInProgress(post.getId());
-        postDetail.setInProgress(isInProcess);
-
-        return postDetail;
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public POST updateDraftContent(String content, String originalContent, Integer postId) {
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
@@ -419,7 +347,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public POST updateStatus(PostStatus status, Integer postId) {
         Assert.notNull(status, "Post status must not be null");
         Assert.isTrue(!ServiceUtils.isEmptyId(postId), "Post id must not be empty");
@@ -449,7 +377,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public List<POST> updateStatusByIds(List<Integer> ids, PostStatus status) {
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
@@ -478,6 +406,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public POST create(POST post) {
         // Check title
         slugMustNotExist(post);
@@ -486,6 +415,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public POST update(POST post) {
         // Check title
         slugMustNotExist(post);
@@ -557,7 +487,7 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
         }
     }
 
-    // CS304 issue link : https://github.com/halo-dev/halo/issues/1224
+    // CS304 issue link : https://github.com/halo-dev/halo/issues/1759
 
     /**
      * @param htmlContent the markdown style content
@@ -565,6 +495,39 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
      */
 
     public static long htmlFormatWordCount(String htmlContent) {
+        if (htmlContent == null) {
+            return 0;
+        }
+
+        String cleanContent = HaloUtils.cleanHtmlTag(htmlContent);
+
+        String tempString = cleanContent.replaceAll(CHINESE_REGEX, "");
+
+        String otherString = cleanContent.replaceAll(CHINESE_REGEX, " ");
+
+        int chineseWordCount = cleanContent.length() - tempString.length();
+
+        String[] otherWords = otherString.split(PUNCTUATION_REGEX);
+
+        int otherWordLength = otherWords.length;
+
+        if (otherWordLength > 0 && otherWords[0].length() == 0) {
+            otherWordLength--;
+        }
+
+        if (otherWords.length > 1 && otherWords[otherWords.length - 1].length() == 0) {
+            otherWordLength--;
+        }
+
+        return chineseWordCount + otherWordLength;
+    }
+
+    /**
+     * @param htmlContent the markdown style content
+     * @return character count except space and line separator
+     */
+
+    public static long htmlFormatCharacterCount(String htmlContent) {
         if (htmlContent == null) {
             return 0;
         }
