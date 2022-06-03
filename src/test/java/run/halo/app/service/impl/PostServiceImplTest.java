@@ -18,7 +18,7 @@ import run.halo.app.model.vo.PostDetailVO;
 @SpringBootTest
 @ActiveProfiles("test")
 @Slf4j
-// @Disabled("Due to spring boot context needed")
+@Disabled("Due to spring boot context needed")
 class PostServiceImplTest {
 
     String standardMdContent = "---\n"
