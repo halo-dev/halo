@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
@@ -54,7 +55,7 @@ class PostServiceImplTest {
 
     String noFontMatterTable = "# 书单\n"
         + "| 书名     | 作者       |\n"
-        + "| -------- | ---------- |\n"
+        + "| :-------- | ---------- |\n"
         + "| 《剑来》 | 烽火戏诸侯 |\n"
         + "## 剑来\n"
         + "\n"
@@ -82,6 +83,7 @@ class PostServiceImplTest {
             .equals(standardCategoryMap.get("JAVA").getParentId()));
         assertEquals(standardPost.getTags().size(), 3);
         assertTrue(standardPost.getContent().contains("书名"));
+        assertFalse(standardPost.getContent().contains("16:11:28"));
 
         PostDetailVO nonStandardPost =
             postService.importMarkdown(nonStandardMdContent, "nonStandard");
