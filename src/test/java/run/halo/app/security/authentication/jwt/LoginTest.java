@@ -36,7 +36,7 @@ class LoginTest {
 
     @Test
     void loginWithoutApplicationJsonAcceptHeader() {
-        var request = new TokenAuthenticationConverter.UsernamePasswordRequest();
+        var request = new LoginAuthenticationConverter.UsernamePasswordRequest();
         request.setUsername("user");
         request.setPassword("invalid_password");
         webClient.post().uri("/api/auth/token")
@@ -46,7 +46,7 @@ class LoginTest {
 
     @Test
     void loginWithInvalidCredential() {
-        var request = new TokenAuthenticationConverter.UsernamePasswordRequest();
+        var request = new LoginAuthenticationConverter.UsernamePasswordRequest();
         request.setUsername("user");
         request.setPassword("invalid_password");
         webClient.post().uri("/api/auth/token")
@@ -58,7 +58,7 @@ class LoginTest {
 
     @Test
     void loginWithValidCredential(@Autowired ReactiveJwtDecoder jwtDecoder) {
-        var request = new TokenAuthenticationConverter.UsernamePasswordRequest();
+        var request = new LoginAuthenticationConverter.UsernamePasswordRequest();
         request.setUsername("user");
         request.setPassword("password");
         webClient.post().uri("/api/auth/token")

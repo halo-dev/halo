@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.properties.JwtProperties;
 
-public class TokenAuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
+public class LoginAuthenticationSuccessHandler implements ServerAuthenticationSuccessHandler {
 
     private final JwtEncoder jwtEncoder;
 
@@ -25,7 +25,7 @@ public class TokenAuthenticationSuccessHandler implements ServerAuthenticationSu
 
     private final ServerResponse.Context context;
 
-    public TokenAuthenticationSuccessHandler(JwtEncoder jwtEncoder, JwtProperties jwtProp,
+    public LoginAuthenticationSuccessHandler(JwtEncoder jwtEncoder, JwtProperties jwtProp,
         ServerResponse.Context context) {
         this.jwtEncoder = jwtEncoder;
         this.jwtProp = jwtProp;

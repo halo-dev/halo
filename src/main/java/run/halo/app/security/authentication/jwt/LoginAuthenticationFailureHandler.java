@@ -8,11 +8,11 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-public class TokenAuthenticationFailureHandler implements ServerAuthenticationFailureHandler {
+public class LoginAuthenticationFailureHandler implements ServerAuthenticationFailureHandler {
 
     private final ServerResponse.Context context;
 
-    public TokenAuthenticationFailureHandler(ServerResponse.Context context) {
+    public LoginAuthenticationFailureHandler(ServerResponse.Context context) {
         this.context = context;
     }
 

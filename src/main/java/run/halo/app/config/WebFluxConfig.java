@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.CodecConfigurer;
 import org.springframework.http.codec.HttpMessageWriter;
+import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -20,11 +21,13 @@ public class WebFluxConfig implements WebFluxConfigurer {
         ViewResolutionResultHandler resultHandler) {
         return new ServerResponse.Context() {
             @Override
+            @NonNull
             public List<HttpMessageWriter<?>> messageWriters() {
                 return codec.getWriters();
             }
 
             @Override
+            @NonNull
             public List<ViewResolver> viewResolvers() {
                 return resultHandler.getViewResolvers();
             }

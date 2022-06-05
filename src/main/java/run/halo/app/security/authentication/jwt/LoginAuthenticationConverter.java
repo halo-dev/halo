@@ -11,11 +11,11 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-public class TokenAuthenticationConverter implements ServerAuthenticationConverter {
+public class LoginAuthenticationConverter implements ServerAuthenticationConverter {
 
     private final List<HttpMessageReader<?>> reader;
 
-    public TokenAuthenticationConverter(List<HttpMessageReader<?>> reader) {
+    public LoginAuthenticationConverter(List<HttpMessageReader<?>> reader) {
         this.reader = reader;
     }
 

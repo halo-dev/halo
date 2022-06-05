@@ -4,12 +4,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
-import run.halo.app.security.authentication.jwt.TokenAuthenticationConverter;
+import run.halo.app.security.authentication.jwt.LoginAuthenticationConverter;
 
 public final class LoginUtils {
 
     public static Mono<String> login(WebTestClient webClient, String username, String password) {
-        var request = new TokenAuthenticationConverter.UsernamePasswordRequest();
+        var request = new LoginAuthenticationConverter.UsernamePasswordRequest();
         request.setUsername(username);
         request.setPassword(password);
         return webClient.post().uri("/api/auth/token")

@@ -1,7 +1,6 @@
 package run.halo.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -10,16 +9,11 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.security.authentication.ReactiveAuthenticationManager;
-import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -30,16 +24,12 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
-import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.infra.properties.JwtProperties;
-import run.halo.app.security.authentication.jwt.TokenAuthenticationConverter;
-import run.halo.app.security.authentication.jwt.TokenAuthenticationFailureHandler;
-import run.halo.app.security.authentication.jwt.TokenAuthenticationSuccessHandler;
+import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
+import run.halo.app.security.authentication.jwt.LoginAuthenticationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
 import run.halo.app.security.authorization.RoleGetter;
 
@@ -73,7 +63,14 @@ public class WebServerSecurityConfig {
             // for reuse the JWT authentication
             .oauth2ResourceServer().jwt();
 
-        http.addFilterAt(tokenFilter(codec, context), SecurityWebFiltersOrder.FORM_LOGIN);
+        var loginManager = new LoginAuthenticationManager(userDetailsService(), passwordEncoder());
+        var loginFilter = new LoginAuthenticationFilter(loginManager,
+            codec,
+            jwtEncoder(),
+            jwtProp,
+            context);
+
+        http.addFilterAt(loginFilter, SecurityWebFiltersOrder.FORM_LOGIN);
 
         return http.build();
     }
@@ -88,36 +85,6 @@ public class WebServerSecurityConfig {
             .logout(withDefaults());
 
         return http.build();
-    }
-
-    // @Bean
-    AuthenticationWebFilter tokenFilter(ServerCodecConfigurer codec,
-        ServerResponse.Context context) {
-        var filter = new AuthenticationWebFilter(
-            authenticationManager(userDetailsService(), passwordEncoder()));
-
-        var requiresMatcher = new AndServerWebExchangeMatcher(
-            pathMatchers(HttpMethod.POST, "/api/auth/token"),
-            new MediaTypeServerWebExchangeMatcher(MediaType.APPLICATION_JSON));
-        filter.setRequiresAuthenticationMatcher(requiresMatcher);
-        filter.setServerAuthenticationConverter(
-            new TokenAuthenticationConverter(codec.getReaders()));
-        filter.setAuthenticationSuccessHandler(
-            new TokenAuthenticationSuccessHandler(jwtEncoder(), jwtProp, context));
-        filter.setAuthenticationFailureHandler(new TokenAuthenticationFailureHandler(context));
-        return filter;
-    }
-
-    ReactiveAuthenticationManager authenticationManager(
-        ReactiveUserDetailsService userDetailsService,
-        PasswordEncoder passwordEncoder) {
-        var authenticationManager =
-            new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-        authenticationManager.setPasswordEncoder(passwordEncoder);
-        if (userDetailsService instanceof ReactiveUserDetailsPasswordService passwordService) {
-            authenticationManager.setUserDetailsPasswordService(passwordService);
-        }
-        return authenticationManager;
     }
 
     @Bean
