@@ -87,7 +87,7 @@ class JSONExtensionConverterTest {
         Metadata metadata = new Metadata();
         metadata.setName(name);
         metadata.setVersion(version);
-        fake.metadata(metadata);
+        fake.setMetadata(metadata);
 
         return fake;
     }

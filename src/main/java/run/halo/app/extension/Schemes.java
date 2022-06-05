@@ -1,5 +1,6 @@
 package run.halo.app.extension;
 
+import com.github.victools.jsonschema.generator.Option;
 import com.github.victools.jsonschema.generator.OptionPreset;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
@@ -39,23 +40,22 @@ public enum Schemes {
     /**
      * The map mapping GroupVersionKind and type of Extension.
      */
-    private final Map<GroupVersionKind, Class<? extends Extension>> gvkToType;
+    private final Map<GroupVersionKind, Scheme> gvkToScheme;
 
     Schemes() {
         schemes = new HashSet<>();
         typeToScheme = new HashMap<>();
-        gvkToType = new HashMap<>();
+        gvkToScheme = new HashMap<>();
     }
 
     /**
      * Clear registered schemes.
-     * <p>
      * This method is only for test.
      */
     void clear() {
         schemes.clear();
         typeToScheme.clear();
-        gvkToType.clear();
+        gvkToScheme.clear();
     }
 
     /**
@@ -74,10 +74,17 @@ public enum Schemes {
                     type.getName()));
         }
 
+        // TODO Move the generation logic outside.
         // generate JSON schema
         var module = new Swagger2Module();
         var config =
             new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2019_09, OptionPreset.PLAIN_JSON)
+                .with(
+                    // See https://victools.github.io/jsonschema-generator/#generator-options
+                    // fore more.
+                    Option.INLINE_ALL_SCHEMAS,
+                    Option.MAP_VALUES_AS_ADDITIONAL_PROPERTIES
+                )
                 .with(module)
                 .build();
         var generator = new SchemaGenerator(config);
@@ -102,7 +109,7 @@ public enum Schemes {
             return;
         }
         typeToScheme.put(scheme.type(), scheme);
-        gvkToType.put(scheme.groupVersionKind(), scheme.type());
+        gvkToScheme.put(scheme.groupVersionKind(), scheme);
     }
 
     /**
@@ -116,6 +123,10 @@ public enum Schemes {
     }
 
 
+    public Optional<Scheme> fetch(GroupVersionKind gvk) {
+        return Optional.ofNullable(gvkToScheme.get(gvk));
+    }
+
     /**
      * Gets a scheme using Extension type.
      *
@@ -126,6 +137,11 @@ public enum Schemes {
     public Scheme get(Class<? extends Extension> type) {
         return fetch(type).orElseThrow(() -> new SchemeNotFoundException(
             "Scheme was not found for Extension " + type.getSimpleName()));
+    }
+
+    public Scheme get(GroupVersionKind gvk) {
+        return fetch(gvk).orElseThrow(() -> new SchemeNotFoundException(
+            "Scheme was not found for GVK " + gvk));
     }
 
 }

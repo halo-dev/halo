@@ -36,6 +36,14 @@ halo:
         jwsAlgorithm: rs512
         public-key-location: classpath:app.pub
         private-key-location: classpath:app.key
+  plugin:
+    runtime-mode: development # development, deployment
+    classes-directories:
+      - "build/classes"
+      - "build/resources"
+    lib-directories:
+      - "libs"
+    plugins-root: plugins
 logging:
   level:
     run.halo.app: DEBUG

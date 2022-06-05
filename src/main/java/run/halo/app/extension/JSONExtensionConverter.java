@@ -33,8 +33,9 @@ public class JSONExtensionConverter implements ExtensionConverter {
 
     @Override
     public <E extends Extension> ExtensionStore convertTo(E extension) {
-        var scheme = Schemes.INSTANCE.get(extension.getClass());
-        var storeName = ExtensionUtil.buildStoreName(scheme, extension.metadata().getName());
+        var gvk = extension.groupVersionKind();
+        var scheme = Schemes.INSTANCE.get(gvk);
+        var storeName = ExtensionUtil.buildStoreName(scheme, extension.getMetadata().getName());
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("JSON schema({}): {}", scheme.type(),
@@ -56,7 +57,7 @@ public class JSONExtensionConverter implements ExtensionConverter {
 
             // keep converting
             var data = objectMapper.writeValueAsBytes(extensionNode);
-            var version = extension.metadata().getVersion();
+            var version = extension.getMetadata().getVersion();
             return new ExtensionStore(storeName, data, version);
         } catch (JsonProcessingException e) {
             throw new ExtensionConvertException("Failed write Extension as bytes", e);
@@ -67,7 +68,7 @@ public class JSONExtensionConverter implements ExtensionConverter {
     public <E extends Extension> E convertFrom(Class<E> type, ExtensionStore extensionStore) {
         try {
             var extension = objectMapper.readValue(extensionStore.getData(), type);
-            extension.metadata().setVersion(extensionStore.getVersion());
+            extension.getMetadata().setVersion(extensionStore.getVersion());
             return extension;
         } catch (IOException e) {
             throw new ExtensionConvertException("Failed to read Extension " + type + " from bytes",
