@@ -18,10 +18,7 @@ repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
     maven { url 'https://maven.aliyun.com/repository/spring/' }
     maven { url 'https://repo.spring.io/milestone' }
-    maven {
-        // See https://github.com/springdoc/springdoc-openapi/issues/1671#issuecomment-1138724068 for more.
-        url 'https://s01.oss.sonatype.org/content/repositories/snapshots'
-    }
+
     mavenLocal()
     mavenCentral()
 
@@ -69,7 +66,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation 'org.springframework.security:spring-security-oauth2-resource-server'
 
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M3-SNAPSHOT'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M3'
     implementation "org.flywaydb:flyway-core"
     implementation "org.flywaydb:flyway-mysql"
 
