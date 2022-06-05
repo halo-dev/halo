@@ -1,4 +1,4 @@
-package run.halo.app.identity.authorization;
+package run.halo.app.security.authorization;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
