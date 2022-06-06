@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -24,8 +25,6 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.util.matcher.OrServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.PathPatternParserServerWebExchangeMatcher;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
@@ -54,10 +53,7 @@ public class WebServerSecurityConfig {
         ServerResponse.Context context,
         RoleGetter roleGetter) {
         http.csrf().disable()
-            .securityMatcher(new OrServerWebExchangeMatcher(
-                new PathPatternParserServerWebExchangeMatcher("/api/**"),
-                new PathPatternParserServerWebExchangeMatcher("/apis/**")
-            ))
+            .securityMatcher(pathMatchers("/api/**", "/apis/**"))
             .authorizeExchange(exchanges ->
                 exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleGetter)))
             // for reuse the JWT authentication
