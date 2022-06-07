@@ -42,6 +42,8 @@ public class PluginApplicationInitializer {
         PluginApplicationContext pluginApplicationContext = new PluginApplicationContext();
         pluginApplicationContext.setParent(getRootApplicationContext());
         pluginApplicationContext.setClassLoader(pluginClassLoader);
+        // populate plugin to plugin application context
+        pluginApplicationContext.setPluginId(pluginId);
         stopWatch.stop();
 
         stopWatch.start("Create DefaultResourceLoader");

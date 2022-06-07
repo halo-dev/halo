@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.GVK;
 
 /**
  * A custom resource for Plugin.
@@ -16,6 +17,7 @@ import run.halo.app.extension.AbstractExtension;
  */
 @Data
 @ToString(callSuper = true)
+@GVK(group = "", version = "v1alpha1", kind = "Plugin", plural = "plugins", singular = "plugin")
 @EqualsAndHashCode(callSuper = true)
 public class Plugin extends AbstractExtension {
 

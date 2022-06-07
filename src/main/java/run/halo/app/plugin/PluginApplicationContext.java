@@ -23,6 +23,8 @@ import org.springframework.util.Assert;
  */
 public class PluginApplicationContext extends GenericApplicationContext {
 
+    private String pluginId;
+
     /**
      * <p>覆盖父类方法中判断context parent不为空时使用parent context广播事件的逻辑。
      * 如果主应用桥接事件到插件中且设置了parent会导致发布事件时死循环.</p>
@@ -71,5 +73,13 @@ public class PluginApplicationContext extends GenericApplicationContext {
             // ignore this exception
             return null;
         }
+    }
+
+    public String getPluginId() {
+        return pluginId;
+    }
+
+    public void setPluginId(String pluginId) {
+        this.pluginId = pluginId;
     }
 }
