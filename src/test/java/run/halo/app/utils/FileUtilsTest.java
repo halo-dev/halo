@@ -317,4 +317,15 @@ class FileUtilsTest {
 
         assertEquals(originalString, FileUtils.readString(inputStream));
     }
+
+    @Test
+    public void fileNameWithReservedCharsWillBeReplaced(){
+        String fileName1 = "abcde";
+        String filteredFileName1 = FileUtils.filterReservedCharsInFileName(fileName1) + ".md";
+        assertEquals("abcde.md", filteredFileName1);
+
+        String fileName2 = "abcde|字符替换\\星号*大于>小于<slash/中文字符、";
+        String filteredFileName2 = FileUtils.filterReservedCharsInFileName(fileName2) + ".md";
+        assertEquals("abcde字符替换星号大于小于slash中文字符、.md", filteredFileName2);
+    }
 }
