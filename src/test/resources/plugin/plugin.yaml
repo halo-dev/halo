@@ -8,8 +8,8 @@ spec:
   requires: ">=2.0.0"
   author: guqing
   logo: https://guqing.xyz/avatar
-  dependencies:
-    - "banana"
+  pluginDependencies:
+    "banana": "0.0.1"
   homepage: https://github.com/guqing/halo-plugin-1
   displayName: "a name to show"
   description: "Tell me more about this plugin."

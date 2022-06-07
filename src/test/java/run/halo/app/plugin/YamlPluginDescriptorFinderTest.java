@@ -74,7 +74,7 @@ class YamlPluginDescriptorFinderTest {
                     "dependencies": [
                         {
                             "pluginId": "banana",
-                            "pluginVersionSupport": "*",
+                            "pluginVersionSupport": "0.0.1",
                             "optional": false
                         }
                     ],

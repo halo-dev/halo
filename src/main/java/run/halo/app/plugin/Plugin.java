@@ -1,12 +1,11 @@
 package run.halo.app.plugin;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.pf4j.PluginDependency;
 import run.halo.app.extension.AbstractExtension;
 
 /**
@@ -26,27 +25,27 @@ public class Plugin extends AbstractExtension {
     @Data
     public static class PluginSpec {
 
-        protected String displayName;
+        private String displayName;
 
-        protected String version;
+        private String version;
 
-        protected String author;
+        private String author;
 
-        protected String logo;
+        private String logo;
 
-        protected List<PluginDependency> dependencies = new ArrayList<>(4);
+        private Map<String, String> pluginDependencies = new HashMap<>(4);
 
-        protected String homepage;
+        private String homepage;
 
-        protected String description;
+        private String description;
 
-        protected String license;
+        private String license;
 
         /**
          * SemVer format.
          */
-        protected String requires = "*";
+        private String requires = "*";
 
-        protected String pluginClass = BasePlugin.class.getName();
+        private String pluginClass = BasePlugin.class.getName();
     }
 }

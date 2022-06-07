@@ -10,7 +10,6 @@ import org.pf4j.PluginRuntimeException;
 import org.pf4j.util.FileUtils;
 import org.springframework.core.io.FileSystemResource;
 import run.halo.app.extension.Unstructured;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
 /**
@@ -79,7 +78,7 @@ public class YamlPluginFinder {
                 propertiesFileName);
         }
         Unstructured unstructured = unstructuredList.get(0);
-        return JsonUtils.DEFAULT_JSON_MAPPER.convertValue(unstructured,
+        return Unstructured.OBJECT_MAPPER.convertValue(unstructured,
             Plugin.class);
     }
 

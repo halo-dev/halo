@@ -2,7 +2,6 @@ package run.halo.app.plugin;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DefaultPluginDescriptor;
 import org.pf4j.PluginDependency;
@@ -51,10 +50,11 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
                 spec.getAuthor(),
                 spec.getLicense());
         // add dependencies
-        List<PluginDependency> dependencies = spec.getDependencies();
-        for (PluginDependency dependency : dependencies) {
+        spec.getPluginDependencies().forEach((pluginDepName, versionRequire) -> {
+            PluginDependency dependency =
+                new PluginDependency(String.format("%s@%s", pluginDepName, versionRequire));
             defaultPluginDescriptor.addDependency(dependency);
-        }
+        });
         return defaultPluginDescriptor;
     }
 }
