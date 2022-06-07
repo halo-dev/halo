@@ -9,9 +9,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "halo")
 public class HaloProperties {
 
-    private final JwtProperties jwt = new JwtProperties();
-
-    public JwtProperties getJwt() {
-        return jwt;
-    }
 }

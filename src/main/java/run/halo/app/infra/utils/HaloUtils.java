@@ -1,10 +1,8 @@
 package run.halo.app.infra.utils;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 
@@ -13,14 +11,6 @@ import org.springframework.util.StreamUtils;
  * @date 2022-04-12
  */
 public class HaloUtils {
-    public static boolean isAjaxRequest(HttpServletRequest request) {
-        String requestedWith = request.getHeader("x-requested-with");
-        return requestedWith == null || requestedWith.equalsIgnoreCase("XMLHttpRequest");
-    }
-
-    public static String simpleUUID() {
-        return UUID.randomUUID().toString().replace("-", "");
-    }
 
     /**
      * <p>Read the file under the classpath as a string.</p>
