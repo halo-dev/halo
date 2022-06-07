@@ -1,11 +1,12 @@
 package run.halo.app.plugin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,56 +23,65 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 class YamlPluginDescriptorFinderTest {
-    private YamlPluginDescriptorFinder descriptorFinder;
+
+    private YamlPluginDescriptorFinder yamlPluginDescriptorFinder;
     private Path testPath;
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
-        descriptorFinder = new YamlPluginDescriptorFinder();
+        yamlPluginDescriptorFinder = new YamlPluginDescriptorFinder();
         File file = ResourceUtils.getFile("classpath:plugin/plugin.yaml");
         testPath = file.toPath().getParent();
     }
 
     @Test
-    void findTest() throws JsonProcessingException, JSONException {
-        PluginDescriptor pluginDescriptor = descriptorFinder.find(testPath);
-        assertThat(pluginDescriptor).isNotNull();
-        JSONAssert.assertEquals("""
-            {
-                "spec": {
-                    "displayName": "a name to show",
-                    "version": "0.0.1",
-                    "author": "guqing",
-                    "logo": "https://guqing.xyz/avatar",
-                    "dependencies": [],
-                    "homepage": "https://github.com/guqing/halo-plugin-1",
-                    "description": "Tell me more about this plugin.",
-                    "license": "MIT",
-                    "requires": ">=2.0.0",
-                    "pluginClass": "org.pf4j.Plugin"
-                },
-                "dependencies": [],
-                "apiVersion": "v1",
-                "kind": "Plugin",
-                "metadata": {
-                    "name": "plugin-1",
-                    "labels": null,
-                    "annotations": null,
-                    "version": null,
-                    "creationTimestamp": null,
-                    "deletionTimestamp": null
-                }
-            }
-            """,
-            JsonUtils.objectToJson(pluginDescriptor),
-            false);
+    void isApplicable() throws IOException {
+        // File not exists
+        boolean applicable =
+            yamlPluginDescriptorFinder.isApplicable(Path.of("/some/path/test.jar"));
+        assertThat(applicable).isFalse();
+
+        // jar file is applicable
+        Path tempJarFile = Files.createTempFile("test", ".jar");
+        applicable =
+            yamlPluginDescriptorFinder.isApplicable(tempJarFile);
+        assertThat(applicable).isTrue();
+
+        // zip file is not applicable
+        Path tempZipFile = Files.createTempFile("test", ".zip");
+        applicable =
+            yamlPluginDescriptorFinder.isApplicable(tempZipFile);
+        assertThat(applicable).isFalse();
+
+        // directory is applicable
+        applicable =
+            yamlPluginDescriptorFinder.isApplicable(tempJarFile.getParent());
+        assertThat(applicable).isTrue();
     }
 
     @Test
-    void findFailedWhenFileNotFound() {
-        Path test = testPath.resolve("tmp");
-        assertThatThrownBy(() -> {
-            descriptorFinder.find(test);
-        });
+    void find() throws JsonProcessingException, JSONException {
+        PluginDescriptor pluginDescriptor = yamlPluginDescriptorFinder.find(testPath);
+        String actual = JsonUtils.objectToJson(pluginDescriptor);
+        JSONAssert.assertEquals("""
+                {
+                    "pluginId": "plugin-1",
+                    "pluginDescription": "Tell me more about this plugin.",
+                    "pluginClass": "run.halo.app.plugin.BasePlugin",
+                    "version": "0.0.1",
+                    "requires": ">=2.0.0",
+                    "provider": "guqing",
+                    "dependencies": [
+                        {
+                            "pluginId": "banana",
+                            "pluginVersionSupport": "*",
+                            "optional": false
+                        }
+                    ],
+                    "license": "MIT"
+                }
+                """,
+            actual,
+            false);
     }
 }

@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.pf4j.DefaultPluginDescriptor;
 import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
@@ -43,12 +42,10 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
     private DefaultPluginDescriptor convert(Plugin plugin) {
         String pluginId = plugin.getMetadata().getName();
         Plugin.PluginSpec spec = plugin.getSpec();
-        String pluginClass =
-            StringUtils.defaultIfBlank(spec.getPluginClass(), BasePlugin.class.getName());
         DefaultPluginDescriptor defaultPluginDescriptor =
             new DefaultPluginDescriptor(pluginId,
                 spec.getDescription(),
-                pluginClass,
+                spec.getPluginClass(),
                 spec.getVersion(),
                 spec.getRequires(),
                 spec.getAuthor(),

@@ -47,6 +47,6 @@ public class Plugin extends AbstractExtension {
          */
         protected String requires = "*";
 
-        protected String pluginClass = org.pf4j.Plugin.class.getName();
+        protected String pluginClass = BasePlugin.class.getName();
     }
 }
