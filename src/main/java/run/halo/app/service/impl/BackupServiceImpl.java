@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
@@ -132,8 +131,6 @@ public class BackupServiceImpl implements BackupService {
     private static final String DATA_EXPORT_BASE_URI = "/api/admin/backups/data";
 
     private static final String UPLOAD_SUB_DIR = "upload/";
-
-    private static final Pattern FILE_PATTERN = Pattern.compile("[\\\\/:*?\"<>|]");
 
     private final AttachmentService attachmentService;
 
@@ -634,7 +631,7 @@ public class BackupServiceImpl implements BackupService {
             content.append(postMarkdownVo.getOriginalContent());
             try {
                 String fileName = postMarkdownVo.getTitle() + "-" + postMarkdownVo.getSlug();
-                String markdownFileName = FILE_PATTERN.matcher(fileName).replaceAll("") + ".md";
+                String markdownFileName = FileUtils.filterReservedCharsInFileName(fileName)+ ".md";
                 Path markdownFilePath = Paths.get(markdownFileTempPathName, markdownFileName);
                 if (!Files.exists(markdownFilePath.getParent())) {
                     Files.createDirectories(markdownFilePath.getParent());

@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -585,5 +586,10 @@ public class FileUtils {
      */
     public static void writeStringToFile(File file, String content) throws IOException {
         org.apache.commons.io.FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
+    }
+
+    public static String filterReservedCharsInFileName(String fileName){
+        Pattern filePattern = Pattern.compile("[\\\\/:*?\"<>|]");
+        return filePattern.matcher(fileName).replaceAll("");
     }
 }
