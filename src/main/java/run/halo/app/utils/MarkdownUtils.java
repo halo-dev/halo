@@ -72,6 +72,7 @@ public class MarkdownUtils {
 
     private static final HtmlRenderer RENDERER = HtmlRenderer.builder(OPTIONS).build();
     private static final Pattern FRONT_MATTER = Pattern.compile("^(---)?[\\s\\S]*?---");
+    private static final Pattern TABLE = Pattern.compile("\\|\\s*:?---");
 
     //    /**
     //     * Render html document to markdown document.
@@ -154,7 +155,8 @@ public class MarkdownUtils {
     public static String removeFrontMatter(String markdown) {
         markdown = markdown.trim();
         Matcher matcher = FRONT_MATTER.matcher(markdown);
-        if (matcher.find()) {
+        // if has '| ---' or '| :---' return
+        if (matcher.find() && !TABLE.matcher(matcher.group()).find()) {
             return markdown.replace(matcher.group(), "");
         }
         return markdown;
