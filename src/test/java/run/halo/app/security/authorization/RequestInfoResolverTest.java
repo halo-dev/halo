@@ -15,6 +15,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.Role.PolicyRule;
+import run.halo.app.core.extension.service.DefaultRuleResolver;
 import run.halo.app.extension.Metadata;
 
 /**

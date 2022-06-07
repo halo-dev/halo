@@ -1,4 +1,4 @@
-package run.halo.app.security.authorization;
+package run.halo.app.core.extension.service;
 
 import java.util.Collection;
 import java.util.Set;

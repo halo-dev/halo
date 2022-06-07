@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import run.halo.app.core.extension.service.RoleBindingLister;
 
 /**
  * <p>Obtain the authorities from the authenticated authentication and construct it as a RoleBinding

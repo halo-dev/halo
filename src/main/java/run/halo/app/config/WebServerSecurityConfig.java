@@ -27,11 +27,11 @@ import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.core.extension.service.RoleGetter;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
-import run.halo.app.security.authorization.RoleGetter;
 
 /**
  * Security configuration for WebFlux.

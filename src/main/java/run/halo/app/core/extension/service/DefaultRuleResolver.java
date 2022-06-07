@@ -1,4 +1,4 @@
-package run.halo.app.security.authorization;
+package run.halo.app.core.extension.service;
 
 import java.util.Collections;
 import java.util.List;
@@ -6,6 +6,11 @@ import java.util.Set;
 import lombok.Data;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
+import run.halo.app.core.extension.Role;
+import run.halo.app.security.authorization.AuthorizationRuleResolver;
+import run.halo.app.security.authorization.DefaultRoleBindingLister;
+import run.halo.app.security.authorization.PolicyRuleList;
+import run.halo.app.security.authorization.RuleAccumulator;
 
 /**
  * @author guqing
@@ -41,7 +46,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
     public void visitRulesFor(UserDetails user, RuleAccumulator visitor) {
         Set<String> roleNames = roleBindingLister.listBoundRoleNames(user.getAuthorities());
 
-        List<PolicyRule> rules = Collections.emptyList();
+        List<Role.PolicyRule> rules = Collections.emptyList();
         for (String roleName : roleNames) {
             try {
                 Role role = roleGetter.getRole(roleName);
@@ -53,7 +58,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
             }
 
             String source = roleBindingDescriber(roleName, user.getUsername());
-            for (PolicyRule rule : rules) {
+            for (Role.PolicyRule rule : rules) {
                 if (!visitor.visit(source, rule, null)) {
                     return;
                 }

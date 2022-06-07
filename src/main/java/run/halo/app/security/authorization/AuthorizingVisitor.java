@@ -2,6 +2,7 @@ package run.halo.app.security.authorization;
 
 import java.util.ArrayList;
 import java.util.List;
+import run.halo.app.core.extension.Role;
 
 /**
  * authorizing visitor short-circuits once allowed, and collects any resolution errors encountered.
@@ -25,7 +26,7 @@ class AuthorizingVisitor implements RuleAccumulator {
     }
 
     @Override
-    public boolean visit(String source, PolicyRule rule, Throwable error) {
+    public boolean visit(String source, Role.PolicyRule rule, Throwable error) {
         if (rule != null && requestEvaluation.ruleAllows(requestAttributes, rule)) {
             this.allowed = true;
             this.reason = String.format("RBAC: allowed by %s", source);

@@ -14,6 +14,8 @@ import org.springframework.security.web.server.authorization.AuthorizationContex
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.service.DefaultRuleResolver;
+import run.halo.app.core.extension.service.RoleGetter;
 
 @Slf4j
 public class RequestInfoAuthorizationManager

@@ -28,6 +28,9 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.Role.PolicyRule;
+import run.halo.app.core.extension.service.RoleGetter;
 import run.halo.app.security.LoginUtils;
 
 @SpringBootTest

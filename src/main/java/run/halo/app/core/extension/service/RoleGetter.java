@@ -1,6 +1,7 @@
-package run.halo.app.security.authorization;
+package run.halo.app.core.extension.service;
 
 import org.springframework.lang.NonNull;
+import run.halo.app.core.extension.Role;
 
 /**
  * @author guqing
