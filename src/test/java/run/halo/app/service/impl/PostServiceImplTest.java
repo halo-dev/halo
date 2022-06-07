@@ -1,6 +1,7 @@
 package run.halo.app.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
@@ -32,7 +33,9 @@ class PostServiceImplTest {
         + "  - solution\n"
         + "date: 2018-11-23 16:11:28\n"
         + "---\n"
-        + "\n"
+        + "| 书名     | 作者       |\n"
+        + "| -------- | ---------- |\n"
+        + "| 《剑来》 | 烽火戏诸侯 |\n"
         + "# Pre\n"
         + "\n"
         + "在前后端分离项目中，通常需要用到 API 文档，springfox 开发的 **[SpringFox](https://github"
@@ -48,6 +51,15 @@ class PostServiceImplTest {
         + "---\n"
         + "\n"
         + "以下将讲解关系型数据的关系描述。仅仅是作为总结。";
+
+
+    String noFontMatterTable = "# 书单\n"
+        + "| 书名     | 作者       |\n"
+        + "| :-------- | ---------- |\n"
+        + "| 《剑来》 | 烽火戏诸侯 |\n"
+        + "## 剑来\n"
+        + "\n"
+        + "大千世界，无奇不有。天道崩塌，我陈平安，唯有一剑，可搬山，断江，倒海，降妖，镇魔，敕神，摘星，摧城，开天。";
 
     @Autowired
     PostServiceImpl postService;
@@ -70,6 +82,9 @@ class PostServiceImplTest {
         assertTrue(standardCategoryMap.get("后端").getId()
             .equals(standardCategoryMap.get("JAVA").getParentId()));
         assertEquals(standardPost.getTags().size(), 3);
+        assertTrue(standardPost.getContent().contains("书名"));
+        assertFalse(standardPost.getContent().contains("16:11:28"));
+
         PostDetailVO nonStandardPost =
             postService.importMarkdown(nonStandardMdContent, "nonStandard");
         Map<String, CategoryDTO> nonStandardCategoryMap = nonStandardPost.getCategories().stream()
@@ -80,5 +95,10 @@ class PostServiceImplTest {
         assertTrue(nonStandardCategoryMap.get("后端").getId()
             .equals(nonStandardCategoryMap.get("JAVA").getParentId()));
         assertEquals(nonStandardPost.getTags().size(), 4);
+
+        PostDetailVO noFontMatterTablePost =
+            postService.importMarkdown(noFontMatterTable, "noFontMatterTable");
+        assertTrue(noFontMatterTablePost.getContent().contains("书单"));
+
     }
 }
