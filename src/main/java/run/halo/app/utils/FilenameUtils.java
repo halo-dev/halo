@@ -3,6 +3,7 @@ package run.halo.app.utils;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
@@ -104,4 +105,8 @@ public class FilenameUtils {
         return filename.substring(dotLastIndex + 1);
     }
 
+    public static String filterReservedCharsInFileName(String fileName){
+        Pattern filePattern = Pattern.compile("[\\\\/:*?\"<>|]");
+        return filePattern.matcher(fileName).replaceAll("");
+    }
 }
