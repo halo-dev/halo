@@ -21,11 +21,11 @@ class FileNameTest {
     public void fileNameWithReservedCharsWillBeReplaced(){
         String fileName1 = "abcde";
         String filteredFileName1 = FILE_PATTERN.matcher(fileName1).replaceAll("") + ".md";
-        assertEquals("abcde", filteredFileName1);
+        assertEquals("abcde.md", filteredFileName1);
 
         String fileName2 = "abcde|字符替换\\星号*大于>小于<slash/中文字符、";
         String filteredFileName2 = FILE_PATTERN.matcher(fileName2).replaceAll("") + ".md";
-        assertEquals("abcde 字符替换 星号 大于 小于 slash 中文字符、", filteredFileName2);
+        assertEquals("abcde字符替换星号大于小于slash中文字符、.md", filteredFileName2);
     }
 
 }
