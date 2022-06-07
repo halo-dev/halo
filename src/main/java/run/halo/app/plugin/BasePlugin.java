@@ -12,7 +12,7 @@ import org.pf4j.PluginWrapper;
  * @since 2.0.0
  */
 @Slf4j
-public abstract class BasePlugin extends Plugin {
+public class BasePlugin extends Plugin {
 
     private PluginApplicationContext applicationContext;
 
