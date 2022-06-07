@@ -18,9 +18,12 @@ repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
     maven { url 'https://maven.aliyun.com/repository/spring/' }
     maven { url 'https://repo.spring.io/milestone' }
+
     mavenLocal()
     mavenCentral()
+
 }
+
 
 configurations {
     implementation {
@@ -54,13 +57,16 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-oauth2-jose'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation "org.springframework.boot:spring-boot-starter-jetty"
+    implementation 'org.springframework.security:spring-security-oauth2-resource-server'
 
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.0-M2'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M3'
     implementation "org.flywaydb:flyway-core"
     implementation "org.flywaydb:flyway-mysql"
 
@@ -84,6 +90,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.projectreactor:reactor-test'
 }
 
 tasks.named('test') {

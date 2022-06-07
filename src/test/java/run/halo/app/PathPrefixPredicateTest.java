@@ -28,9 +28,9 @@ public class PathPrefixPredicateTest {
         assertThat(result).isTrue();
     }
 
-    @RestController
+    @RestController("controller-for-test")
     @RequestMapping("/test-prefix")
-    public static class TestController {
+    class TestController {
 
     }
 }

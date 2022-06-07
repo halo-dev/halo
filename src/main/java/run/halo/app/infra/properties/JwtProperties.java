@@ -1,5 +1,6 @@
 package run.halo.app.infra.properties;
 
+import jakarta.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,14 +11,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.source.InvalidConfigurationPropertyValueException;
 import org.springframework.core.io.Resource;
 import org.springframework.security.converter.RsaKeyConverters;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * @author guqing
+ * @author johnniang
  * @date 2022-04-12
  */
 @ConfigurationProperties(prefix = "halo.security.oauth2.jwt")
+@Validated
 public class JwtProperties {
 
     /**
@@ -29,14 +34,36 @@ public class JwtProperties {
     /**
      * JSON Web Algorithm used for verifying the digital signatures.
      */
-    private String jwsAlgorithm = "RS256";
+    private SignatureAlgorithm jwsAlgorithm;
 
     /**
      * Location of the file containing the public key used to verify a JWT.
      */
+    @NotNull
     private Resource publicKeyLocation;
 
+    @NotNull
     private Resource privateKeyLocation;
+
+    private final RSAPrivateKey privateKey;
+
+    private final RSAPublicKey publicKey;
+
+    public JwtProperties(String issuerUri, SignatureAlgorithm jwsAlgorithm,
+        Resource publicKeyLocation,
+        Resource privateKeyLocation) throws IOException {
+        this.issuerUri = issuerUri;
+        this.jwsAlgorithm = jwsAlgorithm;
+        if (jwsAlgorithm == null) {
+            this.jwsAlgorithm = SignatureAlgorithm.RS256;
+        }
+        this.publicKeyLocation = publicKeyLocation;
+        this.privateKeyLocation = privateKeyLocation;
+
+        //TODO initialize private and public keys at first startup.
+        this.privateKey = this.readPrivateKey();
+        this.publicKey = this.readPublicKey();
+    }
 
     public String getIssuerUri() {
         return issuerUri;
@@ -46,11 +73,11 @@ public class JwtProperties {
         this.issuerUri = issuerUri;
     }
 
-    public String getJwsAlgorithm() {
+    public SignatureAlgorithm getJwsAlgorithm() {
         return this.jwsAlgorithm;
     }
 
-    public void setJwsAlgorithm(String jwsAlgorithm) {
+    public void setJwsAlgorithm(SignatureAlgorithm jwsAlgorithm) {
         this.jwsAlgorithm = jwsAlgorithm;
     }
 
@@ -70,7 +97,15 @@ public class JwtProperties {
         this.privateKeyLocation = privateKeyLocation;
     }
 
-    public RSAPublicKey readPublicKey() throws IOException {
+    public RSAPrivateKey getPrivateKey() {
+        return privateKey;
+    }
+
+    public RSAPublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    private RSAPublicKey readPublicKey() throws IOException {
         String key = "halo.security.oauth2.jwt.public-key-location";
         Assert.notNull(this.publicKeyLocation, "PublicKeyLocation must not be null");
         if (!this.publicKeyLocation.exists()) {
@@ -84,7 +119,7 @@ public class JwtProperties {
         }
     }
 
-    public RSAPrivateKey readPrivateKey() throws IOException {
+    private RSAPrivateKey readPrivateKey() throws IOException {
         String key = "halo.security.oauth2.jwt.private-key-location";
         Assert.notNull(this.privateKeyLocation, "PrivateKeyLocation must not be null");
         if (!this.privateKeyLocation.exists()) {

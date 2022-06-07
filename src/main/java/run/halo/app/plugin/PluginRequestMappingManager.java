@@ -8,7 +8,7 @@ import org.pf4j.PluginWrapper;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * Plugin mapping manager.
