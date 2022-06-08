@@ -1,8 +1,10 @@
 package run.halo.app.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
+import run.halo.app.exception.FileOperationException;
 
 /**
  * Filename utilities test.
@@ -58,20 +60,6 @@ class FilenameUtilsTest {
     }
 
     @Test
-    public void fileNameWithDotWillBeSanitized() {
-        String filename = "fe.qero3.dv. ";
-        String sanitizedName = FilenameUtils.sanitizeFilename(filename);
-        assertEquals("fe.qero3.dv", sanitizedName);
-    }
-
-    @Test
-    public void fileNameWithDotsWillBeSanitized() {
-        String filename = "fe.qero3.dv... ";
-        String sanitizedName = FilenameUtils.sanitizeFilename(filename);
-        assertEquals("fe.qero3.dv", sanitizedName);
-    }
-
-    @Test
     public void fileNameWithReversedNameWillBeReplaced() {
         String filename1 = "CON ";
         String sanitizedName = FilenameUtils.sanitizeFilename(filename1);
@@ -91,13 +79,35 @@ class FilenameUtilsTest {
     }
 
     @Test
-    public void fileNameLengthLimit() {
+    public void filenameLengthLimit() {
         StringBuilder filename = new StringBuilder("haloe");
-        while (filename.length() < 300){
-            filename = filename.append("haloe");
+        while (filename.length() < 300) {
+            filename.append("haloe");
         }
+        assertEquals(300, filename.length());
         String sanitizedName = FilenameUtils.sanitizeFilename(filename.toString());
         assertEquals(200, sanitizedName.length());
     }
 
+    @Test
+    public void filenameMixTest() {
+        String filename = "halo |I'd like.to $be a: CONtributor。。...";
+        String sanitizedName = FilenameUtils.sanitizeFilename(filename);
+        assertEquals("halo I'd liketo $be a CONtributor。。", sanitizedName);
+    }
+
+    @Test
+    public void filenameWithDotsWillBeSanitized() {
+        String filename = "pls.approve...my..PR..... ";
+        String sanitizedName = FilenameUtils.sanitizeFilename(filename);
+        assertEquals("plsapprovemyPR", sanitizedName);
+    }
+
+    @Test
+    public void fileNameExtremelyInvalid() {
+        String filename = "?<>\\:*|...";
+        FileOperationException exception = assertThrows(FileOperationException.class,
+            () -> FilenameUtils.sanitizeFilename(filename));
+        assertEquals("文件名不合法: ?<>\\:*|...", exception.getMessage());
+    }
 }

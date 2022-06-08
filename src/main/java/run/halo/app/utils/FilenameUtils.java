@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import run.halo.app.exception.FileOperationException;
 
 /**
  * Filename utilities.
@@ -18,13 +19,11 @@ import org.springframework.util.Assert;
 public class FilenameUtils {
 
     private static final Pattern FILENAME_WIN_RESERVED_CHARS_PATTERN =
-        Pattern.compile("[\\\\/:*?\"<>|]");
-
-    private static final Pattern FILENAME_UNIX_RESERVED_CHARS_PATTERN = Pattern.compile("\\.+$");
+        Pattern.compile("[\\\\/:*?\"<>|.+]");
 
     private static final Pattern FILENAME_WIN_RESERVED_NAMES_PATTERN =
         Pattern.compile("^(CON|PRM|AUX|NUL|COM[0-9]|LPT[0-9])$");
-    
+
     private static final int FILENAME_MAX_LENGTH = 200;
 
     private FilenameUtils() {
@@ -123,8 +122,9 @@ public class FilenameUtils {
     public static String sanitizeFilename(String filename) {
         String sanitizedFilename =
             FILENAME_WIN_RESERVED_CHARS_PATTERN.matcher(filename.trim()).replaceAll("");
-        sanitizedFilename =
-            FILENAME_UNIX_RESERVED_CHARS_PATTERN.matcher(sanitizedFilename).replaceAll("");
+        if (StringUtils.isEmpty(sanitizedFilename)) {
+            throw new FileOperationException("文件名不合法: " + filename);
+        }
         Matcher matcher = FILENAME_WIN_RESERVED_NAMES_PATTERN.matcher(sanitizedFilename);
         if (matcher.matches()) {
             sanitizedFilename = sanitizedFilename + "_file";
