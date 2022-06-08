@@ -637,9 +637,9 @@ public class BackupServiceImpl implements BackupService {
             }
             content.append(postMarkdownVo.getOriginalContent());
             try {
-                String fileName = postMarkdownVo.getTitle() + "-" + postMarkdownVo.getSlug();
+                String filename = postMarkdownVo.getTitle() + "-" + postMarkdownVo.getSlug();
                 String markdownFileName =
-                    FilenameUtils.filterReservedCharsInFileName(fileName) + ".md";
+                    FilenameUtils.sanitizeFilename(filename) + ".md";
                 Path markdownFilePath = Paths.get(markdownFileTempPathName, markdownFileName);
                 if (!Files.exists(markdownFilePath.getParent())) {
                     Files.createDirectories(markdownFilePath.getParent());

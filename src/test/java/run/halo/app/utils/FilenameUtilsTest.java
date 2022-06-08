@@ -48,12 +48,49 @@ class FilenameUtilsTest {
 
     @Test
     public void fileNameWithReservedCharsWillBeReplaced() {
-        String fileName1 = "abcde";
-        String filteredFileName1 = FilenameUtils.filterReservedCharsInFileName(fileName1) + ".md";
-        assertEquals("abcde.md", filteredFileName1);
+        String filename1 = "abcde";
+        String filteredFilename1 = FilenameUtils.sanitizeFilename(filename1);
+        assertEquals("abcde", filteredFilename1);
 
-        String fileName2 = "abcde|字符替换\\星号*大于>小于<slash/中文字符、";
-        String filteredFileName2 = FilenameUtils.filterReservedCharsInFileName(fileName2) + ".md";
-        assertEquals("abcde字符替换星号大于小于slash中文字符、.md", filteredFileName2);
+        String filename2 = "abcde|字符替换\\星号*大于>小于<slash/中文字符、";
+        String filteredFilename2 = FilenameUtils.sanitizeFilename(filename2);
+        assertEquals("abcde字符替换星号大于小于slash中文字符、", filteredFilename2);
     }
+
+    @Test
+    public void fileNameWithDotWillBeSanitized() {
+        String filename = "fe.qero3.dv. ";
+        String sanitizedName = FilenameUtils.sanitizeFilename(filename);
+        assertEquals("fe.qero3.dv", sanitizedName);
+    }
+
+    @Test
+    public void fileNameWithReversedNameWillBeReplaced() {
+        String filename1 = "CON ";
+        String sanitizedName = FilenameUtils.sanitizeFilename(filename1);
+        assertEquals("CON_file", sanitizedName);
+
+        String filename2 = "LPT19";
+        sanitizedName = FilenameUtils.sanitizeFilename(filename2);
+        assertEquals("LPT19", sanitizedName);
+
+        String filename3 = "CON 12345";
+        sanitizedName = FilenameUtils.sanitizeFilename(filename3);
+        assertEquals("CON 12345", sanitizedName);
+
+        String filename4 = "COM3";
+        sanitizedName = FilenameUtils.sanitizeFilename(filename4);
+        assertEquals("COM3_file", sanitizedName);
+    }
+
+    @Test
+    public void fileNameLengthLimit() {
+        StringBuilder filename = new StringBuilder("haloe");
+        while (filename.length() < 300){
+            filename = filename.append("haloe");
+        }
+        String sanitizedName = FilenameUtils.sanitizeFilename(filename.toString());
+        assertEquals(200, sanitizedName.length());
+    }
+
 }
