@@ -47,7 +47,7 @@ class FilenameUtilsTest {
     }
 
     @Test
-    public void fileNameWithReservedCharsWillBeReplaced(){
+    public void fileNameWithReservedCharsWillBeReplaced() {
         String fileName1 = "abcde";
         String filteredFileName1 = FilenameUtils.filterReservedCharsInFileName(fileName1) + ".md";
         assertEquals("abcde.md", filteredFileName1);

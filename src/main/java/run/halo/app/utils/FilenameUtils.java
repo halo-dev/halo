@@ -16,6 +16,8 @@ import org.springframework.util.Assert;
  */
 public class FilenameUtils {
 
+    private static final Pattern FILE_NAME_RESERVED_CHARACTERS = Pattern.compile("[\\\\/:*?\"<>|]");
+
     private FilenameUtils() {
     }
 
@@ -105,8 +107,7 @@ public class FilenameUtils {
         return filename.substring(dotLastIndex + 1);
     }
 
-    public static String filterReservedCharsInFileName(String fileName){
-        Pattern filePattern = Pattern.compile("[\\\\/:*?\"<>|]");
-        return filePattern.matcher(fileName).replaceAll("");
+    public static String filterReservedCharsInFileName(String fileName) {
+        return FILE_NAME_RESERVED_CHARACTERS.matcher(fileName).replaceAll("").trim();
     }
 }
