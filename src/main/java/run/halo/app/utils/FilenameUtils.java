@@ -130,6 +130,6 @@ public class FilenameUtils {
             sanitizedFilename = sanitizedFilename + "_file";
         }
         return sanitizedFilename.length() < FILENAME_MAX_LENGTH ? sanitizedFilename :
-            sanitizedFilename.substring(0, FILENAME_MAX_LENGTH);
+            sanitizedFilename.substring(0, FILENAME_MAX_LENGTH).trim();
     }
 }
