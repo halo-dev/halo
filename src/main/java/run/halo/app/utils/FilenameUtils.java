@@ -20,7 +20,7 @@ public class FilenameUtils {
     private static final Pattern FILENAME_WIN_RESERVED_CHARS_PATTERN =
         Pattern.compile("[\\\\/:*?\"<>|]");
 
-    private static final Pattern FILENAME_UNIX_RESERVED_CHARS_PATTERN = Pattern.compile("\\.$");
+    private static final Pattern FILENAME_UNIX_RESERVED_CHARS_PATTERN = Pattern.compile("\\.+$");
 
     private static final Pattern FILENAME_WIN_RESERVED_NAMES_PATTERN =
         Pattern.compile("^(CON|PRM|AUX|NUL|COM[0-9]|LPT[0-9])$");

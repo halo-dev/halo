@@ -65,6 +65,13 @@ class FilenameUtilsTest {
     }
 
     @Test
+    public void fileNameWithDotsWillBeSanitized() {
+        String filename = "fe.qero3.dv... ";
+        String sanitizedName = FilenameUtils.sanitizeFilename(filename);
+        assertEquals("fe.qero3.dv", sanitizedName);
+    }
+
+    @Test
     public void fileNameWithReversedNameWillBeReplaced() {
         String filename1 = "CON ";
         String sanitizedName = FilenameUtils.sanitizeFilename(filename1);
