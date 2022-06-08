@@ -18,7 +18,7 @@ import run.halo.app.exception.FileOperationException;
  */
 public class FilenameUtils {
 
-    private static final Pattern FILENAME_WIN_RESERVED_CHARS_PATTERN =
+    private static final Pattern FILENAME_RESERVED_CHARS_PATTERN =
         Pattern.compile("[\\\\/:*?\"<>|.+]");
 
     private static final Pattern FILENAME_WIN_RESERVED_NAMES_PATTERN =
@@ -121,7 +121,7 @@ public class FilenameUtils {
      */
     public static String sanitizeFilename(String filename) {
         String sanitizedFilename =
-            FILENAME_WIN_RESERVED_CHARS_PATTERN.matcher(filename.trim()).replaceAll("");
+            FILENAME_RESERVED_CHARS_PATTERN.matcher(filename.trim()).replaceAll("");
         if (StringUtils.isEmpty(sanitizedFilename)) {
             throw new FileOperationException("文件名不合法: " + filename);
         }
