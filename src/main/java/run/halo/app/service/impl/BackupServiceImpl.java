@@ -118,7 +118,7 @@ import run.halo.app.utils.VersionUtil;
  * @author ryanwang
  * @author Raremaa
  * @author guqing
- * @date 2019-04-26
+ * @date  2019-04-26
  */
 @Service
 @Slf4j
@@ -188,24 +188,18 @@ public class BackupServiceImpl implements BackupService {
     private final ApplicationContext appContext;
 
     public BackupServiceImpl(AttachmentService attachmentService, CategoryService categoryService,
-                             CommentBlackListService commentBlackListService,
-                             JournalService journalService,
-                             JournalCommentService journalCommentService, LinkService linkService,
-                             LogService logService,
-                             MenuService menuService, OptionService optionService,
-                             PhotoService photoService,
-                             PostService postService, ContentService contentService,
-                             ContentPatchLogService contentPatchLogService,
-                             PostCategoryService postCategoryService,
-                             PostCommentService postCommentService, PostMetaService postMetaService,
-                             PostTagService postTagService, SheetService sheetService,
-                             SheetCommentService sheetCommentService,
-                             SheetMetaService sheetMetaService,
-                             TagService tagService, ThemeSettingService themeSettingService,
-                             UserService userService,
-                             OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties,
-                             ApplicationEventPublisher eventPublisher,
-                             ApplicationContext appContext) {
+        CommentBlackListService commentBlackListService, JournalService journalService,
+        JournalCommentService journalCommentService, LinkService linkService, LogService logService,
+        MenuService menuService, OptionService optionService, PhotoService photoService,
+        PostService postService, ContentService contentService,
+        ContentPatchLogService contentPatchLogService,
+        PostCategoryService postCategoryService,
+        PostCommentService postCommentService, PostMetaService postMetaService,
+        PostTagService postTagService, SheetService sheetService,
+        SheetCommentService sheetCommentService, SheetMetaService sheetMetaService,
+        TagService tagService, ThemeSettingService themeSettingService, UserService userService,
+        OneTimeTokenService oneTimeTokenService, HaloProperties haloProperties,
+        ApplicationEventPublisher eventPublisher, ApplicationContext appContext) {
         this.attachmentService = attachmentService;
         this.categoryService = categoryService;
         this.commentBlackListService = commentBlackListService;
