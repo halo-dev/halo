@@ -14,8 +14,7 @@ import org.springframework.security.web.server.authorization.AuthorizationContex
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.service.DefaultRuleResolver;
-import run.halo.app.core.extension.service.RoleGetter;
+import run.halo.app.core.extension.service.RoleService;
 
 @Slf4j
 public class RequestInfoAuthorizationManager
@@ -25,8 +24,8 @@ public class RequestInfoAuthorizationManager
 
     private final AuthorizationRuleResolver ruleResolver;
 
-    public RequestInfoAuthorizationManager(RoleGetter roleGetter) {
-        this.ruleResolver = new DefaultRuleResolver(roleGetter);
+    public RequestInfoAuthorizationManager(RoleService roleService) {
+        this.ruleResolver = new DefaultRuleResolver(roleService);
     }
 
     @Override

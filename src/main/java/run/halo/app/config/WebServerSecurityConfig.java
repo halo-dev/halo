@@ -14,9 +14,7 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
@@ -27,8 +25,10 @@ import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.core.extension.service.RoleGetter;
+import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.infra.properties.JwtProperties;
+import run.halo.app.security.UserExtensionUserDetailService;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
@@ -52,15 +52,18 @@ public class WebServerSecurityConfig {
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http,
         ServerCodecConfigurer codec,
         ServerResponse.Context context,
-        RoleGetter roleGetter) {
+        UserService userService,
+        RoleService roleService) {
         http.csrf().disable()
             .securityMatcher(pathMatchers("/api/**", "/apis/**"))
             .authorizeExchange(exchanges ->
-                exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleGetter)))
+                exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleService)))
             // for reuse the JWT authentication
             .oauth2ResourceServer().jwt();
 
-        var loginManager = new LoginAuthenticationManager(userDetailsService(), passwordEncoder());
+        var loginManager = new LoginAuthenticationManager(
+            userDetailsService(userService, roleService),
+            passwordEncoder());
         var loginFilter = new LoginAuthenticationFilter(loginManager,
             codec,
             jwtEncoder(),
@@ -92,15 +95,9 @@ public class WebServerSecurityConfig {
     }
 
     @Bean
-    ReactiveUserDetailsService userDetailsService() {
-        //TODO Implement details service when User Extension is ready.
-        return new MapReactiveUserDetailsService(
-            // for test
-            User.withDefaultPasswordEncoder().username("user").password("password").roles("USER")
-                .build(),
-            // for test
-            User.withDefaultPasswordEncoder().username("admin").password("password").roles("ADMIN")
-                .build());
+    ReactiveUserDetailsService userDetailsService(UserService userService,
+        RoleService roleService) {
+        return new UserExtensionUserDetailService(userService, roleService);
     }
 
     @Bean

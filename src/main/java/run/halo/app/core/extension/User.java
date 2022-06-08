@@ -1,5 +1,6 @@
 package run.halo.app.core.extension;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;
 import lombok.Data;
@@ -16,10 +17,14 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "", version = "v1alpha1", kind = "User",
-    singular = "user", plural = "users")
+@GVK(group = "",
+    version = "v1alpha1",
+    kind = "User",
+    singular = "user",
+    plural = "users")
 public class User extends AbstractExtension {
 
+    @Schema(required = true)
     private UserSpec spec;
 
     private UserStatus status;
@@ -27,10 +32,12 @@ public class User extends AbstractExtension {
     @Data
     public static class UserSpec {
 
+        @Schema(required = true)
         private String displayName;
 
         private String avatar;
 
+        @Schema(required = true)
         private String email;
 
         private String phone;
@@ -61,12 +68,16 @@ public class User extends AbstractExtension {
     @Data
     public static class LoginHistory {
 
+        @Schema(required = true)
         private Instant loginAt;
 
+        @Schema(required = true)
         private String sourceIp;
 
+        @Schema(required = true)
         private String userAgent;
 
+        @Schema(required = true)
         private Boolean successful;
 
         private String reason;

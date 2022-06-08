@@ -1,4 +1,4 @@
-package run.halo.app.core.extension.service;
+package run.halo.app.security.authorization;
 
 import java.util.Collections;
 import java.util.List;
@@ -7,10 +7,9 @@ import lombok.Data;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Role;
-import run.halo.app.security.authorization.AuthorizationRuleResolver;
-import run.halo.app.security.authorization.DefaultRoleBindingLister;
-import run.halo.app.security.authorization.PolicyRuleList;
-import run.halo.app.security.authorization.RuleAccumulator;
+import run.halo.app.core.extension.service.DefaultRoleBindingLister;
+import run.halo.app.core.extension.service.RoleBindingLister;
+import run.halo.app.core.extension.service.RoleService;
 
 /**
  * @author guqing
@@ -19,12 +18,12 @@ import run.halo.app.security.authorization.RuleAccumulator;
 @Data
 public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
-    private RoleGetter roleGetter;
+    private RoleService roleService;
 
     private RoleBindingLister roleBindingLister = new DefaultRoleBindingLister();
 
-    public DefaultRuleResolver(RoleGetter roleGetter) {
-        this.roleGetter = roleGetter;
+    public DefaultRuleResolver(RoleService roleService) {
+        this.roleService = roleService;
     }
 
     @Override
@@ -49,7 +48,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         List<Role.PolicyRule> rules = Collections.emptyList();
         for (String roleName : roleNames) {
             try {
-                Role role = roleGetter.getRole(roleName);
+                Role role = roleService.getRole(roleName);
                 rules = role.getRules();
             } catch (Exception e) {
                 if (visitor.visit(null, null, e)) {

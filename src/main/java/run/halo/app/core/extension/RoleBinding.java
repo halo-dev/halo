@@ -1,8 +1,10 @@
 package run.halo.app.core.extension;
 
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import run.halo.app.core.Constant;
 import run.halo.app.extension.AbstractExtension;
@@ -68,6 +70,8 @@ public class RoleBinding extends AbstractExtension {
      * @since 2.0.0
      */
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Subject {
         /**
          * Kind of object being referenced. Values defined by this API group are "User", "Group",
