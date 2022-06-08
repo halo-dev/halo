@@ -3,6 +3,7 @@ package run.halo.app.utils;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -16,7 +17,15 @@ import org.springframework.util.Assert;
  */
 public class FilenameUtils {
 
-    private static final Pattern FILE_NAME_RESERVED_CHARACTERS = Pattern.compile("[\\\\/:*?\"<>|]");
+    private static final Pattern FILENAME_WIN_RESERVED_CHARS_PATTERN =
+        Pattern.compile("[\\\\/:*?\"<>|]");
+
+    private static final Pattern FILENAME_UNIX_RESERVED_CHARS_PATTERN = Pattern.compile("\\.$");
+
+    private static final Pattern FILENAME_WIN_RESERVED_NAMES_PATTERN =
+        Pattern.compile("^(CON|PRM|AUX|NUL|COM[0-9]|LPT[0-9])$");
+    
+    private static final int FILENAME_MAX_LENGTH = 200;
 
     private FilenameUtils() {
     }
@@ -107,7 +116,20 @@ public class FilenameUtils {
         return filename.substring(dotLastIndex + 1);
     }
 
-    public static String filterReservedCharsInFileName(String fileName) {
-        return FILE_NAME_RESERVED_CHARACTERS.matcher(fileName).replaceAll("").trim();
+    /**
+     * @param filename filename
+     * @return sanitized filename, without any reserved character
+     */
+    public static String sanitizeFilename(String filename) {
+        String sanitizedFilename =
+            FILENAME_WIN_RESERVED_CHARS_PATTERN.matcher(filename.trim()).replaceAll("");
+        sanitizedFilename =
+            FILENAME_UNIX_RESERVED_CHARS_PATTERN.matcher(sanitizedFilename).replaceAll("");
+        Matcher matcher = FILENAME_WIN_RESERVED_NAMES_PATTERN.matcher(sanitizedFilename);
+        if (matcher.matches()) {
+            sanitizedFilename = sanitizedFilename + "_file";
+        }
+        return sanitizedFilename.length() < FILENAME_MAX_LENGTH ? sanitizedFilename :
+            sanitizedFilename.substring(0, FILENAME_MAX_LENGTH);
     }
 }
