@@ -1,11 +1,9 @@
 server:
   port: 8090
 spring:
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
   output:
     ansi:
-      enabled: always
+      enabled: detect
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
 

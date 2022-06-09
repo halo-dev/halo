@@ -1,8 +1,6 @@
 server:
   port: 8090
 spring:
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss
   output:
     ansi:
       enabled: detect

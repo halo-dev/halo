@@ -73,10 +73,14 @@ public class WebServerSecurityConfig {
     }
 
     @Bean
+    @Order(0)
     SecurityWebFilterChain webFilterChain(ServerHttpSecurity http) {
-        http.authorizeExchange(
-                exchanges -> exchanges.pathMatchers("/v3/api-docs/**", "/v3/api-docs.yaml",
-                    "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll())
+        http.authorizeExchange(exchanges -> exchanges.pathMatchers(
+                "/v3/api-docs/**",
+                "/v3/api-docs.yaml",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/webjars/**").permitAll())
             .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
             .cors(withDefaults())
             .httpBasic(withDefaults())
