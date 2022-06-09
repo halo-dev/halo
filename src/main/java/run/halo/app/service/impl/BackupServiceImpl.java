@@ -106,6 +106,7 @@ import run.halo.app.service.UserService;
 import run.halo.app.utils.DateTimeUtils;
 import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.FileUtils;
+import run.halo.app.utils.FilenameUtils;
 import run.halo.app.utils.HaloUtils;
 import run.halo.app.utils.JsonUtils;
 import run.halo.app.utils.VersionUtil;
@@ -630,8 +631,9 @@ public class BackupServiceImpl implements BackupService {
             }
             content.append(postMarkdownVo.getOriginalContent());
             try {
+                String filename = postMarkdownVo.getTitle() + "-" + postMarkdownVo.getSlug();
                 String markdownFileName =
-                    postMarkdownVo.getTitle() + "-" + postMarkdownVo.getSlug() + ".md";
+                    FilenameUtils.sanitizeFilename(filename) + ".md";
                 Path markdownFilePath = Paths.get(markdownFileTempPathName, markdownFileName);
                 if (!Files.exists(markdownFilePath.getParent())) {
                     Files.createDirectories(markdownFilePath.getParent());
