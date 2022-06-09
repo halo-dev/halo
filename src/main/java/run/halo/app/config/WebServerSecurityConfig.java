@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
@@ -77,7 +78,10 @@ public class WebServerSecurityConfig {
                 exchanges -> exchanges.pathMatchers("/v3/api-docs/**", "/v3/api-docs.yaml",
                     "/swagger-ui/**", "/swagger-ui.html", "/webjars/**").permitAll())
             .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
-            .cors(withDefaults()).httpBasic(withDefaults()).formLogin(withDefaults())
+            .cors(withDefaults())
+            .httpBasic(withDefaults())
+            .formLogin(withDefaults())
+            .csrf().csrfTokenRepository(new CookieServerCsrfTokenRepository()).and()
             .logout(withDefaults());
 
         return http.build();
