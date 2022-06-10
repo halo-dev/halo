@@ -16,13 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/plugins")
+// TODO Optimize prefix configuration
+@RequestMapping("/apis/plugin.halo.run/v1alpha1/plugins")
 public class PluginLifeCycleManagerController {
 
-    private final PluginService pluginService;
+    private final PluginServiceImpl pluginService;
     private final HaloPluginManager pluginManager;
 
-    public PluginLifeCycleManagerController(PluginService pluginService,
+    public PluginLifeCycleManagerController(PluginServiceImpl pluginService,
         HaloPluginManager pluginManager) {
         this.pluginService = pluginService;
         this.pluginManager = pluginManager;
@@ -38,7 +39,7 @@ public class PluginLifeCycleManagerController {
         return pluginManager.startPlugin(pluginName);
     }
 
-    @GetMapping("/{pluginName}/stops")
+    @GetMapping("/{pluginName}/stop")
     public PluginState stop(@PathVariable String pluginName) {
         return pluginManager.stopPlugin(pluginName);
     }

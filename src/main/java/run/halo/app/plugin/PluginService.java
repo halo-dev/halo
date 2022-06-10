@@ -1,30 +1,19 @@
 package run.halo.app.plugin;
 
 import java.util.List;
-import org.springframework.stereotype.Service;
-import run.halo.app.extension.ExtensionClient;
 
 /**
- * Plugin service.
+ * Service for plugin.
  *
  * @author guqing
  * @since 2.0.0
  */
-@Service
-public class PluginService {
-
-    private final ExtensionClient extensionClient;
-
-    public PluginService(ExtensionClient extensionClient) {
-        this.extensionClient = extensionClient;
-    }
+public interface PluginService {
 
     /**
-     * list all plugins including loaded and unloaded.
+     * Lists plugin from repository.
      *
-     * @return plugin info
+     * @return all loaded plugins.
      */
-    public List<Plugin> list() {
-        return extensionClient.list(Plugin.class, null, null);
-    }
+    List<Plugin> list();
 }

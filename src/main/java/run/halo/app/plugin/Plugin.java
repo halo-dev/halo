@@ -17,7 +17,8 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "", version = "v1alpha1", kind = "Plugin", plural = "plugins", singular = "plugin")
+@GVK(group = "plugin.halo.run", version = "v1alpha1", kind = "Plugin", plural = "plugins",
+    singular = "plugin")
 @EqualsAndHashCode(callSuper = true)
 public class Plugin extends AbstractExtension {
 
