@@ -24,6 +24,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
+import run.halo.app.plugin.event.HaloPluginLoadedEvent;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
 import run.halo.app.plugin.event.HaloPluginStateChangedEvent;
 import run.halo.app.plugin.event.HaloPluginStoppedEvent;
@@ -365,6 +366,13 @@ public class HaloPluginManager extends DefaultPluginManager
         } catch (Exception e) {
             log.trace("Plugin application context close failed. ", e);
         }
+    }
+
+    @Override
+    protected PluginWrapper loadPluginFromPath(Path pluginPath) {
+        PluginWrapper pluginWrapper = super.loadPluginFromPath(pluginPath);
+        rootApplicationContext.publishEvent(new HaloPluginLoadedEvent(this, pluginWrapper));
+        return pluginWrapper;
     }
 
     // end-region
