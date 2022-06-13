@@ -14,6 +14,7 @@ import org.pf4j.ExtensionFinder;
 import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
+import org.pf4j.PluginRepository;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginStateEvent;
@@ -60,11 +61,6 @@ public class HaloPluginManager extends DefaultPluginManager
     }
 
     @Override
-    public PluginDescriptorFinder getPluginDescriptorFinder() {
-        return super.getPluginDescriptorFinder();
-    }
-
-    @Override
     protected ExtensionFinder createExtensionFinder() {
         return new SpringComponentsFinder(this);
     }
@@ -95,6 +91,15 @@ public class HaloPluginManager extends DefaultPluginManager
 
     public PluginStartingError getPluginStartingError(String pluginId) {
         return startingErrors.get(pluginId);
+    }
+
+    public PluginRepository getPluginRepository() {
+        return this.pluginRepository;
+    }
+
+    @Override
+    protected PluginDescriptorFinder createPluginDescriptorFinder() {
+        return new YamlPluginDescriptorFinder();
     }
 
     @Override
