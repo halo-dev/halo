@@ -13,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.PluginRuntimeException;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.core.io.Resource;
+import org.springframework.security.util.InMemoryResource;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -38,33 +40,36 @@ class YamlPluginFinderTest {
         Plugin plugin = pluginFinder.find(testPath);
         assertThat(plugin).isNotNull();
         JSONAssert.assertEquals("""
-            {
-                "spec": {
-                    "displayName": "a name to show",
-                    "version": "0.0.1",
-                    "author": "guqing",
-                    "logo": "https://guqing.xyz/avatar",
-                    "pluginDependencies": {
-                      "banana": "0.0.1"
+                {
+                    "spec": {
+                        "displayName": "a name to show",
+                        "version": "0.0.1",
+                        "author": "guqing",
+                        "logo": "https://guqing.xyz/avatar",
+                        "pluginDependencies": {
+                          "banana": "0.0.1"
+                        },
+                        "homepage": "https://github.com/guqing/halo-plugin-1",
+                        "description": "Tell me more about this plugin.",
+                        "license": [{
+                            "name": "MIT",
+                            "url": ""
+                        }],
+                        "requires": ">=2.0.0",
+                        "pluginClass": "run.halo.app.plugin.BasePlugin"
                     },
-                    "homepage": "https://github.com/guqing/halo-plugin-1",
-                    "description": "Tell me more about this plugin.",
-                    "license": "MIT",
-                    "requires": ">=2.0.0",
-                    "pluginClass": "run.halo.app.plugin.BasePlugin"
-                },
-                "apiVersion": "v1",
-                "kind": "Plugin",
-                "metadata": {
-                    "name": "plugin-1",
-                    "labels": null,
-                    "annotations": null,
-                    "version": null,
-                    "creationTimestamp": null,
-                    "deletionTimestamp": null
+                    "apiVersion": "v1",
+                    "kind": "Plugin",
+                    "metadata": {
+                        "name": "plugin-1",
+                        "labels": null,
+                        "annotations": null,
+                        "version": null,
+                        "creationTimestamp": null,
+                        "deletionTimestamp": null
+                    }
                 }
-            }
-            """,
+                """,
             JsonUtils.objectToJson(plugin),
             false);
     }
@@ -76,5 +81,71 @@ class YamlPluginFinderTest {
             pluginFinder.find(test);
         }).isInstanceOf(PluginRuntimeException.class)
             .hasMessage("Cannot find '/tmp/plugin.yaml' path");
+    }
+
+    @Test
+    void acceptArrayLicense() throws JSONException, JsonProcessingException {
+        Resource pluginResource = new InMemoryResource("""
+            apiVersion: v1
+            kind: Plugin
+            metadata:
+              name: plugin-1
+            spec:
+              license: "MIT"
+            """);
+        Plugin plugin = pluginFinder.unstructuredToPlugin(pluginResource);
+        assertThat(plugin.getSpec()).isNotNull();
+        JSONAssert.assertEquals("""
+            [{
+                "name": "MIT",
+                "url": ""
+            }]
+            """, JsonUtils.objectToJson(plugin.getSpec().getLicense()), false);
+    }
+
+    @Test
+    void acceptMultipleItemArrayLicense() throws JsonProcessingException, JSONException {
+        Resource pluginResource = new InMemoryResource("""
+            apiVersion: v1
+            kind: Plugin
+            metadata:
+              name: plugin-1
+            spec:
+              license: ["MIT", "Apache-2.0"]
+            """);
+        Plugin plugin = pluginFinder.unstructuredToPlugin(pluginResource);
+        assertThat(plugin.getSpec()).isNotNull();
+        JSONAssert.assertEquals("""
+            [{
+                "name": "MIT",
+                "url": ""
+            },
+            {
+                "name": "Apache-2.0",
+                "url": ""
+            }]
+            """, JsonUtils.objectToJson(plugin.getSpec().getLicense()), false);
+    }
+
+    @Test
+    void acceptArrayObjectLicense() throws JSONException, JsonProcessingException {
+        Resource pluginResource = new InMemoryResource("""
+            apiVersion: v1
+            kind: Plugin
+            metadata:
+              name: plugin-1
+            spec:
+              license:
+                - name: MIT
+                  url: https://exmple.com
+            """);
+        Plugin plugin = pluginFinder.unstructuredToPlugin(pluginResource);
+        assertThat(plugin.getSpec()).isNotNull();
+        JSONAssert.assertEquals("""
+            [{
+                "name": "MIT",
+                "url": "https://exmple.com"
+            }]
+            """, JsonUtils.objectToJson(plugin.getSpec().getLicense()), false);
     }
 }

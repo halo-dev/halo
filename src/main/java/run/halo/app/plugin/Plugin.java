@@ -1,10 +1,14 @@
 package run.halo.app.plugin;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
@@ -42,7 +46,8 @@ public class Plugin extends AbstractExtension {
 
         private String description;
 
-        private String license;
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+        private List<License> license;
 
         /**
          * SemVer format.
@@ -50,5 +55,20 @@ public class Plugin extends AbstractExtension {
         private String requires = "*";
 
         private String pluginClass = BasePlugin.class.getName();
+    }
+
+    @Getter
+    @Setter
+    public static class License {
+        private String name;
+        private String url;
+
+        public License() {
+        }
+
+        public License(String name) {
+            this.name = name;
+            this.url = "";
+        }
     }
 }
