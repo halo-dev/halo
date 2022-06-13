@@ -1,6 +1,7 @@
 package run.halo.app.extension;
 
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * GroupVersionKind contains group, version and kind name of an Extension.
@@ -24,6 +25,10 @@ public record GroupVersionKind(String group, String version, String kind) {
      */
     public GroupVersion groupVersion() {
         return new GroupVersion(group, version);
+    }
+
+    public boolean hasGroup() {
+        return StringUtils.hasText(group);
     }
 
     /**

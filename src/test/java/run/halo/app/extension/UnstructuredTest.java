@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class UnstructuredTest {
@@ -29,11 +28,6 @@ class UnstructuredTest {
             }
         }
         """;
-
-    @BeforeAll
-    static void setUpGlobally() {
-        Schemes.INSTANCE.register(FakeExtension.class);
-    }
 
     @Test
     void shouldSerializeCorrectly() throws JsonProcessingException {

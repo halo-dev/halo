@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import java.io.IOException;
@@ -26,15 +27,26 @@ public class JSONExtensionConverter implements ExtensionConverter {
     private final ObjectMapper objectMapper;
     private final JsonSchemaFactory jsonSchemaFactory;
 
-    public JSONExtensionConverter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    private final SchemeManager schemeManager;
+
+    public JSONExtensionConverter(SchemeManager schemeManager) {
+        this.schemeManager = schemeManager;
+        // Extension converter need a stable ObjectMapper instead of global ObjectMapper.
+        // So we create a fresh ObjectMapper and register some modules here.
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
         jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     @Override
     public <E extends Extension> ExtensionStore convertTo(E extension) {
         var gvk = extension.groupVersionKind();
-        var scheme = Schemes.INSTANCE.get(gvk);
+        var scheme = schemeManager.get(gvk);
         var storeName = ExtensionUtil.buildStoreName(scheme, extension.getMetadata().getName());
         try {
             if (logger.isDebugEnabled()) {

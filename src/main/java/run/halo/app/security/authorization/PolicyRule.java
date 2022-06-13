@@ -49,6 +49,10 @@ public class PolicyRule {
      */
     String[] verbs;
 
+    public PolicyRule() {
+        this(null, null, null, null, null);
+    }
+
     public PolicyRule(String[] apiGroups, String[] resources, String[] resourceNames,
         String[] nonResourceURLs, String[] verbs) {
         this.apiGroups = nullElseEmpty(apiGroups);

@@ -2,8 +2,6 @@ package run.halo.app.extension;
 
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -14,29 +12,45 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 
-public class ExtensionEndpointInstaller {
+public class ExtensionRouterFunctionFactory {
 
-    public static List<RouterFunction<ServerResponse>> install(Scheme scheme,
-        ExtensionClient client) {
+    private final Scheme scheme;
 
-        var routers = new ArrayList<RouterFunction<ServerResponse>>(6);
+    private final ExtensionClient client;
+
+    public ExtensionRouterFunctionFactory(Scheme scheme, ExtensionClient client) {
+        this.scheme = scheme;
+        this.client = client;
+    }
+
+    @NonNull
+    public RouterFunction<ServerResponse> create() {
         var getHandler = new ExtensionGetHandler(scheme, client);
         var listHandler = new ExtensionListHandler(scheme, client);
         var createHandler = new ExtensionCreateHandler(scheme, client);
         // TODO More handlers here
-        routers.add(route()
+        return route()
             .GET(getHandler.pathPattern(), getHandler)
             .GET(listHandler.pathPattern(), listHandler)
             .POST(createHandler.pathPattern(), createHandler)
-            .build());
-
-        return routers;
+            .build();
     }
 
     public interface PathPatternGenerator {
 
         String pathPattern();
 
+        static String buildExtensionPathPattern(Scheme scheme) {
+            var gvk = scheme.groupVersionKind();
+            StringBuilder pattern = new StringBuilder();
+            if (gvk.hasGroup()) {
+                pattern.append("/apis/").append(gvk.group());
+            } else {
+                pattern.append("/api");
+            }
+            return pattern.append('/').append(gvk.version()).append('/').append(scheme.plural())
+                .toString();
+        }
     }
 
     public interface GetHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
@@ -63,7 +77,8 @@ public class ExtensionEndpointInstaller {
         }
 
         @Override
-        public Mono<ServerResponse> handle(ServerRequest request) {
+        @NonNull
+        public Mono<ServerResponse> handle(@NonNull ServerRequest request) {
             return request.bodyToMono(Unstructured.class)
                 .switchIfEmpty(Mono.error(() -> new ExtensionConvertException(
                     "Cannot read body to " + scheme.groupVersionKind())))
@@ -82,8 +97,7 @@ public class ExtensionEndpointInstaller {
 
         @Override
         public String pathPattern() {
-            var gvk = scheme.groupVersionKind();
-            return "/apis/" + gvk.group() + "/" + gvk.version() + "/" + scheme.plural();
+            return PathPatternGenerator.buildExtensionPathPattern(scheme);
         }
     }
 
@@ -99,7 +113,8 @@ public class ExtensionEndpointInstaller {
         }
 
         @Override
-        public Mono<ServerResponse> handle(ServerRequest request) {
+        @NonNull
+        public Mono<ServerResponse> handle(@NonNull ServerRequest request) {
             // TODO Resolve predicate and comparator
             var extensions = client.list(scheme.type(), null, null);
             return ServerResponse
@@ -110,8 +125,7 @@ public class ExtensionEndpointInstaller {
 
         @Override
         public String pathPattern() {
-            var gvk = scheme.groupVersionKind();
-            return "/apis/" + gvk.group() + "/" + gvk.version() + "/" + scheme.plural();
+            return PathPatternGenerator.buildExtensionPathPattern(scheme);
         }
     }
 
@@ -127,13 +141,12 @@ public class ExtensionEndpointInstaller {
 
         @Override
         public String pathPattern() {
-            var gvk = scheme.groupVersionKind();
-            return "/apis/" + gvk.group() + "/" + gvk.version() + "/" + scheme.plural() + "/{name}";
+            return PathPatternGenerator.buildExtensionPathPattern(scheme) + "/{name}";
         }
 
         @Override
         @NonNull
-        public Mono<ServerResponse> handle(ServerRequest request) {
+        public Mono<ServerResponse> handle(@NonNull ServerRequest request) {
             var extensionName = request.pathVariable("name");
 
             var extension = client.fetch(scheme.type(), extensionName)
