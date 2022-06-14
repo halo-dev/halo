@@ -67,7 +67,7 @@ public class ReverseProxyRouterFunctionFactory {
         Assert.notNull(pluginApplicationContext, "The pluginApplicationContext must not be null.");
 
         String pluginId = pluginApplicationContext.getPluginId();
-        List<RouterFunction<ServerResponse>> routerFunctions = rules.stream()
+        return rules.stream()
             .map(rule -> {
                 String routePath = buildRoutePath(pluginId, rule);
                 log.debug("Plugin [{}] registered reverse proxy route path [{}]", pluginId,
@@ -82,8 +82,9 @@ public class ReverseProxyRouterFunctionFactory {
                         return ServerResponse.ok()
                             .bodyValue(resource);
                     });
-            }).toList();
-        return routerFunctions.stream().reduce(RouterFunction::and).orElse(null);
+            })
+            .reduce(RouterFunction::and)
+            .orElse(null);
     }
 
     private List<ReverseProxyRule> getReverseProxyRules(String pluginId) {
