@@ -9,7 +9,7 @@ import {
   IconPlug,
   IconSettings,
   IconUserSettings,
-} from "@/core/icons";
+} from "@halo-dev/components";
 import type { Component } from "vue";
 
 declare interface MenuGroupType {

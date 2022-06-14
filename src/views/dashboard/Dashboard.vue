@@ -103,19 +103,19 @@
   </VModal>
 </template>
 <script lang="ts" setup>
-import { VSpace } from "@/components/base/space";
-import { VButton } from "@/components/base/button";
-import { VModal } from "@/components/base/modal";
-import { VPageHeader } from "@/components/base/header";
-import { VTabbar } from "@/components/base/tabs";
-import { VAlert } from "@/components/base/alert";
 import {
   IconAddCircle,
   IconCloseCircle,
   IconDashboard,
   IconSave,
   IconSettings,
-} from "@/core/icons";
+  VAlert,
+  VButton,
+  VModal,
+  VPageHeader,
+  VSpace,
+  VTabbar,
+} from "@halo-dev/components";
 import { ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";

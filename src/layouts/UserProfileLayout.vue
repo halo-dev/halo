@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { BasicLayout } from "@/layouts";
-import { VButton } from "@/components/base/button";
-import { VTabbar } from "@/components/base/tabs";
-import { IconUpload } from "@/core/icons";
+import { IconUpload, VButton, VTabbar } from "@halo-dev/components";
 import { onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { users } from "@/views/system/users/users-mock";

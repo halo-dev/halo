@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { VCard } from "@/components/base/card";
 import {
   IconArrowRight,
   IconBookRead,
@@ -7,7 +6,8 @@ import {
   IconPalette,
   IconPlug,
   IconUserSettings,
-} from "@/core/icons";
+  VCard,
+} from "@halo-dev/components";
 import { useRouter } from "vue-router";
 
 const actions = [

@@ -1,20 +1,23 @@
 <script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VModal } from "@/components/base/modal";
-import { VCard } from "@/components/base/card";
-import { VOption, VSelect } from "@/components/base/select";
-import { VInput } from "@/components/base/input";
-import { VTextarea } from "@/components/base/textarea";
-import { VSpace } from "@/components/base/space";
-import { VTabbar, VTabItem, VTabs } from "@/components/base/tabs";
-import { computed, onMounted, ref } from "vue";
 import {
   IconComputer,
   IconPhone,
   IconSave,
   IconSettings,
   IconTablet,
-} from "@/core/icons";
+  VButton,
+  VCard,
+  VInput,
+  VModal,
+  VOption,
+  VSelect,
+  VSpace,
+  VTabbar,
+  VTabItem,
+  VTabs,
+  VTextarea,
+} from "@halo-dev/components";
+import { computed, onMounted, ref } from "vue";
 
 const activeId = ref("general");
 const deviceActiveId = ref("desktop");

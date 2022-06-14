@@ -1,13 +1,15 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VTabbar } from "@/components/base/tabs";
+import {
+  VButton,
+  VCard,
+  VInput,
+  VPageHeader,
+  VSpace,
+  VTabbar,
+  VTag,
+} from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { plugins } from "./plugins-mock";
-import { VTag } from "@/components/base/tag";
-import { VInput } from "@/components/base/input";
-import { VSpace } from "@/components/base/space";
-import { VCard } from "@/components/base/card";
 import { ref } from "vue";
 
 const pluginActiveId = ref("detail");

@@ -1,10 +1,14 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VCard } from "@/components/base/card";
-import { VInput } from "@/components/base/input";
-import { VButton } from "@/components/base/button";
-import { VSpace } from "@/components/base/space";
-import { IconArrowDown, IconMessage, IconSettings } from "@/core/icons";
+import {
+  IconArrowDown,
+  IconMessage,
+  IconSettings,
+  VButton,
+  VCard,
+  VInput,
+  VPageHeader,
+  VSpace,
+} from "@halo-dev/components";
 import { ref } from "vue";
 
 const checkAll = ref(false);

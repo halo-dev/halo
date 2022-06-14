@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VCard } from "@/components/base/card";
+import { VCard } from "@halo-dev/components";
 </script>
 <template>
   <VCard class="h-full">

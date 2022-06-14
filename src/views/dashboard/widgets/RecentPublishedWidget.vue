@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { VCard } from "@/components/base/card";
-import { VSpace } from "@/components/base/space";
+import { VCard, VSpace } from "@halo-dev/components";
 import { posts } from "@/views/contents/posts/posts-mock";
 </script>
 <template>

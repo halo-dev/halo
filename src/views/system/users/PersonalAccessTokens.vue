@@ -1,10 +1,15 @@
 <script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VSpace } from "@/components/base/space";
-import { VModal } from "@/components/base/modal";
-import { VInput } from "@/components/base/input";
-import { VTabItem, VTabs } from "@/components/base/tabs";
-import { IconAddCircle, IconDeleteBin, IconStopCircle } from "@/core/icons";
+import {
+  IconAddCircle,
+  IconDeleteBin,
+  IconStopCircle,
+  VButton,
+  VInput,
+  VModal,
+  VSpace,
+  VTabItem,
+  VTabs,
+} from "@halo-dev/components";
 import { ref } from "vue";
 
 const createVisible = ref(false);

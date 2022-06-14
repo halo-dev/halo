@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { BasicLayout } from "@/layouts";
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VCard } from "@/components/base/card";
-import { VTabbar } from "@/components/base/tabs";
-import { IconSettings } from "@/core/icons";
+import {
+  IconSettings,
+  VButton,
+  VCard,
+  VPageHeader,
+  VTabbar,
+} from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 
@@ -46,7 +48,7 @@ const handleTabChange = (id: string) => {
         <IconSettings class="mr-2 self-center" />
       </template>
       <template #actions>
-        <VButton type="secondary" class="opacity-0">安装</VButton>
+        <VButton class="opacity-0" type="secondary">安装</VButton>
       </template>
     </VPageHeader>
 

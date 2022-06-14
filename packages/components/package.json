@@ -1,0 +1,68 @@
+{
+  "name": "@halo-dev/components",
+  "version": "0.0.0",
+  "description": "",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/halo-components.umd.js",
+  "module": "./dist/halo-components.es.js",
+  "unpkg": "./dist/halo-components.iife.js",
+  "jsdelivr": "./dist/halo-components.iife.js",
+  "types": "./dist/typings/index.d.ts",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "test:unit": "vitest --environment jsdom --run",
+    "test:unit:watch": "vitest --environment jsdom --watch",
+    "test:unit:ui": "vitest --environment jsdom --watch --ui",
+    "test:unit:coverage": "vitest run --environment jsdom --coverage",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "story:dev": "histoire dev --port 4000",
+    "story:build": "histoire build",
+    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
+    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "halo",
+    "halo-components",
+    "halo-dev",
+    "@halo-dev/components"
+  ],
+  "author": {
+    "name": "@halo-dev",
+    "url": "https://github.com/halo-dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo-admin.git",
+    "directory": "packages/components"
+  },
+  "bugs": {
+    "url": "https://github.com/halo-dev/halo/issues"
+  },
+  "homepage": "https://github.com/halo-dev/halo-admin/tree/next/packages/components#readme",
+  "license": "MIT",
+  "dependencies": {
+    "tippy.js": "^6.3.7"
+  },
+  "devDependencies": {
+    "@iconify-json/ri": "^1.1.2",
+    "@rollup/plugin-typescript": "^8.3.3",
+    "histoire": "^0.7.6",
+    "unplugin-icons": "^0.14.3",
+    "vite-plugin-dts": "^1.2.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.37",
+    "vue-router": "^4.0.16"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/halo-components.es.js",
+      "require": "./dist/halo-components.umd.js"
+    },
+    "./dist/style.css": "./dist/style.css"
+  }
+}

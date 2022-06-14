@@ -1,11 +1,15 @@
 <script lang="ts" setup>
-import { VRoutesMenu } from "@/components/base/menu";
-import { VTag } from "@/components/base/tag";
-import { VModal } from "@/components/base/modal";
-import { VInput } from "@/components/base/input";
+import {
+  IconMore,
+  IconSearch,
+  IconUserSettings,
+  VInput,
+  VModal,
+  VRoutesMenu,
+  VTag,
+} from "@halo-dev/components";
 import { menus, minimenus } from "@/router/menus.config";
 import logo from "@/assets/logo.svg";
-import { IconMore, IconSearch, IconUserSettings } from "@/core/icons";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
 

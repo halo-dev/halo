@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VCard } from "@/components/base/card";
-import { VInput } from "@/components/base/input";
-import { VSpace } from "@/components/base/space";
-import { VTag } from "@/components/base/tag";
-import { users } from "./users-mock";
-import { useRouter } from "vue-router";
 import {
   IconAddCircle,
   IconArrowDown,
   IconSettings,
   IconUserFollow,
   IconUserSettings,
-} from "@/core/icons";
+  VButton,
+  VCard,
+  VInput,
+  VPageHeader,
+  VSpace,
+  VTag,
+} from "@halo-dev/components";
+import { users } from "./users-mock";
+import { useRouter } from "vue-router";
 import { ref } from "vue";
 
 const checkAll = ref(false);

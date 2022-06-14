@@ -1,11 +1,15 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VTag } from "@/components/base/tag";
-import { VSpace } from "@/components/base/space";
-import { VCard } from "@/components/base/card";
-import { VMenu, VMenuItem } from "@/components/base/menu";
-import { IconDeleteBin, IconListSettings } from "@/core/icons";
+import {
+  IconDeleteBin,
+  IconListSettings,
+  VButton,
+  VCard,
+  VMenu,
+  VMenuItem,
+  VPageHeader,
+  VSpace,
+  VTag,
+} from "@halo-dev/components";
 import { ref } from "vue";
 
 const menus = ref([

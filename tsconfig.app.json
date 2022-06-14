@@ -3,8 +3,9 @@
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
-    "composite": true,
     "baseUrl": ".",
+    "composite": true,
+    "noImplicitAny": false,
     "paths": {
       "@/*": ["./src/*"]
     }

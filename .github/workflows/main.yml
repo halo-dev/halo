@@ -28,7 +28,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2.0.1
         with:
-          version: 6.15.1
+          version: 7.1.6
   
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
@@ -38,6 +38,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+      - name: Build packages
+        run: pnpm build:packages
       - name: Run code lint check
         run: pnpm lint
       - name: Run unit test

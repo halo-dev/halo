@@ -3,6 +3,7 @@ import { createPinia } from "pinia";
 
 import App from "./App.vue";
 import router from "./router";
+import "@halo-dev/components/dist/style.css";
 import "@/styles/tailwind.css";
 import { Dropdown, Menu, Tooltip, VClosePopper, VTooltip } from "floating-vue";
 import "floating-vue/dist/style.css";

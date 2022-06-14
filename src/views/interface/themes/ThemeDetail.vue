@@ -1,24 +1,24 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VSpace } from "@/components/base/space";
-import { VCard } from "@/components/base/card";
-import { VModal } from "@/components/base/modal";
-import { VInput } from "@/components/base/input";
-import { VTag } from "@/components/base/tag";
-import { VTextarea } from "@/components/base/textarea";
-import { VTabbar } from "@/components/base/tabs";
 import {
   IconArrowRight,
   IconExchange,
   IconEye,
   IconGitHub,
   IconPalette,
-} from "@/core/icons";
+  VAlert,
+  VButton,
+  VCard,
+  VInput,
+  VModal,
+  VPageHeader,
+  VSpace,
+  VTabbar,
+  VTag,
+  VTextarea,
+} from "@halo-dev/components";
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
 import { themes } from "@/views/interface/themes/themes-mock";
-import Alert from "@/components/base/alert/Alert.vue";
 
 const currentTheme = ref(themes[0]);
 const changeTheme = ref(false);
@@ -237,10 +237,10 @@ const handleChangeTheme = (theme: any) => {
             >
               <dt class="text-sm font-medium text-gray-900">插件依赖</dt>
               <dd class="mt-1 text-sm sm:col-span-3 sm:mt-0">
-                <Alert
+                <VAlert
                   description="当前有 1 个插件还未安装"
                   title="提示"
-                ></Alert>
+                ></VAlert>
                 <ul class="mt-2 space-y-2">
                   <li>
                     <div

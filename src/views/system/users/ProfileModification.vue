@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { VInput } from "@/components/base/input";
-import { VTextarea } from "@/components/base/textarea";
-import { VButton } from "@/components/base/button";
+import { VButton, VInput, VTextarea } from "@halo-dev/components";
 import { inject } from "vue";
 
 const user = inject("user");

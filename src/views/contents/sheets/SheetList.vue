@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VCard } from "@/components/base/card";
-import { VSpace } from "@/components/base/space";
-import { VTag } from "@/components/base/tag";
-import { VTabbar } from "@/components/base/tabs";
-import { VInput } from "@/components/base/input";
-import { VPageHeader } from "@/components/base/header";
 import {
   IconAddCircle,
   IconArrowDown,
   IconPages,
   IconSettings,
-} from "@/core/icons";
+  VButton,
+  VCard,
+  VInput,
+  VPageHeader,
+  VSpace,
+  VTabbar,
+  VTag,
+} from "@halo-dev/components";
 import { ref } from "vue";
 import { users } from "@/views/system/users/users-mock";
 import halo from "@/assets/logo-mock/halo.png";

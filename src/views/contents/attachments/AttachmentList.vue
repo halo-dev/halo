@@ -1,18 +1,4 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VModal } from "@/components/base/modal";
-import { VCard } from "@/components/base/card";
-import { VSpace } from "@/components/base/space";
-import { VInput } from "@/components/base/input";
-import { VTag } from "@/components/base/tag";
-import { ref } from "vue";
-import { users } from "@/views/system/users/users-mock";
-import vueFilePond from "vue-filepond";
-import "filepond/dist/filepond.min.css";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
-
 import {
   IconArrowDown,
   IconArrowLeft,
@@ -22,7 +8,20 @@ import {
   IconList,
   IconPalette,
   IconSettings,
-} from "@/core/icons";
+  VButton,
+  VCard,
+  VInput,
+  VModal,
+  VPageHeader,
+  VSpace,
+  VTag,
+} from "@halo-dev/components";
+import { ref } from "vue";
+import { users } from "@/views/system/users/users-mock";
+import vueFilePond from "vue-filepond";
+import "filepond/dist/filepond.min.css";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
 
 const viewTypes = [
   {

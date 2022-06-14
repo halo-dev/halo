@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { VTag } from "@/components/base/tag";
-import { IconUserSettings } from "@/core/icons";
+import { IconUserSettings, VTag } from "@halo-dev/components";
 import { inject } from "vue";
 import { useRouter } from "vue-router";
 

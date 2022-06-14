@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import { VCard } from "@/components/base/card";
-import { VTextarea } from "@/components/base/textarea";
-import { VButton } from "@/components/base/button";
+import { VButton, VCard, VTextarea } from "@halo-dev/components";
 </script>
 <template>
   <VCard

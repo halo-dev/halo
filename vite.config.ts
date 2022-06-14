@@ -1,19 +1,16 @@
 import { fileURLToPath, URL } from "url";
 
 import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-import vueJsx from "@vitejs/plugin-vue-jsx";
-import icons from "unplugin-icons/vite";
+import Vue from "@vitejs/plugin-vue";
+import VueJsx from "@vitejs/plugin-vue-jsx";
 import Compression from "vite-compression-plugin";
 import { VitePWA } from "vite-plugin-pwa";
-import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    vue(),
-    vueJsx(),
-    icons(),
+    Vue(),
+    VueJsx(),
     Compression(),
     VitePWA({
       manifest: {
@@ -22,11 +19,6 @@ export default defineConfig({
         description: "Web Client For Halo",
         theme_color: "#fff",
       },
-    }),
-    dts({
-      outputDir: "dist-typings",
-      entryRoot: "./src",
-      staticImport: true,
     }),
   ],
   resolve: {

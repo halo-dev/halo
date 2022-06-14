@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VInput } from "@/components/base/input";
+import { VButton, VInput } from "@halo-dev/components";
 </script>
 <template>
   <form class="space-y-8 divide-y divide-gray-200 sm:space-y-5">

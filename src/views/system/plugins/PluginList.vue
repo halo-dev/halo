@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { VPageHeader } from "@/components/base/header";
-import { VButton } from "@/components/base/button";
-import { VCard } from "@/components/base/card";
-import { VInput } from "@/components/base/input";
-import { VSpace } from "@/components/base/space";
-import { VTag } from "@/components/base/tag";
 import {
   IconAddCircle,
   IconArrowDown,
   IconPlug,
   IconSettings,
-} from "@/core/icons";
+  VButton,
+  VCard,
+  VInput,
+  VPageHeader,
+  VSpace,
+  VTag,
+} from "@halo-dev/components";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { plugins } from "./plugins-mock";

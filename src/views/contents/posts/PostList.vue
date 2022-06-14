@@ -1,13 +1,4 @@
 <script lang="ts" setup>
-import { VButton } from "@/components/base/button";
-import { VCard } from "@/components/base/card";
-import { VSpace } from "@/components/base/space";
-import { VTag } from "@/components/base/tag";
-import { VInput } from "@/components/base/input";
-import { VPageHeader } from "@/components/base/header";
-import { VModal } from "@/components/base/modal";
-import { VTabItem, VTabs } from "@/components/base/tabs";
-import { VTextarea } from "@/components/base/textarea";
 import {
   IconAddCircle,
   IconArrowDown,
@@ -16,7 +7,17 @@ import {
   IconBookRead,
   IconDeleteBin,
   IconSettings,
-} from "@/core/icons";
+  VButton,
+  VCard,
+  VInput,
+  VModal,
+  VPageHeader,
+  VSpace,
+  VTabItem,
+  VTabs,
+  VTag,
+  VTextarea,
+} from "@halo-dev/components";
 import { posts } from "./posts-mock";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
