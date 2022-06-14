@@ -36,7 +36,7 @@ import run.halo.app.plugin.resources.ReverseProxy.ReverseProxyRule;
 @Component
 public class ReverseProxyRouterFunctionFactory {
     private static final String REVERSE_PROXY_API_PREFIX = "/assets";
-    private static final String REVERSE_PROXY_PLUGIN_LABEL_NAME = "plugin.halo.run/pluginName";
+    private static final String REVERSE_PROXY_PLUGIN_LABEL_NAME = "plugin.halo.run/plugin-name";
 
     private final ExtensionClient extensionClient;
 
