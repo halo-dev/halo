@@ -82,8 +82,6 @@ public class HaloPluginManager extends DefaultPluginManager
 
     @Override
     public void afterPropertiesSet() {
-        // This method load, start plugins and inject extensions in Spring
-        loadPlugins();
         this.pluginApplicationInitializer = new PluginApplicationInitializer(this);
 
         this.requestMappingManager =
