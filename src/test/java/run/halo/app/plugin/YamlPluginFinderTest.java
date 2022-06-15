@@ -16,6 +16,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.Resource;
 import org.springframework.security.util.InMemoryResource;
 import org.springframework.util.ResourceUtils;
+import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -147,5 +148,29 @@ class YamlPluginFinderTest {
                 "url": "https://exmple.com"
             }]
             """, JsonUtils.objectToJson(plugin.getSpec().getLicense()), false);
+    }
+
+    @Test
+    void deserializeLicense() throws JSONException, JsonProcessingException {
+        String pluginJson = """
+            {
+                "apiVersion": "v1",
+                "kind": "Plugin",
+                "metadata": {
+                    "name": "plugin-1"
+                },
+                "spec": {
+                    "license": [
+                        {
+                            "name": "MIT",
+                            "url": "https://exmple.com"
+                        }
+                    ]
+                }
+            }
+            """;
+        Plugin plugin = Unstructured.OBJECT_MAPPER.readValue(pluginJson, Plugin.class);
+        assertThat(plugin.getSpec()).isNotNull();
+        JSONAssert.assertEquals(pluginJson, JsonUtils.objectToJson(plugin), false);
     }
 }
