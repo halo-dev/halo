@@ -5,5 +5,5 @@ package run.halo.app.extension;
     kind = "Fake",
     plural = "fakes",
     singular = "fake")
-class FakeExtension extends AbstractExtension {
+public class FakeExtension extends AbstractExtension {
 }

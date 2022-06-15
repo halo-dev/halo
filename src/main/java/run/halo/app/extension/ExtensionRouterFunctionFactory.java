@@ -36,7 +36,7 @@ public class ExtensionRouterFunctionFactory {
             .build();
     }
 
-    public interface PathPatternGenerator {
+    interface PathPatternGenerator {
 
         String pathPattern();
 
@@ -53,19 +53,19 @@ public class ExtensionRouterFunctionFactory {
         }
     }
 
-    public interface GetHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
+    interface GetHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
 
     }
 
-    public interface ListHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
+    interface ListHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
 
     }
 
-    public interface CreateHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
+    interface CreateHandler extends HandlerFunction<ServerResponse>, PathPatternGenerator {
 
     }
 
-    public static class ExtensionCreateHandler implements CreateHandler {
+    static class ExtensionCreateHandler implements CreateHandler {
 
         private final Scheme scheme;
 
@@ -88,7 +88,7 @@ public class ExtensionRouterFunctionFactory {
                         .orElseThrow(() -> new ExtensionNotFoundException(
                             scheme.groupVersionKind() + " " + unstructured.getMetadata().getName()
                                 + "was not found")))
-                .map(extension -> ServerResponse
+                .flatMap(extension -> ServerResponse
                     .ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(extension))
@@ -101,7 +101,7 @@ public class ExtensionRouterFunctionFactory {
         }
     }
 
-    public static class ExtensionListHandler implements ListHandler {
+    static class ExtensionListHandler implements ListHandler {
 
         private final Scheme scheme;
 
@@ -115,7 +115,7 @@ public class ExtensionRouterFunctionFactory {
         @Override
         @NonNull
         public Mono<ServerResponse> handle(@NonNull ServerRequest request) {
-            // TODO Resolve predicate and comparator
+            // TODO Resolve predicate and comparator from request
             var extensions = client.list(scheme.type(), null, null);
             return ServerResponse
                 .ok()
@@ -129,7 +129,7 @@ public class ExtensionRouterFunctionFactory {
         }
     }
 
-    public static class ExtensionGetHandler implements GetHandler {
+    static class ExtensionGetHandler implements GetHandler {
         private final Scheme scheme;
 
         private final ExtensionClient client;

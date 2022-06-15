@@ -1,13 +1,13 @@
 package run.halo.app.extension;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersion;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.exception.ExtensionConvertException;
@@ -24,23 +24,22 @@ public class JSONExtensionConverter implements ExtensionConverter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ObjectMapper objectMapper;
+    public static final ObjectMapper OBJECT_MAPPER;
     private final JsonSchemaFactory jsonSchemaFactory;
 
     private final SchemeManager schemeManager;
 
-    public JSONExtensionConverter(SchemeManager schemeManager) {
-        this.schemeManager = schemeManager;
-        // Extension converter need a stable ObjectMapper instead of global ObjectMapper.
-        // So we create a fresh ObjectMapper and register some modules here.
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
 
-        jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
+    static {
+        OBJECT_MAPPER = Jackson2ObjectMapperBuilder.json()
+            .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .featuresToDisable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS)
+            .build();
     }
 
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
+    public JSONExtensionConverter(SchemeManager schemeManager) {
+        this.schemeManager = schemeManager;
+        jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V201909);
     }
 
     @Override
@@ -54,9 +53,10 @@ public class JSONExtensionConverter implements ExtensionConverter {
                     scheme.jsonSchema().toPrettyString());
             }
 
+            var data = OBJECT_MAPPER.writeValueAsBytes(extension);
+
             var validator = jsonSchemaFactory.getSchema(scheme.jsonSchema());
-            var extensionNode = objectMapper.valueToTree(extension);
-            var errors = validator.validate(extensionNode);
+            var errors = validator.validate(OBJECT_MAPPER.readTree(data));
             if (!CollectionUtils.isEmpty(errors)) {
                 if (logger.isDebugEnabled()) {
                     // only print the errors when debug mode is enabled
@@ -67,11 +67,9 @@ public class JSONExtensionConverter implements ExtensionConverter {
                     "Failed to validate Extension " + extension.getClass(), errors);
             }
 
-            // keep converting
-            var data = objectMapper.writeValueAsBytes(extensionNode);
             var version = extension.getMetadata().getVersion();
             return new ExtensionStore(storeName, data, version);
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             throw new ExtensionConvertException("Failed write Extension as bytes", e);
         }
     }
@@ -79,7 +77,7 @@ public class JSONExtensionConverter implements ExtensionConverter {
     @Override
     public <E extends Extension> E convertFrom(Class<E> type, ExtensionStore extensionStore) {
         try {
-            var extension = objectMapper.readValue(extensionStore.getData(), type);
+            var extension = OBJECT_MAPPER.readValue(extensionStore.getData(), type);
             extension.getMetadata().setVersion(extensionStore.getVersion());
             return extension;
         } catch (IOException e) {

@@ -24,7 +24,9 @@ public class ExtensionCompositeRouterFunction implements
         SchemeWatcherManager watcherManager) {
         this.client = client;
         schemeRouterFuncMapper = new ConcurrentHashMap<>();
-        watcherManager.register(this);
+        if (watcherManager != null) {
+            watcherManager.register(this);
+        }
     }
 
     @Override
@@ -41,6 +43,7 @@ public class ExtensionCompositeRouterFunction implements
     }
 
     private Iterable<RouterFunction<ServerResponse>> getRouterFunctions() {
+        // TODO Copy router functions here
         return Collections.unmodifiableCollection(schemeRouterFuncMapper.values());
     }
 

@@ -13,7 +13,6 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static run.halo.app.extension.SchemeManager.createSchemeFromType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
@@ -48,7 +47,7 @@ class DefaultExtensionClientTest {
     @BeforeEach
     void setUp() {
         lenient().when(schemeManager.get(eq(FakeExtension.class)))
-            .thenReturn(createSchemeFromType(FakeExtension.class));
+            .thenReturn(Scheme.buildFromType(FakeExtension.class));
     }
 
     FakeExtension createFakeExtension(String name, Long version) {

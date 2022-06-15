@@ -108,5 +108,13 @@ class DefaultSchemeManagerTest {
         verify(watcher, times(1)).onChange(isA(SchemeUnregistered.class));
     }
 
+    @Test
+    void getSizeOfSchemes() {
+        assertEquals(0, schemeManager.size());
+        schemeManager.register(FakeExtension.class);
+        assertEquals(1, schemeManager.size());
+        schemeManager.unregister(schemeManager.get(FakeExtension.class));
+        assertEquals(0, schemeManager.size());
+    }
 }
 

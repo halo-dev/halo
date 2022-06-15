@@ -71,7 +71,9 @@ public class DefaultExtensionClient implements ExtensionClient {
 
     @Override
     public <E extends Extension> void create(E extension) {
-        extension.getMetadata().setCreationTimestamp(Instant.now());
+        var metadata = extension.getMetadata();
+        metadata.setCreationTimestamp(Instant.now());
+        // extension.setMetadata(metadata);
         var extensionStore = converter.convertTo(extension);
         storeClient.create(extensionStore.getName(), extensionStore.getData());
     }

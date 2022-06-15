@@ -22,7 +22,7 @@ class JSONExtensionConverterTest {
     void setUp() {
         DefaultSchemeManager schemeManager = new DefaultSchemeManager(null);
         converter = new JSONExtensionConverter(schemeManager);
-        objectMapper = converter.getObjectMapper();
+        objectMapper = JSONExtensionConverter.OBJECT_MAPPER;
 
         schemeManager.register(FakeExtension.class);
     }

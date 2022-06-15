@@ -1,6 +1,6 @@
 package run.halo.app.infra;
 
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import run.halo.app.security.authorization.Role;
 import run.halo.app.security.authorization.RoleBinding;
 
 @Component
-public class SchemeInitializer implements ApplicationListener<ApplicationReadyEvent> {
+public class SchemeInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
     private final SchemeManager schemeManager;
 
@@ -20,7 +20,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationReadyEv
     }
 
     @Override
-    public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+    public void onApplicationEvent(@NonNull ApplicationStartedEvent event) {
         schemeManager.register(Role.class);
         schemeManager.register(RoleBinding.class);
         schemeManager.register(PersonalAccessToken.class);

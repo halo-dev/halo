@@ -3,6 +3,7 @@ package run.halo.app.extension;
 import java.time.Instant;
 import java.util.Map;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Metadata of Extension.
@@ -10,6 +11,7 @@ import lombok.Data;
  * @author johnniang
  */
 @Data
+@EqualsAndHashCode
 public class Metadata implements MetadataOperator {
 
     /**

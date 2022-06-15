@@ -1,9 +1,10 @@
 package run.halo.app.config;
 
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.HandlerMapping;
-import org.springframework.web.reactive.function.server.support.RouterFunctionMapping;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.extension.DefaultExtensionClient;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
@@ -12,16 +13,16 @@ import run.halo.app.extension.ExtensionCompositeRouterFunction;
 import run.halo.app.extension.JSONExtensionConverter;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.SchemeWatcherManager;
+import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
 import run.halo.app.extension.store.ExtensionStoreClient;
 
 @Configuration(proxyBeanMethods = false)
 public class ExtensionConfiguration {
 
     @Bean
-    HandlerMapping extensionHandlerMapping(ExtensionClient client,
+    RouterFunction<ServerResponse> extensionsRouterFunction(ExtensionClient client,
         SchemeWatcherManager watcherManager) {
-        var extensionRouterFunc = new ExtensionCompositeRouterFunction(client, watcherManager);
-        return new RouterFunctionMapping(extensionRouterFunc);
+        return new ExtensionCompositeRouterFunction(client, watcherManager);
     }
 
     @Bean
@@ -31,7 +32,7 @@ public class ExtensionConfiguration {
     }
 
     @Bean
-    SchemeManager schemeManager(SchemeWatcherManager watcherManager) {
+    SchemeManager schemeManager(SchemeWatcherManager watcherManager, List<SchemeWatcher> watchers) {
         return new DefaultSchemeManager(watcherManager);
     }
 
