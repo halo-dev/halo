@@ -19,7 +19,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.service.RoleGetter;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Scheme;
@@ -37,7 +37,7 @@ class ExtensionConfigurationTest {
     SchemeManager schemeManager;
 
     @MockBean
-    RoleGetter roleGetter;
+    RoleService roleService;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +48,7 @@ class ExtensionConfigurationTest {
         rule.setVerbs(new String[] {"*"});
         var role = new Role();
         role.setRules(List.of(rule));
-        when(roleGetter.getRole(anyString())).thenReturn(role);
+        when(roleService.getRole(anyString())).thenReturn(role);
     }
 
     @AfterEach
