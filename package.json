@@ -27,6 +27,7 @@
   "dependencies": {
     "@halo-dev/admin-api": "^1.1.0",
     "@halo-dev/components": "workspace:*",
+    "@halo-dev/admin-shared": "workspace:*",
     "@vueuse/core": "^8.6.0",
     "filepond": "^4.30.4",
     "filepond-plugin-image-preview": "^4.6.11",
