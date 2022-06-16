@@ -51,7 +51,7 @@
     "@iconify-json/ri": "^1.1.2",
     "@rollup/plugin-typescript": "^8.3.3",
     "histoire": "^0.7.6",
-    "unplugin-icons": "^0.14.3",
+    "unplugin-icons": "^0.14.4",
     "vite-plugin-dts": "^1.2.0"
   },
   "peerDependencies": {
