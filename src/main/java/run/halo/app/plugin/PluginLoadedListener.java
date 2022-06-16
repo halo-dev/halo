@@ -6,7 +6,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.Schemes;
+import run.halo.app.extension.SchemeManager;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.event.HaloPluginLoadedEvent;
 import run.halo.app.plugin.resources.ReverseProxy;
@@ -20,12 +20,12 @@ public class PluginLoadedListener implements ApplicationListener<HaloPluginLoade
     private static final String REVERSE_PROXY_NAME = "extensions/reverseProxy.yaml";
     private final ExtensionClient extensionClient;
 
-    public PluginLoadedListener(ExtensionClient extensionClient) {
+    public PluginLoadedListener(ExtensionClient extensionClient, SchemeManager schemeManager) {
         this.extensionClient = extensionClient;
 
         // TODO Optimize schemes register
-        Schemes.INSTANCE.register(Plugin.class);
-        Schemes.INSTANCE.register(ReverseProxy.class);
+        schemeManager.register(Plugin.class);
+        schemeManager.register(ReverseProxy.class);
     }
 
     @Override

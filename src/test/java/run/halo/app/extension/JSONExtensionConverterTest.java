@@ -6,31 +6,25 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
 import run.halo.app.extension.store.ExtensionStore;
 
-@ExtendWith(MockitoExtension.class)
 class JSONExtensionConverterTest {
 
     JSONExtensionConverter converter;
 
     ObjectMapper objectMapper;
 
-    @BeforeAll
-    static void beforeAll() {
-        Schemes.INSTANCE.register(FakeExtension.class);
-    }
-
     @BeforeEach
     void setUp() {
-        objectMapper = new ObjectMapper();
-        converter = new JSONExtensionConverter(objectMapper);
+        DefaultSchemeManager schemeManager = new DefaultSchemeManager(null);
+        converter = new JSONExtensionConverter(schemeManager);
+        objectMapper = JSONExtensionConverter.OBJECT_MAPPER;
+
+        schemeManager.register(FakeExtension.class);
     }
 
     @Test

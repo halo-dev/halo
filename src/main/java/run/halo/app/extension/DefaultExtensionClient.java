@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.support.PageableExecutionUtils;
-import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreClient;
@@ -18,21 +17,25 @@ import run.halo.app.extension.store.ExtensionStoreClient;
  *
  * @author johnniang
  */
-@Service
 public class DefaultExtensionClient implements ExtensionClient {
 
     private final ExtensionStoreClient storeClient;
     private final ExtensionConverter converter;
 
-    public DefaultExtensionClient(ExtensionStoreClient storeClient, ExtensionConverter converter) {
+    private final SchemeManager schemeManager;
+
+    public DefaultExtensionClient(ExtensionStoreClient storeClient,
+        ExtensionConverter converter,
+        SchemeManager schemeManager) {
         this.storeClient = storeClient;
         this.converter = converter;
+        this.schemeManager = schemeManager;
     }
 
     @Override
     public <E extends Extension> List<E> list(Class<E> type, Predicate<E> predicate,
         Comparator<E> comparator) {
-        var scheme = Schemes.INSTANCE.get(type);
+        var scheme = schemeManager.get(type);
         var storeNamePrefix = ExtensionUtil.buildStoreNamePrefix(scheme);
 
         var storesStream = storeClient.listByNamePrefix(storeNamePrefix).stream()
@@ -59,7 +62,7 @@ public class DefaultExtensionClient implements ExtensionClient {
 
     @Override
     public <E extends Extension> Optional<E> fetch(Class<E> type, String name) {
-        var scheme = Schemes.INSTANCE.get(type);
+        var scheme = schemeManager.get(type);
 
         var storeName = ExtensionUtil.buildStoreName(scheme, name);
         return storeClient.fetchByName(storeName)
@@ -68,7 +71,9 @@ public class DefaultExtensionClient implements ExtensionClient {
 
     @Override
     public <E extends Extension> void create(E extension) {
-        extension.getMetadata().setCreationTimestamp(Instant.now());
+        var metadata = extension.getMetadata();
+        metadata.setCreationTimestamp(Instant.now());
+        // extension.setMetadata(metadata);
         var extensionStore = converter.convertTo(extension);
         storeClient.create(extensionStore.getName(), extensionStore.getData());
     }

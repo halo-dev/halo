@@ -1,14 +1,16 @@
 package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static run.halo.app.extension.MetadataOperator.metadataDeepEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeAll;
+import org.json.JSONException;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
 
 class UnstructuredTest {
 
@@ -30,25 +32,36 @@ class UnstructuredTest {
         }
         """;
 
-    @BeforeAll
-    static void setUpGlobally() {
-        Schemes.INSTANCE.register(FakeExtension.class);
-    }
-
     @Test
     void shouldSerializeCorrectly() throws JsonProcessingException {
-        var extensionNode = (ObjectNode) objectMapper.readTree(extensionJson);
-        var extension = new Unstructured(extensionNode);
+        Map extensionMap = objectMapper.readValue(extensionJson, Map.class);
+        var extension = new Unstructured(extensionMap);
 
         var gotNode = objectMapper.valueToTree(extension);
-        assertEquals(extensionNode, gotNode);
+        assertEquals(objectMapper.readTree(extensionJson), gotNode);
     }
 
     @Test
-    void shouldDeserializeCorrectly() throws JsonProcessingException {
+    void shouldSetCreationTimestamp() throws JsonProcessingException, JSONException {
+        Map extensionMap = objectMapper.readValue(extensionJson, Map.class);
+        var extension = new Unstructured(extensionMap);
+
+        System.out.println(objectMapper.writeValueAsString(extension));
+        var beforeChange = objectMapper.writeValueAsString(extension);
+
+        var metadata = extension.getMetadata();
+        metadata.setCreationTimestamp(metadata.getCreationTimestamp());
+
+        var afterChange = objectMapper.writeValueAsString(extension);
+
+        JSONAssert.assertEquals(beforeChange, afterChange, true);
+    }
+
+    @Test
+    void shouldDeserializeCorrectly() throws JsonProcessingException, JSONException {
         var extension = objectMapper.readValue(extensionJson, Unstructured.class);
-        var wantJsonNode = objectMapper.readTree(extensionJson);
-        assertEquals(wantJsonNode, extension.getExtension());
+        var gotJson = objectMapper.writeValueAsString(extension);
+        JSONAssert.assertEquals(extensionJson, gotJson, true);
     }
 
     @Test
@@ -57,7 +70,7 @@ class UnstructuredTest {
 
         assertEquals("fake.halo.run/v1alpha1", extension.getApiVersion());
         assertEquals("Fake", extension.getKind());
-        assertEquals(createMetadata(), extension.getMetadata());
+        metadataDeepEquals(createMetadata(), extension.getMetadata());
     }
 
     @Test
@@ -69,7 +82,7 @@ class UnstructuredTest {
 
         assertEquals("fake.halo.run/v1alpha1", extension.getApiVersion());
         assertEquals("Fake", extension.getKind());
-        assertEquals(createMetadata(), extension.getMetadata());
+        assertTrue(metadataDeepEquals(createMetadata(), extension.getMetadata()));
     }
 
     private Metadata createMetadata() {

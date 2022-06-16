@@ -59,7 +59,7 @@ class YamlPluginFinderTest {
                         "requires": ">=2.0.0",
                         "pluginClass": "run.halo.app.plugin.BasePlugin"
                     },
-                    "apiVersion": "v1",
+                    "apiVersion": "plugin.halo.run/v1alpha1",
                     "kind": "Plugin",
                     "metadata": {
                         "name": "plugin-1",
@@ -72,7 +72,7 @@ class YamlPluginFinderTest {
                 }
                 """,
             JsonUtils.objectToJson(plugin),
-            false);
+            true);
     }
 
     @Test
@@ -154,7 +154,7 @@ class YamlPluginFinderTest {
     void deserializeLicense() throws JSONException, JsonProcessingException {
         String pluginJson = """
             {
-                "apiVersion": "v1",
+                "apiVersion": "plugin.halo.run/v1alpha1",
                 "kind": "Plugin",
                 "metadata": {
                     "name": "plugin-1"
