@@ -26,6 +26,9 @@ export default defineConfig({
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 2048,
+  },
   test: {
     transformMode: {
       web: [/\.[jt]sx$/],

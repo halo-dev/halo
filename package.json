@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@halo-dev/admin-api": "^1.1.0",
+    "@halo-dev/components": "workspace:*",
     "@vueuse/core": "^8.6.0",
     "filepond": "^4.30.4",
     "filepond-plugin-image-preview": "^4.6.11",
@@ -35,8 +36,7 @@
     "vue": "^3.2.37",
     "vue-filepond": "^7.0.3",
     "vue-grid-layout": "3.0.0-beta1",
-    "vue-router": "^4.0.16",
-    "@halo-dev/components": "workspace:*"
+    "vue-router": "^4.0.16"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.3",
