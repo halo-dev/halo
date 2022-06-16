@@ -9,7 +9,7 @@
   "module": "./dist/halo-components.es.js",
   "unpkg": "./dist/halo-components.iife.js",
   "jsdelivr": "./dist/halo-components.iife.js",
-  "types": "./dist/typings/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "vite build --watch",
     "build": "vite build",
@@ -60,6 +60,7 @@
   },
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/halo-components.es.js",
       "require": "./dist/halo-components.umd.js"
     },

@@ -14,7 +14,7 @@ export default defineConfig({
     Icons(),
     Dts({
       entryRoot: "./src",
-      outputDir: "./dist/typings",
+      outputDir: "./dist",
       insertTypesEntry: true,
     }),
   ],
