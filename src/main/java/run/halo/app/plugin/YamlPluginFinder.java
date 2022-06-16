@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.util.FileUtils;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
@@ -70,8 +71,13 @@ public class YamlPluginFinder {
         if (Files.notExists(propertiesPath)) {
             throw new PluginRuntimeException("Cannot find '{}' path", propertiesPath);
         }
+        Resource propertyResource = new FileSystemResource(propertiesPath);
+        return unstructuredToPlugin(propertyResource);
+    }
+
+    protected Plugin unstructuredToPlugin(Resource propertyResource) {
         YamlUnstructuredLoader yamlUnstructuredLoader =
-            new YamlUnstructuredLoader(new FileSystemResource(propertiesPath));
+            new YamlUnstructuredLoader(propertyResource);
         List<Unstructured> unstructuredList = yamlUnstructuredLoader.load();
         if (unstructuredList.size() != 1) {
             throw new PluginRuntimeException("Unable to find plugin descriptor file '{}'",

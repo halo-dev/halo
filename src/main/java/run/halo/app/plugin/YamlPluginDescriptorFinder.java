@@ -2,12 +2,16 @@ package run.halo.app.plugin;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.pf4j.DefaultPluginDescriptor;
 import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.util.FileUtils;
+import org.springframework.util.CollectionUtils;
 
 /**
  * Find a plugin descriptor for a plugin path.
@@ -41,6 +45,7 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
     private DefaultPluginDescriptor convert(Plugin plugin) {
         String pluginId = plugin.getMetadata().getName();
         Plugin.PluginSpec spec = plugin.getSpec();
+
         DefaultPluginDescriptor defaultPluginDescriptor =
             new DefaultPluginDescriptor(pluginId,
                 spec.getDescription(),
@@ -48,7 +53,7 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
                 spec.getVersion(),
                 spec.getRequires(),
                 spec.getAuthor(),
-                spec.getLicense());
+                joinLicense(spec.getLicense()));
         // add dependencies
         spec.getPluginDependencies().forEach((pluginDepName, versionRequire) -> {
             PluginDependency dependency =
@@ -56,5 +61,14 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
             defaultPluginDescriptor.addDependency(dependency);
         });
         return defaultPluginDescriptor;
+    }
+
+    private String joinLicense(List<Plugin.License> licenses) {
+        if (CollectionUtils.isEmpty(licenses)) {
+            return StringUtils.EMPTY;
+        }
+        return licenses.stream()
+            .map(Plugin.License::getName)
+            .collect(Collectors.joining(","));
     }
 }
