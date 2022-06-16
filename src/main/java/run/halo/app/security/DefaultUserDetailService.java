@@ -12,14 +12,14 @@ import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 
-public class UserExtensionUserDetailService
+public class DefaultUserDetailService
     implements ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
 
     private final UserService userService;
 
     private final RoleService roleService;
 
-    public UserExtensionUserDetailService(UserService userService, RoleService roleService) {
+    public DefaultUserDetailService(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
     }

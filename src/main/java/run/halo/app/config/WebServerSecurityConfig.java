@@ -28,7 +28,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.infra.properties.JwtProperties;
-import run.halo.app.security.UserExtensionUserDetailService;
+import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
@@ -97,7 +97,7 @@ public class WebServerSecurityConfig {
     @Bean
     ReactiveUserDetailsService userDetailsService(UserService userService,
         RoleService roleService) {
-        return new UserExtensionUserDetailService(userService, roleService);
+        return new DefaultUserDetailService(userService, roleService);
     }
 
     @Bean
