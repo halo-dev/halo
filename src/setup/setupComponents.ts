@@ -3,7 +3,7 @@ import { Dropdown, Menu, Tooltip, VClosePopper, VTooltip } from "floating-vue";
 import "floating-vue/dist/style.css";
 // @ts-ignore
 import VueGridLayout from "vue-grid-layout";
-import Widgets from "@/views/dashboard/widgets";
+import Widgets from "@/modules/dashboard/widgets";
 
 export function setupComponents(app: App) {
   app.use(VueGridLayout);

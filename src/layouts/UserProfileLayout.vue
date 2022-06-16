@@ -3,7 +3,7 @@ import { BasicLayout } from "@/layouts";
 import { IconUpload, VButton, VTabbar } from "@halo-dev/components";
 import { onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { users } from "@/views/system/users/users-mock";
+import { users } from "@/modules/system/users/users-mock";
 
 const tabs = [
   {

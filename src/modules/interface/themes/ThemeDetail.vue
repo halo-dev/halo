@@ -18,7 +18,7 @@ import {
 } from "@halo-dev/components";
 import { ref } from "vue";
 import { RouterLink } from "vue-router";
-import { themes } from "@/views/interface/themes/themes-mock";
+import { themes } from "@/modules/interface/themes/themes-mock";
 
 const currentTheme = ref(themes[0]);
 const changeTheme = ref(false);

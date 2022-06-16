@@ -13,7 +13,7 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { ref } from "vue";
-import { users } from "@/views/system/users/users-mock";
+import { users } from "@/modules/system/users/users-mock";
 import halo from "@/assets/logo-mock/halo.png";
 
 const sheetsRef = ref([

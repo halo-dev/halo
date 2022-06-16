@@ -6,31 +6,31 @@ import {
   UserProfileLayout,
 } from "@/layouts";
 
-import Dashboard from "../views/dashboard/Dashboard.vue";
+import Dashboard from "../modules/dashboard/Dashboard.vue";
 
-import PostList from "../views/contents/posts/PostList.vue";
-import PostEditor from "../views/contents/posts/PostEditor.vue";
-import SheetList from "../views/contents/sheets/SheetList.vue";
-import CategoryList from "../views/contents/posts/categories/CategoryList.vue";
-import TagList from "../views/contents/posts/tags/TagList.vue";
-import CommentList from "../views/contents/comments/CommentList.vue";
-import AttachmentList from "../views/contents/attachments/AttachmentList.vue";
+import PostList from "../modules/contents/posts/PostList.vue";
+import PostEditor from "../modules/contents/posts/PostEditor.vue";
+import SheetList from "../modules/contents/sheets/SheetList.vue";
+import CategoryList from "../modules/contents/posts/categories/CategoryList.vue";
+import TagList from "../modules/contents/posts/tags/TagList.vue";
+import CommentList from "../modules/contents/comments/CommentList.vue";
+import AttachmentList from "../modules/contents/attachments/AttachmentList.vue";
 
-import ThemeDetail from "../views/interface/themes/ThemeDetail.vue";
-import MenuList from "../views/interface/menus/MenuList.vue";
-import Visual from "../views/interface/themes/Visual.vue";
+import ThemeDetail from "../modules/interface/themes/ThemeDetail.vue";
+import MenuList from "../modules/interface/menus/MenuList.vue";
+import Visual from "../modules/interface/themes/Visual.vue";
 
-import PluginList from "../views/system/plugins/PluginList.vue";
-import PluginDetail from "../views/system/plugins/PluginDetail.vue";
-import UserList from "../views/system/users/UserList.vue";
-import RoleList from "../views/system/roles/RoleList.vue";
-import RoleDetail from "../views/system/roles/RoleDetail.vue";
-import UserDetail from "../views/system/users/UserDetail.vue";
-import ProfileModification from "../views/system/users/ProfileModification.vue";
-import PasswordChange from "../views/system/users/PasswordChange.vue";
-import PersonalAccessTokens from "../views/system/users/PersonalAccessTokens.vue";
-import GeneralSettings from "../views/system/settings/GeneralSettings.vue";
-import NotificationSettings from "../views/system/settings/NotificationSettings.vue";
+import PluginList from "../modules/system/plugins/PluginList.vue";
+import PluginDetail from "../modules/system/plugins/PluginDetail.vue";
+import UserList from "../modules/system/users/UserList.vue";
+import RoleList from "../modules/system/roles/RoleList.vue";
+import RoleDetail from "../modules/system/roles/RoleDetail.vue";
+import UserDetail from "../modules/system/users/UserDetail.vue";
+import ProfileModification from "../modules/system/users/ProfileModification.vue";
+import PasswordChange from "../modules/system/users/PasswordChange.vue";
+import PersonalAccessTokens from "../modules/system/users/PersonalAccessTokens.vue";
+import GeneralSettings from "../modules/system/settings/GeneralSettings.vue";
+import NotificationSettings from "../modules/system/settings/NotificationSettings.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {

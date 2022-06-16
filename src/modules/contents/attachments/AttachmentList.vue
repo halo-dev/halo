@@ -17,7 +17,7 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { ref } from "vue";
-import { users } from "@/views/system/users/users-mock";
+import { users } from "@/modules/system/users/users-mock";
 import vueFilePond from "vue-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";

@@ -22,7 +22,7 @@ import { posts } from "./posts-mock";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Post } from "@halo-dev/admin-api";
-import { users } from "@/views/system/users/users-mock";
+import { users } from "@/modules/system/users/users-mock";
 
 const postsRef = ref(
   // eslint-disable-next-line

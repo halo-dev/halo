@@ -10,9 +10,9 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { useRoute, useRouter } from "vue-router";
-import { roles } from "@/views/system/roles/roles-mock";
+import { roles } from "@/modules/system/roles/roles-mock";
 import { ref } from "vue";
-import { users } from "@/views/system/users/users-mock";
+import { users } from "@/modules/system/users/users-mock";
 
 const route = useRoute();
 
