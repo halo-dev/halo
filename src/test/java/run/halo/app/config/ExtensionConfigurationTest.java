@@ -43,10 +43,11 @@ class ExtensionConfigurationTest {
     @BeforeEach
     void setUp() {
         // disable authorization
-        var rule = new PolicyRule();
-        rule.setApiGroups(new String[] {"*"});
-        rule.setResources(new String[] {"*"});
-        rule.setVerbs(new String[] {"*"});
+        var rule = new PolicyRule.Builder()
+            .apiGroups("*")
+            .resources("*")
+            .verbs("*")
+            .build();
         var role = new Role();
         role.setRules(List.of(rule));
         when(roleGetter.getRole(anyString())).thenReturn(role);

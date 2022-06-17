@@ -17,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @author guqing
  * @since 2.0.0
  */
-// @ExtendWith(SpringExtension.class)
 public class DefaultRoleBindingListerTest {
 
     private DefaultRoleBindingLister roleBindingLister;

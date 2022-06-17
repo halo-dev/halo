@@ -98,6 +98,9 @@ public class PluginCompositeRouterFunction implements RouterFunction<ServerRespo
     @SuppressWarnings("unchecked")
     private List<RouterFunction<ServerResponse>> routerFunctions(
         PluginApplicationContext applicationContext) {
+        // TODO: Since the parent of the ApplicationContext of the plugin is RootApplicationContext
+        //  obtaining the RouterFunction here will obtain the existing in the parent
+        //  resulting in a loop when there is no matching route
         List<RouterFunction<ServerResponse>> functions =
             applicationContext.getBeanProvider(RouterFunction.class)
                 .orderedStream()

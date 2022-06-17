@@ -65,4 +65,6 @@ public interface Attributes {
      * @return returns the path of the request
      */
     String getPath();
+
+    String pluginName();
 }

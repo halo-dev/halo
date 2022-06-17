@@ -37,7 +37,8 @@ public class RbacRequestEvaluation {
             return verbMatches(rule, requestAttributes.getVerb())
                 && apiGroupMatches(rule, requestAttributes.getApiGroup())
                 && resourceMatches(rule, combinedResource, requestAttributes.getSubresource())
-                && resourceNameMatches(rule, requestAttributes.getName());
+                && resourceNameMatches(rule, requestAttributes.getName())
+                && pluginNameMatches(rule, requestAttributes.pluginName());
         }
         return verbMatches(rule, requestAttributes.getVerb())
             && nonResourceURLMatches(rule, requestAttributes.getPath());
@@ -121,5 +122,9 @@ public class RbacRequestEvaluation {
             }
         }
         return false;
+    }
+
+    protected boolean pluginNameMatches(PolicyRule rule, String pluginName) {
+        return StringUtils.equals(rule.getPluginName(), pluginName);
     }
 }
