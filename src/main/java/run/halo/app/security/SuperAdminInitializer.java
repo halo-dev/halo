@@ -33,7 +33,7 @@ public class SuperAdminInitializer implements ApplicationListener<ApplicationSta
     @Override
     public void onApplicationEvent(ApplicationStartedEvent event) {
         client.fetch(User.class, "admin").ifPresentOrElse(user -> {
-            // do nothing
+            // do nothing if admin has been initialized
         }, () -> {
             var admin = createAdmin();
             var superRole = createSuperRole();
@@ -46,8 +46,7 @@ public class SuperAdminInitializer implements ApplicationListener<ApplicationSta
 
     RoleBinding bindAdminAndSuperRole(User admin, Role superRole) {
         var metadata = new Metadata();
-        metadata.setName(
-            admin.getMetadata().getName() + superRole.getMetadata().getName() + "-binding");
+        metadata.setName("admin-super-role-binding");
         var roleRef = new RoleRef();
         roleRef.setName(superRole.getMetadata().getName());
         roleRef.setApiGroup(superRole.groupVersionKind().group());
