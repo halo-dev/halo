@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.reactive.result.method.RequestMappingInfo;
 import org.springframework.web.reactive.result.method.RequestMappingInfoHandlerMapping;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
+import run.halo.app.extension.GroupVersion;
 
 /**
  * An extension of {@link RequestMappingInfoHandlerMapping} that creates
@@ -119,6 +120,7 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
     }
 
     protected String buildPrefix(String pluginId, String version) {
-        return String.format("/api/%s/plugins/%s", version, pluginId);
+        GroupVersion groupVersion = GroupVersion.parseAPIVersion(version);
+        return String.format("/api/%s/plugins/%s", groupVersion.version(), pluginId);
     }
 }
