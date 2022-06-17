@@ -3,6 +3,7 @@ package run.halo.app.utils;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,6 +19,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.ForbiddenException;
 
 /**
@@ -585,5 +588,19 @@ public class FileUtils {
      */
     public static void writeStringToFile(File file, String content) throws IOException {
         org.apache.commons.io.FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
+    }
+
+    public static File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
+        File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        try {
+            if (file.createNewFile()) {
+                FileOutputStream fos = new FileOutputStream(file);
+                fos.write(multipartFile.getBytes());
+                fos.close();
+            }
+        } catch (Exception e) {
+            throw new IOException("Failed to convert MultipartFile to File.", e);
+        }
+        return file;
     }
 }

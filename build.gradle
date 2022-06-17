@@ -75,6 +75,7 @@ ext {
     jsoupVersion = '1.14.3'
     embeddedRedisVersion = '0.6'
     diffUtilsVersion = '4.11'
+    metadataExtractor = '2.17.0'
 }
 
 dependencies {
@@ -125,6 +126,7 @@ dependencies {
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     implementation "com.google.zxing:core:$zxingVersion"
     implementation "io.github.java-diff-utils:java-diff-utils:$diffUtilsVersion"
+    implementation "com.drewnoakes:metadata-extractor:$metadataExtractor"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
@@ -141,7 +143,7 @@ dependencies {
     }
     testImplementation "org.jsoup:jsoup:$jsoupVersion"
 
-    testImplementation ("com.github.kstyrc:embedded-redis:$embeddedRedisVersion") {
+    testImplementation("com.github.kstyrc:embedded-redis:$embeddedRedisVersion") {
         exclude group: 'org.slf4j', module: 'slf4j-simple'
     }
 

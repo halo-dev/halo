@@ -3,6 +3,7 @@ package run.halo.app.handler.file;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -12,6 +13,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.RepeatTypeException;
+import run.halo.app.handler.prehandler.FilePreHandler;
+import run.halo.app.handler.prehandler.FilePreHandlers;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
@@ -25,6 +28,9 @@ import run.halo.app.model.support.UploadResult;
 @Slf4j
 @Component
 public class FileHandlers {
+    
+    @Autowired
+    private FilePreHandlers filePreHandlers;
 
     /**
      * File handler container.
@@ -50,6 +56,7 @@ public class FileHandlers {
     @NonNull
     public UploadResult upload(@NonNull MultipartFile file,
         @NonNull AttachmentType attachmentType) {
+        filePreHandlers.doPreProcess(file);
         return getSupportedType(attachmentType).upload(file);
     }
 
