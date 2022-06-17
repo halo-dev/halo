@@ -80,6 +80,66 @@ public class RequestInfoResolverTest {
     }
 
     @Test
+    void pluginsScopedAndPluginManage() {
+        List<SuccessCase> testCases =
+            List.of(new SuccessCase("DELETE", "/apis/extensions/v1/plugins/other/posts",
+                    "delete", "apis", "extensions", "v1", "", "plugins", "posts", "other",
+                    new String[] {"plugins", "other", "posts"}),
+
+                // api group identification
+                new SuccessCase("POST", "/apis/extensions/v1/plugins/other/posts", "create", "apis",
+                    "extensions", "v1", "", "plugins", "posts", "other", new String[] {"plugins", "other", "posts"}),
+
+                // api version identification
+                new SuccessCase("POST", "/apis/extensions/v1beta3/plugins/other/posts", "create",
+                    "apis", "extensions", "v1beta3", "", "plugins", "posts", "other",
+                    new String[] {"plugins", "other", "posts"}));
+
+        // 以 /apis 开头的 plugins 资源为 core 中管理插件使用的资源
+        for (SuccessCase successCase : testCases) {
+            var request =
+                method(HttpMethod.valueOf(successCase.method),
+                    successCase.url).build();
+            RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
+            assertThat(requestInfo).isNotNull();
+            assertRequestInfoCase(successCase, requestInfo);
+        }
+
+        List<SuccessCase> pluginScopedCases =
+            List.of(new SuccessCase("DELETE", "/api/v1/plugins/other/posts",
+                    "deletecollection", "api", "", "v1", "other", "posts", "", "",
+                    new String[] {"posts"}),
+
+                // api group identification
+                new SuccessCase("POST", "/api/v1/plugins/other/posts", "create", "api",
+                    "", "v1", "other", "posts", "", "", new String[] {"posts"}),
+
+                // api version identification
+                new SuccessCase("POST", "/api/v1beta3/plugins/other/posts", "create",
+                    "api", "", "v1beta3", "other", "posts", "", "",
+                    new String[] {"posts"}));
+
+        for (SuccessCase pluginScopedCase : pluginScopedCases) {
+            var request =
+                method(HttpMethod.valueOf(pluginScopedCase.method),
+                    pluginScopedCase.url).build();
+            RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
+            assertThat(requestInfo).isNotNull();
+            assertRequestInfoCase(pluginScopedCase, requestInfo);
+        }
+    }
+
+    private void assertRequestInfoCase(SuccessCase pluginScopedCase, RequestInfo requestInfo) {
+        assertThat(requestInfo.getPluginName()).isEqualTo(pluginScopedCase.expectedPluginName);
+        assertThat(requestInfo.getVerb()).isEqualTo(pluginScopedCase.expectedVerb);
+        assertThat(requestInfo.getParts()).isEqualTo(pluginScopedCase.expectedParts);
+        assertThat(requestInfo.getApiGroup()).isEqualTo(pluginScopedCase.expectedAPIGroup);
+        assertThat(requestInfo.getResource()).isEqualTo(pluginScopedCase.expectedResource);
+        assertThat(requestInfo.getSubresource())
+            .isEqualTo(pluginScopedCase.expectedSubresource());
+    }
+
+    @Test
     public void errorCaseTest() {
         List<ErrorCases> errorCases = List.of(new ErrorCases("no resource path", "/"),
             new ErrorCases("just apiversion", "/api/version/"),
@@ -186,7 +246,7 @@ public class RequestInfoResolverTest {
 
     public record SuccessCase(String method, String url, String expectedVerb,
                               String expectedAPIPrefix, String expectedAPIGroup,
-                              String expectedAPIVersion, String expectedNamespace,
+                              String expectedAPIVersion, String expectedPluginName,
                               String expectedResource, String expectedSubresource,
                               String expectedName, String[] expectedParts) {
     }
@@ -256,18 +316,7 @@ public class RequestInfoResolverTest {
             new SuccessCase("DELETE", "/api/v1/plugins", "deletecollection", "api", "", "v1", "",
                 "plugins", "", "", new String[] {"plugins"}),
             new SuccessCase("DELETE", "/api/v1/plugins/other/posts", "deletecollection", "api",
-                "", "v1", "other", "posts", "", "", new String[] {"posts"}),
-            new SuccessCase("DELETE", "/apis/extensions/v1/plugins/other/posts",
-                "deletecollection", "apis", "extensions", "v1", "other", "posts", "", "",
-                new String[] {"posts"}),
-
-            // api group identification
-            new SuccessCase("POST", "/apis/extensions/v1/plugins/other/posts", "create", "apis",
-                "extensions", "v1", "other", "posts", "", "", new String[] {"posts"}),
-
-            // api version identification
-            new SuccessCase("POST", "/apis/extensions/v1beta3/plugins/other/posts", "create",
-                "apis", "extensions", "v1beta3", "other", "posts", "", "", new String[] {"posts"}));
+                "", "v1", "other", "posts", "", "", new String[] {"posts"}));
     }
 
 }

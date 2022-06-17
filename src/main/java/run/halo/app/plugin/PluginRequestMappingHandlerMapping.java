@@ -16,14 +16,15 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.reactive.result.method.RequestMappingInfo;
 import org.springframework.web.reactive.result.method.RequestMappingInfoHandlerMapping;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * An extension of {@link RequestMappingInfoHandlerMapping} that creates
- * {@link RequestMappingInfo} instances from class-level and method-level {@link @RequestMapping}
- * annotations used by plugin.
+ * {@link RequestMappingInfo} instances from class-level and method-level
+ * {@link RequestMapping} annotations used by plugin.
  *
  * @author guqing
  * @since 2.0.0

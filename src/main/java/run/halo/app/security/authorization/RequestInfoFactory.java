@@ -140,7 +140,8 @@ public class RequestInfoFactory {
         }
         // URL forms: /plugins/{plugin-name}/{kind}/*, where parts are adjusted to be relative
         // to kind
-        if (Objects.equals(currentParts[0], "plugins")) {
+        if (Objects.equals(currentParts[0], "plugins")
+            && StringUtils.isEmpty(requestInfo.getApiGroup())) {
             if (currentParts.length > 1) {
                 requestInfo.pluginName = currentParts[1];
 
