@@ -26,8 +26,8 @@
   ],
   "dependencies": {
     "@halo-dev/admin-api": "^1.1.0",
-    "@halo-dev/components": "workspace:*",
     "@halo-dev/admin-shared": "workspace:*",
+    "@halo-dev/components": "workspace:*",
     "@vueuse/core": "^8.6.0",
     "filepond": "^4.30.4",
     "filepond-plugin-image-preview": "^4.6.11",
@@ -72,6 +72,7 @@
     "vite": "^2.9.12",
     "vite-compression-plugin": "^0.0.4",
     "vite-plugin-pwa": "^0.12.0",
+    "vite-plugin-vue-setup-extend": "^0.4.0",
     "vitest": "^0.15.1",
     "vue-tsc": "^0.34.17"
   }

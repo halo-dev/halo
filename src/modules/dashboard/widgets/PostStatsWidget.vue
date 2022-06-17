@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang="ts" name="PostStatsWidget" setup>
 import { VCard } from "@halo-dev/components";
 </script>
 <template>

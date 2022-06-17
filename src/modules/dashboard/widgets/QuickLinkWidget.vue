@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang="ts" name="QuickLinkWidget" setup>
 import {
   IconArrowRight,
   IconBookRead,

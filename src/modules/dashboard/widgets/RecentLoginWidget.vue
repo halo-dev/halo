@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang="ts" name="RecentLoginWidget" setup>
 import { VCard } from "@halo-dev/components";
 import { users } from "@/modules/system/users/users-mock";
 </script>

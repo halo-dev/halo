@@ -2,98 +2,28 @@ import {
   IconBookRead,
   IconDashboard,
   IconFolder,
-  IconListSettings,
   IconMessage,
-  IconPages,
-  IconPalette,
-  IconPlug,
-  IconSettings,
   IconUserSettings,
 } from "@halo-dev/components";
-import type { Component } from "vue";
 
-declare interface MenuGroupType {
-  name?: string;
-  items: MenuItemType[];
-}
-
-declare interface MenuItemType {
-  name: string;
-  path: string;
-  icon?: Component;
-  meta?: Record<string, unknown>;
-  children?: MenuItemType[];
-}
+import type { MenuGroupType, MenuItemType } from "@halo-dev/admin-shared";
 
 export const menus: MenuGroupType[] = [
   {
-    items: [
-      {
-        name: "仪表盘",
-        path: "/dashboard",
-        icon: IconDashboard,
-      },
-    ],
+    name: "",
+    items: [],
   },
   {
     name: "内容",
-    items: [
-      {
-        name: "文章",
-        path: "/posts",
-        icon: IconBookRead,
-      },
-      {
-        name: "页面",
-        path: "/sheets",
-        icon: IconPages,
-      },
-      {
-        name: "评论",
-        path: "/comments",
-        icon: IconMessage,
-      },
-      {
-        name: "附件",
-        path: "/attachments",
-        icon: IconFolder,
-      },
-    ],
+    items: [],
   },
   {
     name: "外观",
-    items: [
-      {
-        name: "主题",
-        path: "/theme",
-        icon: IconPalette,
-      },
-      {
-        name: "菜单",
-        path: "/menus",
-        icon: IconListSettings,
-      },
-    ],
+    items: [],
   },
   {
     name: "系统",
-    items: [
-      {
-        name: "插件",
-        path: "/plugins",
-        icon: IconPlug,
-      },
-      {
-        name: "用户",
-        path: "/users",
-        icon: IconUserSettings,
-      },
-      {
-        name: "设置",
-        path: "/settings",
-        icon: IconSettings,
-      },
-    ],
+    items: [],
   },
 ];
 
@@ -124,6 +54,18 @@ export const minimenus: MenuItemType[] = [
     icon: IconUserSettings,
   },
 ];
+
+export function registerMenu(group: string | undefined, menu: MenuItemType) {
+  const groupIndex = menus.findIndex((g) => g.name === group);
+  if (groupIndex !== -1) {
+    menus[groupIndex].items.push(menu);
+    return;
+  }
+  menus.push({
+    name: group,
+    items: [menu],
+  });
+}
 
 export type { MenuItemType, MenuGroupType };
 

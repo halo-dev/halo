@@ -45,6 +45,7 @@ importers:
       vite: ^2.9.12
       vite-compression-plugin: ^0.0.4
       vite-plugin-pwa: ^0.12.0
+      vite-plugin-vue-setup-extend: ^0.4.0
       vitest: ^0.15.1
       vue: ^3.2.37
       vue-filepond: ^7.0.3
@@ -98,6 +99,7 @@ importers:
       vite: 2.9.12_sass@1.52.3
       vite-compression-plugin: 0.0.4
       vite-plugin-pwa: 0.12.0_vite@2.9.12
+      vite-plugin-vue-setup-extend: 0.4.0_vite@2.9.12
       vitest: 0.15.1_fiumxgyk2tfafw3c4rsaverrnm
       vue-tsc: 0.34.17_typescript@4.7.3
 
@@ -6781,6 +6783,16 @@ packages:
     transitivePeerDependencies:
       - '@types/babel__core'
       - supports-color
+    dev: true
+
+  /vite-plugin-vue-setup-extend/0.4.0_vite@2.9.12:
+    resolution: {integrity: sha512-WMbjPCui75fboFoUTHhdbXzu4Y/bJMv5N9QT9a7do3wNMNHHqrk+Tn2jrSJU0LS5fGl/EG+FEDBYVUeWIkDqXQ==}
+    peerDependencies:
+      vite: '>=2.0.0'
+    dependencies:
+      '@vue/compiler-sfc': 3.2.37
+      magic-string: 0.25.9
+      vite: 2.9.12_sass@1.52.3
     dev: true
 
   /vite/2.9.12:

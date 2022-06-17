@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang="ts" name="JournalPublishWidget" setup>
 import { VButton, VCard, VTextarea } from "@halo-dev/components";
 </script>
 <template>

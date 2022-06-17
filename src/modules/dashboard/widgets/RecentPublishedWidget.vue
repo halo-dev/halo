@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script lang="ts" name="RecentPublishedWidget" setup>
 import { VCard, VSpace } from "@halo-dev/components";
 import { posts } from "@/modules/contents/posts/posts-mock";
 </script>
