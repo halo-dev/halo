@@ -88,7 +88,8 @@ public class RequestInfoResolverTest {
 
                 // api group identification
                 new SuccessCase("POST", "/apis/extensions/v1/plugins/other/posts", "create", "apis",
-                    "extensions", "v1", "", "plugins", "posts", "other", new String[] {"plugins", "other", "posts"}),
+                    "extensions", "v1", "", "plugins", "posts", "other",
+                    new String[] {"plugins", "other", "posts"}),
 
                 // api version identification
                 new SuccessCase("POST", "/apis/extensions/v1beta3/plugins/other/posts", "create",
