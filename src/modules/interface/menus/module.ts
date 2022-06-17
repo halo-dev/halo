@@ -1,9 +1,9 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout } from "@/layouts";
 import MenuList from "./MenuList.vue";
 import { IconListSettings } from "@halo-dev/components";
 
-const menuModule: Plugin = {
+export default definePlugin({
   name: "menuModule",
   components: [],
   routes: [
@@ -31,6 +31,4 @@ const menuModule: Plugin = {
       ],
     },
   ],
-};
-
-export default menuModule;
+});

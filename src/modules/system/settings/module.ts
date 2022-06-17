@@ -1,10 +1,10 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { SystemSettingsLayout } from "@/layouts";
 import GeneralSettings from "./GeneralSettings.vue";
 import NotificationSettings from "./NotificationSettings.vue";
 import { IconSettings } from "@halo-dev/components";
 
-const settingModule: Plugin = {
+export default definePlugin({
   name: "settingModule",
   components: [],
   routes: [
@@ -38,6 +38,4 @@ const settingModule: Plugin = {
       ],
     },
   ],
-};
-
-export default settingModule;
+});

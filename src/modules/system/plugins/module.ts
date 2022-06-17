@@ -1,10 +1,10 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout } from "@/layouts";
 import PluginList from "./PluginList.vue";
 import PluginDetail from "./PluginDetail.vue";
 import { IconPlug } from "@halo-dev/components";
 
-const pluginModule: Plugin = {
+export default definePlugin({
   name: "pluginModule",
   components: [],
   routes: [
@@ -37,6 +37,4 @@ const pluginModule: Plugin = {
       ],
     },
   ],
-};
-
-export default pluginModule;
+});

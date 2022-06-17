@@ -1,9 +1,9 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout } from "@/layouts";
 import RoleList from "./RoleList.vue";
 import RoleDetail from "./RoleDetail.vue";
 
-const roleModule: Plugin = {
+export default definePlugin({
   name: "roleModule",
   components: [],
   routes: [
@@ -25,6 +25,4 @@ const roleModule: Plugin = {
     },
   ],
   menus: [],
-};
-
-export default roleModule;
+});

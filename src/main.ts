@@ -50,7 +50,7 @@ async function registerModule(pluginModule: Plugin) {
 }
 
 function loadCoreModules() {
-  [
+  Array.from<Plugin>([
     dashboardModule,
     postModule,
     sheetModule,
@@ -62,7 +62,7 @@ function loadCoreModules() {
     userModule,
     roleModule,
     settingModule,
-  ].forEach(registerModule);
+  ]).forEach(registerModule);
 }
 
 function loadPluginModules() {

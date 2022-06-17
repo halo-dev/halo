@@ -1,4 +1,4 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout } from "@/layouts";
 import Dashboard from "./Dashboard.vue";
 import { IconDashboard } from "@halo-dev/components";
@@ -12,7 +12,7 @@ import RecentPublishedWidget from "./widgets/RecentPublishedWidget.vue";
 import UserStatsWidget from "./widgets/UserStatsWidget.vue";
 import ViewsStatsWidget from "./widgets/ViewsStatsWidget.vue";
 
-const dashboardModule: Plugin = {
+export default definePlugin({
   name: "dashboardModule",
   components: [
     CommentStatsWidget,
@@ -50,6 +50,4 @@ const dashboardModule: Plugin = {
       ],
     },
   ],
-};
-
-export default dashboardModule;
+});

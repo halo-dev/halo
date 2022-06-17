@@ -1,9 +1,9 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout } from "@/layouts";
 import { IconMessage } from "@halo-dev/components";
 import CommentList from "./CommentList.vue";
 
-const commentModule: Plugin = {
+export default definePlugin({
   name: "commentModule",
   components: [],
   routes: [
@@ -31,6 +31,4 @@ const commentModule: Plugin = {
       ],
     },
   ],
-};
-
-export default commentModule;
+});

@@ -1,9 +1,9 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout } from "@/layouts";
 import SheetList from "./SheetList.vue";
 import { IconPages } from "@halo-dev/components";
 
-const sheetModule: Plugin = {
+export default definePlugin({
   name: "sheetModule",
   components: [],
   routes: [
@@ -31,6 +31,4 @@ const sheetModule: Plugin = {
       ],
     },
   ],
-};
-
-export default sheetModule;
+});

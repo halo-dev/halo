@@ -1,9 +1,9 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout } from "@/layouts";
 import AttachmentList from "./AttachmentList.vue";
 import { IconFolder } from "@halo-dev/components";
 
-const attachmentModule: Plugin = {
+export default definePlugin({
   name: "attachmentModule",
   components: [],
   routes: [
@@ -31,6 +31,4 @@ const attachmentModule: Plugin = {
       ],
     },
   ],
-};
-
-export default attachmentModule;
+});

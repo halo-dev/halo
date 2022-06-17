@@ -1,4 +1,4 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout, BlankLayout } from "@/layouts";
 import { IconBookRead } from "@halo-dev/components";
 import PostList from "./PostList.vue";
@@ -6,7 +6,7 @@ import PostEditor from "./PostEditor.vue";
 import CategoryList from "./categories/CategoryList.vue";
 import TagList from "./tags/TagList.vue";
 
-const postModule: Plugin = {
+export default definePlugin({
   name: "postModule",
   components: [],
   routes: [
@@ -61,6 +61,4 @@ const postModule: Plugin = {
       ],
     },
   ],
-};
-
-export default postModule;
+});

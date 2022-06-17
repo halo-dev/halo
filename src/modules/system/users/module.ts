@@ -1,4 +1,4 @@
-import type { Plugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout, BlankLayout, UserProfileLayout } from "@/layouts";
 import UserList from "./UserList.vue";
 import UserDetail from "./UserDetail.vue";
@@ -7,7 +7,7 @@ import PasswordChange from "./PasswordChange.vue";
 import PersonalAccessTokens from "./PersonalAccessTokens.vue";
 import { IconUserSettings } from "@halo-dev/components";
 
-const userModule: Plugin = {
+export default definePlugin({
   name: "userModule",
   components: [],
   routes: [
@@ -68,6 +68,4 @@ const userModule: Plugin = {
       ],
     },
   ],
-};
-
-export default userModule;
+});
