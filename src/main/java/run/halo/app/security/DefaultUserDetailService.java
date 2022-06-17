@@ -1,12 +1,10 @@
 package run.halo.app.security;
 
-import java.util.Objects;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
 import run.halo.app.core.extension.RoleBinding.Subject;
@@ -29,22 +27,22 @@ public class DefaultUserDetailService
     @Override
     public Mono<UserDetails> updatePassword(UserDetails user, String newPassword) {
         return Mono.just(user)
-            .map(userDetails -> withNewPassword(userDetails, newPassword))
-            .publishOn(Schedulers.boundedElastic())
-            .doOnNext(userDetails ->
-                userService.updatePassword(userDetails.getUsername(), newPassword).subscribe()
+            .map(userDetails -> withNewPassword(user, newPassword))
+            .flatMap(userDetails -> userService.updatePassword(
+                    userDetails.getUsername(),
+                    userDetails.getPassword())
+                .then(Mono.just(userDetails))
             );
     }
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return userService.getUser(username).flatMap(user -> {
-            final var userGk =
-                new run.halo.app.core.extension.User().groupVersionKind().groupKind();
-            final var roleGk = new Role().groupVersionKind().groupKind();
-            return roleService.listRoleRefs(new Subject(userGk.kind(), username, userGk.group()))
-                .filter(roleRef -> Objects.equals(roleGk,
-                    new GroupKind(roleRef.getApiGroup(), roleRef.getKind())))
+            final var userGvk =
+                new run.halo.app.core.extension.User().groupVersionKind();
+            var subject = new Subject(userGvk.kind(), username, userGvk.group());
+            return roleService.listRoleRefs(subject)
+                .filter(this::isRoleRef)
                 .map(RoleRef::getName)
                 .collectList()
                 .map(roleNames -> User.builder()
@@ -53,6 +51,12 @@ public class DefaultUserDetailService
                     .roles(roleNames.toArray(new String[0]))
                     .build());
         });
+    }
+
+    private boolean isRoleRef(RoleRef roleRef) {
+        var roleGvk = new Role().groupVersionKind();
+        var gk = new GroupKind(roleRef.getApiGroup(), roleRef.getKind());
+        return gk.equals(roleGvk.groupKind());
     }
 
     private UserDetails withNewPassword(UserDetails userDetails, String newPassword) {
