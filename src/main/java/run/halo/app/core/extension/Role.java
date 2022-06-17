@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import run.halo.app.core.Constant;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -16,7 +15,7 @@ import run.halo.app.extension.GVK;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@GVK(group = Constant.RBAC_GROUP,
+@GVK(group = "",
     version = "v1alpha1",
     kind = "Role",
     plural = "roles",

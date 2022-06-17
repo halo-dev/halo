@@ -9,7 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
  * @since 2.0.0
  */
 @FunctionalInterface
-public interface RoleBindingLister {
+public interface RoleBindingService {
 
     Set<String> listBoundRoleNames(Collection<? extends GrantedAuthority> authorities);
+
 }

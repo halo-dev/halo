@@ -1,5 +1,6 @@
 package run.halo.app.extension;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.networknt.schema.JsonSchemaFactory;
@@ -34,6 +35,7 @@ public class JSONExtensionConverter implements ExtensionConverter {
         OBJECT_MAPPER = Jackson2ObjectMapperBuilder.json()
             .featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .featuresToDisable(SerializationFeature.WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS)
+            .serializationInclusion(JsonInclude.Include.NON_NULL)
             .build();
     }
 
@@ -48,11 +50,6 @@ public class JSONExtensionConverter implements ExtensionConverter {
         var scheme = schemeManager.get(gvk);
         var storeName = ExtensionUtil.buildStoreName(scheme, extension.getMetadata().getName());
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("JSON schema({}): {}", scheme.type(),
-                    scheme.jsonSchema().toPrettyString());
-            }
-
             var data = OBJECT_MAPPER.writeValueAsBytes(extension);
 
             var validator = jsonSchemaFactory.getSchema(scheme.jsonSchema());

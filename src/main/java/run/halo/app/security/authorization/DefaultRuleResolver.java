@@ -7,8 +7,8 @@ import lombok.Data;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.service.DefaultRoleBindingLister;
-import run.halo.app.core.extension.service.RoleBindingLister;
+import run.halo.app.core.extension.service.DefaultRoleBindingService;
+import run.halo.app.core.extension.service.RoleBindingService;
 import run.halo.app.core.extension.service.RoleService;
 
 /**
@@ -20,7 +20,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
     private RoleService roleService;
 
-    private RoleBindingLister roleBindingLister = new DefaultRoleBindingLister();
+    private RoleBindingService roleBindingService = new DefaultRoleBindingService();
 
     public DefaultRuleResolver(RoleService roleService) {
         this.roleService = roleService;
@@ -43,7 +43,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
     @Override
     public void visitRulesFor(UserDetails user, RuleAccumulator visitor) {
-        Set<String> roleNames = roleBindingLister.listBoundRoleNames(user.getAuthorities());
+        Set<String> roleNames = roleBindingService.listBoundRoleNames(user.getAuthorities());
 
         List<Role.PolicyRule> rules = Collections.emptyList();
         for (String roleName : roleNames) {
@@ -69,8 +69,8 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         return String.format("Binding role [%s] to [%s]", roleName, subject);
     }
 
-    public void setRoleBindingLister(RoleBindingLister roleBindingLister) {
-        Assert.notNull(roleBindingLister, "The roleBindingLister must not be null.");
-        this.roleBindingLister = roleBindingLister;
+    public void setRoleBindingService(RoleBindingService roleBindingService) {
+        Assert.notNull(roleBindingService, "The roleBindingLister must not be null.");
+        this.roleBindingService = roleBindingService;
     }
 }

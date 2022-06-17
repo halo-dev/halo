@@ -124,7 +124,7 @@ public class RequestInfoResolverTest {
         when(roleService.getRole(anyString())).thenReturn(role);
 
         // list bound role names
-        ruleResolver.setRoleBindingLister(
+        ruleResolver.setRoleBindingService(
             (Collection<? extends GrantedAuthority> authorities) -> Set.of("ruleReadPost"));
 
         User user = new User("admin", "123456", AuthorityUtils.createAuthorityList("ruleReadPost"));
