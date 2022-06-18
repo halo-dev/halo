@@ -1,19 +1,22 @@
 package run.halo.app.utils;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
-import java.util.Objects;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.image4j.codec.ico.ICODecoder;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.springframework.lang.NonNull;
-import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.ImageFormatException;
 
 /**
@@ -52,6 +55,20 @@ public class ImageUtils {
             return reader;
         } catch (Exception e) {
             throw new IOException("Failed to read image reader.", e);
+        }
+    }
+
+    /**
+     * only remove exif in jpg/jpeg image for now
+     */
+    public static void removeExifMetadata(final byte[] src, final File dst)
+        throws IOException, ImageReadException, ImageWriteException {
+        try {
+            FileOutputStream fos = new FileOutputStream(dst);
+            OutputStream os = new BufferedOutputStream(fos);
+            new ExifRewriter().removeExifMetadata(src, os);
+        } catch (IOException | ImageReadException | ImageWriteException e) {
+            throw new IOException("Failed to remove Exif metadata from image file.", e);
         }
     }
 }
