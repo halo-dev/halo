@@ -16,6 +16,11 @@ public enum AttachmentProperties implements PropertyEnum {
     UPLOAD_IMAGE_PREVIEW_ENABLE("attachment_upload_image_preview_enable", Boolean.class, "true"),
 
     /**
+     * Remove Exif in image when upload
+     */
+    REMOVE_IMAGE_EXIF_ENABLE("attachment_EXIF_remove_enable", Boolean.class, "false"),
+
+    /**
      * Upload max parallel uploads
      */
     UPLOAD_MAX_PARALLEL_UPLOADS("attachment_upload_max_parallel_uploads", Integer.class, "3"),
