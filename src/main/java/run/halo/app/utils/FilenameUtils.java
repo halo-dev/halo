@@ -24,9 +24,6 @@ public class FilenameUtils {
     private static final Pattern FILENAME_WIN_RESERVED_NAMES_PATTERN =
         Pattern.compile("^(CON|PRM|AUX|NUL|COM[0-9]|LPT[0-9])$");
 
-    private static final Pattern NOT_IMAGE_EXTENSION_PATTERN =
-        Pattern.compile("/*.(txt|md|doc|xls|xlxs|pdf)$");
-
     private static final int FILENAME_MAX_LENGTH = 200;
 
     private FilenameUtils() {
@@ -134,9 +131,5 @@ public class FilenameUtils {
         }
         return sanitizedFilename.length() < FILENAME_MAX_LENGTH ? sanitizedFilename :
             sanitizedFilename.substring(0, FILENAME_MAX_LENGTH).trim();
-    }
-
-    public static boolean notImageFileExtension(String filename) {
-        return NOT_IMAGE_EXTENSION_PATTERN.matcher(filename.toLowerCase()).matches();
     }
 }

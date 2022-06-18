@@ -1,20 +1,21 @@
 package run.halo.app.handler.prehandler;
 
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Directory;
-import com.drew.metadata.Metadata;
-import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import javax.imageio.ImageIO;
+import java.io.OutputStream;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
-import run.halo.app.utils.FileUtils;
-import run.halo.app.utils.FilenameUtils;
 
 /**
  * @author eziosudo
@@ -24,44 +25,32 @@ import run.halo.app.utils.FilenameUtils;
 @Component
 public class AttachmentImagePreHandler implements FilePreHandler {
 
-    private static final String REWRITE_IMAGE_EXTENSION = "jpeg";
-
-    private static final int SIZE_THRESHOLD = 10240;
+    private static final String REWRITE_IMAGE_EXTENSION = "image/jpeg";
 
     @Override
     public MultipartFile preProcess(MultipartFile multipartFile) {
-        // 如果不是图片文件就不处理直接返回，避免不必要的IO操作
-        if (FilenameUtils.notImageFileExtension(multipartFile.getName())) {
+       try {
+            File dst =
+                new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+            removeExifMetadata(multipartFile.getBytes(), dst);
+            FileItem fileItem =
+                new DiskFileItem("exif_removed", REWRITE_IMAGE_EXTENSION, false,
+                    dst.getName(), (int) dst.length(), dst.getParentFile());
+            new FileInputStream(dst).transferTo(fileItem.getOutputStream());
+            multipartFile = new CommonsMultipartFile(fileItem);
             return multipartFile;
-        }
-        try {
-            File file = FileUtils.convertMultipartFileToFile(multipartFile);
-            
-            //todo remove EXIF
-            Metadata metadata = ImageMetadataReader.readMetadata(file);
-            Iterable<Directory> directories = metadata.getDirectories();
-            while (directories.iterator().hasNext()){
-                Directory next = directories.iterator().next();
-                System.out.println(next.getName());
-            }
-            
-
-            BufferedImage image = ImageIO.read(file);
-            if (null != image) {
-                ImageIO.write(image, REWRITE_IMAGE_EXTENSION, file);
-                DiskFileItem fileItem = new DiskFileItem("fileData", "image/jpeg",
-                    true, file.getName(), SIZE_THRESHOLD, file);
-                fileItem.getOutputStream();
-                return new CommonsMultipartFile(fileItem);
-            }
-        } catch (IOException e) {
-            log.error("" + e);
-            //todo 
-            return multipartFile;
-        } catch (ImageProcessingException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.info("Not JPG or JPEG format image. Cannot remove Exif.");
         }
         return multipartFile;
+    }
+
+    public void removeExifMetadata(final byte[] src, final File dst)
+        throws IOException, ImageReadException, ImageWriteException {
+        try (FileOutputStream fos = new FileOutputStream(dst);
+             OutputStream os = new BufferedOutputStream(fos)) {
+            new ExifRewriter().removeExifMetadata(src, os);
+        }
     }
 
 }

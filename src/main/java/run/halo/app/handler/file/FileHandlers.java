@@ -13,7 +13,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.RepeatTypeException;
-import run.halo.app.handler.prehandler.FilePreHandler;
 import run.halo.app.handler.prehandler.FilePreHandlers;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
@@ -28,7 +27,7 @@ import run.halo.app.model.support.UploadResult;
 @Slf4j
 @Component
 public class FileHandlers {
-    
+
     @Autowired
     private FilePreHandlers filePreHandlers;
 
@@ -56,7 +55,7 @@ public class FileHandlers {
     @NonNull
     public UploadResult upload(@NonNull MultipartFile file,
         @NonNull AttachmentType attachmentType) {
-        filePreHandlers.doPreProcess(file);
+        file = filePreHandlers.doPreProcess(file);
         return getSupportedType(attachmentType).upload(file);
     }
 

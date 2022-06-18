@@ -591,7 +591,7 @@ public class FileUtils {
     }
 
     public static File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
-        File file = new File(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        File file = new File(Objects.requireNonNull(multipartFile.getName()));
         try {
             if (file.createNewFile()) {
                 FileOutputStream fos = new FileOutputStream(file);

@@ -30,10 +30,11 @@ public class FilePreHandlers {
      *
      * @param file 输入文件
      */
-    public void doPreProcess(MultipartFile file) {
+    public MultipartFile doPreProcess(MultipartFile file) {
         for (FilePreHandler filePreHandler : preHandlers) {
-            filePreHandler.preProcess(file);
+            file = filePreHandler.preProcess(file);
         }
+        return file;
     }
 
 }
