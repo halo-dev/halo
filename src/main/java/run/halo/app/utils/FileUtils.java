@@ -589,18 +589,4 @@ public class FileUtils {
     public static void writeStringToFile(File file, String content) throws IOException {
         org.apache.commons.io.FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
     }
-
-    public static File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
-        File file = new File(Objects.requireNonNull(multipartFile.getName()));
-        try {
-            if (file.createNewFile()) {
-                FileOutputStream fos = new FileOutputStream(file);
-                fos.write(multipartFile.getBytes());
-                fos.close();
-            }
-        } catch (Exception e) {
-            throw new IOException("Failed to convert MultipartFile to File.", e);
-        }
-        return file;
-    }
 }
