@@ -2,8 +2,6 @@ package run.halo.app.utils;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -69,7 +67,7 @@ public class ImageUtils {
     /**
      * only remove exif in jpg/jpeg image for now
      */
-    public static void removeExifMetadataOut(final byte[] src, final OutputStream dst)
+    public static void removeExifMetadata(final byte[] src, final OutputStream dst)
         throws IOException, ImageReadException, ImageWriteException {
         try {
             OutputStream os = new BufferedOutputStream(dst);

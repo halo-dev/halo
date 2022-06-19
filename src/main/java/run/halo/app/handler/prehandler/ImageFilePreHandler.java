@@ -25,7 +25,7 @@ public class ImageFilePreHandler implements FilePreHandler {
         try {
             if (ImageUtils.isImageType(file) && isRemoveExifEnable()) {
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                ImageUtils.removeExifMetadataOut(file.getBytes(), outputStream);
+                ImageUtils.removeExifMetadata(file.getBytes(), outputStream);
                 file = new ImageMultipartFile(outputStream.toByteArray(),
                     file.getOriginalFilename(),
                     file.getName(), file.getContentType());
