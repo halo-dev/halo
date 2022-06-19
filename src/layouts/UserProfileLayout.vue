@@ -4,6 +4,7 @@ import { IconUpload, VButton, VTabbar } from "@halo-dev/components";
 import { onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { users } from "@/modules/system/users/users-mock";
+import { Starport } from "vue-starport";
 
 const tabs = [
   {
@@ -65,11 +66,17 @@ const handleTabChange = (id: string) => {
       <div class="px-4 sm:px-6 lg:px-8">
         <div class="-mt-12 flex items-end space-x-5 sm:-mt-16">
           <div class="flex">
-            <img
-              :src="user.avatar"
-              alt="Avatar"
-              class="h-24 w-24 rounded-full ring-4 ring-white drop-shadow-lg sm:h-32 sm:w-32"
-            />
+            <Starport
+              :port="`user-profile-${user.name}`"
+              class="h-24 w-24 sm:h-32 sm:w-32"
+              :duration="400"
+            >
+              <img
+                :src="user.avatar"
+                alt="Avatar"
+                class="rounded-full ring-4 ring-white drop-shadow-lg"
+              />
+            </Starport>
           </div>
           <div
             class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"

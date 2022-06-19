@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { RouterView } from "vue-router";
+import { StarportCarrier } from "vue-starport";
 </script>
 
 <template>
-  <RouterView />
+  <StarportCarrier>
+    <RouterView />
+  </StarportCarrier>
 </template>
 
 <style lang="scss">
@@ -11,6 +14,7 @@ body {
   overflow-y: overlay;
   background: #eff4f9;
 }
+
 *,
 *::before,
 *::after {

@@ -15,6 +15,7 @@ import {
 import { users } from "./users-mock";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
+import { Starport } from "vue-starport";
 
 const checkAll = ref(false);
 
@@ -192,15 +193,17 @@ const handleRouteToDetail = (username: string) => {
                 />
               </div>
               <div v-if="user.avatar" class="mr-4">
-                <div
-                  class="h-12 w-12 overflow-hidden rounded border bg-white hover:shadow-sm"
+                <Starport
+                  :duration="400"
+                  :port="`user-profile-${user.name}`"
+                  class="h-12 w-12"
                 >
                   <img
                     :alt="user.name"
                     :src="user.avatar"
-                    class="h-full w-full"
+                    class="h-full w-full overflow-hidden rounded border bg-white hover:shadow-sm"
                   />
-                </div>
+                </Starport>
               </div>
               <div class="flex-1">
                 <div class="flex flex-row items-center">
