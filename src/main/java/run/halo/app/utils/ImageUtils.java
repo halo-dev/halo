@@ -16,7 +16,9 @@ import net.sf.image4j.codec.ico.ICODecoder;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
+import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.exception.ImageFormatException;
 
 /**
@@ -58,15 +60,21 @@ public class ImageUtils {
         }
     }
 
+    public static boolean isImageType(@NonNull MultipartFile file) {
+        MediaType IMAGE_TYPE = MediaType.valueOf("image/*");
+        String mediaType = file.getContentType();
+        return mediaType != null && IMAGE_TYPE.includes(MediaType.valueOf(mediaType));
+    }
+
     /**
      * only remove exif in jpg/jpeg image for now
      */
-    public static void removeExifMetadata(final byte[] src, final File dst)
+    public static void removeExifMetadataOut(final byte[] src, final OutputStream dst)
         throws IOException, ImageReadException, ImageWriteException {
         try {
-            FileOutputStream fos = new FileOutputStream(dst);
-            OutputStream os = new BufferedOutputStream(fos);
+            OutputStream os = new BufferedOutputStream(dst);
             new ExifRewriter().removeExifMetadata(src, os);
+            os.close();
         } catch (IOException | ImageReadException | ImageWriteException e) {
             throw new IOException("Failed to remove Exif metadata from image file.", e);
         }
