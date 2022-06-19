@@ -7,6 +7,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * @author eziosudo
+ * @date 2022-06-19
+ */
 public class ImageMultipartFile implements MultipartFile {
 
     private final byte[] imgContent;
