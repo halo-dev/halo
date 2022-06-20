@@ -58,16 +58,18 @@ function loadCoreModules() {
   coreModules.forEach(registerModule);
 }
 
-function loadPluginModules() {
+async function loadPluginModules() {
   // TODO: load plugin modules
 }
 
-initApp();
+(async function () {
+  await initApp();
+})();
 
 async function initApp() {
   try {
     loadCoreModules();
-    loadPluginModules();
+    await loadPluginModules();
   } catch (e) {
     console.error(e);
   }
