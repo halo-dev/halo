@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.Locale;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import run.halo.app.extension.exception.ExtensionConvertException;
@@ -18,13 +20,23 @@ class JsonExtensionConverterTest {
 
     ObjectMapper objectMapper;
 
+    Locale localeDefault;
+
     @BeforeEach
     void setUp() {
+        localeDefault = Locale.getDefault();
+        Locale.setDefault(Locale.ENGLISH);
+
         DefaultSchemeManager schemeManager = new DefaultSchemeManager(null);
         converter = new JSONExtensionConverter(schemeManager);
         objectMapper = JSONExtensionConverter.OBJECT_MAPPER;
 
         schemeManager.register(FakeExtension.class);
+    }
+
+    @AfterEach
+    void cleanUp() {
+        Locale.setDefault(localeDefault);
     }
 
     @Test
