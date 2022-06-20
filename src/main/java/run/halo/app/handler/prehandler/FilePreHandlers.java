@@ -1,12 +1,9 @@
 package run.halo.app.handler.prehandler;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author eziosudo
@@ -15,26 +12,26 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class FilePreHandlers {
 
-    private final Set<FilePreHandler> preHandlers = new HashSet<>(16);
+    private final List<FilePreHandler> preHandlers;
 
     FilePreHandlers(ApplicationContext applicationContext) {
-        Collection<FilePreHandler> filePreHandlers =
-            applicationContext.getBeansOfType(FilePreHandler.class).values();
-        if (!CollectionUtils.isEmpty(filePreHandlers)) {
-            preHandlers.addAll(filePreHandlers);
-        }
+        preHandlers =
+            applicationContext.getBeanProvider(FilePreHandler.class)
+                .orderedStream()
+                .collect(Collectors.toList());
     }
 
     /**
      * 遍历预处理方法，对输入文件进行预处理
      *
-     * @param file 输入文件
+     * @param bytes 输入文件字节流
+     * @return 输出预处理后的字节流
      */
-    public MultipartFile doPreProcess(MultipartFile file) {
+    public byte[] process(byte[] bytes) {
         for (FilePreHandler filePreHandler : preHandlers) {
-            file = filePreHandler.preProcess(file);
+            bytes = filePreHandler.preProcess(bytes);
         }
-        return file;
+        return bytes;
     }
 
 }

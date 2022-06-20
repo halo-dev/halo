@@ -2,24 +2,25 @@ package run.halo.app.handler.prehandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author eziosudo
  * @date 2022-06-19
  */
-public class ImageMultipartFile implements MultipartFile {
+public class ByteMultipartFile implements MultipartFile {
 
     private final byte[] imgContent;
     private final String originalFilename;
     private final String name;
     private final String contentType;
 
-    public ImageMultipartFile(byte[] imgContent, String originalFilename, String name,
-                              String contentType) {
+    public ByteMultipartFile(byte[] imgContent, String originalFilename, String name,
+                             String contentType) {
         this.imgContent = imgContent;
         this.originalFilename = originalFilename;
         this.name = name;
@@ -62,7 +63,7 @@ public class ImageMultipartFile implements MultipartFile {
     }
 
     @Override
-    public void transferTo(File dest) throws IOException, IllegalStateException {
-        new FileOutputStream(dest).write(imgContent);
+    public void transferTo(@NotNull File dest) throws IOException, IllegalStateException {
+        FileCopyUtils.copy(imgContent, dest);
     }
 }
