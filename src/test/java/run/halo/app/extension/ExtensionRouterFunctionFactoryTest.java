@@ -18,6 +18,7 @@ import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.extension.ExtensionRouterFunctionFactory.CreateHandler;
 import run.halo.app.extension.ExtensionRouterFunctionFactory.GetHandler;
 import run.halo.app.extension.ExtensionRouterFunctionFactory.ListHandler;
+import run.halo.app.extension.ExtensionRouterFunctionFactory.UpdateHandler;
 
 @ExtendWith(MockitoExtension.class)
 class ExtensionRouterFunctionFactoryTest {
@@ -53,10 +54,15 @@ class ExtensionRouterFunctionFactoryTest {
             MockServerHttpRequest.post("/apis/fake.halo.run/v1alpha1/fakes").body("{}")
         );
 
+        var updateWebExchange = MockServerWebExchange.from(
+            MockServerHttpRequest.put("/apis/fake.halo.run/v1alpha1/fakes/my-fake").body("{}")
+        );
+
         return List.of(
             new TestCase(listWebExchange, ListHandler.class),
             new TestCase(getWebExchange, GetHandler.class),
-            new TestCase(createWebExchange, CreateHandler.class)
+            new TestCase(createWebExchange, CreateHandler.class),
+            new TestCase(updateWebExchange, UpdateHandler.class)
         );
     }
 
