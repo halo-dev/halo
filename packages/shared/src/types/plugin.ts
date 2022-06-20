@@ -15,7 +15,7 @@ export interface Plugin {
   name: string;
 
   /**
-   * This components will be registered when plugin is activated.
+   * These components will be registered when plugin is activated.
    */
   components?: Component[];
 

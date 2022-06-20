@@ -8,18 +8,8 @@ import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
 import { registerMenu } from "@/router/menus.config";
 
-// modules
-import dashboardModule from "./modules/dashboard/module";
-import postModule from "./modules/contents/posts/module";
-import sheetModule from "./modules/contents/sheets/module";
-import commentModule from "./modules/contents/comments/module";
-import attachmentModule from "./modules/contents/attachments/module";
-import themeModule from "./modules/interface/themes/module";
-import menuModule from "./modules/interface/menus/module";
-import pluginModule from "./modules/system/plugins/module";
-import userModule from "./modules/system/users/module";
-import roleModule from "./modules/system/roles/module";
-import settingModule from "./modules/system/settings/module";
+// core modules
+import { coreModules } from "./modules";
 
 const app = createApp(App);
 
@@ -27,20 +17,35 @@ setupComponents(app);
 
 app.use(createPinia());
 
-async function registerModule(pluginModule: Plugin) {
+function registerModule(pluginModule: Plugin) {
   if (pluginModule.components) {
+    if (!Array.isArray(pluginModule.components)) {
+      console.error(`${pluginModule.name}: Plugin components must be an array`);
+      return;
+    }
+
     for (const component of pluginModule.components) {
       component.name && app.component(component.name, component);
     }
   }
 
   if (pluginModule.routes) {
+    if (!Array.isArray(pluginModule.routes)) {
+      console.error(`${pluginModule.name}: Plugin routes must be an array`);
+      return;
+    }
+
     for (const route of pluginModule.routes) {
       router.addRoute(route);
     }
   }
 
   if (pluginModule.menus) {
+    if (!Array.isArray(pluginModule.menus)) {
+      console.error(`${pluginModule.name}: Plugin menus must be an array`);
+      return;
+    }
+
     for (const group of pluginModule.menus) {
       for (const menu of group.items) {
         registerMenu(group.name, menu);
@@ -50,19 +55,7 @@ async function registerModule(pluginModule: Plugin) {
 }
 
 function loadCoreModules() {
-  Array.from<Plugin>([
-    dashboardModule,
-    postModule,
-    sheetModule,
-    commentModule,
-    attachmentModule,
-    themeModule,
-    menuModule,
-    pluginModule,
-    userModule,
-    roleModule,
-    settingModule,
-  ]).forEach(registerModule);
+  coreModules.forEach(registerModule);
 }
 
 function loadPluginModules() {
@@ -72,8 +65,12 @@ function loadPluginModules() {
 initApp();
 
 async function initApp() {
-  loadCoreModules();
-  loadPluginModules();
+  try {
+    loadCoreModules();
+    loadPluginModules();
+  } catch (e) {
+    console.error(e);
+  }
   app.use(router);
   app.mount("#app");
 }

@@ -29,7 +29,6 @@ export default definePlugin({
         {
           path: ":username",
           component: UserProfileLayout,
-          alias: ["profile"],
           children: [
             {
               path: "detail",
