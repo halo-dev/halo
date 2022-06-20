@@ -12,7 +12,7 @@ import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
 import run.halo.app.extension.store.ExtensionStore;
 
-class JSONExtensionConverterTest {
+class JsonExtensionConverterTest {
 
     JSONExtensionConverter converter;
 
@@ -71,7 +71,7 @@ class JSONExtensionConverterTest {
         fake.setKind("Fake");
         var error = assertThrows(SchemaViolationException.class, () -> converter.convertTo(fake));
         assertEquals(1, error.getErrors().size());
-        assertEquals("$.metadata.name: null found, string expected",
+        assertEquals("$.metadata.name: is missing but it is required",
             error.getErrors().iterator().next().getMessage());
     }
 

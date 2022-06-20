@@ -10,20 +10,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import run.halo.app.core.extension.service.DefaultRoleBindingService;
 
 /**
- * Tests for {@link DefaultRoleBindingLister}.
+ * Tests for {@link DefaultRoleBindingService}.
  *
  * @author guqing
  * @since 2.0.0
  */
-public class DefaultRoleBindingListerTest {
+public class DefaultRoleBindingServiceTest {
 
-    private DefaultRoleBindingLister roleBindingLister;
+    private DefaultRoleBindingService roleBindingLister;
 
     @BeforeEach
     void setUp() {
-        roleBindingLister = new DefaultRoleBindingLister();
+        roleBindingLister = new DefaultRoleBindingService();
     }
 
     @AfterEach

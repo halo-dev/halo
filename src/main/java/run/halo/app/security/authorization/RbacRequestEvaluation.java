@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import run.halo.app.core.extension.Role;
 
 /**
  * @author guqing
@@ -17,8 +18,8 @@ public class RbacRequestEvaluation {
         String NonResourceAll = "*";
     }
 
-    public boolean rulesAllow(Attributes requestAttributes, List<PolicyRule> rules) {
-        for (PolicyRule rule : rules) {
+    public boolean rulesAllow(Attributes requestAttributes, List<Role.PolicyRule> rules) {
+        for (Role.PolicyRule rule : rules) {
             if (ruleAllows(requestAttributes, rule)) {
                 return true;
             }
@@ -26,7 +27,7 @@ public class RbacRequestEvaluation {
         return false;
     }
 
-    protected boolean ruleAllows(Attributes requestAttributes, PolicyRule rule) {
+    protected boolean ruleAllows(Attributes requestAttributes, Role.PolicyRule rule) {
         if (requestAttributes.isResourceRequest()) {
             String combinedResource = requestAttributes.getResource();
             if (StringUtils.isNotBlank(requestAttributes.getSubresource())) {
@@ -44,7 +45,7 @@ public class RbacRequestEvaluation {
             && nonResourceURLMatches(rule, requestAttributes.getPath());
     }
 
-    protected boolean verbMatches(PolicyRule rule, String requestedVerb) {
+    protected boolean verbMatches(Role.PolicyRule rule, String requestedVerb) {
         for (String ruleVerb : rule.getVerbs()) {
             if (Objects.equals(ruleVerb, WildCard.VerbAll)) {
                 return true;
@@ -56,7 +57,7 @@ public class RbacRequestEvaluation {
         return false;
     }
 
-    protected boolean apiGroupMatches(PolicyRule rule, String requestedGroup) {
+    protected boolean apiGroupMatches(Role.PolicyRule rule, String requestedGroup) {
         for (String ruleGroup : rule.getApiGroups()) {
             if (Objects.equals(ruleGroup, WildCard.APIGroupAll)) {
                 return true;
@@ -68,8 +69,8 @@ public class RbacRequestEvaluation {
         return false;
     }
 
-    protected boolean resourceMatches(PolicyRule rule, String combinedRequestedResource,
-        String requestedSubresource) {
+    protected boolean resourceMatches(Role.PolicyRule rule, String combinedRequestedResource,
+                                      String requestedSubresource) {
         for (String ruleResource : rule.getResources()) {
             // if everything is allowed, we match
             if (Objects.equals(ruleResource, WildCard.ResourceAll)) {
@@ -95,7 +96,7 @@ public class RbacRequestEvaluation {
         return false;
     }
 
-    protected boolean resourceNameMatches(PolicyRule rule, String requestedName) {
+    protected boolean resourceNameMatches(Role.PolicyRule rule, String requestedName) {
         if (ArrayUtils.isEmpty(rule.getResourceNames())) {
             return true;
         }
@@ -107,7 +108,7 @@ public class RbacRequestEvaluation {
         return false;
     }
 
-    protected boolean nonResourceURLMatches(PolicyRule rule, String requestedURL) {
+    protected boolean nonResourceURLMatches(Role.PolicyRule rule, String requestedURL) {
         for (String ruleURL : rule.getNonResourceURLs()) {
             if (Objects.equals(ruleURL, WildCard.NonResourceAll)) {
                 return true;

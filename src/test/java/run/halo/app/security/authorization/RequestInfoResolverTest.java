@@ -3,6 +3,9 @@ package run.halo.app.security.authorization;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.method;
 
 import java.util.Collection;
@@ -15,6 +18,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.Role.PolicyRule;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.Metadata;
 
 /**
@@ -161,34 +167,36 @@ public class RequestInfoResolverTest {
 
     @Test
     public void defaultRuleResolverTest() {
-        DefaultRuleResolver ruleResolver = new DefaultRuleResolver(name -> {
-            // role getter
-            Role role = new Role();
-            List<PolicyRule> rules = List.of(
-                new PolicyRule.Builder().apiGroups("").resources("posts").verbs("list", "get")
-                    .build(),
-                new PolicyRule.Builder().pluginName("fakePlugin").apiGroups("").resources("posts")
-                    .verbs("list", "get").build(),
-                new PolicyRule.Builder().pluginName("fakePlugin").apiGroups("")
-                    .resources("posts/tags").verbs("list", "get").build(),
-                new PolicyRule.Builder().apiGroups("").resources("categories").verbs("*").build(),
-                new PolicyRule.Builder().nonResourceURLs("/healthy").verbs("get", "post", "head")
-                    .build());
-            role.setRules(rules);
-            Metadata metadata = new Metadata();
-            metadata.setName("ruleReadPost");
-            role.setMetadata(metadata);
-            return role;
-        });
+        var roleService = mock(RoleService.class);
+        var ruleResolver = new DefaultRuleResolver(roleService);
+
+        Role role = new Role();
+        List<PolicyRule> rules = List.of(
+            new PolicyRule.Builder().apiGroups("").resources("posts").verbs("list", "get")
+                .build(),
+            new PolicyRule.Builder().pluginName("fakePlugin").apiGroups("").resources("posts")
+                .verbs("list", "get").build(),
+            new PolicyRule.Builder().pluginName("fakePlugin").apiGroups("")
+                .resources("posts/tags").verbs("list", "get").build(),
+            new PolicyRule.Builder().apiGroups("").resources("categories").verbs("*").build(),
+            new PolicyRule.Builder().nonResourceURLs("/healthy").verbs("get", "post", "head")
+                .build());
+        role.setRules(rules);
+        Metadata metadata = new Metadata();
+        metadata.setName("ruleReadPost");
+        role.setMetadata(metadata);
+
+        when(roleService.getRole(anyString())).thenReturn(role);
+
         // list bound role names
-        ruleResolver.setRoleBindingLister(
+        ruleResolver.setRoleBindingService(
             (Collection<? extends GrantedAuthority> authorities) -> Set.of("ruleReadPost"));
 
         User user = new User("admin", "123456", AuthorityUtils.createAuthorityList("ruleReadPost"));
 
         // resolve user rules
-        List<PolicyRule> rules = ruleResolver.rulesFor(user);
-        assertThat(rules).isNotNull();
+        List<PolicyRule> resolvedRules = ruleResolver.rulesFor(user);
+        assertThat(resolvedRules).isNotNull();
 
         RbacRequestEvaluation rbacRequestEvaluation = new RbacRequestEvaluation();
         for (RequestResolveCase requestResolveCase : getRequestResolveCases()) {
@@ -198,7 +206,7 @@ public class RequestInfoResolverTest {
             RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
 
             AttributesRecord attributes = new AttributesRecord(user, requestInfo);
-            boolean allowed = rbacRequestEvaluation.rulesAllow(attributes, rules);
+            boolean allowed = rbacRequestEvaluation.rulesAllow(attributes, resolvedRules);
             assertThat(allowed).isEqualTo(requestResolveCase.expected);
         }
     }

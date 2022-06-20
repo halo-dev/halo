@@ -1,4 +1,4 @@
-package run.halo.app.security.authorization;
+package run.halo.app.core.extension.service;
 
 import java.util.Collection;
 import java.util.Set;
@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
  * @since 2.0.0
  */
 @Slf4j
-public class DefaultRoleBindingLister implements RoleBindingLister {
+public class DefaultRoleBindingService implements RoleBindingService {
     private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";
     private static final String ROLE_AUTHORITY_PREFIX = "ROLE_";
 

@@ -3,12 +3,13 @@ package run.halo.app.security.authorization;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import run.halo.app.core.extension.Role;
 
 /**
  * @author guqing
  * @since 2.0.0
  */
-public class PolicyRuleList extends LinkedList<PolicyRule> {
+public class PolicyRuleList extends LinkedList<Role.PolicyRule> {
     private final List<Throwable> errors = new ArrayList<>(4);
 
     /**

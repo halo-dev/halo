@@ -8,11 +8,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import run.halo.app.core.extension.Role;
 import org.skyscreamer.jsonassert.JSONAssert;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
- * Tests for {@link PolicyRule}.
+ * Tests for {@link Role.PolicyRule}.
  *
  * @author guqing
  * @since 2.0.0
@@ -26,8 +27,8 @@ class PolicyRuleTest {
     }
 
     @Test
-    public void constructPolicyRule() throws JsonProcessingException, JSONException {
-        PolicyRule policyRule = new PolicyRule(null, null, null, null, null, null);
+    public void constructPolicyRule() throws JsonProcessingException {
+        Role.PolicyRule policyRule = new Role.PolicyRule(null, null, null, null, null);
         assertThat(policyRule).isNotNull();
         JSONAssert.assertEquals("""
             {
@@ -42,7 +43,7 @@ class PolicyRuleTest {
             JsonUtils.objectToJson(policyRule),
             true);
 
-        PolicyRule policyByBuilder = new PolicyRule.Builder().build();
+        Role.PolicyRule policyByBuilder = new Role.PolicyRule.Builder().build();
         JSONAssert.assertEquals("""
             {
                 "pluginName": "",
@@ -56,7 +57,7 @@ class PolicyRuleTest {
             JsonUtils.objectToJson(policyByBuilder),
             true);
 
-        PolicyRule policyNonNull = new PolicyRule.Builder()
+        Role.PolicyRule policyNonNull = new Role.PolicyRule.Builder()
             .pluginName("fakePluginName")
             .apiGroups("group")
             .resources("resource-1", "resource-2")

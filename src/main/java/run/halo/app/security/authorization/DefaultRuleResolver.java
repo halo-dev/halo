@@ -6,6 +6,10 @@ import java.util.Set;
 import lombok.Data;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.service.DefaultRoleBindingService;
+import run.halo.app.core.extension.service.RoleBindingService;
+import run.halo.app.core.extension.service.RoleService;
 
 /**
  * @author guqing
@@ -14,12 +18,12 @@ import org.springframework.util.Assert;
 @Data
 public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
-    private RoleGetter roleGetter;
+    private RoleService roleService;
 
-    private RoleBindingLister roleBindingLister = new DefaultRoleBindingLister();
+    private RoleBindingService roleBindingService = new DefaultRoleBindingService();
 
-    public DefaultRuleResolver(RoleGetter roleGetter) {
-        this.roleGetter = roleGetter;
+    public DefaultRuleResolver(RoleService roleService) {
+        this.roleService = roleService;
     }
 
     @Override
@@ -39,12 +43,12 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
     @Override
     public void visitRulesFor(UserDetails user, RuleAccumulator visitor) {
-        Set<String> roleNames = roleBindingLister.listBoundRoleNames(user.getAuthorities());
+        Set<String> roleNames = roleBindingService.listBoundRoleNames(user.getAuthorities());
 
-        List<PolicyRule> rules = Collections.emptyList();
+        List<Role.PolicyRule> rules = Collections.emptyList();
         for (String roleName : roleNames) {
             try {
-                Role role = roleGetter.getRole(roleName);
+                Role role = roleService.getRole(roleName);
                 rules = role.getRules();
             } catch (Exception e) {
                 if (visitor.visit(null, null, e)) {
@@ -53,7 +57,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
             }
 
             String source = roleBindingDescriber(roleName, user.getUsername());
-            for (PolicyRule rule : rules) {
+            for (Role.PolicyRule rule : rules) {
                 if (!visitor.visit(source, rule, null)) {
                     return;
                 }
@@ -65,8 +69,8 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         return String.format("Binding role [%s] to [%s]", roleName, subject);
     }
 
-    public void setRoleBindingLister(RoleBindingLister roleBindingLister) {
-        Assert.notNull(roleBindingLister, "The roleBindingLister must not be null.");
-        this.roleBindingLister = roleBindingLister;
+    public void setRoleBindingService(RoleBindingService roleBindingService) {
+        Assert.notNull(roleBindingService, "The roleBindingLister must not be null.");
+        this.roleBindingService = roleBindingService;
     }
 }
