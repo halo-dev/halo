@@ -4,11 +4,12 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.RoleBinding;
+import run.halo.app.core.extension.User;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.plugin.Plugin;
 import run.halo.app.security.authentication.pat.PersonalAccessToken;
-import run.halo.app.security.authorization.Role;
-import run.halo.app.security.authorization.RoleBinding;
 
 @Component
 public class SchemeInitializer implements ApplicationListener<ApplicationStartedEvent> {
@@ -22,8 +23,9 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
     @Override
     public void onApplicationEvent(@NonNull ApplicationStartedEvent event) {
         schemeManager.register(Role.class);
-        schemeManager.register(RoleBinding.class);
         schemeManager.register(PersonalAccessToken.class);
         schemeManager.register(Plugin.class);
+        schemeManager.register(RoleBinding.class);
+        schemeManager.register(User.class);
     }
 }

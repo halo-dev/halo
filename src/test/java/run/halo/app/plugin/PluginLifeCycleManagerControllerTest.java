@@ -13,10 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.Metadata;
-import run.halo.app.security.authorization.DefaultRoleGetter;
-import run.halo.app.security.authorization.PolicyRule;
-import run.halo.app.security.authorization.Role;
 
 /**
  * @author guqing
@@ -29,8 +28,9 @@ class PluginLifeCycleManagerControllerTest {
 
     @Autowired
     WebTestClient webClient;
+
     @MockBean
-    DefaultRoleGetter defaultRoleGetter;
+    RoleService roleService;
 
     @MockBean
     HaloPluginManager haloPluginManager;
@@ -46,13 +46,13 @@ class PluginLifeCycleManagerControllerTest {
         Metadata metadata = new Metadata();
         metadata.setName("test-plugin-lifecycle-role");
         role.setMetadata(metadata);
-        PolicyRule policyRule = new PolicyRule.Builder()
+        Role.PolicyRule policyRule = new Role.PolicyRule.Builder()
             .apiGroups("plugin.halo.run")
             .resources("plugins", "plugins/startup", "plugins/stop")
             .verbs("*")
             .build();
         role.setRules(List.of(policyRule));
-        when(defaultRoleGetter.getRole("USER")).thenReturn(role);
+        when(roleService.getRole("USER")).thenReturn(role);
         when(haloPluginManager.startPlugin(any())).thenReturn(PluginState.STARTED);
         when(haloPluginManager.stopPlugin(any())).thenReturn(PluginState.STOPPED);
     }

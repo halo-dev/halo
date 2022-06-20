@@ -1,4 +1,4 @@
-package run.halo.app.security.authorization;
+package run.halo.app.core.extension.service;
 
 import java.util.Collection;
 import java.util.Set;
@@ -9,7 +9,8 @@ import org.springframework.security.core.GrantedAuthority;
  * @since 2.0.0
  */
 @FunctionalInterface
-public interface RoleBindingLister {
+public interface RoleBindingService {
 
     Set<String> listBoundRoleNames(Collection<? extends GrantedAuthority> authorities);
+
 }

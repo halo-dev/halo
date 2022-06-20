@@ -28,6 +28,9 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.Role.PolicyRule;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.security.LoginUtils;
 
 @SpringBootTest
@@ -42,7 +45,7 @@ class AuthorizationTest {
     ReactiveUserDetailsService userDetailsService;
 
     @MockBean
-    RoleGetter roleGetter;
+    RoleService roleService;
 
     @Test
     void accessProtectedApiWithoutSufficientRole() {
@@ -67,7 +70,7 @@ class AuthorizationTest {
             new PolicyRule.Builder().apiGroups("fake.halo.run").verbs("list").resources("posts")
                 .build()));
 
-        when(roleGetter.getRole(eq("post.read"))).thenReturn(role);
+        when(roleService.getRole(eq("post.read"))).thenReturn(role);
 
         var token = LoginUtils.login(webClient, "user", "password").block();
         webClient.get().uri("/apis/fake.halo.run/v1/posts")
@@ -80,7 +83,7 @@ class AuthorizationTest {
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).exchange()
             .expectStatus().isForbidden();
 
-        verify(roleGetter, times(2)).getRole("post.read");
+        verify(roleService, times(2)).getRole("post.read");
     }
 
     @TestConfiguration

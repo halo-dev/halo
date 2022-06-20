@@ -18,13 +18,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.SchemeManager;
-import run.halo.app.security.authorization.PolicyRule;
-import run.halo.app.security.authorization.Role;
-import run.halo.app.security.authorization.RoleGetter;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -38,18 +37,18 @@ class ExtensionConfigurationTest {
     SchemeManager schemeManager;
 
     @MockBean
-    RoleGetter roleGetter;
+    RoleService roleService;
 
     @BeforeEach
     void setUp() {
         // disable authorization
-        var rule = new PolicyRule();
+        var rule = new Role.PolicyRule();
         rule.setApiGroups(new String[] {"*"});
         rule.setResources(new String[] {"*"});
         rule.setVerbs(new String[] {"*"});
         var role = new Role();
         role.setRules(List.of(rule));
-        when(roleGetter.getRole(anyString())).thenReturn(role);
+        when(roleService.getRole(anyString())).thenReturn(role);
     }
 
     @AfterEach
