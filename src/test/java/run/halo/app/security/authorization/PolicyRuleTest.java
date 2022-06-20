@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import run.halo.app.core.extension.Role;
 import org.skyscreamer.jsonassert.JSONAssert;
+import run.halo.app.core.extension.Role;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -27,8 +27,8 @@ class PolicyRuleTest {
     }
 
     @Test
-    public void constructPolicyRule() throws JsonProcessingException {
-        Role.PolicyRule policyRule = new Role.PolicyRule(null, null, null, null, null);
+    public void constructPolicyRule() throws JsonProcessingException, JSONException {
+        Role.PolicyRule policyRule = new Role.PolicyRule(null, null, null, null, null, null);
         assertThat(policyRule).isNotNull();
         JSONAssert.assertEquals("""
             {

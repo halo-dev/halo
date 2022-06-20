@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.Role.PolicyRule;
 
 /**
  * @author guqing
