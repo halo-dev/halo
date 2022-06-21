@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -75,17 +76,19 @@ public class PluginCompositeRouterFunction implements RouterFunction<ServerRespo
         RouterFunction<ServerResponse> reverseProxyRouterFunction =
             reverseProxyRouterFunctionFactory.create(pluginApplicationContext);
 
-        routerFunctions(pluginApplicationContext)
-            .stream()
+        List<RouterFunction<ServerResponse>> routerFunctions =
+            routerFunctions(pluginApplicationContext);
+
+        List<RouterFunction<ServerResponse>> combinedRouterFunctions =
+            new ArrayList<>(routerFunctions);
+        if (reverseProxyRouterFunction != null) {
+            combinedRouterFunctions.add(reverseProxyRouterFunction);
+        }
+
+        combinedRouterFunctions.stream()
             .reduce(RouterFunction::and)
-            .map(compositeRouterFunction -> {
-                if (reverseProxyRouterFunction != null) {
-                    compositeRouterFunction.andOther(reverseProxyRouterFunction);
-                }
-                return compositeRouterFunction;
-            })
-            .ifPresent(routerFunction -> {
-                routerFunctionRegistry.put(plugin.getPluginId(), routerFunction);
+            .ifPresent(compositeRouterFunction -> {
+                routerFunctionRegistry.put(plugin.getPluginId(), compositeRouterFunction);
             });
     }
 
