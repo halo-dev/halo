@@ -69,6 +69,7 @@ public class PluginServiceImpl implements PluginService {
         PluginState pluginState = haloPluginManager.stopPlugin(pluginName);
         Plugin plugin = getByName(pluginName);
         plugin.getStatus().setStatus(pluginState);
+        extensionClient.update(plugin);
         return plugin;
     }
 
