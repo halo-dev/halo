@@ -24,9 +24,12 @@ public class PluginApplicationInitializer {
     protected final HaloPluginManager haloPluginManager;
 
     private final ExtensionContextRegistry contextRegistry = ExtensionContextRegistry.getInstance();
+    private final SharedApplicationContextHolder sharedApplicationContextHolder;
 
     public PluginApplicationInitializer(HaloPluginManager springPluginManager) {
         this.haloPluginManager = springPluginManager;
+        sharedApplicationContextHolder = springPluginManager.getRootApplicationContext()
+            .getBean(SharedApplicationContextHolder.class);
     }
 
     public ApplicationContext getRootApplicationContext() {
@@ -40,7 +43,11 @@ public class PluginApplicationInitializer {
         StopWatch stopWatch = new StopWatch("initialize-plugin-context");
         stopWatch.start("Create PluginApplicationContext");
         PluginApplicationContext pluginApplicationContext = new PluginApplicationContext();
-        pluginApplicationContext.setParent(getRootApplicationContext());
+
+        if (sharedApplicationContextHolder != null) {
+            pluginApplicationContext.setParent(sharedApplicationContextHolder.getInstance());
+        }
+
         pluginApplicationContext.setClassLoader(pluginClassLoader);
         // populate plugin to plugin application context
         pluginApplicationContext.setPluginId(pluginId);
