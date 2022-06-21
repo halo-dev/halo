@@ -1,8 +1,10 @@
 package run.halo.app.handler.file;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -10,8 +12,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.FileOperationException;
 import run.halo.app.exception.RepeatTypeException;
+import run.halo.app.handler.prehandler.ByteMultipartFile;
+import run.halo.app.handler.prehandler.FilePreHandlers;
 import run.halo.app.model.entity.Attachment;
 import run.halo.app.model.enums.AttachmentType;
 import run.halo.app.model.support.UploadResult;
@@ -25,6 +30,9 @@ import run.halo.app.model.support.UploadResult;
 @Slf4j
 @Component
 public class FileHandlers {
+
+    @Autowired
+    private FilePreHandlers filePreHandlers;
 
     /**
      * File handler container.
@@ -49,7 +57,14 @@ public class FileHandlers {
      */
     @NonNull
     public UploadResult upload(@NonNull MultipartFile file,
-        @NonNull AttachmentType attachmentType) {
+                               @NonNull AttachmentType attachmentType) {
+        try {
+            byte[] bytes = filePreHandlers.process(file.getBytes());
+            file = new ByteMultipartFile(bytes, file.getOriginalFilename(), file.getName(),
+                file.getContentType());
+        } catch (IOException e) {
+            throw new BadRequestException("Get file bytes for preprocess failed", e);
+        }
         return getSupportedType(attachmentType).upload(file);
     }
 
@@ -94,4 +109,5 @@ public class FileHandlers {
         }
         return handler;
     }
+
 }

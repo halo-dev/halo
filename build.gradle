@@ -75,6 +75,7 @@ ext {
     jsoupVersion = '1.14.3'
     embeddedRedisVersion = '0.6'
     diffUtilsVersion = '4.11'
+    commonsImagingVersion = "1.0-alpha3"
 }
 
 dependencies {
@@ -125,6 +126,7 @@ dependencies {
     implementation "org.flywaydb:flyway-core:$flywayVersion"
     implementation "com.google.zxing:core:$zxingVersion"
     implementation "io.github.java-diff-utils:java-diff-utils:$diffUtilsVersion"
+    implementation "org.apache.commons:commons-imaging:$commonsImagingVersion"
 
     implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
     runtimeOnly "com.h2database:h2:$h2Version"
