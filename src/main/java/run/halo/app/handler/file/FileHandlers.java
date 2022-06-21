@@ -63,7 +63,7 @@ public class FileHandlers {
             file = new ByteMultipartFile(bytes, file.getOriginalFilename(), file.getName(),
                 file.getContentType());
         } catch (IOException e) {
-            throw new BadRequestException("Get file bytes for preprocess failed");
+            throw new BadRequestException("Get file bytes for preprocess failed", e);
         }
         return getSupportedType(attachmentType).upload(file);
     }

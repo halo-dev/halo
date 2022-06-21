@@ -36,40 +36,42 @@ public class PictureExifRemovalPreHandler implements FilePreHandler {
 
     @Override
     public byte[] preProcess(byte[] bytes) {
-        if (isRemoveExifEnable()) {
-            try {
-                ImageMetadata metadata = Imaging.getMetadata(bytes);
-                final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
-                if (null != jpegMetadata) {
-                    final TiffImageMetadata exif = jpegMetadata.getExif();
-                    if (null != exif) {
-                        TiffOutputSet outputSet = exif.getOutputSet();
-                        if (null != outputSet) {
-                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                            OutputStream os = new BufferedOutputStream(bos);
-                            for (TiffOutputDirectory directory : outputSet.getDirectories()) {
-                                for (TiffOutputField field : directory.getFields()) {
-                                    if (!StringUtils.equalsAnyIgnoreCase("Orientation",
-                                        field.tagInfo.name)) {
-                                        outputSet.removeField(field.tagInfo);
-                                    }
-                                }
-                            }
-                            new ExifRewriter().updateExifMetadataLossless(bytes, os, outputSet);
-                            bytes = bos.toByteArray();
-                            os.close();
-                            bos.close();
-                            return bytes;
+        if (!isRemoveExifEnable()) {
+            return bytes;
+        }
+        try {
+            ImageMetadata metadata = Imaging.getMetadata(bytes);
+            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+            if (null == jpegMetadata) {
+                return bytes;
+            }
+            final TiffImageMetadata exif = jpegMetadata.getExif();
+            if (null == exif) {
+                return bytes;
+            }
+            final TiffOutputSet outputSet = exif.getOutputSet();
+            if (null == outputSet) {
+                return bytes;
+            }
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                 OutputStream os = new BufferedOutputStream(bos)) {
+                for (TiffOutputDirectory directory : outputSet.getDirectories()) {
+                    for (TiffOutputField field : directory.getFields()) {
+                        if (!StringUtils.equalsAnyIgnoreCase("Orientation", field.tagInfo.name)) {
+                            outputSet.removeField(field.tagInfo);
                         }
                     }
+                    new ExifRewriter().updateExifMetadataLossless(bytes, os, outputSet);
+                    bytes = bos.toByteArray();
+                    return bytes;
                 }
-            } catch (IllegalArgumentException e) {
-                log.info("Cannot parse to image format.");
-            } catch (ImageWriteException | IOException | ImageReadException e) {
-                log.info("Cannot get metadata from bytes." + e);
-            } catch (Exception e) {
-                log.info("Cannot check or remove Exif from bytes." + e);
             }
+        } catch (IllegalArgumentException e) {
+            log.info("Cannot parse to image format.");
+        } catch (ImageWriteException | ImageReadException | IOException e) {
+            log.info("Cannot get metadata from bytes.", e);
+        } catch (Exception e) {
+            log.info("Cannot check or remove Exif from bytes.", e);
         }
         return bytes;
     }

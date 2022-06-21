@@ -50,5 +50,4 @@ public class ImageUtils {
             throw new IOException("Failed to read image reader.", e);
         }
     }
-
 }
