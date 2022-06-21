@@ -63,7 +63,7 @@ public class YamlPluginFinder {
         Plugin plugin = readPluginDescriptor(pluginPath);
         if (plugin.getStatus() == null) {
             Plugin.PluginStatus pluginStatus = new Plugin.PluginStatus();
-            pluginStatus.setStatus(PluginState.RESOLVED);
+            pluginStatus.setPhase(PluginState.RESOLVED);
             plugin.setStatus(pluginStatus);
         }
         return plugin;

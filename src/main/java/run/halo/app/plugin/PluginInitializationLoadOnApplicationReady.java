@@ -1,6 +1,5 @@
 package run.halo.app.plugin;
 
-import org.pf4j.PluginState;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
@@ -39,8 +38,7 @@ public class PluginInitializationLoadOnApplicationReady
 
     private void initStartupPlugins() {
         extensionClient.list(Plugin.class,
-                predicate ->
-                    PluginState.STARTED.equals(predicate.getStatus().getStatus()),
+                predicate -> predicate.getSpec().getEnabled(),
                 null)
             .forEach(plugin -> pluginService.startup(plugin.getMetadata().getName()));
     }

@@ -2,6 +2,7 @@ package run.halo.app.core.extension;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,6 +60,8 @@ public class Plugin extends AbstractExtension {
         private String requires = "*";
 
         private String pluginClass = BasePlugin.class.getName();
+
+        private Boolean enabled = false;
     }
 
     @Getter
@@ -79,7 +82,13 @@ public class Plugin extends AbstractExtension {
     @Data
     public static class PluginStatus {
 
-        private PluginState status;
+        private PluginState phase;
+
+        private String reason;
+
+        private Instant lastStartTime;
+
+        private Instant lastTransitionTime;
 
         private String entry;
 

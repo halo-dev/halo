@@ -45,11 +45,12 @@ public class PluginServiceImpl implements PluginService {
         Assert.notNull(pluginName, "The pluginName must not be null.");
         PluginState pluginState = haloPluginManager.startPlugin(pluginName);
         Plugin plugin = getByName(pluginName);
+        plugin.getSpec().setEnabled(true);
         Plugin.PluginStatus status = plugin.getStatus();
         if (status == null) {
             status = new Plugin.PluginStatus();
         }
-        status.setStatus(pluginState);
+        status.setPhase(pluginState);
 
         // TODO Check whether the JS bundle rule exists. If it does not exist, do not populate
         // populate stylesheet path
@@ -68,7 +69,8 @@ public class PluginServiceImpl implements PluginService {
         Assert.notNull(pluginName, "The pluginName must not be null.");
         PluginState pluginState = haloPluginManager.stopPlugin(pluginName);
         Plugin plugin = getByName(pluginName);
-        plugin.getStatus().setStatus(pluginState);
+        plugin.getSpec().setEnabled(false);
+        plugin.getStatus().setPhase(pluginState);
         extensionClient.update(plugin);
         return plugin;
     }
