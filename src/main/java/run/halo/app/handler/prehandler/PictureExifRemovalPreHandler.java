@@ -61,10 +61,10 @@ public class PictureExifRemovalPreHandler implements FilePreHandler {
                             outputSet.removeField(field.tagInfo);
                         }
                     }
-                    new ExifRewriter().updateExifMetadataLossless(bytes, os, outputSet);
-                    bytes = bos.toByteArray();
-                    return bytes;
                 }
+                new ExifRewriter().updateExifMetadataLossless(bytes, os, outputSet);
+                bytes = bos.toByteArray();
+                return bytes;
             }
         } catch (IllegalArgumentException e) {
             log.info("Cannot parse to image format.");
