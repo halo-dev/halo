@@ -6,6 +6,6 @@ package run.halo.app.handler.prehandler;
  */
 public interface FilePreHandler {
 
-    byte[] preProcess(byte[] file);
+    byte[] preProcess(byte[] bytes);
 
 }
