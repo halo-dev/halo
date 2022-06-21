@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.Role.PolicyRule;
 
 /**
  * @author guqing
@@ -38,7 +39,8 @@ public class RbacRequestEvaluation {
             return verbMatches(rule, requestAttributes.getVerb())
                 && apiGroupMatches(rule, requestAttributes.getApiGroup())
                 && resourceMatches(rule, combinedResource, requestAttributes.getSubresource())
-                && resourceNameMatches(rule, requestAttributes.getName());
+                && resourceNameMatches(rule, requestAttributes.getName())
+                && pluginNameMatches(rule, requestAttributes.pluginName());
         }
         return verbMatches(rule, requestAttributes.getVerb())
             && nonResourceURLMatches(rule, requestAttributes.getPath());
@@ -122,5 +124,9 @@ public class RbacRequestEvaluation {
             }
         }
         return false;
+    }
+
+    protected boolean pluginNameMatches(PolicyRule rule, String pluginName) {
+        return StringUtils.equals(rule.getPluginName(), pluginName);
     }
 }

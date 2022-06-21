@@ -8,6 +8,8 @@ import org.springframework.http.server.PathContainer;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 
 /**
+ * Creates {@link RequestInfo} from {@link ServerHttpRequest}.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -25,6 +27,9 @@ public class RequestInfoFactory {
      */
     final Set<String> grouplessApiPrefixes;
 
+    /**
+     * special verbs no subresources.
+     */
     final Set<String> specialVerbs;
 
     public RequestInfoFactory(Set<String> apiPrefixes, Set<String> grouplessApiPrefixes) {
@@ -39,39 +44,35 @@ public class RequestInfoFactory {
     }
 
     /**
-     * newRequestInfo returns the information from the http request.  If error is not occurred,
+     * <p>newRequestInfo returns the information from the http request.  If error is not occurred,
      * RequestInfo holds the information as best it is known before the failure
      * It handles both resource and non-resource requests and fills in all the pertinent
-     * information
-     * for each.
-     * <p>
+     * information.</p>
+     * <p>for each.</p>
      * Valid Inputs:
-     * <p>
-     * Resource paths
+     * <p>Resource paths</p>
      * <pre>
-     * /apis/{api-group}/{version}/namespaces
-     * /api/{version}/namespaces
-     * /api/{version}/namespaces/{namespace}
-     * /api/{version}/namespaces/{namespace}/{resource}
-     * /api/{version}/namespaces/{namespace}/{resource}/{resourceName}
+     * /api/{version}/plugins
+     * /api/{version}/plugins/{pluginName}
+     * /api/{version}/plugins/{pluginName}/{resource}
+     * /api/{version}/plugins/{pluginName}/{resource}/{resourceName}
      * /api/{version}/{resource}
      * /api/{version}/{resource}/{resourceName}
      * </pre>
-     *
+     * <p>Special verbs without subresources:</p>
      * <pre>
-     * Special verbs without subresources:
      * /api/{version}/proxy/{resource}/{resourceName}
      * /api/{version}/proxy/namespaces/{namespace}/{resource}/{resourceName}
      * </pre>
      *
+     * <p>Special verbs with subresources:</p>
      * <pre>
-     * Special verbs with subresources:
      * /api/{version}/watch/{resource}
      * /api/{version}/watch/namespaces/{namespace}/{resource}
      * </pre>
      *
+     * <p>NonResource paths:</p>
      * <pre>
-     * NonResource paths
      * /apis/{api-group}/{version}
      * /apis/{api-group}
      * /apis
@@ -137,29 +138,29 @@ public class RequestInfoFactory {
                 default -> "";
             };
         }
-        Set<String> namespaceSubresources = Set.of("status", "finalize");
-        // URL forms: /namespaces/{namespace}/{kind}/*, where parts are adjusted to be relative
+        // URL forms: /plugins/{plugin-name}/{kind}/*, where parts are adjusted to be relative
         // to kind
-        if (Objects.equals(currentParts[0], "namespaces")) {
+        if (Objects.equals(currentParts[0], "plugins")
+            && StringUtils.isEmpty(requestInfo.getApiGroup())) {
             if (currentParts.length > 1) {
-                requestInfo.namespace = currentParts[1];
+                requestInfo.pluginName = currentParts[1];
 
-                // if there is another step after the namespace name and it is not a known
-                // namespace subresource
+                // if there is another step after the plugin name and it is not a known
+                // plugins subresource
                 // move currentParts to include it as a resource in its own right
-                if (currentParts.length > 2 && !namespaceSubresources.contains(currentParts[2])) {
+                if (currentParts.length > 2) {
                     currentParts = Arrays.copyOfRange(currentParts, 2, currentParts.length);
                 }
             }
         } else {
-            requestInfo.namespace = "";
+            requestInfo.pluginName = "";
         }
 
         // parsing successful, so we now know the proper value for .Parts
         requestInfo.parts = currentParts;
-        Set<String> specialVerbsNoSubresources = Set.of("proxy");
+        // special verbs no subresources
         // parts look like: resource/resourceName/subresource/other/stuff/we/don't/interpret
-        if (requestInfo.parts.length >= 3 && !specialVerbsNoSubresources.contains(
+        if (requestInfo.parts.length >= 3 && !specialVerbs.contains(
             requestInfo.verb)) {
             requestInfo.subresource = requestInfo.parts[2];
         }
@@ -195,7 +196,7 @@ public class RequestInfoFactory {
         return "1".equals(requestParam) || "true".equals(requestParam);
     }
 
-    public String[] splitPath(String path) {
+    private String[] splitPath(String path) {
         path = StringUtils.strip(path, "/");
         if (StringUtils.isEmpty(path)) {
             return new String[] {};

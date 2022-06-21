@@ -67,4 +67,9 @@ public class AttributesRecord implements Attributes {
     public String getPath() {
         return requestInfo.getPath();
     }
+
+    @Override
+    public String pluginName() {
+        return requestInfo.getPluginName();
+    }
 }

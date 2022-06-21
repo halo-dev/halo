@@ -4,7 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -32,29 +34,28 @@ public class Role extends AbstractExtension {
      * @author guqing
      * @since 2.0.0
      */
-    @Data
+    @Getter
     public static class PolicyRule {
-
         /**
          * APIGroups is the name of the APIGroup that contains the resources.
          * If multiple API groups are specified, any action requested against one of the enumerated
          * resources in any API group will be allowed.
          */
-        String[] apiGroups;
+        final String[] apiGroups;
 
         /**
          * Resources is a list of resources this rule applies to.  '*' represents all resources in
          * the specified apiGroups.
-         * '*&#47;foo' represents the subresource 'foo' for all resources in
-         * the specified apiGroups.
+         * '*&#47;foo' represents the subresource 'foo' for all resources in the specified
+         * apiGroups.
          */
-        String[] resources;
+        final String[] resources;
 
         /**
          * ResourceNames is an optional white list of names that the rule applies to.  An empty set
          * means that everything is allowed.
          */
-        String[] resourceNames;
+        final String[] resourceNames;
 
         /**
          * NonResourceURLs is a set of partial urls that a user should have access to.
@@ -66,19 +67,26 @@ public class Role extends AbstractExtension {
          * Rules can either apply to API resources (such as "pods" or "secrets") or non-resource
          * URL paths (such as "/api"),  but not both.
          */
-        String[] nonResourceURLs;
+        final String[] nonResourceURLs;
 
         /**
          * about who the rule applies to or which namespace the rule applies to.
          */
-        String[] verbs;
+        final String[] verbs;
+
+        /**
+         * If the plugin name exists, it means that the API is provided by the plugin.
+         */
+        final String pluginName;
 
         public PolicyRule() {
-            this(null, null, null, null, null);
+            this(null, null, null, null, null, null);
         }
 
-        public PolicyRule(String[] apiGroups, String[] resources, String[] resourceNames,
+        public PolicyRule(String pluginName, String[] apiGroups, String[] resources,
+            String[] resourceNames,
             String[] nonResourceURLs, String[] verbs) {
+            this.pluginName = StringUtils.defaultString(pluginName);
             this.apiGroups = nullElseEmpty(apiGroups);
             this.resources = nullElseEmpty(resources);
             this.resourceNames = nullElseEmpty(resourceNames);
@@ -95,10 +103,21 @@ public class Role extends AbstractExtension {
 
         public static class Builder {
             String[] apiGroups;
+
             String[] resources;
+
             String[] resourceNames;
+
             String[] nonResourceURLs;
+
             String[] verbs;
+
+            String pluginName;
+
+            public Builder pluginName(String pluginName) {
+                this.pluginName = pluginName;
+                return this;
+            }
 
             public Builder apiGroups(String... apiGroups) {
                 this.apiGroups = apiGroups;
@@ -126,7 +145,9 @@ public class Role extends AbstractExtension {
             }
 
             public PolicyRule build() {
-                return new PolicyRule(apiGroups, resources, resourceNames, nonResourceURLs, verbs);
+                return new PolicyRule(pluginName, apiGroups, resources, resourceNames,
+                    nonResourceURLs,
+                    verbs);
             }
         }
     }

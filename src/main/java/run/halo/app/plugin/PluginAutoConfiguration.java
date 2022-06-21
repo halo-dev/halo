@@ -14,11 +14,12 @@ import org.pf4j.PluginLoader;
 import org.pf4j.PluginManager;
 import org.pf4j.PluginStatusProvider;
 import org.pf4j.RuntimeMode;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
-import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 
 /**
  * Plugin autoconfiguration for Spring Boot.
@@ -32,18 +33,26 @@ import org.springframework.web.reactive.result.method.annotation.RequestMappingH
 public class PluginAutoConfiguration {
 
     private final PluginProperties pluginProperties;
-
-    private final RequestMappingHandlerMapping requestMappingHandlerMapping;
+    @Qualifier("webFluxContentTypeResolver")
+    private final RequestedContentTypeResolver requestedContentTypeResolver;
 
     public PluginAutoConfiguration(PluginProperties pluginProperties,
-        RequestMappingHandlerMapping requestMappingHandlerMapping) {
+        RequestedContentTypeResolver requestedContentTypeResolver) {
         this.pluginProperties = pluginProperties;
-        this.requestMappingHandlerMapping = requestMappingHandlerMapping;
+        this.requestedContentTypeResolver = requestedContentTypeResolver;
+    }
+
+    @Bean
+    public PluginRequestMappingHandlerMapping pluginRequestMappingHandlerMapping() {
+        PluginRequestMappingHandlerMapping mapping = new PluginRequestMappingHandlerMapping();
+        mapping.setContentTypeResolver(requestedContentTypeResolver);
+        mapping.setOrder(-1);
+        return mapping;
     }
 
     @Bean
     public PluginRequestMappingManager pluginRequestMappingManager() {
-        return new PluginRequestMappingManager(requestMappingHandlerMapping);
+        return new PluginRequestMappingManager(pluginRequestMappingHandlerMapping());
     }
 
     @Bean
