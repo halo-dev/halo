@@ -1,4 +1,4 @@
-package run.halo.app.plugin.resources;
+package run.halo.app.core.extension;
 
 import java.util.List;
 import lombok.Data;
@@ -21,9 +21,9 @@ import run.halo.app.extension.GVK;
 public class ReverseProxy extends AbstractExtension {
     private List<ReverseProxyRule> rules;
 
-    record ReverseProxyRule(String path, FileReverseProxyProvider file) {
+    public record ReverseProxyRule(String path, FileReverseProxyProvider file) {
     }
 
-    record FileReverseProxyProvider(String directory, String filename) {
+    public record FileReverseProxyProvider(String directory, String filename) {
     }
 }

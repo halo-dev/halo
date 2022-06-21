@@ -16,6 +16,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.Resource;
 import org.springframework.security.util.InMemoryResource;
 import org.springframework.util.ResourceUtils;
+import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -42,34 +43,41 @@ class YamlPluginFinderTest {
         assertThat(plugin).isNotNull();
         JSONAssert.assertEquals("""
                 {
-                    "spec": {
-                        "displayName": "a name to show",
-                        "version": "0.0.1",
-                        "author": "guqing",
-                        "logo": "https://guqing.xyz/avatar",
-                        "pluginDependencies": {
-                          "banana": "0.0.1"
-                        },
-                        "homepage": "https://github.com/guqing/halo-plugin-1",
-                        "description": "Tell me more about this plugin.",
-                        "license": [{
-                            "name": "MIT",
-                            "url": ""
-                        }],
-                        "requires": ">=2.0.0",
-                        "pluginClass": "run.halo.app.plugin.BasePlugin"
-                    },
-                    "apiVersion": "plugin.halo.run/v1alpha1",
-                    "kind": "Plugin",
-                    "metadata": {
-                        "name": "plugin-1",
-                        "labels": null,
-                        "annotations": null,
-                        "version": null,
-                        "creationTimestamp": null,
-                        "deletionTimestamp": null
-                    }
-                }
+                     "spec": {
+                         "displayName": "a name to show",
+                         "version": "0.0.1",
+                         "author": "guqing",
+                         "logo": "https://guqing.xyz/avatar",
+                         "pluginDependencies": {
+                             "banana": "0.0.1"
+                         },
+                         "homepage": "https://github.com/guqing/halo-plugin-1",
+                         "description": "Tell me more about this plugin.",
+                         "license": [
+                             {
+                                 "name": "MIT",
+                                 "url": ""
+                             }
+                         ],
+                         "requires": ">=2.0.0",
+                         "pluginClass": "run.halo.app.plugin.BasePlugin"
+                     },
+                     "status": {
+                         "status": "RESOLVED",
+                         "entry": null,
+                         "stylesheet": null
+                     },
+                     "apiVersion": "plugin.halo.run/v1alpha1",
+                     "kind": "Plugin",
+                     "metadata": {
+                         "name": "plugin-1",
+                         "labels": null,
+                         "annotations": null,
+                         "version": null,
+                         "creationTimestamp": null,
+                         "deletionTimestamp": null
+                     }
+                 }
                 """,
             JsonUtils.objectToJson(plugin),
             true);

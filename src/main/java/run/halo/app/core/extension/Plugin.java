@@ -1,4 +1,4 @@
-package run.halo.app.plugin;
+package run.halo.app.core.extension;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,8 +10,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.pf4j.PluginState;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.plugin.BasePlugin;
 
 /**
  * A custom resource for Plugin.
@@ -28,6 +30,8 @@ public class Plugin extends AbstractExtension {
 
     @Schema(required = true)
     private PluginSpec spec;
+
+    private PluginStatus status;
 
     @Data
     public static class PluginSpec {
@@ -70,5 +74,15 @@ public class Plugin extends AbstractExtension {
             this.name = name;
             this.url = "";
         }
+    }
+
+    @Data
+    public static class PluginStatus {
+
+        private PluginState status;
+
+        private String entry;
+
+        private String stylesheet;
     }
 }

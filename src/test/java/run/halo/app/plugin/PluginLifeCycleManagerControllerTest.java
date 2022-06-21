@@ -68,19 +68,19 @@ class PluginLifeCycleManagerControllerTest {
 
     @Test
     void start() {
-        webClient.get()
+        webClient.put()
             .uri(prefix + "/apples/startup")
             .exchange()
             .expectStatus()
-            .isOk();
+            .is5xxServerError();
     }
 
     @Test
     void stop() {
-        webClient.get()
+        webClient.put()
             .uri(prefix + "/apples/stop")
             .exchange()
             .expectStatus()
-            .isOk();
+            .is5xxServerError();
     }
 }

@@ -2,14 +2,10 @@ package run.halo.app.plugin;
 
 import org.pf4j.PluginWrapper;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.SchemeManager;
-import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.event.HaloPluginLoadedEvent;
-import run.halo.app.plugin.resources.ReverseProxy;
 
 /**
  * @author guqing
@@ -17,15 +13,13 @@ import run.halo.app.plugin.resources.ReverseProxy;
  */
 @Component
 public class PluginLoadedListener implements ApplicationListener<HaloPluginLoadedEvent> {
-    private static final String REVERSE_PROXY_NAME = "extensions/reverseProxy.yaml";
     private final ExtensionClient extensionClient;
 
-    public PluginLoadedListener(ExtensionClient extensionClient, SchemeManager schemeManager) {
-        this.extensionClient = extensionClient;
+    private final PluginUnstructuredResourceLoader pluginUnstructuredResourceLoader;
 
-        // TODO Optimize schemes register
-        schemeManager.register(Plugin.class);
-        schemeManager.register(ReverseProxy.class);
+    public PluginLoadedListener(ExtensionClient extensionClient) {
+        this.extensionClient = extensionClient;
+        pluginUnstructuredResourceLoader = new PluginUnstructuredResourceLoader();
     }
 
     @Override
@@ -35,14 +29,10 @@ public class PluginLoadedListener implements ApplicationListener<HaloPluginLoade
         // load plugin.yaml
         YamlPluginFinder yamlPluginFinder = new YamlPluginFinder();
         Plugin plugin = yamlPluginFinder.find(pluginWrapper.getPluginPath());
-        DefaultResourceLoader defaultResourceLoader =
-            new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());
         extensionClient.create(plugin);
-        // load reverse proxy
-        Resource resource = defaultResourceLoader.getResource(REVERSE_PROXY_NAME);
-        if (resource.exists()) {
-            YamlUnstructuredLoader unstructuredLoader = new YamlUnstructuredLoader(resource);
-            unstructuredLoader.load().forEach(extensionClient::create);
-        }
+
+        // load plugin unstructured resource
+        pluginUnstructuredResourceLoader.loadUnstructured(pluginWrapper)
+            .forEach(extensionClient::create);
     }
 }

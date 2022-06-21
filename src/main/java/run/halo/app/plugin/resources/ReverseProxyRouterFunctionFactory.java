@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.ALL;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +19,12 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.core.extension.ReverseProxy;
+import run.halo.app.core.extension.ReverseProxy.FileReverseProxyProvider;
+import run.halo.app.core.extension.ReverseProxy.ReverseProxyRule;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.PluginApplicationContext;
-import run.halo.app.plugin.resources.ReverseProxy.FileReverseProxyProvider;
-import run.halo.app.plugin.resources.ReverseProxy.ReverseProxyRule;
 
 /**
  * <p>Plugin's reverse proxy router factory.</p>
@@ -41,8 +43,12 @@ public class ReverseProxyRouterFunctionFactory {
 
     private final ExtensionClient extensionClient;
 
-    public ReverseProxyRouterFunctionFactory(ExtensionClient extensionClient) {
+    private final JsBundleRuleProvider jsBundleRuleProvider;
+
+    public ReverseProxyRouterFunctionFactory(ExtensionClient extensionClient,
+        JsBundleRuleProvider jsBundleRuleProvider) {
         this.extensionClient = extensionClient;
+        this.jsBundleRuleProvider = jsBundleRuleProvider;
     }
 
     /**
@@ -89,7 +95,7 @@ public class ReverseProxyRouterFunctionFactory {
     }
 
     private List<ReverseProxyRule> getReverseProxyRules(String pluginId) {
-        return extensionClient.list(ReverseProxy.class,
+        List<ReverseProxyRule> rules = extensionClient.list(ReverseProxy.class,
                 reverseProxy -> {
                     String pluginName = reverseProxy.getMetadata()
                         .getLabels()
@@ -101,9 +107,27 @@ public class ReverseProxyRouterFunctionFactory {
             .map(ReverseProxy::getRules)
             .flatMap(List::stream)
             .collect(Collectors.toList());
+
+        // populate plugin js bundle rules.
+        rules.addAll(getJsBundleRules(pluginId));
+        return rules;
     }
 
-    private String buildRoutePath(String pluginId, ReverseProxyRule reverseProxyRule) {
+    private List<ReverseProxyRule> getJsBundleRules(String pluginId) {
+        List<ReverseProxyRule> rules = new ArrayList<>(2);
+        ReverseProxyRule jsRule = jsBundleRuleProvider.jsRule(pluginId);
+        if (jsRule != null) {
+            rules.add(jsRule);
+        }
+
+        ReverseProxyRule cssRule = jsBundleRuleProvider.cssRule(pluginId);
+        if (cssRule != null) {
+            rules.add(cssRule);
+        }
+        return rules;
+    }
+
+    public static String buildRoutePath(String pluginId, ReverseProxyRule reverseProxyRule) {
         return PathUtils.combinePath(REVERSE_PROXY_API_PREFIX, pluginId, reverseProxyRule.path());
     }
 

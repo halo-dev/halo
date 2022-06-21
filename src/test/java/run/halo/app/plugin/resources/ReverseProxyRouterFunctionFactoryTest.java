@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.plugin.PluginApplicationContext;
@@ -37,7 +38,9 @@ class ReverseProxyRouterFunctionFactoryTest {
 
     @BeforeEach
     void setUp() {
-        reverseProxyRouterFunctionFactory = new ReverseProxyRouterFunctionFactory(extensionClient);
+        JsBundleRuleProvider jsBundleRuleProvider = new JsBundleRuleProvider();
+        reverseProxyRouterFunctionFactory = new ReverseProxyRouterFunctionFactory(extensionClient,
+            jsBundleRuleProvider);
 
         ReverseProxy reverseProxy = mockReverseProxy();
 
