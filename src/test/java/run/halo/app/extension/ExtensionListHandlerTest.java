@@ -27,20 +27,20 @@ class ExtensionListHandlerTest {
     @Test
     void shouldBuildPathPatternCorrectly() {
         var scheme = Scheme.buildFromType(FakeExtension.class);
-        var getHandler = new ExtensionListHandler(scheme, client);
-        var pathPattern = getHandler.pathPattern();
+        var listHandler = new ExtensionListHandler(scheme, client);
+        var pathPattern = listHandler.pathPattern();
         assertEquals("/apis/fake.halo.run/v1alpha1/fakes", pathPattern);
     }
 
     @Test
     void shouldHandleCorrectly() {
         var scheme = Scheme.buildFromType(FakeExtension.class);
-        var getHandler = new ExtensionListHandler(scheme, client);
+        var listHandler = new ExtensionListHandler(scheme, client);
         var serverRequest = MockServerRequest.builder().build();
         final var fake = new FakeExtension();
         when(client.list(eq(FakeExtension.class), any(), any())).thenReturn(List.of(fake));
 
-        var responseMono = getHandler.handle(serverRequest);
+        var responseMono = listHandler.handle(serverRequest);
 
         StepVerifier.create(responseMono)
             .consumeNextWith(response -> {
