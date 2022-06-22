@@ -1,10 +1,14 @@
 package run.halo.app.extension;
 
-import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Objects;
+import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
@@ -35,12 +39,70 @@ public class ExtensionRouterFunctionFactory {
         var updateHandler = new ExtensionUpdateHandler(scheme, client);
         var deleteHandler = new ExtensionDeleteHandler(scheme, client);
         // TODO More handlers here
-        return route()
-            .GET(getHandler.pathPattern(), getHandler)
-            .GET(listHandler.pathPattern(), listHandler)
-            .POST(createHandler.pathPattern(), createHandler)
-            .PUT(updateHandler.pathPattern(), updateHandler)
-            .DELETE(deleteHandler.pathPattern(), deleteHandler)
+        var gvk = scheme.groupVersionKind();
+        var tagName = gvk.toString();
+        return SpringdocRouteBuilder.route()
+            .GET(getHandler.pathPattern(), getHandler,
+                builder -> builder.operationId("Get" + gvk)
+                    .description("Get " + gvk)
+                    .tag(tagName)
+                    .parameter(parameterBuilder().in(ParameterIn.PATH)
+                        .name("name")
+                        .description("Name of " + scheme.singular()))
+                    .response(responseBuilder().responseCode("200")
+                        .description("Response single " + scheme.singular())
+                        .implementation(scheme.type())))
+            .GET(listHandler.pathPattern(), listHandler,
+                builder -> builder.operationId("List" + gvk)
+                    .description("List " + gvk)
+                    .tag(tagName)
+                    .parameter(parameterBuilder().in(ParameterIn.QUERY)
+                        .name("page")
+                        .description("Page index")
+                        .implementation(Integer.class))
+                    .parameter(parameterBuilder().in(ParameterIn.QUERY)
+                        .name("size")
+                        .description("Size of one page")
+                        .implementation(Integer.class))
+                    .parameter(parameterBuilder().in(ParameterIn.QUERY)
+                        .name("sort")
+                        .description("Sort by some fields. Like metadata.name,desc"))
+
+                    .response(responseBuilder().responseCode("200")
+                        .description("Response " + scheme.plural())
+                        .implementationArray(scheme.type())))
+            .POST(createHandler.pathPattern(), createHandler,
+                builder -> builder.operationId("Create" + gvk)
+                    .description("Create " + gvk)
+                    .tag(tagName)
+                    .requestBody(requestBodyBuilder()
+                        .description("Fresh " + scheme.singular())
+                        .implementation(scheme.type()))
+                    .response(responseBuilder().responseCode("200")
+                        .description("Response " + scheme.plural() + " created just now")
+                        .implementation(scheme.type())))
+            .PUT(updateHandler.pathPattern(), updateHandler,
+                builder -> builder.operationId("Update" + gvk)
+                    .description("Update " + gvk)
+                    .tag(tagName)
+                    .parameter(parameterBuilder().in(ParameterIn.PATH)
+                        .name("name")
+                        .description("Name of " + scheme.singular()))
+                    .requestBody(requestBodyBuilder()
+                        .description("Updated " + scheme.singular())
+                        .implementation(scheme.type()))
+                    .response(responseBuilder().responseCode("200")
+                        .description("Response " + scheme.plural() + " updated just now")
+                        .implementation(scheme.type())))
+            .DELETE(deleteHandler.pathPattern(), deleteHandler,
+                builder -> builder.operationId("Delete" + gvk)
+                    .description("Delete " + gvk)
+                    .tag(tagName)
+                    .parameter(parameterBuilder().in(ParameterIn.PATH)
+                        .name("name")
+                        .description("Name of " + scheme.singular()))
+                    .response(responseBuilder().responseCode("200")
+                        .description("Response " + scheme.singular() + " deleted just now")))
             .build();
     }
 
