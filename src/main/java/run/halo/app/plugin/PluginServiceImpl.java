@@ -43,15 +43,10 @@ public class PluginServiceImpl implements PluginService {
     @Override
     public Plugin startup(String pluginName) {
         Assert.notNull(pluginName, "The pluginName must not be null.");
-        PluginState pluginState = haloPluginManager.startPlugin(pluginName);
-        Plugin plugin = getByName(pluginName);
-        plugin.getSpec().setEnabled(true);
-        Plugin.PluginStatus status = plugin.getStatus();
-        if (status == null) {
-            status = new Plugin.PluginStatus();
-        }
-        status.setPhase(pluginState);
+        PluginState currentState = haloPluginManager.startPlugin(pluginName);
 
+        Plugin plugin = handleStatus(pluginName, currentState, PluginState.STARTED);
+        Plugin.PluginStatus status = plugin.getStatus();
         // TODO Check whether the JS bundle rule exists. If it does not exist, do not populate
         // populate stylesheet path
         String jsBundleRoute = ReverseProxyRouterFunctionFactory.buildRoutePath(pluginName,
@@ -64,17 +59,35 @@ public class PluginServiceImpl implements PluginService {
         return plugin;
     }
 
+    private Plugin handleStatus(String pluginName, PluginState currentState,
+        PluginState desiredState) {
+        Plugin plugin = getByName(pluginName);
+        Plugin.PluginStatus status = plugin.getStatus();
+        if (status == null) {
+            status = new Plugin.PluginStatus();
+        }
+        status.setPhase(currentState);
+        if (desiredState.equals(currentState)) {
+            plugin.getSpec().setEnabled(true);
+        } else {
+            PluginStartingError startingError =
+                haloPluginManager.getPluginStartingError(pluginName);
+            status.setReason(startingError.getMessage());
+            status.setMessage(startingError.getDevMessage());
+        }
+        return plugin;
+    }
+
     @Override
     public Plugin stop(String pluginName) {
         Assert.notNull(pluginName, "The pluginName must not be null.");
-        PluginState pluginState = haloPluginManager.stopPlugin(pluginName);
-        Plugin plugin = getByName(pluginName);
-        plugin.getSpec().setEnabled(false);
-        plugin.getStatus().setPhase(pluginState);
+        PluginState currentState = haloPluginManager.stopPlugin(pluginName);
+        Plugin plugin = handleStatus(pluginName, currentState, PluginState.STOPPED);
         extensionClient.update(plugin);
         return plugin;
     }
 
+    @Override
     public Plugin getByName(String pluginName) {
         Assert.notNull(pluginName, "The pluginName must not be null.");
         return extensionClient.fetch(Plugin.class, pluginName)

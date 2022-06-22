@@ -86,6 +86,8 @@ public class Plugin extends AbstractExtension {
 
         private String reason;
 
+        private String message;
+
         private Instant lastStartTime;
 
         private Instant lastTransitionTime;
