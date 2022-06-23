@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import java.time.Instant;
 import java.util.List;
 import org.pf4j.PluginState;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,7 @@ public class PluginServiceImpl implements PluginService {
             jsBundleRule.cssRule(pluginName));
         status.setEntry(jsBundleRoute);
         status.setStylesheet(cssBundleRoute);
+        status.setLastStartTime(Instant.now());
         extensionClient.update(plugin);
         return plugin;
     }

@@ -25,13 +25,13 @@ import run.halo.app.infra.utils.JsonUtils;
 class YamlPluginDescriptorFinderTest {
 
     private YamlPluginDescriptorFinder yamlPluginDescriptorFinder;
-    private Path testPath;
+
+    private File testFile;
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
         yamlPluginDescriptorFinder = new YamlPluginDescriptorFinder();
-        File file = ResourceUtils.getFile("classpath:plugin/plugin.yaml");
-        testPath = file.toPath().getParent();
+        testFile = ResourceUtils.getFile("classpath:plugin/test-unstructured-resource-loader.jar");
     }
 
     @Test
@@ -61,25 +61,19 @@ class YamlPluginDescriptorFinderTest {
 
     @Test
     void find() throws JsonProcessingException, JSONException {
-        PluginDescriptor pluginDescriptor = yamlPluginDescriptorFinder.find(testPath);
+        PluginDescriptor pluginDescriptor = yamlPluginDescriptorFinder.find(testFile.toPath());
         String actual = JsonUtils.objectToJson(pluginDescriptor);
         JSONAssert.assertEquals("""
                 {
-                    "pluginId": "plugin-1",
-                    "pluginDescription": "Tell me more about this plugin.",
-                    "pluginClass": "run.halo.app.plugin.BasePlugin",
-                    "version": "0.0.1",
-                    "requires": ">=2.0.0",
-                    "provider": "guqing",
-                    "dependencies": [
-                        {
-                            "pluginId": "banana",
-                            "pluginVersionSupport": "0.0.1",
-                            "optional": false
-                        }
-                    ],
-                    "license": "MIT"
-                }
+                     "pluginId": "io.github.guqing.apples",
+                     "pluginDescription": "这是一个用来测试的插件",
+                     "pluginClass": "run.halo.app.plugin.BasePlugin",
+                     "version": "0.0.1",
+                     "requires": "*",
+                     "provider": "guqing",
+                     "dependencies": [],
+                     "license": "MIT"
+                 }
                 """,
             actual,
             false);

@@ -96,7 +96,7 @@ public class PluginAutoConfiguration {
                                     PluginDescriptor pluginDescriptor) {
                                     PluginClassLoader pluginClassLoader =
                                         new PluginClassLoader(pluginManager, pluginDescriptor,
-                                            getClass().getClassLoader());
+                                            getClass().getClassLoader(), ClassLoadingStrategy.APD);
 
                                     loadClasses(pluginPath, pluginClassLoader);
                                     loadJars(pluginPath, pluginClassLoader);

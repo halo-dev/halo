@@ -25,6 +25,7 @@ import run.halo.app.core.extension.ReverseProxy.ReverseProxyRule;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.PluginApplicationContext;
+import run.halo.app.plugin.PluginConst;
 
 /**
  * <p>Plugin's reverse proxy router factory.</p>
@@ -38,8 +39,6 @@ import run.halo.app.plugin.PluginApplicationContext;
 @Component
 public class ReverseProxyRouterFunctionFactory {
     private static final String REVERSE_PROXY_API_PREFIX = "/assets";
-
-    public static final String REVERSE_PROXY_PLUGIN_LABEL_NAME = "plugin.halo.run/plugin-name";
 
     private final ExtensionClient extensionClient;
 
@@ -99,7 +98,7 @@ public class ReverseProxyRouterFunctionFactory {
                 reverseProxy -> {
                     String pluginName = reverseProxy.getMetadata()
                         .getLabels()
-                        .get(REVERSE_PROXY_PLUGIN_LABEL_NAME);
+                        .get(PluginConst.PLUGIN_NAME_LABEL_NAME);
                     return pluginId.equals(pluginName);
                 },
                 null)
