@@ -9,23 +9,56 @@ import {
   VInput,
   VPageHeader,
   VSpace,
+  VSwitch,
   VTag,
 } from "@halo-dev/components";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { plugins } from "./plugins-mock";
+import type { Plugin } from "./types";
+import axiosInstance from "@/utils/api-client";
 
 const checkAll = ref(false);
+const plugins = ref<Plugin[]>([]);
 
 const router = useRouter();
 
-// eslint-disable-next-line
-const handleRouteToDetail = (plugin: any) => {
+const handleRouteToDetail = (plugin: Plugin) => {
   router.push({
     name: "PluginDetail",
-    params: { id: plugin.spec.pluginClass },
+    params: { pluginName: plugin.metadata.name },
   });
 };
+
+function isStarted(plugin: Plugin) {
+  return plugin.status.phase === "STARTED" && plugin.spec.enabled;
+}
+
+const handleFetchPlugins = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/apis/plugin.halo.run/v1alpha1/plugins`
+    );
+    plugins.value = response.data;
+  } catch (e) {
+    console.error("Fail to fetch plugins", e);
+  }
+};
+
+const handleChangePluginStatus = async (plugin: Plugin) => {
+  try {
+    await axiosInstance.put(
+      `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.metadata.name}/${
+        isStarted(plugin) ? "stop" : "startup"
+      }`
+    );
+  } catch (e) {
+    console.error(e);
+  } finally {
+    window.location.reload();
+  }
+};
+
+onMounted(handleFetchPlugins);
 </script>
 <template>
   <VPageHeader title="插件">
@@ -187,11 +220,7 @@ const handleRouteToDetail = (plugin: any) => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li
-          v-for="(plugin, index) in plugins"
-          :key="index"
-          @click.stop="handleRouteToDetail(plugin)"
-        >
+        <li v-for="(plugin, index) in plugins" :key="index">
           <div
             :class="{
               'bg-gray-100': checkAll,
@@ -223,12 +252,15 @@ const handleRouteToDetail = (plugin: any) => {
               </div>
               <div class="flex-1">
                 <div class="flex flex-row items-center">
-                  <span class="mr-2 truncate text-sm font-medium text-gray-900">
-                    {{ plugin.metadata.name }}
+                  <span
+                    class="mr-2 truncate text-sm font-medium text-gray-900"
+                    @click.stop="handleRouteToDetail(plugin)"
+                  >
+                    {{ plugin.spec.displayName }}
                   </span>
                   <VSpace>
                     <VTag>
-                      {{ plugin.metadata.enabled ? "已启用" : "未启用" }}
+                      {{ isStarted(plugin) ? "已启用" : "未启用" }}
                     </VTag>
                   </VSpace>
                 </div>
@@ -258,10 +290,16 @@ const handleRouteToDetail = (plugin: any) => {
                     {{ plugin.spec.version }}
                   </span>
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
-                    2020-01-07
+                    {{ plugin.metadata.creationTimestamp }}
                   </time>
+                  <div class="flex items-center">
+                    <VSwitch
+                      :model-value="isStarted(plugin)"
+                      @click="handleChangePluginStatus(plugin)"
+                    />
+                  </div>
                   <span class="cursor-pointer">
-                    <IconSettings />
+                    <IconSettings @click.stop="handleRouteToDetail(plugin)" />
                   </span>
                 </div>
               </div>

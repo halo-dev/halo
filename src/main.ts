@@ -10,6 +10,9 @@ import { registerMenu } from "@/router/menus.config";
 
 // core modules
 import { coreModules } from "./modules";
+import { useScriptTag } from "@vueuse/core";
+import { usePluginStore } from "@/stores/plugin";
+import axiosInstance from "@/utils/api-client";
 
 const app = createApp(App);
 
@@ -58,8 +61,37 @@ function loadCoreModules() {
   coreModules.forEach(registerModule);
 }
 
+const pluginStore = usePluginStore();
+
 async function loadPluginModules() {
-  // TODO: load plugin modules
+  const response = await axiosInstance.get(
+    `/apis/plugin.halo.run/v1alpha1/plugins`
+  );
+
+  // Get all started plugins
+  const plugins = response.data.filter(
+    (plugin) => plugin.status.phase === "STARTED" && plugin.spec.enabled
+  );
+
+  for (const plugin of plugins) {
+    const { entry } = plugin.status;
+
+    if (entry) {
+      const { load } = useScriptTag(
+        `http://localhost:8090${plugin.status.entry}`
+      );
+      await load();
+      const pluginModule = window[plugin.metadata.name];
+
+      if (pluginModule) {
+        // @ts-ignore
+        plugin.spec.module = pluginModule;
+        registerModule(pluginModule);
+      }
+    }
+
+    pluginStore.registerPlugin(plugin);
+  }
 }
 
 (async function () {
@@ -72,7 +104,8 @@ async function initApp() {
     await loadPluginModules();
   } catch (e) {
     console.error(e);
+  } finally {
+    app.use(router);
+    app.mount("#app");
   }
-  app.use(router);
-  app.mount("#app");
 }

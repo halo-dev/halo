@@ -21,6 +21,7 @@ importers:
       '@vue/tsconfig': ^0.1.3
       '@vueuse/core': ^8.6.0
       autoprefixer: ^10.4.7
+      axios: ^0.27.2
       c8: ^7.11.3
       cypress: ^9.7.0
       eslint: ^8.17.0
@@ -60,6 +61,7 @@ importers:
       '@halo-dev/admin-shared': link:packages/shared
       '@halo-dev/components': link:packages/components
       '@vueuse/core': 8.6.0_vue@3.2.37
+      axios: 0.27.2
       filepond: 4.30.4
       filepond-plugin-image-preview: 4.6.11_filepond@4.30.4
       floating-vue: 2.0.0-beta.16_vue@3.2.37
@@ -2747,6 +2749,15 @@ packages:
     resolution: {integrity: sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==}
     dependencies:
       follow-redirects: 1.14.9
+    transitivePeerDependencies:
+      - debug
+    dev: false
+
+  /axios/0.27.2:
+    resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
+    dependencies:
+      follow-redirects: 1.14.9
+      form-data: 4.0.0
     transitivePeerDependencies:
       - debug
     dev: false

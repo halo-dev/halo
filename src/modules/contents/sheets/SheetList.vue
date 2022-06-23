@@ -14,7 +14,7 @@ import {
 } from "@halo-dev/components";
 import { ref } from "vue";
 import { users } from "@/modules/system/users/users-mock";
-import halo from "@/assets/logo-mock/halo.png";
+import halo from "@/assets/logo.svg";
 
 const sheetsRef = ref([
   {

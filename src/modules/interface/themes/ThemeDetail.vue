@@ -249,7 +249,7 @@ const handleChangeTheme = (theme: any) => {
                       <RouterLink
                         :to="{
                           name: 'PluginDetail',
-                          params: { id: 'run.halo.plugins.links' },
+                          params: { pluginName: 'PluginLinks' },
                         }"
                         class="font-medium text-gray-900 hover:text-blue-400"
                       >

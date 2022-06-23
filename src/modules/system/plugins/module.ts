@@ -18,7 +18,7 @@ export default definePlugin({
           component: PluginList,
         },
         {
-          path: ":id",
+          path: ":pluginName",
           name: "PluginDetail",
           component: PluginDetail,
         },
