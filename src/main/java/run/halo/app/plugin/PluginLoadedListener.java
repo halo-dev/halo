@@ -1,6 +1,8 @@
 package run.halo.app.plugin;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.pf4j.PluginWrapper;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.DefaultResourceLoader;
@@ -41,6 +43,15 @@ public class PluginLoadedListener implements ApplicationListener<HaloPluginLoade
             .filter(Resource::exists)
             .map(resource -> new YamlUnstructuredLoader(resource).load())
             .flatMap(List::stream)
-            .forEach(extensionClient::create);
+            .forEach(unstructured -> {
+                Map<String, String> labels = unstructured.getMetadata().getLabels();
+                if (labels == null) {
+                    unstructured.getMetadata().setLabels(new HashMap<>());
+                }
+                unstructured.getMetadata()
+                    .getLabels()
+                    .put(PluginConst.PLUGIN_NAME_LABEL_NAME, plugin.getMetadata().getName());
+                extensionClient.create(unstructured);
+            });
     }
 }
