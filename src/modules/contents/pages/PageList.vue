@@ -14,9 +14,10 @@ import {
 } from "@halo-dev/components";
 import { ref } from "vue";
 import { users } from "@/modules/system/users/users-mock";
-import halo from "@/assets/logo.svg";
+import type { PagesPublicState } from "@halo-dev/admin-shared";
+import { useExtensionPointsState } from "@/composables/usePlugins";
 
-const sheetsRef = ref([
+const pagesRef = ref([
   {
     title: "关于我们",
     url: "/about",
@@ -37,29 +38,13 @@ const sheetsRef = ref([
   },
 ]);
 
-const advancedSheets = ref([
-  {
-    name: "友情链接",
-    author: "halo-dev",
-    logo: halo,
-    url: "/links",
-  },
-  {
-    name: "图库",
-    author: "halo-dev",
-    logo: halo,
-    url: "/photos",
-  },
-  {
-    name: "社区",
-    author: "halo-dev",
-    logo: halo,
-    url: "/community",
-  },
-]);
-
+const activeId = ref("functional");
 const checkAll = ref(false);
-const activeId = ref("advanced");
+const pagesPublicState = ref<PagesPublicState>({
+  functionalPages: [],
+});
+
+useExtensionPointsState("PAGES", pagesPublicState);
 </script>
 <template>
   <VPageHeader title="页面">
@@ -82,19 +67,23 @@ const activeId = ref("advanced");
         <VTabbar
           v-model:active-id="activeId"
           :items="[
-            { id: 'advanced', label: '功能页面' },
+            { id: 'functional', label: '功能页面' },
             { id: 'custom', label: '自定义页面' },
           ]"
           class="w-full !rounded-none"
           type="outline"
         ></VTabbar>
       </template>
-      <div v-if="activeId === 'advanced'">
+      <div v-if="activeId === 'functional'">
         <ul
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(sheet, index) in advancedSheets" :key="index">
+          <li
+            v-for="(page, index) in pagesPublicState.functionalPages"
+            :key="index"
+            @click="$router.push({ path: page.path })"
+          >
             <div
               class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
             >
@@ -104,20 +93,15 @@ const activeId = ref("advanced");
                     <span
                       class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
                     >
-                      {{ sheet.name }}
+                      {{ page.name }}
                     </span>
-                    <VTag>{{ sheet.url }}</VTag>
+                    <VTag>{{ page.url }}</VTag>
                   </div>
                 </div>
                 <div class="flex">
                   <div
                     class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                   >
-                    <img
-                      v-tooltip="`由${sheet.name}插件提供`"
-                      :src="sheet.logo"
-                      class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
-                    />
                     <span class="cursor-pointer">
                       <IconSettings />
                     </span>
@@ -269,7 +253,7 @@ const activeId = ref("advanced");
             class="box-border h-full w-full divide-y divide-gray-100"
             role="list"
           >
-            <li v-for="(sheet, index) in sheetsRef" :key="index">
+            <li v-for="(page, index) in pagesRef" :key="index">
               <div
                 :class="{
                   'bg-gray-100': checkAll,
@@ -293,17 +277,17 @@ const activeId = ref("advanced");
                       <span
                         class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
                       >
-                        {{ sheet.title }}
+                        {{ page.title }}
                       </span>
-                      <VTag>{{ sheet.url }}</VTag>
+                      <VTag>{{ page.url }}</VTag>
                     </div>
                     <div class="mt-1 flex">
                       <VSpace>
                         <span class="text-xs text-gray-500">
-                          访问量 {{ sheet.views }}
+                          访问量 {{ page.views }}
                         </span>
                         <span class="text-xs text-gray-500">
-                          评论 {{ sheet.commentCount }}
+                          评论 {{ page.commentCount }}
                         </span>
                       </VSpace>
                     </div>

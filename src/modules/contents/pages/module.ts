@@ -1,19 +1,19 @@
 import { definePlugin } from "@halo-dev/admin-shared";
 import { BasicLayout } from "@/layouts";
-import SheetList from "./SheetList.vue";
+import SheetList from "./PageList.vue";
 import { IconPages } from "@halo-dev/components";
 
 export default definePlugin({
-  name: "sheetModule",
+  name: "pageModule",
   components: [],
   routes: [
     {
-      path: "/sheets",
+      path: "/pages",
       component: BasicLayout,
       children: [
         {
           path: "",
-          name: "Sheets",
+          name: "Pages",
           component: SheetList,
         },
       ],
@@ -25,7 +25,7 @@ export default definePlugin({
       items: [
         {
           name: "页面",
-          path: "/sheets",
+          path: "/pages",
           icon: IconPages,
         },
       ],

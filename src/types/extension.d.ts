@@ -1,3 +1,5 @@
+import type { Plugin as PluginModule } from "@halo-dev/admin-shared";
+
 export interface License {
   name?: string;
   url?: string;
@@ -44,6 +46,7 @@ export interface PluginSpec {
   requires?: string;
   pluginClass?: string;
   enabled?: boolean;
+  module?: PluginModule;
 }
 
 export interface PluginStatus {

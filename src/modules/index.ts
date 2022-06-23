@@ -1,6 +1,6 @@
 import dashboardModule from "./dashboard/module";
 import postModule from "./contents/posts/module";
-import sheetModule from "./contents/sheets/module";
+import pageModule from "./contents/pages/module";
 import commentModule from "./contents/comments/module";
 import attachmentModule from "./contents/attachments/module";
 import themeModule from "./interface/themes/module";
@@ -13,7 +13,7 @@ import settingModule from "./system/settings/module";
 const coreModules = [
   dashboardModule,
   postModule,
-  sheetModule,
+  pageModule,
   commentModule,
   attachmentModule,
   themeModule,
