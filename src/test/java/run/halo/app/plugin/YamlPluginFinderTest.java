@@ -33,7 +33,6 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 class YamlPluginFinderTest {
     private YamlPluginFinder pluginFinder;
-    private Path testPath;
 
     private File testFile;
 
@@ -41,7 +40,6 @@ class YamlPluginFinderTest {
     void setUp() throws FileNotFoundException {
         pluginFinder = new YamlPluginFinder();
         testFile = ResourceUtils.getFile("classpath:plugin/plugin.yaml");
-        testPath = testFile.toPath().getParent();
     }
 
     @Test
@@ -63,14 +61,12 @@ class YamlPluginFinderTest {
                     "lastStartTime": null,
                     "lastTransitionTime": null,
                     "entry": null,
-                    "stylesheet": null,
-                    "extensionLocations": [
-                        "extensions/roles.yaml"
-                    ]
+                    "stylesheet": null
                 }
                 """,
             JsonUtils.objectToJson(plugin.getStatus()),
             true);
+        assertThat(plugin.getSpec().getExtensionLocations()).contains("extensions/roles.yaml");
     }
 
     @Test
@@ -97,7 +93,8 @@ class YamlPluginFinderTest {
                         ],
                         "requires": ">=2.0.0",
                         "pluginClass": "run.halo.app.plugin.BasePlugin",
-                        "enabled": false
+                        "enabled": false,
+                        "extensionLocations": null
                     },
                     "status": null,
                     "apiVersion": "plugin.halo.run/v1alpha1",

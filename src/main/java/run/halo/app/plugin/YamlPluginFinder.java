@@ -76,9 +76,9 @@ public class YamlPluginFinder {
         }
         // read unstructured files
         if (FileUtils.isJarFile(pluginPath)) {
-            plugin.getStatus().setExtensionLocations(getUnstructuredFilePathFromJar(pluginPath));
+            plugin.getSpec().setExtensionLocations(getUnstructuredFilePathFromJar(pluginPath));
         } else {
-            plugin.getStatus().setExtensionLocations(getUnstructuredFileFromClasspath(pluginPath));
+            plugin.getSpec().setExtensionLocations(getUnstructuredFileFromClasspath(pluginPath));
         }
         return plugin;
     }

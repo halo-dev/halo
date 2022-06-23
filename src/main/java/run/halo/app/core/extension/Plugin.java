@@ -62,6 +62,8 @@ public class Plugin extends AbstractExtension {
         private String pluginClass = BasePlugin.class.getName();
 
         private Boolean enabled = false;
+
+        private List<String> extensionLocations;
     }
 
     @Getter
@@ -95,7 +97,5 @@ public class Plugin extends AbstractExtension {
         private String entry;
 
         private String stylesheet;
-
-        private List<String> extensionLocations;
     }
 }

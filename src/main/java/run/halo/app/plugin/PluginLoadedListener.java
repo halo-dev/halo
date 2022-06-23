@@ -35,7 +35,7 @@ public class PluginLoadedListener implements ApplicationListener<HaloPluginLoade
         // load unstructured
         DefaultResourceLoader resourceLoader =
             new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());
-        plugin.getStatus().getExtensionLocations()
+        plugin.getSpec().getExtensionLocations()
             .stream()
             .map(resourceLoader::getResource)
             .filter(Resource::exists)
