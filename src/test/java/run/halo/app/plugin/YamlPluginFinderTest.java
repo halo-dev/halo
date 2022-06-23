@@ -16,6 +16,7 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.Resource;
 import org.springframework.security.util.InMemoryResource;
 import org.springframework.util.ResourceUtils;
+import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -41,23 +42,35 @@ class YamlPluginFinderTest {
         Plugin plugin = pluginFinder.find(testPath);
         assertThat(plugin).isNotNull();
         JSONAssert.assertEquals("""
-                {
+                  {
                     "spec": {
                         "displayName": "a name to show",
                         "version": "0.0.1",
                         "author": "guqing",
                         "logo": "https://guqing.xyz/avatar",
                         "pluginDependencies": {
-                          "banana": "0.0.1"
+                            "banana": "0.0.1"
                         },
                         "homepage": "https://github.com/guqing/halo-plugin-1",
                         "description": "Tell me more about this plugin.",
-                        "license": [{
-                            "name": "MIT",
-                            "url": ""
-                        }],
+                        "license": [
+                            {
+                                "name": "MIT",
+                                "url": ""
+                            }
+                        ],
                         "requires": ">=2.0.0",
-                        "pluginClass": "run.halo.app.plugin.BasePlugin"
+                        "pluginClass": "run.halo.app.plugin.BasePlugin",
+                        "enabled": false
+                    },
+                    "status": {
+                        "phase": "RESOLVED",
+                        "reason": null,
+                        "message": null,
+                        "lastStartTime": null,
+                        "lastTransitionTime": null,
+                        "entry": null,
+                        "stylesheet": null
                     },
                     "apiVersion": "plugin.halo.run/v1alpha1",
                     "kind": "Plugin",
@@ -70,7 +83,7 @@ class YamlPluginFinderTest {
                         "deletionTimestamp": null
                     }
                 }
-                """,
+                  """,
             JsonUtils.objectToJson(plugin),
             true);
     }

@@ -2,11 +2,12 @@ package run.halo.app.plugin;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.PluginState;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import run.halo.app.core.extension.Plugin;
 
 /**
  * Plugin manager controller.
@@ -20,13 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/apis/plugin.halo.run/v1alpha1/plugins")
 public class PluginLifeCycleManagerController {
 
-    private final PluginServiceImpl pluginService;
-    private final HaloPluginManager pluginManager;
+    private final PluginService pluginService;
 
-    public PluginLifeCycleManagerController(PluginServiceImpl pluginService,
-        HaloPluginManager pluginManager) {
+    public PluginLifeCycleManagerController(PluginService pluginService) {
         this.pluginService = pluginService;
-        this.pluginManager = pluginManager;
     }
 
     @GetMapping
@@ -34,13 +32,13 @@ public class PluginLifeCycleManagerController {
         return pluginService.list();
     }
 
-    @GetMapping("/{pluginName}/startup")
-    public PluginState start(@PathVariable String pluginName) {
-        return pluginManager.startPlugin(pluginName);
+    @PutMapping("/{pluginName}/startup")
+    public Plugin start(@PathVariable String pluginName) {
+        return pluginService.startup(pluginName);
     }
 
-    @GetMapping("/{pluginName}/stop")
-    public PluginState stop(@PathVariable String pluginName) {
-        return pluginManager.stopPlugin(pluginName);
+    @PutMapping("/{pluginName}/stop")
+    public Plugin stop(@PathVariable String pluginName) {
+        return pluginService.stop(pluginName);
     }
 }

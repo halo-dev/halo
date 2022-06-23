@@ -12,6 +12,7 @@ import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.util.FileUtils;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.core.extension.Plugin;
 
 /**
  * Find a plugin descriptor for a plugin path.
