@@ -12,18 +12,24 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { users } from "./users-mock";
-import { useRouter } from "vue-router";
 import { ref } from "vue";
 import { Starport } from "vue-starport";
+import axiosInstance from "@/utils/api-client";
+import type { User } from "@/types/extension";
 
 const checkAll = ref(false);
+const users = ref<User[]>([]);
 
-const router = useRouter();
-
-const handleRouteToDetail = (username: string) => {
-  router.push({ name: "UserDetail", params: { username } });
+const handleFetchUsers = async () => {
+  try {
+    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    users.value = data;
+  } catch (e) {
+    console.error(e);
+  }
 };
+
+handleFetchUsers();
 </script>
 <template>
   <VPageHeader title="用户">
@@ -172,7 +178,12 @@ const handleRouteToDetail = (username: string) => {
         <li
           v-for="(user, index) in users"
           :key="index"
-          @click="handleRouteToDetail(user.username)"
+          @click="
+            $router.push({
+              name: 'UserDetail',
+              params: { name: user.metadata.name },
+            })
+          "
         >
           <div
             :class="{
@@ -192,15 +203,15 @@ const handleRouteToDetail = (username: string) => {
                   type="checkbox"
                 />
               </div>
-              <div v-if="user.avatar" class="mr-4">
+              <div v-if="user.spec.avatar" class="mr-4">
                 <Starport
                   :duration="400"
-                  :port="`user-profile-${user.name}`"
+                  :port="`user-profile-${user.metadata.name}`"
                   class="h-12 w-12"
                 >
                   <img
-                    :alt="user.name"
-                    :src="user.avatar"
+                    :alt="user.spec.displayName"
+                    :src="user.spec.avatar"
                     class="h-full w-full overflow-hidden rounded border bg-white hover:shadow-sm"
                   />
                 </Starport>
@@ -208,14 +219,14 @@ const handleRouteToDetail = (username: string) => {
               <div class="flex-1">
                 <div class="flex flex-row items-center">
                   <span class="mr-2 truncate text-sm font-medium text-gray-900">
-                    {{ user.name }}
+                    {{ user.spec.displayName }}
                   </span>
-                  <VTag class="sm:hidden">{{ user.role }}</VTag>
+                  <VTag class="sm:hidden">{{ user.metadata.name }}</VTag>
                 </div>
                 <div class="mt-1 flex">
                   <VSpace align="start" direction="column" spacing="xs">
                     <span class="text-xs text-gray-500">
-                      {{ user.username }}
+                      {{ user.metadata.name }}
                     </span>
                   </VSpace>
                 </div>
@@ -224,13 +235,13 @@ const handleRouteToDetail = (username: string) => {
                 <div
                   class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
-                  <span class="hidden sm:block">
+                  <div class="hidden items-center sm:flex">
                     <VTag>
-                      {{ user.role }}
+                      {{ user.metadata.name }}
                     </VTag>
-                  </span>
+                  </div>
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
-                    2020-01-07
+                    {{ user.metadata.creationTimestamp }}
                   </time>
                   <span class="cursor-pointer">
                     <IconSettings />

@@ -27,7 +27,7 @@ export default definePlugin({
           ],
         },
         {
-          path: ":username",
+          path: ":name",
           component: UserProfileLayout,
           children: [
             {

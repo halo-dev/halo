@@ -27,10 +27,7 @@ const handleRouteToProfile = () => {
 
 <template>
   <div class="flex h-full">
-    <aside
-      class="navbar fixed hidden h-full overflow-y-auto md:block"
-      style="background: #fff"
-    >
+    <aside class="navbar fixed hidden h-full overflow-y-auto md:block">
       <div class="logo flex justify-center py-5">
         <img :src="logo" alt="Halo Logo" style="width: 78px" />
       </div>
@@ -174,6 +171,7 @@ const handleRouteToProfile = () => {
 <style lang="scss">
 .navbar {
   @apply w-64;
+  @apply bg-white;
   z-index: 999;
   box-shadow: 0 4px 4px #f6c6ce;
   padding-bottom: 70px;

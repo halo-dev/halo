@@ -2,8 +2,9 @@
 import { IconUserSettings, VTag } from "@halo-dev/components";
 import { inject } from "vue";
 import { useRouter } from "vue-router";
+import type { User } from "@/types/extension";
 
-const user = inject("user");
+const user = inject<User>("user");
 
 const router = useRouter();
 </script>
@@ -15,7 +16,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">显示名称</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user.name }}
+          {{ user?.spec?.displayName }}
         </dd>
       </div>
       <div
@@ -23,7 +24,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">用户名</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user.username }}
+          {{ user?.metadata?.name }}
         </dd>
       </div>
       <div
@@ -31,7 +32,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">电子邮箱</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user.email || "未设置" }}
+          {{ user?.spec?.email || "未设置" }}
         </dd>
       </div>
       <div
@@ -43,7 +44,7 @@ const router = useRouter();
             <template #leftIcon>
               <IconUserSettings />
             </template>
-            {{ user.role }}
+            {{ user?.metadata?.name }}
           </VTag>
         </dd>
       </div>
@@ -52,7 +53,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">描述</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          Hello Halo
+          {{ user?.spec?.bio }}
         </dd>
       </div>
       <div
@@ -66,7 +67,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">注册时间</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          2022-01-01 00:00:00
+          {{ user?.metadata?.creationTimestamp }}
         </dd>
       </div>
       <div
@@ -74,7 +75,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">最近登录时间</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          2022-05-30 12:00:00
+          {{ user?.metadata?.creationTimestamp }}
         </dd>
       </div>
     </dl>

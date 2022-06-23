@@ -3,8 +3,9 @@ import { BasicLayout } from "@/layouts";
 import { IconUpload, VButton, VTabbar } from "@halo-dev/components";
 import { onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { users } from "@/modules/system/users/users-mock";
 import { Starport } from "vue-starport";
+import axiosInstance from "@/utils/api-client";
+import type { User } from "@/types/extension";
 
 const tabs = [
   {
@@ -29,15 +30,20 @@ const tabs = [
   },
 ];
 
-const user = ref();
+const user = ref<User>();
 
-const route = useRoute();
+const { params } = useRoute();
 
-if (route.params.username) {
-  user.value = users.find((u) => u.username === route.params.username);
-} else {
-  user.value = users[0];
-}
+const handleFetchUser = async () => {
+  try {
+    const { data } = await axiosInstance.get(
+      `/api/v1alpha1/users/${params.name}`
+    );
+    user.value = data;
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 provide("user", user);
 
@@ -48,6 +54,7 @@ const router = useRouter();
 
 // set default active tab
 onMounted(() => {
+  handleFetchUser();
   const tab = tabs.find((tab) => tab.routeName === currentRouteName);
   activeTab.value = tab ? tab.id : tabs[0].id;
 });
@@ -62,19 +69,19 @@ const handleTabChange = (id: string) => {
 <template>
   <BasicLayout>
     <header class="bg-white">
-      <div :class="user.cover" class="h-48 bg-gradient-to-r"></div>
+      <div class="h-48 bg-gradient-to-r from-gray-800 to-red-500"></div>
       <div class="px-4 sm:px-6 lg:px-8">
         <div class="-mt-12 flex items-end space-x-5 sm:-mt-16">
           <div class="flex">
             <Starport
-              :port="`user-profile-${user.name}`"
-              class="h-24 w-24 sm:h-32 sm:w-32"
               :duration="400"
+              :port="`user-profile-${user.metadata?.name}`"
+              class="h-24 w-24 sm:h-32 sm:w-32"
             >
               <img
-                :src="user.avatar"
+                :src="user.spec?.avatar"
                 alt="Avatar"
-                class="rounded-full ring-4 ring-white drop-shadow-lg"
+                class="h-full w-full rounded-full ring-4 ring-white drop-shadow-lg"
               />
             </Starport>
           </div>
@@ -83,7 +90,7 @@ const handleTabChange = (id: string) => {
           >
             <div class="mt-6 block min-w-0 flex-1">
               <h1 class="truncate text-xl font-bold text-gray-900">
-                <span class="mr-1">{{ user.name }}</span>
+                <span class="mr-1">{{ user.spec?.displayName }}</span>
               </h1>
             </div>
             <div

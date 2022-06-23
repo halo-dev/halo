@@ -11,7 +11,7 @@ import {
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, ref } from "vue";
-import type { Plugin } from "./types";
+import type { Plugin } from "@/types/extension";
 import axiosInstance from "@/utils/api-client";
 
 const pluginActiveId = ref("detail");
@@ -31,7 +31,9 @@ const handleFetchPlugin = async () => {
 };
 
 const isStarted = computed(() => {
-  return plugin.value?.status.phase === "STARTED" && plugin.value?.spec.enabled;
+  return (
+    plugin.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
+  );
 });
 
 const handleChangePluginStatus = async () => {

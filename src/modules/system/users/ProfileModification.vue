@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { VButton, VInput, VTextarea } from "@halo-dev/components";
 import { inject } from "vue";
+import type { User } from "@/types/extension";
 
-const user = inject("user");
+const user = inject<User>("user");
 </script>
 <template>
   <form class="space-y-8 divide-y divide-gray-200 sm:space-y-5">
@@ -13,7 +14,7 @@ const user = inject("user");
         </label>
         <div class="mt-1 sm:col-span-3 sm:mt-0">
           <div class="flex max-w-lg shadow-sm">
-            <VInput :modelValue="user.username" />
+            <VInput :modelValue="user?.metadata?.name" />
           </div>
         </div>
       </div>
@@ -23,7 +24,7 @@ const user = inject("user");
         </label>
         <div class="mt-1 sm:col-span-3 sm:mt-0">
           <div class="flex max-w-lg shadow-sm">
-            <VInput :modelValue="user.name" />
+            <VInput :modelValue="user?.spec?.displayName" />
           </div>
         </div>
       </div>
@@ -34,7 +35,7 @@ const user = inject("user");
         </label>
         <div class="mt-1 sm:col-span-3 sm:mt-0">
           <div class="flex max-w-lg shadow-sm">
-            <VInput :modelValue="user.email" />
+            <VInput :modelValue="user?.spec?.email" />
           </div>
         </div>
       </div>
@@ -44,7 +45,7 @@ const user = inject("user");
         </label>
         <div class="mt-1 sm:col-span-3 sm:mt-0">
           <div class="flex max-w-lg shadow-sm">
-            <VTextarea modelValue="Halo" />
+            <VTextarea :modelValue="user?.spec?.bio" />
           </div>
         </div>
       </div>
@@ -52,7 +53,7 @@ const user = inject("user");
 
     <div class="pt-5">
       <div class="flex justify-start">
-        <VButton type="secondary"> 保存</VButton>
+        <VButton type="secondary">保存</VButton>
       </div>
     </div>
   </form>
