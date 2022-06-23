@@ -6,15 +6,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.PluginRuntimeException;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.util.InMemoryResource;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.Unstructured;
@@ -30,16 +35,47 @@ class YamlPluginFinderTest {
     private YamlPluginFinder pluginFinder;
     private Path testPath;
 
+    private File testFile;
+
     @BeforeEach
     void setUp() throws FileNotFoundException {
         pluginFinder = new YamlPluginFinder();
-        File file = ResourceUtils.getFile("classpath:plugin/plugin.yaml");
-        testPath = file.toPath().getParent();
+        testFile = ResourceUtils.getFile("classpath:plugin/plugin.yaml");
+        testPath = testFile.toPath().getParent();
     }
 
     @Test
-    void findTest() throws JsonProcessingException, JSONException {
-        Plugin plugin = pluginFinder.find(testPath);
+    void find() throws IOException, JSONException {
+        Path tempDirectory = Files.createTempDirectory("halo-test-plugin");
+
+        Path directories = Files.createDirectories(tempDirectory.resolve("build/resources/main"));
+        FileCopyUtils.copy(testFile, directories.resolve("plugin.yaml").toFile());
+        Path extensions = Files.createDirectory(directories.resolve("extensions"));
+        Files.createFile(extensions.resolve("roles.yaml"));
+
+        Plugin plugin = pluginFinder.find(tempDirectory);
+        assertThat(plugin).isNotNull();
+        JSONAssert.assertEquals("""
+                {
+                    "phase": "RESOLVED",
+                    "reason": null,
+                    "message": null,
+                    "lastStartTime": null,
+                    "lastTransitionTime": null,
+                    "entry": null,
+                    "stylesheet": null,
+                    "extensionLocations": [
+                        "extensions/roles.yaml"
+                    ]
+                }
+                """,
+            JsonUtils.objectToJson(plugin.getStatus()),
+            true);
+    }
+
+    @Test
+    void unstructuredToPluginTest() throws JsonProcessingException, JSONException {
+        Plugin plugin = pluginFinder.unstructuredToPlugin(new FileSystemResource(testFile));
         assertThat(plugin).isNotNull();
         JSONAssert.assertEquals("""
                   {
@@ -63,15 +99,7 @@ class YamlPluginFinderTest {
                         "pluginClass": "run.halo.app.plugin.BasePlugin",
                         "enabled": false
                     },
-                    "status": {
-                        "phase": "RESOLVED",
-                        "reason": null,
-                        "message": null,
-                        "lastStartTime": null,
-                        "lastTransitionTime": null,
-                        "entry": null,
-                        "stylesheet": null
-                    },
+                    "status": null,
                     "apiVersion": "plugin.halo.run/v1alpha1",
                     "kind": "Plugin",
                     "metadata": {
@@ -94,7 +122,7 @@ class YamlPluginFinderTest {
         assertThatThrownBy(() -> {
             pluginFinder.find(test);
         }).isInstanceOf(PluginRuntimeException.class)
-            .hasMessage("Cannot find '/tmp/plugin.yaml' path");
+            .hasMessage("Unable to find plugin descriptor file: plugin.yaml");
     }
 
     @Test
@@ -185,5 +213,15 @@ class YamlPluginFinderTest {
         Plugin plugin = Unstructured.OBJECT_MAPPER.readValue(pluginJson, Plugin.class);
         assertThat(plugin.getSpec()).isNotNull();
         JSONAssert.assertEquals(pluginJson, JsonUtils.objectToJson(plugin), false);
+    }
+
+    @Test
+    void getUnstructuredFilePathFromJar() throws FileNotFoundException {
+        File file = ResourceUtils.getFile("classpath:plugin/test-unstructured-resource-loader.jar");
+        List<String> unstructuredFilePathFromJar =
+            pluginFinder.getUnstructuredFilePathFromJar(file.toPath());
+        assertThat(unstructuredFilePathFromJar).hasSize(3);
+        assertThat(unstructuredFilePathFromJar).contains("extensions/roles.yaml",
+            "extensions/reverseProxy.yaml", "extensions/test.yml");
     }
 }

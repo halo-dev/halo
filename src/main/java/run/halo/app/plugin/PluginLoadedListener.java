@@ -1,10 +1,14 @@
 package run.halo.app.plugin;
 
+import java.util.List;
 import org.pf4j.PluginWrapper;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.event.HaloPluginLoadedEvent;
 
 /**
@@ -15,11 +19,8 @@ import run.halo.app.plugin.event.HaloPluginLoadedEvent;
 public class PluginLoadedListener implements ApplicationListener<HaloPluginLoadedEvent> {
     private final ExtensionClient extensionClient;
 
-    private final PluginUnstructuredResourceLoader pluginUnstructuredResourceLoader;
-
     public PluginLoadedListener(ExtensionClient extensionClient) {
         this.extensionClient = extensionClient;
-        pluginUnstructuredResourceLoader = new PluginUnstructuredResourceLoader();
     }
 
     @Override
@@ -31,8 +32,15 @@ public class PluginLoadedListener implements ApplicationListener<HaloPluginLoade
         Plugin plugin = yamlPluginFinder.find(pluginWrapper.getPluginPath());
         extensionClient.create(plugin);
 
-        // load plugin unstructured resource
-        pluginUnstructuredResourceLoader.loadUnstructured(pluginWrapper)
+        // load unstructured
+        DefaultResourceLoader resourceLoader =
+            new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());
+        plugin.getStatus().getExtensionLocations()
+            .stream()
+            .map(resourceLoader::getResource)
+            .filter(Resource::exists)
+            .map(resource -> new YamlUnstructuredLoader(resource).load())
+            .flatMap(List::stream)
             .forEach(extensionClient::create);
     }
 }
