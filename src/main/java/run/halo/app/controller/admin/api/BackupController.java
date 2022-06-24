@@ -4,6 +4,7 @@ import static run.halo.app.service.BackupService.BackupType.JSON_DATA;
 import static run.halo.app.service.BackupService.BackupType.MARKDOWN;
 import static run.halo.app.service.BackupService.BackupType.WHOLE_SITE;
 
+import com.google.common.collect.Lists;
 import io.swagger.annotations.ApiOperation;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,6 +15,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import run.halo.app.annotation.DisableOnCondition;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.BadRequestException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.dto.BackupDTO;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
@@ -141,12 +145,21 @@ public class BackupController {
         backupService.deleteWorkDirBackup(filename);
     }
 
-    @PostMapping(value = "markdown/import", consumes = {
-        MediaType.TEXT_PLAIN_VALUE,
-        MediaType.TEXT_MARKDOWN_VALUE})
+    @PostMapping(value = "markdown/import")
     @ApiOperation("Imports markdown")
     public BasePostDetailDTO backupMarkdowns(@RequestPart("file") MultipartFile file)
         throws IOException {
+        List<String> supportType = Lists.newArrayList("md", "markdown", "mdown");
+        String filename = file.getOriginalFilename();
+        if (StringUtils.isEmpty(filename)) {
+            throw new BadRequestException("文件名不可为空").setErrorData(filename);
+        }
+        String extension = FilenameUtils.getExtension(filename).toLowerCase();
+        if (!supportType.contains(extension)) {
+            throw new BadRequestException(
+                "不支持" + (StringUtils.isNotEmpty(extension) ? extension : "未知") 
+                    + "格式的文件上传").setErrorData(filename);
+        }
         return backupService.importMarkdown(file);
     }
 
