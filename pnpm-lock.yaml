@@ -127,7 +127,12 @@ importers:
 
   packages/shared:
     specifiers:
+      '@halo-dev/components': workspace:*
+      axios: ^0.27.2
       vite-plugin-dts: ^1.2.0
+    dependencies:
+      '@halo-dev/components': link:../components
+      axios: 0.27.2
     devDependencies:
       vite-plugin-dts: 1.2.0
 

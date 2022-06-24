@@ -8,11 +8,13 @@ import {
   VRoutesMenu,
   VTag,
 } from "@halo-dev/components";
-import { menus, minimenus } from "@/router/menus.config";
+import type { MenuGroupType, MenuItemType } from "@/types/menus";
 import logo from "@/assets/logo.svg";
 import { RouterView, useRoute, useRouter } from "vue-router";
-import { ref } from "vue";
+import { inject, ref } from "vue";
 
+const menus = inject<MenuGroupType>("menus");
+const minimenus = inject<MenuItemType>("minimenus");
 const route = useRoute();
 const router = useRouter();
 

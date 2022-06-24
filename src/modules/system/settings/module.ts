@@ -1,5 +1,4 @@
-import { definePlugin } from "@halo-dev/admin-shared";
-import { SystemSettingsLayout } from "@/layouts";
+import { definePlugin, SystemSettingsLayout } from "@halo-dev/admin-shared";
 import GeneralSettings from "./GeneralSettings.vue";
 import NotificationSettings from "./NotificationSettings.vue";
 import { IconSettings } from "@halo-dev/components";

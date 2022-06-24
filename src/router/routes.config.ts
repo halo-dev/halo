@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from "vue-router";
 import NotFound from "@/views/exceptions/NotFound.vue";
-import { BasicLayout } from "@/layouts";
+import { BasicLayout } from "@halo-dev/admin-shared";
 
 export const routes: Array<RouteRecordRaw> = [
   {

@@ -2,11 +2,15 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
-import type { Plugin } from "@halo-dev/admin-shared";
+import type {
+  MenuGroupType,
+  MenuItemType,
+  Plugin,
+} from "@halo-dev/admin-shared";
+import { menus, minimenus, registerMenu } from "./router/menus.config";
 // setup
 import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
-import { registerMenu } from "@/router/menus.config";
 
 // core modules
 import { coreModules } from "./modules";
@@ -134,6 +138,9 @@ async function initApp() {
   try {
     loadCoreModules();
     await loadPluginModules();
+
+    app.provide<MenuGroupType[]>("menus", menus);
+    app.provide<MenuItemType[]>("minimenus", minimenus);
   } catch (e) {
     console.error(e);
   } finally {

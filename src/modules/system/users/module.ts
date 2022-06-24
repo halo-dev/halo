@@ -1,5 +1,9 @@
-import { definePlugin } from "@halo-dev/admin-shared";
-import { BasicLayout, BlankLayout, UserProfileLayout } from "@/layouts";
+import {
+  BasicLayout,
+  BlankLayout,
+  definePlugin,
+  UserProfileLayout,
+} from "@halo-dev/admin-shared";
 import UserList from "./UserList.vue";
 import UserDetail from "./UserDetail.vue";
 import ProfileModification from "./ProfileModification.vue";

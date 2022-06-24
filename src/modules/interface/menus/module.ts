@@ -1,5 +1,4 @@
-import { definePlugin } from "@halo-dev/admin-shared";
-import { BasicLayout } from "@/layouts";
+import { BasicLayout, definePlugin } from "@halo-dev/admin-shared";
 import MenuList from "./MenuList.vue";
 import { IconListSettings } from "@halo-dev/components";
 

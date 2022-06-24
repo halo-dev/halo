@@ -22,7 +22,8 @@
       "types": "./dist/index.d.ts",
       "require": "./dist/halo-admin-shared.cjs.js",
       "import": "./dist/halo-admin-shared.es.js"
-    }
+    },
+    "./dist/style.css": "./dist/style.css"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,10 @@
   },
   "homepage": "https://github.com/halo-dev/halo-admin/tree/next/shared/components#readme",
   "license": "MIT",
+  "dependencies": {
+    "@halo-dev/components": "workspace:*",
+    "axios": "^0.27.2"
+  },
   "devDependencies": {
     "vite-plugin-dts": "^1.2.0"
   },

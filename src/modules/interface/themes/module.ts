@@ -1,5 +1,4 @@
-import { definePlugin } from "@halo-dev/admin-shared";
-import { BasicLayout, BlankLayout } from "@/layouts";
+import { BasicLayout, BlankLayout, definePlugin } from "@halo-dev/admin-shared";
 import ThemeDetail from "./ThemeDetail.vue";
 import Visual from "./Visual.vue";
 import { IconPalette } from "@halo-dev/components";

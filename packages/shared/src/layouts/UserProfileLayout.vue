@@ -75,11 +75,11 @@ const handleTabChange = (id: string) => {
           <div class="flex">
             <Starport
               :duration="400"
-              :port="`user-profile-${user.metadata?.name}`"
+              :port="`user-profile-${user?.metadata?.name}`"
               class="h-24 w-24 sm:h-32 sm:w-32"
             >
               <img
-                :src="user.spec?.avatar"
+                :src="user?.spec?.avatar"
                 alt="Avatar"
                 class="h-full w-full rounded-full ring-4 ring-white drop-shadow-lg"
               />
@@ -90,7 +90,7 @@ const handleTabChange = (id: string) => {
           >
             <div class="mt-6 block min-w-0 flex-1">
               <h1 class="truncate text-xl font-bold text-gray-900">
-                <span class="mr-1">{{ user.spec?.displayName }}</span>
+                <span class="mr-1">{{ user?.spec?.displayName }}</span>
               </h1>
             </div>
             <div
