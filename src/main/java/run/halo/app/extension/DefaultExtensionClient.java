@@ -62,8 +62,15 @@ public class DefaultExtensionClient implements ExtensionClient {
 
     @Override
     public <E extends Extension> Optional<E> fetch(Class<E> type, String name) {
-        var scheme = schemeManager.get(type);
+        return fetch(schemeManager.get(type), name, type);
+    }
 
+    @Override
+    public Optional<Unstructured> fetch(GroupVersionKind gvk, String name) {
+        return fetch(schemeManager.get(gvk), name, Unstructured.class);
+    }
+
+    private <E extends Extension> Optional<E> fetch(Scheme scheme, String name, Class<E> type) {
         var storeName = ExtensionUtil.buildStoreName(scheme, name);
         return storeClient.fetchByName(storeName)
             .map(extensionStore -> converter.convertFrom(type, extensionStore));

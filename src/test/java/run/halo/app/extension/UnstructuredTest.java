@@ -1,6 +1,7 @@
 package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static run.halo.app.extension.MetadataOperator.metadataDeepEquals;
 
@@ -46,7 +47,6 @@ class UnstructuredTest {
         Map extensionMap = objectMapper.readValue(extensionJson, Map.class);
         var extension = new Unstructured(extensionMap);
 
-        System.out.println(objectMapper.writeValueAsString(extension));
         var beforeChange = objectMapper.writeValueAsString(extension);
 
         var metadata = extension.getMetadata();
@@ -75,14 +75,32 @@ class UnstructuredTest {
 
     @Test
     void shouldSetExtensionCorrectly() {
-        var extension = new Unstructured();
-        extension.setApiVersion("fake.halo.run/v1alpha1");
-        extension.setKind("Fake");
-        extension.setMetadata(createMetadata());
+        var extension = createUnstructured();
 
         assertEquals("fake.halo.run/v1alpha1", extension.getApiVersion());
         assertEquals("Fake", extension.getKind());
         assertTrue(metadataDeepEquals(createMetadata(), extension.getMetadata()));
+    }
+
+    @Test
+    void shouldBeEqual() {
+        assertEquals(new Unstructured(), new Unstructured());
+        assertEquals(createUnstructured(), createUnstructured());
+    }
+
+    @Test
+    void shouldNotBeEqual() {
+        var another = createUnstructured();
+        another.getMetadata().setName("fake-extension-2");
+        assertNotEquals(createUnstructured(), another);
+    }
+
+    Unstructured createUnstructured() {
+        var unstructured = new Unstructured();
+        unstructured.setApiVersion("fake.halo.run/v1alpha1");
+        unstructured.setKind("Fake");
+        unstructured.setMetadata(createMetadata());
+        return unstructured;
     }
 
     private Metadata createMetadata() {
