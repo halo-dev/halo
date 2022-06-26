@@ -9,10 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.extension.GroupVersionKind.fromAPIVersionAndKind;
+import static run.halo.app.extension.Scheme.buildFromType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
@@ -32,6 +35,8 @@ import run.halo.app.extension.store.ExtensionStoreClient;
 @ExtendWith(MockitoExtension.class)
 class DefaultExtensionClientTest {
 
+    static final Scheme fakeScheme = Scheme.buildFromType(FakeExtension.class);
+
     @Mock
     ExtensionStoreClient storeClient;
 
@@ -47,7 +52,7 @@ class DefaultExtensionClientTest {
     @BeforeEach
     void setUp() {
         lenient().when(schemeManager.get(eq(FakeExtension.class)))
-            .thenReturn(Scheme.buildFromType(FakeExtension.class));
+            .thenReturn(buildFromType(FakeExtension.class));
     }
 
     FakeExtension createFakeExtension(String name, Long version) {
@@ -94,11 +99,18 @@ class DefaultExtensionClientTest {
     }
 
     @Test
+    void shouldFetchUnstructuredSuccessfully() {
+
+    }
+
+    @Test
     void shouldThrowSchemeNotFoundExceptionWhenSchemeNotRegistered() {
         class UnRegisteredExtension extends AbstractExtension {
         }
 
         when(schemeManager.get(eq(UnRegisteredExtension.class)))
+            .thenThrow(SchemeNotFoundException.class);
+        when(schemeManager.get(isA(GroupVersionKind.class)))
             .thenThrow(SchemeNotFoundException.class);
 
         assertThrows(SchemeNotFoundException.class,
@@ -107,6 +119,8 @@ class DefaultExtensionClientTest {
             () -> client.page(UnRegisteredExtension.class, null, null, 0, 10));
         assertThrows(SchemeNotFoundException.class,
             () -> client.fetch(UnRegisteredExtension.class, "fake"));
+        assertThrows(SchemeNotFoundException.class, () ->
+            client.fetch(fromAPIVersionAndKind("fake.halo.run/v1alpha1", "UnRegistered"), "fake"));
         assertThrows(SchemeNotFoundException.class, () -> {
             when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
             client.create(createFakeExtension("fake", null));
@@ -211,6 +225,19 @@ class DefaultExtensionClientTest {
     }
 
     @Test
+    void shouldNotFetchUnstructured() {
+        when(schemeManager.get(isA(GroupVersionKind.class)))
+            .thenReturn(fakeScheme);
+        when(storeClient.fetchByName(any())).thenReturn(Optional.empty());
+        var unstructuredFake = client.fetch(fakeScheme.groupVersionKind(), "fake");
+
+        assertEquals(Optional.empty(), unstructuredFake);
+        verify(converter, times(0)).convertFrom(any(), any());
+        verify(schemeManager, times(1)).get(isA(GroupVersionKind.class));
+        verify(storeClient, times(1)).fetchByName(any());
+    }
+
+    @Test
     void shouldFetchAnExtension() {
         var storeName = "/registry/fake.halo.run/fakes/fake";
         when(storeClient.fetchByName(storeName)).thenReturn(
@@ -225,6 +252,25 @@ class DefaultExtensionClientTest {
 
         verify(storeClient, times(1)).fetchByName(eq(storeName));
         verify(converter, times(1)).convertFrom(eq(FakeExtension.class),
+            eq(createExtensionStore(storeName)));
+    }
+
+    @Test
+    void shouldFetchUnstructuredExtension() throws JsonProcessingException {
+        var storeName = "/registry/fake.halo.run/fakes/fake";
+        when(storeClient.fetchByName(storeName)).thenReturn(
+            Optional.of(createExtensionStore(storeName)));
+        when(schemeManager.get(isA(GroupVersionKind.class)))
+            .thenReturn(fakeScheme);
+        when(converter.convertFrom(Unstructured.class, createExtensionStore(storeName)))
+            .thenReturn(createUnstructured());
+
+        var fake = client.fetch(fakeScheme.groupVersionKind(), "fake");
+
+        assertEquals(Optional.of(createUnstructured()), fake);
+        verify(storeClient, times(1)).fetchByName(eq(storeName));
+        verify(schemeManager, times(1)).get(isA(GroupVersionKind.class));
+        verify(converter, times(1)).convertFrom(eq(Unstructured.class),
             eq(createExtensionStore(storeName)));
     }
 

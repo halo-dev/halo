@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -99,7 +100,7 @@ class ExtensionDeleteHandlerTest {
         StepVerifier.create(responseMono)
             .verifyError(ExtensionNotFoundException.class);
 
-        verify(client, times(1)).fetch(any(), anyString());
+        verify(client, times(1)).fetch(same(FakeExtension.class), anyString());
         verify(client, times(0)).update(any());
         verify(client, times(0)).delete(any());
     }

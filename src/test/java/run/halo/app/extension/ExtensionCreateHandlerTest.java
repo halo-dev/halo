@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -107,6 +108,6 @@ class ExtensionCreateHandlerTest {
             .verifyError(ExtensionNotFoundException.class);
         verify(client, times(1)).create(
             argThat(extension -> Objects.equals("my-fake", extension.getMetadata().getName())));
-        verify(client, times(0)).fetch(any(), anyString());
+        verify(client, times(0)).fetch(same(FakeExtension.class), anyString());
     }
 }

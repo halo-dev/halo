@@ -50,6 +50,8 @@ public interface ExtensionClient {
      */
     <E extends Extension> Optional<E> fetch(Class<E> type, String name);
 
+    Optional<Unstructured> fetch(GroupVersionKind gvk, String name);
+
 
     /**
      * Creates an Extension.
