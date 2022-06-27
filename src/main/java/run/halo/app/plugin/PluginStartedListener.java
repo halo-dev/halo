@@ -10,7 +10,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
@@ -52,9 +51,7 @@ public class PluginStartedListener implements ApplicationListener<HaloPluginStar
                     metadata.setLabels(labels);
                 }
                 labels.put(PluginConst.PLUGIN_NAME_LABEL_NAME, plugin.getMetadata().getName());
-                extensionClient.fetch(
-                        GroupVersionKind.fromAPIVersionAndKind(unstructured.getApiVersion(),
-                            unstructured.getKind()), metadata.getName())
+                extensionClient.fetch(unstructured.groupVersionKind(), metadata.getName())
                     .ifPresentOrElse(persisted -> {
                         unstructured.getMetadata().setVersion(persisted.getMetadata().getVersion());
                         extensionClient.update(unstructured);
