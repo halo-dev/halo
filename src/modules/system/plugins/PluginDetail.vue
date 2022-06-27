@@ -12,7 +12,7 @@ import {
 import { useRoute } from "vue-router";
 import { computed, ref } from "vue";
 import type { Plugin } from "@/types/extension";
-import axiosInstance from "@/utils/api-client";
+import { axiosInstance } from "@halo-dev/admin-shared";
 
 const pluginActiveId = ref("detail");
 const plugin = ref<Plugin>();

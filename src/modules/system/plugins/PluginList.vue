@@ -15,7 +15,7 @@ import {
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Plugin } from "@/types/extension";
-import axiosInstance from "@/utils/api-client";
+import { axiosInstance } from "@halo-dev/admin-shared";
 
 const checkAll = ref(false);
 const plugins = ref<Plugin[]>([]);

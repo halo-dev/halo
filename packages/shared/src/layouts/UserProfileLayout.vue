@@ -4,7 +4,7 @@ import { IconUpload, VButton, VTabbar } from "@halo-dev/components";
 import { onMounted, provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { Starport } from "vue-starport";
-import axiosInstance from "@/utils/api-client";
+import { axiosInstance } from "@/utils/api-client";
 import type { User } from "@/types/extension";
 
 const tabs = [

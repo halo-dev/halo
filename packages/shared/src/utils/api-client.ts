@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const token =
-"eyJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJIYWxvIE93bmVyIiwic3ViIjoiYWRtaW4iLCJleHAiOjE2NTYxMzk1MzcsImlhdCI6MTY1NjA1MzEzNywic2NvcGUiOlsiUk9MRV9zdXBlci1yb2xlIl19.QUAe5lD2chY5NG_bXwqPxk2y4gxUifz-_H-dN_ZcggdQ0Nm2m5R168VUt33jJ4gCUW5HQx7hqJY_V60jDQ0nAP3VjrfeDNG7BvoaqLyoThg40f1oD-AUoB648b_TZga0oKtwkCyLYi_qkgmvF6UZumMsI9rTVHxef6O5vAbSrFFc2pZ90xNH9PN7ILJDimv_2I1IRpBtASJG1cM0yWYUmHWO-yW2UwUKGxJTf3TN_OvJqHcMRqD7Y5Fe1BVhZfzY8UX6KygG21eKd26hLNIQz6xx-O85HTj8HM5CJUR7jSp3Oo7rtQwIbEDTdGeTqmFM96ufL4nVYdpDuONm0zSxYQ"
+  "eyJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJIYWxvIE93bmVyIiwic3ViIjoiYWRtaW4iLCJleHAiOjE2NTYzODYyODYsImlhdCI6MTY1NjI5OTg4Niwic2NvcGUiOlsiUk9MRV9zdXBlci1yb2xlIl19.uiBxplxctL3a8G_pNWJzEKEMD-a11VPygHh-yUmm3jaZadt5KWIonkuMl3bSASC96NJn3Lmo1OtSagWIkRWUrWqM4r4_sj3NDOiDpcjxy2msrpe8v9sp_BA4yGjAoaoMBEvdjZ3sQ7L9gJKHhL9bTNsXiSkjS5b7OJLujuF5VFJMp-fmzUDz8-EC5u43wz8MUF88bMk4gUg3nOJYnSTRlrU6759IggEM_0SjZu9wewcLxxa4Vhson_mN6hTObsOyWYjMjTbMlSBQiDfN9IXZ2cRZTnE2me0pT6J0AyP33qBp69B-K0cTaUO2Tcx5_BuWHGUCFUAFwE5FKchGgr6NuA"
 const axiosInstance = axios.create({
   headers: {
     Authorization: `Bearer ${token}`,
@@ -9,4 +9,4 @@ const axiosInstance = axios.create({
   baseURL: "http://localhost:8090",
 });
 
-export default axiosInstance;
+export { axiosInstance };

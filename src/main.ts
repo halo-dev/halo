@@ -16,7 +16,7 @@ import { setupComponents } from "./setup/setupComponents";
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
 import { usePluginStore } from "@/stores/plugin";
-import axiosInstance from "@/utils/api-client";
+import { axiosInstance } from "@halo-dev/admin-shared";
 
 const app = createApp(App);
 

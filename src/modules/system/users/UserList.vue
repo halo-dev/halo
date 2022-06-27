@@ -14,7 +14,7 @@ import {
 } from "@halo-dev/components";
 import { ref } from "vue";
 import { Starport } from "vue-starport";
-import axiosInstance from "@/utils/api-client";
+import { axiosInstance } from "@halo-dev/admin-shared";
 import type { User } from "@/types/extension";
 
 const checkAll = ref(false);
