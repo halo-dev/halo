@@ -12,12 +12,13 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
+import UserCreationModal from "./components/UserCreationModal.vue";
 import { ref } from "vue";
-import { Starport } from "vue-starport";
 import { axiosInstance } from "@halo-dev/admin-shared";
 import type { User } from "@/types/extension";
 
 const checkAll = ref(false);
+const creationModal = ref<boolean>(false);
 const users = ref<User[]>([]);
 
 const handleFetchUsers = async () => {
@@ -32,6 +33,11 @@ const handleFetchUsers = async () => {
 handleFetchUsers();
 </script>
 <template>
+  <UserCreationModal
+    v-model:visible="creationModal"
+    @close="handleFetchUsers"
+  />
+
   <VPageHeader title="用户">
     <template #icon>
       <IconUserSettings class="mr-2 self-center" />
@@ -44,7 +50,7 @@ handleFetchUsers();
           </template>
           角色管理
         </VButton>
-        <VButton type="secondary">
+        <VButton type="secondary" @click="creationModal = true">
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
@@ -204,17 +210,13 @@ handleFetchUsers();
                 />
               </div>
               <div v-if="user.spec.avatar" class="mr-4">
-                <Starport
-                  :duration="400"
-                  :port="`user-profile-${user.metadata.name}`"
-                  class="h-12 w-12"
-                >
+                <div class="h-12 w-12">
                   <img
                     :alt="user.spec.displayName"
                     :src="user.spec.avatar"
                     class="h-full w-full overflow-hidden rounded border bg-white hover:shadow-sm"
                   />
-                </Starport>
+                </div>
               </div>
               <div class="flex-1">
                 <div class="flex flex-row items-center">

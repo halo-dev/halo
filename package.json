@@ -34,11 +34,11 @@
     "floating-vue": "2.0.0-beta.16",
     "lodash.clonedeep": "^4.5.0",
     "pinia": "^2.0.14",
+    "uuid": "^8.3.2",
     "vue": "^3.2.37",
     "vue-filepond": "^7.0.3",
     "vue-grid-layout": "3.0.0-beta1",
-    "vue-router": "^4.0.16",
-    "vue-starport": "^0.3.0"
+    "vue-router": "^4.0.16"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.3",

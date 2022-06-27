@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { BasicLayout } from "@/layouts";
 import { IconUpload, VButton, VTabbar } from "@halo-dev/components";
-import { onMounted, provide, ref } from "vue";
+import { onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { Starport } from "vue-starport";
 import { axiosInstance } from "@/utils/api-client";
 import type { User } from "@/types/extension";
 
@@ -49,15 +48,23 @@ provide("user", user);
 
 const activeTab = ref();
 
-const { name: currentRouteName } = useRoute();
+const route = useRoute();
 const router = useRouter();
 
 // set default active tab
 onMounted(() => {
   handleFetchUser();
-  const tab = tabs.find((tab) => tab.routeName === currentRouteName);
+  const tab = tabs.find((tab) => tab.routeName === route.name);
   activeTab.value = tab ? tab.id : tabs[0].id;
 });
+
+watch(
+  () => route.name,
+  async (newRouteName) => {
+    const tab = tabs.find((tab) => tab.routeName === newRouteName);
+    activeTab.value = tab ? tab.id : tabs[0].id;
+  }
+);
 
 const handleTabChange = (id: string) => {
   const tab = tabs.find((tab) => tab.id === id);
@@ -73,17 +80,13 @@ const handleTabChange = (id: string) => {
       <div class="px-4 sm:px-6 lg:px-8">
         <div class="-mt-12 flex items-end space-x-5 sm:-mt-16">
           <div class="flex">
-            <Starport
-              :duration="400"
-              :port="`user-profile-${user?.metadata?.name}`"
-              class="h-24 w-24 sm:h-32 sm:w-32"
-            >
+            <div class="h-24 w-24 sm:h-32 sm:w-32">
               <img
                 :src="user?.spec?.avatar"
                 alt="Avatar"
                 class="h-full w-full rounded-full ring-4 ring-white drop-shadow-lg"
               />
-            </Starport>
+            </div>
           </div>
           <div
             class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"

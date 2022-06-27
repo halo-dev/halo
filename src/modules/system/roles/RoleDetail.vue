@@ -13,7 +13,6 @@ import { useRoute, useRouter } from "vue-router";
 import { roles } from "@/modules/system/roles/roles-mock";
 import { ref } from "vue";
 import { users } from "@/modules/system/users/users-mock";
-import { Starport } from "vue-starport";
 
 const route = useRoute();
 
@@ -128,11 +127,7 @@ const handleRouteToUser = (username: string) => {
                       <div class="flex items-center px-4 py-4">
                         <div class="flex min-w-0 flex-1 items-center">
                           <div class="flex-shrink-0">
-                            <Starport
-                              :duration="400"
-                              :port="`user-profile-${user.name}`"
-                              class="h-12 w-12"
-                            >
+                            <div class="h-12 w-12">
                               <div
                                 class="overflow-hidden rounded border bg-white hover:shadow-sm"
                               >
@@ -142,7 +137,7 @@ const handleRouteToUser = (username: string) => {
                                   class="h-full w-full"
                                 />
                               </div>
-                            </Starport>
+                            </div>
                           </div>
                           <div
                             class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4"

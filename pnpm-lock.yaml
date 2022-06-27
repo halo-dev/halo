@@ -42,6 +42,7 @@ importers:
       tailwindcss-safe-area: ^0.2.2
       tailwindcss-themeable: ^1.3.0
       typescript: ~4.7.4
+      uuid: ^8.3.2
       vite: ^2.9.12
       vite-compression-plugin: ^0.0.4
       vite-plugin-externals: ^0.5.0
@@ -53,7 +54,6 @@ importers:
       vue-filepond: ^7.0.3
       vue-grid-layout: 3.0.0-beta1
       vue-router: ^4.0.16
-      vue-starport: ^0.3.0
       vue-tsc: ^0.34.17
     dependencies:
       '@halo-dev/admin-api': 1.1.0
@@ -65,11 +65,11 @@ importers:
       floating-vue: 2.0.0-beta.16_vue@3.2.37
       lodash.clonedeep: 4.5.0
       pinia: 2.0.14_j6bzmzd4ujpabbp5objtwxyjp4
+      uuid: 8.3.2
       vue: 3.2.37
       vue-filepond: 7.0.3_filepond@4.30.4+vue@3.2.37
       vue-grid-layout: 3.0.0-beta1
       vue-router: 4.0.16_vue@3.2.37
-      vue-starport: 0.3.0
     devDependencies:
       '@rushstack/eslint-patch': 1.1.3
       '@tailwindcss/aspect-ratio': 0.4.0_tailwindcss@3.1.4
@@ -6723,7 +6723,6 @@ packages:
   /uuid/8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
-    dev: true
 
   /v8-compile-cache/2.3.0:
     resolution: {integrity: sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==}
@@ -7010,15 +7009,6 @@ packages:
     dependencies:
       '@vue/devtools-api': 6.1.4
       vue: 3.2.37
-
-  /vue-starport/0.3.0:
-    resolution: {integrity: sha512-CfwYVxJDFqj7zoDw0TAMdNdpefuTdUH3rtupsadSa1je5Z7S/XwUCdxN0vVjBEEvWh33HmqjdK0IRQMWDlV7VQ==}
-    dependencies:
-      '@vueuse/core': 8.7.5_vue@3.2.37
-      vue: 3.2.37
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-    dev: false
 
   /vue-tsc/0.34.17_typescript@4.7.4:
     resolution: {integrity: sha512-jzUXky44ZLHC4daaJag7FQr3idlPYN719/K1eObGljz5KaS2UnVGTU/XSYCd7d6ampYYg4OsyalbHyJIxV0aEQ==}

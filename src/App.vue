@@ -1,12 +1,9 @@
 <script lang="ts" setup>
 import { RouterView } from "vue-router";
-import { StarportCarrier } from "vue-starport";
 </script>
 
 <template>
-  <StarportCarrier>
-    <RouterView />
-  </StarportCarrier>
+  <RouterView />
 </template>
 
 <style lang="scss">
