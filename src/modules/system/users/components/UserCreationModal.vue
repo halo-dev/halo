@@ -1,6 +1,6 @@
 <script lang="ts" name="UserCreationModal" setup>
 import type { PropType } from "vue";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { axiosInstance } from "@halo-dev/admin-shared";
 import {
   IconSave,
@@ -59,6 +59,12 @@ const creationModalTitle = computed(() => {
   return isUpdateMode.value ? "编辑用户" : "新增用户";
 });
 
+watch(props, (newVal) => {
+  if (newVal.visible && props.user) {
+    creationForm.value.user = props.user;
+  }
+});
+
 const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
@@ -69,7 +75,15 @@ const handleVisibleChange = (visible: boolean) => {
 const handleCreateUser = async () => {
   try {
     creationForm.value.saving = true;
-    await axiosInstance.post("/api/v1alpha1/users", creationForm.value.user);
+
+    if (isUpdateMode.value) {
+      await axiosInstance.put(
+        `/api/v1alpha1/users/${creationForm.value.user.metadata.name}`,
+        creationForm.value.user
+      );
+    } else {
+      await axiosInstance.post("/api/v1alpha1/users", creationForm.value.user);
+    }
 
     handleVisibleChange(false);
   } catch (e) {

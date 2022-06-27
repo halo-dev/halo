@@ -13,13 +13,14 @@ import {
   VTag,
 } from "@halo-dev/components";
 import UserCreationModal from "./components/UserCreationModal.vue";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { axiosInstance } from "@halo-dev/admin-shared";
 import type { User } from "@/types/extension";
 
 const checkAll = ref(false);
 const creationModal = ref<boolean>(false);
 const users = ref<User[]>([]);
+const selectedUser = ref<User | null>(null);
 
 const handleFetchUsers = async () => {
   try {
@@ -30,11 +31,19 @@ const handleFetchUsers = async () => {
   }
 };
 
-handleFetchUsers();
+const handleOpenCreateModal = (user: User) => {
+  selectedUser.value = user;
+  creationModal.value = true;
+};
+
+onMounted(() => {
+  handleFetchUsers();
+});
 </script>
 <template>
   <UserCreationModal
     v-model:visible="creationModal"
+    :user="selectedUser"
     @close="handleFetchUsers"
   />
 
@@ -181,16 +190,7 @@ handleFetchUsers();
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li
-          v-for="(user, index) in users"
-          :key="index"
-          @click="
-            $router.push({
-              name: 'UserDetail',
-              params: { name: user.metadata.name },
-            })
-          "
-        >
+        <li v-for="(user, index) in users" :key="index">
           <div
             :class="{
               'bg-gray-100': checkAll,
@@ -220,7 +220,15 @@ handleFetchUsers();
               </div>
               <div class="flex-1">
                 <div class="flex flex-row items-center">
-                  <span class="mr-2 truncate text-sm font-medium text-gray-900">
+                  <span
+                    class="mr-2 truncate text-sm font-medium text-gray-900"
+                    @click="
+                      $router.push({
+                        name: 'UserDetail',
+                        params: { name: user.metadata.name },
+                      })
+                    "
+                  >
                     {{ user.spec.displayName }}
                   </span>
                   <VTag class="sm:hidden">{{ user.metadata.name }}</VTag>
@@ -246,7 +254,7 @@ handleFetchUsers();
                     {{ user.metadata.creationTimestamp }}
                   </time>
                   <span class="cursor-pointer">
-                    <IconSettings />
+                    <IconSettings @click="handleOpenCreateModal(user)" />
                   </span>
                 </div>
               </div>
