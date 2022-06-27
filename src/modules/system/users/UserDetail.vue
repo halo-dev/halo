@@ -60,7 +60,9 @@ const router = useRouter();
         class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
       >
         <dt class="text-sm font-medium text-gray-900">两步验证</dt>
-        <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">已启用</dd>
+        <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
+          {{ user?.spec.twoFactorAuthEnabled ? "开启" : "关闭" }}
+        </dd>
       </div>
       <div
         class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
