@@ -194,8 +194,6 @@ public class PostServiceImpl extends BasePostServiceImpl<Post> implements PostSe
     @Transactional(rollbackFor = Exception.class)
     public PostDetailVO updateBy(Post postToUpdate, Set<Integer> tagIds, Set<Integer> categoryIds,
         Set<PostMeta> metas, boolean autoSave) {
-        // Set edit time
-        postToUpdate.setEditTime(DateUtils.now());
         PostDetailVO updatedPost = createOrUpdate(postToUpdate, tagIds, categoryIds, metas);
         if (!autoSave) {
             // Log the creation
