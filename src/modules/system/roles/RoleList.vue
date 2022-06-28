@@ -12,17 +12,31 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { roles } from "./roles-mock";
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import type { Role } from "@/types/extension";
+import { axiosInstance } from "@halo-dev/admin-shared";
 
 const createVisible = ref(false);
+const roles = ref<Role[]>([]);
 
 const router = useRouter();
 
-const handleRouteToDetail = (id: number) => {
-  router.push({ name: "RoleDetail", params: { id } });
+const handleFetchRoles = async () => {
+  try {
+    const { data } = await axiosInstance.get("/api/v1alpha1/roles");
+    roles.value = data;
+  } catch (e) {
+    console.error(e);
+  }
 };
+const handleRouteToDetail = (name: string) => {
+  router.push({ name: "RoleDetail", params: { name } });
+};
+
+onMounted(() => {
+  handleFetchRoles();
+});
 </script>
 <template>
   <VModal v-model:visible="createVisible" title="新建角色"></VModal>
@@ -140,7 +154,7 @@ const handleRouteToDetail = (id: number) => {
         <li
           v-for="(role, index) in roles"
           :key="index"
-          @click="handleRouteToDetail(role.id)"
+          @click="handleRouteToDetail(role.metadata.name)"
         >
           <div
             class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
@@ -149,12 +163,12 @@ const handleRouteToDetail = (id: number) => {
               <div class="flex-1">
                 <div class="flex flex-row items-center">
                   <span class="mr-2 truncate text-sm font-medium text-gray-900">
-                    {{ role.name }}
+                    {{ role.metadata.name }}
                   </span>
                 </div>
                 <div class="mt-2 flex">
                   <span class="text-xs text-gray-500">
-                    包含 {{ role.permissions }} 个权限
+                    包含 {{ role.rules?.length }} 个权限
                   </span>
                 </div>
               </div>
@@ -166,7 +180,7 @@ const handleRouteToDetail = (id: number) => {
                     class="hidden text-sm text-gray-500 hover:text-gray-900 sm:block"
                     target="_blank"
                   >
-                    {{ role.users }} 个用户
+                    0 个用户
                   </a>
                   <VTag> 系统保留</VTag>
                   <time class="text-sm text-gray-500" datetime="2020-01-07">

@@ -16,7 +16,7 @@ export default definePlugin({
           component: RoleList,
         },
         {
-          path: "roles/:id",
+          path: "roles/:name",
           name: "RoleDetail",
           component: RoleDetail,
         },

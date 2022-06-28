@@ -10,28 +10,29 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
+import type { PersonalAccessToken } from "@/types/extension";
+import { axiosInstance } from "@halo-dev/admin-shared";
 
 const createVisible = ref(false);
 const createActiveId = ref("general");
 
-const tokens = ref([
-  {
-    id: 1,
-    name: "小程序",
-    token: "...SlR6vi_BkwqjYcVgHrhA",
-  },
-  {
-    id: 2,
-    name: "App",
-    token: "...SlR6vi_BkwqjYcVgHrhA",
-  },
-  {
-    id: 3,
-    name: "Raycast",
-    token: "...SlR6vi_BkwqjYcVgHrhA",
-  },
-]);
+const personalAccessTokens = ref<PersonalAccessToken[]>([]);
+
+const handleFetchPersonalAccessTokens = async () => {
+  try {
+    const response = await axiosInstance.get(
+      "/api/v1alpha1/personalaccesstokens"
+    );
+    personalAccessTokens.value = response.data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+onMounted(() => {
+  handleFetchPersonalAccessTokens();
+});
 </script>
 <template>
   <VModal v-model:visible="createVisible" :width="720" title="创建个人令牌">
@@ -269,7 +270,7 @@ const tokens = ref([
     class="mt-5 box-border h-full w-full divide-y divide-gray-100"
     role="list"
   >
-    <li v-for="(token, index) in tokens" :key="index">
+    <li v-for="(token, index) in personalAccessTokens" :key="index">
       <div
         class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
       >
@@ -277,12 +278,12 @@ const tokens = ref([
           <div class="flex-1">
             <div class="flex flex-row items-center">
               <span class="mr-2 truncate text-sm font-medium text-gray-900">
-                {{ token.name }}
+                {{ token.spec?.displayName }}
               </span>
             </div>
             <div class="mt-2 flex">
               <span class="text-xs text-gray-500">
-                {{ token.token }}
+                {{ token.spec?.tokenDigest }}
               </span>
             </div>
           </div>
@@ -292,10 +293,10 @@ const tokens = ref([
             >
               <div class="flex flex-col gap-1">
                 <time class="text-xs text-gray-500" datetime="2020-01-07">
-                  创建日期：2020-01-07 12:00:00
+                  创建日期：{{ token.metadata?.creationTimestamp }}
                 </time>
                 <time class="text-xs text-gray-500" datetime="2020-01-07">
-                  失效日期：永久
+                  失效日期：{{ token.spec?.expiresAt }}
                 </time>
               </div>
               <span class="cursor-pointer hover:text-red-600">

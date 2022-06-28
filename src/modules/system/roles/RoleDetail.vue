@@ -10,29 +10,39 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { useRoute, useRouter } from "vue-router";
-import { roles } from "@/modules/system/roles/roles-mock";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { users } from "@/modules/system/users/users-mock";
+import { axiosInstance } from "@halo-dev/admin-shared";
+import type { Role } from "@/types/extension";
 
 const route = useRoute();
 
-const role = ref();
+const role = ref<Role>();
 const roleActiveId = ref("detail");
 
-if (route.params.id) {
-  role.value = roles.find((r) => r.id === Number(route.params.id));
-} else {
-  role.value = roles[0];
-}
+const handleFetchRole = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/v1alpha1/roles/${route.params.name}`
+    );
+    role.value = response.data;
+  } catch (error) {
+    console.error(error);
+  }
+};
 
 const router = useRouter();
 
 const handleRouteToUser = (username: string) => {
   router.push({ name: "UserDetail", params: { username } });
 };
+
+onMounted(() => {
+  handleFetchRole();
+});
 </script>
 <template>
-  <VPageHeader :title="`角色：${role.name}`">
+  <VPageHeader :title="`角色：${role?.metadata?.name}`">
     <template #icon>
       <IconShieldUser class="mr-2 self-center" />
     </template>
@@ -64,7 +74,7 @@ const handleRouteToUser = (username: string) => {
           <p
             class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500"
           >
-            <span>包含 {{ role.permissions }} 个权限</span>
+            <span>包含 {{ role?.rules?.length }} 个权限</span>
           </p>
         </div>
         <div class="border-t border-gray-200">
@@ -74,7 +84,7 @@ const handleRouteToUser = (username: string) => {
             >
               <dt class="text-sm font-medium text-gray-900">名称</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ role.name }}
+                {{ role?.metadata?.name }}
               </dd>
             </div>
             <div
@@ -82,7 +92,7 @@ const handleRouteToUser = (username: string) => {
             >
               <dt class="text-sm font-medium text-gray-900">别名</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ role.slug }}
+                {{ role?.metadata?.name }}
               </dd>
             </div>
             <div
@@ -106,7 +116,7 @@ const handleRouteToUser = (username: string) => {
             >
               <dt class="text-sm font-medium text-gray-900">创建时间</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                2020-01-01
+                {{ role?.metadata?.creationTimestamp }}
               </dd>
             </div>
             <div
