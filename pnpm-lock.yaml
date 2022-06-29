@@ -111,16 +111,16 @@ importers:
 
   packages/components:
     specifiers:
-      '@iconify-json/ri': ^1.1.2
+      '@iconify-json/ri': ^1.1.3
       '@rollup/plugin-typescript': ^8.3.3
       histoire: ^0.7.8
-      unplugin-icons: ^0.14.5
+      unplugin-icons: ^0.14.6
       vite-plugin-dts: ^1.2.0
     devDependencies:
-      '@iconify-json/ri': 1.1.2
+      '@iconify-json/ri': 1.1.3
       '@rollup/plugin-typescript': 8.3.3
       histoire: 0.7.8
-      unplugin-icons: 0.14.5
+      unplugin-icons: 0.14.6
       vite-plugin-dts: 1.2.0
 
   packages/shared:
@@ -1532,8 +1532,8 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
-  /@iconify-json/ri/1.1.2:
-    resolution: {integrity: sha512-qLlDrpkxJi+aUxY2xipKC08aI2seaxFsrEWC3Wm5WJxTtZco+G8SUBpzNpQaKzjN4IwpzcZv8T37Q3aREXDk/A==}
+  /@iconify-json/ri/1.1.3:
+    resolution: {integrity: sha512-YQ45kQNpuHc2bso4fDGhooWou43qy7njD/I5l7vpjcujb+P/K2BfLASbWYTTUKu6lMersuFmO8F7NdGzy6eGWw==}
     dependencies:
       '@iconify/types': 1.1.0
     dev: true
@@ -6640,8 +6640,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
-  /unplugin-icons/0.14.5:
-    resolution: {integrity: sha512-fxi/fuBZXtZu64L8iAPj+ecu/rnSvTbfR14RO44xIWdsI/Ohpzs9Gve7+nHIgD6JFrdtCfzGnXWBEVPbMGWX3A==}
+  /unplugin-icons/0.14.6:
+    resolution: {integrity: sha512-8sxDiL4l+TV4zufZfrskgHZZSDFoGOCBgYsefRMM4inQ3Z6KhgMSuNyew7U7D/xG//rwxgD7bN+Dv+YAZEEfEw==}
     peerDependencies:
       '@svgr/core': '>=5.5.0'
       '@vue/compiler-sfc': ^3.0.2

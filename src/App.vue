@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { RouterView } from "vue-router";
+import { VDialogProvider } from "@halo-dev/components";
 </script>
 
 <template>
-  <RouterView />
+  <VDialogProvider>
+    <RouterView />
+  </VDialogProvider>
 </template>
 
 <style lang="scss">

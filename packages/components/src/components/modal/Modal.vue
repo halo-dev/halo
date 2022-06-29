@@ -46,7 +46,7 @@ function handleClose() {
 }
 </script>
 <template>
-  <Teleport to="body">
+  <Teleport to="body" :disabled="true">
     <div
       v-show="rootVisible"
       :class="wrapperClasses"
@@ -81,7 +81,7 @@ function handleClose() {
           :style="contentStyles"
           class="modal-content transform transition-all"
         >
-          <div class="modal-header">
+          <div v-if="$slots.header || title" class="modal-header">
             <slot name="header">
               <div class="modal-header-title">{{ title }}</div>
               <div class="modal-header-actions flex flex-row">

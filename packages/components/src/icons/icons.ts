@@ -79,6 +79,8 @@ import IconShieldUser from "~icons/ri/shield-user-line";
 import IconGitBranch from "~icons/ri/git-branch-line";
 // @ts-ignore
 import IconStopCircle from "~icons/ri/stop-circle-line";
+// @ts-ignore
+import IconForbidLine from "~icons/ri/forbid-line";
 
 export {
   IconDashboard,
@@ -121,4 +123,5 @@ export {
   IconShieldUser,
   IconGitBranch,
   IconStopCircle,
+  IconForbidLine,
 };
