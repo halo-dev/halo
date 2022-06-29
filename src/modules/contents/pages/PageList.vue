@@ -12,10 +12,11 @@ import {
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { ref } from "vue";
-import { users } from "@/modules/system/users/users-mock";
+import { onMounted, ref } from "vue";
 import type { PagesPublicState } from "@halo-dev/admin-shared";
+import { axiosInstance } from "@halo-dev/admin-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
+import type { User } from "@/types/extension";
 
 const pagesRef = ref([
   {
@@ -38,6 +39,8 @@ const pagesRef = ref([
   },
 ]);
 
+const users = ref<User[]>([]);
+
 const activeId = ref("functional");
 const checkAll = ref(false);
 const pagesPublicState = ref<PagesPublicState>({
@@ -45,6 +48,19 @@ const pagesPublicState = ref<PagesPublicState>({
 });
 
 useExtensionPointsState("PAGES", pagesPublicState);
+
+const handleFetchUsers = async () => {
+  try {
+    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    users.value = data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+onMounted(() => {
+  handleFetchUsers();
+});
 </script>
 <template>
   <VPageHeader title="页面">
@@ -173,8 +189,8 @@ useExtensionPointsState("PAGES", pagesPublicState);
                                   </div>
                                   <div class="flex-shrink-0">
                                     <img
-                                      :alt="user.name"
-                                      :src="user.avatar"
+                                      :alt="user.spec.displayName"
+                                      :src="user.spec.avatar"
                                       class="h-10 w-10 rounded"
                                     />
                                   </div>
@@ -182,10 +198,10 @@ useExtensionPointsState("PAGES", pagesPublicState);
                                     <p
                                       class="truncate text-sm font-medium text-gray-900"
                                     >
-                                      {{ user.name }}
+                                      {{ user.spec.displayName }}
                                     </p>
                                     <p class="truncate text-sm text-gray-500">
-                                      @{{ user.username }}
+                                      @{{ user.metadata.name }}
                                     </p>
                                   </div>
                                   <div>

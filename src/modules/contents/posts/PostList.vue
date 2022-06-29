@@ -19,10 +19,11 @@ import {
   VTextarea,
 } from "@halo-dev/components";
 import { posts } from "./posts-mock";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Post } from "@halo-dev/admin-api";
-import { users } from "@/modules/system/users/users-mock";
+import { axiosInstance } from "@halo-dev/admin-shared";
+import type { User } from "@/types/extension";
 
 const postsRef = ref(
   // eslint-disable-next-line
@@ -41,10 +42,20 @@ const settingActiveId = ref("general");
 // eslint-disable-next-line
 const selected = ref<Post | Record<string, any>>({});
 const saving = ref(false);
+const users = ref<User[]>([]);
 
 const checkedCount = computed(() => {
   return postsRef.value.filter((post) => post.checked).length;
 });
+
+const handleFetchUsers = async () => {
+  try {
+    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    users.value = data;
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 const handleCheckAll = () => {
   postsRef.value.forEach((item) => {
@@ -81,6 +92,10 @@ const handleRouteToEditor = (post: any) => {
     },
   });
 };
+
+onMounted(() => {
+  handleFetchUsers();
+});
 </script>
 <template>
   <VModal v-model:visible="postSettings" :width="680" title="文章设置">
@@ -452,8 +467,8 @@ const handleRouteToEditor = (post: any) => {
                               </div>
                               <div class="flex-shrink-0">
                                 <img
-                                  :alt="user.name"
-                                  :src="user.avatar"
+                                  :alt="user.spec.displayName"
+                                  :src="user.spec.avatar"
                                   class="h-10 w-10 rounded"
                                 />
                               </div>
@@ -461,10 +476,10 @@ const handleRouteToEditor = (post: any) => {
                                 <p
                                   class="truncate text-sm font-medium text-gray-900"
                                 >
-                                  {{ user.name }}
+                                  {{ user.spec.displayName }}
                                 </p>
                                 <p class="truncate text-sm text-gray-500">
-                                  @{{ user.username }}
+                                  @{{ user.metadata.name }}
                                 </p>
                               </div>
                               <div>

@@ -16,12 +16,13 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import { ref } from "vue";
-import { users } from "@/modules/system/users/users-mock";
+import { onMounted, ref } from "vue";
 import vueFilePond from "vue-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
+import type { User } from "@/types/extension";
+import { axiosInstance } from "@halo-dev/admin-shared";
 
 const viewTypes = [
   {
@@ -43,6 +44,7 @@ const attachmentSelectVisible = ref(false);
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
 const checkAll = ref(false);
+const users = ref<User[]>([]);
 
 const strategies = ref([
   {
@@ -76,6 +78,19 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
     };
   }
 );
+
+const handleFetchUsers = async () => {
+  try {
+    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    users.value = data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+onMounted(() => {
+  handleFetchUsers();
+});
 </script>
 <template>
   <VPageHeader title="附件库">
@@ -455,8 +470,8 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                                   </div>
                                   <div class="flex-shrink-0">
                                     <img
-                                      :alt="user.name"
-                                      :src="user.avatar"
+                                      :alt="user.spec.displayName"
+                                      :src="user.spec.avatar"
                                       class="h-10 w-10 rounded"
                                     />
                                   </div>
@@ -464,10 +479,10 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
                                     <p
                                       class="truncate text-sm font-medium text-gray-900"
                                     >
-                                      {{ user.name }}
+                                      {{ user.spec.displayName }}
                                     </p>
                                     <p class="truncate text-sm text-gray-500">
-                                      @{{ user.username }}
+                                      @{{ user.metadata.name }}
                                     </p>
                                   </div>
                                   <div>

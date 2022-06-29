@@ -11,12 +11,12 @@ import {
 } from "@halo-dev/components";
 import { useRoute, useRouter } from "vue-router";
 import { onMounted, ref } from "vue";
-import { users } from "@/modules/system/users/users-mock";
 import { axiosInstance } from "@halo-dev/admin-shared";
-import type { Role } from "@/types/extension";
+import type { Role, User } from "@/types/extension";
 
 const route = useRoute();
 
+const users = ref<User[]>([]);
 const role = ref<Role>();
 const roleActiveId = ref("detail");
 
@@ -31,14 +31,24 @@ const handleFetchRole = async () => {
   }
 };
 
+const handleFetchUsers = async () => {
+  try {
+    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    users.value = data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 const router = useRouter();
 
-const handleRouteToUser = (username: string) => {
-  router.push({ name: "UserDetail", params: { username } });
+const handleRouteToUser = (name: string) => {
+  router.push({ name: "UserDetail", params: { name } });
 };
 
 onMounted(() => {
   handleFetchRole();
+  handleFetchUsers();
 });
 </script>
 <template>
@@ -132,7 +142,7 @@ onMounted(() => {
                       v-for="(user, index) in users"
                       :key="index"
                       class="block cursor-pointer hover:bg-gray-50"
-                      @click="handleRouteToUser(user.username)"
+                      @click="handleRouteToUser(user.metadata.name)"
                     >
                       <div class="flex items-center px-4 py-4">
                         <div class="flex min-w-0 flex-1 items-center">
@@ -142,8 +152,8 @@ onMounted(() => {
                                 class="overflow-hidden rounded border bg-white hover:shadow-sm"
                               >
                                 <img
-                                  :alt="user.name"
-                                  :src="user.avatar"
+                                  :alt="user.spec.displayName"
+                                  :src="user.spec.avatar"
                                   class="h-full w-full"
                                 />
                               </div>
@@ -156,11 +166,11 @@ onMounted(() => {
                               <p
                                 class="truncate text-sm font-medium text-gray-900"
                               >
-                                {{ user.name }}
+                                {{ user.spec.displayName }}
                               </p>
                               <p class="mt-2 flex items-center">
                                 <span class="text-xs text-gray-500">
-                                  {{ user.username }}
+                                  {{ user.metadata.name }}
                                 </span>
                               </p>
                             </div>

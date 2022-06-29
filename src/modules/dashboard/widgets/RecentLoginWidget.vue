@@ -1,6 +1,22 @@
 <script lang="ts" name="RecentLoginWidget" setup>
 import { VCard } from "@halo-dev/components";
-import { users } from "@/modules/system/users/users-mock";
+import { onMounted, ref } from "vue";
+import type { User } from "@/types/extension";
+import { axiosInstance } from "@halo-dev/admin-shared";
+
+const users = ref<User[]>([]);
+
+const handleFetchUsers = async () => {
+  try {
+    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    users.value = data;
+  } catch (e) {
+    console.error(e);
+  }
+};
+onMounted(() => {
+  handleFetchUsers();
+});
 </script>
 <template>
   <VCard
@@ -18,16 +34,18 @@ import { users } from "@/modules/system/users/users-mock";
           <div class="flex items-center space-x-4">
             <div class="flex-shrink-0">
               <img
-                :alt="user.name"
-                :src="user.avatar"
+                :alt="user.spec.displayName"
+                :src="user.spec.avatar"
                 class="h-10 w-10 rounded"
               />
             </div>
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium text-gray-900">
-                {{ user.name }}
+                {{ user.spec.displayName }}
               </p>
-              <p class="truncate text-sm text-gray-500">@{{ user.username }}</p>
+              <p class="truncate text-sm text-gray-500">
+                @{{ user.metadata.name }}
+              </p>
             </div>
             <div>
               <time class="text-sm text-gray-500" datetime="2020-01-07 20:00">
