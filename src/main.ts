@@ -7,6 +7,7 @@ import type {
   MenuItemType,
   Plugin,
 } from "@halo-dev/admin-shared";
+import { axiosInstance } from "@halo-dev/admin-shared";
 import { menus, minimenus, registerMenu } from "./router/menus.config";
 // setup
 import "./setup/setupStyles";
@@ -16,7 +17,6 @@ import { setupComponents } from "./setup/setupComponents";
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
 import { usePluginStore } from "@/stores/plugin";
-import { axiosInstance } from "@halo-dev/admin-shared";
 
 const app = createApp(App);
 
@@ -138,7 +138,6 @@ async function initApp() {
   try {
     loadCoreModules();
     await loadPluginModules();
-
     app.provide<MenuGroupType[]>("menus", menus);
     app.provide<MenuItemType[]>("minimenus", minimenus);
   } catch (e) {
