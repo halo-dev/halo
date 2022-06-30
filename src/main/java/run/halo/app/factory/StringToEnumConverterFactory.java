@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 public class StringToEnumConverterFactory implements ConverterFactory<String, Enum<?>> {
 
     @Override
+    @SuppressWarnings("unchecked")
     @NonNull
     public <T extends Enum<?>> Converter<String, T> getConverter(@NonNull Class<T> targetType) {
         return new StringToEnumConverter(targetType);
