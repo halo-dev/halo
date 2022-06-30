@@ -75,8 +75,8 @@ public abstract class BasePostParam {
         }
 
         // update the editTime  only when changing the post title or post content
-        if (!Objects.equals(title,post.getTitle())
-            || ! Objects.equals(originalContent,post.getContent().getOriginalContent())){
+        if (!Objects.equals(title, post.getTitle())
+            || !Objects.equals(originalContent, post.getContent().getOriginalContent())) {
             post.setEditTime(DateUtils.now());
         }
 
