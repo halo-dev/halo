@@ -36,6 +36,7 @@ import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.assembler.PostAssembler;
+import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.HaloUtils;
 
 /**
@@ -164,8 +165,14 @@ public class PostController {
     public BasePostDetailDTO updateDraftBy(
         @PathVariable("postId") Integer postId,
         @RequestBody PostContentParam contentParam) {
-        Post postToUse = postService.getById(postId);
+        Post postToUse = postService.getWithLatestContentById(postId);
         String formattedContent = contentParam.decideContentBy(postToUse.getEditorType());
+        // Update the  editTime when the content of the posts changes
+        if (!postToUse.getContent().getOriginalContent()
+            .equals(contentParam.getOriginalContent())) {
+            postToUse.setEditTime(DateUtils.now());
+            postService.update(postToUse);
+        }
         // Update draft content
         Post post = postService.updateDraftContent(formattedContent,
             contentParam.getOriginalContent(), postId);
