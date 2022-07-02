@@ -9,12 +9,18 @@ import UserDetail from "./UserDetail.vue";
 import ProfileModification from "./ProfileModification.vue";
 import PasswordChange from "./PasswordChange.vue";
 import PersonalAccessTokens from "./PersonalAccessTokens.vue";
+import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
 
 export default definePlugin({
   name: "userModule",
   components: [],
   routes: [
+    {
+      path: "/login",
+      name: "Login",
+      component: Login,
+    },
     {
       path: "/users",
       component: BlankLayout,

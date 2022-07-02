@@ -1,13 +1,12 @@
 const { themeable } = require("tailwindcss-themeable");
 
 module.exports = {
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  content: ["./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
     extend: {},
   },
   plugins: [
     require("tailwindcss-safe-area"),
-    require("@tailwindcss/aspect-ratio"),
     themeable({
       defaultTheme: "default",
       themes: [

@@ -12,6 +12,8 @@ importers:
       '@types/jsdom': ^16.2.14
       '@types/lodash.clonedeep': 4.5.7
       '@types/node': ^17.0.45
+      '@types/qs': ^6.9.7
+      '@types/uuid': ^8.3.4
       '@vitejs/plugin-vue': ^2.3.3
       '@vitejs/plugin-vue-jsx': ^1.3.10
       '@vitest/ui': ^0.15.2
@@ -36,6 +38,7 @@ importers:
       postcss: ^8.4.14
       prettier: ^2.7.1
       prettier-plugin-tailwindcss: ^0.1.11
+      qs: ^6.11.0
       sass: ^1.53.0
       start-server-and-test: ^1.14.0
       tailwindcss: ^3.1.4
@@ -65,6 +68,7 @@ importers:
       floating-vue: 2.0.0-beta.16_vue@3.2.37
       lodash.clonedeep: 4.5.0
       pinia: 2.0.14_j6bzmzd4ujpabbp5objtwxyjp4
+      qs: 6.11.0
       uuid: 8.3.2
       vue: 3.2.37
       vue-filepond: 7.0.3_filepond@4.30.4+vue@3.2.37
@@ -76,6 +80,8 @@ importers:
       '@types/jsdom': 16.2.14
       '@types/lodash.clonedeep': 4.5.7
       '@types/node': 17.0.45
+      '@types/qs': 6.9.7
+      '@types/uuid': 8.3.4
       '@vitejs/plugin-vue': 2.3.3_vite@2.9.12+vue@3.2.37
       '@vitejs/plugin-vue-jsx': 1.3.10
       '@vitest/ui': 0.15.2
@@ -1472,7 +1478,7 @@ packages:
       axios: 0.24.0
       form-data: 4.0.0
       js-base64: 3.7.2
-      qs: 6.10.3
+      qs: 6.11.0
       tslib: 2.4.0
     transitivePeerDependencies:
       - debug
@@ -2154,6 +2160,10 @@ packages:
 
   /@types/trusted-types/2.0.2:
     resolution: {integrity: sha512-F5DIZ36YVLE+PN+Zwws4kJogq47hNgX3Nx6WyDJ3kcplxyke3XIzB8uK5n/Lpm1HBsbGzd6nmGehL8cPekP+Tg==}
+    dev: true
+
+  /@types/uuid/8.3.4:
+    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
     dev: true
 
   /@types/web-bluetooth/0.0.14:
@@ -5763,6 +5773,14 @@ packages:
     engines: {node: '>=0.6'}
     dependencies:
       side-channel: 1.0.4
+    dev: true
+
+  /qs/6.11.0:
+    resolution: {integrity: sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==}
+    engines: {node: '>=0.6'}
+    dependencies:
+      side-channel: 1.0.4
+    dev: false
 
   /qs/6.5.3:
     resolution: {integrity: sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==}
