@@ -11,7 +11,7 @@ export default defineConfig({
   plugins: [
     Vue(),
     VueJsx(),
-    Icons(),
+    Icons({ compiler: "vue3" }),
     Dts({
       entryRoot: "./src",
       outputDir: "./dist",
