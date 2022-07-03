@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * An implementation of ExtensionStoreClient using JPA.
@@ -42,6 +43,7 @@ public class ExtensionStoreClientJPAImpl implements ExtensionStoreClient {
     }
 
     @Override
+    @Transactional
     public ExtensionStore delete(String name, Long version) {
         var extensionStore =
             repository.findById(name).orElseThrow(EntityNotFoundException::new);

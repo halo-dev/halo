@@ -33,4 +33,5 @@ public class PathPrefixPredicateTest {
     class TestController {
 
     }
+
 }

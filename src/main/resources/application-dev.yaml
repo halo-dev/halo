@@ -53,7 +53,7 @@ springdoc:
     enabled: true
   show-login-endpoint: true
   show-actuator: true
-  use-management-port: true
+  use-management-port: false
 
 management:
   endpoints:
