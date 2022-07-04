@@ -1,7 +1,6 @@
 package run.halo.app.security;
 
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -31,7 +30,6 @@ class SuperAdminInitializerTest {
 
     @Test
     void checkSuperAdminInitialization() {
-        verify(client, times(1)).fetch(eq(User.class), eq("admin"));
         verify(client, times(1)).create(argThat(extension -> {
             if (extension instanceof User user) {
                 return "admin".equals(user.getMetadata().getName());

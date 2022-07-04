@@ -9,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.Assert;
-import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreClient;
 
 /**
@@ -24,12 +23,16 @@ public class DefaultExtensionClient implements ExtensionClient {
 
     private final SchemeManager schemeManager;
 
+    private final Watcher.WatcherComposite watchers;
+
     public DefaultExtensionClient(ExtensionStoreClient storeClient,
         ExtensionConverter converter,
         SchemeManager schemeManager) {
         this.storeClient = storeClient;
         this.converter = converter;
         this.schemeManager = schemeManager;
+
+        watchers = new Watcher.WatcherComposite();
     }
 
     @Override
@@ -82,7 +85,9 @@ public class DefaultExtensionClient implements ExtensionClient {
         metadata.setCreationTimestamp(Instant.now());
         // extension.setMetadata(metadata);
         var extensionStore = converter.convertTo(extension);
-        storeClient.create(extensionStore.getName(), extensionStore.getData());
+        var createdStore = storeClient.create(extensionStore.getName(), extensionStore.getData());
+        var createdExt = converter.convertFrom(extension.getClass(), createdStore);
+        watchers.onAdd(createdExt);
     }
 
     @Override
@@ -90,14 +95,23 @@ public class DefaultExtensionClient implements ExtensionClient {
         var extensionStore = converter.convertTo(extension);
         Assert.notNull(extension.getMetadata().getVersion(),
             "Extension version must not be null when updating");
-        storeClient.update(extensionStore.getName(), extensionStore.getVersion(),
+        var updatedStore = storeClient.update(extensionStore.getName(), extensionStore.getVersion(),
             extensionStore.getData());
+        var updatedExt = converter.convertFrom(extension.getClass(), updatedStore);
+        watchers.onUpdate(extension, updatedExt);
     }
 
     @Override
     public <E extends Extension> void delete(E extension) {
-        ExtensionStore extensionStore = converter.convertTo(extension);
-        storeClient.delete(extensionStore.getName(), extensionStore.getVersion());
+        var extensionStore = converter.convertTo(extension);
+        var deleteStore = storeClient.delete(extensionStore.getName(), extensionStore.getVersion());
+        Extension deleteExt = converter.convertFrom(extension.getClass(), deleteStore);
+        watchers.onDelete(deleteExt);
+    }
+
+    @Override
+    public void watch(Watcher watcher) {
+        this.watchers.addWatcher(watcher);
     }
 
 }

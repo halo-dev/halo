@@ -18,8 +18,8 @@ public interface ExtensionClient {
      * Lists Extensions by Extension type, filter and sorter.
      *
      * @param type is the class type of Extension.
-     * @param predicate filters the result.
-     * @param comparator sorts the result.
+     * @param predicate filters the reEnqueue.
+     * @param comparator sorts the reEnqueue.
      * @param <E> is Extension type.
      * @return all filtered and sorted Extensions.
      */
@@ -30,8 +30,8 @@ public interface ExtensionClient {
      * Lists Extensions by Extension type, filter, sorter and page info.
      *
      * @param type is the class type of Extension.
-     * @param predicate filters the result.
-     * @param comparator sorts the result.
+     * @param predicate filters the reEnqueue.
+     * @param comparator sorts the reEnqueue.
      * @param page is page number which starts from 0.
      * @param size is page size.
      * @param <E> is Extension type.
@@ -79,5 +79,7 @@ public interface ExtensionClient {
      * @param <E> is Extension type.
      */
     <E extends Extension> void delete(E extension);
+
+    void watch(Watcher watcher);
 
 }

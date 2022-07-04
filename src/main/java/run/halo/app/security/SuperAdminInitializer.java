@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -20,7 +20,7 @@ import run.halo.app.extension.Metadata;
 
 @Slf4j
 @Component
-public class SuperAdminInitializer implements ApplicationListener<ApplicationStartedEvent> {
+public class SuperAdminInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
     private final ExtensionClient client;
     private final PasswordEncoder passwordEncoder;
@@ -31,7 +31,7 @@ public class SuperAdminInitializer implements ApplicationListener<ApplicationSta
     }
 
     @Override
-    public void onApplicationEvent(ApplicationStartedEvent event) {
+    public void onApplicationEvent(ApplicationReadyEvent event) {
         client.fetch(User.class, "admin").ifPresentOrElse(user -> {
             // do nothing if admin has been initialized
         }, () -> {

@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,6 +22,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -96,11 +99,6 @@ class DefaultExtensionClientTest {
             }
             """;
         return Unstructured.OBJECT_MAPPER.readValue(extensionJson, Unstructured.class);
-    }
-
-    @Test
-    void shouldFetchUnstructuredSuccessfully() {
-
     }
 
     @Test
@@ -347,6 +345,43 @@ class DefaultExtensionClientTest {
 
         verify(converter, times(1)).convertTo(any());
         verify(storeClient, times(1)).delete(any(), any());
+    }
+
+    @Nested
+    @DisplayName("Extension watcher test")
+    class WatcherTest {
+
+        @Mock
+        Watcher watcher;
+
+        @BeforeEach
+        void setUp() {
+            client.watch(watcher);
+        }
+
+        @Test
+        void shouldWatchOnAddSuccessfully() {
+            doNothing().when(watcher).onAdd(any());
+            shouldCreateSuccessfully();
+
+            verify(watcher, times(1)).onAdd(any());
+        }
+
+        @Test
+        void shouldWatchOnUpdateSuccessfully() {
+            doNothing().when(watcher).onUpdate(any(), any());
+            shouldUpdateSuccessfully();
+
+            verify(watcher, times(1)).onUpdate(any(), any());
+        }
+
+        @Test
+        void shouldWatchOnDeleteSuccessfully() {
+            doNothing().when(watcher).onDelete(any());
+            shouldDeleteSuccessfully();
+
+            verify(watcher, times(1)).onDelete(any());
+        }
     }
 
 }
