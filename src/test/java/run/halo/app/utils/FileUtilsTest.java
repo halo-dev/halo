@@ -3,6 +3,7 @@ package run.halo.app.utils;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import run.halo.app.exception.ForbiddenException;
 import run.halo.app.model.support.HaloConst;
 
 /**
@@ -132,6 +134,14 @@ class FileUtilsTest {
         assertFalse(Files.exists(filePath));
         assertTrue(Files.isRegularFile(newPath));
         assertEquals(content, new String(Files.readAllBytes(newPath)));
+    }
+
+    @Test
+    void shouldThrowErrorIfNewNameIsInvalidWhenRenaming() {
+        final var target = tempDirectory.resolve("fake.file");
+        assertThrows(ForbiddenException.class, () -> FileUtils.rename(target, "../fake.file"));
+        assertThrows(ForbiddenException.class, () -> FileUtils.rename(target, "../../fake.file"));
+        assertThrows(ForbiddenException.class, () -> FileUtils.rename(target, "/fake.file"));
     }
 
     @Test
