@@ -87,23 +87,28 @@ public class RequestInfoResolverTest {
 
     @Test
     void pluginsScopedAndPluginManage() {
-        List<SuccessCase> testCases =
-            List.of(new SuccessCase("DELETE", "/apis/extensions/v1/plugins/other/posts",
-                    "delete", "apis", "extensions", "v1", "", "plugins", "posts", "other",
+        List<CustomSuccessCase> testCases =
+            List.of(
+                new CustomSuccessCase("DELETE", "/apis/plugin.api.halo.run/v1/plugins/other/posts",
+                    "delete", "apis", "plugin.api.halo.run", "v1", "", "plugins", "posts", "", "",
                     new String[] {"plugins", "other", "posts"}),
 
                 // api group identification
-                new SuccessCase("POST", "/apis/extensions/v1/plugins/other/posts", "create", "apis",
-                    "extensions", "v1", "", "plugins", "posts", "other",
-                    new String[] {"plugins", "other", "posts"}),
+                new CustomSuccessCase("POST",
+                    "/apis/plugin.api.halo.run/v1/plugins/other/posts/foo",
+                    "create", "apis",
+                    "plugin.api.halo.run", "v1", "", "plugins", "posts", "other", "foo",
+                    new String[] {"plugins", "other", "posts", "foo"}),
 
                 // api version identification
-                new SuccessCase("POST", "/apis/extensions/v1beta3/plugins/other/posts", "create",
-                    "apis", "extensions", "v1beta3", "", "plugins", "posts", "other",
-                    new String[] {"plugins", "other", "posts"}));
+                new CustomSuccessCase("POST",
+                    "/apis/plugin.api.halo.run/v1beta3/plugins/other/posts/bar", "create",
+                    "apis", "plugin.api.halo.run", "v1beta3", "", "plugins", "posts", "other",
+                    "bar",
+                    new String[] {"plugins", "other", "posts", "bar"}));
 
         // 以 /apis 开头的 plugins 资源为 core 中管理插件使用的资源
-        for (SuccessCase successCase : testCases) {
+        for (CustomSuccessCase successCase : testCases) {
             var request =
                 method(HttpMethod.valueOf(successCase.method),
                     successCase.url).build();
@@ -112,21 +117,19 @@ public class RequestInfoResolverTest {
             assertRequestInfoCase(successCase, requestInfo);
         }
 
-        List<SuccessCase> pluginScopedCases =
-            List.of(new SuccessCase("DELETE", "/api/v1/plugins/other/posts",
-                    "deletecollection", "api", "", "v1", "other", "posts", "", "",
-                    new String[] {"posts"}),
+        List<CustomSuccessCase> pluginScopedCases =
+            List.of(
+                new CustomSuccessCase("DELETE", "/apis/plugin.api.halo.run/v1/plugins/other/posts",
+                    "delete", "apis", "plugin.api.halo.run", "v1", "", "plugins", "posts",
+                    "other", "", new String[] {"plugins", "other", "posts"}),
 
                 // api group identification
-                new SuccessCase("POST", "/api/v1/plugins/other/posts", "create", "api",
-                    "", "v1", "other", "posts", "", "", new String[] {"posts"}),
+                new CustomSuccessCase("POST",
+                    "/apis/plugin.api.halo.run/v1/plugins/other/posts/some-name", "create", "apis",
+                    "plugin.api.halo.run", "v1", "other", "plugins", "posts", "other", "some-name",
+                    new String[] {"plugins", "other", "posts", "some-name"}));
 
-                // api version identification
-                new SuccessCase("POST", "/api/v1beta3/plugins/other/posts", "create",
-                    "api", "", "v1beta3", "other", "posts", "", "",
-                    new String[] {"posts"}));
-
-        for (SuccessCase pluginScopedCase : pluginScopedCases) {
+        for (CustomSuccessCase pluginScopedCase : pluginScopedCases) {
             var request =
                 method(HttpMethod.valueOf(pluginScopedCase.method),
                     pluginScopedCase.url).build();
@@ -136,14 +139,16 @@ public class RequestInfoResolverTest {
         }
     }
 
-    private void assertRequestInfoCase(SuccessCase pluginScopedCase, RequestInfo requestInfo) {
-        assertThat(requestInfo.getPluginName()).isEqualTo(pluginScopedCase.expectedPluginName);
+    private void assertRequestInfoCase(CustomSuccessCase pluginScopedCase,
+        RequestInfo requestInfo) {
         assertThat(requestInfo.getVerb()).isEqualTo(pluginScopedCase.expectedVerb);
         assertThat(requestInfo.getParts()).isEqualTo(pluginScopedCase.expectedParts);
         assertThat(requestInfo.getApiGroup()).isEqualTo(pluginScopedCase.expectedAPIGroup);
         assertThat(requestInfo.getResource()).isEqualTo(pluginScopedCase.expectedResource);
         assertThat(requestInfo.getSubresource())
             .isEqualTo(pluginScopedCase.expectedSubresource());
+        assertThat(requestInfo.getSubName())
+            .isEqualTo(pluginScopedCase.expectedSubName());
     }
 
     @Test
@@ -174,11 +179,11 @@ public class RequestInfoResolverTest {
         List<PolicyRule> rules = List.of(
             new PolicyRule.Builder().apiGroups("").resources("posts").verbs("list", "get")
                 .build(),
-            new PolicyRule.Builder().pluginName("fakePlugin").apiGroups("").resources("posts")
-                .verbs("list", "get").build(),
-            new PolicyRule.Builder().pluginName("fakePlugin").apiGroups("")
-                .resources("posts/tags").verbs("list", "get").build(),
             new PolicyRule.Builder().apiGroups("").resources("categories").verbs("*").build(),
+            new PolicyRule.Builder().apiGroups("plugin.api.halo.run").resources("plugins/users")
+                .resourceNames("foo/bar").verbs("*").build(),
+            new PolicyRule.Builder().apiGroups("plugin.api.halo.run").resources("plugins/users")
+                .resourceNames("foo").verbs("*").build(),
             new PolicyRule.Builder().nonResourceURLs("/healthy").verbs("get", "post", "head")
                 .build());
         role.setRules(rules);
@@ -230,13 +235,16 @@ public class RequestInfoResolverTest {
             new RequestResolveCase("/api/v1/posts", "DELETE", false),
             new RequestResolveCase("/api/v1/posts/aName", "UPDATE", false),
 
-            // plugin resource
-            new RequestResolveCase("/api/v1/plugins/fakePlugin/posts", "GET", true),
-            new RequestResolveCase("/api/v1/plugins/fakePlugin/posts/some-name", "GET", true),
-            new RequestResolveCase("/api/v1/plugins/fakePlugin/posts/some-name/tags", "GET", true),
-
             // group resource url
             new RequestResolveCase("/apis/group/v1/posts", "GET", false),
+
+            // plugin custom resource url
+            new RequestResolveCase("/apis/plugin.api.halo.run/v1alpha1/plugins/foo/users", "GET",
+                true),
+            new RequestResolveCase("/apis/plugin.api.halo.run/v1alpha1/plugins/foo/users/bar",
+                "GET", true),
+            new RequestResolveCase("/apis/plugin.api.halo.run/v1alpha1/plugins/foo/posts/bar",
+                "GET", false),
 
             // non resource url
             new RequestResolveCase("/healthy", "GET", true),
@@ -255,40 +263,47 @@ public class RequestInfoResolverTest {
 
     public record SuccessCase(String method, String url, String expectedVerb,
                               String expectedAPIPrefix, String expectedAPIGroup,
-                              String expectedAPIVersion, String expectedPluginName,
+                              String expectedAPIVersion, String expectedNamespace,
                               String expectedResource, String expectedSubresource,
                               String expectedName, String[] expectedParts) {
     }
 
+    public record CustomSuccessCase(String method, String url, String expectedVerb,
+                                    String expectedAPIPrefix, String expectedAPIGroup,
+                                    String expectedAPIVersion, String expectedNamespace,
+                                    String expectedResource, String expectedSubresource,
+                                    String expectedName, String expectedSubName,
+                                    String[] expectedParts) {
+    }
 
     List<SuccessCase> getTestRequestInfos() {
         String namespaceAll = "*";
         return List.of(
-            new SuccessCase("GET", "/api/v1/plugins", "list", "api", "", "v1", "", "plugins",
-                "", "", new String[] {"plugins"}),
-            new SuccessCase("GET", "/api/v1/plugins/other", "get", "api", "", "v1", "other",
-                "plugins", "", "other", new String[] {"plugins", "other"}),
+            new SuccessCase("GET", "/api/v1/namespaces", "list", "api", "", "v1", "", "namespaces",
+                "", "", new String[] {"namespaces"}),
+            new SuccessCase("GET", "/api/v1/namespaces/other", "get", "api", "", "v1", "other",
+                "namespaces", "", "other", new String[] {"namespaces", "other"}),
 
-            new SuccessCase("GET", "/api/v1/plugins/other/posts", "list", "api", "", "v1",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts", "list", "api", "", "v1",
                 "other", "posts", "", "", new String[] {"posts"}),
-            new SuccessCase("GET", "/api/v1/plugins/other/posts/foo", "get", "api", "", "v1",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts/foo", "get", "api", "", "v1",
                 "other", "posts", "", "foo", new String[] {"posts", "foo"}),
-            new SuccessCase("HEAD", "/api/v1/plugins/other/posts/foo", "get", "api", "", "v1",
+            new SuccessCase("HEAD", "/api/v1/namespaces/other/posts/foo", "get", "api", "", "v1",
                 "other", "posts", "", "foo", new String[] {"posts", "foo"}),
             new SuccessCase("GET", "/api/v1/posts", "list", "api", "", "v1", namespaceAll, "posts",
                 "", "", new String[] {"posts"}),
             new SuccessCase("HEAD", "/api/v1/posts", "list", "api", "", "v1", namespaceAll, "posts",
                 "", "", new String[] {"posts"}),
-            new SuccessCase("GET", "/api/v1/plugins/other/posts/foo", "get", "api", "", "v1",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts/foo", "get", "api", "", "v1",
                 "other", "posts", "", "foo", new String[] {"posts", "foo"}),
-            new SuccessCase("GET", "/api/v1/plugins/other/posts", "list", "api", "", "v1",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts", "list", "api", "", "v1",
                 "other", "posts", "", "", new String[] {"posts"}),
 
             // special verbs
-            new SuccessCase("GET", "/api/v1/proxy/plugins/other/posts/foo", "proxy", "api", "",
+            new SuccessCase("GET", "/api/v1/proxy/namespaces/other/posts/foo", "proxy", "api", "",
                 "v1", "other", "posts", "", "foo", new String[] {"posts", "foo"}),
             new SuccessCase("GET",
-                "/api/v1/proxy/plugins/other/posts/foo/subpath/not/a/subresource", "proxy",
+                "/api/v1/proxy/namespaces/other/posts/foo/subpath/not/a/subresource", "proxy",
                 "api", "", "v1", "other", "posts", "", "foo",
                 new String[] {"posts", "foo", "subpath", "not", "a", "subresource"}),
             new SuccessCase("GET", "/api/v1/watch/posts", "watch", "api", "", "v1", namespaceAll,
@@ -297,35 +312,55 @@ public class RequestInfoResolverTest {
                 namespaceAll, "posts", "", "", new String[] {"posts"}),
             new SuccessCase("GET", "/api/v1/posts?watch=false", "list", "api", "", "v1",
                 namespaceAll, "posts", "", "", new String[] {"posts"}),
-            new SuccessCase("GET", "/api/v1/watch/plugins/other/posts", "watch", "api", "", "v1",
+            new SuccessCase("GET", "/api/v1/watch/namespaces/other/posts", "watch", "api", "", "v1",
                 "other", "posts", "", "", new String[] {"posts"}),
-            new SuccessCase("GET", "/api/v1/plugins/other/posts?watch=1", "watch", "api", "",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts?watch=1", "watch", "api", "",
                 "v1", "other", "posts", "", "", new String[] {"posts"}),
-            new SuccessCase("GET", "/api/v1/plugins/other/posts?watch=0", "list", "api", "",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts?watch=0", "list", "api", "",
                 "v1", "other", "posts", "", "", new String[] {"posts"}),
 
             // subresource identification
-            new SuccessCase("GET", "/api/v1/plugins/other/posts/foo/status", "get", "api", "",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts/foo/status", "get", "api", "",
                 "v1", "other", "posts", "status", "foo", new String[] {"posts", "foo", "status"}),
-            new SuccessCase("GET", "/api/v1/plugins/other/posts/foo/proxy/subpath", "get", "api",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts/foo/proxy/subpath", "get", "api",
                 "", "v1", "other", "posts", "proxy", "foo",
                 new String[] {"posts", "foo", "proxy", "subpath"}),
+            new SuccessCase("PUT", "/api/v1/namespaces/other/finalize", "update", "api", "", "v1",
+                "other", "namespaces", "finalize", "other",
+                new String[] {"namespaces", "other", "finalize"}),
+            new SuccessCase("PUT", "/api/v1/namespaces/other/status", "update", "api", "", "v1",
+                "other", "namespaces", "status", "other",
+                new String[] {"namespaces", "other", "status"}),
 
             // verb identification
-            new SuccessCase("PATCH", "/api/v1/plugins/other/posts/foo", "patch", "api", "", "v1",
+            new SuccessCase("PATCH", "/api/v1/namespaces/other/posts/foo", "patch", "api", "", "v1",
                 "other", "posts", "", "foo", new String[] {"posts", "foo"}),
-            new SuccessCase("DELETE", "/api/v1/plugins/other/posts/foo", "delete", "api", "",
+            new SuccessCase("DELETE", "/api/v1/namespaces/other/posts/foo", "delete", "api", "",
                 "v1", "other", "posts", "", "foo", new String[] {"posts", "foo"}),
-            new SuccessCase("POST", "/api/v1/plugins/other/posts", "create", "api", "", "v1",
+            new SuccessCase("POST", "/api/v1/namespaces/other/posts", "create", "api", "", "v1",
                 "other", "posts", "", "", new String[] {"posts"}),
 
             // deletecollection verb identification
-            new SuccessCase("DELETE", "/api/v1/nodes", "deletecollection", "api", "", "v1", "",
+            new SuccessCase("DELETE", "/api/v1/nodes?all=true", "deletecollection", "api", "", "v1",
+                "",
                 "nodes", "", "", new String[] {"nodes"}),
-            new SuccessCase("DELETE", "/api/v1/plugins", "deletecollection", "api", "", "v1", "",
-                "plugins", "", "", new String[] {"plugins"}),
-            new SuccessCase("DELETE", "/api/v1/plugins/other/posts", "deletecollection", "api",
-                "", "v1", "other", "posts", "", "", new String[] {"posts"}));
+            new SuccessCase("DELETE", "/api/v1/namespaces?all=1", "deletecollection", "api", "",
+                "v1", "",
+                "namespaces", "", "", new String[] {"namespaces"}),
+            new SuccessCase("DELETE", "/api/v1/namespaces/other/posts?all=true", "deletecollection",
+                "api",
+                "", "v1", "other", "posts", "", "", new String[] {"posts"}),
+            new SuccessCase("DELETE", "/apis/extensions/v1/namespaces/other/posts?all=true",
+                "deletecollection", "apis", "extensions", "v1", "other", "posts", "", "",
+                new String[] {"posts"}),
+
+            // api group identification
+            new SuccessCase("POST", "/apis/extensions/v1/namespaces/other/posts", "create", "apis",
+                "extensions", "v1", "other", "posts", "", "", new String[] {"posts"}),
+
+            // api version identification
+            new SuccessCase("POST", "/apis/extensions/v1beta3/namespaces/other/posts", "create",
+                "apis", "extensions", "v1beta3", "other", "posts", "", "", new String[] {"posts"}));
     }
 
 }

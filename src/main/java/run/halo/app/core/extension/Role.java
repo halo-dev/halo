@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -74,19 +73,13 @@ public class Role extends AbstractExtension {
          */
         final String[] verbs;
 
-        /**
-         * If the plugin name exists, it means that the API is provided by the plugin.
-         */
-        final String pluginName;
-
         public PolicyRule() {
-            this(null, null, null, null, null, null);
+            this(null, null, null, null, null);
         }
 
-        public PolicyRule(String pluginName, String[] apiGroups, String[] resources,
+        public PolicyRule(String[] apiGroups, String[] resources,
             String[] resourceNames,
             String[] nonResourceURLs, String[] verbs) {
-            this.pluginName = StringUtils.defaultString(pluginName);
             this.apiGroups = nullElseEmpty(apiGroups);
             this.resources = nullElseEmpty(resources);
             this.resourceNames = nullElseEmpty(resourceNames);
@@ -114,11 +107,6 @@ public class Role extends AbstractExtension {
 
             String pluginName;
 
-            public Builder pluginName(String pluginName) {
-                this.pluginName = pluginName;
-                return this;
-            }
-
             public Builder apiGroups(String... apiGroups) {
                 this.apiGroups = apiGroups;
                 return this;
@@ -145,7 +133,7 @@ public class Role extends AbstractExtension {
             }
 
             public PolicyRule build() {
-                return new PolicyRule(pluginName, apiGroups, resources, resourceNames,
+                return new PolicyRule(apiGroups, resources, resourceNames,
                     nonResourceURLs,
                     verbs);
             }

@@ -69,7 +69,7 @@ public class AttributesRecord implements Attributes {
     }
 
     @Override
-    public String pluginName() {
-        return requestInfo.getPluginName();
+    public String getSubName() {
+        return requestInfo.getSubName();
     }
 }

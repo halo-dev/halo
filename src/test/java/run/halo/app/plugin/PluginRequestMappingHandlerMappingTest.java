@@ -69,7 +69,8 @@ class PluginRequestMappingHandlerMappingTest {
         assertThat(info).isNotNull();
         assertThat(info.getPatternsCondition().getPatterns()).isEqualTo(
             Collections.singleton(
-                new PathPatternParser().parse("/api/v1alpha1/plugins/fakePlugin/user/{id}")));
+                new PathPatternParser().parse(
+                    "/apis/plugin.api.halo.run/v1alpha1/plugins/fakePlugin/user/{id}")));
     }
 
     @Test
@@ -94,7 +95,7 @@ class PluginRequestMappingHandlerMappingTest {
         List<RequestMappingInfo> mappings = handlerMapping.getMappings("fakePlugin");
         assertThat(mappings).hasSize(1);
         assertThat(mappings.get(0).toString()).isEqualTo(
-            "{GET /api/v1alpha1/plugins/fakePlugin/user/{id}}");
+            "{GET /apis/plugin.api.halo.run/v1alpha1/plugins/fakePlugin/user/{id}}");
     }
 
     @Test
@@ -120,7 +121,8 @@ class PluginRequestMappingHandlerMappingTest {
 
         // get handler by mock exchange
         ServerWebExchange exchange =
-            MockServerWebExchange.from(get("/api/v1alpha1/plugins/fakePlugin/foo"));
+            MockServerWebExchange.from(
+                get("/apis/plugin.api.halo.run/v1alpha1/plugins/fakePlugin/foo"));
         HandlerMethod hm = (HandlerMethod) this.handlerMapping.getHandler(exchange).block();
 
         assertThat(hm).isNotNull();
@@ -135,7 +137,7 @@ class PluginRequestMappingHandlerMappingTest {
         Method expected =
             ResolvableMethod.on(TestController.class).annot(getMapping("/foo").params("p")).build();
 
-        String requestPath = "/api/v1alpha1/plugins/fakePlugin/foo?p=anything";
+        String requestPath = "/apis/plugin.api.halo.run/v1alpha1/plugins/fakePlugin/foo?p=anything";
         ServerWebExchange exchange = MockServerWebExchange.from(get(requestPath));
         HandlerMethod hm = (HandlerMethod) this.handlerMapping.getHandler(exchange).block();
 
@@ -150,7 +152,7 @@ class PluginRequestMappingHandlerMappingTest {
         Method expected =
             ResolvableMethod.on(TestController.class).annot(getMapping("")).build();
 
-        String requestPath = "/api/v1alpha1/plugins/fakePlugin";
+        String requestPath = "/apis/plugin.api.halo.run/v1alpha1/plugins/fakePlugin";
         ServerWebExchange exchange = MockServerWebExchange.from(get(requestPath));
         HandlerMethod hm = (HandlerMethod) this.handlerMapping.getHandler(exchange).block();
 
@@ -163,7 +165,7 @@ class PluginRequestMappingHandlerMappingTest {
         // register handler methods first
         handlerMapping.registerHandlerMethods("fakePlugin", new TestController());
 
-        String requestPath = "/api/v1alpha1/plugins/fakePlugin/bar";
+        String requestPath = "/apis/plugin.api.halo.run/v1alpha1/plugins/fakePlugin/bar";
         ServerWebExchange exchange = MockServerWebExchange.from(post(requestPath));
         Mono<Object> mono = this.handlerMapping.getHandler(exchange);
 

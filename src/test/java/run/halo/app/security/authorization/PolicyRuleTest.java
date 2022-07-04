@@ -28,11 +28,10 @@ class PolicyRuleTest {
 
     @Test
     public void constructPolicyRule() throws JsonProcessingException, JSONException {
-        Role.PolicyRule policyRule = new Role.PolicyRule(null, null, null, null, null, null);
+        Role.PolicyRule policyRule = new Role.PolicyRule(null, null, null, null, null);
         assertThat(policyRule).isNotNull();
         JSONAssert.assertEquals("""
             {
-                "pluginName": "",
                 "apiGroups": [],
                 "resources": [],
                 "resourceNames": [],
@@ -46,7 +45,6 @@ class PolicyRuleTest {
         Role.PolicyRule policyByBuilder = new Role.PolicyRule.Builder().build();
         JSONAssert.assertEquals("""
             {
-                "pluginName": "",
                 "apiGroups": [],
                 "resources": [],
                 "resourceNames": [],
@@ -58,7 +56,6 @@ class PolicyRuleTest {
             true);
 
         Role.PolicyRule policyNonNull = new Role.PolicyRule.Builder()
-            .pluginName("fakePluginName")
             .apiGroups("group")
             .resources("resource-1", "resource-2")
             .resourceNames("resourceName")
@@ -68,7 +65,6 @@ class PolicyRuleTest {
 
         JsonNode expected = objectMapper.readTree("""
             {
-                "pluginName": "fakePluginName",
                 "apiGroups": [
                     "group"
                 ],

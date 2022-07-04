@@ -52,10 +52,11 @@ public class RequestInfoFactory {
      * Valid Inputs:
      * <p>Resource paths</p>
      * <pre>
-     * /api/{version}/plugins
-     * /api/{version}/plugins/{pluginName}
-     * /api/{version}/plugins/{pluginName}/{resource}
-     * /api/{version}/plugins/{pluginName}/{resource}/{resourceName}
+     * /apis/{api-group}/{version}/namespaces
+     * /api/{version}/namespaces
+     * /api/{version}/namespaces/{namespace}
+     * /api/{version}/namespaces/{namespace}/{resource}
+     * /api/{version}/namespaces/{namespace}/{resource}/{resourceName}
      * /api/{version}/{resource}
      * /api/{version}/{resource}/{resourceName}
      * </pre>
@@ -138,22 +139,22 @@ public class RequestInfoFactory {
                 default -> "";
             };
         }
-        // URL forms: /plugins/{plugin-name}/{kind}/*, where parts are adjusted to be relative
+        // URL forms: /namespaces/{namespace}/{kind}/*, where parts are adjusted to be relative
         // to kind
-        if (Objects.equals(currentParts[0], "plugins")
-            && StringUtils.isEmpty(requestInfo.getApiGroup())) {
+        Set<String> namespaceSubresources = Set.of("status", "finalize");
+        if (Objects.equals(currentParts[0], "namespaces")) {
             if (currentParts.length > 1) {
-                requestInfo.pluginName = currentParts[1];
+                requestInfo.namespace = currentParts[1];
 
-                // if there is another step after the plugin name and it is not a known
-                // plugins subresource
+                // if there is another step after the namespace name and it is not a known
+                // namespace subresource
                 // move currentParts to include it as a resource in its own right
-                if (currentParts.length > 2) {
+                if (currentParts.length > 2 && !namespaceSubresources.contains(currentParts[2])) {
                     currentParts = Arrays.copyOfRange(currentParts, 2, currentParts.length);
                 }
             }
         } else {
-            requestInfo.pluginName = "";
+            requestInfo.namespace = "";
         }
 
         // parsing successful, so we now know the proper value for .Parts
@@ -163,6 +164,10 @@ public class RequestInfoFactory {
         if (requestInfo.parts.length >= 3 && !specialVerbs.contains(
             requestInfo.verb)) {
             requestInfo.subresource = requestInfo.parts[2];
+            // if there is another step after the subresource name and it is not a known
+            if (requestInfo.parts.length >= 4) {
+                requestInfo.subName = requestInfo.parts[3];
+            }
         }
 
         if (requestInfo.parts.length >= 2) {
@@ -185,14 +190,20 @@ public class RequestInfoFactory {
         }
         // if there's no name on the request and we thought it was a deleted before, then the
         // actual verb is deletecollection
-        if (requestInfo.name.length() == 0
-            && Objects.equals(requestInfo.verb, "delete")) {
-            requestInfo.verb = "deletecollection";
+        if (Objects.equals(requestInfo.verb, "delete")) {
+            var deleteAll = request.getQueryParams().getFirst("all");
+            if (isDeleteCollection(deleteAll)) {
+                requestInfo.verb = "deletecollection";
+            }
         }
         return requestInfo;
     }
 
     boolean isWatch(String requestParam) {
+        return "1".equals(requestParam) || "true".equals(requestParam);
+    }
+
+    boolean isDeleteCollection(String requestParam) {
         return "1".equals(requestParam) || "true".equals(requestParam);
     }
 
