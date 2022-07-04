@@ -7,18 +7,25 @@ import {
   VButton,
   VCard,
   VInput,
-  VModal,
   VPageHeader,
   VSpace,
   VTag,
 } from "@halo-dev/components";
+import RoleCreationModal from "./components/RoleCreationModal.vue";
 import { useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import type { Role } from "@/types/extension";
 import { axiosInstance } from "@halo-dev/admin-shared";
 
 const createVisible = ref(false);
 const roles = ref<Role[]>([]);
+
+const basicRoles = computed(() => {
+  return roles.value.filter(
+    (role) =>
+      role.metadata?.labels?.["plugin.halo.run/role-template"] !== "true"
+  );
+});
 
 const router = useRouter();
 
@@ -30,6 +37,7 @@ const handleFetchRoles = async () => {
     console.error(e);
   }
 };
+
 const handleRouteToDetail = (name: string) => {
   router.push({ name: "RoleDetail", params: { name } });
 };
@@ -39,7 +47,10 @@ onMounted(() => {
 });
 </script>
 <template>
-  <VModal v-model:visible="createVisible" title="新建角色"></VModal>
+  <RoleCreationModal
+    v-model:visible="createVisible"
+    @close="handleFetchRoles"
+  />
 
   <VPageHeader title="角色">
     <template #icon>
@@ -152,7 +163,7 @@ onMounted(() => {
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li
-          v-for="(role, index) in roles"
+          v-for="(role, index) in basicRoles"
           :key="index"
           @click="handleRouteToDetail(role.metadata.name)"
         >
@@ -163,13 +174,15 @@ onMounted(() => {
               <div class="flex-1">
                 <div class="flex flex-row items-center">
                   <span class="mr-2 truncate text-sm font-medium text-gray-900">
-                    {{ role.metadata.name }}
+                    {{
+                      role.metadata.annotations?.[
+                        "plugin.halo.run/display-name"
+                      ] || role.metadata.name
+                    }}
                   </span>
                 </div>
                 <div class="mt-2 flex">
-                  <span class="text-xs text-gray-500">
-                    包含 {{ role.rules?.length }} 个权限
-                  </span>
+                  <span class="text-xs text-gray-500"> 包含 0 个权限 </span>
                 </div>
               </div>
               <div class="flex">
