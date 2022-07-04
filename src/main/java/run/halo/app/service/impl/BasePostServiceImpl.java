@@ -314,8 +314,6 @@ public abstract class BasePostServiceImpl<POST extends BasePost>
                 postContent.getContent(), postContent.getOriginalContent());
         } else {
             // The sheet will be updated
-            // Set edit time
-            post.setEditTime(DateUtils.now());
             contentService.createOrUpdateDraftBy(post.getId(),
                 postContent.getContent(), postContent.getOriginalContent());
             // Update it

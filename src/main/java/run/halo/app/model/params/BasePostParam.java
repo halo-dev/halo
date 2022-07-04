@@ -10,7 +10,7 @@ import run.halo.app.model.entity.BasePost;
 import run.halo.app.model.entity.Content;
 import run.halo.app.model.enums.PostEditorType;
 import run.halo.app.model.enums.PostStatus;
-import run.halo.app.service.impl.BasePostServiceImpl;
+import run.halo.app.utils.DateUtils;
 import run.halo.app.utils.MarkdownUtils;
 
 /**
@@ -73,6 +73,13 @@ public abstract class BasePostParam {
         } else {
             postContent.setContent(content);
         }
+
+        // update the editTime  only when changing the post title or post content
+        if (!Objects.equals(title, post.getTitle())
+            || !Objects.equals(originalContent, post.getContent().getOriginalContent())) {
+            post.setEditTime(DateUtils.now());
+        }
+
         post.setContent(Content.PatchedContent.of(postContent));
     }
 }
