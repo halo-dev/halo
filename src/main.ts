@@ -17,6 +17,7 @@ import { setupComponents } from "./setup/setupComponents";
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
 import { usePluginStore } from "@/stores/plugin";
+import type { User } from "@/types/extension";
 
 const app = createApp(App);
 
@@ -130,6 +131,11 @@ async function loadPluginModules() {
   }
 }
 
+async function loadCurrentUser() {
+  const response = await axiosInstance.get(`/custom-api/v1alpha1/users/me`);
+  app.provide<User>("currentUser", response.data);
+}
+
 (async function () {
   await initApp();
 })();
@@ -138,6 +144,7 @@ async function initApp() {
   try {
     loadCoreModules();
     await loadPluginModules();
+    await loadCurrentUser();
     app.provide<MenuGroupType[]>("menus", menus);
     app.provide<MenuItemType[]>("minimenus", minimenus);
   } catch (e) {

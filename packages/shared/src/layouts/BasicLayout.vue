@@ -9,6 +9,7 @@ import {
   VTag,
 } from "@halo-dev/components";
 import type { MenuGroupType, MenuItemType } from "@/types/menus";
+import type { User } from "../../../../src/types/extension";
 import logo from "@/assets/logo.svg";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { inject, ref } from "vue";
@@ -22,8 +23,10 @@ const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
 const spotlight = ref(false);
 
+const currentUser = inject<User>("currentUser");
+
 const handleRouteToProfile = () => {
-  router.push({ path: "/users/profile/detail" });
+  router.push({ path: `/users/${currentUser?.metadata.name}/detail` });
 };
 </script>
 
@@ -47,11 +50,13 @@ const handleRouteToProfile = () => {
       </div>
       <VRoutesMenu :menus="menus" />
       <div class="current-profile">
-        <div class="profile-avatar">
-          <img class="h-11 w-11 rounded-full" src="https://ryanc.cc/avatar" />
+        <div v-if="currentUser.spec.avatar" class="profile-avatar">
+          <img :src="currentUser.spec.avatar" class="h-11 w-11 rounded-full" />
         </div>
         <div class="profile-name">
-          <div class="flex text-sm font-medium">Ryan Wang</div>
+          <div class="flex text-sm font-medium">
+            {{ currentUser.spec.displayName }}
+          </div>
           <div class="flex">
             <VTag>
               <template #leftIcon>
