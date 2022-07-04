@@ -107,6 +107,12 @@ public class FileUtils {
         Assert.notNull(newName, "New name must not be null");
 
         Path newPath = pathToRename.resolveSibling(newName);
+        var parent = pathToRename.getParent();
+        if (parent == null) {
+            parent = pathToRename;
+        }
+        checkDirectoryTraversal(parent, newPath);
+
         log.info("Rename [{}] to [{}]", pathToRename, newPath);
 
         Files.move(pathToRename, newPath);
