@@ -5,7 +5,6 @@ import java.util.Objects;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.Role.PolicyRule;
 
 /**
  * @author guqing
@@ -35,15 +34,24 @@ public class RbacRequestEvaluation {
                 combinedResource =
                     requestAttributes.getResource() + "/" + requestAttributes.getSubresource();
             }
-
             return verbMatches(rule, requestAttributes.getVerb())
                 && apiGroupMatches(rule, requestAttributes.getApiGroup())
                 && resourceMatches(rule, combinedResource, requestAttributes.getSubresource())
-                && resourceNameMatches(rule, requestAttributes.getName())
-                && pluginNameMatches(rule, requestAttributes.pluginName());
+                && resourceNameMatches(rule,
+                combineResourceName(requestAttributes.getName(), requestAttributes.getSubName()));
         }
         return verbMatches(rule, requestAttributes.getVerb())
             && nonResourceURLMatches(rule, requestAttributes.getPath());
+    }
+
+    private String combineResourceName(String name, String subName) {
+        if (StringUtils.isBlank(name)) {
+            return subName;
+        }
+        if (StringUtils.isBlank(subName)) {
+            return name;
+        }
+        return name + "/" + subName;
     }
 
     protected boolean verbMatches(Role.PolicyRule rule, String requestedVerb) {
@@ -71,7 +79,7 @@ public class RbacRequestEvaluation {
     }
 
     protected boolean resourceMatches(Role.PolicyRule rule, String combinedRequestedResource,
-                                      String requestedSubresource) {
+        String requestedSubresource) {
         for (String ruleResource : rule.getResources()) {
             // if everything is allowed, we match
             if (Objects.equals(ruleResource, WildCard.ResourceAll)) {
@@ -124,9 +132,5 @@ public class RbacRequestEvaluation {
             }
         }
         return false;
-    }
-
-    protected boolean pluginNameMatches(PolicyRule rule, String pluginName) {
-        return StringUtils.equals(rule.getPluginName(), pluginName);
     }
 }
