@@ -23,7 +23,7 @@ import run.halo.app.extension.GVK;
     singular = "role")
 public class Role extends AbstractExtension {
 
-    @Schema(minLength = 1)
+    @Schema(required = true)
     List<PolicyRule> rules;
 
     /**
