@@ -182,7 +182,7 @@ public class RequestInfoFactory {
         // verb is a list or a watch
         if (requestInfo.name.length() == 0 && "get".equals(requestInfo.verb)) {
             var watch = request.getQueryParams().getFirst("watch");
-            if (isWatch(watch)) {
+            if (Boolean.parseBoolean(watch)) {
                 requestInfo.verb = "watch";
             } else {
                 requestInfo.verb = "list";
@@ -192,19 +192,11 @@ public class RequestInfoFactory {
         // actual verb is deletecollection
         if (Objects.equals(requestInfo.verb, "delete")) {
             var deleteAll = request.getQueryParams().getFirst("all");
-            if (isDeleteCollection(deleteAll)) {
+            if (Boolean.parseBoolean(deleteAll)) {
                 requestInfo.verb = "deletecollection";
             }
         }
         return requestInfo;
-    }
-
-    boolean isWatch(String requestParam) {
-        return "1".equals(requestParam) || "true".equals(requestParam);
-    }
-
-    boolean isDeleteCollection(String requestParam) {
-        return "1".equals(requestParam) || "true".equals(requestParam);
     }
 
     private String[] splitPath(String path) {
