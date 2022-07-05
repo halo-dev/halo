@@ -74,7 +74,7 @@ onMounted(() => {
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
             <div class="flex w-full flex-1 sm:w-auto">
-              <VInput class="w-full sm:w-72" placeholder="输入关键词搜索" />
+              <VInput class="w-72" placeholder="输入关键词搜索" />
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">

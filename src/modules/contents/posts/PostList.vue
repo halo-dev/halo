@@ -360,7 +360,7 @@ onMounted(() => {
             <div class="flex w-full flex-1 sm:w-auto">
               <VInput
                 v-if="checkedCount <= 0"
-                class="w-full sm:w-72"
+                class="w-72"
                 placeholder="输入关键词搜索"
               />
               <VSpace v-else>

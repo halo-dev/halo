@@ -51,7 +51,7 @@ const handleLogin = async () => {
   } catch (e) {
     console.error(e);
   } finally {
-    await router.replace({ name: "Dashboard" });
+    window.location.href = "/#/dashboard";
     loginForm.value.logging = false;
   }
 };
