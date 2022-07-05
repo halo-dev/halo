@@ -314,9 +314,9 @@ public class RequestInfoResolverTest {
                 namespaceAll, "posts", "", "", new String[] {"posts"}),
             new SuccessCase("GET", "/api/v1/watch/namespaces/other/posts", "watch", "api", "", "v1",
                 "other", "posts", "", "", new String[] {"posts"}),
-            new SuccessCase("GET", "/api/v1/namespaces/other/posts?watch=1", "watch", "api", "",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts?watch=true", "watch", "api", "",
                 "v1", "other", "posts", "", "", new String[] {"posts"}),
-            new SuccessCase("GET", "/api/v1/namespaces/other/posts?watch=0", "list", "api", "",
+            new SuccessCase("GET", "/api/v1/namespaces/other/posts?watch=false", "list", "api", "",
                 "v1", "other", "posts", "", "", new String[] {"posts"}),
 
             // subresource identification
@@ -344,7 +344,7 @@ public class RequestInfoResolverTest {
             new SuccessCase("DELETE", "/api/v1/nodes?all=true", "deletecollection", "api", "", "v1",
                 "",
                 "nodes", "", "", new String[] {"nodes"}),
-            new SuccessCase("DELETE", "/api/v1/namespaces?all=1", "deletecollection", "api", "",
+            new SuccessCase("DELETE", "/api/v1/namespaces?all=false", "delete", "api", "",
                 "v1", "",
                 "namespaces", "", "", new String[] {"namespaces"}),
             new SuccessCase("DELETE", "/api/v1/namespaces/other/posts?all=true", "deletecollection",
