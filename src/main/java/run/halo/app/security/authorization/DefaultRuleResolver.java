@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -16,6 +15,7 @@ import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.service.DefaultRoleBindingService;
 import run.halo.app.core.extension.service.RoleBindingService;
 import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.extension.MetadataOperator;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -74,12 +74,13 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
     }
 
     private List<Role.PolicyRule> fetchRules(Role role) {
-        Map<String, String> annotations = role.getMetadata().getAnnotations();
-        if (annotations == null) {
+        MetadataOperator metadata = role.getMetadata();
+        if (metadata == null || metadata.getAnnotations() == null) {
             return role.getRules();
         }
         // merge policy rules
-        String roleDependencyRules = annotations.get(RoleReconciler.ROLE_DEPENDENCY_RULES);
+        String roleDependencyRules = metadata.getAnnotations()
+            .get(RoleReconciler.ROLE_DEPENDENCY_RULES);
         List<Role.PolicyRule> rules = convertFrom(roleDependencyRules);
         rules.addAll(role.getRules());
         return rules;
