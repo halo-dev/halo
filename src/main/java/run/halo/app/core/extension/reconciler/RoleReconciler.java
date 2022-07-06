@@ -5,8 +5,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.Role;
@@ -36,17 +38,24 @@ public class RoleReconciler implements Reconciler {
         client.fetch(Role.class, request.name()).ifPresent(role -> {
             Map<String, String> annotations = role.getMetadata().getAnnotations();
             if (annotations == null) {
-                return;
+                annotations = new HashMap<>();
+                role.getMetadata().setAnnotations(annotations);
             }
+            Map<String, String> oldAnnotations = Map.copyOf(annotations);
+
             String s = annotations.get(ROLE_DEPENDENCIES);
             List<String> roleDependencies = readValue(s);
             List<Role.PolicyRule> dependencyRules = listDependencyRoles(roleDependencies)
                 .stream()
                 .map(Role::getRules)
-                .flatMap(List::stream).toList();
+                .flatMap(List::stream)
+                .sorted()
+                .toList();
             // merge dependency rules to annotations
             annotations.put(ROLE_DEPENDENCY_RULES, JsonUtils.objectToJson(dependencyRules));
-            client.update(role);
+            if (!Objects.deepEquals(oldAnnotations, annotations)) {
+                client.update(role);
+            }
         });
         return new Result(false, null);
     }
