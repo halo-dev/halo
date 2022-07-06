@@ -2,7 +2,6 @@ package run.halo.app.infra.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,7 +16,7 @@ import org.junit.jupiter.api.Test;
 public class JsonUtilsTest {
 
     @Test
-    public void serializerTime() throws JsonProcessingException {
+    public void serializerTime() {
         Instant now = Instant.now();
         String instantStr = JsonUtils.objectToJson(now);
         assertThat(instantStr).isNotNull();

@@ -1,15 +1,22 @@
 package run.halo.app.security.authorization;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.service.DefaultRoleBindingService;
 import run.halo.app.core.extension.service.RoleBindingService;
 import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.extension.MetadataOperator;
+import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * @author guqing
@@ -49,7 +56,8 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         for (String roleName : roleNames) {
             try {
                 Role role = roleService.getRole(roleName);
-                rules = role.getRules();
+                // fetch rules from role
+                rules = fetchRules(role);
             } catch (Exception e) {
                 if (visitor.visit(null, null, e)) {
                     return;
@@ -62,6 +70,31 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
                     return;
                 }
             }
+        }
+    }
+
+    private List<Role.PolicyRule> fetchRules(Role role) {
+        MetadataOperator metadata = role.getMetadata();
+        if (metadata == null || metadata.getAnnotations() == null) {
+            return role.getRules();
+        }
+        // merge policy rules
+        String roleDependencyRules = metadata.getAnnotations()
+            .get(RoleReconciler.ROLE_DEPENDENCY_RULES);
+        List<Role.PolicyRule> rules = convertFrom(roleDependencyRules);
+        rules.addAll(role.getRules());
+        return rules;
+    }
+
+    private List<Role.PolicyRule> convertFrom(String json) {
+        if (StringUtils.isBlank(json)) {
+            return new ArrayList<>();
+        }
+        try {
+            return JsonUtils.DEFAULT_JSON_MAPPER.readValue(json, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 

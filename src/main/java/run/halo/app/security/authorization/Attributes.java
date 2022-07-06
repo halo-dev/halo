@@ -66,5 +66,5 @@ public interface Attributes {
      */
     String getPath();
 
-    String pluginName();
+    String getSubName();
 }

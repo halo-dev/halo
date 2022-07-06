@@ -5,9 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
+import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.reconciler.UserReconciler;
 import run.halo.app.extension.DefaultExtensionClient;
 import run.halo.app.extension.DefaultSchemeManager;
@@ -52,6 +54,14 @@ public class ExtensionConfiguration {
         return new ControllerBuilder("user-controller", client)
             .reconciler(new UserReconciler(client))
             .extension(new User())
+            .build();
+    }
+
+    @Bean
+    Controller roleController(ExtensionClient client) {
+        return new ControllerBuilder("role-controller", client)
+            .reconciler(new RoleReconciler(client))
+            .extension(new Role())
             .build();
     }
 

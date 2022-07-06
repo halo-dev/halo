@@ -1,12 +1,13 @@
 package run.halo.app.core.extension;
 
+import static java.util.Arrays.compare;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -24,7 +25,7 @@ import run.halo.app.extension.GVK;
     singular = "role")
 public class Role extends AbstractExtension {
 
-    @Schema(minLength = 1)
+    @Schema(required = true)
     List<PolicyRule> rules;
 
     /**
@@ -35,7 +36,7 @@ public class Role extends AbstractExtension {
      * @since 2.0.0
      */
     @Getter
-    public static class PolicyRule {
+    public static class PolicyRule implements Comparable {
         /**
          * APIGroups is the name of the APIGroup that contains the resources.
          * If multiple API groups are specified, any action requested against one of the enumerated
@@ -74,19 +75,13 @@ public class Role extends AbstractExtension {
          */
         final String[] verbs;
 
-        /**
-         * If the plugin name exists, it means that the API is provided by the plugin.
-         */
-        final String pluginName;
-
         public PolicyRule() {
-            this(null, null, null, null, null, null);
+            this(null, null, null, null, null);
         }
 
-        public PolicyRule(String pluginName, String[] apiGroups, String[] resources,
+        public PolicyRule(String[] apiGroups, String[] resources,
             String[] resourceNames,
             String[] nonResourceURLs, String[] verbs) {
-            this.pluginName = StringUtils.defaultString(pluginName);
             this.apiGroups = nullElseEmpty(apiGroups);
             this.resources = nullElseEmpty(resources);
             this.resourceNames = nullElseEmpty(resourceNames);
@@ -101,6 +96,31 @@ public class Role extends AbstractExtension {
             return items;
         }
 
+        @Override
+        public int compareTo(Object o) {
+            if (o instanceof PolicyRule other) {
+                int result = compare(apiGroups, other.apiGroups);
+                if (result != 0) {
+                    return result;
+                }
+                result = compare(resources, other.resources);
+                if (result != 0) {
+                    return result;
+                }
+                result = compare(resourceNames, other.resourceNames);
+                if (result != 0) {
+                    return result;
+                }
+                result = compare(nonResourceURLs, other.nonResourceURLs);
+                if (result != 0) {
+                    return result;
+                }
+                result = compare(verbs, other.verbs);
+                return result;
+            }
+            return 1;
+        }
+
         public static class Builder {
             String[] apiGroups;
 
@@ -113,11 +133,6 @@ public class Role extends AbstractExtension {
             String[] verbs;
 
             String pluginName;
-
-            public Builder pluginName(String pluginName) {
-                this.pluginName = pluginName;
-                return this;
-            }
 
             public Builder apiGroups(String... apiGroups) {
                 this.apiGroups = apiGroups;
@@ -145,7 +160,7 @@ public class Role extends AbstractExtension {
             }
 
             public PolicyRule build() {
-                return new PolicyRule(pluginName, apiGroups, resources, resourceNames,
+                return new PolicyRule(apiGroups, resources, resourceNames,
                     nonResourceURLs,
                     verbs);
             }
