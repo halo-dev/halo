@@ -6,9 +6,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.Role;
@@ -51,7 +53,7 @@ public class RoleReconciler implements Reconciler {
                 .flatMap(List::stream)
                 .sorted()
                 .toList();
-            // merge dependency rules to annotations
+            // override dependency rules to annotations
             annotations.put(ROLE_DEPENDENCY_RULES, JsonUtils.objectToJson(dependencyRules));
             if (!Objects.deepEquals(oldAnnotations, annotations)) {
                 client.update(role);
@@ -77,10 +79,17 @@ public class RoleReconciler implements Reconciler {
         if (dependencies == null) {
             return result;
         }
-
+        Set<String> visited = new HashSet<>();
         Deque<String> queue = new ArrayDeque<>(dependencies);
         while (!queue.isEmpty()) {
             String roleName = queue.poll();
+            // detecting cycle in role dependencies
+            if (visited.contains(roleName)) {
+                log.warn("Detected a cycle in role dependencies: {},and skipped automatically",
+                    roleName);
+                continue;
+            }
+            visited.add(roleName);
             client.fetch(Role.class, roleName).ifPresent(role -> {
                 result.add(role);
                 // add role dependencies to queue

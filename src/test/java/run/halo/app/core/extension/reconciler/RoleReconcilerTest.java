@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
 import java.util.Optional;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,8 @@ class RoleReconcilerTest {
 
     private RoleReconciler roleReconciler;
 
+    private String roleOther;
+
     @BeforeEach
     void setUp() {
         roleReconciler = new RoleReconciler(extensionClient);
@@ -54,8 +57,6 @@ class RoleReconcilerTest {
                  }]
              }
             """, Role.class);
-        when(extensionClient.fetch(eq(Role.class), eq("role-template-apple-manage"))).thenReturn(
-            Optional.of(roleManage));
 
         Role roleView = JsonUtils.jsonToObject("""
             {
@@ -73,10 +74,8 @@ class RoleReconcilerTest {
                  }]
              }
             """, Role.class);
-        when(extensionClient.fetch(eq(Role.class), eq("role-template-apple-view"))).thenReturn(
-            Optional.of(roleView));
 
-        Role roleOther = JsonUtils.jsonToObject("""
+        roleOther = """
             {
                 "apiVersion": "v1alpha1",
                 "kind": "Role",
@@ -88,13 +87,34 @@ class RoleReconcilerTest {
                     "verbs": ["update"]
                 }]
             }
-            """, Role.class);
-        when(extensionClient.fetch(eq(Role.class), eq("role-template-apple-other"))).thenReturn(
-            Optional.of(roleOther));
+            """;
+        when(extensionClient.fetch(eq(Role.class), eq("role-template-apple-manage"))).thenReturn(
+            Optional.of(roleManage));
+        when(extensionClient.fetch(eq(Role.class), eq("role-template-apple-view"))).thenReturn(
+            Optional.of(roleView));
     }
 
     @Test
     void reconcile() throws JSONException {
+        when(extensionClient.fetch(eq(Role.class), eq("role-template-apple-other"))).thenReturn(
+            Optional.of(JsonUtils.jsonToObject(roleOther, Role.class)));
+        assertReconcile();
+    }
+
+    @Test
+    void detectingCycle() throws JSONException {
+        Role roleToUse = JsonUtils.jsonToObject(roleOther, Role.class);
+        // build a cycle in the dependency
+        Map<String, String> annotations =
+            Map.of("halo.run/dependencies", "[\"role-template-apple-view\"]");
+        roleToUse.getMetadata().setAnnotations(annotations);
+        when(extensionClient.fetch(eq(Role.class), eq("role-template-apple-other"))).thenReturn(
+            Optional.of(roleToUse));
+
+        assertReconcile();
+    }
+
+    private void assertReconcile() throws JSONException {
         ArgumentCaptor<Role> roleCaptor = ArgumentCaptor.forClass(Role.class);
         doNothing().when(extensionClient).update(roleCaptor.capture());
 
