@@ -1,11 +1,16 @@
 <script lang="ts" setup>
-import { VButton, VInput, VSpace } from "@halo-dev/components";
+import {
+  IconShieldUser,
+  IconUserSettings,
+  VButton,
+} from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
 import { axiosInstance } from "@halo-dev/admin-shared";
 import qs from "qs";
 import logo from "../../../assets/logo.svg";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { submitForm } from "@formkit/vue";
 
 interface LoginForm {
   _csrf: string;
@@ -64,14 +69,43 @@ onMounted(() => {
   <div class="flex h-screen flex-col items-center justify-center">
     <img :src="logo" alt="Logo" class="mb-8 w-20" />
     <div class="login-form w-72">
-      <VSpace class="w-full" direction="column" spacing="lg">
-        <VInput
-          v-model="loginForm.state.username"
+      <FormKit
+        id="login"
+        v-model="loginForm.state"
+        :actions="false"
+        type="form"
+        @submit="handleLogin"
+      >
+        <FormKit
+          :validation-messages="{
+            required: '请输入用户名',
+          }"
+          name="username"
           placeholder="用户名"
-        ></VInput>
-        <VInput v-model="loginForm.state.password" placeholder="密码"></VInput>
-        <VButton block type="secondary" @click="handleLogin">登录</VButton>
-      </VSpace>
+          type="text"
+          validation="required"
+        >
+          <template #prefixIcon>
+            <IconUserSettings />
+          </template>
+        </FormKit>
+        <FormKit
+          :validation-messages="{
+            required: '请输入密码',
+          }"
+          name="password"
+          placeholder="密码"
+          type="password"
+          validation="required"
+        >
+          <template #prefixIcon>
+            <IconShieldUser />
+          </template>
+        </FormKit>
+        <VButton block type="secondary" @click="submitForm('login')">
+          登录
+        </VButton>
+      </FormKit>
     </div>
   </div>
 </template>
