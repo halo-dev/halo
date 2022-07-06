@@ -1,5 +1,7 @@
 package run.halo.app.core.extension;
 
+import static java.util.Arrays.compare;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -23,7 +25,7 @@ import run.halo.app.extension.GVK;
     singular = "role")
 public class Role extends AbstractExtension {
 
-    @Schema(minLength = 1)
+    @Schema(required = true)
     List<PolicyRule> rules;
 
     /**
@@ -34,7 +36,7 @@ public class Role extends AbstractExtension {
      * @since 2.0.0
      */
     @Getter
-    public static class PolicyRule {
+    public static class PolicyRule implements Comparable {
         /**
          * APIGroups is the name of the APIGroup that contains the resources.
          * If multiple API groups are specified, any action requested against one of the enumerated
@@ -92,6 +94,31 @@ public class Role extends AbstractExtension {
                 return new String[] {};
             }
             return items;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            if (o instanceof PolicyRule other) {
+                int result = compare(apiGroups, other.apiGroups);
+                if (result != 0) {
+                    return result;
+                }
+                result = compare(resources, other.resources);
+                if (result != 0) {
+                    return result;
+                }
+                result = compare(resourceNames, other.resourceNames);
+                if (result != 0) {
+                    return result;
+                }
+                result = compare(nonResourceURLs, other.nonResourceURLs);
+                if (result != 0) {
+                    return result;
+                }
+                result = compare(verbs, other.verbs);
+                return result;
+            }
+            return 1;
         }
 
         public static class Builder {

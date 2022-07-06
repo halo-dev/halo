@@ -2,7 +2,6 @@ package run.halo.app.plugin;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -60,7 +59,7 @@ class YamlPluginDescriptorFinderTest {
     }
 
     @Test
-    void find() throws JsonProcessingException, JSONException {
+    void find() throws JSONException {
         PluginDescriptor pluginDescriptor = yamlPluginDescriptorFinder.find(testFile.toPath());
         String actual = JsonUtils.objectToJson(pluginDescriptor);
         JSONAssert.assertEquals("""

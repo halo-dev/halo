@@ -123,7 +123,7 @@ class YamlPluginFinderTest {
     }
 
     @Test
-    void acceptArrayLicense() throws JSONException, JsonProcessingException {
+    void acceptArrayLicense() throws JSONException {
         Resource pluginResource = new InMemoryResource("""
             apiVersion: v1
             kind: Plugin
@@ -143,7 +143,7 @@ class YamlPluginFinderTest {
     }
 
     @Test
-    void acceptMultipleItemArrayLicense() throws JsonProcessingException, JSONException {
+    void acceptMultipleItemArrayLicense() throws JSONException {
         Resource pluginResource = new InMemoryResource("""
             apiVersion: v1
             kind: Plugin
@@ -167,7 +167,7 @@ class YamlPluginFinderTest {
     }
 
     @Test
-    void acceptArrayObjectLicense() throws JSONException, JsonProcessingException {
+    void acceptArrayObjectLicense() throws JSONException {
         Resource pluginResource = new InMemoryResource("""
             apiVersion: v1
             kind: Plugin

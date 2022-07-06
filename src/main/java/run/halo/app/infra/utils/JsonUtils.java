@@ -70,14 +70,15 @@ public class JsonUtils {
      *
      * @param source source object must not be null
      * @return json format of the source object
-     * @throws JsonProcessingException throws when fail to convert
      */
     @NonNull
-    public static String objectToJson(@NonNull Object source)
-        throws JsonProcessingException {
+    public static String objectToJson(@NonNull Object source) {
         Assert.notNull(source, "Source object must not be null");
-
-        return DEFAULT_JSON_MAPPER.writeValueAsString(source);
+        try {
+            return DEFAULT_JSON_MAPPER.writeValueAsString(source);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

@@ -2,7 +2,6 @@ package run.halo.app.infra.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,7 +62,7 @@ class YamlUnstructuredLoaderTest {
     }
 
     @Test
-    void loadTest() throws JsonProcessingException {
+    void loadTest() {
         Resource[] resources = yamlResources.toArray(Resource[]::new);
         YamlUnstructuredLoader yamlUnstructuredLoader = new YamlUnstructuredLoader(resources);
         List<Unstructured> unstructuredList = yamlUnstructuredLoader.load();
