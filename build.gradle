@@ -70,7 +70,7 @@ ext {
     levelDbVersion = "0.12"
     annotationsVersion = "3.0.1u2"
     zxingVersion = '3.4.1'
-    huaweiObsVersion = '3.21.8.1'
+    huaweiObsVersion = '3.21.4'
     templateInheritanceVersion = "0.4.RELEASE"
     jsoupVersion = '1.14.3'
     embeddedRedisVersion = '0.6'
