@@ -55,6 +55,7 @@ public class ExtensionConfiguration {
             .build();
     }
 
+    @Bean
     Controller roleBindingController(ExtensionClient client) {
         return new ControllerBuilder("role-binding-controller", client)
             .reconciler(new RoleBindingReconciler(client))
