@@ -94,12 +94,7 @@ const handleCreateUser = async () => {
     :width="700"
     @update:visible="handleVisibleChange"
   >
-    <FormKit
-      id="user-form"
-      :actions="false"
-      type="form"
-      @submit="handleCreateUser"
-    >
+    <FormKit id="user-form" type="form" @submit="handleCreateUser">
       <FormKit
         v-model="creationForm.user.metadata.name"
         label="用户名"

@@ -92,7 +92,7 @@ const menus = ref([
   </VPageHeader>
   <div class="m-0 md:m-4">
     <div class="flex flex-col gap-4 sm:flex-row">
-      <div class="w-full sm:w-96">
+      <div class="w-96">
         <VCard title="分组">
           <VMenu class="!p-0">
             <VMenuItem id="default" active title="未分组"></VMenuItem>
