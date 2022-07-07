@@ -14,7 +14,7 @@ import type { Plugin } from "@/types/extension";
 import { axiosInstance } from "@halo-dev/admin-shared";
 
 const pluginActiveId = ref("detail");
-const plugin = ref<Plugin>();
+const plugin = ref<Plugin>({} as Plugin);
 
 const { params } = useRoute();
 
@@ -30,17 +30,15 @@ const handleFetchPlugin = async () => {
 };
 
 const isStarted = computed(() => {
-  return (
-    plugin.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
-  );
+  return plugin.value.status?.phase === "STARTED" && plugin.value.spec.enabled;
 });
 
 const handleChangePluginStatus = async () => {
   try {
+    plugin.value.spec.enabled = !plugin.value.spec.enabled;
     await axiosInstance.put(
-      `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.value?.metadata.name}/${
-        isStarted.value ? "stop" : "startup"
-      }`
+      `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.value.metadata.name}`,
+      plugin.value
     );
   } catch (e) {
     console.error(e);

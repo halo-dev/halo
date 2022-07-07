@@ -45,10 +45,10 @@ const handleFetchPlugins = async () => {
 
 const handleChangePluginStatus = async (plugin: Plugin) => {
   try {
+    plugin.spec.enabled = !plugin.spec.enabled;
     await axiosInstance.put(
-      `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.metadata.name}/${
-        isStarted(plugin) ? "stop" : "startup"
-      }`
+      `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.metadata.name}`,
+      plugin
     );
   } catch (e) {
     console.error(e);
