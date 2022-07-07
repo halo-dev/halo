@@ -60,7 +60,8 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
                 rules = fetchRules(role);
             } catch (Exception e) {
                 if (visitor.visit(null, null, e)) {
-                    return;
+                    // if visitor returns true, we continue visiting
+                    continue;
                 }
             }
 
