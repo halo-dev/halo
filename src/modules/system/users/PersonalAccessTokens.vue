@@ -4,7 +4,6 @@ import {
   IconDeleteBin,
   IconStopCircle,
   VButton,
-  VInput,
   VModal,
   VSpace,
   VTabItem,
@@ -38,30 +37,10 @@ onMounted(() => {
   <VModal v-model:visible="createVisible" :width="720" title="创建个人令牌">
     <VTabs v-model:active-id="createActiveId" type="outline">
       <VTabItem id="general" label="基础信息">
-        <form>
-          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                名称
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput></VInput>
-              </div>
-            </div>
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                失效日期
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput></VInput>
-              </div>
-            </div>
-          </div>
-        </form>
+        <FormKit id="role-form" :actions="false" type="form">
+          <FormKit label="名称" type="text" validation="required"></FormKit>
+          <FormKit label="失效日期" type="text" validation="required"></FormKit>
+        </FormKit>
       </VTabItem>
       <VTabItem id="permissions" label="权限">
         <div>

@@ -9,7 +9,6 @@ import { axiosInstance } from "@halo-dev/admin-shared";
 import qs from "qs";
 import logo from "../../../assets/logo.svg";
 import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import { submitForm } from "@formkit/vue";
 
 interface LoginForm {
@@ -23,14 +22,12 @@ interface LoginFormState {
   state: LoginForm;
 }
 
-const router = useRouter();
-
 const loginForm = ref<LoginFormState>({
   logging: false,
   state: {
     _csrf: "",
     username: "admin",
-    password: "{no}123456",
+    password: "1A3DTGDF7yeGsZaR",
   },
 });
 

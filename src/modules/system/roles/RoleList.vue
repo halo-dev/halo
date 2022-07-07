@@ -6,7 +6,6 @@ import {
   IconShieldUser,
   VButton,
   VCard,
-  VInput,
   VPageHeader,
   VSpace,
   VTag,
@@ -74,7 +73,10 @@ onMounted(() => {
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
             <div class="flex w-full flex-1 sm:w-auto">
-              <VInput class="w-72" placeholder="输入关键词搜索" />
+              <FormKit
+                placeholder="输入关键词搜索"
+                type="text"
+              ></FormKit>
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">

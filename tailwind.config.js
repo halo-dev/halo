@@ -8,6 +8,7 @@ module.exports = {
   plugins: [
     require("tailwindcss-safe-area"),
     require("@tailwindcss/aspect-ratio"),
+    require("@formkit/themes/tailwindcss"),
     themeable({
       defaultTheme: "default",
       themes: [

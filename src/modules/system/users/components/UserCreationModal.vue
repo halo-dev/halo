@@ -2,13 +2,7 @@
 import type { PropType } from "vue";
 import { computed, ref, watch } from "vue";
 import { axiosInstance } from "@halo-dev/admin-shared";
-import {
-  IconSave,
-  VButton,
-  VInput,
-  VModal,
-  VTextarea,
-} from "@halo-dev/components";
+import { IconSave, VButton, VModal } from "@halo-dev/components";
 import type { User } from "@/types/extension";
 import { v4 as uuid } from "uuid";
 
@@ -100,76 +94,51 @@ const handleCreateUser = async () => {
     :width="700"
     @update:visible="handleVisibleChange"
   >
-    <form>
-      <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
-        <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-          <label
-            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-          >
-            用户名
-          </label>
-          <div class="mt-1 sm:col-span-2 sm:mt-0">
-            <VInput v-model="creationForm.user.metadata.name"></VInput>
-          </div>
-        </div>
-
-        <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-          <label
-            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-          >
-            昵称
-          </label>
-          <div class="mt-1 sm:col-span-2 sm:mt-0">
-            <VInput v-model="creationForm.user.spec.displayName"></VInput>
-          </div>
-        </div>
-
-        <div class="sm:grid sm:grid-cols-3 sm:items-center sm:gap-4 sm:pt-5">
-          <label class="block text-sm font-medium text-gray-700">
-            电子邮箱
-          </label>
-          <div class="mt-1 sm:col-span-2 sm:mt-0">
-            <VInput v-model="creationForm.user.spec.email"></VInput>
-          </div>
-        </div>
-
-        <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-          <label
-            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-          >
-            手机号
-          </label>
-          <div class="mt-1 sm:col-span-2 sm:mt-0">
-            <VInput v-model="creationForm.user.spec.phone"></VInput>
-          </div>
-        </div>
-        <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-          <label
-            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-          >
-            头像
-          </label>
-          <div class="mt-1 sm:col-span-2 sm:mt-0">
-            <VInput v-model="creationForm.user.spec.avatar"></VInput>
-          </div>
-        </div>
-        <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-          <label
-            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-          >
-            描述
-          </label>
-          <div class="mt-1 sm:col-span-2 sm:mt-0">
-            <VTextarea v-model="creationForm.user.spec.bio"></VTextarea>
-          </div>
-        </div>
-      </div>
-    </form>
+    <FormKit
+      id="user-form"
+      :actions="false"
+      type="form"
+      @submit="handleCreateUser"
+    >
+      <FormKit
+        v-model="creationForm.user.metadata.name"
+        label="用户名"
+        type="text"
+        validation="required"
+      ></FormKit>
+      <FormKit
+        v-model="creationForm.user.spec.displayName"
+        label="显示名称"
+        type="text"
+        validation="required"
+      ></FormKit>
+      <FormKit
+        v-model="creationForm.user.spec.email"
+        label="电子邮箱"
+        type="email"
+        validation="required"
+      ></FormKit>
+      <FormKit
+        v-model="creationForm.user.spec.phone"
+        label="手机号"
+        type="text"
+      ></FormKit>
+      <FormKit
+        v-model="creationForm.user.spec.avatar"
+        label="头像"
+        type="text"
+      ></FormKit>
+      <FormKit
+        v-model="creationForm.user.spec.bio"
+        label="描述"
+        type="textarea"
+      ></FormKit>
+    </FormKit>
     <template #footer>
       <VButton
         :loading="creationForm.saving"
         type="secondary"
-        @click="handleCreateUser"
+        @click="$formkit.submit('user-form')"
       >
         <template #icon>
           <IconSave class="h-full w-full" />

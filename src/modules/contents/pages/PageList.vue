@@ -6,7 +6,6 @@ import {
   IconSettings,
   VButton,
   VCard,
-  VInput,
   VPageHeader,
   VSpace,
   VTabbar,
@@ -146,11 +145,11 @@ onMounted(() => {
                   />
                 </div>
                 <div class="flex w-full flex-1 sm:w-auto">
-                  <VInput
+                  <FormKit
                     v-if="!checkAll"
-                    class="w-72"
                     placeholder="输入关键词搜索"
-                  />
+                    type="text"
+                  ></FormKit>
                   <VSpace v-else>
                     <VButton type="default">设置</VButton>
                     <VButton type="danger">删除</VButton>
@@ -171,7 +170,10 @@ onMounted(() => {
                         <div class="h-96 w-80 p-4">
                           <div class="bg-white">
                             <!--TODO: Auto Focus-->
-                            <VInput placeholder="根据关键词搜索"></VInput>
+                            <FormKit
+                              placeholder="输入关键词搜索"
+                              type="text"
+                            ></FormKit>
                           </div>
                           <div class="mt-2">
                             <ul class="divide-y divide-gray-200" role="list">

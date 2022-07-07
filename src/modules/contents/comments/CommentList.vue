@@ -5,7 +5,6 @@ import {
   IconSettings,
   VButton,
   VCard,
-  VInput,
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
@@ -40,11 +39,11 @@ const checkAll = ref(false);
               />
             </div>
             <div class="flex w-full flex-1 sm:w-auto">
-              <VInput
+              <FormKit
                 v-if="!checkAll"
-                class="w-72"
                 placeholder="输入关键词搜索"
-              />
+                type="text"
+              ></FormKit>
               <VSpace v-else>
                 <VButton type="default">设置</VButton>
                 <VButton type="danger">删除</VButton>

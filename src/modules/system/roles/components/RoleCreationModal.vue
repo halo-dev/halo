@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VButton, VInput, VModal, VTabItem, VTabs } from "@halo-dev/components";
+import { VButton, VModal, VTabItem, VTabs } from "@halo-dev/components";
 import { computed, ref, watch } from "vue";
 import type { Role } from "@/types/extension";
 import { axiosInstance } from "@halo-dev/admin-shared";
@@ -122,39 +122,30 @@ watch(
   >
     <VTabs v-model:active-id="creationActiveId" type="outline">
       <VTabItem id="general" label="基础信息">
-        <form>
-          <div class="space-y-6 divide-y-0 sm:divide-y sm:divide-gray-200">
-            <div
-              v-if="creationFormState.role.metadata.annotations"
-              class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5"
-            >
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                名称
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput
-                  v-model="
-                    creationFormState.role.metadata.annotations[
-                      'plugin.halo.run/display-name'
-                    ]
-                  "
-                ></VInput>
-              </div>
-            </div>
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
-              <label
-                class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-              >
-                别名
-              </label>
-              <div class="mt-1 sm:col-span-2 sm:mt-0">
-                <VInput v-model="creationFormState.role.metadata.name"></VInput>
-              </div>
-            </div>
-          </div>
-        </form>
+        <FormKit
+          v-if="creationFormState.role.metadata.annotations"
+          id="role-form"
+          :actions="false"
+          type="form"
+          @submit="handleCreateRole"
+        >
+          <FormKit
+            v-model="
+              creationFormState.role.metadata.annotations[
+                'plugin.halo.run/display-name'
+              ]
+            "
+            label="名称"
+            type="text"
+            validation="required"
+          ></FormKit>
+          <FormKit
+            v-model="creationFormState.role.metadata.name"
+            label="别名"
+            type="text"
+            validation="required"
+          ></FormKit>
+        </FormKit>
       </VTabItem>
       <VTabItem id="permissions" label="权限">
         <div>
@@ -218,7 +209,7 @@ watch(
       <VButton
         :loading="creationFormState.saving"
         type="secondary"
-        @click="handleCreateRole"
+        @click="$formkit.submit('role-form')"
         >创建
       </VButton>
     </template>

@@ -4,11 +4,19 @@ import "floating-vue/dist/style.css";
 // @ts-ignore
 import VueGridLayout from "vue-grid-layout";
 import { defaultConfig, plugin as FormKit } from "@formkit/vue";
-import "@formkit/themes/genesis";
+import FormKitConfig from "@/formkit/formkit.config";
+import { zh } from "@formkit/i18n";
 
 export function setupComponents(app: App) {
   app.use(VueGridLayout);
-  app.use(FormKit, defaultConfig({}));
+  app.use(
+    FormKit,
+    defaultConfig({
+      locales: { zh },
+      locale: "zh",
+      ...FormKitConfig,
+    })
+  );
 
   app.directive("tooltip", VTooltip);
   app.directive("close-popper", VClosePopper);

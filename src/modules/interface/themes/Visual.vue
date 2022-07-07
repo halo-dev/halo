@@ -7,15 +7,11 @@ import {
   IconTablet,
   VButton,
   VCard,
-  VInput,
   VModal,
-  VOption,
-  VSelect,
   VSpace,
   VTabbar,
   VTabItem,
   VTabs,
-  VTextarea,
 } from "@halo-dev/components";
 import { computed, onMounted, ref } from "vue";
 
@@ -198,77 +194,25 @@ onMounted(() => {
             <div class="h-full w-full overflow-y-auto bg-white drop-shadow-sm">
               <VTabs v-model:active-id="activeId" type="outline">
                 <VTabItem id="general" class="p-3" label="基础设置">
-                  <form>
-                    <div
-                      class="space-y-8 divide-y divide-gray-200 sm:space-y-5"
-                    >
-                      <div class="space-y-6 sm:space-y-5">
-                        <div class="space-y-2">
-                          <label
-                            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                            for="first-name"
-                          >
-                            Halo 当前版本：
-                          </label>
-                          <div class="mt-1 sm:col-span-2 sm:mt-0">
-                            <VInput model-value="1.5.3"></VInput>
-                          </div>
-                        </div>
-
-                        <div class="space-y-2">
-                          <label
-                            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                            for="last-name"
-                          >
-                            首页图片：
-                          </label>
-                          <div class="mt-1 sm:col-span-2 sm:mt-0">
-                            <VInput
-                              model-value="https://halo.run/upload/2022/03/support-team.svg"
-                            ></VInput>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
+                  <FormKit :actions="false" type="form">
+                    <FormKit label="Halo 当前版本" type="text"></FormKit>
+                    <FormKit label="首页图片" type="text"></FormKit>
+                  </FormKit>
                 </VTabItem>
                 <VTabItem id="style" class="p-3" label="样式设置">
-                  <form>
-                    <div
-                      class="space-y-8 divide-y divide-gray-200 sm:space-y-5"
-                    >
-                      <div class="space-y-6 sm:space-y-5">
-                        <div class="space-y-2">
-                          <label
-                            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                            for="first-name"
-                          >
-                            文章代码高亮语言：
-                          </label>
-                          <div class="mt-1 sm:col-span-2 sm:mt-0">
-                            <VTextarea></VTextarea>
-                          </div>
-                        </div>
-
-                        <div class="space-y-2">
-                          <label
-                            class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                            for="last-name"
-                          >
-                            文章代码高亮主题：
-                          </label>
-                          <div class="mt-1 sm:col-span-2 sm:mt-0">
-                            <VSelect>
-                              <VOption value="java">Java</VOption>
-                              <VOption value="c">C</VOption>
-                              <VOption value="go">Go</VOption>
-                              <VOption value="javascript">JavaScript</VOption>
-                            </VSelect>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
+                  <FormKit :actions="false" type="form">
+                    <FormKit label="文章代码高亮语言" type="text"></FormKit>
+                    <FormKit
+                      :options="[
+                        { label: 'Java', value: 'java' },
+                        { label: 'C', value: 'c' },
+                        { label: 'Go', value: 'go' },
+                        { label: 'JavaScript', value: 'javascript' },
+                      ]"
+                      label="文章代码高亮主题"
+                      type="select"
+                    ></FormKit>
+                  </FormKit>
                 </VTabItem>
               </VTabs>
             </div>
