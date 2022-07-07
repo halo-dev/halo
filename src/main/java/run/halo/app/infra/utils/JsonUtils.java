@@ -77,7 +77,7 @@ public class JsonUtils {
         try {
             return DEFAULT_JSON_MAPPER.writeValueAsString(source);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonParseException(e);
         }
     }
 
@@ -93,7 +93,7 @@ public class JsonUtils {
         try {
             return DEFAULT_JSON_MAPPER.readValue(json, toValueType);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new JsonParseException(e);
         }
     }
 }
