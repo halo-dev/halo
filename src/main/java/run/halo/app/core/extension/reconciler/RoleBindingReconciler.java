@@ -1,6 +1,5 @@
 package run.halo.app.core.extension.reconciler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -57,16 +56,11 @@ public class RoleBindingReconciler implements Reconciler {
                         annotations = new HashMap<>();
                     }
                     var oldAnnotations = Map.copyOf(annotations);
-                    try {
-                        annotations.put(ROLE_NAMES_ANNO, JsonUtils.objectToJson(roleNames));
-                        user.getMetadata().setAnnotations(annotations);
-                        if (!Objects.deepEquals(oldAnnotations, annotations)) {
-                            // update user
-                            client.update(user);
-                        }
-                    } catch (JsonProcessingException e) {
-                        // should never happen
-                        log.warn("Failed to convert role names to json", e);
+                    annotations.put(ROLE_NAMES_ANNO, JsonUtils.objectToJson(roleNames));
+                    user.getMetadata().setAnnotations(annotations);
+                    if (!Objects.deepEquals(oldAnnotations, annotations)) {
+                        // update user
+                        client.update(user);
                     }
                 });
             });
