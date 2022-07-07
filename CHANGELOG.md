@@ -1,5 +1,28 @@
 # CHANGELOG
 
+# 1.5.4
+
+## Improvements
+
+- 默认评论组件的地址由 jsDelivr 更改为 unpkg.com。 halo-dev/halo#2098 [Yhcrown@](https://github.com/Yhcrown) [@ruibaby](https://github.com/ruibaby)
+- 限制 Markdown 导入文件的格式和大小。 halo-dev/halo#2104 halo-dev/halo#2187 [@ETLAN666](https://github.com/ETLAN666) [@XM2510136957](https://github.com/XM2510136957) [@eziosudo](https://github.com/eziosudo)
+- 又拍云附件上传文件命名规则改为保持原文件名。 halo-dev/halo#2185 [@okayhu](https://github.com/okayhu)
+
+## Bug Fixes
+
+- 修复后台新建分类中父级分类选择列表过长导致的 UI 问题。 halo-dev/halo-admin#577 [@SladeGranger](https://github.com/SladeGranger) [@Alickx](https://github.com/Alickx)
+- 修复附件名包含特殊字符无法访问的问题。 halo-dev/halo#1874 halo-dev/halo-admin#568 [@FanZeros](https://github.com/FanZeros) [@Lwenguang](https://github.com/Lwenguang)
+- 修复导入文章时 Front Matter 解析错误的问题。 halo-dev/halo#2137 [@Simple-Stark](https://github.com/Simple-Stark) [@MarmaladeCat](https://github.com/MarmaladeCat)
+- 修复在 Windows 平台下，导出 Markdown 文档因为文件名包含特殊字符导致无法导出的问题。 halo-dev/halo#2143 [@eziosudo](https://github.com/eziosudo) [@szgacsaftop](https://github.com/szgacsaftop)
+- 修复静态存储文件重命名时文件名造成的目录逃逸问题。 halo-dev/halo#2207 [@JohnNiang](https://github.com/JohnNiang)
+- 修复上传附件到华为云时提示 `NoSuchMethodError，okhttp3.RequestBody.create` 的问题。 halo-dev/halo#2209 [@JohnNiang](https://github.com/JohnNiang) [@toolv94](https://github.com/toolv94)
+
+## Dependencies
+
+- 更新后台 @halo-dev/editor 版本。 halo-dev/halo-admin#584 [@ruibaby](https://github.com/ruibaby)
+    - 优化预览/编辑按钮的提示文案。 halo-dev/editor#4 [@manction](https://github.com/manction)
+    - 修复编辑器的滚动条会与添加链接面板有重叠的问题。 halo-dev/editor#5 [@wxyShine](https://github.com/wxyShine) [@zyy247796143](https://github.com/zyy247796143)
+
 # 1.5.3
 
 ## Improvements
