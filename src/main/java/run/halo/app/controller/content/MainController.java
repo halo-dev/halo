@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import run.halo.app.config.properties.HaloProperties;
+import run.halo.app.exception.NotFoundException;
 import run.halo.app.exception.ServiceException;
 import run.halo.app.model.entity.User;
 import run.halo.app.model.properties.BlogProperties;
@@ -71,6 +72,8 @@ public class MainController {
                 StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/")
                     + INSTALL_REDIRECT_URI;
             response.sendRedirect(installRedirectUri);
+        } else {
+            throw new NotFoundException("404");
         }
     }
 
