@@ -76,7 +76,7 @@ public class PluginReconciler implements Reconciler {
 
         if (pluginWrapper == null) {
             pluginStatus.setPhase(PluginState.FAILED);
-            pluginStatus.setReason("Plugin not found");
+            pluginStatus.setReason("PluginNotFound");
             pluginStatus.setMessage("Plugin " + name + " not found in plugin manager");
             return;
         }
@@ -157,6 +157,7 @@ public class PluginReconciler implements Reconciler {
             status = new Plugin.PluginStatus();
         }
         status.setPhase(currentState);
+        status.setLastTransitionTime(Instant.now());
         if (desiredState.equals(currentState)) {
             plugin.getSpec().setEnabled(PluginState.STARTED.equals(currentState));
         } else {
