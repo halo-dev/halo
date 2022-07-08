@@ -88,11 +88,12 @@ public class WebServerSecurityConfig {
         http.authorizeExchange(exchanges -> exchanges.pathMatchers(
                 "/actuator/**"
             ).permitAll())
+            .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
             .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
             .cors(withDefaults())
             .httpBasic(withDefaults())
             .formLogin(withDefaults())
-            .csrf().csrfTokenRepository(new CookieServerCsrfTokenRepository()).and()
+            .csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse()).and()
             .logout(withDefaults());
 
         return http.build();
@@ -102,11 +103,14 @@ public class WebServerSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedHeaders(
-            List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
+            List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT,
+                "X-XSRF-TOKEN", HttpHeaders.COOKIE));
+        configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
         source.registerCorsConfiguration("/apis/**", configuration);
+        source.registerCorsConfiguration("/login", configuration);
         return source;
     }
 
