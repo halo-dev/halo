@@ -4,6 +4,7 @@ import {
   IconArrowDown,
   IconPlug,
   IconSettings,
+  useDialog,
   VButton,
   VCard,
   VPageHeader,
@@ -11,15 +12,25 @@ import {
   VSwitch,
   VTag,
 } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import type { Plugin } from "@/types/extension";
 import { axiosInstance } from "@halo-dev/admin-shared";
+import cloneDeep from "lodash.clonedeep";
 
-const checkAll = ref(false);
-const plugins = ref<Plugin[]>([]);
+const checkedAll = ref(false);
+const plugins = ref<Plugin[]>([] as Plugin[]);
+const selectedPlugins = ref<string[]>([]);
 
 const router = useRouter();
+const dialog = useDialog();
+
+watch(
+  () => selectedPlugins.value,
+  (newValue) => {
+    checkedAll.value = newValue.length === plugins.value?.length;
+  }
+);
 
 const handleRouteToDetail = (plugin: Plugin) => {
   router.push({
@@ -28,9 +39,9 @@ const handleRouteToDetail = (plugin: Plugin) => {
   });
 };
 
-function isStarted(plugin: Plugin) {
+const isStarted = (plugin: Plugin) => {
   return plugin.status?.phase === "STARTED" && plugin.spec.enabled;
-}
+};
 
 const handleFetchPlugins = async () => {
   try {
@@ -43,18 +54,65 @@ const handleFetchPlugins = async () => {
   }
 };
 
-const handleChangePluginStatus = async (plugin: Plugin) => {
-  try {
-    plugin.spec.enabled = !plugin.spec.enabled;
-    await axiosInstance.put(
-      `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.metadata.name}`,
-      plugin
-    );
-  } catch (e) {
-    console.error(e);
-  } finally {
-    window.location.reload();
+const handleChangeStatus = (plugin: Plugin) => {
+  const pluginToUpdate = cloneDeep(plugin);
+
+  dialog.info({
+    title: `确定要${plugin.spec.enabled ? "停止" : "启动"}该插件吗？`,
+    onConfirm: async () => {
+      try {
+        pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
+        await axiosInstance.put(
+          `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.metadata.name}`,
+          pluginToUpdate
+        );
+      } catch (e) {
+        console.error(e);
+      } finally {
+        window.location.reload();
+      }
+    },
+  });
+};
+
+const handleCheckedAllChange = () => {
+  if (checkedAll.value) {
+    selectedPlugins.value = plugins.value.map((plugin) => plugin.metadata.name);
+  } else {
+    selectedPlugins.value.length = 0;
   }
+};
+
+const handleChangeStatusInBatch = (enable: boolean) => {
+  const pluginsToUpdate = plugins.value.filter(
+    (plugin) =>
+      selectedPlugins.value.includes(plugin.metadata.name) &&
+      plugin.spec.enabled !== enable
+  );
+
+  if (pluginsToUpdate.length === 0) {
+    alert("没有需要更新的插件");
+    return;
+  }
+
+  dialog.warning({
+    title: `确定要${enable ? "启动" : "停止"}所选插件吗？`,
+    onConfirm: async () => {
+      try {
+        for (const plugin of pluginsToUpdate) {
+          plugin.spec.enabled = enable;
+          await axiosInstance.put(
+            `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.metadata.name}`,
+            plugin
+          );
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        window.location.reload();
+      }
+    },
+  });
 };
 
 onMounted(handleFetchPlugins);
@@ -83,19 +141,31 @@ onMounted(handleFetchPlugins);
           >
             <div class="mr-4 hidden items-center sm:flex">
               <input
-                v-model="checkAll"
+                v-model="checkedAll"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
+                @change="handleCheckedAllChange"
               />
             </div>
             <div class="flex w-full flex-1 sm:w-auto">
               <FormKit
-                v-if="!checkAll"
+                v-if="!selectedPlugins.length"
                 placeholder="输入关键词搜索"
                 type="text"
               ></FormKit>
               <VSpace v-else>
-                <VButton type="default">禁用</VButton>
+                <VButton
+                  type="default"
+                  @click="handleChangeStatusInBatch(true)"
+                >
+                  启用
+                </VButton>
+                <VButton
+                  type="default"
+                  @click="handleChangeStatusInBatch(false)"
+                >
+                  禁用
+                </VButton>
                 <VButton type="danger">卸载</VButton>
               </VSpace>
             </div>
@@ -225,18 +295,19 @@ onMounted(handleFetchPlugins);
         <li v-for="(plugin, index) in plugins" :key="index">
           <div
             :class="{
-              'bg-gray-100': checkAll,
+              'bg-gray-100': selectedPlugins.includes(plugin.metadata.name),
             }"
             class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
           >
             <div
-              v-show="checkAll"
+              v-show="selectedPlugins.includes(plugin.metadata.name)"
               class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
             ></div>
             <div class="relative flex flex-row items-center">
               <div class="mr-4 hidden items-center sm:flex">
                 <input
-                  v-model="checkAll"
+                  v-model="selectedPlugins"
+                  :value="plugin.metadata.name"
                   class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   type="checkbox"
                 />
@@ -283,12 +354,12 @@ onMounted(handleFetchPlugins);
                 >
                   <a
                     :href="plugin.spec.homepage"
-                    class="hidden text-sm text-gray-500 hover:text-gray-900 sm:block"
+                    class="text-sm text-gray-500 hover:text-gray-900"
                     target="_blank"
                   >
                     @{{ plugin.spec.author }}
                   </a>
-                  <span class="hidden text-sm text-gray-500 sm:block">
+                  <span class="text-sm text-gray-500">
                     {{ plugin.spec.version }}
                   </span>
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
@@ -297,7 +368,7 @@ onMounted(handleFetchPlugins);
                   <div class="flex items-center">
                     <VSwitch
                       :model-value="isStarted(plugin)"
-                      @click="handleChangePluginStatus(plugin)"
+                      @click="handleChangeStatus(plugin)"
                     />
                   </div>
                   <span class="cursor-pointer">
