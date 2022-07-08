@@ -5,9 +5,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.reconciler.UserReconciler;
@@ -23,6 +25,8 @@ import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.store.ExtensionStoreClient;
+import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.resources.JsBundleRuleProvider;
 
 @Configuration(proxyBeanMethods = false)
 public class ExtensionConfiguration {
@@ -70,6 +74,15 @@ public class ExtensionConfiguration {
         return new ControllerBuilder("role-binding-controller", client)
             .reconciler(new RoleBindingReconciler(client))
             .extension(new RoleBinding())
+            .build();
+    }
+
+    @Bean
+    Controller pluginController(ExtensionClient client, HaloPluginManager haloPluginManager,
+        JsBundleRuleProvider jsBundleRule) {
+        return new ControllerBuilder("plugin-controller", client)
+            .reconciler(new PluginReconciler(client, haloPluginManager, jsBundleRule))
+            .extension(new Plugin())
             .build();
     }
 }
