@@ -48,6 +48,7 @@
     "vue-router": "^4.1.1"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.23.1",
     "@rushstack/eslint-patch": "^1.1.4",
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@types/jsdom": "^16.2.14",
