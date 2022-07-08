@@ -132,7 +132,9 @@ async function loadPluginModules() {
 }
 
 async function loadCurrentUser() {
-  const response = await axiosInstance.get(`/custom-api/v1alpha1/users/me`);
+  const response = await axiosInstance.get(
+    `/apis/api.halo.run/v1alpha1/users/-`
+  );
   app.provide<User>("currentUser", response.data);
 }
 
