@@ -1,28 +1,11 @@
 package run.halo.app.controller.admin.api;
 
-import static org.springframework.data.domain.Sort.Direction.DESC;
-
 import io.swagger.annotations.ApiOperation;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import javax.validation.Valid;
 import org.apache.http.client.utils.URIBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import run.halo.app.cache.AbstractStringCacheStore;
 import run.halo.app.model.dto.post.BasePostDetailDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
@@ -33,10 +16,21 @@ import run.halo.app.model.params.PostContentParam;
 import run.halo.app.model.params.PostParam;
 import run.halo.app.model.params.PostQuery;
 import run.halo.app.model.vo.PostDetailVO;
+import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.OptionService;
 import run.halo.app.service.PostService;
 import run.halo.app.service.assembler.PostAssembler;
 import run.halo.app.utils.HaloUtils;
+
+import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 /**
  * Post controller.
@@ -211,5 +205,13 @@ public class PostController {
         return new URIBuilder(previewUrl.toString())
             .addParameter("token", token)
             .build().toString();
+    }
+
+
+    @GetMapping("commentMostFirst")
+    @ApiOperation("Pages post with most comment")
+    public List<PostListVO> pageMostCommentPost(
+        @RequestParam(name = "top", defaultValue = "10") int top) {
+        return postAssembler.convertToListVo(postService.pageMostCommentPost(top));
     }
 }

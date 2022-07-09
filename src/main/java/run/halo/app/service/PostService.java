@@ -1,9 +1,5 @@
 package run.halo.app.service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import javax.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,6 +13,11 @@ import run.halo.app.model.vo.ArchiveYearVO;
 import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostMarkdownVO;
 import run.halo.app.service.base.BasePostService;
+
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Post service interface.
@@ -239,4 +240,14 @@ public interface PostService extends BasePostService<Post> {
      */
     @NonNull
     List<PostMarkdownVO> listPostMarkdowns();
+
+    /**
+     * list post with most comment
+     *
+     * @param top amount of post will be returned
+     * @return most comment post
+     * @author <a href="mailto:masaiqi.com@gmail.com">masaiqi</a>
+     * @date 2022-07-09 18:31
+     */
+    List<Post> pageMostCommentPost(int top);
 }
