@@ -14,3 +14,4 @@ export * from "./components/tag";
 export * from "./components/textarea";
 export * from "./components/switch";
 export * from "./components/dialog";
+export * from "./components/pagination";

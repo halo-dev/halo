@@ -1,0 +1,100 @@
+<script lang="ts" setup>
+import { useOffsetPagination } from "@vueuse/core";
+import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
+import { defineProps } from "vue";
+
+const props = defineProps({
+  page: {
+    type: Number,
+    default: 1,
+  },
+  size: {
+    type: Number,
+    default: 10,
+  },
+  total: {
+    type: Number,
+    default: 0,
+  },
+});
+
+const emit = defineEmits(["update:page", "update:size", "change"]);
+
+const onPageChange = ({
+  currentPage,
+  currentPageSize,
+}: {
+  currentPage: number;
+  currentPageSize: number;
+}) => {
+  emit("update:size", props.size);
+  emit("update:page", props.page);
+  emit("change", {
+    page: currentPage,
+    size: currentPageSize,
+  });
+};
+
+const { currentPage, pageCount, prev, next } = useOffsetPagination({
+  total: props.total,
+  page: props.page,
+  pageSize: props.size,
+  onPageChange: onPageChange,
+  onPageSizeChange: onPageChange,
+});
+</script>
+<template>
+  <div class="bg-white flex items-center justify-between">
+    <div class="flex-1 flex justify-between sm:hidden items-center">
+      <span
+        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+        @click="prev"
+      >
+        <IconArrowLeft />
+      </span>
+      <span class="text-sm text-gray-500">
+        {{ currentPage }} / {{ pageCount }}
+      </span>
+      <span
+        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+        @click="next"
+      >
+        <IconArrowRight />
+      </span>
+    </div>
+    <div class="hidden sm:flex-1 sm:flex sm:items-center">
+      <nav
+        aria-label="Pagination"
+        class="relative z-0 inline-flex rounded-[4px] shadow-sm -space-x-px"
+      >
+        <span
+          class="relative inline-flex items-center px-2 py-2 rounded-l-[4px] border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer"
+          @click="prev"
+        >
+          <IconArrowLeft />
+        </span>
+        <span
+          v-for="i in pageCount"
+          :key="i"
+          :class="{
+            'z-10 bg-themeable-primary-50 border-themeable-primary-500 text-themeable-primary-600':
+              i === currentPage,
+            'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 ':
+              i !== currentPage,
+          }"
+          aria-current="page"
+          class="relative inline-flex items-center px-4 py-2 border text-sm font-medium cursor-pointer select-none"
+          @click="currentPage = i"
+        >
+          {{ i }}
+        </span>
+        <span
+          class="relative inline-flex items-center px-2 py-2 rounded-r-[4px] border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer"
+          @click="next"
+        >
+          <IconArrowRight />
+        </span>
+      </nav>
+    </div>
+  </div>
+</template>
