@@ -354,12 +354,12 @@ onMounted(handleFetchPlugins);
                 >
                   <a
                     :href="plugin.spec.homepage"
-                    class="text-sm text-gray-500 hover:text-gray-900"
+                    class="hidden text-sm text-gray-500 hover:text-gray-900 sm:block"
                     target="_blank"
                   >
                     @{{ plugin.spec.author }}
                   </a>
-                  <span class="text-sm text-gray-500">
+                  <span class="hidden text-sm text-gray-500 sm:block">
                     {{ plugin.spec.version }}
                   </span>
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
