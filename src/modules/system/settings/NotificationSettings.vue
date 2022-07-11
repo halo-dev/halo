@@ -2,7 +2,7 @@
 import { VButton } from "@halo-dev/components";
 </script>
 <template>
-  <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:pt-5">
+  <div class="w-1/3">
     <FormKit :actions="false" type="form">
       <FormKit label="站点地址" type="url"></FormKit>
       <FormKit label="站点标题" type="text"></FormKit>

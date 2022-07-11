@@ -1,8 +1,8 @@
 const textClassification = {
   label: "block font-bold text-sm formkit-invalid:text-red-500 w-56",
-  wrapper: "flex flex-row items-center",
+  wrapper: "flex flex-col sm:flex-row items-start sm:items-center",
   inner:
-    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-[4px] overflow-hidden focus-within:border-themeable-primary-500",
+    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-[4px] overflow-hidden focus-within:border-themeable-primary-500 mt-2 sm:mt-0",
   input:
     "outline-0 bg-white antialiased resize-none w-full text-black block transition-all appearance-none h-9 px-3 text-sm",
 };
@@ -29,7 +29,7 @@ const theme: Record<string, Record<string, string>> = {
     help: "text-xs text-gray-500",
     messages: "list-none p-0 mt-1 mb-0",
     message: "text-red-500 mb-1 text-xs",
-    form: "flex flex-col divide-y divide-gray-100 space-y-3",
+    form: "flex flex-col space-y-4",
   },
   button: buttonClassification,
   color: {

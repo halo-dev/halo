@@ -42,6 +42,7 @@ const users = ref<User[]>([]);
 
 const activeId = ref("functional");
 const checkAll = ref(false);
+
 const pagesPublicState = ref<PagesPublicState>({
   functionalPages: [],
 });

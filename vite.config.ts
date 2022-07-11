@@ -12,6 +12,7 @@ export default ({ mode }: { mode: string }) => {
   const isProduction = mode === "production";
 
   return defineConfig({
+    base: "./",
     plugins: [
       Vue(),
       VueJsx(),
