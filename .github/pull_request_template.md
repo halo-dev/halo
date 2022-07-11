@@ -17,7 +17,7 @@ Add one of the following kinds:
 /kind cleanup
 /kind documentation
 /kind feature
-/kind optimization
+/kind improvement
 
 适当添加其中一个或多个类别（可选）：
 Optionally add one or more of the following kinds if applicable:
