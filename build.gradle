@@ -37,7 +37,6 @@ configurations {
 }
 
 bootJar {
-    launchScript()
     manifest {
         attributes "Implementation-Title": "Halo Application",
                 "Implementation-Version": archiveVersion
