@@ -1,0 +1,17 @@
+name: Nightly Build
+
+on:
+  schedule:
+    - cron: '30 18 * * *' # At 02:30 GMT+8
+  # For test purpose
+  workflow_dispatch:
+jobs:
+  nightly-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: ./.github/actions/docker-build
+        with:
+          ghcr-token: ${{ secrets.GHCR_TOKEN }}

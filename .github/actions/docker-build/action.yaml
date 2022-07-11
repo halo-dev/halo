@@ -1,0 +1,55 @@
+name: 'Docker build'
+description: 'Builds the Docker image'
+
+inputs:
+  ghcr-token:
+    description: Token of current GitHub account in GitHub container registry.
+    required: false
+    default: ""
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup JDK 17
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'temurin'
+        cache: 'gradle'
+        java-version: 17
+    - name: Build with Gradle
+      shell: bash
+      run: |
+        ./gradlew clean build -x test
+        # we don't need the plain jar when building docker image.
+        rm -rf build/libs/*-plain.jar
+    - name: Docker meta for Halo
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: |
+          ghcr.io/${{ github.repository_owner }}/halo
+        tags: |
+          type=schedule,pattern=nightly
+          type=ref,event=branch
+          type=semver,pattern={{ version }}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to GHCR
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ inputs.ghcr-token }}
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ./Dockerfile
+        platforms: linux/amd64,linux/arm/v7,linux/arm64
+        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta.outputs.tags }}
+        push: true
