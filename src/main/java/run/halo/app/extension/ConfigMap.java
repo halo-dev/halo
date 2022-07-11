@@ -2,7 +2,8 @@ package run.halo.app.extension;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.lang.Nullable;
 
 /**
@@ -11,15 +12,13 @@ import org.springframework.lang.Nullable;
  * @author guqing
  * @since 2.0.0
  */
+@Data
+@EqualsAndHashCode(callSuper = true)
 @GVK(group = "", version = "v1alpha1", kind = "ConfigMap", plural = "configmaps",
     singular = "configmap")
 public class ConfigMap extends AbstractExtension {
 
     private Map<String, String> data;
-
-    public void setData(Map<String, String> data) {
-        this.data = data;
-    }
 
     public ConfigMap putDataItem(String key, String dataItem) {
         if (this.data == null) {
@@ -53,25 +52,5 @@ public class ConfigMap extends AbstractExtension {
             return "null";
         }
         return o.toString().replace("\n", "\n    ");
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        if (!super.equals(o)) {
-            return false;
-        }
-        ConfigMap configMap = (ConfigMap) o;
-        return Objects.equals(data, configMap.data);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), data);
     }
 }
