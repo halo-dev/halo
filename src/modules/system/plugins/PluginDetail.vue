@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+  useDialog,
   VButton,
   VCard,
   VPageHeader,
@@ -9,14 +10,16 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import type { Plugin } from "@/types/extension";
 import { axiosInstance } from "@halo-dev/admin-shared";
+import cloneDeep from "lodash.clonedeep";
 
 const pluginActiveId = ref("detail");
 const plugin = ref<Plugin>({} as Plugin);
 
 const { params } = useRoute();
+const dialog = useDialog();
 
 const handleFetchPlugin = async () => {
   try {
@@ -34,20 +37,27 @@ const isStarted = computed(() => {
 });
 
 const handleChangePluginStatus = async () => {
-  try {
-    plugin.value.spec.enabled = !plugin.value.spec.enabled;
-    await axiosInstance.put(
-      `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.value.metadata.name}`,
-      plugin.value
-    );
-  } catch (e) {
-    console.error(e);
-  } finally {
-    window.location.reload();
-  }
+  const pluginToUpdate = cloneDeep(plugin.value);
+
+  dialog.info({
+    title: `确定要${plugin.value.spec.enabled ? "停止" : "启动"}该插件吗？`,
+    onConfirm: async () => {
+      try {
+        pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
+        await axiosInstance.put(
+          `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.value.metadata.name}`,
+          pluginToUpdate
+        );
+      } catch (e) {
+        console.error(e);
+      } finally {
+        window.location.reload();
+      }
+    },
+  });
 };
 
-handleFetchPlugin();
+onMounted(handleFetchPlugin);
 </script>
 
 <template>
@@ -308,5 +318,3 @@ handleFetchPlugin();
     </VCard>
   </div>
 </template>
-
-<style lang="scss" scoped></style>
