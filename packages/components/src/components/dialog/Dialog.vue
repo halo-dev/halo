@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { VModal } from "@/components/modal";
-import { VSpace } from "@/components/space";
 import { VButton } from "@/components/button";
 import {
   IconCheckboxCircle,
@@ -94,35 +93,30 @@ const handleClose = () => {
 <template>
   <VModal :visible="visible" :width="450" @close="handleCancel()">
     <div class="flex justify-between items-start py-2 mb-2">
-      <div>
-        <div
-          :class="`ring-${icon.color}-100`"
-          class="inline-flex rounded-full bg-teal-50 p-1.5 ring-4"
-        >
-          <component
-            :is="icon.icon"
-            :class="`text-${icon.color}-500`"
-            class="w-5 h-5"
-          ></component>
-        </div>
+      <div class="flex flex-row items-center gap-3">
+        <component
+          :is="icon.icon"
+          :class="`text-${icon.color}-500`"
+          class="w-6 h-6"
+        ></component>
+        <div class="text-base text-gray-900 font-bold">{{ title }}</div>
       </div>
       <div>
         <IconClose class="cursor-pointer" @click="handleCancel" />
       </div>
     </div>
     <div class="flex items-center gap-4">
-      <div class="flex-1 flex flex-col items-stretch gap-2">
-        <div class="text-base text-gray-900 font-bold">{{ title }}</div>
+      <div class="flex-1 flex items-stretch">
         <div class="text-sm text-gray-700">{{ description }}</div>
       </div>
     </div>
     <template #footer>
-      <VSpace>
+      <div class="flex flex-col sm:flex-row gap-[10px]">
         <VButton :loading="loading" type="secondary" @click="handleConfirm">
           {{ confirmText }}
         </VButton>
         <VButton @click="handleCancel">{{ cancelText }}</VButton>
-      </VSpace>
+      </div>
     </template>
   </VModal>
 </template>
