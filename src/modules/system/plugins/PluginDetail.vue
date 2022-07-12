@@ -11,12 +11,30 @@ import {
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, onMounted, ref } from "vue";
-import type { Plugin } from "@/types/extension";
+import type {
+  ConfigMap,
+  Plugin,
+  Setting,
+  SettingSpec,
+} from "@/types/extension";
 import { axiosInstance } from "@halo-dev/admin-shared";
 import cloneDeep from "lodash.clonedeep";
 
-const pluginActiveId = ref("detail");
+const pageTabs = ref([{ id: "detail", label: "详情" }]);
+const activeTabId = ref(pageTabs.value[0].id);
 const plugin = ref<Plugin>({} as Plugin);
+const settings = ref<Setting>({} as Setting);
+
+const configmapFormData = ref<Record<string, Record<string, string>>>({});
+const configmap = ref<ConfigMap>({
+  data: {},
+  apiVersion: "v1alpha1",
+  kind: "ConfigMap",
+  metadata: {
+    name: "",
+  },
+});
+const saving = ref(false);
 
 const { params } = useRoute();
 const dialog = useDialog();
@@ -27,8 +45,87 @@ const handleFetchPlugin = async () => {
       `/apis/plugin.halo.run/v1alpha1/plugins/${params.pluginName}`
     );
     plugin.value = response.data;
+
+    await handleFetchSettings();
+    await handleFetchConfigMap();
   } catch (e) {
     console.error(e);
+  }
+};
+
+const handleFetchSettings = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/v1alpha1/settings/${plugin.value.spec.settingName}`
+    );
+    settings.value = response.data;
+
+    const { spec } = settings.value;
+
+    if (spec) {
+      pageTabs.value = [
+        ...pageTabs.value,
+        ...spec.map((item: SettingSpec) => {
+          return {
+            id: item.group,
+            label: item.label,
+          };
+        }),
+      ];
+
+      spec.forEach((item: SettingSpec) => {
+        configmapFormData.value[item.group] = {};
+      });
+    }
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const handleFetchConfigMap = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `/api/v1alpha1/configmaps/${plugin.value.spec.configmapName}`
+    );
+    configmap.value = response.data;
+
+    const { data } = configmap.value;
+
+    Object.keys(data).forEach((key) => {
+      configmapFormData.value[key] = JSON.parse(data[key]);
+    });
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const handleSaveConfigMap = async () => {
+  try {
+    saving.value = true;
+
+    if (!configmap.value.metadata.name && plugin.value.spec.configmapName) {
+      configmap.value.metadata.name = plugin.value.spec.configmapName;
+    }
+
+    settings.value.spec.forEach((item: SettingSpec) => {
+      configmap.value.data[item.group] = JSON.stringify(
+        configmapFormData.value[item.group]
+      );
+    });
+
+    if (!configmap.value.metadata.creationTimestamp) {
+      await axiosInstance.post(`/api/v1alpha1/configmaps`, configmap.value);
+    } else {
+      await axiosInstance.put(
+        `/api/v1alpha1/configmaps/${configmap.value.metadata.name}`,
+        configmap.value
+      );
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await handleFetchConfigMap();
+    saving.value = false;
   }
 };
 
@@ -74,17 +171,14 @@ onMounted(handleFetchPlugin);
     <VCard :body-class="['!p-0']">
       <template #header>
         <VTabbar
-          v-model:active-id="pluginActiveId"
-          :items="[
-            { id: 'detail', label: '详情' },
-            { id: 'settings', label: '基础设置' },
-          ]"
+          v-model:active-id="activeTabId"
+          :items="pageTabs"
           class="w-full !rounded-none"
           type="outline"
         ></VTabbar>
       </template>
 
-      <div v-if="pluginActiveId === 'detail'">
+      <div v-if="activeTabId === 'detail'">
         <div class="flex items-center justify-between px-4 py-4 sm:px-6">
           <div>
             <h3 class="text-lg font-medium leading-6 text-gray-900">
@@ -303,18 +397,37 @@ onMounted(handleFetchPlugin);
         </div>
       </div>
 
-      <div v-if="pluginActiveId === 'settings'">
-        <FormKit id="plugin-setting-form" :actions="false" type="form">
-          <FormKit label="设置项 1" type="text"></FormKit>
-          <FormKit label="设置项 2" type="text"></FormKit>
-        </FormKit>
-
-        <div class="pt-5">
-          <div class="flex justify-start p-4">
-            <VButton type="secondary"> 保存</VButton>
+      <template v-for="(group, index) in settings.spec">
+        <div
+          v-if="activeTabId === group.group"
+          :key="index"
+          class="p-4 sm:px-6"
+        >
+          <div class="w-1/3">
+            <FormKit
+              :id="group.group"
+              v-model="configmapFormData[group.group]"
+              :actions="false"
+              :preserve="true"
+              type="form"
+              @submit="handleSaveConfigMap"
+            >
+              <FormKitSchema :schema="group.formSchema" />
+            </FormKit>
+          </div>
+          <div class="pt-5">
+            <div class="flex justify-start">
+              <VButton
+                :loading="saving"
+                type="secondary"
+                @click="$formkit.submit(group.group)"
+              >
+                保存
+              </VButton>
+            </div>
           </div>
         </div>
-      </div>
+      </template>
     </VCard>
   </div>
 </template>

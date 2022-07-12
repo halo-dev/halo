@@ -1,4 +1,5 @@
 import type { Plugin as PluginModule } from "@halo-dev/admin-shared";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 
 export interface License {
   name?: string;
@@ -47,6 +48,8 @@ export interface PluginSpec {
   pluginClass?: string;
   enabled?: boolean;
   module?: PluginModule;
+  settingName?: string;
+  configmapName?: string;
 }
 
 export interface PluginStatus {
@@ -166,4 +169,24 @@ export interface ReverseProxy {
 export interface ReverseProxyRule {
   path?: string;
   file?: FileReverseProxyProvider;
+}
+
+export interface Setting {
+  spec: SettingSpec[];
+  apiVersion: string;
+  kind: string;
+  metadata: Metadata;
+}
+
+export interface SettingSpec {
+  group: string;
+  label: string;
+  formSchema: FormKitSchemaCondition | FormKitSchemaNode[];
+}
+
+export interface ConfigMap {
+  data: Record<string, string>;
+  apiVersion: string;
+  kind: string;
+  metadata: Metadata;
 }
