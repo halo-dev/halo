@@ -94,7 +94,9 @@ class YamlPluginFinderTest {
                         "requires": ">=2.0.0",
                         "pluginClass": "run.halo.app.plugin.BasePlugin",
                         "enabled": false,
-                        "extensionLocations": null
+                        "extensionLocations": null,
+                        settingName: null,
+                        configMapName: null
                     },
                     "status": null,
                     "apiVersion": "plugin.halo.run/v1alpha1",

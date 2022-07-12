@@ -64,6 +64,10 @@ public class Plugin extends AbstractExtension {
         private Boolean enabled = false;
 
         private List<String> extensionLocations;
+
+        private String settingName;
+
+        private String configMapName;
     }
 
     @Getter

@@ -11,6 +11,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StopWatch;
+import run.halo.app.extension.ExtensionClient;
 
 /**
  * Plugin application initializer will create plugin application context by plugin id and
@@ -65,6 +66,8 @@ public class PluginApplicationInitializer {
         AnnotationConfigUtils.registerAnnotationConfigProcessors(beanFactory);
         stopWatch.stop();
 
+        populateSettingFetcher(pluginId, beanFactory);
+
         log.debug("Total millis: {} ms -> {}", stopWatch.getTotalTimeMillis(),
             stopWatch.prettyPrint());
 
@@ -101,6 +104,14 @@ public class PluginApplicationInitializer {
 
         log.debug("initApplicationContext total millis: {} ms -> {}",
             stopWatch.getTotalTimeMillis(), stopWatch.prettyPrint());
+    }
+
+    private void populateSettingFetcher(String pluginName,
+        DefaultListableBeanFactory listableBeanFactory) {
+        ExtensionClient extensionClient =
+            getRootApplicationContext().getBean(ExtensionClient.class);
+        SettingFetcher settingFetcher = new SettingFetcher(pluginName, extensionClient);
+        listableBeanFactory.registerSingleton("settingFetcher", settingFetcher);
     }
 
     public void onStartUp(String pluginId) {
