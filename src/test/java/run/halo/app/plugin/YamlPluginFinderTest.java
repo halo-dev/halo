@@ -96,7 +96,7 @@ class YamlPluginFinderTest {
                         "enabled": false,
                         "extensionLocations": null,
                         settingName: null,
-                        configmapName: null
+                        configMapName: null
                     },
                     "status": null,
                     "apiVersion": "plugin.halo.run/v1alpha1",

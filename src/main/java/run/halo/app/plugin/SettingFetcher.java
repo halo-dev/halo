@@ -71,11 +71,11 @@ public class SettingFetcher {
     private Optional<ConfigMap> configMap(String pluginName) {
         return extensionClient.fetch(Plugin.class, pluginName)
             .flatMap(plugin -> {
-                String configMapName = plugin.getSpec().getConfigmapName();
+                String configMapName = plugin.getSpec().getConfigMapName();
                 if (StringUtils.isBlank(configMapName)) {
                     return Optional.empty();
                 }
-                return extensionClient.fetch(ConfigMap.class, plugin.getSpec().getConfigmapName());
+                return extensionClient.fetch(ConfigMap.class, plugin.getSpec().getConfigMapName());
             });
     }
 

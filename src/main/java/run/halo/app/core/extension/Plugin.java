@@ -67,7 +67,7 @@ public class Plugin extends AbstractExtension {
 
         private String settingName;
 
-        private String configmapName;
+        private String configMapName;
     }
 
     @Getter

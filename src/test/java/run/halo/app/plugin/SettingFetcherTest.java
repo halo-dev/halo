@@ -120,7 +120,7 @@ class SettingFetcherTest {
         plugin.setMetadata(pluginMetadata);
 
         Plugin.PluginSpec pluginSpec = new Plugin.PluginSpec();
-        pluginSpec.setConfigmapName("fakeConfigMap");
+        pluginSpec.setConfigMapName("fakeConfigMap");
         pluginSpec.setSettingName("fakeSetting");
         plugin.setSpec(pluginSpec);
         return plugin;
