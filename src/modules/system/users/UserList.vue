@@ -45,6 +45,13 @@ const handleOpenCreateModal = (user: User) => {
   creationModal.value = true;
 };
 
+const getRoles = (user: User) => {
+  return JSON.parse(
+    user.metadata.annotations?.["rbac.authorization.halo.run/role-names"] ||
+      "[]"
+  );
+};
+
 onMounted(() => {
   handleFetchUsers();
 });
@@ -254,9 +261,13 @@ onMounted(() => {
                 <div
                   class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
-                  <div class="hidden items-center sm:flex">
+                  <div
+                    v-for="(role, index) in getRoles(user)"
+                    :key="index"
+                    class="hidden items-center sm:flex"
+                  >
                     <VTag>
-                      {{ user.metadata.name }}
+                      {{ role }}
                     </VTag>
                   </div>
                   <time class="text-sm text-gray-500" datetime="2020-01-07">

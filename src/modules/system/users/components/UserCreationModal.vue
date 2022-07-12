@@ -1,9 +1,9 @@
 <script lang="ts" name="UserCreationModal" setup>
 import type { PropType } from "vue";
-import { computed, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { axiosInstance } from "@halo-dev/admin-shared";
 import { IconSave, VButton, VModal } from "@halo-dev/components";
-import type { User } from "@/types/extension";
+import type { Role, User } from "@/types/extension";
 import { v4 as uuid } from "uuid";
 
 const props = defineProps({
@@ -24,6 +24,7 @@ interface creationFormState {
   saving: boolean;
 }
 
+const roles = ref<Role[]>([]);
 const creationForm = ref<creationFormState>({
   user: {
     spec: {
@@ -44,6 +45,7 @@ const creationForm = ref<creationFormState>({
   },
   saving: false,
 });
+const selectedRole = ref("");
 
 const isUpdateMode = computed(() => {
   return !!creationForm.value.user.metadata.creationTimestamp;
@@ -53,11 +55,27 @@ const creationModalTitle = computed(() => {
   return isUpdateMode.value ? "编辑用户" : "新增用户";
 });
 
+const basicRoles = computed(() => {
+  return roles.value.filter(
+    (role) =>
+      role.metadata?.labels?.["plugin.halo.run/role-template"] !== "true"
+  );
+});
+
 watch(props, (newVal) => {
   if (newVal.visible && props.user) {
     creationForm.value.user = props.user;
   }
 });
+
+const handleFetchRoles = async () => {
+  try {
+    const { data } = await axiosInstance.get("/api/v1alpha1/roles");
+    roles.value = data;
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
@@ -69,14 +87,29 @@ const handleVisibleChange = (visible: boolean) => {
 const handleCreateUser = async () => {
   try {
     creationForm.value.saving = true;
+    let user: User;
 
     if (isUpdateMode.value) {
-      await axiosInstance.put(
+      const response = await axiosInstance.put(
         `/api/v1alpha1/users/${creationForm.value.user.metadata.name}`,
         creationForm.value.user
       );
+      user = response.data;
     } else {
-      await axiosInstance.post("/api/v1alpha1/users", creationForm.value.user);
+      const response = await axiosInstance.post(
+        "/api/v1alpha1/users",
+        creationForm.value.user
+      );
+      user = response.data;
+    }
+
+    if (selectedRole.value) {
+      await axiosInstance.post(
+        `/apis/api.halo.run/v1alpha1/users/${user.metadata.name}/permissions`,
+        {
+          roles: [selectedRole.value],
+        }
+      );
     }
 
     handleVisibleChange(false);
@@ -86,6 +119,8 @@ const handleCreateUser = async () => {
     creationForm.value.saving = false;
   }
 };
+
+onMounted(handleFetchRoles);
 </script>
 <template>
   <VModal
@@ -111,6 +146,20 @@ const handleCreateUser = async () => {
         v-model="creationForm.user.spec.email"
         label="电子邮箱"
         type="email"
+        validation="required"
+      ></FormKit>
+      <FormKit
+        v-model="selectedRole"
+        :options="
+          basicRoles.map((role:Role) => {
+            return {
+              label: role.metadata?.annotations?.['plugin.halo.run/display-name'] || role.metadata.name,
+              value: role.metadata?.name,
+            };
+          })
+        "
+        label="角色"
+        type="select"
         validation="required"
       ></FormKit>
       <FormKit

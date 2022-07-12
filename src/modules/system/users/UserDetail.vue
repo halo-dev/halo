@@ -1,10 +1,19 @@
 <script lang="ts" setup>
 import { IconUserSettings, VTag } from "@halo-dev/components";
-import { inject } from "vue";
+import type { Ref } from "vue";
+import { computed, inject } from "vue";
 import { useRouter } from "vue-router";
 import type { User } from "@/types/extension";
 
-const user = inject<User>("user");
+const user = inject<Ref<User>>("user");
+
+const roles = computed(() => {
+  return JSON.parse(
+    user?.value?.metadata?.annotations?.[
+      "rbac.authorization.halo.run/role-names"
+    ] || "[]"
+  );
+});
 
 const router = useRouter();
 </script>
@@ -40,11 +49,15 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">角色</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          <VTag @click="router.push({ name: 'RoleDetail', params: { id: 1 } })">
+          <VTag
+            v-for="(role, index) in roles"
+            :key="index"
+            @click="router.push({ name: 'RoleDetail', params: { id: 1 } })"
+          >
             <template #leftIcon>
               <IconUserSettings />
             </template>
-            {{ user?.metadata?.name }}
+            {{ role }}
           </VTag>
         </dd>
       </div>
