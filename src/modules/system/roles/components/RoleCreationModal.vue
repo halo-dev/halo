@@ -38,6 +38,7 @@ const creationFormState = ref<CreationFormState>({
         "plugin.halo.run/display-name": "",
       }!,
     },
+    rules: [],
   },
   selectedRoleTemplates: [],
   saving: false,
