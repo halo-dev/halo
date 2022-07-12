@@ -1,13 +1,22 @@
 package run.halo.app.core.extension;
 
+import static run.halo.app.core.extension.RoleBinding.GROUP;
+import static run.halo.app.core.extension.RoleBinding.KIND;
+import static run.halo.app.core.extension.RoleBinding.VERSION;
+
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.GVK;
+import run.halo.app.extension.Metadata;
 
 /**
  * RoleBinding references a role, but does not contain it.
@@ -20,12 +29,18 @@ import run.halo.app.extension.GVK;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@GVK(group = "",
-    version = "v1alpha1",
-    kind = "RoleBinding",
+@GVK(group = GROUP,
+    version = VERSION,
+    kind = KIND,
     plural = "rolebindings",
     singular = "rolebinding")
 public class RoleBinding extends AbstractExtension {
+
+    public static final String GROUP = "";
+
+    public static final String VERSION = "v1alpha1";
+
+    public static final String KIND = "RoleBinding";
 
     /**
      * Subjects holds references to the objects the role applies to.
@@ -91,5 +106,55 @@ public class RoleBinding extends AbstractExtension {
          * Defaults to "rbac.authorization.halo.run" for User and Group subjects.
          */
         String apiGroup;
+
+        public static Predicate<Subject> isUser(String username) {
+            return subject -> User.KIND.equals(subject.getKind())
+                && User.GROUP.equals(subject.getApiGroup())
+                && username.equals(subject.getName());
+        }
+
+        public static Predicate<Subject> containsUser(Set<String> usernames) {
+            return subject -> User.KIND.equals(subject.getKind())
+                && User.GROUP.equals(subject.apiGroup)
+                && usernames.contains(subject.getName());
+        }
+    }
+
+    public static RoleBinding create(String username, String roleName) {
+        var metadata = new Metadata();
+        metadata.setName(String.join("-", username, roleName, "binding"));
+
+        var roleRef = new RoleRef();
+        roleRef.setKind(Role.KIND);
+        roleRef.setName(roleName);
+        roleRef.setApiGroup(Role.GROUP);
+
+        var subject = new Subject();
+        subject.setKind(User.KIND);
+        subject.setName(username);
+        subject.setApiGroup(User.GROUP);
+
+        var binding = new RoleBinding();
+        binding.setMetadata(metadata);
+        binding.setRoleRef(roleRef);
+
+        // keep the subjects mutable
+        var subjects = new LinkedList<Subject>();
+        subjects.add(subject);
+
+        binding.setSubjects(subjects);
+        return binding;
+    }
+
+    public static Predicate<RoleBinding> containsUser(String username) {
+        return ExtensionOperator.<RoleBinding>isNotDeleted().and(
+            binding -> binding.getSubjects().stream()
+                .anyMatch(Subject.isUser(username)));
+    }
+
+    public static Predicate<RoleBinding> containsUser(Set<String> usernames) {
+        return ExtensionOperator.<RoleBinding>isNotDeleted()
+            .and(binding -> binding.getSubjects().stream()
+                .anyMatch(Subject.containsUser(usernames)));
     }
 }

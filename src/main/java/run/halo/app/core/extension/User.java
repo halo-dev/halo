@@ -1,5 +1,9 @@
 package run.halo.app.core.extension;
 
+import static run.halo.app.core.extension.User.GROUP;
+import static run.halo.app.core.extension.User.KIND;
+import static run.halo.app.core.extension.User.VERSION;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;
@@ -17,12 +21,16 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "",
-    version = "v1alpha1",
-    kind = "User",
+@GVK(group = GROUP,
+    version = VERSION,
+    kind = KIND,
     singular = "user",
     plural = "users")
 public class User extends AbstractExtension {
+
+    public static final String GROUP = "";
+    public static final String VERSION = "v1alpha1";
+    public static final String KIND = "User";
 
     @Schema(required = true)
     private UserSpec spec;

@@ -1,6 +1,9 @@
 package run.halo.app.core.extension;
 
 import static java.util.Arrays.compare;
+import static run.halo.app.core.extension.Role.GROUP;
+import static run.halo.app.core.extension.Role.KIND;
+import static run.halo.app.core.extension.Role.VERSION;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -18,12 +21,16 @@ import run.halo.app.extension.GVK;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@GVK(group = "",
-    version = "v1alpha1",
-    kind = "Role",
+@GVK(group = GROUP,
+    version = VERSION,
+    kind = KIND,
     plural = "roles",
     singular = "role")
 public class Role extends AbstractExtension {
+
+    public static final String GROUP = "";
+    public static final String VERSION = "v1alpha1";
+    public static final String KIND = "Role";
 
     @Schema(required = true)
     List<PolicyRule> rules;
