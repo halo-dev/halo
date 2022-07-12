@@ -273,14 +273,12 @@ onMounted(() => {
       </ul>
 
       <template #footer>
-        <div class="flex items-center justify-end bg-white">
-          <div class="flex flex-1 items-center justify-end">
-            <VPagination
-              v-model:page="pagination.page"
-              v-model:size="pagination.size"
-              :total="pagination.total"
-            />
-          </div>
+        <div class="bg-white sm:flex sm:items-center sm:justify-end">
+          <VPagination
+            v-model:page="pagination.page"
+            v-model:size="pagination.size"
+            :total="pagination.total"
+          />
         </div>
       </template>
     </VCard>

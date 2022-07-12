@@ -137,10 +137,8 @@ const checkAll = ref(false);
       </ul>
 
       <template #footer>
-        <div class="flex items-center justify-end bg-white">
-          <div class="flex flex-1 items-center justify-end">
-            <VPagination :page="1" :size="10" :total="20" />
-          </div>
+        <div class="bg-white sm:flex sm:items-center sm:justify-end">
+          <VPagination :page="1" :size="10" :total="20" />
         </div>
       </template>
     </VCard>
