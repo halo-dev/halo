@@ -49,7 +49,7 @@ export interface PluginSpec {
   enabled?: boolean;
   module?: PluginModule;
   settingName?: string;
-  configmapName?: string;
+  configMapName?: string;
 }
 
 export interface PluginStatus {

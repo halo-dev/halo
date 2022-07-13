@@ -85,7 +85,7 @@ const handleFetchSettings = async () => {
 const handleFetchConfigMap = async () => {
   try {
     const response = await axiosInstance.get(
-      `/api/v1alpha1/configmaps/${plugin.value.spec.configmapName}`
+      `/api/v1alpha1/configmaps/${plugin.value.spec.configMapName}`
     );
     configmap.value = response.data;
 
@@ -103,8 +103,8 @@ const handleSaveConfigMap = async () => {
   try {
     saving.value = true;
 
-    if (!configmap.value.metadata.name && plugin.value.spec.configmapName) {
-      configmap.value.metadata.name = plugin.value.spec.configmapName;
+    if (!configmap.value.metadata.name && plugin.value.spec.configMapName) {
+      configmap.value.metadata.name = plugin.value.spec.configMapName;
     }
 
     settings.value.spec.forEach((item: SettingSpec) => {
