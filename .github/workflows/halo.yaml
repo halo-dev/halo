@@ -2,12 +2,16 @@ name: Halo CI
 
 on:
   pull_request:
+    branches:
+      - next
+      - main
     paths:
       - "**"
       - "!**.md"
   push:
     branches:
-      - "**"
+      - next
+      - main
     paths:
       - "**"
       - "!**.md"
@@ -54,3 +58,4 @@ jobs:
           image-name: halodev
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
           push: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/next' }} # we only push to GHCR if the push is to the next branch
+          checkout-from: ${{ github.ref }}
