@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.service;
 
+import java.util.List;
+import java.util.Set;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Flux;
 import run.halo.app.core.extension.Role;
@@ -16,4 +18,6 @@ public interface RoleService {
     Role getRole(String name);
 
     Flux<RoleRef> listRoleRefs(Subject subject);
+
+    List<Role> listDependencies(Set<String> names);
 }

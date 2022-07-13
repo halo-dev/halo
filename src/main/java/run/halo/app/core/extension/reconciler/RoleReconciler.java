@@ -1,12 +1,8 @@
 package run.halo.app.core.extension.reconciler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +10,7 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
@@ -26,13 +23,14 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Slf4j
 public class RoleReconciler implements Reconciler {
-    public static final String ROLE_DEPENDENCIES = "halo.run/dependencies";
-    public static final String ROLE_DEPENDENCY_RULES = "halo.run/dependency-rules";
 
     private final ExtensionClient client;
 
-    public RoleReconciler(ExtensionClient client) {
+    private final RoleService roleService;
+
+    public RoleReconciler(ExtensionClient client, RoleService roleService) {
         this.client = client;
+        this.roleService = roleService;
     }
 
     @Override
@@ -45,16 +43,21 @@ public class RoleReconciler implements Reconciler {
             }
             Map<String, String> oldAnnotations = Map.copyOf(annotations);
 
-            String s = annotations.get(ROLE_DEPENDENCIES);
-            List<String> roleDependencies = readValue(s);
-            List<Role.PolicyRule> dependencyRules = listDependencyRoles(roleDependencies)
-                .stream()
+            String s = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
+            Set<String> roleDependencies = readValue(s);
+
+            List<Role> dependenciesRole = roleService.listDependencies(roleDependencies);
+
+            List<Role.PolicyRule> dependencyRules = dependenciesRole.stream()
                 .map(Role::getRules)
                 .flatMap(List::stream)
                 .sorted()
                 .toList();
+            List<String> uiPermissions = aggregateUiPermissions(dependenciesRole);
             // override dependency rules to annotations
-            annotations.put(ROLE_DEPENDENCY_RULES, JsonUtils.objectToJson(dependencyRules));
+            annotations.put(Role.ROLE_DEPENDENCY_RULES, JsonUtils.objectToJson(dependencyRules));
+            annotations.put(Role.UI_PERMISSIONS_AGGREGATED_ANNO,
+                JsonUtils.objectToJson(uiPermissions));
             if (!Objects.deepEquals(oldAnnotations, annotations)) {
                 client.update(role);
             }
@@ -62,45 +65,25 @@ public class RoleReconciler implements Reconciler {
         return new Result(false, null);
     }
 
-    private List<String> readValue(String json) {
-        if (StringUtils.isBlank(json)) {
-            return new ArrayList<>();
-        }
-        try {
-            return JsonUtils.DEFAULT_JSON_MAPPER.readValue(json, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+    private List<String> aggregateUiPermissions(List<Role> dependencyRoles) {
+        return dependencyRoles.stream()
+            .filter(role -> role.getMetadata().getAnnotations() != null)
+            .map(role -> {
+                Map<String, String> roleAnnotations = role.getMetadata().getAnnotations();
+                return roleAnnotations.get(Role.UI_PERMISSIONS_ANNO);
+            })
+            .map(this::readValue)
+            .flatMap(Set::stream)
+            .sorted()
+            .toList();
     }
 
-    private List<Role> listDependencyRoles(List<String> dependencies) {
-        List<Role> result = new ArrayList<>();
-        if (dependencies == null) {
-            return result;
+    private Set<String> readValue(String json) {
+        if (StringUtils.isBlank(json)) {
+            return new LinkedHashSet<>();
         }
-        Set<String> visited = new HashSet<>();
-        Deque<String> queue = new ArrayDeque<>(dependencies);
-        while (!queue.isEmpty()) {
-            String roleName = queue.poll();
-            // detecting cycle in role dependencies
-            if (visited.contains(roleName)) {
-                log.warn("Detected a cycle in role dependencies: {},and skipped automatically",
-                    roleName);
-                continue;
-            }
-            visited.add(roleName);
-            client.fetch(Role.class, roleName).ifPresent(role -> {
-                result.add(role);
-                // add role dependencies to queue
-                Map<String, String> annotations = role.getMetadata().getAnnotations();
-                if (annotations != null) {
-                    String roleNameDependencies = annotations.get(ROLE_DEPENDENCIES);
-                    List<String> roleDependencies = readValue(roleNameDependencies);
-                    queue.addAll(roleDependencies);
-                }
-            });
-        }
-        return result;
+        return JsonUtils.jsonToObject(json, new TypeReference<>() {
+        });
     }
+
 }

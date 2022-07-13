@@ -4,12 +4,17 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -22,18 +27,23 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.utils.JsonUtils;
 
 @Component
 public class UserEndpoint implements CustomEndpoint {
 
     private final ExtensionClient client;
+    private final UserService userService;
 
-    public UserEndpoint(ExtensionClient client) {
+    public UserEndpoint(ExtensionClient client, UserService userService) {
         this.client = client;
+        this.userService = userService;
     }
 
+    @NonNull
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
             .map(ctx -> {
@@ -46,6 +56,7 @@ public class UserEndpoint implements CustomEndpoint {
                 .bodyValue(user));
     }
 
+    @NonNull
     Mono<ServerResponse> grantPermission(ServerRequest request) {
         var username = request.pathVariable("name");
         return request.bodyToMono(GrantRequest.class)
@@ -115,7 +126,47 @@ public class UserEndpoint implements CustomEndpoint {
                     .requestBody(
                         requestBodyBuilder().required(true).implementation(GrantRequest.class))
                     .response(responseBuilder().implementation(User.class)))
+            .GET("/users/{name}/permissions", this::getUserPermission,
+                builder -> builder.operationId("GetPermissions")
+                    .description("Get permissions of user")
+                    .tag(tag)
+                    .parameter(parameterBuilder().in(ParameterIn.PATH).name("name")
+                        .description("User name")
+                        .required(true))
+                    .response(responseBuilder().implementation(Set.class)))
             .build();
     }
 
+    @NonNull
+    private Mono<ServerResponse> getUserPermission(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return userService.listRoles(name)
+            .reduce(new LinkedHashSet<Role>(), (list, role) -> {
+                list.add(role);
+                return list;
+            })
+            .map(roles -> {
+                Set<String> uiPermissions =
+                    roles.stream()
+                        .map(role -> role.getMetadata().getAnnotations())
+                        .filter(Objects::nonNull)
+                        .filter(annotations -> annotations.containsKey(
+                            Role.UI_PERMISSIONS_AGGREGATED_ANNO))
+                        .map(annotations -> annotations.get(Role.UI_PERMISSIONS_AGGREGATED_ANNO))
+                        .map(permissions -> JsonUtils.jsonToObject(permissions,
+                            new TypeReference<LinkedHashSet<String>>() {
+                            })
+                        )
+                        .flatMap(Set::stream)
+                        .collect(Collectors.toSet());
+                return new UserPermission(roles, uiPermissions);
+            })
+            .flatMap(result -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(result)
+            );
+    }
+
+    record UserPermission(Set<Role> roles, Set<String> uiPermissions) {
+    }
 }
