@@ -3,6 +3,7 @@ package run.halo.app.extension;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.function.Predicate;
 import org.springframework.util.StringUtils;
 
 /**
@@ -91,4 +92,7 @@ public interface ExtensionOperator {
         return GroupVersionKind.fromAPIVersionAndKind(getApiVersion(), getKind());
     }
 
+    static <T extends ExtensionOperator> Predicate<T> isNotDeleted() {
+        return ext -> ext.getMetadata().getDeletionTimestamp() == null;
+    }
 }

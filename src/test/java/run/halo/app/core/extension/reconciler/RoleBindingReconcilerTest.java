@@ -137,6 +137,10 @@ class RoleBindingReconcilerTest {
         var bindingName = "fake-binding-name";
         var userName = "fake-user-name";
         var subject = mock(Subject.class);
+        when(subject.getKind()).thenReturn("User");
+        when(subject.getName()).thenReturn(userName);
+        when(subject.getApiGroup()).thenReturn("");
+
         var user = mock(User.class);
         var userMetadata = mock(Metadata.class);
         var binding = createRoleBinding("Role", "fake-role", false, subject);
@@ -145,8 +149,6 @@ class RoleBindingReconcilerTest {
             .thenReturn(Optional.of(binding));
         when(binding.getSubjects()).thenReturn(List.of(subject));
 
-        when(subject.getKind()).thenReturn("User");
-        when(subject.getName()).thenReturn(userName);
         when(client.fetch(User.class, userName)).thenReturn(Optional.of(user));
         when(user.getMetadata()).thenReturn(userMetadata);
         var bindings = List.of(
@@ -182,6 +184,7 @@ class RoleBindingReconcilerTest {
         var metadata = mock(Metadata.class);
         lenient().when(roleRef.getKind()).thenReturn(roleRefKind);
         lenient().when(roleRef.getName()).thenReturn(roleRefName);
+        lenient().when(roleRef.getApiGroup()).thenReturn("");
         lenient().when(metadata.getDeletionTimestamp()).thenReturn(deleting ? Instant.now() : null);
         lenient().when(binding.getRoleRef()).thenReturn(roleRef);
         lenient().when(binding.getMetadata()).thenReturn(metadata);
