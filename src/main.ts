@@ -126,7 +126,11 @@ async function loadPluginModules() {
     }
 
     if (stylesheet) {
-      await loadStyle(`http://localhost:8090${stylesheet}`);
+      try {
+        await loadStyle(`http://localhost:8090${stylesheet}`);
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     pluginStore.registerPlugin(plugin);

@@ -13,25 +13,16 @@ import {
   VSwitch,
   VTag,
 } from "@halo-dev/components";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 
-const checkedAll = ref(false);
 const plugins = ref<Plugin[]>([] as Plugin[]);
-const selectedPlugins = ref<string[]>([]);
 
 const router = useRouter();
 const dialog = useDialog();
-
-watch(
-  () => selectedPlugins.value,
-  (newValue) => {
-    checkedAll.value = newValue.length === plugins.value?.length;
-  }
-);
 
 const handleRouteToDetail = (plugin: Plugin) => {
   router.push({
@@ -75,46 +66,6 @@ const handleChangeStatus = (plugin: Plugin) => {
   });
 };
 
-const handleCheckedAllChange = () => {
-  if (checkedAll.value) {
-    selectedPlugins.value = plugins.value.map((plugin) => plugin.metadata.name);
-  } else {
-    selectedPlugins.value.length = 0;
-  }
-};
-
-const handleChangeStatusInBatch = (enable: boolean) => {
-  const pluginsToUpdate = plugins.value.filter(
-    (plugin) =>
-      selectedPlugins.value.includes(plugin.metadata.name) &&
-      plugin.spec.enabled !== enable
-  );
-
-  if (pluginsToUpdate.length === 0) {
-    alert("没有需要更新的插件");
-    return;
-  }
-
-  dialog.warning({
-    title: `确定要${enable ? "启动" : "停止"}所选插件吗？`,
-    onConfirm: async () => {
-      try {
-        for (const plugin of pluginsToUpdate) {
-          plugin.spec.enabled = enable;
-          await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-            plugin.metadata.name,
-            plugin
-          );
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        window.location.reload();
-      }
-    },
-  });
-};
-
 onMounted(handleFetchPlugins);
 </script>
 <template>
@@ -139,35 +90,8 @@ onMounted(handleFetchPlugins);
           <div
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
-            <div class="mr-4 hidden items-center sm:flex">
-              <input
-                v-model="checkedAll"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                type="checkbox"
-                @change="handleCheckedAllChange"
-              />
-            </div>
             <div class="flex w-full flex-1 sm:w-auto">
-              <FormKit
-                v-if="!selectedPlugins.length"
-                placeholder="输入关键词搜索"
-                type="text"
-              ></FormKit>
-              <VSpace v-else>
-                <VButton
-                  type="default"
-                  @click="handleChangeStatusInBatch(true)"
-                >
-                  启用
-                </VButton>
-                <VButton
-                  type="default"
-                  @click="handleChangeStatusInBatch(false)"
-                >
-                  禁用
-                </VButton>
-                <VButton type="danger">卸载</VButton>
-              </VSpace>
+              <FormKit placeholder="输入关键词搜索" type="text"></FormKit>
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
@@ -294,24 +218,9 @@ onMounted(handleFetchPlugins);
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li v-for="(plugin, index) in plugins" :key="index">
           <div
-            :class="{
-              'bg-gray-100': selectedPlugins.includes(plugin.metadata.name),
-            }"
             class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
           >
-            <div
-              v-show="selectedPlugins.includes(plugin.metadata.name)"
-              class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
-            ></div>
             <div class="relative flex flex-row items-center">
-              <div class="mr-4 hidden items-center sm:flex">
-                <input
-                  v-model="selectedPlugins"
-                  :value="plugin.metadata.name"
-                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                  type="checkbox"
-                />
-              </div>
               <div v-if="plugin.spec.logo" class="mr-4">
                 <div
                   class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm"
