@@ -25,12 +25,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.utils.JsonUtils;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -44,6 +47,9 @@ class UserEndpointTest {
 
     @MockBean
     ExtensionClient client;
+
+    @MockBean
+    UserService userService;
 
     @BeforeEach
     void setUp() {
@@ -177,6 +183,54 @@ class UserEndpointTest {
             verify(client, never()).update(isA(RoleBinding.class));
         }
 
-    }
+        @Test
+        @WithMockUser("fake-user")
+        void shouldGetPermission() {
+            Role roleA = JsonUtils.jsonToObject("""
+                {
+                    "apiVersion": "v1alpha1",
+                    "kind": "Role",
+                    "metadata": {
+                        "name": "test-A",
+                        "annotations": {
+                            "halo.run/ui-permissions": "[\\"permission-A\\"]",
+                            "halo.run/ui-permissions-aggregated": "[\\"permission-B\\"]"
+                        }
+                    },
+                    "rules": []
+                }
+                """, Role.class);
+            when(userService.listRoles(eq("fake-user")))
+                .thenReturn(Flux.fromIterable(List.of(roleA)));
 
+            webClient.get().uri("/apis/api.halo.run/v1alpha1/users/fake-user/permissions")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                    {  "roles": [
+                          {
+                              "rules": [],
+                              "apiVersion": "v1alpha1",
+                              "kind": "Role",
+                              "metadata": {
+                                  "name": "test-A",
+                                  "annotations": {
+                                      "halo.run/ui-permissions": "[\\"permission-A\\"]",
+                                      "halo.run/ui-permissions-aggregated": "[\\"permission-B\\"]"
+                                  }
+                              }
+                          }
+                      ],
+                      "uiPermissions": [
+                          "permission-A",
+                          "permission-B"
+                      ]
+                    }
+                    """);
+
+            verify(userService, times(1)).listRoles(eq("fake-user"));
+        }
+    }
 }

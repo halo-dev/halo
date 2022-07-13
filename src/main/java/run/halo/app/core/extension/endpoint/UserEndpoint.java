@@ -5,9 +5,11 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -150,13 +152,7 @@ public class UserEndpoint implements CustomEndpoint {
                     roles.stream()
                         .map(role -> role.getMetadata().getAnnotations())
                         .filter(Objects::nonNull)
-                        .filter(annotations -> annotations.containsKey(
-                            Role.UI_PERMISSIONS_AGGREGATED_ANNO))
-                        .map(annotations -> annotations.get(Role.UI_PERMISSIONS_AGGREGATED_ANNO))
-                        .map(permissions -> JsonUtils.jsonToObject(permissions,
-                            new TypeReference<LinkedHashSet<String>>() {
-                            })
-                        )
+                        .map(this::mergeUiPermissions)
                         .flatMap(Set::stream)
                         .collect(Collectors.toSet());
                 return new UserPermission(roles, uiPermissions);
@@ -165,6 +161,23 @@ public class UserEndpoint implements CustomEndpoint {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(result)
             );
+    }
+
+    private Set<String> mergeUiPermissions(Map<String, String> annotations) {
+        Set<String> result = new LinkedHashSet<>();
+        String permissionsStr = annotations.get(Role.UI_PERMISSIONS_AGGREGATED_ANNO);
+        if (StringUtils.isNotBlank(permissionsStr)) {
+            result.addAll(JsonUtils.jsonToObject(permissionsStr,
+                new TypeReference<LinkedHashSet<String>>() {
+                }));
+        }
+        String uiPermissionStr = annotations.get(Role.UI_PERMISSIONS_ANNO);
+        if (StringUtils.isNotBlank(uiPermissionStr)) {
+            result.addAll(JsonUtils.jsonToObject(uiPermissionStr,
+                new TypeReference<LinkedHashSet<String>>() {
+                }));
+        }
+        return result;
     }
 
     record UserPermission(Set<Role> roles, Set<String> uiPermissions) {
