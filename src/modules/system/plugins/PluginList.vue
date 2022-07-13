@@ -15,8 +15,8 @@ import {
 } from "@halo-dev/components";
 import { onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
-import type { Plugin } from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 
 const checkedAll = ref(false);
@@ -46,9 +46,8 @@ const isStarted = (plugin: Plugin) => {
 
 const handleFetchPlugins = async () => {
   try {
-    const response = await axiosInstance.get(
-      `/apis/plugin.halo.run/v1alpha1/plugins`
-    );
+    const response =
+      await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
     plugins.value = response.data;
   } catch (e) {
     console.error("Fail to fetch plugins", e);
@@ -63,8 +62,8 @@ const handleChangeStatus = (plugin: Plugin) => {
     onConfirm: async () => {
       try {
         pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-        await axiosInstance.put(
-          `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.metadata.name}`,
+        await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
+          pluginToUpdate.metadata.name,
           pluginToUpdate
         );
       } catch (e) {
@@ -102,8 +101,8 @@ const handleChangeStatusInBatch = (enable: boolean) => {
       try {
         for (const plugin of pluginsToUpdate) {
           plugin.spec.enabled = enable;
-          await axiosInstance.put(
-            `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.metadata.name}`,
+          await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
+            plugin.metadata.name,
             plugin
           );
         }

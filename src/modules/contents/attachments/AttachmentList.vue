@@ -21,8 +21,8 @@ import vueFilePond from "vue-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
-import type { User } from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import type { User } from "@halo-dev/api-client";
+import { apiClient } from "@halo-dev/admin-shared";
 
 const viewTypes = [
   {
@@ -81,7 +81,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    const { data } = await apiClient.extension.user.listv1alpha1User();
     users.value = data;
   } catch (e) {
     console.error(e);

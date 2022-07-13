@@ -14,8 +14,8 @@ import {
 } from "@halo-dev/components";
 import UserCreationModal from "./components/UserCreationModal.vue";
 import { onMounted, ref } from "vue";
-import { axiosInstance } from "@halo-dev/admin-shared";
-import type { User } from "@/types/extension";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { User } from "@halo-dev/api-client";
 
 const checkAll = ref(false);
 const creationModal = ref<boolean>(false);
@@ -33,7 +33,7 @@ const pagination = ref<{
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    const { data } = await apiClient.extension.user.listv1alpha1User();
     users.value = data;
   } catch (e) {
     console.error(e);

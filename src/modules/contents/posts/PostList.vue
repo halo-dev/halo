@@ -17,8 +17,8 @@ import { posts } from "./posts-mock";
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { Post } from "@halo-dev/admin-api";
-import { axiosInstance } from "@halo-dev/admin-shared";
-import type { User } from "@/types/extension";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { User } from "@halo-dev/api-client";
 
 const postsRef = ref(
   // eslint-disable-next-line
@@ -43,7 +43,7 @@ const checkedCount = computed(() => {
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    const { data } = await apiClient.extension.user.listv1alpha1User();
     users.value = data;
   } catch (e) {
     console.error(e);

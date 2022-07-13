@@ -4,26 +4,34 @@ import {
   VButton,
   VCard,
   VPageHeader,
-  VSpace,
   VSwitch,
   VTabbar,
   VTag,
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, onMounted, ref } from "vue";
+import { apiClient } from "@halo-dev/admin-shared";
 import type {
-  ConfigMap,
   Plugin,
+  ConfigMap,
   Setting,
   SettingSpec,
-} from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+} from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+
+interface FormKitSettingSpec extends Omit<SettingSpec, "formSchema"> {
+  formSchema: FormKitSchemaCondition | FormKitSchemaNode[];
+}
+
+interface FormKitSetting extends Omit<Setting, "spec"> {
+  spec: Array<FormKitSettingSpec>;
+}
 
 const pageTabs = ref([{ id: "detail", label: "详情" }]);
 const activeTabId = ref(pageTabs.value[0].id);
 const plugin = ref<Plugin>({} as Plugin);
-const settings = ref<Setting>({} as Setting);
+const settings = ref<FormKitSetting>({} as FormKitSetting);
 
 const configmapFormData = ref<Record<string, Record<string, string>>>({});
 const configmap = ref<ConfigMap>({
@@ -41,9 +49,10 @@ const dialog = useDialog();
 
 const handleFetchPlugin = async () => {
   try {
-    const response = await axiosInstance.get(
-      `/apis/plugin.halo.run/v1alpha1/plugins/${params.pluginName}`
-    );
+    const response =
+      await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin(
+        params.pluginName as string
+      );
     plugin.value = response.data;
 
     await handleFetchSettings();
@@ -55,25 +64,25 @@ const handleFetchPlugin = async () => {
 
 const handleFetchSettings = async () => {
   try {
-    const response = await axiosInstance.get(
-      `/api/v1alpha1/settings/${plugin.value.spec.settingName}`
+    const response = await apiClient.extension.setting.getv1alpha1Setting(
+      plugin.value.spec.settingName as string
     );
-    settings.value = response.data;
+    settings.value = response.data as FormKitSetting;
 
     const { spec } = settings.value;
 
     if (spec) {
       pageTabs.value = [
         ...pageTabs.value,
-        ...spec.map((item: SettingSpec) => {
+        ...spec.map((item: FormKitSettingSpec) => {
           return {
             id: item.group,
-            label: item.label,
+            label: item.label || "",
           };
         }),
       ];
 
-      spec.forEach((item: SettingSpec) => {
+      spec.forEach((item: FormKitSettingSpec) => {
         configmapFormData.value[item.group] = {};
       });
     }
@@ -84,16 +93,18 @@ const handleFetchSettings = async () => {
 
 const handleFetchConfigMap = async () => {
   try {
-    const response = await axiosInstance.get(
-      `/api/v1alpha1/configmaps/${plugin.value.spec.configMapName}`
+    const response = await apiClient.extension.configMap.getv1alpha1ConfigMap(
+      plugin.value.spec.configMapName as string
     );
     configmap.value = response.data;
 
     const { data } = configmap.value;
 
-    Object.keys(data).forEach((key) => {
-      configmapFormData.value[key] = JSON.parse(data[key]);
-    });
+    if (data) {
+      Object.keys(data).forEach((key) => {
+        configmapFormData.value[key] = JSON.parse(data[key]);
+      });
+    }
   } catch (e) {
     console.error(e);
   }
@@ -107,17 +118,20 @@ const handleSaveConfigMap = async () => {
       configmap.value.metadata.name = plugin.value.spec.configMapName;
     }
 
-    settings.value.spec.forEach((item: SettingSpec) => {
+    settings.value.spec.forEach((item: FormKitSettingSpec) => {
+      // @ts-ignore
       configmap.value.data[item.group] = JSON.stringify(
         configmapFormData.value[item.group]
       );
     });
 
     if (!configmap.value.metadata.creationTimestamp) {
-      await axiosInstance.post(`/api/v1alpha1/configmaps`, configmap.value);
+      await apiClient.extension.configMap.createv1alpha1ConfigMap(
+        configmap.value
+      );
     } else {
-      await axiosInstance.put(
-        `/api/v1alpha1/configmaps/${configmap.value.metadata.name}`,
+      await apiClient.extension.configMap.updatev1alpha1ConfigMap(
+        configmap.value.metadata.name,
         configmap.value
       );
     }
@@ -141,8 +155,8 @@ const handleChangePluginStatus = async () => {
     onConfirm: async () => {
       try {
         pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-        await axiosInstance.put(
-          `/apis/plugin.halo.run/v1alpha1/plugins/${plugin.value.metadata.name}`,
+        await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
+          plugin.value.metadata.name,
           pluginToUpdate
         );
       } catch (e) {
@@ -264,31 +278,7 @@ onMounted(handleFetchPlugin);
             >
               <dt class="text-sm font-medium text-gray-900">模型定义</dt>
               <dd class="mt-1 sm:col-span-2 sm:mt-0">
-                <ul v-if="plugin?.extensions" class="space-y-2">
-                  <li
-                    v-for="(extension, index) in plugin?.extensions"
-                    :key="index"
-                  >
-                    <div
-                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-themeable-primary"
-                    >
-                      <span class="font-medium text-gray-900">
-                        {{ extension.name }}
-                      </span>
-                      <div class="text-xs text-gray-400">
-                        <VSpace>
-                          <VTag
-                            v-for="(field, fieldIndex) in extension.fields"
-                            :key="fieldIndex"
-                          >
-                            {{ field }}
-                          </VTag>
-                        </VSpace>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-                <span v-else>无</span>
+                <span>无</span>
               </dd>
             </div>
             <div

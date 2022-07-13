@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { VButton, VModal, VTabItem, VTabs } from "@halo-dev/components";
 import { computed, ref, watch } from "vue";
-import type { Role } from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { Role } from "@halo-dev/api-client";
 
 interface RoleTemplateGroup {
   name: string | null | undefined;
@@ -71,7 +71,7 @@ const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
 
 const handleFetchRoles = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/roles");
+    const { data } = await apiClient.extension.role.listv1alpha1Role();
     roles.value = data;
   } catch (e) {
     console.error(e);
@@ -86,8 +86,7 @@ const handleCreateRole = async () => {
         "plugin.halo.run/dependencies"
       ] = JSON.stringify(creationFormState.value.selectedRoleTemplates);
     }
-    await axiosInstance.post<Role>(
-      "/api/v1alpha1/roles",
+    await apiClient.extension.role.createv1alpha1Role(
       creationFormState.value.role
     );
     handleVisibleChange(false);

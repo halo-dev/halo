@@ -3,8 +3,8 @@ import { BasicLayout } from "@/layouts";
 import { IconUpload, VButton, VTabbar } from "@halo-dev/components";
 import { onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { axiosInstance } from "@/utils/api-client";
-import type { User } from "@/types/extension";
+import { apiClient } from "@/utils/api-client";
+import type { User } from "@halo-dev/api-client";
 
 const tabs = [
   {
@@ -35,8 +35,8 @@ const { params } = useRoute();
 
 const handleFetchUser = async () => {
   try {
-    const { data } = await axiosInstance.get(
-      `/api/v1alpha1/users/${params.name}`
+    const { data } = await apiClient.extension.user.getv1alpha1User(
+      params.name as string
     );
     user.value = data;
   } catch (e) {

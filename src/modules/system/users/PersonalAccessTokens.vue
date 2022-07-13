@@ -10,8 +10,8 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
-import type { PersonalAccessToken } from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { PersonalAccessToken } from "@halo-dev/api-client";
 
 const createVisible = ref(false);
 const createActiveId = ref("general");
@@ -20,9 +20,8 @@ const personalAccessTokens = ref<PersonalAccessToken[]>([]);
 
 const handleFetchPersonalAccessTokens = async () => {
   try {
-    const response = await axiosInstance.get(
-      "/api/v1alpha1/personalaccesstokens"
-    );
+    const response =
+      await apiClient.extension.personalAccessToken.listv1alpha1PersonalAccessToken();
     personalAccessTokens.value = response.data;
   } catch (e) {
     console.error(e);

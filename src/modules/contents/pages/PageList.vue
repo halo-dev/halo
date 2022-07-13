@@ -14,9 +14,9 @@ import {
 } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import type { PagesPublicState } from "@halo-dev/admin-shared";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
-import type { User } from "@/types/extension";
+import type { User } from "@halo-dev/api-client";
 
 const pagesRef = ref([
   {
@@ -52,7 +52,7 @@ useExtensionPointsState("PAGES", pagesPublicState);
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    const { data } = await apiClient.extension.user.listv1alpha1User();
     users.value = data;
   } catch (e) {
     console.error(e);

@@ -1,14 +1,14 @@
 <script lang="ts" name="RecentLoginWidget" setup>
 import { VCard } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
-import type { User } from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { User } from "@halo-dev/api-client";
 
 const users = ref<User[]>([]);
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    const { data } = await apiClient.extension.user.listv1alpha1User();
     users.value = data;
   } catch (e) {
     console.error(e);

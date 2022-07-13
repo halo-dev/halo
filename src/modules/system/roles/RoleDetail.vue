@@ -11,8 +11,8 @@ import {
 } from "@halo-dev/components";
 import { useRoute, useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
-import { axiosInstance } from "@halo-dev/admin-shared";
-import type { Role, User } from "@/types/extension";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { Role, User } from "@halo-dev/api-client";
 
 interface RoleTemplateGroup {
   name: string | null | undefined;
@@ -42,6 +42,7 @@ const formState = ref<FormState>({
         "plugin.halo.run/display-name": "",
       },
     },
+    rules: [],
   },
   selectedRoleTemplates: [],
   saving: false,
@@ -74,8 +75,8 @@ const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
 
 const handleFetchRole = async () => {
   try {
-    const response = await axiosInstance.get<Role>(
-      `/api/v1alpha1/roles/${route.params.name}`
+    const response = await apiClient.extension.role.getv1alpha1Role(
+      route.params.name as string
     );
     formState.value.role = response.data;
     formState.value.selectedRoleTemplates = JSON.parse(
@@ -89,7 +90,7 @@ const handleFetchRole = async () => {
 
 const handleFetchRoles = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/roles");
+    const { data } = await apiClient.extension.role.listv1alpha1Role();
     roles.value = data;
   } catch (e) {
     console.error(e);
@@ -98,7 +99,7 @@ const handleFetchRoles = async () => {
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/users");
+    const { data } = await apiClient.extension.user.listv1alpha1User();
     users.value = data;
   } catch (e) {
     console.error(e);
@@ -113,8 +114,8 @@ const handleUpdateRole = async () => {
         "plugin.halo.run/dependencies"
       ] = JSON.stringify(formState.value.selectedRoleTemplates);
     }
-    await axiosInstance.put<Role>(
-      `/api/v1alpha1/roles/${route.params.name}`,
+    await apiClient.extension.role.updatev1alpha1Role(
+      route.params.name as string,
       formState.value.role
     );
   } catch (e) {

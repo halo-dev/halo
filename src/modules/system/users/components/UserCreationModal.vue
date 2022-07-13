@@ -1,9 +1,9 @@
 <script lang="ts" name="UserCreationModal" setup>
 import type { PropType } from "vue";
 import { computed, onMounted, ref, watch } from "vue";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { Role, User } from "@halo-dev/api-client";
 import { IconSave, VButton, VModal } from "@halo-dev/components";
-import type { Role, User } from "@/types/extension";
 import { v4 as uuid } from "uuid";
 
 const props = defineProps({
@@ -70,7 +70,7 @@ watch(props, (newVal) => {
 
 const handleFetchRoles = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/roles");
+    const { data } = await apiClient.extension.role.listv1alpha1Role();
     roles.value = data;
   } catch (e) {
     console.error(e);
@@ -90,27 +90,26 @@ const handleCreateUser = async () => {
     let user: User;
 
     if (isUpdateMode.value) {
-      const response = await axiosInstance.put(
-        `/api/v1alpha1/users/${creationForm.value.user.metadata.name}`,
+      const response = await apiClient.extension.user.updatev1alpha1User(
+        creationForm.value.user.metadata.name,
         creationForm.value.user
       );
       user = response.data;
     } else {
-      const response = await axiosInstance.post(
-        "/api/v1alpha1/users",
+      const response = await apiClient.extension.user.createv1alpha1User(
         creationForm.value.user
       );
       user = response.data;
     }
 
-    if (selectedRole.value) {
-      await axiosInstance.post(
-        `/apis/api.halo.run/v1alpha1/users/${user.metadata.name}/permissions`,
-        {
-          roles: [selectedRole.value],
-        }
-      );
-    }
+    // if (selectedRole.value) {
+    //   await apiClient.user.(
+    //     `/apis/api.halo.run/v1alpha1/users/${user.metadata.name}/permissions`,
+    //     {
+    //       roles: [selectedRole.value],
+    //     }
+    //   );
+    // }
 
     handleVisibleChange(false);
   } catch (e) {

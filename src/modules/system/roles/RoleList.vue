@@ -14,8 +14,8 @@ import {
 import RoleCreationModal from "./components/RoleCreationModal.vue";
 import { useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
-import type { Role } from "@/types/extension";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import type { Role } from "@halo-dev/api-client";
+import { apiClient } from "@halo-dev/admin-shared";
 
 const createVisible = ref(false);
 const roles = ref<Role[]>([]);
@@ -31,7 +31,7 @@ const router = useRouter();
 
 const handleFetchRoles = async () => {
   try {
-    const { data } = await axiosInstance.get("/api/v1alpha1/roles");
+    const { data } = await apiClient.extension.role.listv1alpha1Role();
     roles.value = data;
   } catch (e) {
     console.error(e);

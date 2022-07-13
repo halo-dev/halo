@@ -7,7 +7,7 @@ import type {
   MenuItemType,
   Plugin,
 } from "@halo-dev/admin-shared";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
 import { menus, minimenus, registerMenu } from "./router/menus.config";
 // setup
 import "./setup/setupStyles";
@@ -17,7 +17,7 @@ import { setupComponents } from "./setup/setupComponents";
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
 import { usePluginStore } from "@/stores/plugin";
-import type { User } from "@/types/extension";
+import type { User } from "@halo-dev/api-client";
 
 const app = createApp(App);
 
@@ -97,21 +97,23 @@ function loadStyle(href: string) {
 }
 
 async function loadPluginModules() {
-  const response = await axiosInstance.get(
-    `/apis/plugin.halo.run/v1alpha1/plugins`
-  );
+  const response =
+    await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
 
   // Get all started plugins
   const plugins = response.data.filter(
-    (plugin) => plugin.status.phase === "STARTED" && plugin.spec.enabled
+    (plugin) => plugin.status?.phase === "STARTED" && plugin.spec.enabled
   );
 
   for (const plugin of plugins) {
-    const { entry, stylesheet } = plugin.status;
+    const { entry, stylesheet } = plugin.status || {
+      entry: "",
+      stylesheet: "",
+    };
 
     if (entry) {
       const { load } = useScriptTag(
-        `http://localhost:8090${plugin.status.entry}`
+        `http://localhost:8090${plugin.status?.entry}`
       );
       await load();
       const pluginModule = window[plugin.metadata.name];
@@ -132,9 +134,7 @@ async function loadPluginModules() {
 }
 
 async function loadCurrentUser() {
-  const response = await axiosInstance.get(
-    `/apis/api.halo.run/v1alpha1/users/-`
-  );
+  const response = await apiClient.user.getCurrentUserDetail();
   app.provide<User>("currentUser", response.data);
 }
 

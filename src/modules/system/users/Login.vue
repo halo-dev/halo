@@ -5,11 +5,16 @@ import {
   VButton,
 } from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
-import { axiosInstance } from "@halo-dev/admin-shared";
+import axios from "axios";
 import qs from "qs";
 import logo from "../../../assets/logo.svg";
 import { onMounted, ref } from "vue";
 import { submitForm } from "@formkit/vue";
+
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8090",
+  withCredentials: true,
+});
 
 interface LoginForm {
   _csrf: string;

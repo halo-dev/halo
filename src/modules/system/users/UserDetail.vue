@@ -3,7 +3,7 @@ import { IconUserSettings, VTag } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject } from "vue";
 import { useRouter } from "vue-router";
-import type { User } from "@/types/extension";
+import type { User } from "@halo-dev/api-client";
 
 const user = inject<Ref<User>>("user");
 

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VButton } from "@halo-dev/components";
 import { inject } from "vue";
-import type { User } from "@/types/extension";
+import type { User } from "@halo-dev/api-client";
 
 const user = inject<User>("user");
 </script>
