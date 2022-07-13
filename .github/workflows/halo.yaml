@@ -53,4 +53,5 @@ jobs:
         with:
           image-name: halodev
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
-          push: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/next' }} # we only push to GHCR if the push is to the next branch
+          push: ${{ github.event_name == 'push' }} # we only push to GHCR if the push is to the current branch
+          checkout-from: ${{ github.ref_name }}
