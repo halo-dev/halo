@@ -28,11 +28,12 @@ import run.halo.app.extension.GVK;
     plural = "roles",
     singular = "role")
 public class Role extends AbstractExtension {
-    public static final String ROLE_DEPENDENCY_RULES = "halo.run/dependency-rules";
-    public static final String ROLE_DEPENDENCIES_ANNO = "halo.run/dependencies";
-    public static final String UI_PERMISSIONS_ANNO = "halo.run/ui-permissions";
+    public static final String ROLE_DEPENDENCY_RULES =
+        "rbac.authorization.halo.run/dependency-rules";
+    public static final String ROLE_DEPENDENCIES_ANNO = "rbac.authorization.halo.run/dependencies";
+    public static final String UI_PERMISSIONS_ANNO = "rbac.authorization.halo.run/ui-permissions";
     public static final String UI_PERMISSIONS_AGGREGATED_ANNO =
-        "halo.run/ui-permissions-aggregated";
+        "rbac.authorization.halo.run/ui-permissions-aggregated";
 
     public static final String GROUP = "";
     public static final String VERSION = "v1alpha1";

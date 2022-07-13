@@ -36,15 +36,14 @@ public class RoleReconciler implements Reconciler {
     @Override
     public Result reconcile(Request request) {
         client.fetch(Role.class, request.name()).ifPresent(role -> {
+            final Role oldRole = JsonUtils.deepCopy(role);
             Map<String, String> annotations = role.getMetadata().getAnnotations();
             if (annotations == null) {
                 annotations = new HashMap<>();
                 role.getMetadata().setAnnotations(annotations);
             }
-            Map<String, String> oldAnnotations = Map.copyOf(annotations);
 
-            String s = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
-            Set<String> roleDependencies = readValue(s);
+            Set<String> roleDependencies = readValue(annotations.get(Role.ROLE_DEPENDENCIES_ANNO));
 
             List<Role> dependenciesRole = roleService.listDependencies(roleDependencies);
 
@@ -58,7 +57,7 @@ public class RoleReconciler implements Reconciler {
             annotations.put(Role.ROLE_DEPENDENCY_RULES, JsonUtils.objectToJson(dependencyRules));
             annotations.put(Role.UI_PERMISSIONS_AGGREGATED_ANNO,
                 JsonUtils.objectToJson(uiPermissions));
-            if (!Objects.deepEquals(oldAnnotations, annotations)) {
+            if (!Objects.equals(oldRole, role)) {
                 client.update(role);
             }
         });

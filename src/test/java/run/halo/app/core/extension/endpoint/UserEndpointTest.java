@@ -171,15 +171,15 @@ class UserEndpointTest {
 
             webClient.post().uri("/apis/api.halo.run/v1alpha1/users/fake-user/permissions")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
-                .exchange()
+                .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role"))).exchange()
                 .expectStatus().isOk();
 
             verify(client, times(1)).fetch(same(User.class), eq("fake-user"));
             verify(client, times(1)).fetch(same(Role.class), eq("fake-role"));
             verify(client, times(1)).create(RoleBinding.create("fake-user", "fake-role"));
-            verify(client, times(1)).delete(argThat(binding ->
-                binding.getMetadata().getName().equals(roleBinding.getMetadata().getName())));
+            verify(client, times(1))
+                .delete(argThat(binding -> binding.getMetadata().getName()
+                .equals(roleBinding.getMetadata().getName())));
             verify(client, never()).update(isA(RoleBinding.class));
         }
 
@@ -193,15 +193,16 @@ class UserEndpointTest {
                     "metadata": {
                         "name": "test-A",
                         "annotations": {
-                            "halo.run/ui-permissions": "[\\"permission-A\\"]",
-                            "halo.run/ui-permissions-aggregated": "[\\"permission-B\\"]"
+                            "rbac.authorization.halo.run/ui-permissions": "[\\"permission-A\\"]",
+                            "rbac.authorization.halo.run/ui-permissions-aggregated":
+                             "[\\"permission-B\\"]"
                         }
                     },
                     "rules": []
                 }
                 """, Role.class);
-            when(userService.listRoles(eq("fake-user")))
-                .thenReturn(Flux.fromIterable(List.of(roleA)));
+            when(userService.listRoles(eq("fake-user"))).thenReturn(
+                Flux.fromIterable(List.of(roleA)));
 
             webClient.get().uri("/apis/api.halo.run/v1alpha1/users/fake-user/permissions")
                 .exchange()
@@ -209,28 +210,29 @@ class UserEndpointTest {
                 .isOk()
                 .expectBody()
                 .json("""
-                    {  "roles": [
-                          {
-                              "rules": [],
-                              "apiVersion": "v1alpha1",
-                              "kind": "Role",
-                              "metadata": {
-                                  "name": "test-A",
-                                  "annotations": {
-                                      "halo.run/ui-permissions": "[\\"permission-A\\"]",
-                                      "halo.run/ui-permissions-aggregated": "[\\"permission-B\\"]"
-                                  }
-                              }
-                          }
-                      ],
-                      "uiPermissions": [
-                          "permission-A",
-                          "permission-B"
-                      ]
-                    }
+                        {  "roles": [{
+                               "rules": [],
+                               "apiVersion": "v1alpha1",
+                               "kind": "Role",
+                               "metadata": {
+                                   "name": "test-A",
+                                   "annotations": {
+                                       "rbac.authorization.halo.run/ui-permissions":
+                                        "[\\"permission-A\\"]",
+                                       "rbac.authorization.halo.run/ui-permissions-aggregated":
+                                        "[\\"permission-B\\"]"
+                                   }
+                               }
+                           }],
+                            "uiPermissions": [
+                               "permission-A",
+                               "permission-B"
+                            ]
+                        }
                     """);
 
             verify(userService, times(1)).listRoles(eq("fake-user"));
         }
     }
+
 }
