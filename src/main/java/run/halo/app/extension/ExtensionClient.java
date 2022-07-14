@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import org.springframework.data.domain.Page;
 
 /**
  * ExtensionClient is an interface which contains some operations on Extension instead of
@@ -35,9 +34,9 @@ public interface ExtensionClient {
      * @param page is page number which starts from 0.
      * @param size is page size.
      * @param <E> is Extension type.
-     * @return a page of Extensions.
+     * @return a list of Extensions.
      */
-    <E extends Extension> Page<E> page(Class<E> type, Predicate<E> predicate,
+    <E extends Extension> ListResult<E> list(Class<E> type, Predicate<E> predicate,
         Comparator<E> comparator, int page, int size);
 
     /**

@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Objects;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.type.TypeDescription;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
@@ -67,10 +69,9 @@ public class ExtensionRouterFunctionFactory {
                     .parameter(parameterBuilder().in(ParameterIn.QUERY)
                         .name("sort")
                         .description("Sort by some fields. Like metadata.name,desc"))
-
                     .response(responseBuilder().responseCode("200")
                         .description("Response " + scheme.plural())
-                        .implementationArray(scheme.type())))
+                        .implementation(generateListResultClass())))
             .POST(createHandler.pathPattern(), createHandler,
                 builder -> builder.operationId("Create" + gvk)
                     .description("Create " + gvk)
@@ -194,12 +195,18 @@ public class ExtensionRouterFunctionFactory {
         @Override
         @NonNull
         public Mono<ServerResponse> handle(@NonNull ServerRequest request) {
+            int page = request.queryParam("page")
+                .filter(StringUtils::hasLength)
+                .map(Integer::parseUnsignedInt).orElse(0);
+            int size = request.queryParam("size")
+                .filter(StringUtils::hasLength)
+                .map(Integer::parseUnsignedInt).orElse(0);
             // TODO Resolve predicate and comparator from request
-            var extensions = client.list(scheme.type(), null, null);
+            var listResult = client.list(scheme.type(), null, null, page, size);
             return ServerResponse
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(extensions);
+                .bodyValue(listResult);
         }
 
         @Override
@@ -314,5 +321,17 @@ public class ExtensionRouterFunctionFactory {
             return PathPatternGenerator.buildExtensionPathPattern(scheme) + "/{name}";
         }
 
+    }
+
+    private Class<?> generateListResultClass() {
+        var generic =
+            TypeDescription.Generic.Builder.parameterizedType(ListResult.class, scheme.type())
+                .build();
+        return new ByteBuddy()
+            .subclass(generic)
+            .name(scheme.groupVersionKind().kind() + "List")
+            .make()
+            .load(this.getClass().getClassLoader())
+            .getLoaded();
     }
 }

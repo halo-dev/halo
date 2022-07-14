@@ -29,8 +29,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreClient;
@@ -114,7 +112,7 @@ class DefaultExtensionClientTest {
         assertThrows(SchemeNotFoundException.class,
             () -> client.list(UnRegisteredExtension.class, null, null));
         assertThrows(SchemeNotFoundException.class,
-            () -> client.page(UnRegisteredExtension.class, null, null, 0, 10));
+            () -> client.list(UnRegisteredExtension.class, null, null, 0, 10));
         assertThrows(SchemeNotFoundException.class,
             () -> client.fetch(UnRegisteredExtension.class, "fake"));
         assertThrows(SchemeNotFoundException.class, () ->
@@ -192,23 +190,27 @@ class DefaultExtensionClientTest {
                 createExtensionStore("fake-03")));
 
         // without filter and sorter.
-        var fakes = client.page(FakeExtension.class, null, null, 0, 10);
-        assertEquals(new PageImpl<>(List.of(fake1, fake2, fake3), PageRequest.of(0, 10), 3), fakes);
+        var fakes = client.list(FakeExtension.class, null, null, 1, 10);
+        assertEquals(new ListResult<>(1, 10, 3, List.of(fake1, fake2, fake3)), fakes);
 
         // out of page range
-        fakes = client.page(FakeExtension.class, null, null, 100, 10);
-        assertEquals(new PageImpl<>(emptyList(), PageRequest.of(100, 10), 3), fakes);
+        fakes = client.list(FakeExtension.class, null, null, 100, 10);
+        assertEquals(new ListResult<>(100, 10, 3, emptyList()), fakes);
 
         // with filter only
         fakes =
-            client.page(FakeExtension.class, fake -> "fake-03".equals(fake.getMetadata().getName()),
-                null, 0, 10);
-        assertEquals(new PageImpl<>(List.of(fake3), PageRequest.of(0, 10), 1), fakes);
+            client.list(FakeExtension.class, fake -> "fake-03".equals(fake.getMetadata().getName()),
+                null, 1, 10);
+        assertEquals(new ListResult<>(1, 10, 1, List.of(fake3)), fakes);
 
         // with sorter only
-        fakes = client.page(FakeExtension.class, null,
-            reverseOrder(comparing(fake -> fake.getMetadata().getName())), 0, 10);
-        assertEquals(new PageImpl<>(List.of(fake3, fake2, fake1), PageRequest.of(0, 10), 3), fakes);
+        fakes = client.list(FakeExtension.class, null,
+            reverseOrder(comparing(fake -> fake.getMetadata().getName())), 1, 10);
+        assertEquals(new ListResult<>(1, 10, 3, List.of(fake3, fake2, fake1)), fakes);
+
+        // without page
+        fakes = client.list(FakeExtension.class, null, null, 0, 0);
+        assertEquals(new ListResult<>(0, 0, 3, List.of(fake1, fake2, fake3)), fakes);
     }
 
     @Test

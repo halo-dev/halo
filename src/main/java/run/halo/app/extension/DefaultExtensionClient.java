@@ -5,9 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.Assert;
 import run.halo.app.extension.store.ExtensionStoreClient;
 
@@ -53,14 +50,19 @@ public class DefaultExtensionClient implements ExtensionClient {
     }
 
     @Override
-    public <E extends Extension> Page<E> page(Class<E> type, Predicate<E> predicate,
+    public <E extends Extension> ListResult<E> list(Class<E> type, Predicate<E> predicate,
         Comparator<E> comparators, int page, int size) {
-        var pageable = PageRequest.of(page, size);
-        var all = list(type, predicate, comparators);
-        var total = all.size();
-        var content =
-            all.stream().limit(pageable.getPageSize()).skip(pageable.getOffset()).toList();
-        return PageableExecutionUtils.getPage(content, pageable, () -> total);
+        var extensions = list(type, predicate, comparators);
+        var extensionStream = extensions.stream();
+        if (page > 0) {
+            extensionStream = extensionStream.skip(((long) (page - 1)) * (long) size);
+        }
+        if (size > 0) {
+            extensionStream = extensionStream.limit(size);
+        }
+        var content = extensionStream.toList();
+
+        return new ListResult<>(page, size, extensions.size(), content);
     }
 
     @Override
