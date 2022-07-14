@@ -2,7 +2,7 @@ const textClassification = {
   label: "block font-bold text-sm formkit-invalid:text-red-500 w-56",
   wrapper: "flex flex-col sm:flex-row items-start sm:items-center",
   inner:
-    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-[4px] overflow-hidden focus-within:border-themeable-primary-500 mt-2 sm:mt-0",
+    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-base overflow-hidden focus-within:border-primary mt-2 sm:mt-0",
   input:
     "outline-0 bg-white antialiased resize-none w-full text-black block transition-all appearance-none h-9 px-3 text-sm",
 };

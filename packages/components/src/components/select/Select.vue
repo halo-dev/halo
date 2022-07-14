@@ -62,15 +62,15 @@ function handleChange(e: Event) {
     @apply block;
     @apply transition-all;
     @apply appearance-none;
+    @apply rounded-base;
     border: 1px solid #ced4da;
-    border-radius: 4px;
 
     &:active {
-      border-color: #4ccba0;
+      @apply border-primary;
     }
 
     &:focus {
-      border-color: #4ccba0;
+      @apply border-primary;
     }
 
     &:disabled {

@@ -18,7 +18,7 @@ const handleChange = () => {
     <button
       :class="{
         'bg-gray-200': !modelValue,
-        '!bg-themeable-primary-600': modelValue,
+        '!bg-primary': modelValue,
       }"
       aria-checked="false"
       class="switch-inner"

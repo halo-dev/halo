@@ -37,7 +37,7 @@ defineProps({
   @apply bg-white;
   @apply shadow-sm;
   @apply overflow-hidden;
-  border-radius: 4px;
+  @apply rounded-base;
   border: 1px solid #eaecf0;
 
   .card-header {

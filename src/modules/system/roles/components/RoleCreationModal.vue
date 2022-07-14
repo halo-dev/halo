@@ -162,7 +162,7 @@ watch(
                 <ul class="space-y-2">
                   <li v-for="(role, index) in group.roles" :key="index">
                     <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         v-model="creationFormState.selectedRoleTemplates"

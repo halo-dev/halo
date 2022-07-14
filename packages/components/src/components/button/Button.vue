@@ -94,7 +94,7 @@ function handleClick() {
 </script>
 <style lang="scss">
 .btn {
-  border-radius: 4px;
+  @apply rounded-base;
   @apply inline-flex;
   @apply flex-shrink-0;
   @apply cursor-pointer;
@@ -131,18 +131,16 @@ function handleClick() {
   border: 1px solid #d9d9d9;
 
   .btn-icon {
-    color: #0e1731;
+    @apply text-secondary;
   }
 }
 
 .btn-primary {
-  background: #4ccba0;
-  @apply text-white;
+  @apply text-white bg-primary;
 }
 
 .btn-secondary {
-  background: #0e1731;
-  @apply text-white;
+  @apply text-white bg-secondary;
 }
 
 .btn-danger {

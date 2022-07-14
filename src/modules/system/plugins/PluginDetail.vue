@@ -299,7 +299,7 @@ onMounted(handleFetchPlugin);
                       <ul class="space-y-2">
                         <li>
                           <div
-                            class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                            class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                           >
                             <input
                               class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -317,7 +317,7 @@ onMounted(handleFetchPlugin);
                         </li>
                         <li>
                           <div
-                            class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                            class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-primary"
                           >
                             <input
                               class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -346,7 +346,7 @@ onMounted(handleFetchPlugin);
                       <ul class="space-y-2">
                         <li>
                           <div
-                            class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                            class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                           >
                             <input
                               class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -364,7 +364,7 @@ onMounted(handleFetchPlugin);
                         </li>
                         <li>
                           <div
-                            class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-themeable-primary"
+                            class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-primary"
                           >
                             <input
                               class="h-4 w-4 rounded border-gray-300 text-indigo-600"

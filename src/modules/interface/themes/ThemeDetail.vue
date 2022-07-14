@@ -47,7 +47,7 @@ const handleChangeTheme = (theme: any) => {
         <div class="flex items-center">
           <div
             v-show="theme.activated"
-            class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
+            class="absolute inset-y-0 left-0 w-0.5 bg-primary"
           ></div>
           <div class="w-40 px-4">
             <div
@@ -242,7 +242,7 @@ const handleChangeTheme = (theme: any) => {
                 <ul class="mt-2 space-y-2">
                   <li>
                     <div
-                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-primary"
                     >
                       <RouterLink
                         :to="{
@@ -262,7 +262,7 @@ const handleChangeTheme = (theme: any) => {
                   </li>
                   <li>
                     <div
-                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-themeable-primary"
+                      class="inline-flex w-96 cursor-pointer flex-row flex-col gap-y-3 rounded border p-5 hover:border-primary"
                     >
                       <span class="font-medium hover:text-blue-400">
                         run.halo.plugins.photos

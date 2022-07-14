@@ -1,5 +1,3 @@
-const { themeable } = require("tailwindcss-themeable");
-
 module.exports = {
   content: [
     "./index.html",
@@ -13,14 +11,29 @@ module.exports = {
     require("tailwindcss-safe-area"),
     require("@tailwindcss/aspect-ratio"),
     require("@formkit/themes/tailwindcss"),
-    themeable({
-      defaultTheme: "default",
-      themes: [
-        {
-          name: "default",
-          palette: {
+    require("tailwindcss-themer")({
+      defaultTheme: {
+        extend: {
+          colors: {
             primary: "#4CCBA0",
             secondary: "#0E1731",
+          },
+          borderRadius: {
+            base: "4px",
+          },
+        },
+      },
+      themes: [
+        {
+          name: "theme-dark",
+          extend: {
+            colors: {
+              primary: "black",
+              secondary: "#0E1731",
+            },
+            borderRadius: {
+              base: "2px",
+            },
           },
         },
       ],

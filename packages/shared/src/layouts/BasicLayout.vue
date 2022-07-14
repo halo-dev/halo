@@ -81,8 +81,7 @@ const handleRouteToProfile = () => {
 
     <!--bottom nav bar-->
     <div
-      class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black drop-shadow-2xl mt-safe pb-safe md:hidden"
-      style="background: #0e1731"
+      class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black drop-shadow-2xl mt-safe pb-safe md:hidden bg-secondary"
     >
       <div
         v-for="(menu, index) in minimenus"

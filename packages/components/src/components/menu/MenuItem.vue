@@ -85,8 +85,7 @@ function handleClick() {
   @apply relative;
   @apply p-2;
   @apply font-normal;
-
-  border-radius: 4px;
+  @apply rounded-base;
 
   &:hover,
   &.active {

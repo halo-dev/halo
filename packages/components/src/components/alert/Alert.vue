@@ -78,8 +78,8 @@ const handleClose = () => {
   @apply flex-col;
   @apply box-border;
   @apply border;
+  @apply rounded-base;
   padding: 12px 16px;
-  border-radius: 4px;
 
   .alert-header {
     @apply flex;

@@ -65,7 +65,7 @@ const { currentPage, pageCount, prev, next } = useOffsetPagination({
     <div class="hidden sm:flex-1 sm:flex sm:items-center">
       <nav
         aria-label="Pagination"
-        class="relative z-0 inline-flex rounded-[4px] shadow-sm -space-x-px"
+        class="relative z-0 inline-flex rounded-base shadow-sm -space-x-px"
       >
         <span
           class="relative inline-flex items-center px-2 py-2 rounded-l-[4px] border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer"
@@ -77,9 +77,8 @@ const { currentPage, pageCount, prev, next } = useOffsetPagination({
           v-for="i in pageCount"
           :key="i"
           :class="{
-            'z-10 bg-themeable-primary-50 border-themeable-primary-500 text-themeable-primary-600':
-              i === currentPage,
-            'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 ':
+            'z-10 bg-primary/1 border-primary text-primary': i === currentPage,
+            'bg-white border-gray-300 text-gray-500 hover:bg-gray-50':
               i !== currentPage,
           }"
           aria-current="page"

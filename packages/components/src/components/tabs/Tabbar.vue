@@ -100,8 +100,8 @@ const handleChange = (id: number | string) => {
       border-bottom-width: 2px;
 
       &.tabbar-item-active {
-        color: #0e1731;
-        border-bottom-color: #0e1731;
+        @apply text-secondary;
+        @apply border-b-secondary;
       }
     }
   }
@@ -117,7 +117,7 @@ const handleChange = (id: number | string) => {
       @apply px-9;
       @apply py-1;
       @apply opacity-70;
-      border-radius: 4px;
+      @apply rounded-base;
 
       &.tabbar-item-active {
         @apply bg-gray-100;
@@ -133,7 +133,7 @@ const handleChange = (id: number | string) => {
   &.tabbar-outline {
     @apply p-1;
     @apply bg-gray-100;
-    border-radius: 4px;
+    @apply rounded-base;
 
     .tabbar-items {
       @apply gap-1;
@@ -145,7 +145,7 @@ const handleChange = (id: number | string) => {
       @apply px-9;
       @apply py-1;
       @apply opacity-70;
-      border-radius: 4px;
+      @apply rounded-base;
 
       &.tabbar-item-active {
         @apply bg-white;
@@ -186,7 +186,7 @@ const handleChange = (id: number | string) => {
         border-right-width: 2px;
 
         &.tabbar-item-active {
-          border-right-color: #0e1731;
+          @apply border-r-secondary;
         }
       }
     }

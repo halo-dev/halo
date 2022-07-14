@@ -293,7 +293,7 @@ onMounted(() => {
               <ul class="mt-2 space-y-2">
                 <li>
                   <div
-                    class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-themeable-primary"
+                    class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-primary"
                   >
                     <RouterLink
                       :to="{
@@ -312,7 +312,7 @@ onMounted(() => {
                 </li>
                 <li>
                   <div
-                    class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-themeable-primary"
+                    class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-primary"
                   >
                     <RouterLink
                       :to="{
@@ -638,7 +638,7 @@ onMounted(() => {
               >
                 <div
                   v-show="checkAll"
-                  class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
+                  class="absolute inset-y-0 left-0 w-0.5 bg-primary"
                 ></div>
                 <div class="relative flex flex-row items-center">
                   <div class="mr-4 hidden items-center sm:flex">

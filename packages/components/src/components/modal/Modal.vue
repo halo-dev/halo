@@ -130,9 +130,9 @@ function handleClose() {
     @apply bg-white;
     @apply items-stretch;
     @apply shadow-xl;
+    @apply rounded-base;
     width: calc(100vw - 20px);
     max-height: calc(100vh - 20px);
-    border-radius: 4px;
 
     .modal-header {
       @apply flex;

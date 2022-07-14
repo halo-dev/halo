@@ -343,7 +343,7 @@ onMounted(() => {
           >
             <div
               v-show="selected?.id === post.id || post.checked"
-              class="absolute inset-y-0 left-0 w-0.5 bg-themeable-primary"
+              class="absolute inset-y-0 left-0 w-0.5 bg-primary"
             ></div>
             <div class="relative flex flex-row items-center">
               <div class="mr-4 hidden items-center sm:flex">
