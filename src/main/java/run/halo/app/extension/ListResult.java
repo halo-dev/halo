@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -12,12 +13,17 @@ import org.springframework.util.Assert;
 @Data
 public class ListResult<T> implements Streamable<T> {
 
+    @Schema(description = "Page number, starts from 1. If not set or equal to 0, it means no "
+        + "pagination.")
     private final int page;
 
+    @Schema(description = "Size of each page. If not set or equal to 0, it means no pagination.")
     private final int size;
 
+    @Schema(description = "Total elements.")
     private final long total;
 
+    @Schema(description = "A chunk of items.")
     private final List<T> items;
 
     public ListResult(int page, int size, long total, List<T> items) {
