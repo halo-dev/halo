@@ -1,17 +1,19 @@
 package run.halo.app.core.extension;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.pf4j.PluginState;
+import org.springframework.lang.NonNull;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.plugin.BasePlugin;
@@ -34,6 +36,20 @@ public class Plugin extends AbstractExtension {
 
     private PluginStatus status;
 
+    /**
+     * Gets plugin status.
+     *
+     * @return empty object if status is null.
+     */
+    @NonNull
+    @JsonIgnore
+    public PluginStatus statusNonNull() {
+        if (this.status == null) {
+            return new PluginStatus();
+        }
+        return status;
+    }
+
     @Data
     public static class PluginSpec {
 
@@ -51,7 +67,6 @@ public class Plugin extends AbstractExtension {
 
         private String description;
 
-        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         private List<License> license;
 
         /**
@@ -68,6 +83,12 @@ public class Plugin extends AbstractExtension {
         private String settingName;
 
         private String configMapName;
+
+        @NonNull
+        @JsonIgnore
+        public List<String> extensionLocationsNonNull() {
+            return Objects.requireNonNullElseGet(extensionLocations, List::of);
+        }
     }
 
     @Getter
@@ -75,14 +96,6 @@ public class Plugin extends AbstractExtension {
     public static class License {
         private String name;
         private String url;
-
-        public License() {
-        }
-
-        public License(String name) {
-            this.name = name;
-            this.url = "";
-        }
     }
 
     @Data

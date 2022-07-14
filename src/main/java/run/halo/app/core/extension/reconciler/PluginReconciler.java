@@ -10,12 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
+import org.pf4j.RuntimeMode;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginStartingError;
+import run.halo.app.plugin.YamlPluginFinder;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionFactory;
 
@@ -66,7 +68,7 @@ public class PluginReconciler implements Reconciler {
     }
 
     private void reconcilePluginState(Plugin plugin) {
-        Plugin.PluginStatus pluginStatus = plugin.getStatus();
+        Plugin.PluginStatus pluginStatus = plugin.statusNonNull();
         String name = plugin.getMetadata().getName();
         PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
         if (pluginWrapper == null) {
@@ -80,6 +82,8 @@ public class PluginReconciler implements Reconciler {
             pluginStatus.setMessage("Plugin " + name + " not found in plugin manager");
             return;
         }
+
+        ensureSpecUpToDateWhenDevelopmentMode(pluginWrapper, plugin);
 
         if (!Objects.equals(pluginStatus.getPhase(), pluginWrapper.getPluginState())) {
             // Set to the correct state
@@ -120,14 +124,14 @@ public class PluginReconciler implements Reconciler {
 
     private boolean shouldReconcileStartState(Plugin plugin) {
         return plugin.getSpec().getEnabled()
-            && plugin.getStatus().getPhase() != PluginState.STARTED;
+            && plugin.statusNonNull().getPhase() != PluginState.STARTED;
     }
 
     private void startPlugin(Plugin plugin) {
         String pluginName = plugin.getMetadata().getName();
         PluginState currentState = haloPluginManager.startPlugin(pluginName);
         handleStatus(plugin, currentState, PluginState.STARTED);
-        Plugin.PluginStatus status = plugin.getStatus();
+        Plugin.PluginStatus status = plugin.statusNonNull();
         // TODO Check whether the JS bundle rule exists. If it does not exist, do not populate
         // populate stylesheet path
         String jsBundleRoute = ReverseProxyRouterFunctionFactory.buildRoutePath(pluginName,
@@ -141,7 +145,7 @@ public class PluginReconciler implements Reconciler {
 
     private boolean shouldReconcileStopState(Plugin plugin) {
         return !plugin.getSpec().getEnabled()
-            && plugin.getStatus().getPhase() == PluginState.STARTED;
+            && plugin.statusNonNull().getPhase() == PluginState.STARTED;
     }
 
     private void stopPlugin(Plugin plugin) {
@@ -152,10 +156,7 @@ public class PluginReconciler implements Reconciler {
 
     private void handleStatus(Plugin plugin, PluginState currentState,
         PluginState desiredState) {
-        Plugin.PluginStatus status = plugin.getStatus();
-        if (status == null) {
-            status = new Plugin.PluginStatus();
-        }
+        Plugin.PluginStatus status = plugin.statusNonNull();
         status.setPhase(currentState);
         status.setLastTransitionTime(Instant.now());
         if (desiredState.equals(currentState)) {
@@ -167,6 +168,20 @@ public class PluginReconciler implements Reconciler {
             status.setMessage(startingError.getDevMessage());
             // requeue the plugin for reconciliation
             throw new PluginRuntimeException(startingError.getMessage());
+        }
+    }
+
+    private void ensureSpecUpToDateWhenDevelopmentMode(PluginWrapper pluginWrapper,
+        Plugin oldPlugin) {
+        if (!RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
+            return;
+        }
+        YamlPluginFinder yamlPluginFinder = new YamlPluginFinder();
+        Plugin pluginFromPath = yamlPluginFinder.find(pluginWrapper.getPluginPath());
+        // ensure plugin spec is up to date
+        Plugin.PluginSpec pluginSpec = JsonUtils.deepCopy(pluginFromPath.getSpec());
+        if (!Objects.equals(oldPlugin.getSpec(), pluginSpec)) {
+            oldPlugin.setSpec(pluginSpec);
         }
     }
 }

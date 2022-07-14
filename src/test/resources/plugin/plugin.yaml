@@ -13,4 +13,5 @@ spec:
   homepage: https://github.com/guqing/halo-plugin-1
   displayName: "a name to show"
   description: "Tell me more about this plugin."
-  license: MIT
+  license:
+    - name: MIT
