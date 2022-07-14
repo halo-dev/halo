@@ -47,7 +47,8 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
  *   # 'displayName' explains what the plugin does in only a few words
  *   displayName: "a name to show"
  *   description: "Tell me more about this plugin."
- *   license: MIT
+ *   license:
+ *     - name: MIT
  * </pre>
  *
  * @author guqing

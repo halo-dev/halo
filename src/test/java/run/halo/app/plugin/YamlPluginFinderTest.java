@@ -88,7 +88,7 @@ class YamlPluginFinderTest {
                         "license": [
                             {
                                 "name": "MIT",
-                                "url": ""
+                                "url": null
                             }
                         ],
                         "requires": ">=2.0.0",
@@ -122,50 +122,6 @@ class YamlPluginFinderTest {
             pluginFinder.find(test);
         }).isInstanceOf(PluginRuntimeException.class)
             .hasMessage("Unable to find plugin descriptor file: plugin.yaml");
-    }
-
-    @Test
-    void acceptArrayLicense() throws JSONException {
-        Resource pluginResource = new InMemoryResource("""
-            apiVersion: v1
-            kind: Plugin
-            metadata:
-              name: plugin-1
-            spec:
-              license: "MIT"
-            """);
-        Plugin plugin = pluginFinder.unstructuredToPlugin(pluginResource);
-        assertThat(plugin.getSpec()).isNotNull();
-        JSONAssert.assertEquals("""
-            [{
-                "name": "MIT",
-                "url": ""
-            }]
-            """, JsonUtils.objectToJson(plugin.getSpec().getLicense()), false);
-    }
-
-    @Test
-    void acceptMultipleItemArrayLicense() throws JSONException {
-        Resource pluginResource = new InMemoryResource("""
-            apiVersion: v1
-            kind: Plugin
-            metadata:
-              name: plugin-1
-            spec:
-              license: ["MIT", "Apache-2.0"]
-            """);
-        Plugin plugin = pluginFinder.unstructuredToPlugin(pluginResource);
-        assertThat(plugin.getSpec()).isNotNull();
-        JSONAssert.assertEquals("""
-            [{
-                "name": "MIT",
-                "url": ""
-            },
-            {
-                "name": "Apache-2.0",
-                "url": ""
-            }]
-            """, JsonUtils.objectToJson(plugin.getSpec().getLicense()), false);
     }
 
     @Test
