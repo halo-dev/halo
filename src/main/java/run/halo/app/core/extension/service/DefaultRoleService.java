@@ -3,12 +3,14 @@ package run.halo.app.core.extension.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -71,13 +73,21 @@ public class DefaultRoleService implements RoleService {
                 Map<String, String> annotations = role.getMetadata().getAnnotations();
                 if (annotations != null) {
                     String roleNameDependencies = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
-                    List<String> roleDependencies = JsonUtils.jsonToObject(roleNameDependencies,
-                        new TypeReference<>() {
-                        });
+                    List<String> roleDependencies = stringToList(roleNameDependencies);
                     queue.addAll(roleDependencies);
                 }
             });
         }
         return result;
+    }
+
+    @NonNull
+    private List<String> stringToList(String str) {
+        if (StringUtils.isBlank(str)) {
+            return Collections.emptyList();
+        }
+        return JsonUtils.jsonToObject(str,
+            new TypeReference<>() {
+            });
     }
 }
