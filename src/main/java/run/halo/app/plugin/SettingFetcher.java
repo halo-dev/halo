@@ -50,9 +50,16 @@ public class SettingFetcher {
         return getInternal(group);
     }
 
+    /**
+     * Get values from {@link ConfigMap}.
+     *
+     * @return a unmodifiable map of values(non-null).
+     */
     @NonNull
     public Map<String, JsonNode> getValues() {
-        return valueRef.updateAndGet(m -> m != null ? m : getValuesInternal());
+        Map<String, JsonNode> values =
+            valueRef.updateAndGet(m -> m != null ? m : getValuesInternal());
+        return Map.copyOf(values);
     }
 
     private JsonNode getInternal(String group) {
