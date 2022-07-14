@@ -71,7 +71,7 @@ watch(props, (newVal) => {
 const handleFetchRoles = async () => {
   try {
     const { data } = await apiClient.extension.role.listv1alpha1Role();
-    roles.value = data;
+    roles.value = data.items;
   } catch (e) {
     console.error(e);
   }
@@ -102,14 +102,12 @@ const handleCreateUser = async () => {
       user = response.data;
     }
 
-    // if (selectedRole.value) {
-    //   await apiClient.user.(
-    //     `/apis/api.halo.run/v1alpha1/users/${user.metadata.name}/permissions`,
-    //     {
-    //       roles: [selectedRole.value],
-    //     }
-    //   );
-    // }
+    if (selectedRole.value) {
+      await apiClient.user.grantPermission(user.metadata.name, {
+        // @ts-ignore
+        roles: [selectedRole.value],
+      });
+    }
 
     handleVisibleChange(false);
   } catch (e) {

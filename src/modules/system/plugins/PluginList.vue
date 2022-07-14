@@ -37,9 +37,9 @@ const isStarted = (plugin: Plugin) => {
 
 const handleFetchPlugins = async () => {
   try {
-    const response =
+    const {data} =
       await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
-    plugins.value = response.data;
+    plugins.value = data.items;
   } catch (e) {
     console.error("Fail to fetch plugins", e);
   }

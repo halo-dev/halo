@@ -63,6 +63,9 @@ const handleFetchPlugin = async () => {
 };
 
 const handleFetchSettings = async () => {
+  if (!plugin.value.spec.settingName) {
+    return;
+  }
   try {
     const response = await apiClient.extension.setting.getv1alpha1Setting(
       plugin.value.spec.settingName as string
@@ -92,6 +95,9 @@ const handleFetchSettings = async () => {
 };
 
 const handleFetchConfigMap = async () => {
+  if (!plugin.value.spec.configMapName) {
+    return;
+  }
   try {
     const response = await apiClient.extension.configMap.getv1alpha1ConfigMap(
       plugin.value.spec.configMapName as string

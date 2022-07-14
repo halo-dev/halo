@@ -30,6 +30,7 @@ importers:
       '@vue/eslint-config-typescript': ^11.0.0
       '@vue/test-utils': ^2.0.2
       '@vue/tsconfig': ^0.1.3
+      '@vueuse/components': ^8.9.2
       '@vueuse/core': ^8.9.2
       autoprefixer: ^10.4.7
       axios: ^0.27.2
@@ -79,6 +80,7 @@ importers:
       '@halo-dev/admin-shared': link:packages/shared
       '@halo-dev/api-client': 0.0.0
       '@halo-dev/components': link:packages/components
+      '@vueuse/components': 8.9.2_vue@3.2.37
       '@vueuse/core': 8.9.2_vue@3.2.37
       axios: 0.27.2
       filepond: 4.30.4
@@ -2873,6 +2875,17 @@ packages:
     dependencies:
       '@types/node': 17.0.45
     dev: true
+
+  /@vueuse/components/8.9.2_vue@3.2.37:
+    resolution: {integrity: sha512-7K39dgpSdMJgotCGCaa3W7q/9AEZ2jitG+mBWH0TK+HSqLeYd5syHQKKK61raWP/qImu/mrwcsqeKtbFunU1FA==}
+    dependencies:
+      '@vueuse/core': 8.9.2_vue@3.2.37
+      '@vueuse/shared': 8.9.2_vue@3.2.37
+      vue-demi: 0.12.1_vue@3.2.37
+    transitivePeerDependencies:
+      - '@vue/composition-api'
+      - vue
+    dev: false
 
   /@vueuse/core/8.9.2_vue@3.2.37:
     resolution: {integrity: sha512-dE3/JgwqIHmmtmRBdZAnq87rZCSFbYVps2t3gWy9Jv/+Qp6sHSSKuPFtwguJVZ2OnaGnB/AMRmx4CuFRxFin3A==}

@@ -20,9 +20,9 @@ const personalAccessTokens = ref<PersonalAccessToken[]>([]);
 
 const handleFetchPersonalAccessTokens = async () => {
   try {
-    const response =
+    const { data } =
       await apiClient.extension.personalAccessToken.listv1alpha1PersonalAccessToken();
-    personalAccessTokens.value = response.data;
+    personalAccessTokens.value = data.items;
   } catch (e) {
     console.error(e);
   }

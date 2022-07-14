@@ -44,7 +44,7 @@ const checkedCount = computed(() => {
 const handleFetchUsers = async () => {
   try {
     const { data } = await apiClient.extension.user.listv1alpha1User();
-    users.value = data;
+    users.value = data.items;
   } catch (e) {
     console.error(e);
   }

@@ -82,7 +82,7 @@ const attachments = Array.from(new Array(50), (_, index) => index).map(
 const handleFetchUsers = async () => {
   try {
     const { data } = await apiClient.extension.user.listv1alpha1User();
-    users.value = data;
+    users.value = data.items;
   } catch (e) {
     console.error(e);
   }

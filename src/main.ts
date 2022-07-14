@@ -97,11 +97,11 @@ function loadStyle(href: string) {
 }
 
 async function loadPluginModules() {
-  const response =
+  const { data } =
     await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
 
   // Get all started plugins
-  const plugins = response.data.filter(
+  const plugins = data.items.filter(
     (plugin) => plugin.status?.phase === "STARTED" && plugin.spec.enabled
   );
 
@@ -138,8 +138,13 @@ async function loadPluginModules() {
 }
 
 async function loadCurrentUser() {
-  const response = await apiClient.user.getCurrentUserDetail();
-  app.provide<User>("currentUser", response.data);
+  const { data: user } = await apiClient.user.getCurrentUserDetail();
+  app.provide<User>("currentUser", user);
+
+  const { data: permissions } = await apiClient.user.getPermissions(
+    "ac7cdce1-acf2-4e27-a422-c16d6f47cfa2"
+  );
+  app.provide("permissions", permissions);
 }
 
 (async function () {

@@ -32,7 +32,7 @@ const router = useRouter();
 const handleFetchRoles = async () => {
   try {
     const { data } = await apiClient.extension.role.listv1alpha1Role();
-    roles.value = data;
+    roles.value = data.items;
   } catch (e) {
     console.error(e);
   }

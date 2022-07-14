@@ -16,28 +16,44 @@ import UserCreationModal from "./components/UserCreationModal.vue";
 import { onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { User } from "@halo-dev/api-client";
+import type { UserList } from "@halo-dev/api-client";
 
 const checkAll = ref(false);
 const creationModal = ref<boolean>(false);
-const users = ref<User[]>([]);
-const selectedUser = ref<User | null>(null);
-const pagination = ref<{
-  page: number;
-  size: number;
-  total: number;
-}>({
+const users = ref<UserList>({
   page: 1,
-  size: 10,
-  total: 100,
+  size: 5,
+  total: 0,
+  items: [],
+  first: true,
+  last: false,
+  hasNext: false,
+  hasPrevious: false,
 });
+const selectedUser = ref<User | null>(null);
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await apiClient.extension.user.listv1alpha1User();
+    const { data } = await apiClient.extension.user.listv1alpha1User(
+      users.value.page,
+      users.value.size
+    );
     users.value = data;
   } catch (e) {
     console.error(e);
   }
+};
+
+const handlePaginationChange = async ({
+  page,
+  size,
+}: {
+  page: number;
+  size: number;
+}) => {
+  users.value.page = page;
+  users.value.size = size;
+  await handleFetchUsers();
 };
 
 const handleOpenCreateModal = (user: User) => {
@@ -206,7 +222,7 @@ onMounted(() => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li v-for="(user, index) in users" :key="index">
+        <li v-for="(user, index) in users.items" :key="index">
           <div
             :class="{
               'bg-gray-100': checkAll,
@@ -286,9 +302,10 @@ onMounted(() => {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            v-model:page="pagination.page"
-            v-model:size="pagination.size"
-            :total="pagination.total"
+            :page="users.page"
+            :size="users.size"
+            :total="users.total"
+            @change="handlePaginationChange"
           />
         </div>
       </template>
