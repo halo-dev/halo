@@ -14,16 +14,16 @@ import org.springframework.util.Assert;
 public class ListResult<T> implements Streamable<T> {
 
     @Schema(description = "Page number, starts from 1. If not set or equal to 0, it means no "
-        + "pagination.")
+        + "pagination.", required = true)
     private final int page;
 
-    @Schema(description = "Size of each page. If not set or equal to 0, it means no pagination.")
+    @Schema(description = "Size of each page. If not set or equal to 0, it means no pagination.", required = true)
     private final int size;
 
-    @Schema(description = "Total elements.")
+    @Schema(description = "Total elements.", required = true)
     private final long total;
 
-    @Schema(description = "A chunk of items.")
+    @Schema(description = "A chunk of items.", required = true)
     private final List<T> items;
 
     public ListResult(int page, int size, long total, List<T> items) {
@@ -47,14 +47,17 @@ public class ListResult<T> implements Streamable<T> {
         this(0, 0, items.size(), items);
     }
 
+    @Schema(description = "Indicates whether current page is the first page.", required = true)
     public boolean isFirst() {
         return !hasPrevious();
     }
 
+    @Schema(description = "Indicates whether current page is the last page.", required = true)
     public boolean isLast() {
         return !hasNext();
     }
 
+    @Schema(description = "Indicates whether current page has previous page.", required = true)
     @JsonProperty("hasNext")
     public boolean hasNext() {
         if (page <= 0) {
@@ -64,6 +67,7 @@ public class ListResult<T> implements Streamable<T> {
         return page < totalPages;
     }
 
+    @Schema(description = "Indicates whether current page has previous page.", required = true)
     @JsonProperty("hasPrevious")
     public boolean hasPrevious() {
         return page > 1;
