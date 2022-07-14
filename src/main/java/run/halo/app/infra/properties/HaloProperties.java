@@ -12,5 +12,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "halo")
 public class HaloProperties {
 
-    private Set<String> initializeExtensionLocations;
+    private Set<String> initialExtensionLocations;
 }

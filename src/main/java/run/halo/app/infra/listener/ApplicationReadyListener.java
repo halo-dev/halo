@@ -27,7 +27,8 @@ public class ApplicationReadyListener implements ApplicationListener<Application
     private final HaloProperties haloProperties;
     private final ExtensionClient extensionClient;
 
-    public ApplicationReadyListener(HaloProperties haloProperties, ExtensionClient extensionClient) {
+    public ApplicationReadyListener(HaloProperties haloProperties,
+        ExtensionClient extensionClient) {
         this.haloProperties = haloProperties;
         this.extensionClient = extensionClient;
     }
@@ -38,7 +39,7 @@ public class ApplicationReadyListener implements ApplicationListener<Application
     }
 
     private void initializeExtensions() {
-        Set<String> extensionLocations = haloProperties.getInitializeExtensionLocations();
+        Set<String> extensionLocations = haloProperties.getInitialExtensionLocations();
         if (!CollectionUtils.isEmpty(extensionLocations)) {
 
             Resource[] resources = extensionLocations.stream()
