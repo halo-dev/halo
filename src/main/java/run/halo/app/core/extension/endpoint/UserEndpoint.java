@@ -135,7 +135,7 @@ public class UserEndpoint implements CustomEndpoint {
                     .parameter(parameterBuilder().in(ParameterIn.PATH).name("name")
                         .description("User name")
                         .required(true))
-                    .response(responseBuilder().implementation(Set.class)))
+                    .response(responseBuilder().implementation(UserPermission.class)))
             .build();
     }
 

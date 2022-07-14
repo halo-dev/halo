@@ -54,7 +54,7 @@ class SettingFetcherTest {
 
     @Test
     void getValues() throws JSONException {
-        JsonNode values = settingFetcher.getValues();
+        Map<String, JsonNode> values = settingFetcher.getValues();
 
         verify(extensionClient, times(1)).fetch(eq(ConfigMap.class), any());
 
@@ -62,7 +62,7 @@ class SettingFetcherTest {
         JSONAssert.assertEquals(getSns(), JsonUtils.objectToJson(values.get("sns")), true);
 
         // The extensionClient will only be called once
-        JsonNode callAgain = settingFetcher.getValues();
+        Map<String, JsonNode> callAgain = settingFetcher.getValues();
         assertThat(callAgain).isNotNull();
         verify(extensionClient, times(1)).fetch(eq(ConfigMap.class), any());
     }
@@ -98,15 +98,14 @@ class SettingFetcherTest {
         configMap.setMetadata(metadata);
         configMap.setKind("ConfigMap");
         configMap.setApiVersion("v1alpha1");
-        configMap.setData(Map.of("setting", String.format("""
-            {
-                 "sns": %s,
-                 "basic": {
+        configMap.setData(Map.of("sns", getSns(),
+            "basic", """
+                {
                      "color": "red",
                      "width": "100"
                  }
-            }
-            """, getSns())));
+                """)
+        );
         return configMap;
     }
 
