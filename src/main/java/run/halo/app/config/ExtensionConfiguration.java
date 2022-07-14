@@ -13,6 +13,7 @@ import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.reconciler.UserReconciler;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.DefaultExtensionClient;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
@@ -62,9 +63,9 @@ public class ExtensionConfiguration {
     }
 
     @Bean
-    Controller roleController(ExtensionClient client) {
+    Controller roleController(ExtensionClient client, RoleService roleService) {
         return new ControllerBuilder("role-controller", client)
-            .reconciler(new RoleReconciler(client))
+            .reconciler(new RoleReconciler(client, roleService))
             .extension(new Role())
             .build();
     }

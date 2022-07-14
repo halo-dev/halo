@@ -13,7 +13,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static run.halo.app.core.extension.reconciler.RoleBindingReconciler.ROLE_NAMES_ANNO;
+import static run.halo.app.core.extension.User.ROLE_NAMES_ANNO;
 
 import java.time.Instant;
 import java.util.List;

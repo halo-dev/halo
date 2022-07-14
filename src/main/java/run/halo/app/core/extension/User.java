@@ -32,6 +32,8 @@ public class User extends AbstractExtension {
     public static final String VERSION = "v1alpha1";
     public static final String KIND = "User";
 
+    public static final String ROLE_NAMES_ANNO = "rbac.authorization.halo.run/role-names";
+
     @Schema(required = true)
     private UserSpec spec;
 

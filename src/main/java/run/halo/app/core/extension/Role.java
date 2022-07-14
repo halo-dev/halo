@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import org.springframework.lang.NonNull;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -27,6 +28,12 @@ import run.halo.app.extension.GVK;
     plural = "roles",
     singular = "role")
 public class Role extends AbstractExtension {
+    public static final String ROLE_DEPENDENCY_RULES =
+        "rbac.authorization.halo.run/dependency-rules";
+    public static final String ROLE_DEPENDENCIES_ANNO = "rbac.authorization.halo.run/dependencies";
+    public static final String UI_PERMISSIONS_ANNO = "rbac.authorization.halo.run/ui-permissions";
+    public static final String UI_PERMISSIONS_AGGREGATED_ANNO =
+        "rbac.authorization.halo.run/ui-permissions-aggregated";
 
     public static final String GROUP = "";
     public static final String VERSION = "v1alpha1";
@@ -43,7 +50,7 @@ public class Role extends AbstractExtension {
      * @since 2.0.0
      */
     @Getter
-    public static class PolicyRule implements Comparable {
+    public static class PolicyRule implements Comparable<PolicyRule> {
         /**
          * APIGroups is the name of the APIGroup that contains the resources.
          * If multiple API groups are specified, any action requested against one of the enumerated
@@ -104,28 +111,25 @@ public class Role extends AbstractExtension {
         }
 
         @Override
-        public int compareTo(Object o) {
-            if (o instanceof PolicyRule other) {
-                int result = compare(apiGroups, other.apiGroups);
-                if (result != 0) {
-                    return result;
-                }
-                result = compare(resources, other.resources);
-                if (result != 0) {
-                    return result;
-                }
-                result = compare(resourceNames, other.resourceNames);
-                if (result != 0) {
-                    return result;
-                }
-                result = compare(nonResourceURLs, other.nonResourceURLs);
-                if (result != 0) {
-                    return result;
-                }
-                result = compare(verbs, other.verbs);
+        public int compareTo(@NonNull PolicyRule other) {
+            int result = compare(apiGroups, other.apiGroups);
+            if (result != 0) {
                 return result;
             }
-            return 1;
+            result = compare(resources, other.resources);
+            if (result != 0) {
+                return result;
+            }
+            result = compare(resourceNames, other.resourceNames);
+            if (result != 0) {
+                return result;
+            }
+            result = compare(nonResourceURLs, other.nonResourceURLs);
+            if (result != 0) {
+                return result;
+            }
+            result = compare(verbs, other.verbs);
+            return result;
         }
 
         public static class Builder {

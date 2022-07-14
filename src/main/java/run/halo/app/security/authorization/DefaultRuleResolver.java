@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.service.DefaultRoleBindingService;
 import run.halo.app.core.extension.service.RoleBindingService;
 import run.halo.app.core.extension.service.RoleService;
@@ -81,7 +80,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         }
         // merge policy rules
         String roleDependencyRules = metadata.getAnnotations()
-            .get(RoleReconciler.ROLE_DEPENDENCY_RULES);
+            .get(Role.ROLE_DEPENDENCY_RULES);
         List<Role.PolicyRule> rules = convertFrom(roleDependencyRules);
         rules.addAll(role.getRules());
         return rules;

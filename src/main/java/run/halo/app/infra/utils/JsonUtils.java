@@ -1,6 +1,7 @@
 package run.halo.app.infra.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -93,6 +94,38 @@ public class JsonUtils {
         try {
             return DEFAULT_JSON_MAPPER.readValue(json, toValueType);
         } catch (Exception e) {
+            throw new JsonParseException(e);
+        }
+    }
+
+    /**
+     * Method to deserialize JSON content from given JSON content String.
+     *
+     * @param json json content
+     * @param typeReference type reference to convert
+     * @param <T> real type to convert
+     * @return converted object
+     */
+    public static <T> T jsonToObject(String json, TypeReference<T> typeReference) {
+        try {
+            return DEFAULT_JSON_MAPPER.readValue(json, typeReference);
+        } catch (Exception e) {
+            throw new JsonParseException(e);
+        }
+    }
+
+    /**
+     * Method to deserialize JSON content and serialize back from given Object.
+     *
+     * @param source source object to copy
+     * @param <T> real type to deep copy
+     * @return deep copy of the source object
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T deepCopy(T source) {
+        try {
+            return (T) DEFAULT_JSON_MAPPER.readValue(objectToJson(source), source.getClass());
+        } catch (JsonProcessingException e) {
             throw new JsonParseException(e);
         }
     }

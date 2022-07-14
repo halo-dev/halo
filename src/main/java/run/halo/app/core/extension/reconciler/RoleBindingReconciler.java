@@ -20,8 +20,6 @@ import run.halo.app.infra.utils.JsonUtils;
 @Slf4j
 public class RoleBindingReconciler implements Reconciler {
 
-    static final String ROLE_NAMES_ANNO = "rbac.authorization.halo.run/role-names";
-
     private final ExtensionClient client;
 
     public RoleBindingReconciler(ExtensionClient client) {
@@ -57,7 +55,7 @@ public class RoleBindingReconciler implements Reconciler {
                         annotations = new HashMap<>();
                     }
                     var oldAnnotations = Map.copyOf(annotations);
-                    annotations.put(ROLE_NAMES_ANNO, JsonUtils.objectToJson(roleNames));
+                    annotations.put(User.ROLE_NAMES_ANNO, JsonUtils.objectToJson(roleNames));
                     user.getMetadata().setAnnotations(annotations);
                     if (!Objects.deepEquals(oldAnnotations, annotations)) {
                         // update user
