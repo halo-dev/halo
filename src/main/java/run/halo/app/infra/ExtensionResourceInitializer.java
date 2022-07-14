@@ -1,4 +1,4 @@
-package run.halo.app.infra.listener;
+package run.halo.app.infra;
 
 import java.io.FileNotFoundException;
 import java.util.Set;
@@ -12,22 +12,25 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
 /**
- * Scheme ready listener.
+ * <p>Extension resources initializer.</p>
+ * <p>Check whether {@link HaloProperties#getInitialExtensionLocations()} is configured
+ * When the system ready, and load resources according to it to creates {@link Unstructured}</p>
  *
  * @author guqing
  * @since 2.0.0
  */
 @Slf4j
 @Component
-public class ApplicationReadyListener implements ApplicationListener<ApplicationReadyEvent> {
+public class ExtensionResourceInitializer implements ApplicationListener<ApplicationReadyEvent> {
     private final HaloProperties haloProperties;
     private final ExtensionClient extensionClient;
 
-    public ApplicationReadyListener(HaloProperties haloProperties,
+    public ExtensionResourceInitializer(HaloProperties haloProperties,
         ExtensionClient extensionClient) {
         this.haloProperties = haloProperties;
         this.extensionClient = extensionClient;
@@ -35,10 +38,6 @@ public class ApplicationReadyListener implements ApplicationListener<Application
 
     @Override
     public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-        initializeExtensions();
-    }
-
-    private void initializeExtensions() {
         Set<String> extensionLocations = haloProperties.getInitialExtensionLocations();
         if (!CollectionUtils.isEmpty(extensionLocations)) {
 
