@@ -34,7 +34,7 @@ const creationFormState = ref<CreationFormState>({
       name: "",
       labels: {},
       annotations: {
-        "plugin.halo.run/dependencies": "",
+        "rbac.authorization.halo.run/dependencies": "",
         "plugin.halo.run/display-name": "",
       }!,
     },
@@ -83,7 +83,7 @@ const handleCreateRole = async () => {
     creationFormState.value.saving = true;
     if (creationFormState.value.role.metadata.annotations) {
       creationFormState.value.role.metadata.annotations[
-        "plugin.halo.run/dependencies"
+        "rbac.authorization.halo.run/dependencies"
       ] = JSON.stringify(creationFormState.value.selectedRoleTemplates);
     }
     await apiClient.extension.role.createv1alpha1Role(
@@ -181,7 +181,7 @@ watch(
                         <span
                           v-if="
                             role.metadata.annotations?.[
-                              'plugin.halo.run/dependencies'
+                              'rbac.authorization.halo.run/dependencies'
                             ]
                           "
                           class="text-xs text-gray-400"
@@ -190,7 +190,7 @@ watch(
                           {{
                             JSON.parse(
                               role.metadata.annotations?.[
-                                "plugin.halo.run/dependencies"
+                                "rbac.authorization.halo.run/dependencies"
                               ]
                             ).join(", ")
                           }}

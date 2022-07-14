@@ -38,7 +38,7 @@ const formState = ref<FormState>({
       name: "",
       labels: {},
       annotations: {
-        "plugin.halo.run/dependencies": "",
+        "rbac.authorization.halo.run/dependencies": "",
         "plugin.halo.run/display-name": "",
       },
     },
@@ -80,7 +80,7 @@ const handleFetchRole = async () => {
     );
     formState.value.role = response.data;
     formState.value.selectedRoleTemplates = JSON.parse(
-      response.data.metadata.annotations?.["plugin.halo.run/dependencies"] ||
+      response.data.metadata.annotations?.["rbac.authorization.halo.run/dependencies"] ||
         "[]"
     );
   } catch (error) {
@@ -111,7 +111,7 @@ const handleUpdateRole = async () => {
     formState.value.saving = true;
     if (formState.value.role.metadata.annotations) {
       formState.value.role.metadata.annotations[
-        "plugin.halo.run/dependencies"
+        "rbac.authorization.halo.run/dependencies"
       ] = JSON.stringify(formState.value.selectedRoleTemplates);
     }
     await apiClient.extension.role.updatev1alpha1Role(
@@ -319,7 +319,7 @@ onMounted(() => {
                         <span
                           v-if="
                             role.metadata.annotations?.[
-                              'plugin.halo.run/dependencies'
+                              'rbac.authorization.halo.run/dependencies'
                             ]
                           "
                           class="text-xs text-gray-400"
@@ -328,7 +328,7 @@ onMounted(() => {
                           {{
                             JSON.parse(
                               role.metadata.annotations?.[
-                                "plugin.halo.run/dependencies"
+                                "rbac.authorization.halo.run/dependencies"
                               ]
                             ).join(", ")
                           }}

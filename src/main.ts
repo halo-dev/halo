@@ -142,7 +142,7 @@ async function loadCurrentUser() {
   app.provide<User>("currentUser", user);
 
   const { data: permissions } = await apiClient.user.getPermissions(
-    "ac7cdce1-acf2-4e27-a422-c16d6f47cfa2"
+    user.metadata.name
   );
   app.provide("permissions", permissions);
 }
