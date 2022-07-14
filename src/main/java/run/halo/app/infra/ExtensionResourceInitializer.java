@@ -1,7 +1,12 @@
 package run.halo.app.infra;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -10,7 +15,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ResourceUtils;
+import org.thymeleaf.util.StringUtils;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
@@ -42,14 +47,8 @@ public class ExtensionResourceInitializer implements ApplicationListener<Applica
         if (!CollectionUtils.isEmpty(extensionLocations)) {
 
             Resource[] resources = extensionLocations.stream()
-                .map(location -> {
-                    try {
-                        return ResourceUtils.getFile(location);
-                    } catch (FileNotFoundException e) {
-                        throw new IllegalArgumentException(e);
-                    }
-                })
-                .map(FileSystemResource::new)
+                .map(this::listYamlFiles)
+                .flatMap(List::stream)
                 .toArray(Resource[]::new);
 
             log.debug("Initialization loaded [{}] resources to establish.", resources.length);
@@ -63,5 +62,21 @@ public class ExtensionResourceInitializer implements ApplicationListener<Applica
                         extensionClient.update(unstructured);
                     }, () -> extensionClient.create(unstructured)));
         }
+    }
+
+    private List<FileSystemResource> listYamlFiles(String location) {
+        try (Stream<Path> walk = Files.walk(Paths.get(location))) {
+            return walk.filter(this::isYamlFile)
+                .map(path -> new FileSystemResource(path.toFile()))
+                .toList();
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    private boolean isYamlFile(Path pathname) {
+        Path fileName = pathname.getFileName();
+        return StringUtils.endsWith(fileName, ".yaml")
+            || StringUtils.endsWith(fileName, ".yml");
     }
 }
