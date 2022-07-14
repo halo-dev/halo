@@ -57,6 +57,7 @@ export default ({ mode }: { mode: string }) => {
           description: "Web Client For Halo",
           theme_color: "#fff",
         },
+        disable: true,
       }),
     ],
     resolve: {

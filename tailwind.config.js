@@ -39,4 +39,5 @@ module.exports = {
       ],
     }),
   ],
+  safelist: ["theme-dark"],
 };
