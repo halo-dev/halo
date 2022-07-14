@@ -17,7 +17,8 @@ public class ListResult<T> implements Streamable<T> {
         + "pagination.", required = true)
     private final int page;
 
-    @Schema(description = "Size of each page. If not set or equal to 0, it means no pagination.", required = true)
+    @Schema(description = "Size of each page. If not set or equal to 0, it means no pagination.",
+        required = true)
     private final int size;
 
     @Schema(description = "Total elements.", required = true)
