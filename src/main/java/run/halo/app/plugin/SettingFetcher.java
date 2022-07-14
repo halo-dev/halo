@@ -3,8 +3,11 @@ package run.halo.app.plugin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -25,9 +28,7 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 public class SettingFetcher {
 
-    private static final String PLUGIN_SETTING_VALUE = "setting";
-
-    private final AtomicReference<JsonNode> valueRef = new AtomicReference<>(null);
+    private final AtomicReference<Map<String, JsonNode>> valueRef = new AtomicReference<>(null);
 
     private final ExtensionClient extensionClient;
 
@@ -50,7 +51,7 @@ public class SettingFetcher {
     }
 
     @NonNull
-    public JsonNode getValues() {
+    public Map<String, JsonNode> getValues() {
         return valueRef.updateAndGet(m -> m != null ? m : getValuesInternal());
     }
 
@@ -59,13 +60,14 @@ public class SettingFetcher {
             .orElse(JsonNodeFactory.instance.missingNode());
     }
 
-    private JsonNode getValuesInternal() {
+    private Map<String, JsonNode> getValuesInternal() {
         return configMap(pluginName)
-            .filter(configMap -> configMap.getData() != null
-                && configMap.getData().containsKey(PLUGIN_SETTING_VALUE))
-            .map(configMap -> configMap.getData().get(PLUGIN_SETTING_VALUE))
-            .map(this::readTree)
-            .orElse(JsonNodeFactory.instance.missingNode());
+            .filter(configMap -> configMap.getData() != null)
+            .map(ConfigMap::getData)
+            .map(Map::entrySet)
+            .stream()
+            .flatMap(Collection::stream)
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> readTree(entry.getValue())));
     }
 
     private Optional<ConfigMap> configMap(String pluginName) {
@@ -80,6 +82,9 @@ public class SettingFetcher {
     }
 
     private JsonNode readTree(String json) {
+        if (StringUtils.isBlank(json)) {
+            return JsonNodeFactory.instance.missingNode();
+        }
         try {
             return JsonUtils.DEFAULT_JSON_MAPPER.readTree(json);
         } catch (JsonProcessingException e) {
