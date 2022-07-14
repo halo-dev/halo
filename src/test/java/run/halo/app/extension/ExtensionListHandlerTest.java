@@ -3,7 +3,8 @@ package run.halo.app.extension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -38,7 +39,10 @@ class ExtensionListHandlerTest {
         var listHandler = new ExtensionListHandler(scheme, client);
         var serverRequest = MockServerRequest.builder().build();
         final var fake = new FakeExtension();
-        when(client.list(eq(FakeExtension.class), any(), any())).thenReturn(List.of(fake));
+        // when(client.list(same(FakeExtension.class), any(), any())).thenReturn(List.of(fake));
+        var fakeListResult = new ListResult<>(0, 0, 1, List.of(fake));
+        when(client.list(same(FakeExtension.class), any(), any(), anyInt(), anyInt()))
+            .thenReturn(fakeListResult);
 
         var responseMono = listHandler.handle(serverRequest);
 
@@ -47,7 +51,7 @@ class ExtensionListHandlerTest {
                 assertEquals(HttpStatus.OK, response.statusCode());
                 assertEquals(MediaType.APPLICATION_JSON, response.headers().getContentType());
                 assertTrue(response instanceof EntityResponse<?>);
-                assertEquals(List.of(fake), ((EntityResponse<?>) response).entity());
+                assertEquals(fakeListResult, ((EntityResponse<?>) response).entity());
             })
             .verifyComplete();
     }
