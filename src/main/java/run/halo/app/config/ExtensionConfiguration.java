@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -25,6 +26,7 @@ import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
+import run.halo.app.extension.controller.ControllerManager;
 import run.halo.app.extension.store.ExtensionStoreClient;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
@@ -54,36 +56,49 @@ public class ExtensionConfiguration {
         return new DefaultSchemeWatcherManager();
     }
 
-    @Bean
-    Controller userController(ExtensionClient client) {
-        return new ControllerBuilder("user-controller", client)
-            .reconciler(new UserReconciler(client))
-            .extension(new User())
-            .build();
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "halo.extension.controller.disabled",
+        havingValue = "false",
+        matchIfMissing = true)
+    static class ExtensionControllerConfiguration {
+
+        @Bean
+        ControllerManager controllerManager() {
+            return new ControllerManager();
+        }
+
+        @Bean
+        Controller userController(ExtensionClient client) {
+            return new ControllerBuilder("user-controller", client)
+                .reconciler(new UserReconciler(client))
+                .extension(new User())
+                .build();
+        }
+
+        @Bean
+        Controller roleController(ExtensionClient client, RoleService roleService) {
+            return new ControllerBuilder("role-controller", client)
+                .reconciler(new RoleReconciler(client, roleService))
+                .extension(new Role())
+                .build();
+        }
+
+        @Bean
+        Controller roleBindingController(ExtensionClient client) {
+            return new ControllerBuilder("role-binding-controller", client)
+                .reconciler(new RoleBindingReconciler(client))
+                .extension(new RoleBinding())
+                .build();
+        }
+
+        @Bean
+        Controller pluginController(ExtensionClient client, HaloPluginManager haloPluginManager,
+            JsBundleRuleProvider jsBundleRule) {
+            return new ControllerBuilder("plugin-controller", client)
+                .reconciler(new PluginReconciler(client, haloPluginManager, jsBundleRule))
+                .extension(new Plugin())
+                .build();
+        }
     }
 
-    @Bean
-    Controller roleController(ExtensionClient client, RoleService roleService) {
-        return new ControllerBuilder("role-controller", client)
-            .reconciler(new RoleReconciler(client, roleService))
-            .extension(new Role())
-            .build();
-    }
-
-    @Bean
-    Controller roleBindingController(ExtensionClient client) {
-        return new ControllerBuilder("role-binding-controller", client)
-            .reconciler(new RoleBindingReconciler(client))
-            .extension(new RoleBinding())
-            .build();
-    }
-
-    @Bean
-    Controller pluginController(ExtensionClient client, HaloPluginManager haloPluginManager,
-        JsBundleRuleProvider jsBundleRule) {
-        return new ControllerBuilder("plugin-controller", client)
-            .reconciler(new PluginReconciler(client, haloPluginManager, jsBundleRule))
-            .extension(new Plugin())
-            .build();
-    }
 }

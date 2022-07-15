@@ -1,22 +1,18 @@
 package run.halo.app.extension.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
 public class ControllerManager implements ApplicationListener<ApplicationReadyEvent>,
-    DisposableBean {
+    ApplicationContextAware, DisposableBean {
 
-    private final ApplicationContext applicationContext;
-
-    public ControllerManager(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+    private ApplicationContext applicationContext;
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
@@ -39,4 +35,8 @@ public class ControllerManager implements ApplicationListener<ApplicationReadyEv
         log.info("Shutdown {} controllers.", controllers.size());
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 }

@@ -9,6 +9,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -33,8 +34,11 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
+import run.halo.app.extension.ExtensionClient;
+import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.DefaultUserDetailService;
+import run.halo.app.security.SuperAdminInitializer;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
@@ -143,4 +147,13 @@ public class WebServerSecurityConfig {
         return new NimbusJwtEncoder(jwks);
     }
 
+    @Bean
+    @ConditionalOnProperty(name = "halo.security.initializer.disabled",
+        havingValue = "false",
+        matchIfMissing = true)
+    SuperAdminInitializer superAdminInitializer(ExtensionClient client, HaloProperties halo) {
+        return new SuperAdminInitializer(client,
+            passwordEncoder(),
+            halo.getSecurity().getInitializer());
+    }
 }

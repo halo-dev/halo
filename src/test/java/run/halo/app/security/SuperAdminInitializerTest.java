@@ -10,13 +10,16 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ExtensionClient;
 
-@SpringBootTest
+@SpringBootTest(properties = {"halo.security.initializer.disabled=false",
+    "halo.security.initializer.super-admin-username=fake-admin",
+    "halo.security.initializer.super-admin-password=fake-password"})
 @AutoConfigureWebTestClient
 @AutoConfigureTestDatabase
 class SuperAdminInitializerTest {
@@ -28,11 +31,15 @@ class SuperAdminInitializerTest {
     @Autowired
     WebTestClient webClient;
 
+    @Autowired
+    PasswordEncoder encoder;
+
     @Test
     void checkSuperAdminInitialization() {
         verify(client, times(1)).create(argThat(extension -> {
             if (extension instanceof User user) {
-                return "admin".equals(user.getMetadata().getName());
+                return "fake-admin".equals(user.getMetadata().getName())
+                    && encoder.matches("fake-password", user.getSpec().getPassword());
             }
             return false;
         }));
@@ -44,7 +51,7 @@ class SuperAdminInitializerTest {
         }));
         verify(client, times(1)).create(argThat(extension -> {
             if (extension instanceof RoleBinding roleBinding) {
-                return "admin-super-role-binding".equals(roleBinding.getMetadata().getName());
+                return "fake-admin-super-role-binding".equals(roleBinding.getMetadata().getName());
             }
             return false;
         }));
