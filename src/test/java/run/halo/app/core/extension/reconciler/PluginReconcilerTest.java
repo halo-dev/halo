@@ -49,7 +49,7 @@ class PluginReconcilerTest {
 
     @BeforeEach
     void setUp() {
-        JsBundleRuleProvider jsBundleRule = new JsBundleRuleProvider();
+        JsBundleRuleProvider jsBundleRule = new JsBundleRuleProvider(haloPluginManager);
         pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager, jsBundleRule);
 
         when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);

@@ -134,12 +134,14 @@ public class PluginReconciler implements Reconciler {
         Plugin.PluginStatus status = plugin.statusNonNull();
         // TODO Check whether the JS bundle rule exists. If it does not exist, do not populate
         // populate stylesheet path
-        String jsBundleRoute = ReverseProxyRouterFunctionFactory.buildRoutePath(pluginName,
-            jsBundleRule.jsRule(pluginName));
-        String cssBundleRoute = ReverseProxyRouterFunctionFactory.buildRoutePath(pluginName,
-            jsBundleRule.cssRule(pluginName));
-        status.setEntry(jsBundleRoute);
-        status.setStylesheet(cssBundleRoute);
+        jsBundleRule.jsRule(pluginName)
+            .map(jsRule -> ReverseProxyRouterFunctionFactory.buildRoutePath(pluginName, jsRule))
+            .ifPresent(status::setEntry);
+
+        jsBundleRule.cssRule(pluginName)
+            .map(cssRule -> ReverseProxyRouterFunctionFactory.buildRoutePath(pluginName, cssRule))
+            .ifPresent(status::setStylesheet);
+
         status.setLastStartTime(Instant.now());
     }
 

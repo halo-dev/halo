@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginApplicationContext;
 import run.halo.app.plugin.PluginConst;
 
@@ -34,12 +35,14 @@ class ReverseProxyRouterFunctionFactoryTest {
 
     @Mock
     private PluginApplicationContext pluginApplicationContext;
+    @Mock
+    private HaloPluginManager haloPluginManager;
 
     private ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory;
 
     @BeforeEach
     void setUp() {
-        JsBundleRuleProvider jsBundleRuleProvider = new JsBundleRuleProvider();
+        JsBundleRuleProvider jsBundleRuleProvider = new JsBundleRuleProvider(haloPluginManager);
         reverseProxyRouterFunctionFactory = new ReverseProxyRouterFunctionFactory(extensionClient,
             jsBundleRuleProvider);
 
