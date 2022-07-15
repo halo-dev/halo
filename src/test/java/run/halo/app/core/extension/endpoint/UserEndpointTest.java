@@ -1,7 +1,6 @@
 package run.halo.app.core.extension.endpoint;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
@@ -37,6 +38,7 @@ import run.halo.app.infra.utils.JsonUtils;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
+@WithMockUser(username = "fake-user", password = "fake-password", roles = "fake-super-role")
 class UserEndpointTest {
 
     @Autowired
@@ -61,41 +63,78 @@ class UserEndpointTest {
             .build();
         var role = new Role();
         role.setRules(List.of(rule));
-        when(roleService.getRole(anyString())).thenReturn(role);
-        // prevent from initializing the super admin.
-        when(client.fetch(User.class, "admin")).thenReturn(Optional.of(mock(User.class)));
-    }
-
-    @Test
-    @WithMockUser("fake-user")
-    void shouldResponseErrorIfUserNotFound() {
-        when(client.fetch(User.class, "fake-user")).thenReturn(Optional.empty());
-        webClient.get().uri("/apis/api.halo.run/v1alpha1/users/-")
-            .exchange()
-            .expectStatus().is5xxServerError();
-    }
-
-    @Test
-    @WithMockUser("fake-user")
-    void shouldGetCurrentUserDetail() {
-        var metadata = new Metadata();
-        metadata.setName("fake-user");
-        var user = new User();
-        user.setMetadata(metadata);
-        when(client.fetch(User.class, "fake-user")).thenReturn(Optional.of(user));
-        webClient.get().uri("/apis/api.halo.run/v1alpha1/users/-")
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON)
-            .expectBody(User.class)
-            .isEqualTo(user);
+        when(roleService.getRole("fake-super-role")).thenReturn(role);
     }
 
     @Nested
+    @DisplayName("GetUserDetail")
+    class GetUserDetailTest {
+
+        @Test
+        void shouldResponseErrorIfUserNotFound() {
+            when(client.fetch(User.class, "fake-user")).thenReturn(Optional.empty());
+            webClient.get().uri("/apis/api.halo.run/v1alpha1/users/-")
+                .exchange()
+                .expectStatus().is5xxServerError();
+        }
+
+        @Test
+        void shouldGetCurrentUserDetail() {
+            var metadata = new Metadata();
+            metadata.setName("fake-user");
+            var user = new User();
+            user.setMetadata(metadata);
+            when(client.fetch(User.class, "fake-user")).thenReturn(Optional.of(user));
+            webClient.get().uri("/apis/api.halo.run/v1alpha1/users/-")
+                .exchange()
+                .expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(User.class)
+                .isEqualTo(user);
+        }
+    }
+
+    @Nested
+    @DisplayName("ChangePassword")
+    class ChangePasswordTest {
+
+        @Test
+        void shouldUpdateMyPasswordCorrectly() {
+            var user = new User();
+            when(userService.updateWithRawPassword("fake-user", "new-password"))
+                .thenReturn(Mono.just(user));
+            webClient.put().uri("/apis/api.halo.run/v1alpha1/users/-/password")
+                .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .isEqualTo(user);
+
+            verify(userService, times(1)).updateWithRawPassword("fake-user", "new-password");
+        }
+
+        @Test
+        void shouldUpdateOtherPasswordCorrectly() {
+            var user = new User();
+            when(userService.updateWithRawPassword("another-fake-user", "new-password"))
+                .thenReturn(Mono.just(user));
+            webClient.put().uri("/apis/api.halo.run/v1alpha1/users/another-fake-user/password")
+                .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .isEqualTo(user);
+
+            verify(userService, times(1)).updateWithRawPassword("another-fake-user",
+                "new-password");
+        }
+    }
+
+    @Nested
+    @DisplayName("GrantPermission")
     class GrantPermissionEndpointTest {
 
         @Test
-        @WithMockUser("fake-user")
         void shouldGetBadRequestIfRequestBodyIsEmpty() {
             webClient.post().uri("/apis/api.halo.run/v1alpha1/users/fake-user/permissions")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -108,7 +147,6 @@ class UserEndpointTest {
         }
 
         @Test
-        @WithMockUser("fake-user")
         void shouldGetNotFoundIfUserNotFound() {
             when(client.fetch(User.class, "fake-user")).thenReturn(Optional.empty());
             when(client.fetch(Role.class, "fake-role")).thenReturn(Optional.of(mock(Role.class)));
@@ -124,7 +162,6 @@ class UserEndpointTest {
         }
 
         @Test
-        @WithMockUser("fake-user")
         void shouldGetNotFoundIfRoleNotFound() {
             when(client.fetch(User.class, "fake-user")).thenReturn(Optional.of(mock(User.class)));
             when(client.fetch(Role.class, "fake-role")).thenReturn(Optional.empty());
@@ -140,7 +177,6 @@ class UserEndpointTest {
         }
 
         @Test
-        @WithMockUser("fake-user")
         void shouldCreateRoleBindingIfNotExist() {
             when(client.fetch(User.class, "fake-user")).thenReturn(Optional.of(mock(User.class)));
             var role = mock(Role.class);
@@ -160,7 +196,6 @@ class UserEndpointTest {
         }
 
         @Test
-        @WithMockUser("fake-user")
         void shouldDeleteRoleBindingIfNotProvided() {
             when(client.fetch(User.class, "fake-user")).thenReturn(Optional.of(mock(User.class)));
             var role = mock(Role.class);
@@ -179,12 +214,11 @@ class UserEndpointTest {
             verify(client, times(1)).create(RoleBinding.create("fake-user", "fake-role"));
             verify(client, times(1))
                 .delete(argThat(binding -> binding.getMetadata().getName()
-                .equals(roleBinding.getMetadata().getName())));
+                    .equals(roleBinding.getMetadata().getName())));
             verify(client, never()).update(isA(RoleBinding.class));
         }
 
         @Test
-        @WithMockUser("fake-user")
         void shouldGetPermission() {
             Role roleA = JsonUtils.jsonToObject("""
                 {
