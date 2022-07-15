@@ -7,7 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.Role.PolicyRule;
 import run.halo.app.core.extension.RoleBinding;
@@ -17,22 +17,28 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.User.UserSpec;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.properties.SecurityProperties.Initializer;
 
 @Slf4j
-@Component
 public class SuperAdminInitializer implements ApplicationListener<ApplicationReadyEvent> {
+
+    private static final String SUPER_ROLE_NAME = "super-role";
 
     private final ExtensionClient client;
     private final PasswordEncoder passwordEncoder;
 
-    public SuperAdminInitializer(ExtensionClient client, PasswordEncoder passwordEncoder) {
+    private final Initializer initializer;
+
+    public SuperAdminInitializer(ExtensionClient client, PasswordEncoder passwordEncoder,
+        Initializer initializer) {
         this.client = client;
         this.passwordEncoder = passwordEncoder;
+        this.initializer = initializer;
     }
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        client.fetch(User.class, "admin").ifPresentOrElse(user -> {
+        client.fetch(User.class, initializer.getSuperAdminUsername()).ifPresentOrElse(user -> {
             // do nothing if admin has been initialized
         }, () -> {
             var admin = createAdmin();
@@ -46,7 +52,9 @@ public class SuperAdminInitializer implements ApplicationListener<ApplicationRea
 
     RoleBinding bindAdminAndSuperRole(User admin, Role superRole) {
         var metadata = new Metadata();
-        metadata.setName("admin-super-role-binding");
+        String name =
+            String.join("-", initializer.getSuperAdminUsername(), SUPER_ROLE_NAME, "binding");
+        metadata.setName(name);
         var roleRef = new RoleRef();
         roleRef.setName(superRole.getMetadata().getName());
         roleRef.setApiGroup(superRole.groupVersionKind().group());
@@ -67,7 +75,7 @@ public class SuperAdminInitializer implements ApplicationListener<ApplicationRea
 
     Role createSuperRole() {
         var metadata = new Metadata();
-        metadata.setName("super-role");
+        metadata.setName(SUPER_ROLE_NAME);
 
         var superRule = new PolicyRule.Builder()
             .apiGroups("*")
@@ -84,7 +92,7 @@ public class SuperAdminInitializer implements ApplicationListener<ApplicationRea
 
     User createAdmin() {
         var metadata = new Metadata();
-        metadata.setName("admin");
+        metadata.setName(initializer.getSuperAdminUsername());
 
         var spec = new UserSpec();
         spec.setDisplayName("Administrator");
@@ -92,15 +100,22 @@ public class SuperAdminInitializer implements ApplicationListener<ApplicationRea
         spec.setRegisteredAt(Instant.now());
         spec.setTwoFactorAuthEnabled(false);
         spec.setEmail("admin@halo.run");
-        // generate password
-        var randomPassword = RandomStringUtils.randomAlphanumeric(16);
-        log.info("=== Generated random password: {} for initial user: {} ===",
-            randomPassword, metadata.getName());
-        spec.setPassword(passwordEncoder.encode(randomPassword));
+        spec.setPassword(passwordEncoder.encode(getPassword()));
 
         var user = new User();
         user.setMetadata(metadata);
         user.setSpec(spec);
         return user;
+    }
+
+    private String getPassword() {
+        var password = this.initializer.getSuperAdminPassword();
+        if (!StringUtils.hasText(password)) {
+            // generate password
+            password = RandomStringUtils.randomAlphanumeric(16);
+            log.info("=== Generated random password: {} for super administrator: {} ===",
+                password, this.initializer.getSuperAdminUsername());
+        }
+        return password;
     }
 }

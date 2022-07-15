@@ -19,10 +19,15 @@ spring:
 
 halo:
   security:
+    initializer:
+      disabled: true
     oauth2:
       jwt:
         public-key-location: classpath:app.pub
         private-key-location: classpath:app.key
+  extension:
+    controller:
+      disabled: true
 
 springdoc:
   api-docs:
