@@ -1,7 +1,9 @@
 package run.halo.app.security;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -68,6 +70,9 @@ public class SuperAdminInitializer implements ApplicationListener<ApplicationRea
     Role createSuperRole() {
         var metadata = new Metadata();
         metadata.setName("super-role");
+        Map<String, String> annotations = new HashMap<>();
+        annotations.put(Role.UI_PERMISSIONS_ANNO, "[\"*\"]");
+        metadata.setAnnotations(annotations);
 
         var superRule = new PolicyRule.Builder()
             .apiGroups("*")
