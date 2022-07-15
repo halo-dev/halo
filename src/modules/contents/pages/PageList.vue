@@ -99,6 +99,7 @@ onMounted(() => {
           <li
             v-for="(page, index) in pagesPublicState.functionalPages"
             :key="index"
+            v-permission="page.permissions"
             @click="$router.push({ path: page.path })"
           >
             <div

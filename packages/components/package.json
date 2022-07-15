@@ -49,7 +49,7 @@
     "@rollup/plugin-typescript": "^8.3.3",
     "histoire": "^0.7.9",
     "unplugin-icons": "^0.14.7",
-    "vite-plugin-dts": "^1.2.1"
+    "vite-plugin-dts": "^1.3.0"
   },
   "peerDependencies": {
     "vue": "^3.2.37",

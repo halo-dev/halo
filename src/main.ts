@@ -1,3 +1,4 @@
+import type { DirectiveBinding } from "vue";
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
@@ -18,6 +19,8 @@ import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
 import { usePluginStore } from "@/stores/plugin";
 import type { User } from "@halo-dev/api-client";
+import { hasPermission } from "@/utils/permission";
+import { useRoleStore } from "@/stores/role";
 
 const app = createApp(App);
 
@@ -141,10 +144,29 @@ async function loadCurrentUser() {
   const { data: user } = await apiClient.user.getCurrentUserDetail();
   app.provide<User>("currentUser", user);
 
-  const { data: permissions } = await apiClient.user.getPermissions(
+  const { data: currentPermissions } = await apiClient.user.getPermissions(
     user.metadata.name
   );
-  app.provide("permissions", permissions);
+  const roleStore = useRoleStore();
+  roleStore.$patch({
+    permissions: currentPermissions,
+  });
+  app.directive(
+    "permission",
+    (el: HTMLElement, binding: DirectiveBinding<string[]>) => {
+      const uiPermissions = Array.from<string>(
+        currentPermissions.uiPermissions
+      );
+      const { value } = binding;
+      const { any, enable } = binding.modifiers;
+
+      if (hasPermission(uiPermissions, value, any)) {
+        return;
+      }
+
+      enable ? (el.style.backgroundColor = "red") : el.remove();
+    }
+  );
 }
 
 (async function () {

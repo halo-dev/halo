@@ -4,7 +4,7 @@ importers:
 
   .:
     specifiers:
-      '@changesets/cli': ^2.23.1
+      '@changesets/cli': ^2.23.2
       '@formkit/addons': 1.0.0-beta.9
       '@formkit/core': 1.0.0-beta.9
       '@formkit/i18n': 1.0.0-beta.9
@@ -13,7 +13,7 @@ importers:
       '@formkit/vue': 1.0.0-beta.9
       '@halo-dev/admin-api': ^1.1.0
       '@halo-dev/admin-shared': workspace:*
-      '@halo-dev/api-client': ^0.0.0
+      '@halo-dev/api-client': ^0.0.2
       '@halo-dev/components': workspace:*
       '@rushstack/eslint-patch': ^1.1.4
       '@tailwindcss/aspect-ratio': ^0.4.0
@@ -30,8 +30,8 @@ importers:
       '@vue/eslint-config-typescript': ^11.0.0
       '@vue/test-utils': ^2.0.2
       '@vue/tsconfig': ^0.1.3
-      '@vueuse/components': ^8.9.2
-      '@vueuse/core': ^8.9.2
+      '@vueuse/components': ^8.9.3
+      '@vueuse/core': ^8.9.3
       autoprefixer: ^10.4.7
       axios: ^0.27.2
       c8: ^7.11.3
@@ -45,6 +45,7 @@ importers:
       husky: ^8.0.1
       jsdom: ^19.0.0
       lodash.clonedeep: ^4.5.0
+      lodash.isequal: ^4.5.0
       pinia: ^2.0.16
       postcss: ^8.4.14
       prettier: ^2.7.1
@@ -78,15 +79,16 @@ importers:
       '@formkit/vue': 1.0.0-beta.9_jly5jqkcc2zgnt3crhnp3znzv4
       '@halo-dev/admin-api': 1.1.0
       '@halo-dev/admin-shared': link:packages/shared
-      '@halo-dev/api-client': 0.0.0
+      '@halo-dev/api-client': 0.0.2
       '@halo-dev/components': link:packages/components
-      '@vueuse/components': 8.9.2_vue@3.2.37
-      '@vueuse/core': 8.9.2_vue@3.2.37
+      '@vueuse/components': 8.9.3_vue@3.2.37
+      '@vueuse/core': 8.9.3_vue@3.2.37
       axios: 0.27.2
       filepond: 4.30.4
       filepond-plugin-image-preview: 4.6.11_filepond@4.30.4
       floating-vue: 2.0.0-beta.16_vue@3.2.37
       lodash.clonedeep: 4.5.0
+      lodash.isequal: 4.5.0
       pinia: 2.0.16_j6bzmzd4ujpabbp5objtwxyjp4
       qs: 6.11.0
       uuid: 8.3.2
@@ -95,7 +97,7 @@ importers:
       vue-grid-layout: 3.0.0-beta1
       vue-router: 4.1.2_vue@3.2.37
     devDependencies:
-      '@changesets/cli': 2.23.1
+      '@changesets/cli': 2.23.2
       '@rushstack/eslint-patch': 1.1.4
       '@tailwindcss/aspect-ratio': 0.4.0_tailwindcss@3.1.6
       '@types/jsdom': 16.2.14
@@ -143,26 +145,26 @@ importers:
       '@rollup/plugin-typescript': ^8.3.3
       histoire: ^0.7.9
       unplugin-icons: ^0.14.7
-      vite-plugin-dts: ^1.2.1
+      vite-plugin-dts: ^1.3.0
     devDependencies:
       '@iconify-json/ri': 1.1.3
       '@rollup/plugin-typescript': 8.3.3
       histoire: 0.7.9
       unplugin-icons: 0.14.7
-      vite-plugin-dts: 1.2.1
+      vite-plugin-dts: 1.3.0
 
   packages/shared:
     specifiers:
-      '@halo-dev/api-client': ^0.0.0
+      '@halo-dev/api-client': ^0.0.2
       '@halo-dev/components': workspace:*
       axios: ^0.27.2
-      vite-plugin-dts: ^1.2.1
+      vite-plugin-dts: ^1.3.0
     dependencies:
-      '@halo-dev/api-client': 0.0.0
+      '@halo-dev/api-client': 0.0.2
       '@halo-dev/components': link:../components
       axios: 0.27.2
     devDependencies:
-      vite-plugin-dts: 1.2.1
+      vite-plugin-dts: 1.3.0
 
 packages:
 
@@ -1454,8 +1456,8 @@ packages:
       '@changesets/types': 5.0.0
     dev: true
 
-  /@changesets/cli/2.23.1:
-    resolution: {integrity: sha512-yXQ29Iw/26yq1oJpOCa7BJDeUvuurZmREmCX9p9m5RxlKNDnROJBylQDCVfqQdZbeV2jfvd3XRKvci80SvGssg==}
+  /@changesets/cli/2.23.2:
+    resolution: {integrity: sha512-o7CWC+mcwOmA3yK5axqHOSYPYEjX/x+nq/s9aX78AyzH1SQZa6L5HX4P9uUXibyjcKynklkmusxv8vN8+hJggA==}
     hasBin: true
     dependencies:
       '@babel/runtime': 7.17.9
@@ -1787,8 +1789,8 @@ packages:
       - debug
     dev: false
 
-  /@halo-dev/api-client/0.0.0:
-    resolution: {integrity: sha512-DC+0MsnX3e5IkqFFya3gz8JK893hGH+9ohKzLp1b7QqYj1Hvxxc1Nbr77IxvVbktZ14LUZTeHOdWHdqFAFQdvw==}
+  /@halo-dev/api-client/0.0.2:
+    resolution: {integrity: sha512-7amtdteNPCZ9ObM969HfknIqd+eXK8gjJ0cKWc7F7TET6puerlPxmmPC0SSdUEpnTf8zK1XUJg+Y06joxZboHA==}
     dev: false
 
   /@halo-dev/logger/1.1.0:
@@ -2876,11 +2878,11 @@ packages:
       '@types/node': 17.0.45
     dev: true
 
-  /@vueuse/components/8.9.2_vue@3.2.37:
-    resolution: {integrity: sha512-7K39dgpSdMJgotCGCaa3W7q/9AEZ2jitG+mBWH0TK+HSqLeYd5syHQKKK61raWP/qImu/mrwcsqeKtbFunU1FA==}
+  /@vueuse/components/8.9.3_vue@3.2.37:
+    resolution: {integrity: sha512-7A97cUdJxwAESo1dJvIzxGW7Z8n5LGrLPOrQ9qgNGUKZlwVgBHJNiQ5KMddDDoqSwTVrLGspc1p8q8/+tYpHKA==}
     dependencies:
-      '@vueuse/core': 8.9.2_vue@3.2.37
-      '@vueuse/shared': 8.9.2_vue@3.2.37
+      '@vueuse/core': 8.9.3_vue@3.2.37
+      '@vueuse/shared': 8.9.3_vue@3.2.37
       vue-demi: 0.12.1_vue@3.2.37
     transitivePeerDependencies:
       - '@vue/composition-api'
@@ -2903,9 +2905,33 @@ packages:
       '@vueuse/shared': 8.9.2_vue@3.2.37
       vue: 3.2.37
       vue-demi: 0.12.1_vue@3.2.37
+    dev: true
+
+  /@vueuse/core/8.9.3_vue@3.2.37:
+    resolution: {integrity: sha512-q2pr3N7FPG7IBBhEXTYOJU+38VwKMLP5IfD33byzBV4Th7f1JHT4qPKvJrvr17knAefPRzNqgt9et+xFqaRlPQ==}
+    peerDependencies:
+      '@vue/composition-api': ^1.1.0
+      vue: ^2.6.0 || ^3.2.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+      vue:
+        optional: true
+    dependencies:
+      '@types/web-bluetooth': 0.0.14
+      '@vueuse/metadata': 8.9.3
+      '@vueuse/shared': 8.9.3_vue@3.2.37
+      vue: 3.2.37
+      vue-demi: 0.12.1_vue@3.2.37
+    dev: false
 
   /@vueuse/metadata/8.9.2:
     resolution: {integrity: sha512-g2s2BeyeEtJElmMFfFPnM+BTvnt0omniyvz8U18/zXDpQIMGozlNQgHoFeratyMfgVBhH/u2VKzmchChtDsgPQ==}
+    dev: true
+
+  /@vueuse/metadata/8.9.3:
+    resolution: {integrity: sha512-57gZZKtWAmcJaUBmciCohvmumVLz4+FnoVnWj7U5BWs5PC2/7gU9Z0/i1i9leDNeboAauFzAq7z1GjS8eYnT+w==}
+    dev: false
 
   /@vueuse/shared/8.9.2_vue@3.2.37:
     resolution: {integrity: sha512-s4Nk82oheL5z1GywyGnqjob0MzbAt88olMZa0vgt/p3gcMsT8Ff7+SqmNgEFC6AAs6xiuhOAZpnew9Zs3d90yQ==}
@@ -2920,6 +2946,22 @@ packages:
     dependencies:
       vue: 3.2.37
       vue-demi: 0.12.1_vue@3.2.37
+    dev: true
+
+  /@vueuse/shared/8.9.3_vue@3.2.37:
+    resolution: {integrity: sha512-foorYQAU3CGknAO1w9No/rpGBJmb7L74MPltnZAYxeBRfhsajjJYYgja+D5IT2vT+/a0NciISaVp3fDwMN1ocA==}
+    peerDependencies:
+      '@vue/composition-api': ^1.1.0
+      vue: ^2.6.0 || ^3.2.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+      vue:
+        optional: true
+    dependencies:
+      vue: 3.2.37
+      vue-demi: 0.12.1_vue@3.2.37
+    dev: false
 
   /abab/2.0.5:
     resolution: {integrity: sha512-9IK9EadsbHo6jLWIpxpR6pL0sazTXV6+SQv25ZB+F7Bj9mJNaOc4nCRabwd5M/JwmUa8idz6Eci6eKfJryPs6Q==}
@@ -3731,7 +3773,7 @@ packages:
       cli-table3: 0.6.1
       commander: 5.1.0
       common-tags: 1.8.2
-      dayjs: 1.10.8
+      dayjs: 1.11.3
       debug: 4.3.4_supports-color@8.1.1
       enquirer: 2.3.6
       eventemitter2: 6.4.5
@@ -3775,8 +3817,8 @@ packages:
       whatwg-url: 10.0.0
     dev: true
 
-  /dayjs/1.10.8:
-    resolution: {integrity: sha512-wbNwDfBHHur9UOzNUjeKUOJ0fCb0a52Wx0xInmQ7Y8FstyajiV1NmK1e00cxsr9YrE9r7yAChE0VvpuY5Rnlow==}
+  /dayjs/1.11.3:
+    resolution: {integrity: sha512-xxwlswWOlGhzgQ4TKzASQkUhqERI3egRNqgV4ScR8wlANA/A9tZ7miXa44vTTKEq5l7vWoL5G57bG3zA+Kow0A==}
     dev: true
 
   /debug/2.6.9:
@@ -5777,7 +5819,6 @@ packages:
 
   /lodash.isequal/4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
-    dev: true
 
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
@@ -6067,7 +6108,7 @@ packages:
     resolution: {integrity: sha512-/5CMN3T0R4XTj4DcGaexo+roZSdSFW/0AOOTROrjxzCG1wrWXEsGbRKevjlIL+ZDE4sZlJr5ED4YW0yqmkK+eA==}
     dependencies:
       hosted-git-info: 2.8.9
-      resolve: 1.22.0
+      resolve: 1.22.1
       semver: 5.7.1
       validate-npm-package-license: 3.0.4
     dev: true
@@ -7755,8 +7796,8 @@ packages:
       - stylus
     dev: true
 
-  /vite-plugin-dts/1.2.1:
-    resolution: {integrity: sha512-V59rsKQnPI6FTGybh/ED4+dyK3UeSkvC1CJzpuDNoXb7mKNUcWmg66EM0N5Ijoc8xDAfZIXYxQjg675YHIDvFw==}
+  /vite-plugin-dts/1.3.0:
+    resolution: {integrity: sha512-YxDNqOE2wp713SyZ6AMmSu/sNfmiiy7GtlFXCMvlpD4nMaIbpqltidbve7fNlc3+gxlV+e156As/TwBtBp3g4Q==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       vite: '>=2.4.4'

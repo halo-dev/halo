@@ -6,4 +6,5 @@ export interface FunctionalPagesState {
   name: string;
   path: string;
   url?: string;
+  permissions?: Array<string>;
 }
