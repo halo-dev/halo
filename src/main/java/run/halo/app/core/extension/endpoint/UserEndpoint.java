@@ -7,6 +7,7 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -148,8 +149,7 @@ public class UserEndpoint implements CustomEndpoint {
                 return list;
             })
             .map(roles -> {
-                Set<String> uiPermissions =
-                    roles.stream()
+                Set<String> uiPermissions = roles.stream()
                         .map(role -> role.getMetadata().getAnnotations())
                         .filter(Objects::nonNull)
                         .map(this::mergeUiPermissions)
@@ -180,6 +180,7 @@ public class UserEndpoint implements CustomEndpoint {
         return result;
     }
 
-    record UserPermission(Set<Role> roles, Set<String> uiPermissions) {
+    record UserPermission(@Schema(required = true) Set<Role> roles,
+                          @Schema(required = true) Set<String> uiPermissions) {
     }
 }
