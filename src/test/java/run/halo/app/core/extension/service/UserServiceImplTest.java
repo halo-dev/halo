@@ -230,6 +230,24 @@ class UserServiceImplTest {
         }
 
         @Test
+        void shouldUpdatePasswordIfNoPasswordBefore() {
+            userService = spy(userService);
+
+            doReturn(
+                Mono.just(createUser("")),
+                Mono.just(createUser("new-password")))
+                .when(userService)
+                .getUser("fake-user");
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
+                .expectNext(createUser("new-password"))
+                .verifyComplete();
+
+            verify(passwordEncoder, never()).matches(anyString(), anyString());
+            verify(passwordEncoder, times(1)).encode("new-password");
+            verify(userService, times(2)).getUser("fake-user");
+        }
+
+        @Test
         void shouldDoNothingIfPasswordNotChanged() {
             userService = spy(userService);
 

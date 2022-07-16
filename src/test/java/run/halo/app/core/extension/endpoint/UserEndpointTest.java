@@ -128,6 +128,7 @@ class UserEndpointTest {
             verify(userService, times(1)).updateWithRawPassword("another-fake-user",
                 "new-password");
         }
+
     }
 
     @Nested
