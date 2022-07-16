@@ -50,7 +50,7 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
         DefaultPluginDescriptor defaultPluginDescriptor =
             new DefaultPluginDescriptor(pluginId,
                 spec.getDescription(),
-                spec.getPluginClass(),
+                BasePlugin.class.getName(),
                 spec.getVersion(),
                 spec.getRequires(),
                 spec.getAuthor(),

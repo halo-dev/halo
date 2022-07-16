@@ -35,7 +35,7 @@ public class BasePlugin extends Plugin {
         return applicationContext;
     }
 
-    public HaloPluginManager getPluginManager() {
+    private HaloPluginManager getPluginManager() {
         return (HaloPluginManager) getWrapper().getPluginManager();
     }
 }
