@@ -5,12 +5,12 @@ export function hasPermission(
   targetPermissions: Array<string>,
   any: boolean
 ): boolean {
-  if (!targetPermissions || !targetPermissions.length) {
+  // super admin has all permissions
+  if (uiPermissions.includes("*")) {
     return true;
   }
 
-  // super admin has all permissions
-  if (targetPermissions.includes("*")) {
+  if (!targetPermissions || !targetPermissions.length) {
     return true;
   }
 
