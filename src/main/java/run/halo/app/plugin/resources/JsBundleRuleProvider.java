@@ -17,6 +17,15 @@ import run.halo.app.plugin.HaloPluginManager;
  */
 @Component
 public class JsBundleRuleProvider {
+    private static final String JS_LOCATION = "/admin/main.js";
+    private static final String CSS_LOCATION = "/admin/style.css";
+
+    private static final FileReverseProxyProvider JS_FILE_PROXY =
+        new FileReverseProxyProvider("admin", "main.js");
+
+    private static final FileReverseProxyProvider CSS_FILE_PROXY =
+        new FileReverseProxyProvider("admin", "style.css");
+
     private final HaloPluginManager haloPluginManager;
 
     public JsBundleRuleProvider(HaloPluginManager haloPluginManager) {
@@ -30,14 +39,10 @@ public class JsBundleRuleProvider {
      * @return a js bundle rule
      */
     public Optional<ReverseProxyRule> jsRule(String pluginName) {
-        return Optional.of("/admin/main.js")
+        return Optional.of(JS_LOCATION)
             .filter(path -> createResourceLoader(pluginName)
                 .getResource(path).exists())
-            .map(path -> {
-                FileReverseProxyProvider
-                    file = new FileReverseProxyProvider("admin", "main.js");
-                return new ReverseProxyRule(path, file);
-            });
+            .map(path -> new ReverseProxyRule(path, JS_FILE_PROXY));
     }
 
     /**
@@ -47,15 +52,11 @@ public class JsBundleRuleProvider {
      * @return a stylesheet bundle rule
      */
     public Optional<ReverseProxyRule> cssRule(String pluginName) {
-        return Optional.of("/admin/style.css")
+        return Optional.of(CSS_LOCATION)
             .filter(path -> createResourceLoader(pluginName)
                 .getResource(path)
                 .exists())
-            .map(path -> {
-                FileReverseProxyProvider
-                    file = new FileReverseProxyProvider("admin", "style.css");
-                return new ReverseProxyRule(path, file);
-            });
+            .map(path -> new ReverseProxyRule(path, CSS_FILE_PROXY));
     }
 
     @NonNull
