@@ -114,15 +114,8 @@ public class ReverseProxyRouterFunctionFactory {
 
     private List<ReverseProxyRule> getJsBundleRules(String pluginId) {
         List<ReverseProxyRule> rules = new ArrayList<>(2);
-        ReverseProxyRule jsRule = jsBundleRuleProvider.jsRule(pluginId);
-        if (jsRule != null) {
-            rules.add(jsRule);
-        }
-
-        ReverseProxyRule cssRule = jsBundleRuleProvider.cssRule(pluginId);
-        if (cssRule != null) {
-            rules.add(cssRule);
-        }
+        jsBundleRuleProvider.jsRule(pluginId).ifPresent(rules::add);
+        jsBundleRuleProvider.cssRule(pluginId).ifPresent(rules::add);
         return rules;
     }
 

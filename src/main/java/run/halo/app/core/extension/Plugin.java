@@ -44,7 +44,7 @@ public class Plugin extends AbstractExtension {
     @JsonIgnore
     public PluginStatus statusNonNull() {
         if (this.status == null) {
-            return new PluginStatus();
+            this.status = new PluginStatus();
         }
         return status;
     }
@@ -87,7 +87,8 @@ public class Plugin extends AbstractExtension {
         @NonNull
         @JsonIgnore
         public List<String> extensionLocationsNonNull() {
-            return Objects.requireNonNullElseGet(extensionLocations, List::of);
+            this.extensionLocations = Objects.requireNonNullElseGet(extensionLocations, List::of);
+            return this.extensionLocations;
         }
     }
 
