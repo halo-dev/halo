@@ -10,14 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
-import org.pf4j.RuntimeMode;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginStartingError;
-import run.halo.app.plugin.YamlPluginFinder;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionFactory;
 
@@ -82,8 +80,6 @@ public class PluginReconciler implements Reconciler {
             pluginStatus.setMessage("Plugin " + name + " not found in plugin manager");
             return;
         }
-
-        ensureSpecUpToDateWhenDevelopmentMode(pluginWrapper, plugin);
 
         if (!Objects.equals(pluginStatus.getPhase(), pluginWrapper.getPluginState())) {
             // Set to the correct state
@@ -170,20 +166,6 @@ public class PluginReconciler implements Reconciler {
             status.setMessage(startingError.getDevMessage());
             // requeue the plugin for reconciliation
             throw new PluginRuntimeException(startingError.getMessage());
-        }
-    }
-
-    private void ensureSpecUpToDateWhenDevelopmentMode(PluginWrapper pluginWrapper,
-        Plugin oldPlugin) {
-        if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
-            return;
-        }
-        YamlPluginFinder yamlPluginFinder = new YamlPluginFinder();
-        Plugin pluginFromPath = yamlPluginFinder.find(pluginWrapper.getPluginPath());
-        // ensure plugin spec is up to date
-        Plugin.PluginSpec pluginSpec = JsonUtils.deepCopy(pluginFromPath.getSpec());
-        if (!Objects.equals(oldPlugin.getSpec(), pluginSpec)) {
-            oldPlugin.setSpec(pluginSpec);
         }
     }
 }

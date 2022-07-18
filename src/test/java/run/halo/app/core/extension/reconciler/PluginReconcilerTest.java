@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
-import org.pf4j.RuntimeMode;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
@@ -54,7 +53,6 @@ class PluginReconcilerTest {
         pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager, jsBundleRule);
 
         when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
-        when(pluginWrapper.getRuntimeMode()).thenReturn(RuntimeMode.DEPLOYMENT);
         when(haloPluginManager.getUnresolvedPlugins()).thenReturn(List.of());
     }
 
