@@ -35,8 +35,8 @@
     "@halo-dev/admin-shared": "workspace:*",
     "@halo-dev/api-client": "^0.0.2",
     "@halo-dev/components": "workspace:*",
-    "@vueuse/components": "^8.9.3",
-    "@vueuse/core": "^8.9.3",
+    "@vueuse/components": "^8.9.4",
+    "@vueuse/core": "^8.9.4",
     "axios": "^0.27.2",
     "filepond": "^4.30.4",
     "filepond-plugin-image-preview": "^4.6.11",
@@ -71,7 +71,7 @@
     "autoprefixer": "^10.4.7",
     "c8": "^7.11.3",
     "cypress": "^9.7.0",
-    "eslint": "^8.19.0",
+    "eslint": "^8.20.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-vue": "^9.2.0",
     "husky": "^8.0.1",
@@ -87,11 +87,11 @@
     "typescript": "~4.7.4",
     "vite": "^2.9.14",
     "vite-compression-plugin": "^0.0.4",
-    "vite-plugin-externals": "^0.5.0",
+    "vite-plugin-externals": "^0.5.1",
     "vite-plugin-pwa": "^0.12.3",
     "vite-plugin-static-copy": "^0.6.1",
     "vite-plugin-vue-setup-extend": "^0.4.0",
     "vitest": "^0.16.0",
-    "vue-tsc": "^0.38.5"
+    "vue-tsc": "^0.38.8"
   }
 }

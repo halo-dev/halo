@@ -80,8 +80,9 @@ const handleFetchRole = async () => {
     );
     formState.value.role = response.data;
     formState.value.selectedRoleTemplates = JSON.parse(
-      response.data.metadata.annotations?.["rbac.authorization.halo.run/dependencies"] ||
-        "[]"
+      response.data.metadata.annotations?.[
+        "rbac.authorization.halo.run/dependencies"
+      ] || "[]"
     );
   } catch (error) {
     console.error(error);

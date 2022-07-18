@@ -37,7 +37,7 @@ const isStarted = (plugin: Plugin) => {
 
 const handleFetchPlugins = async () => {
   try {
-    const {data} =
+    const { data } =
       await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
     plugins.value = data.items;
   } catch (e) {
