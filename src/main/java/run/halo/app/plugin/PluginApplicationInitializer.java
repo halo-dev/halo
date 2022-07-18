@@ -66,6 +66,8 @@ public class PluginApplicationInitializer {
         AnnotationConfigUtils.registerAnnotationConfigProcessors(beanFactory);
         stopWatch.stop();
 
+        beanFactory.registerSingleton("pluginWrapper", haloPluginManager.getPlugin(pluginId));
+
         populateSettingFetcher(pluginId, beanFactory);
 
         log.debug("Total millis: {} ms -> {}", stopWatch.getTotalTimeMillis(),

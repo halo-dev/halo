@@ -14,6 +14,7 @@ import org.pf4j.ExtensionFinder;
 import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
+import org.pf4j.PluginFactory;
 import org.pf4j.PluginRepository;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
@@ -78,6 +79,11 @@ public class HaloPluginManager extends DefaultPluginManager
 
     public PluginApplicationContext getPluginApplicationContext(String pluginId) {
         return pluginApplicationInitializer.getPluginApplicationContext(pluginId);
+    }
+
+    @Override
+    protected PluginFactory createPluginFactory() {
+        return new BasePluginFactory();
     }
 
     @Override
