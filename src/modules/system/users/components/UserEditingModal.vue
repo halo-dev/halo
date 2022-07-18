@@ -19,13 +19,13 @@ const props = defineProps({
 
 const emit = defineEmits(["update:visible", "close"]);
 
-interface creationFormState {
+interface EditingFormState {
   user: User;
   saving: boolean;
 }
 
 const roles = ref<Role[]>([]);
-const creationForm = ref<creationFormState>({
+const editingFormState = ref<EditingFormState>({
   user: {
     spec: {
       displayName: "",
@@ -48,7 +48,7 @@ const creationForm = ref<creationFormState>({
 const selectedRole = ref("");
 
 const isUpdateMode = computed(() => {
-  return !!creationForm.value.user.metadata.creationTimestamp;
+  return !!editingFormState.value.user.metadata.creationTimestamp;
 });
 
 const creationModalTitle = computed(() => {
@@ -64,7 +64,7 @@ const basicRoles = computed(() => {
 
 watch(props, (newVal) => {
   if (newVal.visible && props.user) {
-    creationForm.value.user = props.user;
+    editingFormState.value.user = props.user;
   }
 });
 
@@ -86,18 +86,18 @@ const handleVisibleChange = (visible: boolean) => {
 
 const handleCreateUser = async () => {
   try {
-    creationForm.value.saving = true;
+    editingFormState.value.saving = true;
     let user: User;
 
     if (isUpdateMode.value) {
       const response = await apiClient.extension.user.updatev1alpha1User(
-        creationForm.value.user.metadata.name,
-        creationForm.value.user
+        editingFormState.value.user.metadata.name,
+        editingFormState.value.user
       );
       user = response.data;
     } else {
       const response = await apiClient.extension.user.createv1alpha1User(
-        creationForm.value.user
+        editingFormState.value.user
       );
       user = response.data;
     }
@@ -113,7 +113,7 @@ const handleCreateUser = async () => {
   } catch (e) {
     console.error(e);
   } finally {
-    creationForm.value.saving = false;
+    editingFormState.value.saving = false;
   }
 };
 
@@ -128,19 +128,20 @@ onMounted(handleFetchRoles);
   >
     <FormKit id="user-form" type="form" @submit="handleCreateUser">
       <FormKit
-        v-model="creationForm.user.metadata.name"
+        v-model="editingFormState.user.metadata.name"
+        :disabled="true"
         label="用户名"
         type="text"
         validation="required"
       ></FormKit>
       <FormKit
-        v-model="creationForm.user.spec.displayName"
+        v-model="editingFormState.user.spec.displayName"
         label="显示名称"
         type="text"
         validation="required"
       ></FormKit>
       <FormKit
-        v-model="creationForm.user.spec.email"
+        v-model="editingFormState.user.spec.email"
         label="电子邮箱"
         type="email"
         validation="required"
@@ -160,24 +161,24 @@ onMounted(handleFetchRoles);
         validation="required"
       ></FormKit>
       <FormKit
-        v-model="creationForm.user.spec.phone"
+        v-model="editingFormState.user.spec.phone"
         label="手机号"
         type="text"
       ></FormKit>
       <FormKit
-        v-model="creationForm.user.spec.avatar"
+        v-model="editingFormState.user.spec.avatar"
         label="头像"
         type="text"
       ></FormKit>
       <FormKit
-        v-model="creationForm.user.spec.bio"
+        v-model="editingFormState.user.spec.bio"
         label="描述"
         type="textarea"
       ></FormKit>
     </FormKit>
     <template #footer>
       <VButton
-        :loading="creationForm.saving"
+        :loading="editingFormState.saving"
         type="secondary"
         @click="$formkit.submit('user-form')"
       >

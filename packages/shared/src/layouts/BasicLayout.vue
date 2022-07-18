@@ -12,7 +12,7 @@ import type { MenuGroupType, MenuItemType } from "@/types/menus";
 import type { User } from "../../../../src/types/extension";
 import logo from "@/assets/logo.svg";
 import { RouterView, useRoute, useRouter } from "vue-router";
-import { inject, ref } from "vue";
+import { computed, inject, ref } from "vue";
 
 const menus = inject<MenuGroupType>("menus");
 const minimenus = inject<MenuItemType>("minimenus");
@@ -28,6 +28,14 @@ const currentUser = inject<User>("currentUser");
 const handleRouteToProfile = () => {
   router.push({ path: `/users/${currentUser?.metadata.name}/detail` });
 };
+
+const currentRole = computed(() => {
+  return JSON.parse(
+    currentUser?.metadata.annotations?.[
+      "rbac.authorization.halo.run/role-names"
+    ] || "[]"
+  )[0];
+});
 </script>
 
 <template>
@@ -62,7 +70,7 @@ const handleRouteToProfile = () => {
               <template #leftIcon>
                 <IconUserSettings />
               </template>
-              管理员
+              {{ currentRole }}
             </VTag>
           </div>
         </div>

@@ -32,7 +32,7 @@ const loginForm = ref<LoginFormState>({
   state: {
     _csrf: "",
     username: "admin",
-    password: "1A3DTGDF7yeGsZaR",
+    password: "12345678",
   },
 });
 

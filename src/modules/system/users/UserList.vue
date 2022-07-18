@@ -12,17 +12,19 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import UserCreationModal from "./components/UserCreationModal.vue";
+import UserEditingModal from "./components/UserEditingModal.vue";
+import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import { onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { User } from "@halo-dev/api-client";
 import type { UserList } from "@halo-dev/api-client";
 
 const checkAll = ref(false);
-const creationModal = ref<boolean>(false);
+const editingModal = ref<boolean>(false);
+const passwordChangeModal = ref<boolean>(false);
 const users = ref<UserList>({
   page: 1,
-  size: 5,
+  size: 10,
   total: 0,
   items: [],
   first: true,
@@ -41,6 +43,8 @@ const handleFetchUsers = async () => {
     users.value = data;
   } catch (e) {
     console.error(e);
+  } finally {
+    selectedUser.value = null;
   }
 };
 
@@ -58,7 +62,12 @@ const handlePaginationChange = async ({
 
 const handleOpenCreateModal = (user: User) => {
   selectedUser.value = user;
-  creationModal.value = true;
+  editingModal.value = true;
+};
+
+const handleOpenPasswordChangeModal = (user: User) => {
+  selectedUser.value = user;
+  passwordChangeModal.value = true;
 };
 
 const getRoles = (user: User) => {
@@ -73,8 +82,14 @@ onMounted(() => {
 });
 </script>
 <template>
-  <UserCreationModal
-    v-model:visible="creationModal"
+  <UserEditingModal
+    v-model:visible="editingModal"
+    :user="selectedUser"
+    @close="handleFetchUsers"
+  />
+
+  <UserPasswordChangeModal
+    v-model:visible="passwordChangeModal"
     :user="selectedUser"
     @close="handleFetchUsers"
   />
@@ -91,7 +106,7 @@ onMounted(() => {
           </template>
           角色管理
         </VButton>
-        <VButton type="secondary" @click="creationModal = true">
+        <VButton type="secondary" @click="editingModal = true">
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
@@ -290,7 +305,30 @@ onMounted(() => {
                     {{ user.metadata.creationTimestamp }}
                   </time>
                   <span class="cursor-pointer">
-                    <IconSettings @click="handleOpenCreateModal(user)" />
+                    <FloatingDropdown>
+                      <IconSettings />
+
+                      <template #popper>
+                        <div class="links-w-48 links-p-2">
+                          <VSpace class="links-w-full" direction="column">
+                            <VButton
+                              block
+                              type="secondary"
+                              @click="handleOpenCreateModal(user)"
+                            >
+                              修改资料
+                            </VButton>
+                            <VButton
+                              v-permission="['system:users:manage']"
+                              block
+                              @click="handleOpenPasswordChangeModal(user)"
+                            >
+                              修改密码
+                            </VButton>
+                          </VSpace>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
                   </span>
                 </div>
               </div>
