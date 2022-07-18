@@ -9,7 +9,7 @@ import {
   VTag,
 } from "@halo-dev/components";
 import type { MenuGroupType, MenuItemType } from "@/types/menus";
-import type { User } from "../../../../src/types/extension";
+import type { User } from "@halo-dev/api-client";
 import logo from "@/assets/logo.svg";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { computed, inject, ref } from "vue";
