@@ -16,7 +16,6 @@ import org.pf4j.PluginState;
 import org.springframework.lang.NonNull;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
-import run.halo.app.plugin.BasePlugin;
 
 /**
  * A custom resource for Plugin.
@@ -74,7 +73,8 @@ public class Plugin extends AbstractExtension {
          */
         private String requires = "*";
 
-        private String pluginClass = BasePlugin.class.getName();
+        @Deprecated
+        private String pluginClass;
 
         private Boolean enabled = false;
 

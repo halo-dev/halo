@@ -92,7 +92,7 @@ class YamlPluginFinderTest {
                             }
                         ],
                         "requires": ">=2.0.0",
-                        "pluginClass": "run.halo.app.plugin.BasePlugin",
+                        "pluginClass": null,
                         "enabled": false,
                         "extensionLocations": null,
                         settingName: null,

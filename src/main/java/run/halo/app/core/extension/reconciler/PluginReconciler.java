@@ -175,7 +175,7 @@ public class PluginReconciler implements Reconciler {
 
     private void ensureSpecUpToDateWhenDevelopmentMode(PluginWrapper pluginWrapper,
         Plugin oldPlugin) {
-        if (!RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
+        if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
             return;
         }
         YamlPluginFinder yamlPluginFinder = new YamlPluginFinder();
