@@ -3,7 +3,10 @@ package run.halo.app.core.extension.service;
 import static run.halo.app.core.extension.RoleBinding.containsUser;
 
 import java.util.Objects;
+import java.util.function.Predicate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
@@ -16,8 +19,11 @@ public class UserServiceImpl implements UserService {
 
     private final ExtensionClient client;
 
-    public UserServiceImpl(ExtensionClient client) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserServiceImpl(ExtensionClient client, PasswordEncoder passwordEncoder) {
         this.client = client;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -33,6 +39,27 @@ public class UserServiceImpl implements UserService {
                 client.update(user);
             })
             .then();
+    }
+
+    @Override
+    public Mono<User> updateWithRawPassword(String username, String rawPassword) {
+        return getUser(username)
+            .filter(Predicate.not(hasPassword().and(passwordMatches(rawPassword))))
+            .flatMap(user -> {
+                // TODO Validate the password
+                user.getSpec().setPassword(passwordEncoder.encode(rawPassword));
+                client.update(user);
+                // get the latest user
+                return getUser(username);
+            });
+    }
+
+    private Predicate<User> hasPassword() {
+        return user -> StringUtils.hasText(user.getSpec().getPassword());
+    }
+
+    private Predicate<User> passwordMatches(String rawPassword) {
+        return user -> passwordEncoder.matches(rawPassword, user.getSpec().getPassword());
     }
 
     @Override

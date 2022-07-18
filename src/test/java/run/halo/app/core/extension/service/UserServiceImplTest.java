@@ -2,20 +2,28 @@ package run.halo.app.core.extension.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
@@ -29,6 +37,9 @@ class UserServiceImplTest {
 
     @Mock
     ExtensionClient client;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -194,4 +205,88 @@ class UserServiceImplTest {
             JsonUtils.jsonToObject(bindB, RoleBinding.class),
             JsonUtils.jsonToObject(bindC, RoleBinding.class));
     }
+
+    @Nested
+    @DisplayName("UpdateWithRawPassword")
+    class UpdateWithRawPasswordTest {
+
+        @Test
+        void shouldUpdatePasswordWithDifferentPassword() {
+            userService = spy(userService);
+
+            doReturn(
+                Mono.just(createUser("fake-password")),
+                Mono.just(createUser("new-password")))
+                .when(userService)
+                .getUser("fake-user");
+            when(passwordEncoder.matches("new-password", "fake-password")).thenReturn(false);
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
+                .expectNext(createUser("new-password"))
+                .verifyComplete();
+
+            verify(passwordEncoder, times(1)).matches("new-password", "fake-password");
+            verify(passwordEncoder, times(1)).encode("new-password");
+            verify(userService, times(2)).getUser("fake-user");
+        }
+
+        @Test
+        void shouldUpdatePasswordIfNoPasswordBefore() {
+            userService = spy(userService);
+
+            doReturn(
+                Mono.just(createUser("")),
+                Mono.just(createUser("new-password")))
+                .when(userService)
+                .getUser("fake-user");
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
+                .expectNext(createUser("new-password"))
+                .verifyComplete();
+
+            verify(passwordEncoder, never()).matches(anyString(), anyString());
+            verify(passwordEncoder, times(1)).encode("new-password");
+            verify(userService, times(2)).getUser("fake-user");
+        }
+
+        @Test
+        void shouldDoNothingIfPasswordNotChanged() {
+            userService = spy(userService);
+
+            doReturn(
+                Mono.just(createUser("fake-password")),
+                Mono.just(createUser("new-password")))
+                .when(userService)
+                .getUser("fake-user");
+            when(passwordEncoder.matches("fake-password", "fake-password")).thenReturn(true);
+
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "fake-password"))
+                .expectNextCount(0)
+                .verifyComplete();
+
+            verify(passwordEncoder, times(1)).matches("fake-password", "fake-password");
+            verify(passwordEncoder, never()).encode("fake-password");
+            verify(userService, times(1)).getUser("fake-user");
+        }
+
+        @Test
+        void shouldDoNothingIfUserNotFound() {
+            userService = spy(userService);
+
+            doReturn(Mono.empty()).when(userService).getUser("fake-user");
+            StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
+                .expectNextCount(0)
+                .verifyComplete();
+
+            verify(passwordEncoder, never()).matches(anyString(), anyString());
+            verify(passwordEncoder, never()).encode(anyString());
+            verify(userService, times(1)).getUser(anyString());
+        }
+
+        User createUser(String password) {
+            var user = new User();
+            user.setSpec(new User.UserSpec());
+            user.getSpec().setPassword(password);
+            return user;
+        }
+    }
+
 }

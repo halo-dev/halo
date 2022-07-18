@@ -9,7 +9,10 @@ public interface UserService {
 
     Mono<User> getUser(String username);
 
+    @Deprecated
     Mono<Void> updatePassword(String username, String newPassword);
+
+    Mono<User> updateWithRawPassword(String username, String rawPassword);
 
     Flux<Role> listRoles(String username);
 }
