@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
@@ -23,7 +24,7 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Data
 public class DefaultRuleResolver implements AuthorizationRuleResolver {
-
+    private static final String AUTHENTICATED_ROLE = "authenticated";
     private RoleService roleService;
 
     private RoleBindingService roleBindingService = new DefaultRoleBindingService();
@@ -49,7 +50,10 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
     @Override
     public void visitRulesFor(UserDetails user, RuleAccumulator visitor) {
-        Set<String> roleNames = roleBindingService.listBoundRoleNames(user.getAuthorities());
+        Set<String> roleNamesImmutable =
+            roleBindingService.listBoundRoleNames(user.getAuthorities());
+        Set<String> roleNames = new HashSet<>(roleNamesImmutable);
+        roleNames.add(AUTHENTICATED_ROLE);
 
         List<Role.PolicyRule> rules = Collections.emptyList();
         for (String roleName : roleNames) {

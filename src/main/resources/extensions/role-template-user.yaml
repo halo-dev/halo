@@ -1,0 +1,42 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-users
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-view-users" ]
+    rbac.authorization.halo.run/module: "Users Management"
+    rbac.authorization.halo.run/display-name: "用户管理"
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "users" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-users
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Users Management"
+    rbac.authorization.halo.run/display-name: "用户查看"
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "users" ]
+    verbs: [ "get", "list" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-change-password
+  labels:
+    halo.run/role-template: "true"
+    rbac.authorization.halo.run/module: "Users Management"
+    rbac.authorization.halo.run/display-name: "修改密码"
+rules:
+  - apiGroups: [ "api.halo.run" ]
+    resources: [ "users/password" ]
+    verbs: [ "update" ]

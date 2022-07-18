@@ -1,0 +1,28 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-permissions
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-permissions\" ]"
+    rbac.authorization.halo.run/module: "Permissions Management"
+    rbac.authorization.halo.run/display-name: "权限管理"
+rules:
+  - apiGroups: [ "api.halo.run" ]
+    resources: [ "users/permissions" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-permissions
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Permissions Management"
+    rbac.authorization.halo.run/display-name: "权限查看"
+rules:
+  - apiGroups: [ "api.halo.run" ]
+    resources: [ "users/permissions" ]
+    verbs: [ "get", "list" ]

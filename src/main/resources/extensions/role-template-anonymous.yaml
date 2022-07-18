@@ -1,0 +1,9 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: anonymous
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/hidden: "true"
+rules: [ ]

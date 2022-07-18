@@ -38,6 +38,7 @@ import run.halo.app.infra.utils.JsonUtils;
 @Component
 public class UserEndpoint implements CustomEndpoint {
 
+    private static final String SELF_USER = "-";
     private final ExtensionClient client;
     private final UserService userService;
 
@@ -94,7 +95,8 @@ public class UserEndpoint implements CustomEndpoint {
     Mono<ServerResponse> changePassword(ServerRequest request) {
         final var nameInPath = request.pathVariable("name");
         return ReactiveSecurityContextHolder.getContext()
-            .map(ctx -> "-".equals(nameInPath) ? ctx.getAuthentication().getName() : nameInPath)
+            .map(ctx -> SELF_USER.equals(nameInPath) ? ctx.getAuthentication().getName()
+                : nameInPath)
             .flatMap(username -> request.bodyToMono(ChangePasswordRequest.class)
                 .switchIfEmpty(Mono.defer(() ->
                     Mono.error(new ServerWebInputException("Request body is empty"))))
@@ -182,7 +184,9 @@ public class UserEndpoint implements CustomEndpoint {
     @NonNull
     private Mono<ServerResponse> getUserPermission(ServerRequest request) {
         String name = request.pathVariable("name");
-        return userService.listRoles(name)
+        return ReactiveSecurityContextHolder.getContext()
+            .map(ctx -> SELF_USER.equals(name) ? ctx.getAuthentication().getName() : name)
+            .flatMapMany(userService::listRoles)
             .reduce(new LinkedHashSet<Role>(), (list, role) -> {
                 list.add(role);
                 return list;

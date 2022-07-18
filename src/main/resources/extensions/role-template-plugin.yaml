@@ -1,0 +1,30 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-plugins
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-view-plugins", "role-template-manage-configmaps" ]
+    rbac.authorization.halo.run/module: "Plugins Management"
+    rbac.authorization.halo.run/display-name: "插件管理"
+rules:
+  - apiGroups: [ "plugin.halo.run" ]
+    resources: [ "plugins" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-plugins
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-settings\" ]"
+    rbac.authorization.halo.run/module: "Plugins Management"
+    rbac.authorization.halo.run/display-name: "插件查看"
+rules:
+  - apiGroups: [ "plugin.halo.run" ]
+    resources: [ "plugins" ]
+    verbs: [ "get", "list" ]

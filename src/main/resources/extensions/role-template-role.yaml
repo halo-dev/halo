@@ -1,0 +1,28 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-roles
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-roles\" ]"
+    rbac.authorization.halo.run/module: "Roles Management"
+    rbac.authorization.halo.run/display-name: "角色管理"
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "roles" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-roles
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Roles Management"
+    rbac.authorization.halo.run/display-name: "角色查看"
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "roles" ]
+    verbs: [ "get", "list" ]
