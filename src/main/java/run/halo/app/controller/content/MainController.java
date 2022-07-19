@@ -50,11 +50,9 @@ public class MainController {
     }
 
     @GetMapping("${halo.admin-path:admin}")
-    public void admin(HttpServletResponse response) throws IOException {
-        String adminIndexRedirectUri =
-            HaloUtils.ensureBoth(haloProperties.getAdminPath(), HaloUtils.URL_SEPARATOR)
-                + INDEX_REDIRECT_URI;
-        response.sendRedirect(adminIndexRedirectUri);
+    public String admin() throws IOException {
+        return HaloUtils.ensureBoth(haloProperties.getAdminPath(), HaloUtils.URL_SEPARATOR)
+            + INDEX_REDIRECT_URI;
     }
 
     @GetMapping("version")
@@ -64,14 +62,12 @@ public class MainController {
     }
 
     @GetMapping("install")
-    public void installation(HttpServletResponse response) throws IOException {
+    public String installation() throws IOException {
         boolean isInstalled = optionService
             .getByPropertyOrDefault(PrimaryProperties.IS_INSTALLED, Boolean.class, false);
         if (!isInstalled) {
-            String installRedirectUri =
-                StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/")
-                    + INSTALL_REDIRECT_URI;
-            response.sendRedirect(installRedirectUri);
+            return StringUtils.appendIfMissing(this.haloProperties.getAdminPath(), "/")
+                + INSTALL_REDIRECT_URI;
         } else {
             throw new NotFoundException("404");
         }
