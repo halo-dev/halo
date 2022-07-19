@@ -7,7 +7,9 @@ metadata:
   annotations:
     rbac.authorization.halo.run/dependencies: "[ \"role-template-view-configmaps\" ]"
     rbac.authorization.halo.run/module: "ConfigMaps Management"
-    rbac.authorization.halo.run/display-name: "ConfigMap 管理"
+    rbac.authorization.halo.run/display-name: "ConfigMap Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:configmaps:manage"]
 rules:
   - apiGroups: [ "" ]
     resources: [ "configmaps" ]
@@ -21,7 +23,9 @@ metadata:
     halo.run/role-template: "true"
   annotations:
     rbac.authorization.halo.run/module: "ConfigMaps Management"
-    rbac.authorization.halo.run/display-name: "ConfigMap 查看"
+    rbac.authorization.halo.run/display-name: "ConfigMap View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:configmaps:view"]
 rules:
   - apiGroups: [ "" ]
     resources: [ "configmaps" ]

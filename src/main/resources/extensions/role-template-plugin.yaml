@@ -8,7 +8,9 @@ metadata:
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-view-plugins", "role-template-manage-configmaps" ]
     rbac.authorization.halo.run/module: "Plugins Management"
-    rbac.authorization.halo.run/display-name: "插件管理"
+    rbac.authorization.halo.run/display-name: "Plugin Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:plugins:manage"]
 rules:
   - apiGroups: [ "plugin.halo.run" ]
     resources: [ "plugins" ]
@@ -23,7 +25,9 @@ metadata:
   annotations:
     rbac.authorization.halo.run/dependencies: "[ \"role-template-view-settings\" ]"
     rbac.authorization.halo.run/module: "Plugins Management"
-    rbac.authorization.halo.run/display-name: "插件查看"
+    rbac.authorization.halo.run/display-name: "Plugin View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:plugins:view"]
 rules:
   - apiGroups: [ "plugin.halo.run" ]
     resources: [ "plugins" ]

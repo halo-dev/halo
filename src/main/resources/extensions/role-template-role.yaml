@@ -8,7 +8,9 @@ metadata:
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-view-roles", "role-template-manage-permissions" ]
     rbac.authorization.halo.run/module: "Roles Management"
-    rbac.authorization.halo.run/display-name: "角色管理"
+    rbac.authorization.halo.run/display-name: "Role Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:roles:manage"]
 rules:
   - apiGroups: [ "" ]
     resources: [ "roles" ]
@@ -22,7 +24,9 @@ metadata:
     halo.run/role-template: "true"
   annotations:
     rbac.authorization.halo.run/module: "Roles Management"
-    rbac.authorization.halo.run/display-name: "角色查看"
+    rbac.authorization.halo.run/display-name: "Role View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:roles:view"]
 rules:
   - apiGroups: [ "" ]
     resources: [ "roles" ]

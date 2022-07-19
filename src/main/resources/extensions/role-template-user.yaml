@@ -6,9 +6,11 @@ metadata:
     halo.run/role-template: "true"
   annotations:
     rbac.authorization.halo.run/dependencies: |
-      [ "role-template-view-users" ]
+      [ "role-template-view-users", "role-template-change-password" ]
     rbac.authorization.halo.run/module: "Users Management"
-    rbac.authorization.halo.run/display-name: "用户管理"
+    rbac.authorization.halo.run/display-name: "User manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:users:manage"]
 rules:
   - apiGroups: [ "" ]
     resources: [ "users" ]
@@ -22,7 +24,9 @@ metadata:
     halo.run/role-template: "true"
   annotations:
     rbac.authorization.halo.run/module: "Users Management"
-    rbac.authorization.halo.run/display-name: "用户查看"
+    rbac.authorization.halo.run/display-name: "User View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:users:view"]
 rules:
   - apiGroups: [ "" ]
     resources: [ "users" ]
@@ -36,7 +40,9 @@ metadata:
     halo.run/role-template: "true"
   annotations:
     rbac.authorization.halo.run/module: "Users Management"
-    rbac.authorization.halo.run/display-name: "修改密码"
+    rbac.authorization.halo.run/display-name: "User Password Change"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:users:manage"]
 rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "users/password" ]
