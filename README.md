@@ -19,11 +19,17 @@
 ## 开发环境运行
 
 ```bash
+# pnpm@7.0.0+
 npm install -g pnpm
 ```
 
 ```bash
 pnpm install 
+```
+
+```bash
+# build packages
+pnpm build:packages
 ```
 
 ```bash
