@@ -16,7 +16,6 @@ import type { Role, User } from "@halo-dev/api-client";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
-  displayName: string | null | undefined;
   roles: Role[];
 }
 
@@ -71,10 +70,6 @@ const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
       groups.push({
         module:
           role.metadata.annotations?.["rbac.authorization.halo.run/module"],
-        displayName:
-          role.metadata.annotations?.[
-            "rbac.authorization.halo.run/display-name"
-          ],
         roles: [role],
       });
     }
@@ -304,7 +299,7 @@ onMounted(() => {
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">
-                {{ group.displayName }}
+                {{ group.module }}
               </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <ul class="space-y-2">
