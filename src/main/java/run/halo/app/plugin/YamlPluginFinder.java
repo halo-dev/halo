@@ -4,20 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.jar.JarFile;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
 import lombok.extern.slf4j.Slf4j;
+import org.pf4j.DevelopmentPluginClasspath;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.util.FileUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.lang.Nullable;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.utils.PathUtils;
@@ -56,8 +50,8 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
  */
 @Slf4j
 public class YamlPluginFinder {
+    static final DevelopmentPluginClasspath PLUGIN_CLASSPATH = new DevelopmentPluginClasspath();
     public static final String DEFAULT_PROPERTIES_FILE_NAME = "plugin.yaml";
-    private static final String DEFAULT_RESOURCE_LOCATION = "extensions/";
     private final String propertiesFileName;
 
     public YamlPluginFinder() {
@@ -74,12 +68,6 @@ public class YamlPluginFinder {
             Plugin.PluginStatus pluginStatus = new Plugin.PluginStatus();
             pluginStatus.setPhase(PluginState.RESOLVED);
             plugin.setStatus(pluginStatus);
-        }
-        // read unstructured files
-        if (FileUtils.isJarFile(pluginPath)) {
-            plugin.getSpec().setExtensionLocations(getUnstructuredFilePathFromJar(pluginPath));
-        } else {
-            plugin.getSpec().setExtensionLocations(getUnstructuredFileFromClasspath(pluginPath));
         }
         return plugin;
     }
@@ -113,7 +101,7 @@ public class YamlPluginFinder {
 
     protected Path getManifestPath(Path pluginPath, String propertiesFileName) {
         if (Files.isDirectory(pluginPath)) {
-            for (String location : getSearchLocations()) {
+            for (String location : PLUGIN_CLASSPATH.getClassesDirectories()) {
                 String s = PathUtils.combinePath(pluginPath.toString(),
                     location, propertiesFileName);
                 Path path = Paths.get(s);
@@ -132,67 +120,5 @@ public class YamlPluginFinder {
                 throw new PluginRuntimeException(e);
             }
         }
-    }
-
-    /**
-     * <p>Lists the path of the unstructured yaml configuration file from the plugin jar.</p>
-     *
-     * @param jarPath plugin jar path
-     * @return Unstructured file paths relative to plugin classpath
-     * @throws PluginRuntimeException If loading the file fails
-     */
-    protected List<String> getUnstructuredFilePathFromJar(Path jarPath) {
-        try (JarFile jarFile = new JarFile(jarPath.toFile())) {
-            return jarFile.stream()
-                .filter(jarEntry -> {
-                    String name = jarEntry.getName();
-                    return name.startsWith(DEFAULT_RESOURCE_LOCATION)
-                        && !jarEntry.isDirectory()
-                        && isYamlFile(name);
-                })
-                .map(ZipEntry::getName)
-                .toList();
-        } catch (IOException e) {
-            throw new PluginRuntimeException(e);
-        }
-    }
-
-    private List<String> getUnstructuredFileFromClasspath(Path pluginPath) {
-        final Path unstructuredLocation = decisionUnstructuredLocation(pluginPath);
-        if (unstructuredLocation == null) {
-            return Collections.emptyList();
-        }
-        try (Stream<Path> stream = Files.walk(unstructuredLocation)) {
-            return stream.map(Path::normalize)
-                .filter(Files::isRegularFile)
-                .filter(path -> isYamlFile(path.getFileName().toString()))
-                .map(path -> unstructuredLocation.getParent().relativize(path).toString())
-                .collect(Collectors.toList());
-        } catch (IOException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    @Nullable
-    private Path decisionUnstructuredLocation(Path pluginPath) {
-        for (String searchLocation : getSearchLocations()) {
-            String unstructuredLocationString = PathUtils.combinePath(pluginPath.toString(),
-                searchLocation, DEFAULT_RESOURCE_LOCATION);
-            Path path = Paths.get(unstructuredLocationString);
-            boolean exists = Files.exists(path);
-            if (exists) {
-                return path;
-            }
-        }
-        return null;
-    }
-
-    private boolean isYamlFile(String path) {
-        return path.endsWith(".yaml") || path.endsWith(".yml");
-    }
-
-    private Set<String> getSearchLocations() {
-        // TODO 优化路径获取
-        return Set.of("build/resources/main/", "target/classes/");
     }
 }

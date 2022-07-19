@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.TestRole;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
@@ -89,6 +90,35 @@ class RoleReconcilerTest {
             .get(Role.ROLE_DEPENDENCY_RULES), false);
     }
 
+    @Test
+    void reconcileOnDelete() {
+        String roleName = "role-not-exist";
+        when(extensionClient.fetch(eq(Role.class), eq(roleName))).thenReturn(
+            Optional.empty());
+
+        // fake role binding
+        RoleBinding roleBindingA = RoleBinding.create("zhangsan", roleName);
+        RoleBinding roleBindingB = RoleBinding.create("lisi", roleName);
+        when(extensionClient.list(eq(RoleBinding.class), any(), any()))
+            .thenReturn(List.of(roleBindingA, roleBindingB));
+
+        final ArgumentCaptor<RoleBinding> bindingArgumentCaptor =
+            ArgumentCaptor.forClass(RoleBinding.class);
+
+        // mock reconcile
+        roleReconciler.reconcile(new Reconciler.Request(roleName));
+
+        // trigger on delete method
+        verify(extensionClient, times(1)).list(eq(RoleBinding.class), any(), any());
+
+        verify(extensionClient, times(2)).delete(bindingArgumentCaptor.capture());
+
+        List<RoleBinding> deletedRoleBindings = bindingArgumentCaptor.getAllValues();
+
+        assertThat(deletedRoleBindings).hasSize(2);
+        assertThat(deletedRoleBindings.get(0)).isEqualTo(roleBindingA);
+        assertThat(deletedRoleBindings.get(1)).isEqualTo(roleBindingB);
+    }
 
     @Test
     void reconcileUiPermission() {

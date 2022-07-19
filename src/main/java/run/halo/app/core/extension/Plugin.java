@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -78,18 +77,9 @@ public class Plugin extends AbstractExtension {
 
         private Boolean enabled = false;
 
-        private List<String> extensionLocations;
-
         private String settingName;
 
         private String configMapName;
-
-        @NonNull
-        @JsonIgnore
-        public List<String> extensionLocationsNonNull() {
-            this.extensionLocations = Objects.requireNonNullElseGet(extensionLocations, List::of);
-            return this.extensionLocations;
-        }
     }
 
     @Getter

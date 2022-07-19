@@ -25,6 +25,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
+import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
 import run.halo.app.plugin.event.HaloPluginLoadedEvent;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
 import run.halo.app.plugin.event.HaloPluginStateChangedEvent;
@@ -127,7 +128,6 @@ public class HaloPluginManager extends DefaultPluginManager
     @Override
     protected PluginState stopPlugin(String pluginId, boolean stopDependents) {
         checkPluginId(pluginId);
-
         PluginWrapper pluginWrapper = getPlugin(pluginId);
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
@@ -141,6 +141,8 @@ public class HaloPluginManager extends DefaultPluginManager
             // do nothing
             return pluginState;
         }
+
+        rootApplicationContext.publishEvent(new HaloPluginBeforeStopEvent(this, pluginWrapper));
 
         if (stopDependents) {
             List<String> dependents = dependencyResolver.getDependents(pluginId);
@@ -171,7 +173,7 @@ public class HaloPluginManager extends DefaultPluginManager
 
     @Override
     public PluginState stopPlugin(String pluginId) {
-        return stopPlugin(pluginId, true);
+        return this.stopPlugin(pluginId, true);
     }
 
     @Override
@@ -294,6 +296,8 @@ public class HaloPluginManager extends DefaultPluginManager
             PluginState pluginState = pluginWrapper.getPluginState();
             if (PluginState.STARTED == pluginState) {
                 try {
+                    rootApplicationContext.publishEvent(
+                        new HaloPluginBeforeStopEvent(this, pluginWrapper));
                     log.info("Stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
                     pluginWrapper.getPlugin().stop();
                     pluginWrapper.setPluginState(PluginState.STOPPED);
