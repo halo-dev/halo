@@ -19,6 +19,7 @@ importers:
       '@tailwindcss/aspect-ratio': ^0.4.0
       '@types/jsdom': ^16.2.14
       '@types/lodash.clonedeep': 4.5.7
+      '@types/lodash.isequal': ^4.5.6
       '@types/node': ^17.0.45
       '@types/qs': ^6.9.7
       '@types/uuid': ^8.3.4
@@ -102,6 +103,7 @@ importers:
       '@tailwindcss/aspect-ratio': 0.4.0_tailwindcss@3.1.6
       '@types/jsdom': 16.2.14
       '@types/lodash.clonedeep': 4.5.7
+      '@types/lodash.isequal': 4.5.6
       '@types/node': 17.0.45
       '@types/qs': 6.9.7
       '@types/uuid': 8.3.4
@@ -2442,6 +2444,12 @@ packages:
 
   /@types/lodash.clonedeep/4.5.7:
     resolution: {integrity: sha512-ccNqkPptFIXrpVqUECi60/DFxjNKsfoQxSQsgcBJCX/fuX1wgyQieojkcWH/KpE3xzLoWN/2k+ZeGqIN3paSvw==}
+    dependencies:
+      '@types/lodash': 4.14.182
+    dev: true
+
+  /@types/lodash.isequal/4.5.6:
+    resolution: {integrity: sha512-Ww4UGSe3DmtvLLJm2F16hDwEQSv7U0Rr8SujLUA2wHI2D2dm8kPu6Et+/y303LfjTIwSBKXB/YTUcAKpem/XEg==}
     dependencies:
       '@types/lodash': 4.14.182
     dev: true

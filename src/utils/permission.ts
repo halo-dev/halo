@@ -1,4 +1,4 @@
-import isEqual from "lodash.isEqual";
+import isEqual from "lodash.isequal";
 
 export function hasPermission(
   uiPermissions: Array<string>,

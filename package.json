@@ -57,6 +57,7 @@
     "@tailwindcss/aspect-ratio": "^0.4.0",
     "@types/jsdom": "^16.2.14",
     "@types/lodash.clonedeep": "4.5.7",
+    "@types/lodash.isequal": "^4.5.6",
     "@types/node": "^17.0.45",
     "@types/qs": "^6.9.7",
     "@types/uuid": "^8.3.4",
