@@ -4,8 +4,8 @@ metadata:
   name: authenticated
   labels:
     halo.run/role-template: "true"
+    halo.run/hidden: "true"
   annotations:
-    rbac.authorization.halo.run/hidden: "true"
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-own-user-info", "role-template-own-permissions", "role-template-change-own-password",
       "role-template-manage-configmaps" ]
@@ -17,8 +17,7 @@ metadata:
   name: role-template-own-user-info
   labels:
     halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/hidden: "true"
+    halo.run/hidden: "true"
 rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "users" ]
@@ -31,8 +30,7 @@ metadata:
   name: role-template-own-permissions
   labels:
     halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/hidden: "true"
+    halo.run/hidden: "true"
 rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "users/permissions" ]
@@ -45,8 +43,7 @@ metadata:
   name: role-template-change-own-password
   labels:
     halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/hidden: "true"
+    halo.run/hidden: "true"
 rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "users/password" ]
