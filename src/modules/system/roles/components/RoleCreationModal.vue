@@ -5,7 +5,8 @@ import { apiClient } from "@halo-dev/admin-shared";
 import type { Role } from "@halo-dev/api-client";
 
 interface RoleTemplateGroup {
-  name: string | null | undefined;
+  module: string | null | undefined;
+  displayName: string | null | undefined;
   roles: Role[];
 }
 
@@ -35,7 +36,7 @@ const creationFormState = ref<CreationFormState>({
       labels: {},
       annotations: {
         "rbac.authorization.halo.run/dependencies": "",
-        "plugin.halo.run/display-name": "",
+        "rbac.authorization.halo.run/display-name": "",
       }!,
     },
     rules: [],
@@ -46,7 +47,9 @@ const creationFormState = ref<CreationFormState>({
 
 const roleTemplates = computed<Role[]>(() => {
   return roles.value.filter(
-    (role) => role.metadata.labels?.["plugin.halo.run/role-template"] === "true"
+    (role) =>
+      role.metadata.labels?.["halo.run/role-template"] === "true" &&
+      role.metadata.labels?.["halo.run/hidden"] !== "true"
   );
 });
 
@@ -55,13 +58,19 @@ const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
   roleTemplates.value.forEach((role) => {
     const group = groups.find(
       (group) =>
-        group.name === role.metadata.annotations?.["plugin.halo.run/module"]
+        group.module ===
+        role.metadata.annotations?.["rbac.authorization.halo.run/module"]
     );
     if (group) {
       group.roles.push(role);
     } else {
       groups.push({
-        name: role.metadata.annotations?.["plugin.halo.run/module"],
+        module:
+          role.metadata.annotations?.["rbac.authorization.halo.run/module"],
+        displayName:
+          role.metadata.annotations?.[
+            "rbac.authorization.halo.run/display-name"
+          ],
         roles: [role],
       });
     }
@@ -132,7 +141,7 @@ watch(
           <FormKit
             v-model="
               creationFormState.role.metadata.annotations[
-                'plugin.halo.run/display-name'
+                'rbac.authorization.halo.run/display-name'
               ]
             "
             label="名称"
@@ -156,13 +165,13 @@ watch(
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">
-                {{ group.name }}
+                {{ group.displayName }}
               </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <ul class="space-y-2">
                   <li v-for="(role, index) in group.roles" :key="index">
-                    <div
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
+                    <label
+                      class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                     >
                       <input
                         v-model="creationFormState.selectedRoleTemplates"
@@ -170,11 +179,11 @@ watch(
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                         type="checkbox"
                       />
-                      <div class="inline-flex flex-col gap-y-3">
+                      <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
                           {{
                             role.metadata.annotations?.[
-                              "plugin.halo.run/display-name"
+                              "rbac.authorization.halo.run/display-name"
                             ]
                           }}
                         </span>
@@ -196,7 +205,7 @@ watch(
                           }}
                         </span>
                       </div>
-                    </div>
+                    </label>
                   </li>
                 </ul>
               </dd>

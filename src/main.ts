@@ -174,6 +174,12 @@ async function loadCurrentUser() {
 })();
 
 async function initApp() {
+  // TODO 实验性特性
+  const theme = localStorage.getItem("theme");
+  if (theme) {
+    document.body.classList.add(theme);
+  }
+
   try {
     loadCoreModules();
     await loadPluginModules();

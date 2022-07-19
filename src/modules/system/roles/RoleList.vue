@@ -22,8 +22,7 @@ const roles = ref<Role[]>([]);
 
 const basicRoles = computed(() => {
   return roles.value.filter(
-    (role) =>
-      role.metadata?.labels?.["plugin.halo.run/role-template"] !== "true"
+    (role) => role.metadata?.labels?.["halo.run/role-template"] !== "true"
   );
 });
 
