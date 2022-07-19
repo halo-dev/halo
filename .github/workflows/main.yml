@@ -18,23 +18,33 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2.0.1
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
         with:
-          version: 7.1.6
-  
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+          node-version: 16
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install
@@ -42,24 +52,44 @@ jobs:
         run: pnpm build:packages
       - name: Run code lint check
         run: pnpm lint
-      - name: Run unit test
-        run: pnpm test:unit
       - name: Run typescript type check
         run: pnpm typecheck
+      - name: Run unit test
+        run: pnpm test:unit
 
   github-release:
     runs-on: ubuntu-latest
     needs: check
     if: github.event_name == 'release'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js 16
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '16'
-      - name: Install pnpm package manager
-        run: npm install -g pnpm
+          node-version: 16
+
+      - uses: pnpm/action-setup@v2.0.1
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        run: |
+          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - run: pnpm install
+      - run: pnpm build:packages
       - name: Build for release
         run: pnpm build
       - name: Compress dist directory
