@@ -53,9 +53,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
+      - uses: actions/checkout@v2
       - uses: halo-sigs/actions/halo-next-docker-build@main # change the version to specific ref or release tag while the action is stable.
         with:
-          image-name: halodev
+          image-name: halo-dev
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
           push: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/next' }} # we only push to GHCR if the push is to the next branch
-          checkout-from: ${{ github.ref }}
