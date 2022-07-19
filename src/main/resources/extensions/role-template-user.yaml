@@ -38,11 +38,10 @@ metadata:
   name: role-template-change-password
   labels:
     halo.run/role-template: "true"
+    halo.run/hidden: "true"
   annotations:
     rbac.authorization.halo.run/module: "Users Management"
     rbac.authorization.halo.run/display-name: "User Password Change"
-    rbac.authorization.halo.run/ui-permissions: |
-      ["system:users:manage"]
 rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "users/password" ]
