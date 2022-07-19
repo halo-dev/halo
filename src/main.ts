@@ -144,9 +144,7 @@ async function loadCurrentUser() {
   const { data: user } = await apiClient.user.getCurrentUserDetail();
   app.provide<User>("currentUser", user);
 
-  const { data: currentPermissions } = await apiClient.user.getPermissions(
-    user.metadata.name
-  );
+  const { data: currentPermissions } = await apiClient.user.getPermissions("-");
   const roleStore = useRoleStore();
   roleStore.$patch({
     permissions: currentPermissions,
@@ -174,7 +172,7 @@ async function loadCurrentUser() {
 })();
 
 async function initApp() {
-  // TODO 实验性特性
+  // TODO 实验性
   const theme = localStorage.getItem("theme");
   if (theme) {
     document.body.classList.add(theme);

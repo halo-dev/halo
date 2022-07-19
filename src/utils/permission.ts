@@ -22,5 +22,5 @@ export function hasPermission(
     return true;
   }
 
-  return !!(!any && isEqual(uiPermissions, targetPermissions));
+  return !!(!any && isEqual(intersection, targetPermissions));
 }

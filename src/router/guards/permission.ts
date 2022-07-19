@@ -11,7 +11,7 @@ export function setupPermissionGuard(router: Router) {
       const flag = hasPermission(
         Array.from(uiPermissions),
         meta.permissions as string[],
-        false
+        true
       );
       if (!flag) {
         next({ name: "Forbidden" });

@@ -14,11 +14,17 @@ export default definePlugin({
           path: "roles",
           name: "Roles",
           component: RoleList,
+          meta: {
+            permissions: ["system:roles:view"],
+          },
         },
         {
           path: "roles/:name",
           name: "RoleDetail",
           component: RoleDetail,
+          meta: {
+            permissions: ["system:roles:view"],
+          },
         },
       ],
     },

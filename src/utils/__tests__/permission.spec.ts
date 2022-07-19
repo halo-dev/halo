@@ -6,10 +6,10 @@ describe("hasPermission", () => {
     const uiPermissions = ["system:post:manage", "system:post:view"];
 
     expect(hasPermission(uiPermissions, ["system:post:manage"], false)).toBe(
-      false
+      true
     );
     expect(hasPermission(uiPermissions, ["system:post:view"], false)).toBe(
-      false
+      true
     );
     expect(hasPermission(uiPermissions, ["system:post:view"], true)).toBe(true);
     expect(

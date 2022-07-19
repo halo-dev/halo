@@ -213,7 +213,7 @@ onMounted(handleFetchPlugin);
               </VTag>
             </p>
           </div>
-          <div>
+          <div v-permission="['system:plugins:manage']">
             <VSwitch
               :model-value="isStarted"
               @change="handleChangePluginStatus"

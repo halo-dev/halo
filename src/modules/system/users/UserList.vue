@@ -84,12 +84,14 @@ onMounted(() => {
 <template>
   <UserEditingModal
     v-model:visible="editingModal"
+    v-permission="['system:users:manage']"
     :user="selectedUser"
     @close="handleFetchUsers"
   />
 
   <UserPasswordChangeModal
     v-model:visible="passwordChangeModal"
+    v-permission="['system:users:manage']"
     :user="selectedUser"
     @close="handleFetchUsers"
   />
@@ -100,13 +102,22 @@ onMounted(() => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton :route="{ name: 'Roles' }" size="sm" type="default">
+        <VButton
+          v-permission="['system:roles:view']"
+          :route="{ name: 'Roles' }"
+          size="sm"
+          type="default"
+        >
           <template #icon>
             <IconUserFollow class="h-full w-full" />
           </template>
           角色管理
         </VButton>
-        <VButton type="secondary" @click="editingModal = true">
+        <VButton
+          v-permission="['system:users:manage']"
+          type="secondary"
+          @click="editingModal = true"
+        >
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
@@ -126,6 +137,7 @@ onMounted(() => {
             <div class="mr-4 hidden items-center sm:flex">
               <input
                 v-model="checkAll"
+                v-permission="['system:users:manage']"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
               />
@@ -252,6 +264,7 @@ onMounted(() => {
               <div class="mr-4 hidden items-center sm:flex">
                 <input
                   v-model="checkAll"
+                  v-permission="['system:users:manage']"
                   class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   type="checkbox"
                 />
@@ -304,10 +317,12 @@ onMounted(() => {
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
                     {{ user.metadata.creationTimestamp }}
                   </time>
-                  <span class="cursor-pointer">
+                  <span
+                    v-permission="['system:users:manage']"
+                    class="cursor-pointer"
+                  >
                     <FloatingDropdown>
                       <IconSettings />
-
                       <template #popper>
                         <div class="links-w-48 links-p-2">
                           <VSpace class="links-w-full" direction="column">
@@ -319,7 +334,6 @@ onMounted(() => {
                               修改资料
                             </VButton>
                             <VButton
-                              v-permission="['system:users:manage']"
                               block
                               @click="handleOpenPasswordChangeModal(user)"
                             >

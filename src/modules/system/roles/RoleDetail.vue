@@ -154,7 +154,7 @@ onMounted(() => {
       <IconShieldUser class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton type="secondary">
+      <VButton v-permission="['system:roles:manage']" type="secondary">
         <template #icon>
           <IconGitBranch class="h-full w-full" />
         </template>
@@ -345,7 +345,7 @@ onMounted(() => {
               </dd>
             </div>
           </dl>
-          <div class="p-4">
+          <div v-permission="['system:roles:manage']" class="p-4">
             <VButton
               :loading="formState.saving"
               type="secondary"

@@ -56,7 +56,11 @@ onMounted(() => {
       <IconShieldUser class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton type="secondary" @click="createVisible = true">
+      <VButton
+        v-permission="['system:roles:manage']"
+        type="secondary"
+        @click="createVisible = true"
+      >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
@@ -198,7 +202,10 @@ onMounted(() => {
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
                     2020-01-07
                   </time>
-                  <span class="cursor-pointer">
+                  <span
+                    v-permission="['system:roles:manage']"
+                    class="cursor-pointer"
+                  >
                     <IconSettings />
                   </span>
                 </div>

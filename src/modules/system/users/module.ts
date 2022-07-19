@@ -33,6 +33,9 @@ export default definePlugin({
               path: "",
               name: "Users",
               component: UserList,
+              meta: {
+                permissions: ["system:users:view"],
+              },
             },
           ],
         },

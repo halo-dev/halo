@@ -15,11 +15,17 @@ export default definePlugin({
           path: "",
           name: "Plugins",
           component: PluginList,
+          meta: {
+            permissions: ["system:plugins:view"],
+          },
         },
         {
           path: ":pluginName",
           name: "PluginDetail",
           component: PluginDetail,
+          meta: {
+            permissions: ["system:plugins:view"],
+          },
         },
       ],
     },

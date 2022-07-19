@@ -74,7 +74,7 @@ onMounted(handleFetchPlugins);
       <IconPlug class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton type="secondary">
+      <VButton v-permission="['system:plugins:manage']" type="secondary">
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
@@ -274,13 +274,19 @@ onMounted(handleFetchPlugins);
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
                     {{ plugin.metadata.creationTimestamp }}
                   </time>
-                  <div class="flex items-center">
+                  <div
+                    v-permission="['system:plugins:manage']"
+                    class="flex items-center"
+                  >
                     <VSwitch
                       :model-value="isStarted(plugin)"
                       @click="handleChangeStatus(plugin)"
                     />
                   </div>
-                  <span class="cursor-pointer">
+                  <span
+                    v-permission="['system:plugins:manage']"
+                    class="cursor-pointer"
+                  >
                     <IconSettings @click.stop="handleRouteToDetail(plugin)" />
                   </span>
                 </div>
