@@ -2,12 +2,16 @@ name: Halo Admin CI
 
 on:
   pull_request:
+    branches:
+      - next
+      - main
     paths:
       - '**'
       - '!**.md'
   push:
     branches:
-      - '**'
+      - next
+      - main
     paths:
       - '**'
       - '!**.md'
@@ -20,32 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Use Node.js 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - uses: pnpm/action-setup@v2.0.1
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 7
-          run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
+      - name: Environment Set Up
+        uses: halo-sigs/actions/admin-env-setup@main
       - name: Install dependencies
         run: pnpm install
       - name: Build packages
@@ -63,31 +43,8 @@ jobs:
     if: github.event_name == 'release'
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js 16
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - uses: pnpm/action-setup@v2.0.1
-        name: Install pnpm
-        id: pnpm-install
-        with:
-          version: 7
-          run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: |
-          echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
-
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
+      - name: Environment Set Up
+        uses: halo-sigs/actions/admin-env-setup@main
       - run: pnpm install
       - run: pnpm build:packages
       - name: Build for release
@@ -127,5 +84,14 @@ jobs:
               name: artifactName,
               data: await fs.readFile(artifactPathName)
             });
-        
-
+  build-push:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v3
+      - name: Docker build and push
+        uses: halo-sigs/actions/admin-next-docker-build-push@main
+        with:
+          image-name: admin-dev
+          ghcr-token: ${{ secrets.GHCR_TOKEN }}
+          push: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/next' }} # we only push to GHCR if the push is to the next branch
