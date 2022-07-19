@@ -1,7 +1,7 @@
 apiVersion: v1alpha1
 kind: "Role"
 metadata:
-  name: role-template-permissions
+  name: role-template-manage-permissions
   labels:
     halo.run/role-template: "true"
   annotations:
@@ -16,7 +16,7 @@ rules:
 apiVersion: v1alpha1
 kind: "Role"
 metadata:
-  name: role-template-permissions
+  name: role-template-view-permissions
   labels:
     halo.run/role-template: "true"
   annotations:
