@@ -33,7 +33,7 @@
     "@formkit/vue": "1.0.0-beta.9",
     "@halo-dev/admin-api": "^1.1.0",
     "@halo-dev/admin-shared": "workspace:*",
-    "@halo-dev/api-client": "^0.0.2",
+    "@halo-dev/api-client": "^0.0.3",
     "@halo-dev/components": "workspace:*",
     "@vueuse/components": "^8.9.4",
     "@vueuse/core": "^8.9.4",
