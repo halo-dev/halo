@@ -5,16 +5,11 @@ import {
   VButton,
 } from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
-import axios from "axios";
 import qs from "qs";
 import logo from "../../../assets/logo.svg";
 import { onMounted, ref } from "vue";
 import { submitForm } from "@formkit/vue";
-
-const axiosInstance = axios.create({
-  baseURL: "http://localhost:8090",
-  withCredentials: true,
-});
+import router from "@/router";
 
 interface LoginForm {
   _csrf: string;
@@ -31,7 +26,7 @@ const loginForm = ref<LoginFormState>({
   logging: false,
   state: {
     _csrf: "",
-    username: "admin",
+    username: "ryanwang",
     password: "12345678",
   },
 });
@@ -46,19 +41,20 @@ const handleLogin = async () => {
   try {
     loginForm.value.logging = true;
 
-    await axiosInstance.post(
-      `http://localhost:8090/login`,
-      qs.stringify(loginForm.value.state),
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    await fetch("http://localhost:8090/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      credentials: "include",
+      redirect: "manual",
+      body: qs.stringify(loginForm.value.state),
+    });
+    await router.push({ name: "Dashboard" });
+    await router.go(0);
   } catch (e) {
     console.error(e);
   } finally {
-    window.location.href = "/#/dashboard";
     loginForm.value.logging = false;
   }
 };
