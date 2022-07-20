@@ -14,24 +14,97 @@ import {
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
-import { themes } from "@/modules/interface/themes/themes-mock";
+import type { Metadata } from "@halo-dev/api-client";
 
-const currentTheme = ref(themes[0]);
-const changeTheme = ref(false);
+interface ThemeAuthor {
+  name: string;
+  website: string;
+}
+
+interface ThemeSpec {
+  displayName: string;
+  author: ThemeAuthor;
+  description?: string;
+  logo?: string;
+  website?: string;
+  repo?: string;
+  version: string;
+  require: string;
+}
+
+interface Theme {
+  metadata: Metadata;
+  spec: ThemeSpec;
+  kind: string;
+  apiVersion: string;
+}
+
+const themes = ref<Theme[]>([]);
+const currentTheme = ref<Theme>({} as Theme);
+const themesModal = ref(false);
 const themeActiveId = ref("detail");
 
-// eslint-disable-next-line
-const handleChangeTheme = (theme: any) => {
+const handleChangeTheme = (theme: Theme) => {
   currentTheme.value = theme;
-  changeTheme.value = false;
+  themesModal.value = false;
 };
+
+const handleFetchThemes = async () => {
+  themes.value = await new Promise((resolve) => {
+    resolve([
+      {
+        apiVersion: "theme.halo.run/v1alpha1",
+        kind: "Theme",
+        metadata: {
+          name: "default",
+        },
+        spec: {
+          displayName: "Default",
+          author: {
+            name: "halo-dev",
+            website: "https://halo.run",
+          },
+          description: "Halo 2.0 的默认主题",
+          logo: "https://halo.run/logo",
+          website: "https://github.com/halo-sigs/theme-default.git",
+          repo: "https://github.com/halo-sigs/theme-default.git",
+          version: "1.0.0",
+          require: "2.0.0",
+        },
+      },
+      {
+        apiVersion: "theme.halo.run/v1alpha1",
+        kind: "Theme",
+        metadata: {
+          name: "gtvg",
+        },
+        spec: {
+          displayName: "GTVG",
+          author: {
+            name: "guqing",
+            website: "https://guqing.xyz",
+          },
+          description: "测试主题",
+          logo: "https://guqing.xyz/logo.png",
+          website: "https://github.com/guqing/halo-theme-test.git",
+          repo: "https://github.com/guqing/halo-theme-test.git",
+          version: "1.0.0",
+          require: "2.0.0",
+        },
+      },
+    ]);
+  });
+  currentTheme.value = themes.value[0];
+};
+
+onMounted(handleFetchThemes);
 </script>
 
 <template>
   <VModal
-    v-model:visible="changeTheme"
+    v-model:visible="themesModal"
     :body-class="['!p-0']"
     :width="888"
     title="已安装的主题"
@@ -40,13 +113,15 @@ const handleChangeTheme = (theme: any) => {
       <li
         v-for="(theme, index) in themes"
         :key="index"
-        :class="{ 'bg-gray-50': theme.activated }"
+        :class="{
+          'bg-gray-50': theme.metadata.name === currentTheme.metadata?.name,
+        }"
         class="relative cursor-pointer py-4 transition-all hover:bg-gray-100"
         @click="handleChangeTheme(theme)"
       >
         <div class="flex items-center">
           <div
-            v-show="theme.activated"
+            v-show="theme.metadata.name === currentTheme.metadata?.name"
             class="absolute inset-y-0 left-0 w-0.5 bg-primary"
           ></div>
           <div class="w-40 px-4">
@@ -54,7 +129,7 @@ const handleChangeTheme = (theme: any) => {
               class="group aspect-w-4 aspect-h-3 block w-full overflow-hidden rounded border bg-gray-100"
             >
               <img
-                :src="theme.screenshots"
+                :src="theme.spec.logo"
                 alt=""
                 class="pointer-events-none object-cover group-hover:opacity-75"
               />
@@ -64,12 +139,14 @@ const handleChangeTheme = (theme: any) => {
             <VSpace align="start" direction="column" spacing="xs">
               <div class="flex items-center gap-2">
                 <span class="text-lg font-medium text-gray-900">
-                  {{ theme.name }}
+                  {{ theme.spec.displayName }}
                 </span>
-                <VTag v-if="theme.activated">当前启用</VTag>
+                <VTag>当前启用</VTag>
               </div>
               <div>
-                <span class="text-sm text-gray-400">{{ theme.version }}</span>
+                <span class="text-sm text-gray-400">
+                  {{ theme.spec.version }}
+                </span>
               </div>
             </VSpace>
           </div>
@@ -77,12 +154,12 @@ const handleChangeTheme = (theme: any) => {
             <VSpace spacing="lg">
               <div>
                 <span class="text-sm text-gray-400 hover:text-blue-600">
-                  {{ theme.author.name }}
+                  {{ theme.spec.author.name }}
                 </span>
               </div>
-              <div v-if="theme.repo">
+              <div v-if="theme.spec.website">
                 <a
-                  :href="theme.repo"
+                  :href="theme.spec.website"
                   class="text-gray-900 hover:text-blue-600"
                   target="_blank"
                 >
@@ -98,24 +175,22 @@ const handleChangeTheme = (theme: any) => {
       </li>
     </ul>
     <template #footer>
-      <VButton @click="changeTheme = false">关闭</VButton>
+      <VButton @click="themesModal = false">关闭</VButton>
     </template>
   </VModal>
-  <VPageHeader :title="currentTheme.name">
+  <VPageHeader :title="currentTheme.spec?.displayName">
     <template #icon>
       <IconPalette class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
-        <VButton size="sm" type="default" @click="changeTheme = true">
+        <VButton size="sm" type="default" @click="themesModal = true">
           <template #icon>
             <IconExchange class="h-full w-full" />
           </template>
           切换主题
         </VButton>
-        <VButton v-if="!currentTheme.activated" size="sm" type="primary">
-          启用
-        </VButton>
+        <VButton size="sm" type="primary"> 启用</VButton>
         <VButton :route="{ name: 'ThemeVisual' }" type="secondary">
           <template #icon>
             <IconEye class="h-full w-full" />
@@ -142,28 +217,26 @@ const handleChangeTheme = (theme: any) => {
       <div v-if="themeActiveId === 'detail'">
         <div class="px-4 py-4 sm:px-6">
           <div class="flex flex-row gap-3">
-            <div v-if="currentTheme.logo">
+            <div v-if="currentTheme.spec?.logo">
               <div
                 class="h-12 w-12 overflow-hidden rounded border bg-white hover:shadow-sm"
               >
                 <img
-                  :alt="currentTheme.name"
-                  :src="currentTheme.logo"
+                  :alt="currentTheme.spec?.displayName"
+                  :src="currentTheme.spec?.logo"
                   class="h-full w-full"
                 />
               </div>
             </div>
             <div>
               <h3 class="text-lg font-medium leading-6 text-gray-900">
-                {{ currentTheme.name }}
+                {{ currentTheme.spec?.displayName }}
               </h3>
               <p class="mt-1 flex max-w-2xl items-center gap-2">
                 <span class="text-sm text-gray-500">
-                  {{ currentTheme.version }}
+                  {{ currentTheme.spec?.version }}
                 </span>
-                <VTag>
-                  {{ currentTheme.activated ? "当前启用" : "未启用" }}
-                </VTag>
+                <VTag> 当前启用</VTag>
               </p>
             </div>
           </div>
@@ -175,7 +248,7 @@ const handleChangeTheme = (theme: any) => {
             >
               <dt class="text-sm font-medium text-gray-900">ID</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                {{ currentTheme.id }}
+                {{ currentTheme.metadata?.name }}
               </dd>
             </div>
             <div
@@ -183,7 +256,7 @@ const handleChangeTheme = (theme: any) => {
             >
               <dt class="text-sm font-medium text-gray-900">作者</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                {{ currentTheme.author.name }}
+                {{ currentTheme.spec?.author?.name }}
               </dd>
             </div>
             <div
@@ -191,8 +264,8 @@ const handleChangeTheme = (theme: any) => {
             >
               <dt class="text-sm font-medium text-gray-900">网站</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                <a :href="currentTheme.website" target="_blank">
-                  {{ currentTheme.website }}
+                <a :href="currentTheme.spec?.website" target="_blank">
+                  {{ currentTheme.spec?.website }}
                 </a>
               </dd>
             </div>
@@ -201,8 +274,8 @@ const handleChangeTheme = (theme: any) => {
             >
               <dt class="text-sm font-medium text-gray-900">源码仓库</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                <a :href="currentTheme.repo" target="_blank">
-                  {{ currentTheme.repo }}
+                <a :href="currentTheme.spec?.website" target="_blank">
+                  {{ currentTheme.spec?.website }}
                 </a>
               </dd>
             </div>
@@ -211,7 +284,7 @@ const handleChangeTheme = (theme: any) => {
             >
               <dt class="text-sm font-medium text-gray-900">当前版本</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                {{ currentTheme.version }}
+                {{ currentTheme.spec?.version }}
               </dd>
             </div>
             <div
@@ -219,7 +292,7 @@ const handleChangeTheme = (theme: any) => {
             >
               <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                {{ currentTheme.require }}
+                {{ currentTheme.spec?.require }}
               </dd>
             </div>
             <div
@@ -227,7 +300,7 @@ const handleChangeTheme = (theme: any) => {
             >
               <dt class="text-sm font-medium text-gray-900">存储位置</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                {{ currentTheme.themePath }}
+                无
               </dd>
             </div>
             <div
