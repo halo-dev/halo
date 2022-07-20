@@ -52,7 +52,7 @@ const router = useRouter();
           <VTag
             v-for="(role, index) in roles"
             :key="index"
-            @click="router.push({ name: 'RoleDetail', params: { id: 1 } })"
+            @click="router.push({ name: 'RoleDetail', params: { name: role } })"
           >
             <template #leftIcon>
               <IconUserSettings />
