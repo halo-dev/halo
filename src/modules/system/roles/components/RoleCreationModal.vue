@@ -3,6 +3,8 @@ import { VButton, VModal, VTabItem, VTabs } from "@halo-dev/components";
 import { computed, ref, watch } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Role } from "@halo-dev/api-client";
+import { rbacAnnotations } from "@/constants/annotations";
+import { roleLabels } from "@/constants/labels";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -34,8 +36,8 @@ const creationFormState = ref<CreationFormState>({
       name: "",
       labels: {},
       annotations: {
-        "rbac.authorization.halo.run/dependencies": "",
-        "rbac.authorization.halo.run/display-name": "",
+        [rbacAnnotations.DEPENDENCIES]: "",
+        [rbacAnnotations.DISPLAY_NAME]: "",
       }!,
     },
     rules: [],
@@ -47,7 +49,7 @@ const creationFormState = ref<CreationFormState>({
 const roleTemplates = computed<Role[]>(() => {
   return roles.value.filter(
     (role) =>
-      role.metadata.labels?.["halo.run/role-template"] === "true" &&
+      role.metadata.labels?.[roleLabels.TEMPLATE] === "true" &&
       role.metadata.labels?.["halo.run/hidden"] !== "true"
   );
 });
@@ -57,15 +59,13 @@ const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
   roleTemplates.value.forEach((role) => {
     const group = groups.find(
       (group) =>
-        group.module ===
-        role.metadata.annotations?.["rbac.authorization.halo.run/module"]
+        group.module === role.metadata.annotations?.[rbacAnnotations.MODULE]
     );
     if (group) {
       group.roles.push(role);
     } else {
       groups.push({
-        module:
-          role.metadata.annotations?.["rbac.authorization.halo.run/module"],
+        module: role.metadata.annotations?.[rbacAnnotations.MODULE],
         roles: [role],
       });
     }
@@ -87,7 +87,7 @@ const handleCreateRole = async () => {
     creationFormState.value.saving = true;
     if (creationFormState.value.role.metadata.annotations) {
       creationFormState.value.role.metadata.annotations[
-        "rbac.authorization.halo.run/dependencies"
+        rbacAnnotations.DEPENDENCIES
       ] = JSON.stringify(creationFormState.value.selectedRoleTemplates);
     }
     await apiClient.extension.role.createv1alpha1Role(
@@ -136,7 +136,7 @@ watch(
           <FormKit
             v-model="
               creationFormState.role.metadata.annotations[
-                'rbac.authorization.halo.run/display-name'
+                rbacAnnotations.DISPLAY_NAME
               ]
             "
             label="名称"
@@ -178,14 +178,14 @@ watch(
                         <span class="font-medium text-gray-900">
                           {{
                             role.metadata.annotations?.[
-                              "rbac.authorization.halo.run/display-name"
+                              rbacAnnotations.DISPLAY_NAME
                             ]
                           }}
                         </span>
                         <span
                           v-if="
                             role.metadata.annotations?.[
-                              'rbac.authorization.halo.run/dependencies'
+                              rbacAnnotations.DEPENDENCIES
                             ]
                           "
                           class="text-xs text-gray-400"
@@ -194,7 +194,7 @@ watch(
                           {{
                             JSON.parse(
                               role.metadata.annotations?.[
-                                "rbac.authorization.halo.run/dependencies"
+                                rbacAnnotations.DEPENDENCIES
                               ]
                             ).join(", ")
                           }}

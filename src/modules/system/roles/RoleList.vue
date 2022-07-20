@@ -16,13 +16,15 @@ import { useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
 import type { Role } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
+import { roleLabels } from "@/constants/labels";
+import { pluginAnnotations } from "@/constants/annotations";
 
 const createVisible = ref(false);
 const roles = ref<Role[]>([]);
 
 const basicRoles = computed(() => {
   return roles.value.filter(
-    (role) => role.metadata?.labels?.["halo.run/role-template"] !== "true"
+    (role) => role.metadata?.labels?.[roleLabels.TEMPLATE] !== "true"
   );
 });
 
@@ -179,7 +181,7 @@ onMounted(() => {
                   <span class="mr-2 truncate text-sm font-medium text-gray-900">
                     {{
                       role.metadata.annotations?.[
-                        "plugin.halo.run/display-name"
+                        pluginAnnotations.DISPLAY_NAME
                       ] || role.metadata.name
                     }}
                   </span>

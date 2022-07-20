@@ -12,14 +12,16 @@ import { useRoute } from "vue-router";
 import { computed, onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type {
-  Plugin,
   ConfigMap,
+  Plugin,
+  Role,
   Setting,
   SettingSpec,
-  Role,
 } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import { pluginLabels } from "@/constants/labels";
+import { rbacAnnotations } from "@/constants/annotations";
 
 interface FormKitSettingSpec extends Omit<SettingSpec, "formSchema"> {
   formSchema: FormKitSchemaCondition | FormKitSchemaNode[];
@@ -195,8 +197,7 @@ const handleFetchRoles = async () => {
 const pluginRoleTemplates = computed(() => {
   return roles.value.filter((item) => {
     return (
-      item.metadata.labels?.["plugin.halo.run/plugin-name"] ===
-      plugin.value.metadata.name
+      item.metadata.labels?.[pluginLabels.NAME] === plugin.value.metadata.name
     );
   });
 });
@@ -206,15 +207,13 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
   pluginRoleTemplates.value.forEach((role) => {
     const group = groups.find(
       (group) =>
-        group.module ===
-        role.metadata.annotations?.["rbac.authorization.halo.run/module"]
+        group.module === role.metadata.annotations?.[rbacAnnotations.MODULE]
     );
     if (group) {
       group.roles.push(role);
     } else {
       groups.push({
-        module:
-          role.metadata.annotations?.["rbac.authorization.halo.run/module"],
+        module: role.metadata.annotations?.[rbacAnnotations.MODULE],
         roles: [role],
       });
     }
@@ -370,14 +369,14 @@ onMounted(() => {
                               <span class="font-medium text-gray-900">
                                 {{
                                   role.metadata.annotations?.[
-                                    "rbac.authorization.halo.run/display-name"
+                                    rbacAnnotations.DISPLAY_NAME
                                   ]
                                 }}
                               </span>
                               <span
                                 v-if="
                                   role.metadata.annotations?.[
-                                    'rbac.authorization.halo.run/dependencies'
+                                    rbacAnnotations.DEPENDENCIES
                                   ]
                                 "
                                 class="text-xs text-gray-400"
@@ -386,7 +385,7 @@ onMounted(() => {
                                 {{
                                   JSON.parse(
                                     role.metadata.annotations?.[
-                                      "rbac.authorization.halo.run/dependencies"
+                                      rbacAnnotations.DEPENDENCIES
                                     ]
                                   ).join(", ")
                                 }}

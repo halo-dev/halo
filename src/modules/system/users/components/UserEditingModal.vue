@@ -5,6 +5,8 @@ import { apiClient } from "@halo-dev/admin-shared";
 import type { Role, User } from "@halo-dev/api-client";
 import { IconSave, VButton, VModal } from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
+import { roleLabels } from "@/constants/labels";
+import { rbacAnnotations } from "@/constants/annotations";
 
 const props = defineProps({
   visible: {
@@ -57,7 +59,7 @@ const creationModalTitle = computed(() => {
 
 const basicRoles = computed(() => {
   return roles.value.filter(
-    (role) => role.metadata?.labels?.["halo.run/role-template"] !== "true"
+    (role) => role.metadata?.labels?.[roleLabels.TEMPLATE] !== "true"
   );
 });
 
@@ -150,7 +152,7 @@ onMounted(handleFetchRoles);
         :options="
           basicRoles.map((role:Role) => {
             return {
-              label: role.metadata?.annotations?.['plugin.halo.run/display-name'] || role.metadata.name,
+              label: role.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] || role.metadata.name,
               value: role.metadata?.name,
             };
           })

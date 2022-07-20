@@ -16,8 +16,8 @@ import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import { onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
-import type { User } from "@halo-dev/api-client";
-import type { UserList } from "@halo-dev/api-client";
+import type { User, UserList } from "@halo-dev/api-client";
+import { rbacAnnotations } from "@/constants/annotations";
 
 const checkAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -72,8 +72,7 @@ const handleOpenPasswordChangeModal = (user: User) => {
 
 const getRoles = (user: User) => {
   return JSON.parse(
-    user.metadata.annotations?.["rbac.authorization.halo.run/role-names"] ||
-      "[]"
+    user.metadata.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
   );
 };
 

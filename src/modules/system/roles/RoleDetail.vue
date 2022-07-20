@@ -13,6 +13,8 @@ import { useRoute, useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Role, User } from "@halo-dev/api-client";
+import { pluginLabels, roleLabels } from "@/constants/labels";
+import { rbacAnnotations } from "@/constants/annotations";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -38,8 +40,8 @@ const formState = ref<FormState>({
       name: "",
       labels: {},
       annotations: {
-        "rbac.authorization.halo.run/dependencies": "",
-        "rbac.authorization.halo.run/display-name": "",
+        [rbacAnnotations.DEPENDENCIES]: "",
+        [rbacAnnotations.DISPLAY_NAME]: "",
       },
     },
     rules: [],
@@ -51,7 +53,7 @@ const formState = ref<FormState>({
 const roleTemplates = computed<Role[]>(() => {
   return roles.value.filter(
     (role) =>
-      role.metadata.labels?.["halo.run/role-template"] === "true" &&
+      role.metadata.labels?.[roleLabels.TEMPLATE] === "true" &&
       role.metadata.labels?.["halo.run/hidden"] !== "true"
   );
 });
@@ -61,15 +63,13 @@ const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
   roleTemplates.value.forEach((role) => {
     const group = groups.find(
       (group) =>
-        group.module ===
-        role.metadata.annotations?.["rbac.authorization.halo.run/module"]
+        group.module === role.metadata.annotations?.[rbacAnnotations.MODULE]
     );
     if (group) {
       group.roles.push(role);
     } else {
       groups.push({
-        module:
-          role.metadata.annotations?.["rbac.authorization.halo.run/module"],
+        module: role.metadata.annotations?.[rbacAnnotations.MODULE],
         roles: [role],
       });
     }
@@ -84,9 +84,7 @@ const handleFetchRole = async () => {
     );
     formState.value.role = response.data;
     formState.value.selectedRoleTemplates = JSON.parse(
-      response.data.metadata.annotations?.[
-        "rbac.authorization.halo.run/dependencies"
-      ] || "[]"
+      response.data.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
     );
   } catch (error) {
     console.error(error);
@@ -115,9 +113,8 @@ const handleUpdateRole = async () => {
   try {
     formState.value.saving = true;
     if (formState.value.role.metadata.annotations) {
-      formState.value.role.metadata.annotations[
-        "rbac.authorization.halo.run/dependencies"
-      ] = JSON.stringify(formState.value.selectedRoleTemplates);
+      formState.value.role.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
+        JSON.stringify(formState.value.selectedRoleTemplates);
     }
     await apiClient.extension.role.updatev1alpha1Role(
       route.params.name as string,
@@ -146,7 +143,7 @@ onMounted(() => {
 <template>
   <VPageHeader
     :title="`角色：${
-      formState.role?.metadata?.annotations?.['plugin.halo.run/display-name'] ||
+      formState.role?.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
       formState.role?.metadata?.name
     }`"
   >
@@ -193,7 +190,7 @@ onMounted(() => {
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{
                   formState.role?.metadata?.annotations?.[
-                    "plugin.halo.run/display-name"
+                    rbacAnnotations.DISPLAY_NAME
                   ] || formState.role?.metadata?.name
                 }}
               </dd>
@@ -299,7 +296,31 @@ onMounted(() => {
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">
-                {{ group.module }}
+                <div>
+                  {{ group.module }}
+                </div>
+                <div
+                  v-if="
+                    group.roles.length &&
+                    group.roles[0].metadata.labels?.[pluginLabels.NAME]
+                  "
+                  class="mt-3 text-xs text-gray-500"
+                >
+                  由
+                  <RouterLink
+                    :to="{
+                      name: 'PluginDetail',
+                      params: {
+                        pluginName:
+                          group.roles[0].metadata.labels?.[pluginLabels.NAME],
+                      },
+                    }"
+                    class="hover:text-blue-600"
+                  >
+                    {{ group.roles[0].metadata.labels?.[pluginLabels.NAME] }}
+                  </RouterLink>
+                  插件提供
+                </div>
               </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <ul class="space-y-2">
@@ -317,14 +338,14 @@ onMounted(() => {
                         <span class="font-medium text-gray-900">
                           {{
                             role.metadata.annotations?.[
-                              "rbac.authorization.halo.run/display-name"
+                              rbacAnnotations.DISPLAY_NAME
                             ]
                           }}
                         </span>
                         <span
                           v-if="
                             role.metadata.annotations?.[
-                              'rbac.authorization.halo.run/dependencies'
+                              rbacAnnotations.DEPENDENCIES
                             ]
                           "
                           class="text-xs text-gray-400"
@@ -333,7 +354,7 @@ onMounted(() => {
                           {{
                             JSON.parse(
                               role.metadata.annotations?.[
-                                "rbac.authorization.halo.run/dependencies"
+                                rbacAnnotations.DEPENDENCIES
                               ]
                             ).join(", ")
                           }}

@@ -354,16 +354,18 @@ onMounted(handleFetchThemes);
         </div>
       </div>
 
-      <div v-if="themeActiveId === 'settings'">
-        <FormKit id="theme-setting-form" :actions="false" type="form">
-          <FormKit label="侧边栏宽度" type="text"></FormKit>
-          <FormKit label="侧边栏背景图" type="text"></FormKit>
-          <FormKit label="右上角图标" type="text"></FormKit>
-          <FormKit label="文章代码高亮语言" type="text"></FormKit>
-        </FormKit>
+      <div v-if="themeActiveId === 'settings'" class="p-4 sm:px-6">
+        <div class="w-1/3">
+          <FormKit id="theme-setting-form" :actions="false" type="form">
+            <FormKit label="侧边栏宽度" type="text"></FormKit>
+            <FormKit label="侧边栏背景图" type="text"></FormKit>
+            <FormKit label="右上角图标" type="text"></FormKit>
+            <FormKit label="文章代码高亮语言" type="text"></FormKit>
+          </FormKit>
+        </div>
 
         <div class="pt-5">
-          <div class="flex justify-start p-4">
+          <div class="flex justify-start">
             <VButton type="secondary"> 保存</VButton>
           </div>
         </div>

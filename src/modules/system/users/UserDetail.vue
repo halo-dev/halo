@@ -4,14 +4,13 @@ import type { Ref } from "vue";
 import { computed, inject } from "vue";
 import { useRouter } from "vue-router";
 import type { User } from "@halo-dev/api-client";
+import { rbacAnnotations } from "@/constants/annotations";
 
 const user = inject<Ref<User>>("user");
 
 const roles = computed(() => {
   return JSON.parse(
-    user?.value?.metadata?.annotations?.[
-      "rbac.authorization.halo.run/role-names"
-    ] || "[]"
+    user?.value?.metadata?.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
   );
 });
 
