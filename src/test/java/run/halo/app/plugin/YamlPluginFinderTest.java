@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,8 +47,6 @@ class YamlPluginFinderTest {
 
         Path directories = Files.createDirectories(tempDirectory.resolve("build/resources/main"));
         FileCopyUtils.copy(testFile, directories.resolve("plugin.yaml").toFile());
-        Path extensions = Files.createDirectory(directories.resolve("extensions"));
-        Files.createFile(extensions.resolve("roles.yaml"));
 
         Plugin plugin = pluginFinder.find(tempDirectory);
         assertThat(plugin).isNotNull();
@@ -66,11 +63,19 @@ class YamlPluginFinderTest {
                 """,
             JsonUtils.objectToJson(plugin.getStatus()),
             true);
-        assertThat(plugin.getSpec().getExtensionLocations()).contains("extensions/roles.yaml");
     }
 
     @Test
-    void unstructuredToPluginTest() throws JsonProcessingException, JSONException {
+    void findFromJar() throws FileNotFoundException {
+        File file =
+            ResourceUtils.getFile("classpath:plugin/test-unstructured-resource-loader.jar");
+        Plugin plugin = pluginFinder.find(file.toPath());
+        assertThat(plugin).isNotNull();
+        assertThat(plugin.getMetadata().getName()).isEqualTo("io.github.guqing.apples");
+    }
+
+    @Test
+    void unstructuredToPluginTest() throws JSONException {
         Plugin plugin = pluginFinder.unstructuredToPlugin(new FileSystemResource(testFile));
         assertThat(plugin).isNotNull();
         JSONAssert.assertEquals("""
@@ -94,7 +99,6 @@ class YamlPluginFinderTest {
                         "requires": ">=2.0.0",
                         "pluginClass": null,
                         "enabled": false,
-                        "extensionLocations": null,
                         settingName: null,
                         configMapName: null
                     },
@@ -168,15 +172,5 @@ class YamlPluginFinderTest {
         Plugin plugin = Unstructured.OBJECT_MAPPER.readValue(pluginJson, Plugin.class);
         assertThat(plugin.getSpec()).isNotNull();
         JSONAssert.assertEquals(pluginJson, JsonUtils.objectToJson(plugin), false);
-    }
-
-    @Test
-    void getUnstructuredFilePathFromJar() throws FileNotFoundException {
-        File file = ResourceUtils.getFile("classpath:plugin/test-unstructured-resource-loader.jar");
-        List<String> unstructuredFilePathFromJar =
-            pluginFinder.getUnstructuredFilePathFromJar(file.toPath());
-        assertThat(unstructuredFilePathFromJar).hasSize(3);
-        assertThat(unstructuredFilePathFromJar).contains("extensions/roles.yaml",
-            "extensions/reverseProxy.yaml", "extensions/test.yml");
     }
 }

@@ -89,7 +89,6 @@ class RoleReconcilerTest {
             .get(Role.ROLE_DEPENDENCY_RULES), false);
     }
 
-
     @Test
     void reconcileUiPermission() {
         Role roleManage = TestRole.getRoleManage();
