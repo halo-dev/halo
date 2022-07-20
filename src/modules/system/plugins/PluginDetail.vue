@@ -16,6 +16,7 @@ import type {
   ConfigMap,
   Setting,
   SettingSpec,
+  Role,
 } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
@@ -174,7 +175,57 @@ const handleChangePluginStatus = async () => {
   });
 };
 
-onMounted(handleFetchPlugin);
+// TODO 临时解决方案
+interface RoleTemplateGroup {
+  module: string | null | undefined;
+  roles: Role[];
+}
+
+const roles = ref<Role[]>([]);
+
+const handleFetchRoles = async () => {
+  try {
+    const { data } = await apiClient.extension.role.listv1alpha1Role();
+    roles.value = data.items;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const pluginRoleTemplates = computed(() => {
+  return roles.value.filter((item) => {
+    return (
+      item.metadata.labels?.["plugin.halo.run/plugin-name"] ===
+      plugin.value.metadata.name
+    );
+  });
+});
+
+const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
+  const groups: RoleTemplateGroup[] = [];
+  pluginRoleTemplates.value.forEach((role) => {
+    const group = groups.find(
+      (group) =>
+        group.module ===
+        role.metadata.annotations?.["rbac.authorization.halo.run/module"]
+    );
+    if (group) {
+      group.roles.push(role);
+    } else {
+      groups.push({
+        module:
+          role.metadata.annotations?.["rbac.authorization.halo.run/module"],
+        roles: [role],
+      });
+    }
+  });
+  return groups;
+});
+
+onMounted(() => {
+  handleFetchPlugin();
+  handleFetchRoles();
+});
 </script>
 
 <template>
@@ -288,97 +339,57 @@ onMounted(handleFetchPlugin);
               </dd>
             </div>
             <div
-              class="bg-gray-50 px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+              :class="`${
+                pluginRoleTemplateGroups.length ? 'bg-gray-50' : 'bg-white'
+              }`"
+              class="px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">权限定义</dt>
+              <dt class="text-sm font-medium text-gray-900">权限模板</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-5 sm:mt-0">
-                <dl class="divide-y divide-gray-100">
+                <dl
+                  v-if="pluginRoleTemplateGroups.length"
+                  class="divide-y divide-gray-100"
+                >
                   <div
+                    v-for="(group, groupIndex) in pluginRoleTemplateGroups"
+                    :key="groupIndex"
                     class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
                   >
                     <dt class="text-sm font-medium text-gray-900">
-                      Discussions Management
+                      {{ group.module }}
                     </dt>
                     <dd
                       class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
                     >
                       <ul class="space-y-2">
-                        <li>
+                        <li v-for="(role, index) in group.roles" :key="index">
                           <div
                             class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
                           >
-                            <input
-                              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                              type="checkbox"
-                            />
                             <div class="inline-flex flex-col gap-y-3">
                               <span class="font-medium text-gray-900">
-                                Discussions Management
+                                {{
+                                  role.metadata.annotations?.[
+                                    "rbac.authorization.halo.run/display-name"
+                                  ]
+                                }}
                               </span>
-                              <span class="text-xs text-gray-400">
-                                依赖于 Discussions View
-                              </span>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div
-                            class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-primary"
-                          >
-                            <input
-                              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                              type="checkbox"
-                            />
-                            <div class="inline-flex flex-col gap-y-3">
-                              <span class="font-medium text-gray-900">
-                                Discussions View
-                              </span>
-                            </div>
-                          </div>
-                        </li>
-                      </ul>
-                    </dd>
-                  </div>
-
-                  <div
-                    class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                  >
-                    <dt class="text-sm font-medium text-gray-900">
-                      Posts Management
-                    </dt>
-                    <dd
-                      class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0"
-                    >
-                      <ul class="space-y-2">
-                        <li>
-                          <div
-                            class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
-                          >
-                            <input
-                              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                              type="checkbox"
-                            />
-                            <div class="inline-flex flex-col gap-y-3">
-                              <span class="font-medium text-gray-900">
-                                Posts Management
-                              </span>
-                              <span class="text-xs text-gray-400">
-                                依赖于 Posts View
-                              </span>
-                            </div>
-                          </div>
-                        </li>
-                        <li>
-                          <div
-                            class="inline-flex w-72 cursor-pointer items-center gap-4 rounded border p-5 hover:border-primary"
-                          >
-                            <input
-                              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                              type="checkbox"
-                            />
-                            <div class="inline-flex flex-col gap-y-3">
-                              <span class="font-medium text-gray-900">
-                                Posts View
+                              <span
+                                v-if="
+                                  role.metadata.annotations?.[
+                                    'rbac.authorization.halo.run/dependencies'
+                                  ]
+                                "
+                                class="text-xs text-gray-400"
+                              >
+                                依赖于
+                                {{
+                                  JSON.parse(
+                                    role.metadata.annotations?.[
+                                      "rbac.authorization.halo.run/dependencies"
+                                    ]
+                                  ).join(", ")
+                                }}
                               </span>
                             </div>
                           </div>
@@ -387,6 +398,7 @@ onMounted(handleFetchPlugin);
                     </dd>
                   </div>
                 </dl>
+                <span v-else>无</span>
               </dd>
             </div>
           </dl>
