@@ -10,7 +10,6 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
@@ -36,7 +35,7 @@ public class RoleReconciler implements Reconciler {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Role.class, request.name()).ifPresentOrElse(role -> {
+        client.fetch(Role.class, request.name()).ifPresent(role -> {
             final Role oldRole = JsonUtils.deepCopy(role);
             Map<String, String> annotations = role.getMetadata().getAnnotations();
             if (annotations == null) {
@@ -61,18 +60,8 @@ public class RoleReconciler implements Reconciler {
             if (!Objects.equals(oldRole, role)) {
                 client.update(role);
             }
-        }, () -> onDelete(request.name()));
+        });
         return new Result(false, null);
-    }
-
-    private void onDelete(String name) {
-        log.debug("Watched that role [{}] was deleted, preparing to clean up"
-            + " RoleBinding resources.", name);
-        // clean up role binding by role name
-        client.list(RoleBinding.class,
-                roleBinding -> Role.KIND.equals(roleBinding.getRoleRef().getKind())
-                    && roleBinding.getRoleRef().getName().equals(name), null)
-            .forEach(client::delete);
     }
 
     private List<String> aggregateUiPermissions(List<Role> dependencyRoles) {
