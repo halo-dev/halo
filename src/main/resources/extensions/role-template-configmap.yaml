@@ -1,0 +1,32 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-configmaps
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-configmaps\" ]"
+    rbac.authorization.halo.run/module: "ConfigMaps Management"
+    rbac.authorization.halo.run/display-name: "ConfigMap Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:configmaps:manage"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "configmaps" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-configmaps
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "ConfigMaps Management"
+    rbac.authorization.halo.run/display-name: "ConfigMap View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:configmaps:view"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "configmaps" ]
+    verbs: [ "get", "list" ]

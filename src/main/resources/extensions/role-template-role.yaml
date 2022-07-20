@@ -1,0 +1,33 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-roles
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-view-roles", "role-template-manage-permissions" ]
+    rbac.authorization.halo.run/module: "Roles Management"
+    rbac.authorization.halo.run/display-name: "Role Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:roles:manage"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "roles" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-roles
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Roles Management"
+    rbac.authorization.halo.run/display-name: "Role View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:roles:view"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "roles" ]
+    verbs: [ "get", "list" ]
