@@ -41,7 +41,7 @@ const currentRole = computed(() => {
 <template>
   <div class="flex h-full">
     <aside class="navbar fixed hidden h-full overflow-y-auto md:block">
-      <div class="logo flex justify-center py-5">
+      <div class="logo flex justify-center pt-5 pb-7">
         <img :src="logo" alt="Halo Logo" style="width: 78px" />
       </div>
       <div class="px-3">
@@ -191,24 +191,24 @@ const currentRole = computed(() => {
   padding-bottom: 70px;
 
   .current-profile {
-    background: #fff;
-    position: fixed;
-    left: 0;
-    bottom: 0;
     height: 70px;
-    display: flex;
-    @apply w-64;
-    @apply p-3;
+    @apply w-64
+    bg-white
+    p-3
+    flex
+    fixed
+    left-0
+    bottom-0
+    gap-3;
 
     .profile-avatar {
-      @apply self-center;
-      @apply flex;
+      @apply self-center
+      flex;
     }
 
     .profile-name {
-      @apply self-center;
-      @apply flex-1;
-      @apply ml-3;
+      @apply self-center
+      flex-1;
     }
 
     .profile-control {
@@ -218,11 +218,11 @@ const currentRole = computed(() => {
 }
 
 .content {
-  @apply ml-0;
-  @apply md:ml-64;
-  display: flex;
-  flex: auto;
-  flex-direction: column;
-  overflow-x: hidden;
+  @apply ml-0
+  flex
+  flex-auto
+  flex-col
+  overflow-x-hidden
+  md:ml-64;
 }
 </style>
