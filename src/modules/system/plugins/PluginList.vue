@@ -261,6 +261,19 @@ onMounted(handleFetchPlugins);
                 <div
                   class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
+                  <FloatingTooltip
+                    v-if="!plugin.spec.enabled"
+                    class="hidden items-center sm:flex"
+                  >
+                    <div
+                      class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
+                    >
+                      <span
+                        class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
+                      ></span>
+                    </div>
+                    <template #popper> 启动异常</template>
+                  </FloatingTooltip>
                   <a
                     :href="plugin.spec.homepage"
                     class="hidden text-sm text-gray-500 hover:text-gray-900 sm:block"
@@ -271,7 +284,10 @@ onMounted(handleFetchPlugins);
                   <span class="hidden text-sm text-gray-500 sm:block">
                     {{ plugin.spec.version }}
                   </span>
-                  <time class="text-sm text-gray-500" datetime="2020-01-07">
+                  <time
+                    class="hidden text-sm text-gray-500 sm:block"
+                    datetime="2020-01-07"
+                  >
                     {{ plugin.metadata.creationTimestamp }}
                   </time>
                   <div
