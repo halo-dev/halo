@@ -8,7 +8,7 @@ import type {
   MenuItemType,
   Plugin,
 } from "@halo-dev/admin-shared";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient, setApiUrl } from "@halo-dev/admin-shared";
 import { menus, minimenus, registerMenu } from "./router/menus.config";
 // setup
 import "./setup/setupStyles";
@@ -25,6 +25,7 @@ import { useRoleStore } from "@/stores/role";
 const app = createApp(App);
 
 setupComponents(app);
+setApiUrl(import.meta.env.VITE_API_URL);
 
 app.use(createPinia());
 
