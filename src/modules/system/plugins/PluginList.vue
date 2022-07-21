@@ -27,7 +27,7 @@ const dialog = useDialog();
 const handleRouteToDetail = (plugin: Plugin) => {
   router.push({
     name: "PluginDetail",
-    params: { pluginName: plugin.metadata.name },
+    params: { name: plugin.metadata.name },
   });
 };
 

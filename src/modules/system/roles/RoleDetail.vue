@@ -311,8 +311,9 @@ onMounted(() => {
                     :to="{
                       name: 'PluginDetail',
                       params: {
-                        pluginName:
-                          group.roles[0].metadata.labels?.[pluginLabels.NAME],
+                        name: group.roles[0].metadata.labels?.[
+                          pluginLabels.NAME
+                        ],
                       },
                     }"
                     class="hover:text-blue-600"

@@ -320,7 +320,7 @@ onMounted(handleFetchThemes);
                       <RouterLink
                         :to="{
                           name: 'PluginDetail',
-                          params: { pluginName: 'PluginLinks' },
+                          params: { name: 'PluginLinks' },
                         }"
                         class="font-medium text-gray-900 hover:text-blue-400"
                       >
