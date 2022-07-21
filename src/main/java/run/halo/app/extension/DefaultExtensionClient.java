@@ -105,8 +105,10 @@ public class DefaultExtensionClient implements ExtensionClient {
 
     @Override
     public <E extends Extension> void delete(E extension) {
+        extension.getMetadata().setDeletionTimestamp(Instant.now());
         var extensionStore = converter.convertTo(extension);
-        var deleteStore = storeClient.delete(extensionStore.getName(), extensionStore.getVersion());
+        var deleteStore = storeClient.update(extensionStore.getName(), extensionStore.getVersion(),
+            extensionStore.getData());
         Extension deleteExt = converter.convertFrom(extension.getClass(), deleteStore);
         watchers.onDelete(deleteExt);
     }

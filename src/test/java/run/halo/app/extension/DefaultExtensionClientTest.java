@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -340,13 +341,14 @@ class DefaultExtensionClientTest {
         var fake = createFakeExtension("fake", 2L);
         when(converter.convertTo(any())).thenReturn(
             createExtensionStore("/registry/fake.halo.run/fakes/fake"));
-        when(storeClient.delete(any(), any())).thenReturn(
+        when(storeClient.update(any(), any(), any())).thenReturn(
             createExtensionStore("/registry/fake.halo.run/fakes/fake"));
 
         client.delete(fake);
 
         verify(converter, times(1)).convertTo(any());
-        verify(storeClient, times(1)).delete(any(), any());
+        verify(storeClient, times(1)).update(any(), any(), any());
+        verify(storeClient, never()).delete(any(), any());
     }
 
     @Nested
