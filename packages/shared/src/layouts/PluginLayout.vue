@@ -5,11 +5,9 @@ import { RouterView, useRoute, useRouter } from "vue-router";
 import type { Ref } from "vue";
 import { onMounted, provide, ref, watch } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
-import type {
-  FormKitSetting,
-  FormKitSettingSpec,
-} from "@halo-dev/admin-shared";
-import { apiClient, BasicLayout } from "@halo-dev/admin-shared";
+import type { FormKitSetting, FormKitSettingSpec } from "@/types/formkit";
+import { BasicLayout } from "../layouts";
+import { apiClient } from "@/utils/api-client";
 
 interface PluginTab {
   id: string;
