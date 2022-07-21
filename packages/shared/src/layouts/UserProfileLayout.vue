@@ -80,7 +80,7 @@ const handleTabChange = (id: string) => {
       <div class="px-4 sm:px-6 lg:px-8">
         <div class="-mt-12 flex items-end space-x-5 sm:-mt-16">
           <div class="flex">
-            <div class="h-24 w-24 sm:h-32 sm:w-32">
+            <div class="bg-white h-24 w-24 sm:h-32 sm:w-32">
               <img
                 :src="user?.spec?.avatar"
                 alt="Avatar"

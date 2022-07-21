@@ -14,13 +14,12 @@
     "name": "@halo-dev",
     "url": "https://github.com/halo-dev"
   },
-  "main": "./dist/halo-admin-shared.cjs.js",
+  "main": "./dist/halo-admin-shared.iife.js",
   "module": "./dist/halo-admin-shared.es.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "require": "./dist/halo-admin-shared.cjs.js",
       "import": "./dist/halo-admin-shared.es.js"
     },
     "./dist/style.css": "./dist/style.css"

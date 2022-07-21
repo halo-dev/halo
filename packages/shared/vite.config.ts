@@ -26,7 +26,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "HaloAdminShared",
-      formats: ["es", "cjs", "umd", "iife"],
+      formats: ["es", "iife"],
       fileName: (format) => `halo-admin-shared.${format}.js`,
     },
     rollupOptions: {

@@ -28,7 +28,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
       name: "HaloComponents",
-      formats: ["es", "cjs", "umd", "iife"],
+      formats: ["es", "iife"],
       fileName: (format) => `halo-components.${format}.js`,
     },
     rollupOptions: {
