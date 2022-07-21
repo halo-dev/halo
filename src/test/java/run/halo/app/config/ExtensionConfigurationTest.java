@@ -29,6 +29,7 @@ import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.store.ExtensionStoreRepository;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -57,6 +58,11 @@ class ExtensionConfigurationTest {
 
         // register scheme
         schemeManager.register(FakeExtension.class);
+    }
+
+    @AfterEach
+    void cleanUp(@Autowired ExtensionStoreRepository repository) {
+        repository.deleteAll();
     }
 
     @Test
@@ -128,12 +134,6 @@ class ExtensionConfigurationTest {
                 })
                 .returnResult()
                 .getResponseBody();
-        }
-
-        @AfterEach
-        void cleanUp() {
-            FakeExtension fakeToDelete = getFakeExtension(createdFake.getMetadata().getName());
-            extClient.delete(fakeToDelete);
         }
 
         @Test

@@ -6,7 +6,6 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.net.URI;
-import java.time.Instant;
 import java.util.Objects;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.type.TypeDescription;
@@ -299,10 +298,7 @@ public class ExtensionRouterFunctionFactory {
             String name = request.pathVariable("name");
             return getExtension(name)
                 .flatMap(extension ->
-                    Mono.fromRunnable(() -> {
-                        extension.getMetadata().setDeletionTimestamp(Instant.now());
-                        client.update(extension);
-                    }).thenReturn(extension))
+                    Mono.fromRunnable(() -> client.delete(extension)).thenReturn(extension))
                 .flatMap(extension -> this.getExtension(name))
                 .flatMap(extension -> ServerResponse
                     .ok()

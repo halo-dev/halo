@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doNothing;
@@ -57,7 +56,7 @@ class ExtensionDeleteHandlerTest {
             .pathVariable("name", "my-fake")
             .body(Mono.just(unstructured));
         when(client.fetch(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Optional.of(fake));
-        doNothing().when(client).update(any());
+        doNothing().when(client).delete(any());
 
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var deleteHandler = new ExtensionDeleteHandler(scheme, client);
@@ -72,9 +71,8 @@ class ExtensionDeleteHandlerTest {
             })
             .verifyComplete();
         verify(client, times(2)).fetch(eq(FakeExtension.class), eq("my-fake"));
-        verify(client, times(1)).update(
-            argThat(fakeToDelete -> fakeToDelete.getMetadata().getDeletionTimestamp() != null));
-        verify(client, times(0)).delete(any());
+        verify(client, times(1)).delete(any());
+        verify(client, times(0)).update(any());
     }
 
     @Test
