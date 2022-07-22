@@ -1,5 +1,6 @@
 package run.halo.app.infra.properties;
 
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
@@ -12,6 +13,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "halo")
 public class HaloProperties {
+
+    private Path workDir;
 
     private Set<String> initialExtensionLocations = new HashSet<>();
 

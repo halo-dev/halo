@@ -9,7 +9,7 @@ spring:
 
     # H2 database configuration.
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/halo-next/db/halo;AUTO_SERVER=TRUE
+    url: jdbc:h2:file:${halo.work-dir}/db/halo;AUTO_SERVER=TRUE
     username: admin
     password: 123456
 
@@ -35,6 +35,9 @@ halo:
       jwt:
         public-key-location: classpath:app.pub
         private-key-location: classpath:app.key
+  work-dir: ${user.home}/halo-next
+  plugin:
+    plugins-root: ${halo.work-dir}/plugins
 
 springdoc:
   api-docs:
