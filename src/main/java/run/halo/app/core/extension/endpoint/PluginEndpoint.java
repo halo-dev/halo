@@ -85,7 +85,7 @@ public class PluginEndpoint implements CustomEndpoint {
                         return client.fetch(Plugin.class, plugin.getMetadata().getName())
                             .orElseThrow();
                     });
-                return plugin;
+                return createdPlugin;
             }).flatMap(plugin -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(plugin));
