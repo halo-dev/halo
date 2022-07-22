@@ -57,7 +57,7 @@ public class PluginProperties {
      * Plugin root directory: default “plugins”; when non-jar mode plugin, the value should be an
      * absolute directory address.
      */
-    private String pluginsRoot = "plugins";
+    private String pluginsRoot;
 
     /**
      * Allows providing custom plugin loaders.
