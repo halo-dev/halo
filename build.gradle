@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '3.0.0-M3'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '3.0.0-M4'
+    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
     id "checkstyle"
     id 'java'
 }
@@ -68,6 +68,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M3'
     implementation "org.flywaydb:flyway-core"
     implementation "org.flywaydb:flyway-mysql"
+    implementation "net.bytebuddy:byte-buddy"
 
     implementation "com.github.victools:jsonschema-generator:$jsonschemaGenerator"
     implementation "com.github.victools:jsonschema-module-swagger-2:$jsonschemaGenerator"
