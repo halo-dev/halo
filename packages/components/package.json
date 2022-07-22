@@ -61,5 +61,11 @@
       "import": "./dist/halo-components.es.js"
     },
     "./dist/style.css": "./dist/style.css"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.0.1",
+    "@codemirror/state": "^6.1.0",
+    "@codemirror/view": "^6.1.0",
+    "codemirror": "^6.0.1"
   }
 }
