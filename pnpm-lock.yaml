@@ -71,6 +71,7 @@ importers:
       vue-grid-layout: 3.0.0-beta1
       vue-router: ^4.1.2
       vue-tsc: ^0.38.8
+      yaml: ^2.1.1
     dependencies:
       '@formkit/addons': 1.0.0-beta.9_vue@3.2.37
       '@formkit/core': 1.0.0-beta.9
@@ -97,6 +98,7 @@ importers:
       vue-filepond: 7.0.3_filepond@4.30.4+vue@3.2.37
       vue-grid-layout: 3.0.0-beta1
       vue-router: 4.1.2_vue@3.2.37
+      yaml: 2.1.1
     devDependencies:
       '@changesets/cli': 2.23.2
       '@rushstack/eslint-patch': 1.1.4
@@ -144,6 +146,8 @@ importers:
   packages/components:
     specifiers:
       '@codemirror/commands': ^6.0.1
+      '@codemirror/language': ^6.2.1
+      '@codemirror/legacy-modes': ^6.1.0
       '@codemirror/state': ^6.1.0
       '@codemirror/view': ^6.1.0
       '@iconify-json/ri': ^1.1.3
@@ -151,9 +155,11 @@ importers:
       codemirror: ^6.0.1
       histoire: ^0.7.9
       unplugin-icons: ^0.14.7
-      vite-plugin-dts: ^1.3.1
+      vite-plugin-dts: ^1.4.0
     dependencies:
       '@codemirror/commands': 6.0.1
+      '@codemirror/language': 6.2.1
+      '@codemirror/legacy-modes': 6.1.0
       '@codemirror/state': 6.1.0
       '@codemirror/view': 6.1.0
       codemirror: 6.0.1
@@ -162,7 +168,7 @@ importers:
       '@rollup/plugin-typescript': 8.3.3
       histoire: 0.7.9
       unplugin-icons: 0.14.7
-      vite-plugin-dts: 1.3.1
+      vite-plugin-dts: 1.4.0
 
   packages/shared:
     specifiers:
@@ -1644,6 +1650,12 @@ packages:
       style-mod: 4.0.0
     dev: false
 
+  /@codemirror/legacy-modes/6.1.0:
+    resolution: {integrity: sha512-V/PgGpndkZeTn3Hdlg/gd8MLFdyvTCIX+iwJzjUw5iNziWiNsAY8X0jvf7m3gSfxnKkNzmid6l0g4rYSpiDaCw==}
+    dependencies:
+      '@codemirror/language': 6.2.1
+    dev: false
+
   /@codemirror/lint/6.0.0:
     resolution: {integrity: sha512-nUUXcJW1Xp54kNs+a1ToPLK8MadO0rMTnJB8Zk4Z8gBdrN0kqV7uvUraU/T2yqg+grDNR38Vmy/MrhQN/RgwiA==}
     dependencies:
@@ -1652,8 +1664,8 @@ packages:
       crelt: 1.0.5
     dev: false
 
-  /@codemirror/search/6.0.0:
-    resolution: {integrity: sha512-rL0rd3AhI0TAsaJPUaEwC63KHLO7KL0Z/dYozXj6E7L3wNHRyx7RfE0/j5HsIf912EE5n2PCb4Vg0rGYmDv4UQ==}
+  /@codemirror/search/6.0.1:
+    resolution: {integrity: sha512-uOinkOrM+daMduCgMPomDfKLr7drGHB4jHl3Vq6xY2WRlL7MkNsBE0b+XHYa/Mee2npsJOgwvkW4n1lMFeBW2Q==}
     dependencies:
       '@codemirror/state': 6.1.0
       '@codemirror/view': 6.1.0
@@ -3659,7 +3671,7 @@ packages:
       '@codemirror/commands': 6.0.1
       '@codemirror/language': 6.2.1
       '@codemirror/lint': 6.0.0
-      '@codemirror/search': 6.0.0
+      '@codemirror/search': 6.0.1
       '@codemirror/state': 6.1.0
       '@codemirror/view': 6.1.0
     dev: false
@@ -7923,6 +7935,23 @@ packages:
       - supports-color
     dev: true
 
+  /vite-plugin-dts/1.4.0:
+    resolution: {integrity: sha512-RyDCjQzVxUeDqF+Rl1hQT+t/rKmvfvo04gaGV/l3597FpeIWGKtNF1S4x509Kx1AfHOjLa1JdmjVgnSEIv+lpw==}
+    engines: {node: '>=12.0.0'}
+    peerDependencies:
+      vite: '>=2.4.4'
+    dependencies:
+      '@microsoft/api-extractor': 7.23.2
+      '@rushstack/node-core-library': 3.45.5
+      chalk: 4.1.2
+      debug: 4.3.4
+      fast-glob: 3.2.11
+      fs-extra: 10.1.0
+      ts-morph: 14.0.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /vite-plugin-externals/0.5.1_vite@2.9.14:
     resolution: {integrity: sha512-HvRFG5y9wXoJUG9FSbSp9ikOiJRh7EzN6tJC5oIOcEj+19GUw9Z1NNCPFtAmX75Ajcr10FdELKNmuXS3lExkcg==}
     peerDependencies:
@@ -8511,6 +8540,11 @@ packages:
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
+
+  /yaml/2.1.1:
+    resolution: {integrity: sha512-o96x3OPo8GjWeSLF+wOAbrPfhFOGY0W00GNaxCDv+9hkcDJEnev1yh8S7pgHF0ik6zc8sQLuL8hjHjJULZp8bw==}
+    engines: {node: '>= 14'}
+    dev: false
 
   /yargs-parser/18.1.3:
     resolution: {integrity: sha512-o50j0JeToy/4K6OZcaQmW6lyXXKhq7csREXcDwk2omFPJEwUNOVtJKvmDr9EI1fAJZUyZcRF7kxGBWmRXudrCQ==}

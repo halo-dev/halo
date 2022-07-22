@@ -39,6 +39,7 @@ import IconShieldUser from "~icons/ri/shield-user-line";
 import IconGitBranch from "~icons/ri/git-branch-line";
 import IconStopCircle from "~icons/ri/stop-circle-line";
 import IconForbidLine from "~icons/ri/forbid-line";
+import IconCodeBoxLine from "~icons/ri/code-box-line";
 
 export {
   IconDashboard,
@@ -82,4 +83,5 @@ export {
   IconGitBranch,
   IconStopCircle,
   IconForbidLine,
+  IconCodeBoxLine,
 };

@@ -5,6 +5,12 @@ import type { EditorStateConfig } from "@codemirror/state";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
+import { StreamLanguage } from "@codemirror/language";
+import { yaml } from "@codemirror/legacy-modes/mode/yaml";
+
+const languages = {
+  yaml: StreamLanguage.define(yaml),
+};
 
 const props = defineProps({
   modelValue: {
@@ -14,6 +20,10 @@ const props = defineProps({
   height: {
     type: String,
     default: "auto",
+  },
+  language: {
+    type: String as PropType<"yaml">,
+    default: "yaml",
   },
   extensions: {
     type: Array as PropType<EditorStateConfig["extensions"]>,
@@ -41,6 +51,7 @@ const createCmEditor = () => {
     basicSetup,
     EditorView.lineWrapping,
     customTheme,
+    languages[props.language],
     EditorView.updateListener.of((viewUpdate) => {
       if (viewUpdate.docChanged) {
         const doc = viewUpdate.state.doc.toString();

@@ -49,7 +49,8 @@
     "vue": "^3.2.37",
     "vue-filepond": "^7.0.3",
     "vue-grid-layout": "3.0.0-beta1",
-    "vue-router": "^4.1.2"
+    "vue-router": "^4.1.2",
+    "yaml": "^2.1.1"
   },
   "devDependencies": {
     "@changesets/cli": "^2.23.2",
