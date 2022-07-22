@@ -120,7 +120,7 @@ watch(
 <template>
   <VModal
     :visible="visible"
-    :width="650"
+    :width="700"
     title="创建角色"
     @update:visible="handleVisibleChange"
   >
@@ -145,6 +145,7 @@ watch(
           ></FormKit>
           <FormKit
             v-model="creationFormState.role.metadata.name"
+            help="角色别名，用于区分角色，不能重复，创建之后不能修改"
             label="别名"
             type="text"
             validation="required"

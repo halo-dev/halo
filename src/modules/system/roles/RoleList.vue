@@ -17,7 +17,7 @@ import { computed, onMounted, ref } from "vue";
 import type { Role } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { roleLabels } from "@/constants/labels";
-import { pluginAnnotations } from "@/constants/annotations";
+import { pluginAnnotations, rbacAnnotations } from "@/constants/annotations";
 
 const createVisible = ref(false);
 const roles = ref<Role[]>([]);
@@ -187,7 +187,17 @@ onMounted(() => {
                   </span>
                 </div>
                 <div class="mt-2 flex">
-                  <span class="text-xs text-gray-500"> 包含 0 个权限 </span>
+                  <span class="text-xs text-gray-500">
+                    包含
+                    {{
+                      JSON.parse(
+                        role.metadata.annotations?.[
+                          rbacAnnotations.DEPENDENCIES
+                        ] || "[]"
+                      ).length
+                    }}
+                    个权限
+                  </span>
                 </div>
               </div>
               <div class="flex">

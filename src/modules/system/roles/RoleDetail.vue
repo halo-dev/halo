@@ -178,7 +178,17 @@ onMounted(() => {
           <p
             class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500"
           >
-            <span>包含 {{ formState.role?.rules?.length }} 个权限</span>
+            <span
+              >包含
+              {{
+                JSON.parse(
+                  formState.role.metadata.annotations?.[
+                    rbacAnnotations.DEPENDENCIES
+                  ] || "[]"
+                ).length
+              }}
+              个权限</span
+            >
           </p>
         </div>
         <div class="border-t border-gray-200">
