@@ -172,12 +172,12 @@ importers:
 
   packages/shared:
     specifiers:
-      '@halo-dev/api-client': ^0.0.3
+      '@halo-dev/api-client': ^0.0.4
       '@halo-dev/components': workspace:*
       axios: ^0.27.2
       vite-plugin-dts: ^1.3.1
     dependencies:
-      '@halo-dev/api-client': 0.0.3
+      '@halo-dev/api-client': 0.0.4
       '@halo-dev/components': link:../components
       axios: 0.27.2
     devDependencies:
@@ -1871,6 +1871,10 @@ packages:
 
   /@halo-dev/api-client/0.0.3:
     resolution: {integrity: sha512-ybtVcjeeFqOldPIKRrm3socfGtbSR5GL+MXVmkSJwD2fCwT9OiXEvs3cgceWceIZI0Ug7AEKwxbcO+ZfOmDlYA==}
+    dev: false
+
+  /@halo-dev/api-client/0.0.4:
+    resolution: {integrity: sha512-rNkQJWBL+1du/wfe70cqc7YczcQMTlQBQb0xmBLXCvQvxIlANpEVo0YKlbMXBvznaec2MYUFu7aF0b8hi4GEDw==}
     dev: false
 
   /@halo-dev/logger/1.1.0:

@@ -13,6 +13,7 @@ import {
   VSwitch,
   VTag,
 } from "@halo-dev/components";
+import PluginInstallModal from "./components/PluginInstallModal.vue";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { apiClient } from "@halo-dev/admin-shared";
@@ -20,6 +21,7 @@ import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 
 const plugins = ref<Plugin[]>([] as Plugin[]);
+const pluginInstall = ref(false);
 
 const router = useRouter();
 const dialog = useDialog();
@@ -69,12 +71,22 @@ const handleChangeStatus = (plugin: Plugin) => {
 onMounted(handleFetchPlugins);
 </script>
 <template>
+  <PluginInstallModal
+    v-model:visible="pluginInstall"
+    v-permission="['system:plugins:manage']"
+    @close="handleFetchPlugins"
+  />
+
   <VPageHeader title="插件">
     <template #icon>
       <IconPlug class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton v-permission="['system:plugins:manage']" type="secondary">
+      <VButton
+        v-permission="['system:plugins:manage']"
+        type="secondary"
+        @click="pluginInstall = true"
+      >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>

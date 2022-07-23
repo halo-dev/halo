@@ -1,18 +1,17 @@
 import {
-  PluginHaloRunV1alpha1PluginApi,
-  V1alpha1UserApi,
+  ApiHaloRunV1alpha1PluginApi,
   ApiHaloRunV1alpha1UserApi,
+  PluginHaloRunV1alpha1PluginApi,
+  PluginHaloRunV1alpha1ReverseProxyApi,
   V1alpha1ConfigMapApi,
   V1alpha1PersonalAccessTokenApi,
-  V1alpha1RoleBindingApi,
   V1alpha1RoleApi,
+  V1alpha1RoleBindingApi,
   V1alpha1SettingApi,
-  PluginHaloRunV1alpha1ReverseProxyApi,
-  CoreHaloRunV1alpha1LinkApi,
-  CoreHaloRunV1alpha1LinkGroupApi,
+  V1alpha1UserApi,
 } from "@halo-dev/api-client";
-import axios from "axios";
 import type { AxiosInstance } from "axios";
+import axios from "axios";
 
 let apiUrl: string | undefined;
 const axiosInstance = axios.create({
@@ -61,10 +60,11 @@ function setupApiClient(axios: AxiosInstance) {
       user: new V1alpha1UserApi(undefined, apiUrl, axios),
 
       // TODO optional
-      link: new CoreHaloRunV1alpha1LinkApi(undefined, apiUrl, axios),
-      linkGroup: new CoreHaloRunV1alpha1LinkGroupApi(undefined, apiUrl, axios),
+      // link: new CoreHaloRunV1alpha1LinkApi(undefined, apiUrl, axios),
+      // linkGroup: new CoreHaloRunV1alpha1LinkGroupApi(undefined, apiUrl, axios),
     },
     user: new ApiHaloRunV1alpha1UserApi(undefined, apiUrl, axios),
+    plugin: new ApiHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
   };
 }
 
