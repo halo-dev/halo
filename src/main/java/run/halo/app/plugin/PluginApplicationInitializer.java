@@ -138,6 +138,10 @@ public class PluginApplicationInitializer {
 
         stopWatch.start("getExtensionClassNames");
         Set<String> extensionClassNames = haloPluginManager.getExtensionClassNames(pluginId);
+        if (extensionClassNames == null) {
+            log.debug("No components class names found for plugin [{}]", pluginId);
+            extensionClassNames = Set.of();
+        }
         stopWatch.stop();
 
         // add extensions for each started plugin

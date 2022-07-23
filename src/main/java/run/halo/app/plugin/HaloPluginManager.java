@@ -182,6 +182,7 @@ public class HaloPluginManager extends DefaultPluginManager
         long ts = System.currentTimeMillis();
 
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
+            checkExtensionFinderReady(pluginWrapper);
             PluginState pluginState = pluginWrapper.getPluginState();
             if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
                 try {
@@ -232,6 +233,8 @@ public class HaloPluginManager extends DefaultPluginManager
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
+        checkExtensionFinderReady(pluginWrapper);
+
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
         if (PluginState.STARTED == pluginState) {
@@ -284,6 +287,15 @@ public class HaloPluginManager extends DefaultPluginManager
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
         }
         return pluginWrapper.getPluginState();
+    }
+
+    private void checkExtensionFinderReady(PluginWrapper pluginWrapper) {
+        if (extensionFinder instanceof SpringComponentsFinder springComponentsFinder) {
+            springComponentsFinder.readPluginStorageToMemory(pluginWrapper);
+            return;
+        }
+        // should never happen
+        throw new PluginRuntimeException("Plugin component classes may not loaded yet.");
     }
 
     private void doStopPlugins() {
@@ -367,6 +379,7 @@ public class HaloPluginManager extends DefaultPluginManager
      * Release plugin holding release on stop.
      */
     public void releaseAdditionalResources(String pluginId) {
+        removePluginComponentsCache(pluginId);
         // release request mapping
         requestMappingManager.removeHandlerMappings(pluginId);
         try {
@@ -389,5 +402,10 @@ public class HaloPluginManager extends DefaultPluginManager
         return null;
     }
 
+    private void removePluginComponentsCache(String pluginId) {
+        if (extensionFinder instanceof SpringComponentsFinder springComponentsFinder) {
+            springComponentsFinder.removeComponentsStorage(pluginId);
+        }
+    }
     // end-region
 }
