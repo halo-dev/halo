@@ -41,12 +41,16 @@ const server = {
         title: "上传成功",
         description: "是否启动当前安装的插件？",
         onConfirm: async () => {
-          plugin.spec.enabled = true;
-
           try {
+            const { data: pluginToUpdate } =
+              await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin(
+                plugin.metadata.name
+              );
+            pluginToUpdate.spec.enabled = true;
+
             await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-              plugin.metadata.name,
-              plugin
+              pluginToUpdate.metadata.name,
+              pluginToUpdate
             );
 
             window.location.reload();
