@@ -69,6 +69,7 @@ public class WebServerSecurityConfig {
             .securityMatcher(pathMatchers("/api/**", "/apis/**"))
             .authorizeExchange(exchanges ->
                 exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleService)))
+            .httpBasic(withDefaults())
             // for reuse the JWT authentication
             .oauth2ResourceServer().jwt();
 
@@ -82,7 +83,6 @@ public class WebServerSecurityConfig {
             context);
 
         http.addFilterAt(loginFilter, SecurityWebFiltersOrder.FORM_LOGIN);
-
         return http.build();
     }
 
@@ -90,7 +90,8 @@ public class WebServerSecurityConfig {
     @Order(0)
     SecurityWebFilterChain webFilterChain(ServerHttpSecurity http) {
         http.authorizeExchange(exchanges -> exchanges.pathMatchers(
-                "/actuator/**"
+                "/actuator/**",
+                "/swagger-ui.html", "/webjars/**", "/v3/api-docs/**"
             ).permitAll())
             .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
             .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
