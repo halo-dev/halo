@@ -100,6 +100,8 @@ function loadStyle(href: string) {
   });
 }
 
+const pluginErrorMessages: Array<string> = [];
+
 async function loadPluginModules() {
   const { data } =
     await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
@@ -116,16 +118,22 @@ async function loadPluginModules() {
     };
 
     if (entry) {
-      const { load } = useScriptTag(
-        `${import.meta.env.VITE_API_URL}${plugin.status?.entry}`
-      );
-      await load();
-      const pluginModule = window[plugin.metadata.name];
+      try {
+        const { load } = useScriptTag(
+          `${import.meta.env.VITE_API_URL}${plugin.status?.entry}`
+        );
+        await load();
+        const pluginModule = window[plugin.metadata.name];
 
-      if (pluginModule) {
-        // @ts-ignore
-        plugin.spec.module = pluginModule;
-        registerModule(pluginModule);
+        if (pluginModule) {
+          // @ts-ignore
+          plugin.spec.module = pluginModule;
+          registerModule(pluginModule);
+        }
+      } catch (e) {
+        const message = `${plugin.metadata.name}: Failed load plugin entry module`;
+        console.error(message, e);
+        pluginErrorMessages.push(message);
       }
     }
 
@@ -133,11 +141,17 @@ async function loadPluginModules() {
       try {
         await loadStyle(`${import.meta.env.VITE_API_URL}${stylesheet}`);
       } catch (e) {
-        console.error(e);
+        const message = `${plugin.metadata.name}: Failed load plugin stylesheet`;
+        console.error(message, e);
+        pluginErrorMessages.push(message);
       }
     }
 
     pluginStore.registerPlugin(plugin);
+  }
+
+  if (pluginErrorMessages.length > 0) {
+    alert(pluginErrorMessages.join("\n"));
   }
 }
 
