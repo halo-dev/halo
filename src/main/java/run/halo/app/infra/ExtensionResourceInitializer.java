@@ -1,21 +1,17 @@
 package run.halo.app.infra;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.thymeleaf.util.StringUtils;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
@@ -32,6 +28,9 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
 @Slf4j
 @Component
 public class ExtensionResourceInitializer implements ApplicationListener<ApplicationReadyEvent> {
+
+    public static final Set<String> REQUIRED_EXTENSION_LOCATIONS =
+        Set.of("classpath:/extensions/*.yaml", "classpath:/extensions/*.yml");
     private final HaloProperties haloProperties;
     private final ExtensionClient extensionClient;
 
@@ -43,40 +42,46 @@ public class ExtensionResourceInitializer implements ApplicationListener<Applica
 
     @Override
     public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
-        Set<String> extensionLocations = haloProperties.getInitialExtensionLocations();
-        if (!CollectionUtils.isEmpty(extensionLocations)) {
+        var locations = new HashSet<String>();
+        if (!haloProperties.isRequiredExtensionDisabled()) {
+            locations.addAll(REQUIRED_EXTENSION_LOCATIONS);
+        }
+        if (haloProperties.getInitialExtensionLocations() != null) {
+            locations.addAll(haloProperties.getInitialExtensionLocations());
+        }
 
-            Resource[] resources = extensionLocations.stream()
-                .map(this::listYamlFiles)
-                .flatMap(List::stream)
-                .toArray(Resource[]::new);
+        if (CollectionUtils.isEmpty(locations)) {
+            return;
+        }
 
-            log.debug("Initialization loaded [{}] resources to establish.", resources.length);
+        var resources = locations.stream()
+            .map(this::listResources)
+            .flatMap(List::stream)
+            .distinct()
+            .toArray(Resource[]::new);
 
-            new YamlUnstructuredLoader(resources).load()
-                .forEach(unstructured -> extensionClient.fetch(unstructured.groupVersionKind(),
-                        unstructured.getMetadata().getName())
-                    .ifPresentOrElse(persisted -> {
-                        unstructured.getMetadata()
-                            .setVersion(persisted.getMetadata().getVersion());
-                        extensionClient.update(unstructured);
-                    }, () -> extensionClient.create(unstructured)));
+        log.info("Initializing [{}] extensions in locations: {}", resources.length, locations);
+
+        new YamlUnstructuredLoader(resources).load()
+            .forEach(unstructured -> extensionClient.fetch(unstructured.groupVersionKind(),
+                    unstructured.getMetadata().getName())
+                .ifPresentOrElse(persisted -> {
+                    unstructured.getMetadata()
+                        .setVersion(persisted.getMetadata().getVersion());
+                    // TODO Patch the unstructured instead of update it in the future
+                    extensionClient.update(unstructured);
+                }, () -> extensionClient.create(unstructured)));
+
+        log.info("Initialized [{}] extensions in locations: {}", resources.length, locations);
+    }
+
+    private List<Resource> listResources(String location) {
+        var resolver = new PathMatchingResourcePatternResolver();
+        try {
+            return List.of(resolver.getResources(location));
+        } catch (IOException ie) {
+            throw new IllegalArgumentException("Invalid extension location: " + location, ie);
         }
     }
 
-    private List<FileSystemResource> listYamlFiles(String location) {
-        try (Stream<Path> walk = Files.walk(Paths.get(location))) {
-            return walk.filter(this::isYamlFile)
-                .map(path -> new FileSystemResource(path.toFile()))
-                .toList();
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private boolean isYamlFile(Path pathname) {
-        Path fileName = pathname.getFileName();
-        return StringUtils.endsWith(fileName, ".yaml")
-            || StringUtils.endsWith(fileName, ".yml");
-    }
 }
