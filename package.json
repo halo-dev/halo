@@ -90,6 +90,7 @@
     "vite": "^2.9.14",
     "vite-compression-plugin": "^0.0.4",
     "vite-plugin-externals": "^0.5.1",
+    "vite-plugin-html": "^3.2.0",
     "vite-plugin-pwa": "^0.12.3",
     "vite-plugin-static-copy": "^0.6.1",
     "vite-plugin-vue-setup-extend": "^0.4.0",

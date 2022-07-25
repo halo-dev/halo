@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from "url";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
 import VueSetupExtend from "vite-plugin-vue-setup-extend";
@@ -7,12 +7,14 @@ import Compression from "vite-compression-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import { viteExternalsPlugin as ViteExternals } from "vite-plugin-externals";
 import { viteStaticCopy as ViteStaticCopy } from "vite-plugin-static-copy";
+import { createHtmlPlugin as VitePluginHtml } from "vite-plugin-html";
 
 export default ({ mode }: { mode: string }) => {
+  const env = loadEnv(mode, process.cwd(), "");
   const isProduction = mode === "production";
 
   return defineConfig({
-    base: "./",
+    base: env.VITE_BASE_URL,
     plugins: [
       Vue(),
       VueJsx(),
@@ -49,6 +51,19 @@ export default ({ mode }: { mode: string }) => {
             dest: "assets/components",
           },
         ],
+      }),
+      VitePluginHtml({
+        minify: false,
+        inject: {
+          data: {
+            injectScript: [
+              `<script src="${env.VITE_BASE_URL}assets/vue/vue.global.js"></script>`,
+              `<script src="${env.VITE_BASE_URL}assets/vue-router/vue-router.global.js"></script>`,
+              `<script src="${env.VITE_BASE_URL}assets/components/halo-components.iife.js"></script>`,
+              `<script src="${env.VITE_BASE_URL}assets/admin-shared/halo-admin-shared.iife.js"></script>`,
+            ].join("\n"),
+          },
+        },
       }),
       VitePWA({
         manifest: {
