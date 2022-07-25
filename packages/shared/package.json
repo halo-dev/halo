@@ -35,7 +35,7 @@
   "homepage": "https://github.com/halo-dev/halo-admin/tree/next/shared/components#readme",
   "license": "MIT",
   "dependencies": {
-    "@halo-dev/api-client": "^0.0.4",
+    "@halo-dev/api-client": "^0.0.5",
     "@halo-dev/components": "workspace:*",
     "axios": "^0.27.2"
   },
