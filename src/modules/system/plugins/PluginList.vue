@@ -274,7 +274,7 @@ onMounted(handleFetchPlugins);
                   class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
                   <FloatingTooltip
-                    v-if="!plugin.spec.enabled"
+                    v-if="plugin.status?.phase === 'FAILED'"
                     class="hidden items-center sm:flex"
                   >
                     <div
@@ -284,7 +284,10 @@ onMounted(handleFetchPlugins);
                         class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
                       ></span>
                     </div>
-                    <template #popper> 启动异常</template>
+                    <template #popper>
+                      {{ plugin.status?.reason }}:
+                      {{ plugin.status?.message }}
+                    </template>
                   </FloatingTooltip>
                   <a
                     :href="plugin.spec.homepage"
