@@ -26,6 +26,7 @@
   ],
   "dependencies": {
     "@formkit/addons": "1.0.0-beta.9",
+    "@formkit/auto-animate": "1.0.0-beta.1",
     "@formkit/core": "1.0.0-beta.9",
     "@formkit/i18n": "1.0.0-beta.9",
     "@formkit/inputs": "1.0.0-beta.9",

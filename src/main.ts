@@ -1,7 +1,8 @@
 import type { DirectiveBinding } from "vue";
-import { createApp } from "vue";
+import { createApp, ref } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
+import LoadingMessageContainer from "./LoadingMessageContainer.vue";
 import router from "./router";
 import type {
   MenuGroupType,
@@ -10,10 +11,10 @@ import type {
 } from "@halo-dev/admin-shared";
 import { apiClient, setApiUrl } from "@halo-dev/admin-shared";
 import { menus, minimenus, registerMenu } from "./router/menus.config";
+import type { LoadingMessage } from "@/loading-message";
 // setup
 import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
-
 // core modules
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
@@ -21,6 +22,20 @@ import { usePluginStore } from "@/stores/plugin";
 import type { User } from "@halo-dev/api-client";
 import { hasPermission } from "@/utils/permission";
 import { useRoleStore } from "@/stores/role";
+
+// TODO 实验性
+const messages = ref<LoadingMessage[]>([]);
+const messageContainerApp = createApp({
+  data: () => ({
+    messages: messages,
+  }),
+  components: {
+    LoadingMessageContainer,
+  },
+  template: `
+    <LoadingMessageContainer :messages="messages"/>`,
+});
+messageContainerApp.mount("#app");
 
 const app = createApp(App);
 
@@ -67,7 +82,16 @@ function registerModule(pluginModule: Plugin) {
 }
 
 function loadCoreModules() {
+  const coreLoadStartTime = Date.now();
+  messages.value.push({
+    type: "info",
+    message: "Loading core modules...",
+  });
   coreModules.forEach(registerModule);
+  messages.value.push({
+    type: "info",
+    message: `All core modules loaded(${Date.now() - coreLoadStartTime}ms)`,
+  });
 }
 
 const pluginStore = usePluginStore();
@@ -103,6 +127,11 @@ function loadStyle(href: string) {
 const pluginErrorMessages: Array<string> = [];
 
 async function loadPluginModules() {
+  messages.value.push({
+    type: "info",
+    message: "Loading plugins...",
+  });
+
   const { data } =
     await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
 
@@ -119,10 +148,26 @@ async function loadPluginModules() {
 
     if (entry) {
       try {
+        messages.value.push({
+          type: "info",
+          message: `${plugin.metadata.name}: Loading entry module...`,
+        });
+
         const { load } = useScriptTag(
           `${import.meta.env.VITE_API_URL}${plugin.status?.entry}`
         );
+
+        const entryLoadStartTime = Date.now();
+
         await load();
+
+        messages.value.push({
+          type: "info",
+          message: `${plugin.metadata.name}: Loaded entry module(${
+            Date.now() - entryLoadStartTime
+          }ms)`,
+        });
+
         const pluginModule = window[plugin.metadata.name];
 
         if (pluginModule) {
@@ -132,6 +177,10 @@ async function loadPluginModules() {
         }
       } catch (e) {
         const message = `${plugin.metadata.name}: Failed load plugin entry module`;
+        messages.value.push({
+          type: "error",
+          message,
+        });
         console.error(message, e);
         pluginErrorMessages.push(message);
       }
@@ -139,9 +188,26 @@ async function loadPluginModules() {
 
     if (stylesheet) {
       try {
+        messages.value.push({
+          type: "info",
+          message: `${plugin.metadata.name}: Loading stylesheet...`,
+        });
+        const styleLoadStartTime = Date.now();
+
         await loadStyle(`${import.meta.env.VITE_API_URL}${stylesheet}`);
+
+        messages.value.push({
+          type: "info",
+          message: `${plugin.metadata.name}: Loaded stylesheet(${
+            Date.now() - styleLoadStartTime
+          }ms)`,
+        });
       } catch (e) {
         const message = `${plugin.metadata.name}: Failed load plugin stylesheet`;
+        messages.value.push({
+          type: "error",
+          message,
+        });
         console.error(message, e);
         pluginErrorMessages.push(message);
       }
@@ -149,6 +215,11 @@ async function loadPluginModules() {
 
     pluginStore.registerPlugin(plugin);
   }
+
+  messages.value.push({
+    type: "info",
+    message: "All plugins loaded",
+  });
 
   if (pluginErrorMessages.length > 0) {
     alert(pluginErrorMessages.join("\n"));
@@ -199,6 +270,7 @@ async function initApp() {
     await loadCurrentUser();
     app.provide<MenuGroupType[]>("menus", menus);
     app.provide<MenuItemType[]>("minimenus", minimenus);
+    messageContainerApp.unmount();
   } catch (e) {
     console.error(e);
   } finally {
