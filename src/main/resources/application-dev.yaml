@@ -31,14 +31,10 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
-  show-login-endpoint: true
   show-actuator: true
-  use-management-port: false
 
 management:
   endpoints:
     web:
       exposure:
-        include: openapi, swagger-ui
-  server:
-    port: 9090
+        include: "*"
