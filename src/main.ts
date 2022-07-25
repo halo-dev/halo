@@ -117,7 +117,7 @@ async function loadPluginModules() {
 
     if (entry) {
       const { load } = useScriptTag(
-        `http://localhost:8090${plugin.status?.entry}`
+        `${import.meta.env.VITE_API_URL}${plugin.status?.entry}`
       );
       await load();
       const pluginModule = window[plugin.metadata.name];
@@ -131,7 +131,7 @@ async function loadPluginModules() {
 
     if (stylesheet) {
       try {
-        await loadStyle(`http://localhost:8090${stylesheet}`);
+        await loadStyle(`${import.meta.env.VITE_API_URL}${stylesheet}`);
       } catch (e) {
         console.error(e);
       }

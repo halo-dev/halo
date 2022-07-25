@@ -41,7 +41,7 @@ const handleLogin = async () => {
   try {
     loginForm.value.logging = true;
 
-    await fetch("http://localhost:8090/login", {
+    await fetch(`${import.meta.env.VITE_API_URL}/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
