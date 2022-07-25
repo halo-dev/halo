@@ -204,7 +204,6 @@ onMounted(handleFetchRoles);
         "
           label="角色"
           type="select"
-          validation="required"
         ></FormKit>
         <FormKit
           v-model="formState.user.spec.phone"

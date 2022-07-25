@@ -29,7 +29,7 @@
       :is-draggable="settings"
       :is-resizable="settings"
       :margin="[10, 10]"
-      :responsive="true"
+      :responsive="false"
       :row-height="30"
       :use-css-transforms="true"
       :vertical-compact="true"
@@ -168,22 +168,23 @@ const layout = useStorage("widgets", [
   { x: 6, y: 0, w: 3, h: 3, i: 2, widget: "CommentStatsWidget" },
   { x: 9, y: 0, w: 3, h: 3, i: 3, widget: "ViewsStatsWidget" },
   {
-    x: 4,
+    x: 5,
     y: 3,
     w: 4,
     h: 10,
     i: 4,
     widget: "RecentPublishedWidget",
   },
-  { x: 0, y: 3, w: 4, h: 10, i: 5, widget: "RecentLoginWidget" },
+  { x: 9, y: 3, w: 3, h: 10, i: 5, widget: "RecentLoginWidget" },
   {
-    x: 8,
-    y: 3,
+    x: 0,
+    y: 13,
     w: 4,
-    h: 8,
+    h: 10,
     i: 6,
     widget: "JournalPublishWidget",
   },
+  { x: 0, y: 3, w: 5, h: 10, i: 7, widget: "QuickLinkWidget" },
 ]);
 
 // eslint-disable-next-line

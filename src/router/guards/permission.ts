@@ -16,7 +16,6 @@ export function setupPermissionGuard(router: Router) {
       if (!flag) {
         next({ name: "Forbidden" });
       }
-      next();
     }
     next();
   });
