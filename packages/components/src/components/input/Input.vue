@@ -52,21 +52,21 @@ function handleInput(e: Event) {
 
 <style lang="scss">
 .input-wrapper {
-  @apply box-border;
-  @apply relative;
-  @apply w-full;
-  @apply inline-flex;
+  @apply box-border
+  relative
+  w-full
+  inline-flex;
   input {
-    @apply outline-0;
-    @apply bg-white;
-    @apply antialiased;
-    @apply resize-none;
-    @apply w-full;
-    @apply text-black;
-    @apply block;
-    @apply transition-all;
-    @apply appearance-none;
-    @apply rounded-base;
+    @apply outline-0
+    bg-white
+    antialiased
+    resize-none
+    w-full
+    text-black
+    block
+    transition-all
+    appearance-none
+    rounded-base;
     border: 1px solid #ced4da;
 
     &:active {
@@ -78,32 +78,32 @@ function handleInput(e: Event) {
     }
 
     &:disabled {
-      @apply opacity-50;
-      @apply cursor-not-allowed;
+      @apply opacity-50
+      cursor-not-allowed;
     }
 
     &.input-lg {
-      @apply h-11;
-      @apply px-4;
-      @apply text-lg;
+      @apply h-11
+      px-4
+      text-lg;
     }
 
     &.input-md {
-      @apply h-9;
-      @apply px-3;
-      @apply text-sm;
+      @apply h-9
+      px-3
+      text-sm;
     }
 
     &.input-sm {
-      @apply h-7;
-      @apply px-3;
-      @apply text-xs;
+      @apply h-7
+      px-3
+      text-xs;
     }
 
     &.input-xs {
-      @apply h-6;
-      @apply px-2;
-      @apply text-xs;
+      @apply h-6
+      px-2
+      text-xs;
     }
   }
 

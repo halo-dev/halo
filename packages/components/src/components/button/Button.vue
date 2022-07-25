@@ -94,24 +94,24 @@ function handleClick() {
 </script>
 <style lang="scss">
 .btn {
-  @apply rounded-base;
-  @apply inline-flex;
-  @apply flex-shrink-0;
-  @apply cursor-pointer;
-  @apply select-none;
-  @apply flex-wrap;
-  @apply items-center;
-  @apply justify-center;
-  @apply transition-all;
-  @apply text-center;
-  @apply text-sm;
-  @apply no-underline;
-  @apply h-9;
-  @apply px-4;
-  @apply outline-0;
-  @apply border-none;
-  @apply appearance-none;
-  @apply align-middle;
+  @apply rounded-base
+  inline-flex
+  flex-shrink-0
+  cursor-pointer
+  select-none
+  flex-wrap
+  items-center
+  justify-center
+  transition-all
+  text-center
+  text-sm
+  no-underline
+  h-9
+  px-4
+  outline-0
+  border-none
+  appearance-none
+  align-middle;
 
   &:hover {
     @apply opacity-90;
@@ -122,8 +122,8 @@ function handleClick() {
   }
 
   &:disabled {
-    @apply opacity-50;
-    @apply cursor-not-allowed;
+    @apply opacity-50
+    cursor-not-allowed;
   }
 }
 
@@ -153,9 +153,9 @@ function handleClick() {
 }
 
 .btn-icon {
-  @apply h-5 w-5;
-  @apply text-white;
-  @apply mr-3;
+  @apply h-5 w-5
+  text-white
+  mr-3;
 }
 
 .btn-loading {
@@ -166,37 +166,39 @@ function handleClick() {
 }
 
 .btn-lg {
-  @apply h-11;
-  @apply px-5;
-  @apply text-lg;
+  @apply h-11
+  px-5
+  text-lg;
 }
 
 .btn-sm {
-  @apply h-7;
-  @apply px-3;
-  @apply text-xs;
+  @apply h-7
+  px-3
+  text-xs;
 
   .btn-icon {
-    @apply h-3 w-3;
-    @apply mr-2;
+    @apply h-3
+    w-3
+    mr-2;
   }
 }
 
 .btn-xs {
-  @apply h-6;
-  @apply px-2;
-  @apply text-xs;
+  @apply h-6
+  px-2
+  text-xs;
 
   .btn-icon {
-    @apply h-3 w-3;
-    @apply mr-2;
+    @apply h-3
+    w-3
+    mr-2;
   }
 }
 
 .btn-circle {
-  @apply w-9;
-  @apply p-0;
-  @apply rounded-full;
+  @apply w-9
+  p-0
+  rounded-full;
 }
 
 .btn-lg.btn-circle {

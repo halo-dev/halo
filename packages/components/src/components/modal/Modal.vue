@@ -46,7 +46,7 @@ function handleClose() {
 }
 </script>
 <template>
-  <Teleport to="body" :disabled="true">
+  <Teleport :disabled="true" to="body">
     <div
       v-show="rootVisible"
       :class="wrapperClasses"
@@ -106,49 +106,55 @@ function handleClose() {
 
 <style lang="scss">
 .modal-wrapper {
-  @apply fixed;
-  @apply top-0 left-0;
-  @apply h-full w-full;
-  @apply flex flex-row;
-  @apply items-center justify-center;
+  @apply fixed
+  top-0
+  left-0
+  h-full
+  w-full
+  flex
+  flex-row
+  items-center
+  justify-center;
   z-index: 999;
 
   .modal-layer {
-    @apply flex-none;
-    @apply absolute;
-    @apply top-0 left-0;
-    @apply h-full w-full;
-    @apply transition-opacity;
-    @apply bg-gray-500;
-    @apply bg-opacity-75;
+    @apply flex-none
+    absolute
+    top-0
+    left-0
+    h-full
+    w-full
+    transition-opacity
+    bg-gray-500
+    bg-opacity-75;
   }
 
   .modal-content {
-    @apply flex;
-    @apply flex-col;
-    @apply relative;
-    @apply bg-white;
-    @apply items-stretch;
-    @apply shadow-xl;
-    @apply rounded-base;
+    @apply flex
+    flex-col
+    relative
+    bg-white
+    items-stretch
+    shadow-xl
+    rounded-base;
     width: calc(100vw - 20px);
     max-height: calc(100vh - 20px);
 
     .modal-header {
-      @apply flex;
-      @apply justify-between;
-      @apply border-b;
+      @apply flex
+      justify-between
+      border-b;
 
       .modal-header-title {
-        @apply self-center;
-        @apply text-base;
-        @apply font-bold;
+        @apply self-center
+        text-base
+        font-bold;
         padding: 12px 16px;
       }
 
       .modal-header-actions {
-        @apply self-center;
-        @apply h-full;
+        @apply self-center
+        h-full;
         .modal-header-action {
           @apply cursor-pointer;
           padding: 12px 16px;
@@ -161,8 +167,9 @@ function handleClose() {
     }
 
     .modal-body {
-      @apply overflow-y-auto overflow-x-hidden;
-      @apply flex-1;
+      @apply overflow-y-auto
+      overflow-x-hidden
+      flex-1;
       word-wrap: break-word;
       padding: 12px 16px;
     }

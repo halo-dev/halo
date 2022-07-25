@@ -48,21 +48,21 @@ function handleChange(e: Event) {
 </template>
 <style lang="scss">
 .select-wrapper {
-  @apply box-border;
-  @apply relative;
-  @apply w-full;
-  @apply inline-flex;
+  @apply box-border
+  relative
+  w-full
+  inline-flex;
 
   select {
-    @apply outline-0;
-    @apply bg-white;
-    @apply antialiased;
-    @apply w-full;
-    @apply text-black;
-    @apply block;
-    @apply transition-all;
-    @apply appearance-none;
-    @apply rounded-base;
+    @apply outline-0
+    bg-white
+    antialiased
+    w-full
+    text-black
+    block
+    transition-all
+    appearance-none
+    rounded-base;
     border: 1px solid #ced4da;
 
     &:active {
@@ -74,32 +74,32 @@ function handleChange(e: Event) {
     }
 
     &:disabled {
-      @apply opacity-50;
-      @apply cursor-not-allowed;
+      @apply opacity-50
+      cursor-not-allowed;
     }
 
     &.select-lg {
-      @apply h-11;
-      @apply px-4;
-      @apply text-lg;
+      @apply h-11
+      px-4
+      text-lg;
     }
 
     &.select-md {
-      @apply h-9;
-      @apply px-3;
-      @apply text-sm;
+      @apply h-9
+      px-3
+      text-sm;
     }
 
     &.select-sm {
-      @apply h-7;
-      @apply px-3;
-      @apply text-xs;
+      @apply h-7
+      px-3
+      text-xs;
     }
 
     &.select-xs {
-      @apply h-6;
-      @apply px-2;
-      @apply text-xs;
+      @apply h-6
+      px-2
+      text-xs;
     }
   }
 }

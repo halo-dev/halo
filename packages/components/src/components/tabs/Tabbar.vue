@@ -62,19 +62,19 @@ const handleChange = (id: number | string) => {
 <style lang="scss">
 .tabbar-wrapper {
   .tabbar-items {
-    @apply flex;
-    @apply items-center;
-    @apply flex-row;
+    @apply flex
+    items-center
+    flex-row;
   }
 
   .tabbar-item {
-    @apply flex;
-    @apply cursor-pointer;
-    @apply self-center;
-    @apply transition-all;
-    @apply text-base;
-    @apply justify-center;
-    @apply gap-2;
+    @apply flex
+    cursor-pointer
+    self-center
+    transition-all
+    text-base
+    justify-center
+    gap-2;
 
     .tabbar-item-label,
     .tabbar-item-icon {
@@ -92,16 +92,16 @@ const handleChange = (id: number | string) => {
     }
 
     .tabbar-item {
-      @apply h-10;
-      @apply px-5;
-      @apply py-1;
-      @apply border-b-gray-100;
+      @apply h-10
+      px-5
+      py-1
+      border-b-gray-100;
 
       border-bottom-width: 2px;
 
       &.tabbar-item-active {
-        @apply text-secondary;
-        @apply border-b-secondary;
+        @apply text-secondary
+        border-b-secondary;
       }
     }
   }
@@ -113,15 +113,15 @@ const handleChange = (id: number | string) => {
     }
 
     .tabbar-item {
-      @apply h-10;
-      @apply px-9;
-      @apply py-1;
-      @apply opacity-70;
-      @apply rounded-base;
+      @apply h-10
+      px-9
+      py-1
+      opacity-70
+      rounded-base;
 
       &.tabbar-item-active {
-        @apply bg-gray-100;
-        @apply opacity-100;
+        @apply bg-gray-100
+        opacity-100;
       }
 
       &:hover {
@@ -131,26 +131,26 @@ const handleChange = (id: number | string) => {
   }
 
   &.tabbar-outline {
-    @apply p-1;
-    @apply bg-gray-100;
-    @apply rounded-base;
+    @apply p-1
+    bg-gray-100
+    rounded-base;
 
     .tabbar-items {
-      @apply gap-1;
-      justify-content: flex-start;
+      @apply gap-1
+      justify-start;
     }
 
     .tabbar-item {
-      @apply h-10;
-      @apply px-9;
-      @apply py-1;
-      @apply opacity-70;
-      @apply rounded-base;
+      @apply h-10
+      px-9
+      py-1
+      opacity-70
+      rounded-base;
 
       &.tabbar-item-active {
-        @apply bg-white;
-        @apply opacity-100;
-        @apply shadow-sm;
+        @apply bg-white
+        opacity-100
+        shadow-sm;
       }
 
       &:hover {

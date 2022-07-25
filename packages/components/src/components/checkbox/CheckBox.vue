@@ -48,9 +48,9 @@ function handleChange(e: Event) {
 </template>
 <style lang="scss">
 .checkbox-wrapper {
-  @apply flex;
-  @apply items-center;
-  @apply box-border;
-  @apply flex-grow-0;
+  @apply flex
+  items-center
+  box-border
+  flex-grow-0;
 }
 </style>

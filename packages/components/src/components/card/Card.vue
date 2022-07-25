@@ -33,22 +33,24 @@ defineProps({
 </template>
 <style lang="scss">
 .card-wrapper {
-  @apply box-border flex flex-col;
-  @apply bg-white;
-  @apply shadow-sm;
-  @apply overflow-hidden;
-  @apply rounded-base;
+  @apply box-border
+  flex
+  flex-col
+  bg-white
+  shadow-sm
+  overflow-hidden
+  rounded-base;
   border: 1px solid #eaecf0;
 
   .card-header {
-    @apply flex;
-    @apply justify-between;
+    @apply flex
+    justify-between;
     border-bottom: 1px solid #eaecf0;
 
     .card-header-title {
-      @apply self-center;
-      @apply text-base;
-      @apply font-bold;
+      @apply self-center
+      text-base
+      font-bold;
       padding: 12px 16px;
     }
 

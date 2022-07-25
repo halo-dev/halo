@@ -74,57 +74,58 @@ const handleClose = () => {
 
 <style lang="scss" scoped>
 .alert-wrapper {
-  @apply flex;
-  @apply flex-col;
-  @apply box-border;
-  @apply border;
-  @apply rounded-base;
+  @apply flex
+  flex-col
+  box-border
+  border
+  rounded-base;
   padding: 12px 16px;
 
   .alert-header {
     @apply flex;
 
     .alert-icon {
-      @apply self-center;
-      @apply mr-3;
-      @apply text-lg;
+      @apply self-center
+      mr-3
+      text-lg;
     }
 
     .alert-title {
-      @apply self-center;
-      @apply mr-3;
-      @apply flex-1;
-      @apply font-medium;
-      @apply text-base;
+      @apply self-center
+      mr-3
+      flex-1
+      font-medium
+      text-base;
     }
 
     .alert-close {
-      @apply self-center;
-      @apply cursor-pointer;
-      @apply rounded-full;
-      @apply p-0.5;
+      @apply self-center
+      cursor-pointer
+      rounded-full
+      p-0.5;
 
       &:hover {
-        @apply transition-all;
-        @apply bg-gray-300;
-        @apply text-white;
+        @apply transition-all
+        bg-gray-300
+        text-white;
       }
     }
   }
 
   .alert-description {
-    @apply text-sm;
-    @apply mt-2;
+    @apply text-sm
+    mt-2;
   }
 
   .alert-actions {
-    @apply border-t;
-    @apply mt-3 pt-2;
+    @apply border-t
+    mt-3
+    pt-2;
   }
 
   &.alert-default {
-    @apply bg-gray-50;
-    @apply border-gray-300;
+    @apply bg-gray-50
+    border-gray-300;
 
     .alert-icon,
     .alert-description {
@@ -138,8 +139,8 @@ const handleClose = () => {
   }
 
   &.alert-success {
-    @apply bg-green-50;
-    @apply border-green-300;
+    @apply bg-green-50
+    border-green-300;
 
     .alert-icon,
     .alert-description {
@@ -153,8 +154,8 @@ const handleClose = () => {
   }
 
   &.alert-info {
-    @apply bg-sky-50;
-    @apply border-sky-300;
+    @apply bg-sky-50
+    border-sky-300;
 
     .alert-icon,
     .alert-description {
@@ -168,8 +169,8 @@ const handleClose = () => {
   }
 
   &.alert-warning {
-    @apply bg-orange-50;
-    @apply border-orange-300;
+    @apply bg-orange-50
+    border-orange-300;
 
     .alert-icon,
     .alert-description {
@@ -183,8 +184,8 @@ const handleClose = () => {
   }
 
   &.alert-error {
-    @apply bg-red-50;
-    @apply border-red-300;
+    @apply bg-red-50
+    border-red-300;
 
     .alert-icon,
     .alert-description {

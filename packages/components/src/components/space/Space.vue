@@ -35,8 +35,8 @@ const wrapperClasses = computed(() => {
 </template>
 <style lang="scss">
 .space-wrapper {
-  @apply inline-flex;
-  @apply box-border;
+  @apply inline-flex
+  box-border;
 
   &.space-direction-row {
     @apply flex-row;

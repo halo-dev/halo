@@ -78,19 +78,19 @@ function handleClick() {
 }
 
 .menu-item-title {
-  @apply transition-all;
-  @apply text-base;
-  @apply flex;
-  @apply select-none;
-  @apply relative;
-  @apply p-2;
-  @apply font-normal;
-  @apply rounded-base;
+  @apply transition-all
+  text-base
+  flex
+  select-none
+  relative
+  p-2
+  font-normal
+  rounded-base;
 
   &:hover,
   &.active {
-    @apply bg-gray-100;
-    @apply font-medium;
+    @apply bg-gray-100
+    font-medium;
   }
 
   &.active::after {

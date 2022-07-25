@@ -49,21 +49,21 @@ function handleChange(e: Event) {
 </template>
 <style lang="scss">
 .radio-wrapper {
-  @apply flex;
-  @apply items-center;
-  @apply box-border;
-  @apply flex-grow-0;
+  @apply flex
+  items-center
+  box-border
+  flex-grow-0;
 
   .radio-inner {
-    @apply self-center;
-    @apply relative;
+    @apply self-center
+    relative;
   }
 
   .radio-label {
-    @apply flex;
-    @apply self-center;
-    @apply items-start;
-    @apply ml-3;
+    @apply flex
+    self-center
+    items-start
+    ml-3;
   }
 }
 </style>

@@ -37,23 +37,22 @@ function handleInput(e: Event) {
 </template>
 <style lang="scss">
 .textarea-wrapper {
-  @apply box-border;
-  @apply relative;
-  @apply w-full;
-  @apply inline-flex;
+  @apply box-border
+  relative
+  w-full
+  inline-flex;
   textarea {
-    @apply outline-0;
-    @apply bg-white;
-    @apply antialiased;
-    @apply w-full;
-    @apply text-black;
-    @apply block;
-    @apply transition-all;
-    @apply appearance-none;
-
-    @apply p-3;
-    @apply text-sm;
-    @apply rounded-base;
+    @apply outline-0
+    bg-white
+    antialiased
+    w-full
+    text-black
+    block
+    transition-all
+    appearance-none
+    p-3
+    text-sm
+    rounded-base;
     border: 1px solid #ced4da;
 
     &:active {
@@ -65,8 +64,8 @@ function handleInput(e: Event) {
     }
 
     &:disabled {
-      @apply opacity-50;
-      @apply cursor-not-allowed;
+      @apply opacity-50
+      cursor-not-allowed;
     }
   }
 }

@@ -41,36 +41,36 @@ const handleChange = () => {
 </template>
 <style lang="scss">
 .switch-wrapper {
-  @apply inline-flex;
-  @apply box-border;
+  @apply inline-flex
+  box-border;
 
   .switch-inner {
-    @apply relative;
-    @apply inline-flex;
-    @apply flex-shrink-0;
-    @apply h-6;
-    @apply w-11;
-    @apply border-2;
-    @apply border-transparent;
-    @apply rounded-full;
-    @apply cursor-pointer;
-    @apply transition-colors;
-    @apply ease-in-out;
-    @apply duration-200;
+    @apply relative
+    inline-flex
+    flex-shrink-0
+    h-6
+    w-11
+    border-2
+    border-transparent
+    rounded-full
+    cursor-pointer
+    transition-colors
+    ease-in-out
+    duration-200;
 
     .switch-indicator {
-      @apply pointer-events-none;
-      @apply inline-block;
-      @apply h-5;
-      @apply w-5;
-      @apply rounded-full;
-      @apply bg-white;
-      @apply shadow;
-      @apply transform;
-      @apply ring-0;
-      @apply transition;
-      @apply ease-in-out;
-      @apply duration-200;
+      @apply pointer-events-none
+      inline-block
+      h-5
+      w-5
+      rounded-full
+      bg-white
+      shadow
+      transform
+      ring-0
+      transition
+      ease-in-out
+      duration-200;
     }
   }
 }
