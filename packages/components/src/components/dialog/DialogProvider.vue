@@ -17,6 +17,7 @@ provide(DialogProviderProvideKey, options);
     v-model:visible="options.visible"
     :cancel-text="options.cancelText"
     :confirm-text="options.confirmText"
+    :confirm-type="options.confirmType"
     :description="options.description"
     :onCancel="options.onCancel"
     :onConfirm="options.onConfirm"

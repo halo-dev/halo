@@ -22,6 +22,9 @@ export function useDialog(): useDialogReturn {
   }
 
   const createDialog = (type: Type) => (options: useDialogUserOptions) => {
+    // clear previous dialog
+    dialogOptions.value = { title: "", visible: false };
+
     dialogOptions.value = { ...dialogOptions.value, ...options };
     dialogOptions.value.type = type;
     dialogOptions.value.visible = true;

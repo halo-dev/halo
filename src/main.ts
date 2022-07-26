@@ -270,11 +270,11 @@ async function initApp() {
     await loadCurrentUser();
     app.provide<MenuGroupType[]>("menus", menus);
     app.provide<MenuItemType[]>("minimenus", minimenus);
-    messageContainerApp.unmount();
   } catch (e) {
     console.error(e);
   } finally {
     app.use(router);
+    messageContainerApp.unmount();
     app.mount("#app");
   }
 }

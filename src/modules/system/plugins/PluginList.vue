@@ -68,6 +68,38 @@ const handleChangeStatus = (plugin: Plugin) => {
   });
 };
 
+const handleUninstall = (plugin: Plugin) => {
+  const { enabled } = plugin.spec;
+  dialog.warning({
+    title: `确定要卸载该插件吗？`,
+    description: `${
+      enabled ? "当前插件还在启用状态，将在停止运行后卸载。" : ""
+    }`,
+    confirmType: "danger",
+    confirmText: `${enabled ? "停止运行并卸载" : "卸载"}`,
+    onConfirm: async () => {
+      try {
+        if (enabled) {
+          const pluginToUpdate = cloneDeep(plugin);
+          pluginToUpdate.spec.enabled = false;
+          await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
+            plugin.metadata.name,
+            pluginToUpdate
+          );
+        }
+
+        await apiClient.extension.plugin.deletepluginHaloRunV1alpha1Plugin(
+          plugin.metadata.name
+        );
+      } catch (e) {
+        console.error(e);
+      } finally {
+        window.location.reload();
+      }
+    },
+  });
+};
+
 onMounted(handleFetchPlugins);
 </script>
 <template>
@@ -236,6 +268,7 @@ onMounted(handleFetchPlugins);
               <div v-if="plugin.spec.logo" class="mr-4">
                 <div
                   class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm"
+                  @click.stop="handleRouteToDetail(plugin)"
                 >
                   <img
                     :alt="plugin.metadata.name"
@@ -310,7 +343,7 @@ onMounted(handleFetchPlugins);
                     class="flex items-center"
                   >
                     <VSwitch
-                      :model-value="isStarted(plugin)"
+                      :model-value="plugin.spec.enabled"
                       @click="handleChangeStatus(plugin)"
                     />
                   </div>
@@ -318,7 +351,22 @@ onMounted(handleFetchPlugins);
                     v-permission="['system:plugins:manage']"
                     class="cursor-pointer"
                   >
-                    <IconSettings @click.stop="handleRouteToDetail(plugin)" />
+                    <FloatingDropdown>
+                      <IconSettings />
+                      <template #popper>
+                        <div class="links-w-48 links-p-2">
+                          <VSpace class="links-w-full" direction="column">
+                            <VButton
+                              block
+                              type="danger"
+                              @click="handleUninstall(plugin)"
+                            >
+                              卸载
+                            </VButton>
+                          </VSpace>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
                   </span>
                 </div>
               </div>

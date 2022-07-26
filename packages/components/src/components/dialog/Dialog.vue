@@ -11,6 +11,7 @@ import {
 import type { PropType } from "vue";
 import { computed, ref } from "vue";
 import type { Type } from "@/components/dialog/interface";
+import type { Type as ButtonType } from "@/components/button/interface";
 
 const props = defineProps({
   type: {
@@ -28,6 +29,10 @@ const props = defineProps({
   confirmText: {
     type: String,
     default: "确定",
+  },
+  confirmType: {
+    type: String as PropType<ButtonType>,
+    default: "primary",
   },
   cancelText: {
     type: String,
@@ -112,7 +117,7 @@ const handleClose = () => {
     </div>
     <template #footer>
       <div class="flex flex-col sm:flex-row gap-[10px]">
-        <VButton :loading="loading" type="secondary" @click="handleConfirm">
+        <VButton :loading="loading" :type="confirmType" @click="handleConfirm">
           {{ confirmText }}
         </VButton>
         <VButton @click="handleCancel">{{ cancelText }}</VButton>
