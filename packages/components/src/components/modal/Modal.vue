@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
-import { computed, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { IconClose } from "../../icons/icons";
 
 const props = defineProps({
@@ -27,6 +27,7 @@ const props = defineProps({
 const emit = defineEmits(["update:visible", "close"]);
 
 const rootVisible = ref(false);
+const modelWrapper = ref<HTMLElement>();
 
 const wrapperClasses = computed(() => {
   return {
@@ -44,11 +45,23 @@ function handleClose() {
   emit("update:visible", false);
   emit("close");
 }
+
+watch(
+  () => props.visible,
+  () => {
+    if (props.visible) {
+      nextTick(() => {
+        modelWrapper.value?.focus();
+      });
+    }
+  }
+);
 </script>
 <template>
   <Teleport :disabled="true" to="body">
     <div
       v-show="rootVisible"
+      ref="modelWrapper"
       :class="wrapperClasses"
       aria-modal="true"
       class="modal-wrapper"
