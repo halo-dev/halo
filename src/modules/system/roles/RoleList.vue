@@ -11,7 +11,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
-import RoleCreationModal from "./components/RoleCreationModal.vue";
+import RoleEditingModal from "./components/RoleEditingModal.vue";
 import { useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
 import type { Role } from "@halo-dev/api-client";
@@ -48,10 +48,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <RoleCreationModal
-    v-model:visible="createVisible"
-    @close="handleFetchRoles"
-  />
+  <RoleEditingModal v-model:visible="createVisible" @close="handleFetchRoles" />
 
   <VPageHeader title="角色">
     <template #icon>

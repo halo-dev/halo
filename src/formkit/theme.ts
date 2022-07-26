@@ -26,8 +26,8 @@ const buttonClassification = {
 const theme: Record<string, Record<string, string>> = {
   global: {
     outer: "formkit-disabled:opacity-50",
-    help: "text-xs text-gray-500",
-    messages: "list-none p-0 mt-1 mb-0",
+    help: "text-xs mt-1.5 text-gray-500",
+    messages: "list-none p-0 mt-1.5 mb-0",
     message: "text-red-500 mb-1 text-xs",
     form: "flex flex-col space-y-4",
   },

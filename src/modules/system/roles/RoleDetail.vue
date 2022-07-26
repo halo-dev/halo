@@ -10,27 +10,21 @@ import {
   VTag,
 } from "@halo-dev/components";
 import { useRoute, useRouter } from "vue-router";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Role, User } from "@halo-dev/api-client";
-import { pluginLabels, roleLabels } from "@/constants/labels";
+import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
-
-interface RoleTemplateGroup {
-  module: string | null | undefined;
-  roles: Role[];
-}
+import { useRoleTemplateSelection } from "@/modules/system/roles/composables/use-role";
 
 interface FormState {
   role: Role;
-  selectedRoleTemplates: string[];
   saving: boolean;
 }
 
 const route = useRoute();
 
 const users = ref<User[]>([]);
-const roles = ref<Role[]>([]);
 const roleActiveId = ref("detail");
 const formState = ref<FormState>({
   role: {
@@ -46,36 +40,11 @@ const formState = ref<FormState>({
     },
     rules: [],
   },
-  selectedRoleTemplates: [],
   saving: false,
 });
 
-const roleTemplates = computed<Role[]>(() => {
-  return roles.value.filter(
-    (role) =>
-      role.metadata.labels?.[roleLabels.TEMPLATE] === "true" &&
-      role.metadata.labels?.["halo.run/hidden"] !== "true"
-  );
-});
-
-const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
-  const groups: RoleTemplateGroup[] = [];
-  roleTemplates.value.forEach((role) => {
-    const group = groups.find(
-      (group) =>
-        group.module === role.metadata.annotations?.[rbacAnnotations.MODULE]
-    );
-    if (group) {
-      group.roles.push(role);
-    } else {
-      groups.push({
-        module: role.metadata.annotations?.[rbacAnnotations.MODULE],
-        roles: [role],
-      });
-    }
-  });
-  return groups;
-});
+const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
+  useRoleTemplateSelection();
 
 const handleFetchRole = async () => {
   try {
@@ -83,20 +52,14 @@ const handleFetchRole = async () => {
       route.params.name as string
     );
     formState.value.role = response.data;
-    formState.value.selectedRoleTemplates = JSON.parse(
-      response.data.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
+    selectedRoleTemplates.value = new Set(
+      JSON.parse(
+        response.data.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] ||
+          "[]"
+      )
     );
   } catch (error) {
     console.error(error);
-  }
-};
-
-const handleFetchRoles = async () => {
-  try {
-    const { data } = await apiClient.extension.role.listv1alpha1Role();
-    roles.value = data.items;
-  } catch (e) {
-    console.error(e);
   }
 };
 
@@ -114,7 +77,7 @@ const handleUpdateRole = async () => {
     formState.value.saving = true;
     if (formState.value.role.metadata.annotations) {
       formState.value.role.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
-        JSON.stringify(formState.value.selectedRoleTemplates);
+        JSON.stringify(Array.from(selectedRoleTemplates.value));
     }
     await apiClient.extension.role.updatev1alpha1Role(
       route.params.name as string,
@@ -136,7 +99,6 @@ const handleRouteToUser = (name: string) => {
 
 onMounted(() => {
   handleFetchRole();
-  handleFetchRoles();
   handleFetchUsers();
 });
 </script>
@@ -337,13 +299,14 @@ onMounted(() => {
                 <ul class="space-y-2">
                   <li v-for="(role, index) in group.roles" :key="index">
                     <label
-                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
+                      class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
                     >
                       <input
-                        v-model="formState.selectedRoleTemplates"
+                        v-model="selectedRoleTemplates"
                         :value="role.metadata.name"
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                         type="checkbox"
+                        @change="handleRoleTemplateSelect"
                       />
                       <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
