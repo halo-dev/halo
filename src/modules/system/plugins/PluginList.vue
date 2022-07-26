@@ -4,7 +4,6 @@ import {
   IconArrowDown,
   IconPlug,
   IconSettings,
-  useDialog,
   VButton,
   VCard,
   VPageHeader,
@@ -15,23 +14,15 @@ import {
 } from "@halo-dev/components";
 import PluginInstallModal from "./components/PluginInstallModal.vue";
 import { onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Plugin } from "@halo-dev/api-client";
-import cloneDeep from "lodash.clonedeep";
+import { usePluginLifeCycle } from "./composables/use-plugin";
 
 const plugins = ref<Plugin[]>([] as Plugin[]);
 const pluginInstall = ref(false);
+const selectedPlugin = ref<Plugin | null>(null);
 
-const router = useRouter();
-const dialog = useDialog();
-
-const handleRouteToDetail = (plugin: Plugin) => {
-  router.push({
-    name: "PluginDetail",
-    params: { name: plugin.metadata.name },
-  });
-};
+const { changeStatus, uninstall } = usePluginLifeCycle(selectedPlugin);
 
 const isStarted = (plugin: Plugin) => {
   return plugin.status?.phase === "STARTED" && plugin.spec.enabled;
@@ -47,58 +38,15 @@ const handleFetchPlugins = async () => {
   }
 };
 
-const handleChangeStatus = (plugin: Plugin) => {
-  const pluginToUpdate = cloneDeep(plugin);
+function handleChangeStatus(plugin: Plugin) {
+  selectedPlugin.value = plugin;
+  changeStatus();
+}
 
-  dialog.info({
-    title: `确定要${plugin.spec.enabled ? "停止" : "启动"}该插件吗？`,
-    onConfirm: async () => {
-      try {
-        pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-        await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-          pluginToUpdate.metadata.name,
-          pluginToUpdate
-        );
-      } catch (e) {
-        console.error(e);
-      } finally {
-        window.location.reload();
-      }
-    },
-  });
-};
-
-const handleUninstall = (plugin: Plugin) => {
-  const { enabled } = plugin.spec;
-  dialog.warning({
-    title: `确定要卸载该插件吗？`,
-    description: `${
-      enabled ? "当前插件还在启用状态，将在停止运行后卸载。" : ""
-    }`,
-    confirmType: "danger",
-    confirmText: `${enabled ? "停止运行并卸载" : "卸载"}`,
-    onConfirm: async () => {
-      try {
-        if (enabled) {
-          const pluginToUpdate = cloneDeep(plugin);
-          pluginToUpdate.spec.enabled = false;
-          await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-            plugin.metadata.name,
-            pluginToUpdate
-          );
-        }
-
-        await apiClient.extension.plugin.deletepluginHaloRunV1alpha1Plugin(
-          plugin.metadata.name
-        );
-      } catch (e) {
-        console.error(e);
-      } finally {
-        window.location.reload();
-      }
-    },
-  });
-};
+function handleUninstall(plugin: Plugin) {
+  selectedPlugin.value = plugin;
+  uninstall();
+}
 
 onMounted(handleFetchPlugins);
 </script>
@@ -266,25 +214,37 @@ onMounted(handleFetchPlugins);
           >
             <div class="relative flex flex-row items-center">
               <div v-if="plugin.spec.logo" class="mr-4">
-                <div
-                  class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm"
-                  @click.stop="handleRouteToDetail(plugin)"
+                <RouterLink
+                  :to="{
+                    name: 'PluginDetail',
+                    params: { name: plugin.metadata.name },
+                  }"
                 >
-                  <img
-                    :alt="plugin.metadata.name"
-                    :src="plugin.spec.logo"
-                    class="h-full w-full"
-                  />
-                </div>
+                  <div
+                    class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm"
+                  >
+                    <img
+                      :alt="plugin.metadata.name"
+                      :src="plugin.spec.logo"
+                      class="h-full w-full"
+                    />
+                  </div>
+                </RouterLink>
               </div>
               <div class="flex-1">
                 <div class="flex flex-row items-center">
-                  <span
-                    class="mr-2 truncate text-sm font-medium text-gray-900"
-                    @click.stop="handleRouteToDetail(plugin)"
+                  <RouterLink
+                    :to="{
+                      name: 'PluginDetail',
+                      params: { name: plugin.metadata.name },
+                    }"
                   >
-                    {{ plugin.spec.displayName }}
-                  </span>
+                    <span
+                      class="mr-2 truncate text-sm font-medium text-gray-900"
+                    >
+                      {{ plugin.spec.displayName }}
+                    </span>
+                  </RouterLink>
                   <VSpace>
                     <VTag>
                       {{ isStarted(plugin) ? "已启用" : "未启用" }}

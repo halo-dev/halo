@@ -1,41 +1,19 @@
 <script lang="ts" setup>
-import { useDialog, VSwitch, VTag } from "@halo-dev/components";
+import { VSwitch, VTag } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject, onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Plugin, Role } from "@halo-dev/api-client";
-import cloneDeep from "lodash.clonedeep";
 import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
+import { usePluginLifeCycle } from "./composables/use-plugin";
 
 const plugin = inject<Ref<Plugin>>("plugin", ref({} as Plugin));
-
-const dialog = useDialog();
+const { changeStatus } = usePluginLifeCycle(plugin);
 
 const isStarted = computed(() => {
   return plugin.value.status?.phase === "STARTED" && plugin.value.spec.enabled;
 });
-
-const handleChangePluginStatus = async () => {
-  const pluginToUpdate = cloneDeep(plugin.value);
-
-  dialog.info({
-    title: `确定要${plugin.value.spec.enabled ? "停止" : "启动"}该插件吗？`,
-    onConfirm: async () => {
-      try {
-        pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-        await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-          plugin.value.metadata.name,
-          pluginToUpdate
-        );
-      } catch (e) {
-        console.error(e);
-      } finally {
-        window.location.reload();
-      }
-    },
-  });
-};
 
 // TODO 临时解决方案
 interface RoleTemplateGroup {
@@ -98,7 +76,7 @@ onMounted(() => {
       </p>
     </div>
     <div v-permission="['system:plugins:manage']">
-      <VSwitch :model-value="isStarted" @change="handleChangePluginStatus" />
+      <VSwitch :model-value="isStarted" @change="changeStatus" />
     </div>
   </div>
   <div class="border-t border-gray-200">
