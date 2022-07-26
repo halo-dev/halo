@@ -18,6 +18,13 @@ public class HaloProperties {
 
     private Set<String> initialExtensionLocations = new HashSet<>();
 
+    /**
+     * This property could stop initializing required Extensions defined in classpath.
+     * See {@link run.halo.app.infra.ExtensionResourceInitializer#REQUIRED_EXTENSION_LOCATIONS}
+     * for more.
+     */
+    private boolean requiredExtensionDisabled;
+
     private final ExtensionProperties extension = new ExtensionProperties();
 
     private final SecurityProperties security = new SecurityProperties();

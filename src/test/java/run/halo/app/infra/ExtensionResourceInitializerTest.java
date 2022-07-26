@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.json.JSONException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.util.FileSystemUtils;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Unstructured;
@@ -46,13 +49,19 @@ class ExtensionResourceInitializerTest {
 
     private ExtensionResourceInitializer extensionResourceInitializer;
 
+    List<Path> dirsToClean;
+
     @BeforeEach
     void setUp() throws IOException {
         extensionResourceInitializer =
             new ExtensionResourceInitializer(haloProperties, extensionClient);
 
+        dirsToClean = new ArrayList<>(2);
+
         Path tempDirectory = Files.createTempDirectory("extension-resource-initializer-test");
-        Path multiDirectory = Files.createDirectories(tempDirectory.resolve("a/b/c"));
+        dirsToClean.add(tempDirectory);
+        Path multiDirectory =
+            Files.createDirectories(tempDirectory.resolve("a").resolve("b").resolve("c"));
         Files.writeString(tempDirectory.resolve("hello.yml"), """
                 kind: FakeExtension
                 apiVersion: v1
@@ -79,8 +88,9 @@ class ExtensionResourceInitializerTest {
             StandardCharsets.UTF_8);
 
         // test file in directory
-        Path filePath = Files.createTempDirectory("extension-resource-file-test")
-            .resolve("good.yml");
+        Path secondTempDir = Files.createTempDirectory("extension-resource-file-test");
+        dirsToClean.add(secondTempDir);
+        Path filePath = secondTempDir.resolve("good.yml");
         Files.writeString(filePath, """
                 kind: FakeExtension
                 apiVersion: v1
@@ -92,11 +102,23 @@ class ExtensionResourceInitializerTest {
             StandardCharsets.UTF_8);
 
         when(haloProperties.getInitialExtensionLocations())
-            .thenReturn(Set.of(tempDirectory.toString(), filePath.toString()));
+            .thenReturn(Set.of("file:" + tempDirectory + "/**/*.yaml",
+                "file:" + tempDirectory + "/**/*.yml",
+                "file:" + filePath));
+    }
+
+    @AfterEach
+    void cleanUp() throws IOException {
+        if (dirsToClean != null) {
+            for (var dir : dirsToClean) {
+                FileSystemUtils.deleteRecursively(dir);
+            }
+        }
     }
 
     @Test
     void onApplicationEvent() throws JSONException {
+        when(haloProperties.isRequiredExtensionDisabled()).thenReturn(true);
         ArgumentCaptor<Unstructured> argumentCaptor = ArgumentCaptor.forClass(Unstructured.class);
 
         when(extensionClient.fetch(any(GroupVersionKind.class), any()))
