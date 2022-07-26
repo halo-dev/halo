@@ -9,6 +9,54 @@ interface RoleTemplateGroup {
   roles: Role[];
 }
 
+const initialFormState: Role = {
+  apiVersion: "v1alpha1",
+  kind: "Role",
+  metadata: {
+    name: "",
+    labels: {},
+    annotations: {
+      [rbacAnnotations.DEPENDENCIES]: "",
+      [rbacAnnotations.DISPLAY_NAME]: "",
+    },
+  },
+  rules: [],
+};
+
+export function useRoleForm() {
+  const formState = ref<Role>(initialFormState);
+  const saving = ref(false);
+
+  const isUpdateMode = computed(() => {
+    return !!formState.value.metadata.creationTimestamp;
+  });
+
+  const handleCreateOrUpdate = async () => {
+    try {
+      saving.value = true;
+      if (isUpdateMode.value) {
+        await apiClient.extension.role.updatev1alpha1Role(
+          formState.value.metadata.name,
+          formState.value
+        );
+      } else {
+        await apiClient.extension.role.createv1alpha1Role(formState.value);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      saving.value = false;
+    }
+  };
+
+  return {
+    formState,
+    initialFormState,
+    saving,
+    handleCreateOrUpdate,
+  };
+}
+
 export function useRoleTemplateSelection() {
   const rawRoles = ref<Role[]>([] as Role[]);
   const selectedRoleTemplates = ref<Set<string>>(new Set());

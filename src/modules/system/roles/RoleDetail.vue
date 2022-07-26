@@ -9,49 +9,43 @@ import {
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { useRoute, useRouter } from "vue-router";
-import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { onMounted, ref, watch } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
-import type { Role, User } from "@halo-dev/api-client";
+import type { User } from "@halo-dev/api-client";
 import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
-import { useRoleTemplateSelection } from "@/modules/system/roles/composables/use-role";
-
-interface FormState {
-  role: Role;
-  saving: boolean;
-}
+import {
+  useRoleForm,
+  useRoleTemplateSelection,
+} from "@/modules/system/roles/composables/use-role";
 
 const route = useRoute();
 
 const users = ref<User[]>([]);
-const roleActiveId = ref("detail");
-const formState = ref<FormState>({
-  role: {
-    apiVersion: "v1alpha1",
-    kind: "Role",
-    metadata: {
-      name: "",
-      labels: {},
-      annotations: {
-        [rbacAnnotations.DEPENDENCIES]: "",
-        [rbacAnnotations.DISPLAY_NAME]: "",
-      },
-    },
-    rules: [],
-  },
-  saving: false,
-});
+const tabActiveId = ref("detail");
 
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection();
+
+const { formState, saving, handleCreateOrUpdate } = useRoleForm();
+
+watch(
+  () => selectedRoleTemplates.value,
+  (newValue) => {
+    if (formState.value.metadata.annotations) {
+      formState.value.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
+        JSON.stringify(Array.from(newValue));
+    }
+  }
+);
 
 const handleFetchRole = async () => {
   try {
     const response = await apiClient.extension.role.getv1alpha1Role(
       route.params.name as string
     );
-    formState.value.role = response.data;
+    formState.value = response.data;
     selectedRoleTemplates.value = new Set(
       JSON.parse(
         response.data.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] ||
@@ -73,28 +67,8 @@ const handleFetchUsers = async () => {
 };
 
 const handleUpdateRole = async () => {
-  try {
-    formState.value.saving = true;
-    if (formState.value.role.metadata.annotations) {
-      formState.value.role.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
-        JSON.stringify(Array.from(selectedRoleTemplates.value));
-    }
-    await apiClient.extension.role.updatev1alpha1Role(
-      route.params.name as string,
-      formState.value.role
-    );
-  } catch (e) {
-    console.error(e);
-  } finally {
-    formState.value.saving = false;
-    await handleFetchRole();
-  }
-};
-
-const router = useRouter();
-
-const handleRouteToUser = (name: string) => {
-  router.push({ name: "UserDetail", params: { name } });
+  await handleCreateOrUpdate();
+  await handleFetchRole();
 };
 
 onMounted(() => {
@@ -105,8 +79,8 @@ onMounted(() => {
 <template>
   <VPageHeader
     :title="`角色：${
-      formState.role?.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-      formState.role?.metadata?.name
+      formState.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+      formState.metadata?.name
     }`"
   >
     <template #icon>
@@ -125,7 +99,7 @@ onMounted(() => {
     <VCard :body-class="['!p-0']">
       <template #header>
         <VTabbar
-          v-model:active-id="roleActiveId"
+          v-model:active-id="tabActiveId"
           :items="[
             { id: 'detail', label: '详情' },
             { id: 'permissions', label: '权限设置' },
@@ -134,7 +108,7 @@ onMounted(() => {
           type="outline"
         ></VTabbar>
       </template>
-      <div v-if="roleActiveId === 'detail'">
+      <div v-if="tabActiveId === 'detail'">
         <div class="px-4 py-4 sm:px-6">
           <h3 class="text-lg font-medium leading-6 text-gray-900">权限信息</h3>
           <p
@@ -144,7 +118,7 @@ onMounted(() => {
               >包含
               {{
                 JSON.parse(
-                  formState.role.metadata.annotations?.[
+                  formState.metadata.annotations?.[
                     rbacAnnotations.DEPENDENCIES
                   ] || "[]"
                 ).length
@@ -161,9 +135,9 @@ onMounted(() => {
               <dt class="text-sm font-medium text-gray-900">名称</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{
-                  formState.role?.metadata?.annotations?.[
+                  formState.metadata?.annotations?.[
                     rbacAnnotations.DISPLAY_NAME
-                  ] || formState.role?.metadata?.name
+                  ] || formState.metadata?.name
                 }}
               </dd>
             </div>
@@ -172,7 +146,7 @@ onMounted(() => {
             >
               <dt class="text-sm font-medium text-gray-900">别名</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ formState.role?.metadata?.name }}
+                {{ formState.metadata?.name }}
               </dd>
             </div>
             <div
@@ -196,7 +170,7 @@ onMounted(() => {
             >
               <dt class="text-sm font-medium text-gray-900">创建时间</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ formState.role?.metadata?.creationTimestamp }}
+                {{ formState.metadata?.creationTimestamp }}
               </dd>
             </div>
             <div
@@ -208,49 +182,53 @@ onMounted(() => {
                   class="h-96 overflow-y-auto overflow-x-hidden rounded-sm bg-white shadow-sm transition-all hover:shadow"
                 >
                   <ul class="divide-y divide-gray-100" role="list">
-                    <li
+                    <RouterLink
                       v-for="(user, index) in users"
                       :key="index"
-                      class="block cursor-pointer hover:bg-gray-50"
-                      @click="handleRouteToUser(user.metadata.name)"
+                      :to="{
+                        name: 'UserDetail',
+                        params: { name: user.metadata.name },
+                      }"
                     >
-                      <div class="flex items-center px-4 py-4">
-                        <div class="flex min-w-0 flex-1 items-center">
-                          <div class="flex-shrink-0">
-                            <div class="h-12 w-12">
-                              <div
-                                class="overflow-hidden rounded border bg-white hover:shadow-sm"
-                              >
-                                <img
-                                  :alt="user.spec.displayName"
-                                  :src="user.spec.avatar"
-                                  class="h-full w-full"
-                                />
+                      <li class="block cursor-pointer hover:bg-gray-50">
+                        <div class="flex items-center px-4 py-4">
+                          <div class="flex min-w-0 flex-1 items-center">
+                            <div class="flex-shrink-0">
+                              <div class="h-12 w-12">
+                                <div
+                                  class="overflow-hidden rounded border bg-white hover:shadow-sm"
+                                >
+                                  <img
+                                    :alt="user.spec.displayName"
+                                    :src="user.spec.avatar"
+                                    class="h-full w-full"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            <div
+                              class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4"
+                            >
+                              <div>
+                                <p
+                                  class="truncate text-sm font-medium text-gray-900"
+                                >
+                                  {{ user.spec.displayName }}
+                                </p>
+                                <p class="mt-2 flex items-center">
+                                  <span class="text-xs text-gray-500">
+                                    {{ user.metadata.name }}
+                                  </span>
+                                </p>
                               </div>
                             </div>
                           </div>
-                          <div
-                            class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4"
-                          >
-                            <div>
-                              <p
-                                class="truncate text-sm font-medium text-gray-900"
-                              >
-                                {{ user.spec.displayName }}
-                              </p>
-                              <p class="mt-2 flex items-center">
-                                <span class="text-xs text-gray-500">
-                                  {{ user.metadata.name }}
-                                </span>
-                              </p>
-                            </div>
+                          <div>
+                            <IconArrowRight />
                           </div>
                         </div>
-                        <div>
-                          <IconArrowRight />
-                        </div>
-                      </div>
-                    </li>
+                      </li>
+                    </RouterLink>
                   </ul>
                 </div>
               </dd>
@@ -259,7 +237,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <div v-if="roleActiveId === 'permissions'">
+      <div v-if="tabActiveId === 'permissions'">
         <div>
           <dl class="divide-y divide-gray-100">
             <div
@@ -342,7 +320,7 @@ onMounted(() => {
           </dl>
           <div v-permission="['system:roles:manage']" class="p-4">
             <VButton
-              :loading="formState.saving"
+              :loading="saving"
               type="secondary"
               @click="handleUpdateRole"
               >保存

@@ -12,15 +12,15 @@ import {
   VTag,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
-import { useRouter } from "vue-router";
 import { computed, onMounted, ref } from "vue";
 import type { Role } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { roleLabels } from "@/constants/labels";
-import { pluginAnnotations, rbacAnnotations } from "@/constants/annotations";
+import { rbacAnnotations } from "@/constants/annotations";
 
-const createVisible = ref(false);
 const roles = ref<Role[]>([]);
+const editingModal = ref<boolean>(false);
+const selectedRole = ref<Role | null>(null);
 
 const basicRoles = computed(() => {
   return roles.value.filter(
@@ -28,19 +28,20 @@ const basicRoles = computed(() => {
   );
 });
 
-const router = useRouter();
-
 const handleFetchRoles = async () => {
   try {
     const { data } = await apiClient.extension.role.listv1alpha1Role();
     roles.value = data.items;
   } catch (e) {
     console.error(e);
+  } finally {
+    selectedRole.value = null;
   }
 };
 
-const handleRouteToDetail = (name: string) => {
-  router.push({ name: "RoleDetail", params: { name } });
+const handleOpenEditingModal = (role: Role) => {
+  selectedRole.value = role;
+  editingModal.value = true;
 };
 
 onMounted(() => {
@@ -48,7 +49,11 @@ onMounted(() => {
 });
 </script>
 <template>
-  <RoleEditingModal v-model:visible="createVisible" @close="handleFetchRoles" />
+  <RoleEditingModal
+    v-model:visible="editingModal"
+    :role="selectedRole"
+    @close="handleFetchRoles"
+  />
 
   <VPageHeader title="角色">
     <template #icon>
@@ -58,7 +63,7 @@ onMounted(() => {
       <VButton
         v-permission="['system:roles:manage']"
         type="secondary"
-        @click="createVisible = true"
+        @click="editingModal = true"
       >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
@@ -164,24 +169,31 @@ onMounted(() => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li
-          v-for="(role, index) in basicRoles"
-          :key="index"
-          @click="handleRouteToDetail(role.metadata.name)"
-        >
+        <li v-for="(role, index) in basicRoles" :key="index">
           <div
             class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
           >
             <div class="relative flex flex-row items-center">
               <div class="flex-1">
                 <div class="flex flex-row items-center">
-                  <span class="mr-2 truncate text-sm font-medium text-gray-900">
-                    {{
-                      role.metadata.annotations?.[
-                        pluginAnnotations.DISPLAY_NAME
-                      ] || role.metadata.name
-                    }}
-                  </span>
+                  <RouterLink
+                    :to="{
+                      name: 'RoleDetail',
+                      params: {
+                        name: role.metadata.name,
+                      },
+                    }"
+                  >
+                    <span
+                      class="mr-2 truncate text-sm font-medium text-gray-900"
+                    >
+                      {{
+                        role.metadata.annotations?.[
+                          rbacAnnotations.DISPLAY_NAME
+                        ] || role.metadata.name
+                      }}
+                    </span>
+                  </RouterLink>
                 </div>
                 <div class="mt-2 flex">
                   <span class="text-xs text-gray-500">
@@ -208,14 +220,14 @@ onMounted(() => {
                     0 个用户
                   </a>
                   <VTag> 系统保留</VTag>
-                  <time class="text-sm text-gray-500" datetime="2020-01-07">
-                    2020-01-07
+                  <time class="text-sm text-gray-500">
+                    {{ role.metadata.creationTimestamp }}
                   </time>
                   <span
                     v-permission="['system:roles:manage']"
                     class="cursor-pointer"
                   >
-                    <IconSettings />
+                    <IconSettings @click="handleOpenEditingModal(role)" />
                   </span>
                 </div>
               </div>
