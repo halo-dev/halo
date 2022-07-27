@@ -1,4 +1,5 @@
 import type { Ref } from "vue";
+import { computed } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@halo-dev/admin-shared";
@@ -6,6 +7,12 @@ import { useDialog } from "@halo-dev/components";
 
 export function usePluginLifeCycle(plugin: Ref<Plugin | null>) {
   const dialog = useDialog();
+
+  const isStarted = computed(() => {
+    return (
+      plugin.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
+    );
+  });
 
   const changeStatus = () => {
     if (!plugin.value) return;
@@ -68,6 +75,7 @@ export function usePluginLifeCycle(plugin: Ref<Plugin | null>) {
   };
 
   return {
+    isStarted,
     changeStatus,
     uninstall,
   };
