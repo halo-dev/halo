@@ -53,6 +53,7 @@ export function useRoleForm() {
     formState,
     initialFormState,
     saving,
+    isUpdateMode,
     handleCreateOrUpdate,
   };
 }

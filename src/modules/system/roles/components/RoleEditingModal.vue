@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { VButton, VModal, VTabItem, VTabs } from "@halo-dev/components";
+import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
 import type { PropType } from "vue";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
 import {
@@ -9,6 +9,8 @@ import {
   useRoleTemplateSelection,
 } from "@/modules/system/roles/composables/use-role";
 import cloneDeep from "lodash.clonedeep";
+import { submitForm } from "@formkit/core";
+import { useMagicKeys } from "@vueuse/core";
 
 const props = defineProps({
   visible: {
@@ -25,8 +27,14 @@ const emit = defineEmits(["update:visible", "close"]);
 
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection();
-const { formState, initialFormState, saving, handleCreateOrUpdate } =
-  useRoleForm();
+
+const {
+  formState,
+  isUpdateMode,
+  initialFormState,
+  saving,
+  handleCreateOrUpdate,
+} = useRoleForm();
 
 watch(
   () => selectedRoleTemplates.value,
@@ -39,14 +47,36 @@ watch(
 );
 
 watch(props, (newVal) => {
+  const { Command_Enter } = useMagicKeys();
+  let keyboardWatcher;
+  if (newVal.visible) {
+    keyboardWatcher = watch(Command_Enter, (v) => {
+      if (v) {
+        submitForm("role-form");
+      }
+    });
+  } else {
+    keyboardWatcher?.unwatch();
+  }
+
   if (newVal.visible && props.role) {
     formState.value = cloneDeep(props.role);
+    const dependencies =
+      props.role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
+    if (dependencies) {
+      selectedRoleTemplates.value = new Set(JSON.parse(dependencies));
+    }
     return;
   }
   formState.value = cloneDeep(initialFormState);
+  selectedRoleTemplates.value.clear();
 });
 
 const tabActiveId = ref("general");
+
+const editingModalTitle = computed(() => {
+  return isUpdateMode.value ? "编辑角色" : "创建角色";
+});
 
 const handleCreateOrUpdateRole = async () => {
   try {
@@ -68,7 +98,7 @@ const handleVisibleChange = (visible: boolean) => {
   <VModal
     :visible="visible"
     :width="700"
-    title="创建角色"
+    :title="editingModalTitle"
     @update:visible="handleVisibleChange"
   >
     <VTabs v-model:active-id="tabActiveId" type="outline">
@@ -157,12 +187,16 @@ const handleVisibleChange = (visible: boolean) => {
       </VTabItem>
     </VTabs>
     <template #footer>
-      <VButton
-        :loading="saving"
-        type="secondary"
-        @click="$formkit.submit('role-form')"
-        >创建
-      </VButton>
+      <VSpace>
+        <VButton
+          :loading="saving"
+          type="secondary"
+          @click="$formkit.submit('role-form')"
+        >
+          提交 ⌘ + ↵
+        </VButton>
+        <VButton @click="handleVisibleChange(false)">取消 Esc</VButton>
+      </VSpace>
     </template>
   </VModal>
 </template>
