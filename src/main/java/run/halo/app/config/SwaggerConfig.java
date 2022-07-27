@@ -30,8 +30,8 @@ public class SwaggerConfig {
     @Bean
     GroupedOpenApi extensionCoreApi() {
         return GroupedOpenApi.builder()
-            .group("CoreAPI")
-            .displayName("Core API")
+            .group("core-api")
+            .displayName("Core APIs")
             .pathsToMatch("/api/**")
             .build();
     }
@@ -39,8 +39,8 @@ public class SwaggerConfig {
     @Bean
     GroupedOpenApi extensionApi() {
         return GroupedOpenApi.builder()
-            .group("ExtensionAPI")
-            .displayName("Extension API")
+            .group("extension-api")
+            .displayName("Extension APIs")
             .pathsToMatch("/apis/**")
             .pathsToExclude("/apis/api.halo.run/**", "/apis/plugin.api.halo.run/**")
             .build();
@@ -49,8 +49,8 @@ public class SwaggerConfig {
     @Bean
     GroupedOpenApi systemCustomApi() {
         return GroupedOpenApi.builder()
-            .group("SystemCustomAPI")
-            .displayName("System Custom API")
+            .group("core-custom-api")
+            .displayName("Custom APIs in Core")
             .pathsToMatch("/apis/api.halo.run/**")
             .build();
     }
@@ -58,9 +58,18 @@ public class SwaggerConfig {
     @Bean
     GroupedOpenApi pluginCustomApi() {
         return GroupedOpenApi.builder()
-            .group("PluginCustomAPI")
-            .displayName("Plugin Custom API")
+            .group("plugin-custom-api")
+            .displayName("Custom APIs in Plugin")
             .pathsToMatch("/apis/plugin.api.halo.run/**")
+            .build();
+    }
+
+    @Bean
+    GroupedOpenApi allApi() {
+        return GroupedOpenApi.builder()
+            .group("all-api")
+            .displayName("All APIs")
+            .pathsToMatch("/api/**", "/apis/**")
             .build();
     }
 
