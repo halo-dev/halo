@@ -191,7 +191,7 @@ onMounted(handleFetchRoles);
       <FormKit id="user-form" type="form" @submit="handleCreateUser">
         <FormKit
           v-model="formState.user.metadata.name"
-          :disabled="true"
+          :disabled="isUpdateMode"
           label="用户名"
           type="text"
           validation="required"
