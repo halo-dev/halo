@@ -10,6 +10,10 @@ import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.menu.Menu;
+import run.halo.app.core.extension.menu.MenuItem;
+import run.halo.app.core.extension.menu.MenuItemReconciler;
+import run.halo.app.core.extension.menu.MenuReconciler;
 import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
@@ -97,6 +101,22 @@ public class ExtensionConfiguration {
             return new ControllerBuilder("plugin-controller", client)
                 .reconciler(new PluginReconciler(client, haloPluginManager, jsBundleRule))
                 .extension(new Plugin())
+                .build();
+        }
+
+        @Bean
+        Controller menuController(ExtensionClient client) {
+            return new ControllerBuilder("menu-controller", client)
+                .reconciler(new MenuReconciler(client))
+                .extension(new Menu())
+                .build();
+        }
+
+        @Bean
+        Controller menuItemController(ExtensionClient client) {
+            return new ControllerBuilder("menu-item-controller", client)
+                .reconciler(new MenuItemReconciler(client))
+                .extension(new MenuItem())
                 .build();
         }
     }
