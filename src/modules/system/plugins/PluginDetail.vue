@@ -9,11 +9,7 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { usePluginLifeCycle } from "./composables/use-plugin";
 
 const plugin = inject<Ref<Plugin>>("plugin", ref({} as Plugin));
-const { changeStatus } = usePluginLifeCycle(plugin);
-
-const isStarted = computed(() => {
-  return plugin.value.status?.phase === "STARTED" && plugin.value.spec.enabled;
-});
+const { changeStatus, isStarted } = usePluginLifeCycle(plugin);
 
 // TODO 临时解决方案
 interface RoleTemplateGroup {
