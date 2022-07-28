@@ -114,6 +114,7 @@ class ExtensionConfigurationTest {
 
             var metadata = new Metadata();
             metadata.setName("my-fake");
+            metadata.setLabels(Map.of("label-key", "label-value"));
             var fake = new FakeExtension();
             fake.setMetadata(metadata);
 
@@ -158,14 +159,37 @@ class ExtensionConfigurationTest {
         @Test
         @WithMockUser
         void shouldListExtensionsWhenSchemeRegistered() {
-            webClient.get()
-                .uri("/apis/fake.halo.run/v1alpha1/fakes")
+            webClient.get().uri("/apis/fake.halo.run/v1alpha1/fakes")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(FakeExtension.class)
-                .hasSize(1);
+                .expectBody().jsonPath("$.items.length()").isEqualTo(1);
         }
 
+        @Test
+        @WithMockUser
+        void shouldListExtensionsWithMatchedSelectors() {
+            webClient.get().uri(uriBuilder -> uriBuilder
+                    .path("/apis/fake.halo.run/v1alpha1/fakes")
+                    .queryParam("labelSelector", "label-key=label-value")
+                    .queryParam("fieldSelector", "name=my-fake")
+                    .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.items.length()").isEqualTo(1);
+        }
+
+        @Test
+        @WithMockUser
+        void shouldListExtensionsWithMismatchedSelectors() {
+            webClient.get().uri(uriBuilder -> uriBuilder
+                    .path("/apis/fake.halo.run/v1alpha1/fakes")
+                    .queryParam("labelSelector", "label-key=invalid-label-value")
+                    .queryParam("fieldSelector", "name=invalid-name")
+                    .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().jsonPath("$.items.length()").isEqualTo(0);
+        }
 
         @Test
         @WithMockUser
@@ -217,20 +241,6 @@ class ExtensionConfigurationTest {
                 .expectBody(FakeExtension.class)
                 .returnResult()
                 .getResponseBody();
-        }
-
-
-        WebTestClient.ResponseSpec getCreateExtensionResponse() {
-            var metadata = new Metadata();
-            metadata.setName("my-fake");
-            var fake = new FakeExtension();
-            fake.setMetadata(metadata);
-
-            return webClient.post()
-                .uri("/apis/fake.halo.run/v1alpha1/fakes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(fake)
-                .exchange();
         }
 
     }
