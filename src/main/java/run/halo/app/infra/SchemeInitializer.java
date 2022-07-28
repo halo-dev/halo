@@ -9,18 +9,24 @@ import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.Setting;
+import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.security.authentication.pat.PersonalAccessToken;
 
 @Component
 public class SchemeInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
     private final SchemeManager schemeManager;
+    private final HaloProperties haloProperties;
 
-    public SchemeInitializer(SchemeManager schemeManager) {
+    public SchemeInitializer(SchemeManager schemeManager,
+        HaloProperties haloProperties) {
         this.schemeManager = schemeManager;
+        this.haloProperties = haloProperties;
     }
 
     @Override
@@ -33,5 +39,12 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(ReverseProxy.class);
         schemeManager.register(Setting.class);
         schemeManager.register(ConfigMap.class);
+        schemeManager.register(Theme.class);
+
+        // Set the halo working directory
+        if (haloProperties.getWorkDir() != null) {
+            System.setProperty(HaloUtils.HALO_WORK_DIR_PROPERTY,
+                haloProperties.getWorkDir().toString());
+        }
     }
 }

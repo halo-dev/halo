@@ -1,0 +1,9 @@
+apiVersion: v1alpha1
+kind: "ConfigMap"
+metadata:
+  name: system
+data:
+  theme: |
+    {
+      "active": "default"
+    }

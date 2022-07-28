@@ -12,11 +12,13 @@ import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.reactive.config.ViewResolverRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
+import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveViewResolver;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
 
@@ -25,9 +27,12 @@ import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
 public class WebFluxConfig implements WebFluxConfigurer {
 
     final ObjectMapper objectMapper;
+    final ThymeleafReactiveViewResolver thymeleafReactiveViewResolver;
 
-    public WebFluxConfig(ObjectMapper objectMapper) {
+    public WebFluxConfig(ObjectMapper objectMapper,
+        ThymeleafReactiveViewResolver thymeleafReactiveViewResolver) {
         this.objectMapper = objectMapper;
+        this.thymeleafReactiveViewResolver = thymeleafReactiveViewResolver;
     }
 
     @Bean
@@ -63,5 +68,10 @@ public class WebFluxConfig implements WebFluxConfigurer {
         context.getBeansOfType(CustomEndpoint.class).values()
             .forEach(customEndpoint -> builder.add(customEndpoint.endpoint()));
         return builder.build();
+    }
+
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        registry.viewResolver(thymeleafReactiveViewResolver);
     }
 }

@@ -14,5 +14,4 @@ public class HaloConfiguration {
             builder.serializationInclusion(JsonInclude.Include.NON_NULL);
         };
     }
-
 }

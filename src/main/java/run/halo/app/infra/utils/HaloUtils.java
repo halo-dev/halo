@@ -11,6 +11,7 @@ import org.springframework.util.StreamUtils;
  * @date 2022-04-12
  */
 public class HaloUtils {
+    public static final String HALO_WORK_DIR_PROPERTY = "halo.workdir";
 
     /**
      * <p>Read the file under the classpath as a string.</p>
@@ -27,5 +28,14 @@ public class HaloUtils {
                 String.format("Failed to read class path file as string from location [%s]",
                     location), e);
         }
+    }
+
+    public static String getWorkDir() {
+        // TODO 优化工作目录获取
+        String property = System.getProperty(HALO_WORK_DIR_PROPERTY);
+        if (property == null) {
+            return FilePathUtils.combinePath(System.getProperty("user.dir"), "halo").toString();
+        }
+        return property;
     }
 }

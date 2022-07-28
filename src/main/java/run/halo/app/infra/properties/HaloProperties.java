@@ -4,12 +4,14 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author guqing
  * @since 2022-04-12
  */
+@Slf4j
 @Data
 @ConfigurationProperties(prefix = "halo")
 public class HaloProperties {
@@ -28,5 +30,4 @@ public class HaloProperties {
     private final ExtensionProperties extension = new ExtensionProperties();
 
     private final SecurityProperties security = new SecurityProperties();
-
 }
