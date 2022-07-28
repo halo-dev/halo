@@ -8,12 +8,16 @@ import org.thymeleaf.cache.ExpressionCacheKey;
 import org.thymeleaf.cache.ICache;
 import org.thymeleaf.cache.ICacheEntryValidityChecker;
 import org.thymeleaf.cache.StandardCache;
+import org.thymeleaf.cache.StandardCacheManager;
 import org.thymeleaf.cache.StandardParsedTemplateEntryValidator;
 import org.thymeleaf.cache.TemplateCacheKey;
 import org.thymeleaf.engine.TemplateModel;
 
 /**
+ * Code from {@link StandardCacheManager}.
+ *
  * @author guqing
+ * @see StandardCacheManager
  * @since 2.0.0
  */
 public class ThemeCacheManager extends AbstractCacheManager {
