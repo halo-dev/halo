@@ -23,6 +23,7 @@ import run.halo.app.model.entity.Tag;
 import run.halo.app.model.enums.EncryptTypeEnum;
 import run.halo.app.model.enums.PostStatus;
 import run.halo.app.model.vo.ArchiveYearVO;
+import run.halo.app.model.vo.PostDetailVO;
 import run.halo.app.model.vo.PostListVO;
 import run.halo.app.service.CategoryService;
 import run.halo.app.service.OptionService;
@@ -143,21 +144,25 @@ public class PostModel {
                 tags.stream().map(Tag::getName).collect(Collectors.joining(",")));
         }
 
+        model.addAttribute("is_post", true);
+
+        PostDetailVO postDetail;
+        if (StringUtils.isNotBlank(token)) {
+            postDetail = postRenderAssembler.convertToPreviewDetailVo(post);
+            model.addAttribute("post", postDetail);
+        } else {
+            postDetail = postRenderAssembler.convertToDetailVo(post);
+            model.addAttribute("post", postDetail);
+        }
+
         // Generate meta description.
         if (StringUtils.isNotEmpty(post.getMetaDescription())) {
             model.addAttribute("meta_description", post.getMetaDescription());
         } else {
             model.addAttribute("meta_description",
-                postService.generateDescription(post.getContent().getContent()));
+                postService.generateDescription(postDetail.getContent()));
         }
 
-        model.addAttribute("is_post", true);
-
-        if (StringUtils.isNotBlank(token)) {
-            model.addAttribute("post", postRenderAssembler.convertToPreviewDetailVo(post));
-        } else {
-            model.addAttribute("post", postRenderAssembler.convertToDetailVo(post));
-        }
 
         model.addAttribute("categories", categoryService.convertTo(categories));
         model.addAttribute("tags", tagService.convertTo(tags));
