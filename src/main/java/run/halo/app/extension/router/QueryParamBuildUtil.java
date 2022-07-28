@@ -49,33 +49,39 @@ public final class QueryParamBuildUtil {
             if (requiredNames.contains(propSchema.getName())) {
                 paramBuilder.required(true);
             }
-            var allowableValues = new String[0];
-            if (propSchema.getEnum() != null) {
-                allowableValues = (String[]) propSchema.getEnum().stream()
-                    .map(Object::toString)
-                    .toArray(String[]::new);
-            }
-            paramBuilder.schema(schemaBuilder()
-                .type(propSchema.getType())
-                .format(propSchema.getFormat())
-                .nullable(defaultIfNull(propSchema.getNullable(), false))
-                .allowableValues(allowableValues)
-                .defaultValue(toStringOrNull(propSchema.getDefault()))
-                .example(toStringOrNull(propSchema.getExample()))
-            );
 
             if (propSchema instanceof ArraySchema arraySchema) {
                 paramBuilder.array(arraySchemaBuilder()
                     .uniqueItems(defaultIfNull(arraySchema.getUniqueItems(), false))
                     .minItems(defaultIfNull(arraySchema.getMinItems(), 0))
                     .maxItems(defaultIfNull(arraySchema.getMaxItems(), Integer.MAX_VALUE))
-                    .schema(schemaBuilder()
-                        .type(arraySchema.getItems().getType())
-                        .format(arraySchema.getItems().getFormat())
-                        .defaultValue(toStringOrNull(arraySchema.getItems().getDefault())))
+                    .arraySchema(convertSchemaBuilder(arraySchema))
+                    .schema(convertSchemaBuilder(arraySchema.getItems()))
                 );
+            } else {
+                paramBuilder.schema(convertSchemaBuilder(propSchema));
             }
             operationBuilder.parameter(paramBuilder);
         });
+    }
+
+    private static org.springdoc.core.fn.builders.schema.Builder convertSchemaBuilder(
+        Schema<?> schema) {
+        var allowableValues = new String[0];
+        if (schema.getEnum() != null) {
+            allowableValues = schema.getEnum().stream()
+                .map(Object::toString)
+                .toArray(String[]::new);
+        }
+        return schemaBuilder()
+            .name(schema.getName())
+            .type(schema.getType())
+            .description(schema.getDescription())
+            .format(schema.getFormat())
+            .deprecated(defaultIfNull(schema.getDeprecated(), false))
+            .nullable(defaultIfNull(schema.getNullable(), false))
+            .allowableValues(allowableValues)
+            .defaultValue(toStringOrNull(schema.getDefault()))
+            .example(toStringOrNull(schema.getExample()));
     }
 }
