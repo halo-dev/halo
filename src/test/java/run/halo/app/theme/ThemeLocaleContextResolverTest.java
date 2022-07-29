@@ -1,6 +1,7 @@
 package run.halo.app.theme;
 
 import static java.util.Locale.CANADA;
+import static java.util.Locale.CHINA;
 import static java.util.Locale.CHINESE;
 import static java.util.Locale.ENGLISH;
 import static java.util.Locale.GERMAN;
@@ -11,11 +12,16 @@ import static java.util.Locale.KOREA;
 import static java.util.Locale.UK;
 import static java.util.Locale.US;
 import static org.assertj.core.api.Assertions.assertThat;
+import static run.halo.app.theme.ThemeLocaleContextResolver.DEFAULT_PARAMETER_NAME;
+import static run.halo.app.theme.ThemeLocaleContextResolver.TIME_ZONE_COOKIE_NAME;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.TimeZone;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.i18n.TimeZoneAwareLocaleContext;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
@@ -30,6 +36,17 @@ import org.springframework.web.server.ServerWebExchange;
 class ThemeLocaleContextResolverTest {
     private final ThemeLocaleContextResolver resolver = new ThemeLocaleContextResolver();
 
+    @Test
+    public void resolveTimeZone() {
+        TimeZoneAwareLocaleContext localeContext =
+            (TimeZoneAwareLocaleContext) this.resolver.resolveLocaleContext(
+                exchangeTimeZone(CHINA));
+        assertThat(localeContext.getTimeZone()).isNotNull();
+        assertThat(localeContext.getTimeZone())
+            .isEqualTo(TimeZone.getTimeZone("America/Adak"));
+        assertThat(localeContext.getLocale()).isNotNull();
+        assertThat(localeContext.getLocale().getLanguage()).isEqualTo("en");
+    }
 
     @Test
     public void resolve() {
@@ -160,6 +177,13 @@ class ThemeLocaleContextResolverTest {
     private ServerWebExchange exchange(Locale... locales) {
         return MockServerWebExchange.from(
             MockServerHttpRequest.get("").acceptLanguageAsLocales(locales));
+    }
+
+    private ServerWebExchange exchangeTimeZone(Locale... locales) {
+        return MockServerWebExchange.from(
+            MockServerHttpRequest.get("").acceptLanguageAsLocales(locales)
+                .cookie(new HttpCookie(TIME_ZONE_COOKIE_NAME, "America/Adak"))
+                .cookie(new HttpCookie(DEFAULT_PARAMETER_NAME, "en")));
     }
 
     private ServerWebExchange exchangeForParam(String language) {
