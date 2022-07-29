@@ -1,4 +1,4 @@
-package run.halo.app.extension;
+package run.halo.app.extension.router;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,7 +25,11 @@ import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.web.reactive.function.server.EntityResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.ExtensionRouterFunctionFactory.ExtensionUpdateHandler;
+import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.Metadata;
+import run.halo.app.extension.Scheme;
+import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 

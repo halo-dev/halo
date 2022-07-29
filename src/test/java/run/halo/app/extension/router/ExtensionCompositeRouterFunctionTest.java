@@ -1,4 +1,4 @@
-package run.halo.app.extension;
+package run.halo.app.extension.router;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -15,6 +15,10 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.ServerRequest;
+import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.Scheme;
+import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.SchemeWatcherManager.SchemeRegistered;
 import run.halo.app.extension.SchemeWatcherManager.SchemeUnregistered;
 
