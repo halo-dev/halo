@@ -91,7 +91,8 @@ public class WebServerSecurityConfig {
     SecurityWebFilterChain webFilterChain(ServerHttpSecurity http) {
         http.authorizeExchange(exchanges -> exchanges.pathMatchers(
                 "/actuator/**",
-                "/swagger-ui.html", "/webjars/**", "/v3/api-docs/**"
+                "/swagger-ui.html", "/webjars/**", "/v3/api-docs/**",
+                "/", "/index", "/themes/**"
             ).permitAll())
             .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
             .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
