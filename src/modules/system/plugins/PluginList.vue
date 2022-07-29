@@ -12,22 +12,41 @@ import {
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginInstallModal from "./components/PluginInstallModal.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Plugin } from "@halo-dev/api-client";
 
 const plugins = ref<Plugin[]>([] as Plugin[]);
 const pluginInstall = ref(false);
+const keyword = ref("");
 
 const handleFetchPlugins = async () => {
   try {
+    const fieldSelector: Array<string> = [];
+
+    if (keyword.value) {
+      fieldSelector.push(`name=${keyword.value}`);
+    }
+
     const { data } =
-      await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
+      await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin(
+        0,
+        0,
+        [],
+        fieldSelector
+      );
     plugins.value = data.items;
   } catch (e) {
     console.error("Fail to fetch plugins", e);
   }
 };
+
+watch(
+  () => keyword.value,
+  () => {
+    handleFetchPlugins();
+  }
+);
 
 onMounted(handleFetchPlugins);
 </script>
@@ -64,7 +83,11 @@ onMounted(handleFetchPlugins);
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
             <div class="flex w-full flex-1 sm:w-auto">
-              <FormKit placeholder="输入关键词搜索" type="text"></FormKit>
+              <FormKit
+                v-model="keyword"
+                placeholder="输入关键词搜索"
+                type="text"
+              ></FormKit>
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">

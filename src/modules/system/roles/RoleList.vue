@@ -12,7 +12,7 @@ import {
   VTag,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import type { Role } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { roleLabels } from "@/constants/labels";
@@ -22,15 +22,11 @@ const roles = ref<Role[]>([]);
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role | null>(null);
 
-const basicRoles = computed(() => {
-  return roles.value.filter(
-    (role) => role.metadata?.labels?.[roleLabels.TEMPLATE] !== "true"
-  );
-});
-
 const handleFetchRoles = async () => {
   try {
-    const { data } = await apiClient.extension.role.listv1alpha1Role();
+    const { data } = await apiClient.extension.role.listv1alpha1Role(0, 0, [
+      `!${roleLabels.TEMPLATE}`,
+    ]);
     roles.value = data.items;
   } catch (e) {
     console.error(e);
@@ -169,7 +165,7 @@ onMounted(() => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li v-for="(role, index) in basicRoles" :key="index">
+        <li v-for="(role, index) in roles" :key="index">
           <div
             class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
           >

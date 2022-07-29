@@ -59,21 +59,13 @@ export function useRoleForm() {
 }
 
 export function useRoleTemplateSelection() {
-  const rawRoles = ref<Role[]>([] as Role[]);
+  const roleTemplates = ref<Role[]>([] as Role[]);
   const selectedRoleTemplates = ref<Set<string>>(new Set());
 
-  // Get all role templates based on the condition that `metadata.labels.[halo.run/role-template] === 'true'`
-  const roleTemplates = computed<Role[]>(() => {
-    return rawRoles.value.filter(
-      (role) =>
-        role.metadata.labels?.[roleLabels.TEMPLATE] === "true" &&
-        role.metadata.labels?.["halo.run/hidden"] !== "true"
-    );
-  });
-
   /**
-   * Grouping role templates by module
+   * Grouping role templates by module <br />
    * Example:
+   * ```json
    * {
    *   "module": "Users Management",
    *   "roles": [
@@ -151,6 +143,7 @@ export function useRoleTemplateSelection() {
    *     }
    *   ]
    * }
+   * ```
    */
   const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
     const groups: RoleTemplateGroup[] = [];
@@ -171,10 +164,16 @@ export function useRoleTemplateSelection() {
     return groups;
   });
 
+  /**
+   * Get all role templates based on the condition that `metadata.labels.[halo.run/role-template] = 'true'` and `!halo.run/hidden`
+   */
   const handleFetchRoles = async () => {
     try {
-      const { data } = await apiClient.extension.role.listv1alpha1Role();
-      rawRoles.value = data.items;
+      const { data } = await apiClient.extension.role.listv1alpha1Role(0, 0, [
+        `${roleLabels.TEMPLATE}=true`,
+        "!halo.run/hidden",
+      ]);
+      roleTemplates.value = data.items;
     } catch (e) {
       console.error(e);
     }
@@ -185,7 +184,9 @@ export function useRoleTemplateSelection() {
     if (!checked) {
       return;
     }
-    const role = rawRoles.value.find((role) => role.metadata.name === value);
+    const role = roleTemplates.value.find(
+      (role) => role.metadata.name === value
+    );
     const dependencies =
       role?.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
     if (!dependencies) {
@@ -200,7 +201,6 @@ export function useRoleTemplateSelection() {
   onMounted(handleFetchRoles);
 
   return {
-    rawRoles,
     selectedRoleTemplates,
     roleTemplates,
     roleTemplateGroups,

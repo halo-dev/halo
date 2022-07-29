@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VSwitch, VTag } from "@halo-dev/components";
 import type { Ref } from "vue";
-import { computed, inject, onMounted, ref } from "vue";
+import { computed, inject, ref, watchEffect } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { Plugin, Role } from "@halo-dev/api-client";
 import { pluginLabels } from "@/constants/labels";
@@ -11,30 +11,23 @@ import { usePluginLifeCycle } from "./composables/use-plugin";
 const plugin = inject<Ref<Plugin>>("plugin", ref({} as Plugin));
 const { changeStatus, isStarted } = usePluginLifeCycle(plugin);
 
-// TODO 临时解决方案
 interface RoleTemplateGroup {
   module: string | null | undefined;
   roles: Role[];
 }
 
-const roles = ref<Role[]>([]);
+const pluginRoleTemplates = ref<Role[]>([]);
 
 const handleFetchRoles = async () => {
   try {
-    const { data } = await apiClient.extension.role.listv1alpha1Role();
-    roles.value = data.items;
+    const { data } = await apiClient.extension.role.listv1alpha1Role(0, 0, [
+      `${pluginLabels.NAME}=${plugin.value.metadata.name}`,
+    ]);
+    pluginRoleTemplates.value = data.items;
   } catch (e) {
     console.error(e);
   }
 };
-
-const pluginRoleTemplates = computed(() => {
-  return roles.value.filter((item) => {
-    return (
-      item.metadata.labels?.[pluginLabels.NAME] === plugin.value.metadata?.name
-    );
-  });
-});
 
 const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
   const groups: RoleTemplateGroup[] = [];
@@ -55,8 +48,10 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
   return groups;
 });
 
-onMounted(() => {
-  handleFetchRoles();
+watchEffect(() => {
+  if (plugin.value.metadata?.name) {
+    handleFetchRoles();
+  }
 });
 </script>
 
