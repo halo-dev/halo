@@ -18,7 +18,7 @@ import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FilePathUtils;
 import run.halo.app.theme.cache.ThemeCacheManager;
 import run.halo.app.theme.engine.ThemeWebFluxTemplateEngine;
-import run.halo.app.theme.message.ThemeMessageResolver;
+import run.halo.app.theme.message.DelegatingThemeMessageResolver;
 
 /**
  * @author guqing
@@ -38,7 +38,7 @@ public class ThemeConfiguration {
         ObjectProvider<IDialect> dialects) {
         ThemeWebFluxTemplateEngine engine = new ThemeWebFluxTemplateEngine();
         engine.setEnableSpringELCompiler(properties.isEnableSpringElCompiler());
-        engine.setMessageResolver(new ThemeMessageResolver());
+        engine.setMessageResolver(new DelegatingThemeMessageResolver());
         engine.setLinkBuilder(new ThemeLinkBuilder());
 
         engine.setRenderHiddenMarkersBeforeCheckboxes(
