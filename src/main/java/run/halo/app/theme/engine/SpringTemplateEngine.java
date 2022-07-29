@@ -25,10 +25,14 @@ import org.thymeleaf.spring6.messageresolver.SpringMessageResolver;
  * needs to be overridden, the {@link #setTemplateEngineMessageSource(MessageSource)} can
  * be used.
  * </p>
+ * <p>
+ * Code from
+ * <a href="https://github.com/thymeleaf/thymeleaf/blob/3.1-master/lib/thymeleaf-spring6/src/main/java/org/thymeleaf/spring6/SpringTemplateEngine.java">Thymeleaf SpringTemplateEngine</a>
+ * </p>
  *
  * @author Daniel Fern&aacute;ndez
- * @see org.thymeleaf.spring6.SpringTemplateEngine
  * @author guqing
+ * @see org.thymeleaf.spring6.SpringTemplateEngine
  * @since 2.0.0
  */
 public class SpringTemplateEngine extends TemplateEngine

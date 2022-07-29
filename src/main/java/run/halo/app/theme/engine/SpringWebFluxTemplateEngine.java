@@ -44,6 +44,8 @@ import reactor.core.publisher.Mono;
  * Standard implementation of {@link ISpringWebFluxTemplateEngine}, and default
  * template engine implementation to be used in Spring WebFlux environments.
  * </p>
+ * Code from
+ * <a href="https://github.com/thymeleaf/thymeleaf/blob/3.1-master/lib/thymeleaf-spring6/src/main/java/org/thymeleaf/spring6/SpringWebFluxTemplateEngine.java">thymeleaf SpringWebFluxTemplateEngine</a>
  *
  * @author Daniel Fern&aacute;ndez
  * @see ISpringWebFluxTemplateEngine

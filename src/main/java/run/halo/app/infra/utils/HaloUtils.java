@@ -29,13 +29,4 @@ public class HaloUtils {
                     location), e);
         }
     }
-
-    public static String getWorkDir() {
-        // TODO 优化工作目录获取
-        String property = System.getProperty(HALO_WORK_DIR_PROPERTY);
-        if (property == null) {
-            return FilePathUtils.combinePath(System.getProperty("user.dir"), "halo").toString();
-        }
-        return property;
-    }
 }

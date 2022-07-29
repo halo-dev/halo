@@ -3,6 +3,8 @@ package run.halo.app.theme;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Paths;
@@ -15,7 +17,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.utils.HaloUtils;
+import run.halo.app.infra.properties.HaloProperties;
 
 /**
  * Tests for {@link ThemeContextFilter}.
@@ -28,13 +30,15 @@ public class ThemeContextFilterTests {
 
     @Mock
     private SystemConfigurableEnvironmentFetcher systemEnvironmentFetcher;
+    @Mock
+    private HaloProperties haloProperties;
 
     private ThemeContextFilter themeContextFilter;
 
     @BeforeEach
     void setUp() {
-        themeContextFilter = new ThemeContextFilter(systemEnvironmentFetcher);
-        System.setProperty(HaloUtils.HALO_WORK_DIR_PROPERTY, "/tmp");
+        when(haloProperties.getWorkDir()).thenReturn(Paths.get("/tmp"));
+        themeContextFilter = new ThemeContextFilter(systemEnvironmentFetcher, haloProperties);
     }
 
     @Test
@@ -57,6 +61,7 @@ public class ThemeContextFilterTests {
             })
             .webFilter(themeContextFilter)
             .build();
+        verify(haloProperties, times(1)).getWorkDir();
 
         client.get().uri("/")
             .exchange()

@@ -1,7 +1,6 @@
 package run.halo.app.theme;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.lang.NonNull;
@@ -12,7 +11,7 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.utils.HaloUtils;
+import run.halo.app.infra.properties.HaloProperties;
 
 /**
  * @author guqing
@@ -23,10 +22,13 @@ public class ThemeContextFilter implements WebFilter {
     private static final String THEME_LOCATION = "themes";
     private static final String THEME_PARAMETER = "theme";
     private final SystemConfigurableEnvironmentFetcher systemConfigurableEnvironmentFetcher;
+    private final Path workDir;
 
     public ThemeContextFilter(
-        SystemConfigurableEnvironmentFetcher systemConfigurableEnvironmentFetcher) {
+        SystemConfigurableEnvironmentFetcher systemConfigurableEnvironmentFetcher,
+        HaloProperties haloProperties) {
         this.systemConfigurableEnvironmentFetcher = systemConfigurableEnvironmentFetcher;
+        this.workDir = haloProperties.getWorkDir();
     }
 
     @Override
@@ -62,8 +64,7 @@ public class ThemeContextFilter implements WebFilter {
     }
 
     Path themePath(String themeName) {
-        return Paths.get(HaloUtils.getWorkDir())
-            .resolve(THEME_LOCATION)
+        return workDir.resolve(THEME_LOCATION)
             .resolve(themeName);
     }
 }
