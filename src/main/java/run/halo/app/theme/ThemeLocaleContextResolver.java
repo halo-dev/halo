@@ -10,17 +10,18 @@ import org.springframework.context.i18n.SimpleTimeZoneAwareLocaleContext;
 import org.springframework.http.HttpCookie;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.adapter.WebHttpHandlerBuilder;
 import org.springframework.web.server.i18n.AcceptHeaderLocaleContextResolver;
-import org.springframework.web.server.i18n.LocaleContextResolver;
 
 /**
  * @author guqing
  * @since 2.0.0
  */
 @Slf4j
-public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolver
-    implements LocaleContextResolver {
+@Component(WebHttpHandlerBuilder.LOCALE_CONTEXT_RESOLVER_BEAN_NAME)
+public class ThemeLocaleContextResolver extends AcceptHeaderLocaleContextResolver {
     public static final String TIME_ZONE_REQUEST_ATTRIBUTE_NAME =
         ThemeLocaleContextResolver.class.getName() + ".TIME_ZONE";
     public static final String LOCALE_REQUEST_ATTRIBUTE_NAME =

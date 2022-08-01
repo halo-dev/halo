@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,8 +22,7 @@ import org.springframework.lang.Nullable;
 import org.thymeleaf.exceptions.TemplateInputException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.util.StringUtils;
-import run.halo.app.theme.ThemeContext;
-import run.halo.app.theme.ThemeContextHolder;
+import run.halo.app.theme.newplan.ThemeContext;
 
 /**
  * @author guqing
@@ -37,10 +36,9 @@ public class ThemeMessageResolutionUtils {
     private static final Object[] EMPTY_MESSAGE_PARAMETERS = new Object[0];
 
     @Nullable
-    private static Reader messageReader(String messageResourceName)
+    private static Reader messageReader(String messageResourceName, ThemeContext theme)
         throws FileNotFoundException {
-        ThemeContext themeContext = ThemeContextHolder.getThemeContext();
-        Path themePath = themeContext.getPath();
+        var themePath = Paths.get(theme.getPath());
         File messageFile = themePath.resolve(messageResourceName).toFile();
         if (!messageFile.exists()) {
             return null;
@@ -49,7 +47,8 @@ public class ThemeMessageResolutionUtils {
         return new BufferedReader(new InputStreamReader(new BufferedInputStream(inputStream)));
     }
 
-    public static Map<String, String> resolveMessagesForTemplate(final Locale locale) {
+    public static Map<String, String> resolveMessagesForTemplate(final Locale locale,
+        ThemeContext theme) {
 
         // Compute all the resource names we should use: *_gl_ES-gheada.properties, *_gl_ES
         // .properties, _gl.properties...
@@ -65,7 +64,7 @@ public class ThemeMessageResolutionUtils {
         Map<String, String> combinedMessages = null;
         for (final String messageResourceName : messageResourceNames) {
             try {
-                final Reader messageResourceReader = messageReader(messageResourceName);
+                final Reader messageResourceReader = messageReader(messageResourceName, theme);
                 if (messageResourceReader != null) {
 
                     final Properties messageProperties =

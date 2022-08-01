@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.lang.NonNull;
@@ -43,6 +44,17 @@ public class SystemConfigurableEnvironmentFetcher {
             return (T) conversionService.convert(value, valueType);
         }
         return (T) JsonUtils.jsonToObject(value, valueType);
+    }
+
+    public <T> Optional<T> fetch(String key, Class<T> type) {
+        var stringValue = getInternal(key);
+        if (stringValue == null) {
+            return Optional.empty();
+        }
+        if (conversionService.canConvert(String.class, type)) {
+            return Optional.ofNullable(conversionService.convert(stringValue, type));
+        }
+        return Optional.of(JsonUtils.jsonToObject(stringValue, type));
     }
 
     private String getInternal(String group) {

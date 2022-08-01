@@ -5,8 +5,7 @@ import java.util.Map;
 import java.util.concurrent.locks.StampedLock;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.messageresolver.AbstractMessageResolver;
-import run.halo.app.theme.ThemeContext;
-import run.halo.app.theme.ThemeContextHolder;
+import run.halo.app.theme.newplan.ThemeContext;
 
 /**
  * @author guqing
@@ -15,6 +14,12 @@ import run.halo.app.theme.ThemeContextHolder;
 public class DelegatingThemeMessageResolver extends AbstractMessageResolver {
     private final Map<String, ThemeMessageResolver> delegateCache = new HashMap<>();
     private final StampedLock stampedLock = new StampedLock();
+
+    private final ThemeContext theme;
+
+    public DelegatingThemeMessageResolver(ThemeContext theme) {
+        this.theme = theme;
+    }
 
     @Override
     public String resolveMessage(ITemplateContext context, Class<?> origin, String key,
@@ -30,8 +35,7 @@ public class DelegatingThemeMessageResolver extends AbstractMessageResolver {
     }
 
     private ThemeMessageResolver getMessageResolver() {
-        ThemeContext themeContext = ThemeContextHolder.getThemeContext();
-        String themeName = themeContext.getThemeName();
+        String themeName = theme.getName();
         long stamp = stampedLock.tryOptimisticRead();
         ThemeMessageResolver themeMessageResolver = delegateCache.get(themeName);
         if (themeMessageResolver == null) {
@@ -51,7 +55,7 @@ public class DelegatingThemeMessageResolver extends AbstractMessageResolver {
     private ThemeMessageResolver createMessageResolver(String themeName) {
         long stamp = stampedLock.writeLock();
         try {
-            ThemeMessageResolver themeMessageResolver = new ThemeMessageResolver();
+            ThemeMessageResolver themeMessageResolver = new ThemeMessageResolver(theme);
             delegateCache.put(themeName, themeMessageResolver);
             return themeMessageResolver;
         } finally {

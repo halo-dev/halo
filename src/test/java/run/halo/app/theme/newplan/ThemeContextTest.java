@@ -1,6 +1,5 @@
-package run.halo.app.theme;
+package run.halo.app.theme.newplan;
 
-import java.nio.file.Paths;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -17,15 +16,15 @@ class ThemeContextTest {
     @Test
     void constructorTest() throws JSONException {
         ThemeContext testTheme =
-            new ThemeContext("testTheme", Paths.get("/tmp/themes/testTheme"), false);
+            new ThemeContext("testTheme", "/tmp/themes/testTheme", false);
         String s = JsonUtils.objectToJson(testTheme);
         JSONAssert.assertEquals("""
-            {
-                "themeName": "testTheme",
-                "path": "file:///tmp/themes/testTheme",
-                "active": false
-            }
-            """,
+                {
+                    "themeName": "testTheme",
+                    "path": "file:///tmp/themes/testTheme",
+                    "active": false
+                }
+                """,
             s,
             false);
     }
@@ -33,18 +32,18 @@ class ThemeContextTest {
     @Test
     void constructorBuilderTest() throws JSONException {
         ThemeContext testTheme = ThemeContext.builder()
-            .themeName("testTheme")
-            .path(Paths.get("/tmp/themes/testTheme"))
-            .isActive(true)
+            .name("testTheme")
+            .path("/tmp/themes/testTheme")
+            .active(true)
             .build();
         String s = JsonUtils.objectToJson(testTheme);
         JSONAssert.assertEquals("""
-            {
-                "themeName": "testTheme",
-                "path": "file:///tmp/themes/testTheme",
-                "active": true
-            }
-            """,
+                {
+                    "themeName": "testTheme",
+                    "path": "file:///tmp/themes/testTheme",
+                    "active": true
+                }
+                """,
             s,
             false);
     }

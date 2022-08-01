@@ -1,4 +1,4 @@
-package run.halo.app.theme;
+package run.halo.app.theme.newplan;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -13,7 +13,13 @@ import run.halo.app.infra.utils.PathUtils;
 public class ThemeLinkBuilder extends StandardLinkBuilder {
     private static final String THEME_ASSETS_PREFIX = "/assets";
     private static final String THEME_PREVIEW_PREFIX = "/themes";
-    private static final String THEME_PREVIEW_PARAM_NAME = "theme";
+    private static final String THEME_PREVIEW_PARAM_NAME = "preview-theme";
+
+    private final ThemeContext theme;
+
+    public ThemeLinkBuilder(ThemeContext theme) {
+        this.theme = theme;
+    }
 
     @Override
     protected String processLink(IExpressionContext context, String link) {
@@ -25,19 +31,17 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
             link = "/";
         }
 
-        ThemeContext themeContext = ThemeContextHolder.getThemeContext();
-        String themeName = themeContext.getThemeName();
         if (isAssetsRequest(link)) {
-            return PathUtils.combinePath(THEME_PREVIEW_PREFIX, themeName, link);
+            return PathUtils.combinePath(THEME_PREVIEW_PREFIX, theme.getName(), link);
         }
 
         // not assets link
-        if (themeContext.isActive()) {
+        if (theme.isActive()) {
             return link;
         }
 
         return UriComponentsBuilder.fromUriString(link)
-            .queryParam(THEME_PREVIEW_PARAM_NAME, themeName)
+            .queryParam(THEME_PREVIEW_PARAM_NAME, theme.getName())
             .build().toString();
     }
 
