@@ -11,20 +11,20 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.NonNull;
-import org.springframework.web.reactive.config.EnableWebFlux;
+import org.springframework.web.reactive.config.DelegatingWebFluxConfiguration;
 import org.springframework.web.reactive.config.ViewResolverRegistry;
-import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveViewResolver;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
+import run.halo.app.theme.ThemeLocaleContextResolver;
 
 @Configuration
-@EnableWebFlux
-public class WebFluxConfig implements WebFluxConfigurer {
+public class WebFluxConfig extends DelegatingWebFluxConfiguration {
 
     final ObjectMapper objectMapper;
     final ThymeleafReactiveViewResolver thymeleafReactiveViewResolver;
@@ -73,5 +73,11 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Override
     public void configureViewResolvers(ViewResolverRegistry registry) {
         registry.viewResolver(thymeleafReactiveViewResolver);
+    }
+
+    @Override
+    @NonNull
+    protected LocaleContextResolver createLocaleContextResolver() {
+        return new ThemeLocaleContextResolver();
     }
 }

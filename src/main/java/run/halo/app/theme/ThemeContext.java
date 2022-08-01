@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ThemeContext {
+    public static final String THEME_CONTEXT_KEY = ThemeContext.class.getName() + ".CONTEXT";
 
     private String themeName;
 

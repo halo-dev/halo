@@ -15,7 +15,6 @@ public class ThemeWebFluxTemplateEngine extends SpringWebFluxTemplateEngine {
 
     @Override
     protected void initializeSpecific() {
-        // First of all, give the opportunity to subclasses to apply their own configurations
-        initializeSpringSpecific();
+        // Nothing to be executed here, override this method to remove parent initialization
     }
 }

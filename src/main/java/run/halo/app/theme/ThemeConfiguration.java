@@ -52,6 +52,7 @@ public class ThemeConfiguration {
         return engine;
     }
 
+
     @Bean
     ThemeResourceTemplateResolver themeResourceTemplateResolver() {
         ThemeResourceTemplateResolver themeResourceTemplateResolver =

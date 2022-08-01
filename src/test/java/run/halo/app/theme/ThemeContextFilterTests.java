@@ -20,7 +20,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.properties.HaloProperties;
 
 /**
- * Tests for {@link ThemeContextFilter}.
+ * Tests for {@link ThemeReactiveContextFilter}.
  *
  * @author guqing
  * @since 2.0.0
@@ -33,12 +33,13 @@ public class ThemeContextFilterTests {
     @Mock
     private HaloProperties haloProperties;
 
-    private ThemeContextFilter themeContextFilter;
+    private ThemeReactiveContextFilter themeContextFilter;
 
     @BeforeEach
     void setUp() {
         when(haloProperties.getWorkDir()).thenReturn(Paths.get("/tmp"));
-        themeContextFilter = new ThemeContextFilter(systemEnvironmentFetcher, haloProperties);
+        themeContextFilter =
+            new ThemeReactiveContextFilter(systemEnvironmentFetcher, haloProperties);
     }
 
     @Test
@@ -51,14 +52,14 @@ public class ThemeContextFilterTests {
             IllegalStateException.class);
 
         WebTestClient client = WebTestClient
-            .bindToWebHandler(exchange -> {
-                ThemeContext themeContext = ThemeContextHolder.getThemeContext();
+            .bindToWebHandler(exchange -> Mono.deferContextual(ctx -> {
+                ThemeContext themeContext = ctx.get(ThemeContext.THEME_CONTEXT_KEY);
                 assertThat(themeContext).isNotNull();
                 assertThat(themeContext.getThemeName()).isEqualTo("default");
                 assertThat(themeContext.getPath()).isEqualTo(Paths.get("/tmp/themes/default"));
                 assertThat(themeContext.isActive()).isTrue();
-                return Mono.empty();
-            })
+                return Mono.just(ctx);
+            }).then(Mono.empty()))
             .webFilter(themeContextFilter)
             .build();
         verify(haloProperties, times(1)).getWorkDir();
@@ -74,14 +75,14 @@ public class ThemeContextFilterTests {
             IllegalStateException.class);
 
         WebTestClient client = WebTestClient
-            .bindToWebHandler(exchange -> {
-                ThemeContext themeContext = ThemeContextHolder.getThemeContext();
+            .bindToWebHandler(exchange -> Mono.deferContextual(ctx -> {
+                ThemeContext themeContext = ctx.get(ThemeContext.THEME_CONTEXT_KEY);
                 assertThat(themeContext).isNotNull();
                 assertThat(themeContext.getThemeName()).isEqualTo("other");
                 assertThat(themeContext.getPath()).isEqualTo(Paths.get("/tmp/themes/other"));
                 assertThat(themeContext.isActive()).isFalse();
-                return Mono.empty();
-            })
+                return Mono.just(ctx);
+            }).then(Mono.empty()))
             .webFilter(themeContextFilter)
             .build();
 

@@ -18,7 +18,7 @@ spring:
     show-sql: true
 
 halo:
-  work-dir: ${user.home}/halo-next
+  work-dir: ${user.home}/halo-next-test
   security:
     initializer:
       disabled: true
