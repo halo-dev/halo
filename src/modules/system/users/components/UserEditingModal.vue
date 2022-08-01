@@ -1,4 +1,4 @@
-<script lang="ts" name="UserCreationModal" setup>
+<script lang="ts" name="UserEditingModal" setup>
 import type { PropType } from "vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";

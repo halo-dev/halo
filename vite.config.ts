@@ -83,10 +83,5 @@ export default ({ mode }: { mode: string }) => {
     build: {
       chunkSizeWarningLimit: 2048,
     },
-    test: {
-      transformMode: {
-        web: [/\.[jt]sx$/],
-      },
-    },
   });
 };
