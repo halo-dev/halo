@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 @Builder
 @EqualsAndHashCode(of = "name")
 public class ThemeContext {
+    public static final String THEME_CONTEXT_KEY = ThemeContext.class.getName() + ".CONTEXT";
 
     public static final String THEME_PREVIEW_PARAM_NAME = "preview-theme";
 

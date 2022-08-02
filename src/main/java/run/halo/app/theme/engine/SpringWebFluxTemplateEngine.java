@@ -37,6 +37,8 @@ import org.thymeleaf.util.LoggingUtils;
 import org.thymeleaf.web.IWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.theme.ThemeContext;
+import run.halo.app.theme.ThemeContextHolder;
 
 
 /**
@@ -46,15 +48,17 @@ import reactor.core.publisher.Mono;
  * </p>
  * Code from
  * <a href="https://github.com/thymeleaf/thymeleaf/blob/3.1-master/lib/thymeleaf-spring6/src/main/java/org/thymeleaf/spring6/SpringWebFluxTemplateEngine.java">thymeleaf SpringWebFluxTemplateEngine</a>
+ * <p>调用{@link SpringTemplateEngine#process(String, IContext)}之前会将Reactor context 传递到
+ * {@link ThemeContextHolder}.</p>
  *
  * @author Daniel Fern&aacute;ndez
+ * @author guqing
  * @see ISpringWebFluxTemplateEngine
  * @see org.thymeleaf.spring6.SpringWebFluxTemplateEngine
  * @since 2.0.0
  */
 public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
     implements ISpringWebFluxTemplateEngine {
-
     private static final Logger logger = LoggerFactory.getLogger(SpringWebFluxTemplateEngine.class);
     private static final String LOG_CATEGORY_FULL_OUTPUT =
         SpringWebFluxTemplateEngine.class.getName() + ".DOWNSTREAM.FULL";
@@ -118,6 +122,7 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
 
         /*
          * CHECK FOR DATA-DRIVEN EXECUTION
+         * TODO: No theme context filled for data driver stream
          */
         try {
             final String dataDriverVariableName = findDataDriverInModel(context);
@@ -167,17 +172,19 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
         final String templateName, final Set<String> markupSelectors, final IContext context,
         final DataBufferFactory bufferFactory, final Charset charset) {
 
-        final Mono<DataBuffer> stream =
-            Mono.create(
+        final Mono<DataBuffer> stream = Mono.deferContextual(ctx -> Mono.create(
                 subscriber -> {
+                    // Note that: 填充主题上下文
+                    ThemeContext themeContext = ctx.get(ThemeContext.THEME_CONTEXT_KEY);
+                    ThemeContextHolder.setThemeContext(themeContext);
 
                     if (logger.isTraceEnabled()) {
                         logger.trace(
                             "[THYMELEAF][{}] STARTING STREAM PROCESS (FULL MODE) OF TEMPLATE "
                                 + "\"{}\" WITH LOCALE {}",
-                            new Object[] {TemplateEngine.threadIndex(),
-                                LoggingUtils.loggifyTemplateName(templateName),
-                                context.getLocale()});
+                            TemplateEngine.threadIndex(),
+                            LoggingUtils.loggifyTemplateName(templateName),
+                            context.getLocale());
                     }
 
                     final DataBuffer dataBuffer = bufferFactory.allocateBuffer();
@@ -187,16 +194,15 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                         writer = new OutputStreamWriter(dataBuffer.asOutputStream(), charset);
 
                     try {
-
                         process(templateName, markupSelectors, context, writer);
 
                     } catch (final Throwable t) {
                         logger.error(
                             String.format(
                                 "[THYMELEAF][%s] Exception processing template \"%s\": %s",
-                                new Object[] {TemplateEngine.threadIndex(),
-                                    LoggingUtils.loggifyTemplateName(templateName),
-                                    t.getMessage()}),
+                                TemplateEngine.threadIndex(),
+                                LoggingUtils.loggifyTemplateName(templateName),
+                                t.getMessage()),
                             t);
                         subscriber.error(t);
                         return;
@@ -208,16 +214,22 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                         logger.trace(
                             "[THYMELEAF][{}] FINISHED STREAM PROCESS (FULL MODE) OF TEMPLATE "
                                 + "\"{}\" WITH LOCALE {}. PRODUCED {} BYTES",
-                            new Object[] {
-                                TemplateEngine.threadIndex(),
-                                LoggingUtils.loggifyTemplateName(templateName),
-                                context.getLocale(), Integer.valueOf(bytesProduced)});
+                            TemplateEngine.threadIndex(),
+                            LoggingUtils.loggifyTemplateName(templateName),
+                            context.getLocale(), bytesProduced);
                     }
 
                     // This is a Mono<?>, so no need to call "next()" or "complete()"
                     subscriber.success(dataBuffer);
 
-                });
+                })
+            .doFinally(s -> {
+                // Note that: 清除主题上下文
+                logger.debug("Remove theme context: [{}]",
+                    ThemeContextHolder.getThemeContext());
+                ThemeContextHolder.resetThemeContext();
+            })
+        ).cast(DataBuffer.class);
 
         // Will add some logging to the data stream
         return stream.log(LOG_CATEGORY_FULL_OUTPUT, Level.FINEST);
@@ -230,96 +242,110 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
         final DataBufferFactory bufferFactory, final Charset charset,
         final int responseMaxChunkSizeBytes) {
 
-        final Flux<DataBuffer> stream = Flux.generate(
+        final Flux<DataBuffer> stream = Flux.deferContextual(ctx -> Flux.generate(
 
-            // Using the throttledProcessor as state in this Flux.generate allows us to delay the
-            // initialization of the throttled processor until the last moment, when output
-            // generation
-            // is really requested.
-            // NOTE 'sse' is specified as 'false' because SSE is only allowed in data-driven mode
-            // . Also, no
-            // data-driven iterator is available (we are in chunked mode).
-            () -> new SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor(
-                processThrottled(templateName, markupSelectors, context), null, null, 0L, false),
+                // Using the throttledProcessor as state in this Flux.generate allows us to delay
+                // the
+                // initialization of the throttled processor until the last moment, when output
+                // generation
+                // is really requested.
+                // NOTE 'sse' is specified as 'false' because SSE is only allowed in data-driven
+                // mode
+                // . Also, no
+                // data-driven iterator is available (we are in chunked mode).
+                () -> {
+                    // Note that: 传递主题上下文
+                    ThemeContextHolder.setThemeContext(ctx.get(ThemeContext.THEME_CONTEXT_KEY));
+                    return new StreamThrottledTemplateProcessor(
+                        processThrottled(templateName, markupSelectors, context), null, null, 0L,
+                        false);
+                },
 
-            // This stream will execute, in a one-by-one (non-interleaved) fashion, the following
-            // code
-            // for each back-pressure request coming from downstream. Each of these steps
-            // (chunks) will
-            // execute the throttled processor once and return its result as a DataBuffer object.
-            (throttledProcessor, emitter) -> {
+                // This stream will execute, in a one-by-one (non-interleaved) fashion, the
+                // following
+                // code
+                // for each back-pressure request coming from downstream. Each of these steps
+                // (chunks) will
+                // execute the throttled processor once and return its result as a DataBuffer
+                // object.
+                (throttledProcessor, emitter) -> {
 
-                throttledProcessor.startChunk();
-
-                if (logger.isTraceEnabled()) {
-                    logger.trace(
-                        "[THYMELEAF][{}][{}] STARTING PARTIAL STREAM PROCESS (CHUNKED MODE, "
-                            + "THROTTLER ID "
-                            +
-                            "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}",
-                        new Object[] {
-                            TemplateEngine.threadIndex(),
-                            throttledProcessor.getProcessorIdentifier(),
-                            throttledProcessor.getProcessorIdentifier(),
-                            Integer.valueOf(throttledProcessor.getChunkCount()),
-                            LoggingUtils.loggifyTemplateName(templateName), context.getLocale()});
-                }
-
-                final DataBuffer buffer = bufferFactory.allocateBuffer(responseMaxChunkSizeBytes);
-
-                final int bytesProduced;
-                try {
-                    bytesProduced =
-                        throttledProcessor.process(responseMaxChunkSizeBytes,
-                            buffer.asOutputStream(), charset);
-                } catch (final Throwable t) {
-                    emitter.error(t);
-                    return null;
-                }
-
-                if (logger.isTraceEnabled()) {
-                    logger.trace(
-                        "[THYMELEAF][{}][{}] FINISHED PARTIAL STREAM PROCESS (CHUNKED MODE, "
-                            + "THROTTLER ID "
-                            +
-                            "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED {} "
-                            + "BYTES",
-                        new Object[] {
-                            TemplateEngine.threadIndex(),
-                            throttledProcessor.getProcessorIdentifier(),
-                            throttledProcessor.getProcessorIdentifier(),
-                            Integer.valueOf(throttledProcessor.getChunkCount()),
-                            LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
-                            Integer.valueOf(bytesProduced)});
-                }
-
-                emitter.next(buffer);
-
-                if (throttledProcessor.isFinished()) {
+                    throttledProcessor.startChunk();
 
                     if (logger.isTraceEnabled()) {
                         logger.trace(
-                            "[THYMELEAF][{}][{}] FINISHED ALL STREAM PROCESS (CHUNKED MODE, "
+                            "[THYMELEAF][{}][{}] STARTING PARTIAL STREAM PROCESS (CHUNKED MODE, "
                                 + "THROTTLER ID "
                                 +
-                                "\"{}\") FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED A TOTAL OF "
-                                + "{} BYTES IN {} CHUNKS",
-                            new Object[] {
+                                "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}",
+                            TemplateEngine.threadIndex(),
+                            throttledProcessor.getProcessorIdentifier(),
+                            throttledProcessor.getProcessorIdentifier(),
+                            throttledProcessor.getChunkCount(),
+                            LoggingUtils.loggifyTemplateName(templateName), context.getLocale());
+                    }
+
+                    final DataBuffer buffer =
+                        bufferFactory.allocateBuffer(responseMaxChunkSizeBytes);
+
+                    final int bytesProduced;
+                    try {
+                        bytesProduced =
+                            throttledProcessor.process(responseMaxChunkSizeBytes,
+                                buffer.asOutputStream(), charset);
+                    } catch (final Throwable t) {
+                        emitter.error(t);
+                        return null;
+                    }
+
+                    if (logger.isTraceEnabled()) {
+                        logger.trace(
+                            "[THYMELEAF][{}][{}] FINISHED PARTIAL STREAM PROCESS (CHUNKED MODE, "
+                                + "THROTTLER ID "
+                                +
+                                "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED {} "
+                                + "BYTES",
+                            TemplateEngine.threadIndex(),
+                            throttledProcessor.getProcessorIdentifier(),
+                            throttledProcessor.getProcessorIdentifier(),
+                            throttledProcessor.getChunkCount(),
+                            LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
+                            bytesProduced);
+                    }
+
+                    emitter.next(buffer);
+
+                    if (throttledProcessor.isFinished()) {
+
+                        if (logger.isTraceEnabled()) {
+                            logger.trace(
+                                "[THYMELEAF][{}][{}] FINISHED ALL STREAM PROCESS (CHUNKED MODE, "
+                                    + "THROTTLER ID "
+                                    +
+                                    "\"{}\") FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED A TOTAL"
+                                    + " OF "
+                                    + "{} BYTES IN {} CHUNKS",
                                 TemplateEngine.threadIndex(),
                                 throttledProcessor.getProcessorIdentifier(),
                                 throttledProcessor.getProcessorIdentifier(),
                                 LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
-                                Long.valueOf(throttledProcessor.getTotalBytesProduced()),
-                                Integer.valueOf(throttledProcessor.getChunkCount() + 1)});
+                                throttledProcessor.getTotalBytesProduced(),
+                                throttledProcessor.getChunkCount() + 1);
+                        }
+
+                        emitter.complete();
+
                     }
 
-                    emitter.complete();
+                    return throttledProcessor;
 
-                }
-
-                return throttledProcessor;
-
-            });
+                })
+            .doFinally(s -> {
+                // Note that: 清除主题上下文
+                logger.debug("Remove theme context: [{}]", ThemeContextHolder.getThemeContext());
+                ThemeContextHolder.resetThemeContext();
+            })
+        ).cast(DataBuffer.class);
 
         // Will add some logging to the data stream
         return stream.log(LOG_CATEGORY_CHUNKED_OUTPUT, Level.FINEST);
@@ -369,7 +395,7 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
 
         // STEP 4: Initialize the (throttled) template engine for each subscriber (normally there
         // will only be one)
-        final Flux<SpringWebFluxTemplateEngine.DataDrivenFluxStep> dataDrivenWithContextStream =
+        final Flux<DataDrivenFluxStep> dataDrivenWithContextStream =
             Flux.using(
 
                 // Using the throttledProcessor as state in this Flux.using allows us to delay the
@@ -380,7 +406,7 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                     final String outputContentType = sse ? "text/event-stream" : null;
                     final TemplateSpec templateSpec =
                         new TemplateSpec(templateName, markupSelectors, outputContentType, null);
-                    return new SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor(
+                    return new StreamThrottledTemplateProcessor(
                         processThrottled(templateSpec, wrappedContext), dataDrivenIterator,
                         sseEventsPrefix, sseEventsID, sse);
                 },
@@ -486,7 +512,7 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                 // dataDrivenIterator.
                 (initialize, emitter) -> {
 
-                    final SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor
+                    final StreamThrottledTemplateProcessor
                         throttledProcessor = step.getThrottledProcessor();
                     final DataDrivenTemplateIterator dataDrivenTemplateIterator =
                         throttledProcessor.getDataDrivenTemplateIterator();
@@ -540,13 +566,12 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                                 + "MODE, THROTTLER ID "
                                 +
                                 "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}",
-                            new Object[] {
-                                TemplateEngine.threadIndex(),
-                                throttledProcessor.getProcessorIdentifier(),
-                                throttledProcessor.getProcessorIdentifier(),
-                                Integer.valueOf(throttledProcessor.getChunkCount()),
-                                LoggingUtils.loggifyTemplateName(templateName),
-                                context.getLocale()});
+                            TemplateEngine.threadIndex(),
+                            throttledProcessor.getProcessorIdentifier(),
+                            throttledProcessor.getProcessorIdentifier(),
+                            throttledProcessor.getChunkCount(),
+                            LoggingUtils.loggifyTemplateName(templateName),
+                            context.getLocale());
                     }
 
                     final DataBuffer buffer =
@@ -574,13 +599,12 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                                 +
                                 "\"{}\", CHUNK {}) FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED "
                                 + "{} BYTES",
-                            new Object[] {
-                                TemplateEngine.threadIndex(),
-                                throttledProcessor.getProcessorIdentifier(),
-                                throttledProcessor.getProcessorIdentifier(),
-                                Integer.valueOf(throttledProcessor.getChunkCount()),
-                                LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
-                                Integer.valueOf(bytesProduced)});
+                            TemplateEngine.threadIndex(),
+                            throttledProcessor.getProcessorIdentifier(),
+                            throttledProcessor.getProcessorIdentifier(),
+                            throttledProcessor.getChunkCount(),
+                            LoggingUtils.loggifyTemplateName(templateName), context.getLocale(),
+                            bytesProduced);
                     }
 
 
@@ -606,14 +630,13 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                                     +
                                     "\"{}\") FOR TEMPLATE \"{}\" WITH LOCALE {}. PRODUCED A TOTAL"
                                     + " OF {} BYTES IN {} CHUNKS",
-                                new Object[] {
-                                    TemplateEngine.threadIndex(),
-                                    throttledProcessor.getProcessorIdentifier(),
-                                    throttledProcessor.getProcessorIdentifier(),
-                                    LoggingUtils.loggifyTemplateName(templateName),
-                                    context.getLocale(),
-                                    Long.valueOf(throttledProcessor.getTotalBytesProduced()),
-                                    Integer.valueOf(throttledProcessor.getChunkCount() + 1)});
+                                TemplateEngine.threadIndex(),
+                                throttledProcessor.getProcessorIdentifier(),
+                                throttledProcessor.getProcessorIdentifier(),
+                                LoggingUtils.loggifyTemplateName(templateName),
+                                context.getLocale(),
+                                throttledProcessor.getTotalBytesProduced(),
+                                throttledProcessor.getChunkCount() + 1);
                         }
 
                         // We have finished executing the template, which can happen after
@@ -706,12 +729,12 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
         // Not an IEngineContext, but might still be an IWebContext, and we don't want to lose
         // that info
         if (Contexts.isWebContext(context)) {
-            return new SpringWebFluxTemplateEngine.DataDrivenWebContextWrapper(
+            return new DataDrivenWebContextWrapper(
                 Contexts.asWebContext(context), dataDriverVariableName, dataDrivenTemplateIterator);
         }
 
         // Not a recognized context interface: just use a default implementation
-        return new SpringWebFluxTemplateEngine.DataDrivenContextWrapper(context,
+        return new DataDrivenContextWrapper(context,
             dataDriverVariableName, dataDrivenTemplateIterator);
 
 
@@ -874,42 +897,42 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
             DATA_DRIVEN_PHASE_HEAD, DATA_DRIVEN_PHASE_BUFFER, DATA_DRIVEN_PHASE_TAIL
         }
 
-        private final SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor
+        private final StreamThrottledTemplateProcessor
             throttledProcessor;
         private final List<Object> values;
-        private final SpringWebFluxTemplateEngine.DataDrivenFluxStep.FluxStepPhase phase;
+        private final FluxStepPhase phase;
 
 
-        static SpringWebFluxTemplateEngine.DataDrivenFluxStep forHead(
-            final SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor throttledProcessor) {
-            return new SpringWebFluxTemplateEngine.DataDrivenFluxStep(throttledProcessor, null,
+        static DataDrivenFluxStep forHead(
+            final StreamThrottledTemplateProcessor throttledProcessor) {
+            return new DataDrivenFluxStep(throttledProcessor, null,
                 DATA_DRIVEN_PHASE_HEAD);
         }
 
-        static SpringWebFluxTemplateEngine.DataDrivenFluxStep forBuffer(
-            final SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor throttledProcessor,
+        static DataDrivenFluxStep forBuffer(
+            final StreamThrottledTemplateProcessor throttledProcessor,
             final List<Object> values) {
-            return new SpringWebFluxTemplateEngine.DataDrivenFluxStep(throttledProcessor, values,
+            return new DataDrivenFluxStep(throttledProcessor, values,
                 DATA_DRIVEN_PHASE_BUFFER);
         }
 
-        static SpringWebFluxTemplateEngine.DataDrivenFluxStep forTail(
-            final SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor throttledProcessor) {
-            return new SpringWebFluxTemplateEngine.DataDrivenFluxStep(throttledProcessor, null,
+        static DataDrivenFluxStep forTail(
+            final StreamThrottledTemplateProcessor throttledProcessor) {
+            return new DataDrivenFluxStep(throttledProcessor, null,
                 DATA_DRIVEN_PHASE_TAIL);
         }
 
         private DataDrivenFluxStep(
-            final SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor throttledProcessor,
+            final StreamThrottledTemplateProcessor throttledProcessor,
             final List<Object> values,
-            final SpringWebFluxTemplateEngine.DataDrivenFluxStep.FluxStepPhase phase) {
+            final FluxStepPhase phase) {
             super();
             this.throttledProcessor = throttledProcessor;
             this.values = values;
             this.phase = phase;
         }
 
-        SpringWebFluxTemplateEngine.StreamThrottledTemplateProcessor getThrottledProcessor() {
+        StreamThrottledTemplateProcessor getThrottledProcessor() {
             return this.throttledProcessor;
         }
 
@@ -938,7 +961,7 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
      * DataDrivenTemplateIterator in its place.
      */
     static class DataDrivenWebContextWrapper
-        extends SpringWebFluxTemplateEngine.DataDrivenContextWrapper implements IWebContext {
+        extends DataDrivenContextWrapper implements IWebContext {
 
         private final IWebContext context;
 
