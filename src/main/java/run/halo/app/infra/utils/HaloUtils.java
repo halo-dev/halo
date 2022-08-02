@@ -11,7 +11,6 @@ import org.springframework.util.StreamUtils;
  * @date 2022-04-12
  */
 public class HaloUtils {
-    public static final String HALO_WORK_DIR_PROPERTY = "halo.workdir";
 
     /**
      * <p>Read the file under the classpath as a string.</p>
