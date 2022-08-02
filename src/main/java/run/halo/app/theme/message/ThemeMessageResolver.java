@@ -4,7 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.thymeleaf.messageresolver.StandardMessageResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
-import run.halo.app.theme.newplan.ThemeContext;
+import run.halo.app.theme.ThemeContext;
 
 /**
  * @author guqing

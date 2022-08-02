@@ -1,4 +1,4 @@
-package run.halo.app.theme.newplan;
+package run.halo.app.theme;
 
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;

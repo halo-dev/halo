@@ -1,7 +1,8 @@
-package run.halo.app.theme.newplan;
+package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -19,10 +20,10 @@ class ThemeLinkBuilderTest {
 
         String link = "/post";
         String processed = themeLinkBuilder.processLink(null, link);
-        assertThat(processed).isEqualTo("/post?theme=test-theme");
+        assertThat(processed).isEqualTo("/post?preview-theme=test-theme");
 
         processed = themeLinkBuilder.processLink(null, "/post?foo=bar");
-        assertThat(processed).isEqualTo("/post?foo=bar&theme=test-theme");
+        assertThat(processed).isEqualTo("/post?foo=bar&preview-theme=test-theme");
     }
 
     @Test
@@ -61,7 +62,7 @@ class ThemeLinkBuilderTest {
         // empty link
         link = "";
         processed = themeLinkBuilder.processLink(null, link);
-        assertThat(processed).isEqualTo("/?theme=test-theme");
+        assertThat(processed).isEqualTo("/?preview-theme=test-theme");
     }
 
     @Test
@@ -83,7 +84,7 @@ class ThemeLinkBuilderTest {
     private ThemeContext getTheme(boolean isActive) {
         return ThemeContext.builder()
             .name("test-theme")
-            .path("/themes/test-theme")
+            .path(Paths.get("/themes/test-theme"))
             .active(isActive)
             .build();
     }

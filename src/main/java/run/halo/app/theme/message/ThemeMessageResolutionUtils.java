@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,7 +21,7 @@ import org.springframework.lang.Nullable;
 import org.thymeleaf.exceptions.TemplateInputException;
 import org.thymeleaf.exceptions.TemplateProcessingException;
 import org.thymeleaf.util.StringUtils;
-import run.halo.app.theme.newplan.ThemeContext;
+import run.halo.app.theme.ThemeContext;
 
 /**
  * @author guqing
@@ -38,7 +37,7 @@ public class ThemeMessageResolutionUtils {
     @Nullable
     private static Reader messageReader(String messageResourceName, ThemeContext theme)
         throws FileNotFoundException {
-        var themePath = Paths.get(theme.getPath());
+        var themePath = theme.getPath();
         File messageFile = themePath.resolve(messageResourceName).toFile();
         if (!messageFile.exists()) {
             return null;
