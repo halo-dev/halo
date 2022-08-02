@@ -6,7 +6,7 @@ import org.springframework.lang.Nullable;
 
 public enum Operator implements Converter<String, SelectorCriteria> {
 
-    Equals("=", 2) {
+    Equals("=", 3) {
         @Override
         @Nullable
         public SelectorCriteria convert(@Nullable String selector) {
@@ -16,6 +16,23 @@ public enum Operator implements Converter<String, SelectorCriteria> {
                     String key = selector.substring(0, i);
                     String value = selector.substring(i + getOperator().length());
                     return new SelectorCriteria(key, this, Set.of(value));
+                }
+            }
+            return null;
+        }
+    },
+    IN("=(", 2) {
+        @Override
+        public SelectorCriteria convert(String selector) {
+            if (preFlightCheck(selector, 5)) {
+                var idx = selector.indexOf(getOperator());
+                if (idx > 0 && (idx + getOperator().length()) < selector.length() - 2
+                    && selector.charAt(selector.length() - 1) == ')') {
+                    var key = selector.substring(0, idx);
+                    var valuesString =
+                        selector.substring(idx + getOperator().length(), selector.length() - 1);
+                    String[] values = valuesString.split(",");
+                    return new SelectorCriteria(key, this, Set.of(values));
                 }
             }
             return null;

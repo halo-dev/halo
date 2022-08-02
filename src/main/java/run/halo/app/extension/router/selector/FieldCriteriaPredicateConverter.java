@@ -19,7 +19,7 @@ public class FieldCriteriaPredicateConverter<E extends Extension>
                     return false;
                 }
                 switch (criteria.operator()) {
-                    case Equals -> {
+                    case Equals, IN -> {
                         return criteria.values().contains(name);
                     }
                     case NotEquals -> {

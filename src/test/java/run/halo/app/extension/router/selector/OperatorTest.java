@@ -3,6 +3,7 @@ package run.halo.app.extension.router.selector;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static run.halo.app.extension.router.selector.Operator.Equals;
 import static run.halo.app.extension.router.selector.Operator.Exist;
+import static run.halo.app.extension.router.selector.Operator.IN;
 import static run.halo.app.extension.router.selector.Operator.NotEquals;
 import static run.halo.app.extension.router.selector.Operator.NotExist;
 
@@ -46,7 +47,13 @@ class OperatorTest {
             new TestCase("name", Exist, new SelectorCriteria("name", Exist, Set.of())),
             new TestCase("", Exist, null),
             new TestCase("!", Exist, new SelectorCriteria("!", Exist, Set.of())),
-            new TestCase("a", Exist, new SelectorCriteria("a", Exist, Set.of()))
+            new TestCase("a", Exist, new SelectorCriteria("a", Exist, Set.of())),
+
+            new TestCase("name", IN, null),
+            new TestCase("name=(fake-name)", IN,
+                new SelectorCriteria("name", IN, Set.of("fake-name"))),
+            new TestCase("name=(first-name,second-name)", IN,
+                new SelectorCriteria("name", IN, Set.of("first-name", "second-name")))
         ).forEach(testCase -> {
             log.debug("Testing: {}", testCase);
             assertEquals(testCase.expected(), testCase.converter().convert(testCase.source()));
