@@ -1,11 +1,10 @@
 package run.halo.app.theme.message;
 
 import java.io.FileNotFoundException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,16 +14,15 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerWebExchange;
-import reactor.util.context.Context;
 import run.halo.app.theme.ThemeContext;
-import run.halo.app.theme.ThemeReactiveContextFilter;
+import run.halo.app.theme.ThemeResolver;
 
 /**
  * Tests for {@link ThemeMessageResolver}.
@@ -37,17 +35,17 @@ public class ThemeMessageResolverIntegrationTest {
     @Autowired
     private ApplicationContext applicationContext;
     @Autowired
-    private ThemeReactiveContextFilter themeReactiveContextFilter;
-
-    private BiFunction<ServerWebExchange, Context, Context> defaultThemeContextFunction;
+    private ThemeResolver themeResolver;
     private URL defaultThemeUrl;
     private URL otherThemeUrl;
+
+    Function<ServerHttpRequest, ThemeContext> themeContextFunction;
 
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
-        defaultThemeContextFunction = themeReactiveContextFilter.getThemeContextFunction();
+        themeContextFunction = themeResolver.getThemeContextFunction();
         webTestClient = WebTestClient
             .bindToApplicationContext(applicationContext)
             .configureClient()
@@ -60,16 +58,12 @@ public class ThemeMessageResolverIntegrationTest {
 
     @AfterEach
     void tearDown() {
-        themeReactiveContextFilter.setThemeContextFunction(defaultThemeContextFunction);
+        this.themeResolver.setThemeContextFunction(themeContextFunction);
     }
 
     @Test
     void messageResolverWhenDefaultTheme() {
-        themeReactiveContextFilter.setThemeContextFunction((exchange, context) -> {
-            ThemeContext defaultContext = createDefaultContext();
-            return context.put(ThemeContext.THEME_CONTEXT_KEY, defaultContext);
-        });
-
+        themeResolver.setThemeContextFunction(request -> createDefaultContext());
         webTestClient.get()
             .uri("/?language=zh")
             .exchange()
@@ -84,7 +78,9 @@ public class ThemeMessageResolverIntegrationTest {
                     <title>Title</title>
                 </head>
                 <body>
-                <p>欢迎来到首页</p>
+                index
+                <div>zh</div>
+                <div>欢迎来到首页</div>
                 </body>
                 </html>
                 """);
@@ -92,10 +88,7 @@ public class ThemeMessageResolverIntegrationTest {
 
     @Test
     void messageResolverForEnLanguageWhenDefaultTheme() {
-        themeReactiveContextFilter.setThemeContextFunction((exchange, context) -> {
-            ThemeContext defaultContext = createDefaultContext();
-            return context.put(ThemeContext.THEME_CONTEXT_KEY, defaultContext);
-        });
+        themeResolver.setThemeContextFunction(request -> createDefaultContext());
         webTestClient.get()
             .uri("/?language=en")
             .exchange()
@@ -110,7 +103,9 @@ public class ThemeMessageResolverIntegrationTest {
                     <title>Title</title>
                 </head>
                 <body>
-                <p>Welcome to the index</p>
+                index
+                <div>en</div>
+                <div>Welcome to the index</div>
                 </body>
                 </html>
                 """);
@@ -118,12 +113,9 @@ public class ThemeMessageResolverIntegrationTest {
 
     @Test
     void shouldUseDefaultWhenLanguageNotSupport() {
-        themeReactiveContextFilter.setThemeContextFunction((exchange, context) -> {
-            ThemeContext defaultContext = createDefaultContext();
-            return context.put(ThemeContext.THEME_CONTEXT_KEY, defaultContext);
-        });
+        themeResolver.setThemeContextFunction(request -> createDefaultContext());
         webTestClient.get()
-            .uri("/?language=foo")
+            .uri("/index?language=foo")
             .exchange()
             .expectStatus()
             .isOk()
@@ -136,7 +128,9 @@ public class ThemeMessageResolverIntegrationTest {
                     <title>Title</title>
                 </head>
                 <body>
-                <p>欢迎来到首页</p>
+                index
+                <div>foo</div>
+                <div>欢迎来到首页</div>
                 </body>
                 </html>
                 """);
@@ -144,13 +138,9 @@ public class ThemeMessageResolverIntegrationTest {
 
     @Test
     void switchTheme() {
-        // For default theme
-        themeReactiveContextFilter.setThemeContextFunction((exchange, context) -> {
-            ThemeContext defaultContext = createDefaultContext();
-            return context.put(ThemeContext.THEME_CONTEXT_KEY, defaultContext);
-        });
+        themeResolver.setThemeContextFunction(request -> createDefaultContext());
         webTestClient.get()
-            .uri("/?language=zh")
+            .uri("/index?language=zh")
             .exchange()
             .expectStatus()
             .isOk()
@@ -163,18 +153,17 @@ public class ThemeMessageResolverIntegrationTest {
                     <title>Title</title>
                 </head>
                 <body>
-                <p>欢迎来到首页</p>
+                index
+                <div>zh</div>
+                <div>欢迎来到首页</div>
                 </body>
                 </html>
                 """);
 
         // For other theme
-        themeReactiveContextFilter.setThemeContextFunction((exchange, context) -> {
-            ThemeContext otherContext = createOtherContext();
-            return context.put(ThemeContext.THEME_CONTEXT_KEY, otherContext);
-        });
+        themeResolver.setThemeContextFunction(request -> createOtherContext());
         webTestClient.get()
-            .uri("/?language=zh")
+            .uri("/index?language=zh")
             .exchange()
             .expectBody(String.class)
             .isEqualTo("""
@@ -190,7 +179,7 @@ public class ThemeMessageResolverIntegrationTest {
                 </html>
                 """);
         webTestClient.get()
-            .uri("/?language=en")
+            .uri("/index?language=en")
             .exchange()
             .expectBody(String.class)
             .isEqualTo("""
@@ -208,27 +197,19 @@ public class ThemeMessageResolverIntegrationTest {
     }
 
     ThemeContext createDefaultContext() {
-        try {
-            return ThemeContext.builder()
-                .themeName("default")
-                .path(Paths.get(defaultThemeUrl.toURI()))
-                .isActive(true)
-                .build();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        return ThemeContext.builder()
+            .name("default")
+            .path(Paths.get(defaultThemeUrl.getPath()))
+            .active(true)
+            .build();
     }
 
     ThemeContext createOtherContext() {
-        try {
-            return ThemeContext.builder()
-                .themeName("other")
-                .path(Paths.get(otherThemeUrl.toURI()))
-                .isActive(false)
-                .build();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        return ThemeContext.builder()
+            .name("other")
+            .path(Paths.get(otherThemeUrl.getPath()))
+            .active(false)
+            .build();
     }
 
     @TestConfiguration
