@@ -64,6 +64,27 @@ class FieldCriteriaPredicateConverterTest {
     }
 
     @Test
+    void shouldConvertNameInCorrectly() {
+        var criteria = new SelectorCriteria("name", Operator.IN, Set.of("value1", "value2"));
+        var predicate = converter.convert(criteria);
+        assertNotNull(predicate);
+
+        var fake = new FakeExtension();
+        var metadata = new Metadata();
+        fake.setMetadata(metadata);
+        assertFalse(predicate.test(fake));
+
+        metadata.setName("not-contain-value");
+        assertFalse(predicate.test(fake));
+
+        metadata.setName("value1");
+        assertTrue(predicate.test(fake));
+
+        metadata.setName("value2");
+        assertTrue(predicate.test(fake));
+    }
+
+    @Test
     void shouldReturnAlwaysFalseIfCriteriaKeyNotSupported() {
         var criteria =
             new SelectorCriteria("unsupported-field", Operator.Equals, Set.of("value1", "value2"));
