@@ -1,9 +1,12 @@
 package run.halo.app.theme;
 
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ConcurrentLruCache;
+import org.springframework.util.ResourceUtils;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
@@ -51,11 +54,19 @@ public class TemplateEngineManager {
         // cache not exists, will create new engine
         if (!engineCache.contains(theme)) {
             // before this, check if theme exists
-            if (!theme.getPath().toFile().exists()) {
+            if (!fileExists(theme.getPath())) {
                 throw new NotFoundException("Theme not found.");
             }
         }
         return engineCache.get(theme);
+    }
+
+    private boolean fileExists(Path path) {
+        try {
+            return ResourceUtils.getFile(path.toUri()).exists();
+        } catch (FileNotFoundException e) {
+            return false;
+        }
     }
 
     private ISpringWebFluxTemplateEngine templateEngineGenerator(ThemeContext theme) {
