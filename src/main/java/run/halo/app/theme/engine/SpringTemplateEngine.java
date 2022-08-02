@@ -300,7 +300,7 @@ public class SpringTemplateEngine extends TemplateEngine
             messageResolver = new StandardMessageResolver();
         }
 
-        super.setMessageResolver(messageResolver);
+        super.addMessageResolver(messageResolver);
 
     }
 

@@ -15,36 +15,20 @@ import run.halo.app.infra.utils.JsonUtils;
 class ThemeContextTest {
 
     @Test
-    void constructorTest() throws JSONException {
-        ThemeContext testTheme =
-            new ThemeContext("testTheme", Paths.get("/tmp/themes/testTheme"), false);
-        String s = JsonUtils.objectToJson(testTheme);
-        JSONAssert.assertEquals("""
-            {
-                "themeName": "testTheme",
-                "path": "file:///tmp/themes/testTheme",
-                "active": false
-            }
-            """,
-            s,
-            false);
-    }
-
-    @Test
     void constructorBuilderTest() throws JSONException {
         ThemeContext testTheme = ThemeContext.builder()
-            .themeName("testTheme")
+            .name("testTheme")
             .path(Paths.get("/tmp/themes/testTheme"))
-            .isActive(true)
+            .active(true)
             .build();
         String s = JsonUtils.objectToJson(testTheme);
         JSONAssert.assertEquals("""
-            {
-                "themeName": "testTheme",
-                "path": "file:///tmp/themes/testTheme",
-                "active": true
-            }
-            """,
+                {
+                    "name": "testTheme",
+                    "path": "file:///tmp/themes/testTheme",
+                    "active": true
+                }
+                """,
             s,
             false);
     }

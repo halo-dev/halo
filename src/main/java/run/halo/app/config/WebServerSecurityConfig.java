@@ -27,7 +27,6 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -66,10 +65,12 @@ public class WebServerSecurityConfig {
         RoleService roleService) {
         http.csrf().disable()
             .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
-            .securityMatcher(pathMatchers("/api/**", "/apis/**"))
+            .securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
             .authorizeExchange(exchanges ->
                 exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleService)))
             .httpBasic(withDefaults())
+            .formLogin(withDefaults())
+            .logout(withDefaults())
             // for reuse the JWT authentication
             .oauth2ResourceServer().jwt();
 
@@ -83,25 +84,6 @@ public class WebServerSecurityConfig {
             context);
 
         http.addFilterAt(loginFilter, SecurityWebFiltersOrder.FORM_LOGIN);
-        return http.build();
-    }
-
-    @Bean
-    @Order(0)
-    SecurityWebFilterChain webFilterChain(ServerHttpSecurity http) {
-        http.authorizeExchange(exchanges -> exchanges.pathMatchers(
-                "/actuator/**",
-                "/swagger-ui.html", "/webjars/**", "/v3/api-docs/**",
-                "/", "/index", "/themes/**"
-            ).permitAll())
-            .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
-            .authorizeExchange(exchanges -> exchanges.anyExchange().authenticated())
-            .cors(withDefaults())
-            .httpBasic(withDefaults())
-            .formLogin(withDefaults())
-            .csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse()).and()
-            .logout(withDefaults());
-
         return http.build();
     }
 

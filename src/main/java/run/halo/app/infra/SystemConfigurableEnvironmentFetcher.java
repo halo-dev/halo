@@ -1,17 +1,12 @@
 package run.halo.app.infra;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
+import java.util.Optional;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -31,33 +26,19 @@ public class SystemConfigurableEnvironmentFetcher {
         this.conversionService = conversionService;
     }
 
-    @Nullable
-    @SuppressWarnings("unchecked")
-    public <T> T get(SystemSetting systemSetting) {
-        Class<?> valueType = systemSetting.getValueType();
-        String value = getInternal(systemSetting.getGroup());
-        if (value == null) {
-            return null;
+    public <T> Optional<T> fetch(String key, Class<T> type) {
+        var stringValue = getInternal(key);
+        if (stringValue == null) {
+            return Optional.empty();
         }
-        if (valueType.isPrimitive()) {
-            return (T) conversionService.convert(value, valueType);
+        if (conversionService.canConvert(String.class, type)) {
+            return Optional.ofNullable(conversionService.convert(stringValue, type));
         }
-        return (T) JsonUtils.jsonToObject(value, valueType);
+        return Optional.of(JsonUtils.jsonToObject(stringValue, type));
     }
 
     private String getInternal(String group) {
         return getValuesInternal().get(group);
-    }
-
-    private JsonNode readTree(String json) {
-        if (StringUtils.isBlank(json)) {
-            return JsonNodeFactory.instance.missingNode();
-        }
-        try {
-            return JsonUtils.DEFAULT_JSON_MAPPER.readTree(json);
-        } catch (JsonProcessingException e) {
-            throw new JsonParseException(e);
-        }
     }
 
     @NonNull

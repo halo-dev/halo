@@ -3,6 +3,7 @@ package run.halo.app.theme;
 import java.nio.file.Path;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author guqing
@@ -10,12 +11,14 @@ import lombok.Data;
  */
 @Data
 @Builder
+@EqualsAndHashCode(of = "name")
 public class ThemeContext {
-    public static final String THEME_CONTEXT_KEY = ThemeContext.class.getName() + ".CONTEXT";
 
-    private String themeName;
+    public static final String THEME_PREVIEW_PARAM_NAME = "preview-theme";
+
+    private String name;
 
     private Path path;
 
-    private boolean isActive;
+    private boolean active;
 }

@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 import org.thymeleaf.messageresolver.StandardMessageResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
+import run.halo.app.theme.ThemeContext;
 
 /**
  * @author guqing
@@ -11,11 +12,17 @@ import org.thymeleaf.templateresource.ITemplateResource;
  */
 public class ThemeMessageResolver extends StandardMessageResolver {
 
+    private final ThemeContext theme;
+
+    public ThemeMessageResolver(ThemeContext theme) {
+        this.theme = theme;
+    }
+
     @Override
     protected Map<String, String> resolveMessagesForTemplate(String template,
         ITemplateResource templateResource,
         Locale locale) {
-        return ThemeMessageResolutionUtils.resolveMessagesForTemplate(locale);
+        return ThemeMessageResolutionUtils.resolveMessagesForTemplate(locale, theme);
     }
 
     @Override

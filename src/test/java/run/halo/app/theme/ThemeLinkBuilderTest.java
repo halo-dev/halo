@@ -2,8 +2,7 @@ package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.nio.file.Path;
-import org.junit.jupiter.api.BeforeEach;
+import java.nio.file.Paths;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -15,26 +14,21 @@ import org.junit.jupiter.api.Test;
 class ThemeLinkBuilderTest {
     private ThemeLinkBuilder themeLinkBuilder;
 
-    @BeforeEach
-    void setUp() {
-        themeLinkBuilder = new ThemeLinkBuilder();
-    }
-
     @Test
     void processTemplateLinkWithNoActive() {
-        populateThemeContext(false);
+        themeLinkBuilder = new ThemeLinkBuilder(getTheme(false));
 
         String link = "/post";
         String processed = themeLinkBuilder.processLink(null, link);
-        assertThat(processed).isEqualTo("/post?theme=test-theme");
+        assertThat(processed).isEqualTo("/post?preview-theme=test-theme");
 
         processed = themeLinkBuilder.processLink(null, "/post?foo=bar");
-        assertThat(processed).isEqualTo("/post?foo=bar&theme=test-theme");
+        assertThat(processed).isEqualTo("/post?foo=bar&preview-theme=test-theme");
     }
 
     @Test
     void processTemplateLinkWithActive() {
-        populateThemeContext(true);
+        themeLinkBuilder = new ThemeLinkBuilder(getTheme(true));
 
         String link = "/post";
         String processed = themeLinkBuilder.processLink(null, link);
@@ -44,14 +38,14 @@ class ThemeLinkBuilderTest {
     @Test
     void processAssetsLink() {
         // activated theme
-        populateThemeContext(true);
+        themeLinkBuilder = new ThemeLinkBuilder(getTheme(true));
 
         String link = "/assets/css/style.css";
         String processed = themeLinkBuilder.processLink(null, link);
         assertThat(processed).isEqualTo("/themes/test-theme/assets/css/style.css");
 
         // preview theme
-        populateThemeContext(false);
+        getTheme(false);
         link = "/assets/js/main.js";
         processed = themeLinkBuilder.processLink(null, link);
         assertThat(processed).isEqualTo("/themes/test-theme/assets/js/main.js");
@@ -59,7 +53,7 @@ class ThemeLinkBuilderTest {
 
     @Test
     void processNullLink() {
-        populateThemeContext(false);
+        themeLinkBuilder = new ThemeLinkBuilder(getTheme(false));
 
         String link = null;
         String processed = themeLinkBuilder.processLink(null, link);
@@ -68,12 +62,12 @@ class ThemeLinkBuilderTest {
         // empty link
         link = "";
         processed = themeLinkBuilder.processLink(null, link);
-        assertThat(processed).isEqualTo("/?theme=test-theme");
+        assertThat(processed).isEqualTo("/?preview-theme=test-theme");
     }
 
     @Test
     void processAbsoluteLink() {
-        populateThemeContext(false);
+        themeLinkBuilder = new ThemeLinkBuilder(getTheme(false));
         String link = "https://github.com/halo-dev";
         String processed = themeLinkBuilder.processLink(null, link);
         assertThat(processed).isEqualTo(link);
@@ -87,11 +81,11 @@ class ThemeLinkBuilderTest {
         assertThat(processed).isEqualTo(link);
     }
 
-    private void populateThemeContext(boolean isActive) {
-        ThemeContext themeContext = ThemeContext.builder()
-            .themeName("test-theme")
-            .path(Path.of("/themes/test-theme"))
-            .isActive(isActive).build();
-        ThemeContextHolder.setThemeContext(themeContext);
+    private ThemeContext getTheme(boolean isActive) {
+        return ThemeContext.builder()
+            .name("test-theme")
+            .path(Paths.get("/themes/test-theme"))
+            .active(isActive)
+            .build();
     }
 }
