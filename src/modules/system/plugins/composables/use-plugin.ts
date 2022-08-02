@@ -1,11 +1,19 @@
-import type { Ref } from "vue";
+import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@halo-dev/admin-shared";
 import { useDialog } from "@halo-dev/components";
 
-export function usePluginLifeCycle(plugin: Ref<Plugin | null>) {
+interface usePluginLifeCycleReturn {
+  isStarted: ComputedRef<boolean | undefined>;
+  changeStatus: () => void;
+  uninstall: () => void;
+}
+
+export function usePluginLifeCycle(
+  plugin: Ref<Plugin | null>
+): usePluginLifeCycleReturn {
   const dialog = useDialog();
 
   const isStarted = computed(() => {
