@@ -28,5 +28,4 @@ public class HaloProperties {
     private final ExtensionProperties extension = new ExtensionProperties();
 
     private final SecurityProperties security = new SecurityProperties();
-
 }

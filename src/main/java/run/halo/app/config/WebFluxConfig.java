@@ -11,7 +11,6 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.NonNull;
-import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -21,7 +20,6 @@ import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
 
 @Configuration
-@EnableWebFlux
 public class WebFluxConfig implements WebFluxConfigurer {
 
     final ObjectMapper objectMapper;
@@ -64,4 +62,5 @@ public class WebFluxConfig implements WebFluxConfigurer {
             .forEach(customEndpoint -> builder.add(customEndpoint.endpoint()));
         return builder.build();
     }
+
 }

@@ -9,6 +9,7 @@ import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.Setting;
+import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
@@ -33,5 +34,6 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(ReverseProxy.class);
         schemeManager.register(Setting.class);
         schemeManager.register(ConfigMap.class);
+        schemeManager.register(Theme.class);
     }
 }
