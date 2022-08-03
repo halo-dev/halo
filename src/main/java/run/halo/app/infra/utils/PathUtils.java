@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * Path manipulation tool class.
+ * Http path manipulation tool class.
  *
  * @author guqing
  * @since 2.0.0
@@ -21,6 +21,9 @@ public class PathUtils {
     public static String combinePath(String... pathSegments) {
         StringBuilder sb = new StringBuilder();
         for (String path : pathSegments) {
+            if (path == null) {
+                continue;
+            }
             String s = path.startsWith("/") ? path : "/" + path;
             String segment = s.endsWith("/") ? s.substring(0, s.length() - 1) : s;
             sb.append(segment);

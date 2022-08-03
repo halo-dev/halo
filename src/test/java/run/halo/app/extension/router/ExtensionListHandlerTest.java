@@ -1,4 +1,4 @@
-package run.halo.app.extension;
+package run.halo.app.extension.router;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,7 +17,10 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.web.reactive.function.server.EntityResponse;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.ExtensionRouterFunctionFactory.ExtensionListHandler;
+import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.ListResult;
+import run.halo.app.extension.Scheme;
 
 @ExtendWith(MockitoExtension.class)
 class ExtensionListHandlerTest {
@@ -39,7 +42,6 @@ class ExtensionListHandlerTest {
         var listHandler = new ExtensionListHandler(scheme, client);
         var serverRequest = MockServerRequest.builder().build();
         final var fake = new FakeExtension();
-        // when(client.list(same(FakeExtension.class), any(), any())).thenReturn(List.of(fake));
         var fakeListResult = new ListResult<>(0, 0, 1, List.of(fake));
         when(client.list(same(FakeExtension.class), any(), any(), anyInt(), anyInt()))
             .thenReturn(fakeListResult);

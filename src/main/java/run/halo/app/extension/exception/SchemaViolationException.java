@@ -1,7 +1,6 @@
 package run.halo.app.extension.exception;
 
-import com.networknt.schema.ValidationMessage;
-import java.util.Set;
+import org.openapi4j.core.validation.ValidationResults;
 
 /**
  * This exception is thrown when Schema is violation.
@@ -13,35 +12,34 @@ public class SchemaViolationException extends ExtensionException {
     /**
      * Validation errors.
      */
-    private final Set<ValidationMessage> errors;
+    private final ValidationResults errors;
 
-    public SchemaViolationException(Set<ValidationMessage> errors) {
+    public SchemaViolationException(ValidationResults errors) {
         this.errors = errors;
     }
 
-    public SchemaViolationException(String message, Set<ValidationMessage> errors) {
+    public SchemaViolationException(String message, ValidationResults errors) {
         super(message);
         this.errors = errors;
     }
 
-    public SchemaViolationException(String message, Throwable cause,
-        Set<ValidationMessage> errors) {
+    public SchemaViolationException(String message, Throwable cause, ValidationResults errors) {
         super(message, cause);
         this.errors = errors;
     }
 
-    public SchemaViolationException(Throwable cause, Set<ValidationMessage> errors) {
+    public SchemaViolationException(Throwable cause, ValidationResults errors) {
         super(cause);
         this.errors = errors;
     }
 
     public SchemaViolationException(String message, Throwable cause, boolean enableSuppression,
-        boolean writableStackTrace, Set<ValidationMessage> errors) {
+        boolean writableStackTrace, ValidationResults errors) {
         super(message, cause, enableSuppression, writableStackTrace);
         this.errors = errors;
     }
 
-    public Set<ValidationMessage> getErrors() {
+    public ValidationResults getErrors() {
         return errors;
     }
 }

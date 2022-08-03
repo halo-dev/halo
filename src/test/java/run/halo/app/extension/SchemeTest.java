@@ -63,7 +63,7 @@ class SchemeTest {
             scheme.groupVersionKind());
         assertEquals("fake", scheme.singular());
         assertEquals("fakes", scheme.plural());
-        assertNotNull(scheme.jsonSchema());
+        assertNotNull(scheme.openApiSchema());
         assertEquals(FakeExtension.class, scheme.type());
     }
 

@@ -1,9 +1,12 @@
-package run.halo.app.extension;
+package run.halo.app.extension.router;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import run.halo.app.extension.ExtensionRouterFunctionFactory.PathPatternGenerator;
+import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.GVK;
+import run.halo.app.extension.Scheme;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory.PathPatternGenerator;
 
 class PathPatternGeneratorTest {
 

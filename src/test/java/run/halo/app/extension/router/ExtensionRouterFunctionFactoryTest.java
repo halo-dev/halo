@@ -1,4 +1,4 @@
-package run.halo.app.extension;
+package run.halo.app.extension.router;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
@@ -15,10 +15,14 @@ import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
-import run.halo.app.extension.ExtensionRouterFunctionFactory.CreateHandler;
-import run.halo.app.extension.ExtensionRouterFunctionFactory.GetHandler;
-import run.halo.app.extension.ExtensionRouterFunctionFactory.ListHandler;
-import run.halo.app.extension.ExtensionRouterFunctionFactory.UpdateHandler;
+import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.Scheme;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory.CreateHandler;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory.GetHandler;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory.ListHandler;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory.UpdateHandler;
 
 @ExtendWith(MockitoExtension.class)
 class ExtensionRouterFunctionFactoryTest {

@@ -1,4 +1,4 @@
-package run.halo.app.extension;
+package run.halo.app.extension.router;
 
 import java.util.Collections;
 import java.util.Map;
@@ -11,6 +11,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.Scheme;
+import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
 
 public class ExtensionCompositeRouterFunction implements
