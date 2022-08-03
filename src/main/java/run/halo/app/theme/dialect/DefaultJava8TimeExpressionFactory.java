@@ -3,9 +3,7 @@ package run.halo.app.theme.dialect;
 import static run.halo.app.theme.ThemeLocaleContextResolver.TIME_ZONE_REQUEST_ATTRIBUTE_NAME;
 
 import java.util.TimeZone;
-import org.thymeleaf.context.Contexts;
 import org.thymeleaf.context.IExpressionContext;
-import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeExpressionFactory;
 import org.thymeleaf.extras.java8time.expression.Temporals;
 
@@ -18,8 +16,7 @@ public class DefaultJava8TimeExpressionFactory extends Java8TimeExpressionFactor
 
     @Override
     public Object buildObject(IExpressionContext context, String expressionObjectName) {
-        IWebContext webContext = Contexts.asWebContext(context);
-        TimeZone timeZone = (TimeZone) webContext.getVariable(TIME_ZONE_REQUEST_ATTRIBUTE_NAME);
+        TimeZone timeZone = (TimeZone) context.getVariable(TIME_ZONE_REQUEST_ATTRIBUTE_NAME);
         if (timeZone == null) {
             timeZone = TimeZone.getDefault();
         }
