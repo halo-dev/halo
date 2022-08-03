@@ -31,11 +31,11 @@ public class MenuItemReconciler implements Reconciler {
             } else if (spec.getPostRef() != null) {
                 // TODO resolve permalink from post.
             } else {
-                if (spec.getPermalink() == null || !StringUtils.hasText(spec.getDisplayName())) {
+                if (spec.getHref() == null || !StringUtils.hasText(spec.getDisplayName())) {
                     // at last, we resolve permalink from spec.
                     throw new IllegalArgumentException("Invalid permalink or displayName");
                 }
-                status.setPermalink(spec.getPermalink());
+                status.setHref(spec.getHref());
                 status.setDisplayName(spec.getDisplayName());
                 // update status
                 client.update(menuItem);
