@@ -3,15 +3,14 @@ package run.halo.app.theme.message;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -30,27 +29,25 @@ import run.halo.app.theme.ThemeResolver;
  * @author guqing
  * @since 2.0.0
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
+@AutoConfigureWebTestClient
 public class ThemeMessageResolverIntegrationTest {
-    @Autowired
-    private ApplicationContext applicationContext;
+
     @Autowired
     private ThemeResolver themeResolver;
+
     private URL defaultThemeUrl;
+
     private URL otherThemeUrl;
 
     Function<ServerHttpRequest, ThemeContext> themeContextFunction;
 
+    @Autowired
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
         themeContextFunction = themeResolver.getThemeContextFunction();
-        webTestClient = WebTestClient
-            .bindToApplicationContext(applicationContext)
-            .configureClient()
-            .responseTimeout(Duration.ofMinutes(1))
-            .build();
 
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
         otherThemeUrl = ResourceUtils.getURL("classpath:themes/other");
