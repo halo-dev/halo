@@ -6,7 +6,6 @@ import static run.halo.app.theme.ThemeLocaleContextResolver.TIME_ZONE_COOKIE_NAM
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Locale;
@@ -17,9 +16,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -39,11 +38,9 @@ import run.halo.app.theme.ThemeResolver;
  * @author guqing
  * @since 2.0.0
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest
+@AutoConfigureWebTestClient
 class ThemeJava8TimeDialectIntegrationTest {
-    @Autowired
-    private ApplicationContext applicationContext;
-
     private static final Instant INSTANT = Instant.now();
 
     @Autowired
@@ -53,6 +50,7 @@ class ThemeJava8TimeDialectIntegrationTest {
 
     Function<ServerHttpRequest, ThemeContext> themeContextFunction;
 
+    @Autowired
     private WebTestClient webTestClient;
 
     private TimeZone defaultTimeZone;
@@ -61,12 +59,6 @@ class ThemeJava8TimeDialectIntegrationTest {
     void setUp() throws FileNotFoundException {
         themeContextFunction = themeResolver.getThemeContextFunction();
         themeResolver.setThemeContextFunction(request -> createDefaultContext());
-
-        webTestClient = WebTestClient
-            .bindToApplicationContext(applicationContext)
-            .configureClient()
-            .responseTimeout(Duration.ofMinutes(1))
-            .build();
 
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
         defaultTimeZone = TimeZone.getDefault();
