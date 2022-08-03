@@ -2,7 +2,6 @@ package run.halo.app.core.extension.menu;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.net.URL;
 import java.util.LinkedHashSet;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,11 +28,8 @@ public class MenuItem extends AbstractExtension {
         @Schema(description = "The display name of menu item.")
         private String displayName;
 
-        @Schema(description = "The icon name of menu item.")
-        private String iconName;
-
-        @Schema(description = "The permalink of this manu.")
-        private URL permalink;
+        @Schema(description = "The href of this menu item.")
+        private String href;
 
         @ArraySchema(
             arraySchema = @Schema(description = "Children of this menu item"),
@@ -54,6 +50,16 @@ public class MenuItem extends AbstractExtension {
 
     }
 
+    public static class AnchorAttributes {
+
+        @Schema(description = "The href of anchor.")
+        private String href;
+
+        @Schema(description = "The target of anchor.")
+        private String target;
+
+    }
+
     @Data
     public static class MenuItemRef {
 
@@ -65,11 +71,11 @@ public class MenuItem extends AbstractExtension {
     @Data
     public static class MenuItemStatus {
 
-        @Schema(description = "Calculated Display name of menu item.", required = true)
+        @Schema(description = "Calculated Display name of menu item.")
         private String displayName;
 
-        @Schema(description = "Calculated permalink of manu item.")
-        private URL permalink;
+        @Schema(description = "Calculated href of manu item.")
+        private String href;
 
     }
 }
