@@ -1,12 +1,9 @@
 package run.halo.app.extension;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.victools.jsonschema.generator.Option;
-import com.github.victools.jsonschema.generator.OptionPreset;
-import com.github.victools.jsonschema.generator.SchemaGenerator;
-import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
-import com.github.victools.jsonschema.generator.SchemaVersion;
-import com.github.victools.jsonschema.module.swagger2.Swagger2Module;
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.core.util.Json;
+import java.util.Map;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import run.halo.app.extension.exception.ExtensionException;
@@ -18,20 +15,20 @@ import run.halo.app.extension.exception.ExtensionException;
  * @param groupVersionKind is GroupVersionKind of Extension.
  * @param plural is plural name of Extension.
  * @param singular is singular name of Extension.
- * @param jsonSchema is JSON schema of Extension.
+ * @param openApiSchema is JSON schema of Extension.
  * @author johnniang
  */
 public record Scheme(Class<? extends Extension> type,
                      GroupVersionKind groupVersionKind,
                      String plural,
                      String singular,
-                     ObjectNode jsonSchema) {
+                     ObjectNode openApiSchema) {
     public Scheme {
         Assert.notNull(type, "Type of Extension must not be null");
         Assert.notNull(groupVersionKind, "GroupVersionKind of Extension must not be null");
         Assert.hasText(plural, "Plural name of Extension must not be blank");
         Assert.hasText(singular, "Singular name of Extension must not be blank");
-        Assert.notNull(jsonSchema, "Json Schema must not be null");
+        Assert.notNull(openApiSchema, "Json Schema must not be null");
     }
 
     /**
@@ -46,26 +43,19 @@ public record Scheme(Class<? extends Extension> type,
         var gvk = getGvkFromType(type);
 
         // TODO Move the generation logic outside.
-        // generate JSON schema
-        var module = new Swagger2Module();
-        var config =
-            new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2019_09, OptionPreset.PLAIN_JSON)
-                .with(
-                    // See https://victools.github.io/jsonschema-generator/#generator-options
-                    // fore more.
-                    Option.INLINE_ALL_SCHEMAS,
-                    Option.MAP_VALUES_AS_ADDITIONAL_PROPERTIES
-                )
-                .with(module)
-                .build();
-        var generator = new SchemaGenerator(config);
-        var jsonSchema = generator.generateSchema(type);
+        // generate OpenAPI schema
+        var resolvedSchema = ModelConverters.getInstance().readAllAsResolvedSchema(type);
+        var mapper = Json.mapper();
+        var schema = (ObjectNode) mapper.valueToTree(resolvedSchema.schema);
+        // for schema validation.
+        schema.set("components",
+            mapper.valueToTree(Map.of("schemas", resolvedSchema.referencedSchemas)));
 
         return new Scheme(type,
             new GroupVersionKind(gvk.group(), gvk.version(), gvk.kind()),
             gvk.plural(),
             gvk.singular(),
-            jsonSchema);
+            schema);
     }
 
     /**

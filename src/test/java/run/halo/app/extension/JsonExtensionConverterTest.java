@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +30,7 @@ class JsonExtensionConverterTest {
 
         DefaultSchemeManager schemeManager = new DefaultSchemeManager(null);
         converter = new JSONExtensionConverter(schemeManager);
-        objectMapper = JSONExtensionConverter.OBJECT_MAPPER;
+        objectMapper = converter.getObjectMapper();
 
         schemeManager.register(FakeExtension.class);
     }
@@ -83,8 +84,8 @@ class JsonExtensionConverterTest {
         fake.setKind("Fake");
         var error = assertThrows(SchemaViolationException.class, () -> converter.convertTo(fake));
         assertEquals(1, error.getErrors().size());
-        assertEquals("$.metadata.name: is missing but it is required",
-            error.getErrors().iterator().next().getMessage());
+        // error.getErrors().items().get(0).message();
+        assertTrue(error.getErrors().items().get(0).toString().contains("'name' is required"));
     }
 
     FakeExtension createFakeExtension(String name, Long version) {
