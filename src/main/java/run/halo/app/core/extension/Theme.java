@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -24,6 +26,7 @@ public class Theme extends AbstractExtension {
     @Data
     @ToString
     public static class ThemeSpec {
+        private static final String WILDCARD = "*";
 
         @Schema(required = true, minLength = 1)
         private String displayName;
@@ -39,9 +42,29 @@ public class Theme extends AbstractExtension {
 
         private String repo;
 
-        private String version = "*";
+        private String version;
 
-        private String require = "*";
+        private String require;
+
+        private String settingName;
+
+        private String configMapName;
+
+        @NonNull
+        public String getVersion() {
+            if (StringUtils.isBlank(this.version)) {
+                return WILDCARD;
+            }
+            return version;
+        }
+
+        @NonNull
+        public String getRequire() {
+            if (StringUtils.isBlank(this.require)) {
+                return WILDCARD;
+            }
+            return require;
+        }
     }
 
     @Data
