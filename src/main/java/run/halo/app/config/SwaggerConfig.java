@@ -2,6 +2,7 @@ package run.halo.app.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.SpecVersion;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
@@ -13,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     @Bean
-    OpenAPI customOpenAPI() {
-        return new OpenAPI()
+    OpenAPI haloOpenApi() {
+        return new OpenAPI(SpecVersion.V30)
             // See https://swagger.io/docs/specification/authentication/ for more.
             .components(new Components()
                 .addSecuritySchemes("BasicAuth", new SecurityScheme()
