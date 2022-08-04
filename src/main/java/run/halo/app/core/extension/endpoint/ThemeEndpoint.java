@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
@@ -185,23 +186,29 @@ public class ThemeEndpoint implements CustomEndpoint {
             boolean override) {
             ZipInputStream zipInputStream = new ZipInputStream(inputStream);
             try {
+                ZipEntry firstEntry = zipInputStream.getNextEntry();
+                if (firstEntry == null) {
+                    throw new IllegalArgumentException("Theme zip file is empty.");
+                }
                 Path tempDirectory = Files.createTempDirectory(THEME_TMP_PREFIX);
+                Path themeTempWorkDir = tempDirectory.resolve(firstEntry.getName());
                 FileUtils.unzip(zipInputStream, tempDirectory);
-                Path themeManifestPath = resolveThemeManifest(tempDirectory);
+
+                Path themeManifestPath = resolveThemeManifest(themeTempWorkDir);
                 if (themeManifestPath == null) {
                     FileSystemUtils.deleteRecursively(tempDirectory);
                     throw new IllegalArgumentException(
                         "It's an invalid zip format for the theme, manifest "
-                            + "file [themes.yaml] is required.");
+                            + "file [theme.yaml] is required.");
                 }
                 Unstructured unstructured = loadThemeManifest(themeManifestPath);
                 String themeName = unstructured.getMetadata().getName();
-                Path targetPath = themeWorkDir.resolve(themeName);
-                if (!override && !FileUtils.isEmpty(targetPath)) {
+                Path themeTargetPath = themeWorkDir.resolve(themeName);
+                if (!override && !FileUtils.isEmpty(themeTargetPath)) {
                     throw new UnsupportedOperationException("Theme already exists.");
                 }
                 // install theme to theme work dir
-                FileSystemUtils.copyRecursively(tempDirectory, targetPath);
+                FileSystemUtils.copyRecursively(themeTempWorkDir, themeTargetPath);
                 // clean temp directory
                 FileSystemUtils.deleteRecursively(tempDirectory);
                 return unstructured;

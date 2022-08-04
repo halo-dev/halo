@@ -44,9 +44,13 @@ public abstract class FileUtils {
                 throw new IllegalArgumentException("Cannot unzip to a subdirectory of itself");
             }
 
+            if (Files.notExists(entryPath.getParent())) {
+                Files.createDirectories(entryPath.getParent());
+            }
+
             if (zipEntry.isDirectory()) {
-                // Create directories
-                Files.createDirectories(entryPath);
+                // Create directory
+                Files.createDirectory(entryPath);
             } else {
                 // Copy file
                 Files.copy(zis, entryPath);
