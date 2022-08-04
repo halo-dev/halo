@@ -16,9 +16,11 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "theme.halo.run", version = "v1alpha1", kind = "Theme",
+@GVK(group = "theme.halo.run", version = "v1alpha1", kind = Theme.KIND,
     plural = "themes", singular = "theme")
 public class Theme extends AbstractExtension {
+
+    public static final String KIND = "Theme";
 
     @Schema(required = true)
     private ThemeSpec spec;
