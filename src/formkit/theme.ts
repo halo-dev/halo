@@ -8,13 +8,15 @@ const textClassification = {
 };
 
 const boxClassification = {
-  fieldset: "border border-gray-400 rounded-md px-2 pb-1",
+  fieldset:
+    "border border-gray-300 rounded-base px-2 pb-1 focus-within:border-primary",
   legend: "font-bold text-sm",
   wrapper: "flex items-center mb-1 cursor-pointer",
   help: "mb-2",
   input:
-    "form-check-input appearance-none h-5 w-5 mr-2 border border-gray-500 rounded-sm bg-white checked:bg-blue-500 focus:outline-none focus:ring-0 transition duration-200",
-  label: "text-sm text-gray-700 mt-1",
+    "form-check-input appearance-none h-4 w-4 mr-2 border border-gray-500 rounded-sm bg-white checked:bg-primary focus:outline-none focus:ring-0 transition duration-200",
+  label: "text-sm text-gray-700",
+  inner: "flex items-center",
 };
 
 const buttonClassification = {

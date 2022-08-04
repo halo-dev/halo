@@ -8,14 +8,14 @@ import {
   VRoutesMenu,
   VTag,
 } from "@halo-dev/components";
-import type { MenuGroupType, MenuItemType } from "@/types/menus";
+import type { MenuGroupType, MenuItemType } from "../types/menus";
 import type { User } from "@halo-dev/api-client";
 import logo from "@/assets/logo.svg";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { computed, inject, ref } from "vue";
 
-const menus = inject<MenuGroupType>("menus");
-const minimenus = inject<MenuItemType>("minimenus");
+const menus = inject<MenuGroupType[]>("menus");
+const minimenus = inject<MenuItemType[]>("minimenus");
 const route = useRoute();
 const router = useRouter();
 
@@ -58,12 +58,12 @@ const currentRole = computed(() => {
       </div>
       <VRoutesMenu :menus="menus" />
       <div class="current-profile">
-        <div v-if="currentUser.spec.avatar" class="profile-avatar">
-          <img :src="currentUser.spec.avatar" class="h-11 w-11 rounded-full" />
+        <div v-if="currentUser?.spec.avatar" class="profile-avatar">
+          <img :src="currentUser?.spec.avatar" class="h-11 w-11 rounded-full" />
         </div>
         <div class="profile-name">
           <div class="flex text-sm font-medium">
-            {{ currentUser.spec.displayName }}
+            {{ currentUser?.spec.displayName }}
           </div>
           <div class="flex">
             <VTag>
@@ -89,14 +89,15 @@ const currentRole = computed(() => {
 
     <!--bottom nav bar-->
     <div
+      v-if="minimenus"
       class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black drop-shadow-2xl mt-safe pb-safe md:hidden bg-secondary"
     >
       <div
         v-for="(menu, index) in minimenus"
         :key="index"
-        :class="{ 'bg-black': route.path === menu.path }"
+        :class="{ 'bg-black': route.path === menu?.path }"
         class="nav-item"
-        @click="router.push(menu.path)"
+        @click="router.push(menu?.path)"
       >
         <div
           class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
@@ -105,10 +106,10 @@ const currentRole = computed(() => {
             class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
           >
             <div class="text-base">
-              <Component :is="menu.icon" />
+              <Component :is="menu?.icon" />
             </div>
             <div class="mt-0.5 text-xs">
-              {{ menu.name }}
+              {{ menu?.name }}
             </div>
           </div>
         </div>

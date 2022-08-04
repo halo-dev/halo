@@ -7,7 +7,8 @@
   ],
   "scripts": {
     "dev": "vite build --watch",
-    "build": "vite build"
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
   },
   "keywords": [],
   "author": {
@@ -35,7 +36,7 @@
   "homepage": "https://github.com/halo-dev/halo-admin/tree/next/shared/components#readme",
   "license": "MIT",
   "dependencies": {
-    "@halo-dev/api-client": "^0.0.7",
+    "@halo-dev/api-client": "^0.0.8",
     "@halo-dev/components": "workspace:*",
     "axios": "^0.27.2"
   },

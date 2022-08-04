@@ -115,7 +115,7 @@ onMounted(() => {
 });
 
 watch([() => plugin.value, () => group?.value], () => {
-  handleFetchConfigMap();
+  handleFetchSettings();
   handleFetchConfigMap();
 });
 </script>

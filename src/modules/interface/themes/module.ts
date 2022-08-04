@@ -1,5 +1,7 @@
-import { BasicLayout, BlankLayout, definePlugin } from "@halo-dev/admin-shared";
+import { BlankLayout, definePlugin } from "@halo-dev/admin-shared";
+import ThemeLayout from "./layouts/ThemeLayout.vue";
 import ThemeDetail from "./ThemeDetail.vue";
+import ThemeSetting from "./ThemeSetting.vue";
 import Visual from "./Visual.vue";
 import { IconPalette } from "@halo-dev/components";
 
@@ -9,12 +11,17 @@ export default definePlugin({
   routes: [
     {
       path: "/theme",
-      component: BasicLayout,
+      component: ThemeLayout,
       children: [
         {
           path: "",
-          name: "Theme",
+          name: "ThemeDetail",
           component: ThemeDetail,
+        },
+        {
+          path: "settings/:group",
+          name: "ThemeSetting",
+          component: ThemeSetting,
         },
       ],
     },

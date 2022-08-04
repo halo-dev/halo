@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BasicLayout } from "@/layouts";
+import { BasicLayout } from "./index";
 import {
   IconSettings,
   VButton,

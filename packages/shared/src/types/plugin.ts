@@ -1,7 +1,7 @@
 import type { Component, Ref } from "vue";
 import type { RouteRecordRaw } from "vue-router";
 import type { MenuGroupType } from "./menus";
-import type { PagesPublicState } from "@/states/pages";
+import type { PagesPublicState } from "../states/pages";
 
 export type ExtensionPointName = "PAGES" | "POSTS";
 

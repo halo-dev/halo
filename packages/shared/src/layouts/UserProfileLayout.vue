@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { BasicLayout } from "@/layouts";
+import { BasicLayout } from "../layouts";
 import { IconUpload, VButton, VTabbar } from "@halo-dev/components";
 import { onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "../utils/api-client";
 import type { User } from "@halo-dev/api-client";
 
 const tabs = [
