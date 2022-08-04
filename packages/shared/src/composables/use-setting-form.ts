@@ -1,16 +1,13 @@
 // core libs
 import { ref } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "../utils/api-client";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
 
 // types
 import type { Ref } from "vue";
-import type {
-  FormKitSetting,
-  FormKitSettingSpec,
-} from "@halo-dev/admin-shared";
+import type { FormKitSetting, FormKitSettingSpec } from "../types/formkit";
 import type { ConfigMap } from "@halo-dev/api-client";
 
 const initialConfigMap: ConfigMap = {
@@ -64,6 +61,7 @@ export function useSettingForm(
 
       if (data) {
         configMapFormData.value = Object.keys(data).reduce((acc, key) => {
+          // @ts-ignore
           acc[key] = JSON.parse(data[key]);
           return acc;
         }, {});
@@ -73,6 +71,7 @@ export function useSettingForm(
     } finally {
       if (!configMapFormData.value) {
         configMapFormData.value = settings.value?.spec.reduce((acc, item) => {
+          // @ts-ignore
           acc[item.group] = {};
           return acc;
         }, {});

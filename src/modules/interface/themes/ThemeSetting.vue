@@ -10,7 +10,7 @@ import type { Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
 // hooks
-import { useSettingForm } from "@/composables/use-setting-form";
+import { useSettingForm } from "@halo-dev/admin-shared";
 
 const selectedTheme = inject<Ref<Theme>>("selectedTheme", ref({} as Theme));
 const group = inject<Ref<string | undefined>>("activeTab");

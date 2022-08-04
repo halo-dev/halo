@@ -8,7 +8,7 @@ import cloneDeep from "lodash.clonedeep";
 
 // hooks
 import { useThemeLifeCycle } from "../composables/use-theme";
-import { useSettingForm } from "@/composables/use-setting-form";
+import { useSettingForm } from "@halo-dev/admin-shared";
 
 // components
 import {
@@ -122,7 +122,6 @@ const onTabChange = (routeName: string) => {
     return;
   }
 
-  // @ts-ignore
   const tab = tabs.value.find((tab) => tab.route.name === route.name);
   activeTab.value = tab ? tab.id : tabs.value[0].id;
 };
