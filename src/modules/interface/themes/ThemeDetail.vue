@@ -1,8 +1,13 @@
 <script lang="ts" setup>
-import { VAlert, VSpace, VTag } from "@halo-dev/components";
-import type { ComputedRef, Ref } from "vue";
+// core libs
 import { computed, inject, ref } from "vue";
 import { RouterLink } from "vue-router";
+
+// components
+import { VAlert, VSpace, VTag } from "@halo-dev/components";
+
+// types
+import type { ComputedRef, Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
 const selectedTheme = inject<Ref<Theme>>(

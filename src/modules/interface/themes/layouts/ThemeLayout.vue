@@ -1,4 +1,16 @@
 <script lang="ts" setup>
+// core libs
+import { computed, provide, ref, watch, watchEffect } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+// libs
+import cloneDeep from "lodash.clonedeep";
+
+// hooks
+import { useThemeLifeCycle } from "../composables/use-theme";
+import { useSettingForm } from "@/composables/use-setting-form";
+
+// components
 import {
   IconExchange,
   IconEye,
@@ -9,24 +21,21 @@ import {
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
-import type {
-  FormKitSetting,
-  FormKitSettingSpec,
-} from "@halo-dev/admin-shared";
-import { apiClient, BasicLayout } from "@halo-dev/admin-shared";
 import ThemeListModal from "../components/ThemeListModal.vue";
+import { BasicLayout } from "@halo-dev/admin-shared";
+
+// types
+import type { FormKitSettingSpec } from "@halo-dev/admin-shared";
 import type { ComputedRef, Ref } from "vue";
-import { provide, ref, watch, watchEffect } from "vue";
-import type { RouteLocationRaw } from "vue-router";
-import { useRoute, useRouter } from "vue-router";
-import type { ConfigMap, Theme } from "@halo-dev/api-client";
-import { useThemeLifeCycle } from "../composables/use-theme";
-import cloneDeep from "lodash.clonedeep";
+import type { Theme } from "@halo-dev/api-client";
 
 interface ThemeTab {
   id: string;
   label: string;
-  route: RouteLocationRaw;
+  route: {
+    name: string;
+    params?: Record<string, string>;
+  };
 }
 
 const initialTabs: ThemeTab[] = [
@@ -39,36 +48,24 @@ const initialTabs: ThemeTab[] = [
   },
 ];
 
-const initialConfigMap: ConfigMap = {
-  data: {},
-  apiVersion: "v1alpha1",
-  kind: "ConfigMap",
-  metadata: {
-    name: "",
-  },
-};
-
 const tabs = ref<ThemeTab[]>(cloneDeep(initialTabs));
 const selectedTheme = ref<Theme>({} as Theme);
-const settings = ref<FormKitSetting | undefined>();
-const configmapFormData = ref<
-  Record<string, Record<string, string>> | undefined
->();
-const configmap = ref<ConfigMap>(cloneDeep(initialConfigMap));
 const themesModal = ref(false);
-const activeTab = ref("detail");
+const activeTab = ref("");
 
 const { isActivated, activatedTheme, handleActiveTheme } =
   useThemeLifeCycle(selectedTheme);
 
+const settingName = computed(() => selectedTheme.value.spec?.settingName);
+const configMapName = computed(() => selectedTheme.value.spec?.configMapName);
+
+const { settings, handleFetchSettings } = useSettingForm(
+  settingName,
+  configMapName
+);
+
 provide<Ref<Theme>>("activatedTheme", activatedTheme);
 provide<Ref<Theme>>("selectedTheme", selectedTheme);
-provide<Ref<FormKitSetting | undefined>>("settings", settings);
-provide<Ref<Record<string, Record<string, string>> | undefined>>(
-  "configmapFormData",
-  configmapFormData
-);
-provide<Ref<ConfigMap>>("configmap", configmap);
 provide<ComputedRef<boolean>>("isActivated", isActivated);
 provide<Ref<string | undefined>>("activeTab", activeTab);
 
@@ -82,23 +79,16 @@ const handleTabChange = (id: string) => {
   }
 };
 
-const handleFetchSettings = async () => {
-  tabs.value = cloneDeep(initialTabs);
-  if (!selectedTheme.value?.spec?.settingName) {
-    return;
-  }
-  try {
-    const response = await apiClient.extension.setting.getv1alpha1Setting(
-      selectedTheme.value.spec.settingName as string
-    );
-    settings.value = response.data as FormKitSetting;
+watchEffect(async () => {
+  if (selectedTheme.value) {
+    // reset tabs
+    tabs.value = cloneDeep(initialTabs);
+    await handleFetchSettings();
 
-    const { spec } = settings.value;
-
-    if (spec) {
+    if (settings.value && settings.value.spec) {
       tabs.value = [
         ...tabs.value,
-        ...spec.map((item: FormKitSettingSpec) => {
+        ...settings.value.spec.map((item: FormKitSettingSpec) => {
           return {
             id: item.group,
             label: item.label || "",
@@ -111,51 +101,8 @@ const handleFetchSettings = async () => {
           };
         }),
       ] as ThemeTab[];
-
       onTabChange(route.name as string);
     }
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-const handleFetchConfigMap = async () => {
-  if (!selectedTheme.value.spec?.configMapName) {
-    return;
-  }
-  try {
-    const response = await apiClient.extension.configMap.getv1alpha1ConfigMap(
-      selectedTheme.value.spec?.configMapName as string
-    );
-    configmap.value = response.data;
-
-    const { data } = configmap.value;
-
-    if (data) {
-      configmapFormData.value = Object.keys(data).reduce((acc, key) => {
-        acc[key] = JSON.parse(data[key]);
-        return acc;
-      }, {});
-    }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    if (!configmapFormData.value) {
-      configmapFormData.value = settings.value?.spec.reduce((acc, item) => {
-        acc[item.group] = {};
-        return acc;
-      }, {});
-    }
-  }
-};
-
-provide<() => void>("handleFetchSettings", handleFetchSettings);
-provide<() => void>("handleFetchConfigMap", handleFetchConfigMap);
-
-watchEffect(() => {
-  if (selectedTheme.value) {
-    handleFetchSettings();
-    handleFetchConfigMap();
   }
 });
 
@@ -163,10 +110,8 @@ const onTabChange = (routeName: string) => {
   if (routeName === "ThemeSetting") {
     const tab = tabs.value.find((tab) => {
       return (
-        // @ts-ignore
         tab.route.name === routeName &&
-        // @ts-ignore
-        tab.route.params.group === route.params.group
+        tab.route.params?.group === route.params.group
       );
     });
     if (tab) {
