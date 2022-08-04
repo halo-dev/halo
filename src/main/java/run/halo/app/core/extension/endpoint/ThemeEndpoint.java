@@ -42,6 +42,7 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.infra.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
@@ -184,13 +185,16 @@ public class ThemeEndpoint implements CustomEndpoint {
 
         static Unstructured unzipThemeTo(InputStream inputStream, Path themeWorkDir,
             boolean override) {
-            ZipInputStream zipInputStream = new ZipInputStream(inputStream);
-            try {
+
+            Path tempDirectory = null;
+            try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
+                tempDirectory = Files.createTempDirectory(THEME_TMP_PREFIX);
+
                 ZipEntry firstEntry = zipInputStream.getNextEntry();
                 if (firstEntry == null) {
                     throw new IllegalArgumentException("Theme zip file is empty.");
                 }
-                Path tempDirectory = Files.createTempDirectory(THEME_TMP_PREFIX);
+
                 Path themeTempWorkDir = tempDirectory.resolve(firstEntry.getName());
                 FileUtils.unzip(zipInputStream, tempDirectory);
 
@@ -205,18 +209,21 @@ public class ThemeEndpoint implements CustomEndpoint {
                 String themeName = unstructured.getMetadata().getName();
                 Path themeTargetPath = themeWorkDir.resolve(themeName);
                 if (!override && !FileUtils.isEmpty(themeTargetPath)) {
-                    throw new UnsupportedOperationException("Theme already exists.");
+                    throw new ThemeInstallationException("Theme already exists.");
                 }
                 // install theme to theme work dir
                 FileSystemUtils.copyRecursively(themeTempWorkDir, themeTargetPath);
-                // clean temp directory
-                FileSystemUtils.deleteRecursively(tempDirectory);
                 return unstructured;
             } catch (IOException e) {
-                throw new UnsupportedOperationException("Unable to unzip theme", e);
+                throw new ThemeInstallationException("Unable to install theme", e);
             } finally {
-                FileUtils.closeQuietly(zipInputStream);
-                FileUtils.closeQuietly(inputStream);
+                // clean temp directory
+                try {
+                    // null safe
+                    FileSystemUtils.deleteRecursively(tempDirectory);
+                } catch (IOException e) {
+                    // ignore this exception
+                }
             }
         }
 
