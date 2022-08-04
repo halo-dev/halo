@@ -79,7 +79,8 @@ public class ThemeEndpoint implements CustomEndpoint {
                             .schema(Builder.schemaBuilder()
                                 .implementation(InstallRequest.class))
                         ))
-                    .response(responseBuilder())
+                    .response(responseBuilder()
+                        .implementation(Theme.class))
             )
             .build();
     }
