@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.v3.core.util.Json;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
@@ -28,7 +29,7 @@ import java.util.Optional;
 @SuppressWarnings("rawtypes")
 public class Unstructured implements Extension {
 
-    public static final ObjectMapper OBJECT_MAPPER = JSONExtensionConverter.OBJECT_MAPPER;
+    public static final ObjectMapper OBJECT_MAPPER = Json.mapper();
 
     private final Map data;
 

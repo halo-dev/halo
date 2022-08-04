@@ -11,8 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FilePathUtils;
+import run.halo.app.theme.dialect.ThemeJava8TimeDialect;
 
 /**
  * @author guqing
@@ -58,5 +60,10 @@ public class ThemeConfiguration {
     private Path getThemeAssetsPath(String themeName, String resource) {
         return FilePathUtils.combinePath(haloProperties.getWorkDir().toString(),
             "themes", themeName, "templates", "assets", resource);
+    }
+
+    @Bean
+    Java8TimeDialect java8TimeDialect() {
+        return new ThemeJava8TimeDialect();
     }
 }

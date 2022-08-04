@@ -12,18 +12,22 @@ import java.io.SequenceInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.MultiValueMap;
@@ -32,7 +36,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
@@ -69,7 +75,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .content(contentBuilder()
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(Builder.schemaBuilder()
-                                    .implementation(InstallRequest.class))
+                                .implementation(InstallRequest.class))
                         ))
                     .response(responseBuilder())
             )
@@ -88,19 +94,88 @@ public class ThemeEndpoint implements CustomEndpoint {
                 .map(DataBuffer::asInputStream)
                 .reduce(SequenceInputStream::new)
                 .map(inputStream -> ThemeUtils.unzipThemeTo(inputStream, getThemeWorkDir())))
-            .map(themeManifest -> {
-                client.create(themeManifest);
-                return client.fetch(Theme.class, themeManifest.getMetadata().getName())
-                    .orElseThrow();
-            })
+            .map(this::persistent)
             .flatMap(theme -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(theme));
     }
 
+    /**
+     * Creates theme manifest and related unstructured resources.
+     * TODO: In case of failure in saving midway, the problem of data consistency needs to be
+     * solved.
+     *
+     * @param themeManifest the theme custom model
+     * @return a theme custom model
+     * @see Theme
+     */
+    public Theme persistent(Unstructured themeManifest) {
+        Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()),
+            "Theme manifest kind must be Theme.");
+        client.create(themeManifest);
+        Theme theme = client.fetch(Theme.class, themeManifest.getMetadata().getName())
+            .orElseThrow();
+        List<Unstructured> unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
+        if (unstructureds.stream()
+            .filter(unstructured -> unstructured.getKind().equals(Setting.KIND))
+            .filter(unstructured -> unstructured.getMetadata().getName()
+                .equals(theme.getSpec().getSettingName()))
+            .count() > 1) {
+            throw new IllegalStateException(
+                "Theme must only have one settings.yaml or settings.yml.");
+        }
+        if (unstructureds.stream()
+            .filter(unstructured -> unstructured.getKind().equals(ConfigMap.KIND))
+            .filter(unstructured -> unstructured.getMetadata().getName()
+                .equals(theme.getSpec().getConfigMapName()))
+            .count() > 1) {
+            throw new IllegalStateException(
+                "Theme must only have one config.yaml or config.yml.");
+        }
+        Theme.ThemeSpec spec = theme.getSpec();
+        for (Unstructured unstructured : unstructureds) {
+            String name = unstructured.getMetadata().getName();
+
+            boolean isThemeSetting = unstructured.getKind().equals(Setting.KIND)
+                && StringUtils.equals(spec.getSettingName(), name);
+
+            boolean isThemeConfig = unstructured.getKind().equals(ConfigMap.KIND)
+                && StringUtils.equals(spec.getConfigMapName(), name);
+            if (isThemeSetting || isThemeConfig) {
+                client.create(unstructured);
+            }
+        }
+        return theme;
+    }
+
+    private Path getThemePath(Theme theme) {
+        return getThemeWorkDir().resolve(theme.getMetadata().getName());
+    }
+
     static class ThemeUtils {
         private static final String THEME_TMP_PREFIX = "halo-theme-";
         private static final String[] themeManifests = {"theme.yaml", "theme.yml"};
+        private static final String[] THEME_RESOURCES = {
+            "settings.yaml",
+            "settings.yml",
+            "config.yaml",
+            "config.yml"
+        };
+
+        static List<Unstructured> loadThemeResources(Path themePath) {
+            List<Resource> resources = new ArrayList<>(4);
+            for (String themeResource : THEME_RESOURCES) {
+                Path resourcePath = themePath.resolve(themeResource);
+                if (Files.exists(resourcePath)) {
+                    resources.add(new FileSystemResource(resourcePath));
+                }
+            }
+            if (CollectionUtils.isEmpty(resources)) {
+                return List.of();
+            }
+            return new YamlUnstructuredLoader(resources.toArray(new Resource[0]))
+                .load();
+        }
 
         static Unstructured unzipThemeTo(InputStream inputStream, Path themeWorkDir) {
             return unzipThemeTo(inputStream, themeWorkDir, false);
