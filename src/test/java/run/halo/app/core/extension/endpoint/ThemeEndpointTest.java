@@ -38,7 +38,7 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
  * @since 2.0.0
  */
 @ExtendWith(MockitoExtension.class)
-class ThemeEndpointIntegrationTest {
+class ThemeEndpointTest {
 
     @Mock
     private ExtensionClient extensionClient;
