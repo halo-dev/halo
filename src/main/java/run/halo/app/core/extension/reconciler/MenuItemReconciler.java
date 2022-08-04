@@ -1,7 +1,8 @@
-package run.halo.app.core.extension.menu;
+package run.halo.app.core.extension.reconciler;
 
 import org.springframework.util.StringUtils;
-import run.halo.app.core.extension.menu.MenuItem.MenuItemStatus;
+import run.halo.app.core.extension.MenuItem;
+import run.halo.app.core.extension.MenuItem.MenuItemStatus;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 
@@ -31,9 +32,9 @@ public class MenuItemReconciler implements Reconciler {
             } else if (spec.getPostRef() != null) {
                 // TODO resolve permalink from post.
             } else {
+                // at last, we resolve href and display name from spec.
                 if (spec.getHref() == null || !StringUtils.hasText(spec.getDisplayName())) {
-                    // at last, we resolve permalink from spec.
-                    throw new IllegalArgumentException("Invalid permalink or displayName");
+                    throw new IllegalArgumentException("Both href and displayName are required");
                 }
                 status.setHref(spec.getHref());
                 status.setDisplayName(spec.getDisplayName());

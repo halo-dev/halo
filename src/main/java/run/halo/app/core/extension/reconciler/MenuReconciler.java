@@ -1,4 +1,4 @@
-package run.halo.app.core.extension.menu;
+package run.halo.app.core.extension.reconciler;
 
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;

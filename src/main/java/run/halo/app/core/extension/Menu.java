@@ -1,4 +1,4 @@
-package run.halo.app.core.extension.menu;
+package run.halo.app.core.extension;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;

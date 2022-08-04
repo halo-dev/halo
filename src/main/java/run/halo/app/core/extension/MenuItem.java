@@ -1,4 +1,4 @@
-package run.halo.app.core.extension.menu;
+package run.halo.app.core.extension;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -47,16 +47,6 @@ public class MenuItem extends AbstractExtension {
 
         @Schema(description = "Page reference.")
         private MenuItemRef pageRef;
-
-    }
-
-    public static class AnchorAttributes {
-
-        @Schema(description = "The href of anchor.")
-        private String href;
-
-        @Schema(description = "The target of anchor.")
-        private String target;
 
     }
 
