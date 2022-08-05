@@ -136,11 +136,7 @@ public class UpOssFileHandler implements FileHandler {
         manager.setApiDomain(RestManager.ED_AUTO);
 
         try {
-            Response result = manager.deleteFile(key, null);
-            if (!result.isSuccessful()) {
-                log.warn("附件 " + key + " 从又拍云删除失败");
-                throw new FileOperationException("附件 " + key + " 从又拍云删除失败");
-            }
+            manager.deleteFile(key, null);
         } catch (IOException | UpException e) {
             e.printStackTrace();
             throw new FileOperationException("附件 " + key + " 从又拍云删除失败", e);

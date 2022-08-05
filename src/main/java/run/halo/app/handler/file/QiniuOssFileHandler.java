@@ -183,11 +183,7 @@ public class QiniuOssFileHandler implements FileHandler {
         BucketManager bucketManager = new BucketManager(auth, configuration);
 
         try {
-            Response response = bucketManager.delete(bucket, key);
-            if (!response.isOK()) {
-                log.warn("附件 " + key + " 从七牛云删除失败");
-                throw new FileOperationException("附件 " + key + " 从七牛云删除失败");
-            }
+            bucketManager.delete(bucket, key);
         } catch (QiniuException e) {
             log.error("Qiniu oss error response: [{}]", e.response);
             throw new FileOperationException("附件 " + key + " 从七牛云删除失败", e);
