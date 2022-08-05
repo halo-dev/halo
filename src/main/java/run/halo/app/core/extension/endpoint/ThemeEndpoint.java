@@ -2,9 +2,11 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.io.InputStream;
@@ -42,7 +44,7 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Unstructured;
-import run.halo.app.infra.ThemeInstallationException;
+import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
@@ -82,7 +84,32 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Theme.class))
             )
+            .DELETE("themes/{name}/uninstall", this::uninstall,
+                builder -> builder.operationId("UninstallTheme")
+                    .description("Uninstall a theme by name.")
+                    .parameter(parameterBuilder()
+                        .required(true)
+                        .name("name")
+                        .description("The name of the theme to uninstall.")
+                        .in(ParameterIn.PATH)
+                        .implementation(String.class)
+                    )
+                    .tag(tag)
+                    .response(responseBuilder()
+                        .implementation(Theme.class))
+            )
             .build();
+    }
+
+    Mono<ServerResponse> uninstall(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return client.fetch(Theme.class, name)
+            .map(theme -> {
+                client.delete(theme);
+                return theme;
+            })
+            .map(theme -> ServerResponse.ok().bodyValue(theme))
+            .orElseThrow();
     }
 
     public record InstallRequest(
