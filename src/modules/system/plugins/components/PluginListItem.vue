@@ -119,8 +119,8 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
             <FloatingDropdown>
               <IconSettings />
               <template #popper>
-                <div class="links-w-48 links-p-2">
-                  <VSpace class="links-w-full" direction="column">
+                <div class="w-48 p-2">
+                  <VSpace class="w-full" direction="column">
                     <VButton block type="danger" @click="uninstall">
                       卸载
                     </VButton>
