@@ -80,6 +80,9 @@ export default ({ mode }: { mode: string }) => {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
       },
     },
+    server: {
+      port: 3000,
+    },
     build: {
       chunkSizeWarningLimit: 2048,
     },
