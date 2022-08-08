@@ -10,6 +10,7 @@ import {
   V1alpha1SettingApi,
   V1alpha1UserApi,
   ThemeHaloRunV1alpha1ThemeApi,
+  ApiHaloRunV1alpha1ThemeApi,
 } from "@halo-dev/api-client";
 import type { AxiosInstance } from "axios";
 import axios from "axios";
@@ -67,6 +68,7 @@ function setupApiClient(axios: AxiosInstance) {
     },
     user: new ApiHaloRunV1alpha1UserApi(undefined, apiUrl, axios),
     plugin: new ApiHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
+    theme: new ApiHaloRunV1alpha1ThemeApi(undefined, apiUrl, axios),
   };
 }
 

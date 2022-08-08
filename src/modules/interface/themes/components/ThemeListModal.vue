@@ -7,6 +7,7 @@ import {
   VSpace,
   VTag,
 } from "@halo-dev/components";
+import ThemeInstallModal from "./ThemeInstallModal.vue";
 import type { PropType } from "vue";
 import { onMounted, ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
@@ -30,6 +31,7 @@ defineProps({
 const emit = defineEmits(["update:visible", "close", "update:selectedTheme"]);
 
 const themes = ref<Theme[]>([]);
+const themeInstall = ref(false);
 
 const handleFetchThemes = async () => {
   try {
@@ -137,7 +139,17 @@ defineExpose({
       </li>
     </ul>
     <template #footer>
-      <VButton @click="handleVisibleChange(false)">关闭</VButton>
+      <VSpace>
+        <VButton type="secondary" @click="themeInstall = true">
+          安装主题
+        </VButton>
+        <VButton @click="handleVisibleChange(false)">关闭</VButton>
+      </VSpace>
     </template>
   </VModal>
+
+  <ThemeInstallModal
+    v-model:visible="themeInstall"
+    @close="handleFetchThemes"
+  />
 </template>
