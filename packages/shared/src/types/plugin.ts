@@ -1,11 +1,16 @@
 import type { Component, Ref } from "vue";
-import type { RouteRecordRaw } from "vue-router";
+import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { MenuGroupType } from "./menus";
 import type { PagesPublicState } from "../states/pages";
 
 export type ExtensionPointName = "PAGES" | "POSTS";
 
 export type ExtensionPointState = PagesPublicState;
+
+interface RouteRecordAppend {
+  parentName: RouteRecordName;
+  route: RouteRecordRaw;
+}
 
 export interface Plugin {
   name: string;
@@ -25,7 +30,7 @@ export interface Plugin {
    */
   deactivated?: () => void;
 
-  routes?: RouteRecordRaw[];
+  routes?: RouteRecordRaw[] | RouteRecordAppend[];
 
   menus?: MenuGroupType[];
 

@@ -1,5 +1,5 @@
 import { BasicLayout, definePlugin } from "@halo-dev/admin-shared";
-import SheetList from "./PageList.vue";
+import PageList from "./PageList.vue";
 import { IconPages } from "@halo-dev/components";
 
 export default definePlugin({
@@ -9,11 +9,12 @@ export default definePlugin({
     {
       path: "/pages",
       component: BasicLayout,
+      name: "BasePages",
       children: [
         {
           path: "",
           name: "Pages",
-          component: SheetList,
+          component: PageList,
         },
       ],
     },

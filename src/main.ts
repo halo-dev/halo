@@ -47,7 +47,11 @@ function registerModule(pluginModule: Plugin) {
     }
 
     for (const route of pluginModule.routes) {
-      router.addRoute(route);
+      if ("parentName" in route) {
+        router.addRoute(route.parentName, route.route);
+      } else {
+        router.addRoute(route);
+      }
     }
   }
 

@@ -38,6 +38,7 @@ export default defineConfig({
           "@halo-dev/components": "HaloComponents",
         },
         exports: "named",
+        generatedCode: "es5",
       },
     },
     sourcemap: true,
