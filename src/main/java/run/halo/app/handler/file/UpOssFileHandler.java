@@ -137,8 +137,9 @@ public class UpOssFileHandler implements FileHandler {
 
         try {
             Response result = manager.deleteFile(key, null);
-            if (!result.isSuccessful()) {
+            if (!result.isSuccessful() && result.code() != 404) {
                 log.warn("附件 " + key + " 从又拍云删除失败");
+                throw new FileOperationException("附件 " + key + " 从又拍云删除失败");
             }
         } catch (IOException | UpException e) {
             e.printStackTrace();
