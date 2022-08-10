@@ -42,7 +42,7 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Unstructured;
-import run.halo.app.infra.ThemeInstallationException;
+import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;

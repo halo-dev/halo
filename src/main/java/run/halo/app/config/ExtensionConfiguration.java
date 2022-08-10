@@ -9,10 +9,12 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
+import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
+import run.halo.app.core.extension.reconciler.ThemeReconciler;
 import run.halo.app.core.extension.reconciler.UserReconciler;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.DefaultExtensionClient;
@@ -28,6 +30,7 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.ControllerManager;
 import run.halo.app.extension.router.ExtensionCompositeRouterFunction;
 import run.halo.app.extension.store.ExtensionStoreClient;
+import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
 
@@ -97,6 +100,14 @@ public class ExtensionConfiguration {
             return new ControllerBuilder("plugin-controller", client)
                 .reconciler(new PluginReconciler(client, haloPluginManager, jsBundleRule))
                 .extension(new Plugin())
+                .build();
+        }
+
+        @Bean
+        Controller themeController(ExtensionClient client, HaloProperties haloProperties) {
+            return new ControllerBuilder("theme-controller", client)
+                .reconciler(new ThemeReconciler(client, haloProperties))
+                .extension(new Theme())
                 .build();
         }
     }

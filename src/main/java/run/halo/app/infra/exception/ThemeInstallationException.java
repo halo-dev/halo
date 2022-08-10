@@ -1,4 +1,4 @@
-package run.halo.app.infra;
+package run.halo.app.infra.exception;
 
 /**
  * @author guqing
