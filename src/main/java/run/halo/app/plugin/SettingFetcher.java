@@ -6,11 +6,9 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
@@ -19,16 +17,11 @@ import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * <p>A value fetcher for pPlugin form configuration.</p>
- * <p>The method of obtaining values is lazy,only when it is used for the first time can the real
- * query value be obtained from {@link ConfigMap}.</p>
- * <p>It is thread safe.</p>
  *
  * @author guqing
  * @since 2.0.0
  */
 public class SettingFetcher {
-
-    private final AtomicReference<Map<String, JsonNode>> valueRef = new AtomicReference<>(null);
 
     private final ExtensionClient extensionClient;
 
@@ -40,13 +33,13 @@ public class SettingFetcher {
         this.pluginName = pluginName;
     }
 
-    @Nullable
-    public <T> T getGroupForObject(String group, Class<T> clazz) {
-        return convertValue(getInternal(group), clazz);
+    @NonNull
+    public <T> Optional<T> fetch(String group, Class<T> clazz) {
+        return Optional.ofNullable(convertValue(getInternal(group), clazz));
     }
 
     @NonNull
-    public JsonNode getGroup(String group) {
+    public JsonNode get(String group) {
         return getInternal(group);
     }
 
@@ -57,13 +50,11 @@ public class SettingFetcher {
      */
     @NonNull
     public Map<String, JsonNode> getValues() {
-        Map<String, JsonNode> values =
-            valueRef.updateAndGet(m -> m != null ? m : getValuesInternal());
-        return Map.copyOf(values);
+        return Map.copyOf(getValuesInternal());
     }
 
     private JsonNode getInternal(String group) {
-        return Optional.ofNullable(getValues().get(group))
+        return Optional.ofNullable(getValuesInternal().get(group))
             .orElse(JsonNodeFactory.instance.missingNode());
     }
 

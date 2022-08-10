@@ -35,6 +35,13 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
     private final MultiValueMap<String, RequestMappingInfo> pluginMappingInfo =
         new LinkedMultiValueMap<>();
 
+    @Override
+    protected void initHandlerMethods() {
+        // Parent method will scan beans in the ApplicationContext
+        // detect and register handler methods.
+        // but this is superfluous for this class.
+    }
+
     /**
      * Register handler methods according to the plugin id and the controller(annotated
      * {@link Controller}) bean.

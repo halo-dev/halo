@@ -6,12 +6,16 @@ import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.ClassLoadingStrategy;
 import org.pf4j.CompoundPluginLoader;
+import org.pf4j.CompoundPluginRepository;
+import org.pf4j.DefaultPluginRepository;
 import org.pf4j.DevelopmentPluginLoader;
 import org.pf4j.JarPluginLoader;
+import org.pf4j.JarPluginRepository;
 import org.pf4j.PluginClassLoader;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginLoader;
 import org.pf4j.PluginManager;
+import org.pf4j.PluginRepository;
 import org.pf4j.PluginStatusProvider;
 import org.pf4j.RuntimeMode;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,6 +37,7 @@ import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 public class PluginAutoConfiguration {
 
     private final PluginProperties pluginProperties;
+
     @Qualifier("webFluxContentTypeResolver")
     private final RequestedContentTypeResolver requestedContentTypeResolver;
 
@@ -126,11 +131,23 @@ public class PluginAutoConfiguration {
                     }
                     return super.createPluginStatusProvider();
                 }
+
+                @Override
+                protected PluginRepository createPluginRepository() {
+                    var developmentPluginRepository =
+                        new DefaultDevelopmentPluginRepository(getPluginsRoots());
+                    developmentPluginRepository
+                        .setFixedPaths(pluginProperties.getFixedPluginPath());
+                    return new CompoundPluginRepository()
+                        .add(developmentPluginRepository, this::isDevelopment)
+                        .add(new JarPluginRepository(getPluginsRoots()), this::isNotDevelopment)
+                        .add(new DefaultPluginRepository(getPluginsRoots()),
+                            this::isNotDevelopment);
+                }
             };
 
         pluginManager.setExactVersionAllowed(pluginProperties.isExactVersionAllowed());
         pluginManager.setSystemVersion(pluginProperties.getSystemVersion());
-
         return pluginManager;
     }
 }
