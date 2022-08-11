@@ -4,6 +4,8 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.Menu;
+import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Role;
@@ -35,5 +37,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(Setting.class);
         schemeManager.register(ConfigMap.class);
         schemeManager.register(Theme.class);
+        schemeManager.register(Menu.class);
+        schemeManager.register(MenuItem.class);
     }
 }

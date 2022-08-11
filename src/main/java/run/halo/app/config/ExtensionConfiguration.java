@@ -6,11 +6,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.core.extension.Menu;
+import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.reconciler.MenuItemReconciler;
+import run.halo.app.core.extension.reconciler.MenuReconciler;
 import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
@@ -100,6 +104,22 @@ public class ExtensionConfiguration {
             return new ControllerBuilder("plugin-controller", client)
                 .reconciler(new PluginReconciler(client, haloPluginManager, jsBundleRule))
                 .extension(new Plugin())
+                .build();
+        }
+
+        @Bean
+        Controller menuController(ExtensionClient client) {
+            return new ControllerBuilder("menu-controller", client)
+                .reconciler(new MenuReconciler(client))
+                .extension(new Menu())
+                .build();
+        }
+
+        @Bean
+        Controller menuItemController(ExtensionClient client) {
+            return new ControllerBuilder("menu-item-controller", client)
+                .reconciler(new MenuItemReconciler(client))
+                .extension(new MenuItem())
                 .build();
         }
 
