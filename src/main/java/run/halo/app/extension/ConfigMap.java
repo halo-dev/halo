@@ -15,9 +15,11 @@ import lombok.ToString;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "", version = "v1alpha1", kind = "ConfigMap", plural = "configmaps",
+@GVK(group = "", version = "v1alpha1", kind = ConfigMap.KIND, plural = "configmaps",
     singular = "configmap")
 public class ConfigMap extends AbstractExtension {
+
+    public static final String KIND = "ConfigMap";
 
     private Map<String, String> data;
 

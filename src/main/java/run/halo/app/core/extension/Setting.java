@@ -15,9 +15,11 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "", version = "v1alpha1", kind = "Setting",
+@GVK(group = "", version = "v1alpha1", kind = Setting.KIND,
     plural = "settings", singular = "setting")
 public class Setting extends AbstractExtension {
+
+    public static final String KIND = "Setting";
 
     @Schema(required = true, minLength = 1)
     private List<SettingSpec> spec;

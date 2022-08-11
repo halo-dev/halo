@@ -69,3 +69,6 @@ nbdist/
 application-local.yml
 application-local.yaml
 application-local.properties
+
+### Zip file for test
+!src/test/resources/themes/*.zip
