@@ -5,9 +5,11 @@ import "floating-vue/dist/style.css";
 import VueGridLayout from "vue-grid-layout";
 import { defaultConfig, plugin as FormKit } from "@formkit/vue";
 import FormKitConfig from "@/formkit/formkit.config";
+import RichTextEditor from "@halo-dev/richtext-editor";
 
 export function setupComponents(app: App) {
   app.use(VueGridLayout);
+  app.use(RichTextEditor);
   app.use(
     FormKit,
     defaultConfig({

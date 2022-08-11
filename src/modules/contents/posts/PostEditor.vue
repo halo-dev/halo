@@ -23,9 +23,6 @@ import {
   </VPageHeader>
   <div class="editor">
     <!--mock-->
-    <iframe
-      class="h-screen w-full border-0"
-      src="https://stackedit.io/app"
-    ></iframe>
+    <RichTextEditor  />
   </div>
 </template>
