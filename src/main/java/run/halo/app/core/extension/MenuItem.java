@@ -31,6 +31,9 @@ public class MenuItem extends AbstractExtension {
         @Schema(description = "The href of this menu item.")
         private String href;
 
+        @Schema(description = "The priority is for ordering.")
+        private Integer priority;
+
         @ArraySchema(
             arraySchema = @Schema(description = "Children of this menu item"),
             schema = @Schema(description = "The name of menu item child"))
