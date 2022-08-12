@@ -11,7 +11,7 @@ import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
-import run.halo.app.infra.NotFoundException;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.engine.SpringWebFluxTemplateEngine;
 import run.halo.app.theme.message.ThemeMessageResolver;
 
