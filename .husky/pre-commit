@@ -3,4 +3,5 @@
 
 pnpm test:unit
 pnpm typecheck
+pnpm prettier
 pnpm lint
