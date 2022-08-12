@@ -14,7 +14,7 @@ importers:
       '@formkit/vue': 1.0.0-beta.10
       '@halo-dev/admin-api': ^1.1.0
       '@halo-dev/admin-shared': workspace:*
-      '@halo-dev/api-client': ^0.0.9
+      '@halo-dev/api-client': ^0.0.11
       '@halo-dev/components': workspace:*
       '@halo-dev/richtext-editor': 0.0.0-alpha.1
       '@rushstack/eslint-patch': ^1.1.4
@@ -85,7 +85,7 @@ importers:
       '@formkit/vue': 1.0.0-beta.10_wwmyxdjqen5bmh3tr2meig5lki
       '@halo-dev/admin-api': 1.1.0
       '@halo-dev/admin-shared': link:packages/shared
-      '@halo-dev/api-client': 0.0.9
+      '@halo-dev/api-client': 0.0.11
       '@halo-dev/components': link:packages/components
       '@halo-dev/richtext-editor': 0.0.0-alpha.1_vue@3.2.37
       '@vueuse/components': 8.9.4_vue@3.2.37
@@ -176,12 +176,12 @@ importers:
 
   packages/shared:
     specifiers:
-      '@halo-dev/api-client': ^0.0.9
+      '@halo-dev/api-client': ^0.0.11
       '@halo-dev/components': workspace:*
       axios: ^0.27.2
       vite-plugin-dts: ^1.4.1
     dependencies:
-      '@halo-dev/api-client': 0.0.9
+      '@halo-dev/api-client': 0.0.11
       '@halo-dev/components': link:../components
       axios: 0.27.2
     devDependencies:
@@ -2126,8 +2126,8 @@ packages:
       - debug
     dev: false
 
-  /@halo-dev/api-client/0.0.9:
-    resolution: {integrity: sha512-GhDbgIASrvUwVE1/jadowPWZnQMASaOIF9mS7FKcC3/UjHZGBmxx03ECVLc7PH1hnHqsNTCbiLUDZtig6ZDuUw==}
+  /@halo-dev/api-client/0.0.11:
+    resolution: {integrity: sha512-67e7lrWPoHVKF4XItT6OWr7rX96CR9s/3SOVXYD3xCyAMIgLyFULfKVI7JGxisFMKvadTx7rm5RK4zzZ/CbXIw==}
     dev: false
 
   /@halo-dev/logger/1.1.0:
