@@ -1,5 +1,5 @@
 import { BasicLayout, definePlugin } from "@halo-dev/admin-shared";
-import MenuList from "./MenuList.vue";
+import Menus from "./Menus.vue";
 import { IconListSettings } from "@halo-dev/components";
 
 export default definePlugin({
@@ -13,7 +13,7 @@ export default definePlugin({
         {
           path: "",
           name: "Menus",
-          component: MenuList,
+          component: Menus,
         },
       ],
     },

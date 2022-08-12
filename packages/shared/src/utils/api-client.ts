@@ -9,6 +9,8 @@ import {
   V1alpha1RoleBindingApi,
   V1alpha1SettingApi,
   V1alpha1UserApi,
+  V1alpha1MenuApi,
+  V1alpha1MenuItemApi,
   ThemeHaloRunV1alpha1ThemeApi,
   ApiHaloRunV1alpha1ThemeApi,
 } from "@halo-dev/api-client";
@@ -61,10 +63,8 @@ function setupApiClient(axios: AxiosInstance) {
       plugin: new PluginHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
       user: new V1alpha1UserApi(undefined, apiUrl, axios),
       theme: new ThemeHaloRunV1alpha1ThemeApi(undefined, apiUrl, axios),
-
-      // TODO optional
-      // link: new CoreHaloRunV1alpha1LinkApi(undefined, apiUrl, axios),
-      // linkGroup: new CoreHaloRunV1alpha1LinkGroupApi(undefined, apiUrl, axios),
+      menu: new V1alpha1MenuApi(undefined, apiUrl, axios),
+      menuItem: new V1alpha1MenuItemApi(undefined, apiUrl, axios),
     },
     user: new ApiHaloRunV1alpha1UserApi(undefined, apiUrl, axios),
     plugin: new ApiHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
