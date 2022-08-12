@@ -11,7 +11,7 @@ import lombok.Data;
  * @since 2.0.0
  */
 @Data
-public class Conditions {
+public class Condition {
     /**
      * type of condition in CamelCase or in foo.example.com/CamelCase
      * example: Ready, Initialized
