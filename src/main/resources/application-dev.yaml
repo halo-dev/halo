@@ -25,7 +25,7 @@ halo:
 logging:
   level:
     run.halo.app: DEBUG
-
+    org.springframework.r2dbc: DEBUG
 springdoc:
   api-docs:
     enabled: true

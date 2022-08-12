@@ -77,9 +77,9 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // R2DBC
+    runtimeOnly 'io.r2dbc:r2dbc-h2'
     runtimeOnly 'com.h2database:h2'
 //    runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
-    runtimeOnly 'io.r2dbc:r2dbc-h2'
 //    runtimeOnly 'io.r2dbc:r2dbc-mssql'
     runtimeOnly 'mysql:mysql-connector-java'
 //    runtimeOnly 'org.mariadb:r2dbc-mariadb'

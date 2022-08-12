@@ -1,6 +1,5 @@
 package run.halo.app.config;
 
-import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +21,6 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.JSONExtensionConverter;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.SchemeWatcherManager;
-import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.ControllerManager;
@@ -47,7 +45,7 @@ public class ExtensionConfiguration {
     }
 
     @Bean
-    SchemeManager schemeManager(SchemeWatcherManager watcherManager, List<SchemeWatcher> watchers) {
+    SchemeManager schemeManager(SchemeWatcherManager watcherManager) {
         return new DefaultSchemeManager(watcherManager);
     }
 
