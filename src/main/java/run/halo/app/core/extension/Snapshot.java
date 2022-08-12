@@ -1,10 +1,14 @@
 package run.halo.app.core.extension;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.util.Assert;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -49,6 +53,16 @@ public class Snapshot extends AbstractExtension {
         private Integer version;
 
         private Instant publishTime;
+
+        private Set<String> contributors;
+
+        @JsonIgnore
+        public Set<String> getContributorsOrDefault() {
+            if (this.contributors == null) {
+                this.contributors = new LinkedHashSet<>();
+            }
+            return this.contributors;
+        }
     }
 
     @Data
@@ -58,5 +72,33 @@ public class Snapshot extends AbstractExtension {
 
         @Schema(required = true)
         private String name;
+    }
+
+    public static String displayVersionFrom(Integer version) {
+        Assert.notNull(version, "The version must not be null");
+        return "v" + version;
+    }
+
+    @JsonIgnore
+    public boolean isPublished() {
+        return this.spec.getPublishTime() != null;
+    }
+
+    @JsonIgnore
+    public void addContributor(String name) {
+        Assert.notNull(name, "The username must not be null.");
+        Set<String> contributors = spec.getContributorsOrDefault();
+        contributors.add(name);
+    }
+
+    @JsonIgnore
+    public void setSubjectRef(String kind, String name) {
+        Assert.notNull(kind, "The subject kind must not be null.");
+        Assert.notNull(name, "The subject name must not be null.");
+        if (spec.subjectRef == null) {
+            spec.subjectRef = new SubjectRef();
+        }
+        spec.subjectRef.setKind(kind);
+        spec.subjectRef.setName(name);
     }
 }

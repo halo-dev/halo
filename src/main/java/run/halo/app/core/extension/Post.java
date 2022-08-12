@@ -1,6 +1,9 @@
 package run.halo.app.core.extension;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
@@ -8,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
-import run.halo.app.infra.Conditions;
+import run.halo.app.infra.Condition;
 
 /**
  * @author guqing
@@ -29,11 +32,22 @@ public class Post extends AbstractExtension {
     @Schema(required = true)
     private PostStatus status;
 
+    @JsonIgnore
+    public PostStatus getStatusOrDefault() {
+        if (this.status == null) {
+            this.status = new PostStatus();
+        }
+        return status;
+    }
+
     @Data
     public static class PostSpec {
         @Schema(required = true, minLength = 1)
         private String title;
 
+        /**
+         * 文章引用到的已发布的内容，用于主题端显示
+         */
         private String releaseSnapshot;
 
         @Schema(required = true, minLength = 1)
@@ -54,6 +68,8 @@ public class Post extends AbstractExtension {
 
         @Schema(required = true, defaultValue = "false")
         private Boolean published;
+
+        private Instant publishTime;
 
         @Schema(required = true, defaultValue = "false")
         private Boolean pinned;
@@ -86,7 +102,7 @@ public class Post extends AbstractExtension {
         private String phase;
 
         @Schema(required = true)
-        private List<Conditions> conditions;
+        private List<Condition> conditions;
 
         private String permalink;
 
@@ -96,6 +112,14 @@ public class Post extends AbstractExtension {
         private Boolean inProgress;
 
         private List<String> contributors;
+
+        @JsonIgnore
+        public List<Condition> getConditionsOrDefault() {
+            if (this.conditions == null) {
+                this.conditions = new ArrayList<>();
+            }
+            return conditions;
+        }
     }
 
     @Data
@@ -105,6 +129,12 @@ public class Post extends AbstractExtension {
         private Boolean autoGenerate;
 
         private String raw;
+    }
+
+    public enum PostPhase {
+        DRAFT,
+        PENDING_APPROVAL,
+        PUBLISHED
     }
 
     public enum VisibleEnum {
