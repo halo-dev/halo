@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import {
-  IconArrowRight,
   IconGitHub,
+  IconMore,
+  useDialog,
   VButton,
   VModal,
   VSpace,
@@ -33,6 +34,8 @@ const emit = defineEmits(["update:visible", "close", "update:selectedTheme"]);
 const themes = ref<Theme[]>([]);
 const themeInstall = ref(false);
 
+const dialog = useDialog();
+
 const handleFetchThemes = async () => {
   try {
     const { data } =
@@ -41,6 +44,24 @@ const handleFetchThemes = async () => {
   } catch (e) {
     console.error("Failed to fetch themes", e);
   }
+};
+
+const handleUninstall = async (theme: Theme) => {
+  dialog.warning({
+    title: "是否确定删除该主题？",
+    description: "删除后将无法恢复。",
+    onConfirm: async () => {
+      try {
+        await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme(
+          theme.metadata.name
+        );
+      } catch (e) {
+        console.error("Failed to uninstall theme", e);
+      } finally {
+        await handleFetchThemes();
+      }
+    },
+  });
 };
 
 const handleVisibleChange = (visible: boolean) => {
@@ -131,7 +152,30 @@ defineExpose({
                 </a>
               </div>
               <div>
-                <IconArrowRight class="text-gray-900" />
+                <FloatingDropdown>
+                  <IconMore
+                    class="rounded text-gray-900 hover:bg-gray-200 hover:text-gray-600"
+                    @click.stop
+                  />
+                  <template #popper>
+                    <div class="w-48 p-2">
+                      <VSpace class="w-full" direction="column">
+                        <VButton
+                          v-close-popper
+                          :disabled="
+                            theme.metadata.name ===
+                            activatedTheme?.metadata?.name
+                          "
+                          block
+                          type="danger"
+                          @click="handleUninstall(theme)"
+                        >
+                          卸载
+                        </VButton>
+                      </VSpace>
+                    </div>
+                  </template>
+                </FloatingDropdown>
               </div>
             </VSpace>
           </div>
