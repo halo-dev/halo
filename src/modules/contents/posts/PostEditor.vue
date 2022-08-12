@@ -23,6 +23,6 @@ import {
   </VPageHeader>
   <div class="editor">
     <!--mock-->
-    <RichTextEditor  />
+    <RichTextEditor />
   </div>
 </template>
