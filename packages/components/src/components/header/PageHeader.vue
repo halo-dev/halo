@@ -6,7 +6,7 @@ defineProps({
 });
 </script>
 <template>
-  <div class="flex items-center justify-between bg-white p-4">
+  <div class="flex items-center justify-between bg-white p-4 h-14">
     <div class="min-w-0 flex-1 self-center">
       <h2 class="flex items-center truncate text-xl font-bold text-gray-800">
         <slot name="icon" />

@@ -21,8 +21,7 @@ import {
       </VButton>
     </template>
   </VPageHeader>
-  <div class="editor">
-    <!--mock-->
+  <div class="editor border-t">
     <RichTextEditor />
   </div>
 </template>

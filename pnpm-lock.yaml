@@ -16,7 +16,7 @@ importers:
       '@halo-dev/admin-shared': workspace:*
       '@halo-dev/api-client': ^0.0.10
       '@halo-dev/components': workspace:*
-      '@halo-dev/richtext-editor': 0.0.0-alpha.1
+      '@halo-dev/richtext-editor': 0.0.0-alpha.2
       '@rushstack/eslint-patch': ^1.1.4
       '@tailwindcss/aspect-ratio': ^0.4.0
       '@types/jsdom': ^20.0.0
@@ -89,7 +89,7 @@ importers:
       '@halo-dev/admin-shared': link:packages/shared
       '@halo-dev/api-client': 0.0.10
       '@halo-dev/components': link:packages/components
-      '@halo-dev/richtext-editor': 0.0.0-alpha.1_vue@3.2.37
+      '@halo-dev/richtext-editor': 0.0.0-alpha.2_vue@3.2.37
       '@vueuse/components': 8.9.4_vue@3.2.37
       '@vueuse/core': 8.9.4_vue@3.2.37
       '@vueuse/router': 9.1.0_45jhv7el6g2ztux7wgm2ofrf4e
@@ -2155,8 +2155,8 @@ packages:
       - debug
     dev: false
 
-  /@halo-dev/richtext-editor/0.0.0-alpha.1_vue@3.2.37:
-    resolution: {integrity: sha512-rRghi9uSMIGN7hCMZarTdngF0DkWtC3q66It1T0YZiYy/C1uVdF4/+y8EiF7N1zqmVussjj50zxlJ5utm966Qg==}
+  /@halo-dev/richtext-editor/0.0.0-alpha.2_vue@3.2.37:
+    resolution: {integrity: sha512-/X+k2khvEbsXpf298cglE4b5ilFEHWaKegTMJTV5WmWowbi1gflJNqW+LGcHpNB77ndNvdV/V/tkH6vtAWsxrA==}
     peerDependencies:
       vue: ^3.2.37
     dependencies:
@@ -2164,6 +2164,9 @@ packages:
       '@tiptap/extension-code-block-lowlight': 2.0.0-beta.73_giic42g7xysntyllbw3z33pheu
       '@tiptap/extension-image': 2.0.0-beta.30_jdrcmhoxj44u3cq7gnenksjiqq
       '@tiptap/extension-link': 2.0.0-beta.43_jdrcmhoxj44u3cq7gnenksjiqq
+      '@tiptap/extension-placeholder': 2.0.0-beta.53_jdrcmhoxj44u3cq7gnenksjiqq
+      '@tiptap/extension-subscript': 2.0.0-beta.13_jdrcmhoxj44u3cq7gnenksjiqq
+      '@tiptap/extension-superscript': 2.0.0-beta.13_jdrcmhoxj44u3cq7gnenksjiqq
       '@tiptap/extension-table': 2.0.0-beta.54_jdrcmhoxj44u3cq7gnenksjiqq
       '@tiptap/extension-table-cell': 2.0.0-beta.23_jdrcmhoxj44u3cq7gnenksjiqq
       '@tiptap/extension-table-header': 2.0.0-beta.25_jdrcmhoxj44u3cq7gnenksjiqq
@@ -2611,8 +2614,8 @@ packages:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
     dev: true
 
-  /@popperjs/core/2.11.5:
-    resolution: {integrity: sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==}
+  /@popperjs/core/2.11.6:
+    resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
     dev: false
 
   /@rollup/plugin-babel/5.3.1_yxrswjuizjis6zyfy4tmgvt2ju:
@@ -2943,8 +2946,35 @@ packages:
       '@tiptap/core': 2.0.0-beta.182
     dev: false
 
+  /@tiptap/extension-placeholder/2.0.0-beta.53_jdrcmhoxj44u3cq7gnenksjiqq:
+    resolution: {integrity: sha512-NGU/a+GvcJVBjFqb2vI45+rNa3Cjsq/M+R/2xg9olb1w/HBr17NKf/5WSoqcc1S2cdnmMH6rB0/mVhG7Ciur+Q==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.1
+    dependencies:
+      '@tiptap/core': 2.0.0-beta.182
+      prosemirror-model: 1.18.1
+      prosemirror-state: 1.4.1
+      prosemirror-view: 1.26.2
+    dev: false
+
   /@tiptap/extension-strike/2.0.0-beta.29_jdrcmhoxj44u3cq7gnenksjiqq:
     resolution: {integrity: sha512-zqFuY7GfNmZ/KClt6kxQ+msGo3syqucP/Xnlihxi+/h/G+oTvEwyOIXCtDOltvxcsWH/TUsdr5vzLp0j+Mdc6Q==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.1
+    dependencies:
+      '@tiptap/core': 2.0.0-beta.182
+    dev: false
+
+  /@tiptap/extension-subscript/2.0.0-beta.13_jdrcmhoxj44u3cq7gnenksjiqq:
+    resolution: {integrity: sha512-L9f2zKzNI5y4YvMdNxHDT4Y+8gS1UwtbTJ1vUJdCZGfF8DrMuTZIRp3LjOxYXydr7NGEXyYbucdm97Tzrsp8WA==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.1
+    dependencies:
+      '@tiptap/core': 2.0.0-beta.182
+    dev: false
+
+  /@tiptap/extension-superscript/2.0.0-beta.13_jdrcmhoxj44u3cq7gnenksjiqq:
+    resolution: {integrity: sha512-Vr9KIG2c4jzymcMMQCjhx2gppmRvnbw6Xvrd8YCpK4szyYI1ClMQ5KQMYl2zV3Y4ZIsivRSy9cE0ipGsXGE3Gw==}
     peerDependencies:
       '@tiptap/core': ^2.0.0-beta.1
     dependencies:
@@ -8624,7 +8654,7 @@ packages:
   /tippy.js/6.3.7:
     resolution: {integrity: sha512-E1d3oP2emgJ9dRQZdf3Kkn0qJgI6ZLpyS5z6ZkY1DF3kaQaBsGZsndEpHwx+eC+tYM41HaSNvNtLx8tU57FzTQ==}
     dependencies:
-      '@popperjs/core': 2.11.5
+      '@popperjs/core': 2.11.6
     dev: false
 
   /tmp/0.0.33:
