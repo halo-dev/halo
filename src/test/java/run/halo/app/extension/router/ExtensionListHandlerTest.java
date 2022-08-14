@@ -16,17 +16,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.web.reactive.function.server.EntityResponse;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 
 @ExtendWith(MockitoExtension.class)
 class ExtensionListHandlerTest {
 
     @Mock
-    ExtensionClient client;
+    ReactiveExtensionClient client;
 
     @Test
     void shouldBuildPathPatternCorrectly() {
@@ -44,7 +45,7 @@ class ExtensionListHandlerTest {
         final var fake = new FakeExtension();
         var fakeListResult = new ListResult<>(0, 0, 1, List.of(fake));
         when(client.list(same(FakeExtension.class), any(), any(), anyInt(), anyInt()))
-            .thenReturn(fakeListResult);
+            .thenReturn(Mono.just(fakeListResult));
 
         var responseMono = listHandler.handle(serverRequest);
 

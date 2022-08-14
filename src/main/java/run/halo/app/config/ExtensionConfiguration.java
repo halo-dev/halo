@@ -25,6 +25,7 @@ import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.JSONExtensionConverter;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.controller.Controller;
@@ -40,7 +41,7 @@ import run.halo.app.plugin.resources.JsBundleRuleProvider;
 public class ExtensionConfiguration {
 
     @Bean
-    RouterFunction<ServerResponse> extensionsRouterFunction(ExtensionClient client,
+    RouterFunction<ServerResponse> extensionsRouterFunction(ReactiveExtensionClient client,
         SchemeWatcherManager watcherManager) {
         return new ExtensionCompositeRouterFunction(client, watcherManager);
     }

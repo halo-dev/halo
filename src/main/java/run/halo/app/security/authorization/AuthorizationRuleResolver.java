@@ -1,6 +1,7 @@
 package run.halo.app.security.authorization;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import reactor.core.publisher.Mono;
 
 /**
  * @author guqing
@@ -28,4 +29,6 @@ public interface AuthorizationRuleResolver {
      * @param visitor visitor
      */
     void visitRulesFor(UserDetails user, RuleAccumulator visitor);
+
+    Mono<AuthorizingVisitor> visitRulesForMono(UserDetails user, RequestInfo requestInfo);
 }

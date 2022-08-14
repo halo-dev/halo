@@ -1,6 +1,8 @@
 package run.halo.app.theme.dialect;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static run.halo.app.theme.ThemeLocaleContextResolver.TIME_ZONE_COOKIE_NAME;
 
 import java.io.FileNotFoundException;
@@ -19,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -29,6 +32,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.thymeleaf.extras.java8time.expression.Temporals;
+import reactor.core.publisher.Mono;
 import run.halo.app.theme.ThemeContext;
 import run.halo.app.theme.ThemeResolver;
 
@@ -43,7 +47,8 @@ import run.halo.app.theme.ThemeResolver;
 class ThemeJava8TimeDialectIntegrationTest {
     private static final Instant INSTANT = Instant.now();
 
-    @Autowired
+    // @Autowired
+    @SpyBean
     private ThemeResolver themeResolver;
 
     private URL defaultThemeUrl;
@@ -57,17 +62,15 @@ class ThemeJava8TimeDialectIntegrationTest {
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
-        themeContextFunction = themeResolver.getThemeContextFunction();
-        themeResolver.setThemeContextFunction(request -> createDefaultContext());
-
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
+        when(themeResolver.getTheme(any(ServerHttpRequest.class))).thenReturn(
+            Mono.just(createDefaultContext()));
         defaultTimeZone = TimeZone.getDefault();
     }
 
     @AfterEach
     void tearDown() {
         TimeZone.setDefault(defaultTimeZone);
-        this.themeResolver.setThemeContextFunction(themeContextFunction);
     }
 
     @Test

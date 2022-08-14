@@ -22,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
@@ -54,7 +55,7 @@ class ExtensionConfigurationTest {
             .build();
         var role = new Role();
         role.setRules(List.of(rule));
-        when(roleService.getRole(anyString())).thenReturn(role);
+        when(roleService.getMonoRole(anyString())).thenReturn(Mono.just(role));
 
         // register scheme
         schemeManager.register(FakeExtension.class);
@@ -62,7 +63,7 @@ class ExtensionConfigurationTest {
 
     @AfterEach
     void cleanUp(@Autowired ExtensionStoreRepository repository) {
-        repository.deleteAll();
+        repository.deleteAll().subscribe();
     }
 
     @Test

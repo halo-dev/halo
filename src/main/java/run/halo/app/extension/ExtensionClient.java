@@ -11,6 +11,7 @@ import java.util.function.Predicate;
  *
  * @author johnniang
  */
+@Deprecated
 public interface ExtensionClient {
 
     /**

@@ -51,6 +51,7 @@ public interface ReactiveExtensionClient {
 
     Mono<Unstructured> fetch(GroupVersionKind gvk, String name);
 
+    <E extends Extension> Mono<E> get(Class<E> type, String name);
 
     /**
      * Creates an Extension.

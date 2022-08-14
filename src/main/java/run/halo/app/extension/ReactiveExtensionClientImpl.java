@@ -8,6 +8,7 @@ import org.springframework.data.util.Predicates;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 @Component
@@ -75,6 +76,19 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    public <E extends Extension> Mono<E> get(Class<E> type, String name) {
+        return fetch(type, name)
+            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(
+                "Extension " + type.getName() + " with name " + name + " not found")));
+    }
+
+    private Mono<Unstructured> get(GroupVersionKind gvk, String name) {
+        return fetch(gvk, name)
+            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(
+                "Extension " + gvk + " with name " + name + " not found")));
+    }
+
+    @Override
     public <E extends Extension> Mono<E> create(E extension) {
         var metadata = extension.getMetadata();
         // those fields should be managed by halo.
@@ -92,7 +106,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     @Override
     public <E extends Extension> Mono<E> update(E extension) {
         // overwrite some fields
-        return fetch(extension.getClass(), extension.getMetadata().getName())
+        Mono<? extends Extension> mono;
+        if (extension instanceof Unstructured unstructured) {
+            mono = get(unstructured.groupVersionKind(), extension.getMetadata().getName());
+        } else {
+            mono = get(extension.getClass(), extension.getMetadata().getName());
+        }
+        return mono
             .map(old -> {
                 // reset some fields
                 var oldMetadata = old.getMetadata();

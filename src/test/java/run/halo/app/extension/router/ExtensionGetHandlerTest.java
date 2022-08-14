@@ -1,12 +1,10 @@
 package run.halo.app.extension.router;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -15,9 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.web.reactive.function.server.EntityResponse;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 
@@ -25,7 +25,7 @@ import run.halo.app.extension.exception.ExtensionNotFoundException;
 class ExtensionGetHandlerTest {
 
     @Mock
-    ExtensionClient client;
+    ReactiveExtensionClient client;
 
     @Test
     void shouldBuildPathPatternCorrectly() {
@@ -43,7 +43,7 @@ class ExtensionGetHandlerTest {
             .pathVariable("name", "my-fake")
             .build();
         final var fake = new FakeExtension();
-        when(client.fetch(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Optional.of(fake));
+        when(client.get(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Mono.just(fake));
 
         var responseMono = getHandler.handle(serverRequest);
 
@@ -64,8 +64,12 @@ class ExtensionGetHandlerTest {
         var serverRequest = MockServerRequest.builder()
             .pathVariable("name", "my-fake")
             .build();
-        when(client.fetch(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Optional.empty());
+        when(client.get(eq(FakeExtension.class), eq("my-fake"))).thenReturn(
+            Mono.error(new ExtensionNotFoundException()));
 
-        assertThrows(ExtensionNotFoundException.class, () -> getHandler.handle(serverRequest));
+        Mono<ServerResponse> responseMono = getHandler.handle(serverRequest);
+        StepVerifier.create(responseMono)
+            .expectError(ExtensionNotFoundException.class)
+            .verify();
     }
 }

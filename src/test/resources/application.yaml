@@ -4,18 +4,13 @@ spring:
   output:
     ansi:
       enabled: detect
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:halo
-    username: admin
-    password: 123456
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    open-in-view: false
-    show-sql: true
+  r2dbc:
+    name: halo-test
+    generate-unique-name: true
+  sql:
+    init:
+      mode: always
+      platform: h2
 
 halo:
   work-dir: ${user.home}/halo-next-test
@@ -36,3 +31,4 @@ springdoc:
 logging:
   level:
     run.halo.app: debug
+    org.springframework.r2dbc: DEBUG

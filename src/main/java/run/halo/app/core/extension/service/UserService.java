@@ -9,7 +9,6 @@ public interface UserService {
 
     Mono<User> getUser(String username);
 
-    @Deprecated
     Mono<User> updatePassword(String username, String newPassword);
 
     Mono<User> updateWithRawPassword(String username, String rawPassword);

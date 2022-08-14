@@ -7,10 +7,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.service.DefaultRoleBindingService;
 import run.halo.app.core.extension.service.RoleBindingService;
@@ -75,6 +78,39 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
                 }
             }
         }
+    }
+
+    @Override
+    public Mono<AuthorizingVisitor> visitRulesForMono(UserDetails user, RequestInfo requestInfo) {
+        var roleNamesImmutable =
+            roleBindingService.listBoundRoleNames(user.getAuthorities());
+        var roleNames = new HashSet<>(roleNamesImmutable);
+        roleNames.add(AUTHENTICATED_ROLE);
+
+        var record = new AttributesRecord(user, requestInfo);
+        var visitor = new AuthorizingVisitor(record);
+        var stopVisiting = new AtomicBoolean(false);
+        return Flux.fromIterable(roleNames)
+            .flatMap(roleName -> {
+                if (stopVisiting.get()) {
+                    return Mono.empty();
+                }
+                return roleService.getMonoRole(roleName)
+                    .onErrorContinue(t -> visitor.visit(null, null, t), (throwable, o) -> {
+                    })
+                    .doOnNext(role -> {
+                        var rules = fetchRules(role);
+                        var source = roleBindingDescriber(roleName, user.getUsername());
+                        for (var rule : rules) {
+                            if (!visitor.visit(source, rule, null)) {
+                                stopVisiting.set(true);
+                                return;
+                            }
+                        }
+                    });
+            })
+            .then()
+            .thenReturn(visitor);
     }
 
     private List<Role.PolicyRule> fetchRules(Role role) {
