@@ -16,7 +16,10 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: string[]): void;
+  (event: "change", value: string[]): void;
+}>();
 
 function handleChange(e: Event) {
   const { value, checked } = e.target as HTMLInputElement;

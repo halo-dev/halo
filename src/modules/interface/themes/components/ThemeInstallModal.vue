@@ -15,7 +15,10 @@ withDefaults(
   }
 );
 
-const emit = defineEmits(["update:visible", "close"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+}>();
 
 const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);

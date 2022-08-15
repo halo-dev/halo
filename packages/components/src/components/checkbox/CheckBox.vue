@@ -15,7 +15,10 @@ const id = ["checkbox", props.name, props.value]
   .filter((item) => !!item)
   .join("-");
 
-const emit = defineEmits(["update:checked", "change"]);
+const emit = defineEmits<{
+  (event: "update:checked", value: boolean): void;
+  (event: "change", value: Event): void;
+}>();
 
 function handleChange(e: Event) {
   const { checked } = e.target as HTMLInputElement;

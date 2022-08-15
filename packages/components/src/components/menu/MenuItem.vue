@@ -15,7 +15,9 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["select"]);
+const emit = defineEmits<{
+  (event: "select", id: string): void;
+}>();
 
 const slots = useSlots();
 

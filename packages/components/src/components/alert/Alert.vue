@@ -31,7 +31,9 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits<{
+  (event: "close"): void;
+}>();
 
 const classes = computed(() => {
   return [`alert-${props.type}`];

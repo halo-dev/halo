@@ -20,7 +20,11 @@ const { page, size, total } = toRefs(props);
 
 const key = ref(Math.random());
 
-const emit = defineEmits(["update:page", "update:size", "change"]);
+const emit = defineEmits<{
+  (event: "update:page", page: number): void;
+  (event: "update:size", size: number): void;
+  (event: "change", value: { page: number; size: number }): void;
+}>();
 
 const onPageChange = ({
   currentPage,

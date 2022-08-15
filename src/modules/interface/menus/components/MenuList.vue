@@ -21,7 +21,10 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["select", "update:selectedMenu"]);
+const emit = defineEmits<{
+  (event: "select", menu: Menu): void;
+  (event: "update:selectedMenu", menu: Menu): void;
+}>();
 
 const menus = ref<Menu[]>([] as Menu[]);
 const selectedMenuToUpdate = ref<Menu | null>(null);

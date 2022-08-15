@@ -8,7 +8,10 @@ const props = defineProps<{
   name?: string;
 }>();
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: string | number | boolean): void;
+  (event: "change", value: string | number | boolean): void;
+}>();
 
 const id = ["radio", props.name, props.value]
   .filter((item) => !!item)

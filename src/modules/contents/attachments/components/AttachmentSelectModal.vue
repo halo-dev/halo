@@ -10,7 +10,10 @@ withDefaults(
   }
 );
 
-const emit = defineEmits(["update:visible", "close"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+}>();
 
 const attachments = Array.from(new Array(50), (_, index) => index).map(
   (index) => {

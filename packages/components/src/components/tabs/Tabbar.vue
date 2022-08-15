@@ -19,7 +19,10 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:activeId", "change"]);
+const emit = defineEmits<{
+  (event: "update:activeId", value: number | string): void;
+  (event: "change", value: number | string): void;
+}>();
 
 const classes = computed(() => {
   return [`tabbar-${props.type}`, `tabbar-direction-${props.direction}`];

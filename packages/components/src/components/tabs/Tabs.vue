@@ -25,7 +25,10 @@ provide<ComputedRef<string | number | undefined>>(
   computed(() => props.activeId)
 );
 
-const emit = defineEmits(["update:activeId", "change"]);
+const emit = defineEmits<{
+  (event: "update:activeId", value: number | string): void;
+  (event: "change", value: number | string): void;
+}>();
 
 const slots = useSlots();
 

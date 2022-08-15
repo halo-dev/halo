@@ -17,7 +17,10 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:visible", "close"]);
+const emit = defineEmits<{
+  (event: "update:visible", value: boolean): void;
+  (event: "close"): void;
+}>();
 
 const rootVisible = ref(false);
 const modelWrapper = ref<HTMLElement>();

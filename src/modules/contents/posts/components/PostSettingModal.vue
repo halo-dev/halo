@@ -27,7 +27,12 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:visible", "close", "previous", "next"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+  (event: "previous"): void;
+  (event: "next"): void;
+}>();
 
 const settingActiveId = ref("general");
 const formState = ref<FormState>({

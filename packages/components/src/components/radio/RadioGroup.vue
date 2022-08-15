@@ -15,7 +15,10 @@ withDefaults(
   }
 );
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: string | number | boolean): void;
+  (event: "change", value: string | number | boolean): void;
+}>();
 
 function handleChange(value: string | number | boolean) {
   emit("update:modelValue", value);

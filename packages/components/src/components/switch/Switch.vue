@@ -8,7 +8,10 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:modelValue", "change"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: boolean): void;
+  (event: "change", value: boolean): void;
+}>();
 
 const handleChange = () => {
   emit("update:modelValue", !props.modelValue);

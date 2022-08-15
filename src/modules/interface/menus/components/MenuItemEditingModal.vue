@@ -19,7 +19,11 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:visible", "close", "saved"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+  (event: "saved", menuItem: MenuItem): void;
+}>();
 
 const initialFormState: MenuItem = {
   spec: {

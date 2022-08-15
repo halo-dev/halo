@@ -61,7 +61,9 @@ const props = withDefaults(
 );
 
 const router = useRouter();
-const emit = defineEmits(["click"]);
+const emit = defineEmits<{
+  (event: "click"): void;
+}>();
 
 const classes = computed(() => {
   return [

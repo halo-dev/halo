@@ -13,7 +13,11 @@ withDefaults(
   }
 );
 
-const emit = defineEmits(["change", "open-editing", "delete"]);
+const emit = defineEmits<{
+  (event: "change"): void;
+  (event: "open-editing", menuItem: MenuTreeItem): void;
+  (event: "delete", menuItem: MenuTreeItem): void;
+}>();
 
 const isDragging = ref(false);
 

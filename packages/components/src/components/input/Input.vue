@@ -15,7 +15,9 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits<{
+  (event: "update:modelValue", value: string): void;
+}>();
 
 const classes = computed(() => {
   return [`input-${props.size}`];

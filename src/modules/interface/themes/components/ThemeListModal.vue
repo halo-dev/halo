@@ -26,7 +26,11 @@ withDefaults(
   }
 );
 
-const emit = defineEmits(["update:visible", "close", "update:selectedTheme"]);
+const emit = defineEmits<{
+  (event: "update:visible", visible: boolean): void;
+  (event: "close"): void;
+  (event: "update:selectedTheme", theme: Theme | null): void;
+}>();
 
 const themes = ref<Theme[]>([]);
 const themeInstall = ref(false);
