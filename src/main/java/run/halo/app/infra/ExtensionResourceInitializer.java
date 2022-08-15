@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import run.halo.app.extension.ExtensionClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
@@ -27,21 +28,21 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
  */
 @Slf4j
 @Component
-public class ExtensionResourceInitializer implements ApplicationListener<ApplicationReadyEvent> {
+public class ExtensionResourceInitializer {
 
     public static final Set<String> REQUIRED_EXTENSION_LOCATIONS =
         Set.of("classpath:/extensions/*.yaml", "classpath:/extensions/*.yml");
     private final HaloProperties haloProperties;
-    private final ExtensionClient extensionClient;
+    private final ReactiveExtensionClient extensionClient;
 
     public ExtensionResourceInitializer(HaloProperties haloProperties,
-        ExtensionClient extensionClient) {
+        ReactiveExtensionClient extensionClient) {
         this.haloProperties = haloProperties;
         this.extensionClient = extensionClient;
     }
 
-    @Override
-    public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
+    @EventListener
+    public Mono<Void> initialize(ApplicationReadyEvent readyEvent) {
         var locations = new HashSet<String>();
         if (!haloProperties.isRequiredExtensionDisabled()) {
             locations.addAll(REQUIRED_EXTENSION_LOCATIONS);
@@ -49,30 +50,35 @@ public class ExtensionResourceInitializer implements ApplicationListener<Applica
         if (haloProperties.getInitialExtensionLocations() != null) {
             locations.addAll(haloProperties.getInitialExtensionLocations());
         }
-
         if (CollectionUtils.isEmpty(locations)) {
-            return;
+            return Mono.empty();
         }
 
-        var resources = locations.stream()
+        return Flux.fromIterable(locations)
+            .doOnNext(location ->
+                log.debug("Trying to initialize extension resources from location: {}", location))
             .map(this::listResources)
-            .flatMap(List::stream)
             .distinct()
-            .toArray(Resource[]::new);
-
-        log.info("Initializing [{}] extensions in locations: {}", resources.length, locations);
-
-        new YamlUnstructuredLoader(resources).load()
-            .forEach(unstructured -> extensionClient.fetch(unstructured.groupVersionKind(),
-                    unstructured.getMetadata().getName())
-                .ifPresentOrElse(persisted -> {
-                    unstructured.getMetadata()
-                        .setVersion(persisted.getMetadata().getVersion());
-                    // TODO Patch the unstructured instead of update it in the future
-                    extensionClient.update(unstructured);
-                }, () -> extensionClient.create(unstructured)));
-
-        log.info("Initialized [{}] extensions in locations: {}", resources.length, locations);
+            .flatMapIterable(resources -> resources)
+            .doOnNext(resource -> log.debug("Initializing extension resource: {}", resource))
+            .map(resource -> new YamlUnstructuredLoader(resource).load())
+            .flatMapIterable(extensions -> extensions)
+            .flatMap(extension -> extensionClient.fetch(extension.groupVersionKind(),
+                    extension.getMetadata().getName())
+                .flatMap(createdExtension -> {
+                    extension.getMetadata()
+                        .setVersion(createdExtension.getMetadata().getVersion());
+                    return extensionClient.update(extension);
+                })
+                .switchIfEmpty(extensionClient.create(extension))
+            )
+            .doOnNext(extension -> {
+                if (log.isDebugEnabled()) {
+                    log.debug("Initialized extension resource: {}/{}", extension.groupVersionKind(),
+                        extension.getMetadata().getName());
+                }
+            })
+            .then();
     }
 
     private List<Resource> listResources(String location) {

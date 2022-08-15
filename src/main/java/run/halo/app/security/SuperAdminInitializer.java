@@ -7,9 +7,10 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.Role.PolicyRule;
 import run.halo.app.core.extension.RoleBinding;
@@ -17,39 +18,41 @@ import run.halo.app.core.extension.RoleBinding.RoleRef;
 import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.User.UserSpec;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.properties.SecurityProperties.Initializer;
 
 @Slf4j
-public class SuperAdminInitializer implements ApplicationListener<ApplicationReadyEvent> {
+public class SuperAdminInitializer {
 
     private static final String SUPER_ROLE_NAME = "super-role";
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
     private final PasswordEncoder passwordEncoder;
 
     private final Initializer initializer;
 
-    public SuperAdminInitializer(ExtensionClient client, PasswordEncoder passwordEncoder,
+    public SuperAdminInitializer(ReactiveExtensionClient client, PasswordEncoder passwordEncoder,
         Initializer initializer) {
         this.client = client;
         this.passwordEncoder = passwordEncoder;
         this.initializer = initializer;
     }
 
-    @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-        client.fetch(User.class, initializer.getSuperAdminUsername()).ifPresentOrElse(user -> {
-            // do nothing if admin has been initialized
-        }, () -> {
-            var admin = createAdmin();
-            var superRole = createSuperRole();
-            var roleBinding = bindAdminAndSuperRole(admin, superRole);
-            client.create(admin);
-            client.create(superRole);
-            client.create(roleBinding);
-        });
+    @EventListener
+    public Mono<Void> initialize(ApplicationReadyEvent readyEvent) {
+        return client.fetch(User.class, initializer.getSuperAdminUsername())
+            .switchIfEmpty(client.create(createAdmin())
+                .flatMap(admin -> {
+                    var superRole = createSuperRole();
+                    return client.create(superRole)
+                        .flatMap(role -> {
+                            var binding = bindAdminAndSuperRole(admin, superRole);
+                            return client.create(binding).thenReturn(role);
+                        })
+                        .thenReturn(admin);
+                }))
+            .then();
     }
 
     RoleBinding bindAdminAndSuperRole(User admin, Role superRole) {
