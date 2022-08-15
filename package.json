@@ -36,7 +36,7 @@
     "@halo-dev/admin-shared": "workspace:*",
     "@halo-dev/api-client": "^0.0.10",
     "@halo-dev/components": "workspace:*",
-    "@halo-dev/richtext-editor": "0.0.0-alpha.2",
+    "@halo-dev/richtext-editor": "0.0.0-alpha.3",
     "@vueuse/components": "^8.9.4",
     "@vueuse/core": "^8.9.4",
     "@vueuse/router": "^9.1.0",

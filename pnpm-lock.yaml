@@ -16,7 +16,7 @@ importers:
       '@halo-dev/admin-shared': workspace:*
       '@halo-dev/api-client': ^0.0.10
       '@halo-dev/components': workspace:*
-      '@halo-dev/richtext-editor': 0.0.0-alpha.2
+      '@halo-dev/richtext-editor': 0.0.0-alpha.3
       '@rushstack/eslint-patch': ^1.1.4
       '@tailwindcss/aspect-ratio': ^0.4.0
       '@types/jsdom': ^20.0.0
@@ -89,7 +89,7 @@ importers:
       '@halo-dev/admin-shared': link:packages/shared
       '@halo-dev/api-client': 0.0.10
       '@halo-dev/components': link:packages/components
-      '@halo-dev/richtext-editor': 0.0.0-alpha.2_vue@3.2.37
+      '@halo-dev/richtext-editor': 0.0.0-alpha.3_vue@3.2.37
       '@vueuse/components': 8.9.4_vue@3.2.37
       '@vueuse/core': 8.9.4_vue@3.2.37
       '@vueuse/router': 9.1.0_45jhv7el6g2ztux7wgm2ofrf4e
@@ -202,7 +202,7 @@ packages:
       prosemirror-model: 1.18.1
       prosemirror-state: 1.4.1
       prosemirror-transform: 1.6.0
-      prosemirror-view: 1.26.2
+      prosemirror-view: 1.27.0
     dev: false
 
   /@ampproject/remapping/2.1.2:
@@ -2157,8 +2157,8 @@ packages:
       - debug
     dev: false
 
-  /@halo-dev/richtext-editor/0.0.0-alpha.2_vue@3.2.37:
-    resolution: {integrity: sha512-/X+k2khvEbsXpf298cglE4b5ilFEHWaKegTMJTV5WmWowbi1gflJNqW+LGcHpNB77ndNvdV/V/tkH6vtAWsxrA==}
+  /@halo-dev/richtext-editor/0.0.0-alpha.3_vue@3.2.37:
+    resolution: {integrity: sha512-gFWctuT9yvARObGJdtxlPh1Ph0XniE0KbTNUTHW+HW+pb546SqTIifi3tIsMg20KXebV2uRoYyzggwa3bl1cCQ==}
     peerDependencies:
       vue: ^3.2.37
     dependencies:
