@@ -11,6 +11,7 @@ import {
 import cloneDeep from "lodash.clonedeep";
 import { submitForm } from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";
+import { reset } from "@formkit/core";
 
 const props = defineProps({
   visible: {
@@ -70,6 +71,7 @@ watch(props, (newVal) => {
   }
   formState.value = cloneDeep(initialFormState);
   selectedRoleTemplates.value.clear();
+  reset("role-form");
 });
 
 const tabActiveId = ref("general");
@@ -96,9 +98,9 @@ const handleVisibleChange = (visible: boolean) => {
 </script>
 <template>
   <VModal
+    :title="editingModalTitle"
     :visible="visible"
     :width="700"
-    :title="editingModalTitle"
     @update:visible="handleVisibleChange"
   >
     <VTabs v-model:active-id="tabActiveId" type="outline">

@@ -8,6 +8,7 @@ import { apiClient } from "@halo-dev/admin-shared";
 import { submitForm } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
+import { reset } from "@formkit/core";
 
 const props = defineProps({
   visible: {
@@ -88,6 +89,7 @@ watch(props, (newVal) => {
   }
   formState.value = cloneDeep(initialFormState);
   formState.value.metadata.name = uuid();
+  reset("menuitem-form");
 });
 
 watchEffect(() => {

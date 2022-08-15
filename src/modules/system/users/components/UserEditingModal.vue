@@ -17,7 +17,7 @@ import { rbacAnnotations } from "@/constants/annotations";
 import YAML from "yaml";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
-import { submitForm } from "@formkit/core";
+import { reset, submitForm } from "@formkit/core";
 
 const props = defineProps({
   visible: {
@@ -103,6 +103,7 @@ watch(props, (newVal) => {
     return;
   }
   formState.value = cloneDeep(initialFormState);
+  reset("user-form");
 });
 
 const handleFetchRoles = async () => {
