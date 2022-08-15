@@ -1,5 +1,6 @@
 package run.halo.app.security.authorization;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -51,12 +52,15 @@ class AuthorizationTest {
     void accessProtectedApiWithoutSufficientRole() {
         when(userDetailsService.findByUsername(eq("user"))).thenReturn(
             Mono.just(User.withDefaultPasswordEncoder().username("user").password("password")
-                // .roles("role-template-view-posts", "role-template-manage-posts")
                 .roles("invalid-role").build()));
+        when(roleService.getMonoRole(any())).thenReturn(Mono.empty());
         var token = LoginUtils.login(webClient, "user", "password").block();
         webClient.get().uri("/apis/fake.halo.run/v1/posts")
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).exchange().expectStatus()
             .isForbidden();
+
+        verify(roleService, times(1)).getMonoRole("authenticated");
+        verify(roleService, times(1)).getMonoRole("invalid-role");
     }
 
     @Test
@@ -70,7 +74,7 @@ class AuthorizationTest {
             new PolicyRule.Builder().apiGroups("fake.halo.run").verbs("list").resources("posts")
                 .build()));
 
-        when(roleService.getRole(eq("post.read"))).thenReturn(role);
+        when(roleService.getMonoRole(any())).thenReturn(Mono.just(role));
 
         var token = LoginUtils.login(webClient, "user", "password").block();
         webClient.get().uri("/apis/fake.halo.run/v1/posts")
@@ -83,7 +87,8 @@ class AuthorizationTest {
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).exchange()
             .expectStatus().isForbidden();
 
-        verify(roleService, times(2)).getRole("post.read");
+        verify(roleService, times(2)).getMonoRole("authenticated");
+        verify(roleService, times(1)).getMonoRole("post.read");
     }
 
     @TestConfiguration

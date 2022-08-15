@@ -10,8 +10,9 @@ import java.util.function.Predicate;
  * ExtensionStore.
  *
  * @author johnniang
+ * @deprecated Use {@link ReactiveExtensionClient} instead.
  */
-@Deprecated
+@Deprecated(forRemoval = true, since = "2.0")
 public interface ExtensionClient {
 
     /**

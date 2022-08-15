@@ -97,6 +97,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
                 }
                 return roleService.getMonoRole(roleName)
                     .onErrorContinue(t -> visitor.visit(null, null, t), (throwable, o) -> {
+                        //Do nothing here
                     })
                     .doOnNext(role -> {
                         var rules = fetchRules(role);

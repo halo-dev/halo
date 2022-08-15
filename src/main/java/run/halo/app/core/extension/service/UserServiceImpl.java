@@ -26,7 +26,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> getUser(String username) {
-        return client.fetch(User.class, username);
+        return client.get(User.class, username);
     }
 
     @Override
@@ -41,7 +41,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> updateWithRawPassword(String username, String rawPassword) {
-        return updatePassword(username, passwordEncoder.encode(rawPassword));
+        return getUser(username)
+            .filter(user -> !passwordEncoder.matches(rawPassword, user.getSpec().getPassword()))
+            .flatMap(user -> {
+                user.getSpec().setPassword(passwordEncoder.encode(rawPassword));
+                return client.update(user);
+            });
     }
 
     @Override
@@ -51,4 +56,5 @@ public class UserServiceImpl implements UserService {
             .map(roleBinding -> roleBinding.getRoleRef().getName())
             .flatMap(roleName -> client.fetch(Role.class, roleName));
     }
+
 }

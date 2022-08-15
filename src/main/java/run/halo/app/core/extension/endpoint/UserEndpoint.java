@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -24,25 +23,24 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.UserService;
-import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
 public class UserEndpoint implements CustomEndpoint {
 
     private static final String SELF_USER = "-";
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
     private final UserService userService;
 
-    public UserEndpoint(ExtensionClient client, UserService userService) {
+    public UserEndpoint(ReactiveExtensionClient client, UserService userService) {
         this.client = client;
         this.userService = userService;
     }
@@ -118,10 +116,9 @@ public class UserEndpoint implements CustomEndpoint {
     @NonNull
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
-            .map(ctx -> {
+            .flatMap(ctx -> {
                 var name = ctx.getAuthentication().getName();
-                return client.fetch(User.class, name)
-                    .orElseThrow(() -> new ExtensionNotFoundException(name));
+                return client.get(User.class, name);
             })
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -134,18 +131,15 @@ public class UserEndpoint implements CustomEndpoint {
         return request.bodyToMono(GrantRequest.class)
             .switchIfEmpty(
                 Mono.error(() -> new ServerWebInputException("Request body is empty")))
-            .flatMap(grant -> {
-                // preflight check
-                client.fetch(User.class, username)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "User " + username + " was not found"));
-
-                grant.roles.forEach(roleName -> client.fetch(Role.class, roleName)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Role " + roleName + " was not found")));
-
-                var bindings =
-                    client.list(RoleBinding.class, RoleBinding.containsUser(username), null);
+            .flatMap(grant -> client.get(User.class, username).thenReturn(grant))
+            .flatMap(grant -> Flux.fromIterable(grant.roles)
+                .flatMap(roleName -> client.get(Role.class, roleName))
+                .then().thenReturn(grant))
+            .zipWith(client.list(RoleBinding.class, RoleBinding.containsUser(username), null)
+                .collectList())
+            .flatMap(tuple2 -> {
+                var grant = tuple2.getT1();
+                var bindings = tuple2.getT2();
                 var bindingToUpdate = new HashSet<RoleBinding>();
                 var bindingToDelete = new HashSet<RoleBinding>();
                 var existingRoles = new HashSet<String>();

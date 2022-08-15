@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -14,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,20 +21,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
     @Mock
-    ExtensionClient client;
+    ReactiveExtensionClient client;
 
     @Mock
     PasswordEncoder passwordEncoder;
@@ -45,53 +45,45 @@ class UserServiceImplTest {
     UserServiceImpl userService;
 
     @Test
-    void shouldGetEmptyUserIfUserNotFoundInExtension() {
-        when(client.fetch(User.class, "faker")).thenReturn(Optional.empty());
+    void shouldThrowExceptionIfUserNotFoundInExtension() {
+        when(client.get(User.class, "faker")).thenReturn(
+            Mono.error(new ExtensionNotFoundException()));
 
         StepVerifier.create(userService.getUser("faker"))
-            .verifyComplete();
+            .verifyError(ExtensionNotFoundException.class);
 
-        verify(client, times(1)).fetch(eq(User.class), eq("faker"));
+        verify(client, times(1)).get(eq(User.class), eq("faker"));
     }
 
     @Test
     void shouldGetUserIfUserFoundInExtension() {
         User fakeUser = new User();
-        when(client.fetch(User.class, "faker")).thenReturn(Optional.of(fakeUser));
+        when(client.get(User.class, "faker")).thenReturn(Mono.just(fakeUser));
 
         StepVerifier.create(userService.getUser("faker"))
             .assertNext(user -> assertEquals(fakeUser, user))
             .verifyComplete();
 
-        verify(client, times(1)).fetch(eq(User.class), eq("faker"));
+        verify(client, times(1)).get(eq(User.class), eq("faker"));
     }
 
     @Test
     void shouldUpdatePasswordIfUserFoundInExtension() {
-        User fakeUser = new User();
+        var fakeUser = new User();
         fakeUser.setSpec(new User.UserSpec());
 
-        when(client.fetch(User.class, "faker")).thenReturn(Optional.of(fakeUser));
+        when(client.get(User.class, "faker")).thenReturn(Mono.just(fakeUser));
+        when(client.update(eq(fakeUser))).thenReturn(Mono.just(fakeUser));
 
         StepVerifier.create(userService.updatePassword("faker", "new-fake-password"))
+            .expectNext(fakeUser)
             .verifyComplete();
 
-        verify(client, times(1)).fetch(eq(User.class), eq("faker"));
+        verify(client, times(1)).get(eq(User.class), eq("faker"));
         verify(client, times(1)).update(argThat(extension -> {
             var user = (User) extension;
             return "new-fake-password".equals(user.getSpec().getPassword());
         }));
-    }
-
-    @Test
-    void shouldNotUpdatePasswordIfUserNotFoundInExtension() {
-        when(client.fetch(User.class, "faker")).thenReturn(Optional.empty());
-
-        StepVerifier.create(userService.updatePassword("faker", "new-fake-password"))
-            .verifyComplete();
-
-        verify(client, times(1)).fetch(eq(User.class), eq("faker"));
-        verify(client, times(0)).update(any());
     }
 
     @Test
@@ -102,7 +94,8 @@ class UserServiceImplTest {
         fakeUser.setMetadata(metadata);
         fakeUser.setSpec(new User.UserSpec());
 
-        when(client.list(eq(RoleBinding.class), any(), any())).thenReturn(getRoleBindings());
+        when(client.list(eq(RoleBinding.class), any(), any())).thenReturn(
+            Flux.fromIterable(getRoleBindings()));
         Role roleA = new Role();
         Metadata metadataA = new Metadata();
         metadataA.setName("test-A");
@@ -118,9 +111,9 @@ class UserServiceImplTest {
         metadataC.setName("ddd");
         roleC.setMetadata(metadataC);
 
-        when(client.fetch(eq(Role.class), eq("test-A"))).thenReturn(Optional.of(roleA));
-        when(client.fetch(eq(Role.class), eq("test-B"))).thenReturn(Optional.of(roleB));
-        lenient().when(client.fetch(eq(Role.class), eq("ddd"))).thenReturn(Optional.of(roleC));
+        when(client.fetch(eq(Role.class), eq("test-A"))).thenReturn(Mono.just(roleA));
+        when(client.fetch(eq(Role.class), eq("test-B"))).thenReturn(Mono.just(roleB));
+        lenient().when(client.fetch(eq(Role.class), eq("ddd"))).thenReturn(Mono.just(roleC));
 
         StepVerifier.create(userService.listRoles("faker"))
             .expectNext(roleA)
@@ -212,50 +205,58 @@ class UserServiceImplTest {
 
         @Test
         void shouldUpdatePasswordWithDifferentPassword() {
-            userService = spy(userService);
+            var oldUser = createUser("fake-password");
+            var newUser = createUser("new-password");
 
-            doReturn(
-                Mono.just(createUser("fake-password")),
-                Mono.just(createUser("new-password")))
-                .when(userService)
-                .getUser("fake-user");
+            when(client.get(User.class, "fake-user")).thenReturn(
+                Mono.just(oldUser));
+            when(client.update(eq(oldUser))).thenReturn(Mono.just(newUser));
             when(passwordEncoder.matches("new-password", "fake-password")).thenReturn(false);
+            when(passwordEncoder.encode("new-password")).thenReturn("encoded-new-password");
+
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
-                .expectNext(createUser("new-password"))
+                .expectNext(newUser)
                 .verifyComplete();
 
-            verify(passwordEncoder, times(1)).matches("new-password", "fake-password");
-            verify(passwordEncoder, times(1)).encode("new-password");
-            verify(userService, times(2)).getUser("fake-user");
+            verify(passwordEncoder).matches("new-password", "fake-password");
+            verify(passwordEncoder).encode("new-password");
+            verify(client).get(User.class, "fake-user");
+            verify(client).update(argThat(extension -> {
+                var user = (User) extension;
+                return "encoded-new-password".equals(user.getSpec().getPassword());
+            }));
         }
 
         @Test
         void shouldUpdatePasswordIfNoPasswordBefore() {
-            userService = spy(userService);
+            var oldUser = createUser("");
+            var newUser = createUser("new-password");
 
-            doReturn(
-                Mono.just(createUser("")),
-                Mono.just(createUser("new-password")))
-                .when(userService)
-                .getUser("fake-user");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(oldUser));
+            when(client.update(oldUser)).thenReturn(Mono.just(newUser));
+            when(passwordEncoder.matches("new-password", "")).thenReturn(false);
+            when(passwordEncoder.encode("new-password")).thenReturn("encoded-new-password");
+
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
-                .expectNext(createUser("new-password"))
+                .expectNext(newUser)
                 .verifyComplete();
 
-            verify(passwordEncoder, never()).matches(anyString(), anyString());
-            verify(passwordEncoder, times(1)).encode("new-password");
-            verify(userService, times(2)).getUser("fake-user");
+            verify(passwordEncoder).matches("new-password", "");
+            verify(passwordEncoder).encode("new-password");
+            verify(client).update(argThat(extension -> {
+                var user = (User) extension;
+                return "encoded-new-password".equals(user.getSpec().getPassword());
+            }));
+            verify(client).get(User.class, "fake-user");
         }
 
         @Test
         void shouldDoNothingIfPasswordNotChanged() {
             userService = spy(userService);
 
-            doReturn(
-                Mono.just(createUser("fake-password")),
-                Mono.just(createUser("new-password")))
-                .when(userService)
-                .getUser("fake-user");
+            var oldUser = createUser("fake-password");
+            var newUser = createUser("new-password");
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(oldUser));
             when(passwordEncoder.matches("fake-password", "fake-password")).thenReturn(true);
 
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "fake-password"))
@@ -263,22 +264,23 @@ class UserServiceImplTest {
                 .verifyComplete();
 
             verify(passwordEncoder, times(1)).matches("fake-password", "fake-password");
-            verify(passwordEncoder, never()).encode("fake-password");
-            verify(userService, times(1)).getUser("fake-user");
+            verify(passwordEncoder, never()).encode(any());
+            verify(client, never()).update(any());
+            verify(client).get(User.class, "fake-user");
         }
 
         @Test
-        void shouldDoNothingIfUserNotFound() {
-            userService = spy(userService);
+        void shouldThrowExceptionIfUserNotFound() {
+            when(client.get(User.class, "fake-user"))
+                .thenReturn(Mono.error(new ExtensionNotFoundException()));
 
-            doReturn(Mono.empty()).when(userService).getUser("fake-user");
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
-                .expectNextCount(0)
-                .verifyComplete();
+                .verifyError(ExtensionNotFoundException.class);
 
             verify(passwordEncoder, never()).matches(anyString(), anyString());
             verify(passwordEncoder, never()).encode(anyString());
-            verify(userService, times(1)).getUser(anyString());
+            verify(client, never()).update(any());
+            verify(client).get(User.class, "fake-user");
         }
 
         User createUser(String password) {
