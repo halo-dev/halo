@@ -1,18 +1,21 @@
 package run.halo.app.content;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.test.context.TestSecurityContextHolder;
-import org.springframework.security.test.context.support.ReactorContextTestExecutionListener;
-import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import reactor.test.StepVerifier;
 import run.halo.app.content.impl.PostServiceImpl;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
@@ -20,29 +23,22 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Metadata;
-import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * @author guqing
  * @since 2.0.0
  */
-@ExtendWith(MockitoExtension.class)
-@TestExecutionListeners(ReactorContextTestExecutionListener.class)
+@WithMockUser(username = "guqing")
+@ExtendWith(SpringExtension.class)
 class PostServiceTest {
     @Mock
     private ExtensionClient client;
-
-    @Mock
-    private Authentication authentication;
 
     private PostService postService;
 
     @BeforeEach
     void setUp() {
         postService = new PostServiceImpl(client);
-
-        when(authentication.getPrincipal()).thenReturn("guqing");
-        TestSecurityContextHolder.setAuthentication(authentication);
     }
 
     @Test
@@ -53,13 +49,52 @@ class PostServiceTest {
             .thenReturn(Optional.of(snapshotV1()));
 
         PostRequest postRequest = new PostRequest(postV1(), contentRequest("B", "<p>B</p>"));
-        Post block = postService.draftPost(postRequest).block();
-        System.out.println(block);
-        System.out.println(JsonUtils.objectToJson(block));
+
+        ArgumentCaptor<AbstractExtension> captor = ArgumentCaptor.forClass(AbstractExtension.class);
+        StepVerifier.create(postService.draftPost(postRequest))
+            .expectNext(postV1())
+            .expectComplete()
+            .verify();
+
+        verify(client, times(2)).create(captor.capture());
+        List<AbstractExtension> allValues = captor.getAllValues();
+        assertThat(allValues.size()).isEqualTo(2);
+        assertThat(allValues.get(0)).isInstanceOf(Post.class);
+        assertThat(allValues.get(1)).isInstanceOf(Snapshot.class);
+        Post expectPost = postV1();
+        expectPost.getSpec().setOwner("guqing");
+        assertThat(allValues.get(0)).isEqualTo(expectPost);
+
+        Snapshot expectSnapshot = snapshotV1();
+        expectSnapshot.getMetadata().setName(allValues.get(1).getMetadata().getName());
+        expectSnapshot.setSubjectRef(Post.KIND, expectPost.getMetadata().getName());
+        expectSnapshot.getSpec().setRawPatch("B");
+        expectSnapshot.getSpec().setContentPatch("<p>B</p>");
+        assertThat(allValues.get(1)).isEqualTo(expectSnapshot);
     }
 
     @Test
     void updatePost() {
+        // baseSnapshot = v1
+        when(client.fetch(eq(Snapshot.class), eq("v1")))
+            .thenReturn(Optional.of(snapshotV1()));
+
+        // 1.post 的 head 指向 v1, release-snapshot 指向 null
+        Post post = postV1();
+        post.getSpec().setBaseSnapshot("v1");
+        post.getSpec().setHeadSnapshot("v1");
+        post.getSpec().setReleaseSnapshot(null);
+
+        PostRequest postRequest = new PostRequest(post, contentRequest("B", "<p>B</p>"));
+        StepVerifier.create(postService.updatePost(postRequest))
+            .expectNext(post)
+            .expectComplete()
+            .verify();
+
+
+        // 2.post 的 head 指向 v2, release-snapshot 指向 v2
+
+        // 3.post 的 head 指向 v1, release-snapshot 指向 v2
     }
 
     @Test
