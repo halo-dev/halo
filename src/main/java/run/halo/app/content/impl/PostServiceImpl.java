@@ -144,7 +144,7 @@ public class PostServiceImpl implements PostService {
 
                 Post.PostSpec postSpec = post.getSpec();
                 if (Objects.equals(true, postSpec.getPublished())) {
-                    // before is published
+                    // has been published before
                     postSpec.setVersion(postSpec.getVersion() + 1);
                 } else {
                     postSpec.setPublished(true);
@@ -208,7 +208,7 @@ public class PostServiceImpl implements PostService {
         String originalRaw = baseSnapshot.getSpec().getRawPatch();
         String originalContent = baseSnapshot.getSpec().getRawPatch();
 
-        // is the v1 snapshot, set the content directly
+        // it is the v1 snapshot, set the content directly
         if (StringUtils.equals(headSnapshotName, baseSnapshotName)) {
             snapshotToUse.getSpec().setRawPatch(originalRaw);
             snapshotToUse.getSpec().setContentPatch(originalContent);

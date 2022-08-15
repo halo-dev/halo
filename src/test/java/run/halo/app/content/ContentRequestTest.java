@@ -8,6 +8,8 @@ import run.halo.app.core.extension.Snapshot;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
+ * Tests for {@link ContentRequest}.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -33,36 +35,43 @@ class ContentRequestTest {
 
     @Test
     void toSnapshot() throws JSONException {
+        String expectedContentPath =
+            "<p>Four score and seven</p>\n<p>years ago our fathers</p>\n<br/>\n<p>brought forth "
+                + "on this continent</p>\n";
+        String expectedRawPatch =
+            "Four score and seven\nyears ago our fathers\n\nbrought forth on this continent\n";
         Snapshot snapshot = contentRequest.toSnapshot();
         snapshot.getMetadata().setName("7b149646-ac60-4a5c-98ee-78b2dd0631b2");
         JSONAssert.assertEquals(JsonUtils.objectToJson(snapshot),
             """
-                    {
-                        "spec": {
-                            "subjectRef": {
-                                "kind": null,
-                                "name": null
-                            },
-                            "rawType": "MARKDOWN",
-                            "rawPatch": "Four score and seven\\nyears ago our fathers\\n\\nbrought forth on this continent\\n",
-                            "contentPatch": "<p>Four score and seven</p>\\n<p>years ago our fathers</p>\\n<br/>\\n<p>brought forth on this continent</p>\\n",
-                            "parentSnapshotName": null,
-                            "displayVersion": "v1",
-                            "version": 1,
-                            "publishTime": null
+                {
+                    "spec": {
+                        "subjectRef": {
+                            "kind": null,
+                            "name": null
                         },
-                        "apiVersion": "content.halo.run/v1alpha1",
-                        "kind": "Snapshot",
-                        "metadata": {
-                            "name": "7b149646-ac60-4a5c-98ee-78b2dd0631b2",
-                            "labels": null,
-                            "annotations": null,
-                            "version": null,
-                            "creationTimestamp": null,
-                            "deletionTimestamp": null
-                        }
+                        "rawType": "MARKDOWN",
+                        "rawPatch": "%s",
+                        "contentPatch": "%s",
+                        "parentSnapshotName": null,
+                        "displayVersion": "v1",
+                        "version": 1,
+                        "publishTime": null,
+                        "contributors": null
+                    },
+                    "apiVersion": "content.halo.run/v1alpha1",
+                    "kind": "Snapshot",
+                    "metadata": {
+                        "name": "7b149646-ac60-4a5c-98ee-78b2dd0631b2",
+                        "labels": null,
+                        "annotations": null,
+                        "version": null,
+                        "creationTimestamp": null,
+                        "deletionTimestamp": null
                     }
-                """, true);
+                }
+                """.formatted(expectedRawPatch, expectedContentPath),
+            true);
     }
 
     @Test

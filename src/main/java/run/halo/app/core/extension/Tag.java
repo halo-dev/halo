@@ -32,7 +32,7 @@ public class Tag extends AbstractExtension {
         private String displayName;
 
         /**
-         * Color regex explanation:
+         * Color regex explanation.
          * <pre>
          * ^                 # start of the line
          * #                 # start with a number sign `#`

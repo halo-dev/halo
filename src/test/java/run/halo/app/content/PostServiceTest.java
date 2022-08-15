@@ -81,7 +81,7 @@ class PostServiceTest {
     }
 
     /**
-     * post 的 head 指向 v1, release-snapshot 指向 null
+     * post 的 head 指向 v1, release-snapshot 指向 null.
      */
     @Test
     void updatePostWhenHeadEqualsToBaseAndNoReleased() {
@@ -119,7 +119,7 @@ class PostServiceTest {
     }
 
     /**
-     * post 的 head 指向 v1, release-snapshot 指向 v1
+     * post 的 head 指向 v1, release-snapshot 指向 v1.
      */
     @Test
     void updatePostWhenHeadEqualsToBaseAndHasReleased() {
@@ -172,7 +172,7 @@ class PostServiceTest {
     }
 
     /**
-     * 3.post 的 head 指向 v1, release-snapshot 指向 v2
+     * 3.post 的 head 指向 v1, release-snapshot 指向 v2.
      */
     @Test
     void updatePostWhenHeadPointsToPreviousRelease() {

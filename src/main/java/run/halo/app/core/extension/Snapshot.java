@@ -35,7 +35,7 @@ public class Snapshot extends AbstractExtension {
         private SubjectRef subjectRef;
 
         /**
-         * such as: markdown | html | json | asciidoc | latex
+         * such as: markdown | html | json | asciidoc | latex.
          */
         @Schema(required = true, minLength = 1, maxLength = 50)
         private String rawType;

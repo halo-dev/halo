@@ -49,7 +49,7 @@ public class Category extends AbstractExtension {
         private String permalink;
 
         /**
-         * 包括当前和其下所有层级的文章 name (depth=max)
+         * 包括当前和其下所有层级的文章 name (depth=max).
          */
         private List<String> posts;
     }

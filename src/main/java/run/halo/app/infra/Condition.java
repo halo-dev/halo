@@ -13,9 +13,9 @@ import lombok.Data;
 @Data
 public class Condition {
     /**
-     * type of condition in CamelCase or in foo.example.com/CamelCase
-     * example: Ready, Initialized
-     * maxLength: 316
+     * type of condition in CamelCase or in foo.example.com/CamelCase.
+     * example: Ready, Initialized.
+     * maxLength: 316.
      */
     @Schema(required = true, maxLength = 316,
         pattern = "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?("

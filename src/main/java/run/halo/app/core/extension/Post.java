@@ -46,7 +46,7 @@ public class Post extends AbstractExtension {
         private String title;
 
         /**
-         * 文章引用到的已发布的内容，用于主题端显示
+         * 文章引用到的已发布的内容，用于主题端显示.
          */
         private String releaseSnapshot;
 
