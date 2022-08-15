@@ -77,13 +77,12 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     // R2DBC
+    // Currently, official doesn't support mssql and mariadb yet until drivers are available.
+    // See https://github.com/spring-projects/spring-data-relational/commit/ee6c2c89b5c433748b22a79cf40dc8e01142caa3
+    // for more.
     runtimeOnly 'io.r2dbc:r2dbc-h2'
     runtimeOnly 'com.h2database:h2'
-//    runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
-//    runtimeOnly 'io.r2dbc:r2dbc-mssql'
     runtimeOnly 'mysql:mysql-connector-java'
-//    runtimeOnly 'org.mariadb:r2dbc-mariadb'
-//    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
 
