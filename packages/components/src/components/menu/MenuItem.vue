@@ -2,20 +2,18 @@
 import { IconArrowRight } from "../../icons/icons";
 import { computed, inject, ref, useSlots } from "vue";
 
-const props = defineProps({
-  id: {
-    type: String,
-    default: "",
-  },
-  title: {
-    type: String,
-    default: "",
-  },
-  active: {
-    type: Boolean,
-    default: false,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    id?: string;
+    title?: string;
+    active?: boolean;
+  }>(),
+  {
+    id: "",
+    title: "",
+    active: false,
+  }
+);
 
 const emit = defineEmits(["select"]);
 

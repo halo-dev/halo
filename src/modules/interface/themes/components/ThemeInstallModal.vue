@@ -6,12 +6,14 @@ import { apiClient } from "@halo-dev/admin-shared";
 
 const FilePond = VueFilePond();
 
-defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-});
+withDefaults(
+  defineProps<{
+    visible: boolean;
+  }>(),
+  {
+    visible: false,
+  }
+);
 
 const emit = defineEmits(["update:visible", "close"]);
 

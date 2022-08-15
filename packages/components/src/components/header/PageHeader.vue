@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-defineProps({
-  title: {
-    type: String,
-  },
-});
+defineProps<{
+  title?: string;
+}>();
 </script>
 <template>
   <div class="flex items-center justify-between bg-white p-4 h-14">

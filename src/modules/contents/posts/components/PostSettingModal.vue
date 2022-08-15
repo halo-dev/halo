@@ -8,7 +8,6 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import type { PropType } from "vue";
 import { ref, unref, watch } from "vue";
 import type { Post } from "@halo-dev/admin-api";
 
@@ -17,16 +16,16 @@ interface FormState {
   saving: boolean;
 }
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  post: {
-    type: Object as PropType<Post | Record<string, unknown> | null>,
-    default: null,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    post: Post | Record<string, unknown> | null;
+  }>(),
+  {
+    visible: false,
+    post: null,
+  }
+);
 
 const emit = defineEmits(["update:visible", "close", "previous", "next"]);
 

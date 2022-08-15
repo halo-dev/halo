@@ -1,14 +1,8 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
-
-defineProps({
-  title: {
-    type: String,
-  },
-  bodyClass: {
-    type: Object as PropType<string[]>,
-  },
-});
+defineProps<{
+  title?: string;
+  bodyClass?: string[];
+}>();
 </script>
 
 <template>

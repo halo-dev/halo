@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Component, PropType } from "vue";
+import type { Component } from "vue";
 import { computed } from "vue";
 import type { Type } from "./interface";
 import {
@@ -18,22 +18,18 @@ const TypeIcons: Record<Type, Component> = {
   error: IconCloseCircle,
 };
 
-const props = defineProps({
-  type: {
-    type: String as PropType<Type>,
-    default: "default",
-  },
-  title: {
-    type: String,
-  },
-  description: {
-    type: String,
-  },
-  closable: {
-    type: Boolean,
-    default: true,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    type?: Type;
+    title?: string;
+    description?: string;
+    closable?: boolean;
+  }>(),
+  {
+    type: "default",
+    closable: true,
+  }
+);
 
 const emit = defineEmits(["close"]);
 

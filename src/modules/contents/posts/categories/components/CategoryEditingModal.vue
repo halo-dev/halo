@@ -1,17 +1,16 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
-import type { PropType } from "vue";
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  category: {
-    type: Object as PropType<unknown | null>,
-    default: null,
-  },
-});
+withDefaults(
+  defineProps<{
+    visible: boolean;
+    category: unknown | null;
+  }>(),
+  {
+    visible: false,
+    category: undefined,
+  }
+);
 
 const emit = defineEmits(["update:visible", "close"]);
 

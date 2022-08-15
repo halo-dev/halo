@@ -1,22 +1,20 @@
 <script lang="ts" setup>
 import { UseOffsetPagination } from "@vueuse/components";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
-import { defineProps, ref, toRefs, watch } from "vue";
+import { ref, toRefs, watch } from "vue";
 
-const props = defineProps({
-  page: {
-    type: Number,
-    default: 1,
-  },
-  size: {
-    type: Number,
-    default: 10,
-  },
-  total: {
-    type: Number,
-    default: 0,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    page?: number;
+    size?: number;
+    total?: number;
+  }>(),
+  {
+    page: 1,
+    size: 10,
+    total: 0,
+  }
+);
 
 const { page, size, total } = toRefs(props);
 

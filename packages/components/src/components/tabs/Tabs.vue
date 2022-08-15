@@ -1,30 +1,24 @@
 <script lang="ts" setup>
-import type { ComputedRef, PropType } from "vue";
+import type { ComputedRef } from "vue";
 import { computed, provide, useSlots } from "vue";
 import { VTabbar } from "./index";
 import type { Direction, Type } from "./interface";
 
-const props = defineProps({
-  activeId: {
-    type: [Number, String],
-  },
-  type: {
-    type: String as PropType<Type>,
-    default: "default",
-  },
-  direction: {
-    type: String as PropType<Direction>,
-    default: "row",
-  },
-  idKey: {
-    type: String,
-    default: "id",
-  },
-  labelKey: {
-    type: String,
-    default: "label",
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    activeId?: number | string;
+    type?: Type;
+    direction?: Direction;
+    idKey?: string;
+    labelKey?: string;
+  }>(),
+  {
+    type: "default",
+    direction: "row",
+    idKey: "id",
+    labelKey: "label",
+  }
+);
 
 provide<ComputedRef<string | number | undefined>>(
   "activeId",

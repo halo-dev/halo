@@ -1,25 +1,23 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
-import type { PropType } from "vue";
 import { computed, ref, watch, watchEffect } from "vue";
 import type { MenuItem } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
 import { apiClient } from "@halo-dev/admin-shared";
-import { submitForm } from "@formkit/core";
+import { reset, submitForm } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
-import { reset } from "@formkit/core";
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  menuItem: {
-    type: Object as PropType<MenuItem | null>,
-    default: null,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    menuItem: MenuItem | null;
+  }>(),
+  {
+    visible: false,
+    menuItem: null,
+  }
+);
 
 const emit = defineEmits(["update:visible", "close", "saved"]);
 

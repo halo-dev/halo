@@ -2,14 +2,10 @@
 import type { ComputedRef } from "vue";
 import { computed, inject } from "vue";
 
-const props = defineProps({
-  id: {
-    type: String,
-  },
-  label: {
-    type: String,
-  },
-});
+const props = defineProps<{
+  id?: string;
+  label?: string;
+}>();
 
 const activeId = inject<ComputedRef<string | number | undefined>>("activeId");
 

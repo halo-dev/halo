@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
 import { onBeforeUnmount, onMounted, shallowRef, watch } from "vue";
 import type { EditorStateConfig } from "@codemirror/state";
 import { EditorState } from "@codemirror/state";
@@ -12,24 +11,20 @@ const languages = {
   yaml: StreamLanguage.define(yaml),
 };
 
-const props = defineProps({
-  modelValue: {
-    type: String,
-    default: "",
-  },
-  height: {
-    type: String,
-    default: "auto",
-  },
-  language: {
-    type: String as PropType<"yaml">,
-    default: "yaml",
-  },
-  extensions: {
-    type: Array as PropType<EditorStateConfig["extensions"]>,
-    default: () => [],
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string;
+    height?: string;
+    language?: "yaml";
+    extensions?: EditorStateConfig["extensions"];
+  }>(),
+  {
+    modelValue: "",
+    height: "auto",
+    language: "yaml",
+    extensions: () => [],
+  }
+);
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;

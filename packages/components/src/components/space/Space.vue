@@ -1,23 +1,20 @@
 <script lang="ts" setup>
 import type { Align, Direction, Spacing } from "./interface";
 import { SpacingSize } from "./interface";
-import type { PropType } from "vue";
 import { computed } from "vue";
 
-const props = defineProps({
-  spacing: {
-    type: String as PropType<Spacing>,
-    default: "xs",
-  },
-  direction: {
-    type: String as PropType<Direction>,
-    default: "row",
-  },
-  align: {
-    type: String as PropType<Align>,
-    default: "center",
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    spacing?: Spacing;
+    direction?: Direction;
+    align?: Align;
+  }>(),
+  {
+    spacing: "xs",
+    direction: "row",
+    align: "center",
+  }
+);
 
 const wrapperClasses = computed(() => {
   const { direction, align } = props;

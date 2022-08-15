@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import { IconList, IconSettings, VButton, VSpace } from "@halo-dev/components";
 import Draggable from "vuedraggable";
-import type { PropType } from "vue";
 import { ref } from "vue";
 import type { MenuTreeItem } from "@/modules/interface/menus/utils";
 
-defineProps({
-  menuTreeItems: {
-    type: Array as PropType<MenuTreeItem[]>,
-    default: () => [],
-  },
-});
+withDefaults(
+  defineProps<{
+    menuTreeItems: MenuTreeItem[];
+  }>(),
+  {
+    menuTreeItems: () => [],
+  }
+);
 
 const emit = defineEmits(["change", "open-editing", "delete"]);
 

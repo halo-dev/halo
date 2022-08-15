@@ -1,32 +1,23 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
 import { computed } from "vue";
 import type { Direction, Type } from "./interface";
 
-const props = defineProps({
-  activeId: {
-    type: [Number, String],
-  },
-  items: {
-    type: Object as PropType<Array<Record<string, string>>>,
-  },
-  type: {
-    type: String as PropType<Type>,
-    default: "default",
-  },
-  direction: {
-    type: String as PropType<Direction>,
-    default: "row",
-  },
-  idKey: {
-    type: String,
-    default: "id",
-  },
-  labelKey: {
-    type: String,
-    default: "label",
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    activeId?: number | string;
+    items?: Array<Record<string, string>>;
+    type?: Type;
+    direction?: Direction;
+    idKey?: string;
+    labelKey?: string;
+  }>(),
+  {
+    type: "default",
+    direction: "row",
+    idKey: "id",
+    labelKey: "label",
+  }
+);
 
 const emit = defineEmits(["update:activeId", "change"]);
 

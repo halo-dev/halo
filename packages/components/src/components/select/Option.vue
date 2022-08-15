@@ -1,9 +1,7 @@
 <script lang="ts" setup>
-defineProps({
-  value: {
-    type: [String, Number, Boolean],
-  },
-});
+defineProps<{
+  value?: string | number | boolean;
+}>();
 </script>
 
 <template>

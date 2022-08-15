@@ -1,19 +1,15 @@
 <script lang="ts" setup>
-const props = defineProps({
-  checked: {
-    type: Boolean,
-    default: false,
-  },
-  value: {
-    type: [String, Number, Boolean],
-  },
-  label: {
-    type: String,
-  },
-  name: {
-    type: String,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    checked?: boolean;
+    value?: string | number | boolean;
+    label?: string;
+    name?: string;
+  }>(),
+  {
+    checked: false,
+  }
+);
 
 const id = ["checkbox", props.name, props.value]
   .filter((item) => !!item)

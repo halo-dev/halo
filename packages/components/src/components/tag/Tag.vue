@@ -1,18 +1,17 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
 import { computed } from "vue";
 import type { Theme } from "./interface";
 
-const props = defineProps({
-  theme: {
-    type: String as PropType<Theme>,
-    default: "default",
-  },
-  rounded: {
-    type: Boolean,
-    default: false,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    theme?: Theme;
+    rounded?: boolean;
+  }>(),
+  {
+    theme: "default",
+    rounded: false,
+  }
+);
 
 const classes = computed(() => {
   return [`tag-${props.theme}`, { "tag-rounded": props.rounded }];

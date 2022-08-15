@@ -8,47 +8,32 @@ import {
   IconForbidLine,
   IconInformation,
 } from "@/icons/icons";
-import type { PropType } from "vue";
 import { computed, ref } from "vue";
 import type { Type } from "@/components/dialog/interface";
 import type { Type as ButtonType } from "@/components/button/interface";
 
-const props = defineProps({
-  type: {
-    type: String as PropType<Type>,
-    default: "info",
-  },
-  title: {
-    type: String,
-    default: "提示",
-  },
-  description: {
-    type: String,
-    default: "",
-  },
-  confirmText: {
-    type: String,
-    default: "确定",
-  },
-  confirmType: {
-    type: String as PropType<ButtonType>,
-    default: "primary",
-  },
-  cancelText: {
-    type: String,
-    default: "取消",
-  },
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  onConfirm: {
-    type: Function as PropType<() => void>,
-  },
-  onCancel: {
-    type: Function as PropType<() => void>,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    type?: Type;
+    title?: string;
+    description?: string;
+    confirmText?: string;
+    confirmType?: ButtonType;
+    cancelText?: string;
+    visible?: boolean;
+    onConfirm?: () => void;
+    onCancel?: () => void;
+  }>(),
+  {
+    type: "info",
+    title: "提示",
+    description: "",
+    confirmText: "确定",
+    confirmType: "primary",
+    cancelText: "取消",
+    visible: false,
+  }
+);
 
 const emit = defineEmits(["update:visible", "close"]);
 

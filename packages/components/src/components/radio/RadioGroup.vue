@@ -1,26 +1,19 @@
 <script lang="ts" setup>
 import { VRadio } from "./index";
-import type { PropType } from "vue";
 
-defineProps({
-  modelValue: {
-    type: [String, Number, Boolean],
-  },
-  options: {
-    type: Object as PropType<Array<Record<string, string | number | boolean>>>,
-  },
-  valueKey: {
-    type: String,
-    default: "value",
-  },
-  labelKey: {
-    type: String,
-    default: "label",
-  },
-  name: {
-    type: String,
-  },
-});
+withDefaults(
+  defineProps<{
+    modelValue?: string | number | boolean;
+    options?: Array<Record<string, string | number | boolean>>;
+    valueKey?: string;
+    labelKey?: string;
+    name?: string;
+  }>(),
+  {
+    valueKey: "value",
+    labelKey: "label",
+  }
+);
 
 const emit = defineEmits(["update:modelValue", "change"]);
 

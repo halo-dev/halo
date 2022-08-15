@@ -1,28 +1,21 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
 import { computed, nextTick, ref, watch } from "vue";
 import { IconClose } from "../../icons/icons";
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  title: {
-    type: String,
-  },
-  width: {
-    type: Number,
-    default: 500,
-  },
-  fullscreen: {
-    type: Boolean,
-    default: false,
-  },
-  bodyClass: {
-    type: Object as PropType<string[]>,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    visible?: boolean;
+    title?: string;
+    width?: number;
+    fullscreen?: boolean;
+    bodyClass?: string[];
+  }>(),
+  {
+    visible: false,
+    width: 500,
+    fullscreen: false,
+  }
+);
 
 const emit = defineEmits(["update:visible", "close"]);
 

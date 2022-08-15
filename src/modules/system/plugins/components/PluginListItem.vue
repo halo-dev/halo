@@ -6,17 +6,18 @@ import {
   VSwitch,
   VTag,
 } from "@halo-dev/components";
-import type { PropType } from "vue";
 import { toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 
-const props = defineProps({
-  plugin: {
-    type: Object as PropType<Plugin | null>,
-    default: null,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    plugin: Plugin | null;
+  }>(),
+  {
+    plugin: null,
+  }
+);
 
 const { plugin } = toRefs(props);
 

@@ -1,21 +1,20 @@
 <script lang="ts" setup>
-import { VModal, VButton, IconSave } from "@halo-dev/components";
+import { IconSave, VButton, VModal } from "@halo-dev/components";
 import { inject, ref } from "vue";
 import type { User } from "@halo-dev/api-client";
-import type { PropType } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import cloneDeep from "lodash.clonedeep";
 
-const props = defineProps({
-  visible: {
-    type: Boolean,
-    default: false,
-  },
-  user: {
-    type: Object as PropType<User | null>,
-    default: null,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    visible: boolean;
+    user: User | null;
+  }>(),
+  {
+    visible: false,
+    user: null,
+  }
+);
 
 const emit = defineEmits(["update:visible", "close"]);
 const currentUser = inject<User>("currentUser");

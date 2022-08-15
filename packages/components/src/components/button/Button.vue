@@ -35,41 +35,30 @@
   </button>
 </template>
 <script lang="ts" setup>
-import type { PropType } from "vue";
 import { computed } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 import { useRouter } from "vue-router";
 import type { Size, Type } from "./interface";
 
-const props = defineProps({
-  type: {
-    type: String as PropType<Type>,
-    default: "default",
-  },
-  size: {
-    type: String as PropType<Size>,
-    default: "md",
-  },
-  circle: {
-    type: Boolean,
-    default: false,
-  },
-  block: {
-    type: Boolean,
-    default: false,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  route: {
-    type: Object as PropType<RouteLocationRaw>,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    type?: Type;
+    size?: Size;
+    circle?: boolean;
+    block?: boolean;
+    disabled?: boolean;
+    loading?: boolean;
+    route?: RouteLocationRaw;
+  }>(),
+  {
+    type: "default",
+    size: "md",
+    circle: false,
+    block: false,
+    disabled: false,
+    loading: false,
+  }
+);
 
 const router = useRouter();
 const emit = defineEmits(["click"]);

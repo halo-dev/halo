@@ -7,18 +7,19 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
-import type { PropType } from "vue";
 import { defineExpose, onMounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { useRouteQuery } from "@vueuse/router";
 
-const props = defineProps({
-  selectedMenu: {
-    type: Object as PropType<Menu | null>,
-    default: null,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    selectedMenu: Menu | null;
+  }>(),
+  {
+    selectedMenu: null,
+  }
+);
 
 const emit = defineEmits(["select", "update:selectedMenu"]);
 
