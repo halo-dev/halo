@@ -38,8 +38,8 @@ class ExtensionListHandler implements ExtensionRouterFunctionFactory.ListHandler
         var fieldSelectors = request.queryParams().get("fieldSelector");
 
         // TODO Resolve comparator from request
-        return client.list(scheme.type(), labelAndFieldSelectorToPredicate(labelSelectors, fieldSelectors),
-                null, page, size)
+        return client.list(scheme.type(),
+                labelAndFieldSelectorToPredicate(labelSelectors, fieldSelectors), null, page, size)
             .flatMap(listResult -> ServerResponse
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
