@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.content.TestPost.postV1;
+import static run.halo.app.content.TestPost.snapshotV1;
 
 import java.time.Instant;
 import java.util.List;
@@ -23,8 +25,6 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.GVK;
-import run.halo.app.extension.Metadata;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
@@ -177,7 +177,7 @@ class PostServiceTest {
     @Test
     void updatePostWhenHeadPointsToPreviousRelease() {
         // baseSnapshot = v1
-        Snapshot snapshotV2 = snapshotV2();
+        Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV2.getMetadata().setName("v2");
         snapshotV2.getSpec().setPublishTime(Instant.now());
         when(client.fetch(eq(Snapshot.class), eq(snapshotV2.getMetadata().getName())))
@@ -310,7 +310,7 @@ class PostServiceTest {
         when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
             .thenReturn(Optional.of(snapshotV1));
 
-        Snapshot snapshotV2 = snapshotV2();
+        Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV2.getMetadata().setName("v2");
         snapshotV2.getSpec().setPublishTime(null);
         when(client.fetch(eq(Snapshot.class), eq(snapshotV2.getMetadata().getName())))
@@ -354,70 +354,5 @@ class PostServiceTest {
 
     ContentRequest contentRequest(String raw, String content) {
         return new ContentRequest(raw, content, "MARKDOWN");
-    }
-
-    Post postV1() {
-        Post post = new Post();
-        post.setKind(Post.KIND);
-        post.setApiVersion(getApiVersion(Post.class));
-        Metadata metadata = new Metadata();
-        metadata.setName("post-A");
-        post.setMetadata(metadata);
-
-        Post.PostSpec postSpec = new Post.PostSpec();
-        post.setSpec(postSpec);
-
-        postSpec.setTitle("post-A");
-        postSpec.setVersion(1);
-        postSpec.setBaseSnapshot(snapshotV1().getMetadata().getName());
-        postSpec.setHeadSnapshot("base-snapshot");
-        postSpec.setReleaseSnapshot(null);
-
-        return post;
-    }
-
-    Snapshot snapshotV1() {
-        Snapshot snapshot = new Snapshot();
-        snapshot.setKind(Snapshot.KIND);
-        snapshot.setApiVersion(getApiVersion(Snapshot.class));
-        Metadata metadata = new Metadata();
-        metadata.setName("snapshot-A");
-        snapshot.setMetadata(metadata);
-        Snapshot.SnapShotSpec spec = new Snapshot.SnapShotSpec();
-        snapshot.setSpec(spec);
-
-        spec.setDisplayVersion("v1");
-        spec.setVersion(1);
-        snapshot.addContributor("guqing");
-        spec.setRawType("MARKDOWN");
-        spec.setRawPatch("A");
-        spec.setContentPatch("<p>A</p>");
-
-        return snapshot;
-    }
-
-    Snapshot snapshotV2() {
-        Snapshot snapshot = new Snapshot();
-        snapshot.setKind(Snapshot.KIND);
-        snapshot.setApiVersion(getApiVersion(Snapshot.class));
-        Metadata metadata = new Metadata();
-        metadata.setName("snapshot-B");
-        snapshot.setMetadata(metadata);
-        Snapshot.SnapShotSpec spec = new Snapshot.SnapShotSpec();
-        snapshot.setSpec(spec);
-
-        spec.setDisplayVersion("v2");
-        spec.setVersion(2);
-        snapshot.addContributor("guqing");
-        spec.setRawType("MARKDOWN");
-        spec.setRawPatch(PatchUtils.diffToJsonPatch("A", "B"));
-        spec.setContentPatch(PatchUtils.diffToJsonPatch("<p>A</p>", "<p>B</p>"));
-
-        return snapshot;
-    }
-
-    public String getApiVersion(Class<? extends AbstractExtension> extension) {
-        GVK annotation = extension.getAnnotation(GVK.class);
-        return annotation.group() + "/" + annotation.version();
     }
 }

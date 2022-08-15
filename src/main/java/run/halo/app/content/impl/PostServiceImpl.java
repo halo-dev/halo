@@ -221,15 +221,18 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    // TODO remove it when PR#2324 merged
     <E extends Extension> Mono<E> fetch(Class<E> type, String name) {
         return Mono.just(client.fetch(type, name).orElseThrow());
     }
 
+    // TODO remove it when PR#2324 merged
     <E extends Extension> Mono<Void> update(E extension) {
         client.update(extension);
         return Mono.empty();
     }
 
+    // TODO remove it when PR#2324 merged
     <E extends Extension> Mono<Void> create(E extension) {
         client.create(extension);
         return Mono.empty();

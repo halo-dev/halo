@@ -2,17 +2,22 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.core.extension.Theme;
-import run.halo.app.extension.ExtensionClient;
+import reactor.core.publisher.Mono;
+import run.halo.app.content.PostRequest;
+import run.halo.app.content.PostService;
+import run.halo.app.core.extension.Post;
 
 /**
  * Endpoint for managing posts.
@@ -21,20 +26,20 @@ import run.halo.app.extension.ExtensionClient;
  * @since 2.0.0
  */
 @Component
-public class PostEndpoint implements CustomEndpoint{
+public class PostEndpoint implements CustomEndpoint {
 
-    private final ExtensionClient client;
+    private final PostService postService;
 
-    public PostEndpoint(ExtensionClient client) {
-        this.client = client;
+    public PostEndpoint(PostService postService) {
+        this.postService = postService;
     }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "content.halo.run/v1alpha1/Post";
+        final var tag = "api.halo.run/v1alpha1/Post";
         return SpringdocRouteBuilder.route()
             .POST("posts", contentType(MediaType.APPLICATION_JSON),
-                null, builder -> builder.operationId("DraftPost")
+                this::draftPost, builder -> builder.operationId("DraftPost")
                     .description("Draft a post.")
                     .tag(tag)
                     .requestBody(requestBodyBuilder()
@@ -42,11 +47,58 @@ public class PostEndpoint implements CustomEndpoint{
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
                             .schema(Builder.schemaBuilder()
-                                .implementation(ThemeEndpoint.InstallRequest.class))
+                                .implementation(PostRequest.class))
                         ))
                     .response(responseBuilder()
-                        .implementation(Theme.class))
+                        .implementation(Post.class))
+            )
+            .PUT("posts/{name}", contentType(MediaType.APPLICATION_JSON),
+                this::updatePost, builder -> builder.operationId("UpdateDraftPost")
+                    .description("Update a post.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class))
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(PostRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Post.class))
+            )
+            .PUT("posts/{name}/publish", contentType(MediaType.APPLICATION_JSON),
+                this::publishPost, builder -> builder.operationId("PublishPost")
+                    .description("Publish a post.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class))
+                    .response(responseBuilder()
+                        .implementation(Post.class))
             )
             .build();
+    }
+
+    Mono<ServerResponse> draftPost(ServerRequest request) {
+        return request.bodyToMono(PostRequest.class)
+            .flatMap(postService::draftPost)
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+    }
+
+    Mono<ServerResponse> updatePost(ServerRequest request) {
+        return request.bodyToMono(PostRequest.class)
+            .flatMap(postService::updatePost)
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+    }
+
+    Mono<ServerResponse> publishPost(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return postService.publishPost(name)
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 }
