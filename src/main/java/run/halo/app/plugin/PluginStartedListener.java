@@ -7,8 +7,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -19,13 +17,14 @@ import org.pf4j.DevelopmentPluginClasspath;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
-import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
-import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.MetadataOperator;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
 
@@ -36,50 +35,55 @@ import run.halo.app.plugin.event.HaloPluginStartedEvent;
  * @since 2.0.0
  */
 @Component
-public class PluginStartedListener implements ApplicationListener<HaloPluginStartedEvent> {
+public class PluginStartedListener {
 
-    private final ExtensionClient extensionClient;
+    private final ReactiveExtensionClient client;
 
-    public PluginStartedListener(ExtensionClient extensionClient) {
-        this.extensionClient = extensionClient;
+    public PluginStartedListener(ReactiveExtensionClient extensionClient) {
+        this.client = extensionClient;
     }
 
-    @Override
-    public void onApplicationEvent(HaloPluginStartedEvent event) {
+    @EventListener
+    public Mono<Void> onApplicationEvent(HaloPluginStartedEvent event) {
         PluginWrapper pluginWrapper = event.getPlugin();
-        Plugin plugin =
-            extensionClient.fetch(Plugin.class, pluginWrapper.getPluginId()).orElseThrow();
-        // load unstructured
-        DefaultResourceLoader resourceLoader =
+        var resourceLoader =
             new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());
-
-        PluginApplicationContext pluginApplicationContext = ExtensionContextRegistry.getInstance()
+        var pluginApplicationContext = ExtensionContextRegistry.getInstance()
             .getByPluginId(pluginWrapper.getPluginId());
+        return client.get(Plugin.class, pluginWrapper.getPluginId())
+            .zipWith(Mono.just(
+                lookupExtensions(pluginWrapper.getPluginPath(), pluginWrapper.getRuntimeMode())))
+            .flatMap(tuple2 -> {
+                var plugin = tuple2.getT1();
+                var extensionLocations = tuple2.getT2();
+                return Flux.fromIterable(extensionLocations)
+                    .map(resourceLoader::getResource)
+                    .filter(Resource::exists)
+                    .map(resource -> new YamlUnstructuredLoader(resource).load())
+                    .flatMapIterable(rs -> rs)
+                    .flatMap(unstructured -> {
+                        var metadata = unstructured.getMetadata();
+                        // collector plugin initialize extension resources
+                        pluginApplicationContext.addExtensionMapping(
+                            unstructured.groupVersionKind(),
+                            metadata.getName());
+                        var labels = metadata.getLabels();
+                        if (labels == null) {
+                            labels = new HashMap<>();
+                        }
+                        labels.put(PluginConst.PLUGIN_NAME_LABEL_NAME,
+                            plugin.getMetadata().getName());
+                        metadata.setLabels(labels);
 
-        lookupExtensions(pluginWrapper.getPluginPath(),
-            pluginWrapper.getRuntimeMode())
-            .stream()
-            .map(resourceLoader::getResource)
-            .filter(Resource::exists)
-            .map(resource -> new YamlUnstructuredLoader(resource).load())
-            .flatMap(List::stream)
-            .forEach(unstructured -> {
-                MetadataOperator metadata = unstructured.getMetadata();
-                // collector plugin initialize extension resources
-                pluginApplicationContext.addExtensionMapping(unstructured.groupVersionKind(),
-                    metadata.getName());
-                Map<String, String> labels = metadata.getLabels();
-                if (labels == null) {
-                    labels = new HashMap<>();
-                    metadata.setLabels(labels);
-                }
-                labels.put(PluginConst.PLUGIN_NAME_LABEL_NAME, plugin.getMetadata().getName());
-                extensionClient.fetch(unstructured.groupVersionKind(), metadata.getName())
-                    .ifPresentOrElse(persisted -> {
-                        unstructured.getMetadata().setVersion(persisted.getMetadata().getVersion());
-                        extensionClient.update(unstructured);
-                    }, () -> extensionClient.create(unstructured));
-            });
+                        return client.fetch(unstructured.groupVersionKind(), metadata.getName())
+                            .flatMap(extension -> {
+                                unstructured.getMetadata()
+                                    .setVersion(extension.getMetadata().getVersion());
+                                return client.update(unstructured);
+                            })
+                            .switchIfEmpty(client.create(unstructured));
+                    }).then();
+            }).then();
     }
 
     Set<String> lookupExtensions(Path pluginPath, RuntimeMode runtimeMode) {
