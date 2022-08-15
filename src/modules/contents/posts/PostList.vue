@@ -3,7 +3,6 @@ import {
   IconAddCircle,
   IconArrowDown,
   IconBookRead,
-  IconDeleteBin,
   IconSettings,
   VButton,
   VCard,
@@ -107,12 +106,7 @@ onMounted(() => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton size="sm">
-          <template #icon>
-            <IconDeleteBin class="h-full w-full" />
-          </template>
-          回收站
-        </VButton>
+        <VButton :route="{ name: 'Categories' }" size="sm">分类</VButton>
         <VButton :route="{ name: 'PostEditor' }" type="secondary">
           <template #icon>
             <IconAddCircle class="h-full w-full" />
