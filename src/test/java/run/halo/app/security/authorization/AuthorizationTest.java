@@ -32,6 +32,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.Role.PolicyRule;
 import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.security.LoginUtils;
 
 @SpringBootTest
@@ -74,7 +75,9 @@ class AuthorizationTest {
             new PolicyRule.Builder().apiGroups("fake.halo.run").verbs("list").resources("posts")
                 .build()));
 
-        when(roleService.getMonoRole(any())).thenReturn(Mono.just(role));
+        when(roleService.getMonoRole("post.read")).thenReturn(Mono.just(role));
+        when(roleService.getMonoRole("authenticated")).thenReturn(
+            Mono.error(ExtensionNotFoundException::new));
 
         var token = LoginUtils.login(webClient, "user", "password").block();
         webClient.get().uri("/apis/fake.halo.run/v1/posts")
@@ -88,7 +91,7 @@ class AuthorizationTest {
             .expectStatus().isForbidden();
 
         verify(roleService, times(2)).getMonoRole("authenticated");
-        verify(roleService, times(1)).getMonoRole("post.read");
+        verify(roleService, times(2)).getMonoRole("post.read");
     }
 
     @TestConfiguration

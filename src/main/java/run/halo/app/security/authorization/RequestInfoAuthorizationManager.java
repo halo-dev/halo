@@ -36,7 +36,7 @@ public class RequestInfoAuthorizationManager
 
         return authentication.flatMap(auth -> {
             var userDetails = this.createUserDetails(auth);
-            return this.ruleResolver.visitRulesForMono(userDetails, requestInfo)
+            return this.ruleResolver.visitRules(userDetails, requestInfo)
                 .map(visitor -> {
                     if (!visitor.isAllowed()) {
                         showErrorMessage(visitor.getErrors());

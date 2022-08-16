@@ -81,9 +81,8 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
     }
 
     @Override
-    public Mono<AuthorizingVisitor> visitRulesForMono(UserDetails user, RequestInfo requestInfo) {
-        var roleNamesImmutable =
-            roleBindingService.listBoundRoleNames(user.getAuthorities());
+    public Mono<AuthorizingVisitor> visitRules(UserDetails user, RequestInfo requestInfo) {
+        var roleNamesImmutable = roleBindingService.listBoundRoleNames(user.getAuthorities());
         var roleNames = new HashSet<>(roleNamesImmutable);
         roleNames.add(AUTHENTICATED_ROLE);
 
@@ -96,8 +95,9 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
                     return Mono.empty();
                 }
                 return roleService.getMonoRole(roleName)
-                    .onErrorContinue(t -> visitor.visit(null, null, t), (throwable, o) -> {
+                    .onErrorResume(t -> visitor.visit(null, null, t), t -> {
                         //Do nothing here
+                        return Mono.empty();
                     })
                     .doOnNext(role -> {
                         var rules = fetchRules(role);
@@ -110,8 +110,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
                         }
                     });
             })
-            .then()
-            .thenReturn(visitor);
+            .then(Mono.just(visitor));
     }
 
     private List<Role.PolicyRule> fetchRules(Role role) {

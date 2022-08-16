@@ -18,6 +18,7 @@ public interface AuthorizationRuleResolver {
      *
      * @param user authenticated user info
      */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     PolicyRuleList rulesFor(UserDetails user);
 
     /**
@@ -28,7 +29,8 @@ public interface AuthorizationRuleResolver {
      * @param user user info
      * @param visitor visitor
      */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     void visitRulesFor(UserDetails user, RuleAccumulator visitor);
 
-    Mono<AuthorizingVisitor> visitRulesForMono(UserDetails user, RequestInfo requestInfo);
+    Mono<AuthorizingVisitor> visitRules(UserDetails user, RequestInfo requestInfo);
 }
