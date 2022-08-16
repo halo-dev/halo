@@ -20,11 +20,9 @@ import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.reconciler.ThemeReconciler;
 import run.halo.app.core.extension.reconciler.UserReconciler;
 import run.halo.app.core.extension.service.RoleService;
-import run.halo.app.extension.DefaultExtensionClient;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.JSONExtensionConverter;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.SchemeWatcherManager;
@@ -32,7 +30,6 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.ControllerManager;
 import run.halo.app.extension.router.ExtensionCompositeRouterFunction;
-import run.halo.app.extension.store.ExtensionStoreClient;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
@@ -44,12 +41,6 @@ public class ExtensionConfiguration {
     RouterFunction<ServerResponse> extensionsRouterFunction(ReactiveExtensionClient client,
         SchemeWatcherManager watcherManager) {
         return new ExtensionCompositeRouterFunction(client, watcherManager);
-    }
-
-    @Bean
-    ExtensionClient extensionClient(ExtensionStoreClient storeClient, SchemeManager schemeManager) {
-        var converter = new JSONExtensionConverter(schemeManager);
-        return new DefaultExtensionClient(storeClient, converter, schemeManager);
     }
 
     @Bean

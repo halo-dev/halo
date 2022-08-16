@@ -48,6 +48,9 @@ class DefaultExtensionClientTest {
     @Mock
     SchemeManager schemeManager;
 
+    @Mock
+    ReactiveExtensionClient reactiveClient;
+
     @InjectMocks
     DefaultExtensionClient client;
 
@@ -361,6 +364,7 @@ class DefaultExtensionClientTest {
         @BeforeEach
         void setUp() {
             client.watch(watcher);
+            verify(reactiveClient).watch(watcher);
         }
 
         @Test
