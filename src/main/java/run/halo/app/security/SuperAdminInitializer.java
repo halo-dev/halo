@@ -42,7 +42,7 @@ public class SuperAdminInitializer {
     @EventListener
     public Mono<Void> initialize(ApplicationReadyEvent readyEvent) {
         return client.fetch(User.class, initializer.getSuperAdminUsername())
-            .switchIfEmpty(client.create(createAdmin())
+            .switchIfEmpty(Mono.defer(() -> client.create(createAdmin()))
                 .flatMap(admin -> {
                     var superRole = createSuperRole();
                     return client.create(superRole)
