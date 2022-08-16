@@ -12,6 +12,7 @@ import static run.halo.app.content.TestPost.snapshotV1;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,7 +28,6 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
-import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Tests for {@link PostService}.
@@ -46,6 +46,24 @@ class PostServiceTest {
     @BeforeEach
     void setUp() {
         postService = new PostServiceImpl(client);
+    }
+
+    @Test
+    void latestSnapshotVersion() {
+        String postName = "post-1";
+        Snapshot snapshotV1 = snapshotV1();
+        snapshotV1.setSubjectRef(Post.KIND, postName);
+        Snapshot snapshotV2 = TestPost.snapshotV2();
+        snapshotV2.setSubjectRef(Post.KIND, postName);
+
+        when(client.list(eq(Snapshot.class), any(), any()))
+            .thenReturn(Stream.of(snapshotV1, snapshotV2)
+                .sorted(PostServiceImpl.LATEST_SNAPSHOT_COMPARATOR).toList());
+
+        StepVerifier.create(postService.latestSnapshotVersion(postName))
+            .expectNext(snapshotV2)
+            .expectComplete()
+            .verify();
     }
 
     @Test
@@ -137,18 +155,20 @@ class PostServiceTest {
         post.getSpec().setReleaseSnapshot("v1");
 
         when(client.fetch(eq(Post.class), eq("post-A"))).thenReturn(Optional.of(post));
+        when(client.list(eq(Snapshot.class), any(), any()))
+            .thenReturn(List.of(snapshotV1()));
 
         PostRequest postRequest = new PostRequest(post, contentRequest("B", "<p>B</p>"));
 
         ArgumentCaptor<Snapshot> createCaptor = ArgumentCaptor.forClass(Snapshot.class);
-        ArgumentCaptor<Post> fetchCaptor = ArgumentCaptor.forClass(Post.class);
+        final ArgumentCaptor<Post> fetchCaptor = ArgumentCaptor.forClass(Post.class);
 
         StepVerifier.create(postService.updatePost(postRequest))
             .expectNext(post)
             .expectComplete()
             .verify();
 
-        verify(client, times(3)).fetch(eq(Snapshot.class), eq("v1"));
+        verify(client, times(2)).fetch(eq(Snapshot.class), eq("v1"));
 
         // will create a snapshot
         verify(client, times(1)).create(createCaptor.capture());
@@ -196,11 +216,13 @@ class PostServiceTest {
         post.getSpec().setReleaseSnapshot("v2");
 
         when(client.fetch(eq(Post.class), eq("post-A"))).thenReturn(Optional.of(post));
+        when(client.list(eq(Snapshot.class), any(), any()))
+            .thenReturn(List.of(snapshotV2, snapshotV1));
 
         PostRequest postRequest = new PostRequest(post, contentRequest("B", "<p>B</p>"));
 
         ArgumentCaptor<Snapshot> createCaptor = ArgumentCaptor.forClass(Snapshot.class);
-        ArgumentCaptor<Post> fetchCaptor = ArgumentCaptor.forClass(Post.class);
+        final ArgumentCaptor<Post> fetchCaptor = ArgumentCaptor.forClass(Post.class);
 
         StepVerifier.create(postService.updatePost(postRequest))
             .expectNext(post)
@@ -208,12 +230,11 @@ class PostServiceTest {
             .verify();
 
         verify(client, times(2)).fetch(eq(Snapshot.class), eq("v1"));
-        verify(client, times(1)).fetch(eq(Snapshot.class), eq("v2"));
 
         // will create a snapshot
         verify(client, times(1)).create(createCaptor.capture());
+
         Snapshot createdSnapshot = createCaptor.getValue();
-        System.out.println("----->" + JsonUtils.objectToJson(createdSnapshot));
         snapshotV2.getMetadata().setName(createdSnapshot.getMetadata().getName());
         snapshotV2.setSubjectRef(Post.KIND, post.getMetadata().getName());
         snapshotV2.getSpec().setRawPatch("[{\"source\":{\"position\":0,\"lines\":[\"A\"],"

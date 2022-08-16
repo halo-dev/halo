@@ -2,13 +2,16 @@ package run.halo.app.content.impl;
 
 import java.security.Principal;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 import run.halo.app.content.ContentRequest;
@@ -22,12 +25,16 @@ import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 
 /**
+ * A default implementation of {@link PostService}.
+ *
  * @author guqing
  * @since 2.0.0
  */
 @Component
 public class PostServiceImpl implements PostService {
-
+    private static final Comparator<Snapshot> SNAPSHOT_COMPARATOR =
+        Comparator.comparing(snapshot -> snapshot.getSpec().getVersion());
+    public static Comparator<Snapshot> LATEST_SNAPSHOT_COMPARATOR = SNAPSHOT_COMPARATOR.reversed();
     private final ExtensionClient client;
 
     public PostServiceImpl(ExtensionClient client) {
@@ -81,7 +88,6 @@ public class PostServiceImpl implements PostService {
         Post post,
         String username) {
         Post.PostSpec postSpec = post.getSpec();
-        String headSnapshotName = postSpec.getHeadSnapshot();
         String baseSnapshotName = postSpec.getBaseSnapshot();
 
         Snapshot newSnapshot = contentRequest.toSnapshot();
@@ -98,10 +104,12 @@ public class PostServiceImpl implements PostService {
         // if headPtr != releasePtr && head is not published, then update its content directly
         // if headPtr != releasePtr && head is published, then create a new snapshot
         // if headPtr == releasePtr, then create a new snapshot too
-        return fetch(Snapshot.class, postSpec.getReleaseSnapshot())
-            .flatMap(releasedSnapshot -> {
+        return latestSnapshotVersion(post.getMetadata().getName())
+            .flatMap(latestSnapshot -> {
+                String headSnapshotName = postSpec.getHeadSnapshot();
+
                 newSnapshot.getSpec()
-                    .setVersion(releasedSnapshot.getSpec().getVersion() + 1);
+                    .setVersion(latestSnapshot.getSpec().getVersion() + 1);
                 newSnapshot.getSpec().setDisplayVersion(
                     Snapshot.displayVersionFrom(newSnapshot.getSpec().getVersion()));
                 newSnapshot.getSpec()
@@ -160,7 +168,18 @@ public class PostServiceImpl implements PostService {
             });
     }
 
-    public static void appendPublishedCondition(Post post) {
+    @Override
+    public Mono<Snapshot> latestSnapshotVersion(String postName) {
+        Assert.notNull(postName, "The postName must not be null.");
+        return list(Snapshot.class, snapshot -> {
+            Snapshot.SubjectRef subjectRef = snapshot.getSpec().getSubjectRef();
+            return Post.KIND.equals(subjectRef.getKind())
+                && postName.equals(subjectRef.getName());
+        }, LATEST_SNAPSHOT_COMPARATOR)
+            .next();
+    }
+
+    void appendPublishedCondition(Post post) {
         Assert.notNull(post, "The post must not be null.");
         Post.PostStatus status = post.getStatusOrDefault();
         status.setPhase(Post.PostPhase.PUBLISHED.name());
@@ -190,7 +209,6 @@ public class PostServiceImpl implements PostService {
     private Mono<Snapshot> createNewSnapshot(Snapshot snapshotToCreate,
         String baseSnapshotName,
         ContentRequest contentRequest) {
-
         return fetch(Snapshot.class, baseSnapshotName)
             .flatMap(baseSnapshot -> {
                 determineRawAndContentPatch(snapshotToCreate,
@@ -236,5 +254,11 @@ public class PostServiceImpl implements PostService {
     <E extends Extension> Mono<Void> create(E extension) {
         client.create(extension);
         return Mono.empty();
+    }
+
+    // TODO remove it when PR#2324 merged
+    <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
+        Comparator<E> comparator) {
+        return Flux.fromIterable(client.list(type, predicate, comparator));
     }
 }

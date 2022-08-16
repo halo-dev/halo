@@ -24,6 +24,7 @@ public class Tag extends AbstractExtension {
     @Schema(required = true)
     private TagSpec spec;
 
+    @Schema
     private TagStatus status;
 
     @Data

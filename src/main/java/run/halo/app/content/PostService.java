@@ -2,8 +2,11 @@ package run.halo.app.content;
 
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.Snapshot;
 
 /**
+ * Service for {@link Post}.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -14,4 +17,6 @@ public interface PostService {
     Mono<Post> updatePost(PostRequest postRequest);
 
     Mono<Post> publishPost(String postName);
+
+    Mono<Snapshot> latestSnapshotVersion(String postName);
 }

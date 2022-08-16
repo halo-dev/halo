@@ -23,7 +23,7 @@ public class Category extends AbstractExtension {
     @Schema(required = true)
     private CategorySpec spec;
 
-    @Schema(required = true)
+    @Schema
     private CategoryStatus status;
 
     @Data

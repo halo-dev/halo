@@ -29,7 +29,7 @@ public class Post extends AbstractExtension {
     @Schema(required = true)
     private PostSpec spec;
 
-    @Schema(required = true)
+    @Schema
     private PostStatus status;
 
     @JsonIgnore
