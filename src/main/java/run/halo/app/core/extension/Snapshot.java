@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.util.Assert;
+import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.PatchUtils;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
@@ -72,6 +74,13 @@ public class Snapshot extends AbstractExtension {
 
         @Schema(required = true)
         private String name;
+
+        public static SubjectRef of(String kind, String name) {
+            SubjectRef subjectRef = new SubjectRef();
+            subjectRef.setKind(kind);
+            subjectRef.setName(name);
+            return subjectRef;
+        }
     }
 
     public static String displayVersionFrom(Integer version) {
@@ -100,5 +109,20 @@ public class Snapshot extends AbstractExtension {
         }
         spec.subjectRef.setKind(kind);
         spec.subjectRef.setName(name);
+    }
+
+    @JsonIgnore
+    public ContentWrapper applyPatch(Snapshot baseSnapshot) {
+        Assert.notNull(baseSnapshot, "The baseSnapshot must not be null.");
+        Integer version = baseSnapshot.getSpec().getVersion();
+        if (version == 1) {
+            return new ContentWrapper(this.spec.rawPatch, this.spec.contentPatch,
+                this.spec.rawType);
+        }
+        String patchedContent =
+            PatchUtils.applyPatch(baseSnapshot.getSpec().getContentPatch(), this.spec.contentPatch);
+        String patchedRaw =
+            PatchUtils.applyPatch(baseSnapshot.getSpec().getRawPatch(), this.spec.rawPatch);
+        return new ContentWrapper(patchedRaw, patchedContent, this.spec.rawType);
     }
 }

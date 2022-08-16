@@ -12,7 +12,6 @@ import static run.halo.app.content.TestPost.snapshotV1;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +20,7 @@ import org.mockito.Mock;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.test.StepVerifier;
+import run.halo.app.content.impl.ContentServiceImpl;
 import run.halo.app.content.impl.PostServiceImpl;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
@@ -28,6 +28,7 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Tests for {@link PostService}.
@@ -45,57 +46,52 @@ class PostServiceTest {
 
     @BeforeEach
     void setUp() {
-        postService = new PostServiceImpl(client);
-    }
-
-    @Test
-    void latestSnapshotVersion() {
-        String postName = "post-1";
-        Snapshot snapshotV1 = snapshotV1();
-        snapshotV1.setSubjectRef(Post.KIND, postName);
-        Snapshot snapshotV2 = TestPost.snapshotV2();
-        snapshotV2.setSubjectRef(Post.KIND, postName);
-
-        when(client.list(eq(Snapshot.class), any(), any()))
-            .thenReturn(Stream.of(snapshotV1, snapshotV2)
-                .sorted(PostServiceImpl.LATEST_SNAPSHOT_COMPARATOR).toList());
-
-        StepVerifier.create(postService.latestSnapshotVersion(postName))
-            .expectNext(snapshotV2)
-            .expectComplete()
-            .verify();
+        ContentService contentService = new ContentServiceImpl(client);
+        postService = new PostServiceImpl(contentService, client);
     }
 
     @Test
     void draftPost() {
+        Snapshot snapshotV1 = snapshotV1();
+        snapshotV1.setSubjectRef(Post.KIND, "post-A");
+        snapshotV1.getMetadata().setName("Post-post-A-v1-snapshot");
+
         when(client.fetch(eq(Post.class), eq("post-A")))
             .thenReturn(Optional.of(postV1()));
         when(client.fetch(eq(Snapshot.class), eq("snapshot-A")))
-            .thenReturn(Optional.of(snapshotV1()));
+            .thenReturn(Optional.of(snapshotV1));
+
+        when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
+            .thenReturn(Optional.of(snapshotV1));
+        // base snapshot
+        when(client.list(eq(Snapshot.class), any(), eq(null))).thenReturn(List.of(snapshotV1));
 
         PostRequest postRequest = new PostRequest(postV1(), contentRequest("B", "<p>B</p>"));
 
         ArgumentCaptor<AbstractExtension> captor = ArgumentCaptor.forClass(AbstractExtension.class);
         StepVerifier.create(postService.draftPost(postRequest))
-            .expectNext(postV1())
+            //.expectNext()//postV1()
+            .consumeNextWith(post -> {
+                System.out.println(JsonUtils.objectToJson(post));
+            })
             .expectComplete()
             .verify();
 
         verify(client, times(2)).create(captor.capture());
         List<AbstractExtension> allValues = captor.getAllValues();
         assertThat(allValues.size()).isEqualTo(2);
-        assertThat(allValues.get(0)).isInstanceOf(Post.class);
-        assertThat(allValues.get(1)).isInstanceOf(Snapshot.class);
+        assertThat(allValues.get(0)).isInstanceOf(Snapshot.class);
+        assertThat(allValues.get(1)).isInstanceOf(Post.class);
         Post expectPost = postV1();
         expectPost.getSpec().setOwner("guqing");
-        assertThat(allValues.get(0)).isEqualTo(expectPost);
+        assertThat(allValues.get(1)).isEqualTo(expectPost);
 
         Snapshot expectSnapshot = snapshotV1();
-        expectSnapshot.getMetadata().setName(allValues.get(1).getMetadata().getName());
-        expectSnapshot.setSubjectRef(Post.KIND, expectPost.getMetadata().getName());
+        expectSnapshot.getMetadata().setName(snapshotV1.getMetadata().getName());
+        expectSnapshot.setSubjectRef(Post.KIND, "post-A");
         expectSnapshot.getSpec().setRawPatch("B");
         expectSnapshot.getSpec().setContentPatch("<p>B</p>");
-        assertThat(allValues.get(1)).isEqualTo(expectSnapshot);
+        assertThat(allValues.get(0)).isEqualTo(expectSnapshot);
     }
 
     /**
@@ -108,6 +104,8 @@ class PostServiceTest {
         oldSnapshot.getMetadata().setName("v1");
         when(client.fetch(eq(Snapshot.class), eq(oldSnapshot.getMetadata().getName())))
             .thenReturn(Optional.of(oldSnapshot));
+        // base snapshot
+        when(client.list(eq(Snapshot.class), any(), eq(null))).thenReturn(List.of(oldSnapshot));
 
         // 1.post 的 head 指向 v1, release-snapshot 指向 null
         Post post = postV1();
@@ -125,14 +123,14 @@ class PostServiceTest {
             .expectComplete()
             .verify();
 
-        verify(client, times(2)).fetch(eq(Snapshot.class), eq("v1"));
-
+        verify(client, times(3)).fetch(eq(Snapshot.class), eq("v1"));
         verify(client, times(2)).update(captor.capture());
         assertThat(captor.getAllValues()).hasSize(2);
-        Snapshot updatedSnapshot = captor.getAllValues().get(1);
+
         oldSnapshot.setSubjectRef(Post.KIND, post.getMetadata().getName());
         oldSnapshot.getSpec().setRawPatch("B");
         oldSnapshot.getSpec().setContentPatch("<p>B</p>");
+        Snapshot updatedSnapshot = captor.getAllValues().get(1);
         assertThat(updatedSnapshot).isEqualTo(oldSnapshot);
     }
 
@@ -156,8 +154,7 @@ class PostServiceTest {
 
         when(client.fetch(eq(Post.class), eq("post-A"))).thenReturn(Optional.of(post));
         when(client.list(eq(Snapshot.class), any(), any()))
-            .thenReturn(List.of(snapshotV1()));
-
+            .thenReturn(List.of(oldSnapshot));
         PostRequest postRequest = new PostRequest(post, contentRequest("B", "<p>B</p>"));
 
         ArgumentCaptor<Snapshot> createCaptor = ArgumentCaptor.forClass(Snapshot.class);
@@ -168,7 +165,7 @@ class PostServiceTest {
             .expectComplete()
             .verify();
 
-        verify(client, times(2)).fetch(eq(Snapshot.class), eq("v1"));
+        verify(client, times(4)).fetch(eq(Snapshot.class), eq("v1"));
 
         // will create a snapshot
         verify(client, times(1)).create(createCaptor.capture());
@@ -191,75 +188,14 @@ class PostServiceTest {
         verify(client, times(1)).update(fetchCaptor.capture());
     }
 
-    /**
-     * 3.post 的 head 指向 v1, release-snapshot 指向 v2.
-     */
-    @Test
-    void updatePostWhenHeadPointsToPreviousRelease() {
-        // baseSnapshot = v1
-        Snapshot snapshotV2 = TestPost.snapshotV2();
-        snapshotV2.getMetadata().setName("v2");
-        snapshotV2.getSpec().setPublishTime(Instant.now());
-        when(client.fetch(eq(Snapshot.class), eq(snapshotV2.getMetadata().getName())))
-            .thenReturn(Optional.of(snapshotV2));
-
-        Snapshot snapshotV1 = snapshotV1();
-        snapshotV1.getMetadata().setName("v1");
-        snapshotV1.getSpec().setPublishTime(Instant.now());
-        when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
-            .thenReturn(Optional.of(snapshotV1));
-
-        // 3.post 的 head 指向 v1, release-snapshot 指向 v2
-        Post post = postV1();
-        post.getSpec().setBaseSnapshot("v1");
-        post.getSpec().setHeadSnapshot("v1");
-        post.getSpec().setReleaseSnapshot("v2");
-
-        when(client.fetch(eq(Post.class), eq("post-A"))).thenReturn(Optional.of(post));
-        when(client.list(eq(Snapshot.class), any(), any()))
-            .thenReturn(List.of(snapshotV2, snapshotV1));
-
-        PostRequest postRequest = new PostRequest(post, contentRequest("B", "<p>B</p>"));
-
-        ArgumentCaptor<Snapshot> createCaptor = ArgumentCaptor.forClass(Snapshot.class);
-        final ArgumentCaptor<Post> fetchCaptor = ArgumentCaptor.forClass(Post.class);
-
-        StepVerifier.create(postService.updatePost(postRequest))
-            .expectNext(post)
-            .expectComplete()
-            .verify();
-
-        verify(client, times(2)).fetch(eq(Snapshot.class), eq("v1"));
-
-        // will create a snapshot
-        verify(client, times(1)).create(createCaptor.capture());
-
-        Snapshot createdSnapshot = createCaptor.getValue();
-        snapshotV2.getMetadata().setName(createdSnapshot.getMetadata().getName());
-        snapshotV2.setSubjectRef(Post.KIND, post.getMetadata().getName());
-        snapshotV2.getSpec().setRawPatch("[{\"source\":{\"position\":0,\"lines\":[\"A\"],"
-            + "\"changePosition\":null},\"target\":{\"position\":0,\"lines\":[\"B\"],"
-            + "\"changePosition\":null},\"type\":\"CHANGE\"}]");
-        snapshotV2.getSpec().setContentPatch("[{\"source\":{\"position\":0,\"lines\":[\"A\"],"
-            + "\"changePosition\":null},\"target\":{\"position\":0,\"lines\":[\"<p>B</p>\"],"
-            + "\"changePosition\":null},\"type\":\"CHANGE\"}]");
-        snapshotV2.getSpec().setParentSnapshotName("v1");
-        // new snapshot version is v3
-        snapshotV2.getSpec().setVersion(3);
-        snapshotV2.getSpec().setDisplayVersion(Snapshot.displayVersionFrom(3));
-        snapshotV2.getSpec().setPublishTime(null);
-        assertThat(createdSnapshot).isEqualTo(snapshotV2);
-
-        // update post called
-        verify(client, times(1)).update(fetchCaptor.capture());
-    }
-
     @Test
     void publishPostWhenNoReleasedBefore() {
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getMetadata().setName("v1");
         when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
             .thenReturn(Optional.of(snapshotV1));
+        // base snapshot
+        when(client.list(eq(Snapshot.class), any(), eq(null))).thenReturn(List.of(snapshotV1));
 
         Post post = postV1();
         post.getSpec().setBaseSnapshot("v1");
@@ -291,8 +227,8 @@ class PostServiceTest {
         verify(client, times(2)).update(captor.capture());
         assertThat(captor.getAllValues()).hasSize(2);
 
-        assertThat(captor.getAllValues().get(0)).isInstanceOf(Snapshot.class);
-        Snapshot publishedSnapshot = (Snapshot) captor.getAllValues().get(0);
+        assertThat(captor.getAllValues().get(1)).isInstanceOf(Snapshot.class);
+        Snapshot publishedSnapshot = (Snapshot) captor.getAllValues().get(1);
         assertThat(publishedSnapshot.isPublished()).isTrue();
         assertThat(publishedSnapshot.getSpec().getVersion()).isEqualTo(1);
     }
@@ -304,6 +240,9 @@ class PostServiceTest {
         snapshotV1.getSpec().setPublishTime(Instant.now());
         when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
             .thenReturn(Optional.of(snapshotV1));
+
+        // base snapshot
+        when(client.list(eq(Snapshot.class), any(), eq(null))).thenReturn(List.of(snapshotV1));
 
         Post post = postV1();
         post.getSpec().setPublished(true);
@@ -320,7 +259,7 @@ class PostServiceTest {
             .expectComplete()
             .verify();
 
-        verify(client, times(0)).update(any());
+        verify(client, times(1)).update(any());
     }
 
     @Test
@@ -367,13 +306,13 @@ class PostServiceTest {
 
         verify(client, times(2)).update(captor.capture());
 
-        assertThat(captor.getAllValues().get(0)).isInstanceOf(Snapshot.class);
-        Snapshot publishedSnapshot = (Snapshot) captor.getAllValues().get(0);
+        assertThat(captor.getAllValues().get(1)).isInstanceOf(Snapshot.class);
+        Snapshot publishedSnapshot = (Snapshot) captor.getAllValues().get(1);
         assertThat(publishedSnapshot.isPublished()).isTrue();
         assertThat(publishedSnapshot.getSpec().getVersion()).isEqualTo(2);
     }
 
-    ContentRequest contentRequest(String raw, String content) {
-        return new ContentRequest(raw, content, "MARKDOWN");
+    PostRequest.Content contentRequest(String raw, String content) {
+        return new PostRequest.Content(raw, content, "MARKDOWN");
     }
 }

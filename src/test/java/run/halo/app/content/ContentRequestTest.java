@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -18,7 +19,8 @@ class ContentRequestTest {
 
     @BeforeEach
     void setUp() {
-        contentRequest = new ContentRequest("""
+        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, "test-post");
+        contentRequest = new ContentRequest(subjectRef, "snapshot-1", """
             Four score and seven
             years ago our fathers
 
@@ -47,8 +49,8 @@ class ContentRequestTest {
                 {
                     "spec": {
                         "subjectRef": {
-                            "kind": null,
-                            "name": null
+                            "kind": "Post",
+                            "name": "test-post"
                         },
                         "rawType": "MARKDOWN",
                         "rawPatch": "%s",

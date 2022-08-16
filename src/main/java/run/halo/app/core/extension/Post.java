@@ -50,10 +50,8 @@ public class Post extends AbstractExtension {
          */
         private String releaseSnapshot;
 
-        @Schema(required = true, minLength = 1)
         private String headSnapshot;
 
-        @Schema(required = true, minLength = 1)
         private String baseSnapshot;
 
         @Schema(required = true, minLength = 1)
