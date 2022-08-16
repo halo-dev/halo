@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -36,11 +37,12 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
@@ -56,10 +58,10 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
 @Component
 public class ThemeEndpoint implements CustomEndpoint {
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
     private final HaloProperties haloProperties;
 
-    public ThemeEndpoint(ExtensionClient client, HaloProperties haloProperties) {
+    public ThemeEndpoint(ReactiveExtensionClient client, HaloProperties haloProperties) {
         this.client = client;
         this.haloProperties = haloProperties;
     }
@@ -97,7 +99,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                 .map(DataBuffer::asInputStream)
                 .reduce(SequenceInputStream::new)
                 .map(inputStream -> ThemeUtils.unzipThemeTo(inputStream, getThemeWorkDir())))
-            .map(this::persistent)
+            .flatMap(this::persistent)
             .flatMap(theme -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(theme));
@@ -112,47 +114,56 @@ public class ThemeEndpoint implements CustomEndpoint {
      * @return a theme custom model
      * @see Theme
      */
-    public Theme persistent(Unstructured themeManifest) {
+    public Mono<Theme> persistent(Unstructured themeManifest) {
         Assert.state(StringUtils.equals(Theme.KIND, themeManifest.getKind()),
             "Theme manifest kind must be Theme.");
-        client.create(themeManifest);
-        Theme theme = client.fetch(Theme.class, themeManifest.getMetadata().getName())
-            .orElseThrow();
-        List<Unstructured> unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
-        if (unstructureds.stream()
-            .filter(unstructured -> unstructured.getKind().equals(Setting.KIND))
-            .filter(unstructured -> unstructured.getMetadata().getName()
-                .equals(theme.getSpec().getSettingName()))
-            .count() > 1) {
-            throw new IllegalStateException(
-                "Theme must only have one settings.yaml or settings.yml.");
-        }
-        if (unstructureds.stream()
-            .filter(unstructured -> unstructured.getKind().equals(ConfigMap.KIND))
-            .filter(unstructured -> unstructured.getMetadata().getName()
-                .equals(theme.getSpec().getConfigMapName()))
-            .count() > 1) {
-            throw new IllegalStateException(
-                "Theme must only have one config.yaml or config.yml.");
-        }
-        Theme.ThemeSpec spec = theme.getSpec();
-        for (Unstructured unstructured : unstructureds) {
-            String name = unstructured.getMetadata().getName();
+        return client.create(themeManifest)
+            .map(theme -> Unstructured.OBJECT_MAPPER.convertValue(theme, Theme.class))
+            .flatMap(theme -> {
+                var unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
+                if (unstructureds.stream()
+                    .filter(hasSettingsYaml(theme))
+                    .count() > 1) {
+                    return Mono.error(new IllegalStateException(
+                        "Theme must only have one settings.yaml or settings.yml."));
+                }
+                if (unstructureds.stream()
+                    .filter(hasConfigYaml(theme))
+                    .count() > 1) {
+                    return Mono.error(new IllegalStateException(
+                        "Theme must only have one config.yaml or config.yml."));
+                }
+                return Flux.fromIterable(unstructureds)
+                    .flatMap(unstructured -> {
+                        var spec = theme.getSpec();
+                        String name = unstructured.getMetadata().getName();
 
-            boolean isThemeSetting = unstructured.getKind().equals(Setting.KIND)
-                && StringUtils.equals(spec.getSettingName(), name);
+                        boolean isThemeSetting = unstructured.getKind().equals(Setting.KIND)
+                            && StringUtils.equals(spec.getSettingName(), name);
 
-            boolean isThemeConfig = unstructured.getKind().equals(ConfigMap.KIND)
-                && StringUtils.equals(spec.getConfigMapName(), name);
-            if (isThemeSetting || isThemeConfig) {
-                client.create(unstructured);
-            }
-        }
-        return theme;
+                        boolean isThemeConfig = unstructured.getKind().equals(ConfigMap.KIND)
+                            && StringUtils.equals(spec.getConfigMapName(), name);
+                        if (isThemeSetting || isThemeConfig) {
+                            return client.create(unstructured);
+                        }
+                        return Mono.empty();
+                    })
+                    .then(Mono.just(theme));
+            });
     }
 
     private Path getThemePath(Theme theme) {
         return getThemeWorkDir().resolve(theme.getMetadata().getName());
+    }
+
+    private Predicate<Unstructured> hasSettingsYaml(Theme theme) {
+        return unstructured -> Setting.KIND.equals(unstructured.getKind())
+            && theme.getSpec().getSettingName().equals(unstructured.getMetadata().getName());
+    }
+
+    private Predicate<Unstructured> hasConfigYaml(Theme theme) {
+        return unstructured -> ConfigMap.KIND.equals(unstructured.getKind())
+            && theme.getSpec().getConfigMapName().equals(unstructured.getMetadata().getName());
     }
 
     static class ThemeUtils {
