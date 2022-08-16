@@ -81,7 +81,7 @@ public class PluginStartedListener {
                                     .setVersion(extension.getMetadata().getVersion());
                                 return client.update(unstructured);
                             })
-                            .switchIfEmpty(client.create(unstructured));
+                            .switchIfEmpty(Mono.defer(() -> client.create(unstructured)));
                     }).then();
             }).then();
     }

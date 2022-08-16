@@ -81,7 +81,7 @@ public class PluginEndpoint implements CustomEndpoint {
                 // overwrite the enabled flag
                 plugin.getSpec().setEnabled(false);
                 return client.fetch(Plugin.class, plugin.getMetadata().getName())
-                    .switchIfEmpty(client.create(plugin));
+                    .switchIfEmpty(Mono.defer(() -> client.create(plugin)));
             })
             .flatMap(plugin -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)

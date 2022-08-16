@@ -70,7 +70,7 @@ public class ExtensionResourceInitializer {
                         .setVersion(createdExtension.getMetadata().getVersion());
                     return extensionClient.update(extension);
                 })
-                .switchIfEmpty(extensionClient.create(extension))
+                .switchIfEmpty(Mono.defer(() -> extensionClient.create(extension)))
             )
             .doOnNext(extension -> {
                 if (log.isDebugEnabled()) {
