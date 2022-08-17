@@ -3,6 +3,7 @@ package run.halo.app.content.impl;
 import java.security.Principal;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.UUID;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -68,7 +69,11 @@ public class ContentServiceImpl implements ContentService {
                 return handleSnapshot(headSnapShot, contentRequest, username);
             })
             .flatMap(snapshot -> restoredContent(contentRequest.headSnapshotName(),
-                contentRequest.subjectRef()));
+                contentRequest.subjectRef())
+                .map(content -> new ContentWrapper(snapshot.getMetadata().getName(),
+                    content.raw(), content.content(), content.rawType())
+                )
+            );
     }
 
     @Override
@@ -195,6 +200,7 @@ public class ContentServiceImpl implements ContentService {
             .flatMap(baseSnapshot -> {
                 determineRawAndContentPatch(snapshotToCreate,
                     baseSnapshot, contentRequest);
+                snapshotToCreate.getMetadata().setName(UUID.randomUUID().toString());
                 return create(snapshotToCreate)
                     .thenReturn(snapshotToCreate);
             });

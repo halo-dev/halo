@@ -56,9 +56,12 @@ public class PostServiceImpl implements PostService {
     @Override
     public Mono<Post> updatePost(PostRequest postRequest) {
         Post post = postRequest.post();
-        return update(post)
-            .then(contentService.updateContent(postRequest.contentRequest()))
-            .flatMap(snapshot -> fetch(Post.class, postRequest.post().getMetadata().getName()));
+        return contentService.updateContent(postRequest.contentRequest())
+            .flatMap(contentWrapper -> {
+                post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
+                return update(post);
+            })
+            .then(fetch(Post.class, postRequest.post().getMetadata().getName()));
     }
 
     private Mono<String> getContextUsername() {

@@ -132,7 +132,7 @@ class PostServiceTest {
         oldSnapshot.setSubjectRef(Post.KIND, post.getMetadata().getName());
         oldSnapshot.getSpec().setRawPatch("B");
         oldSnapshot.getSpec().setContentPatch("<p>B</p>");
-        Snapshot updatedSnapshot = captor.getAllValues().get(1);
+        Snapshot updatedSnapshot = captor.getAllValues().get(0);
         assertThat(updatedSnapshot).isEqualTo(oldSnapshot);
     }
 
@@ -229,8 +229,8 @@ class PostServiceTest {
         verify(client, times(2)).update(captor.capture());
         assertThat(captor.getAllValues()).hasSize(2);
 
-        assertThat(captor.getAllValues().get(1)).isInstanceOf(Snapshot.class);
-        Snapshot publishedSnapshot = (Snapshot) captor.getAllValues().get(1);
+        assertThat(captor.getAllValues().get(0)).isInstanceOf(Snapshot.class);
+        Snapshot publishedSnapshot = (Snapshot) captor.getAllValues().get(0);
         assertThat(publishedSnapshot.isPublished()).isTrue();
         assertThat(publishedSnapshot.getSpec().getVersion()).isEqualTo(1);
     }
@@ -306,12 +306,7 @@ class PostServiceTest {
             .expectComplete()
             .verify();
 
-        verify(client, times(2)).update(captor.capture());
-
-        assertThat(captor.getAllValues().get(1)).isInstanceOf(Snapshot.class);
-        Snapshot publishedSnapshot = (Snapshot) captor.getAllValues().get(1);
-        assertThat(publishedSnapshot.isPublished()).isTrue();
-        assertThat(publishedSnapshot.getSpec().getVersion()).isEqualTo(2);
+        verify(client, times(1)).update(captor.capture());
     }
 
     PostRequest.Content contentRequest(String raw, String content) {
