@@ -90,7 +90,10 @@ public class PostServiceImpl implements PostService {
                 } else {
                     postSpec.setPublished(true);
                 }
-                postSpec.setPublishTime(Instant.now());
+
+                if (postSpec.getPublishTime() == null) {
+                    postSpec.setPublishTime(Instant.now());
+                }
 
                 // update release snapshot name and condition
                 postSpec.setReleaseSnapshot(snapshot.getMetadata().getName());
