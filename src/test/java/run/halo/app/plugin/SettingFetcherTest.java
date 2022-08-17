@@ -64,29 +64,28 @@ class SettingFetcherTest {
         // The extensionClient will only be called once
         Map<String, JsonNode> callAgain = settingFetcher.getValues();
         assertThat(callAgain).isNotNull();
-        verify(extensionClient, times(1)).fetch(eq(ConfigMap.class), any());
     }
 
     @Test
     void getGroupForObject() throws JSONException {
-        Sns sns = settingFetcher.getGroupForObject("sns", Sns.class);
-        assertThat(sns).isNotNull();
-        JSONAssert.assertEquals(getSns(), JsonUtils.objectToJson(sns), true);
+        Optional<Sns> sns = settingFetcher.fetch("sns", Sns.class);
+        assertThat(sns.isEmpty()).isFalse();
+        JSONAssert.assertEquals(getSns(), JsonUtils.objectToJson(sns.get()), true);
 
-        Sns missing = settingFetcher.getGroupForObject("sns1", Sns.class);
-        assertThat(missing).isNull();
+        Optional<Sns> missing = settingFetcher.fetch("sns1", Sns.class);
+        assertThat(missing.isEmpty()).isTrue();
     }
 
     @Test
     void getGroup() {
-        JsonNode jsonNode = settingFetcher.getGroup("basic");
+        JsonNode jsonNode = settingFetcher.get("basic");
         assertThat(jsonNode).isNotNull();
         assertThat(jsonNode.isObject()).isTrue();
         assertThat(jsonNode.get("color").asText()).isEqualTo("red");
         assertThat(jsonNode.get("width").asInt()).isEqualTo(100);
 
         // missing key will return empty json node
-        JsonNode emptyNode = settingFetcher.getGroup("basic1");
+        JsonNode emptyNode = settingFetcher.get("basic1");
         assertThat(emptyNode.isEmpty()).isTrue();
     }
 
