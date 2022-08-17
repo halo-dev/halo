@@ -45,6 +45,9 @@ public class Post extends AbstractExtension {
         @Schema(required = true, minLength = 1)
         private String title;
 
+        @Schema(required = true, minLength = 1)
+        private String slug;
+
         /**
          * 文章引用到的已发布的内容，用于主题端显示.
          */

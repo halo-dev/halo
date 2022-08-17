@@ -29,8 +29,12 @@ public class Tag extends AbstractExtension {
 
     @Data
     public static class TagSpec {
-        @Schema(required = true)
+
+        @Schema(required = true, minLength = 1)
         private String displayName;
+
+        @Schema(required = true, minLength = 1)
+        private String slug;
 
         /**
          * Color regex explanation.

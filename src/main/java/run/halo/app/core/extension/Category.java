@@ -28,8 +28,12 @@ public class Category extends AbstractExtension {
 
     @Data
     public static class CategorySpec {
-        @Schema(required = true)
+
+        @Schema(required = true, minLength = 1)
         private String displayName;
+
+        @Schema(required = true, minLength = 1)
+        private String slug;
 
         private String description;
 
