@@ -212,7 +212,7 @@ public class ContentServiceImpl implements ContentService {
     private void determineRawAndContentPatch(Snapshot snapshotToUse, Snapshot baseSnapshot,
         ContentRequest contentRequest) {
         String originalRaw = baseSnapshot.getSpec().getRawPatch();
-        String originalContent = baseSnapshot.getSpec().getRawPatch();
+        String originalContent = baseSnapshot.getSpec().getContentPatch();
 
         // it is the v1 snapshot, set the content directly
         if (snapshotToUse.getSpec().getVersion() == 1) {

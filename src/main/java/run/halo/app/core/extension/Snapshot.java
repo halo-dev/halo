@@ -115,8 +115,7 @@ public class Snapshot extends AbstractExtension {
     @JsonIgnore
     public ContentWrapper applyPatch(Snapshot baseSnapshot) {
         Assert.notNull(baseSnapshot, "The baseSnapshot must not be null.");
-        Integer version = baseSnapshot.getSpec().getVersion();
-        if (version == 1) {
+        if (this.spec.version == 1) {
             return new ContentWrapper(this.getMetadata().getName(), this.spec.rawPatch,
                 this.spec.contentPatch, this.spec.rawType);
         }
