@@ -4,7 +4,6 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
-import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.schema.Builder;
@@ -38,8 +37,8 @@ public class PostEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "api.halo.run/v1alpha1/Post";
         return SpringdocRouteBuilder.route()
-            .POST("posts", contentType(MediaType.APPLICATION_JSON),
-                this::draftPost, builder -> builder.operationId("DraftPost")
+            .POST("posts", this::draftPost,
+                builder -> builder.operationId("DraftPost")
                     .description("Draft a post.")
                     .tag(tag)
                     .requestBody(requestBodyBuilder()
@@ -52,8 +51,8 @@ public class PostEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Post.class))
             )
-            .PUT("posts/{name}", contentType(MediaType.APPLICATION_JSON),
-                this::updatePost, builder -> builder.operationId("UpdateDraftPost")
+            .PUT("posts/{name}", this::updatePost,
+                builder -> builder.operationId("UpdateDraftPost")
                     .description("Update a post.")
                     .tag(tag)
                     .parameter(parameterBuilder().name("name")
@@ -70,8 +69,8 @@ public class PostEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Post.class))
             )
-            .PUT("posts/{name}/publish", contentType(MediaType.APPLICATION_JSON),
-                this::publishPost, builder -> builder.operationId("PublishPost")
+            .PUT("posts/{name}/publish", this::publishPost,
+                builder -> builder.operationId("PublishPost")
                     .description("Publish a post.")
                     .tag(tag)
                     .parameter(parameterBuilder().name("name")

@@ -4,7 +4,6 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
-import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.schema.Builder;
@@ -39,8 +38,8 @@ public class ContentEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "api.halo.run/v1alpha1/Content";
         return SpringdocRouteBuilder.route()
-            .GET("contents/{snapshotName}", contentType(MediaType.APPLICATION_JSON),
-                this::obtainContent, builder -> builder.operationId("ObtainSnapshotContent")
+            .GET("contents/{snapshotName}", this::obtainContent,
+                builder -> builder.operationId("ObtainSnapshotContent")
                     .description("Obtain a snapshot content.")
                     .tag(tag)
                     .parameter(parameterBuilder()
@@ -50,23 +49,22 @@ public class ContentEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ContentWrapper.class))
             )
-            .POST("contents", contentType(MediaType.APPLICATION_JSON),
-                this::draftSnapshotContent, builder ->
-                    builder.operationId("DraftSnapshotContent")
-                        .description("Draft a snapshot content.")
-                        .tag(tag)
-                        .requestBody(requestBodyBuilder()
-                            .required(true)
-                            .content(contentBuilder()
-                                .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                                .schema(Builder.schemaBuilder()
-                                    .implementation(ContentRequest.class))
-                            ))
-                        .response(responseBuilder()
-                            .implementation(ContentWrapper.class))
+            .POST("contents", this::draftSnapshotContent,
+                builder -> builder.operationId("DraftSnapshotContent")
+                    .description("Draft a snapshot content.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(ContentRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(ContentWrapper.class))
             )
-            .PUT("contents/{snapshotName}", contentType(MediaType.APPLICATION_JSON),
-                this::updateSnapshotContent, builder -> builder.operationId("UpdateSnapshotContent")
+            .PUT("contents/{snapshotName}", this::updateSnapshotContent,
+                builder -> builder.operationId("UpdateSnapshotContent")
                     .description("Update a snapshot content.")
                     .tag(tag)
                     .parameter(parameterBuilder()
@@ -83,9 +81,8 @@ public class ContentEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ContentWrapper.class))
             )
-            .PUT("contents/{snapshotName}/publish", contentType(MediaType.APPLICATION_JSON),
-                this::publishSnapshotContent, builder ->
-                    builder.operationId("PublishSnapshotContent")
+            .PUT("contents/{snapshotName}/publish", this::publishSnapshotContent,
+                builder -> builder.operationId("PublishSnapshotContent")
                     .description("Publish a snapshot content.")
                     .tag(tag)
                     .parameter(parameterBuilder()
@@ -114,7 +111,7 @@ public class ContentEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> updateSnapshotContent(ServerRequest request) {
         String snapshotName = request.pathVariable("snapshotName");
         return request.bodyToMono(ContentRequest.class)
-            .map(content -> {
+            .flatMap(content -> {
                 ContentRequest contentRequest =
                     new ContentRequest(content.subjectRef(), snapshotName,
                         content.raw(), content.content(), content.rawType());
@@ -126,13 +123,13 @@ public class ContentEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> publishSnapshotContent(ServerRequest request) {
         String snapshotName = request.pathVariable("snapshotName");
         return request.bodyToMono(Snapshot.SubjectRef.class)
-            .map(subjectRef -> contentService.publish(snapshotName, subjectRef))
+            .flatMap(subjectRef -> contentService.publish(snapshotName, subjectRef))
             .flatMap(content -> ServerResponse.ok().bodyValue(content));
     }
 
     private Mono<ServerResponse> draftSnapshotContent(ServerRequest request) {
         return request.bodyToMono(ContentRequest.class)
-            .map(contentService::draftContent)
+            .flatMap(contentService::draftContent)
             .flatMap(content -> ServerResponse.ok().bodyValue(content));
     }
 }

@@ -210,8 +210,8 @@ public class ContentServiceImpl implements ContentService {
 
         // it is the v1 snapshot, set the content directly
         if (StringUtils.equals(headSnapshotName, baseSnapshotName)) {
-            snapshotToUse.getSpec().setRawPatch(originalRaw);
-            snapshotToUse.getSpec().setContentPatch(originalContent);
+            snapshotToUse.getSpec().setRawPatch(contentRequest.raw());
+            snapshotToUse.getSpec().setContentPatch(contentRequest.content());
         } else {
             // otherwise diff a patch based on the v1 snapshot
             String revisedRaw = contentRequest.rawPatchFrom(originalRaw);

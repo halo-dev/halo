@@ -68,6 +68,7 @@ public class Snapshot extends AbstractExtension {
     }
 
     @Data
+    @EqualsAndHashCode
     public static class SubjectRef {
         @Schema(required = true)
         private String kind;
