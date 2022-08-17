@@ -177,9 +177,10 @@ class PostServiceTest {
         oldSnapshot.getSpec().setRawPatch("[{\"source\":{\"position\":0,\"lines\":[\"A\"],"
             + "\"changePosition\":null},\"target\":{\"position\":0,\"lines\":[\"B\"],"
             + "\"changePosition\":null},\"type\":\"CHANGE\"}]");
-        oldSnapshot.getSpec().setContentPatch("[{\"source\":{\"position\":0,\"lines\":[\"A\"],"
-            + "\"changePosition\":null},\"target\":{\"position\":0,\"lines\":[\"<p>B</p>\"],"
-            + "\"changePosition\":null},\"type\":\"CHANGE\"}]");
+        oldSnapshot.getSpec().setContentPatch(
+            "[{\"source\":{\"position\":0,\"lines\":[\"<p>A</p>\"],\"changePosition\":null},"
+                + "\"target\":{\"position\":0,\"lines\":[\"<p>B</p>\"],\"changePosition\":null},"
+                + "\"type\":\"CHANGE\"}]");
         oldSnapshot.getSpec().setParentSnapshotName("v1");
         oldSnapshot.getSpec().setVersion(2);
         oldSnapshot.getSpec().setDisplayVersion(Snapshot.displayVersionFrom(2));
