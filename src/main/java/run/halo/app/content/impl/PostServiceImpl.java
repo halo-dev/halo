@@ -15,8 +15,7 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
-import run.halo.app.extension.Extension;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 
@@ -32,9 +31,9 @@ public class PostServiceImpl implements PostService {
         Comparator.comparing(snapshot -> snapshot.getSpec().getVersion());
     public static Comparator<Snapshot> LATEST_SNAPSHOT_COMPARATOR = SNAPSHOT_COMPARATOR.reversed();
     private final ContentService contentService;
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    public PostServiceImpl(ContentService contentService, ExtensionClient client) {
+    public PostServiceImpl(ContentService contentService, ReactiveExtensionClient client) {
         this.contentService = contentService;
         this.client = client;
     }
@@ -48,9 +47,9 @@ public class PostServiceImpl implements PostService {
                     post.getSpec().setBaseSnapshot(contentWrapper.snapshotName());
                     post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
                     post.getSpec().setOwner(username);
-                    return create(post)
+                    return client.create(post)
                         .then(Mono.defer(() ->
-                            fetch(Post.class, postRequest.post().getMetadata().getName())));
+                            client.fetch(Post.class, postRequest.post().getMetadata().getName())));
                 }));
     }
 
@@ -60,9 +59,9 @@ public class PostServiceImpl implements PostService {
         return contentService.updateContent(postRequest.contentRequest())
             .flatMap(contentWrapper -> {
                 post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
-                return update(post);
+                return client.update(post);
             })
-            .then(Mono.defer(() -> fetch(Post.class, post.getMetadata().getName())));
+            .then(Mono.defer(() -> client.fetch(Post.class, post.getMetadata().getName())));
     }
 
     private Mono<String> getContextUsername() {
@@ -73,11 +72,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Mono<Post> publishPost(String postName) {
-        return fetch(Post.class, postName)
+        return client.fetch(Post.class, postName)
             .flatMap(post -> {
                 Post.PostSpec spec = post.getSpec();
                 // publish snapshot
-                return Mono.zip(Mono.just(post), fetch(Snapshot.class, spec.getHeadSnapshot()));
+                return Mono.zip(Mono.just(post),
+                    client.fetch(Snapshot.class, spec.getHeadSnapshot()));
             })
             .flatMap(tuple -> {
                 Post post = tuple.getT1();
@@ -104,9 +104,9 @@ public class PostServiceImpl implements PostService {
                 return contentService.publish(snapshot.getMetadata().getName(), subjectRef)
                     .flatMap(contentWrapper -> {
                         post.getSpec().setReleaseSnapshot(contentWrapper.snapshotName());
-                        return update(post);
+                        return client.update(post);
                     })
-                    .then(Mono.defer(() -> fetch(Post.class, postName)));
+                    .then(Mono.defer(() -> client.fetch(Post.class, postName)));
             });
     }
 
@@ -123,23 +123,5 @@ public class PostServiceImpl implements PostService {
         condition.setMessage("");
         condition.setStatus(ConditionStatus.TRUE);
         condition.setLastTransitionTime(Instant.now());
-    }
-
-
-    // TODO remove it when PR#2324 merged
-    <E extends Extension> Mono<E> fetch(Class<E> type, String name) {
-        return Mono.just(client.fetch(type, name).orElseThrow());
-    }
-
-    // TODO remove it when PR#2324 merged
-    <E extends Extension> Mono<Void> update(E extension) {
-        client.update(extension);
-        return Mono.empty();
-    }
-
-    // TODO remove it when PR#2324 merged
-    <E extends Extension> Mono<Void> create(E extension) {
-        client.create(extension);
-        return Mono.empty();
     }
 }

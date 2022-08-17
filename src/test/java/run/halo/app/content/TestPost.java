@@ -71,6 +71,20 @@ public class TestPost {
         return snapshot;
     }
 
+    public static Snapshot snapshotV3() {
+        Snapshot snapshotV3 = snapshotV2();
+        snapshotV3.getMetadata().setName("snapshot-C");
+        Snapshot.SnapShotSpec spec = snapshotV3.getSpec();
+        spec.setDisplayVersion("v3");
+        spec.setVersion(3);
+        snapshotV3.addContributor("guqing");
+        spec.setRawType("MARKDOWN");
+        spec.setRawPatch(PatchUtils.diffToJsonPatch("B", "C"));
+        spec.setContentPatch(PatchUtils.diffToJsonPatch("<p>B</p>", "<p>C</p>"));
+
+        return snapshotV3;
+    }
+
     public static String getApiVersion(Class<? extends AbstractExtension> extension) {
         GVK annotation = extension.getAnnotation(GVK.class);
         return annotation.group() + "/" + annotation.version();

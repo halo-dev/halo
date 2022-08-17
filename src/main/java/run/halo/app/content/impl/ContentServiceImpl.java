@@ -4,7 +4,6 @@ import java.security.Principal;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.UUID;
-import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -16,8 +15,7 @@ import run.halo.app.content.ContentRequest;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.core.extension.Snapshot;
-import run.halo.app.extension.Extension;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
  * A default implementation of {@link ContentService}.
@@ -31,15 +29,15 @@ public class ContentServiceImpl implements ContentService {
         Comparator.comparing(snapshot -> snapshot.getSpec().getVersion());
     public static Comparator<Snapshot> LATEST_SNAPSHOT_COMPARATOR = SNAPSHOT_COMPARATOR.reversed();
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    public ContentServiceImpl(ExtensionClient client) {
+    public ContentServiceImpl(ReactiveExtensionClient client) {
         this.client = client;
     }
 
     @Override
     public Mono<ContentWrapper> getContent(String name) {
-        return fetch(Snapshot.class, name)
+        return client.fetch(Snapshot.class, name)
             .flatMap(snapshot -> getBaseSnapshot(snapshot.getSpec().getSubjectRef())
                 .map(snapshot::applyPatch));
     }
@@ -51,10 +49,8 @@ public class ContentServiceImpl implements ContentService {
                 // create snapshot
                 Snapshot snapshot = contentRequest.toSnapshot();
                 snapshot.addContributor(username);
-                return create(snapshot)
-                    .then(Mono.defer(() -> restoredContent(snapshot.getMetadata().getName(),
-                        contentRequest.subjectRef()))
-                    );
+                return client.create(snapshot)
+                    .flatMap(this::restoredContent);
             });
     }
 
@@ -63,14 +59,13 @@ public class ContentServiceImpl implements ContentService {
         Assert.notNull(contentRequest, "The contentRequest must not be null");
         Assert.notNull(contentRequest.headSnapshotName(), "The headSnapshotName must not be null");
         return Mono.zip(getContextUsername(),
-                fetch(Snapshot.class, contentRequest.headSnapshotName()))
+                client.fetch(Snapshot.class, contentRequest.headSnapshotName()))
             .flatMap(tuple -> {
                 String username = tuple.getT1();
                 Snapshot headSnapShot = tuple.getT2();
                 return handleSnapshot(headSnapShot, contentRequest, username);
             })
-            .flatMap(snapshot -> restoredContent(contentRequest.headSnapshotName(),
-                contentRequest.subjectRef())
+            .flatMap(snapshot -> restoredContent(snapshot)
                 .map(content -> new ContentWrapper(snapshot.getMetadata().getName(),
                     content.raw(), content.content(), content.rawType())
                 )
@@ -80,7 +75,7 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public Mono<ContentWrapper> publish(String headSnapshotName, Snapshot.SubjectRef subjectRef) {
         Assert.notNull(headSnapshotName, "The headSnapshotName must not be null");
-        return fetch(Snapshot.class, headSnapshotName)
+        return client.fetch(Snapshot.class, headSnapshotName)
             .flatMap(snapshot -> {
                 if (snapshot.isPublished()) {
                     // there is nothing to publish
@@ -92,7 +87,7 @@ public class ContentServiceImpl implements ContentService {
                 snapshotSpec.setPublishTime(Instant.now());
                 snapshotSpec.setDisplayVersion(
                     Snapshot.displayVersionFrom(snapshotSpec.getVersion()));
-                return update(snapshot)
+                return client.update(snapshot)
                     .then(Mono.defer(
                         () -> restoredContent(snapshot.getMetadata().getName(), subjectRef))
                     );
@@ -102,16 +97,19 @@ public class ContentServiceImpl implements ContentService {
     private Mono<ContentWrapper> restoredContent(String snapshotName,
         Snapshot.SubjectRef subjectRef) {
         return getBaseSnapshot(subjectRef)
-            .flatMap(baseSnapshot -> fetch(Snapshot.class, snapshotName)
+            .flatMap(baseSnapshot -> client.fetch(Snapshot.class, snapshotName)
                 .map(snapshot -> snapshot.applyPatch(baseSnapshot)));
     }
 
-    private Mono<Snapshot> getBaseSnapshot(Snapshot.SubjectRef subjectRef) {
-        return list(Snapshot.class, snapshot -> {
-            Snapshot.SubjectRef recordSubjectRef = snapshot.getSpec().getSubjectRef();
-            return subjectRef.equals(recordSubjectRef)
-                && snapshot.getSpec().getVersion() == 1;
-        }, null)
+    private Mono<ContentWrapper> restoredContent(Snapshot headSnapshot) {
+        return getBaseSnapshot(headSnapshot.getSpec().getSubjectRef())
+            .map(headSnapshot::applyPatch);
+    }
+
+    @Override
+    public Mono<Snapshot> getBaseSnapshot(Snapshot.SubjectRef subjectRef) {
+        return listSnapshots(subjectRef)
+            .filter(snapshot -> snapshot.getSpec().getVersion() == 1)
             .next();
     }
 
@@ -164,18 +162,24 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public Mono<Snapshot> latestSnapshotVersion(Snapshot.SubjectRef subjectRef) {
         Assert.notNull(subjectRef, "The subjectRef must not be null.");
-        return list(Snapshot.class, snapshot -> subjectRef.equals(snapshot.getSpec()
-            .getSubjectRef()), LATEST_SNAPSHOT_COMPARATOR)
+        return listSnapshots(subjectRef)
+            .sort(LATEST_SNAPSHOT_COMPARATOR)
             .next();
     }
 
     @Override
     public Mono<Snapshot> latestPublishedSnapshot(Snapshot.SubjectRef subjectRef) {
         Assert.notNull(subjectRef, "The subjectRef must not be null.");
-        return list(Snapshot.class, snapshot ->
-            subjectRef.equals(snapshot.getSpec().getSubjectRef())
-                && snapshot.isPublished(), LATEST_SNAPSHOT_COMPARATOR)
+        return listSnapshots(subjectRef)
+            .filter(Snapshot::isPublished)
+            .sort(LATEST_SNAPSHOT_COMPARATOR)
             .next();
+    }
+
+    private Flux<Snapshot> listSnapshots(Snapshot.SubjectRef subjectRef) {
+        Assert.notNull(subjectRef, "The subjectRef must not be null.");
+        return client.list(Snapshot.class, snapshot -> subjectRef.equals(snapshot.getSpec()
+            .getSubjectRef()), null);
     }
 
     private Mono<String> getContextUsername() {
@@ -187,11 +191,11 @@ public class ContentServiceImpl implements ContentService {
     private Mono<Snapshot> updateRawAndContentToHeadSnapshot(Snapshot snapshotToUpdate,
         String baseSnapshotName,
         ContentRequest contentRequest) {
-        return fetch(Snapshot.class, baseSnapshotName)
+        return client.fetch(Snapshot.class, baseSnapshotName)
             .flatMap(baseSnapshot -> {
                 determineRawAndContentPatch(snapshotToUpdate,
                     baseSnapshot, contentRequest);
-                return update(snapshotToUpdate)
+                return client.update(snapshotToUpdate)
                     .thenReturn(snapshotToUpdate);
             });
     }
@@ -199,12 +203,13 @@ public class ContentServiceImpl implements ContentService {
     private Mono<Snapshot> createNewSnapshot(Snapshot snapshotToCreate,
         String baseSnapshotName,
         ContentRequest contentRequest) {
-        return fetch(Snapshot.class, baseSnapshotName)
+        return client.fetch(Snapshot.class, baseSnapshotName)
             .flatMap(baseSnapshot -> {
                 determineRawAndContentPatch(snapshotToCreate,
                     baseSnapshot, contentRequest);
                 snapshotToCreate.getMetadata().setName(UUID.randomUUID().toString());
-                return create(snapshotToCreate)
+                snapshotToCreate.getSpec().setSubjectRef(contentRequest.subjectRef());
+                return client.create(snapshotToCreate)
                     .thenReturn(snapshotToCreate);
             });
     }
@@ -225,27 +230,5 @@ public class ContentServiceImpl implements ContentService {
             snapshotToUse.getSpec().setRawPatch(revisedRaw);
             snapshotToUse.getSpec().setContentPatch(revisedContent);
         }
-    }
-
-    <E extends Extension> Mono<E> fetch(Class<E> type, String name) {
-        return Mono.just(client.fetch(type, name).orElseThrow());
-    }
-
-    // TODO remove it when PR#2324 merged
-    <E extends Extension> Mono<Void> update(E extension) {
-        client.update(extension);
-        return Mono.empty();
-    }
-
-    // TODO remove it when PR#2324 merged
-    <E extends Extension> Mono<Void> create(E extension) {
-        client.create(extension);
-        return Mono.empty();
-    }
-
-    // TODO remove it when PR#2324 merged
-    <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator) {
-        return Flux.fromIterable(client.list(type, predicate, comparator));
     }
 }
