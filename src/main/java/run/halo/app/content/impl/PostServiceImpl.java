@@ -49,7 +49,8 @@ public class PostServiceImpl implements PostService {
                     post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
                     post.getSpec().setOwner(username);
                     return create(post)
-                        .then(fetch(Post.class, post.getMetadata().getName()));
+                        .then(Mono.defer(() ->
+                            fetch(Post.class, postRequest.post().getMetadata().getName())));
                 }));
     }
 
@@ -61,7 +62,7 @@ public class PostServiceImpl implements PostService {
                 post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
                 return update(post);
             })
-            .then(fetch(Post.class, postRequest.post().getMetadata().getName()));
+            .then(Mono.defer(() -> fetch(Post.class, post.getMetadata().getName())));
     }
 
     private Mono<String> getContextUsername() {
@@ -102,7 +103,7 @@ public class PostServiceImpl implements PostService {
                         post.getSpec().setReleaseSnapshot(contentWrapper.snapshotName());
                         return update(post);
                     })
-                    .then(fetch(Post.class, postName));
+                    .then(Mono.defer(() -> fetch(Post.class, postName)));
             });
     }
 

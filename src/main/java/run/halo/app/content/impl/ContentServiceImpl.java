@@ -52,8 +52,9 @@ public class ContentServiceImpl implements ContentService {
                 Snapshot snapshot = contentRequest.toSnapshot();
                 snapshot.addContributor(username);
                 return create(snapshot)
-                    .then(restoredContent(snapshot.getMetadata().getName(),
-                        contentRequest.subjectRef()));
+                    .then(Mono.defer(() -> restoredContent(snapshot.getMetadata().getName(),
+                        contentRequest.subjectRef()))
+                    );
             });
     }
 
@@ -92,8 +93,9 @@ public class ContentServiceImpl implements ContentService {
                 snapshotSpec.setDisplayVersion(
                     Snapshot.displayVersionFrom(snapshotSpec.getVersion()));
                 return update(snapshot)
-                    .then(restoredContent(snapshot.getMetadata().getName(),
-                        subjectRef));
+                    .then(Mono.defer(
+                        () -> restoredContent(snapshot.getMetadata().getName(), subjectRef))
+                    );
             });
     }
 
@@ -153,8 +155,9 @@ public class ContentServiceImpl implements ContentService {
                         });
                 })
                 // no released snapshot, indicating v1 now, just update the content directly
-                .switchIfEmpty(updateRawAndContentToHeadSnapshot(headSnapshot, baseSnapshotName,
-                    contentRequest));
+                .switchIfEmpty(Mono.defer(
+                    () -> updateRawAndContentToHeadSnapshot(headSnapshot, baseSnapshotName,
+                        contentRequest)));
         });
     }
 
@@ -208,14 +211,11 @@ public class ContentServiceImpl implements ContentService {
 
     private void determineRawAndContentPatch(Snapshot snapshotToUse, Snapshot baseSnapshot,
         ContentRequest contentRequest) {
-        String headSnapshotName = snapshotToUse.getMetadata().getName();
-        String baseSnapshotName = baseSnapshot.getMetadata().getName();
-
         String originalRaw = baseSnapshot.getSpec().getRawPatch();
         String originalContent = baseSnapshot.getSpec().getRawPatch();
 
         // it is the v1 snapshot, set the content directly
-        if (StringUtils.equals(headSnapshotName, baseSnapshotName)) {
+        if (snapshotToUse.getSpec().getVersion() == 1) {
             snapshotToUse.getSpec().setRawPatch(contentRequest.raw());
             snapshotToUse.getSpec().setContentPatch(contentRequest.content());
         } else {

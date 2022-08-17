@@ -167,7 +167,7 @@ class PostServiceTest {
             .expectComplete()
             .verify();
 
-        verify(client, times(4)).fetch(eq(Snapshot.class), eq("v1"));
+        verify(client, times(3)).fetch(eq(Snapshot.class), eq("v1"));
 
         // will create a snapshot
         verify(client, times(1)).create(createCaptor.capture());
