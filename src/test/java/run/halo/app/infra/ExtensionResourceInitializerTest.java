@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
@@ -25,8 +24,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.util.FileSystemUtils;
-import run.halo.app.extension.ExtensionClient;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
@@ -41,7 +42,7 @@ import run.halo.app.infra.utils.JsonUtils;
 class ExtensionResourceInitializerTest {
 
     @Mock
-    private ExtensionClient extensionClient;
+    private ReactiveExtensionClient extensionClient;
     @Mock
     private HaloProperties haloProperties;
     @Mock
@@ -119,12 +120,16 @@ class ExtensionResourceInitializerTest {
     @Test
     void onApplicationEvent() throws JSONException {
         when(haloProperties.isRequiredExtensionDisabled()).thenReturn(true);
-        ArgumentCaptor<Unstructured> argumentCaptor = ArgumentCaptor.forClass(Unstructured.class);
+        var argumentCaptor = ArgumentCaptor.forClass(Unstructured.class);
 
         when(extensionClient.fetch(any(GroupVersionKind.class), any()))
-            .thenReturn(Optional.empty());
+            .thenReturn(Mono.empty());
+        when(extensionClient.create(any())).thenReturn(Mono.empty());
 
-        extensionResourceInitializer.onApplicationEvent(applicationReadyEvent);
+        var initializeMono = extensionResourceInitializer.initialize(applicationReadyEvent);
+        StepVerifier.create(initializeMono)
+            .verifyComplete();
+
 
         verify(extensionClient, times(3)).create(argumentCaptor.capture());
 

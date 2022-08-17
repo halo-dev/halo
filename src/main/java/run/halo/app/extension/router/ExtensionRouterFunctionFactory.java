@@ -12,17 +12,17 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 
 public class ExtensionRouterFunctionFactory {
 
     private final Scheme scheme;
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    public ExtensionRouterFunctionFactory(Scheme scheme, ExtensionClient client) {
+    public ExtensionRouterFunctionFactory(Scheme scheme, ReactiveExtensionClient client) {
         this.scheme = scheme;
         this.client = client;
     }

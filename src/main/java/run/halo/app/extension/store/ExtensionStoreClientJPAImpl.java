@@ -22,31 +22,31 @@ public class ExtensionStoreClientJPAImpl implements ExtensionStoreClient {
 
     @Override
     public List<ExtensionStore> listByNamePrefix(String prefix) {
-        return repository.findAllByNameStartingWith(prefix);
+        return repository.findAllByNameStartingWith(prefix).collectList().block();
     }
 
     @Override
     public Optional<ExtensionStore> fetchByName(String name) {
-        return repository.findById(name);
+        return repository.findById(name).blockOptional();
     }
 
     @Override
     public ExtensionStore create(String name, byte[] data) {
         var store = new ExtensionStore(name, data);
-        return repository.save(store);
+        return repository.save(store).block();
     }
 
     @Override
     public ExtensionStore update(String name, Long version, byte[] data) {
         var store = new ExtensionStore(name, data, version);
-        return repository.save(store);
+        return repository.save(store).block();
     }
 
     @Override
     @Transactional
     public ExtensionStore delete(String name, Long version) {
         var extensionStore =
-            repository.findById(name).orElseThrow(EntityNotFoundException::new);
+            repository.findById(name).blockOptional().orElseThrow(EntityNotFoundException::new);
         extensionStore.setVersion(version);
         repository.delete(extensionStore);
         return extensionStore;

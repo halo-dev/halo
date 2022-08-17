@@ -1,19 +1,17 @@
 package run.halo.app.extension;
 
 import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * ExtensionClient is an interface which contains some operations on Extension instead of
  * ExtensionStore.
  *
  * @author johnniang
- * @deprecated Use {@link ReactiveExtensionClient} instead.
  */
-@Deprecated(forRemoval = true, since = "2.0")
-public interface ExtensionClient {
+public interface ReactiveExtensionClient {
 
     /**
      * Lists Extensions by Extension type, filter and sorter.
@@ -24,7 +22,7 @@ public interface ExtensionClient {
      * @param <E> is Extension type.
      * @return all filtered and sorted Extensions.
      */
-    <E extends Extension> List<E> list(Class<E> type, Predicate<E> predicate,
+    <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
         Comparator<E> comparator);
 
     /**
@@ -38,7 +36,7 @@ public interface ExtensionClient {
      * @param <E> is Extension type.
      * @return a list of Extensions.
      */
-    <E extends Extension> ListResult<E> list(Class<E> type, Predicate<E> predicate,
+    <E extends Extension> Mono<ListResult<E>> list(Class<E> type, Predicate<E> predicate,
         Comparator<E> comparator, int page, int size);
 
     /**
@@ -49,10 +47,11 @@ public interface ExtensionClient {
      * @param <E> is Extension type.
      * @return an optional Extension.
      */
-    <E extends Extension> Optional<E> fetch(Class<E> type, String name);
+    <E extends Extension> Mono<E> fetch(Class<E> type, String name);
 
-    Optional<Unstructured> fetch(GroupVersionKind gvk, String name);
+    Mono<Unstructured> fetch(GroupVersionKind gvk, String name);
 
+    <E extends Extension> Mono<E> get(Class<E> type, String name);
 
     /**
      * Creates an Extension.
@@ -61,7 +60,7 @@ public interface ExtensionClient {
      * not exist.
      * @param <E> is Extension type.
      */
-    <E extends Extension> void create(E extension);
+    <E extends Extension> Mono<E> create(E extension);
 
     /**
      * Updates an Extension.
@@ -70,7 +69,7 @@ public interface ExtensionClient {
      * latest.
      * @param <E> is Extension type.
      */
-    <E extends Extension> void update(E extension);
+    <E extends Extension> Mono<E> update(E extension);
 
     /**
      * Deletes an Extension.
@@ -79,7 +78,7 @@ public interface ExtensionClient {
      * latest.
      * @param <E> is Extension type.
      */
-    <E extends Extension> void delete(E extension);
+    <E extends Extension> Mono<E> delete(E extension);
 
     void watch(Watcher watcher);
 

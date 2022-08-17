@@ -4,39 +4,29 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.Extension;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
-import run.halo.app.extension.exception.ExtensionNotFoundException;
 
 class ExtensionDeleteHandler implements ExtensionRouterFunctionFactory.DeleteHandler {
 
     private final Scheme scheme;
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    ExtensionDeleteHandler(Scheme scheme, ExtensionClient client) {
+    ExtensionDeleteHandler(Scheme scheme, ReactiveExtensionClient client) {
         this.scheme = scheme;
         this.client = client;
     }
 
     @Override
     public Mono<ServerResponse> handle(ServerRequest request) {
-        String name = request.pathVariable("name");
-        return getExtension(name)
-            .flatMap(extension ->
-                Mono.fromRunnable(() -> client.delete(extension)).thenReturn(extension))
-            .flatMap(extension -> this.getExtension(name))
-            .flatMap(extension -> ServerResponse
+        var name = request.pathVariable("name");
+        return client.get(scheme.type(), name)
+            .flatMap(client::delete)
+            .flatMap(deleted -> ServerResponse
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(extension));
-    }
-
-    private Mono<? extends Extension> getExtension(String name) {
-        return Mono.justOrEmpty(client.fetch(scheme.type(), name))
-            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(
-                "Extension with name " + name + " was not found")));
+                .bodyValue(deleted));
     }
 
     @Override

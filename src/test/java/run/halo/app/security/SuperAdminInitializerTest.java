@@ -15,7 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 
 @SpringBootTest(properties = {"halo.security.initializer.disabled=false",
     "halo.security.initializer.super-admin-username=fake-admin",
@@ -24,9 +24,8 @@ import run.halo.app.extension.ExtensionClient;
 @AutoConfigureTestDatabase
 class SuperAdminInitializerTest {
 
-    @Autowired
     @SpyBean
-    ExtensionClient client;
+    ReactiveExtensionClient client;
 
     @Autowired
     WebTestClient webClient;

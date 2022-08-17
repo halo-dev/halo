@@ -14,11 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
 import run.halo.app.core.extension.RoleBinding.Subject;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -29,23 +30,28 @@ import run.halo.app.infra.utils.JsonUtils;
 @Service
 public class DefaultRoleService implements RoleService {
 
-    private final ExtensionClient extensionClient;
+    private final ReactiveExtensionClient extensionClient;
 
-    public DefaultRoleService(ExtensionClient extensionClient) {
+    public DefaultRoleService(ReactiveExtensionClient extensionClient) {
         this.extensionClient = extensionClient;
     }
 
     @Override
     @NonNull
     public Role getRole(@NonNull String name) {
-        return extensionClient.fetch(Role.class, name).orElseThrow();
+        return extensionClient.fetch(Role.class, name).blockOptional().orElseThrow();
+    }
+
+    @Override
+    public Mono<Role> getMonoRole(String name) {
+        return extensionClient.get(Role.class, name);
     }
 
     @Override
     public Flux<RoleRef> listRoleRefs(Subject subject) {
-        return Flux.fromIterable(extensionClient.list(RoleBinding.class,
+        return extensionClient.list(RoleBinding.class,
                 binding -> binding.getSubjects().contains(subject),
-                null))
+                null)
             .map(RoleBinding::getRoleRef);
     }
 
@@ -67,16 +73,16 @@ public class DefaultRoleService implements RoleService {
                 continue;
             }
             visited.add(roleName);
-            extensionClient.fetch(Role.class, roleName).ifPresent(role -> {
-                result.add(role);
-                // add role dependencies to queue
-                Map<String, String> annotations = role.getMetadata().getAnnotations();
-                if (annotations != null) {
-                    String roleNameDependencies = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
-                    List<String> roleDependencies = stringToList(roleNameDependencies);
-                    queue.addAll(roleDependencies);
-                }
-            });
+            extensionClient.fetch(Role.class, roleName)
+                .subscribe(role -> {
+                    result.add(role);
+                    Map<String, String> annotations = role.getMetadata().getAnnotations();
+                    if (annotations != null) {
+                        String roleNameDependencies = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
+                        List<String> roleDependencies = stringToList(roleNameDependencies);
+                        queue.addAll(roleDependencies);
+                    }
+                });
         }
         return result;
     }

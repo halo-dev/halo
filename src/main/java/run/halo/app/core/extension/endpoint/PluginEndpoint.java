@@ -25,7 +25,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.YamlPluginFinder;
 
@@ -35,9 +35,9 @@ public class PluginEndpoint implements CustomEndpoint {
 
     private final PluginProperties pluginProperties;
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    public PluginEndpoint(PluginProperties pluginProperties, ExtensionClient client) {
+    public PluginEndpoint(PluginProperties pluginProperties, ReactiveExtensionClient client) {
         this.pluginProperties = pluginProperties;
         this.client = client;
     }
@@ -74,19 +74,16 @@ public class PluginEndpoint implements CustomEndpoint {
                 createDirectoriesIfNotExists(pluginRoot);
                 var pluginPath = pluginRoot.resolve(file.filename());
                 return file.transferTo(pluginPath).thenReturn(pluginPath);
-            }).map(pluginPath -> {
+            })
+            .flatMap(pluginPath -> {
                 log.info("Plugin uploaded at {}", pluginPath);
                 var plugin = new YamlPluginFinder().find(pluginPath);
                 // overwrite the enabled flag
                 plugin.getSpec().setEnabled(false);
-                var createdPlugin =
-                    client.fetch(Plugin.class, plugin.getMetadata().getName()).orElseGet(() -> {
-                        client.create(plugin);
-                        return client.fetch(Plugin.class, plugin.getMetadata().getName())
-                            .orElseThrow();
-                    });
-                return createdPlugin;
-            }).flatMap(plugin -> ServerResponse.ok()
+                return client.fetch(Plugin.class, plugin.getMetadata().getName())
+                    .switchIfEmpty(Mono.defer(() -> client.create(plugin)));
+            })
+            .flatMap(plugin -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(plugin));
     }

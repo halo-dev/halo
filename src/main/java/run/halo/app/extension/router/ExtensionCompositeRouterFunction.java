@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
@@ -21,9 +21,9 @@ public class ExtensionCompositeRouterFunction implements
 
     private final Map<Scheme, RouterFunction<ServerResponse>> schemeRouterFuncMapper;
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    public ExtensionCompositeRouterFunction(ExtensionClient client,
+    public ExtensionCompositeRouterFunction(ReactiveExtensionClient client,
         SchemeWatcherManager watcherManager) {
         this.client = client;
         schemeRouterFuncMapper = new ConcurrentHashMap<>();

@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine;
 import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveView;
 import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveViewResolver;
 import reactor.core.publisher.Mono;
@@ -28,17 +27,11 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver {
         @Override
         public Mono<Void> render(Map<String, ?> model, MediaType contentType,
             ServerWebExchange exchange) {
-            // calculate the engine before rendering
-            var theme = themeResolver.getTheme(exchange.getRequest());
-            var templateEngine = engineManager.getTemplateEngine(theme);
-            setTemplateEngine(templateEngine);
-
-            return super.render(model, contentType, exchange);
-        }
-
-        @Override
-        protected ISpringWebFluxTemplateEngine getTemplateEngine() {
-            return super.getTemplateEngine();
+            return themeResolver.getTheme(exchange.getRequest()).flatMap(theme -> {
+                // calculate the engine before rendering
+                setTemplateEngine(engineManager.getTemplateEngine(theme));
+                return super.render(model, contentType, exchange);
+            });
         }
     }
 

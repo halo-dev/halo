@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
  * <p>This {@link SharedApplicationContextHolder} class is used to hold a singleton instance of
@@ -52,8 +53,11 @@ public class SharedApplicationContextHolder {
             (DefaultListableBeanFactory) sharedApplicationContext.getBeanFactory();
 
         // register shared object here
-        ExtensionClient extensionClient = rootApplicationContext.getBean(ExtensionClient.class);
+        var extensionClient = rootApplicationContext.getBean(ExtensionClient.class);
+        var reactiveExtensionClient = rootApplicationContext.getBean(ReactiveExtensionClient.class);
         beanFactory.registerSingleton("extensionClient", extensionClient);
+        beanFactory.registerSingleton("reactiveExtensionClient", reactiveExtensionClient);
+
         DefaultSchemeManager defaultSchemeManager =
             rootApplicationContext.getBean(DefaultSchemeManager.class);
         beanFactory.registerSingleton("schemeManager", defaultSchemeManager);

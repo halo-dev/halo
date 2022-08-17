@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
 import run.halo.app.core.extension.RoleBinding.Subject;
@@ -15,7 +16,10 @@ import run.halo.app.core.extension.RoleBinding.Subject;
 public interface RoleService {
 
     @NonNull
+    @Deprecated
     Role getRole(String name);
+
+    Mono<Role> getMonoRole(String name);
 
     Flux<RoleRef> listRoleRefs(Subject subject);
 

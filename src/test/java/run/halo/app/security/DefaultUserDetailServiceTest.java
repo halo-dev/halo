@@ -43,8 +43,10 @@ class DefaultUserDetailServiceTest {
     void shouldUpdatePasswordSuccessfully() {
         var fakeUser = createFakeUserDetails();
 
+        var user = new run.halo.app.core.extension.User();
+
         when(userService.updatePassword("faker", "new-fake-password")).thenReturn(
-            Mono.just("").then()
+            Mono.just(user)
         );
 
         var userDetailsMono = userDetailService.updatePassword(fakeUser, "new-fake-password");

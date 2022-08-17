@@ -26,11 +26,6 @@ repositories {
 
 
 configurations {
-    implementation {
-        exclude module: "spring-boot-starter-tomcat"
-        exclude module: "slf4j-log4j12"
-        exclude module: 'junit'
-    }
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -59,6 +54,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
 
     // Spring Security
     implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -84,9 +80,15 @@ dependencies {
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    runtimeOnly "com.h2database:h2"
+    // R2DBC
+    // Currently, official doesn't support mssql and mariadb yet until drivers are available.
+    // See https://github.com/spring-projects/spring-data-relational/commit/ee6c2c89b5c433748b22a79cf40dc8e01142caa3
+    // for more.
+    runtimeOnly 'io.r2dbc:r2dbc-h2'
+    runtimeOnly 'com.h2database:h2'
     runtimeOnly 'mysql:mysql-connector-java'
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.postgresql:r2dbc-postgresql'
 
     annotationProcessor 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'

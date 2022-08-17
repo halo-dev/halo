@@ -33,7 +33,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.DefaultUserDetailService;
@@ -135,9 +135,9 @@ public class WebServerSecurityConfig {
     @ConditionalOnProperty(name = "halo.security.initializer.disabled",
         havingValue = "false",
         matchIfMissing = true)
-    SuperAdminInitializer superAdminInitializer(ExtensionClient client, HaloProperties halo) {
-        return new SuperAdminInitializer(client,
-            passwordEncoder(),
+    SuperAdminInitializer superAdminInitializer(ReactiveExtensionClient client,
+        HaloProperties halo) {
+        return new SuperAdminInitializer(client, passwordEncoder(),
             halo.getSecurity().getInitializer());
     }
 }

@@ -3,14 +3,14 @@ package run.halo.app.theme.message;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.function.Function;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 import run.halo.app.theme.ThemeContext;
 import run.halo.app.theme.ThemeResolver;
 
@@ -33,34 +34,27 @@ import run.halo.app.theme.ThemeResolver;
 @AutoConfigureWebTestClient
 public class ThemeMessageResolverIntegrationTest {
 
-    @Autowired
+    @SpyBean
     private ThemeResolver themeResolver;
 
     private URL defaultThemeUrl;
 
     private URL otherThemeUrl;
 
-    Function<ServerHttpRequest, ThemeContext> themeContextFunction;
-
     @Autowired
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
-        themeContextFunction = themeResolver.getThemeContextFunction();
-
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
         otherThemeUrl = ResourceUtils.getURL("classpath:themes/other");
-    }
 
-    @AfterEach
-    void tearDown() {
-        this.themeResolver.setThemeContextFunction(themeContextFunction);
+        Mockito.when(themeResolver.getTheme(Mockito.any(ServerHttpRequest.class)))
+            .thenReturn(Mono.just(createDefaultContext()));
     }
 
     @Test
     void messageResolverWhenDefaultTheme() {
-        themeResolver.setThemeContextFunction(request -> createDefaultContext());
         webTestClient.get()
             .uri("/?language=zh")
             .exchange()
@@ -85,7 +79,6 @@ public class ThemeMessageResolverIntegrationTest {
 
     @Test
     void messageResolverForEnLanguageWhenDefaultTheme() {
-        themeResolver.setThemeContextFunction(request -> createDefaultContext());
         webTestClient.get()
             .uri("/?language=en")
             .exchange()
@@ -110,7 +103,6 @@ public class ThemeMessageResolverIntegrationTest {
 
     @Test
     void shouldUseDefaultWhenLanguageNotSupport() {
-        themeResolver.setThemeContextFunction(request -> createDefaultContext());
         webTestClient.get()
             .uri("/index?language=foo")
             .exchange()
@@ -135,7 +127,6 @@ public class ThemeMessageResolverIntegrationTest {
 
     @Test
     void switchTheme() {
-        themeResolver.setThemeContextFunction(request -> createDefaultContext());
         webTestClient.get()
             .uri("/index?language=zh")
             .exchange()
@@ -158,7 +149,8 @@ public class ThemeMessageResolverIntegrationTest {
                 """);
 
         // For other theme
-        themeResolver.setThemeContextFunction(request -> createOtherContext());
+        Mockito.when(themeResolver.getTheme(Mockito.any(ServerHttpRequest.class)))
+            .thenReturn(Mono.just(createOtherContext()));
         webTestClient.get()
             .uri("/index?language=zh")
             .exchange()

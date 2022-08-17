@@ -2,7 +2,6 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,8 +23,9 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Theme;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
@@ -41,7 +40,7 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
 class ThemeEndpointTest {
 
     @Mock
-    private ExtensionClient extensionClient;
+    private ReactiveExtensionClient extensionClient;
 
     @Mock
     private HaloProperties haloProperties;
@@ -74,18 +73,14 @@ class ThemeEndpointTest {
 
     @Test
     void install() {
-        when(extensionClient.fetch(eq(Theme.class), eq("default")))
-            .then(answer -> {
-                Path defaultThemeManifestPath = tmpHaloWorkDir.resolve("themes/default/theme.yaml");
+        when(extensionClient.create(any(Unstructured.class))).thenReturn(
+            Mono.fromCallable(() -> {
+                var defaultThemeManifestPath = tmpHaloWorkDir.resolve("themes/default/theme.yaml");
                 assertThat(Files.exists(defaultThemeManifestPath)).isTrue();
-
-                Unstructured unstructured =
-                    new YamlUnstructuredLoader(new FileSystemResource(defaultThemeManifestPath))
-                        .load()
-                        .get(0);
-                return Optional.of(
-                    Unstructured.OBJECT_MAPPER.convertValue(unstructured, Theme.class));
-            });
+                return new YamlUnstructuredLoader(new FileSystemResource(defaultThemeManifestPath))
+                    .load()
+                    .get(0);
+            })).thenReturn(Mono.empty()).thenReturn(Mono.empty());
 
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part("file", new FileSystemResource(defaultTheme))

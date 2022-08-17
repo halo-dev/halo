@@ -1,10 +1,10 @@
 package run.halo.app.extension.store;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
-import jakarta.persistence.Version;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * ExtensionStore is an entity for storing Extension data into database.
@@ -12,7 +12,7 @@ import lombok.Data;
  * @author johnniang
  */
 @Data
-@Entity(name = "extensions")
+@Table(name = "extensions")
 public class ExtensionStore {
 
     /**

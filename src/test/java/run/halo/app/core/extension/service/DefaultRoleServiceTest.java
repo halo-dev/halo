@@ -10,16 +10,16 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.TestRole;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
  * Tests for {@link DefaultRoleService}.
@@ -30,7 +30,7 @@ import run.halo.app.extension.ExtensionClient;
 @ExtendWith(MockitoExtension.class)
 class DefaultRoleServiceTest {
     @Mock
-    private ExtensionClient extensionClient;
+    private ReactiveExtensionClient extensionClient;
 
     private DefaultRoleService roleService;
 
@@ -40,7 +40,7 @@ class DefaultRoleServiceTest {
     }
 
     @Test
-    void listDependencie() {
+    void listDependencies() {
         Role roleManage = TestRole.getRoleManage();
         Map<String, String> manageAnnotations = new HashMap<>();
         manageAnnotations.put(Role.ROLE_DEPENDENCIES_ANNO, "[\"role-template-apple-view\"]");
@@ -54,11 +54,11 @@ class DefaultRoleServiceTest {
         Role roleOther = TestRole.getRoleOther();
 
         when(extensionClient.fetch(same(Role.class), eq("role-template-apple-manage")))
-            .thenReturn(Optional.of(roleManage));
+            .thenReturn(Mono.just(roleManage));
         when(extensionClient.fetch(same(Role.class), eq("role-template-apple-view")))
-            .thenReturn(Optional.of(roleView));
+            .thenReturn(Mono.just(roleView));
         when(extensionClient.fetch(same(Role.class), eq("role-template-apple-other")))
-            .thenReturn(Optional.of(roleOther));
+            .thenReturn(Mono.just(roleOther));
 
         // list without cycle
         List<Role> roles = roleService.listDependencies(Set.of("role-template-apple-manage"));
@@ -75,7 +75,7 @@ class DefaultRoleServiceTest {
         anotherAnnotations.put(Role.ROLE_DEPENDENCIES_ANNO, "[\"role-template-apple-view\"]");
         roleOther.getMetadata().setAnnotations(anotherAnnotations);
         when(extensionClient.fetch(same(Role.class), eq("role-template-apple-other")))
-            .thenReturn(Optional.of(roleOther));
+            .thenReturn(Mono.just(roleOther));
         // correct behavior is to ignore the cycle relation
         List<Role> rolesFromCycle =
             roleService.listDependencies(Set.of("role-template-apple-manage"));

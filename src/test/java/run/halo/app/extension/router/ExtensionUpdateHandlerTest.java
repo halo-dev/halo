@@ -14,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Objects;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -23,21 +22,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.web.reactive.function.server.EntityResponse;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.Unstructured;
-import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class ExtensionUpdateHandlerTest {
 
     @Mock
-    ExtensionClient client;
+    ReactiveExtensionClient client;
 
     @Test
     void shouldBuildPathPatternCorrectly() {
@@ -62,7 +61,8 @@ class ExtensionUpdateHandlerTest {
         var serverRequest = MockServerRequest.builder()
             .pathVariable("name", "my-fake")
             .body(Mono.just(unstructured));
-        when(client.fetch(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Optional.of(fake));
+        // when(client.fetch(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Mono.just(fake));
+        when(client.update(eq(unstructured))).thenReturn(Mono.just(unstructured));
 
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var updateHandler = new ExtensionUpdateHandler(scheme, client);
@@ -73,10 +73,10 @@ class ExtensionUpdateHandlerTest {
                 assertEquals(HttpStatus.OK, response.statusCode());
                 assertEquals(MediaType.APPLICATION_JSON, response.headers().getContentType());
                 assertTrue(response instanceof EntityResponse<?>);
-                assertEquals(fake, ((EntityResponse<?>) response).entity());
+                assertEquals(unstructured, ((EntityResponse<?>) response).entity());
             })
             .verifyComplete();
-        verify(client, times(1)).fetch(eq(FakeExtension.class), eq("my-fake"));
+        // verify(client, times(1)).fetch(eq(FakeExtension.class), eq("my-fake"));
         verify(client, times(1)).update(eq(unstructured));
     }
 
@@ -89,7 +89,7 @@ class ExtensionUpdateHandlerTest {
         var updateHandler = new ExtensionUpdateHandler(scheme, client);
         var responseMono = updateHandler.handle(serverRequest);
         StepVerifier.create(responseMono)
-            .verifyError(ExtensionConvertException.class);
+            .verifyError(ServerWebInputException.class);
     }
 
     @Test

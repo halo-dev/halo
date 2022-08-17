@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -14,6 +15,9 @@ import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.extension.Metadata;
 import run.halo.app.security.LoginUtils;
 
 @SpringBootTest
@@ -25,6 +29,9 @@ class JwtAuthenticationTest {
 
     @MockBean
     ReactiveUserDetailsService userDetailsService;
+
+    @MockBean
+    RoleService roleService;
 
     @Test
     void accessProtectedApiWithoutToken() {
@@ -40,6 +47,19 @@ class JwtAuthenticationTest {
                 .roles("USER")
                 .build()
         ));
+
+        var role = new Role();
+        var metadata = new Metadata();
+        metadata.setName("USER");
+        role.setMetadata(metadata);
+        role.setRules(List.of(new Role.PolicyRule.Builder()
+            .apiGroups("")
+            .resources("test")
+            .resourceNames("hello")
+            .build()));
+        when(roleService.getMonoRole("authenticated")).thenReturn(Mono.empty());
+        when(roleService.getMonoRole("USER")).thenReturn(Mono.just(role));
+
         final var token = LoginUtils.login(webClient, "username", "password").block();
         webClient.get().uri("/api/v1/test/hello")
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
