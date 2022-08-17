@@ -117,13 +117,14 @@ public class Snapshot extends AbstractExtension {
         Assert.notNull(baseSnapshot, "The baseSnapshot must not be null.");
         Integer version = baseSnapshot.getSpec().getVersion();
         if (version == 1) {
-            return new ContentWrapper(this.spec.rawPatch, this.spec.contentPatch,
-                this.spec.rawType);
+            return new ContentWrapper(this.getMetadata().getName(), this.spec.rawPatch,
+                this.spec.contentPatch, this.spec.rawType);
         }
         String patchedContent =
             PatchUtils.applyPatch(baseSnapshot.getSpec().getContentPatch(), this.spec.contentPatch);
         String patchedRaw =
             PatchUtils.applyPatch(baseSnapshot.getSpec().getRawPatch(), this.spec.rawPatch);
-        return new ContentWrapper(patchedRaw, patchedContent, this.spec.rawType);
+        return new ContentWrapper(this.getMetadata().getName(), patchedRaw,
+            patchedContent, this.spec.rawType);
     }
 }

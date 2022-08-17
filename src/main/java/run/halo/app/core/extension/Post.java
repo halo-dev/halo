@@ -106,7 +106,6 @@ public class Post extends AbstractExtension {
 
         private String excerpt;
 
-        @Schema(required = true, defaultValue = "false")
         private Boolean inProgress;
 
         private List<String> contributors;

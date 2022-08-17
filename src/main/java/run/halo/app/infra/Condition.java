@@ -44,7 +44,7 @@ public class Condition {
     /**
      * Unique, one-word, CamelCase reason for the condition's last transition.
      */
-    @Schema(required = true, minLength = 1, maxLength = 1024,
+    @Schema(required = true, maxLength = 1024,
         pattern = "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$")
     private String reason;
 }

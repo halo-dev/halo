@@ -45,6 +45,8 @@ public class PostServiceImpl implements PostService {
             .flatMap(contentWrapper -> getContextUsername()
                 .flatMap(username -> {
                     Post post = postRequest.post();
+                    post.getSpec().setBaseSnapshot(contentWrapper.snapshotName());
+                    post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
                     post.getSpec().setOwner(username);
                     return create(post)
                         .then(fetch(Post.class, post.getMetadata().getName()));
@@ -93,7 +95,10 @@ public class PostServiceImpl implements PostService {
                 Snapshot.SubjectRef subjectRef =
                     Snapshot.SubjectRef.of(Post.KIND, post.getMetadata().getName());
                 return contentService.publish(snapshot.getMetadata().getName(), subjectRef)
-                    .then(update(post))
+                    .flatMap(contentWrapper -> {
+                        post.getSpec().setReleaseSnapshot(contentWrapper.snapshotName());
+                        return update(post);
+                    })
                     .then(fetch(Post.class, postName));
             });
     }
@@ -107,7 +112,7 @@ public class PostServiceImpl implements PostService {
         conditions.add(condition);
 
         condition.setType(Post.PostPhase.PUBLISHED.name());
-        condition.setReason("");
+        condition.setReason(Post.PostPhase.PUBLISHED.name());
         condition.setMessage("");
         condition.setStatus(ConditionStatus.TRUE);
         condition.setLastTransitionTime(Instant.now());

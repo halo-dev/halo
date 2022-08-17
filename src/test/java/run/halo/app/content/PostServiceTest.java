@@ -83,6 +83,8 @@ class PostServiceTest {
         assertThat(allValues.get(0)).isInstanceOf(Snapshot.class);
         assertThat(allValues.get(1)).isInstanceOf(Post.class);
         Post expectPost = postV1();
+        expectPost.getSpec().setBaseSnapshot("Post-post-A-v1-snapshot");
+        expectPost.getSpec().setHeadSnapshot("Post-post-A-v1-snapshot");
         expectPost.getSpec().setOwner("guqing");
         assertThat(allValues.get(1)).isEqualTo(expectPost);
 
