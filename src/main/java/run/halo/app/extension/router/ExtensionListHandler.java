@@ -8,15 +8,15 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 
 class ExtensionListHandler implements ExtensionRouterFunctionFactory.ListHandler {
     private final Scheme scheme;
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    public ExtensionListHandler(Scheme scheme, ExtensionClient client) {
+    public ExtensionListHandler(Scheme scheme, ReactiveExtensionClient client) {
         this.scheme = scheme;
         this.client = client;
     }
@@ -38,12 +38,12 @@ class ExtensionListHandler implements ExtensionRouterFunctionFactory.ListHandler
         var fieldSelectors = request.queryParams().get("fieldSelector");
 
         // TODO Resolve comparator from request
-        var listResult = client.list(scheme.type(),
-            labelAndFieldSelectorToPredicate(labelSelectors, fieldSelectors), null, page, size);
-        return ServerResponse
-            .ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(listResult);
+        return client.list(scheme.type(),
+                labelAndFieldSelectorToPredicate(labelSelectors, fieldSelectors), null, page, size)
+            .flatMap(listResult -> ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(listResult));
     }
 
     @Override

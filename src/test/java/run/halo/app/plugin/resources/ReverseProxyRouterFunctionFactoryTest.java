@@ -1,6 +1,5 @@
 package run.halo.app.plugin.resources;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -12,11 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 import run.halo.app.core.extension.ReverseProxy;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginApplicationContext;
 import run.halo.app.plugin.PluginConst;
@@ -31,7 +30,7 @@ import run.halo.app.plugin.PluginConst;
 class ReverseProxyRouterFunctionFactoryTest {
 
     @Mock
-    private ExtensionClient extensionClient;
+    private ReactiveExtensionClient extensionClient;
 
     @Mock
     private PluginApplicationContext pluginApplicationContext;
@@ -50,14 +49,15 @@ class ReverseProxyRouterFunctionFactoryTest {
 
         when(pluginApplicationContext.getPluginId()).thenReturn("fakeA");
         when(extensionClient.list(eq(ReverseProxy.class), any(), any())).thenReturn(
-            List.of(reverseProxy));
+            Flux.just(reverseProxy));
     }
 
     @Test
     void create() {
-        RouterFunction<ServerResponse> routerFunction =
-            reverseProxyRouterFunctionFactory.create(pluginApplicationContext);
-        assertThat(routerFunction).isNotNull();
+        var routerFunction = reverseProxyRouterFunctionFactory.create(pluginApplicationContext);
+        StepVerifier.create(routerFunction)
+            .expectNextCount(1)
+            .verifyComplete();
     }
 
 

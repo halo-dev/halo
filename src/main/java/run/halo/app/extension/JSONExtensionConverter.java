@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.openapi4j.core.exception.ResolutionException;
 import org.openapi4j.schema.validator.ValidationData;
 import org.openapi4j.schema.validator.v3.SchemaValidator;
+import org.springframework.stereotype.Component;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
 import run.halo.app.extension.store.ExtensionStore;
@@ -17,6 +18,7 @@ import run.halo.app.extension.store.ExtensionStore;
  * @author johnniang
  */
 @Slf4j
+@Component
 public class JSONExtensionConverter implements ExtensionConverter {
 
     public final ObjectMapper objectMapper;

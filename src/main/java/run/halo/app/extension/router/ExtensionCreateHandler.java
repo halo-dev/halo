@@ -6,19 +6,18 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.exception.ExtensionConvertException;
-import run.halo.app.extension.exception.ExtensionNotFoundException;
 
 class ExtensionCreateHandler implements ExtensionRouterFunctionFactory.CreateHandler {
 
     private final Scheme scheme;
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    public ExtensionCreateHandler(Scheme scheme, ExtensionClient client) {
+    public ExtensionCreateHandler(Scheme scheme, ReactiveExtensionClient client) {
         this.scheme = scheme;
         this.client = client;
     }
@@ -29,18 +28,11 @@ class ExtensionCreateHandler implements ExtensionRouterFunctionFactory.CreateHan
         return request.bodyToMono(Unstructured.class)
             .switchIfEmpty(Mono.error(() -> new ExtensionConvertException(
                 "Cannot read body to " + scheme.groupVersionKind())))
-            .flatMap(extToCreate -> Mono.fromCallable(() -> {
-                var name = extToCreate.getMetadata().getName();
-                client.create(extToCreate);
-                return client.fetch(scheme.type(), name)
-                    .orElseThrow(() -> new ExtensionNotFoundException(
-                        "Extension with name " + name + " was not found"));
-            }))
+            .flatMap(client::create)
             .flatMap(createdExt -> ServerResponse
                 .created(URI.create(pathPattern() + "/" + createdExt.getMetadata().getName()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(createdExt))
-            .cast(ServerResponse.class);
+                .bodyValue(createdExt));
     }
 
     @Override

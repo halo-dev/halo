@@ -26,13 +26,8 @@ public class DefaultUserDetailService
 
     @Override
     public Mono<UserDetails> updatePassword(UserDetails user, String newPassword) {
-        return Mono.just(user)
-            .map(userDetails -> withNewPassword(user, newPassword))
-            .flatMap(userDetails -> userService.updatePassword(
-                    userDetails.getUsername(),
-                    userDetails.getPassword())
-                .then(Mono.just(userDetails))
-            );
+        return userService.updatePassword(user.getUsername(), newPassword)
+            .map(u -> withNewPassword(user, newPassword));
     }
 
     @Override

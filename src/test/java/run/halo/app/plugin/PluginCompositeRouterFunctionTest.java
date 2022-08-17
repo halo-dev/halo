@@ -1,6 +1,7 @@
 package run.halo.app.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -62,17 +63,20 @@ class PluginCompositeRouterFunctionTest {
         handlerFunction = request -> ServerResponse.ok().build();
         routerFunction = request -> Mono.just(handlerFunction);
 
-        ObjectProvider objectProvider = mock(ObjectProvider.class);
+        var objectProvider = mock(ObjectProvider.class);
         when(objectProvider.orderedStream()).thenReturn(Stream.of(routerFunction));
 
         when(pluginApplicationContext.getBeanProvider(RouterFunction.class))
             .thenReturn(objectProvider);
+        when(reverseProxyRouterFunctionFactory.create(any())).thenReturn(Mono.empty());
     }
 
     @Test
     void route() {
         // trigger haloPluginStartedEvent
-        compositeRouterFunction.onPluginStarted(new HaloPluginStartedEvent(this, pluginWrapper));
+        StepVerifier.create(compositeRouterFunction.onPluginStarted(
+                new HaloPluginStartedEvent(this, pluginWrapper)))
+            .verifyComplete();
 
         RouterFunctionMapping mapping = new RouterFunctionMapping(compositeRouterFunction);
         mapping.setMessageReaders(this.codecConfigurer.getReaders());
@@ -90,14 +94,18 @@ class PluginCompositeRouterFunctionTest {
         assertThat(compositeRouterFunction.getRouterFunction("fakeA")).isNull();
 
         // trigger haloPluginStartedEvent
-        compositeRouterFunction.onPluginStarted(new HaloPluginStartedEvent(this, pluginWrapper));
+        StepVerifier.create(compositeRouterFunction.onPluginStarted(
+                new HaloPluginStartedEvent(this, pluginWrapper)))
+            .verifyComplete();
         assertThat(compositeRouterFunction.getRouterFunction("fakeA")).isEqualTo(routerFunction);
     }
 
     @Test
     void onPluginStopped() {
         // trigger haloPluginStartedEvent
-        compositeRouterFunction.onPluginStarted(new HaloPluginStartedEvent(this, pluginWrapper));
+        StepVerifier.create(compositeRouterFunction.onPluginStarted(
+                new HaloPluginStartedEvent(this, pluginWrapper)))
+            .verifyComplete();
         assertThat(compositeRouterFunction.getRouterFunction("fakeA")).isEqualTo(routerFunction);
 
         // trigger HaloPluginStoppedEvent

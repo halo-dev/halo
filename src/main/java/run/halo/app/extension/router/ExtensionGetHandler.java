@@ -5,16 +5,15 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
-import run.halo.app.extension.exception.ExtensionNotFoundException;
 
 class ExtensionGetHandler implements ExtensionRouterFunctionFactory.GetHandler {
     private final Scheme scheme;
 
-    private final ExtensionClient client;
+    private final ReactiveExtensionClient client;
 
-    public ExtensionGetHandler(Scheme scheme, ExtensionClient client) {
+    public ExtensionGetHandler(Scheme scheme, ReactiveExtensionClient client) {
         this.scheme = scheme;
         this.client = client;
     }
@@ -30,12 +29,9 @@ class ExtensionGetHandler implements ExtensionRouterFunctionFactory.GetHandler {
     public Mono<ServerResponse> handle(@NonNull ServerRequest request) {
         var extensionName = request.pathVariable("name");
 
-        var extension = client.fetch(scheme.type(), extensionName)
-            .orElseThrow(() -> new ExtensionNotFoundException(
-                scheme.groupVersionKind() + " was not found"));
-        return ServerResponse
-            .ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(extension);
+        return client.get(scheme.type(), extensionName)
+            .flatMap(extension -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(extension));
     }
 }

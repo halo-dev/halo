@@ -7,12 +7,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -23,9 +21,9 @@ import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.web.reactive.function.server.EntityResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
@@ -34,7 +32,7 @@ import run.halo.app.extension.exception.ExtensionNotFoundException;
 class ExtensionDeleteHandlerTest {
 
     @Mock
-    ExtensionClient client;
+    ReactiveExtensionClient client;
 
     @Test
     void shouldBuildPathPatternCorrectly() {
@@ -59,8 +57,8 @@ class ExtensionDeleteHandlerTest {
         var serverRequest = MockServerRequest.builder()
             .pathVariable("name", "my-fake")
             .body(Mono.just(unstructured));
-        when(client.fetch(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Optional.of(fake));
-        doNothing().when(client).delete(any());
+        when(client.get(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Mono.just(fake));
+        when(client.delete(eq(fake))).thenReturn(Mono.just(fake));
 
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var deleteHandler = new ExtensionDeleteHandler(scheme, client);
@@ -74,7 +72,7 @@ class ExtensionDeleteHandlerTest {
                 assertEquals(fake, ((EntityResponse<?>) response).entity());
             })
             .verifyComplete();
-        verify(client, times(2)).fetch(eq(FakeExtension.class), eq("my-fake"));
+        verify(client, times(1)).get(eq(FakeExtension.class), eq("my-fake"));
         verify(client, times(1)).delete(any());
         verify(client, times(0)).update(any());
     }
@@ -93,7 +91,8 @@ class ExtensionDeleteHandlerTest {
         var serverRequest = MockServerRequest.builder()
             .pathVariable("name", "my-fake")
             .build();
-        when(client.fetch(FakeExtension.class, "my-fake")).thenReturn(Optional.empty());
+        when(client.get(FakeExtension.class, "my-fake")).thenReturn(
+            Mono.error(new ExtensionNotFoundException()));
 
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var deleteHandler = new ExtensionDeleteHandler(scheme, client);
@@ -102,7 +101,7 @@ class ExtensionDeleteHandlerTest {
         StepVerifier.create(responseMono)
             .verifyError(ExtensionNotFoundException.class);
 
-        verify(client, times(1)).fetch(same(FakeExtension.class), anyString());
+        verify(client, times(1)).get(same(FakeExtension.class), anyString());
         verify(client, times(0)).update(any());
         verify(client, times(0)).delete(any());
     }

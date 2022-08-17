@@ -34,16 +34,16 @@ public class RequestInfoAuthorizationManager
         ServerHttpRequest request = context.getExchange().getRequest();
         RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
 
-        return authentication.map(auth -> {
-            UserDetails userDetails = this.createUserDetails(auth);
-            var record = new AttributesRecord(userDetails, requestInfo);
-            var visitor = new AuthorizingVisitor(record);
-            ruleResolver.visitRulesFor(userDetails, visitor);
-            if (!visitor.isAllowed()) {
-                showErrorMessage(visitor.getErrors());
-                return new AuthorizationDecision(false);
-            }
-            return new AuthorizationDecision(isGranted(auth));
+        return authentication.flatMap(auth -> {
+            var userDetails = this.createUserDetails(auth);
+            return this.ruleResolver.visitRules(userDetails, requestInfo)
+                .map(visitor -> {
+                    if (!visitor.isAllowed()) {
+                        showErrorMessage(visitor.getErrors());
+                        return new AuthorizationDecision(false);
+                    }
+                    return new AuthorizationDecision(isGranted(auth));
+                });
         });
     }
 

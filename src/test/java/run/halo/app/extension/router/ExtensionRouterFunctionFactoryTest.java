@@ -15,10 +15,9 @@ import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
-import run.halo.app.extension.router.ExtensionRouterFunctionFactory;
 import run.halo.app.extension.router.ExtensionRouterFunctionFactory.CreateHandler;
 import run.halo.app.extension.router.ExtensionRouterFunctionFactory.GetHandler;
 import run.halo.app.extension.router.ExtensionRouterFunctionFactory.ListHandler;
@@ -28,7 +27,7 @@ import run.halo.app.extension.router.ExtensionRouterFunctionFactory.UpdateHandle
 class ExtensionRouterFunctionFactoryTest {
 
     @Mock
-    ExtensionClient client;
+    ReactiveExtensionClient client;
 
     @Test
     void shouldCreateSuccessfully() {

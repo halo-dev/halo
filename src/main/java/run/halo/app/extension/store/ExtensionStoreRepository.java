@@ -1,8 +1,8 @@
 package run.halo.app.extension.store;
 
-import java.util.List;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 /**
  * This repository contains some basic operations on ExtensionStore entity.
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
  * @author johnniang
  */
 @Repository
-public interface ExtensionStoreRepository extends JpaRepository<ExtensionStore, String> {
+public interface ExtensionStoreRepository extends R2dbcRepository<ExtensionStore, String> {
 
     /**
      * Finds all ExtensionStore by name prefix.
@@ -18,6 +18,6 @@ public interface ExtensionStoreRepository extends JpaRepository<ExtensionStore, 
      * @param prefix is the prefix of name.
      * @return all ExtensionStores which names starts with the given prefix.
      */
-    List<ExtensionStore> findAllByNameStartingWith(String prefix);
+    Flux<ExtensionStore> findAllByNameStartingWith(String prefix);
 
 }

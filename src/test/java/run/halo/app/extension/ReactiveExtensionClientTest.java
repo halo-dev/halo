@@ -3,13 +3,13 @@ package run.halo.app.extension;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.reverseOrder;
 import static java.util.Comparator.comparing;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -17,11 +17,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static run.halo.app.extension.GroupVersionKind.fromAPIVersionAndKind;
-import static run.halo.app.extension.Scheme.buildFromType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,17 +28,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 import run.halo.app.extension.store.ExtensionStore;
-import run.halo.app.extension.store.ExtensionStoreClient;
+import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultExtensionClientTest {
+class ReactiveExtensionClientTest {
 
     static final Scheme fakeScheme = Scheme.buildFromType(FakeExtension.class);
 
     @Mock
-    ExtensionStoreClient storeClient;
+    ReactiveExtensionStoreClient storeClient;
 
     @Mock
     ExtensionConverter converter;
@@ -48,16 +49,14 @@ class DefaultExtensionClientTest {
     @Mock
     SchemeManager schemeManager;
 
-    @Mock
-    ReactiveExtensionClient reactiveClient;
-
     @InjectMocks
-    DefaultExtensionClient client;
+    ReactiveExtensionClientImpl client;
 
     @BeforeEach
     void setUp() {
         lenient().when(schemeManager.get(eq(FakeExtension.class)))
-            .thenReturn(buildFromType(FakeExtension.class));
+            .thenReturn(fakeScheme);
+        lenient().when(schemeManager.get(eq(fakeScheme.groupVersionKind()))).thenReturn(fakeScheme);
     }
 
     FakeExtension createFakeExtension(String name, Long version) {
@@ -137,9 +136,10 @@ class DefaultExtensionClientTest {
 
     @Test
     void shouldReturnEmptyExtensions() {
-        when(storeClient.listByNamePrefix(anyString())).thenReturn(emptyList());
+        when(storeClient.listByNamePrefix(anyString())).thenReturn(Flux.empty());
         var fakes = client.list(FakeExtension.class, null, null);
-        assertEquals(emptyList(), fakes);
+        StepVerifier.create(fakes)
+            .verifyComplete();
     }
 
     @Test
@@ -154,23 +154,32 @@ class DefaultExtensionClientTest {
             converter.convertFrom(FakeExtension.class, createExtensionStore("fake-02"))).thenReturn(
             fake2);
         when(storeClient.listByNamePrefix(anyString())).thenReturn(
-            List.of(createExtensionStore("fake-01"), createExtensionStore("fake-02")));
+            Flux.fromIterable(
+                List.of(createExtensionStore("fake-01"), createExtensionStore("fake-02"))));
 
         // without filter and sorter
         var fakes = client.list(FakeExtension.class, null, null);
-        assertEquals(List.of(fake1, fake2), fakes);
+        StepVerifier.create(fakes)
+            .expectNext(fake1)
+            .expectNext(fake2)
+            .verifyComplete();
 
         // with filter
         fakes = client.list(FakeExtension.class, fake -> {
             String name = fake.getMetadata().getName();
             return "fake-01".equals(name);
         }, null);
-        assertEquals(List.of(fake1), fakes);
+        StepVerifier.create(fakes)
+            .expectNext(fake1)
+            .verifyComplete();
 
         // with sorter
         fakes = client.list(FakeExtension.class, null,
             reverseOrder(comparing(fake -> fake.getMetadata().getName())));
-        assertEquals(List.of(fake2, fake1), fakes);
+        StepVerifier.create(fakes)
+            .expectNext(fake2)
+            .expectNext(fake1)
+            .verifyComplete();
     }
 
     @Test
@@ -189,41 +198,53 @@ class DefaultExtensionClientTest {
             converter.convertFrom(FakeExtension.class, createExtensionStore("fake-03"))).thenReturn(
             fake3);
 
-        when(storeClient.listByNamePrefix(anyString())).thenReturn(
+        when(storeClient.listByNamePrefix(anyString())).thenReturn(Flux.fromIterable(
             List.of(createExtensionStore("fake-01"), createExtensionStore("fake-02"),
-                createExtensionStore("fake-03")));
+                createExtensionStore("fake-03"))));
 
         // without filter and sorter.
         var fakes = client.list(FakeExtension.class, null, null, 1, 10);
-        assertEquals(new ListResult<>(1, 10, 3, List.of(fake1, fake2, fake3)), fakes);
+        StepVerifier.create(fakes)
+            .expectNext(new ListResult<>(1, 10, 3, List.of(fake1, fake2, fake3)))
+            .verifyComplete();
 
         // out of page range
         fakes = client.list(FakeExtension.class, null, null, 100, 10);
-        assertEquals(new ListResult<>(100, 10, 3, emptyList()), fakes);
+        StepVerifier.create(fakes)
+            .expectNext(new ListResult<>(100, 10, 3, emptyList()))
+            .verifyComplete();
 
         // with filter only
         fakes =
             client.list(FakeExtension.class, fake -> "fake-03".equals(fake.getMetadata().getName()),
                 null, 1, 10);
-        assertEquals(new ListResult<>(1, 10, 1, List.of(fake3)), fakes);
+        StepVerifier.create(fakes)
+            .expectNext(new ListResult<>(1, 10, 1, List.of(fake3)))
+            .verifyComplete();
 
         // with sorter only
         fakes = client.list(FakeExtension.class, null,
             reverseOrder(comparing(fake -> fake.getMetadata().getName())), 1, 10);
-        assertEquals(new ListResult<>(1, 10, 3, List.of(fake3, fake2, fake1)), fakes);
+        StepVerifier.create(fakes)
+            .expectNext(new ListResult<>(1, 10, 3, List.of(fake3, fake2, fake1)))
+            .verifyComplete();
 
         // without page
         fakes = client.list(FakeExtension.class, null, null, 0, 0);
-        assertEquals(new ListResult<>(0, 0, 3, List.of(fake1, fake2, fake3)), fakes);
+        StepVerifier.create(fakes)
+            .expectNext(new ListResult<>(0, 0, 3, List.of(fake1, fake2, fake3)))
+            .verifyComplete();
     }
 
     @Test
     void shouldFetchNothing() {
-        when(storeClient.fetchByName(any())).thenReturn(Optional.empty());
+        when(storeClient.fetchByName(any())).thenReturn(Mono.empty());
 
-        Optional<FakeExtension> fake = client.fetch(FakeExtension.class, "fake");
+        var fake = client.fetch(FakeExtension.class, "fake");
 
-        assertEquals(Optional.empty(), fake);
+        StepVerifier.create(fake)
+            .verifyComplete();
+
         verify(converter, times(0)).convertFrom(any(), any());
         verify(storeClient, times(1)).fetchByName(any());
     }
@@ -232,10 +253,11 @@ class DefaultExtensionClientTest {
     void shouldNotFetchUnstructured() {
         when(schemeManager.get(isA(GroupVersionKind.class)))
             .thenReturn(fakeScheme);
-        when(storeClient.fetchByName(any())).thenReturn(Optional.empty());
+        when(storeClient.fetchByName(any())).thenReturn(Mono.empty());
         var unstructuredFake = client.fetch(fakeScheme.groupVersionKind(), "fake");
+        StepVerifier.create(unstructuredFake)
+            .verifyComplete();
 
-        assertEquals(Optional.empty(), unstructuredFake);
         verify(converter, times(0)).convertFrom(any(), any());
         verify(schemeManager, times(1)).get(isA(GroupVersionKind.class));
         verify(storeClient, times(1)).fetchByName(any());
@@ -245,14 +267,16 @@ class DefaultExtensionClientTest {
     void shouldFetchAnExtension() {
         var storeName = "/registry/fake.halo.run/fakes/fake";
         when(storeClient.fetchByName(storeName)).thenReturn(
-            Optional.of(createExtensionStore(storeName)));
+            Mono.just(createExtensionStore(storeName)));
 
         when(
             converter.convertFrom(FakeExtension.class, createExtensionStore(storeName))).thenReturn(
             createFakeExtension("fake", 1L));
 
-        Optional<FakeExtension> fake = client.fetch(FakeExtension.class, "fake");
-        assertEquals(Optional.of(createFakeExtension("fake", 1L)), fake);
+        var fake = client.fetch(FakeExtension.class, "fake");
+        StepVerifier.create(fake)
+            .expectNext(createFakeExtension("fake", 1L))
+            .verifyComplete();
 
         verify(storeClient, times(1)).fetchByName(eq(storeName));
         verify(converter, times(1)).convertFrom(eq(FakeExtension.class),
@@ -263,15 +287,17 @@ class DefaultExtensionClientTest {
     void shouldFetchUnstructuredExtension() throws JsonProcessingException {
         var storeName = "/registry/fake.halo.run/fakes/fake";
         when(storeClient.fetchByName(storeName)).thenReturn(
-            Optional.of(createExtensionStore(storeName)));
+            Mono.just(createExtensionStore(storeName)));
         when(schemeManager.get(isA(GroupVersionKind.class)))
             .thenReturn(fakeScheme);
         when(converter.convertFrom(Unstructured.class, createExtensionStore(storeName)))
             .thenReturn(createUnstructured());
 
         var fake = client.fetch(fakeScheme.groupVersionKind(), "fake");
+        StepVerifier.create(fake)
+            .expectNext(createUnstructured())
+            .verifyComplete();
 
-        assertEquals(Optional.of(createUnstructured()), fake);
         verify(storeClient, times(1)).fetchByName(eq(storeName));
         verify(schemeManager, times(1)).get(isA(GroupVersionKind.class));
         verify(converter, times(1)).convertFrom(eq(Unstructured.class),
@@ -284,9 +310,12 @@ class DefaultExtensionClientTest {
         when(converter.convertTo(any())).thenReturn(
             createExtensionStore("/registry/fake.halo.run/fakes/fake"));
         when(storeClient.create(any(), any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+            Mono.just(createExtensionStore("/registry/fake.halo.run/fakes/fake")));
+        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
 
-        client.create(fake);
+        StepVerifier.create(client.create(fake))
+            .expectNext(fake)
+            .verifyComplete();
 
         verify(converter, times(1)).convertTo(eq(fake));
         verify(storeClient, times(1)).create(eq("/registry/fake.halo.run/fakes/fake"), any());
@@ -300,9 +329,12 @@ class DefaultExtensionClientTest {
         when(converter.convertTo(any())).thenReturn(
             createExtensionStore("/registry/fake.halo.run/fakes/fake"));
         when(storeClient.create(any(), any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+            Mono.just(createExtensionStore("/registry/fake.halo.run/fakes/fake")));
+        when(converter.convertFrom(same(Unstructured.class), any())).thenReturn(fake);
 
-        client.create(fake);
+        StepVerifier.create(client.create(fake))
+            .expectNext(fake)
+            .verifyComplete();
 
         verify(converter, times(1)).convertTo(eq(fake));
         verify(storeClient, times(1)).create(eq("/registry/fake.halo.run/fakes/fake"), any());
@@ -312,12 +344,18 @@ class DefaultExtensionClientTest {
     @Test
     void shouldUpdateSuccessfully() {
         var fake = createFakeExtension("fake", 2L);
+        var storeName = "/registry/fake.halo.run/fakes/fake";
         when(converter.convertTo(any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake", 2L));
+            createExtensionStore(storeName, 2L));
         when(storeClient.update(any(), any(), any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake", 2L));
+            Mono.just(createExtensionStore(storeName, 2L)));
+        when(storeClient.fetchByName(storeName)).thenReturn(
+            Mono.just(createExtensionStore(storeName, 1L)));
+        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
 
-        client.update(fake);
+        StepVerifier.create(client.update(fake))
+            .expectNext(fake)
+            .verifyComplete();
 
         verify(converter, times(1)).convertTo(eq(fake));
         verify(storeClient, times(1))
@@ -327,12 +365,18 @@ class DefaultExtensionClientTest {
     @Test
     void shouldUpdateUnstructuredSuccessfully() throws JsonProcessingException {
         var fake = createUnstructured();
-        when(converter.convertTo(any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake", 12345L));
-        when(storeClient.update(any(), any(), any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake", 12345L));
+        var name = "/registry/fake.halo.run/fakes/fake";
+        when(converter.convertTo(any()))
+            .thenReturn(createExtensionStore(name, 12345L));
+        when(storeClient.update(any(), any(), any()))
+            .thenReturn(Mono.just(createExtensionStore(name, 12345L)));
+        when(storeClient.fetchByName(name))
+            .thenReturn(Mono.just(createExtensionStore(name, 12346L)));
+        when(converter.convertFrom(same(Unstructured.class), any())).thenReturn(fake);
 
-        client.update(fake);
+        StepVerifier.create(client.update(fake))
+            .expectNext(fake)
+            .verifyComplete();
 
         verify(converter, times(1)).convertTo(eq(fake));
         verify(storeClient, times(1))
@@ -345,9 +389,12 @@ class DefaultExtensionClientTest {
         when(converter.convertTo(any())).thenReturn(
             createExtensionStore("/registry/fake.halo.run/fakes/fake"));
         when(storeClient.update(any(), any(), any())).thenReturn(
-            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+            Mono.just(createExtensionStore("/registry/fake.halo.run/fakes/fake")));
+        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
 
-        client.delete(fake);
+        StepVerifier.create(client.delete(fake))
+            .expectNext(fake)
+            .verifyComplete();
 
         verify(converter, times(1)).convertTo(any());
         verify(storeClient, times(1)).update(any(), any(), any());
@@ -364,7 +411,6 @@ class DefaultExtensionClientTest {
         @BeforeEach
         void setUp() {
             client.watch(watcher);
-            verify(reactiveClient).watch(watcher);
         }
 
         @Test

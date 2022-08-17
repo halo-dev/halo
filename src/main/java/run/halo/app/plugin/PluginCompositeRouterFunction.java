@@ -1,6 +1,5 @@
 package run.halo.app.plugin;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -66,30 +65,18 @@ public class PluginCompositeRouterFunction implements RouterFunction<ServerRespo
      * @param haloPluginStartedEvent event for plugin started
      */
     @EventListener(HaloPluginStartedEvent.class)
-    public void onPluginStarted(HaloPluginStartedEvent haloPluginStartedEvent) {
+    public Mono<Void> onPluginStarted(HaloPluginStartedEvent haloPluginStartedEvent) {
         PluginWrapper plugin = haloPluginStartedEvent.getPlugin();
         // Obtain plugin application context
         PluginApplicationContext pluginApplicationContext =
             ExtensionContextRegistry.getInstance().getByPluginId(plugin.getPluginId());
 
-        // create reverse proxy router function for plugin
-        RouterFunction<ServerResponse> reverseProxyRouterFunction =
-            reverseProxyRouterFunctionFactory.create(pluginApplicationContext);
-
-        List<RouterFunction<ServerResponse>> routerFunctions =
-            routerFunctions(pluginApplicationContext);
-
-        List<RouterFunction<ServerResponse>> combinedRouterFunctions =
-            new ArrayList<>(routerFunctions);
-        if (reverseProxyRouterFunction != null) {
-            combinedRouterFunctions.add(reverseProxyRouterFunction);
-        }
-
-        combinedRouterFunctions.stream()
+        return Flux.fromIterable(routerFunctions(pluginApplicationContext))
+            .concatWith(reverseProxyRouterFunctionFactory.create(pluginApplicationContext))
             .reduce(RouterFunction::and)
-            .ifPresent(compositeRouterFunction -> {
-                routerFunctionRegistry.put(plugin.getPluginId(), compositeRouterFunction);
-            });
+            .doOnNext(routerFunction ->
+                routerFunctionRegistry.put(plugin.getPluginId(), routerFunction))
+            .then();
     }
 
     @EventListener(HaloPluginStoppedEvent.class)

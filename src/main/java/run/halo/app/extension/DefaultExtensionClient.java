@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.extension.store.ExtensionStoreClient;
 
@@ -13,6 +14,7 @@ import run.halo.app.extension.store.ExtensionStoreClient;
  *
  * @author johnniang
  */
+@Component
 public class DefaultExtensionClient implements ExtensionClient {
 
     private final ExtensionStoreClient storeClient;
@@ -22,12 +24,15 @@ public class DefaultExtensionClient implements ExtensionClient {
 
     private final Watcher.WatcherComposite watchers;
 
+    private final ReactiveExtensionClient reactiveClient;
+
     public DefaultExtensionClient(ExtensionStoreClient storeClient,
         ExtensionConverter converter,
-        SchemeManager schemeManager) {
+        SchemeManager schemeManager, ReactiveExtensionClient reactiveClient) {
         this.storeClient = storeClient;
         this.converter = converter;
         this.schemeManager = schemeManager;
+        this.reactiveClient = reactiveClient;
 
         watchers = new Watcher.WatcherComposite();
     }
@@ -116,6 +121,8 @@ public class DefaultExtensionClient implements ExtensionClient {
     @Override
     public void watch(Watcher watcher) {
         this.watchers.addWatcher(watcher);
+        // TODO Refactor the watch process. At present, we have to ensure the compatibility.
+        reactiveClient.watch(watcher);
     }
 
 }

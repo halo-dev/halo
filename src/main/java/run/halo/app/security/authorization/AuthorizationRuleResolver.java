@@ -1,6 +1,7 @@
 package run.halo.app.security.authorization;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import reactor.core.publisher.Mono;
 
 /**
  * @author guqing
@@ -17,6 +18,7 @@ public interface AuthorizationRuleResolver {
      *
      * @param user authenticated user info
      */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     PolicyRuleList rulesFor(UserDetails user);
 
     /**
@@ -27,5 +29,8 @@ public interface AuthorizationRuleResolver {
      * @param user user info
      * @param visitor visitor
      */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     void visitRulesFor(UserDetails user, RuleAccumulator visitor);
+
+    Mono<AuthorizingVisitor> visitRules(UserDetails user, RequestInfo requestInfo);
 }

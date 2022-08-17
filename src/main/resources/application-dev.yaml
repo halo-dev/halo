@@ -5,8 +5,6 @@ spring:
   output:
     ansi:
       enabled: always
-  jpa:
-    show-sql: true
 
 halo:
   security:
@@ -25,7 +23,7 @@ halo:
 logging:
   level:
     run.halo.app: DEBUG
-
+    org.springframework.r2dbc: DEBUG
 springdoc:
   api-docs:
     enabled: true
