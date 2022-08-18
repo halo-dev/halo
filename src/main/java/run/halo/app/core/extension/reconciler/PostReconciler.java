@@ -76,6 +76,8 @@ public class PostReconciler implements Reconciler {
                     String contentRevised = content.content();
                     status.setExcerpt(getExcerpt(contentRevised));
                 });
+        } else {
+            status.setExcerpt(excerpt.getRaw());
         }
 
         // handle contributors
