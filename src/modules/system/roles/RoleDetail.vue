@@ -12,23 +12,24 @@ import {
 import { useRoute } from "vue-router";
 import { onMounted, ref, watch } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
-import type { User } from "@halo-dev/api-client";
 import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import {
   useRoleForm,
   useRoleTemplateSelection,
 } from "@/modules/system/roles/composables/use-role";
+import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
 const route = useRoute();
 
-const users = ref<User[]>([]);
 const tabActiveId = ref("detail");
 
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection();
 
 const { formState, saving, handleCreateOrUpdate } = useRoleForm();
+
+const { users } = useUserFetch();
 
 watch(
   () => selectedRoleTemplates.value,
@@ -57,15 +58,6 @@ const handleFetchRole = async () => {
   }
 };
 
-const handleFetchUsers = async () => {
-  try {
-    const { data } = await apiClient.extension.user.listv1alpha1User();
-    users.value = data.items;
-  } catch (e) {
-    console.error(e);
-  }
-};
-
 const handleUpdateRole = async () => {
   await handleCreateOrUpdate();
   await handleFetchRole();
@@ -73,7 +65,6 @@ const handleUpdateRole = async () => {
 
 onMounted(() => {
   handleFetchRole();
-  handleFetchUsers();
 });
 </script>
 <template>

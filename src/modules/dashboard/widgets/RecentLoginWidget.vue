@@ -1,22 +1,8 @@
 <script lang="ts" name="RecentLoginWidget" setup>
 import { VCard } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
-import type { User } from "@halo-dev/api-client";
+import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
-const users = ref<User[]>([]);
-
-const handleFetchUsers = async () => {
-  try {
-    const { data } = await apiClient.extension.user.listv1alpha1User();
-    users.value = data.items;
-  } catch (e) {
-    console.error(e);
-  }
-};
-onMounted(() => {
-  handleFetchUsers();
-});
+const { users } = useUserFetch();
 </script>
 <template>
   <VCard

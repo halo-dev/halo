@@ -12,11 +12,10 @@ import {
   VTabbar,
   VTag,
 } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import type { PagesPublicState } from "@halo-dev/admin-shared";
-import { apiClient } from "@halo-dev/admin-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
-import type { User } from "@halo-dev/api-client";
+import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
 const pagesRef = ref([
   {
@@ -39,29 +38,16 @@ const pagesRef = ref([
   },
 ]);
 
-const users = ref<User[]>([]);
-
 const activeId = ref("functional");
 const checkAll = ref(false);
+
+const { users } = useUserFetch();
 
 const pagesPublicState = ref<PagesPublicState>({
   functionalPages: [],
 });
 
 useExtensionPointsState("PAGES", pagesPublicState);
-
-const handleFetchUsers = async () => {
-  try {
-    const { data } = await apiClient.extension.user.listv1alpha1User();
-    users.value = data.items;
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-onMounted(() => {
-  handleFetchUsers();
-});
 </script>
 <template>
   <VPageHeader title="页面">

@@ -21,9 +21,8 @@ import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentSelectModal from "./components/AttachmentSelectModal.vue";
 import AttachmentStrategiesModal from "./components/AttachmentStrategiesModal.vue";
-import { onMounted, ref } from "vue";
-import type { User } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { ref } from "vue";
+import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
 const viewTypes = [
   {
@@ -43,7 +42,8 @@ const selectVisible = ref(false);
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
 const checkAll = ref(false);
-const users = ref<User[]>([]);
+
+const { users } = useUserFetch();
 
 const attachments = Array.from(new Array(50), (_, index) => index).map(
   (index) => {
@@ -81,19 +81,6 @@ const folders = [
     name: "Developer",
   },
 ];
-
-const handleFetchUsers = async () => {
-  try {
-    const { data } = await apiClient.extension.user.listv1alpha1User();
-    users.value = data.items;
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-onMounted(() => {
-  handleFetchUsers();
-});
 </script>
 <template>
   <AttachmentDetailModal v-model:visible="detailVisible" />
