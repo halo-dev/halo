@@ -70,7 +70,7 @@ public class PostReconciler implements Reconciler {
             spec.setExcerpt(excerpt);
         }
 
-        if (excerpt.getAutoGenerate() && StringUtils.isBlank(status.getExcerpt())) {
+        if (excerpt.getAutoGenerate()) {
             contentService.getContent(spec.getHeadSnapshot())
                 .subscribe(content -> {
                     String contentRevised = content.content();

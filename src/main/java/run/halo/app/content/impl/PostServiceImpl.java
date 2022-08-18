@@ -52,15 +52,15 @@ public class PostServiceImpl implements PostService {
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
         return client.list(Post.class, labelAndFieldSelectorToPredicate(query.getLabelSelector(),
                     query.getFieldSelector()),
-                DEFAULT_POST_COMPARATOR, query.getPage(), query.getSize())
+                DEFAULT_POST_COMPARATOR.reversed(), query.getPage(), query.getSize())
             .flatMap(listResult -> Flux.fromStream(
-                    listResult.get().map(this::getListedPost)
-                )
-                .flatMap(Function.identity())
-                .collectList()
-                .map(listedPosts -> new ListResult<>(listResult.getPage(), listResult.getSize(),
-                    listResult.getTotal(), listedPosts)
-                )
+                        listResult.get().map(this::getListedPost)
+                    )
+                    .flatMap(Function.identity())
+                    .collectList()
+                    .map(listedPosts -> new ListResult<>(listResult.getPage(), listResult.getSize(),
+                        listResult.getTotal(), listedPosts)
+                    )
             );
     }
 
