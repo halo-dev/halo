@@ -176,7 +176,8 @@ public class ContentServiceImpl implements ContentService {
             .next();
     }
 
-    private Flux<Snapshot> listSnapshots(Snapshot.SubjectRef subjectRef) {
+    @Override
+    public Flux<Snapshot> listSnapshots(Snapshot.SubjectRef subjectRef) {
         Assert.notNull(subjectRef, "The subjectRef must not be null.");
         return client.list(Snapshot.class, snapshot -> subjectRef.equals(snapshot.getSpec()
             .getSubjectRef()), null);

@@ -1,23 +1,28 @@
 package run.halo.app.core.extension.reconciler;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 
@@ -54,6 +59,13 @@ class PostReconcilerTest {
                 new ContentWrapper(post.getSpec().getHeadSnapshot(), "hello world",
                     "<p>hello world</p>", "markdown")));
 
+        Snapshot snapshotV1 = TestPost.snapshotV1();
+        Snapshot snapshotV2 = TestPost.snapshotV2();
+        snapshotV1.getSpec().setContributors(Set.of("guqing"));
+        snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
+        when(contentService.listSnapshots(any()))
+            .thenReturn(Flux.just(snapshotV1, snapshotV2));
+
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
 
@@ -63,6 +75,7 @@ class PostReconcilerTest {
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
         assertThat(value.getStatus().getPermalink()).isEqualTo(
             PostReconciler.PERMALINK_PREFIX + name);
+        assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "zhangsan"));
     }
 
 }

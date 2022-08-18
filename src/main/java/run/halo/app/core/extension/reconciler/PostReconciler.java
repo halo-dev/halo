@@ -1,9 +1,14 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
@@ -72,6 +77,23 @@ public class PostReconciler implements Reconciler {
                     status.setExcerpt(getExcerpt(contentRevised));
                 });
         }
+
+        // handle contributors
+        contentService.listSnapshots(Snapshot.SubjectRef.of(Post.KIND, name))
+            .collectList()
+            .subscribe(snapshots -> {
+                List<String> contributors = snapshots.stream()
+                    .map(snapshot -> {
+                        Set<String> usernames = snapshot.getSpec().getContributors();
+                        return Objects.requireNonNullElseGet(usernames,
+                            () -> new HashSet<String>());
+                    })
+                    .flatMap(Set::stream)
+                    .distinct()
+                    .sorted()
+                    .toList();
+                status.setContributors(contributors);
+            });
     }
 
     private String getExcerpt(String htmlContent) {

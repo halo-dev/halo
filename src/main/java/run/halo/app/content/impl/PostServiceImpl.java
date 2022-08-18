@@ -70,7 +70,7 @@ public class PostServiceImpl implements PostService {
         listedPost.setPost(post);
         return Mono.zip(listTags(post.getSpec().getTags()),
                 listCategories(post.getSpec().getCategories()),
-                listContributors(post.getMetadata().getName())
+                listContributors(post.getStatusOrDefault().getContributors())
             )
             .map(tuple -> {
                 List<Tag> tags = tuple.getT1();
@@ -103,11 +103,11 @@ public class PostServiceImpl implements PostService {
             .collectList();
     }
 
-    private Mono<List<Contributor>> listContributors(String postName) {
-        return client.list(Snapshot.class, snapshot -> snapshot.getSpec().getSubjectRef()
-                .equals(Snapshot.SubjectRef.of(Post.KIND, postName)), null)
-            .map(snapshot -> snapshot.getSpec().getContributors())
-            .flatMapIterable(username -> username)
+    private Mono<List<Contributor>> listContributors(List<String> usernames) {
+        if (usernames == null) {
+            return Mono.empty();
+        }
+        return Flux.fromIterable(usernames)
             .map(username -> client.fetch(User.class, username)
                 .map(user -> {
                     Contributor contributor = new Contributor();
