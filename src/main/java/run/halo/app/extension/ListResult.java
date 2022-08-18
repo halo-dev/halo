@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import lombok.Data;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.type.TypeDescription;
 import org.springframework.data.util.Streamable;
 import org.springframework.util.Assert;
 
@@ -83,5 +85,24 @@ public class ListResult<T> implements Streamable<T> {
     @JsonIgnore
     public boolean isEmpty() {
         return Streamable.super.isEmpty();
+    }
+
+    /**
+     * Generate generic ListResult class. Like {@code ListResult<User>}, {@code ListResult<Post>},
+     * etc.
+     *
+     * @param scheme scheme of the generic type.
+     * @return generic ListResult class.
+     */
+    public static Class<?> generateGenericClass(Scheme scheme) {
+        var generic =
+            TypeDescription.Generic.Builder.parameterizedType(ListResult.class, scheme.type())
+                .build();
+        return new ByteBuddy()
+            .subclass(generic)
+            .name(scheme.groupVersionKind().kind() + "List")
+            .make()
+            .load(ListResult.class.getClassLoader())
+            .getLoaded();
     }
 }

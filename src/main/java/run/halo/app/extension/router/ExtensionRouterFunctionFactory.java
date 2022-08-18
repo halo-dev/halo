@@ -5,8 +5,6 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.type.TypeDescription;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -55,7 +53,7 @@ public class ExtensionRouterFunctionFactory {
                         .tag(tagName)
                         .response(responseBuilder().responseCode("200")
                             .description("Response " + scheme.plural())
-                            .implementation(generateListResultClass()));
+                            .implementation(ListResult.generateGenericClass(scheme)));
                     QueryParamBuildUtil.buildParametersFromType(builder, ListRequest.class);
                 })
             .POST(createHandler.pathPattern(), createHandler,
@@ -130,15 +128,4 @@ public class ExtensionRouterFunctionFactory {
 
     }
 
-    private Class<?> generateListResultClass() {
-        var generic =
-            TypeDescription.Generic.Builder.parameterizedType(ListResult.class, scheme.type())
-                .build();
-        return new ByteBuddy()
-            .subclass(generic)
-            .name(scheme.groupVersionKind().kind() + "List")
-            .make()
-            .load(this.getClass().getClassLoader())
-            .getLoaded();
-    }
 }
