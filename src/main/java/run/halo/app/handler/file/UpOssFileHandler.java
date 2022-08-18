@@ -21,6 +21,7 @@ import run.halo.app.model.support.UploadResult;
 import run.halo.app.repository.AttachmentRepository;
 import run.halo.app.service.OptionService;
 import run.halo.app.utils.ImageUtils;
+import run.halo.app.utils.JsonUtils;
 
 /**
  * Up oss file handler.
@@ -137,8 +138,9 @@ public class UpOssFileHandler implements FileHandler {
 
         try {
             Response result = manager.deleteFile(key, null);
-            String code = result.body().string().split(",")[1].split(":")[1];
-            if (!result.isSuccessful() && !code.equals("40400001")) {
+            HashMap respondBody = JsonUtils.jsonToObject(result.body().string(), HashMap.class);
+            if (!result.isSuccessful() &&
+                !(result.code() == 404 && respondBody.get("code").equals(40400001))) {
                 log.warn("附件 " + key + " 从又拍云删除失败");
                 throw new FileOperationException("附件 " + key + " 从又拍云删除失败");
             }
