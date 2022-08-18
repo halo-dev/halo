@@ -14,6 +14,8 @@ import run.halo.app.extension.GVK;
 import run.halo.app.infra.Condition;
 
 /**
+ * <p>Post extension.</p>
+ *
  * @author guqing
  * @see <a href="https://github.com/halo-dev/halo/issues/2322">issue#2322</a>
  * @since 2.0.0
@@ -25,6 +27,8 @@ import run.halo.app.infra.Condition;
 @EqualsAndHashCode(callSuper = true)
 public class Post extends AbstractExtension {
     public static final String KIND = "Post";
+    public static final String CATEGORIES_ANNO = "content.halo.run/categories";
+    public static final String TAGS_ANNO = "content.halo.run/tags";
 
     @Schema(required = true)
     private PostSpec spec;
@@ -57,7 +61,6 @@ public class Post extends AbstractExtension {
 
         private String baseSnapshot;
 
-        @Schema(required = true, minLength = 1)
         private String owner;
 
         private String template;

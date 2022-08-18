@@ -45,6 +45,7 @@ ext {
     pf4j = "3.6.0"
     javaDiffUtils = "4.12"
     guava = "31.1-jre"
+    jsoup = "1.15.2"
 }
 
 dependencies {
@@ -71,6 +72,7 @@ dependencies {
     implementation "io.seruco.encoding:base62:$base62"
     implementation "org.pf4j:pf4j:$pf4j"
     implementation "com.google.guava:guava:$guava"
+    implementation "org.jsoup:jsoup:$jsoup"
     implementation "io.github.java-diff-utils:java-diff-utils:$javaDiffUtils"
 
     compileOnly 'org.projectlombok:lombok'
