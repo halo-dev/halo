@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -21,6 +22,12 @@ public class PluginProperties {
      * Auto start plugin when main app is ready.
      */
     private boolean autoStartPlugin = true;
+
+    /**
+     * The default plugin path is obtained through file scanning.
+     * In the development mode, you can specify the plugin path as the project directory.
+     */
+    private List<Path> fixedPluginPath = new ArrayList<>();
 
     /**
      * Plugins disabled by default.
