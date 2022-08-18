@@ -190,7 +190,9 @@ public class QiniuOssFileHandler implements FileHandler {
             }
         } catch (QiniuException e) {
             log.error("Qiniu oss error response: [{}]", e.response);
-            throw new FileOperationException("附件 " + key + " 从七牛云删除失败", e);
+            if (e.response.statusCode != 612) {
+                throw new FileOperationException("附件 " + key + " 从七牛云删除失败", e);
+            }
         }
     }
 
