@@ -20,6 +20,7 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.Scheme;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
@@ -40,13 +41,15 @@ public class PostEndpoint implements CustomEndpoint {
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "api.halo.run/v1alpha1/Post";
+        Scheme scheme = Scheme.buildFromType(Post.class);
         return SpringdocRouteBuilder.route()
             .GET("posts", this::listPost, builder -> {
                     builder.operationId("ListPosts")
                         .description("List posts.")
                         .tag(tag)
                         .response(responseBuilder()
-                            .implementation(ListResult.class));
+                            .implementation(ListResult.generateGenericClass(scheme))
+                        );
                     QueryParamBuildUtil.buildParametersFromType(builder, PostQuery.class);
                 }
             )
