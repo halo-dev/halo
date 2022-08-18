@@ -1,20 +1,31 @@
 package run.halo.app.content.impl;
 
+import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+
 import java.security.Principal;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
+import run.halo.app.content.Contributor;
+import run.halo.app.content.ListedPost;
+import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
+import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.Tag;
+import run.halo.app.core.extension.User;
+import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
@@ -27,15 +38,87 @@ import run.halo.app.infra.ConditionStatus;
  */
 @Component
 public class PostServiceImpl implements PostService {
-    private static final Comparator<Snapshot> SNAPSHOT_COMPARATOR =
-        Comparator.comparing(snapshot -> snapshot.getSpec().getVersion());
-    public static Comparator<Snapshot> LATEST_SNAPSHOT_COMPARATOR = SNAPSHOT_COMPARATOR.reversed();
+    private static final Comparator<Post> DEFAULT_POST_COMPARATOR =
+        Comparator.comparing(post -> post.getMetadata().getCreationTimestamp());
     private final ContentService contentService;
     private final ReactiveExtensionClient client;
 
     public PostServiceImpl(ContentService contentService, ReactiveExtensionClient client) {
         this.contentService = contentService;
         this.client = client;
+    }
+
+    @Override
+    public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
+        return client.list(Post.class, labelAndFieldSelectorToPredicate(query.getLabelSelector(),
+                    query.getFieldSelector()),
+                DEFAULT_POST_COMPARATOR, query.getPage(), query.getSize())
+            .flatMap(listResult -> Flux.fromStream(
+                    listResult.get().map(this::getListedPost)
+                )
+                .flatMap(Function.identity())
+                .collectList()
+                .map(listedPosts -> new ListResult<>(listResult.getPage(), listResult.getSize(),
+                    listResult.getTotal(), listedPosts)
+                )
+            );
+    }
+
+    private Mono<ListedPost> getListedPost(Post post) {
+        Assert.notNull(post, "The post must not be null.");
+        ListedPost listedPost = new ListedPost();
+        listedPost.setPost(post);
+        return Mono.zip(listTags(post.getSpec().getTags()),
+                listCategories(post.getSpec().getCategories()),
+                listContributors(post.getMetadata().getName())
+            )
+            .map(tuple -> {
+                List<Tag> tags = tuple.getT1();
+                List<Category> categories = tuple.getT2();
+                List<Contributor> contributors = tuple.getT3();
+                listedPost.setTags(tags);
+                listedPost.setCategories(categories);
+                listedPost.setContributors(contributors);
+                return listedPost;
+            });
+    }
+
+    private Mono<List<Tag>> listTags(List<String> tagNames) {
+        if (tagNames == null) {
+            return Mono.empty();
+        }
+        return Flux.fromStream(tagNames.stream()
+                .map(tagName -> client.fetch(Tag.class, tagName)))
+            .flatMap(Function.identity())
+            .collectList();
+    }
+
+    private Mono<List<Category>> listCategories(List<String> categoryNames) {
+        if (categoryNames == null) {
+            return Mono.empty();
+        }
+        return Flux.fromStream(categoryNames.stream()
+                .map(categoryName -> client.fetch(Category.class, categoryName)))
+            .flatMap(Function.identity())
+            .collectList();
+    }
+
+    private Mono<List<Contributor>> listContributors(String postName) {
+        return client.list(Snapshot.class, snapshot -> snapshot.getSpec().getSubjectRef()
+                .equals(Snapshot.SubjectRef.of(Post.KIND, postName)), null)
+            .map(snapshot -> snapshot.getSpec().getContributors())
+            .flatMapIterable(username -> username)
+            .map(username -> client.fetch(User.class, username)
+                .map(user -> {
+                    Contributor contributor = new Contributor();
+                    contributor.setName(username);
+                    contributor.setDisplayName(user.getSpec().getDisplayName());
+                    contributor.setAvatar(user.getSpec().getAvatar());
+                    return contributor;
+                })
+            )
+            .flatMap(Function.identity())
+            .collectList();
     }
 
     @Override
@@ -47,6 +130,7 @@ public class PostServiceImpl implements PostService {
                     post.getSpec().setBaseSnapshot(contentWrapper.snapshotName());
                     post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
                     post.getSpec().setOwner(username);
+                    appendPublishedCondition(post, Post.PostPhase.DRAFT);
                     return client.create(post)
                         .then(Mono.defer(() ->
                             client.fetch(Post.class, postRequest.post().getMetadata().getName())));
@@ -97,7 +181,7 @@ public class PostServiceImpl implements PostService {
 
                 // update release snapshot name and condition
                 postSpec.setReleaseSnapshot(snapshot.getMetadata().getName());
-                appendPublishedCondition(post);
+                appendPublishedCondition(post, Post.PostPhase.PUBLISHED);
 
                 Snapshot.SubjectRef subjectRef =
                     Snapshot.SubjectRef.of(Post.KIND, post.getMetadata().getName());
@@ -110,16 +194,16 @@ public class PostServiceImpl implements PostService {
             });
     }
 
-    void appendPublishedCondition(Post post) {
+    void appendPublishedCondition(Post post, Post.PostPhase phase) {
         Assert.notNull(post, "The post must not be null.");
         Post.PostStatus status = post.getStatusOrDefault();
-        status.setPhase(Post.PostPhase.PUBLISHED.name());
+        status.setPhase(phase.name());
         List<Condition> conditions = status.getConditionsOrDefault();
         Condition condition = new Condition();
         conditions.add(condition);
 
-        condition.setType(Post.PostPhase.PUBLISHED.name());
-        condition.setReason(Post.PostPhase.PUBLISHED.name());
+        condition.setType(phase.name());
+        condition.setReason(phase.name());
         condition.setMessage("");
         condition.setStatus(ConditionStatus.TRUE);
         condition.setLastTransitionTime(Instant.now());

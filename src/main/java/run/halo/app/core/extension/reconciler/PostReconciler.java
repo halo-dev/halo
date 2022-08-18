@@ -49,6 +49,9 @@ public class PostReconciler implements Reconciler {
         String name = post.getMetadata().getName();
         Post.PostSpec spec = post.getSpec();
         Post.PostStatus status = post.getStatusOrDefault();
+        if (status.getPhase() == null) {
+            status.setPhase(Post.PostPhase.DRAFT.name());
+        }
         // handle permalink
         if (StringUtils.isBlank(status.getPermalink())) {
             status.setPermalink(PERMALINK_PREFIX + name);

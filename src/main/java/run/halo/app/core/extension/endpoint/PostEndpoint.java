@@ -8,15 +8,19 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
+import run.halo.app.extension.ListResult;
+import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
  * Endpoint for managing posts.
@@ -37,6 +41,15 @@ public class PostEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "api.halo.run/v1alpha1/Post";
         return SpringdocRouteBuilder.route()
+            .GET("posts", this::listPost, builder -> {
+                    builder.operationId("ListPosts")
+                        .description("List posts.")
+                        .tag(tag)
+                        .response(responseBuilder()
+                            .implementation(ListResult.class));
+                    QueryParamBuildUtil.buildParametersFromType(builder, PostQuery.class);
+                }
+            )
             .POST("posts", this::draftPost,
                 builder -> builder.operationId("DraftPost")
                     .description("Draft a post.")
@@ -99,5 +112,27 @@ public class PostEndpoint implements CustomEndpoint {
         String name = request.pathVariable("name");
         return postService.publishPost(name)
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
+    }
+
+    Mono<ServerResponse> listPost(ServerRequest request) {
+        var conversionService = ApplicationConversionService.getSharedInstance();
+        var page =
+            request.queryParam("page")
+                .map(pageString -> conversionService.convert(pageString, Integer.class))
+                .orElse(0);
+
+        var size = request.queryParam("size")
+            .map(sizeString -> conversionService.convert(sizeString, Integer.class))
+            .orElse(0);
+
+        var labelSelectors = request.queryParams().get("labelSelector");
+        var fieldSelectors = request.queryParams().get("fieldSelector");
+        PostQuery postQuery = new PostQuery();
+        postQuery.setPage(page);
+        postQuery.setSize(size);
+        postQuery.setLabelSelector(labelSelectors);
+        postQuery.setFieldSelector(fieldSelectors);
+        return postService.listPost(postQuery)
+            .flatMap(listedPosts -> ServerResponse.ok().bodyValue(listedPosts));
     }
 }

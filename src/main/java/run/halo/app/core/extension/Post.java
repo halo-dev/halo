@@ -105,7 +105,7 @@ public class Post extends AbstractExtension {
         @Schema(required = true)
         private String phase;
 
-        @Schema(required = true)
+        @Schema
         private List<Condition> conditions;
 
         private String permalink;
