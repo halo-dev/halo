@@ -127,7 +127,8 @@ public class PostReconciler implements Reconciler {
         }
         // synchronize some fields to labels to query
         labels.put(Post.PHASE_LABEL, status.getPhase());
-        labels.put(Post.VISIBLE_LABEL, spec.getVisible().name());
+        labels.put(Post.VISIBLE_LABEL,
+            Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
         labels.put(Post.OWNER_LABEL, spec.getOwner());
     }
 
