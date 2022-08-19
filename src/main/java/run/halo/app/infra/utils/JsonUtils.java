@@ -2,13 +2,11 @@ package run.halo.app.infra.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.swagger.v3.core.util.Json;
 import java.util.Map;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -19,38 +17,9 @@ import org.springframework.util.Assert;
  * @since 2.0.0
  */
 public class JsonUtils {
-    public static final ObjectMapper DEFAULT_JSON_MAPPER = createDefaultJsonMapper();
+    public static final ObjectMapper DEFAULT_JSON_MAPPER = Json.mapper();
 
     private JsonUtils() {
-    }
-
-    /**
-     * Creates a default json mapper.
-     *
-     * @return object mapper
-     */
-    public static ObjectMapper createDefaultJsonMapper() {
-        return createDefaultJsonMapper(null);
-    }
-
-    /**
-     * Creates a default json mapper.
-     *
-     * @param strategy property naming strategy
-     * @return object mapper
-     */
-    @NonNull
-    public static ObjectMapper createDefaultJsonMapper(@Nullable PropertyNamingStrategy strategy) {
-        // Create object mapper
-        ObjectMapper mapper = new ObjectMapper();
-        // Configure
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.registerModule(new JavaTimeModule());
-        // Set property naming strategy
-        if (strategy != null) {
-            mapper.setPropertyNamingStrategy(strategy);
-        }
-        return mapper;
     }
 
     /**

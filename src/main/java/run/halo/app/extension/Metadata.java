@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -43,5 +44,7 @@ public class Metadata implements MetadataOperator {
      * Deletion timestamp of the Extension.
      */
     private Instant deletionTimestamp;
+
+    private Set<String> finalizers;
 
 }

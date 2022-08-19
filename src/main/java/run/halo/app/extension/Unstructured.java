@@ -13,10 +13,14 @@ import io.swagger.v3.core.util.Json;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Unstructured is a generic Extension, which wraps ObjectNode to maintain the Extension data, like
@@ -89,6 +93,11 @@ public class Unstructured implements Extension {
         }
 
         @Override
+        public Set<String> getFinalizers() {
+            return getNestedStringSet(data, "metadata", "finalizers").orElse(null);
+        }
+
+        @Override
         public void setName(String name) {
             setNestedValue(data, name, "metadata", "name");
         }
@@ -117,7 +126,13 @@ public class Unstructured implements Extension {
         public void setDeletionTimestamp(Instant deletionTimestamp) {
             setNestedValue(data, deletionTimestamp, "metadata", "deletionTimestamp");
         }
+
+        @Override
+        public void setFinalizers(Set<String> finalizers) {
+            setNestedValue(data, finalizers, "metadata", "finalizers");
+        }
     }
+
 
     @Override
     public void setApiVersion(String apiVersion) {
@@ -149,6 +164,21 @@ public class Unstructured implements Extension {
             tempMap = (Map<?, ?>) value;
         }
         return Optional.ofNullable(tempMap.get(fields[fields.length - 1]));
+    }
+
+    @SuppressWarnings("unchecked")
+    static Optional<List<String>> getNestedStringList(Map map, String... fields) {
+        return getNestedValue(map, fields).map(value -> (List<String>) value);
+    }
+
+    static Optional<Set<String>> getNestedStringSet(Map map, String... fields) {
+        return getNestedValue(map, fields).map(value -> {
+            if (value instanceof Collection collection) {
+                return new LinkedHashSet<>(collection);
+            }
+            throw new IllegalArgumentException(
+                "Incorrect value type: " + value.getClass() + ", expected: " + Set.class);
+        });
     }
 
     @SuppressWarnings("unchecked")
