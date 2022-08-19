@@ -1,16 +1,22 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.time.Instant;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
+import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.infra.Condition;
+import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -96,6 +102,43 @@ public class PostReconciler implements Reconciler {
                     .toList();
                 status.setContributors(contributors);
             });
+
+        // handle cancel publish,has released version and published is false and not handled
+        if (StringUtils.isNotBlank(spec.getReleaseSnapshot())
+            && Objects.equals(false, spec.getPublished())
+            && !StringUtils.equals(status.getPhase(), Post.PostPhase.DRAFT.name())) {
+            Condition condition = new Condition();
+            condition.setType("CancelledPublish");
+            condition.setStatus(ConditionStatus.TRUE);
+            condition.setReason(condition.getType());
+            condition.setMessage(StringUtils.EMPTY);
+            condition.setLastTransitionTime(Instant.now());
+            status.getConditionsOrDefault().add(condition);
+            status.setPhase(Post.PostPhase.DRAFT.name());
+        }
+
+        // handle logic delete
+        Map<String, String> labels = getLabelsOrDefault(post);
+        if (Objects.equals(spec.getDeleted(), true)) {
+            labels.put(Post.DELETED_LABEL, Boolean.TRUE.toString());
+            // TODO do more about logic delete such as remove router
+        } else {
+            labels.put(Post.DELETED_LABEL, Boolean.FALSE.toString());
+        }
+        // synchronize some fields to labels to query
+        labels.put(Post.PHASE_LABEL, status.getPhase());
+        labels.put(Post.VISIBLE_LABEL, spec.getVisible().name());
+        labels.put(Post.OWNER_LABEL, spec.getOwner());
+    }
+
+    private Map<String, String> getLabelsOrDefault(Post post) {
+        Assert.notNull(post, "The post must not be null.");
+        Map<String, String> labels = post.getMetadata().getLabels();
+        if (labels == null) {
+            labels = new LinkedHashMap<>();
+            post.getMetadata().setLabels(labels);
+        }
+        return labels;
     }
 
     private String getExcerpt(String htmlContent) {

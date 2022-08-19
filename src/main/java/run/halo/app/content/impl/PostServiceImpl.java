@@ -4,10 +4,12 @@ import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldS
 
 import java.security.Principal;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
@@ -50,8 +52,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
-        return client.list(Post.class, labelAndFieldSelectorToPredicate(query.getLabelSelector(),
-                    query.getFieldSelector()),
+        return client.list(Post.class, postListPredicate(query),
                 DEFAULT_POST_COMPARATOR.reversed(), query.getPage(), query.getSize())
             .flatMap(listResult -> Flux.fromStream(
                         listResult.get().map(this::getListedPost)
@@ -62,6 +63,31 @@ public class PostServiceImpl implements PostService {
                         listResult.getTotal(), listedPosts)
                     )
             );
+    }
+
+    Predicate<Post> postListPredicate(PostQuery query) {
+        Predicate<Post> paramPredicate = post ->
+            contains(query.getCategories(), post.getSpec().getCategories())
+                && contains(query.getTags(), post.getSpec().getTags())
+                && contains(query.getContributors(), post.getStatus().getContributors());
+        Predicate<Post> predicate = labelAndFieldSelectorToPredicate(query.getLabelSelector(),
+            query.getFieldSelector());
+        return predicate.and(paramPredicate);
+    }
+
+    boolean contains(Collection<String> left, List<String> right) {
+        // parameter is null, it means that ignore this condition
+        if (left == null) {
+            return true;
+        }
+        // else, it means that right is empty
+        if (left.isEmpty()) {
+            return right.isEmpty();
+        }
+        if (right == null) {
+            return false;
+        }
+        return right.stream().anyMatch(left::contains);
     }
 
     private Mono<ListedPost> getListedPost(Post post) {

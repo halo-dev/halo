@@ -29,6 +29,10 @@ public class Post extends AbstractExtension {
     public static final String KIND = "Post";
     public static final String CATEGORIES_ANNO = "content.halo.run/categories";
     public static final String TAGS_ANNO = "content.halo.run/tags";
+    public static final String DELETED_LABEL = "content.halo.run/deleted";
+    public static final String OWNER_LABEL = "content.halo.run/owner";
+    public static final String VISIBLE_LABEL = "content.halo.run/visible";
+    public static final String PHASE_LABEL = "content.halo.run/phase";
 
     @Schema(required = true)
     private PostSpec spec;

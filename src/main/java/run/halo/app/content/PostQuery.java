@@ -1,5 +1,6 @@
 package run.halo.app.content;
 
+import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import run.halo.app.core.extension.Post;
@@ -14,5 +15,11 @@ import run.halo.app.extension.router.ListRequest;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PostQuery extends ListRequest {
+
+    private Set<String> contributors;
+
+    private Set<String> categories;
+
+    private Set<String> tags;
     // TODO add more query fields
 }
