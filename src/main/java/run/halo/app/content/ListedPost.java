@@ -1,5 +1,6 @@
 package run.halo.app.content;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 import run.halo.app.core.extension.Category;
@@ -16,11 +17,15 @@ import run.halo.app.core.extension.Tag;
 @Data
 public class ListedPost {
 
+    @Schema(required = true)
     private Post post;
 
+    @Schema(required = true)
     private List<Category> categories;
 
+    @Schema(required = true)
     private List<Tag> tags;
 
+    @Schema(required = true)
     private List<Contributor> contributors;
 }

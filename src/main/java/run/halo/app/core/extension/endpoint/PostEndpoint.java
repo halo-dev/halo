@@ -15,12 +15,12 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
-import run.halo.app.extension.Scheme;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
@@ -41,14 +41,13 @@ public class PostEndpoint implements CustomEndpoint {
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "api.halo.run/v1alpha1/Post";
-        Scheme scheme = Scheme.buildFromType(Post.class);
         return SpringdocRouteBuilder.route()
             .GET("posts", this::listPost, builder -> {
                     builder.operationId("ListPosts")
                         .description("List posts.")
                         .tag(tag)
                         .response(responseBuilder()
-                            .implementation(ListResult.generateGenericClass(scheme))
+                            .implementation(ListResult.generateGenericClass(ListedPost.class))
                         );
                     QueryParamBuildUtil.buildParametersFromType(builder, PostQuery.class);
                 }

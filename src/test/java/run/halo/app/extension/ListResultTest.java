@@ -19,4 +19,12 @@ class ListResultTest {
         assertEquals("FakeList", fakeListClass.getSimpleName());
     }
 
+    @Test
+    void generateGenericClassForClassParam() {
+        var fakeListClass = ListResult.generateGenericClass(FakeExtension.class);
+        assertTrue(ListResult.class.isAssignableFrom(fakeListClass));
+        assertSame(FakeExtension.class, ((ParameterizedType) fakeListClass.getGenericSuperclass())
+            .getActualTypeArguments()[0]);
+        assertEquals("FakeExtensionList", fakeListClass.getSimpleName());
+    }
 }
