@@ -3,7 +3,6 @@ import {
   IconArrowDown,
   IconCheckboxFill,
   IconDatabase2Line,
-  IconFolder,
   IconGrid,
   IconList,
   IconMore,
@@ -325,44 +324,20 @@ const folders = [
           </template>
 
           <div v-if="viewType === 'grid'">
-            <nav aria-label="Breadcrumb" class="mb-5 flex">
-              <ol class="flex items-center space-x-4" role="list">
-                <li>
-                  <div class="flex items-center">
-                    <a
-                      class="text-sm font-medium text-gray-500 hover:text-gray-700"
-                      href="javascript:void(0)"
-                    >
-                      Root
-                    </a>
-                  </div>
-                </li>
-
-                <li>
-                  <div class="flex items-center">
-                    <div
-                      class="flex h-5 w-5 flex-shrink-0 items-center justify-center text-gray-300"
-                    >
-                      <span> / </span>
-                    </div>
-                    <a
-                      class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700"
-                      href="javascript:void(0)"
-                    >
-                      Photos
-                    </a>
-                  </div>
-                </li>
-              </ol>
-            </nav>
             <div class="mb-5 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-6">
+              <div
+                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-600 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+              >
+                <div class="flex flex-1 items-center">
+                  <span class="text-sm">全部</span>
+                </div>
+              </div>
               <div
                 v-for="(folder, index) in folders"
                 :key="index"
                 class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-600 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
               >
                 <div class="flex flex-1 items-center">
-                  <IconFolder class="mr-2 h-4 w-4" />
                   <span class="text-sm">{{ folder.name }}</span>
                 </div>
                 <IconMore />
