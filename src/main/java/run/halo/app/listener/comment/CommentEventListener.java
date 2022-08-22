@@ -17,6 +17,7 @@ import run.halo.app.model.entity.JournalComment;
 import run.halo.app.model.entity.PostComment;
 import run.halo.app.model.entity.SheetComment;
 import run.halo.app.model.entity.User;
+import run.halo.app.model.enums.CommentStatus;
 import run.halo.app.model.properties.CommentProperties;
 import run.halo.app.service.JournalCommentService;
 import run.halo.app.service.JournalService;
@@ -227,6 +228,11 @@ public class CommentEventListener {
             }
 
             if (!baseComment.getAllowNotification()) {
+                return;
+            }
+
+            // only send email with published comments
+            if (!postComment.getStatus().equals(CommentStatus.PUBLISHED)) {
                 return;
             }
 
