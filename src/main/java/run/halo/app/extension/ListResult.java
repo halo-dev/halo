@@ -105,4 +105,23 @@ public class ListResult<T> implements Streamable<T> {
             .load(ListResult.class.getClassLoader())
             .getLoaded();
     }
+
+    /**
+     * Generate generic ListResult class. Like {@code ListResult<User>}, {@code ListResult<Post>},
+     * etc.
+     *
+     * @param type the generic type of {@link ListResult}.
+     * @return generic ListResult class.
+     */
+    public static <T> Class<?> generateGenericClass(Class<T> type) {
+        var generic =
+            TypeDescription.Generic.Builder.parameterizedType(ListResult.class, type)
+                .build();
+        return new ByteBuddy()
+            .subclass(generic)
+            .name(type.getSimpleName() + "List")
+            .make()
+            .load(ListResult.class.getClassLoader())
+            .getLoaded();
+    }
 }
