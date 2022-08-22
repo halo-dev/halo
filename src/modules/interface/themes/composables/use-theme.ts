@@ -5,6 +5,7 @@ import { apiClient } from "@halo-dev/admin-shared";
 import { useDialog } from "@halo-dev/components";
 
 interface useThemeLifeCycleReturn {
+  loading: Ref<boolean>;
   activatedTheme: Ref<Theme>;
   isActivated: ComputedRef<boolean>;
   handleActiveTheme: () => void;
@@ -12,6 +13,7 @@ interface useThemeLifeCycleReturn {
 
 export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
   const activatedTheme = ref<Theme>({} as Theme);
+  const loading = ref(false);
 
   const isActivated = computed(() => {
     return activatedTheme.value?.metadata?.name === theme.value?.metadata?.name;
@@ -21,6 +23,8 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
 
   const handleFetchActivatedTheme = async () => {
     try {
+      loading.value = true;
+
       const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap(
         "system"
       );
@@ -40,6 +44,8 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
       activatedTheme.value = themeData;
     } catch (e) {
       console.error("Failed to fetch active theme", e);
+    } finally {
+      loading.value = false;
     }
   };
 
@@ -76,6 +82,7 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
   onMounted(handleFetchActivatedTheme);
 
   return {
+    loading,
     activatedTheme,
     isActivated,
     handleActiveTheme,

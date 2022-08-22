@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import {
+  IconAddCircle,
   IconGitHub,
   IconMore,
   useDialog,
   VButton,
+  VEmpty,
   VModal,
   VSpace,
   VTag,
@@ -33,17 +35,21 @@ const emit = defineEmits<{
 }>();
 
 const themes = ref<Theme[]>([]);
+const loading = ref(false);
 const themeInstall = ref(false);
 
 const dialog = useDialog();
 
 const handleFetchThemes = async () => {
   try {
+    loading.value = true;
     const { data } =
       await apiClient.extension.theme.listthemeHaloRunV1alpha1Theme();
     themes.value = data.items;
   } catch (e) {
     console.error("Failed to fetch themes", e);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -91,7 +97,25 @@ defineExpose({
     title="已安装的主题"
     @update:visible="handleVisibleChange"
   >
-    <ul class="flex flex-col divide-y divide-gray-100" role="list">
+    <VEmpty
+      v-if="!themes.length && !loading"
+      message="当前没有已安装的主题，你可以尝试刷新或者安装新主题"
+      title="当前没有已安装的主题"
+    >
+      <template #actions>
+        <VSpace>
+          <VButton @click="handleFetchThemes"> 刷新</VButton>
+          <VButton type="primary" @click="themeInstall = true">
+            <template #icon>
+              <IconAddCircle class="h-full w-full" />
+            </template>
+            新增菜单项
+          </VButton>
+        </VSpace>
+      </template>
+    </VEmpty>
+
+    <ul v-else class="flex flex-col divide-y divide-gray-100" role="list">
       <li
         v-for="(theme, index) in themes"
         :key="index"

@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import {
+  IconAddCircle,
   IconListSettings,
   useDialog,
   VButton,
   VCard,
+  VEmpty,
   VPageHeader,
   VSpace,
 } from "@halo-dev/components";
@@ -28,6 +30,7 @@ const menuItems = ref<MenuItem[]>([] as MenuItem[]);
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
 const selectedMenu = ref<Menu | undefined>();
 const selectedMenuItem = ref<MenuItem | null>(null);
+const loading = ref(false);
 const menuListRef = ref();
 const menuItemEditingModal = ref();
 
@@ -35,6 +38,8 @@ const dialog = useDialog();
 
 const handleFetchMenuItems = async () => {
   try {
+    loading.value = true;
+
     if (!selectedMenu.value?.spec.menuItems) {
       return;
     }
@@ -52,6 +57,8 @@ const handleFetchMenuItems = async () => {
     menuTreeItems.value = buildMenuItemsTree(data.items);
   } catch (e) {
     console.error("Failed to fetch menu items", e);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -181,7 +188,25 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
               </div>
             </div>
           </template>
+          <VEmpty
+            v-if="!menuItems.length && !loading"
+            message="你可以尝试刷新或者新建菜单项"
+            title="当前没有菜单项"
+          >
+            <template #actions>
+              <VSpace>
+                <VButton @click="handleFetchMenuItems"> 刷新</VButton>
+                <VButton type="primary" @click="menuItemEditingModal = true">
+                  <template #icon>
+                    <IconAddCircle class="h-full w-full" />
+                  </template>
+                  新增菜单项
+                </VButton>
+              </VSpace>
+            </template>
+          </VEmpty>
           <MenuItemListItem
+            v-else
             :menu-tree-items="menuTreeItems"
             @change="handleUpdateInBatch"
             @delete="handleDelete"

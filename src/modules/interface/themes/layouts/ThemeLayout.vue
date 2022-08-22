@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 // core libs
+import type { ComputedRef, Ref } from "vue";
 import { computed, provide, ref, watch, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -8,7 +9,9 @@ import cloneDeep from "lodash.clonedeep";
 
 // hooks
 import { useThemeLifeCycle } from "../composables/use-theme";
-import { useSettingForm } from "@halo-dev/admin-shared";
+// types
+import type { FormKitSettingSpec } from "@halo-dev/admin-shared";
+import { BasicLayout, useSettingForm } from "@halo-dev/admin-shared";
 
 // components
 import {
@@ -17,16 +20,12 @@ import {
   IconPalette,
   VButton,
   VCard,
+  VEmpty,
   VPageHeader,
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
-import { BasicLayout } from "@halo-dev/admin-shared";
-
-// types
-import type { FormKitSettingSpec } from "@halo-dev/admin-shared";
-import type { ComputedRef, Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
 interface ThemeTab {
@@ -53,7 +52,7 @@ const selectedTheme = ref<Theme>({} as Theme);
 const themesModal = ref(false);
 const activeTab = ref("");
 
-const { isActivated, activatedTheme, handleActiveTheme } =
+const { loading, isActivated, activatedTheme, handleActiveTheme } =
   useThemeLifeCycle(selectedTheme);
 
 const settingName = computed(() => selectedTheme.value.spec?.settingName);
@@ -171,19 +170,45 @@ watch(
     </VPageHeader>
 
     <div class="m-0 md:m-4">
-      <VCard :body-class="['!p-0']">
-        <template #header>
-          <VTabbar
-            v-model:active-id="activeTab"
-            :items="tabs"
-            class="w-full !rounded-none"
-            type="outline"
-            @change="handleTabChange"
-          ></VTabbar>
+      <VEmpty
+        v-if="
+          !selectedTheme.metadata?.name &&
+          !activatedTheme.metadata?.name &&
+          !loading
+        "
+        message="当前没有已激活或者选择的主题，你可以切换主题或者安装新主题"
+        title="当前没有已激活或已选择的主题"
+      >
+        <template #actions>
+          <VSpace>
+            <VButton @click="themesModal = true">
+              安装主题
+            </VButton>
+            <VButton type="primary" @click="themesModal = true">
+              <template #icon>
+                <IconExchange class="h-full w-full" />
+              </template>
+              切换主题
+            </VButton>
+          </VSpace>
         </template>
-      </VCard>
-      <div>
-        <RouterView :key="activeTab" />
+      </VEmpty>
+
+      <div v-else>
+        <VCard :body-class="['!p-0']">
+          <template #header>
+            <VTabbar
+              v-model:active-id="activeTab"
+              :items="tabs"
+              class="w-full !rounded-none"
+              type="outline"
+              @change="handleTabChange"
+            ></VTabbar>
+          </template>
+        </VCard>
+        <div>
+          <RouterView :key="activeTab" />
+        </div>
       </div>
     </div>
   </BasicLayout>

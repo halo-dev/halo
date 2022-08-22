@@ -4,6 +4,7 @@ import {
   useDialog,
   VButton,
   VCard,
+  VEmpty,
   VSpace,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
@@ -27,6 +28,7 @@ const emit = defineEmits<{
 }>();
 
 const menus = ref<Menu[]>([] as Menu[]);
+const loading = ref(false);
 const selectedMenuToUpdate = ref<Menu | null>(null);
 const menuEditingModal = ref<boolean>(false);
 
@@ -35,6 +37,8 @@ const dialog = useDialog();
 const handleFetchMenus = async () => {
   selectedMenuToUpdate.value = null;
   try {
+    loading.value = true;
+
     const { data } = await apiClient.extension.menu.listv1alpha1Menu();
     menus.value = data.items;
 
@@ -49,6 +53,8 @@ const handleFetchMenus = async () => {
     }
   } catch (e) {
     console.error("Failed to fetch menus", e);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -114,6 +120,17 @@ defineExpose({
     @close="handleFetchMenus"
   />
   <VCard :bodyClass="['!p-0']" title="菜单">
+    <VEmpty
+      v-if="!menus.length && !loading"
+      message="你可以尝试刷新或者新建菜单"
+      title="当前没有菜单"
+    >
+      <template #actions>
+        <VSpace>
+          <VButton size="sm" @click="handleFetchMenus"> 刷新</VButton>
+        </VSpace>
+      </template>
+    </VEmpty>
     <div class="divide-y divide-gray-100 bg-white">
       <div
         v-for="(menu, index) in menus"

@@ -90,6 +90,6 @@ describe("Empty", () => {
     expect(attributes.src).not.toEqual("/src/components/empty/Empty.svg");
 
     expect(attributes.src).toEqual("./empty");
-    expect(attributes.alt).toEqual("Empty Status")
+    expect(attributes.alt).toEqual("Empty Status");
   });
 });

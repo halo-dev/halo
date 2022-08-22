@@ -5,6 +5,7 @@ import {
   IconPlug,
   VButton,
   VCard,
+  VEmpty,
   VPageHeader,
   VPagination,
   VSpace,
@@ -17,11 +18,14 @@ import { apiClient } from "@halo-dev/admin-shared";
 import type { Plugin } from "@halo-dev/api-client";
 
 const plugins = ref<Plugin[]>([] as Plugin[]);
+const loading = ref(false);
 const pluginInstall = ref(false);
 const keyword = ref("");
 
 const handleFetchPlugins = async () => {
   try {
+    loading.value = true;
+
     const fieldSelector: Array<string> = [];
 
     if (keyword.value) {
@@ -38,6 +42,8 @@ const handleFetchPlugins = async () => {
     plugins.value = data.items;
   } catch (e) {
     console.error("Fail to fetch plugins", e);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -211,7 +217,34 @@ onMounted(handleFetchPlugins);
           </div>
         </div>
       </template>
-      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
+
+      <VEmpty
+        v-if="!plugins.length && !loading"
+        message="当前没有已安装的插件，你可以尝试刷新或者安装新插件"
+        title="当前没有已安装的插件"
+      >
+        <template #actions>
+          <VSpace>
+            <VButton @click="handleFetchPlugins">刷新</VButton>
+            <VButton
+              v-permission="['system:plugins:manage']"
+              type="secondary"
+              @click="pluginInstall = true"
+            >
+              <template #icon>
+                <IconAddCircle class="h-full w-full" />
+              </template>
+              安装插件
+            </VButton>
+          </VSpace>
+        </template>
+      </VEmpty>
+
+      <ul
+        v-else
+        class="box-border h-full w-full divide-y divide-gray-100"
+        role="list"
+      >
         <li v-for="(plugin, index) in plugins" :key="index">
           <PluginListItem :plugin="plugin" />
         </li>
