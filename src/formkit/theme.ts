@@ -4,7 +4,7 @@ const textClassification = {
   inner:
     "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary mt-2 sm:mt-0",
   input:
-    "outline-0 bg-white antialiased resize-none w-full text-black block transition-all appearance-none h-9 px-3 text-sm",
+    "outline-0 bg-white antialiased resize-none w-full text-black block transition-all appearance-none h-full px-3 text-sm",
 };
 
 const boxClassification = {
@@ -74,8 +74,10 @@ const theme: Record<string, Record<string, string>> = {
   "datetime-local": textClassification,
   textarea: {
     ...textClassification,
+    inner:
+      "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-32 rounded-base overflow-hidden focus-within:border-primary mt-2 sm:mt-0",
     input:
-      "outline-0 bg-white antialiased w-full text-black block transition-all appearance-none h-32 px-3 py-2 text-sm",
+      "outline-0 bg-white antialiased w-full text-black block transition-all appearance-none h-full px-3 py-2 text-sm",
   },
 };
 

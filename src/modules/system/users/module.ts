@@ -1,13 +1,7 @@
-import {
-  BasicLayout,
-  BlankLayout,
-  definePlugin,
-  UserProfileLayout,
-} from "@halo-dev/admin-shared";
+import { BasicLayout, BlankLayout, definePlugin } from "@halo-dev/admin-shared";
+import UserProfileLayout from "./layouts/UserProfileLayout.vue";
 import UserList from "./UserList.vue";
 import UserDetail from "./UserDetail.vue";
-import ProfileModification from "./ProfileModification.vue";
-import PasswordChange from "./PasswordChange.vue";
 import PersonalAccessTokens from "./PersonalAccessTokens.vue";
 import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
@@ -42,21 +36,12 @@ export default definePlugin({
         {
           path: ":name",
           component: UserProfileLayout,
+          name: "User",
           children: [
             {
               path: "detail",
               name: "UserDetail",
               component: UserDetail,
-            },
-            {
-              path: "profile-modification",
-              name: "ProfileModification",
-              component: ProfileModification,
-            },
-            {
-              path: "password-change",
-              name: "PasswordChange",
-              component: PasswordChange,
             },
             {
               path: "tokens",
