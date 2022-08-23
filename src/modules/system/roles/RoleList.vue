@@ -9,6 +9,7 @@ import {
   IconArrowDown,
   IconSettings,
   IconShieldUser,
+  useDialog,
   VButton,
   VCard,
   VPageHeader,
@@ -25,6 +26,10 @@ import { formatDatetime } from "@/utils/date";
 // hooks
 import { useFetchRole } from "@/modules/system/roles/composables/use-role";
 
+// libs
+import cloneDeep from "lodash.clonedeep";
+import { apiClient } from "@halo-dev/admin-shared";
+
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role | null>(null);
 
@@ -38,6 +43,30 @@ const handleOpenEditingModal = (role: Role) => {
 const onEditingModalClose = () => {
   selectedRole.value = null;
   handleFetchRoles();
+};
+
+const handleCloneRole = (role: Role) => {
+  const roleToCreate = cloneDeep<Role>(role);
+  roleToCreate.metadata.name = "";
+  roleToCreate.metadata.creationTimestamp = undefined;
+  selectedRole.value = roleToCreate;
+  editingModal.value = true;
+};
+
+const dialog = useDialog();
+const handleDelete = async (role: Role) => {
+  dialog.warning({
+    title: "是否确定删除该权限？",
+    description: "此权限删除之后，相关联的用户将被删除角色绑定，此操作不可恢复",
+    confirmType: "danger",
+    onConfirm: async () => {
+      try {
+        await apiClient.extension.role.deletev1alpha1Role(role.metadata.name);
+      } catch (e) {
+        console.error("Failed to delete role", e);
+      }
+    },
+  });
 };
 </script>
 <template>
@@ -211,6 +240,20 @@ const onEditingModalClose = () => {
                 <div
                   class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
+                  <FloatingTooltip
+                    v-if="role.metadata.deletionTimestamp"
+                    class="hidden items-center sm:flex"
+                  >
+                    <div
+                      class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
+                    >
+                      <span
+                        class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
+                      ></span>
+                    </div>
+                    <template #popper> 删除中</template>
+                  </FloatingTooltip>
+
                   <a
                     class="hidden text-sm text-gray-500 hover:text-gray-900 sm:block"
                     target="_blank"
@@ -225,7 +268,38 @@ const onEditingModalClose = () => {
                     v-permission="['system:roles:manage']"
                     class="cursor-pointer"
                   >
-                    <IconSettings @click="handleOpenEditingModal(role)" />
+                    <FloatingDropdown>
+                      <IconSettings />
+                      <template #popper>
+                        <div class="w-48 p-2">
+                          <VSpace class="w-full" direction="column">
+                            <VButton
+                              v-close-popper
+                              block
+                              type="secondary"
+                              @click="handleOpenEditingModal(role)"
+                            >
+                              编辑
+                            </VButton>
+                            <VButton
+                              v-close-popper
+                              block
+                              type="danger"
+                              @click="handleDelete(role)"
+                            >
+                              删除
+                            </VButton>
+                            <VButton
+                              v-close-popper
+                              block
+                              @click="handleCloneRole(role)"
+                            >
+                              基于此角色创建
+                            </VButton>
+                          </VSpace>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
                   </span>
                 </div>
               </div>

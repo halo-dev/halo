@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
   IconArrowRight,
-  IconGitBranch,
   IconShieldUser,
   VButton,
   VCard,
@@ -76,14 +75,6 @@ onMounted(() => {
   >
     <template #icon>
       <IconShieldUser class="mr-2 self-center" />
-    </template>
-    <template #actions>
-      <VButton v-permission="['system:roles:manage']" type="secondary">
-        <template #icon>
-          <IconGitBranch class="h-full w-full" />
-        </template>
-        Fork
-      </VButton>
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
