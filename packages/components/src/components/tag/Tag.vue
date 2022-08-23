@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { CSSProperties } from "vue";
 import { computed } from "vue";
 import type { Theme } from "./interface";
 
@@ -6,10 +7,14 @@ const props = withDefaults(
   defineProps<{
     theme?: Theme;
     rounded?: boolean;
+    styles?: CSSProperties;
   }>(),
   {
     theme: "default",
     rounded: false,
+    styles: () => {
+      return {};
+    },
   }
 );
 
@@ -18,7 +23,7 @@ const classes = computed(() => {
 });
 </script>
 <template>
-  <div :class="classes" class="tag-wrapper">
+  <div :class="classes" :style="styles" class="tag-wrapper">
     <div v-if="$slots.leftIcon" class="tag-left-icon">
       <slot name="leftIcon" />
     </div>

@@ -1,18 +1,26 @@
 import {
+  ApiHaloRunV1alpha1ContentApi,
   ApiHaloRunV1alpha1PluginApi,
+  ApiHaloRunV1alpha1PostApi,
+  ApiHaloRunV1alpha1ThemeApi,
   ApiHaloRunV1alpha1UserApi,
+  ContentHaloRunV1alpha1CategoryApi,
+  ContentHaloRunV1alpha1CommentApi,
+  ContentHaloRunV1alpha1PostApi,
+  ContentHaloRunV1alpha1ReplyApi,
+  ContentHaloRunV1alpha1SnapshotApi,
+  ContentHaloRunV1alpha1TagApi,
   PluginHaloRunV1alpha1PluginApi,
   PluginHaloRunV1alpha1ReverseProxyApi,
+  ThemeHaloRunV1alpha1ThemeApi,
   V1alpha1ConfigMapApi,
+  V1alpha1MenuApi,
+  V1alpha1MenuItemApi,
   V1alpha1PersonalAccessTokenApi,
   V1alpha1RoleApi,
   V1alpha1RoleBindingApi,
   V1alpha1SettingApi,
   V1alpha1UserApi,
-  V1alpha1MenuApi,
-  V1alpha1MenuItemApi,
-  ThemeHaloRunV1alpha1ThemeApi,
-  ApiHaloRunV1alpha1ThemeApi,
 } from "@halo-dev/api-client";
 import type { AxiosInstance } from "axios";
 import axios from "axios";
@@ -65,10 +73,19 @@ function setupApiClient(axios: AxiosInstance) {
       theme: new ThemeHaloRunV1alpha1ThemeApi(undefined, apiUrl, axios),
       menu: new V1alpha1MenuApi(undefined, apiUrl, axios),
       menuItem: new V1alpha1MenuItemApi(undefined, apiUrl, axios),
+      post: new ContentHaloRunV1alpha1PostApi(undefined, apiUrl, axios),
+      category: new ContentHaloRunV1alpha1CategoryApi(undefined, apiUrl, axios),
+      tag: new ContentHaloRunV1alpha1TagApi(undefined, apiUrl, axios),
+      snapshot: new ContentHaloRunV1alpha1SnapshotApi(undefined, apiUrl, axios),
+      comment: new ContentHaloRunV1alpha1CommentApi(undefined, apiUrl, axios),
+      reply: new ContentHaloRunV1alpha1ReplyApi(undefined, apiUrl, axios),
     },
+    // custom endpoints
     user: new ApiHaloRunV1alpha1UserApi(undefined, apiUrl, axios),
     plugin: new ApiHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
     theme: new ApiHaloRunV1alpha1ThemeApi(undefined, apiUrl, axios),
+    post: new ApiHaloRunV1alpha1PostApi(undefined, apiUrl, axios),
+    content: new ApiHaloRunV1alpha1ContentApi(undefined, apiUrl, axios),
   };
 }
 

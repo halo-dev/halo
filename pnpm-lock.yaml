@@ -12,9 +12,8 @@ importers:
       '@formkit/inputs': 1.0.0-beta.10
       '@formkit/themes': 1.0.0-beta.10
       '@formkit/vue': 1.0.0-beta.10
-      '@halo-dev/admin-api': ^1.1.0
       '@halo-dev/admin-shared': workspace:*
-      '@halo-dev/api-client': ^0.0.10
+      '@halo-dev/api-client': ^0.0.12
       '@halo-dev/components': workspace:*
       '@halo-dev/richtext-editor': 0.0.0-alpha.3
       '@rushstack/eslint-patch': ^1.1.4
@@ -39,7 +38,9 @@ importers:
       autoprefixer: ^10.4.8
       axios: ^0.27.2
       c8: ^7.12.0
+      colorjs.io: ^0.4.0
       cypress: ^9.7.0
+      dayjs: ^1.11.5
       eslint: ^8.22.0
       eslint-plugin-cypress: ^2.12.1
       eslint-plugin-vue: ^9.3.0
@@ -85,15 +86,16 @@ importers:
       '@formkit/inputs': 1.0.0-beta.10
       '@formkit/themes': 1.0.0-beta.10_tailwindcss@3.1.8
       '@formkit/vue': 1.0.0-beta.10_wwmyxdjqen5bmh3tr2meig5lki
-      '@halo-dev/admin-api': 1.1.0
       '@halo-dev/admin-shared': link:packages/shared
-      '@halo-dev/api-client': 0.0.10
+      '@halo-dev/api-client': 0.0.12
       '@halo-dev/components': link:packages/components
       '@halo-dev/richtext-editor': 0.0.0-alpha.3_vue@3.2.37
       '@vueuse/components': 8.9.4_vue@3.2.37
       '@vueuse/core': 8.9.4_vue@3.2.37
       '@vueuse/router': 9.1.0_26a4nhf5pwzjzqc5ckt7ohj5zi
       axios: 0.27.2
+      colorjs.io: 0.4.0
+      dayjs: 1.11.5
       filepond: 4.30.4
       filepond-plugin-image-preview: 4.6.11_filepond@4.30.4
       floating-vue: 2.0.0-beta.19_vue@3.2.37
@@ -182,12 +184,12 @@ importers:
 
   packages/shared:
     specifiers:
-      '@halo-dev/api-client': ^0.0.10
+      '@halo-dev/api-client': ^0.0.12
       '@halo-dev/components': workspace:*
       axios: ^0.27.2
       vite-plugin-dts: ^1.4.1
     dependencies:
-      '@halo-dev/api-client': 0.0.10
+      '@halo-dev/api-client': 0.0.12
       '@halo-dev/components': link:../components
       axios: 0.27.2
     devDependencies:
@@ -2109,39 +2111,8 @@ packages:
       - windicss
     dev: false
 
-  /@halo-dev/admin-api/1.1.0:
-    resolution: {integrity: sha512-2K8ulSucPudWfBo8SWz92hLtlu8C7hVVfYNejlns0BZfMxFyivvGyTgeYiMYHgNR5n4K6tF903Zn1DkS7jnv0g==}
-    engines: {node: '>=12'}
-    dependencies:
-      '@halo-dev/rest-api-client': 1.1.0
-      tslib: 2.4.0
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
-  /@halo-dev/api-client/0.0.10:
-    resolution: {integrity: sha512-DKQKkEAKMR/rbopI6jbjbzLiYUZeY6dOcgqGoDGG8MAcwkWOI6iWaZnuR5z+X8vd51XjiPhnekAphfcO6PaWEQ==}
-    dev: false
-
-  /@halo-dev/logger/1.1.0:
-    resolution: {integrity: sha512-y0jVivYwF8MCVi/OdW2D0LN+GTM5rzMsR/ZmQVfgmKQw7Q7Q+EXPijxON6iCMZnWANGa4NaAcOO9k3ggG8oRwg==}
-    engines: {node: '>=12.0.0'}
-    dependencies:
-      tslib: 2.4.0
-    dev: false
-
-  /@halo-dev/rest-api-client/1.1.0:
-    resolution: {integrity: sha512-zoAzaswdgBpkAw8A6zs4N+n03sSwF/YKnLnj9p7PNQoiix1Z1GK+Tc/WV59A+wRB9Xw5W3JZhzvuaOPOe7RpEw==}
-    engines: {node: '>=12'}
-    dependencies:
-      '@halo-dev/logger': 1.1.0
-      axios: 0.24.0
-      form-data: 4.0.0
-      js-base64: 3.7.2
-      qs: 6.11.0
-      tslib: 2.4.0
-    transitivePeerDependencies:
-      - debug
+  /@halo-dev/api-client/0.0.12:
+    resolution: {integrity: sha512-fOI3DB9rOA1Z+h1aKiEQ+2kWkNSmdWIDvd+39dR5b3X0DmKH+zWrNmygA5Qe2gBPX28TNt/zr2qCKUjGjb99CA==}
     dev: false
 
   /@halo-dev/richtext-editor/0.0.0-alpha.3_vue@3.2.37:
@@ -3950,14 +3921,6 @@ packages:
       - debug
     dev: true
 
-  /axios/0.24.0:
-    resolution: {integrity: sha512-Q6cWsys88HoPgAaFAVUb0WpPk0O8iTeisR9IMqy9G8AbO4NlpVknrnQS03zzF9PGAWgO3cgletO3VjV/P7VztA==}
-    dependencies:
-      follow-redirects: 1.14.9
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /axios/0.27.2:
     resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
     dependencies:
@@ -4379,6 +4342,10 @@ packages:
     resolution: {integrity: sha512-hUewv7oMjCp+wkBv5Rm0v87eJhq4woh5rSR+42YSQJKecCqgIqNkZ6lAlQms/BwHPJA5NKMRlpxPRv0n8HQW6g==}
     dev: true
 
+  /colorjs.io/0.4.0:
+    resolution: {integrity: sha512-AUKG9GCDSHsFRUnxGrEMCm6nq6lxddnDvD0avmsy/klCEk68htpqgl9IERGtGoxaGJlr7uP5wmD381gY2uG8hw==}
+    dev: false
+
   /colors/1.2.5:
     resolution: {integrity: sha512-erNRLao/Y3Fv54qUa0LBB+//Uf3YwMUmdJinN20yMXm9zdKKqH9wt7R9IIVZ+K7ShzfpLV/Zg8+VyrBJYB4lpg==}
     engines: {node: '>=0.1.90'}
@@ -4579,7 +4546,7 @@ packages:
       cli-table3: 0.6.1
       commander: 5.1.0
       common-tags: 1.8.2
-      dayjs: 1.11.3
+      dayjs: 1.11.5
       debug: 4.3.4_supports-color@8.1.1
       enquirer: 2.3.6
       eventemitter2: 6.4.5
@@ -4623,9 +4590,8 @@ packages:
       whatwg-url: 11.0.0
     dev: true
 
-  /dayjs/1.11.3:
-    resolution: {integrity: sha512-xxwlswWOlGhzgQ4TKzASQkUhqERI3egRNqgV4ScR8wlANA/A9tZ7miXa44vTTKEq5l7vWoL5G57bG3zA+Kow0A==}
-    dev: true
+  /dayjs/1.11.5:
+    resolution: {integrity: sha512-CAdX5Q3YW3Gclyo5Vpqkgpj8fSdLQcRuzfX6mC6Phy0nfJ0eGYOeS7m4mt2plDWLAtA4TqTakvbboHvUxfe4iA==}
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -6460,10 +6426,6 @@ packages:
       '@sideway/formula': 3.0.0
       '@sideway/pinpoint': 2.0.0
     dev: true
-
-  /js-base64/3.7.2:
-    resolution: {integrity: sha512-NnRs6dsyqUXejqk/yv2aiXlAvOs56sLkX6nUdeaNezI5LFFLlsZjOThmwnrcwh5ZZRwZlCMnVAY3CvhIhoVEKQ==}
-    dev: false
 
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -8560,6 +8522,7 @@ packages:
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
+    dev: true
 
   /tsutils/3.21.0_typescript@4.7.4:
     resolution: {integrity: sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==}

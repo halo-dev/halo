@@ -2,14 +2,14 @@ const textClassification = {
   label: "block font-bold text-sm formkit-invalid:text-red-500 w-56",
   wrapper: "flex flex-col sm:flex-row items-start sm:items-center",
   inner:
-    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 rounded-base overflow-hidden focus-within:border-primary mt-2 sm:mt-0",
+    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary mt-2 sm:mt-0",
   input:
     "outline-0 bg-white antialiased resize-none w-full text-black block transition-all appearance-none h-9 px-3 text-sm",
 };
 
 const boxClassification = {
   fieldset:
-    "border border-gray-300 rounded-base px-2 pb-1 focus-within:border-primary",
+    "border border-gray-300 rounded-base px-2 py-2 focus-within:border-primary",
   legend: "font-bold text-sm",
   wrapper: "flex items-center mb-1 cursor-pointer",
   help: "mb-2",

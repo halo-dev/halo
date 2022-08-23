@@ -14,6 +14,7 @@ import IconUserSettings from "~icons/ri/user-settings-line";
 import IconSettings from "~icons/ri/settings-4-line";
 import IconPlug from "~icons/ri/plug-2-line";
 import IconEye from "~icons/ri/eye-line";
+import IconEyeOff from "~icons/ri/eye-off-line";
 import IconFolder from "~icons/ri/folder-2-line";
 import IconMore from "~icons/ri/more-line";
 import IconClose from "~icons/ri/close-line";
@@ -41,6 +42,7 @@ import IconStopCircle from "~icons/ri/stop-circle-line";
 import IconForbidLine from "~icons/ri/forbid-line";
 import IconCodeBoxLine from "~icons/ri/code-box-line";
 import IconDatabase2Line from "~icons/ri/database-2-line";
+import IconTeam from "~icons/ri/team-fill";
 
 export {
   IconDashboard,
@@ -57,6 +59,7 @@ export {
   IconSettings,
   IconPlug,
   IconEye,
+  IconEyeOff,
   IconFolder,
   IconMore,
   IconClose,
@@ -86,4 +89,5 @@ export {
   IconForbidLine,
   IconCodeBoxLine,
   IconDatabase2Line,
+  IconTeam,
 };

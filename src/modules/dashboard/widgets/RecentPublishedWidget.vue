@@ -1,6 +1,22 @@
 <script lang="ts" name="RecentPublishedWidget" setup>
 import { VCard, VSpace } from "@halo-dev/components";
-import { posts } from "@/modules/contents/posts/posts-mock";
+import { onMounted, ref } from "vue";
+import type { Post } from "@halo-dev/api-client";
+import { apiClient } from "@halo-dev/admin-shared";
+
+const posts = ref<Post[]>([] as Post[]);
+
+const handleFetchPosts = async () => {
+  try {
+    const { data } =
+      await apiClient.extension.post.listcontentHaloRunV1alpha1Post();
+    posts.value = data.items;
+  } catch (e) {
+    console.error("Failed to fetch posts", e);
+  }
+};
+
+onMounted(handleFetchPosts);
 </script>
 <template>
   <VCard
@@ -18,23 +34,19 @@ import { posts } from "@/modules/contents/posts/posts-mock";
           <div class="flex items-center space-x-4">
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium text-gray-900">
-                {{ post.title }}
+                {{ post.spec.title }}
               </p>
               <div class="mt-1 flex">
                 <VSpace>
-                  <span class="text-xs text-gray-500">
-                    阅读 {{ post.visits }}
-                  </span>
-                  <span class="text-xs text-gray-500">
-                    评论 {{ post.commentCount }}
-                  </span>
+                  <span class="text-xs text-gray-500"> 阅读 0 </span>
+                  <span class="text-xs text-gray-500"> 评论 0 </span>
                 </VSpace>
               </div>
             </div>
 
             <div>
-              <time class="text-sm text-gray-500" datetime="2020-01-07 20:00">
-                2020-01-07 20:00
+              <time class="text-sm text-gray-500">
+                {{ post.metadata.creationTimestamp }}
               </time>
             </div>
           </div>
