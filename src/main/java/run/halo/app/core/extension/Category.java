@@ -1,5 +1,6 @@
 package run.halo.app.core.extension;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -45,6 +46,14 @@ public class Category extends AbstractExtension {
         private Integer priority;
 
         private List<String> children;
+    }
+
+    @JsonIgnore
+    public CategoryStatus getStatusOrDefault() {
+        if (this.status == null) {
+            this.status = new CategoryStatus();
+        }
+        return this.status;
     }
 
     @Data

@@ -1,5 +1,6 @@
 package run.halo.app.core.extension;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -54,6 +55,15 @@ public class Tag extends AbstractExtension {
 
         private String cover;
     }
+
+    @JsonIgnore
+    public TagStatus getStatusOrDefault() {
+        if (this.status == null) {
+            this.status = new TagStatus();
+        }
+        return this.status;
+    }
+
 
     @Data
     public static class TagStatus {
