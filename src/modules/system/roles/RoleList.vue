@@ -95,11 +95,13 @@ onMounted(() => {
                     <div class="w-52 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">正常</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">已禁用</span>
@@ -121,11 +123,13 @@ onMounted(() => {
                     <div class="w-52 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">系统保留</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">自定义</span>
@@ -147,11 +151,13 @@ onMounted(() => {
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">更高权限</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">更低权限</span>

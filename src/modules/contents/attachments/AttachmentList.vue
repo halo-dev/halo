@@ -156,16 +156,19 @@ const folders = [
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">本地</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">阿里云 OSS</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">Amazon S3</span>
@@ -197,6 +200,7 @@ const folders = [
                               <li
                                 v-for="(user, index) in users"
                                 :key="index"
+                                v-close-popper
                                 class="cursor-pointer py-4 hover:bg-gray-50"
                               >
                                 <div class="flex items-center space-x-4">
@@ -246,11 +250,13 @@ const folders = [
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">未被引用</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">文章</span>
@@ -280,21 +286,25 @@ const folders = [
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">较近上传</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">较晚上传</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">文件大小降序</span>
                             </li>
                             <li
+                              v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                             >
                               <span class="truncate">文件大小升序</span>

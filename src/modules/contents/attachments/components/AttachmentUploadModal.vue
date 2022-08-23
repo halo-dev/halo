@@ -66,6 +66,7 @@ const onVisibleChange = (visible: boolean) => {
               <li
                 v-for="(strategy, index) in strategies"
                 :key="index"
+                v-close-popper
                 class="flex cursor-pointer flex-col rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               >
                 <span class="truncate">

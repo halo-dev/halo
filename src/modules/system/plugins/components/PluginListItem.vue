@@ -120,7 +120,12 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
               <template #popper>
                 <div class="w-48 p-2">
                   <VSpace class="w-full" direction="column">
-                    <VButton block type="danger" @click="uninstall">
+                    <VButton
+                      v-close-popper
+                      block
+                      type="danger"
+                      @click="uninstall"
+                    >
                       卸载
                     </VButton>
                   </VSpace>

@@ -110,11 +110,13 @@ onMounted(handleFetchPlugins);
                     <div class="w-52 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">已启用</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">未启用</span>
@@ -199,11 +201,13 @@ onMounted(handleFetchPlugins);
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">较近安装</span>
                         </li>
                         <li
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                         >
                           <span class="truncate">较晚安装</span>

@@ -187,6 +187,7 @@ useExtensionPointsState("PAGES", pagesPublicState);
                               <li
                                 v-for="(user, index) in users"
                                 :key="index"
+                                v-close-popper
                                 class="cursor-pointer py-4 hover:bg-gray-50"
                               >
                                 <div class="flex items-center space-x-4">
