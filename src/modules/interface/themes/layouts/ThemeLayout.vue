@@ -181,9 +181,7 @@ watch(
       >
         <template #actions>
           <VSpace>
-            <VButton @click="themesModal = true">
-              安装主题
-            </VButton>
+            <VButton @click="themesModal = true"> 安装主题 </VButton>
             <VButton type="primary" @click="themesModal = true">
               <template #icon>
                 <IconExchange class="h-full w-full" />

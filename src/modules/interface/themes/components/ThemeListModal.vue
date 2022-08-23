@@ -109,7 +109,7 @@ defineExpose({
             <template #icon>
               <IconAddCircle class="h-full w-full" />
             </template>
-            新增菜单项
+            安装主题
           </VButton>
         </VSpace>
       </template>
