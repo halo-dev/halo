@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+  IconAddCircle,
   IconArrowDown,
   IconCheckboxFill,
   IconDatabase2Line,
@@ -336,21 +337,38 @@ const folders = [
           <div v-if="viewType === 'grid'">
             <div class="mb-5 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-6">
               <div
-                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-600 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+                class="flex cursor-pointer items-center rounded-base bg-gray-200 p-2 text-gray-900 transition-all"
               >
                 <div class="flex flex-1 items-center">
-                  <span class="text-sm">全部</span>
+                  <span class="text-sm">全部（212）</span>
+                </div>
+              </div>
+              <div
+                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+              >
+                <div class="flex flex-1 items-center">
+                  <span class="text-sm">未分组（18）</span>
                 </div>
               </div>
               <div
                 v-for="(folder, index) in folders"
                 :key="index"
-                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-600 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
               >
                 <div class="flex flex-1 items-center">
-                  <span class="text-sm">{{ folder.name }}</span>
+                  <span class="text-sm">
+                    {{ folder.name }}（{{ index * 20 }}）
+                  </span>
                 </div>
                 <IconMore />
+              </div>
+              <div
+                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+              >
+                <div class="flex flex-1 items-center">
+                  <span class="text-sm">添加分组</span>
+                </div>
+                <IconAddCircle />
               </div>
             </div>
             <div
