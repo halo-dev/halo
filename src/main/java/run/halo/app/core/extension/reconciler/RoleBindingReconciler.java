@@ -15,10 +15,11 @@ import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Slf4j
-public class RoleBindingReconciler implements Reconciler {
+public class RoleBindingReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
 

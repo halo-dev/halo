@@ -2,13 +2,13 @@ package run.halo.app.extension.controller;
 
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.Disposable;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Watcher;
+import run.halo.app.extension.controller.Reconciler.Request;
 
 @Slf4j
-public class RequestSynchronizer implements Disposable {
+public class RequestSynchronizer implements Synchronizer<Request> {
 
     private final ExtensionClient client;
 
@@ -39,6 +39,7 @@ public class RequestSynchronizer implements Disposable {
         this.listPredicate = listPredicate;
     }
 
+    @Override
     public void start() {
         if (isDisposed() || started) {
             return;

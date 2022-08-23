@@ -70,7 +70,8 @@ class MetadataOperatorTest {
         when(mockMetadata.getVersion()).thenReturn(123L);
         when(mockMetadata.getCreationTimestamp()).thenReturn(now);
         when(mockMetadata.getDeletionTimestamp()).thenReturn(now);
-        when(mockMetadata.getFinalizers()).thenReturn(Set.of("fake-finalizer-1", "fake-finalizer-2"));
+        when(mockMetadata.getFinalizers())
+            .thenReturn(Set.of("fake-finalizer-1", "fake-finalizer-2"));
 
         var metadata = createFullMetadata();
         assertTrue(metadataDeepEquals(metadata, mockMetadata));

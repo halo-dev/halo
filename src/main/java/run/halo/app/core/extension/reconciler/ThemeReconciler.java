@@ -8,6 +8,7 @@ import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.exception.ThemeUninstallException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.theme.ThemePathPolicy;
@@ -18,7 +19,7 @@ import run.halo.app.theme.ThemePathPolicy;
  * @author guqing
  * @since 2.0.0
  */
-public class ThemeReconciler implements Reconciler {
+public class ThemeReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
     private final ThemePathPolicy themePathPolicy;

@@ -15,6 +15,7 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
@@ -31,7 +32,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.0.0
  */
-public class PostReconciler implements Reconciler {
+public class PostReconciler implements Reconciler<Request> {
     public static final String PERMALINK_PREFIX = "/permalink/posts/";
     private final ExtensionClient client;
     private final ContentService contentService;
