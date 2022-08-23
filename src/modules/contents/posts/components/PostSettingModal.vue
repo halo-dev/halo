@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import type { PostRequest } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
@@ -48,12 +48,10 @@ const props = withDefaults(
   defineProps<{
     visible: boolean;
     post?: PostRequest | null;
-    onlyEmit?: boolean;
   }>(),
   {
     visible: false,
     post: null,
-    onlyEmit: false,
   }
 );
 
@@ -100,11 +98,7 @@ const handleVisibleChange = (visible: boolean) => {
   }
 };
 
-const handleSaveOnly = async () => {
-  if (props.onlyEmit) {
-    emit("saved", formState.value);
-    return;
-  }
+const handleSave = async () => {
   try {
     saving.value = true;
     if (isUpdateMode.value) {
@@ -129,13 +123,24 @@ const handleSaveOnly = async () => {
 const handlePublish = async () => {
   try {
     publishing.value = true;
+
+    // Save post
+    await handleSave();
+
+    // Get latest version post
+    const { data: latestData } =
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
+        formState.value.post.metadata.name
+      );
+    formState.value.post = latestData;
+
+    // Publish post
     const { data } = await apiClient.post.publishPost(
       formState.value.post.metadata.name
     );
     formState.value.post = data;
     emit("saved", formState.value);
   } catch (e) {
-    alert(`发布异常: ${e}`);
     console.error("Failed to publish post", e);
   } finally {
     publishing.value = false;
@@ -145,15 +150,22 @@ const handlePublish = async () => {
 const handlePublishCanceling = async () => {
   try {
     publishCanceling.value = true;
+
+    // Update published spec = false
     const postToUpdate = cloneDeep(formState.value);
     postToUpdate.post.spec.published = false;
-
-    const { data } = await apiClient.post.updateDraftPost(
+    await apiClient.post.updateDraftPost(
       postToUpdate.post.metadata.name,
       postToUpdate
     );
 
-    formState.value.post = data;
+    // Get latest version post
+    const { data: latestData } =
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
+        formState.value.post.metadata.name
+      );
+
+    formState.value.post = latestData;
     emit("saved", formState.value);
   } catch (e) {
     console.log("Failed to cancel publish", e);
@@ -161,18 +173,6 @@ const handlePublishCanceling = async () => {
     publishCanceling.value = false;
   }
 };
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible && props.post) {
-      formState.value = cloneDeep(props.post);
-    }
-    if (!visible) {
-      // TODO
-    }
-  }
-);
 
 watchEffect(() => {
   if (props.post) {
@@ -288,27 +288,7 @@ watchEffect(() => {
           ></FormKit>
         </FormKit>
       </VTabItem>
-      <VTabItem id="seo" label="SEO">
-        <FormKit id="seo" :actions="false" :preserve="true" type="form">
-          <FormKit
-            label="自定义关键词"
-            name="metaKeywords"
-            type="textarea"
-          ></FormKit>
-          <FormKit
-            label="自定义描述"
-            name="metaDescription"
-            type="textarea"
-          ></FormKit>
-        </FormKit>
-      </VTabItem>
-      <VTabItem id="metas" label="元数据"></VTabItem>
-      <VTabItem id="inject-code" label="代码注入">
-        <FormKit id="inject-code" :actions="false" :preserve="true" type="form">
-          <FormKit label="CSS" type="textarea"></FormKit>
-          <FormKit label="JavaScript" type="textarea"></FormKit>
-        </FormKit>
-      </VTabItem>
+      <!--TODO: add SEO/Metas/Inject Code form-->
     </VTabs>
 
     <template #footer>
@@ -323,7 +303,6 @@ watchEffect(() => {
         </VButton>
         <VButton
           v-else
-          :disabled="!isUpdateMode"
           :loading="publishing"
           type="secondary"
           @click="handlePublish"
@@ -334,7 +313,7 @@ watchEffect(() => {
           :loading="saving"
           size="sm"
           type="secondary"
-          @click="handleSaveOnly"
+          @click="handleSave"
         >
           仅保存
         </VButton>

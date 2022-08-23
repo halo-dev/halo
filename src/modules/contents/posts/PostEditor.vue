@@ -14,8 +14,6 @@ import { apiClient } from "@halo-dev/admin-shared";
 import { useRouteQuery } from "@vueuse/router";
 import { v4 as uuid } from "uuid";
 
-const name = useRouteQuery("name");
-
 const initialFormState: PostRequest = {
   post: {
     spec: {
@@ -60,10 +58,13 @@ const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
 });
 
-const handleSavePost = async () => {
+const handleSave = async () => {
   try {
     saving.value = true;
+
+    // Set rendered content
     formState.value.content.content = formState.value.content.raw;
+
     if (isUpdateMode.value) {
       const { data } = await apiClient.post.updateDraftPost(
         formState.value.post.metadata.name,
@@ -75,20 +76,38 @@ const handleSavePost = async () => {
       formState.value.post = data;
       name.value = data.metadata.name;
     }
+
+    await handleFetchContent();
   } catch (e) {
-    alert(`保存异常: ${e}`);
     console.error("Failed to save post", e);
   } finally {
     saving.value = false;
   }
 };
 
-const onSettingSaved = (post: PostRequest) => {
-  formState.value = post;
-  settingModal.value = false;
-  handleSavePost();
+const handleFetchContent = async () => {
+  if (!formState.value.post.spec.headSnapshot) {
+    return;
+  }
+  const { data } = await apiClient.content.obtainSnapshotContent(
+    formState.value.post.spec.headSnapshot
+  );
+
+  formState.value.content = data;
 };
 
+const onSettingSaved = (post: PostRequest) => {
+  // Set route query parameter
+  if (!isUpdateMode.value) {
+    name.value = post.post.metadata.name;
+  }
+
+  formState.value = post;
+  settingModal.value = false;
+};
+
+// Get post data when the route contains the name parameter
+const name = useRouteQuery("name");
 onMounted(async () => {
   if (name.value) {
     // fetch post
@@ -98,12 +117,8 @@ onMounted(async () => {
       );
     formState.value.post = post;
 
-    if (formState.value.post.spec.headSnapshot) {
-      const { data: content } = await apiClient.content.obtainSnapshotContent(
-        formState.value.post.spec.headSnapshot
-      );
-      formState.value.content = content;
-    }
+    // fetch post content
+    await handleFetchContent();
   }
 });
 </script>
@@ -111,7 +126,6 @@ onMounted(async () => {
 <template>
   <PostSettingModal
     v-model:visible="settingModal"
-    :only-emit="true"
     :post="formState"
     @saved="onSettingSaved"
   />
@@ -121,12 +135,7 @@ onMounted(async () => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton
-          :loading="saving"
-          size="sm"
-          type="default"
-          @click="handleSavePost"
-        >
+        <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           保存
         </VButton>
         <VButton type="secondary" @click="settingModal = true">

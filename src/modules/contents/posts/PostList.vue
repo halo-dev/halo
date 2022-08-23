@@ -101,13 +101,17 @@ const handlePaginationChange = ({
   handleFetchPosts();
 };
 
-const handleOpenSettingModal = (post: Post) => {
-  selectedPost.value = post;
+const handleOpenSettingModal = async (post: Post) => {
+  const { data } = await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
+    post.metadata.name
+  );
+  selectedPost.value = data;
   settingModal.value = true;
 };
 
 const onSettingModalClose = () => {
   selectedPost.value = null;
+  selectedPostWithContent.value = null;
   handleFetchPosts();
 };
 
@@ -117,7 +121,11 @@ const handleSelectPrevious = async () => {
     (post) => post.post.metadata.name === selectedPost.value?.metadata.name
   );
   if (index > 0) {
-    selectedPost.value = items[index - 1].post;
+    const { data } =
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
+        items[index - 1].post.metadata.name
+      );
+    selectedPost.value = data;
     return;
   }
   if (index === 0 && hasPrevious) {
@@ -133,7 +141,11 @@ const handleSelectNext = async () => {
     (post) => post.post.metadata.name === selectedPost.value?.metadata.name
   );
   if (index < items.length - 1) {
-    selectedPost.value = items[index + 1].post;
+    const { data } =
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
+        items[index + 1].post.metadata.name
+      );
+    selectedPost.value = data;
     return;
   }
   if (index === items.length - 1 && hasNext) {
@@ -625,7 +637,7 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
         <template #actions>
           <VSpace>
             <VButton @click="handleFetchPosts">刷新</VButton>
-            <VButton type="primary" :route="{ name: 'PostEditor' }">
+            <VButton :route="{ name: 'PostEditor' }" type="primary">
               <template #icon>
                 <IconAddCircle class="h-full w-full" />
               </template>

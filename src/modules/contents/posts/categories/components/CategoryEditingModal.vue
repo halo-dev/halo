@@ -88,6 +88,12 @@ const onVisibleChange = (visible: boolean) => {
   }
 };
 
+const handleResetForm = () => {
+  formState.value = cloneDeep(initialFormState);
+  formState.value.metadata.name = uuid();
+  reset("category-form");
+};
+
 const { Command_Enter } = useMagicKeys();
 
 watchEffect(() => {
@@ -99,13 +105,20 @@ watchEffect(() => {
 watch(
   () => props.visible,
   (visible) => {
-    if (visible && props.category) {
-      formState.value = cloneDeep(props.category);
-      return;
+    if (!visible) {
+      handleResetForm();
     }
-    formState.value = cloneDeep(initialFormState);
-    reset("category-form");
-    formState.value.metadata.name = uuid();
+  }
+);
+
+watch(
+  () => props.category,
+  (category) => {
+    if (category) {
+      formState.value = cloneDeep(category);
+    } else {
+      handleResetForm();
+    }
   }
 );
 </script>
