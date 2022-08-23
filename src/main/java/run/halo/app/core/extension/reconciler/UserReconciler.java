@@ -3,9 +3,10 @@ package run.halo.app.core.extension.reconciler;
 import lombok.extern.slf4j.Slf4j;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.Reconciler.Request;
 
 @Slf4j
-public class UserReconciler implements Reconciler {
+public class UserReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
 

@@ -52,13 +52,7 @@ class YamlPluginFinderTest {
         assertThat(plugin).isNotNull();
         JSONAssert.assertEquals("""
                 {
-                    "phase": "RESOLVED",
-                    "reason": null,
-                    "message": null,
-                    "lastStartTime": null,
-                    "lastTransitionTime": null,
-                    "entry": null,
-                    "stylesheet": null
+                    "phase": "RESOLVED"
                 }
                 """,
             JsonUtils.objectToJson(plugin.getStatus()),
@@ -92,26 +86,16 @@ class YamlPluginFinderTest {
                         "description": "Tell me more about this plugin.",
                         "license": [
                             {
-                                "name": "MIT",
-                                "url": null
+                                "name": "MIT"
                             }
                         ],
                         "requires": ">=2.0.0",
-                        "pluginClass": null,
-                        "enabled": false,
-                        settingName: null,
-                        configMapName: null
+                        "enabled": false
                     },
-                    "status": null,
                     "apiVersion": "plugin.halo.run/v1alpha1",
                     "kind": "Plugin",
                     "metadata": {
-                        "name": "plugin-1",
-                        "labels": null,
-                        "annotations": null,
-                        "version": null,
-                        "creationTimestamp": null,
-                        "deletionTimestamp": null
+                        "name": "plugin-1"
                     }
                 }
                   """,

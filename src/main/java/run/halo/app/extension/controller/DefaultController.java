@@ -11,15 +11,15 @@ import org.springframework.util.StopWatch;
 import run.halo.app.extension.controller.RequestQueue.DelayedEntry;
 
 @Slf4j
-class DefaultController implements Controller {
+public class DefaultController<R> implements Controller {
 
     private final String name;
 
-    private final Reconciler reconciler;
+    private final Reconciler<R> reconciler;
 
     private final Supplier<Instant> nowSupplier;
 
-    private final RequestQueue queue;
+    private final RequestQueue<R> queue;
 
     private volatile boolean disposed = false;
 
@@ -27,25 +27,25 @@ class DefaultController implements Controller {
 
     private final ExecutorService executor;
 
-    private final RequestSynchronizer synchronizer;
+    private final Synchronizer<R> synchronizer;
 
     private final Duration minDelay;
 
     private final Duration maxDelay;
 
     public DefaultController(String name,
-        Reconciler reconciler,
-        RequestQueue queue,
-        RequestSynchronizer synchronizer,
+        Reconciler<R> reconciler,
+        RequestQueue<R> queue,
+        Synchronizer<R> synchronizer,
         Duration minDelay,
         Duration maxDelay) {
         this(name, reconciler, queue, synchronizer, Instant::now, minDelay, maxDelay);
     }
 
     public DefaultController(String name,
-        Reconciler reconciler,
-        RequestQueue queue,
-        RequestSynchronizer synchronizer,
+        Reconciler<R> reconciler,
+        RequestQueue<R> queue,
+        Synchronizer<R> synchronizer,
         Supplier<Instant> nowSupplier,
         Duration minDelay,
         Duration maxDelay,
@@ -61,9 +61,9 @@ class DefaultController implements Controller {
     }
 
     public DefaultController(String name,
-        Reconciler reconciler,
-        RequestQueue queue,
-        RequestSynchronizer synchronizer,
+        Reconciler<R> reconciler,
+        RequestQueue<R> queue,
+        Synchronizer<R> synchronizer,
         Supplier<Instant> nowSupplier,
         Duration minDelay,
         Duration maxDelay) {
@@ -97,7 +97,7 @@ class DefaultController implements Controller {
                 Reconciler.Result result;
                 try {
                     log.debug("Reconciling request {} at {}", entry.getEntry(), nowSupplier.get());
-                    StopWatch watch = new StopWatch("Reconcile: " + entry.getEntry().name());
+                    StopWatch watch = new StopWatch("Reconcile: " + entry.getEntry());
                     watch.start("reconciliation");
                     result = this.reconciler.reconcile(entry.getEntry());
                     watch.stop();
@@ -110,6 +110,9 @@ class DefaultController implements Controller {
                     result = new Reconciler.Result(true, null);
                 } finally {
                     queue.done(entry.getEntry());
+                }
+                if (result == null) {
+                    result = new Reconciler.Result(false, null);
                 }
                 if (!result.reEnqueue()) {
                     continue;

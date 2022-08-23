@@ -13,6 +13,7 @@ import org.pf4j.PluginWrapper;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginStartingError;
@@ -26,7 +27,7 @@ import run.halo.app.plugin.resources.ReverseProxyRouterFunctionFactory;
  * @since 2.0.0
  */
 @Slf4j
-public class PluginReconciler implements Reconciler {
+public class PluginReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
     private final HaloPluginManager haloPluginManager;

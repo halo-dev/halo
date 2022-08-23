@@ -8,6 +8,7 @@ import static run.halo.app.extension.MetadataOperator.metadataDeepEquals;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class MetadataOperatorTest {
@@ -53,6 +54,11 @@ class MetadataOperatorTest {
         assertFalse(metadataDeepEquals(left, right));
         right.setName(null);
         assertTrue(metadataDeepEquals(left, right));
+
+        left.setFinalizers(null);
+        assertFalse(metadataDeepEquals(left, right));
+        right.setFinalizers(null);
+        assertTrue(metadataDeepEquals(left, right));
     }
 
     @Test
@@ -64,6 +70,8 @@ class MetadataOperatorTest {
         when(mockMetadata.getVersion()).thenReturn(123L);
         when(mockMetadata.getCreationTimestamp()).thenReturn(now);
         when(mockMetadata.getDeletionTimestamp()).thenReturn(now);
+        when(mockMetadata.getFinalizers())
+            .thenReturn(Set.of("fake-finalizer-1", "fake-finalizer-2"));
 
         var metadata = createFullMetadata();
         assertTrue(metadataDeepEquals(metadata, mockMetadata));
@@ -77,6 +85,7 @@ class MetadataOperatorTest {
         metadata.setVersion(123L);
         metadata.setCreationTimestamp(now);
         metadata.setDeletionTimestamp(now);
+        metadata.setFinalizers(Set.of("fake-finalizer-2", "fake-finalizer-1"));
         return metadata;
     }
 }

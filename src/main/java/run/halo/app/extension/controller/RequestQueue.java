@@ -1,7 +1,5 @@
 package run.halo.app.extension.controller;
 
-import static run.halo.app.extension.controller.Reconciler.Request;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
@@ -10,15 +8,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import reactor.core.Disposable;
 
-public interface RequestQueue extends Disposable {
+public interface RequestQueue<E> extends Disposable {
 
-    boolean addImmediately(Request request);
+    boolean addImmediately(E request);
 
-    boolean add(DelayedEntry<Request> entry);
+    boolean add(DelayedEntry<E> entry);
 
-    DelayedEntry<Request> take() throws InterruptedException;
+    DelayedEntry<E> take() throws InterruptedException;
 
-    void done(Request request);
+    void done(E request);
 
     class DelayedEntry<E> implements Delayed {
 

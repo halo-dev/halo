@@ -90,12 +90,7 @@ class SettingTest {
                     "apiVersion": "v1alpha1",
                     "kind": "Setting",
                     "metadata": {
-                        "name": "setting-name",
-                        "labels": null,
-                        "annotations": null,
-                        "version": null,
-                        "creationTimestamp": null,
-                        "deletionTimestamp": null
+                        "name": "setting-name"
                     }
                 }
                 """,
