@@ -32,6 +32,7 @@ public class DefaultDelayQueue<R>
 
     @Override
     public boolean addImmediately(R request) {
+        log.debug("Adding request {} immediately", request);
         var delayedEntry = new DelayedEntry<>(request, minDelay, nowSupplier);
         return offer(delayedEntry);
     }

@@ -22,7 +22,7 @@ public class GarbageCollectorConfiguration {
         ExtensionConverter converter,
         SchemeManager schemeManager) {
         var reconciler = new GcReconciler(client, storeClient, converter);
-        var queue = new DefaultDelayQueue<GcRequest>(Instant::now);
+        var queue = new DefaultDelayQueue<GcRequest>(Instant::now, Duration.ofMillis(500));
         var synchronizer = new GcSynchronizer(client, queue, schemeManager);
         return new DefaultController<>(
             "garbage-collector-controller",

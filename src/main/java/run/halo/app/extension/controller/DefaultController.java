@@ -111,6 +111,9 @@ public class DefaultController<R> implements Controller {
                 } finally {
                     queue.done(entry.getEntry());
                 }
+                if (result == null) {
+                    result = new Reconciler.Result(false, null);
+                }
                 if (!result.reEnqueue()) {
                     continue;
                 }
