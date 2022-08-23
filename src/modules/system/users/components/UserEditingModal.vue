@@ -1,7 +1,10 @@
-<script lang="ts" name="UserEditingModal" setup>
-import { computed, onMounted, ref, watch } from "vue";
+<script lang="ts" setup>
+// core libs
+import { computed, ref, watch, watchEffect } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
-import type { Role, User } from "@halo-dev/api-client";
+import type { User } from "@halo-dev/api-client";
+
+// components
 import {
   IconCodeBoxLine,
   IconEye,
@@ -10,13 +13,20 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+
+// libs
 import { v4 as uuid } from "uuid";
-import { roleLabels } from "@/constants/labels";
-import { rbacAnnotations } from "@/constants/annotations";
 import YAML from "yaml";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
 import { reset, submitForm } from "@formkit/core";
+
+// constants
+import { rbacAnnotations } from "@/constants/annotations";
+
+// hooks
+import { useFetchRole } from "@/modules/system/roles/composables/use-role";
+import type { FormKitOptionsList } from "@formkit/inputs";
 
 const props = withDefaults(
   defineProps<{
@@ -64,7 +74,6 @@ const initialFormState: FormState = {
   raw: "",
 };
 
-const roles = ref<Role[]>([]);
 const formState = ref<FormState>(cloneDeep(initialFormState));
 const selectedRole = ref("");
 
@@ -80,48 +89,57 @@ const modalWidth = computed(() => {
   return formState.value.rawMode ? 800 : 700;
 });
 
-const basicRoles = computed(() => {
-  return roles.value.filter(
-    (role) => role.metadata?.labels?.[roleLabels.TEMPLATE] !== "true"
-  );
+const { roles } = useFetchRole();
+const rolesMap = computed<FormKitOptionsList>(() => {
+  return roles.value.map((role) => {
+    return {
+      label:
+        role.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+        role.metadata.name,
+      value: role.metadata?.name,
+    };
+  });
 });
 
 const { Command_Enter } = useMagicKeys();
 
-watch(props, (newVal) => {
-  let keyboardWatcher;
-  if (newVal.visible) {
-    keyboardWatcher = watch(Command_Enter, (v) => {
-      if (v) {
-        submitForm("user-form");
-      }
-    });
-  } else {
-    keyboardWatcher?.unwatch();
+watchEffect(() => {
+  if (Command_Enter.value && props.visible) {
+    submitForm("user-form");
   }
-
-  if (newVal.visible && props.user) {
-    formState.value.user = cloneDeep(props.user);
-    return;
-  }
-  formState.value = cloneDeep(initialFormState);
-  reset("user-form");
 });
 
-const handleFetchRoles = async () => {
-  try {
-    const { data } = await apiClient.extension.role.listv1alpha1Role();
-    roles.value = data.items;
-  } catch (e) {
-    console.error(e);
+watch(
+  () => props.visible,
+  (visible) => {
+    if (!visible) {
+      handleResetForm();
+    }
   }
-};
+);
 
-const handleVisibleChange = (visible: boolean) => {
+watch(
+  () => props.user,
+  (user) => {
+    if (user) {
+      formState.value.user = cloneDeep(user);
+    } else {
+      handleResetForm();
+    }
+  }
+);
+
+const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
   }
+};
+
+const handleResetForm = () => {
+  formState.value = cloneDeep(initialFormState);
+  formState.value.user.metadata.name = uuid();
+  reset("user-form");
 };
 
 const handleCreateUser = async () => {
@@ -149,7 +167,7 @@ const handleCreateUser = async () => {
       });
     }
 
-    handleVisibleChange(false);
+    onVisibleChange(false);
   } catch (e) {
     console.error(e);
   } finally {
@@ -166,15 +184,13 @@ const handleRawModeChange = () => {
     formState.value.user = YAML.parse(formState.value.raw);
   }
 };
-
-onMounted(handleFetchRoles);
 </script>
 <template>
   <VModal
     :title="creationModalTitle"
     :visible="visible"
     :width="modalWidth"
-    @update:visible="handleVisibleChange"
+    @update:visible="onVisibleChange"
   >
     <template #actions>
       <div class="modal-header-action" @click="handleRawModeChange">
@@ -213,14 +229,7 @@ onMounted(handleFetchRoles);
         ></FormKit>
         <FormKit
           v-model="selectedRole"
-          :options="
-          basicRoles.map((role:Role) => {
-            return {
-              label: role.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] || role.metadata.name,
-              value: role.metadata?.name,
-            };
-          })
-        "
+          :options="rolesMap"
           label="角色"
           type="select"
         ></FormKit>
@@ -250,7 +259,7 @@ onMounted(handleFetchRoles);
         >
           保存 ⌘ + ↵
         </VButton>
-        <VButton @click="handleVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>
   </VModal>

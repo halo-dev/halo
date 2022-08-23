@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+// core libs
+import { ref } from "vue";
+import type { Role } from "@halo-dev/api-client";
+
+// components
 import {
   IconAddCircle,
   IconArrowDown,
@@ -12,44 +17,34 @@ import {
   VTag,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
-import { onMounted, ref } from "vue";
-import type { Role } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
-import { roleLabels } from "@/constants/labels";
+
+// constants
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 
-const roles = ref<Role[]>([]);
+// hooks
+import { useFetchRole } from "@/modules/system/roles/composables/use-role";
+
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role | null>(null);
 
-const handleFetchRoles = async () => {
-  try {
-    const { data } = await apiClient.extension.role.listv1alpha1Role(0, 0, [
-      `!${roleLabels.TEMPLATE}`,
-    ]);
-    roles.value = data.items;
-  } catch (e) {
-    console.error(e);
-  } finally {
-    selectedRole.value = null;
-  }
-};
+const { roles, handleFetchRoles } = useFetchRole();
 
 const handleOpenEditingModal = (role: Role) => {
   selectedRole.value = role;
   editingModal.value = true;
 };
 
-onMounted(() => {
+const onEditingModalClose = () => {
+  selectedRole.value = null;
   handleFetchRoles();
-});
+};
 </script>
 <template>
   <RoleEditingModal
     v-model:visible="editingModal"
     :role="selectedRole"
-    @close="handleFetchRoles"
+    @close="onEditingModalClose"
   />
 
   <VPageHeader title="角色">

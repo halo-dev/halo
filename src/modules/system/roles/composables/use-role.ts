@@ -1,4 +1,5 @@
 import type { Role } from "@halo-dev/api-client";
+import type { ComputedRef, Ref } from "vue";
 import { computed, onMounted, ref } from "vue";
 import { roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -23,7 +24,65 @@ const initialFormState: Role = {
   rules: [],
 };
 
-export function useRoleForm() {
+interface useFetchRoleReturn {
+  roles: Ref<Role[]>;
+  loading: Ref<boolean>;
+  handleFetchRoles: () => void;
+}
+
+interface useRoleFormReturn {
+  formState: Ref<Role>;
+  initialFormState: Role;
+  saving: Ref<boolean>;
+  isUpdateMode: ComputedRef<boolean>;
+  handleCreateOrUpdate: () => void;
+}
+
+interface useRoleTemplateSelectionReturn {
+  selectedRoleTemplates: Ref<Set<string>>;
+  roleTemplates: Ref<Role[]>;
+  roleTemplateGroups: ComputedRef<RoleTemplateGroup[]>;
+  handleRoleTemplateSelect: (e: Event) => void;
+}
+
+/**
+ * Fetch all roles(without role templates) from the API.
+ *
+ * @returns {useFetchRoleReturn}
+ */
+export function useFetchRole(): useFetchRoleReturn {
+  const roles = ref<Role[]>([]);
+  const loading = ref(false);
+
+  const handleFetchRoles = async () => {
+    try {
+      loading.value = true;
+      const { data } = await apiClient.extension.role.listv1alpha1Role(0, 0, [
+        `!${roleLabels.TEMPLATE}`,
+      ]);
+      roles.value = data.items;
+    } catch (e) {
+      console.error("Failed to fetch roles", e);
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  onMounted(handleFetchRoles);
+
+  return {
+    roles,
+    loading,
+    handleFetchRoles,
+  };
+}
+
+/**
+ * Create or update a role.
+ *
+ * @returns {useRoleFormReturn}
+ */
+export function useRoleForm(): useRoleFormReturn {
   const formState = ref<Role>(initialFormState);
   const saving = ref(false);
 
@@ -58,7 +117,12 @@ export function useRoleForm() {
   };
 }
 
-export function useRoleTemplateSelection() {
+/**
+ * Logic for selecting role templates
+ *
+ * @returns {useRoleTemplateSelectionReturn}
+ */
+export function useRoleTemplateSelection(): useRoleTemplateSelectionReturn {
   const roleTemplates = ref<Role[]>([] as Role[]);
   const selectedRoleTemplates = ref<Set<string>>(new Set());
 

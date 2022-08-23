@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
 import {
@@ -10,6 +10,7 @@ import {
 import cloneDeep from "lodash.clonedeep";
 import { reset, submitForm } from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";
+import { v4 as uuid } from "uuid";
 
 const props = withDefaults(
   defineProps<{
@@ -48,32 +49,38 @@ watch(
   }
 );
 
-watch(props, (newVal) => {
-  const { Command_Enter } = useMagicKeys();
-  let keyboardWatcher;
-  if (newVal.visible) {
-    keyboardWatcher = watch(Command_Enter, (v) => {
-      if (v) {
-        submitForm("role-form");
-      }
-    });
-  } else {
-    keyboardWatcher?.unwatch();
-  }
+const { Command_Enter } = useMagicKeys();
 
-  if (newVal.visible && props.role) {
-    formState.value = cloneDeep(props.role);
-    const dependencies =
-      props.role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
-    if (dependencies) {
-      selectedRoleTemplates.value = new Set(JSON.parse(dependencies));
-    }
-    return;
+watchEffect(() => {
+  if (Command_Enter.value && props.visible) {
+    submitForm("role-form");
   }
-  formState.value = cloneDeep(initialFormState);
-  selectedRoleTemplates.value.clear();
-  reset("role-form");
 });
+
+watch(
+  () => props.visible,
+  (visible) => {
+    if (!visible) {
+      handleResetForm();
+    }
+  }
+);
+
+watch(
+  () => props.role,
+  (role) => {
+    if (role) {
+      formState.value = cloneDeep(role);
+      const dependencies =
+        role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
+      if (dependencies) {
+        selectedRoleTemplates.value = new Set(JSON.parse(dependencies));
+      }
+    } else {
+      handleResetForm();
+    }
+  }
+);
 
 const tabActiveId = ref("general");
 
@@ -84,17 +91,23 @@ const editingModalTitle = computed(() => {
 const handleCreateOrUpdateRole = async () => {
   try {
     await handleCreateOrUpdate();
-    handleVisibleChange(false);
+    onVisibleChange(false);
   } catch (e) {
     console.error(e);
   }
 };
 
-const handleVisibleChange = (visible: boolean) => {
+const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
   }
+};
+
+const handleResetForm = () => {
+  formState.value = cloneDeep(initialFormState);
+  formState.value.metadata.name = uuid();
+  reset("role-form");
 };
 </script>
 <template>
@@ -102,7 +115,7 @@ const handleVisibleChange = (visible: boolean) => {
     :title="editingModalTitle"
     :visible="visible"
     :width="700"
-    @update:visible="handleVisibleChange"
+    @update:visible="onVisibleChange"
   >
     <VTabs v-model:active-id="tabActiveId" type="outline">
       <VTabItem id="general" label="基础信息">
@@ -198,7 +211,7 @@ const handleVisibleChange = (visible: boolean) => {
         >
           提交 ⌘ + ↵
         </VButton>
-        <VButton @click="handleVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>
   </VModal>
