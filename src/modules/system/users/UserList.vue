@@ -18,6 +18,7 @@ import { onMounted, ref } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
+import { formatDatetime } from "@/utils/date";
 
 const checkAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -313,8 +314,8 @@ onMounted(() => {
                       {{ role }}
                     </VTag>
                   </div>
-                  <time class="text-sm text-gray-500" datetime="2020-01-07">
-                    {{ user.metadata.creationTimestamp }}
+                  <time class="text-sm text-gray-500">
+                    {{ formatDatetime(user.metadata.creationTimestamp) }}
                   </time>
                   <span
                     v-permission="['system:users:manage']"

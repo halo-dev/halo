@@ -3,6 +3,7 @@ import { VCard, VSpace } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import type { Post } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
+import { formatDatetime } from "@/utils/date";
 
 const posts = ref<Post[]>([] as Post[]);
 
@@ -46,7 +47,7 @@ onMounted(handleFetchPosts);
 
             <div>
               <time class="text-sm text-gray-500">
-                {{ post.metadata.creationTimestamp }}
+                {{ formatDatetime(post.metadata.creationTimestamp) }}
               </time>
             </div>
           </div>

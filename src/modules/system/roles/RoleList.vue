@@ -17,6 +17,7 @@ import type { Role } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
+import { formatDatetime } from "@/utils/date";
 
 const roles = ref<Role[]>([]);
 const editingModal = ref<boolean>(false);
@@ -217,7 +218,7 @@ onMounted(() => {
                   </a>
                   <VTag> 系统保留</VTag>
                   <time class="text-sm text-gray-500">
-                    {{ role.metadata.creationTimestamp }}
+                    {{ formatDatetime(role.metadata.creationTimestamp) }}
                   </time>
                   <span
                     v-permission="['system:roles:manage']"

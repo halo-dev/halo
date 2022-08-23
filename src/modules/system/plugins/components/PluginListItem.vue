@@ -9,6 +9,7 @@ import {
 import { toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
+import { formatDatetime } from "@/utils/date";
 
 const props = withDefaults(
   defineProps<{
@@ -101,11 +102,8 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
           <span class="hidden text-sm text-gray-500 sm:block">
             {{ plugin?.spec.version }}
           </span>
-          <time
-            class="hidden text-sm text-gray-500 sm:block"
-            datetime="2020-01-07"
-          >
-            {{ plugin?.metadata.creationTimestamp }}
+          <time class="hidden text-sm text-gray-500 sm:block">
+            {{ formatDatetime(plugin?.metadata.creationTimestamp) }}
           </time>
           <div
             v-permission="['system:plugins:manage']"
