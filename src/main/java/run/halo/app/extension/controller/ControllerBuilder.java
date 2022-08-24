@@ -9,6 +9,7 @@ import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.WatcherPredicates;
+import run.halo.app.extension.controller.Reconciler.Request;
 
 public class ControllerBuilder {
 
@@ -18,7 +19,7 @@ public class ControllerBuilder {
 
     private Duration maxDelay;
 
-    private Reconciler reconciler;
+    private Reconciler<Request> reconciler;
 
     private Supplier<Instant> nowSupplier;
 
@@ -51,7 +52,7 @@ public class ControllerBuilder {
         return this;
     }
 
-    public ControllerBuilder reconciler(Reconciler reconciler) {
+    public ControllerBuilder reconciler(Reconciler<Request> reconciler) {
         this.reconciler = reconciler;
         return this;
     }
@@ -102,7 +103,7 @@ public class ControllerBuilder {
         Assert.notNull(extension, "Extension must not be null");
         Assert.notNull(reconciler, "Reconciler must not be null");
 
-        var queue = new DefaultDelayQueue(nowSupplier, minDelay);
+        var queue = new DefaultDelayQueue<Request>(nowSupplier, minDelay);
         var predicates = new WatcherPredicates.Builder()
             .withGroupVersionKind(extension.groupVersionKind())
             .onAddPredicate(onAddPredicate)
@@ -115,6 +116,6 @@ public class ControllerBuilder {
             extension,
             watcher,
             predicates.onAddPredicate());
-        return new DefaultController(name, reconciler, queue, synchronizer, minDelay, maxDelay);
+        return new DefaultController<>(name, reconciler, queue, synchronizer, minDelay, maxDelay);
     }
 }

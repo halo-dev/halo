@@ -63,8 +63,6 @@ class CategoryFinderImplTest {
                         "C1",
                         "C2"
                     ],
-                    "permalink": null,
-                    "posts": null,
                     "postCount": 0
                 }
                 """,

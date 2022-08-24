@@ -62,12 +62,7 @@ class ThemeTest {
                     "apiVersion": "theme.halo.run/v1alpha1",
                     "kind": "Theme",
                     "metadata": {
-                        "name": "test-theme",
-                        "labels": null,
-                        "annotations": null,
-                        "version": null,
-                        "creationTimestamp": null,
-                        "deletionTimestamp": null
+                        "name": "test-theme"
                     }
                 }
                 """,

@@ -30,10 +30,10 @@ import run.halo.app.extension.controller.RequestQueue.DelayedEntry;
 class DefaultControllerTest {
 
     @Mock
-    RequestQueue queue;
+    RequestQueue<Request> queue;
 
     @Mock
-    Reconciler reconciler;
+    Reconciler<Request> reconciler;
 
     @Mock
     RequestSynchronizer synchronizer;
@@ -47,11 +47,11 @@ class DefaultControllerTest {
 
     Duration maxRetryAfter = Duration.ofSeconds(10);
 
-    DefaultController controller;
+    DefaultController<Request> controller;
 
     @BeforeEach
     void setUp() {
-        controller = new DefaultController("fake-controller", reconciler, queue, synchronizer,
+        controller = new DefaultController<>("fake-controller", reconciler, queue, synchronizer,
             () -> now, minRetryAfter, maxRetryAfter, executor);
 
         assertFalse(controller.isDisposed());

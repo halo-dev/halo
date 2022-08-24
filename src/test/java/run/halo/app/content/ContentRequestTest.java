@@ -55,21 +55,13 @@ class ContentRequestTest {
                         "rawType": "MARKDOWN",
                         "rawPatch": "%s",
                         "contentPatch": "%s",
-                        "parentSnapshotName": null,
                         "displayVersion": "v1",
-                        "version": 1,
-                        "publishTime": null,
-                        "contributors": null
+                        "version": 1
                     },
                     "apiVersion": "content.halo.run/v1alpha1",
                     "kind": "Snapshot",
                     "metadata": {
-                        "name": "7b149646-ac60-4a5c-98ee-78b2dd0631b2",
-                        "labels": null,
-                        "annotations": null,
-                        "version": null,
-                        "creationTimestamp": null,
-                        "deletionTimestamp": null
+                        "name": "7b149646-ac60-4a5c-98ee-78b2dd0631b2"
                     }
                 }
                 """.formatted(expectedRawPatch, expectedContentPath),
@@ -88,16 +80,14 @@ class ContentRequestTest {
                     {
                         "source": {
                             "position": 3,
-                            "lines": [],
-                            "changePosition": null
+                            "lines": []
                         },
                         "target": {
                             "position": 3,
                             "lines": [
                                 "brought forth on this continent",
                                 ""
-                            ],
-                            "changePosition": null
+                            ]
                         },
                         "type": "INSERT"
                     }
@@ -116,16 +106,14 @@ class ContentRequestTest {
                  {
                      "source": {
                          "position": 2,
-                         "lines": [],
-                         "changePosition": null
+                         "lines": []
                      },
                      "target": {
                          "position": 2,
                          "lines": [
                              "<br/>",
                              "<p>brought forth on this continent</p>"
-                         ],
-                         "changePosition": null
+                         ]
                      },
                      "type": "INSERT"
                  }

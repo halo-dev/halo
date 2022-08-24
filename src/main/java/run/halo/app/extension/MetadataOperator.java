@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * MetadataOperator contains some getters and setters for required fields of metadata.
@@ -40,6 +41,9 @@ public interface MetadataOperator {
     @JsonProperty("deletionTimestamp")
     Instant getDeletionTimestamp();
 
+    @Schema(nullable = true)
+    Set<String> getFinalizers();
+
     void setName(String name);
 
     void setLabels(Map<String, String> labels);
@@ -51,6 +55,8 @@ public interface MetadataOperator {
     void setCreationTimestamp(Instant creationTimestamp);
 
     void setDeletionTimestamp(Instant deletionTimestamp);
+
+    void setFinalizers(Set<String> finalizers);
 
     static boolean metadataDeepEquals(MetadataOperator left, MetadataOperator right) {
         if (left == null && right == null) {
@@ -75,6 +81,9 @@ public interface MetadataOperator {
             return false;
         }
         if (!Objects.equals(left.getVersion(), right.getVersion())) {
+            return false;
+        }
+        if (!Objects.equals(left.getFinalizers(), right.getFinalizers())) {
             return false;
         }
         return true;

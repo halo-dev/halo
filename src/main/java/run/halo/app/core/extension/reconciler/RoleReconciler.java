@@ -13,6 +13,7 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -22,7 +23,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 @Slf4j
-public class RoleReconciler implements Reconciler {
+public class RoleReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
 

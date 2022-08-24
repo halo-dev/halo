@@ -7,11 +7,10 @@ import java.util.Set;
 import java.util.concurrent.DelayQueue;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
-import run.halo.app.extension.controller.Reconciler.Request;
 
 @Slf4j
-public class DefaultDelayQueue
-    extends DelayQueue<DefaultDelayQueue.DelayedEntry<Request>> implements RequestQueue {
+public class DefaultDelayQueue<R>
+    extends DelayQueue<DefaultDelayQueue.DelayedEntry<R>> implements RequestQueue<R> {
 
     private final Supplier<Instant> nowSupplier;
 
@@ -19,7 +18,7 @@ public class DefaultDelayQueue
 
     private final Duration minDelay;
 
-    private final Set<Request> processing;
+    private final Set<R> processing;
 
     public DefaultDelayQueue(Supplier<Instant> nowSupplier) {
         this(nowSupplier, Duration.ZERO);
@@ -32,13 +31,14 @@ public class DefaultDelayQueue
     }
 
     @Override
-    public boolean addImmediately(Request request) {
+    public boolean addImmediately(R request) {
+        log.debug("Adding request {} immediately", request);
         var delayedEntry = new DelayedEntry<>(request, minDelay, nowSupplier);
         return offer(delayedEntry);
     }
 
     @Override
-    public boolean add(DelayedEntry<Request> entry) {
+    public boolean add(DelayedEntry<R> entry) {
         if (entry.getRetryAfter().compareTo(minDelay) < 0) {
             log.warn("Request {} will be retried after {} ms, but minimum delay is {} ms",
                 entry.getEntry(), entry.getRetryAfter().toMillis(), minDelay.toMillis());
@@ -48,19 +48,19 @@ public class DefaultDelayQueue
     }
 
     @Override
-    public DelayedEntry<Request> take() throws InterruptedException {
+    public DelayedEntry<R> take() throws InterruptedException {
         var entry = super.take();
         processing.add(entry.getEntry());
         return entry;
     }
 
     @Override
-    public void done(Request request) {
+    public void done(R request) {
         processing.remove(request);
     }
 
     @Override
-    public boolean offer(DelayedEntry<Request> entry) {
+    public boolean offer(DelayedEntry<R> entry) {
         if (this.isDisposed() || processing.contains(entry.getEntry())) {
             return false;
         }

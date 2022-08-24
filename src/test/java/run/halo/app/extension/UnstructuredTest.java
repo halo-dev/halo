@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Set;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -28,7 +29,8 @@ class UnstructuredTest {
                 },
                 "name": "fake-extension",
                 "creationTimestamp": "2011-12-03T10:15:30Z",
-                "version": 12345
+                "version": 12345,
+                "finalizers": ["finalizer.1", "finalizer.2"]
             }
         }
         """;
@@ -93,6 +95,13 @@ class UnstructuredTest {
         var another = createUnstructured();
         another.getMetadata().setName("fake-extension-2");
         assertNotEquals(createUnstructured(), another);
+    }
+
+    @Test
+    void shouldGetFinalizersCorrectly() throws JsonProcessingException, JSONException {
+        var extension = objectMapper.readValue(extensionJson, Unstructured.class);
+
+        assertEquals(Set.of("finalizer.1", "finalizer.2"), extension.getMetadata().getFinalizers());
     }
 
     Unstructured createUnstructured() {

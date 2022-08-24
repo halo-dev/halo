@@ -20,13 +20,13 @@ class DefaultDelayQueueTest {
 
     Instant now = Instant.now();
 
-    DefaultDelayQueue queue;
+    DefaultDelayQueue<Request> queue;
 
     final Duration minDelay = Duration.ofMillis(1);
 
     @BeforeEach
     void setUp() {
-        queue = new DefaultDelayQueue(() -> now, minDelay);
+        queue = new DefaultDelayQueue<>(() -> now, minDelay);
     }
 
     @Test

@@ -14,12 +14,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.extension.WatcherPredicates;
+import run.halo.app.extension.controller.Reconciler.Request;
 
 @ExtendWith(MockitoExtension.class)
 class ExtensionWatcherTest {
 
     @Mock
-    RequestQueue queue;
+    RequestQueue<Request> queue;
 
     @Mock
     WatcherPredicates predicates;

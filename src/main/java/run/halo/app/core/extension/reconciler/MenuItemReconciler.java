@@ -5,8 +5,9 @@ import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.MenuItem.MenuItemStatus;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.extension.controller.Reconciler.Request;
 
-public class MenuItemReconciler implements Reconciler {
+public class MenuItemReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
 
