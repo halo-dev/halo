@@ -21,6 +21,7 @@ import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentSelectModal from "./components/AttachmentSelectModal.vue";
 import AttachmentStrategiesModal from "./components/AttachmentStrategiesModal.vue";
+import AttachmentGroupEditingModal from "./components/AttachmentGroupEditingModal.vue";
 import { ref } from "vue";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
@@ -41,6 +42,7 @@ const strategyVisible = ref(false);
 const selectVisible = ref(false);
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
+const groupEditingModal = ref(false);
 const checkAll = ref(false);
 
 const { users } = useUserFetch();
@@ -87,6 +89,7 @@ const folders = [
   <AttachmentUploadModal v-model:visible="uploadVisible" />
   <AttachmentSelectModal v-model:visible="selectVisible" />
   <AttachmentStrategiesModal v-model:visible="strategyVisible" />
+  <AttachmentGroupEditingModal v-model:visible="groupEditingModal" />
   <VPageHeader title="附件库">
     <template #icon>
       <IconPalette class="mr-2 self-center" />
@@ -360,10 +363,30 @@ const folders = [
                     {{ folder.name }}（{{ index * 20 }}）
                   </span>
                 </div>
-                <IconMore />
+                <FloatingDropdown>
+                  <IconMore />
+                  <template #popper>
+                    <div class="w-48 p-2">
+                      <VSpace class="w-full" direction="column">
+                        <VButton
+                          v-close-popper
+                          block
+                          type="secondary"
+                          @click="groupEditingModal = true"
+                        >
+                          重命名
+                        </VButton>
+                        <VButton v-close-popper block type="danger">
+                          删除
+                        </VButton>
+                      </VSpace>
+                    </div>
+                  </template>
+                </FloatingDropdown>
               </div>
               <div
                 class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+                @click="groupEditingModal = true"
               >
                 <div class="flex flex-1 items-center">
                   <span class="text-sm">添加分组</span>
