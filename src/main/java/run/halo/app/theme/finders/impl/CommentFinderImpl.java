@@ -1,8 +1,10 @@
 package run.halo.app.theme.finders.impl;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -24,24 +26,6 @@ import run.halo.app.theme.finders.vo.ReplyVo;
  */
 @Finder("commentFinder")
 public class CommentFinderImpl implements CommentFinder {
-    private static final Comparator<Comment> DEFAULT_ORDER = (o1, o2) -> {
-        Assert.notNull(o1, "o1 must not be null");
-        Assert.notNull(o2, "o2 must not be null");
-        if (o1 == o2) {
-            return 0;
-        }
-        if (Objects.equals(true, o1.getSpec().getTop())) {
-            if (Objects.equals(true, o2.getSpec().getTop())) {
-                return o1.getSpec().getPriority().compareTo(o2.getSpec().getPriority());
-            }
-            return 1;
-        }
-
-        int compare = o1.getMetadata().getCreationTimestamp()
-            .compareTo(o2.getMetadata().getCreationTimestamp());
-        return compare == 0 ? o1.getMetadata().getName()
-            .compareTo(o2.getMetadata().getName()) : compare;
-    };
 
     private final ReactiveExtensionClient client;
 
@@ -60,7 +44,7 @@ public class CommentFinderImpl implements CommentFinder {
     public ListResult<CommentVo> list(Comment.CommentSubjectRef ref, int page, int size) {
         Mono<ListResult<CommentVo>> mono =
             client.list(Comment.class, fixedPredicate(ref),
-                    DEFAULT_ORDER.reversed(),
+                    defaultComparator(),
                     Math.max(page - 1, 0), size)
                 .map(list -> {
                     List<CommentVo> commentVos = list.get().map(CommentVo::from).toList();
@@ -92,5 +76,21 @@ public class CommentFinderImpl implements CommentFinder {
         return comment -> ref.equals(comment.getSpec().getSubjectRef())
             && Objects.equals(false, comment.getSpec().getHidden())
             && Objects.equals(true, comment.getSpec().getApproved());
+    }
+
+    static Comparator<Comment> defaultComparator() {
+        Function<Comment, Boolean> top =
+            comment -> Objects.requireNonNullElse(comment.getSpec().getTop(), false);
+        Function<Comment, Integer> priority =
+            comment -> Objects.requireNonNullElse(comment.getSpec().getPriority(), 0);
+        Function<Comment, Instant> creationTimestamp =
+            comment -> comment.getMetadata().getCreationTimestamp();
+        Function<Comment, String> name =
+            comment -> comment.getMetadata().getName();
+        return Comparator.comparing(top)
+            .thenComparing(priority)
+            .thenComparing(creationTimestamp)
+            .thenComparing(name)
+            .reversed();
     }
 }

@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders.vo;
 
 import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
 import run.halo.app.core.extension.Tag;
@@ -26,6 +27,8 @@ public class TagVo {
 
     List<String> posts;
 
+    Map<String, String> annotations;
+
     /**
      * Convert {@link Tag} to {@link TagVo}.
      *
@@ -43,6 +46,7 @@ public class TagVo {
             .cover(spec.getCover())
             .permalink(status.getPermalink())
             .posts(status.getPosts())
+            .annotations(tag.getMetadata().getAnnotations())
             .build();
     }
 }

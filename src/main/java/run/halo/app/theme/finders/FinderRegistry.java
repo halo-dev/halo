@@ -30,6 +30,10 @@ public class FinderRegistry implements InitializingBean {
         this.applicationContext = applicationContext;
     }
 
+    Object get(String name) {
+        return finders.get(name);
+    }
+
     /**
      * Given a name, register a Finder for it.
      *
@@ -107,12 +111,23 @@ public class FinderRegistry implements InitializingBean {
      * @param event plugin stopped event
      */
     @EventListener(HaloPluginStoppedEvent.class)
-    public void onPluginStopped(HaloPluginStartedEvent event) {
+    public void onPluginStopped(HaloPluginStoppedEvent event) {
         String pluginId = event.getPlugin().getPluginId();
         boolean containsKey = pluginFindersLookup.containsKey(pluginId);
         if (!containsKey) {
             return;
         }
         pluginFindersLookup.get(pluginId).forEach(this::removeFinder);
+    }
+
+    /**
+     * Only for test.
+     *
+     * @param pluginId plugin id
+     * @param finderName finder name
+     */
+    void addPluginFinder(String pluginId, String finderName) {
+        pluginFindersLookup.computeIfAbsent(pluginId, k -> new ArrayList<>())
+            .add(finderName);
     }
 }

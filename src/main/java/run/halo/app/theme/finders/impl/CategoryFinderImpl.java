@@ -1,7 +1,10 @@
 package run.halo.app.theme.finders.impl;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Category;
@@ -35,10 +38,8 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public ListResult<CategoryVo> list(int page, int size) {
-        Comparator<Category> comparator =
-            Comparator.comparing(category -> category.getMetadata().getCreationTimestamp());
         Mono<ListResult<CategoryVo>> mono = client.list(Category.class, null,
-                comparator.reversed(), Math.max(page - 1, 0), size)
+                defaultComparator(), Math.max(page - 1, 0), size)
             .map(list -> {
                 List<CategoryVo> categoryVos = list.stream()
                     .map(CategoryVo::from)
@@ -47,5 +48,18 @@ public class CategoryFinderImpl implements CategoryFinder {
                     categoryVos);
             });
         return SubscriberUtils.subscribe(mono);
+    }
+
+    static Comparator<Category> defaultComparator() {
+        Function<Category, Integer> priority =
+            category -> Objects.requireNonNullElse(category.getSpec().getPriority(), 0);
+        Function<Category, Instant> creationTimestamp =
+            category -> category.getMetadata().getCreationTimestamp();
+        Function<Category, String> name =
+            category -> category.getMetadata().getName();
+        return Comparator.comparing(priority)
+            .thenComparing(creationTimestamp)
+            .thenComparing(name)
+            .reversed();
     }
 }

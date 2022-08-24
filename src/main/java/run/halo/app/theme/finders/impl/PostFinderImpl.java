@@ -1,12 +1,13 @@
 package run.halo.app.theme.finders.impl;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Post;
@@ -26,25 +27,11 @@ import run.halo.app.theme.finders.vo.PostVo;
  */
 @Finder("postFinder")
 public class PostFinderImpl implements PostFinder {
-    private static final Comparator<Post> DEFAULT_ORDER = (o1, o2) -> {
-        Assert.notNull(o1, "o1 must not be null");
-        Assert.notNull(o2, "o2 must not be null");
-        if (o1 == o2) {
-            return 0;
-        }
-        if (Objects.equals(true, o1.getSpec().getPinned())) {
-            if (Objects.equals(true, o2.getSpec().getPinned())) {
-                return o1.getSpec().getPriority().compareTo(o2.getSpec().getPriority());
-            }
-            return 1;
-        }
 
-        int compare = o1.getMetadata().getCreationTimestamp()
-            .compareTo(o2.getMetadata().getCreationTimestamp());
-        return compare == 0 ? o1.getMetadata().getName()
-            .compareTo(o2.getMetadata().getName()) : compare;
-    };
-
+    public static final Predicate<Post> FIXED_PREDICATE = post ->
+        Objects.equals(false, post.getSpec().getDeleted())
+            && Objects.equals(true, post.getSpec().getPublished())
+            && Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
     private final ReactiveExtensionClient client;
 
     private final ContentService contentService;
@@ -87,14 +74,25 @@ public class PostFinderImpl implements PostFinder {
     }
 
     private ListResult<Post> listPost(int page, int size, Predicate<Post> postPredicate) {
-        Predicate<Post> fixedPredicate = post ->
-            Objects.equals(false, post.getSpec().getDeleted())
-                && Objects.equals(true, post.getSpec().getPublished())
-                && Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
-        Predicate<Post> predicate = fixedPredicate
+        Predicate<Post> predicate = FIXED_PREDICATE
             .and(postPredicate == null ? post -> true : postPredicate);
         Mono<ListResult<Post>> mono = client.list(Post.class, predicate,
-            DEFAULT_ORDER.reversed(), Math.max(page - 1, 0), size);
+            defaultComparator(), Math.max(page - 1, 0), size);
         return SubscriberUtils.subscribe(mono);
+    }
+
+    static Comparator<Post> defaultComparator() {
+        Function<Post, Boolean> pinned =
+            post -> Objects.requireNonNullElse(post.getSpec().getPinned(), false);
+        Function<Post, Integer> priority =
+            post -> Objects.requireNonNullElse(post.getSpec().getPriority(), 0);
+        Function<Post, Instant> creationTimestamp =
+            post -> post.getMetadata().getCreationTimestamp();
+        Function<Post, String> name = post -> post.getMetadata().getName();
+        return Comparator.comparing(pinned)
+            .thenComparing(priority)
+            .thenComparing(creationTimestamp)
+            .thenComparing(name)
+            .reversed();
     }
 }

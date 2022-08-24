@@ -20,6 +20,10 @@ import run.halo.app.theme.finders.vo.TagVo;
  */
 @Finder("tagFinder")
 public class TagFinderImpl implements TagFinder {
+
+    public static final Comparator<Tag> DEFAULT_COMPARATOR =
+        Comparator.comparing(tag -> tag.getMetadata().getCreationTimestamp());
+
     private final ReactiveExtensionClient client;
 
     public TagFinderImpl(ReactiveExtensionClient client) {
@@ -35,16 +39,23 @@ public class TagFinderImpl implements TagFinder {
 
     @Override
     public ListResult<TagVo> list(int page, int size) {
-        Comparator<Tag> comparator =
-            Comparator.comparing(tag -> tag.getMetadata().getCreationTimestamp());
         Mono<ListResult<TagVo>> mono = client.list(Tag.class, null,
-                comparator.reversed(), Math.max(page - 1, 0), size)
+                DEFAULT_COMPARATOR.reversed(), Math.max(page - 1, 0), size)
             .map(list -> {
                 List<TagVo> tagVos = list.stream()
                     .map(TagVo::from)
                     .collect(Collectors.toList());
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), tagVos);
             });
+        return SubscriberUtils.subscribe(mono);
+    }
+
+    @Override
+    public List<TagVo> listAll() {
+        Mono<List<TagVo>> mono = client.list(Tag.class, null,
+                DEFAULT_COMPARATOR.reversed())
+            .map(TagVo::from)
+            .collectList();
         return SubscriberUtils.subscribe(mono);
     }
 }
