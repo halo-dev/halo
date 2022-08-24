@@ -1,7 +1,9 @@
 package run.halo.app.theme.finders;
 
+import java.util.List;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
+import run.halo.app.theme.finders.vo.CategoryTreeVo;
 import run.halo.app.theme.finders.vo.CategoryVo;
 
 /**
@@ -15,4 +17,8 @@ public interface CategoryFinder {
     CategoryVo getByName(String name);
 
     ListResult<CategoryVo> list(int page, int size);
+
+    List<CategoryVo> listAll();
+
+    List<CategoryTreeVo> listAsTree();
 }

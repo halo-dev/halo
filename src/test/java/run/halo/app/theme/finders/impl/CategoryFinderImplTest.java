@@ -16,12 +16,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.theme.finders.vo.CategoryTreeVo;
 import run.halo.app.theme.finders.vo.CategoryVo;
 
 /**
@@ -62,7 +64,8 @@ class CategoryFinderImplTest {
                         "C2"
                     ],
                     "permalink": null,
-                    "posts": null
+                    "posts": null,
+                    "postCount": 0
                 }
                 """,
             JsonUtils.objectToJson(categoryVo),
@@ -81,6 +84,59 @@ class CategoryFinderImplTest {
         assertThat(list.getItems()).hasSize(3);
         assertThat(list.get().map(CategoryVo::getName).toList())
             .isEqualTo(List.of("c3", "c2", "hello"));
+    }
+
+    @Test
+    void listAsTree() {
+        when(client.list(eq(Category.class), eq(null), any()))
+            .thenReturn(Flux.fromIterable(categoriesForTree()));
+        List<CategoryTreeVo> treeVos = categoryFinder.listAsTree();
+        assertThat(treeVos).hasSize(1);
+    }
+
+    private List<Category> categoriesForTree() {
+        /*
+         *  D
+         *  ├── E
+         *  │   ├── A
+         *  │   │   └── B
+         *  │   └── C
+         *  └── G
+         *  ├── F
+         *      └── H
+         */
+        Category d = category();
+        d.getMetadata().setName("D");
+        d.getSpec().setChildren(List.of("E", "G", "F"));
+
+        Category e = category();
+        e.getMetadata().setName("E");
+        e.getSpec().setChildren(List.of("A", "C"));
+
+        Category a = category();
+        a.getMetadata().setName("A");
+        a.getSpec().setChildren(List.of("B"));
+
+        Category b = category();
+        b.getMetadata().setName("B");
+        b.getSpec().setChildren(null);
+
+        Category c = category();
+        c.getMetadata().setName("C");
+        c.getSpec().setChildren(null);
+
+        Category g = category();
+        g.getMetadata().setName("G");
+        g.getSpec().setChildren(null);
+
+        Category f = category();
+        f.getMetadata().setName("F");
+        f.getSpec().setChildren(List.of("H"));
+
+        Category h = category();
+        h.getMetadata().setName("H");
+        h.getSpec().setChildren(null);
+        return List.of(d, e, a, b, c, g, f, h);
     }
 
     private List<Category> categories() {

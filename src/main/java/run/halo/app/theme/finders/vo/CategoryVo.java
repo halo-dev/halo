@@ -1,8 +1,9 @@
 package run.halo.app.theme.finders.vo;
 
 import java.util.List;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
+import lombok.experimental.SuperBuilder;
 import run.halo.app.core.extension.Category;
 
 /**
@@ -12,27 +13,11 @@ import run.halo.app.core.extension.Category;
  * @since 2.0.0
  */
 @Value
-@Builder
-public class CategoryVo {
-    String name;
-
-    String displayName;
-
-    String slug;
-
-    String description;
-
-    String cover;
-
-    String template;
-
-    Integer priority;
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class CategoryVo extends BaseCategoryVo {
 
     List<String> children;
-
-    String permalink;
-
-    List<String> posts;
 
     /**
      * Convert {@link Category} to {@link CategoryVo}.
