@@ -144,6 +144,14 @@ const handleSave = async () => {
     // Set rendered content
     formState.value.content.content = formState.value.content.raw;
 
+    // Set default title and slug
+    if (!formState.value.post.spec.title) {
+      formState.value.post.spec.title = "无标题文章";
+    }
+    if (!formState.value.post.spec.slug) {
+      formState.value.post.spec.slug = uuid();
+    }
+
     if (isUpdateMode.value) {
       const { data } = await apiClient.post.updateDraftPost(
         formState.value.post.metadata.name,
