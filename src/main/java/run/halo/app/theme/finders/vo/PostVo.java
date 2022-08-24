@@ -3,6 +3,7 @@ package run.halo.app.theme.finders.vo;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Value;
 import org.springframework.util.Assert;
@@ -76,12 +77,12 @@ public class PostVo {
             .title(spec.getTitle())
             .cover(spec.getCover())
             .allowComment(spec.getAllowComment())
-            .categories(spec.getCategories())
+            .categories(nullSafe(spec.getCategories()))
             .tags(spec.getTags())
             .owner(spec.getOwner())
             .pinned(spec.getPinned())
             .slug(spec.getSlug())
-            .htmlMetas(spec.getHtmlMetas())
+            .htmlMetas(nullSafe(spec.getHtmlMetas()))
             .published(spec.getPublished())
             .priority(spec.getPriority())
             .version(spec.getVersion())
@@ -90,7 +91,11 @@ public class PostVo {
             .snapshot(spec.getReleaseSnapshot())
             .permalink(postStatus.getPermalink())
             .excerpt(postStatus.getExcerpt())
-            .contributors(postStatus.getContributors())
+            .contributors(nullSafe(postStatus.getContributors()))
             .build();
+    }
+
+    static <T> List<T> nullSafe(List<T> t) {
+        return Objects.requireNonNullElse(t, List.of());
     }
 }

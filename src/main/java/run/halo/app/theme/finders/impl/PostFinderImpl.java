@@ -58,9 +58,18 @@ public class PostFinderImpl implements PostFinder {
     }
 
     @Override
-    public ListResult<PostVo> list(int page, int size, String categoryName) {
+    public ListResult<PostVo> listByCategory(int page, int size, String categoryName) {
         ListResult<Post> posts = listPost(page, size,
             post -> contains(post.getSpec().getCategories(), categoryName));
+        List<PostVo> postVos = posts.get().map(PostVo::from)
+            .collect(Collectors.toList());
+        return new ListResult<>(posts.getPage(), posts.getSize(), posts.getTotal(), postVos);
+    }
+
+    @Override
+    public ListResult<PostVo> listByTag(int page, int size, String tag) {
+        ListResult<Post> posts = listPost(page, size,
+            post -> contains(post.getSpec().getTags(), tag));
         List<PostVo> postVos = posts.get().map(PostVo::from)
             .collect(Collectors.toList());
         return new ListResult<>(posts.getPage(), posts.getSize(), posts.getTotal(), postVos);
