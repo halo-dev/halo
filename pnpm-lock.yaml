@@ -15,7 +15,7 @@ importers:
       '@halo-dev/admin-shared': workspace:*
       '@halo-dev/api-client': ^0.0.12
       '@halo-dev/components': workspace:*
-      '@halo-dev/richtext-editor': 0.0.0-alpha.3
+      '@halo-dev/richtext-editor': ^0.0.0-alpha.4
       '@rushstack/eslint-patch': ^1.1.4
       '@tailwindcss/aspect-ratio': ^0.4.0
       '@types/jsdom': ^20.0.0
@@ -89,7 +89,7 @@ importers:
       '@halo-dev/admin-shared': link:packages/shared
       '@halo-dev/api-client': 0.0.12
       '@halo-dev/components': link:packages/components
-      '@halo-dev/richtext-editor': 0.0.0-alpha.3_vue@3.2.37
+      '@halo-dev/richtext-editor': 0.0.0-alpha.4_vue@3.2.37
       '@vueuse/components': 8.9.4_vue@3.2.37
       '@vueuse/core': 8.9.4_vue@3.2.37
       '@vueuse/router': 9.1.0_26a4nhf5pwzjzqc5ckt7ohj5zi
@@ -2010,13 +2010,17 @@ packages:
   /@formkit/addons/1.0.0-beta.10:
     resolution: {integrity: sha512-gQ60lG49CsIP1Rvu4pWG2DOy8qpdiFvZmvFWH1mh31wh0CGu3xrgjk7J4NcoI1Zh9HzJEqUYq1hYWW4t36glQg==}
     dependencies:
-      '@formkit/auto-animate': 1.0.0-beta.2
+      '@formkit/auto-animate': 1.0.0-beta.3
       '@formkit/core': 1.0.0-beta.10
       '@formkit/utils': 1.0.0-beta.10
     dev: false
 
   /@formkit/auto-animate/1.0.0-beta.2:
     resolution: {integrity: sha512-od6Vqzg7uV0P8NqIiVfQyTv+cs6CtDkisRE4KxbwumvKnLvGWaoUGeCdfEaC2BYfKmHWVDvkWT0/TJbnzxNppQ==}
+    dev: false
+
+  /@formkit/auto-animate/1.0.0-beta.3:
+    resolution: {integrity: sha512-glsi+ytwQpxT/Ctr9GtcIfVr4dO6mJ04mQbNU8MFSdCdqMopHtyfU5Fib0+9lNFIeR0luY4/0NW95/2R5pKsag==}
     dev: false
 
   /@formkit/core/1.0.0-beta.10:
@@ -2115,8 +2119,8 @@ packages:
     resolution: {integrity: sha512-fOI3DB9rOA1Z+h1aKiEQ+2kWkNSmdWIDvd+39dR5b3X0DmKH+zWrNmygA5Qe2gBPX28TNt/zr2qCKUjGjb99CA==}
     dev: false
 
-  /@halo-dev/richtext-editor/0.0.0-alpha.3_vue@3.2.37:
-    resolution: {integrity: sha512-gFWctuT9yvARObGJdtxlPh1Ph0XniE0KbTNUTHW+HW+pb546SqTIifi3tIsMg20KXebV2uRoYyzggwa3bl1cCQ==}
+  /@halo-dev/richtext-editor/0.0.0-alpha.4_vue@3.2.37:
+    resolution: {integrity: sha512-38K+eQSOCNBx/i1Mu+/krdXDdZq6I6n0YBdJY4FZ/v70fxQsdCrK28QBo5aUFaG/WrNH69HVl8HbuQLN8cmxtA==}
     peerDependencies:
       vue: ^3.2.37
     dependencies:

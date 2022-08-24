@@ -147,7 +147,7 @@ onMounted(async () => {
       </VSpace>
     </template>
   </VPageHeader>
-  <div class="editor border-t">
+  <div class="editor border-t" style="height: calc(100vh - 3.5rem)">
     <RichTextEditor v-model="formState.content.raw" />
   </div>
 </template>
