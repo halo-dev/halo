@@ -43,6 +43,9 @@ import IconForbidLine from "~icons/ri/forbid-line";
 import IconCodeBoxLine from "~icons/ri/code-box-line";
 import IconDatabase2Line from "~icons/ri/database-2-line";
 import IconTeam from "~icons/ri/team-fill";
+import IconCharacterRecognition from "~icons/ri/character-recognition-line";
+import IconCalendar from "~icons/ri/calendar-line";
+import IconLink from "~icons/ri/link";
 
 export {
   IconDashboard,
@@ -90,4 +93,7 @@ export {
   IconCodeBoxLine,
   IconDatabase2Line,
   IconTeam,
+  IconCharacterRecognition,
+  IconCalendar,
+  IconLink,
 };
