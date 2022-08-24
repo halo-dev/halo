@@ -381,6 +381,14 @@ public abstract class BaseCommentServiceImpl<COMMENT extends BaseComment>
         // Get comment by id
         COMMENT comment = getById(commentId);
 
+        //Send mail if approved
+        if (comment.getStatus().equals(CommentStatus.AUDITING)
+            && status.equals(CommentStatus.PUBLISHED)) {
+            if (!ServiceUtils.isEmptyId(comment.getParentId())) {
+                eventPublisher.publishEvent(new CommentReplyEvent(this, comment.getId()));
+            }
+        }
+
         // Set comment status
         comment.setStatus(status);
 
