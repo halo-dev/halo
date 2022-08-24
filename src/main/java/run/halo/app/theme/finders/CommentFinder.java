@@ -2,6 +2,8 @@ package run.halo.app.theme.finders;
 
 import run.halo.app.core.extension.Comment;
 import run.halo.app.extension.ListResult;
+import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
  * A finder for finding {@link Comment comments} in template.
@@ -11,7 +13,9 @@ import run.halo.app.extension.ListResult;
  */
 public interface CommentFinder {
 
-    Comment getBySubject(String kind, String name);
+    CommentVo getByName(String name);
 
-    ListResult<Comment> list(int page, int size);
+    ListResult<CommentVo> list(Comment.CommentSubjectRef ref, int page, int size);
+
+    ListResult<ReplyVo> listReply(String commentName, int page, int size);
 }

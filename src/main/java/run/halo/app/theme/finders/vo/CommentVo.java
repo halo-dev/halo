@@ -1,8 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
-import java.util.Map;
-import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Value;
+import lombok.experimental.SuperBuilder;
 import run.halo.app.core.extension.Comment;
 
 /**
@@ -12,27 +12,11 @@ import run.halo.app.core.extension.Comment;
  * @since 2.0.0
  */
 @Value
-@Builder
-public class CommentVo {
-    String name;
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class CommentVo extends BaseCommentVo {
 
-    String raw;
-
-    String content;
-
-    Comment.CommentOwner owner;
-
-    String userAgent;
-
-    Integer priority;
-
-    Boolean top;
-
-    Boolean allowNotification;
-
-    Boolean approved;
-
-    Map<String, String> annotations;
+    Comment.CommentSubjectRef subjectRef;
 
     /**
      * Convert {@link Comment} to {@link CommentVo}.
@@ -44,6 +28,7 @@ public class CommentVo {
         Comment.CommentSpec spec = comment.getSpec();
         return CommentVo.builder()
             .name(comment.getMetadata().getName())
+            .subjectRef(spec.getSubjectRef())
             .raw(spec.getRaw())
             .content(spec.getContent())
             .owner(spec.getOwner())
@@ -51,7 +36,6 @@ public class CommentVo {
             .priority(spec.getPriority())
             .top(spec.getTop())
             .allowNotification(spec.getAllowNotification())
-            .approved(spec.getApproved())
             .annotations(comment.getMetadata().getAnnotations())
             .build();
     }
