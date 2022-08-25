@@ -19,4 +19,20 @@ public class Ref {
     @Schema(required = true, description = "Extension name. This field is mandatory")
     private String name;
 
+    public static Ref of(String name) {
+        Ref ref = new Ref();
+        ref.setName(name);
+        return ref;
+    }
+
+    public static Ref of(Extension extension) {
+        var metadata = extension.getMetadata();
+        var gvk = extension.groupVersionKind();
+        var ref = new Ref();
+        ref.setName(metadata.getName());
+        ref.setGroup(gvk.group());
+        ref.setVersion(gvk.version());
+        ref.setKind(gvk.kind());
+        return ref;
+    }
 }

@@ -1,4 +1,4 @@
-package run.halo.app.core.extension.endpoint;
+package run.halo.app.core.extension.attachment.endpoint;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
@@ -8,9 +8,9 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.ExtensionPoint;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
@@ -20,11 +20,16 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
+import run.halo.app.core.extension.attachment.endpoint.AttachmentUploadHandler.UploadOption;
+import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.plugin.HaloPluginManager;
 
 @Slf4j
 @Component
@@ -32,8 +37,11 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
 
-    public AttachmentEndpoint(ReactiveExtensionClient client) {
+    private final HaloPluginManager pluginManager;
+
+    public AttachmentEndpoint(ReactiveExtensionClient client, HaloPluginManager pluginManager) {
         this.client = client;
+        this.pluginManager = pluginManager;
     }
 
     @Override
@@ -86,24 +94,25 @@ public class AttachmentEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> upload(ServerRequest request) {
         return request.body(toMultipartData())
             .map(UploadRequest::new)
-            .flatMap(uploadRequest -> {
+            .zipWhen(uploadRequest -> {
                 // check the policy
-                return client.get(Policy.class, uploadRequest.getPolicyName())
-                    .thenReturn(uploadRequest);
+                return client.get(Policy.class, uploadRequest.getPolicyName());
             })
-            .doOnNext(uploadRequest -> {
-                var attachment = new Attachment();
-                // 1. verify the policy
-                log.info("Got upload request: {}", uploadRequest);
+            .flatMap(tuple2 -> {
+                var uploadRequest = tuple2.getT1();
+                var policy = tuple2.getT2();
+                var uploadOption = new UploadOption(uploadRequest.getFile(), policy);
+                return Flux.fromIterable(pluginManager.getExtensions(AttachmentUploadHandler.class))
+                    .concatMap(uploadHandler -> uploadHandler.upload(uploadOption))
+                    .next()
+                    .switchIfEmpty(Mono.error(
+                        () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                            "No suitable handler found for uploading the attachment")));
             })
-            .flatMap(uploadRequest -> ServerResponse.ok()
+            .flatMap(client::create)
+            .flatMap(attachment -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .build());
+                .bodyValue(attachment));
     }
 
-    public interface AttachmentUploadHandler extends ExtensionPoint {
-
-        Mono<Attachment> upload(IUploadRequest uploadRequest);
-
-    }
 }
