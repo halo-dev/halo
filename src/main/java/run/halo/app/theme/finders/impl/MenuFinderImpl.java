@@ -9,13 +9,11 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.util.CollectionUtils;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.MenuFinder;
-import run.halo.app.theme.finders.SubscriberUtils;
 import run.halo.app.theme.finders.vo.MenuItemVo;
 import run.halo.app.theme.finders.vo.MenuVo;
 
@@ -36,10 +34,10 @@ public class MenuFinderImpl implements MenuFinder {
 
     @Override
     public List<MenuVo> listAll() {
-        Mono<List<MenuVo>> listMono = client.list(Menu.class, null, null)
+        return client.list(Menu.class, null, null)
             .map(MenuVo::from)
-            .collectList();
-        return SubscriberUtils.subscribe(listMono);
+            .collectList()
+            .block();
     }
 
     @Override
@@ -76,12 +74,12 @@ public class MenuFinderImpl implements MenuFinder {
         Function<MenuItem, Integer> priority = menuItem -> menuItem.getSpec().getPriority();
         Function<MenuItem, String> name = menuItem -> menuItem.getMetadata().getName();
 
-        Mono<List<MenuItemVo>> listMono = client.list(MenuItem.class, null,
+        return client.list(MenuItem.class, null,
                 Comparator.comparing(priority).thenComparing(name).reversed()
             )
             .map(MenuItemVo::from)
-            .collectList();
-        return SubscriberUtils.subscribe(listMono);
+            .collectList()
+            .block();
     }
 
     static List<MenuItemVo> populateParentName(List<MenuItemVo> menuItemVos) {

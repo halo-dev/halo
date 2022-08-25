@@ -10,13 +10,11 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.util.CollectionUtils;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
-import run.halo.app.theme.finders.SubscriberUtils;
 import run.halo.app.theme.finders.vo.CategoryTreeVo;
 import run.halo.app.theme.finders.vo.CategoryVo;
 
@@ -36,14 +34,14 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public CategoryVo getByName(String name) {
-        Mono<CategoryVo> mono = client.fetch(Category.class, name)
-            .map(CategoryVo::from);
-        return SubscriberUtils.subscribe(mono);
+        return client.fetch(Category.class, name)
+            .map(CategoryVo::from)
+            .block();
     }
 
     @Override
     public ListResult<CategoryVo> list(int page, int size) {
-        Mono<ListResult<CategoryVo>> mono = client.list(Category.class, null,
+        return client.list(Category.class, null,
                 defaultComparator(), Math.max(page - 1, 0), size)
             .map(list -> {
                 List<CategoryVo> categoryVos = list.stream()
@@ -51,16 +49,16 @@ public class CategoryFinderImpl implements CategoryFinder {
                     .collect(Collectors.toList());
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     categoryVos);
-            });
-        return SubscriberUtils.subscribe(mono);
+            })
+            .block();
     }
 
     @Override
     public List<CategoryVo> listAll() {
-        Mono<List<CategoryVo>> listMono = client.list(Category.class, null, defaultComparator())
+        return client.list(Category.class, null, defaultComparator())
             .map(CategoryVo::from)
-            .collectList();
-        return SubscriberUtils.subscribe(listMono);
+            .collectList()
+            .block();
     }
 
     @Override

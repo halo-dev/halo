@@ -8,14 +8,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
-import run.halo.app.theme.finders.SubscriberUtils;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.PostVo;
 
@@ -43,10 +41,10 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public ContentVo content(String postName) {
-        Mono<ContentVo> mono = contentService.getContent(postName)
+        return contentService.getContent(postName)
             .map(wrapper -> ContentVo.builder().content(wrapper.content())
-                .raw(wrapper.raw()).build());
-        return SubscriberUtils.subscribe(mono);
+                .raw(wrapper.raw()).build())
+            .block();
     }
 
     @Override
@@ -85,9 +83,9 @@ public class PostFinderImpl implements PostFinder {
     private ListResult<Post> listPost(int page, int size, Predicate<Post> postPredicate) {
         Predicate<Post> predicate = FIXED_PREDICATE
             .and(postPredicate == null ? post -> true : postPredicate);
-        Mono<ListResult<Post>> mono = client.list(Post.class, predicate,
-            defaultComparator(), Math.max(page - 1, 0), size);
-        return SubscriberUtils.subscribe(mono);
+        return client.list(Post.class, predicate,
+            defaultComparator(), Math.max(page - 1, 0), size)
+            .block();
     }
 
     static Comparator<Post> defaultComparator() {

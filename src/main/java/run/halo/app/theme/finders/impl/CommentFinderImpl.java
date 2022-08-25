@@ -7,14 +7,12 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.springframework.util.Assert;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Reply;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.Finder;
-import run.halo.app.theme.finders.SubscriberUtils;
 import run.halo.app.theme.finders.vo.CommentVo;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
@@ -35,30 +33,29 @@ public class CommentFinderImpl implements CommentFinder {
 
     @Override
     public CommentVo getByName(String name) {
-        Mono<CommentVo> mono = client.fetch(Comment.class, name)
-            .map(CommentVo::from);
-        return SubscriberUtils.subscribe(mono);
+        return client.fetch(Comment.class, name)
+            .map(CommentVo::from)
+            .block();
     }
 
     @Override
     public ListResult<CommentVo> list(Comment.CommentSubjectRef ref, int page, int size) {
-        Mono<ListResult<CommentVo>> mono =
-            client.list(Comment.class, fixedPredicate(ref),
-                    defaultComparator(),
-                    Math.max(page - 1, 0), size)
-                .map(list -> {
-                    List<CommentVo> commentVos = list.get().map(CommentVo::from).toList();
-                    return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
-                        commentVos);
-                });
-        return SubscriberUtils.subscribe(mono);
+        return client.list(Comment.class, fixedPredicate(ref),
+                defaultComparator(),
+                Math.max(page - 1, 0), size)
+            .map(list -> {
+                List<CommentVo> commentVos = list.get().map(CommentVo::from).toList();
+                return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
+                    commentVos);
+            })
+            .block();
     }
 
     @Override
     public ListResult<ReplyVo> listReply(String commentName, int page, int size) {
         Comparator<Reply> comparator =
             Comparator.comparing(reply -> reply.getMetadata().getCreationTimestamp());
-        Mono<ListResult<ReplyVo>> mono = client.list(Reply.class,
+        return client.list(Reply.class,
                 reply -> reply.getSpec().getCommentName().equals(commentName)
                     && Objects.equals(false, reply.getSpec().getHidden())
                     && Objects.equals(true, reply.getSpec().getApproved()),
@@ -67,8 +64,8 @@ public class CommentFinderImpl implements CommentFinder {
                 List<ReplyVo> replyVos = list.get().map(ReplyVo::from).toList();
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     replyVos);
-            });
-        return SubscriberUtils.subscribe(mono);
+            })
+            .block();
     }
 
     private Predicate<Comment> fixedPredicate(Comment.CommentSubjectRef ref) {

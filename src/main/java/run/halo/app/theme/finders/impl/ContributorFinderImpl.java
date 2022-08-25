@@ -1,13 +1,11 @@
 package run.halo.app.theme.finders.impl;
 
 import java.util.List;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.Contributor;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
-import run.halo.app.theme.finders.SubscriberUtils;
 
 /**
  * A default implementation of {@link ContributorFinder}.
@@ -26,9 +24,9 @@ public class ContributorFinderImpl implements ContributorFinder {
 
     @Override
     public Contributor getContributor(String name) {
-        Mono<Contributor> mono = client.fetch(User.class, name)
-            .map(Contributor::from);
-        return SubscriberUtils.subscribe(mono);
+        return client.fetch(User.class, name)
+            .map(Contributor::from)
+            .block();
     }
 
     @Override
