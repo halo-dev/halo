@@ -1,5 +1,11 @@
-import { definePlugin, SystemSettingsLayout } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/admin-shared";
+import SystemSettingsLayout from "./layouts/SystemSettingsLayout.vue";
 import GeneralSettings from "./GeneralSettings.vue";
+import UserSettings from "./UserSettings.vue";
+import PostSettings from "./PostSettings.vue";
+import SeoSettings from "./SeoSettings.vue";
+import CommentSettings from "./CommentSettings.vue";
+import CodeInjectSettings from "./CodeInjectSettings.vue";
 import NotificationSettings from "./NotificationSettings.vue";
 import { IconSettings } from "@halo-dev/components";
 
@@ -16,6 +22,31 @@ export default definePlugin({
           path: "general",
           name: "GeneralSettings",
           component: GeneralSettings,
+        },
+        {
+          path: "user",
+          name: "UserSettings",
+          component: UserSettings,
+        },
+        {
+          path: "post",
+          name: "PostSettings",
+          component: PostSettings,
+        },
+        {
+          path: "seo",
+          name: "SeoSettings",
+          component: SeoSettings,
+        },
+        {
+          path: "comment",
+          name: "CommentSettings",
+          component: CommentSettings,
+        },
+        {
+          path: "code-inject",
+          name: "CodeInjectSettings",
+          component: CodeInjectSettings,
         },
         {
           path: "notification",

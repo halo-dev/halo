@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BasicLayout } from "./index";
+import { BasicLayout } from "@halo-dev/admin-shared";
 import {
   IconSettings,
   VButton,
@@ -15,6 +15,31 @@ const SettingTabs = [
     id: "general",
     label: "基本设置",
     routeName: "GeneralSettings",
+  },
+  {
+    id: "user",
+    label: "用户设置",
+    routeName: "UserSettings",
+  },
+  {
+    id: "post",
+    label: "文章设置",
+    routeName: "PostSettings",
+  },
+  {
+    id: "seo",
+    label: "SEO 设置",
+    routeName: "SeoSettings",
+  },
+  {
+    id: "comment",
+    label: "评论设置",
+    routeName: "CommentSettings",
+  },
+  {
+    id: "code-inject",
+    label: "代码注入",
+    routeName: "CodeInjectSettings",
   },
   {
     id: "notification",

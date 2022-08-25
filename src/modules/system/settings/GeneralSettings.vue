@@ -4,7 +4,6 @@ import { VButton } from "@halo-dev/components";
 <template>
   <div class="w-1/3">
     <FormKit :actions="false" type="form">
-      <FormKit label="站点地址" type="url"></FormKit>
       <FormKit label="站点标题" type="text"></FormKit>
       <FormKit label="站点副标题" type="text"></FormKit>
       <FormKit label="Logo" type="url"></FormKit>
