@@ -13,6 +13,7 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
+import PostPreviewModal from "./components/PostPreviewModal.vue";
 import type { PostRequest } from "@halo-dev/api-client";
 import { computed, onMounted, ref, watch } from "vue";
 import cloneDeep from "lodash.clonedeep";
@@ -65,6 +66,7 @@ const initialFormState: PostRequest = {
 
 const formState = ref<PostRequest>(cloneDeep(initialFormState));
 const settingModal = ref(false);
+const previewModal = ref(false);
 const saving = ref(false);
 const extraActiveId = ref("toc");
 
@@ -217,12 +219,16 @@ onMounted(async () => {
     :post="formState"
     @saved="onSettingSaved"
   />
+  <PostPreviewModal v-model:visible="previewModal" :post="formState.post" />
   <VPageHeader title="文章">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
+        <VButton size="sm" type="default" @click="previewModal = true">
+          预览
+        </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           保存
         </VButton>
