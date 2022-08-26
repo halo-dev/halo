@@ -43,7 +43,7 @@ public class TagFinderImpl implements TagFinder {
     @Override
     public ListResult<TagVo> list(int page, int size) {
         return client.list(Tag.class, null,
-                DEFAULT_COMPARATOR.reversed(), Math.max(page - 1, 0), size)
+                DEFAULT_COMPARATOR.reversed(), page, size)
             .map(list -> {
                 List<TagVo> tagVos = list.stream()
                     .map(TagVo::from)

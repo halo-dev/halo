@@ -50,7 +50,7 @@ public class CategoryFinderImpl implements CategoryFinder {
     @Override
     public ListResult<CategoryVo> list(int page, int size) {
         return client.list(Category.class, null,
-                defaultComparator(), Math.max(page - 1, 0), size)
+                defaultComparator(), page, size)
             .map(list -> {
                 List<CategoryVo> categoryVos = list.stream()
                     .map(CategoryVo::from)

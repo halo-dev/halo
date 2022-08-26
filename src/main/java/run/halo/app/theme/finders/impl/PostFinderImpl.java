@@ -87,7 +87,7 @@ public class PostFinderImpl implements PostFinder {
         Predicate<Post> predicate = FIXED_PREDICATE
             .and(postPredicate == null ? post -> true : postPredicate);
         ListResult<Post> list = client.list(Post.class, predicate,
-                defaultComparator(), Math.max(page - 1, 0), size)
+                defaultComparator(), page, size)
             .block();
         if (list == null) {
             return new ListResult<>(0, 0, 0, List.of());

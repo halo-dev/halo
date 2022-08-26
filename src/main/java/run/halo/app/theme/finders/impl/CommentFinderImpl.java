@@ -42,7 +42,7 @@ public class CommentFinderImpl implements CommentFinder {
     public ListResult<CommentVo> list(Comment.CommentSubjectRef ref, int page, int size) {
         return client.list(Comment.class, fixedPredicate(ref),
                 defaultComparator(),
-                Math.max(page - 1, 0), size)
+                page, size)
             .map(list -> {
                 List<CommentVo> commentVos = list.get().map(CommentVo::from).toList();
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
