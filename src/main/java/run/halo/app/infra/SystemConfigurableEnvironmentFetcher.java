@@ -15,7 +15,7 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Component
 public class SystemConfigurableEnvironmentFetcher {
-    private static final String SYSTEM_CONFIGMAP_NAME = "system";
+    public static final String SYSTEM_CONFIGMAP_NAME = "system";
 
     private final ReactiveExtensionClient extensionClient;
     private final ConversionService conversionService;
