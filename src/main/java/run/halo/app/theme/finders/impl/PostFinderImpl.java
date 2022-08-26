@@ -7,11 +7,14 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.CategoryFinder;
+import run.halo.app.theme.finders.Contributor;
+import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.TagFinder;
@@ -41,14 +44,28 @@ public class PostFinderImpl implements PostFinder {
 
     private final CategoryFinder categoryFinder;
 
+    private final ContributorFinder contributorFinder;
+
     public PostFinderImpl(ReactiveExtensionClient client,
         ContentService contentService,
         TagFinder tagFinder,
-        CategoryFinder categoryFinder) {
+        CategoryFinder categoryFinder,
+        ContributorFinder contributorFinder) {
         this.client = client;
         this.contentService = contentService;
         this.tagFinder = tagFinder;
         this.categoryFinder = categoryFinder;
+        this.contributorFinder = contributorFinder;
+    }
+
+    @Override
+    public PostVo getByName(String postName) {
+        Post post = client.fetch(Post.class, postName)
+            .block();
+        if (post == null) {
+            return null;
+        }
+        return getPostVo(post);
     }
 
     @Override
@@ -93,14 +110,21 @@ public class PostFinderImpl implements PostFinder {
             return new ListResult<>(0, 0, 0, List.of());
         }
         List<PostVo> postVos = list.get()
-            .map(post -> {
-                PostVo postVo = PostVo.from(post);
-                List<CategoryVo> categoryVos =
-                    categoryFinder.getByNames(post.getSpec().getCategories());
-                List<TagVo> tagVos = tagFinder.getByNames(post.getSpec().getTags());
-                return postVo.withTags(tagVos).withCategories(categoryVos);
-            }).toList();
+            .map(this::getPostVo)
+            .toList();
         return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), postVos);
+    }
+
+    private PostVo getPostVo(@NonNull Post post) {
+        List<TagVo> tags = tagFinder.getByNames(post.getSpec().getTags());
+        List<CategoryVo> categoryVos = categoryFinder.getByNames(post.getSpec().getCategories());
+        List<Contributor> contributors =
+            contributorFinder.getContributors(post.getStatus().getContributors());
+        PostVo postVo = PostVo.from(post);
+        postVo.setCategories(categoryVos);
+        postVo.setTags(tags);
+        postVo.setContributors(contributors);
+        return postVo;
     }
 
     static Comparator<Post> defaultComparator() {

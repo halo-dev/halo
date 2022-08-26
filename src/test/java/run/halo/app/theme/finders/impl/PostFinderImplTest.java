@@ -18,6 +18,7 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.CategoryFinder;
+import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ContentVo;
 
@@ -42,11 +43,15 @@ class PostFinderImplTest {
     @Mock
     private TagFinder tagFinder;
 
+    @Mock
+    private ContributorFinder contributorFinder;
+
     private PostFinderImpl postFinder;
 
     @BeforeEach
     void setUp() {
-        postFinder = new PostFinderImpl(client, contentService, tagFinder, categoryFinder);
+        postFinder = new PostFinderImpl(client, contentService, tagFinder, categoryFinder,
+            contributorFinder);
     }
 
     @Test

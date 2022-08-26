@@ -13,6 +13,8 @@ import run.halo.app.theme.finders.vo.PostVo;
  */
 public interface PostFinder {
 
+    PostVo getByName(String postName);
+
     ContentVo content(String postName);
 
     ListResult<PostVo> list(int page, int size);

@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.Builder;
-import lombok.Value;
-import lombok.With;
+import lombok.Data;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Post;
+import run.halo.app.theme.finders.Contributor;
 
 /**
  * A value object for {@link Post}.
@@ -16,7 +16,7 @@ import run.halo.app.core.extension.Post;
  * @author guqing
  * @since 2.0.0
  */
-@Value
+@Data
 @Builder
 public class PostVo {
 
@@ -48,17 +48,15 @@ public class PostVo {
 
     String excerpt;
 
-    @With
     List<CategoryVo> categories;
 
-    @With
     List<TagVo> tags;
 
     List<Map<String, String>> htmlMetas;
 
     String permalink;
 
-    List<String> contributors;
+    List<Contributor> contributors;
 
     Map<String, String> annotations;
 
@@ -91,7 +89,7 @@ public class PostVo {
             .template(spec.getTemplate())
             .permalink(postStatus.getPermalink())
             .excerpt(postStatus.getExcerpt())
-            .contributors(nullSafe(postStatus.getContributors()))
+            .contributors(List.of())
             .build();
     }
 
