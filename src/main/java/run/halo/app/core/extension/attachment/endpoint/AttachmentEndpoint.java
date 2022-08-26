@@ -15,6 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -92,27 +95,32 @@ public class AttachmentEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> upload(ServerRequest request) {
-        return request.body(toMultipartData())
-            .map(UploadRequest::new)
-            .zipWhen(uploadRequest -> {
-                // check the policy
-                return client.get(Policy.class, uploadRequest.getPolicyName());
-            })
-            .flatMap(tuple2 -> {
-                var uploadRequest = tuple2.getT1();
-                var policy = tuple2.getT2();
-                var uploadOption = new UploadOption(uploadRequest.getFile(), policy);
-                return Flux.fromIterable(pluginManager.getExtensions(AttachmentUploadHandler.class))
-                    .concatMap(uploadHandler -> uploadHandler.upload(uploadOption))
-                    .next()
-                    .switchIfEmpty(Mono.error(
-                        () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                            "No suitable handler found for uploading the attachment")));
-            })
-            .flatMap(client::create)
-            .flatMap(attachment -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(attachment));
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(Authentication::getName)
+            .flatMap(username -> request.body(toMultipartData())
+                .map(UploadRequest::new)
+                .zipWhen(uploadRequest -> {
+                    // check the policy
+                    return client.get(Policy.class, uploadRequest.getPolicyName());
+                })
+                .flatMap(tuple2 -> {
+                    var uploadRequest = tuple2.getT1();
+                    var policy = tuple2.getT2();
+                    var uploadOption =
+                        new UploadOption(uploadRequest.getFile(), policy, username);
+                    return Flux.fromIterable(
+                            pluginManager.getExtensions(AttachmentUploadHandler.class))
+                        .concatMap(uploadHandler -> uploadHandler.upload(uploadOption))
+                        .next()
+                        .switchIfEmpty(Mono.error(
+                            () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                                "No suitable handler found for uploading the attachment")));
+                })
+                .flatMap(client::create)
+                .flatMap(attachment -> ServerResponse.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(attachment)));
     }
 
 }

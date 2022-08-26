@@ -3,9 +3,11 @@ package run.halo.app.core.extension.attachment.endpoint;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
@@ -39,8 +41,12 @@ public class LocalAttachmentUploadHandler implements AttachmentUploadHandler {
                 metadata.setName(UUID.randomUUID().toString());
                 metadata.setLabels(Map.of("storage.halo.run/file-name", file.filename()));
                 var spec = new AttachmentSpec();
+                spec.setUploadedBy(Ref.of(option.username()));
                 spec.setPolicyRef(Ref.of(option.policy()));
-                spec.setMediaType(file.headers().getContentType().toString());
+                file.headers().getContentType();
+                spec.setMediaType(Optional.ofNullable(file.headers().getContentType())
+                    .map(MediaType::toString)
+                    .orElse(null));
                 spec.setDisplayName(FileNameUtils.removeFileExtension(file.filename(), true));
                 var attachment = new Attachment();
                 attachment.setMetadata(metadata);
@@ -48,12 +54,8 @@ public class LocalAttachmentUploadHandler implements AttachmentUploadHandler {
 
                 log.info("Trying to write attachment into {}", attachmentPath);
                 return DataBufferUtils.write(file.content(), attachmentPath, CREATE_NEW)
-                    .doOnNext(v -> spec.setSize(attachmentPath.toFile().length()))
-                    .then(Mono.fromCallable(() -> {
-                        // reset the size at last
-                        spec.setSize(attachmentPath.toFile().length());
-                        return attachment;
-                    }));
+                    .then(Mono.fromRunnable(() -> spec.setSize(attachmentPath.toFile().length())))
+                    .thenReturn(attachment);
             });
     }
 
