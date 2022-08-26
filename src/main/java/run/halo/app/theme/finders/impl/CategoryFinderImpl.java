@@ -44,7 +44,9 @@ public class CategoryFinderImpl implements CategoryFinder {
         if (names == null) {
             return List.of();
         }
-        return names.stream().map(this::getByName).toList();
+        return names.stream().map(this::getByName)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     @Override

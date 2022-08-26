@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.impl;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ListResult;
@@ -37,7 +38,9 @@ public class TagFinderImpl implements TagFinder {
 
     @Override
     public List<TagVo> getByNames(List<String> names) {
-        return names.stream().map(this::getByName).toList();
+        return names.stream().map(this::getByName)
+            .filter(Objects::nonNull)
+            .toList();
     }
 
     @Override

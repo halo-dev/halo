@@ -70,7 +70,9 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public ContentVo content(String postName) {
-        return contentService.getContent(postName)
+        return client.fetch(Post.class, postName)
+            .map(post -> post.getSpec().getReleaseSnapshot())
+            .flatMap(contentService::getContent)
             .map(wrapper -> ContentVo.builder().content(wrapper.content())
                 .raw(wrapper.raw()).build())
             .block();

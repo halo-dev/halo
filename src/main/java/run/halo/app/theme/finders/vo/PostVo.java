@@ -83,6 +83,7 @@ public class PostVo {
             .slug(spec.getSlug())
             .htmlMetas(nullSafe(spec.getHtmlMetas()))
             .published(spec.getPublished())
+            .publishTime(spec.getPublishTime())
             .priority(spec.getPriority())
             .version(spec.getVersion())
             .visible(spec.getVisible())

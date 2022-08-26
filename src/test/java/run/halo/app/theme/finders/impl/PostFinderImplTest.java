@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
@@ -56,8 +57,12 @@ class PostFinderImplTest {
 
     @Test
     void content() {
+        Post post = post(1);
+        post.getSpec().setReleaseSnapshot("release-snapshot");
         ContentWrapper contentWrapper = new ContentWrapper("snapshot", "raw", "content", "rawType");
-        when(contentService.getContent("post-1"))
+        when(client.fetch(eq(Post.class), eq("post-1")))
+            .thenReturn(Mono.just(post));
+        when(contentService.getContent(post.getSpec().getReleaseSnapshot()))
             .thenReturn(Mono.just(contentWrapper));
         ContentVo content = postFinder.content("post-1");
         assertThat(content.getContent()).isEqualTo(contentWrapper.content());

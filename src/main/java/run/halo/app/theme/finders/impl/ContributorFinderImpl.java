@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders.impl;
 
 import java.util.List;
+import java.util.Objects;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.Contributor;
@@ -34,6 +35,9 @@ public class ContributorFinderImpl implements ContributorFinder {
         if (names == null) {
             return List.of();
         }
-        return names.stream().map(this::getContributor).toList();
+        return names.stream()
+            .map(this::getContributor)
+            .filter(Objects::nonNull)
+            .toList();
     }
 }
