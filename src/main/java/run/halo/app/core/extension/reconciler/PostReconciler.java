@@ -88,6 +88,7 @@ public class PostReconciler implements Reconciler<Request> {
         }
 
         // handle contributors
+        String headSnapshot = post.getSpec().getHeadSnapshot();
         contentService.listSnapshots(Snapshot.SubjectRef.of(Post.KIND, name))
             .collectList()
             .subscribe(snapshots -> {
@@ -102,6 +103,14 @@ public class PostReconciler implements Reconciler<Request> {
                     .sorted()
                     .toList();
                 status.setContributors(contributors);
+
+                // update in progress status
+                snapshots.stream()
+                    .filter(snapshot -> snapshot.getMetadata().getName().equals(headSnapshot))
+                    .findAny()
+                    .ifPresent(snapshot -> {
+                        status.setInProgress(!isPublished(snapshot));
+                    });
             });
 
         // handle cancel publish,has released version and published is false and not handled
@@ -148,5 +157,9 @@ public class PostReconciler implements Reconciler<Request> {
         String text = Jsoup.parse(shortHtmlContent).text();
         // TODO The default capture 150 words as excerpt
         return StringUtils.substring(text, 0, 150);
+    }
+
+    private boolean isPublished(Snapshot snapshot) {
+        return snapshot.getSpec().getPublishTime() != null;
     }
 }
