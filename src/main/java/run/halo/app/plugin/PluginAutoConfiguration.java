@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.ClassLoadingStrategy;
 import org.pf4j.CompoundPluginLoader;
 import org.pf4j.CompoundPluginRepository;
+import org.pf4j.DefaultExtensionFinder;
 import org.pf4j.DefaultPluginRepository;
 import org.pf4j.DevelopmentPluginLoader;
+import org.pf4j.ExtensionFinder;
 import org.pf4j.JarPluginLoader;
 import org.pf4j.JarPluginRepository;
 import org.pf4j.PluginClassLoader;
@@ -37,13 +39,16 @@ import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 public class PluginAutoConfiguration {
 
     private final PluginProperties pluginProperties;
+    private final ClassPathExtensionFinder classPathExtensionFinder;
 
     @Qualifier("webFluxContentTypeResolver")
     private final RequestedContentTypeResolver requestedContentTypeResolver;
 
     public PluginAutoConfiguration(PluginProperties pluginProperties,
+        ClassPathExtensionFinder classPathExtensionFinder,
         RequestedContentTypeResolver requestedContentTypeResolver) {
         this.pluginProperties = pluginProperties;
+        this.classPathExtensionFinder = classPathExtensionFinder;
         this.requestedContentTypeResolver = requestedContentTypeResolver;
     }
 
@@ -143,6 +148,15 @@ public class PluginAutoConfiguration {
                         .add(new JarPluginRepository(getPluginsRoots()), this::isNotDevelopment)
                         .add(new DefaultPluginRepository(getPluginsRoots()),
                             this::isNotDevelopment);
+                }
+
+                @Override
+                protected ExtensionFinder createExtensionFinder() {
+                    DefaultExtensionFinder extensionFinder = new DefaultExtensionFinder(this);
+                    addPluginStateListener(extensionFinder);
+                    extensionFinder.add(new SpringComponentsFinder(this));
+                    extensionFinder.add(classPathExtensionFinder);
+                    return extensionFinder;
                 }
             };
 

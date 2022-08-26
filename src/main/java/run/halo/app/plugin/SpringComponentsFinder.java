@@ -11,12 +11,13 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.locks.StampedLock;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.AbstractExtensionFinder;
+import org.pf4j.ExtensionWrapper;
 import org.pf4j.PluginDependency;
-import org.pf4j.PluginManager;
 import org.pf4j.PluginState;
 import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginWrapper;
@@ -37,8 +38,28 @@ public class SpringComponentsFinder extends AbstractExtensionFinder {
     public static final String EXTENSIONS_RESOURCE = "META-INF/plugin-components.idx";
     private final StampedLock entryStampedLock = new StampedLock();
 
-    public SpringComponentsFinder(PluginManager pluginManager) {
+    public SpringComponentsFinder(HaloPluginManager pluginManager) {
         super(pluginManager);
+    }
+
+    @Override
+    public Set<String> findClassNames(String pluginId) {
+        return Objects.requireNonNullElse(super.findClassNames(pluginId), Set.of());
+    }
+
+    @Override
+    public <T> List<ExtensionWrapper<T>> find(Class<T> type) {
+        return Objects.requireNonNullElse(super.find(type), List.of());
+    }
+
+    @Override
+    public <T> List<ExtensionWrapper<T>> find(Class<T> type, String pluginId) {
+        return Objects.requireNonNullElse(super.find(type, pluginId), List.of());
+    }
+
+    @Override
+    public List<ExtensionWrapper> find(String pluginId) {
+        return Objects.requireNonNullElse(super.find(pluginId), List.of());
     }
 
     @Override

@@ -10,7 +10,6 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFactory;
-import org.pf4j.ExtensionFinder;
 import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
@@ -61,11 +60,6 @@ public class HaloPluginManager extends DefaultPluginManager
     @Override
     protected ExtensionFactory createExtensionFactory() {
         return new SpringExtensionFactory(this);
-    }
-
-    @Override
-    protected ExtensionFinder createExtensionFinder() {
-        return new SpringComponentsFinder(this);
     }
 
     public ApplicationContext getRootApplicationContext() {
@@ -182,7 +176,6 @@ public class HaloPluginManager extends DefaultPluginManager
         long ts = System.currentTimeMillis();
 
         for (PluginWrapper pluginWrapper : resolvedPlugins) {
-            checkExtensionFinderReady(pluginWrapper);
             PluginState pluginState = pluginWrapper.getPluginState();
             if ((PluginState.DISABLED != pluginState) && (PluginState.STARTED != pluginState)) {
                 try {
@@ -233,7 +226,6 @@ public class HaloPluginManager extends DefaultPluginManager
         checkPluginId(pluginId);
 
         PluginWrapper pluginWrapper = getPlugin(pluginId);
-        checkExtensionFinderReady(pluginWrapper);
 
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
         PluginState pluginState = pluginWrapper.getPluginState();
@@ -287,15 +279,6 @@ public class HaloPluginManager extends DefaultPluginManager
             firePluginStateEvent(new PluginStateEvent(this, pluginWrapper, pluginState));
         }
         return pluginWrapper.getPluginState();
-    }
-
-    private void checkExtensionFinderReady(PluginWrapper pluginWrapper) {
-        if (extensionFinder instanceof SpringComponentsFinder springComponentsFinder) {
-            springComponentsFinder.readPluginStorageToMemory(pluginWrapper);
-            return;
-        }
-        // should never happen
-        throw new PluginRuntimeException("Plugin component classes may not loaded yet.");
     }
 
     private void doStopPlugins() {
