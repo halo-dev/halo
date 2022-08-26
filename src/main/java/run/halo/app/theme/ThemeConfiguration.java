@@ -47,14 +47,75 @@ public class ThemeConfiguration {
     RouterFunction<ServerResponse> routeIndex() {
         return RouterFunctions
             .route(GET("/").or(GET("/index"))
+                    .or(GET("/page/{page}"))
                     .and(accept(MediaType.TEXT_HTML)),
                 request -> ServerResponse.ok().render("index"));
     }
 
     @Bean
-    RouterFunction<ServerResponse> about() {
-        return RouterFunctions.route(GET("/about").and(accept(MediaType.TEXT_HTML)),
-            request -> ServerResponse.ok().render("about"));
+    RouterFunction<ServerResponse> routePosts() {
+        // prefix
+        // posts
+        return RouterFunctions
+            .route(GET("archives")
+                    .or(GET("/archives/page/{page}"))
+                    .or(GET("/archives/{year}/{month}"))
+                    .or(GET("/archives/{year}/{month}/page/{page}"))
+                    .and(accept(MediaType.TEXT_HTML)),
+                request -> ServerResponse.ok().render("archives"));
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> routePost() {
+        // /archives/{slug}
+        // /archives/{name}
+        // /?p={name}
+        // /{year}/{month}/{slug}
+        // /{year}/{slug}
+        // /{year}/{month}/{day}/{slug}
+
+        // /categories/{categorySlug}/{slug}
+        // /products/halo/halo-2-0-0-released // /categories/products/jumpserver//halo-2-0-0-released
+        return RouterFunctions
+            .route(GET("/archives/{slug}")
+                    .and(accept(MediaType.TEXT_HTML)),
+                request -> ServerResponse.ok().render("post"));
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> routeCategories() {
+        // prefix
+        return RouterFunctions
+            .route(GET("/categories")
+                    .and(accept(MediaType.TEXT_HTML)),
+                request -> ServerResponse.ok().render("categories"));
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> routeCategory() {
+        // prefix
+        return RouterFunctions
+            .route(GET("/categories/{slug}")
+                .or(GET("/categories/{slug}/page/{page}"))
+                    .and(accept(MediaType.TEXT_HTML)),
+                request -> ServerResponse.ok().render("category"));
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> routeTags() {
+        // prefix
+        return RouterFunctions
+            .route(GET("/tags")
+                    .and(accept(MediaType.TEXT_HTML)),
+                request -> ServerResponse.ok().render("tags"));
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> routeTag() {
+        return RouterFunctions
+            .route(GET("/tags/{slug}")
+                    .and(accept(MediaType.TEXT_HTML)),
+                request -> ServerResponse.ok().render("tag"));
     }
 
     private Path getThemeAssetsPath(String themeName, String resource) {
