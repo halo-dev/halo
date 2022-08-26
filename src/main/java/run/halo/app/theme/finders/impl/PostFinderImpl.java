@@ -6,16 +6,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.TagFinder;
+import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.TagVo;
 
 /**
  * A finder for {@link Post}.
@@ -34,9 +37,18 @@ public class PostFinderImpl implements PostFinder {
 
     private final ContentService contentService;
 
-    public PostFinderImpl(ReactiveExtensionClient client, ContentService contentService) {
+    private final TagFinder tagFinder;
+
+    private final CategoryFinder categoryFinder;
+
+    public PostFinderImpl(ReactiveExtensionClient client,
+        ContentService contentService,
+        TagFinder tagFinder,
+        CategoryFinder categoryFinder) {
         this.client = client;
         this.contentService = contentService;
+        this.tagFinder = tagFinder;
+        this.categoryFinder = categoryFinder;
     }
 
     @Override
@@ -49,28 +61,19 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public ListResult<PostVo> list(int page, int size) {
-        ListResult<Post> posts = listPost(page, size, null);
-        List<PostVo> postVos = posts.get().map(PostVo::from)
-            .collect(Collectors.toList());
-        return new ListResult<>(posts.getPage(), posts.getSize(), posts.getTotal(), postVos);
+        return listPost(page, size, null);
     }
 
     @Override
     public ListResult<PostVo> listByCategory(int page, int size, String categoryName) {
-        ListResult<Post> posts = listPost(page, size,
+        return listPost(page, size,
             post -> contains(post.getSpec().getCategories(), categoryName));
-        List<PostVo> postVos = posts.get().map(PostVo::from)
-            .collect(Collectors.toList());
-        return new ListResult<>(posts.getPage(), posts.getSize(), posts.getTotal(), postVos);
     }
 
     @Override
     public ListResult<PostVo> listByTag(int page, int size, String tag) {
-        ListResult<Post> posts = listPost(page, size,
+        return listPost(page, size,
             post -> contains(post.getSpec().getTags(), tag));
-        List<PostVo> postVos = posts.get().map(PostVo::from)
-            .collect(Collectors.toList());
-        return new ListResult<>(posts.getPage(), posts.getSize(), posts.getTotal(), postVos);
     }
 
     private boolean contains(List<String> c, String key) {
@@ -80,12 +83,24 @@ public class PostFinderImpl implements PostFinder {
         return c.contains(key);
     }
 
-    private ListResult<Post> listPost(int page, int size, Predicate<Post> postPredicate) {
+    private ListResult<PostVo> listPost(int page, int size, Predicate<Post> postPredicate) {
         Predicate<Post> predicate = FIXED_PREDICATE
             .and(postPredicate == null ? post -> true : postPredicate);
-        return client.list(Post.class, predicate,
-            defaultComparator(), Math.max(page - 1, 0), size)
+        ListResult<Post> list = client.list(Post.class, predicate,
+                defaultComparator(), Math.max(page - 1, 0), size)
             .block();
+        if (list == null) {
+            return new ListResult<>(0, 0, 0, List.of());
+        }
+        List<PostVo> postVos = list.get()
+            .map(post -> {
+                PostVo postVo = PostVo.from(post);
+                List<CategoryVo> categoryVos =
+                    categoryFinder.getByNames(post.getSpec().getCategories());
+                List<TagVo> tagVos = tagFinder.getByNames(post.getSpec().getTags());
+                return postVo.withTags(tagVos).withCategories(categoryVos);
+            }).toList();
+        return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), postVos);
     }
 
     static Comparator<Post> defaultComparator() {

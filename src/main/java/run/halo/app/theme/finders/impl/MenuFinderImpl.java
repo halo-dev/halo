@@ -33,15 +33,33 @@ public class MenuFinderImpl implements MenuFinder {
     }
 
     @Override
-    public List<MenuVo> listAll() {
+    public MenuVo getByName(String name) {
+        return listAsTree().stream()
+            .filter(menu -> menu.getName().equals(name))
+            .findAny()
+            .orElse(null);
+    }
+
+    @Override
+    public MenuVo getDefault() {
+        List<MenuVo> menuVos = listAsTree();
+        if (CollectionUtils.isEmpty(menuVos)) {
+            return null;
+        }
+        // TODO If there are multiple groups of menus,
+        //  return the first as the default, and consider optimizing it later
+        return menuVos.get(0);
+    }
+
+
+    List<MenuVo> listAll() {
         return client.list(Menu.class, null, null)
             .map(MenuVo::from)
             .collectList()
             .block();
     }
 
-    @Override
-    public List<MenuVo> listAsTree() {
+    List<MenuVo> listAsTree() {
         List<MenuItemVo> menuItemVos = populateParentName(listAllMenuItem());
         List<MenuItemVo> treeList = listToTree(menuItemVos);
         Map<String, MenuItemVo> nameItemRootNodeMap = treeList.stream()
@@ -69,8 +87,7 @@ public class MenuFinderImpl implements MenuFinder {
             .collect(Collectors.toList());
     }
 
-    @Override
-    public List<MenuItemVo> listAllMenuItem() {
+    List<MenuItemVo> listAllMenuItem() {
         Function<MenuItem, Integer> priority = menuItem -> menuItem.getSpec().getPriority();
         Function<MenuItem, String> name = menuItem -> menuItem.getMetadata().getName();
 

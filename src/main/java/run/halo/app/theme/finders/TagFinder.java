@@ -15,6 +15,8 @@ public interface TagFinder {
 
     TagVo getByName(String name);
 
+    List<TagVo> getByNames(List<String> names);
+
     ListResult<TagVo> list(int page, int size);
 
     List<TagVo> listAll();

@@ -16,6 +16,8 @@ public interface CategoryFinder {
 
     CategoryVo getByName(String name);
 
+    List<CategoryVo> getByNames(List<String> names);
+
     ListResult<CategoryVo> list(int page, int size);
 
     List<CategoryVo> listAll();

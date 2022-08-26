@@ -36,6 +36,11 @@ public class TagFinderImpl implements TagFinder {
     }
 
     @Override
+    public List<TagVo> getByNames(List<String> names) {
+        return names.stream().map(this::getByName).toList();
+    }
+
+    @Override
     public ListResult<TagVo> list(int page, int size) {
         return client.list(Tag.class, null,
                 DEFAULT_COMPARATOR.reversed(), Math.max(page - 1, 0), size)

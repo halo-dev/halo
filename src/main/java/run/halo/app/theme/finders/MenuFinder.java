@@ -1,7 +1,5 @@
 package run.halo.app.theme.finders;
 
-import java.util.List;
-import run.halo.app.theme.finders.vo.MenuItemVo;
 import run.halo.app.theme.finders.vo.MenuVo;
 
 /**
@@ -12,9 +10,7 @@ import run.halo.app.theme.finders.vo.MenuVo;
  */
 public interface MenuFinder {
 
-    List<MenuVo> listAll();
+    MenuVo getByName(String name);
 
-    List<MenuVo> listAsTree();
-
-    List<MenuItemVo> listAllMenuItem();
+    MenuVo getDefault();
 }

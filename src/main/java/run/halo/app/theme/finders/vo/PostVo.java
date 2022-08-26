@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.Builder;
 import lombok.Value;
+import lombok.With;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Post;
 
@@ -24,8 +25,6 @@ public class PostVo {
     String title;
 
     String slug;
-
-    String snapshot;
 
     String owner;
 
@@ -49,9 +48,11 @@ public class PostVo {
 
     String excerpt;
 
-    List<String> categories;
+    @With
+    List<CategoryVo> categories;
 
-    List<String> tags;
+    @With
+    List<TagVo> tags;
 
     List<Map<String, String>> htmlMetas;
 
@@ -77,8 +78,8 @@ public class PostVo {
             .title(spec.getTitle())
             .cover(spec.getCover())
             .allowComment(spec.getAllowComment())
-            .categories(nullSafe(spec.getCategories()))
-            .tags(spec.getTags())
+            .categories(List.of())
+            .tags(List.of())
             .owner(spec.getOwner())
             .pinned(spec.getPinned())
             .slug(spec.getSlug())
@@ -88,7 +89,6 @@ public class PostVo {
             .version(spec.getVersion())
             .visible(spec.getVisible())
             .template(spec.getTemplate())
-            .snapshot(spec.getReleaseSnapshot())
             .permalink(postStatus.getPermalink())
             .excerpt(postStatus.getExcerpt())
             .contributors(nullSafe(postStatus.getContributors()))

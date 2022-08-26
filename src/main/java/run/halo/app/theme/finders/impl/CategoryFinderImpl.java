@@ -40,6 +40,14 @@ public class CategoryFinderImpl implements CategoryFinder {
     }
 
     @Override
+    public List<CategoryVo> getByNames(List<String> names) {
+        if (names == null) {
+            return List.of();
+        }
+        return names.stream().map(this::getByName).toList();
+    }
+
+    @Override
     public ListResult<CategoryVo> list(int page, int size) {
         return client.list(Category.class, null,
                 defaultComparator(), Math.max(page - 1, 0), size)
