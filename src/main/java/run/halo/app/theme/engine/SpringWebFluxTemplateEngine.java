@@ -37,6 +37,7 @@ import org.thymeleaf.util.LoggingUtils;
 import org.thymeleaf.web.IWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 
 /**
@@ -46,6 +47,10 @@ import reactor.core.publisher.Mono;
  * </p>
  * Code from
  * <a href="https://github.com/thymeleaf/thymeleaf/blob/3.1-master/lib/thymeleaf-spring6/src/main/java/org/thymeleaf/spring6/SpringWebFluxTemplateEngine.java">thymeleaf SpringWebFluxTemplateEngine</a>
+ *
+ * <p>Note that: We need to subscribe on a new thread to support blocking operations
+ * for theme finders in {@link #createDataDrivenStream} and {@link #createFullStream} and
+ * {@link #createChunkedStream}.</p>
  *
  * @author Daniel Fern&aacute;ndez
  * @see ISpringWebFluxTemplateEngine
@@ -125,7 +130,9 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                 // We should be executing in data-driven mode
                 return createDataDrivenStream(
                     template, markupSelectors, context, dataDriverVariableName, bufferFactory,
-                    charset, chunkSizeBytes, sse);
+                    charset, chunkSizeBytes, sse)
+                    // We need to subscribe on a new thread to support blocking operations
+                    .subscribeOn(Schedulers.boundedElastic());
             }
         } catch (final Throwable t) {
             return Flux.error(t);
@@ -151,14 +158,18 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
          */
         if (chunkSizeBytes == Integer.MAX_VALUE) {
             // No limit on buffer size, so there is no reason to throttle: using FULL mode instead.
-            return createFullStream(template, markupSelectors, context, bufferFactory, charset);
+            return createFullStream(template, markupSelectors, context, bufferFactory, charset)
+                // We need to subscribe on a new thread to support blocking operations
+                .subscribeOn(Schedulers.boundedElastic());
         }
 
         /*
          * CREATE A CHUNKED STREAM
          */
         return createChunkedStream(
-            template, markupSelectors, context, bufferFactory, charset, responseMaxChunkSizeBytes);
+            template, markupSelectors, context, bufferFactory, charset, responseMaxChunkSizeBytes)
+            // We need to subscribe on a new thread to support blocking operations
+            .subscribeOn(Schedulers.boundedElastic());
 
     }
 
