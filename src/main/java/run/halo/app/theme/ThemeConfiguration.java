@@ -67,6 +67,7 @@ public class ThemeConfiguration {
 
     @Bean
     RouterFunction<ServerResponse> routePost() {
+        // Map<String, String> patternNameMap
         // /archives/{slug}
         // /archives/{name}
         // /?p={name}

@@ -2,13 +2,18 @@ package run.halo.app.core.extension.reconciler;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.context.ApplicationContext;
 import org.thymeleaf.util.StringUtils;
+import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.content.PostPermalinkPolicy;
+import run.halo.app.content.PermalinkRuleChangedEvent;
 
 /**
  * @author guqing
@@ -20,8 +25,13 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
 
     private final ExtensionClient client;
 
-    public SystemSettingReconciler(ExtensionClient client) {
+    private final ApplicationContext applicationContext;
+
+    private final PostPermalinkPolicy postPermalinkPolicy = new PostPermalinkPolicy();
+
+    public SystemSettingReconciler(ExtensionClient client, ApplicationContext applicationContext) {
         this.client = client;
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -30,12 +40,12 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         if (isSystemSetting(name)) {
             return new Result(false, null);
         }
-        client.fetch(ConfigMap.class, name).ifPresent(configMap -> {
-
-
-            client.update(configMap);
-        });
-        return null;
+        client.fetch(ConfigMap.class, name)
+            .ifPresent(configMap -> {
+                ruleChangedDispatcher(configMap, request.name());
+                client.update(configMap);
+            });
+        return new Result(false, null);
     }
 
     private void ruleChangedDispatcher(ConfigMap configMap, String name) {
@@ -65,35 +75,40 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         // dispatch event
         if (!StringUtils.equals(oldRules.getArchives(), newRouteRules.getArchives())) {
             // archives rule changed
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
+                DefaultTemplateEnum.ARCHIVES,
+                newRouteRules.getArchives()));
         }
 
         if (!StringUtils.equals(oldRules.getTags(), newRouteRules.getTags())) {
             // tags rule changed
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
+                DefaultTemplateEnum.TAGS,
+                newRouteRules.getTags()));
         }
 
         if (!StringUtils.equals(oldRules.getCategories(), newRouteRules.getCategories())) {
             // categories rule changed
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
+                DefaultTemplateEnum.CATEGORIES,
+                newRouteRules.getCategories()));
         }
 
         if (!StringUtils.equals(oldRules.getPost(), newRouteRules.getPost())) {
             // categories rule changed
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
+                DefaultTemplateEnum.POST,
+                newRouteRules.getPost()));
         }
     }
 
     private void regeneratePostPermalink(String pattern) {
-
-    }
-
-    private void regenerateArchivesRoute(String prefix) {
-
-    }
-
-    private void regenerateTagsRoute(String prefix) {
-
-    }
-
-    private void regenerateCategoriesRoute(String prefix) {
-
+        client.list(Post.class, null, null)
+            .forEach(post -> {
+                String permalink = postPermalinkPolicy.apply(post, pattern);
+                post.getStatusOrDefault().setPermalink(permalink);
+                client.update(post);
+            });
     }
 
     private Map<String, String> getAnnotationsSafe(ConfigMap configMap) {

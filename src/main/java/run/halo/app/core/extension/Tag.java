@@ -64,7 +64,6 @@ public class Tag extends AbstractExtension {
         return this.status;
     }
 
-
     @Data
     public static class TagStatus {
 
