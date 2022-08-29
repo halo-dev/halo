@@ -13,6 +13,8 @@ public interface AttachmentUploadHandler extends ExtensionPoint {
     // TODO Add delete method here
     // Mono<Attachment> delete();
 
-    record UploadOption(FilePart file, Policy policy, String username) {
+    record UploadOption(FilePart file,
+                        Policy policy,
+                        String username) {
     }
 }

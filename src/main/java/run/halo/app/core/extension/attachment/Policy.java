@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.extension.Ref;
 
 @Data
 @ToString(callSuper = true)
@@ -24,10 +25,10 @@ public class Policy extends AbstractExtension {
         private String displayName;
 
         @Schema(description = "Reference name of Setting extension")
-        private String settingRef;
+        private Ref templateRef;
 
         @Schema(description = "Reference name of ConfigMap extension")
-        private String configMapRef;
+        private Ref configMapRef;
 
     }
 

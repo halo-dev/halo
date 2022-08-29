@@ -1,7 +1,6 @@
 package run.halo.app.infra;
 
 import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.boot.jdbc.SchemaManagement;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -23,6 +22,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
+import run.halo.app.core.extension.attachment.PolicyTemplate;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.security.authentication.pat.PersonalAccessToken;
@@ -59,5 +59,6 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(Group.class);
         schemeManager.register(Policy.class);
         schemeManager.register(Attachment.class);
+        schemeManager.register(PolicyTemplate.class);
     }
 }

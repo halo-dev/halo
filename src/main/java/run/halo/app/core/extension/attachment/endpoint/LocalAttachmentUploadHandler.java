@@ -17,8 +17,8 @@ import run.halo.app.extension.Ref;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileNameUtils;
 
-@Component
 @Slf4j
+@Component
 public class LocalAttachmentUploadHandler implements AttachmentUploadHandler {
 
     private final HaloProperties haloProp;
@@ -30,7 +30,7 @@ public class LocalAttachmentUploadHandler implements AttachmentUploadHandler {
     @Override
     public Mono<Attachment> upload(UploadOption uploadOption) {
         return Mono.just(uploadOption)
-            .filter(option -> "local".equals(option.policy().getMetadata().getName()))
+            .filter(this::shouldHandle)
             .flatMap(option -> {
                 var file = option.file();
                 var attachmentPath =
@@ -59,4 +59,9 @@ public class LocalAttachmentUploadHandler implements AttachmentUploadHandler {
             });
     }
 
+    private boolean shouldHandle(UploadOption option) {
+        var spec = option.policy().getSpec();
+        return spec != null && spec.getTemplateRef() != null
+            && "local".equals(spec.getTemplateRef().getName());
+    }
 }
