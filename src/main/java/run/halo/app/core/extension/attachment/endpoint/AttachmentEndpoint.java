@@ -31,6 +31,7 @@ import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentUploadHandler.UploadOption;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.plugin.HaloPluginManager;
 
@@ -100,23 +101,27 @@ public class AttachmentEndpoint implements CustomEndpoint {
             .map(Authentication::getName)
             .flatMap(username -> request.body(toMultipartData())
                 .map(UploadRequest::new)
-                .zipWhen(uploadRequest -> {
-                    // check the policy
-                    return client.get(Policy.class, uploadRequest.getPolicyName());
-                })
-                .flatMap(tuple2 -> {
-                    var uploadRequest = tuple2.getT1();
-                    var policy = tuple2.getT2();
-                    var uploadOption =
-                        new UploadOption(uploadRequest.getFile(), policy, username);
-                    return Flux.fromIterable(
-                            pluginManager.getExtensions(AttachmentUploadHandler.class))
-                        .concatMap(uploadHandler -> uploadHandler.upload(uploadOption))
-                        .next()
-                        .switchIfEmpty(Mono.error(
-                            () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                                "No suitable handler found for uploading the attachment")));
-                })
+                // prepare the upload option
+                .flatMap(uploadRequest -> client.get(Policy.class, uploadRequest.getPolicyName())
+                    .filter(policy -> policy.getSpec().getConfigMapRef() != null)
+                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                        "Please configure the attachment policy before uploading")))
+                    .flatMap(policy -> {
+                        var configMapName = policy.getSpec().getConfigMapRef().getName();
+                        return client.get(ConfigMap.class, configMapName)
+                            .map(configMap -> new UploadOption(uploadRequest.getFile(), policy,
+                                username,
+                                configMap));
+                    })
+                )
+                .flatMap(uploadOption -> Flux.fromIterable(
+                        pluginManager.getExtensions(AttachmentUploadHandler.class))
+                    .concatMap(uploadHandler -> uploadHandler.upload(uploadOption))
+                    .next()
+                    .switchIfEmpty(Mono.error(
+                        () -> new ResponseStatusException(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            "No suitable handler found for uploading the attachment"))))
                 .flatMap(client::create)
                 .flatMap(attachment -> ServerResponse.ok()
                     .contentType(MediaType.APPLICATION_JSON)

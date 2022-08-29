@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -12,6 +13,7 @@ import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import run.halo.app.infra.exception.AccessDeniedException;
 
 /**
  * @author guqing
@@ -131,4 +133,45 @@ public abstract class FileUtils {
             }
         }
     }
+
+    /**
+     * Checks directory traversal vulnerability.
+     *
+     * @param parentPath parent path must not be null.
+     * @param pathToCheck path to check must not be null
+     */
+    public static void checkDirectoryTraversal(@NonNull Path parentPath,
+        @NonNull Path pathToCheck) {
+        Assert.notNull(parentPath, "Parent path must not be null");
+        Assert.notNull(pathToCheck, "Path to check must not be null");
+
+        if (pathToCheck.normalize().startsWith(parentPath)) {
+            return;
+        }
+
+        throw new AccessDeniedException(pathToCheck.toString());
+    }
+
+    /**
+     * Checks directory traversal vulnerability.
+     *
+     * @param parentPath parent path must not be null.
+     * @param pathToCheck path to check must not be null
+     */
+    public static void checkDirectoryTraversal(@NonNull String parentPath,
+        @NonNull String pathToCheck) {
+        checkDirectoryTraversal(Paths.get(parentPath), Paths.get(pathToCheck));
+    }
+
+    /**
+     * Checks directory traversal vulnerability.
+     *
+     * @param parentPath parent path must not be null.
+     * @param pathToCheck path to check must not be null
+     */
+    public static void checkDirectoryTraversal(@NonNull Path parentPath,
+        @NonNull String pathToCheck) {
+        checkDirectoryTraversal(parentPath, Paths.get(pathToCheck));
+    }
+
 }

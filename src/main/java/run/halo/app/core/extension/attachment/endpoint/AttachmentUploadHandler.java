@@ -5,6 +5,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
+import run.halo.app.extension.ConfigMap;
 
 public interface AttachmentUploadHandler extends ExtensionPoint {
 
@@ -15,6 +16,7 @@ public interface AttachmentUploadHandler extends ExtensionPoint {
 
     record UploadOption(FilePart file,
                         Policy policy,
-                        String username) {
+                        String username,
+                        ConfigMap configMap) {
     }
 }
