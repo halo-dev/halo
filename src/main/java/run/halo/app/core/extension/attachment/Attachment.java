@@ -1,8 +1,9 @@
 package run.halo.app.core.extension.attachment;
 
+import static run.halo.app.core.extension.attachment.Attachment.KIND;
+
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,9 +15,11 @@ import run.halo.app.extension.Ref;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "storage.halo.run", version = "v1alpha1", kind = "Attachment", plural = "attachments"
-    , singular = "attachment")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND,
+    plural = "attachments", singular = "attachment")
 public class Attachment extends AbstractExtension {
+
+    public static final String KIND = "Attachment";
 
     @Schema(required = true)
     private AttachmentSpec spec;

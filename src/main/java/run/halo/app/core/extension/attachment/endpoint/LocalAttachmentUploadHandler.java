@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
+import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.properties.HaloProperties;
@@ -70,7 +71,7 @@ public class LocalAttachmentUploadHandler implements AttachmentUploadHandler {
                         // TODO check the file extension
                         var metadata = new Metadata();
                         metadata.setName(UUID.randomUUID().toString());
-                        metadata.setLabels(Map.of("storage.halo.run/local-relative-path",
+                        metadata.setAnnotations(Map.of(Constant.LOCAL_REL_PATH_ANNO_KEY,
                             attachmentsRoot.relativize(attachmentPath).toString()));
                         var spec = new AttachmentSpec();
                         spec.setUploadedBy(Ref.of(option.username()));

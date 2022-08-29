@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.attachment;
 
+import static run.halo.app.core.extension.attachment.Group.KIND;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import lombok.Data;
@@ -11,9 +13,11 @@ import run.halo.app.extension.GVK;
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = "storage.halo.run", version = "v1alpha1", kind = "Group",
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND,
     plural = "groups", singular = "group")
 public class Group extends AbstractExtension {
+
+    public static final String KIND = "Group";
 
     @Schema(required = true)
     private GroupSpec spec;
