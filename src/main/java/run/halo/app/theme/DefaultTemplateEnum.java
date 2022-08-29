@@ -5,11 +5,17 @@ package run.halo.app.theme;
  * @since 2.0.0
  */
 public enum DefaultTemplateEnum {
+    INDEX("index"),
+
     CATEGORIES("categories"),
+
+    CATEGORY("category"),
 
     ARCHIVES("posts"),
 
     POST("post"),
+
+    TAG("tag"),
 
     TAGS("tags");
 
@@ -21,5 +27,14 @@ public enum DefaultTemplateEnum {
 
     public String getValue() {
         return value;
+    }
+
+    public static DefaultTemplateEnum convertFrom(String template) {
+        for (DefaultTemplateEnum e : values()) {
+            if (e.getValue().equals(template)) {
+                return e;
+            }
+        }
+        return null;
     }
 }

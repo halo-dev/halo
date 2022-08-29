@@ -49,6 +49,11 @@ public record GroupVersionKind(String group, String version, String kind) {
         return new GroupVersionKind(gv.group(), gv.version(), kind);
     }
 
+    public static <T extends AbstractExtension> GroupVersionKind fromExtension(Class<T> extension) {
+        GVK gvk = extension.getAnnotation(GVK.class);
+        return new GroupVersionKind(gvk.group(), gvk.version(), gvk.kind());
+    }
+
     @Override
     public String toString() {
         if (hasGroup()) {

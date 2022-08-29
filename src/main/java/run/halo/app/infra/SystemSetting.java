@@ -9,6 +9,7 @@ import lombok.Data;
  * @since 2.0.0
  */
 public class SystemSetting {
+    public static final String SYSTEM_CONFIG = "system";
 
     @Data
     public static class Theme {
