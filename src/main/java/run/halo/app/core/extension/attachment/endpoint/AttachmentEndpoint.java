@@ -30,7 +30,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
-import run.halo.app.core.extension.attachment.endpoint.AttachmentUploadHandler.UploadOption;
+import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler.UploadOption;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -115,7 +115,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 )
                 // find the proper handler to handle the attachment
                 .flatMap(uploadOption -> Flux.fromIterable(
-                        pluginManager.getExtensions(AttachmentUploadHandler.class))
+                        pluginManager.getExtensions(AttachmentHandler.class))
                     .concatMap(uploadHandler -> uploadHandler.upload(uploadOption))
                     .next()
                     .switchIfEmpty(Mono.error(

@@ -7,7 +7,7 @@ import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.ConfigMap;
 
-public interface AttachmentUploadHandler extends ExtensionPoint {
+public interface AttachmentHandler extends ExtensionPoint {
 
     Mono<Attachment> upload(UploadOption uploadRequest);
 

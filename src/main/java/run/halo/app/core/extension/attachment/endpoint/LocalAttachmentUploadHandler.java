@@ -28,7 +28,7 @@ import run.halo.app.infra.utils.JsonUtils;
 
 @Slf4j
 @Component
-public class LocalAttachmentUploadHandler implements AttachmentUploadHandler {
+public class LocalAttachmentUploadHandler implements AttachmentHandler {
 
     private final HaloProperties haloProp;
 
