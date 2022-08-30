@@ -118,9 +118,8 @@ public class HaloPluginManager extends DefaultPluginManager
                 this.getExtensions(extensionFinder.find(type))
                     .stream(),
                 rootApplicationContext.getBeansOfType(type)
-                    .entrySet()
+                    .values()
                     .stream()
-                    .map(Map.Entry::getValue)
                     .sorted(AnnotationAwareOrderComparator.INSTANCE))
             .collect(Collectors.toList());
     }

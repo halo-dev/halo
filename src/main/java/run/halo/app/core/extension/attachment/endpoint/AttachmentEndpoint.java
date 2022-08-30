@@ -8,6 +8,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
+import org.pf4j.PluginManager;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,6 @@ import run.halo.app.core.extension.attachment.endpoint.AttachmentUploadHandler.U
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.plugin.HaloPluginManager;
 
 @Slf4j
 @Component
@@ -41,13 +41,12 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
 
-    private final HaloPluginManager pluginManager;
+    private final PluginManager pluginManager;
 
-    public AttachmentEndpoint(ReactiveExtensionClient client, HaloPluginManager pluginManager) {
+    public AttachmentEndpoint(ReactiveExtensionClient client, PluginManager pluginManager) {
         this.client = client;
         this.pluginManager = pluginManager;
     }
-
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "storage.halo.run/v1alpha1/Attachment";
@@ -114,6 +113,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                                 configMap));
                     })
                 )
+                // find the proper handler to handle the attachment
                 .flatMap(uploadOption -> Flux.fromIterable(
                         pluginManager.getExtensions(AttachmentUploadHandler.class))
                     .concatMap(uploadHandler -> uploadHandler.upload(uploadOption))
@@ -122,6 +122,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         () -> new ResponseStatusException(
                             HttpStatus.INTERNAL_SERVER_ERROR,
                             "No suitable handler found for uploading the attachment"))))
+                // create the attachment
                 .flatMap(client::create)
                 .flatMap(attachment -> ServerResponse.ok()
                     .contentType(MediaType.APPLICATION_JSON)
