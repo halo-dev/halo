@@ -14,6 +14,7 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.reconciler.MenuItemReconciler;
 import run.halo.app.core.extension.reconciler.MenuReconciler;
 import run.halo.app.core.extension.reconciler.PluginReconciler;
@@ -22,6 +23,7 @@ import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.reconciler.ThemeReconciler;
 import run.halo.app.core.extension.reconciler.UserReconciler;
+import run.halo.app.core.extension.reconciler.attachment.AttachmentReconciler;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
@@ -130,6 +132,14 @@ public class ExtensionConfiguration {
                 .reconciler(new PostReconciler(client, contentService))
                 .extension(new Post())
                 .build();
+        }
+
+        @Bean
+        Controller attachmentController(ExtensionClient client) {
+           return new ControllerBuilder("attachment-controller", client)
+               .reconciler(new AttachmentReconciler(client))
+               .extension(new Attachment())
+               .build();
         }
     }
 

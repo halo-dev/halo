@@ -1,5 +1,7 @@
 package run.halo.app.config;
 
+import static org.springframework.util.ResourceUtils.FILE_URL_PREFIX;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.context.ApplicationContext;
@@ -11,6 +13,7 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.NonNull;
+import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -18,14 +21,18 @@ import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
+import run.halo.app.infra.properties.HaloProperties;
 
 @Configuration
 public class WebFluxConfig implements WebFluxConfigurer {
 
-    final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    public WebFluxConfig(ObjectMapper objectMapper) {
+    private final HaloProperties haloProp;
+
+    public WebFluxConfig(ObjectMapper objectMapper, HaloProperties haloProp) {
         this.objectMapper = objectMapper;
+        this.haloProp = haloProp;
     }
 
     @Bean
@@ -63,4 +70,10 @@ public class WebFluxConfig implements WebFluxConfigurer {
         return builder.build();
     }
 
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        var attachmentsRoot = haloProp.getWorkDir().resolve("attachments");
+        registry.addResourceHandler("/upload/**")
+            .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot + "/");
+    }
 }
