@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -160,9 +161,10 @@ public class ExtensionConfiguration {
         }
 
         @Bean
-        Controller systemSettingController(ExtensionClient client) {
+        Controller systemSettingController(ExtensionClient client,
+            ApplicationContext applicationContext) {
             return new ControllerBuilder("system-setting-controller", client)
-                .reconciler(new SystemSettingReconciler(client))
+                .reconciler(new SystemSettingReconciler(client, applicationContext))
                 .extension(new ConfigMap())
                 .build();
         }

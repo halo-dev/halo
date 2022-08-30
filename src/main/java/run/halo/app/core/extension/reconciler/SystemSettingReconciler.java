@@ -2,13 +2,13 @@ package run.halo.app.core.extension.reconciler;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.context.ApplicationContext;
 import org.thymeleaf.util.StringUtils;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.infra.utils.SpringBeanUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkRuleChangedEvent;
 
@@ -21,9 +21,11 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
     private static final String OLD_THEME_ROUTE_RULES = "halo.run/old-theme-route-rules";
 
     private final ExtensionClient client;
+    private final ApplicationContext applicationContext;
 
-    public SystemSettingReconciler(ExtensionClient client) {
+    public SystemSettingReconciler(ExtensionClient client, ApplicationContext applicationContext) {
         this.client = client;
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -72,28 +74,28 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         // dispatch event
         if (!StringUtils.equals(oldRules.getArchives(), newRouteRules.getArchives())) {
             // archives rule changed
-            SpringBeanUtils.publishEvent(new PermalinkRuleChangedEvent(this,
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                 DefaultTemplateEnum.ARCHIVES,
                 newRouteRules.getArchives()));
         }
 
         if (!StringUtils.equals(oldRules.getTags(), newRouteRules.getTags())) {
             // tags rule changed
-            SpringBeanUtils.publishEvent(new PermalinkRuleChangedEvent(this,
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                 DefaultTemplateEnum.TAGS,
                 newRouteRules.getTags()));
         }
 
         if (!StringUtils.equals(oldRules.getCategories(), newRouteRules.getCategories())) {
             // categories rule changed
-            SpringBeanUtils.publishEvent(new PermalinkRuleChangedEvent(this,
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                 DefaultTemplateEnum.CATEGORIES,
                 newRouteRules.getCategories()));
         }
 
         if (!StringUtils.equals(oldRules.getPost(), newRouteRules.getPost())) {
             // categories rule changed
-            SpringBeanUtils.publishEvent(new PermalinkRuleChangedEvent(this,
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                 DefaultTemplateEnum.POST,
                 newRouteRules.getPost()));
         }
