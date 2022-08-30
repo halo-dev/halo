@@ -10,6 +10,7 @@ const VRoutesMenu = defineComponent({
   props: {
     menus: {
       type: Object as PropType<MenuGroupType[]>,
+      required: true,
     },
   },
   emits: ["select"],

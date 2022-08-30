@@ -51,7 +51,7 @@ watch(
     :key="key"
     v-slot="{ currentPage, next, prev, pageCount }"
     :page="page"
-    :pageSize="size"
+    :page-size="size"
     :total="total"
     @page-change="onPageChange"
     @page-size-change="onPageChange"

@@ -2,12 +2,15 @@
 const props = withDefaults(
   defineProps<{
     checked?: boolean;
-    value?: string | number | boolean;
-    label?: string;
-    name?: string;
+    value?: string | number | boolean | undefined;
+    label?: string | undefined;
+    name?: string | undefined;
   }>(),
   {
     checked: false,
+    value: undefined,
+    label: undefined,
+    name: undefined,
   }
 );
 

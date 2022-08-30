@@ -42,7 +42,7 @@ const router = useRouter();
 </script>
 <template>
   <VCard
-    :bodyClass="['h-full', 'overflow-y-auto', '!p-0']"
+    :body-class="['h-full', 'overflow-y-auto', '!p-0']"
     class="h-full"
     title="快捷访问"
   >

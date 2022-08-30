@@ -27,7 +27,7 @@ const onVisibleChange = (visible: boolean) => {
 </script>
 <template>
   <VModal
-    :bodyClass="['!p-0']"
+    :body-class="['!p-0']"
     :visible="visible"
     fullscreen
     title="文章预览"

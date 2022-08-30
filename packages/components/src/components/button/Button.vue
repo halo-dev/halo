@@ -48,7 +48,7 @@ const props = withDefaults(
     block?: boolean;
     disabled?: boolean;
     loading?: boolean;
-    route?: RouteLocationRaw;
+    route?: RouteLocationRaw | undefined;
   }>(),
   {
     type: "default",
@@ -57,6 +57,7 @@ const props = withDefaults(
     block: false,
     disabled: false,
     loading: false,
+    route: undefined,
   }
 );
 

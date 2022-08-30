@@ -4,7 +4,7 @@ import { VCheckbox } from "./index";
 const props = withDefaults(
   defineProps<{
     modelValue?: string[];
-    options?: Array<Record<string, string>>;
+    options: Array<Record<string, string>>;
     valueKey?: string;
     labelKey?: string;
     name?: string;
@@ -13,6 +13,7 @@ const props = withDefaults(
     modelValue: () => [],
     valueKey: "value",
     labelKey: "label",
+    name: undefined,
   }
 );
 

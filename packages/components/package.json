@@ -21,8 +21,7 @@
     "story:dev": "histoire dev --port 4000",
     "story:build": "histoire build",
     "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
-    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'"
   },
   "keywords": [
     "halo",

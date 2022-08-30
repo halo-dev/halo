@@ -93,7 +93,7 @@ const onVisibleChange = (visible: boolean) => {
         label-idle="Drop files here..."
         name="test"
         server="/api"
-        v-bind:allow-multiple="true"
+        :allow-multiple="true"
       />
     </div>
   </VModal>

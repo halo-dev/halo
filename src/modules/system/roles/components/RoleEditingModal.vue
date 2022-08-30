@@ -156,13 +156,13 @@ const handleResetForm = () => {
               </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <ul class="space-y-2">
-                  <li v-for="(role, index) in group.roles" :key="index">
+                  <li v-for="(roleTemplate, index) in group.roles" :key="index">
                     <label
                       class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
                     >
                       <input
                         v-model="selectedRoleTemplates"
-                        :value="role.metadata.name"
+                        :value="roleTemplate.metadata.name"
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                         type="checkbox"
                         @change="handleRoleTemplateSelect"
@@ -170,14 +170,14 @@ const handleResetForm = () => {
                       <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
                           {{
-                            role.metadata.annotations?.[
+                            roleTemplate.metadata.annotations?.[
                               rbacAnnotations.DISPLAY_NAME
                             ]
                           }}
                         </span>
                         <span
                           v-if="
-                            role.metadata.annotations?.[
+                            roleTemplate.metadata.annotations?.[
                               rbacAnnotations.DEPENDENCIES
                             ]
                           "
@@ -186,7 +186,7 @@ const handleResetForm = () => {
                           依赖于
                           {{
                             JSON.parse(
-                              role.metadata.annotations?.[
+                              roleTemplate.metadata.annotations?.[
                                 rbacAnnotations.DEPENDENCIES
                               ]
                             ).join(", ")

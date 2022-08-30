@@ -19,8 +19,8 @@ provide(DialogProviderProvideKey, options);
     :confirm-text="options.confirmText"
     :confirm-type="options.confirmType"
     :description="options.description"
-    :onCancel="options.onCancel"
-    :onConfirm="options.onConfirm"
+    :on-cancel="options.onCancel"
+    :on-confirm="options.onConfirm"
     :title="options.title"
     :type="options.type"
   ></VDialog>

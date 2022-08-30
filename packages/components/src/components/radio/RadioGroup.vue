@@ -10,8 +10,11 @@ withDefaults(
     name?: string;
   }>(),
   {
+    modelValue: undefined,
+    options: undefined,
     valueKey: "value",
     labelKey: "label",
+    name: undefined,
   }
 );
 

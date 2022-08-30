@@ -32,6 +32,12 @@ const props = withDefaults(
     confirmType: "primary",
     cancelText: "取消",
     visible: false,
+    onConfirm: () => {
+      return;
+    },
+    onCancel: () => {
+      return;
+    },
   }
 );
 

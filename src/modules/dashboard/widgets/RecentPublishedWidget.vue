@@ -21,7 +21,7 @@ onMounted(handleFetchPosts);
 </script>
 <template>
   <VCard
-    :bodyClass="['h-full', '!p-0', 'overflow-y-auto']"
+    :body-class="['h-full', '!p-0', 'overflow-y-auto']"
     class="h-full"
     title="最近发布"
   >

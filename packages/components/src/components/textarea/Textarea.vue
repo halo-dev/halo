@@ -7,7 +7,9 @@ withDefaults(
     rows?: number;
   }>(),
   {
+    modelValue: undefined,
     disabled: false,
+    placeholder: undefined,
     rows: 3,
   }
 );

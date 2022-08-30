@@ -12,8 +12,10 @@ const props = withDefaults(
   }>(),
   {
     visible: false,
+    title: undefined,
     width: 500,
     fullscreen: false,
+    bodyClass: undefined,
   }
 );
 

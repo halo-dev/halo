@@ -10,8 +10,10 @@ const props = withDefaults(
     placeholder?: string;
   }>(),
   {
+    modelValue: undefined,
     size: "md",
     disabled: false,
+    placeholder: undefined,
   }
 );
 

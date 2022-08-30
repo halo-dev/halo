@@ -706,8 +706,8 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                       class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                     >
                       分类：<span
-                        v-for="(category, index) in post.categories"
-                        :key="index"
+                        v-for="(category, categoryIndex) in post.categories"
+                        :key="categoryIndex"
                         class="cursor-pointer hover:text-gray-900"
                       >
                         {{ category.spec.displayName }}
@@ -720,11 +720,11 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
               </div>
               <div class="flex">
                 <div
-                  class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                  class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
                   <RouterLink
-                    v-for="(contributor, index) in post.contributors"
-                    :key="index"
+                    v-for="(contributor, contributorIndex) in post.contributors"
+                    :key="contributorIndex"
                     :to="{
                       name: 'UserDetail',
                       params: { name: contributor.name },

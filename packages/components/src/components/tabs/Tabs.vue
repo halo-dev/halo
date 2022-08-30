@@ -13,6 +13,7 @@ const props = withDefaults(
     labelKey?: string;
   }>(),
   {
+    activeId: undefined,
     type: "default",
     direction: "row",
     idKey: "id",
@@ -54,7 +55,7 @@ const handleChange = (id: string | number) => {
   <div :class="classes" class="tabs-wrapper">
     <div class="tabs-bar-wrapper">
       <VTabbar
-        :activeId="activeId"
+        :active-id="activeId"
         :direction="direction"
         :items="tabItems"
         :type="type"

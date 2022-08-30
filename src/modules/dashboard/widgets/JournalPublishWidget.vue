@@ -3,7 +3,7 @@ import { VButton, VCard, VTextarea } from "@halo-dev/components";
 </script>
 <template>
   <VCard
-    :bodyClass="['h-full', 'overflow-y-auto']"
+    :body-class="['h-full', 'overflow-y-auto']"
     class="h-full"
     title="日志发表"
   >

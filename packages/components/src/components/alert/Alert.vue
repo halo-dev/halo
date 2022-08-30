@@ -27,6 +27,8 @@ const props = withDefaults(
   }>(),
   {
     type: "default",
+    title: "",
+    description: "",
     closable: true,
   }
 );

@@ -12,6 +12,8 @@ const props = withDefaults(
     labelKey?: string;
   }>(),
   {
+    activeId: undefined,
+    items: undefined,
     type: "default",
     direction: "row",
     idKey: "id",

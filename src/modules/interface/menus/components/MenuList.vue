@@ -119,7 +119,7 @@ defineExpose({
     :menu="selectedMenuToUpdate"
     @close="handleFetchMenus"
   />
-  <VCard :bodyClass="['!p-0']" title="菜单">
+  <VCard :body-class="['!p-0']" title="菜单">
     <VEmpty
       v-if="!menus.length && !loading"
       message="你可以尝试刷新或者新建菜单"
