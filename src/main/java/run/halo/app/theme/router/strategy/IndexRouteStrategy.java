@@ -11,13 +11,13 @@ import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.TemplateRouterStrategy;
 
 /**
- * The {@link IndexStrategy} for generate {@link RouterFunction} specific to the template
+ * The {@link IndexRouteStrategy} for generate {@link RouterFunction} specific to the template
  * <code>index.html</code>.
  *
  * @author guqing
  * @since 2.0.0
  */
-public class IndexStrategy implements TemplateRouterStrategy {
+public class IndexRouteStrategy implements TemplateRouterStrategy {
 
     @Override
     public RouterFunction<ServerResponse> getRouteFunction(String template, String pattern) {

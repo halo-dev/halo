@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
  * @author guqing
  * @since 2.0.0
  */
+@FunctionalInterface
 public interface TemplateRouterStrategy {
 
     RouterFunction<ServerResponse> getRouteFunction(String template, String pattern);

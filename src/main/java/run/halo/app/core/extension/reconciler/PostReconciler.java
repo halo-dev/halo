@@ -67,7 +67,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
 
         if (Objects.equals(true, post.getSpec().getDeleted())
-            || post.getMetadata().getDeletionTimestamp() != null) {
+            || post.getMetadata().getDeletionTimestamp() != null
+            || Objects.equals(false, post.getSpec().getPublished())) {
             postPermalinkPolicy.onPermalinkDelete(post);
             return;
         }

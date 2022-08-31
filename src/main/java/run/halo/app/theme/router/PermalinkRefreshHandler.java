@@ -12,7 +12,6 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.theme.DefaultTemplateEnum;
-import run.halo.app.theme.router.strategy.TemplateRouterManager;
 
 /**
  * Permalink refresh handler.
@@ -24,13 +23,13 @@ import run.halo.app.theme.router.strategy.TemplateRouterManager;
 @Component
 public class PermalinkRefreshHandler implements ApplicationListener<PermalinkRuleChangedEvent> {
     private final ExtensionClient client;
-    private final TemplateRouterManager templateRouterManager;
+    private final TemplateRouteManager templateRouterManager;
     private final PostPermalinkPolicy postPermalinkPolicy;
     private final TagPermalinkPolicy tagPermalinkPolicy;
     private final CategoryPermalinkPolicy categoryPermalinkPolicy;
 
     public PermalinkRefreshHandler(ExtensionClient client,
-        TemplateRouterManager templateRouterManager,
+        TemplateRouteManager templateRouterManager,
         PostPermalinkPolicy postPermalinkPolicy,
         TagPermalinkPolicy tagPermalinkPolicy,
         CategoryPermalinkPolicy categoryPermalinkPolicy) {

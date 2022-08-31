@@ -1,4 +1,4 @@
-package run.halo.app.theme.router.strategy;
+package run.halo.app.theme.router;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +11,13 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
-import run.halo.app.theme.router.PermalinkIndexer;
-import run.halo.app.theme.router.PermalinkPatternProvider;
-import run.halo.app.theme.router.TemplateRouterStrategy;
+import run.halo.app.theme.router.strategy.ArchivesRouteStrategy;
+import run.halo.app.theme.router.strategy.CategoriesRouteStrategy;
+import run.halo.app.theme.router.strategy.CategoryRouteStrategy;
+import run.halo.app.theme.router.strategy.IndexRouteStrategy;
+import run.halo.app.theme.router.strategy.PostRouteStrategy;
+import run.halo.app.theme.router.strategy.TagRouteStrategy;
+import run.halo.app.theme.router.strategy.TagsRouteStrategy;
 
 /**
  * Theme template router mapping manager.
@@ -25,7 +29,7 @@ import run.halo.app.theme.router.TemplateRouterStrategy;
  * @since 2.0.0
  */
 @Component
-public class TemplateRouterManager implements ApplicationListener<ApplicationReadyEvent> {
+public class TemplateRouteManager implements ApplicationListener<ApplicationReadyEvent> {
 
     private final ReentrantReadWriteLock.WriteLock writeLock =
         new ReentrantReadWriteLock().writeLock();
@@ -33,7 +37,7 @@ public class TemplateRouterManager implements ApplicationListener<ApplicationRea
     private final PermalinkIndexer permalinkIndexer;
     private final PermalinkPatternProvider permalinkPatternProvider;
 
-    public TemplateRouterManager(PermalinkIndexer permalinkIndexer,
+    public TemplateRouteManager(PermalinkIndexer permalinkIndexer,
         PermalinkPatternProvider permalinkPatternProvider) {
         this.permalinkIndexer = permalinkIndexer;
         this.permalinkPatternProvider = permalinkPatternProvider;
@@ -100,13 +104,13 @@ public class TemplateRouterManager implements ApplicationListener<ApplicationRea
             throw new NotFoundException("Unknown template: " + template);
         }
         return switch (value) {
-            case INDEX -> new IndexStrategy();
-            case POST -> new PostRouterStrategy(permalinkIndexer);
-            case ARCHIVES -> new ArchivesStrategy();
-            case TAGS -> new TagsStrategy();
-            case TAG -> new TagStrategy(permalinkIndexer);
-            case CATEGORIES -> new CategoriesRouterStrategy();
-            case CATEGORY -> new CategoryRouterStrategy(permalinkIndexer);
+            case INDEX -> new IndexRouteStrategy();
+            case POST -> new PostRouteStrategy(permalinkIndexer);
+            case ARCHIVES -> new ArchivesRouteStrategy();
+            case TAGS -> new TagsRouteStrategy();
+            case TAG -> new TagRouteStrategy(permalinkIndexer);
+            case CATEGORIES -> new CategoriesRouteStrategy();
+            case CATEGORY -> new CategoryRouteStrategy(permalinkIndexer);
         };
     }
 

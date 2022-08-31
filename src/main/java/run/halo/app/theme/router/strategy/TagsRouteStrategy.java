@@ -12,23 +12,21 @@ import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.TemplateRouterStrategy;
 
 /**
- * The {@link ArchivesStrategy} for generate {@link RouterFunction} specific to the template
- * <code>posts.html</code>.
+ * The {@link TagsRouteStrategy} for generate {@link RouterFunction} specific to the template
+ * <code>tags.html</code>.
  *
  * @author guqing
  * @since 2.0.0
  */
-public class ArchivesStrategy implements TemplateRouterStrategy {
+public class TagsRouteStrategy implements TemplateRouterStrategy {
 
     @Override
     public RouterFunction<ServerResponse> getRouteFunction(String template, String prefix) {
+        String pattern = PathUtils.combinePath(prefix);
         return RouterFunctions
-            .route(GET(prefix)
-                    .or(GET(PathUtils.combinePath(prefix, "/page/{page}")))
-                    .or(GET(PathUtils.combinePath(prefix, "/{year}/{month}")))
-                    .or(GET(PathUtils.combinePath(prefix, "/{year}/{month}/page/{page}")))
+            .route(GET(pattern)
                     .and(accept(MediaType.TEXT_HTML)),
                 request -> ServerResponse.ok()
-                    .render(DefaultTemplateEnum.ARCHIVES.getValue()));
+                    .render(DefaultTemplateEnum.TAGS.getValue()));
     }
 }

@@ -10,24 +10,23 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.theme.router.strategy.TemplateRouterManager;
 
 /**
  * <p>Theme template composite {@link RouterFunction} for manage routers for default templates.</p>
  * It routes specific requests to the {@link RouterFunction} maintained by the
- * {@link TemplateRouterManager}.
+ * {@link TemplateRouteManager}.
  *
  * @author guqing
- * @see TemplateRouterManager
+ * @see TemplateRouteManager
  * @since 2.0.0
  */
 @Component
 public class ThemeCompositeRouterFunction implements
     RouterFunction<ServerResponse> {
 
-    private final TemplateRouterManager templateRouterManager;
+    private final TemplateRouteManager templateRouterManager;
 
-    public ThemeCompositeRouterFunction(TemplateRouterManager templateRouterManager) {
+    public ThemeCompositeRouterFunction(TemplateRouteManager templateRouterManager) {
         this.templateRouterManager = templateRouterManager;
     }
 

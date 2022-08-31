@@ -26,16 +26,16 @@ import run.halo.app.theme.router.PermalinkIndexer;
 import run.halo.app.theme.router.TemplateRouterStrategy;
 
 /**
- * The {@link PostRouterStrategy} for generate {@link RouterFunction} specific to the template
+ * The {@link PostRouteStrategy} for generate {@link RouterFunction} specific to the template
  * <code>post.html</code>.
  *
  * @author guqing
  * @since 2.0.0
  */
-public class PostRouterStrategy implements TemplateRouterStrategy {
+public class PostRouteStrategy implements TemplateRouterStrategy {
     private final PermalinkIndexer permalinkIndexer;
 
-    public PostRouterStrategy(PermalinkIndexer permalinkIndexer) {
+    public PostRouteStrategy(PermalinkIndexer permalinkIndexer) {
         this.permalinkIndexer = permalinkIndexer;
     }
 
