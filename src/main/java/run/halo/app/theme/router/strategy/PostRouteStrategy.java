@@ -20,7 +20,6 @@ import org.springframework.web.util.pattern.PathPatternParser;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexer;
 import run.halo.app.theme.router.TemplateRouterStrategy;
@@ -58,12 +57,13 @@ public class PostRouteStrategy implements TemplateRouterStrategy {
 
                     if (PostRequestParamPredicate.SLUG_PARAM.equals(
                         placeholderName)) {
-                        name = permalinkIndexer.getSlugByName(
+                        name = permalinkIndexer.getNameBySlug(
                             PostRequestParamPredicate.GVK,
                             placeholderName);
                     }
+
                     if (name == null) {
-                        throw new NotFoundException("Post not found.");
+                        return ServerResponse.notFound().build();
                     }
                     return ServerResponse.ok()
                         .render(DefaultTemplateEnum.POST.getValue(),
@@ -79,7 +79,7 @@ public class PostRouteStrategy implements TemplateRouterStrategy {
                             PostRequestParamPredicate.GVK);
                     boolean contains = permalinks.contains(request.path());
                     if (!contains) {
-                        throw new NotFoundException("Post not found.");
+                        return ServerResponse.notFound().build();
                     }
                     ExtensionLocator extensionLocator =
                         permalinkIndexer.lookup(request.path());
