@@ -171,6 +171,24 @@ public class PermalinkIndexer {
         }
     }
 
+    /**
+     * Only for test.
+     *
+     * @return permalinkLookup map size
+     */
+    protected long permalinkLookupSize() {
+        return permalinkLookup.size();
+    }
+
+    /**
+     * Only for test.
+     *
+     * @return permalinkLocatorMap map size
+     */
+    protected long permalinkLocatorMapSize() {
+        return permalinkLocatorMap.size();
+    }
+
     @EventListener(PermalinkIndexAddCommand.class)
     public void onPermalinkAdd(PermalinkIndexAddCommand addCommand) {
         register(addCommand.getLocator(), addCommand.getPermalink());
