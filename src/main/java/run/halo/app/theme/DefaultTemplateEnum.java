@@ -11,7 +11,7 @@ public enum DefaultTemplateEnum {
 
     CATEGORY("category"),
 
-    ARCHIVES("posts"),
+    ARCHIVES("archives"),
 
     POST("post"),
 

@@ -22,8 +22,7 @@ public class IndexRouteStrategy implements TemplateRouterStrategy {
     @Override
     public RouterFunction<ServerResponse> getRouteFunction(String template, String pattern) {
         return RouterFunctions
-            .route(GET("/").or(GET("/index"))
-                    .or(GET("/page/{page}"))
+            .route(GET("/").or(GET("/page/{page}"))
                     .and(accept(MediaType.TEXT_HTML)),
                 request -> ServerResponse.ok()
                     .render(DefaultTemplateEnum.INDEX.getValue()));

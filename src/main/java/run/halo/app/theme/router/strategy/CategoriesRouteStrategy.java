@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.TemplateRouterStrategy;
 
@@ -22,7 +23,7 @@ public class CategoriesRouteStrategy implements TemplateRouterStrategy {
     @Override
     public RouterFunction<ServerResponse> getRouteFunction(String template, String prefix) {
         return RouterFunctions
-            .route(GET("/categories")
+            .route(GET(PathUtils.combinePath(prefix))
                     .and(accept(MediaType.TEXT_HTML)),
                 request -> ServerResponse.ok()
                     .render(DefaultTemplateEnum.CATEGORIES.getValue()));

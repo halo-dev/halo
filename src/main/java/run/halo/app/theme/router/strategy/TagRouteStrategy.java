@@ -33,9 +33,9 @@ public class TagRouteStrategy implements TemplateRouterStrategy {
 
     @Override
     public RouterFunction<ServerResponse> getRouteFunction(String template, String prefix) {
-        String pattern = PathUtils.combinePath(prefix, "/{slug}");
         return RouterFunctions
-            .route(GET(pattern)
+            .route(GET(PathUtils.combinePath(prefix, "/{slug}"))
+                    .or(GET(PathUtils.combinePath(prefix, "/{slug}/page/{page}")))
                     .and(accept(MediaType.TEXT_HTML)),
                 request -> {
                     GroupVersionKind gvk = GroupVersionKind.fromExtension(Tag.class);
