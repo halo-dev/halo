@@ -23,7 +23,6 @@ import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.properties.HaloProperties;
-import run.halo.app.infra.utils.FileNameUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Slf4j
@@ -81,8 +80,7 @@ public class LocalAttachmentUploadHandler implements AttachmentHandler {
                         spec.setMediaType(Optional.ofNullable(file.headers().getContentType())
                             .map(MediaType::toString)
                             .orElse(null));
-                        spec.setDisplayName(
-                            FileNameUtils.removeFileExtension(file.filename(), true));
+                        spec.setDisplayName(file.filename());
                         var attachment = new Attachment();
                         attachment.setMetadata(metadata);
                         attachment.setSpec(spec);

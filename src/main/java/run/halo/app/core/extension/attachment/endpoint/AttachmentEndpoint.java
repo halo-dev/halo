@@ -5,8 +5,10 @@ import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.BodyExtractors.toMultipartData;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
+import static run.halo.app.core.extension.attachment.Constant.FINALIZER_NAME;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginManager;
 import org.springdoc.core.fn.builders.requestbody.Builder;
@@ -34,6 +36,7 @@ import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler.UploadO
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.Ref;
 
 @Slf4j
 @Component
@@ -47,6 +50,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
         this.client = client;
         this.pluginManager = pluginManager;
     }
+
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "storage.halo.run/v1alpha1/Attachment";
@@ -116,7 +120,14 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 // find the proper handler to handle the attachment
                 .flatMap(uploadOption -> Flux.fromIterable(
                         pluginManager.getExtensions(AttachmentHandler.class))
-                    .concatMap(uploadHandler -> uploadHandler.upload(uploadOption))
+                    .concatMap(
+                        uploadHandler -> uploadHandler.upload(uploadOption).doOnNext(attachment -> {
+                            var spec = attachment.getSpec();
+                            spec.setUploadedBy(Ref.of(username));
+                            spec.setPolicyRef(Ref.of(uploadOption.policy()));
+                            // set finalizers mandatory
+                            attachment.getMetadata().setFinalizers(Set.of(FINALIZER_NAME));
+                        }))
                     .next()
                     .switchIfEmpty(Mono.error(
                         () -> new ResponseStatusException(

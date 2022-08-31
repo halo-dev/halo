@@ -8,4 +8,6 @@ public enum Constant {
     public static final String LOCAL_REL_PATH_ANNO_KEY = GROUP + "/local-relative-path";
     public static final String EXTERNAL_LINK_ANNO_KEY = GROUP + "/external-link";
 
+    public static final String FINALIZER_NAME = "attachment-manager";
+
 }

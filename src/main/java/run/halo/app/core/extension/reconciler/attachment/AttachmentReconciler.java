@@ -22,6 +22,7 @@ public class AttachmentReconciler implements Reconciler<Request> {
     @Override
     public Result reconcile(Request request) {
         client.fetch(Attachment.class, request.name()).ifPresent(attachment -> {
+            // TODO Handle the finalizer
             var annotations = attachment.getMetadata().getAnnotations();
             if (annotations != null) {
                 String permalink = null;
