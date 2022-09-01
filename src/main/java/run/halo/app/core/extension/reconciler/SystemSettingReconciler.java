@@ -2,17 +2,20 @@ package run.halo.app.core.extension.reconciler;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
-import org.thymeleaf.util.StringUtils;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkRuleChangedEvent;
 
 /**
+ * Reconciler for system settings.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -59,8 +62,6 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
 
         // get new rules and replace old rules to new rules
         SystemSetting.ThemeRouteRules newRouteRules = themeSetting.getRouteRules();
-        String newRulesJson = JsonUtils.objectToJson(newRouteRules);
-        annotations.put(OLD_THEME_ROUTE_RULES, newRulesJson);
 
         // old rules is empty, means this is the first time to update theme route rules
         if (oldRulesJson == null) {
@@ -94,11 +95,52 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         }
 
         if (!StringUtils.equals(oldRules.getPost(), newRouteRules.getPost())) {
-            // categories rule changed
+            // post rule changed
             applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                 DefaultTemplateEnum.POST,
                 newRouteRules.getPost()));
         }
+
+        // TODO 此处立即同步 post 的新 pattern 到数据库，才能更新到文章页面的 permalink 地址
+        //   但会导致乐观锁失效会失败一次 reconcile
+        if (changePostPatternPrefixIfNecessary(oldRules, newRouteRules)) {
+            // update theme setting
+            themeSetting.setRouteRules(newRouteRules);
+            data.put(SystemSetting.Theme.GROUP, JsonUtils.objectToJson(themeSetting));
+
+            annotations.put(OLD_THEME_ROUTE_RULES, JsonUtils.objectToJson(newRouteRules));
+            // update config map immediately
+            client.update(configMap);
+        }
+
+        // update theme setting
+        themeSetting.setRouteRules(newRouteRules);
+        data.put(SystemSetting.Theme.GROUP, JsonUtils.objectToJson(themeSetting));
+
+        annotations.put(OLD_THEME_ROUTE_RULES, JsonUtils.objectToJson(newRouteRules));
+    }
+
+    boolean changePostPatternPrefixIfNecessary(SystemSetting.ThemeRouteRules oldRules,
+        SystemSetting.ThemeRouteRules newRules) {
+        if (StringUtils.isBlank(oldRules.getArchives())
+            || StringUtils.isBlank(newRules.getPost())) {
+            return false;
+        }
+        String oldArchivesPrefix = StringUtils.removeStart(oldRules.getArchives(), "/");
+
+        String postPattern = StringUtils.removeStart(newRules.getPost(), "/");
+        String newArchivesPrefix = newRules.getArchives();
+        if (postPattern.startsWith(oldArchivesPrefix)) {
+            String postPatternToUpdate = PathUtils.combinePath(newArchivesPrefix,
+                StringUtils.removeStart(postPattern, oldArchivesPrefix));
+            newRules.setPost(postPatternToUpdate);
+
+            // post rule changed
+            applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
+                DefaultTemplateEnum.POST, postPatternToUpdate));
+            return true;
+        }
+        return false;
     }
 
     private Map<String, String> getAnnotationsSafe(ConfigMap configMap) {

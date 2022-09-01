@@ -1,6 +1,7 @@
 package run.halo.app.theme.router;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -59,8 +60,12 @@ public class PermalinkRefreshHandler implements ApplicationListener<PermalinkRul
         log.debug("Update post permalink by new policy [{}]", pattern);
         client.list(Post.class, null, null)
             .forEach(post -> {
+                String oldPermalink = post.getStatusOrDefault().getPermalink();
                 String permalink = postPermalinkPolicy.permalink(post);
                 post.getStatusOrDefault().setPermalink(permalink);
+                if (oldPermalink.equals(permalink)) {
+                    return;
+                }
                 // update permalink
                 client.update(post);
 
@@ -71,26 +76,37 @@ public class PermalinkRefreshHandler implements ApplicationListener<PermalinkRul
 
     private void updateCategoryPermalink() {
         String pattern = categoryPermalinkPolicy.pattern();
-        log.debug("Update category permalink by new policy [{}]", pattern);
+        log.debug("Update category and categories permalink by new policy [{}]", pattern);
+        templateRouterManager.changeTemplatePattern(DefaultTemplateEnum.CATEGORIES.getValue());
         client.list(Category.class, null, null)
             .forEach(category -> {
+                String oldPermalink = category.getStatusOrDefault().getPermalink();
                 String permalink = categoryPermalinkPolicy.permalink(category);
                 category.getStatusOrDefault().setPermalink(permalink);
+                if (StringUtils.equals(oldPermalink, permalink)) {
+                    return;
+                }
                 // update permalink
                 client.update(category);
 
                 categoryPermalinkPolicy.onPermalinkUpdate(category);
-                templateRouterManager.changeTemplatePattern(categoryPermalinkPolicy.templateName());
+                templateRouterManager.changeTemplatePattern(
+                    categoryPermalinkPolicy.templateName());
             });
     }
 
     private void updateTagPermalink() {
         String pattern = tagPermalinkPolicy.pattern();
-        log.debug("Update tag permalink by new policy [{}]", pattern);
+        log.debug("Update tag and tags permalink by new policy [{}]", pattern);
+        templateRouterManager.changeTemplatePattern(DefaultTemplateEnum.TAGS.getValue());
         client.list(Tag.class, null, null)
             .forEach(tag -> {
+                String oldPermalink = tag.getStatusOrDefault().getPermalink();
                 String permalink = tagPermalinkPolicy.permalink(tag);
                 tag.getStatusOrDefault().setPermalink(permalink);
+                if (StringUtils.equals(oldPermalink, permalink)) {
+                    return;
+                }
                 // update permalink
                 client.update(tag);
 
