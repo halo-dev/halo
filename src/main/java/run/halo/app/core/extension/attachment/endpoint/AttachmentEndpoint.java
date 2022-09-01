@@ -113,15 +113,14 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         var configMapName = policy.getSpec().getConfigMapRef().getName();
                         return client.get(ConfigMap.class, configMapName)
                             .map(configMap -> new UploadOption(uploadRequest.getFile(), policy,
-                                username,
                                 configMap));
                     })
                 )
                 // find the proper handler to handle the attachment
                 .flatMap(uploadOption -> Flux.fromIterable(
                         pluginManager.getExtensions(AttachmentHandler.class))
-                    .concatMap(
-                        uploadHandler -> uploadHandler.upload(uploadOption).doOnNext(attachment -> {
+                    .concatMap(uploadHandler -> uploadHandler.upload(uploadOption)
+                        .doOnNext(attachment -> {
                             var spec = attachment.getSpec();
                             spec.setUploadedBy(Ref.of(username));
                             spec.setPolicyRef(Ref.of(uploadOption.policy()));

@@ -9,22 +9,34 @@ import run.halo.app.extension.ConfigMap;
 
 public interface AttachmentHandler extends ExtensionPoint {
 
-    Mono<Attachment> upload(UploadOption uploadOption);
+    Mono<Attachment> upload(UploadContext context);
 
-    // TODO
-    default Mono<Void> delete(DeleteOption deleteOption) {
-        return Mono.empty();
+    Mono<Attachment> delete(DeleteContext context);
+
+    interface UploadContext {
+
+        FilePart file();
+
+        Policy policy();
+
+        ConfigMap configMap();
+
     }
 
-    // TODO Add delete method here
-    // Mono<Attachment> delete();
+    interface DeleteContext {
+        Attachment attachment();
+
+        Policy policy();
+
+        ConfigMap configMap();
+    }
 
     record UploadOption(FilePart file,
                         Policy policy,
-                        String username,
-                        ConfigMap configMap) {
+                        ConfigMap configMap) implements UploadContext {
     }
 
-    record DeleteOption() {
+    record DeleteOption(Attachment attachment, Policy policy, ConfigMap configMap)
+        implements DeleteContext {
     }
 }

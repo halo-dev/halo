@@ -1,5 +1,6 @@
 package run.halo.app.config;
 
+import org.pf4j.PluginManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -135,9 +136,9 @@ public class ExtensionConfiguration {
         }
 
         @Bean
-        Controller attachmentController(ExtensionClient client) {
+        Controller attachmentController(ExtensionClient client, PluginManager pluginManager) {
            return new ControllerBuilder("attachment-controller", client)
-               .reconciler(new AttachmentReconciler(client))
+               .reconciler(new AttachmentReconciler(client, pluginManager))
                .extension(new Attachment())
                .build();
         }
