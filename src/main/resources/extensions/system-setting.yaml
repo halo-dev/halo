@@ -32,6 +32,37 @@ spec:
         label: "默认角色"
         name: defaultRole
         validation: required
+  - group: themeRules
+    label: 主题模板路由设置
+    formSchema:
+      - $formkit: text
+        label: "分类页路由前缀"
+        value: "categories"
+        name: categories
+        validation: required | alphanumeric
+      - $formkit: text
+        label: "标签页路由前缀"
+        value: "tags"
+        name: tags
+        validation: required | alphanumeric
+      - $formkit: text
+        label: "归档页路由前缀"
+        value: "archives"
+        name: archives
+        validation: required | alphanumeric
+      - $formkit: select
+        label: "文章详情页访问规则"
+        value: "/archives/{slug}"
+        options:
+          - /archives/{slug}
+          - /archives/{name}
+          - /?p={name}
+          - /?p={slug}
+          - /{year}/{slug}
+          - /{year}/{month}/{slug}
+          - /{year}/{month}/{day}/{slug}
+        name: post
+        validation: required
   - group: post
     label: 文章设置
     formSchema:
