@@ -9,7 +9,7 @@ import lombok.Data;
  */
 @Data
 @Deprecated(forRemoval = true, since = "2.0.0")
-public class ListRequest implements IListRequest {
+public class ListRequest {
 
     @Schema(description = "The page number. Zero indicates no page.")
     private Integer page;
