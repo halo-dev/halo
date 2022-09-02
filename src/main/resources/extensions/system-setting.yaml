@@ -116,15 +116,15 @@ spec:
         value: true
         label: "仅允许注册用户评论"
   - group: codeInjection
-    label: 评论设置
+    label: 代码注入
     formSchema:
       - $formkit: textarea
         label: "全局 head"
-        name: globalHeader
+        name: globalHead
         help: "插入代码到所有页面的 head 标签部分"
       - $formkit: textarea
         label: "内容页 head"
-        name: contentHeader
+        name: contentHead
         help: "插入代码到文章页面和自定义页面的 head 标签部分"
       - $formkit: textarea
         label: "页脚"
