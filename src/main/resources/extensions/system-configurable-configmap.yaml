@@ -5,11 +5,12 @@ metadata:
 data:
   theme: |
     {
-      "active": "default",
-      "routeRules": {
-        "categories": "/categories",
-        "archives": "/archives",
-        "post": "/archives/{slug}",
-        "tags": "/tags"
-      }
+      "active": "default"
+    }
+  routeRules: |
+    {
+      "categories": "/categories",
+      "archives": "/archives",
+      "post": "/archives/{slug}",
+      "tags": "/tags"
     }

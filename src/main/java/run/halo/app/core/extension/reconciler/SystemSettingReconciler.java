@@ -56,12 +56,10 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         Map<String, String> annotations = getAnnotationsSafe(configMap);
         String oldRulesJson = annotations.get(OLD_THEME_ROUTE_RULES);
 
-        String themeSettingJson = data.get(SystemSetting.Theme.GROUP);
-        SystemSetting.Theme themeSetting =
-            JsonUtils.jsonToObject(themeSettingJson, SystemSetting.Theme.class);
-
+        String routeRulesJson = data.get(SystemSetting.ThemeRouteRules.GROUP);
         // get new rules and replace old rules to new rules
-        SystemSetting.ThemeRouteRules newRouteRules = themeSetting.getRouteRules();
+        SystemSetting.ThemeRouteRules newRouteRules =
+            JsonUtils.jsonToObject(routeRulesJson, SystemSetting.ThemeRouteRules.class);
 
         // old rules is empty, means this is the first time to update theme route rules
         if (oldRulesJson == null) {
@@ -104,19 +102,14 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         // TODO 此处立即同步 post 的新 pattern 到数据库，才能更新到文章页面的 permalink 地址
         //   但会导致乐观锁失效会失败一次 reconcile
         if (changePostPatternPrefixIfNecessary(oldRules, newRouteRules)) {
-            // update theme setting
-            themeSetting.setRouteRules(newRouteRules);
-            data.put(SystemSetting.Theme.GROUP, JsonUtils.objectToJson(themeSetting));
-
+            data.put(SystemSetting.ThemeRouteRules.GROUP, JsonUtils.objectToJson(newRouteRules));
             annotations.put(OLD_THEME_ROUTE_RULES, JsonUtils.objectToJson(newRouteRules));
             // update config map immediately
             client.update(configMap);
         }
 
         // update theme setting
-        themeSetting.setRouteRules(newRouteRules);
-        data.put(SystemSetting.Theme.GROUP, JsonUtils.objectToJson(themeSetting));
-
+        data.put(SystemSetting.ThemeRouteRules.GROUP, JsonUtils.objectToJson(newRouteRules));
         annotations.put(OLD_THEME_ROUTE_RULES, JsonUtils.objectToJson(newRouteRules));
     }
 

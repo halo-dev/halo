@@ -70,7 +70,6 @@ class PermalinkPatternProviderTest {
         Metadata metadata = new Metadata();
         metadata.setName("system");
         configMap.setMetadata(metadata);
-        final SystemSetting.Theme theme = new SystemSetting.Theme();
 
         SystemSetting.ThemeRouteRules themeRouteRules = new SystemSetting.ThemeRouteRules();
         themeRouteRules.setPost("/posts/{slug}");
@@ -78,8 +77,7 @@ class PermalinkPatternProviderTest {
         themeRouteRules.setTags("t");
         themeRouteRules.setArchives("a");
 
-        theme.setRouteRules(themeRouteRules);
-        configMap.setData(Map.of("theme", JsonUtils.objectToJson(theme)));
+        configMap.setData(Map.of("routeRules", JsonUtils.objectToJson(themeRouteRules)));
 
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));

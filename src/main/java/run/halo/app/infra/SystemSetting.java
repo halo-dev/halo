@@ -16,12 +16,12 @@ public class SystemSetting {
         public static final String GROUP = "theme";
 
         private String active;
-
-        private ThemeRouteRules routeRules;
     }
 
     @Data
     public static class ThemeRouteRules {
+        public static final String GROUP = "routeRules";
+
         private String categories;
         private String archives;
         private String post;
