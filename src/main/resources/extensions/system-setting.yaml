@@ -1,0 +1,101 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: system
+spec:
+  - group: basic
+    label: 基本设置
+    formSchema:
+      - $formkit: text
+        label: "站点标题"
+        name: title
+        validation: required
+      - $formkit: text
+        label: "站点副标题"
+        name: subtitle
+        validation: required
+      - $formkit: text
+        label: Logo
+        name: logo
+      - $formkit: text
+        label: Favicon
+        name: favicon
+  - group: user
+    label: 用户设置
+    formSchema:
+      - $formkit: checkbox
+        label: "是否公开注册"
+        value: false
+        name: allowRegistration
+        validation: required
+      - $formkit: text
+        label: "默认角色"
+        name: defaultRole
+        validation: required
+  - group: post
+    label: 文章设置
+    formSchema:
+      - $formkit: select
+        label: "列表排序方式"
+        name: sortOrder
+        value: "publishTime"
+        options:
+          visitCount: "浏览量"
+          publishTime: "发布时间"
+          updateTime: "更新时间"
+        validation: required
+      - $formkit: number
+        label: "列表显示条数"
+        name: pageSize
+        value: 10
+        min: 1
+        max: 100
+        validation: required
+      - $formkit: checkbox
+        label: "新文章审核"
+        value: false
+        name: review
+        help: "用户发布文章是否需要管理员审核"
+  - group: seo
+    label: SEO 设置
+    formSchema:
+      - $formkit: checkbox
+        name: blockSpides
+        label: "屏蔽搜索引擎"
+        value: false
+      - $formkit: textarea
+        name: keywords
+        label: "站点关键词"
+      - $formkit: textarea
+        name: description
+        label: "站点描述"
+  - group: comment
+    label: 评论设置
+    formSchema:
+      - $formkit: checkbox
+        name: enable
+        value: true
+        label: "启用评论"
+      - $formkit: checkbox
+        name: requireReviewForNew
+        value: true
+        label: "新评论审核"
+      - $formkit: checkbox
+        name: systemUserOnly
+        value: true
+        label: "仅允许注册用户评论"
+  - group: codeInjection
+    label: 评论设置
+    formSchema:
+      - $formkit: textarea
+        label: "全局 head"
+        name: globalHeader
+        help: "插入代码到所有页面的 head 标签部分"
+      - $formkit: textarea
+        label: "内容页 head"
+        name: contentHeader
+        help: "插入代码到文章页面和自定义页面的 head 标签部分"
+      - $formkit: textarea
+        label: "页脚"
+        name: footer
+        help: "插入代码到所有页面的页脚部分"
