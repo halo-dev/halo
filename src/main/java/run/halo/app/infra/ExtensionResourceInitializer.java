@@ -41,7 +41,7 @@ public class ExtensionResourceInitializer {
         this.extensionClient = extensionClient;
     }
 
-    @EventListener
+    @EventListener(ApplicationReadyEvent.class)
     public Mono<Void> initialize(ApplicationReadyEvent readyEvent) {
         var locations = new HashSet<String>();
         if (!haloProperties.isRequiredExtensionDisabled()) {
