@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Objects;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.theme.finders.Contributor;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
+import run.halo.app.theme.finders.vo.Contributor;
 
 /**
  * A default implementation of {@link ContributorFinder}.

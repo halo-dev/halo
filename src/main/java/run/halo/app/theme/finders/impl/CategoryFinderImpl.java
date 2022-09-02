@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.CollectionUtils;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
@@ -50,9 +51,9 @@ public class CategoryFinderImpl implements CategoryFinder {
     }
 
     @Override
-    public ListResult<CategoryVo> list(int page, int size) {
+    public ListResult<CategoryVo> list(Integer page, Integer size) {
         return client.list(Category.class, null,
-                defaultComparator(), page, size)
+                defaultComparator(), pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
                 List<CategoryVo> categoryVos = list.stream()
                     .map(CategoryVo::from)
@@ -118,5 +119,13 @@ public class CategoryFinderImpl implements CategoryFinder {
             .thenComparing(creationTimestamp)
             .thenComparing(name)
             .reversed();
+    }
+
+    int pageNullSafe(Integer page) {
+        return ObjectUtils.defaultIfNull(page, 1);
+    }
+
+    int sizeNullSafe(Integer page) {
+        return ObjectUtils.defaultIfNull(page, 10);
     }
 }

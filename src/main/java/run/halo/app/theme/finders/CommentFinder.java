@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders;
 
+import org.springframework.lang.Nullable;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.CommentVo;
@@ -15,7 +16,9 @@ public interface CommentFinder {
 
     CommentVo getByName(String name);
 
-    ListResult<CommentVo> list(Comment.CommentSubjectRef ref, int page, int size);
+    ListResult<CommentVo> list(Comment.CommentSubjectRef ref, @Nullable Integer page,
+        @Nullable Integer size);
 
-    ListResult<ReplyVo> listReply(String commentName, int page, int size);
+    ListResult<ReplyVo> listReply(String commentName, @Nullable Integer page,
+        @Nullable Integer size);
 }

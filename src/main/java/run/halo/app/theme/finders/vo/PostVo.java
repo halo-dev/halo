@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Post;
-import run.halo.app.theme.finders.Contributor;
 
 /**
  * A value object for {@link Post}.

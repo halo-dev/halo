@@ -1,4 +1,4 @@
-package run.halo.app.theme.finders;
+package run.halo.app.theme.finders.vo;
 
 import lombok.Builder;
 import lombok.Value;
