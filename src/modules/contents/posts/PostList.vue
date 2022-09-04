@@ -445,7 +445,7 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                                 </div>
                                 <div class="flex">
                                   <div
-                                    class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                                    class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                                   >
                                     <div
                                       class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
@@ -506,7 +506,7 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                                 </div>
                                 <div class="flex">
                                   <div
-                                    class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                                    class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                                   >
                                     <div
                                       class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
@@ -673,7 +673,7 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                 />
               </div>
               <div class="flex-1">
-                <div class="flex flex-col sm:flex-row">
+                <div class="flex flex-col items-center sm:flex-row">
                   <RouterLink
                     :to="{
                       name: 'PostEditor',
@@ -687,16 +687,35 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                     </span>
                   </RouterLink>
                   <VSpace class="mt-1 sm:mt-0">
-                    <RouterLink
+                    <FloatingTooltip
+                      v-if="post.post.status?.inProgress"
+                      class="hidden items-center sm:flex"
+                    >
+                      <RouterLink
+                        :to="{
+                          name: 'PostEditor',
+                          query: { name: post.post.metadata.name },
+                        }"
+                        class="flex items-center"
+                      >
+                        <div
+                          class="inline-flex h-1.5 w-1.5 rounded-full bg-orange-600"
+                        >
+                          <span
+                            class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-orange-600"
+                          ></span>
+                        </div>
+                      </RouterLink>
+                      <template #popper>
+                        当前有内容已保存，但还未发布。
+                      </template>
+                    </FloatingTooltip>
+                    <PostTag
                       v-for="(tag, tagIndex) in post.tags"
                       :key="tagIndex"
-                      :to="{
-                        name: 'Tags',
-                        query: { name: tag.metadata.name },
-                      }"
-                    >
-                      <PostTag :tag="tag"></PostTag>
-                    </RouterLink>
+                      :tag="tag"
+                      route
+                    ></PostTag>
                   </VSpace>
                 </div>
                 <div class="mt-1 flex">

@@ -101,6 +101,10 @@ const handleVisibleChange = (visible: boolean) => {
 const handleSave = async () => {
   try {
     saving.value = true;
+
+    // Set rendered content
+    formState.value.content.content = formState.value.content.raw;
+
     if (isUpdateMode.value) {
       const { data } = await apiClient.post.updateDraftPost(
         formState.value.post.metadata.name,
@@ -293,21 +297,10 @@ watchEffect(() => {
 
     <template #footer>
       <VSpace>
-        <VButton
-          v-if="formState.post.status?.phase === 'PUBLISHED'"
-          :loading="publishCanceling"
-          type="danger"
-          @click="handlePublishCanceling"
-        >
-          取消发布
-        </VButton>
-        <VButton
-          v-else
-          :loading="publishing"
-          type="secondary"
-          @click="handlePublish"
-        >
-          发布
+        <VButton :loading="publishing" type="secondary" @click="handlePublish">
+          {{
+            formState.post.status?.phase === "PUBLISHED" ? "重新发布" : "发布"
+          }}
         </VButton>
         <VButton
           :loading="saving"
@@ -316,6 +309,15 @@ watchEffect(() => {
           @click="handleSave"
         >
           仅保存
+        </VButton>
+        <VButton
+          v-if="formState.post.status?.phase === 'PUBLISHED'"
+          :loading="publishCanceling"
+          type="danger"
+          size="sm"
+          @click="handlePublishCanceling"
+        >
+          取消发布
         </VButton>
         <VButton size="sm" type="default" @click="handleVisibleChange(false)">
           关闭

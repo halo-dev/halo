@@ -53,7 +53,7 @@ function onDelete(category: CategoryTree) {
           class="group relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
         >
           <div
-            class="drag-element absolute inset-y-0 left-0 flex hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
+            class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
           >
             <IconList class="h-3.5 w-3.5" />
           </div>
@@ -75,7 +75,7 @@ function onDelete(category: CategoryTree) {
             </div>
             <div class="flex">
               <div
-                class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
               >
                 <FloatingTooltip
                   v-if="category.metadata.deletionTimestamp"
