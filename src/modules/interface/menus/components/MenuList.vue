@@ -118,6 +118,7 @@ defineExpose({
     v-model:visible="menuEditingModal"
     :menu="selectedMenuToUpdate"
     @close="handleFetchMenus"
+    @created="handleSelect"
   />
   <VCard :body-class="['!p-0']" title="菜单">
     <VEmpty

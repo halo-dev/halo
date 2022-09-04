@@ -22,6 +22,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
+  (event: "created", menu: Menu): void;
 }>();
 
 const initialFormState: Menu = {
@@ -53,7 +54,10 @@ const handleCreateMenu = async () => {
         formState.value
       );
     } else {
-      await apiClient.extension.menu.createv1alpha1Menu(formState.value);
+      const { data } = await apiClient.extension.menu.createv1alpha1Menu(
+        formState.value
+      );
+      emit("created", data);
     }
     onVisibleChange(false);
   } catch (e) {
