@@ -76,4 +76,12 @@ class GroupVersionKindTest {
         });
     }
 
+    @Test
+    void fromExtension() {
+        GroupVersionKind groupVersionKind = GroupVersionKind.fromExtension(FakeExtension.class);
+        assertEquals("fake.halo.run", groupVersionKind.group());
+        assertEquals("v1alpha1", groupVersionKind.version());
+        assertEquals("Fake", groupVersionKind.kind());
+    }
+
 }

@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.TestPost;
+import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
@@ -39,12 +40,14 @@ class PostReconcilerTest {
     private ExtensionClient client;
     @Mock
     private ContentService contentService;
+    @Mock
+    private PostPermalinkPolicy postPermalinkPolicy;
 
     private PostReconciler postReconciler;
 
     @BeforeEach
     void setUp() {
-        postReconciler = new PostReconciler(client, contentService);
+        postReconciler = new PostReconciler(client, contentService, postPermalinkPolicy);
     }
 
     @Test
@@ -73,8 +76,6 @@ class PostReconcilerTest {
 
         Post value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
-        assertThat(value.getStatus().getPermalink()).isEqualTo(
-            PostReconciler.PERMALINK_PREFIX + name);
         assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "zhangsan"));
     }
 

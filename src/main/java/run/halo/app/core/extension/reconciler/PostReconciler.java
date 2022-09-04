@@ -11,11 +11,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
+import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
@@ -32,14 +32,16 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.0.0
  */
-public class PostReconciler implements Reconciler<Request> {
-    public static final String PERMALINK_PREFIX = "/permalink/posts/";
+public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final ContentService contentService;
+    private final PostPermalinkPolicy postPermalinkPolicy;
 
-    public PostReconciler(ExtensionClient client, ContentService contentService) {
+    public PostReconciler(ExtensionClient client, ContentService contentService,
+        PostPermalinkPolicy postPermalinkPolicy) {
         this.client = client;
         this.contentService = contentService;
+        this.postPermalinkPolicy = postPermalinkPolicy;
     }
 
     @Override
@@ -49,6 +51,7 @@ public class PostReconciler implements Reconciler<Request> {
                 Post oldPost = JsonUtils.deepCopy(post);
 
                 doReconcile(post);
+                permalinkReconcile(post);
 
                 if (!oldPost.equals(post)) {
                     client.update(post);
@@ -57,16 +60,27 @@ public class PostReconciler implements Reconciler<Request> {
         return new Result(false, null);
     }
 
+    private void permalinkReconcile(Post post) {
+        if (post.getStatusOrDefault().getPermalink() == null) {
+            post.getStatusOrDefault()
+                .setPermalink(postPermalinkPolicy.permalink(post));
+        }
+
+        if (Objects.equals(true, post.getSpec().getDeleted())
+            || post.getMetadata().getDeletionTimestamp() != null
+            || Objects.equals(false, post.getSpec().getPublished())) {
+            postPermalinkPolicy.onPermalinkDelete(post);
+            return;
+        }
+        postPermalinkPolicy.onPermalinkAdd(post);
+    }
+
     private void doReconcile(Post post) {
         String name = post.getMetadata().getName();
         Post.PostSpec spec = post.getSpec();
         Post.PostStatus status = post.getStatusOrDefault();
         if (status.getPhase() == null) {
             status.setPhase(Post.PostPhase.DRAFT.name());
-        }
-        // handle permalink
-        if (StringUtils.isBlank(status.getPermalink())) {
-            status.setPermalink(PERMALINK_PREFIX + name);
         }
 
         // handle excerpt

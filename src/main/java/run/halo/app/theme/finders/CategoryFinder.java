@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders;
 
 import java.util.List;
+import org.springframework.lang.Nullable;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.CategoryTreeVo;
@@ -18,7 +19,7 @@ public interface CategoryFinder {
 
     List<CategoryVo> getByNames(List<String> names);
 
-    ListResult<CategoryVo> list(int page, int size);
+    ListResult<CategoryVo> list(@Nullable Integer page, @Nullable Integer size);
 
     List<CategoryVo> listAll();
 

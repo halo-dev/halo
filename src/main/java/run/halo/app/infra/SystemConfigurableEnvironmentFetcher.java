@@ -15,8 +15,6 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Component
 public class SystemConfigurableEnvironmentFetcher {
-    private static final String SYSTEM_CONFIGMAP_NAME = "system";
-
     private final ReactiveExtensionClient extensionClient;
     private final ConversionService conversionService;
 
@@ -28,7 +26,7 @@ public class SystemConfigurableEnvironmentFetcher {
 
     public <T> Mono<T> fetch(String key, Class<T> type) {
         return getValuesInternal().map(map -> map.get(key))
-            .map(stringValue -> {
+            .mapNotNull(stringValue -> {
                 if (conversionService.canConvert(String.class, type)) {
                     return conversionService.convert(stringValue, type);
                 }
@@ -38,7 +36,7 @@ public class SystemConfigurableEnvironmentFetcher {
 
     @NonNull
     private Mono<Map<String, String>> getValuesInternal() {
-        return extensionClient.fetch(ConfigMap.class, SYSTEM_CONFIGMAP_NAME)
+        return extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
             .filter(configMap -> configMap.getData() != null)
             .map(ConfigMap::getData)
             .defaultIfEmpty(Map.of());
