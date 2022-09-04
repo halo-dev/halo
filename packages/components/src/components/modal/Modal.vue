@@ -7,15 +7,19 @@ const props = withDefaults(
     visible?: boolean;
     title?: string;
     width?: number;
+    height?: string;
     fullscreen?: boolean;
     bodyClass?: string[];
+    mountToBody?: boolean;
   }>(),
   {
     visible: false,
     title: undefined,
     width: 500,
+    height: undefined,
     fullscreen: false,
     bodyClass: undefined,
+    mountToBody: false,
   }
 );
 
@@ -36,6 +40,7 @@ const wrapperClasses = computed(() => {
 const contentStyles = computed(() => {
   return {
     maxWidth: props.width + "px",
+    height: props.height,
   };
 });
 
@@ -56,7 +61,7 @@ watch(
 );
 </script>
 <template>
-  <Teleport :disabled="true" to="body">
+  <Teleport :disabled="!mountToBody" to="body">
     <div
       v-show="rootVisible"
       ref="modelWrapper"
@@ -65,7 +70,7 @@ watch(
       class="modal-wrapper"
       role="dialog"
       tabindex="0"
-      @keyup.esc="handleClose()"
+      @keyup.esc.stop="handleClose()"
     >
       <transition
         enter-active-class="ease-out duration-200"
@@ -77,7 +82,7 @@ watch(
         @before-enter="rootVisible = true"
         @after-leave="rootVisible = false"
       >
-        <div v-show="visible" class="modal-layer" @click="handleClose()" />
+        <div v-show="visible" class="modal-layer" @click.stop="handleClose()" />
       </transition>
       <transition
         enter-active-class="ease-out duration-200"
