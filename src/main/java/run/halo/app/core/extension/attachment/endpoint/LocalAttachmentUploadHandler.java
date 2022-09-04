@@ -59,14 +59,15 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                 // check the directory traversal before saving
                 checkDirectoryTraversal(attachmentsRoot, attachmentPath);
 
-                return Mono.fromRunnable(() -> {
-                        try {
-                            // init parent folders
-                            Files.createDirectories(attachmentPath.getParent());
-                        } catch (IOException e) {
-                            throw Exceptions.propagate(e);
-                        }
-                    })
+                return Mono.fromRunnable(
+                        () -> {
+                            try {
+                                // init parent folders
+                                Files.createDirectories(attachmentPath.getParent());
+                            } catch (IOException e) {
+                                throw Exceptions.propagate(e);
+                            }
+                        })
                     .subscribeOn(Schedulers.boundedElastic())
                     // save the attachment
                     .then(DataBufferUtils.write(file.content(), attachmentPath, CREATE_NEW))

@@ -137,10 +137,10 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller attachmentController(ExtensionClient client, PluginManager pluginManager) {
-           return new ControllerBuilder("attachment-controller", client)
-               .reconciler(new AttachmentReconciler(client, pluginManager))
-               .extension(new Attachment())
-               .build();
+            return new ControllerBuilder("attachment-controller", client)
+                .reconciler(new AttachmentReconciler(client, pluginManager))
+                .extension(new Attachment())
+                .build();
         }
     }
 
