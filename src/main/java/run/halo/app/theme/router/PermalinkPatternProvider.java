@@ -28,9 +28,10 @@ public class PermalinkPatternProvider {
         return client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
             .map(configMap -> {
                 Map<String, String> data = configMap.getData();
-                String routeRulesJson = data.get(SystemSetting.ThemeRouteRules.GROUP);
-                return JsonUtils.jsonToObject(routeRulesJson, SystemSetting.ThemeRouteRules.class);
+                return data.get(SystemSetting.ThemeRouteRules.GROUP);
             })
+            .map(routeRulesJson -> JsonUtils.jsonToObject(routeRulesJson,
+                SystemSetting.ThemeRouteRules.class))
             .orElseGet(() -> {
                 SystemSetting.ThemeRouteRules themeRouteRules = new SystemSetting.ThemeRouteRules();
                 themeRouteRules.setArchives("archives");
