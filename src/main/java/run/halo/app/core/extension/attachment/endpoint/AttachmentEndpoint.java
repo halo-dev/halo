@@ -91,6 +91,8 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> upload(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
+            .switchIfEmpty(Mono.error(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                "Please login first and try it again")))
             .map(SecurityContext::getAuthentication)
             .map(Authentication::getName)
             .flatMap(username -> request.body(toMultipartData())
@@ -112,6 +114,10 @@ public class AttachmentEndpoint implements CustomEndpoint {
                         .concatMap(uploadHandler -> uploadHandler.upload(uploadOption)
                             .doOnNext(attachment -> {
                                 var spec = attachment.getSpec();
+                                if (spec == null) {
+                                    spec = new Attachment.AttachmentSpec();
+                                    attachment.setSpec(spec);
+                                }
                                 spec.setUploadedBy(Ref.of(username));
                                 spec.setPolicyRef(Ref.of(uploadOption.policy()));
                                 var groupName = uploadRequest.getGroupName();
