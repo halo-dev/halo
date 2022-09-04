@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders;
 
+import org.springframework.lang.Nullable;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.ContentVo;
@@ -17,9 +18,10 @@ public interface PostFinder {
 
     ContentVo content(String postName);
 
-    ListResult<PostVo> list(int page, int size);
+    ListResult<PostVo> list(@Nullable Integer page, @Nullable Integer size);
 
-    ListResult<PostVo> listByCategory(int page, int size, String categoryName);
+    ListResult<PostVo> listByCategory(@Nullable Integer page, @Nullable Integer size,
+        String categoryName);
 
-    ListResult<PostVo> listByTag(int page, int size, String tag);
+    ListResult<PostVo> listByTag(@Nullable Integer page, @Nullable Integer size, String tag);
 }

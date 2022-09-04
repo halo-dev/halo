@@ -43,20 +43,6 @@ public class ThemeConfiguration {
                 });
     }
 
-    @Bean
-    RouterFunction<ServerResponse> routeIndex() {
-        return RouterFunctions
-            .route(GET("/").or(GET("/index"))
-                    .and(accept(MediaType.TEXT_HTML)),
-                request -> ServerResponse.ok().render("index"));
-    }
-
-    @Bean
-    RouterFunction<ServerResponse> about() {
-        return RouterFunctions.route(GET("/about").and(accept(MediaType.TEXT_HTML)),
-            request -> ServerResponse.ok().render("about"));
-    }
-
     private Path getThemeAssetsPath(String themeName, String resource) {
         return FilePathUtils.combinePath(haloProperties.getWorkDir().toString(),
             "themes", themeName, "templates", "assets", resource);

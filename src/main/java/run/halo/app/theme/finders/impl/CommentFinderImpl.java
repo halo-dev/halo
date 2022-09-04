@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Reply;
@@ -39,10 +40,10 @@ public class CommentFinderImpl implements CommentFinder {
     }
 
     @Override
-    public ListResult<CommentVo> list(Comment.CommentSubjectRef ref, int page, int size) {
+    public ListResult<CommentVo> list(Comment.CommentSubjectRef ref, Integer page, Integer size) {
         return client.list(Comment.class, fixedPredicate(ref),
                 defaultComparator(),
-                page, size)
+                pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
                 List<CommentVo> commentVos = list.get().map(CommentVo::from).toList();
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
@@ -52,14 +53,14 @@ public class CommentFinderImpl implements CommentFinder {
     }
 
     @Override
-    public ListResult<ReplyVo> listReply(String commentName, int page, int size) {
+    public ListResult<ReplyVo> listReply(String commentName, Integer page, Integer size) {
         Comparator<Reply> comparator =
             Comparator.comparing(reply -> reply.getMetadata().getCreationTimestamp());
         return client.list(Reply.class,
                 reply -> reply.getSpec().getCommentName().equals(commentName)
                     && Objects.equals(false, reply.getSpec().getHidden())
                     && Objects.equals(true, reply.getSpec().getApproved()),
-                comparator.reversed(), page, size)
+                comparator.reversed(), pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
                 List<ReplyVo> replyVos = list.get().map(ReplyVo::from).toList();
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
@@ -89,5 +90,13 @@ public class CommentFinderImpl implements CommentFinder {
             .thenComparing(creationTimestamp)
             .thenComparing(name)
             .reversed();
+    }
+
+    int pageNullSafe(Integer page) {
+        return ObjectUtils.defaultIfNull(page, 1);
+    }
+
+    int sizeNullSafe(Integer size) {
+        return ObjectUtils.defaultIfNull(size, 10);
     }
 }

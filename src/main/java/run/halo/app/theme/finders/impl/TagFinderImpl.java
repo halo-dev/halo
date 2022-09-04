@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -44,9 +45,9 @@ public class TagFinderImpl implements TagFinder {
     }
 
     @Override
-    public ListResult<TagVo> list(int page, int size) {
+    public ListResult<TagVo> list(Integer page, Integer size) {
         return client.list(Tag.class, null,
-                DEFAULT_COMPARATOR.reversed(), page, size)
+                DEFAULT_COMPARATOR.reversed(), pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
                 List<TagVo> tagVos = list.stream()
                     .map(TagVo::from)
@@ -63,5 +64,13 @@ public class TagFinderImpl implements TagFinder {
             .map(TagVo::from)
             .collectList()
             .block();
+    }
+
+    int pageNullSafe(Integer page) {
+        return ObjectUtils.defaultIfNull(page, 1);
+    }
+
+    int sizeNullSafe(Integer size) {
+        return ObjectUtils.defaultIfNull(size, 10);
     }
 }

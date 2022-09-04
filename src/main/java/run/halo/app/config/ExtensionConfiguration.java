@@ -2,30 +2,40 @@ package run.halo.app.config;
 
 import org.pf4j.PluginManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.content.ContentService;
+import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
+import run.halo.app.content.permalinks.PostPermalinkPolicy;
+import run.halo.app.content.permalinks.TagPermalinkPolicy;
+import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
+import run.halo.app.core.extension.Tag;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.reconciler.CategoryReconciler;
 import run.halo.app.core.extension.reconciler.MenuItemReconciler;
 import run.halo.app.core.extension.reconciler.MenuReconciler;
 import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.PostReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
+import run.halo.app.core.extension.reconciler.SystemSettingReconciler;
+import run.halo.app.core.extension.reconciler.TagReconciler;
 import run.halo.app.core.extension.reconciler.ThemeReconciler;
 import run.halo.app.core.extension.reconciler.UserReconciler;
 import run.halo.app.core.extension.reconciler.attachment.AttachmentReconciler;
 import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
 import run.halo.app.extension.ExtensionClient;
@@ -128,10 +138,37 @@ public class ExtensionConfiguration {
         }
 
         @Bean
-        Controller postController(ExtensionClient client, ContentService contentService) {
+        Controller postController(ExtensionClient client, ContentService contentService,
+            PostPermalinkPolicy postPermalinkPolicy) {
             return new ControllerBuilder("post-controller", client)
-                .reconciler(new PostReconciler(client, contentService))
+                .reconciler(new PostReconciler(client, contentService, postPermalinkPolicy))
                 .extension(new Post())
+                .build();
+        }
+
+        @Bean
+        Controller categoryController(ExtensionClient client,
+            CategoryPermalinkPolicy categoryPermalinkPolicy) {
+            return new ControllerBuilder("category-controller", client)
+                .reconciler(new CategoryReconciler(client, categoryPermalinkPolicy))
+                .extension(new Category())
+                .build();
+        }
+
+        @Bean
+        Controller tagController(ExtensionClient client, TagPermalinkPolicy tagPermalinkPolicy) {
+            return new ControllerBuilder("tag-controller", client)
+                .reconciler(new TagReconciler(client, tagPermalinkPolicy))
+                .extension(new Tag())
+                .build();
+        }
+
+        @Bean
+        Controller systemSettingController(ExtensionClient client,
+            ApplicationContext applicationContext) {
+            return new ControllerBuilder("system-setting-controller", client)
+                .reconciler(new SystemSettingReconciler(client, applicationContext))
+                .extension(new ConfigMap())
                 .build();
         }
 

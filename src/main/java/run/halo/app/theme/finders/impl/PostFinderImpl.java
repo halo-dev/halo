@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import run.halo.app.content.ContentService;
@@ -13,13 +14,13 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.CategoryFinder;
-import run.halo.app.theme.finders.Contributor;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ContentVo;
+import run.halo.app.theme.finders.vo.Contributor;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.TagVo;
 
@@ -79,18 +80,18 @@ public class PostFinderImpl implements PostFinder {
     }
 
     @Override
-    public ListResult<PostVo> list(int page, int size) {
+    public ListResult<PostVo> list(Integer page, Integer size) {
         return listPost(page, size, null);
     }
 
     @Override
-    public ListResult<PostVo> listByCategory(int page, int size, String categoryName) {
+    public ListResult<PostVo> listByCategory(Integer page, Integer size, String categoryName) {
         return listPost(page, size,
             post -> contains(post.getSpec().getCategories(), categoryName));
     }
 
     @Override
-    public ListResult<PostVo> listByTag(int page, int size, String tag) {
+    public ListResult<PostVo> listByTag(Integer page, Integer size, String tag) {
         return listPost(page, size,
             post -> contains(post.getSpec().getTags(), tag));
     }
@@ -102,11 +103,11 @@ public class PostFinderImpl implements PostFinder {
         return c.contains(key);
     }
 
-    private ListResult<PostVo> listPost(int page, int size, Predicate<Post> postPredicate) {
+    private ListResult<PostVo> listPost(Integer page, Integer size, Predicate<Post> postPredicate) {
         Predicate<Post> predicate = FIXED_PREDICATE
             .and(postPredicate == null ? post -> true : postPredicate);
         ListResult<Post> list = client.list(Post.class, predicate,
-                defaultComparator(), page, size)
+                defaultComparator(), pageNullSafe(page), sizeNullSafe(size))
             .block();
         if (list == null) {
             return new ListResult<>(0, 0, 0, List.of());
@@ -142,5 +143,13 @@ public class PostFinderImpl implements PostFinder {
             .thenComparing(creationTimestamp)
             .thenComparing(name)
             .reversed();
+    }
+
+    int pageNullSafe(Integer page) {
+        return ObjectUtils.defaultIfNull(page, 1);
+    }
+
+    int sizeNullSafe(Integer size) {
+        return ObjectUtils.defaultIfNull(size, 10);
     }
 }
