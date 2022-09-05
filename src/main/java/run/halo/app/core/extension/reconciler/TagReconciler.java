@@ -7,6 +7,8 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
+ * Reconciler for {@link Tag}.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -35,10 +37,8 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void reconcilePermalink(Tag tag) {
-        if (tag.getStatusOrDefault().getPermalink() == null) {
-            tag.getStatusOrDefault()
-                .setPermalink(tagPermalinkPolicy.permalink(tag));
-        }
+        tag.getStatusOrDefault()
+            .setPermalink(tagPermalinkPolicy.permalink(tag));
 
         if (tag.getMetadata().getDeletionTimestamp() != null) {
             tagPermalinkPolicy.onPermalinkDelete(tag);

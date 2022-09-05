@@ -9,19 +9,27 @@ import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
-import run.halo.app.content.permalinks.PostPermalinkPolicy;
+import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
+import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
+import run.halo.app.theme.router.TemplateRouteManager;
 
 /**
- * <p>Reconciler for {@link Post}.</p>
+ * <p>Reconciler for {@link SinglePage}.</p>
  *
  * <p>things to do:</p>
  * <ul>
@@ -32,51 +40,60 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.0.0
  */
-public class PostReconciler implements Reconciler<Reconciler.Request> {
+public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final ContentService contentService;
-    private final PostPermalinkPolicy postPermalinkPolicy;
+    private final ApplicationContext applicationContext;
+    private final TemplateRouteManager templateRouteManager;
 
-    public PostReconciler(ExtensionClient client, ContentService contentService,
-        PostPermalinkPolicy postPermalinkPolicy) {
+    public SinglePageReconciler(ExtensionClient client, ContentService contentService,
+        ApplicationContext applicationContext, TemplateRouteManager templateRouteManager) {
         this.client = client;
         this.contentService = contentService;
-        this.postPermalinkPolicy = postPermalinkPolicy;
+        this.applicationContext = applicationContext;
+        this.templateRouteManager = templateRouteManager;
     }
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Post.class, request.name())
-            .ifPresent(post -> {
-                Post oldPost = JsonUtils.deepCopy(post);
+        client.fetch(SinglePage.class, request.name())
+            .ifPresent(singlePage -> {
+                SinglePage oldPage = JsonUtils.deepCopy(singlePage);
 
-                doReconcile(post);
-                permalinkReconcile(post);
+                doReconcile(singlePage);
+                permalinkReconcile(singlePage);
 
-                if (!oldPost.equals(post)) {
-                    client.update(post);
+                if (!oldPage.equals(singlePage)) {
+                    client.update(singlePage);
                 }
             });
         return new Result(false, null);
     }
 
-    private void permalinkReconcile(Post post) {
-        post.getStatusOrDefault()
-            .setPermalink(postPermalinkPolicy.permalink(post));
+    private void permalinkReconcile(SinglePage singlePage) {
+        singlePage.getStatusOrDefault()
+            .setPermalink(PathUtils.combinePath(singlePage.getSpec().getSlug()));
 
-        if (Objects.equals(true, post.getSpec().getDeleted())
-            || post.getMetadata().getDeletionTimestamp() != null
-            || Objects.equals(false, post.getSpec().getPublished())) {
-            postPermalinkPolicy.onPermalinkDelete(post);
-            return;
+        GroupVersionKind gvk = GroupVersionKind.fromExtension(SinglePage.class);
+        ExtensionLocator locator = new ExtensionLocator(gvk, singlePage.getMetadata().getName(),
+            singlePage.getSpec().getSlug());
+        if (Objects.equals(true, singlePage.getSpec().getDeleted())
+            || singlePage.getMetadata().getDeletionTimestamp() != null
+            || Objects.equals(false, singlePage.getSpec().getPublished())) {
+            applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, locator,
+                singlePage.getStatusOrDefault().getPermalink()));
+        } else {
+            applicationContext.publishEvent(new PermalinkIndexUpdateCommand(this, locator,
+                singlePage.getStatusOrDefault().getPermalink()));
         }
-        postPermalinkPolicy.onPermalinkAdd(post);
+
+        templateRouteManager.changeTemplatePattern(DefaultTemplateEnum.SINGLE_PAGE.getValue());
     }
 
-    private void doReconcile(Post post) {
-        String name = post.getMetadata().getName();
-        Post.PostSpec spec = post.getSpec();
-        Post.PostStatus status = post.getStatusOrDefault();
+    private void doReconcile(SinglePage singlePage) {
+        String name = singlePage.getMetadata().getName();
+        SinglePage.SinglePageSpec spec = singlePage.getSpec();
+        SinglePage.SinglePageStatus status = singlePage.getStatusOrDefault();
         if (status.getPhase() == null) {
             status.setPhase(Post.PostPhase.DRAFT.name());
         }
@@ -100,8 +117,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
 
         // handle contributors
-        String headSnapshot = post.getSpec().getHeadSnapshot();
-        contentService.listSnapshots(Snapshot.SubjectRef.of(Post.KIND, name))
+        String headSnapshot = singlePage.getSpec().getHeadSnapshot();
+        contentService.listSnapshots(Snapshot.SubjectRef.of(SinglePage.KIND, name))
             .collectList()
             .subscribe(snapshots -> {
                 List<String> contributors = snapshots.stream()
@@ -140,26 +157,25 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         }
 
         // handle logic delete
-        Map<String, String> labels = getLabelsOrDefault(post);
-        if (isDeleted(post)) {
-            labels.put(Post.DELETED_LABEL, Boolean.TRUE.toString());
-            // TODO do more about logic delete such as remove router
+        Map<String, String> labels = getLabelsOrDefault(singlePage);
+        if (isDeleted(singlePage)) {
+            labels.put(SinglePage.DELETED_LABEL, Boolean.TRUE.toString());
         } else {
-            labels.put(Post.DELETED_LABEL, Boolean.FALSE.toString());
+            labels.put(SinglePage.DELETED_LABEL, Boolean.FALSE.toString());
         }
         // synchronize some fields to labels to query
-        labels.put(Post.PHASE_LABEL, status.getPhase());
-        labels.put(Post.VISIBLE_LABEL,
+        labels.put(SinglePage.PHASE_LABEL, status.getPhase());
+        labels.put(SinglePage.VISIBLE_LABEL,
             Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
-        labels.put(Post.OWNER_LABEL, spec.getOwner());
+        labels.put(SinglePage.OWNER_LABEL, spec.getOwner());
     }
 
-    private Map<String, String> getLabelsOrDefault(Post post) {
-        Assert.notNull(post, "The post must not be null.");
-        Map<String, String> labels = post.getMetadata().getLabels();
+    private Map<String, String> getLabelsOrDefault(SinglePage singlePage) {
+        Assert.notNull(singlePage, "The singlePage must not be null.");
+        Map<String, String> labels = singlePage.getMetadata().getLabels();
         if (labels == null) {
             labels = new LinkedHashMap<>();
-            post.getMetadata().setLabels(labels);
+            singlePage.getMetadata().setLabels(labels);
         }
         return labels;
     }
@@ -175,8 +191,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         return snapshot.getSpec().getPublishTime() != null;
     }
 
-    private boolean isDeleted(Post post) {
-        return Objects.equals(true, post.getSpec().getDeleted())
-            || post.getMetadata().getDeletionTimestamp() != null;
+    private boolean isDeleted(SinglePage singlePage) {
+        return Objects.equals(true, singlePage.getSpec().getDeleted())
+            || singlePage.getMetadata().getDeletionTimestamp() != null;
     }
 }

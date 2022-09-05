@@ -16,6 +16,7 @@ import run.halo.app.theme.router.strategy.CategoriesRouteStrategy;
 import run.halo.app.theme.router.strategy.CategoryRouteStrategy;
 import run.halo.app.theme.router.strategy.IndexRouteStrategy;
 import run.halo.app.theme.router.strategy.PostRouteStrategy;
+import run.halo.app.theme.router.strategy.SinglePageRouteStrategy;
 import run.halo.app.theme.router.strategy.TagRouteStrategy;
 import run.halo.app.theme.router.strategy.TagsRouteStrategy;
 
@@ -113,6 +114,7 @@ public class TemplateRouteManager implements ApplicationListener<ApplicationRead
             case TAG -> new TagRouteStrategy(permalinkIndexer);
             case CATEGORIES -> new CategoriesRouteStrategy();
             case CATEGORY -> new CategoryRouteStrategy(permalinkIndexer);
+            case SINGLE_PAGE -> new SinglePageRouteStrategy(permalinkIndexer);
         };
     }
 

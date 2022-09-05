@@ -7,6 +7,8 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
+ * Reconciler for {@link Category}.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -36,10 +38,8 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void reconcilePermalink(Category category) {
-        if (category.getStatusOrDefault().getPermalink() == null) {
-            category.getStatusOrDefault()
-                .setPermalink(categoryPermalinkPolicy.permalink(category));
-        }
+        category.getStatusOrDefault()
+            .setPermalink(categoryPermalinkPolicy.permalink(category));
 
         if (category.getMetadata().getDeletionTimestamp() != null) {
             categoryPermalinkPolicy.onPermalinkDelete(category);
