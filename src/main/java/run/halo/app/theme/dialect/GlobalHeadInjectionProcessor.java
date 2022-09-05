@@ -62,7 +62,6 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
          */
         final IModelFactory modelFactory = context.getModelFactory();
         IModel modelToInsert = modelFactory.createModel();
-        modelToInsert.add(modelFactory.createText("\n"));
 
         // apply processors to modelToInsert
         Collection<TemplateHeadProcessor> templateHeadProcessors =
@@ -72,7 +71,6 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
                 .subscribe();
         }
 
-        modelToInsert.add(modelFactory.createText("\n"));
         // add to target model
         model.insertModel(model.size() - 1, modelToInsert);
     }

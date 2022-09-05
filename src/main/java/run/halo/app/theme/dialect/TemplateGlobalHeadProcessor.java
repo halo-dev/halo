@@ -34,14 +34,14 @@ public class TemplateGlobalHeadProcessor implements TemplateHeadProcessor {
             .doOnNext(codeInjection -> {
                 String globalHeader = codeInjection.getGlobalHead();
                 if (StringUtils.isNotBlank(globalHeader)) {
-                    model.add(modelFactory.createText(globalHeader));
+                    model.add(modelFactory.createText(globalHeader + "\n"));
                 }
 
                 // add content head to model
                 String contentHeader = codeInjection.getContentHead();
                 String template = context.getTemplateData().getTemplate();
                 if (StringUtils.isNotBlank(contentHeader) && isContentTemplate(template)) {
-                    model.add(modelFactory.createText(contentHeader));
+                    model.add(modelFactory.createText(contentHeader + "\n"));
                 }
             })
             .then();
