@@ -1,12 +1,16 @@
 package run.halo.app.core.extension.reconciler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -16,10 +20,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.MenuItem.MenuItemSpec;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler.Request;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,8 +38,71 @@ class MenuItemReconcilerTest {
     MenuItemReconciler reconciler;
 
     @Nested
-    class WhenOtherRefNotSet {
+    class WhenCategoryRefSet {
 
+        @Test
+        void shouldNotUpdateMenuItemIfCategoryNotFound() {
+            Supplier<MenuItem> menuItemSupplier = () -> createMenuItem("fake-name", spec -> {
+                spec.setCategoryRef(Ref.of("fake-category"));
+            });
+
+            when(client.fetch(MenuItem.class, "fake-name"))
+                .thenReturn(Optional.of(menuItemSupplier.get()));
+            when(client.fetch(Category.class, "fake-category")).thenReturn(Optional.empty());
+
+            var result = reconciler.reconcile(new Request("fake-name"));
+
+            assertTrue(result.reEnqueue());
+            assertEquals(Duration.ofMinutes(1), result.retryAfter());
+            verify(client).fetch(MenuItem.class, "fake-name");
+            verify(client).fetch(Category.class, "fake-category");
+            verify(client, never()).update(isA(MenuItem.class));
+        }
+
+        @Test
+        void shouldUpdateMenuItemIfCategoryFound() {
+            Supplier<MenuItem> menuItemSupplier = () -> createMenuItem("fake-name", spec -> {
+                spec.setCategoryRef(Ref.of("fake-category"));
+            });
+
+            when(client.fetch(MenuItem.class, "fake-name"))
+                .thenReturn(Optional.of(menuItemSupplier.get()))
+                .thenReturn(Optional.of(menuItemSupplier.get()));
+            when(client.fetch(Category.class, "fake-category"))
+                .thenReturn(Optional.of(createCategory()));
+
+            var result = reconciler.reconcile(new Request("fake-name"));
+
+            assertTrue(result.reEnqueue());
+            assertEquals(Duration.ofMinutes(1), result.retryAfter());
+            verify(client, times(2)).fetch(MenuItem.class, "fake-name");
+            verify(client).fetch(Category.class, "fake-category");
+            verify(client).<MenuItem>update(argThat(menuItem -> {
+                var status = menuItem.getStatus();
+                return status.getHref().equals("fake://permalink")
+                    && status.getDisplayName().equals("Fake Category");
+            }));
+        }
+
+        Category createCategory() {
+            var metadata = new Metadata();
+            metadata.setName("fake-category");
+
+            var spec = new Category.CategorySpec();
+            spec.setDisplayName("Fake Category");
+            var status = new Category.CategoryStatus();
+            status.setPermalink("fake://permalink");
+
+            var category = new Category();
+            category.setMetadata(metadata);
+            category.setSpec(spec);
+            category.setStatus(status);
+            return category;
+        }
+    }
+
+    @Nested
+    class WhenOtherRefsNotSet {
 
         @Test
         void shouldNotRequeueIfHrefNotSet() {
