@@ -69,7 +69,7 @@ function onDelete(category: CategoryTree) {
               </div>
               <div class="mt-1 flex">
                 <span class="text-xs text-gray-500">
-                  /categories/{{ category.spec.slug }}
+                  {{ category.status.permalink }}
                 </span>
               </div>
             </div>

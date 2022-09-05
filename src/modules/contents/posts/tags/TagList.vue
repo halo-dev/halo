@@ -186,7 +186,7 @@ onMounted(async () => {
                   </div>
                   <div class="mt-1 flex">
                     <span class="text-xs text-gray-500">
-                      /tags/{{ tag.spec.slug }}
+                      {{ tag.status?.permalink }}
                     </span>
                   </div>
                 </div>
