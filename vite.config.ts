@@ -8,6 +8,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import { viteExternalsPlugin as ViteExternals } from "vite-plugin-externals";
 import { viteStaticCopy as ViteStaticCopy } from "vite-plugin-static-copy";
 import { createHtmlPlugin as VitePluginHtml } from "vite-plugin-html";
+import Icons from "unplugin-icons/vite";
 
 export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -20,6 +21,7 @@ export default ({ mode }: { mode: string }) => {
       VueJsx(),
       VueSetupExtend(),
       Compression(),
+      Icons({ compiler: "vue3" }),
       ViteExternals({
         vue: "Vue",
         "vue-router": "VueRouter",

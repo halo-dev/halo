@@ -1,19 +1,20 @@
 <script lang="ts" setup>
 import { VModal } from "@halo-dev/components";
-import vueFilePond from "vue-filepond";
-import "filepond/dist/filepond.min.css";
-import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
-import { ref } from "vue";
+import FilePondUpload from "@/components/upload/FilePondUpload.vue";
+import { computed, ref, watch, watchEffect } from "vue";
+import { apiClient } from "@halo-dev/admin-shared";
+import type { Policy, Group } from "@halo-dev/api-client";
+import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
+import AttachmentPoliciesModal from "./AttachmentPoliciesModal.vue";
 
-const FilePond = vueFilePond(FilePondPluginImagePreview);
-
-withDefaults(
+const props = withDefaults(
   defineProps<{
     visible: boolean;
+    group?: Group;
   }>(),
   {
     visible: false,
+    group: undefined,
   }
 );
 
@@ -22,64 +23,95 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const strategies = ref([
-  {
-    id: "1",
-    name: "本地存储",
-    description: "~/.halo/uploads",
-  },
-  {
-    id: "2",
-    name: "阿里云 OSS",
-    description: "bucket/blog-attachments",
-  },
-  {
-    id: "3",
-    name: "阿里云 OSS",
-    description: "bucket/blog-photos",
-  },
-]);
+const { policies, handleFetchPolicies } = useFetchAttachmentPolicy();
+
+const selectedPolicy = ref<Policy | null>(null);
+const policyVisible = ref(false);
+const FilePondUploadRef = ref();
+
+const modalTitle = computed(() => {
+  if (props.group && props.group.metadata.name) {
+    return `上传附件：${props.group.spec.displayName}`;
+  }
+  return "上传附件";
+});
+
+watchEffect(() => {
+  if (policies.value.length) {
+    selectedPolicy.value = policies.value[0];
+  }
+});
 
 const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
+    policyVisible.value = false;
+    FilePondUploadRef.value.handleRemoveFiles();
   }
 };
+
+const uploadHandler = computed(() => {
+  return (file, config) =>
+    apiClient.extension.storage.attachment.uploadAttachment(
+      file,
+      selectedPolicy.value?.metadata.name as string,
+      props.group?.metadata.name as string,
+      config
+    );
+});
+
+watch(
+  () => props.visible,
+  (newValue) => {
+    if (newValue) {
+      handleFetchPolicies();
+    }
+  }
+);
 </script>
 <template>
   <VModal
     :body-class="['!p-0']"
     :visible="visible"
     :width="600"
-    title="上传附件"
+    :title="modalTitle"
     @update:visible="onVisibleChange"
   >
     <template #actions>
       <FloatingDropdown>
         <div v-tooltip="`选择存储策略`" class="modal-header-action">
-          <span class="text-sm">本地存储</span>
+          <span class="text-sm">
+            {{ selectedPolicy?.spec.displayName || "无存储策略" }}
+          </span>
         </div>
         <template #popper>
           <div class="w-72 p-4">
             <ul class="space-y-1">
               <li
-                v-for="(strategy, index) in strategies"
+                v-for="(policy, index) in policies"
                 :key="index"
                 v-close-popper
-                class="flex cursor-pointer flex-col rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                :class="{
+                  '!bg-gray-100 !text-gray-900':
+                    selectedPolicy?.metadata.name === policy.metadata.name,
+                }"
+                class="flex cursor-pointer flex-col rounded px-2 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                @click="selectedPolicy = policy"
               >
                 <span class="truncate">
-                  {{ strategy.name }}
+                  {{ policy.spec.displayName }}
                 </span>
                 <span class="text-xs">
-                  {{ strategy.description }}
+                  {{ policy.spec.templateRef?.name }}
                 </span>
               </li>
               <li
-                class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                v-close-popper
+                class="flex cursor-pointer flex-col rounded px-2 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                @click="policyVisible = true"
               >
-                <span class="truncate">新增存储策略</span>
+                <span class="truncate"> 新增存储策略 </span>
               </li>
             </ul>
           </div>
@@ -87,14 +119,21 @@ const onVisibleChange = (visible: boolean) => {
       </FloatingDropdown>
     </template>
     <div class="w-full p-4">
-      <file-pond
-        ref="pond"
-        accepted-file-types="image/jpeg, image/png"
-        label-idle="Drop files here..."
-        name="test"
-        server="/api"
+      <FilePondUpload
+        ref="FilePondUploadRef"
         :allow-multiple="true"
+        :handler="uploadHandler"
+        :disabled="!selectedPolicy"
+        :max-parallel-uploads="5"
+        :label-idle="
+          selectedPolicy ? '点击选择文件或者拖拽文件到此处' : '请先选择存储策略'
+        "
       />
     </div>
   </VModal>
+
+  <AttachmentPoliciesModal
+    v-model:visible="policyVisible"
+    @close="handleFetchPolicies"
+  />
 </template>

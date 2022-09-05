@@ -1,13 +1,12 @@
 <script lang="ts" setup>
 import {
-  IconAddCircle,
   IconArrowDown,
+  IconArrowLeft,
+  IconArrowRight,
   IconCheckboxFill,
   IconDatabase2Line,
   IconGrid,
   IconList,
-  IconMore,
-  IconPalette,
   IconSettings,
   IconUpload,
   VButton,
@@ -15,16 +14,143 @@ import {
   VPageHeader,
   VPagination,
   VSpace,
-  VTag,
+  VEmpty,
+  IconCloseCircle,
+  IconFolder,
 } from "@halo-dev/components";
+import LazyImage from "@/components/image/LazyImage.vue";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
-import AttachmentSelectModal from "./components/AttachmentSelectModal.vue";
-import AttachmentStrategiesModal from "./components/AttachmentStrategiesModal.vue";
-import AttachmentGroupEditingModal from "./components/AttachmentGroupEditingModal.vue";
-import { ref } from "vue";
+import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
+import AttachmentGroupList from "./components/AttachmentGroupList.vue";
+import { onMounted, ref } from "vue";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
+import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
+import { formatDatetime } from "@/utils/date";
+import prettyBytes from "pretty-bytes";
+import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
+import { useAttachmentControl } from "./composables/use-attachment";
+import AttachmentSelectorModal from "@/modules/contents/attachments/components/AttachmentSelectorModal.vue";
+import AttachmentFileTypeIcon from "./components/AttachmentFileTypeIcon.vue";
+import { apiClient } from "@halo-dev/admin-shared";
+import cloneDeep from "lodash.clonedeep";
+import { isImage } from "@/utils/image";
+import { useRouteQuery } from "@vueuse/router";
+import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 
+const policyVisible = ref(false);
+const uploadVisible = ref(false);
+const detailVisible = ref(false);
+const selectVisible = ref(false);
+
+const { users } = useUserFetch();
+const { policies } = useFetchAttachmentPolicy({ fetchOnMounted: true });
+const { groups, handleFetchGroups } = useFetchAttachmentGroup({
+  fetchOnMounted: true,
+});
+
+const selectedGroup = ref<Group>();
+
+// Filter
+const selectedPolicy = ref<Policy>();
+const selectedUser = ref<User>();
+const keyword = ref<string>("");
+
+function handleSelectPolicy(policy: Policy | undefined) {
+  selectedPolicy.value = policy;
+  handleFetchAttachments();
+}
+
+function handleSelectUser(user: User | undefined) {
+  selectedUser.value = user;
+  handleFetchAttachments();
+}
+
+const {
+  attachments,
+  selectedAttachment,
+  selectedAttachments,
+  checkedAll,
+  loading,
+  handleFetchAttachments,
+  handleSelectNext,
+  handleSelectPrevious,
+  handlePaginationChange,
+  handleDeleteInBatch,
+  handleCheckAll,
+  handleSelect,
+  isChecked,
+  handleReset,
+} = useAttachmentControl({
+  group: selectedGroup,
+  policy: selectedPolicy,
+  user: selectedUser,
+  keyword: keyword,
+});
+
+const handleMove = async (group: Group) => {
+  try {
+    const promises = Array.from(selectedAttachments.value).map((attachment) => {
+      const attachmentToUpdate = cloneDeep(attachment);
+      attachmentToUpdate.spec.groupRef = {
+        name: group.metadata.name,
+      };
+      return apiClient.extension.storage.attachment.updatestorageHaloRunV1alpha1Attachment(
+        attachment.metadata.name,
+        attachmentToUpdate
+      );
+    });
+
+    await Promise.all(promises);
+    selectedAttachments.value.clear();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    handleFetchAttachments();
+  }
+};
+
+const handleClickItem = (attachment: Attachment) => {
+  if (attachment.metadata.deletionTimestamp) {
+    return;
+  }
+
+  if (selectedAttachments.value.size > 0) {
+    handleSelect(attachment);
+    return;
+  }
+
+  selectedAttachment.value = attachment;
+  selectedAttachments.value.clear();
+  detailVisible.value = true;
+};
+
+const handleCheckAllChange = (e: Event) => {
+  const { checked } = e.target as HTMLInputElement;
+  handleCheckAll(checked);
+};
+
+const onDetailModalClose = () => {
+  selectedAttachment.value = undefined;
+  handleFetchAttachments();
+};
+
+const onUploadModalClose = () => {
+  routeQueryAction.value = undefined;
+  handleFetchAttachments();
+};
+
+const onGroupChange = () => {
+  handleReset();
+  handleFetchAttachments();
+};
+
+const getPolicyName = (name: string | undefined) => {
+  const policy = policies.value.find((p) => p.metadata.name === name);
+  return policy?.spec.displayName;
+};
+
+// View type
 const viewTypes = [
   {
     name: "list",
@@ -36,77 +162,54 @@ const viewTypes = [
   },
 ];
 
-const viewType = ref("grid");
+const viewType = useRouteQuery<string>("view", "grid");
 
-const strategyVisible = ref(false);
-const selectVisible = ref(false);
-const uploadVisible = ref(false);
-const detailVisible = ref(false);
-const groupEditingModal = ref(false);
-const checkAll = ref(false);
+// Route query action
+const routeQueryAction = useRouteQuery<string | undefined>("action");
 
-const { users } = useUserFetch();
-
-const attachments = Array.from(new Array(50), (_, index) => index).map(
-  (index) => {
-    return {
-      id: index,
-      name: `attachment-${index}`,
-      url: `https://picsum.photos/1000/700?random=${index}`,
-      size: "1.2MB",
-      type: "image/png",
-      strategy: "本地存储",
-    };
+onMounted(() => {
+  if (!routeQueryAction.value) {
+    return;
   }
-);
-
-const folders = [
-  {
-    name: "2022",
-  },
-  {
-    name: "2021",
-  },
-  {
-    name: "Photos",
-  },
-  {
-    name: "Documents",
-  },
-  {
-    name: "Videos",
-  },
-  {
-    name: "Pictures",
-  },
-  {
-    name: "Developer",
-  },
-];
+  if (routeQueryAction.value === "upload") {
+    uploadVisible.value = true;
+  }
+});
 </script>
 <template>
-  <AttachmentDetailModal v-model:visible="detailVisible" />
-  <AttachmentUploadModal v-model:visible="uploadVisible" />
-  <AttachmentSelectModal v-model:visible="selectVisible" />
-  <AttachmentStrategiesModal v-model:visible="strategyVisible" />
-  <AttachmentGroupEditingModal v-model:visible="groupEditingModal" />
+  <AttachmentSelectorModal v-model:visible="selectVisible" />
+  <AttachmentDetailModal
+    v-model:visible="detailVisible"
+    :attachment="selectedAttachment"
+    @close="onDetailModalClose"
+  >
+    <template #actions>
+      <div class="modal-header-action" @click="handleSelectPrevious">
+        <IconArrowLeft />
+      </div>
+      <div class="modal-header-action" @click="handleSelectNext">
+        <IconArrowRight />
+      </div>
+    </template>
+  </AttachmentDetailModal>
+  <AttachmentUploadModal
+    v-model:visible="uploadVisible"
+    :group="selectedGroup"
+    @close="onUploadModalClose"
+  />
+  <AttachmentPoliciesModal v-model:visible="policyVisible" />
   <VPageHeader title="附件库">
     <template #icon>
-      <IconPalette class="mr-2 self-center" />
+      <IconFolder class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
-        <VButton size="sm" @click="strategyVisible = true">
+        <VButton size="sm" @click="selectVisible = true"> 选择附件</VButton>
+        <VButton size="sm" @click="policyVisible = true">
           <template #icon>
             <IconDatabase2Line class="h-full w-full" />
           </template>
           存储策略
-        </VButton>
-        <VButton size="sm">
-          <template #icon>
-            <IconSettings class="h-full w-full" />
-          </template>
-          设置
         </VButton>
         <VButton type="secondary" @click="uploadVisible = true">
           <template #icon>
@@ -129,20 +232,81 @@ const folders = [
               >
                 <div class="mr-4 hidden items-center sm:flex">
                   <input
-                    v-model="checkAll"
+                    v-model="checkedAll"
                     class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                     type="checkbox"
+                    @change="handleCheckAllChange"
                   />
                 </div>
-                <div class="flex w-full flex-1 sm:w-auto">
-                  <FormKit
-                    v-if="!checkAll"
-                    placeholder="输入关键词搜索"
-                    type="text"
-                  ></FormKit>
+                <div class="flex w-full flex-1 items-center sm:w-auto">
+                  <div
+                    v-if="!selectedAttachments.size"
+                    class="flex items-center gap-2"
+                  >
+                    <FormKit
+                      v-model="keyword"
+                      placeholder="输入关键词搜索"
+                      type="text"
+                      @keyup.enter="handleFetchAttachments()"
+                    ></FormKit>
+
+                    <div
+                      v-if="selectedPolicy"
+                      class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                    >
+                      <span
+                        class="text-xs text-gray-600 group-hover:text-gray-900"
+                      >
+                        存储策略：{{ selectedPolicy?.spec.displayName }}
+                      </span>
+                      <IconCloseCircle
+                        class="h-4 w-4 text-gray-600"
+                        @click="handleSelectPolicy(undefined)"
+                      />
+                    </div>
+
+                    <div
+                      v-if="selectedUser"
+                      class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                    >
+                      <span
+                        class="text-xs text-gray-600 group-hover:text-gray-900"
+                      >
+                        上传者：{{ selectedUser?.spec.displayName }}
+                      </span>
+                      <IconCloseCircle
+                        class="h-4 w-4 text-gray-600"
+                        @click="handleSelectUser(undefined)"
+                      />
+                    </div>
+                  </div>
                   <VSpace v-else>
-                    <VButton type="default">设置</VButton>
-                    <VButton type="danger">删除</VButton>
+                    <VButton type="danger" @click="handleDeleteInBatch">
+                      删除
+                    </VButton>
+                    <VButton @click="selectedAttachments.clear()">
+                      取消选择
+                    </VButton>
+                    <FloatingDropdown>
+                      <VButton>移动</VButton>
+                      <template #popper>
+                        <div class="w-72 p-4">
+                          <ul class="space-y-1">
+                            <li
+                              v-for="(group, index) in groups"
+                              :key="index"
+                              v-close-popper
+                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                              @click="handleMove(group)"
+                            >
+                              <span class="truncate">
+                                {{ group.spec.displayName }}
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+                      </template>
+                    </FloatingDropdown>
                   </VSpace>
                 </div>
                 <div class="mt-4 flex sm:mt-0">
@@ -160,22 +324,20 @@ const folders = [
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
+                              v-for="(policy, index) in policies"
+                              :key="index"
                               v-close-popper
+                              :class="{
+                                'bg-gray-100':
+                                  selectedPolicy?.metadata.name ===
+                                  policy.metadata.name,
+                              }"
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                              @click="handleSelectPolicy(policy)"
                             >
-                              <span class="truncate">本地</span>
-                            </li>
-                            <li
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            >
-                              <span class="truncate">阿里云 OSS</span>
-                            </li>
-                            <li
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            >
-                              <span class="truncate">Amazon S3</span>
+                              <span class="truncate">
+                                {{ policy.spec.displayName }}
+                              </span>
                             </li>
                           </ul>
                         </div>
@@ -191,8 +353,8 @@ const folders = [
                         </span>
                       </div>
                       <template #popper>
-                        <div class="h-96 w-80 p-4">
-                          <div class="bg-white">
+                        <div class="h-96 w-80">
+                          <div class="bg-white p-4">
                             <!--TODO: Auto Focus-->
                             <FormKit
                               placeholder="输入关键词搜索"
@@ -205,15 +367,17 @@ const folders = [
                                 v-for="(user, index) in users"
                                 :key="index"
                                 v-close-popper
-                                class="cursor-pointer py-4 hover:bg-gray-50"
+                                class="cursor-pointer hover:bg-gray-50"
+                                :class="{
+                                  'bg-gray-100':
+                                    selectedUser?.metadata.name ===
+                                    user.metadata.name,
+                                }"
+                                @click="handleSelectUser(user)"
                               >
-                                <div class="flex items-center space-x-4">
-                                  <div class="flex items-center">
-                                    <input
-                                      class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                                      type="checkbox"
-                                    />
-                                  </div>
+                                <div
+                                  class="flex items-center space-x-4 px-4 py-3"
+                                >
                                   <div class="flex-shrink-0">
                                     <img
                                       :alt="user.spec.displayName"
@@ -230,9 +394,6 @@ const folders = [
                                     <p class="truncate text-sm text-gray-500">
                                       @{{ user.metadata.name }}
                                     </p>
-                                  </div>
-                                  <div>
-                                    <VTag>{{ index + 1 }} 篇</VTag>
                                   </div>
                                 </div>
                               </li>
@@ -269,14 +430,6 @@ const folders = [
                         </div>
                       </template>
                     </FloatingDropdown>
-                    <div
-                      class="flex cursor-pointer items-center text-sm text-gray-700 hover:text-black"
-                    >
-                      <span class="mr-0.5">标签</span>
-                      <span>
-                        <IconArrowDown />
-                      </span>
-                    </div>
                     <FloatingDropdown>
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
@@ -337,162 +490,229 @@ const folders = [
             </div>
           </template>
 
-          <div v-if="viewType === 'grid'">
-            <div class="mb-5 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-6">
-              <div
-                class="flex cursor-pointer items-center rounded-base bg-gray-200 p-2 text-gray-900 transition-all"
-              >
-                <div class="flex flex-1 items-center">
-                  <span class="text-sm">全部（212）</span>
-                </div>
-              </div>
-              <div
-                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
-              >
-                <div class="flex flex-1 items-center">
-                  <span class="text-sm">未分组（18）</span>
-                </div>
-              </div>
-              <div
-                v-for="(folder, index) in folders"
-                :key="index"
-                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
-              >
-                <div class="flex flex-1 items-center">
-                  <span class="text-sm">
-                    {{ folder.name }}（{{ index * 20 }}）
-                  </span>
-                </div>
-                <FloatingDropdown>
-                  <IconMore />
-                  <template #popper>
-                    <div class="w-48 p-2">
-                      <VSpace class="w-full" direction="column">
-                        <VButton
-                          v-close-popper
-                          block
-                          type="secondary"
-                          @click="groupEditingModal = true"
-                        >
-                          重命名
-                        </VButton>
-                        <VButton v-close-popper block type="danger">
-                          删除
-                        </VButton>
-                      </VSpace>
-                    </div>
-                  </template>
-                </FloatingDropdown>
-              </div>
-              <div
-                class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
-                @click="groupEditingModal = true"
-              >
-                <div class="flex flex-1 items-center">
-                  <span class="text-sm">添加分组</span>
-                </div>
-                <IconAddCircle />
-              </div>
-            </div>
-            <div
-              class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
-              role="list"
-            >
-              <VCard
-                v-for="(attachment, index) in attachments"
-                :key="index"
-                :body-class="['!p-0']"
-                class="hover:shadow"
-                @click="detailVisible = true"
-              >
-                <div class="relative bg-white">
-                  <div
-                    class="group aspect-w-10 aspect-h-8 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
-                  >
-                    <img
-                      :src="attachment.url"
-                      alt=""
-                      class="pointer-events-none object-cover group-hover:opacity-75"
-                    />
-                  </div>
-                  <p
-                    class="pointer-events-none block truncate px-2 py-1 text-center text-xs font-medium text-gray-700"
-                  >
-                    {{ attachment.name }}
-                  </p>
-
-                  <IconCheckboxFill
-                    v-if="checkAll"
-                    class="absolute top-0.5 right-0.5"
-                  />
-                </div>
-              </VCard>
-            </div>
+          <div :style="`${viewType === 'list' ? 'padding:12px 16px 0' : ''}`">
+            <AttachmentGroupList
+              v-model:selected-group="selectedGroup"
+              @select="onGroupChange"
+              @update="handleFetchGroups"
+            />
           </div>
 
-          <ul
-            v-if="viewType === 'list'"
-            class="box-border h-full w-full divide-y divide-gray-100"
-            role="list"
+          <VEmpty
+            v-if="!attachments.total && !loading"
+            message="当前分组没有附件，你可以尝试刷新或者上传附件"
+            title="当前分组没有附件"
           >
-            <li v-for="(attachment, index) in attachments" :key="index">
+            <template #actions>
+              <VSpace>
+                <VButton @click="handleFetchAttachments">刷新</VButton>
+                <VButton type="secondary" @click="uploadVisible = true">
+                  <template #icon>
+                    <IconUpload class="h-full w-full" />
+                  </template>
+                  上传附件
+                </VButton>
+              </VSpace>
+            </template>
+          </VEmpty>
+
+          <div v-else>
+            <div v-if="viewType === 'grid'">
               <div
-                :class="{
-                  'bg-gray-100': checkAll,
-                }"
-                class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
+                class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
+                role="list"
               >
-                <div
-                  v-show="checkAll"
-                  class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-                ></div>
-                <div class="relative flex flex-row items-center">
-                  <div class="mr-4 hidden items-center sm:flex">
-                    <input
-                      v-model="checkAll"
-                      class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                      type="checkbox"
-                    />
-                  </div>
-                  <div class="flex-1">
-                    <div class="flex flex-col sm:flex-row">
-                      <span
-                        class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
-                      >
-                        {{ attachment.name }}
-                      </span>
-                    </div>
-                    <div class="mt-1 flex">
-                      <VSpace>
-                        <span class="text-xs text-gray-500">image/png</span>
-                        <span class="text-xs text-gray-500">1.2 MB</span>
-                      </VSpace>
-                    </div>
-                  </div>
-                  <div class="flex">
+                <VCard
+                  v-for="(attachment, index) in attachments.items"
+                  :key="index"
+                  :body-class="['!p-0']"
+                  :class="{
+                    'ring-1 ring-primary': isChecked(attachment),
+                    'ring-1 ring-red-600':
+                      attachment.metadata.deletionTimestamp,
+                  }"
+                  class="hover:shadow"
+                  @click="handleClickItem(attachment)"
+                >
+                  <div class="group relative bg-white">
                     <div
-                      class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                      class="aspect-w-10 aspect-h-8 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
                     >
-                      <img
-                        class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
-                        src="https://ryanc.cc/avatar"
+                      <LazyImage
+                        v-if="isImage(attachment.spec.mediaType)"
+                        :key="attachment.metadata.name"
+                        :alt="attachment.spec.displayName"
+                        :src="attachment.status?.permalink"
+                        classes="pointer-events-none object-cover group-hover:opacity-75"
+                      >
+                        <template #loading>
+                          <div
+                            class="flex h-full items-center justify-center object-cover"
+                          >
+                            <span class="text-xs text-gray-400">加载中...</span>
+                          </div>
+                        </template>
+                        <template #error>
+                          <div
+                            class="flex h-full items-center justify-center object-cover"
+                          >
+                            <span class="text-xs text-red-400">加载异常</span>
+                          </div>
+                        </template>
+                      </LazyImage>
+                      <AttachmentFileTypeIcon
+                        v-else
+                        :file-name="attachment.spec.displayName"
                       />
-                      <time class="text-sm text-gray-500" datetime="2020-01-07">
-                        2020-01-07
-                      </time>
-                      <span class="cursor-pointer">
-                        <IconSettings @click.stop="detailVisible = true" />
-                      </span>
+                    </div>
+
+                    <p
+                      v-tooltip="attachment.spec.displayName"
+                      class="block cursor-pointer truncate px-2 py-1 text-center text-xs font-medium text-gray-700"
+                    >
+                      {{ attachment.spec.displayName }}
+                    </p>
+
+                    <div
+                      v-if="attachment.metadata.deletionTimestamp"
+                      class="absolute top-1 right-1 text-xs text-red-300"
+                    >
+                      删除中...
+                    </div>
+
+                    <div
+                      v-if="!attachment.metadata.deletionTimestamp"
+                      :class="{ '!flex': selectedAttachments.has(attachment) }"
+                      class="absolute top-0 left-0 hidden h-1/3 w-full cursor-pointer justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
+                    >
+                      <IconCheckboxFill
+                        :class="{
+                          '!text-primary': selectedAttachments.has(attachment),
+                        }"
+                        class="mt-1 mr-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
+                        @click.stop="handleSelect(attachment)"
+                      />
+                    </div>
+                  </div>
+                </VCard>
+              </div>
+            </div>
+
+            <ul
+              v-if="viewType === 'list'"
+              class="box-border h-full w-full divide-y divide-gray-100"
+              role="list"
+            >
+              <li v-for="(attachment, index) in attachments.items" :key="index">
+                <div
+                  :class="{
+                    'bg-gray-100': isChecked(attachment),
+                  }"
+                  class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
+                >
+                  <div
+                    v-show="isChecked(attachment)"
+                    class="absolute inset-y-0 left-0 w-0.5 bg-primary"
+                  ></div>
+                  <div class="relative flex flex-row items-center">
+                    <div class="mr-4 hidden items-center sm:flex">
+                      <input
+                        :checked="selectedAttachments.has(attachment)"
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        type="checkbox"
+                        @click="handleSelect(attachment)"
+                      />
+                    </div>
+                    <div class="mr-4">
+                      <div
+                        class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm"
+                      >
+                        <AttachmentFileTypeIcon
+                          :display-ext="false"
+                          :file-name="attachment.spec.displayName"
+                          :width="8"
+                          :height="8"
+                        />
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex flex-col sm:flex-row">
+                        <span
+                          class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
+                          @click="handleClickItem(attachment)"
+                        >
+                          {{ attachment.spec.displayName }}
+                        </span>
+                      </div>
+                      <div class="mt-1 flex">
+                        <VSpace>
+                          <span class="text-xs text-gray-500">
+                            {{ attachment.spec.mediaType }}
+                          </span>
+                          <span class="text-xs text-gray-500">
+                            {{ prettyBytes(attachment.spec.size || 0) }}
+                          </span>
+                        </VSpace>
+                      </div>
+                    </div>
+                    <div class="flex">
+                      <div
+                        class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                      >
+                        <span class="text-sm text-gray-500">
+                          {{ getPolicyName(attachment.spec.policyRef?.name) }}
+                        </span>
+                        <RouterLink
+                          :to="{
+                            name: 'UserDetail',
+                            params: { name: attachment.spec.uploadedBy?.name },
+                          }"
+                        >
+                          <span class="text-sm text-gray-500">
+                            {{ attachment.spec.uploadedBy?.name }}
+                          </span>
+                        </RouterLink>
+                        <FloatingTooltip
+                          v-if="attachment.metadata.deletionTimestamp"
+                          class="hidden items-center sm:flex"
+                        >
+                          <div
+                            class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
+                          >
+                            <span
+                              class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
+                            ></span>
+                          </div>
+                          <template #popper> 删除中</template>
+                        </FloatingTooltip>
+                        <time class="text-sm text-gray-500">
+                          {{
+                            formatDatetime(
+                              attachment.metadata.creationTimestamp
+                            )
+                          }}
+                        </time>
+                        <span class="cursor-pointer">
+                          <IconSettings
+                            @click.stop="handleClickItem(attachment)"
+                          />
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          </ul>
+              </li>
+            </ul>
+          </div>
 
           <template #footer>
             <div class="bg-white sm:flex sm:items-center sm:justify-end">
-              <VPagination :page="1" :size="10" :total="20" />
+              <VPagination
+                :page="attachments.page"
+                :size="attachments.size"
+                :total="attachments.total"
+                @change="handlePaginationChange"
+              />
             </div>
           </template>
         </VCard>

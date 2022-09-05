@@ -19,6 +19,7 @@ import { apiClient } from "@halo-dev/admin-shared";
 import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
+import { useRouteQuery } from "@vueuse/router";
 
 const checkAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -66,6 +67,11 @@ const handleOpenCreateModal = (user: User) => {
   editingModal.value = true;
 };
 
+const onEditingModalClose = () => {
+  routeQueryAction.value = undefined;
+  handleFetchUsers();
+};
+
 const handleOpenPasswordChangeModal = (user: User) => {
   selectedUser.value = user;
   passwordChangeModal.value = true;
@@ -80,13 +86,25 @@ const getRoles = (user: User) => {
 onMounted(() => {
   handleFetchUsers();
 });
+
+// Route query action
+const routeQueryAction = useRouteQuery<string | undefined>("action");
+
+onMounted(() => {
+  if (!routeQueryAction.value) {
+    return;
+  }
+  if (routeQueryAction.value === "create") {
+    editingModal.value = true;
+  }
+});
 </script>
 <template>
   <UserEditingModal
     v-model:visible="editingModal"
     v-permission="['system:users:manage']"
     :user="selectedUser"
-    @close="handleFetchUsers"
+    @close="onEditingModalClose"
   />
 
   <UserPasswordChangeModal

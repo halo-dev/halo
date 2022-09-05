@@ -8,33 +8,57 @@ import {
   IconUserSettings,
   VCard,
 } from "@halo-dev/components";
+import { markRaw, type Component } from "vue";
 import { useRouter } from "vue-router";
+import type { RouteLocationRaw } from "vue-router";
 
-const actions = [
+interface Action {
+  icon: Component;
+  title: string;
+  route: RouteLocationRaw;
+}
+
+const actions: Action[] = [
   {
-    icon: IconBookRead,
+    icon: markRaw(IconBookRead),
     title: "创建文章",
-    route: "PostEditor",
+    route: {
+      name: "PostEditor",
+    },
   },
   {
-    icon: IconFolder,
+    icon: markRaw(IconFolder),
     title: "附件上传",
-    route: "Attachments",
+    route: {
+      name: "Attachments",
+      query: {
+        action: "upload",
+      },
+    },
   },
   {
-    icon: IconPalette,
+    icon: markRaw(IconPalette),
     title: "外观编辑",
-    route: "ThemeVisual",
+    route: {
+      name: "ThemeVisual",
+    },
   },
   {
-    icon: IconPlug,
+    icon: markRaw(IconPlug),
     title: "插件管理",
-    route: "Plugins",
+    route: {
+      name: "Plugins",
+    },
   },
   {
-    icon: IconUserSettings,
+    icon: markRaw(IconUserSettings),
     title: "新建用户",
-    route: "Users",
+    route: {
+      name: "Users",
+      query: {
+        action: "create",
+      },
+    },
   },
 ];
 
@@ -53,7 +77,7 @@ const router = useRouter();
         v-for="(action, index) in actions"
         :key="index"
         class="group relative cursor-pointer bg-white p-6 hover:bg-gray-50"
-        @click="router.push({ name: action.route })"
+        @click="router.push(action.route)"
       >
         <div>
           <span
