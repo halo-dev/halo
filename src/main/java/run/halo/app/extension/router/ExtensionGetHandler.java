@@ -1,5 +1,7 @@
 package run.halo.app.extension.router;
 
+import static run.halo.app.extension.router.ExtensionRouterFunctionFactory.PathPatternGenerator.buildExtensionPathPattern;
+
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -7,8 +9,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory.GetHandler;
 
-class ExtensionGetHandler implements ExtensionRouterFunctionFactory.GetHandler {
+class ExtensionGetHandler implements GetHandler {
     private final Scheme scheme;
 
     private final ReactiveExtensionClient client;
@@ -20,8 +23,7 @@ class ExtensionGetHandler implements ExtensionRouterFunctionFactory.GetHandler {
 
     @Override
     public String pathPattern() {
-        return ExtensionRouterFunctionFactory.PathPatternGenerator.buildExtensionPathPattern(scheme)
-            + "/{name}";
+        return buildExtensionPathPattern(scheme) + "/{name}";
     }
 
     @Override

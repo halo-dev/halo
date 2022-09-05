@@ -200,6 +200,7 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                     try {
 
                         process(templateName, markupSelectors, context, writer);
+                        Mono.empty().block();
 
                     } catch (final Throwable t) {
                         logger.error(
@@ -231,7 +232,8 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                 });
 
         // Will add some logging to the data stream
-        return stream.log(LOG_CATEGORY_FULL_OUTPUT, Level.FINEST);
+        return stream.log(LOG_CATEGORY_FULL_OUTPUT, Level.FINEST)
+            .subscribeOn(Schedulers.boundedElastic());
 
     }
 

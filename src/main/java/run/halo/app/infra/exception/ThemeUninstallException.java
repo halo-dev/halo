@@ -4,7 +4,7 @@ package run.halo.app.infra.exception;
  * @author guqing
  * @since 2.0.0
  */
-public class ThemeUninstallException extends RuntimeException {
+public class ThemeUninstallException extends HaloException {
 
     public ThemeUninstallException(String message) {
         super(message);

@@ -1,5 +1,6 @@
 package run.halo.app.config;
 
+import org.pf4j.PluginManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.reconciler.CategoryReconciler;
 import run.halo.app.core.extension.reconciler.MenuItemReconciler;
 import run.halo.app.core.extension.reconciler.MenuReconciler;
@@ -31,6 +33,7 @@ import run.halo.app.core.extension.reconciler.SystemSettingReconciler;
 import run.halo.app.core.extension.reconciler.TagReconciler;
 import run.halo.app.core.extension.reconciler.ThemeReconciler;
 import run.halo.app.core.extension.reconciler.UserReconciler;
+import run.halo.app.core.extension.reconciler.attachment.AttachmentReconciler;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.DefaultSchemeManager;
@@ -166,6 +169,14 @@ public class ExtensionConfiguration {
             return new ControllerBuilder("system-setting-controller", client)
                 .reconciler(new SystemSettingReconciler(client, applicationContext))
                 .extension(new ConfigMap())
+                .build();
+        }
+
+        @Bean
+        Controller attachmentController(ExtensionClient client, PluginManager pluginManager) {
+            return new ControllerBuilder("attachment-controller", client)
+                .reconciler(new AttachmentReconciler(client, pluginManager))
+                .extension(new Attachment())
                 .build();
         }
     }

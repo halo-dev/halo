@@ -1,5 +1,7 @@
 package run.halo.app.extension.router;
 
+import static run.halo.app.extension.router.ExtensionRouterFunctionFactory.PathPatternGenerator.buildExtensionPathPattern;
+
 import java.net.URI;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
@@ -10,8 +12,9 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.exception.ExtensionConvertException;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory.CreateHandler;
 
-class ExtensionCreateHandler implements ExtensionRouterFunctionFactory.CreateHandler {
+class ExtensionCreateHandler implements CreateHandler {
 
     private final Scheme scheme;
 
@@ -37,7 +40,6 @@ class ExtensionCreateHandler implements ExtensionRouterFunctionFactory.CreateHan
 
     @Override
     public String pathPattern() {
-        return ExtensionRouterFunctionFactory.PathPatternGenerator.buildExtensionPathPattern(
-            scheme);
+        return buildExtensionPathPattern(scheme);
     }
 }

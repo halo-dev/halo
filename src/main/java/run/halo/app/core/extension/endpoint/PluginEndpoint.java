@@ -56,7 +56,7 @@ public class PluginEndpoint implements CustomEndpoint {
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(Builder.schemaBuilder().implementation(InstallRequest.class))
                         ))
-                    .response(responseBuilder())
+                    .response(responseBuilder().implementation(Plugin.class))
             )
             .build();
     }

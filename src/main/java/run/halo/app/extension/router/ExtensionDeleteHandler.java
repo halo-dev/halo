@@ -1,13 +1,16 @@
 package run.halo.app.extension.router;
 
+import static run.halo.app.extension.router.ExtensionRouterFunctionFactory.PathPatternGenerator.buildExtensionPathPattern;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
+import run.halo.app.extension.router.ExtensionRouterFunctionFactory.DeleteHandler;
 
-class ExtensionDeleteHandler implements ExtensionRouterFunctionFactory.DeleteHandler {
+class ExtensionDeleteHandler implements DeleteHandler {
 
     private final Scheme scheme;
 
@@ -31,8 +34,7 @@ class ExtensionDeleteHandler implements ExtensionRouterFunctionFactory.DeleteHan
 
     @Override
     public String pathPattern() {
-        return ExtensionRouterFunctionFactory.PathPatternGenerator.buildExtensionPathPattern(scheme)
-            + "/{name}";
+        return buildExtensionPathPattern(scheme) + "/{name}";
     }
 
 }

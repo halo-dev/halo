@@ -4,7 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 
+/**
+ * Use {@link IListRequest.QueryListRequest} instead.
+ */
 @Data
+@Deprecated(forRemoval = true, since = "2.0.0")
 public class ListRequest {
 
     @Schema(description = "The page number. Zero indicates no page.")

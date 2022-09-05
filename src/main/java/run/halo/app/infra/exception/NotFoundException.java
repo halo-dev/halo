@@ -6,7 +6,7 @@ package run.halo.app.infra.exception;
  * @author guqing
  * @since 2.0.0
  */
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends HaloException {
     public NotFoundException(String message) {
         super(message);
     }

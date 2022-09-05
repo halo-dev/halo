@@ -1,0 +1,21 @@
+apiVersion: storage.halo.run/v1alpha1
+kind: PolicyTemplate
+metadata:
+  name: local
+spec:
+  displayName: Local Storage
+  settingRef:
+    name: local-policy-template-setting
+---
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: local-policy-template-setting
+spec:
+  - group: default
+    label: Default
+    formSchema:
+      - $formkit: text
+        name: location
+        label: 存储位置
+        help: ~/halo-next/attachments 下的子目录
