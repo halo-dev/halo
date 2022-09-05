@@ -54,7 +54,12 @@
     </grid-layout>
   </div>
 
-  <VModal v-model:visible="widgetsModal" :width="1280" title="小组件">
+  <VModal
+    v-model:visible="widgetsModal"
+    height="calc(100vh - 20px)"
+    :width="1280"
+    title="小组件"
+  >
     <VTabbar
       v-model:active-id="activeId"
       :items="
