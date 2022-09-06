@@ -14,16 +14,18 @@ import {
 } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostPreviewModal from "./components/PostPreviewModal.vue";
+import AttachmentSelectorModal from "../attachments/components/AttachmentSelectorModal.vue";
 import type { PostRequest } from "@halo-dev/api-client";
 import { computed, onMounted, ref, watch } from "vue";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient, type AttachmentLike } from "@halo-dev/admin-shared";
 import { useRouteQuery } from "@vueuse/router";
 import { v4 as uuid } from "uuid";
 import {
   allExtensions,
   RichTextEditor,
   useEditor,
+  type Content,
 } from "@halo-dev/richtext-editor";
 import ExtensionCharacterCount from "@tiptap/extension-character-count";
 import { formatDatetime } from "@/utils/date";
@@ -69,6 +71,7 @@ const settingModal = ref(false);
 const previewModal = ref(false);
 const saving = ref(false);
 const extraActiveId = ref("toc");
+const attachemntSelectorModal = ref(false);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
@@ -103,6 +106,36 @@ watch(
     editor.value?.commands.setContent(newValue as string, false);
   }
 );
+
+const onAttachmentSelect = (attachments: AttachmentLike[]) => {
+  const images: Content[] = attachments.map((attachment) => {
+    const attrs: { src?: string; alt?: string } = {};
+    if (typeof attachment === "string") {
+      attrs.src = attachment;
+      return {
+        type: "image",
+        attrs,
+      };
+    }
+    if ("url" in attachment) {
+      attrs.src = attachment.url;
+      attrs.alt = attachment.type;
+    }
+    if ("spec" in attachment) {
+      attrs.src = attachment.status?.permalink;
+      attrs.alt = attachment.spec.displayName;
+    }
+    return {
+      type: "image",
+      attrs,
+    };
+  });
+  editor.value
+    ?.chain()
+    .focus()
+    .insertContent([...images, { type: "paragraph", content: "" }])
+    .run();
+};
 
 const handleGenerateTableOfContent = () => {
   if (!editor.value) {
@@ -222,12 +255,23 @@ onMounted(async () => {
     @saved="onSettingSaved"
   />
   <PostPreviewModal v-model:visible="previewModal" :post="formState.post" />
+  <AttachmentSelectorModal
+    v-model:visible="attachemntSelectorModal"
+    @select="onAttachmentSelect"
+  />
   <VPageHeader title="文章">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
+        <VButton
+          size="sm"
+          type="default"
+          @click="attachemntSelectorModal = true"
+        >
+          附件库
+        </VButton>
         <VButton size="sm" type="default" @click="previewModal = true">
           预览
         </VButton>

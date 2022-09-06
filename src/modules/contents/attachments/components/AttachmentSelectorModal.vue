@@ -53,7 +53,6 @@ const onVisibleChange = (visible: boolean) => {
 };
 
 const handleConfirm = () => {
-  console.log(Array.from(selected.value));
   emit("select", Array.from(selected.value));
   onVisibleChange(false);
 };

@@ -30,7 +30,6 @@ import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
 import { useAttachmentControl } from "./composables/use-attachment";
-import AttachmentSelectorModal from "@/modules/contents/attachments/components/AttachmentSelectorModal.vue";
 import AttachmentFileTypeIcon from "./components/AttachmentFileTypeIcon.vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import cloneDeep from "lodash.clonedeep";
@@ -41,7 +40,6 @@ import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 const policyVisible = ref(false);
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
-const selectVisible = ref(false);
 
 const { policies } = useFetchAttachmentPolicy({ fetchOnMounted: true });
 const { groups, handleFetchGroups } = useFetchAttachmentGroup({
@@ -178,7 +176,6 @@ onMounted(() => {
 });
 </script>
 <template>
-  <AttachmentSelectorModal v-model:visible="selectVisible" />
   <AttachmentDetailModal
     v-model:visible="detailVisible"
     :attachment="selectedAttachment"
@@ -205,7 +202,6 @@ onMounted(() => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton size="sm" @click="selectVisible = true"> 选择附件</VButton>
         <VButton size="sm" @click="policyVisible = true">
           <template #icon>
             <IconDatabase2Line class="h-full w-full" />
