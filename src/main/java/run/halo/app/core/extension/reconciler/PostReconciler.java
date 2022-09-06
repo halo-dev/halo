@@ -3,6 +3,7 @@ package run.halo.app.core.extension.reconciler;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +34,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 public class PostReconciler implements Reconciler<Reconciler.Request> {
+    private static final String PERMALINK_FINALIZE = "permalink";
     private final ExtensionClient client;
     private final ContentService contentService;
     private final PostPermalinkPolicy postPermalinkPolicy;
@@ -48,7 +50,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Result reconcile(Request request) {
         client.fetch(Post.class, request.name())
             .ifPresent(post -> {
-                Post oldPost = JsonUtils.deepCopy(post);
+                final Post oldPost = JsonUtils.deepCopy(post);
+
+                finalizeFlag(post);
 
                 doReconcile(post);
                 permalinkReconcile(post);
@@ -61,18 +65,27 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void permalinkReconcile(Post post) {
-        if (post.getStatusOrDefault().getPermalink() == null) {
-            post.getStatusOrDefault()
-                .setPermalink(postPermalinkPolicy.permalink(post));
+        postPermalinkPolicy.onPermalinkDelete(post);
+
+        post.getStatusOrDefault()
+            .setPermalink(postPermalinkPolicy.permalink(post));
+
+        if (!isDeleted(post) && Objects.equals(true, post.getSpec().getPublished())) {
+            postPermalinkPolicy.onPermalinkAdd(post);
         }
 
-        if (Objects.equals(true, post.getSpec().getDeleted())
-            || post.getMetadata().getDeletionTimestamp() != null
-            || Objects.equals(false, post.getSpec().getPublished())) {
-            postPermalinkPolicy.onPermalinkDelete(post);
-            return;
+        if (isDeleted(post) && post.getMetadata().getFinalizers() != null) {
+            post.getMetadata().getFinalizers().remove(PERMALINK_FINALIZE);
         }
-        postPermalinkPolicy.onPermalinkAdd(post);
+    }
+
+    private void finalizeFlag(Post post) {
+        Set<String> finalizers = post.getMetadata().getFinalizers();
+        if (finalizers == null) {
+            finalizers = new LinkedHashSet<>();
+            post.getMetadata().setFinalizers(finalizers);
+        }
+        finalizers.add(PERMALINK_FINALIZE);
     }
 
     private void doReconcile(Post post) {
@@ -175,5 +188,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     private boolean isPublished(Snapshot snapshot) {
         return snapshot.getSpec().getPublishTime() != null;
+    }
+
+    private boolean isDeleted(Post post) {
+        return Objects.equals(true, post.getSpec().getDeleted())
+            || post.getMetadata().getDeletionTimestamp() != null;
     }
 }

@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ExtensionClient;
@@ -11,6 +13,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 public class TagReconciler implements Reconciler<Reconciler.Request> {
+    private static final String PERMALINK_FINALIZE = "permalink";
     private final ExtensionClient client;
     private final TagPermalinkPolicy tagPermalinkPolicy;
 
@@ -25,6 +28,8 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
             .ifPresent(tag -> {
                 Tag oldTag = JsonUtils.deepCopy(tag);
 
+                finalizeFlag(tag);
+
                 this.reconcilePermalink(tag);
 
                 if (!tag.equals(oldTag)) {
@@ -35,15 +40,30 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void reconcilePermalink(Tag tag) {
-        if (tag.getStatusOrDefault().getPermalink() == null) {
-            tag.getStatusOrDefault()
-                .setPermalink(tagPermalinkPolicy.permalink(tag));
+        tagPermalinkPolicy.onPermalinkDelete(tag);
+
+        tag.getStatusOrDefault()
+            .setPermalink(tagPermalinkPolicy.permalink(tag));
+
+        if (!isDeleted(tag)) {
+            tagPermalinkPolicy.onPermalinkAdd(tag);
         }
 
-        if (tag.getMetadata().getDeletionTimestamp() != null) {
-            tagPermalinkPolicy.onPermalinkDelete(tag);
-            return;
+        if (isDeleted(tag) && tag.getMetadata().getFinalizers() != null) {
+            tag.getMetadata().getFinalizers().remove(PERMALINK_FINALIZE);
         }
-        tagPermalinkPolicy.onPermalinkAdd(tag);
+    }
+
+    private void finalizeFlag(Tag tag) {
+        Set<String> finalizers = tag.getMetadata().getFinalizers();
+        if (finalizers == null) {
+            finalizers = new LinkedHashSet<>();
+            tag.getMetadata().setFinalizers(finalizers);
+        }
+        finalizers.add(PERMALINK_FINALIZE);
+    }
+
+    private boolean isDeleted(Tag tag) {
+        return tag.getMetadata().getDeletionTimestamp() != null;
     }
 }

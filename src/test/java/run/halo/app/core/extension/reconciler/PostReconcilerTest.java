@@ -54,6 +54,7 @@ class PostReconcilerTest {
     void reconcile() {
         String name = "post-A";
         Post post = TestPost.postV1();
+        post.getSpec().setPublished(false);
         post.getSpec().setHeadSnapshot("post-A-head-snapshot");
         when(client.fetch(eq(Post.class), eq(name)))
             .thenReturn(Optional.of(post));
@@ -73,6 +74,11 @@ class PostReconcilerTest {
         postReconciler.reconcile(new Reconciler.Request(name));
 
         verify(client, times(1)).update(captor.capture());
+
+        verify(postPermalinkPolicy, times(1)).permalink(any());
+        verify(postPermalinkPolicy, times(0)).onPermalinkAdd(any());
+        verify(postPermalinkPolicy, times(1)).onPermalinkDelete(any());
+        verify(postPermalinkPolicy, times(0)).onPermalinkUpdate(any());
 
         Post value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");

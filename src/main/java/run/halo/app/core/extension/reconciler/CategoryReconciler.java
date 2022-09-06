@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ExtensionClient;
@@ -11,7 +13,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 public class CategoryReconciler implements Reconciler<Reconciler.Request> {
-
+    private static final String PERMALINK_FINALIZE = "permalink";
     private final ExtensionClient client;
     private final CategoryPermalinkPolicy categoryPermalinkPolicy;
 
@@ -26,6 +28,9 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(Category.class, request.name())
             .ifPresent(category -> {
                 Category oldCategory = JsonUtils.deepCopy(category);
+
+                finalizeFlag(category);
+
                 reconcilePermalink(category);
 
                 if (!oldCategory.equals(category)) {
@@ -35,16 +40,31 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
         return new Result(false, null);
     }
 
+    private void finalizeFlag(Category category) {
+        Set<String> finalizers = category.getMetadata().getFinalizers();
+        if (finalizers == null) {
+            finalizers = new LinkedHashSet<>();
+            category.getMetadata().setFinalizers(finalizers);
+        }
+        finalizers.add(PERMALINK_FINALIZE);
+    }
+
     private void reconcilePermalink(Category category) {
-        if (category.getStatusOrDefault().getPermalink() == null) {
-            category.getStatusOrDefault()
-                .setPermalink(categoryPermalinkPolicy.permalink(category));
+        categoryPermalinkPolicy.onPermalinkDelete(category);
+
+        category.getStatusOrDefault()
+            .setPermalink(categoryPermalinkPolicy.permalink(category));
+
+        if (!isDeleted(category)) {
+            categoryPermalinkPolicy.onPermalinkAdd(category);
         }
 
-        if (category.getMetadata().getDeletionTimestamp() != null) {
-            categoryPermalinkPolicy.onPermalinkDelete(category);
-            return;
+        if (isDeleted(category) && category.getMetadata().getFinalizers() != null) {
+            category.getMetadata().getFinalizers().remove(PERMALINK_FINALIZE);
         }
-        categoryPermalinkPolicy.onPermalinkAdd(category);
+    }
+
+    private boolean isDeleted(Category category) {
+        return category.getMetadata().getDeletionTimestamp() != null;
     }
 }
