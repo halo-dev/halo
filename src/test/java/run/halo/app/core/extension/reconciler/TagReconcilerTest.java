@@ -69,15 +69,13 @@ class TagReconcilerTest {
         tag.getMetadata().setDeletionTimestamp(Instant.now());
         when(client.fetch(eq(Tag.class), eq("fake-tag")))
             .thenReturn(Optional.of(tag));
-        when(tagPermalinkPolicy.permalink(any()))
-            .thenAnswer(arg -> "/tags/" + tag.getSpec().getSlug());
         ArgumentCaptor<Tag> captor = ArgumentCaptor.forClass(Tag.class);
 
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
-        verify(client, times(1)).update(captor.capture());
+        verify(client, times(2)).update(captor.capture());
         verify(tagPermalinkPolicy, times(0)).onPermalinkAdd(any());
         verify(tagPermalinkPolicy, times(1)).onPermalinkDelete(any());
-        verify(tagPermalinkPolicy, times(1)).permalink(any());
+        verify(tagPermalinkPolicy, times(0)).permalink(any());
     }
 
     Tag tag() {

@@ -1,6 +1,6 @@
 package run.halo.app.core.extension.reconciler;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.Tag;
@@ -9,6 +9,8 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
+ * Reconciler for {@link Tag}.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -26,47 +28,63 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     public Result reconcile(Request request) {
         client.fetch(Tag.class, request.name())
             .ifPresent(tag -> {
-                final Tag oldTag = JsonUtils.deepCopy(tag);
-
                 if (isDeleted(tag)) {
-                    finalizeFlag(tag);
+                    addFinalizerIfNecessary(tag);
+                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return;
                 }
 
-                this.reconcilePermalink(tag);
-
-                removeFinalizer(tag);
-
-                if (!tag.equals(oldTag)) {
-                    client.update(tag);
-                }
+                this.reconcileStatus(request.name());
             });
         return new Result(false, null);
     }
 
-    private void removeFinalizer(Tag tag) {
-        if (isDeleted(tag) && tag.getMetadata().getFinalizers() != null) {
-            tag.getMetadata().getFinalizers().remove(FINALIZER_NAME);
-        }
-    }
-
-    private void reconcilePermalink(Tag tag) {
+    private void cleanUpResources(Tag tag) {
+        // remove permalink from permalink indexer
         tagPermalinkPolicy.onPermalinkDelete(tag);
-
-        tag.getStatusOrDefault()
-            .setPermalink(tagPermalinkPolicy.permalink(tag));
-
-        if (!isDeleted(tag)) {
-            tagPermalinkPolicy.onPermalinkAdd(tag);
-        }
     }
 
-    private void finalizeFlag(Tag tag) {
-        Set<String> finalizers = tag.getMetadata().getFinalizers();
-        if (finalizers == null) {
-            finalizers = new LinkedHashSet<>();
-            tag.getMetadata().setFinalizers(finalizers);
+    private void addFinalizerIfNecessary(Tag oldTag) {
+        Set<String> finalizers = oldTag.getMetadata().getFinalizers();
+        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
+            return;
         }
-        finalizers.add(FINALIZER_NAME);
+        client.fetch(Tag.class, oldTag.getMetadata().getName())
+            .ifPresent(tag -> {
+                Set<String> newFinalizers = tag.getMetadata().getFinalizers();
+                if (newFinalizers == null) {
+                    newFinalizers = new HashSet<>();
+                    tag.getMetadata().setFinalizers(newFinalizers);
+                }
+                newFinalizers.add(FINALIZER_NAME);
+                client.update(tag);
+            });
+    }
+
+    private void cleanUpResourcesAndRemoveFinalizer(String tagName) {
+        client.fetch(Tag.class, tagName).ifPresent(tag -> {
+            cleanUpResources(tag);
+            if (tag.getMetadata().getFinalizers() != null) {
+                tag.getMetadata().getFinalizers().remove(FINALIZER_NAME);
+            }
+            client.update(tag);
+        });
+    }
+
+    private void reconcileStatus(String tagName) {
+        client.fetch(Tag.class, tagName)
+            .ifPresent(tag -> {
+                Tag oldTag = JsonUtils.deepCopy(tag);
+                tagPermalinkPolicy.onPermalinkDelete(oldTag);
+
+                tag.getStatusOrDefault()
+                    .setPermalink(tagPermalinkPolicy.permalink(tag));
+                tagPermalinkPolicy.onPermalinkAdd(tag);
+
+                if (!oldTag.equals(tag)) {
+                    client.update(tag);
+                }
+            });
     }
 
     private boolean isDeleted(Tag tag) {

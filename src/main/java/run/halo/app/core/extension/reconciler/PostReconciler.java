@@ -3,7 +3,6 @@ package run.halo.app.core.extension.reconciler;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -50,129 +49,149 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Result reconcile(Request request) {
         client.fetch(Post.class, request.name())
             .ifPresent(post -> {
-                final Post oldPost = JsonUtils.deepCopy(post);
-
                 if (isDeleted(post)) {
-                    finalizeFlag(post);
+                    addFinalizerIfNecessary(post);
+                    cleanUpResourcesAndRemoveFinalizer(request.name());
                 }
 
-                doReconcile(post);
-                permalinkReconcile(post);
-
-                removeFinalizer(post);
-
-                if (!oldPost.equals(post)) {
-                    client.update(post);
-                }
+                reconcileMetadata(request.name());
+                reconcileStatus(request.name());
             });
         return new Result(false, null);
     }
 
-    private void removeFinalizer(Post post) {
-        if (isDeleted(post) && post.getMetadata().getFinalizers() != null) {
-            post.getMetadata().getFinalizers().remove(FINALIZER_NAME);
-        }
+    private void reconcileMetadata(String name) {
+        client.fetch(Post.class, name).ifPresent(post -> {
+            final Post oldPost = JsonUtils.deepCopy(post);
+            Post.PostSpec spec = post.getSpec();
+
+            // handle logic delete
+            Map<String, String> labels = getLabelsOrDefault(post);
+            if (Objects.equals(spec.getDeleted(), true)) {
+                labels.put(Post.DELETED_LABEL, Boolean.TRUE.toString());
+            } else {
+                labels.put(Post.DELETED_LABEL, Boolean.FALSE.toString());
+            }
+            // synchronize some fields to labels to query
+            labels.put(Post.PHASE_LABEL, post.getStatusOrDefault().getPhase());
+            labels.put(Post.VISIBLE_LABEL,
+                Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
+            labels.put(Post.OWNER_LABEL, spec.getOwner());
+
+            if (!oldPost.equals(post)) {
+                client.update(post);
+            }
+        });
     }
 
-    private void permalinkReconcile(Post post) {
-        postPermalinkPolicy.onPermalinkDelete(post);
+    private void reconcileStatus(String name) {
+        client.fetch(Post.class, name).ifPresent(post -> {
+            final Post oldPost = JsonUtils.deepCopy(post);
+            postPermalinkPolicy.onPermalinkDelete(oldPost);
 
-        post.getStatusOrDefault()
-            .setPermalink(postPermalinkPolicy.permalink(post));
-
-        if (!isDeleted(post) && Objects.equals(true, post.getSpec().getPublished())) {
+            post.getStatusOrDefault()
+                .setPermalink(postPermalinkPolicy.permalink(post));
             postPermalinkPolicy.onPermalinkAdd(post);
-        }
-    }
 
-    private void finalizeFlag(Post post) {
-        Set<String> finalizers = post.getMetadata().getFinalizers();
-        if (finalizers == null) {
-            finalizers = new LinkedHashSet<>();
-            post.getMetadata().setFinalizers(finalizers);
-        }
-        finalizers.add(FINALIZER_NAME);
-    }
-
-    private void doReconcile(Post post) {
-        String name = post.getMetadata().getName();
-        Post.PostSpec spec = post.getSpec();
-        Post.PostStatus status = post.getStatusOrDefault();
-        if (status.getPhase() == null) {
-            status.setPhase(Post.PostPhase.DRAFT.name());
-        }
-
-        // handle excerpt
-        Post.Excerpt excerpt = spec.getExcerpt();
-        if (excerpt == null) {
-            excerpt = new Post.Excerpt();
-            excerpt.setAutoGenerate(true);
-            spec.setExcerpt(excerpt);
-        }
-
-        if (excerpt.getAutoGenerate()) {
-            contentService.getContent(spec.getHeadSnapshot())
-                .subscribe(content -> {
-                    String contentRevised = content.content();
-                    status.setExcerpt(getExcerpt(contentRevised));
-                });
-        } else {
-            status.setExcerpt(excerpt.getRaw());
-        }
-
-        // handle contributors
-        String headSnapshot = post.getSpec().getHeadSnapshot();
-        contentService.listSnapshots(Snapshot.SubjectRef.of(Post.KIND, name))
-            .collectList()
-            .subscribe(snapshots -> {
-                List<String> contributors = snapshots.stream()
-                    .map(snapshot -> {
-                        Set<String> usernames = snapshot.getSpec().getContributors();
-                        return Objects.requireNonNullElseGet(usernames,
-                            () -> new HashSet<String>());
-                    })
-                    .flatMap(Set::stream)
-                    .distinct()
-                    .sorted()
-                    .toList();
-                status.setContributors(contributors);
-
-                // update in progress status
-                snapshots.stream()
-                    .filter(snapshot -> snapshot.getMetadata().getName().equals(headSnapshot))
-                    .findAny()
-                    .ifPresent(snapshot -> {
-                        status.setInProgress(!isPublished(snapshot));
+            Post.PostStatus status = post.getStatusOrDefault();
+            if (status.getPhase() == null) {
+                status.setPhase(Post.PostPhase.DRAFT.name());
+            }
+            Post.PostSpec spec = post.getSpec();
+            // handle excerpt
+            Post.Excerpt excerpt = spec.getExcerpt();
+            if (excerpt == null) {
+                excerpt = new Post.Excerpt();
+                excerpt.setAutoGenerate(true);
+                spec.setExcerpt(excerpt);
+            }
+            if (excerpt.getAutoGenerate()) {
+                contentService.getContent(spec.getHeadSnapshot())
+                    .subscribe(content -> {
+                        String contentRevised = content.content();
+                        status.setExcerpt(getExcerpt(contentRevised));
                     });
+            } else {
+                status.setExcerpt(excerpt.getRaw());
+            }
+
+            // handle contributors
+            String headSnapshot = post.getSpec().getHeadSnapshot();
+            contentService.listSnapshots(Snapshot.SubjectRef.of(Post.KIND, name))
+                .collectList()
+                .subscribe(snapshots -> {
+                    List<String> contributors = snapshots.stream()
+                        .map(snapshot -> {
+                            Set<String> usernames = snapshot.getSpec().getContributors();
+                            return Objects.requireNonNullElseGet(usernames,
+                                () -> new HashSet<String>());
+                        })
+                        .flatMap(Set::stream)
+                        .distinct()
+                        .sorted()
+                        .toList();
+                    status.setContributors(contributors);
+
+                    // update in progress status
+                    snapshots.stream()
+                        .filter(
+                            snapshot -> snapshot.getMetadata().getName().equals(headSnapshot))
+                        .findAny()
+                        .ifPresent(snapshot -> {
+                            status.setInProgress(!isPublished(snapshot));
+                        });
+                });
+
+            // handle cancel publish,has released version and published is false and not handled
+            if (StringUtils.isNotBlank(spec.getReleaseSnapshot())
+                && Objects.equals(false, spec.getPublished())
+                && !StringUtils.equals(status.getPhase(), Post.PostPhase.DRAFT.name())) {
+                Condition condition = new Condition();
+                condition.setType("CancelledPublish");
+                condition.setStatus(ConditionStatus.TRUE);
+                condition.setReason(condition.getType());
+                condition.setMessage(StringUtils.EMPTY);
+                condition.setLastTransitionTime(Instant.now());
+                status.getConditionsOrDefault().add(condition);
+                status.setPhase(Post.PostPhase.DRAFT.name());
+            }
+
+            if (!oldPost.equals(post)) {
+                client.update(post);
+            }
+        });
+    }
+
+    private void addFinalizerIfNecessary(Post oldPost) {
+        Set<String> finalizers = oldPost.getMetadata().getFinalizers();
+        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
+            return;
+        }
+        client.fetch(Post.class, oldPost.getMetadata().getName())
+            .ifPresent(post -> {
+                Set<String> newFinalizers = post.getMetadata().getFinalizers();
+                if (newFinalizers == null) {
+                    newFinalizers = new HashSet<>();
+                    post.getMetadata().setFinalizers(newFinalizers);
+                }
+                newFinalizers.add(FINALIZER_NAME);
+                client.update(post);
             });
+    }
 
-        // handle cancel publish,has released version and published is false and not handled
-        if (StringUtils.isNotBlank(spec.getReleaseSnapshot())
-            && Objects.equals(false, spec.getPublished())
-            && !StringUtils.equals(status.getPhase(), Post.PostPhase.DRAFT.name())) {
-            Condition condition = new Condition();
-            condition.setType("CancelledPublish");
-            condition.setStatus(ConditionStatus.TRUE);
-            condition.setReason(condition.getType());
-            condition.setMessage(StringUtils.EMPTY);
-            condition.setLastTransitionTime(Instant.now());
-            status.getConditionsOrDefault().add(condition);
-            status.setPhase(Post.PostPhase.DRAFT.name());
-        }
+    private void cleanUpResourcesAndRemoveFinalizer(String postName) {
+        client.fetch(Post.class, postName).ifPresent(post -> {
+            cleanUpResources(post);
+            if (post.getMetadata().getFinalizers() != null) {
+                post.getMetadata().getFinalizers().remove(FINALIZER_NAME);
+            }
+            client.update(post);
+        });
+    }
 
-        // handle logic delete
-        Map<String, String> labels = getLabelsOrDefault(post);
-        if (Objects.equals(spec.getDeleted(), true)) {
-            labels.put(Post.DELETED_LABEL, Boolean.TRUE.toString());
-            // TODO do more about logic delete such as remove router
-        } else {
-            labels.put(Post.DELETED_LABEL, Boolean.FALSE.toString());
-        }
-        // synchronize some fields to labels to query
-        labels.put(Post.PHASE_LABEL, status.getPhase());
-        labels.put(Post.VISIBLE_LABEL,
-            Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
-        labels.put(Post.OWNER_LABEL, spec.getOwner());
+    private void cleanUpResources(Post post) {
+        // remove permalink from permalink indexer
+        postPermalinkPolicy.onPermalinkDelete(post);
     }
 
     private Map<String, String> getLabelsOrDefault(Post post) {
