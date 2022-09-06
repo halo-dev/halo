@@ -28,7 +28,7 @@ const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
 
 const { formState, saving, handleCreateOrUpdate } = useRoleForm();
 
-const { users } = useUserFetch();
+const { users } = useUserFetch({ fetchOnMounted: true });
 
 watch(
   () => selectedRoleTemplates.value,

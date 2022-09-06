@@ -42,7 +42,7 @@ const pagesRef = ref([
 const activeId = ref("functional");
 const checkAll = ref(false);
 
-const { users } = useUserFetch();
+const { users } = useUserFetch({ fetchOnMounted: true });
 
 const pagesPublicState = ref<PagesPublicState>({
   functionalPages: [],

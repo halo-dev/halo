@@ -19,12 +19,12 @@ import {
   IconFolder,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
+import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import { onMounted, ref } from "vue";
-import { useUserFetch } from "@/modules/system/users/composables/use-user";
 import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
@@ -43,7 +43,6 @@ const uploadVisible = ref(false);
 const detailVisible = ref(false);
 const selectVisible = ref(false);
 
-const { users } = useUserFetch();
 const { policies } = useFetchAttachmentPolicy({ fetchOnMounted: true });
 const { groups, handleFetchGroups } = useFetchAttachmentGroup({
   fetchOnMounted: true,
@@ -345,7 +344,10 @@ onMounted(() => {
                         </div>
                       </template>
                     </FloatingDropdown>
-                    <FloatingDropdown>
+                    <UserDropdownSelector
+                      v-model:selected="selectedUser"
+                      @select="handleSelectUser"
+                    >
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
@@ -354,56 +356,7 @@ onMounted(() => {
                           <IconArrowDown />
                         </span>
                       </div>
-                      <template #popper>
-                        <div class="h-96 w-80">
-                          <div class="bg-white p-4">
-                            <!--TODO: Auto Focus-->
-                            <FormKit
-                              placeholder="输入关键词搜索"
-                              type="text"
-                            ></FormKit>
-                          </div>
-                          <div class="mt-2">
-                            <ul class="divide-y divide-gray-200" role="list">
-                              <li
-                                v-for="(user, index) in users"
-                                :key="index"
-                                v-close-popper
-                                class="cursor-pointer hover:bg-gray-50"
-                                :class="{
-                                  'bg-gray-100':
-                                    selectedUser?.metadata.name ===
-                                    user.metadata.name,
-                                }"
-                                @click="handleSelectUser(user)"
-                              >
-                                <div
-                                  class="flex items-center space-x-4 px-4 py-3"
-                                >
-                                  <div class="flex-shrink-0">
-                                    <img
-                                      :alt="user.spec.displayName"
-                                      :src="user.spec.avatar"
-                                      class="h-10 w-10 rounded"
-                                    />
-                                  </div>
-                                  <div class="min-w-0 flex-1">
-                                    <p
-                                      class="truncate text-sm font-medium text-gray-900"
-                                    >
-                                      {{ user.spec.displayName }}
-                                    </p>
-                                    <p class="truncate text-sm text-gray-500">
-                                      @{{ user.metadata.name }}
-                                    </p>
-                                  </div>
-                                </div>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </template>
-                    </FloatingDropdown>
+                    </UserDropdownSelector>
                     <FloatingDropdown>
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"

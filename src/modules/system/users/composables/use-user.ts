@@ -9,7 +9,11 @@ interface useUserFetchReturn {
   handleFetchUsers: () => void;
 }
 
-export function useUserFetch(): useUserFetchReturn {
+export function useUserFetch(options?: {
+  fetchOnMounted: boolean;
+}): useUserFetchReturn {
+  const { fetchOnMounted } = options || {};
+
   const users = ref<User[]>([] as User[]);
   const loading = ref(false);
 
@@ -25,7 +29,9 @@ export function useUserFetch(): useUserFetchReturn {
     }
   };
 
-  onMounted(handleFetchUsers);
+  onMounted(() => {
+    fetchOnMounted && handleFetchUsers();
+  });
 
   return {
     users,

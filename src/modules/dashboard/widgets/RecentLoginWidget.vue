@@ -2,7 +2,7 @@
 import { VCard } from "@halo-dev/components";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
-const { users } = useUserFetch();
+const { users } = useUserFetch({ fetchOnMounted: true });
 </script>
 <template>
   <VCard
