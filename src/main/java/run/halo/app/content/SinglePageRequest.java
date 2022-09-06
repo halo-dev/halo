@@ -1,7 +1,6 @@
 package run.halo.app.content;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 
@@ -16,7 +15,7 @@ public record SinglePageRequest(@Schema(required = true) SinglePage page,
 
     public ContentRequest contentRequest() {
         Snapshot.SubjectRef subjectRef =
-            Snapshot.SubjectRef.of(Post.KIND, page.getMetadata().getName());
+            Snapshot.SubjectRef.of(SinglePage.KIND, page.getMetadata().getName());
         return new ContentRequest(subjectRef, page.getSpec().getHeadSnapshot(), content.raw,
             content.content, content.rawType);
     }

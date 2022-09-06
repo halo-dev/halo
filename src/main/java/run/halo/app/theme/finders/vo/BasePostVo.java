@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import run.halo.app.core.extension.Post;
 
@@ -15,6 +16,7 @@ import run.halo.app.core.extension.Post;
  * @since 2.0.0
  */
 @Data
+@ToString
 @SuperBuilder
 public abstract class BasePostVo {
     String name;

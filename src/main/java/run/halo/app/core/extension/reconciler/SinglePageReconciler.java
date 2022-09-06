@@ -24,8 +24,8 @@ import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
-import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
 import run.halo.app.theme.router.TemplateRouteManager;
 
 /**
@@ -41,6 +41,8 @@ import run.halo.app.theme.router.TemplateRouteManager;
  * @since 2.0.0
  */
 public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
+    private static final String FINALIZER_NAME = "single-page-protection";
+    private static final GroupVersionKind GVK = GroupVersionKind.fromExtension(SinglePage.class);
     private final ExtensionClient client;
     private final ContentService contentService;
     private final ApplicationContext applicationContext;
@@ -59,115 +61,169 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(singlePage -> {
                 SinglePage oldPage = JsonUtils.deepCopy(singlePage);
-
-                doReconcile(singlePage);
-                permalinkReconcile(singlePage);
-
-                if (!oldPage.equals(singlePage)) {
-                    client.update(singlePage);
+                if (isDeleted(oldPage)) {
+                    addFinalizerIfNecessary(oldPage);
+                    cleanUpResourcesAndRemoveFinalizer(request.name());
                 }
+
+                reconcileStatus(request.name());
+                reconcileMetadata(request.name());
             });
         return new Result(false, null);
     }
 
-    private void permalinkReconcile(SinglePage singlePage) {
+    private void addFinalizerIfNecessary(SinglePage oldSinglePage) {
+        Set<String> finalizers = oldSinglePage.getMetadata().getFinalizers();
+        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
+            return;
+        }
+        client.fetch(SinglePage.class, oldSinglePage.getMetadata().getName())
+            .ifPresent(singlePage -> {
+                Set<String> newFinalizers = singlePage.getMetadata().getFinalizers();
+                if (newFinalizers == null) {
+                    newFinalizers = new HashSet<>();
+                    singlePage.getMetadata().setFinalizers(newFinalizers);
+                }
+                newFinalizers.add(FINALIZER_NAME);
+                client.update(singlePage);
+            });
+    }
+
+    private void cleanUpResources(SinglePage singlePage) {
+        // remove permalink from permalink indexer
+        permalinkOnDelete(singlePage);
+    }
+
+    private void cleanUpResourcesAndRemoveFinalizer(String pageName) {
+        client.fetch(SinglePage.class, pageName).ifPresent(singlePage -> {
+            cleanUpResources(singlePage);
+            if (singlePage.getMetadata().getFinalizers() != null) {
+                singlePage.getMetadata().getFinalizers().remove(FINALIZER_NAME);
+            }
+            client.update(singlePage);
+        });
+    }
+
+    private void reconcileMetadata(String name) {
+        client.fetch(SinglePage.class, name).ifPresent(singlePage -> {
+            final SinglePage oldPage = JsonUtils.deepCopy(singlePage);
+
+            SinglePage.SinglePageSpec spec = singlePage.getSpec();
+            // handle logic delete
+            Map<String, String> labels = getLabelsOrDefault(singlePage);
+            if (isDeleted(singlePage)) {
+                labels.put(SinglePage.DELETED_LABEL, Boolean.TRUE.toString());
+            } else {
+                labels.put(SinglePage.DELETED_LABEL, Boolean.FALSE.toString());
+            }
+            // synchronize some fields to labels to query
+            labels.put(SinglePage.PHASE_LABEL, singlePage.getStatusOrDefault().getPhase());
+            labels.put(SinglePage.VISIBLE_LABEL,
+                Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
+            labels.put(SinglePage.OWNER_LABEL, spec.getOwner());
+            if (!oldPage.equals(singlePage)) {
+                client.update(singlePage);
+            }
+        });
+    }
+
+    private void permalinkOnDelete(SinglePage singlePage) {
         singlePage.getStatusOrDefault()
             .setPermalink(PathUtils.combinePath(singlePage.getSpec().getSlug()));
-
-        GroupVersionKind gvk = GroupVersionKind.fromExtension(SinglePage.class);
-        ExtensionLocator locator = new ExtensionLocator(gvk, singlePage.getMetadata().getName(),
+        ExtensionLocator locator = new ExtensionLocator(GVK, singlePage.getMetadata().getName(),
             singlePage.getSpec().getSlug());
-        if (Objects.equals(true, singlePage.getSpec().getDeleted())
-            || singlePage.getMetadata().getDeletionTimestamp() != null
-            || Objects.equals(false, singlePage.getSpec().getPublished())) {
-            applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, locator,
-                singlePage.getStatusOrDefault().getPermalink()));
-        } else {
-            applicationContext.publishEvent(new PermalinkIndexUpdateCommand(this, locator,
-                singlePage.getStatusOrDefault().getPermalink()));
-        }
-
+        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, locator,
+            singlePage.getStatusOrDefault().getPermalink()));
         templateRouteManager.changeTemplatePattern(DefaultTemplateEnum.SINGLE_PAGE.getValue());
     }
 
-    private void doReconcile(SinglePage singlePage) {
-        String name = singlePage.getMetadata().getName();
-        SinglePage.SinglePageSpec spec = singlePage.getSpec();
-        SinglePage.SinglePageStatus status = singlePage.getStatusOrDefault();
-        if (status.getPhase() == null) {
-            status.setPhase(Post.PostPhase.DRAFT.name());
-        }
+    private void permalinkOnAdd(SinglePage singlePage) {
+        ExtensionLocator locator = new ExtensionLocator(GVK, singlePage.getMetadata().getName(),
+            singlePage.getSpec().getSlug());
+        applicationContext.publishEvent(new PermalinkIndexAddCommand(this, locator,
+            singlePage.getStatusOrDefault().getPermalink()));
+        templateRouteManager.changeTemplatePattern(DefaultTemplateEnum.SINGLE_PAGE.getValue());
+    }
 
-        // handle excerpt
-        Post.Excerpt excerpt = spec.getExcerpt();
-        if (excerpt == null) {
-            excerpt = new Post.Excerpt();
-            excerpt.setAutoGenerate(true);
-            spec.setExcerpt(excerpt);
-        }
+    private void reconcileStatus(String name) {
+        client.fetch(SinglePage.class, name).ifPresent(singlePage -> {
+            final SinglePage oldPage = JsonUtils.deepCopy(singlePage);
+            permalinkOnDelete(oldPage);
 
-        if (excerpt.getAutoGenerate()) {
-            contentService.getContent(spec.getHeadSnapshot())
-                .subscribe(content -> {
-                    String contentRevised = content.content();
-                    status.setExcerpt(getExcerpt(contentRevised));
-                });
-        } else {
-            status.setExcerpt(excerpt.getRaw());
-        }
+            singlePage.getStatusOrDefault()
+                .setPermalink(PathUtils.combinePath(singlePage.getSpec().getSlug()));
+            if (isPublished(singlePage)) {
+                permalinkOnAdd(singlePage);
+            }
 
-        // handle contributors
-        String headSnapshot = singlePage.getSpec().getHeadSnapshot();
-        contentService.listSnapshots(Snapshot.SubjectRef.of(SinglePage.KIND, name))
-            .collectList()
-            .subscribe(snapshots -> {
-                List<String> contributors = snapshots.stream()
-                    .map(snapshot -> {
-                        Set<String> usernames = snapshot.getSpec().getContributors();
-                        return Objects.requireNonNullElseGet(usernames,
-                            () -> new HashSet<String>());
-                    })
-                    .flatMap(Set::stream)
-                    .distinct()
-                    .sorted()
-                    .toList();
-                status.setContributors(contributors);
+            SinglePage.SinglePageSpec spec = singlePage.getSpec();
+            SinglePage.SinglePageStatus status = singlePage.getStatusOrDefault();
+            if (status.getPhase() == null) {
+                status.setPhase(Post.PostPhase.DRAFT.name());
+            }
 
-                // update in progress status
-                snapshots.stream()
-                    .filter(snapshot -> snapshot.getMetadata().getName().equals(headSnapshot))
-                    .findAny()
-                    .ifPresent(snapshot -> {
-                        status.setInProgress(!isPublished(snapshot));
+            // handle excerpt
+            Post.Excerpt excerpt = spec.getExcerpt();
+            if (excerpt == null) {
+                excerpt = new Post.Excerpt();
+                excerpt.setAutoGenerate(true);
+                spec.setExcerpt(excerpt);
+            }
+
+            if (excerpt.getAutoGenerate()) {
+                contentService.getContent(spec.getHeadSnapshot())
+                    .subscribe(content -> {
+                        String contentRevised = content.content();
+                        status.setExcerpt(getExcerpt(contentRevised));
                     });
-            });
+            } else {
+                status.setExcerpt(excerpt.getRaw());
+            }
 
-        // handle cancel publish,has released version and published is false and not handled
-        if (StringUtils.isNotBlank(spec.getReleaseSnapshot())
-            && Objects.equals(false, spec.getPublished())
-            && !StringUtils.equals(status.getPhase(), Post.PostPhase.DRAFT.name())) {
-            Condition condition = new Condition();
-            condition.setType("CancelledPublish");
-            condition.setStatus(ConditionStatus.TRUE);
-            condition.setReason(condition.getType());
-            condition.setMessage(StringUtils.EMPTY);
-            condition.setLastTransitionTime(Instant.now());
-            status.getConditionsOrDefault().add(condition);
-            status.setPhase(Post.PostPhase.DRAFT.name());
-        }
+            // handle contributors
+            String headSnapshot = singlePage.getSpec().getHeadSnapshot();
+            contentService.listSnapshots(Snapshot.SubjectRef.of(SinglePage.KIND, name))
+                .collectList()
+                .subscribe(snapshots -> {
+                    List<String> contributors = snapshots.stream()
+                        .map(snapshot -> {
+                            Set<String> usernames = snapshot.getSpec().getContributors();
+                            return Objects.requireNonNullElseGet(usernames,
+                                () -> new HashSet<String>());
+                        })
+                        .flatMap(Set::stream)
+                        .distinct()
+                        .sorted()
+                        .toList();
+                    status.setContributors(contributors);
 
-        // handle logic delete
-        Map<String, String> labels = getLabelsOrDefault(singlePage);
-        if (isDeleted(singlePage)) {
-            labels.put(SinglePage.DELETED_LABEL, Boolean.TRUE.toString());
-        } else {
-            labels.put(SinglePage.DELETED_LABEL, Boolean.FALSE.toString());
-        }
-        // synchronize some fields to labels to query
-        labels.put(SinglePage.PHASE_LABEL, status.getPhase());
-        labels.put(SinglePage.VISIBLE_LABEL,
-            Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
-        labels.put(SinglePage.OWNER_LABEL, spec.getOwner());
+                    // update in progress status
+                    snapshots.stream()
+                        .filter(snapshot -> snapshot.getMetadata().getName().equals(headSnapshot))
+                        .findAny()
+                        .ifPresent(snapshot -> {
+                            status.setInProgress(!isPublished(snapshot));
+                        });
+                });
+
+            // handle cancel publish,has released version and published is false and not handled
+            if (StringUtils.isNotBlank(spec.getReleaseSnapshot())
+                && Objects.equals(false, spec.getPublished())
+                && !StringUtils.equals(status.getPhase(), Post.PostPhase.DRAFT.name())) {
+                Condition condition = new Condition();
+                condition.setType("CancelledPublish");
+                condition.setStatus(ConditionStatus.TRUE);
+                condition.setReason(condition.getType());
+                condition.setMessage(StringUtils.EMPTY);
+                condition.setLastTransitionTime(Instant.now());
+                status.getConditionsOrDefault().add(condition);
+                status.setPhase(Post.PostPhase.DRAFT.name());
+            }
+
+            if (!oldPage.equals(singlePage)) {
+                client.update(singlePage);
+            }
+        });
     }
 
     private Map<String, String> getLabelsOrDefault(SinglePage singlePage) {
@@ -189,6 +245,10 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private boolean isPublished(Snapshot snapshot) {
         return snapshot.getSpec().getPublishTime() != null;
+    }
+
+    private boolean isPublished(SinglePage singlePage) {
+        return Objects.equals(true, singlePage.getSpec().getPublished());
     }
 
     private boolean isDeleted(SinglePage singlePage) {
