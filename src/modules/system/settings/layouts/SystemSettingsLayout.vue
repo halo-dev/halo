@@ -1,70 +1,94 @@
 <script lang="ts" setup>
-import { BasicLayout } from "@halo-dev/admin-shared";
+// core libs
+import { onMounted, type Ref } from "vue";
+import { provide, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+
+// types
+import type { FormKitSettingSpec } from "@halo-dev/admin-shared";
+import { BasicLayout, useSettingForm } from "@halo-dev/admin-shared";
+
+// components
 import {
-  IconSettings,
-  VButton,
   VCard,
   VPageHeader,
   VTabbar,
+  IconSettings,
 } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
-import { RouterView, useRoute, useRouter } from "vue-router";
 
-const SettingTabs = [
-  {
-    id: "general",
-    label: "基本设置",
-    routeName: "GeneralSettings",
-  },
-  {
-    id: "user",
-    label: "用户设置",
-    routeName: "UserSettings",
-  },
-  {
-    id: "post",
-    label: "文章设置",
-    routeName: "PostSettings",
-  },
-  {
-    id: "seo",
-    label: "SEO 设置",
-    routeName: "SeoSettings",
-  },
-  {
-    id: "comment",
-    label: "评论设置",
-    routeName: "CommentSettings",
-  },
-  {
-    id: "code-inject",
-    label: "代码注入",
-    routeName: "CodeInjectSettings",
-  },
-  {
-    id: "notification",
-    label: "通知设置",
-    routeName: "NotificationSettings",
-  },
-];
+interface SettingTab {
+  id: string;
+  label: string;
+  route: {
+    name: string;
+    params?: Record<string, string>;
+  };
+}
 
-const activeTab = ref();
+const tabs = ref<SettingTab[]>([] as SettingTab[]);
+const activeTab = ref("");
 
-const { name: currentRouteName } = useRoute();
+const settingName = ref("system");
+const configMapName = ref("system");
+
+const { settings, handleFetchSettings } = useSettingForm(
+  settingName,
+  configMapName
+);
+
+provide<Ref<string | undefined>>("activeTab", activeTab);
+
+const route = useRoute();
 const router = useRouter();
 
-// set default active tab
-onMounted(() => {
-  const tab = SettingTabs.find((tab) => tab.routeName === currentRouteName);
-  activeTab.value = tab ? tab.id : SettingTabs[0].id;
-});
-
 const handleTabChange = (id: string) => {
-  const tab = SettingTabs.find((tab) => tab.id === id);
+  const tab = tabs.value.find((item) => item.id === id);
   if (tab) {
-    router.push({ name: tab.routeName });
+    router.push(tab.route);
   }
 };
+
+onMounted(async () => {
+  await handleFetchSettings();
+  if (settings.value && settings.value.spec) {
+    tabs.value = settings.value.spec.map((item: FormKitSettingSpec) => {
+      return {
+        id: item.group,
+        label: item.label || "",
+        route: {
+          name: "SystemSetting",
+          params: {
+            group: item.group,
+          },
+        },
+      };
+    });
+    onTabChange(route.name as string);
+  }
+});
+
+const onTabChange = (routeName: string) => {
+  const tab = tabs.value.find((tab) => {
+    return (
+      tab.route.name === routeName &&
+      tab.route.params?.group === route.params.group
+    );
+  });
+
+  if (tab) {
+    activeTab.value = tab.id;
+    return;
+  }
+
+  activeTab.value = tabs.value[0].id;
+};
+
+watch(
+  () => route.name,
+  async (newRouteName) => {
+    onTabChange(newRouteName as string);
+  }
+);
 </script>
 <template>
   <BasicLayout>
@@ -72,24 +96,23 @@ const handleTabChange = (id: string) => {
       <template #icon>
         <IconSettings class="mr-2 self-center" />
       </template>
-      <template #actions>
-        <VButton class="opacity-0" type="secondary">安装</VButton>
-      </template>
     </VPageHeader>
 
     <div class="m-0 md:m-4">
-      <VCard>
+      <VCard :body-class="['!p-0']">
         <template #header>
           <VTabbar
             v-model:active-id="activeTab"
-            :items="SettingTabs"
+            :items="tabs"
             class="w-full !rounded-none"
             type="outline"
             @change="handleTabChange"
           ></VTabbar>
         </template>
-        <RouterView></RouterView>
       </VCard>
+      <div>
+        <RouterView :key="activeTab" />
+      </div>
     </div>
   </BasicLayout>
 </template>

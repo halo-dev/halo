@@ -196,13 +196,17 @@ importers:
     specifiers:
       '@halo-dev/api-client': ^0.0.14
       '@halo-dev/components': workspace:*
+      '@types/lodash.merge': ^4.6.7
       axios: ^0.27.2
+      lodash.merge: ^4.6.2
       vite-plugin-dts: ^1.4.1
     dependencies:
       '@halo-dev/api-client': 0.0.14
       '@halo-dev/components': link:../components
       axios: 0.27.2
+      lodash.merge: 4.6.2
     devDependencies:
+      '@types/lodash.merge': 4.6.7
       vite-plugin-dts: 1.4.1
 
 packages:
@@ -3192,6 +3196,12 @@ packages:
 
   /@types/lodash.isequal/4.5.6:
     resolution: {integrity: sha512-Ww4UGSe3DmtvLLJm2F16hDwEQSv7U0Rr8SujLUA2wHI2D2dm8kPu6Et+/y303LfjTIwSBKXB/YTUcAKpem/XEg==}
+    dependencies:
+      '@types/lodash': 4.14.182
+    dev: true
+
+  /@types/lodash.merge/4.6.7:
+    resolution: {integrity: sha512-OwxUJ9E50gw3LnAefSHJPHaBLGEKmQBQ7CZe/xflHkyy/wH2zVyEIAKReHvVrrn7zKdF58p16We9kMfh7v0RRQ==}
     dependencies:
       '@types/lodash': 4.14.182
     dev: true
@@ -6724,7 +6734,6 @@ packages:
 
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-    dev: true
 
   /lodash.mergewith/4.6.2:
     resolution: {integrity: sha512-GK3g5RPZWTRSeLSpgP8Xhra+pnjBC56q9FZYe1d5RN3TJ35dbkGy3YqBSMbyCrlbi+CM9Z3Jk5yTL7RCsqboyQ==}
