@@ -31,6 +31,8 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.router.PermalinkIndexAddCommand;
+import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
 import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
 import run.halo.app.theme.router.TemplateRouteManager;
 
@@ -83,13 +85,15 @@ class SinglePageReconcilerTest {
         ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
         singlePageReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(1)).update(captor.capture());
+        verify(client, times(2)).update(captor.capture());
 
         SinglePage value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
         assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "zhangsan"));
 
-        verify(applicationContext, times(1)).publishEvent(isA(PermalinkIndexUpdateCommand.class));
+        verify(applicationContext, times(0)).publishEvent(isA(PermalinkIndexAddCommand.class));
+        verify(applicationContext, times(1)).publishEvent(isA(PermalinkIndexDeleteCommand.class));
+        verify(applicationContext, times(0)).publishEvent(isA(PermalinkIndexUpdateCommand.class));
         verify(templateRouteManager, times(1))
             .changeTemplatePattern(eq(DefaultTemplateEnum.SINGLE_PAGE.getValue()));
     }
