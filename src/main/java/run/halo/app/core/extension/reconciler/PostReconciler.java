@@ -91,7 +91,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
             post.getStatusOrDefault()
                 .setPermalink(postPermalinkPolicy.permalink(post));
-            postPermalinkPolicy.onPermalinkAdd(post);
+            if (isPublished(post)) {
+                postPermalinkPolicy.onPermalinkAdd(post);
+            }
 
             Post.PostStatus status = post.getStatusOrDefault();
             if (status.getPhase() == null) {
@@ -213,6 +215,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     private boolean isPublished(Snapshot snapshot) {
         return snapshot.getSpec().getPublishTime() != null;
+    }
+
+    private boolean isPublished(Post post) {
+        return Objects.equals(true, post.getSpec().getPublished());
     }
 
     private boolean isDeleted(Post post) {
