@@ -54,8 +54,8 @@ const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
 
 const { users } = useUserFetch();
-const { categories } = usePostCategory();
-const { tags } = usePostTag();
+const { categories } = usePostCategory({ fetchOnMounted: true });
+const { tags } = usePostTag({ fetchOnMounted: true });
 const dialog = useDialog();
 
 const handleFetchPosts = async () => {

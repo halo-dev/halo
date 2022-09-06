@@ -67,7 +67,7 @@ const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 
-const { categories } = usePostCategory();
+const { categories } = usePostCategory({ fetchOnMounted: true });
 const categoriesMap = computed(() => {
   return categories.value.map((category) => {
     return {
@@ -77,7 +77,7 @@ const categoriesMap = computed(() => {
   });
 });
 
-const { tags } = usePostTag();
+const { tags } = usePostTag({ fetchOnMounted: true });
 const tagsMap = computed(() => {
   return tags.value.map((tag) => {
     return {

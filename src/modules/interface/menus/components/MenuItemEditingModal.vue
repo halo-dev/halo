@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { computed, ref, watch, watchEffect } from "vue";
-import type { MenuItem } from "@halo-dev/api-client";
+import type { MenuItem, Post } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
 import { apiClient } from "@halo-dev/admin-shared";
 import { reset, submitForm } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
+import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
+import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 
 const props = withDefaults(
   defineProps<{
@@ -50,6 +52,21 @@ const handleSaveMenuItem = async () => {
   try {
     saving.value = true;
 
+    const menuItemSource = menuItemSources.find(
+      (source) => source.value === selectedMenuItemSource.value
+    );
+
+    if (menuItemSource) {
+      const { ref } = menuItemSource;
+      if (ref) {
+        formState.value.spec[ref] = {
+          version: "content.halo.run/v1alpha1",
+          kind: menuItemSource.kind,
+          name: selectedRef.value as string,
+        };
+      }
+    }
+
     if (isUpdateMode.value) {
       const { data } =
         await apiClient.extension.menuItem.updatev1alpha1MenuItem({
@@ -80,29 +97,164 @@ const onVisibleChange = (visible: boolean) => {
   }
 };
 
-watch(props, (newVal) => {
-  if (newVal.visible && props.menuItem) {
-    formState.value = cloneDeep(props.menuItem);
-    return;
-  }
+const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
   formState.value.metadata.name = uuid();
   reset("menuitem-form");
-});
+};
+
+const { Command_Enter } = useMagicKeys();
 
 watchEffect(() => {
-  let keyboardWatcher;
-  const { Command_Enter } = useMagicKeys();
-  if (props.visible) {
-    keyboardWatcher = watch(Command_Enter, (v) => {
-      if (v) {
-        submitForm("menuitem-form");
-      }
-    });
-  } else {
-    keyboardWatcher?.unwatch();
+  if (Command_Enter.value && props.visible) {
+    submitForm("menuitem-form");
   }
 });
+
+watch(
+  () => props.visible,
+  (visible) => {
+    if (!visible) {
+      handleResetForm();
+    }
+  }
+);
+
+watch(
+  () => props.menuItem,
+  (menuItem) => {
+    if (menuItem) {
+      formState.value = cloneDeep(menuItem);
+
+      // Set Ref related
+      const { postRef, categoryRef, tagRef } = formState.value.spec;
+
+      if (postRef) {
+        selectedMenuItemSource.value = "post";
+        selectedRef.value = postRef.name;
+      }
+
+      if (categoryRef) {
+        selectedMenuItemSource.value = "category";
+        selectedRef.value = categoryRef.name;
+      }
+
+      if (tagRef) {
+        selectedMenuItemSource.value = "tag";
+        selectedRef.value = tagRef.name;
+      }
+    } else {
+      handleResetForm();
+    }
+  }
+);
+
+// MenuItem Ref
+interface MenuItemSource {
+  label: string;
+  value: string;
+  ref?: "postRef" | "categoryRef" | "tagRef";
+  kind?: "Post" | "Category" | "Tag";
+}
+
+const menuItemSources: MenuItemSource[] = [
+  {
+    label: "自定义链接",
+    value: "custom",
+  },
+  {
+    label: "文章",
+    value: "post",
+    ref: "postRef",
+    kind: "Post",
+  },
+  {
+    label: "分类",
+    value: "category",
+    ref: "categoryRef",
+    kind: "Post",
+  },
+  {
+    label: "标签",
+    value: "tag",
+    ref: "tagRef",
+    kind: "Tag",
+  },
+];
+
+const selectedMenuItemSource = ref<string>(menuItemSources[0].value);
+
+const { categories, handleFetchCategories } = usePostCategory();
+const { tags, handleFetchTags } = usePostTag();
+const posts = ref<Post[]>([] as Post[]);
+
+const postMap = computed(() => {
+  return [
+    { label: "请选择文章", value: undefined },
+    ...posts.value.map((post) => {
+      return {
+        label: post.spec.title,
+        value: post.metadata.name,
+      };
+    }),
+  ];
+});
+
+const categoryMap = computed(() => {
+  return [
+    {
+      label: "请选择分类",
+      value: undefined,
+    },
+    ...categories.value.map((category) => {
+      return {
+        label: category.spec.displayName,
+        value: category.metadata.name,
+      };
+    }),
+  ];
+});
+
+const tagMap = computed(() => {
+  return [
+    {
+      label: "请选择标签",
+      value: undefined,
+    },
+    ...tags.value.map((tag) => {
+      return {
+        label: tag.spec.displayName,
+        value: tag.metadata.name,
+      };
+    }),
+  ];
+});
+
+const selectedRef = ref<string>("");
+
+const handleFetchPosts = async () => {
+  const { data } =
+    await apiClient.extension.post.listcontentHaloRunV1alpha1Post({
+      page: 0,
+      size: 0,
+    });
+  posts.value = data.items;
+};
+
+const onMenuItemSourceChange = () => {
+  selectedRef.value = "";
+};
+
+watch(
+  () => props.visible,
+  (newValue) => {
+    if (newValue) {
+      handleFetchCategories();
+      handleFetchTags();
+      handleFetchPosts();
+    }
+  }
+);
 </script>
 <template>
   <VModal
@@ -113,15 +265,54 @@ watchEffect(() => {
   >
     <FormKit id="menuitem-form" type="form" @submit="handleSaveMenuItem">
       <FormKit
+        v-model="selectedMenuItemSource"
+        :options="menuItemSources"
+        :disabled="isUpdateMode"
+        label="类型"
+        type="select"
+        @change="onMenuItemSourceChange"
+      >
+      </FormKit>
+
+      <FormKit
+        v-if="selectedMenuItemSource === 'custom'"
         v-model="formState.spec.displayName"
         label="名称"
         type="text"
         validation="required"
       ></FormKit>
       <FormKit
+        v-if="selectedMenuItemSource === 'custom'"
         v-model="formState.spec.href"
         label="链接地址"
         type="text"
+        validation="required"
+      ></FormKit>
+
+      <FormKit
+        v-if="selectedMenuItemSource === 'post'"
+        v-model="selectedRef"
+        label="文章"
+        type="select"
+        :options="postMap"
+        validation="required"
+      ></FormKit>
+
+      <FormKit
+        v-if="selectedMenuItemSource === 'tag'"
+        v-model="selectedRef"
+        label="标签"
+        type="select"
+        :options="tagMap"
+        validation="required"
+      ></FormKit>
+
+      <FormKit
+        v-if="selectedMenuItemSource === 'category'"
+        v-model="selectedRef"
+        label="分类"
+        type="select"
+        :options="categoryMap"
         validation="required"
       ></FormKit>
     </FormKit>

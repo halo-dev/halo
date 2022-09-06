@@ -40,7 +40,7 @@ const {
   loading,
   handleFetchCategories,
   handleDelete,
-} = usePostCategory();
+} = usePostCategory({ fetchOnMounted: true });
 
 const handleUpdateInBatch = useDebounceFn(async () => {
   const categoriesTreeToUpdate = resetCategoriesTreePriority(

@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { IconList, IconSettings, VButton, VSpace } from "@halo-dev/components";
+import {
+  IconList,
+  IconSettings,
+  VButton,
+  VSpace,
+  VTag,
+} from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import { ref } from "vue";
 import type { MenuTreeItem } from "@/modules/interface/menus/utils";
@@ -32,6 +38,19 @@ function onOpenEditingModal(menuItem: MenuTreeItem) {
 function onDelete(menuItem: MenuTreeItem) {
   emit("delete", menuItem);
 }
+
+function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
+  if (menuItem.spec.postRef) {
+    return "文章";
+  }
+  if (menuItem.spec.categoryRef) {
+    return "分类";
+  }
+  if (menuItem.spec.tagRef) {
+    return "标签";
+  }
+  return undefined;
+}
 </script>
 <template>
   <draggable
@@ -52,26 +71,29 @@ function onDelete(menuItem: MenuTreeItem) {
           class="group relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
         >
           <div
-            class="drag-element absolute inset-y-0 left-0 flex hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
+            class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
           >
             <IconList class="h-3.5 w-3.5" />
           </div>
           <div class="relative flex flex-row items-center">
             <div class="flex-1">
-              <div class="flex flex-row items-center">
+              <div class="flex flex-row items-center gap-2">
                 <span class="truncate text-sm font-medium text-gray-900">
-                  {{ menuItem.spec.displayName }}
+                  {{ menuItem.status.displayName }}
                 </span>
+                <VTag v-if="getMenuItemRefDisplayName(menuItem)">
+                  {{ getMenuItemRefDisplayName(menuItem) }}
+                </VTag>
               </div>
 
               <div class="mt-1 flex">
                 <VSpace align="start" direction="column" spacing="xs">
                   <a
-                    :href="menuItem.spec.href"
+                    :href="menuItem.status.href"
                     class="text-xs text-gray-500 hover:text-gray-900"
                     target="_blank"
                   >
-                    {{ menuItem.spec.href }}
+                    {{ menuItem.status.href }}
                   </a>
                 </VSpace>
               </div>

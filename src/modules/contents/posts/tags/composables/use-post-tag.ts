@@ -11,7 +11,11 @@ interface usePostTagReturn {
   handleDelete: (tag: Tag) => void;
 }
 
-export function usePostTag(): usePostTagReturn {
+export function usePostTag(options?: {
+  fetchOnMounted: boolean;
+}): usePostTagReturn {
+  const { fetchOnMounted } = options || {};
+
   const tags = ref<Tag[]>([] as Tag[]);
   const loading = ref(false);
 
@@ -53,7 +57,9 @@ export function usePostTag(): usePostTagReturn {
     });
   };
 
-  onMounted(handleFetchTags);
+  onMounted(() => {
+    fetchOnMounted && handleFetchTags();
+  });
 
   return {
     tags,

@@ -40,7 +40,9 @@ const viewTypes = [
 
 const viewType = ref("list");
 
-const { tags, loading, handleFetchTags, handleDelete } = usePostTag();
+const { tags, loading, handleFetchTags, handleDelete } = usePostTag({
+  fetchOnMounted: true,
+});
 
 const editingModal = ref(false);
 const selectedTag = ref<Tag | null>(null);

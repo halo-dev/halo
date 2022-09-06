@@ -14,7 +14,11 @@ interface usePostCategoryReturn {
   handleDelete: (category: CategoryTree) => void;
 }
 
-export function usePostCategory(): usePostCategoryReturn {
+export function usePostCategory(options?: {
+  fetchOnMounted: boolean;
+}): usePostCategoryReturn {
+  const { fetchOnMounted } = options || {};
+
   const categories = ref<Category[]>([] as Category[]);
   const categoriesTree = ref<CategoryTree[]>([] as CategoryTree[]);
   const loading = ref(false);
@@ -59,7 +63,9 @@ export function usePostCategory(): usePostCategoryReturn {
     });
   };
 
-  onMounted(handleFetchCategories);
+  onMounted(() => {
+    fetchOnMounted && handleFetchCategories();
+  });
 
   return {
     categories,
