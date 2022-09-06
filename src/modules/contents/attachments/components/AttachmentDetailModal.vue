@@ -39,9 +39,9 @@ watchEffect(async () => {
       return;
     }
     const { data } =
-      await apiClient.extension.storage.policy.getstorageHaloRunV1alpha1Policy(
-        policyRef.name
-      );
+      await apiClient.extension.storage.policy.getstorageHaloRunV1alpha1Policy({
+        name: policyRef.name,
+      });
     policy.value = data;
   }
 });

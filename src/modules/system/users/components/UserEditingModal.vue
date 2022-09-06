@@ -148,22 +148,24 @@ const handleCreateUser = async () => {
     let user: User;
 
     if (isUpdateMode.value) {
-      const response = await apiClient.extension.user.updatev1alpha1User(
-        formState.value.user.metadata.name,
-        formState.value.user
-      );
+      const response = await apiClient.extension.user.updatev1alpha1User({
+        name: formState.value.user.metadata.name,
+        user: formState.value.user,
+      });
       user = response.data;
     } else {
-      const response = await apiClient.extension.user.createv1alpha1User(
-        formState.value.user
-      );
+      const response = await apiClient.extension.user.createv1alpha1User({
+        user: formState.value.user,
+      });
       user = response.data;
     }
 
     if (selectedRole.value) {
-      await apiClient.user.grantPermission(user.metadata.name, {
-        // @ts-ignore
-        roles: [selectedRole.value],
+      await apiClient.user.grantPermission({
+        name: user.metadata.name,
+        grantRequest: {
+          roles: [selectedRole.value],
+        },
       });
     }
 

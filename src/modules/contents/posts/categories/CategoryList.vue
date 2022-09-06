@@ -49,10 +49,10 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   const categoriesToUpdate = convertTreeToCategories(categoriesTreeToUpdate);
   try {
     const promises = categoriesToUpdate.map((category) =>
-      apiClient.extension.category.updatecontentHaloRunV1alpha1Category(
-        category.metadata.name,
-        category
-      )
+      apiClient.extension.category.updatecontentHaloRunV1alpha1Category({
+        name: category.metadata.name,
+        category: category,
+      })
     );
     await Promise.all(promises);
   } catch (e) {

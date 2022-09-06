@@ -61,7 +61,9 @@ const handleDelete = async (role: Role) => {
     confirmType: "danger",
     onConfirm: async () => {
       try {
-        await apiClient.extension.role.deletev1alpha1Role(role.metadata.name);
+        await apiClient.extension.role.deletev1alpha1Role({
+          name: role.metadata.name,
+        });
       } catch (e) {
         console.error("Failed to delete role", e);
       }

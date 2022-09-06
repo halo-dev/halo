@@ -92,10 +92,10 @@ exports[`convertMenuTreeItemToMenuItem > should match snapshot 1`] = `
     "version": 12,
   },
   "spec": {
-    "children": Set {
+    "children": [
       "caeef383-3828-4039-9114-6f9ad3b4a37e",
       "ded1943d-9fdb-4563-83ee-2f04364872e0",
-    },
+    ],
     "displayName": "文章分类",
     "href": "https://ryanc.cc/categories",
     "priority": 1,
@@ -113,9 +113,9 @@ exports[`convertMenuTreeItemToMenuItem > should match snapshot 2`] = `
     "version": 1,
   },
   "spec": {
-    "children": Set {
+    "children": [
       "96b636bb-3e4a-44d1-8ea7-f9da9e876f45",
-    },
+    ],
     "displayName": "Java",
     "href": "https://ryanc.cc/categories/java",
     "priority": 1,

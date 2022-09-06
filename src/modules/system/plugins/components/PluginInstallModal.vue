@@ -48,15 +48,15 @@ const server = {
         onConfirm: async () => {
           try {
             const { data: pluginToUpdate } =
-              await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin(
-                plugin.metadata.name
-              );
+              await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
+                name: plugin.metadata.name,
+              });
             pluginToUpdate.spec.enabled = true;
 
-            await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-              pluginToUpdate.metadata.name,
-              pluginToUpdate
-            );
+            await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+              name: pluginToUpdate.metadata.name,
+              plugin: pluginToUpdate,
+            });
 
             window.location.reload();
           } catch (e) {

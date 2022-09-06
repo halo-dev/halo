@@ -51,12 +51,16 @@ const handleSave = async () => {
     saving.value = true;
     if (isUpdateMode.value) {
       await apiClient.extension.storage.group.updatestorageHaloRunV1alpha1Group(
-        formState.value.metadata.name,
-        formState.value
+        {
+          name: formState.value.metadata.name,
+          group: formState.value,
+        }
       );
     } else {
       await apiClient.extension.storage.group.createstorageHaloRunV1alpha1Group(
-        formState.value
+        {
+          group: formState.value,
+        }
       );
     }
     onVisibleChange(false);

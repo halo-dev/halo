@@ -15,7 +15,6 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "文章分类",
       href: "https://ryanc.cc/categories",
-      // @ts-ignore
       children: [
         "caeef383-3828-4039-9114-6f9ad3b4a37e",
         "ded1943d-9fdb-4563-83ee-2f04364872e0",
@@ -34,7 +33,6 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "Halo",
       href: "https://ryanc.cc/categories/halo",
-      // @ts-ignore
       children: [],
       priority: 0,
     },
@@ -50,7 +48,6 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "Java",
       href: "https://ryanc.cc/categories/java",
-      // @ts-ignore
       children: ["96b636bb-3e4a-44d1-8ea7-f9da9e876f45"],
       priority: 1,
     },
@@ -66,7 +63,6 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "Spring Boot",
       href: "https://ryanc.cc/categories/spring-boot",
-      // @ts-ignore
       children: [],
       priority: 0,
     },
@@ -82,7 +78,6 @@ const rawMenuItems: MenuItem[] = [
     spec: {
       displayName: "首页",
       href: "https://ryanc.cc/",
-      // @ts-ignore
       children: [],
       priority: 0,
     },
@@ -259,11 +254,9 @@ describe("convertMenuTreeItemToMenuItem", () => {
     ).toBe("文章分类");
     expect(
       convertMenuTreeItemToMenuItem(menuTreeItems[1]).spec.children
-    ).toStrictEqual(
-      new Set([
-        "caeef383-3828-4039-9114-6f9ad3b4a37e",
-        "ded1943d-9fdb-4563-83ee-2f04364872e0",
-      ])
-    );
+    ).toStrictEqual([
+      "caeef383-3828-4039-9114-6f9ad3b4a37e",
+      "ded1943d-9fdb-4563-83ee-2f04364872e0",
+    ]);
   });
 });

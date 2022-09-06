@@ -59,9 +59,9 @@ const handleUninstall = async (theme: Theme) => {
     description: "删除后将无法恢复。",
     onConfirm: async () => {
       try {
-        await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme(
-          theme.metadata.name
-        );
+        await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({
+          name: theme.metadata.name,
+        });
       } catch (e) {
         console.error("Failed to uninstall theme", e);
       } finally {

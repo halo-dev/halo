@@ -63,16 +63,14 @@ export function useAttachmentControl(filterOptions?: {
     try {
       loading.value = true;
       const { data } =
-        await apiClient.extension.storage.attachment.searchAttachments(
-          policy?.value?.metadata.name,
-          keyword?.value,
-          group?.value?.metadata.name,
-          user?.value?.metadata.name,
-          attachments.value.size,
-          attachments.value.page,
-          [],
-          []
-        );
+        await apiClient.extension.storage.attachment.searchAttachments({
+          policy: policy?.value?.metadata.name,
+          displayName: keyword?.value,
+          group: group?.value?.metadata.name,
+          uploadedBy: user?.value?.metadata.name,
+          page: attachments.value.page,
+          size: attachments.value.size,
+        });
       attachments.value = data;
     } catch (e) {
       console.error("Failed to fetch attachments", e);
@@ -138,7 +136,9 @@ export function useAttachmentControl(filterOptions?: {
           const promises = Array.from(selectedAttachments.value).map(
             (attachment) => {
               return apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
-                attachment.metadata.name
+                {
+                  name: attachment.metadata.name,
+                }
               );
             }
           );

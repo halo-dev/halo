@@ -26,7 +26,9 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
       loading.value = true;
 
       const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap(
-        "system"
+        {
+          name: "system",
+        }
       );
 
       if (!data.data?.theme) {
@@ -36,9 +38,9 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
       const themeConfig = JSON.parse(data.data.theme);
 
       const { data: themeData } =
-        await apiClient.extension.theme.getthemeHaloRunV1alpha1Theme(
-          themeConfig.active
-        );
+        await apiClient.extension.theme.getthemeHaloRunV1alpha1Theme({
+          name: themeConfig.active,
+        });
 
       theme.value = themeData;
       activatedTheme.value = themeData;
@@ -56,7 +58,9 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
       onConfirm: async () => {
         try {
           const { data: systemConfigMap } =
-            await apiClient.extension.configMap.getv1alpha1ConfigMap("system");
+            await apiClient.extension.configMap.getv1alpha1ConfigMap({
+              name: "system",
+            });
 
           if (systemConfigMap.data) {
             const themeConfigToUpdate = JSON.parse(
@@ -65,10 +69,10 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
             themeConfigToUpdate.active = theme.value?.metadata?.name;
             systemConfigMap.data["theme"] = JSON.stringify(themeConfigToUpdate);
 
-            await apiClient.extension.configMap.updatev1alpha1ConfigMap(
-              "system",
-              systemConfigMap
-            );
+            await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+              name: "system",
+              configMap: systemConfigMap,
+            });
           }
         } catch (e) {
           console.error("Failed to active theme", e);

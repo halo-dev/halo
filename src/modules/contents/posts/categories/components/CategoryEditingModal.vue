@@ -64,14 +64,14 @@ const handleSaveCategory = async () => {
   try {
     saving.value = true;
     if (isUpdateMode.value) {
-      await apiClient.extension.category.updatecontentHaloRunV1alpha1Category(
-        formState.value.metadata.name,
-        formState.value
-      );
+      await apiClient.extension.category.updatecontentHaloRunV1alpha1Category({
+        name: formState.value.metadata.name,
+        category: formState.value,
+      });
     } else {
-      await apiClient.extension.category.createcontentHaloRunV1alpha1Category(
-        formState.value
-      );
+      await apiClient.extension.category.createcontentHaloRunV1alpha1Category({
+        category: formState.value,
+      });
     }
     onVisibleChange(false);
   } catch (e) {

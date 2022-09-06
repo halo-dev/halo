@@ -164,7 +164,9 @@ async function loadCurrentUser() {
   const { data: user } = await apiClient.user.getCurrentUserDetail();
   app.provide<User>("currentUser", user);
 
-  const { data: currentPermissions } = await apiClient.user.getPermissions("-");
+  const { data: currentPermissions } = await apiClient.user.getPermissions({
+    name: "-",
+  });
   const roleStore = useRoleStore();
   roleStore.$patch({
     permissions: currentPermissions,

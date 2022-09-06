@@ -28,9 +28,9 @@ const { params } = useRoute();
 
 const handleFetchUser = async () => {
   try {
-    const { data } = await apiClient.extension.user.getv1alpha1User(
-      params.name as string
-    );
+    const { data } = await apiClient.extension.user.getv1alpha1User({
+      name: params.name as string,
+    });
     user.value = data;
   } catch (e) {
     console.error(e);

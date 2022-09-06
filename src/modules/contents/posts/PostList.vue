@@ -76,11 +76,11 @@ const handleFetchPosts = async () => {
       );
     }
 
-    const { data } = await apiClient.post.listPosts(
-      posts.value.page,
-      posts.value.size,
-      labelSelector
-    );
+    const { data } = await apiClient.post.listPosts({
+      page: posts.value.page,
+      size: posts.value.size,
+      labelSelector,
+    });
     posts.value = data;
   } catch (e) {
     console.error("Failed to fetch posts", e);
@@ -103,7 +103,9 @@ const handlePaginationChange = ({
 
 const handleOpenSettingModal = async (post: Post) => {
   const { data } = await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-    post.metadata.name
+    {
+      name: post.metadata.name,
+    }
   );
   selectedPost.value = data;
   settingModal.value = true;
@@ -122,9 +124,9 @@ const handleSelectPrevious = async () => {
   );
   if (index > 0) {
     const { data } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-        items[index - 1].post.metadata.name
-      );
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: items[index - 1].post.metadata.name,
+      });
     selectedPost.value = data;
     return;
   }
@@ -142,9 +144,9 @@ const handleSelectNext = async () => {
   );
   if (index < items.length - 1) {
     const { data } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-        items[index + 1].post.metadata.name
-      );
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: items[index + 1].post.metadata.name,
+      });
     selectedPost.value = data;
     return;
   }
@@ -189,10 +191,10 @@ const handleDelete = async (post: Post) => {
     onConfirm: async () => {
       const postToUpdate = cloneDeep(post);
       postToUpdate.spec.deleted = true;
-      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post(
-        postToUpdate.metadata.name,
-        postToUpdate
-      );
+      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+        name: postToUpdate.metadata.name,
+        post: postToUpdate,
+      });
       await handleFetchPosts();
     },
   });
@@ -207,9 +209,9 @@ watchEffect(async () => {
     return;
   }
 
-  const { data: content } = await apiClient.content.obtainSnapshotContent(
-    selectedPost.value.spec.headSnapshot
-  );
+  const { data: content } = await apiClient.content.obtainSnapshotContent({
+    snapshotName: selectedPost.value.spec.headSnapshot,
+  });
 
   selectedPostWithContent.value = {
     post: selectedPost.value,

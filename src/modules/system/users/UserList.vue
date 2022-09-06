@@ -38,10 +38,10 @@ const selectedUser = ref<User | null>(null);
 
 const handleFetchUsers = async () => {
   try {
-    const { data } = await apiClient.extension.user.listv1alpha1User(
-      users.value.page,
-      users.value.size
-    );
+    const { data } = await apiClient.extension.user.listv1alpha1User({
+      page: users.value.page,
+      size: users.value.size,
+    });
     users.value = data;
   } catch (e) {
     console.error(e);

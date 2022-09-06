@@ -72,10 +72,15 @@ const handleDeleteMenu = async (menu: Menu) => {
     confirmType: "danger",
     onConfirm: async () => {
       try {
-        await apiClient.extension.menu.deletev1alpha1Menu(menu.metadata.name);
+        await apiClient.extension.menu.deletev1alpha1Menu({
+          name: menu.metadata.name,
+        });
 
         const deleteItemsPromises = Array.from(menu.spec.menuItems || []).map(
-          (item) => apiClient.extension.menuItem.deletev1alpha1MenuItem(item)
+          (item) =>
+            apiClient.extension.menuItem.deletev1alpha1MenuItem({
+              name: item,
+            })
         );
 
         await Promise.all(deleteItemsPromises);
@@ -151,7 +156,7 @@ defineExpose({
             {{ menu.spec?.displayName }}
           </span>
           <span class="block text-xs text-gray-400">
-            {{ Array.from(menu.spec.menuItems || new Set()).length }}
+            {{ menu.spec.menuItems?.length || 0 }}
             个菜单项
           </span>
         </span>

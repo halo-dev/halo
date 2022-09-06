@@ -57,9 +57,11 @@ export function useFetchRole(): useFetchRoleReturn {
   const handleFetchRoles = async () => {
     try {
       loading.value = true;
-      const { data } = await apiClient.extension.role.listv1alpha1Role(0, 0, [
-        `!${roleLabels.TEMPLATE}`,
-      ]);
+      const { data } = await apiClient.extension.role.listv1alpha1Role({
+        page: 0,
+        size: 0,
+        labelSelector: [`!${roleLabels.TEMPLATE}`],
+      });
       roles.value = data.items;
     } catch (e) {
       console.error("Failed to fetch roles", e);
@@ -94,12 +96,14 @@ export function useRoleForm(): useRoleFormReturn {
     try {
       saving.value = true;
       if (isUpdateMode.value) {
-        await apiClient.extension.role.updatev1alpha1Role(
-          formState.value.metadata.name,
-          formState.value
-        );
+        await apiClient.extension.role.updatev1alpha1Role({
+          name: formState.value.metadata.name,
+          role: formState.value,
+        });
       } else {
-        await apiClient.extension.role.createv1alpha1Role(formState.value);
+        await apiClient.extension.role.createv1alpha1Role({
+          role: formState.value,
+        });
       }
     } catch (e) {
       console.error(e);
@@ -233,10 +237,11 @@ export function useRoleTemplateSelection(): useRoleTemplateSelectionReturn {
    */
   const handleFetchRoles = async () => {
     try {
-      const { data } = await apiClient.extension.role.listv1alpha1Role(0, 0, [
-        `${roleLabels.TEMPLATE}=true`,
-        "!halo.run/hidden",
-      ]);
+      const { data } = await apiClient.extension.role.listv1alpha1Role({
+        page: 0,
+        size: 0,
+        labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
+      });
       roleTemplates.value = data.items;
     } catch (e) {
       console.error(e);

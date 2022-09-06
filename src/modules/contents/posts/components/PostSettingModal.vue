@@ -106,14 +106,16 @@ const handleSave = async () => {
     formState.value.content.content = formState.value.content.raw;
 
     if (isUpdateMode.value) {
-      const { data } = await apiClient.post.updateDraftPost(
-        formState.value.post.metadata.name,
-        formState.value
-      );
+      const { data } = await apiClient.post.updateDraftPost({
+        name: formState.value.post.metadata.name,
+        postRequest: formState.value,
+      });
       formState.value.post = data;
       emit("saved", formState.value);
     } else {
-      const { data } = await apiClient.post.draftPost(formState.value);
+      const { data } = await apiClient.post.draftPost({
+        postRequest: formState.value,
+      });
       formState.value.post = data;
       emit("saved", formState.value);
     }
@@ -133,15 +135,15 @@ const handlePublish = async () => {
 
     // Get latest version post
     const { data: latestData } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-        formState.value.post.metadata.name
-      );
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: formState.value.post.metadata.name,
+      });
     formState.value.post = latestData;
 
     // Publish post
-    const { data } = await apiClient.post.publishPost(
-      formState.value.post.metadata.name
-    );
+    const { data } = await apiClient.post.publishPost({
+      name: formState.value.post.metadata.name,
+    });
     formState.value.post = data;
     emit("saved", formState.value);
   } catch (e) {
@@ -158,16 +160,16 @@ const handlePublishCanceling = async () => {
     // Update published spec = false
     const postToUpdate = cloneDeep(formState.value);
     postToUpdate.post.spec.published = false;
-    await apiClient.post.updateDraftPost(
-      postToUpdate.post.metadata.name,
-      postToUpdate
-    );
+    await apiClient.post.updateDraftPost({
+      name: postToUpdate.post.metadata.name,
+      postRequest: postToUpdate,
+    });
 
     // Get latest version post
     const { data: latestData } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-        formState.value.post.metadata.name
-      );
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: formState.value.post.metadata.name,
+      });
 
     formState.value.post = latestData;
     emit("saved", formState.value);

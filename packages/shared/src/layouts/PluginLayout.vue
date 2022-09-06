@@ -59,9 +59,9 @@ const { settings, handleFetchSettings } = useSettingForm(
 const handleFetchPlugin = async () => {
   try {
     const response =
-      await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin(
-        route.params.name as string
-      );
+      await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
+        name: route.params.name as string,
+      });
     plugin.value = response.data;
   } catch (e) {
     console.error(e);

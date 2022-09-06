@@ -28,7 +28,6 @@ const emit = defineEmits<{
 const initialFormState: Menu = {
   spec: {
     displayName: "",
-    // @ts-ignore
     menuItems: [],
   },
   apiVersion: "v1alpha1",
@@ -49,14 +48,14 @@ const handleCreateMenu = async () => {
   try {
     saving.value = true;
     if (isUpdateMode.value) {
-      await apiClient.extension.menu.updatev1alpha1Menu(
-        formState.value.metadata.name,
-        formState.value
-      );
+      await apiClient.extension.menu.updatev1alpha1Menu({
+        name: formState.value.metadata.name,
+        menu: formState.value,
+      });
     } else {
-      const { data } = await apiClient.extension.menu.createv1alpha1Menu(
-        formState.value
-      );
+      const { data } = await apiClient.extension.menu.createv1alpha1Menu({
+        menu: formState.value,
+      });
       emit("created", data);
     }
     onVisibleChange(false);

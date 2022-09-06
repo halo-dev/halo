@@ -89,7 +89,9 @@ const queryName = useRouteQuery("name");
 onMounted(async () => {
   if (queryName.value) {
     const { data } = await apiClient.extension.tag.getcontentHaloRunV1alpha1Tag(
-      queryName.value as string
+      {
+        name: queryName.value as string,
+      }
     );
     selectedTag.value = data;
     editingModal.value = true;

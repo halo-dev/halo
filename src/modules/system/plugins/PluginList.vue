@@ -33,12 +33,11 @@ const handleFetchPlugins = async () => {
     }
 
     const { data } =
-      await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin(
-        0,
-        0,
-        [],
-        fieldSelector
-      );
+      await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin({
+        page: 0,
+        size: 0,
+        fieldSelector,
+      });
     plugins.value = data.items;
   } catch (e) {
     console.error("Fail to fetch plugins", e);

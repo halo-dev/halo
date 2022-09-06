@@ -46,12 +46,11 @@ const handleFetchMenuItems = async () => {
     const menuItemNames = Array.from(selectedMenu.value.spec.menuItems)?.map(
       (item) => item
     );
-    const { data } = await apiClient.extension.menuItem.listv1alpha1MenuItem(
-      0,
-      0,
-      [],
-      [`name=(${menuItemNames.join(",")})`]
-    );
+    const { data } = await apiClient.extension.menuItem.listv1alpha1MenuItem({
+      page: 0,
+      size: 0,
+      fieldSelector: [`name=(${menuItemNames.join(",")})`],
+    });
     menuItems.value = data.items;
     // Build the menu tree
     menuTreeItems.value = buildMenuItemsTree(data.items);
@@ -71,17 +70,14 @@ const onMenuItemSaved = async (menuItem: MenuItem) => {
   const menuToUpdate = cloneDeep(selectedMenu.value);
 
   if (menuToUpdate) {
-    const menuItemsToUpdate = Array.from(
-      cloneDeep(menuToUpdate.spec.menuItems) || new Set<string>()
-    );
+    const menuItemsToUpdate = cloneDeep(menuToUpdate.spec.menuItems) || [];
     menuItemsToUpdate.push(menuItem.metadata.name);
 
-    // @ts-ignore
-    menuToUpdate.spec.menuItems = Array.from(new Set(menuItemsToUpdate));
-    await apiClient.extension.menu.updatev1alpha1Menu(
-      menuToUpdate.metadata.name,
-      menuToUpdate
-    );
+    menuToUpdate.spec.menuItems = menuItemsToUpdate;
+    await apiClient.extension.menu.updatev1alpha1Menu({
+      name: menuToUpdate.metadata.name,
+      menu: menuToUpdate,
+    });
   }
 
   await menuListRef.value.handleFetchMenus();
@@ -93,10 +89,10 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   const menuItemsToUpdate = convertTreeToMenuItems(menuTreeItemsToUpdate);
   try {
     const promises = menuItemsToUpdate.map((menuItem) =>
-      apiClient.extension.menuItem.updatev1alpha1MenuItem(
-        menuItem.metadata.name,
-        menuItem
-      )
+      apiClient.extension.menuItem.updatev1alpha1MenuItem({
+        name: menuItem.metadata.name,
+        menuItem,
+      })
     );
     await Promise.all(promises);
   } catch (e) {
@@ -113,9 +109,9 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
     description: "删除后将无法恢复",
     confirmType: "danger",
     onConfirm: async () => {
-      await apiClient.extension.menuItem.deletev1alpha1MenuItem(
-        menuItem.metadata.name
-      );
+      await apiClient.extension.menuItem.deletev1alpha1MenuItem({
+        name: menuItem.metadata.name,
+      });
 
       const childrenNames = getChildrenNames(menuItem);
 
@@ -127,7 +123,9 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
             confirmType: "danger",
             onConfirm: async () => {
               const promises = childrenNames.map((name) =>
-                apiClient.extension.menuItem.deletev1alpha1MenuItem(name)
+                apiClient.extension.menuItem.deletev1alpha1MenuItem({
+                  name,
+                })
               );
               await Promise.all(promises);
             },

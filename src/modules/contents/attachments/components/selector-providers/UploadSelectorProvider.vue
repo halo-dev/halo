@@ -71,9 +71,11 @@ const selectedAttachments = ref<Set<Attachment>>(new Set<Attachment>());
 const uploadHandler = computed(() => {
   return (file, config) =>
     apiClient.extension.storage.attachment.uploadAttachment(
-      file,
-      selectedPolicy.value,
-      selectedGroup.value,
+      {
+        file,
+        policyName: selectedPolicy.value,
+        groupName: selectedGroup.value,
+      },
       config
     );
 });
@@ -83,7 +85,9 @@ const onUploaded = async (response: AxiosResponse) => {
 
   const { data } =
     await apiClient.extension.storage.attachment.getstorageHaloRunV1alpha1Attachment(
-      attachment.metadata.name
+      {
+        name: attachment.metadata.name,
+      }
     );
   attachments.value.add(data);
   selectedAttachments.value.add(data);
@@ -107,7 +111,9 @@ const handleDelete = async (attachment: Attachment) => {
     onConfirm: async () => {
       try {
         await apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
-          attachment.metadata.name
+          {
+            name: attachment.metadata.name,
+          }
         );
         attachments.value.delete(attachment);
         selectedAttachments.value.delete(attachment);

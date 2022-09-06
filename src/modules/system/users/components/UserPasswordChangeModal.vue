@@ -56,12 +56,15 @@ const handleChangePassword = async () => {
     delete changePasswordRequest.password_confirm;
 
     if (props.user?.metadata.name === currentUser?.metadata.name) {
-      await apiClient.user.changePassword("-", changePasswordRequest);
+      await apiClient.user.changePassword({
+        name: "-",
+        changePasswordRequest,
+      });
     } else {
-      await apiClient.user.changePassword(
-        props.user?.metadata.name || "",
-        changePasswordRequest
-      );
+      await apiClient.user.changePassword({
+        name: props.user?.metadata.name || "",
+        changePasswordRequest,
+      });
     }
 
     handleVisibleChange(false);

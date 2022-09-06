@@ -54,9 +54,11 @@ const onVisibleChange = (visible: boolean) => {
 const uploadHandler = computed(() => {
   return (file, config) =>
     apiClient.extension.storage.attachment.uploadAttachment(
-      file,
-      selectedPolicy.value?.metadata.name as string,
-      props.group?.metadata.name as string,
+      {
+        file,
+        policyName: selectedPolicy.value?.metadata.name as string,
+        groupName: props.group?.metadata.name as string,
+      },
       config
     );
 });

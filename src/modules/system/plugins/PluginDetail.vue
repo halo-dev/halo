@@ -20,9 +20,11 @@ const pluginRoleTemplates = ref<Role[]>([]);
 
 const handleFetchRoles = async () => {
   try {
-    const { data } = await apiClient.extension.role.listv1alpha1Role(0, 0, [
-      `${pluginLabels.NAME}=${plugin.value.metadata.name}`,
-    ]);
+    const { data } = await apiClient.extension.role.listv1alpha1Role({
+      page: 0,
+      size: 0,
+      labelSelector: [`${pluginLabels.NAME}=${plugin.value.metadata.name}`],
+    });
     pluginRoleTemplates.value = data.items;
   } catch (e) {
     console.error(e);

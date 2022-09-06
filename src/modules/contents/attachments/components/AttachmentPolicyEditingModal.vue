@@ -97,12 +97,16 @@ const handleSave = async () => {
 
     if (isUpdateMode.value) {
       await apiClient.extension.storage.policy.updatestorageHaloRunV1alpha1Policy(
-        formState.value.metadata.name,
-        formState.value
+        {
+          name: formState.value.metadata.name,
+          policy: formState.value,
+        }
       );
     } else {
       await apiClient.extension.storage.policy.createstorageHaloRunV1alpha1Policy(
-        formState.value
+        {
+          policy: formState.value,
+        }
       );
     }
 
@@ -151,7 +155,9 @@ watch(
       if (formState.value.spec.templateRef?.name) {
         const { data } =
           await apiClient.extension.storage.policyTemplate.getstorageHaloRunV1alpha1PolicyTemplate(
-            formState.value.spec.templateRef.name
+            {
+              name: formState.value.spec.templateRef.name,
+            }
           );
         policyTemplate.value = data;
       }

@@ -32,10 +32,10 @@ export function usePluginLifeCycle(
       onConfirm: async () => {
         try {
           pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-          await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-            pluginToUpdate.metadata.name,
-            pluginToUpdate
-          );
+          await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+            name: pluginToUpdate.metadata.name,
+            plugin: pluginToUpdate,
+          });
         } catch (e) {
           console.error(e);
         } finally {
@@ -64,15 +64,15 @@ export function usePluginLifeCycle(
           if (enabled) {
             const pluginToUpdate = cloneDeep(plugin.value);
             pluginToUpdate.spec.enabled = false;
-            await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-              pluginToUpdate.metadata.name,
-              pluginToUpdate
-            );
+            await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+              name: pluginToUpdate.metadata.name,
+              plugin: pluginToUpdate,
+            });
           }
 
-          await apiClient.extension.plugin.deletepluginHaloRunV1alpha1Plugin(
-            plugin.value.metadata.name
-          );
+          await apiClient.extension.plugin.deletepluginHaloRunV1alpha1Plugin({
+            name: plugin.value.metadata.name,
+          });
         } catch (e) {
           console.error(e);
         } finally {

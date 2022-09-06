@@ -155,13 +155,15 @@ const handleSave = async () => {
     }
 
     if (isUpdateMode.value) {
-      const { data } = await apiClient.post.updateDraftPost(
-        formState.value.post.metadata.name,
-        formState.value
-      );
+      const { data } = await apiClient.post.updateDraftPost({
+        name: formState.value.post.metadata.name,
+        postRequest: formState.value,
+      });
       formState.value.post = data;
     } else {
-      const { data } = await apiClient.post.draftPost(formState.value);
+      const { data } = await apiClient.post.draftPost({
+        postRequest: formState.value,
+      });
       formState.value.post = data;
       name.value = data.metadata.name;
     }
@@ -178,9 +180,9 @@ const handleFetchContent = async () => {
   if (!formState.value.post.spec.headSnapshot) {
     return;
   }
-  const { data } = await apiClient.content.obtainSnapshotContent(
-    formState.value.post.spec.headSnapshot
-  );
+  const { data } = await apiClient.content.obtainSnapshotContent({
+    snapshotName: formState.value.post.spec.headSnapshot,
+  });
 
   formState.value.content = data;
 };
@@ -201,9 +203,9 @@ onMounted(async () => {
   if (name.value) {
     // fetch post
     const { data: post } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-        name.value as string
-      );
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: name.value as string,
+      });
     formState.value.post = post;
 
     // fetch post content

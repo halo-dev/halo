@@ -29,7 +29,7 @@ const initialFormState: MenuItem = {
   spec: {
     displayName: "",
     href: "",
-    children: new Set([]),
+    children: [],
     priority: 0,
   },
   apiVersion: "v1alpha1",
@@ -50,23 +50,19 @@ const handleSaveMenuItem = async () => {
   try {
     saving.value = true;
 
-    // TODO 需要后端设置为 Array
-    // @ts-ignore
-    formState.value.spec.children = Array.from(formState.value.spec.children);
-
     if (isUpdateMode.value) {
       const { data } =
-        await apiClient.extension.menuItem.updatev1alpha1MenuItem(
-          formState.value.metadata.name,
-          formState.value
-        );
+        await apiClient.extension.menuItem.updatev1alpha1MenuItem({
+          name: formState.value.metadata.name,
+          menuItem: formState.value,
+        });
       onVisibleChange(false);
       emit("saved", data);
     } else {
       const { data } =
-        await apiClient.extension.menuItem.createv1alpha1MenuItem(
-          formState.value
-        );
+        await apiClient.extension.menuItem.createv1alpha1MenuItem({
+          menuItem: formState.value,
+        });
       onVisibleChange(false);
       emit("saved", data);
     }

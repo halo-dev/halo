@@ -11,8 +11,8 @@ export const useRoleStore = defineStore({
   state: (): RoleStoreState => ({
     roles: [],
     permissions: {
-      roles: new Set<Role>([]),
-      uiPermissions: new Set<string>([]),
+      roles: [],
+      uiPermissions: [],
     },
   }),
 });

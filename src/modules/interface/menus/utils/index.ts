@@ -128,7 +128,6 @@ export function buildMenuItemsTree(menuItems: MenuItem[]): MenuTreeItem[] {
     menuItem.spec.children.forEach((child) => {
       parentMap[child] = menuItem.metadata.name;
     });
-    // @ts-ignore
     menuItem.spec.children = [];
   });
 
@@ -212,7 +211,6 @@ export function convertTreeToMenuItems(menuTreeItems: MenuTreeItem[]) {
       ...node,
       spec: {
         ...node.spec,
-        // @ts-ignore
         children: children.map((child) => child.metadata.name),
       },
     });
@@ -261,7 +259,7 @@ export function convertMenuTreeItemToMenuItem(
     ...menuTreeItem,
     spec: {
       ...menuTreeItem.spec,
-      children: new Set(childNames),
+      children: childNames,
     },
   };
 }

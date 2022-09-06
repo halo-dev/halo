@@ -96,8 +96,10 @@ const handleMove = async (group: Group) => {
         name: group.metadata.name,
       };
       return apiClient.extension.storage.attachment.updatestorageHaloRunV1alpha1Attachment(
-        attachment.metadata.name,
-        attachmentToUpdate
+        {
+          name: attachment.metadata.name,
+          attachment: attachmentToUpdate,
+        }
       );
     });
 
