@@ -1,6 +1,6 @@
 package run.halo.app.infra;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.net.URI;
 import org.junit.jupiter.api.Test;
