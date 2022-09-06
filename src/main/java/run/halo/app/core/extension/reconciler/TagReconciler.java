@@ -13,7 +13,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 public class TagReconciler implements Reconciler<Reconciler.Request> {
-    private static final String PERMALINK_FINALIZE = "permalink";
+    private static final String FINALIZER_NAME = "tag-protection";
     private final ExtensionClient client;
     private final TagPermalinkPolicy tagPermalinkPolicy;
 
@@ -26,17 +26,27 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     public Result reconcile(Request request) {
         client.fetch(Tag.class, request.name())
             .ifPresent(tag -> {
-                Tag oldTag = JsonUtils.deepCopy(tag);
+                final Tag oldTag = JsonUtils.deepCopy(tag);
 
-                finalizeFlag(tag);
+                if (isDeleted(tag)) {
+                    finalizeFlag(tag);
+                }
 
                 this.reconcilePermalink(tag);
+
+                removeFinalizer(tag);
 
                 if (!tag.equals(oldTag)) {
                     client.update(tag);
                 }
             });
         return new Result(false, null);
+    }
+
+    private void removeFinalizer(Tag tag) {
+        if (isDeleted(tag) && tag.getMetadata().getFinalizers() != null) {
+            tag.getMetadata().getFinalizers().remove(FINALIZER_NAME);
+        }
     }
 
     private void reconcilePermalink(Tag tag) {
@@ -48,10 +58,6 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
         if (!isDeleted(tag)) {
             tagPermalinkPolicy.onPermalinkAdd(tag);
         }
-
-        if (isDeleted(tag) && tag.getMetadata().getFinalizers() != null) {
-            tag.getMetadata().getFinalizers().remove(PERMALINK_FINALIZE);
-        }
     }
 
     private void finalizeFlag(Tag tag) {
@@ -60,7 +66,7 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
             finalizers = new LinkedHashSet<>();
             tag.getMetadata().setFinalizers(finalizers);
         }
-        finalizers.add(PERMALINK_FINALIZE);
+        finalizers.add(FINALIZER_NAME);
     }
 
     private boolean isDeleted(Tag tag) {

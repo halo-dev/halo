@@ -34,7 +34,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 public class PostReconciler implements Reconciler<Reconciler.Request> {
-    private static final String PERMALINK_FINALIZE = "permalink";
+    private static final String FINALIZER_NAME = "post-protection";
     private final ExtensionClient client;
     private final ContentService contentService;
     private final PostPermalinkPolicy postPermalinkPolicy;
@@ -52,16 +52,26 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             .ifPresent(post -> {
                 final Post oldPost = JsonUtils.deepCopy(post);
 
-                finalizeFlag(post);
+                if (isDeleted(post)) {
+                    finalizeFlag(post);
+                }
 
                 doReconcile(post);
                 permalinkReconcile(post);
+
+                removeFinalizer(post);
 
                 if (!oldPost.equals(post)) {
                     client.update(post);
                 }
             });
         return new Result(false, null);
+    }
+
+    private void removeFinalizer(Post post) {
+        if (isDeleted(post) && post.getMetadata().getFinalizers() != null) {
+            post.getMetadata().getFinalizers().remove(FINALIZER_NAME);
+        }
     }
 
     private void permalinkReconcile(Post post) {
@@ -73,10 +83,6 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         if (!isDeleted(post) && Objects.equals(true, post.getSpec().getPublished())) {
             postPermalinkPolicy.onPermalinkAdd(post);
         }
-
-        if (isDeleted(post) && post.getMetadata().getFinalizers() != null) {
-            post.getMetadata().getFinalizers().remove(PERMALINK_FINALIZE);
-        }
     }
 
     private void finalizeFlag(Post post) {
@@ -85,7 +91,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             finalizers = new LinkedHashSet<>();
             post.getMetadata().setFinalizers(finalizers);
         }
-        finalizers.add(PERMALINK_FINALIZE);
+        finalizers.add(FINALIZER_NAME);
     }
 
     private void doReconcile(Post post) {

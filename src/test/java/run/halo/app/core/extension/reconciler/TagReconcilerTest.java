@@ -9,10 +9,10 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
@@ -34,12 +34,8 @@ class TagReconcilerTest {
     @Mock
     private TagPermalinkPolicy tagPermalinkPolicy;
 
+    @InjectMocks
     private TagReconciler tagReconciler;
-
-    @BeforeEach
-    void setUp() {
-        tagReconciler = new TagReconciler(client, tagPermalinkPolicy);
-    }
 
     @Test
     void reconcile() {

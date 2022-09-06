@@ -10,10 +10,10 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
@@ -43,12 +43,8 @@ class PostReconcilerTest {
     @Mock
     private PostPermalinkPolicy postPermalinkPolicy;
 
+    @InjectMocks
     private PostReconciler postReconciler;
-
-    @BeforeEach
-    void setUp() {
-        postReconciler = new PostReconciler(client, contentService, postPermalinkPolicy);
-    }
 
     @Test
     void reconcile() {
