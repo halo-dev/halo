@@ -100,15 +100,6 @@ public class SinglePageServiceImpl implements SinglePageService {
         return client.fetch(SinglePage.class, name)
             .flatMap(page -> {
                 SinglePage.SinglePageSpec spec = page.getSpec();
-                // publish snapshot
-                return Mono.zip(Mono.just(page),
-                    client.fetch(Snapshot.class, spec.getHeadSnapshot()));
-            })
-            .flatMap(tuple -> {
-                SinglePage page = tuple.getT1();
-                Snapshot snapshot = tuple.getT2();
-
-                SinglePage.SinglePageSpec spec = page.getSpec();
                 if (Objects.equals(true, spec.getPublished())) {
                     // has been published before
                     spec.setVersion(spec.getVersion() + 1);
@@ -120,14 +111,12 @@ public class SinglePageServiceImpl implements SinglePageService {
                     spec.setPublishTime(Instant.now());
                 }
 
-                // update release snapshot name and condition
-                spec.setReleaseSnapshot(snapshot.getMetadata().getName());
-                appendPublishedCondition(page, Post.PostPhase.PUBLISHED);
-
                 Snapshot.SubjectRef subjectRef =
-                    Snapshot.SubjectRef.of(Post.KIND, page.getMetadata().getName());
-                return contentService.publish(snapshot.getMetadata().getName(), subjectRef)
+                    Snapshot.SubjectRef.of(SinglePage.KIND, page.getMetadata().getName());
+                return contentService.publish(spec.getHeadSnapshot(), subjectRef)
                     .flatMap(contentWrapper -> {
+                        // update release snapshot name and condition
+                        appendPublishedCondition(page, Post.PostPhase.PUBLISHED);
                         page.getSpec().setReleaseSnapshot(contentWrapper.snapshotName());
                         return client.update(page);
                     })
