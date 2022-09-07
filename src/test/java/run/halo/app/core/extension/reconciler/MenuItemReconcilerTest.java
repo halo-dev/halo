@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.MenuItem.MenuItemSpec;
+import run.halo.app.core.extension.SinglePage;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
@@ -98,6 +99,51 @@ class MenuItemReconcilerTest {
             category.setSpec(spec);
             category.setStatus(status);
             return category;
+        }
+    }
+
+    @Nested
+    class WhenPageRefSet {
+
+        @Test
+        void shouldUpdateMenuItemIfPageFound() {
+            Supplier<MenuItem> menuItemSupplier = () -> createMenuItem("fake-name", spec -> {
+                spec.setPageRef(Ref.of("fake-page"));
+            });
+
+            when(client.fetch(MenuItem.class, "fake-name"))
+                .thenReturn(Optional.of(menuItemSupplier.get()))
+                .thenReturn(Optional.of(menuItemSupplier.get()));
+
+            when(client.fetch(SinglePage.class, "fake-page"))
+                .thenReturn(Optional.of(createPage()));
+
+            var result = reconciler.reconcile(new Request("fake-name"));
+            assertTrue(result.reEnqueue());
+            assertEquals(Duration.ofMinutes(1), result.retryAfter());
+            verify(client, times(2)).fetch(MenuItem.class, "fake-name");
+            verify(client).fetch(SinglePage.class, "fake-page");
+            verify(client).<MenuItem>update(argThat(menuItem -> {
+                var status = menuItem.getStatus();
+                return status.getHref().equals("fake://permalink")
+                    && status.getDisplayName().equals("fake-title");
+            }));
+        }
+
+        SinglePage createPage() {
+            var metadata = new Metadata();
+            metadata.setName("fake-page");
+
+            var spec = new SinglePage.SinglePageSpec();
+            spec.setTitle("fake-title");
+            var status = new SinglePage.SinglePageStatus();
+            status.setPermalink("fake://permalink");
+
+            var page = new SinglePage();
+            page.setMetadata(metadata);
+            page.setSpec(spec);
+            page.setStatus(status);
+            return page;
         }
     }
 
