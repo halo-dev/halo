@@ -51,6 +51,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             .ifPresent(post -> {
                 if (isDeleted(post)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return;
                 }
                 addFinalizerIfNecessary(post);
 
