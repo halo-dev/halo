@@ -24,16 +24,26 @@ class TemplateRouterStrategyTest {
 
         @Test
         void nextPageUrl() {
-            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s))
+            long totalPage = 10;
+            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s, totalPage))
                 .isEqualTo("/tags/page/2");
-            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s2))
+            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s2, totalPage))
                 .isEqualTo("/tags/page/3");
-            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s3))
+            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s3, totalPage))
                 .isEqualTo("/tags/y/m/page/3");
-            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s4))
+            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s4, totalPage))
                 .isEqualTo("/tags/y/m/page/2");
-            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s5))
+            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl(s5, totalPage))
                 .isEqualTo("/tags/y/m/page/4");
+
+            // The number of pages does not exceed the total number of pages
+            totalPage = 1;
+            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl("/tags/page/1", totalPage))
+                .isEqualTo("/tags/page/1");
+
+            totalPage = 0;
+            assertThat(TemplateRouterStrategy.PageUrlUtils.nextPageUrl("/tags", totalPage))
+                .isEqualTo("/tags/page/1");
         }
 
         @Test

@@ -68,7 +68,7 @@ public class CategoryRouteStrategy implements TemplateRouterStrategy {
             .publishOn(Schedulers.boundedElastic())
             .map(list -> new PageResult.Builder<PostVo>()
                 .listResult(list)
-                .nextUrl(PageUrlUtils.nextPageUrl(path))
+                .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
                 .build());
     }
