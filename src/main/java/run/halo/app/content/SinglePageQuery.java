@@ -2,6 +2,7 @@ package run.halo.app.content;
 
 import java.util.List;
 import java.util.Set;
+import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.extension.router.IListRequest;
@@ -14,15 +15,13 @@ import run.halo.app.extension.router.IListRequest;
  */
 public class SinglePageQuery extends IListRequest.QueryListRequest {
 
-    private final Set<String> contributors;
-
     public SinglePageQuery(MultiValueMap<String, String> queryParams) {
         super(queryParams);
-        List<String> contributorList = queryParams.get("contributor");
-        this.contributors = contributorList == null ? null : Set.copyOf(contributorList);
     }
 
+    @Nullable
     public Set<String> getContributors() {
-        return contributors;
+        List<String> contributorList = queryParams.get("contributor");
+        return contributorList == null ? null : Set.copyOf(contributorList);
     }
 }

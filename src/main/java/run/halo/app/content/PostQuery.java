@@ -2,7 +2,6 @@ package run.halo.app.content;
 
 import java.util.List;
 import java.util.Set;
-import lombok.EqualsAndHashCode;
 import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 import run.halo.app.core.extension.Post;
@@ -14,32 +13,25 @@ import run.halo.app.extension.router.IListRequest;
  * @author guqing
  * @since 2.0.0
  */
-@EqualsAndHashCode(callSuper = true)
 public class PostQuery extends IListRequest.QueryListRequest {
-
-    private final Set<String> contributors;
-
-    private final Set<String> categories;
-
-    private final Set<String> tags;
 
     public PostQuery(MultiValueMap<String, String> queryParams) {
         super(queryParams);
-        this.contributors = listToSet(queryParams.get("contributor"));
-        this.categories = listToSet(queryParams.get("category"));
-        this.tags = listToSet(queryParams.get("tag"));
     }
 
+    @Nullable
     public Set<String> getContributors() {
-        return contributors;
+        return listToSet(queryParams.get("contributor"));
     }
 
+    @Nullable
     public Set<String> getCategories() {
-        return categories;
+        return listToSet(queryParams.get("category"));
     }
 
+    @Nullable
     public Set<String> getTags() {
-        return tags;
+        return listToSet(queryParams.get("tag"));
     }
 
     @Nullable
