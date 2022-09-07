@@ -10,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.PathContainer;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RequestPredicate;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -17,10 +18,14 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.PermalinkIndexer;
 import run.halo.app.theme.router.TemplateRouterStrategy;
 
@@ -31,11 +36,14 @@ import run.halo.app.theme.router.TemplateRouterStrategy;
  * @author guqing
  * @since 2.0.0
  */
+@Component
 public class PostRouteStrategy implements TemplateRouterStrategy {
     private final PermalinkIndexer permalinkIndexer;
+    private final PostFinder postFinder;
 
-    public PostRouteStrategy(PermalinkIndexer permalinkIndexer) {
+    public PostRouteStrategy(PermalinkIndexer permalinkIndexer, PostFinder postFinder) {
         this.permalinkIndexer = permalinkIndexer;
+        this.postFinder = postFinder;
     }
 
     @Override
@@ -86,15 +94,21 @@ public class PostRouteStrategy implements TemplateRouterStrategy {
                     PathPattern parse = PathPatternParser.defaultInstance.parse(pattern);
                     PathPattern.PathMatchInfo pathMatchInfo =
                         parse.matchAndExtract(PathContainer.parsePath(request.path()));
-                    Map<String, String> uriVariables = new HashMap<>();
-                    uriVariables.put(PostRequestParamPredicate.NAME_PARAM,
+                    Map<String, Object> model = new HashMap<>();
+                    model.put(PostRequestParamPredicate.NAME_PARAM,
                         extensionLocator.name());
                     if (pathMatchInfo != null) {
-                        uriVariables.putAll(pathMatchInfo.getUriVariables());
+                        model.putAll(pathMatchInfo.getUriVariables());
                     }
+                    model.put("post", postByName(extensionLocator.name()));
                     return ServerResponse.ok()
-                        .render(DefaultTemplateEnum.POST.getValue(), uriVariables);
+                        .render(DefaultTemplateEnum.POST.getValue(), model);
                 });
+    }
+
+    private Mono<PostVo> postByName(String name) {
+        return Mono.defer(() -> Mono.just(postFinder.getByName(name)))
+            .publishOn(Schedulers.boundedElastic());
     }
 
     class PostRequestParamPredicate {

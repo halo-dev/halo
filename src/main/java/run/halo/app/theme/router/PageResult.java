@@ -1,8 +1,19 @@
 package run.halo.app.theme.router;
 
 import java.util.List;
+import lombok.Getter;
+import lombok.ToString;
 import run.halo.app.extension.ListResult;
 
+/**
+ * Page wrapper with next and previous url.
+ *
+ * @param <T> the type of the list item.
+ * @author guqing
+ * @since 2.0.0
+ */
+@Getter
+@ToString(callSuper = true)
 public class PageResult<T> extends ListResult<T> {
     private final String nextUrl;
     private final String prevUrl;
@@ -12,20 +23,6 @@ public class PageResult<T> extends ListResult<T> {
         super(page, size, total, items);
         this.nextUrl = nextUrl;
         this.prevUrl = prevUrl;
-    }
-
-    public PageResult(List<T> items, String nextUrl, String prevUrl) {
-        super(items);
-        this.nextUrl = nextUrl;
-        this.prevUrl = prevUrl;
-    }
-
-    public String getNextUrl() {
-        return nextUrl;
-    }
-
-    public String getPrevUrl() {
-        return prevUrl;
     }
 
     public static class Builder<T> {
@@ -63,6 +60,20 @@ public class PageResult<T> extends ListResult<T> {
 
         public Builder<T> prevUrl(String prevUrl) {
             this.prevUrl = prevUrl;
+            return this;
+        }
+
+        /**
+         * Assign value with list result.
+         *
+         * @param listResult list result
+         * @return builder
+         */
+        public Builder<T> listResult(ListResult<T> listResult) {
+            this.page = listResult.getPage();
+            this.size = listResult.getSize();
+            this.total = listResult.getTotal();
+            this.items = listResult.getItems();
             return this;
         }
 
