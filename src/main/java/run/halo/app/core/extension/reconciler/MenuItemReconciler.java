@@ -36,8 +36,8 @@ public class MenuItemReconciler implements Reconciler<Request> {
                 return handleCategoryRef(request.name(), status, spec.getCategoryRef());
             } else if (spec.getTagRef() != null) {
                 return handleTagRef(request.name(), status, spec.getTagRef());
-            } else if (spec.getPageRef() != null) {
-                return handlePageSpec(request.name(), status, spec.getPageRef());
+            } else if (spec.getSinglePageRef() != null) {
+                return handleSinglePageSpec(request.name(), status, spec.getSinglePageRef());
             } else if (spec.getPostRef() != null) {
                 return handlePostRef(request.name(), status, spec.getPostRef());
             } else {
@@ -79,7 +79,7 @@ public class MenuItemReconciler implements Reconciler<Request> {
         return new Result(true, Duration.ofMinutes(1));
     }
 
-    private Result handlePageSpec(String menuItemName, MenuItemStatus status, Ref pageRef) {
+    private Result handleSinglePageSpec(String menuItemName, MenuItemStatus status, Ref pageRef) {
         client.fetch(SinglePage.class, pageRef.getName())
             .filter(page -> page.getStatus() != null)
             .filter(page -> StringUtils.hasText(page.getStatus().getPermalink()))

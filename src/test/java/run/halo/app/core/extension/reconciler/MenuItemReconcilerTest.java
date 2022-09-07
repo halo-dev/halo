@@ -103,12 +103,12 @@ class MenuItemReconcilerTest {
     }
 
     @Nested
-    class WhenPageRefSet {
+    class WhenSinglePageRefSet {
 
         @Test
         void shouldUpdateMenuItemIfPageFound() {
             Supplier<MenuItem> menuItemSupplier = () -> createMenuItem("fake-name", spec -> {
-                spec.setPageRef(Ref.of("fake-page"));
+                spec.setSinglePageRef(Ref.of("fake-page"));
             });
 
             when(client.fetch(MenuItem.class, "fake-name"))
@@ -116,7 +116,7 @@ class MenuItemReconcilerTest {
                 .thenReturn(Optional.of(menuItemSupplier.get()));
 
             when(client.fetch(SinglePage.class, "fake-page"))
-                .thenReturn(Optional.of(createPage()));
+                .thenReturn(Optional.of(createSinglePage()));
 
             var result = reconciler.reconcile(new Request("fake-name"));
             assertTrue(result.reEnqueue());
@@ -130,7 +130,7 @@ class MenuItemReconcilerTest {
             }));
         }
 
-        SinglePage createPage() {
+        SinglePage createSinglePage() {
             var metadata = new Metadata();
             metadata.setName("fake-page");
 
@@ -139,11 +139,11 @@ class MenuItemReconcilerTest {
             var status = new SinglePage.SinglePageStatus();
             status.setPermalink("fake://permalink");
 
-            var page = new SinglePage();
-            page.setMetadata(metadata);
-            page.setSpec(spec);
-            page.setStatus(status);
-            return page;
+            var singlePage = new SinglePage();
+            singlePage.setMetadata(metadata);
+            singlePage.setSpec(spec);
+            singlePage.setStatus(status);
+            return singlePage;
         }
     }
 
