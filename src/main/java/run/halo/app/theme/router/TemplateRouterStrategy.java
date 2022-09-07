@@ -1,5 +1,6 @@
 package run.halo.app.theme.router;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -66,12 +67,15 @@ public interface TemplateRouterStrategy {
                 if (PAGE_PART.equals(pagePart)) {
                     int pageNumIndex = segments.length - 1;
                     String pageNum = segments[pageNumIndex];
-                    segments[pageNumIndex] = toPrevPage(pageNum);
+                    int prevPage = toPrevPage(pageNum);
+                    segments[pageNumIndex] = String.valueOf(prevPage);
+                    if (prevPage == 1) {
+                        segments = ArrayUtils.subarray(segments, 0, pageNumIndex - 1);
+                    }
                     return PathUtils.combinePath(segments);
                 }
-                return appendPagePart(PathUtils.combinePath(segments), 1);
             }
-            return appendPagePart(PathUtils.combinePath(segments), 1);
+            return path;
         }
 
         private static String appendPagePart(String path, long page) {
@@ -83,9 +87,8 @@ public interface TemplateRouterStrategy {
             return String.valueOf(page);
         }
 
-        private static String toPrevPage(String pageStr) {
-            int page = Math.max(parseInt(pageStr) - 1, 1);
-            return String.valueOf(page);
+        private static int toPrevPage(String pageStr) {
+            return Math.max(parseInt(pageStr) - 1, 1);
         }
 
         private static int parseInt(String pageStr) {

@@ -18,7 +18,9 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.TagVo;
 import run.halo.app.theme.router.PageResult;
 import run.halo.app.theme.router.PermalinkIndexer;
 import run.halo.app.theme.router.TemplateRouterStrategy;
@@ -36,9 +38,13 @@ public class TagRouteStrategy implements TemplateRouterStrategy {
     private final PermalinkIndexer permalinkIndexer;
     private final PostFinder postFinder;
 
-    public TagRouteStrategy(PermalinkIndexer permalinkIndexer, PostFinder postFinder) {
+    private final TagFinder tagFinder;
+
+    public TagRouteStrategy(PermalinkIndexer permalinkIndexer, PostFinder postFinder,
+        TagFinder tagFinder) {
         this.permalinkIndexer = permalinkIndexer;
         this.postFinder = postFinder;
+        this.tagFinder = tagFinder;
     }
 
     @Override
@@ -58,7 +64,9 @@ public class TagRouteStrategy implements TemplateRouterStrategy {
                     return ServerResponse.ok()
                         .render(DefaultTemplateEnum.TAG.getValue(),
                             Map.of("name", name,
-                                "posts", postList(request, name)));
+                                "posts", postList(request, name),
+                                "tag", tagByName(name))
+                        );
                 });
     }
 
@@ -71,5 +79,10 @@ public class TagRouteStrategy implements TemplateRouterStrategy {
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
                 .build());
+    }
+
+    private Mono<TagVo> tagByName(String name) {
+        return Mono.defer(() -> Mono.just(tagFinder.getByName(name)))
+            .publishOn(Schedulers.boundedElastic());
     }
 }

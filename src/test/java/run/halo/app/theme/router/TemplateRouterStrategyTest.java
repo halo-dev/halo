@@ -49,15 +49,15 @@ class TemplateRouterStrategyTest {
         @Test
         void prevPageUrl() {
             assertThat(TemplateRouterStrategy.PageUrlUtils.prevPageUrl(s))
-                .isEqualTo("/tags/page/1");
+                .isEqualTo("/tags");
             assertThat(TemplateRouterStrategy.PageUrlUtils.prevPageUrl(s1))
-                .isEqualTo("/tags/page/1");
+                .isEqualTo("/tags");
             assertThat(TemplateRouterStrategy.PageUrlUtils.prevPageUrl(s2))
-                .isEqualTo("/tags/page/1");
+                .isEqualTo("/tags");
             assertThat(TemplateRouterStrategy.PageUrlUtils.prevPageUrl(s3))
-                .isEqualTo("/tags/y/m/page/1");
+                .isEqualTo("/tags/y/m");
             assertThat(TemplateRouterStrategy.PageUrlUtils.prevPageUrl(s4))
-                .isEqualTo("/tags/y/m/page/1");
+                .isEqualTo("/tags/y/m");
             assertThat(TemplateRouterStrategy.PageUrlUtils.prevPageUrl(s5))
                 .isEqualTo("/tags/y/m/page/2");
         }

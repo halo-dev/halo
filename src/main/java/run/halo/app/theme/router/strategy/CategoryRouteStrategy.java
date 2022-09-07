@@ -17,7 +17,9 @@ import run.halo.app.core.extension.Category;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.PageResult;
 import run.halo.app.theme.router.PermalinkIndexer;
@@ -36,9 +38,13 @@ public class CategoryRouteStrategy implements TemplateRouterStrategy {
     private final PermalinkIndexer permalinkIndexer;
     private final PostFinder postFinder;
 
-    public CategoryRouteStrategy(PermalinkIndexer permalinkIndexer, PostFinder postFinder) {
+    private final CategoryFinder categoryFinder;
+
+    public CategoryRouteStrategy(PermalinkIndexer permalinkIndexer, PostFinder postFinder,
+        CategoryFinder categoryFinder) {
         this.permalinkIndexer = permalinkIndexer;
         this.postFinder = postFinder;
+        this.categoryFinder = categoryFinder;
     }
 
     @Override
@@ -58,7 +64,8 @@ public class CategoryRouteStrategy implements TemplateRouterStrategy {
                     return ServerResponse.ok()
                         .render(DefaultTemplateEnum.CATEGORY.getValue(),
                             Map.of("name", categoryName,
-                                "posts", postListByCategoryName(categoryName, request)));
+                                "posts", postListByCategoryName(categoryName, request),
+                                "category", categoryByName(categoryName)));
                 });
     }
 
@@ -71,5 +78,10 @@ public class CategoryRouteStrategy implements TemplateRouterStrategy {
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
                 .build());
+    }
+
+    private Mono<CategoryVo> categoryByName(String name) {
+        return Mono.defer(() -> Mono.just(categoryFinder.getByName(name)))
+            .publishOn(Schedulers.boundedElastic());
     }
 }
