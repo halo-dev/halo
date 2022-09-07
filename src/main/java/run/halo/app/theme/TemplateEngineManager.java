@@ -12,6 +12,7 @@ import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.theme.dialect.HaloProcessorDialect;
 import run.halo.app.theme.engine.SpringWebFluxTemplateEngine;
 import run.halo.app.theme.message.ThemeMessageResolver;
 
@@ -80,6 +81,7 @@ public class TemplateEngineManager {
         var mainResolver = haloTemplateResolver();
         mainResolver.setPrefix(theme.getPath() + "/templates/");
         engine.addTemplateResolver(mainResolver);
+        engine.addDialect(new HaloProcessorDialect());
 
         templateResolvers.orderedStream().forEach(engine::addTemplateResolver);
         dialects.orderedStream().forEach(engine::addDialect);

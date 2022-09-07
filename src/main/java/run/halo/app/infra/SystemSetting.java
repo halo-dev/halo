@@ -27,4 +27,15 @@ public class SystemSetting {
         private String post;
         private String tags;
     }
+
+    @Data
+    public static class CodeInjection {
+        public static final String GROUP = "codeInjection";
+
+        private String globalHead;
+
+        private String contentHead;
+
+        private String footer;
+    }
 }
