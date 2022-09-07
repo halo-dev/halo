@@ -29,10 +29,10 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(Tag.class, request.name())
             .ifPresent(tag -> {
                 if (isDeleted(tag)) {
-                    addFinalizerIfNecessary(tag);
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                     return;
                 }
+                addFinalizerIfNecessary(tag);
 
                 this.reconcileStatus(request.name());
             });

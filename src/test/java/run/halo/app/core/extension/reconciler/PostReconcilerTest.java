@@ -69,7 +69,7 @@ class PostReconcilerTest {
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
 
         verify(postPermalinkPolicy, times(1)).permalink(any());
         verify(postPermalinkPolicy, times(0)).onPermalinkAdd(any());

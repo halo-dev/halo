@@ -30,10 +30,10 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(Category.class, request.name())
             .ifPresent(category -> {
                 if (isDeleted(category)) {
-                    addFinalizerIfNecessary(category);
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                     return;
                 }
+                addFinalizerIfNecessary(category);
 
                 reconcileStatus(request.name());
             });

@@ -50,9 +50,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(Post.class, request.name())
             .ifPresent(post -> {
                 if (isDeleted(post)) {
-                    addFinalizerIfNecessary(post);
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                 }
+                addFinalizerIfNecessary(post);
 
                 reconcileMetadata(request.name());
                 reconcileStatus(request.name());
