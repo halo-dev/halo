@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.TestPost;
@@ -40,8 +41,9 @@ class PostServiceImplTest {
 
     @Test
     void listPredicate() {
-        PostQuery postQuery = new PostQuery();
-        postQuery.setCategories(Set.of("category1", "category2"));
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.put("category", List.of("category1", "category2"));
+        PostQuery postQuery = new PostQuery(multiValueMap);
 
         Post post = TestPost.postV1();
         post.getSpec().setTags(null);
@@ -55,21 +57,23 @@ class PostServiceImplTest {
         assertThat(test).isTrue();
 
         // Do not include tags
-        postQuery.setTags(Set.of("tag2"));
+        multiValueMap.put("tag", List.of("tag2"));
         post.getSpec().setTags(List.of("tag1"));
+        post.getSpec().setCategories(null);
         test = postService.postListPredicate(postQuery).test(post);
         assertThat(test).isFalse();
 
-        postQuery.setTags(Set.of());
+        multiValueMap.put("tag", List.of());
+        multiValueMap.remove("category");
+        postQuery = new PostQuery(multiValueMap);
         post.getSpec().setTags(List.of());
         test = postService.postListPredicate(postQuery).test(post);
         assertThat(test).isTrue();
 
-        postQuery.setLabelSelector(List.of("hello"));
+        multiValueMap.put("labelSelector", List.of("hello"));
         test = postService.postListPredicate(postQuery).test(post);
         assertThat(test).isFalse();
 
-        postQuery.setLabelSelector(List.of("hello"));
         post.getMetadata().setLabels(Map.of("hello", "world"));
         test = postService.postListPredicate(postQuery).test(post);
         assertThat(test).isTrue();

@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.extension.Ref;
 
 @Data
 @ToString(callSuper = true)
@@ -40,24 +41,16 @@ public class MenuItem extends AbstractExtension {
         private LinkedHashSet<String> children;
 
         @Schema(description = "Category reference.")
-        private MenuItemRef categoryRef;
+        private Ref categoryRef;
 
         @Schema(description = "Tag reference.")
-        private MenuItemRef tagRef;
+        private Ref tagRef;
 
         @Schema(description = "Post reference.")
-        private MenuItemRef postRef;
+        private Ref postRef;
 
         @Schema(description = "Page reference.")
-        private MenuItemRef pageRef;
-
-    }
-
-    @Data
-    public static class MenuItemRef {
-
-        @Schema(description = "Reference name.", required = true)
-        private String name;
+        private Ref pageRef;
 
     }
 

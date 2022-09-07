@@ -9,8 +9,13 @@ data:
     }
   routeRules: |
     {
-      "categories": "/categories",
-      "archives": "/archives",
+      "categories": "categories",
+      "archives": "archives",
       "post": "/archives/{slug}",
-      "tags": "/tags"
+      "tags": "tags"
+    }
+  codeInjection: |
+    {
+     "globalHead": "",
+     "footer": ""
     }
