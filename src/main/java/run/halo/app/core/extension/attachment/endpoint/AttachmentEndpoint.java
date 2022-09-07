@@ -5,14 +5,12 @@ import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.BodyExtractors.toMultipartData;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
-import static run.halo.app.core.extension.attachment.Constant.FINALIZER_NAME;
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginManager;
@@ -125,8 +123,6 @@ public class AttachmentEndpoint implements CustomEndpoint {
                                     // validate the group name
                                     spec.setGroupRef(Ref.of(groupName));
                                 }
-                                // set finalizers mandatory
-                                attachment.getMetadata().setFinalizers(Set.of(FINALIZER_NAME));
                             }))
                         .next()
                         .switchIfEmpty(Mono.error(
