@@ -85,7 +85,7 @@ class SinglePageReconcilerTest {
         ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
         singlePageReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
 
         SinglePage value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");

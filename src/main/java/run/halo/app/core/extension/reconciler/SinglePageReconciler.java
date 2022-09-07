@@ -62,9 +62,10 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             .ifPresent(singlePage -> {
                 SinglePage oldPage = JsonUtils.deepCopy(singlePage);
                 if (isDeleted(oldPage)) {
-                    addFinalizerIfNecessary(oldPage);
                     cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return;
                 }
+                addFinalizerIfNecessary(oldPage);
 
                 reconcileStatus(request.name());
                 reconcileMetadata(request.name());
