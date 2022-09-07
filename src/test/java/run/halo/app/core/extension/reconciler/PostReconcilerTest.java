@@ -10,10 +10,10 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
@@ -43,17 +43,14 @@ class PostReconcilerTest {
     @Mock
     private PostPermalinkPolicy postPermalinkPolicy;
 
+    @InjectMocks
     private PostReconciler postReconciler;
-
-    @BeforeEach
-    void setUp() {
-        postReconciler = new PostReconciler(client, contentService, postPermalinkPolicy);
-    }
 
     @Test
     void reconcile() {
         String name = "post-A";
         Post post = TestPost.postV1();
+        post.getSpec().setPublished(false);
         post.getSpec().setHeadSnapshot("post-A-head-snapshot");
         when(client.fetch(eq(Post.class), eq(name)))
             .thenReturn(Optional.of(post));
@@ -72,7 +69,12 @@ class PostReconcilerTest {
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(1)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
+
+        verify(postPermalinkPolicy, times(1)).permalink(any());
+        verify(postPermalinkPolicy, times(0)).onPermalinkAdd(any());
+        verify(postPermalinkPolicy, times(1)).onPermalinkDelete(any());
+        verify(postPermalinkPolicy, times(0)).onPermalinkUpdate(any());
 
         Post value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");

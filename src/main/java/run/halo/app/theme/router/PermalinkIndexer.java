@@ -3,6 +3,7 @@ package run.halo.app.theme.router;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -52,6 +53,9 @@ public class PermalinkIndexer {
             List<String> permalinks = permalinkLookup.get(locator.gvk());
             if (permalinks != null) {
                 permalinks.remove(permalink);
+                if (permalinks.isEmpty()) {
+                    permalinkLookup.remove(locator.gvk());
+                }
             }
             permalinkLocatorMap.remove(permalink);
         } finally {
@@ -83,7 +87,7 @@ public class PermalinkIndexer {
     public List<String> getPermalinks(GroupVersionKind gvk) {
         readWriteLock.readLock().lock();
         try {
-            return permalinkLookup.get(gvk);
+            return Objects.requireNonNullElse(permalinkLookup.get(gvk), List.of());
         } finally {
             readWriteLock.readLock().unlock();
         }
@@ -196,7 +200,7 @@ public class PermalinkIndexer {
 
     @EventListener(PermalinkIndexDeleteCommand.class)
     public void onPermalinkDelete(PermalinkIndexDeleteCommand deleteCommand) {
-        register(deleteCommand.getLocator(), deleteCommand.getPermalink());
+        remove(deleteCommand.getLocator(), deleteCommand.getPermalink());
     }
 
     @EventListener(PermalinkIndexUpdateCommand.class)
