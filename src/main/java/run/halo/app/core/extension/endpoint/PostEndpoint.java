@@ -8,7 +8,6 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -117,23 +116,7 @@ public class PostEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> listPost(ServerRequest request) {
-        var conversionService = ApplicationConversionService.getSharedInstance();
-        var page =
-            request.queryParam("page")
-                .map(pageString -> conversionService.convert(pageString, Integer.class))
-                .orElse(0);
-
-        var size = request.queryParam("size")
-            .map(sizeString -> conversionService.convert(sizeString, Integer.class))
-            .orElse(0);
-
-        var labelSelectors = request.queryParams().get("labelSelector");
-        var fieldSelectors = request.queryParams().get("fieldSelector");
-        PostQuery postQuery = new PostQuery();
-        postQuery.setPage(page);
-        postQuery.setSize(size);
-        postQuery.setLabelSelector(labelSelectors);
-        postQuery.setFieldSelector(fieldSelectors);
+        PostQuery postQuery = new PostQuery(request.queryParams());
         return postService.listPost(postQuery)
             .flatMap(listedPosts -> ServerResponse.ok().bodyValue(listedPosts));
     }

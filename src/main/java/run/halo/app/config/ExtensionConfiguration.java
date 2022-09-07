@@ -18,6 +18,7 @@ import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
+import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
@@ -29,6 +30,7 @@ import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.PostReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
+import run.halo.app.core.extension.reconciler.SinglePageReconciler;
 import run.halo.app.core.extension.reconciler.SystemSettingReconciler;
 import run.halo.app.core.extension.reconciler.TagReconciler;
 import run.halo.app.core.extension.reconciler.ThemeReconciler;
@@ -50,6 +52,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
+import run.halo.app.theme.router.TemplateRouteManager;
 
 @Configuration(proxyBeanMethods = false)
 public class ExtensionConfiguration {
@@ -179,6 +182,17 @@ public class ExtensionConfiguration {
             return new ControllerBuilder("attachment-controller", client)
                 .reconciler(new AttachmentReconciler(client, pluginManager, externalUrl))
                 .extension(new Attachment())
+                .build();
+        }
+
+        @Bean
+        Controller singlePageController(ExtensionClient client, ContentService contentService,
+            ApplicationContext applicationContext, TemplateRouteManager templateRouteManager) {
+            return new ControllerBuilder("single-page-controller", client)
+                .reconciler(new SinglePageReconciler(client, contentService,
+                    applicationContext, templateRouteManager)
+                )
+                .extension(new SinglePage())
                 .build();
         }
     }

@@ -61,10 +61,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void permalinkReconcile(Post post) {
-        if (post.getStatusOrDefault().getPermalink() == null) {
-            post.getStatusOrDefault()
-                .setPermalink(postPermalinkPolicy.permalink(post));
-        }
+        post.getStatusOrDefault()
+            .setPermalink(postPermalinkPolicy.permalink(post));
 
         if (Objects.equals(true, post.getSpec().getDeleted())
             || post.getMetadata().getDeletionTimestamp() != null
@@ -143,7 +141,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
         // handle logic delete
         Map<String, String> labels = getLabelsOrDefault(post);
-        if (Objects.equals(spec.getDeleted(), true)) {
+        if (isDeleted(post)) {
             labels.put(Post.DELETED_LABEL, Boolean.TRUE.toString());
             // TODO do more about logic delete such as remove router
         } else {
@@ -175,5 +173,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     private boolean isPublished(Snapshot snapshot) {
         return snapshot.getSpec().getPublishTime() != null;
+    }
+
+    private boolean isDeleted(Post post) {
+        return Objects.equals(true, post.getSpec().getDeleted())
+            || post.getMetadata().getDeletionTimestamp() != null;
     }
 }
