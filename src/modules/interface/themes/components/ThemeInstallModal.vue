@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import { VModal } from "@halo-dev/components";
-import VueFilePond from "vue-filepond";
-import "filepond/dist/filepond.min.css";
+import FilePondUpload from "@/components/upload/FilePondUpload.vue";
 import { apiClient } from "@halo-dev/admin-shared";
-
-const FilePond = VueFilePond();
+import { computed, ref } from "vue";
 
 withDefaults(
   defineProps<{
@@ -20,26 +18,25 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
+const FilePondUploadRef = ref();
+
 const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
+    FilePondUploadRef.value.handleRemoveFiles();
   }
 };
 
-const server = {
-  process: (fieldName, file, metadata, load) => {
-    const formData = new FormData();
-    formData.append(fieldName, file, file.name);
-
-    apiClient.theme.installTheme(file).then((response) => {
-      load(response);
-      handleVisibleChange(false);
-    });
-
-    return {};
-  },
-};
+const uploadHandler = computed(() => {
+  return (file, config) =>
+    apiClient.theme.installTheme(
+      {
+        file: file,
+      },
+      config
+    );
+});
 </script>
 <template>
   <VModal
@@ -48,12 +45,11 @@ const server = {
     title="安装主题"
     @update:visible="handleVisibleChange"
   >
-    <file-pond
-      ref="pond"
+    <FilePondUpload
+      ref="FilePondUploadRef"
       :allow-multiple="false"
-      :server="server"
-      label-idle="Drop ZIP file here..."
-      name="file"
+      :handler="uploadHandler"
+      label-idle="点击选择文件或者拖拽文件到此处"
     />
   </VModal>
 </template>
