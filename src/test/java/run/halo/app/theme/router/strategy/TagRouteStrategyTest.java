@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +16,8 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Tag;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexer;
 
@@ -40,8 +41,9 @@ class TagRouteStrategyTest {
     @BeforeEach
     void setUp() {
         tagRouteStrategy = new TagRouteStrategy(permalinkIndexer);
-        when(permalinkIndexer.getSlugs(any()))
-            .thenReturn(List.of("fake-slug"));
+        GroupVersionKind gvk = GroupVersionKind.fromExtension(Tag.class);
+        when(permalinkIndexer.containsSlug(eq(gvk), eq("fake-slug")))
+            .thenReturn(true);
         when(permalinkIndexer.getNameBySlug(any(), eq("fake-slug")))
             .thenReturn("fake-name");
     }

@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,9 +55,6 @@ class PostRouteStrategyTest {
 
         piling();
 
-        when(permalinkIndexer.getPermalinks(any()))
-            .thenReturn(List.of("/posts-test/fake-slug"));
-
         client.get()
             .uri("/posts-test/fake-slug")
             .exchange()
@@ -76,9 +72,6 @@ class PostRouteStrategyTest {
 
         piling();
 
-        when(permalinkIndexer.getPermalinks(any()))
-            .thenReturn(List.of("/posts-test/fake-name"));
-
         client.get()
             .uri("/posts-test/fake-name")
             .exchange()
@@ -95,9 +88,6 @@ class PostRouteStrategyTest {
         WebTestClient client = getWebTestClient(routeFunction);
 
         piling();
-
-        when(permalinkIndexer.getPermalinks(any()))
-            .thenReturn(List.of("/2022/08/fake-slug"));
 
         client.get()
             .uri("/2022/08/fake-slug")
@@ -136,14 +126,11 @@ class PostRouteStrategyTest {
     }
 
     private void piling() {
-        lenient().when(permalinkIndexer.getNames(any()))
-            .thenReturn(List.of("fake-name"));
-
-        lenient().when(permalinkIndexer.getSlugs(any()))
-            .thenReturn(List.of("fake-slug"));
-
-        lenient().when(permalinkIndexer.getSlugs(any()))
-            .thenReturn(List.of("fake-slug"));
+        GroupVersionKind postGvk = GroupVersionKind.fromExtension(Post.class);
+        lenient().when(permalinkIndexer.containsName(eq(postGvk), eq("fake-name")))
+            .thenReturn(true);
+        lenient().when(permalinkIndexer.containsSlug(eq(postGvk), eq("fake-slug")))
+            .thenReturn(true);
 
         lenient().when(permalinkIndexer.getNameBySlug(any(), eq("fake-slug")))
             .thenReturn("fake-name");

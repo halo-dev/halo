@@ -11,6 +11,20 @@ import run.halo.app.extension.GroupVersionKind;
  * @param slug extension slug
  */
 public record ExtensionLocator(GroupVersionKind gvk, String name, String slug) {
+
+    /**
+     * Create a new {@link ExtensionLocator} instance.
+     *
+     * @param gvk group version kind
+     * @param name extension name
+     * @param slug extension slug
+     */
+    public ExtensionLocator {
+        Objects.requireNonNull(gvk, "Group version kind must not be null");
+        Objects.requireNonNull(name, "Extension name must not be null");
+        Objects.requireNonNull(slug, "Extension slug must not be null");
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

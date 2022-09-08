@@ -73,14 +73,20 @@ class ArchivesRouteStrategyTest {
             .expectStatus().isOk();
 
         client.get()
-            .uri(prefix + "/year/month")
+            .uri(prefix + "/2022/09")
             .exchange()
             .expectStatus().isOk();
 
         client.get()
-            .uri(prefix + "/year/month/page/1")
+            .uri(prefix + "/2022/08/page/1")
             .exchange()
             .expectStatus().isOk();
+
+        client.get()
+            .uri(prefix + "/2022/8/page/1")
+            .exchange()
+            .expectStatus()
+            .isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test

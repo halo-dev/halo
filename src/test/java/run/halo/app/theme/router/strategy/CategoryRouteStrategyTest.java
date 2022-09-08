@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +16,8 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Category;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexer;
 
@@ -39,8 +40,11 @@ class CategoryRouteStrategyTest {
     @BeforeEach
     void setUp() {
         categoryRouteStrategy = new CategoryRouteStrategy(permalinkIndexer);
-        when(permalinkIndexer.getSlugs(any()))
-            .thenReturn(List.of("category-slug-1", "category-slug-2"));
+        GroupVersionKind gvk = GroupVersionKind.fromExtension(Category.class);
+        when(permalinkIndexer.containsSlug(eq(gvk), eq("category-slug-1")))
+            .thenReturn(true);
+        when(permalinkIndexer.containsSlug(eq(gvk), eq("category-slug-2")))
+            .thenReturn(true);
         when(permalinkIndexer.getNameBySlug(any(), eq("category-slug-1")))
             .thenReturn("category-name-1");
         when(permalinkIndexer.getNameBySlug(any(), eq("category-slug-2")))
