@@ -72,10 +72,13 @@ public interface TemplateRouterStrategy {
                     if (prevPage == 1) {
                         segments = ArrayUtils.subarray(segments, 0, pageNumIndex - 1);
                     }
+                    if (segments.length == 0) {
+                        return "/";
+                    }
                     return PathUtils.combinePath(segments);
                 }
             }
-            return path;
+            return StringUtils.defaultString(path, "/");
         }
 
         private static String appendPagePart(String path, long page) {

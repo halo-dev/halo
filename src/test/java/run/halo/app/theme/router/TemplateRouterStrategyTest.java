@@ -60,6 +60,9 @@ class TemplateRouterStrategyTest {
                 .isEqualTo("/tags/y/m");
             assertThat(TemplateRouterStrategy.PageUrlUtils.prevPageUrl(s5))
                 .isEqualTo("/tags/y/m/page/2");
+
+            assertThat(TemplateRouterStrategy.PageUrlUtils.prevPageUrl("/page/2"))
+                .isEqualTo("/");
         }
     }
 }
