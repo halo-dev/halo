@@ -41,10 +41,7 @@ public abstract class FileUtils {
             // Resolve the entry path
             Path entryPath = targetPath.resolve(zipEntry.getName());
 
-            // Check directory
-            if (targetPath.normalize().startsWith(entryPath)) {
-                throw new IllegalArgumentException("Cannot unzip to a subdirectory of itself");
-            }
+            checkDirectoryTraversal(targetPath, entryPath);
 
             if (Files.notExists(entryPath.getParent())) {
                 Files.createDirectories(entryPath.getParent());

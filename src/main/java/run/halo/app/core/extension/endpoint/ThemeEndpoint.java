@@ -8,7 +8,6 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.SequenceInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,13 +16,12 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
@@ -33,12 +31,15 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
@@ -46,6 +47,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.utils.DataBufferUtils;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
@@ -55,6 +57,7 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 public class ThemeEndpoint implements CustomEndpoint {
 
@@ -92,13 +95,21 @@ public class ThemeEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> install(ServerRequest request) {
-        return request.bodyToMono(new ParameterizedTypeReference<MultiValueMap<String, Part>>() {
-            })
+        return request.body(BodyExtractors.toMultipartData())
             .flatMap(this::getZipFilePart)
-            .flatMap(file -> file.content()
-                .map(DataBuffer::asInputStream)
-                .reduce(SequenceInputStream::new)
-                .map(inputStream -> ThemeUtils.unzipThemeTo(inputStream, getThemeWorkDir())))
+            .map(file -> {
+                try {
+                    var is = DataBufferUtils.toInputStream(file.content());
+                    var themeWorkDir = getThemeWorkDir();
+                    if (log.isDebugEnabled()) {
+                        log.debug("Transferring {} into {}", file.filename(), themeWorkDir);
+                    }
+                    return ThemeUtils.unzipThemeTo(is, themeWorkDir);
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .subscribeOn(Schedulers.boundedElastic())
             .flatMap(this::persistent)
             .flatMap(theme -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -212,7 +223,6 @@ public class ThemeEndpoint implements CustomEndpoint {
 
                 Path themeManifestPath = resolveThemeManifest(themeTempWorkDir);
                 if (themeManifestPath == null) {
-                    FileSystemUtils.deleteRecursively(tempDirectory);
                     throw new IllegalArgumentException(
                         "It's an invalid zip format for the theme, manifest "
                             + "file [theme.yaml] is required.");
