@@ -10,6 +10,7 @@ import {
   ContentHaloRunV1alpha1ReplyApi,
   ContentHaloRunV1alpha1SnapshotApi,
   ContentHaloRunV1alpha1TagApi,
+  ContentHaloRunV1alpha1SinglePageApi,
   PluginHaloRunV1alpha1PluginApi,
   PluginHaloRunV1alpha1ReverseProxyApi,
   StorageHaloRunV1alpha1AttachmentApi,
@@ -78,6 +79,11 @@ function setupApiClient(axios: AxiosInstance) {
       menu: new V1alpha1MenuApi(undefined, apiUrl, axios),
       menuItem: new V1alpha1MenuItemApi(undefined, apiUrl, axios),
       post: new ContentHaloRunV1alpha1PostApi(undefined, apiUrl, axios),
+      singlePage: new ContentHaloRunV1alpha1SinglePageApi(
+        undefined,
+        apiUrl,
+        axios
+      ),
       category: new ContentHaloRunV1alpha1CategoryApi(undefined, apiUrl, axios),
       tag: new ContentHaloRunV1alpha1TagApi(undefined, apiUrl, axios),
       snapshot: new ContentHaloRunV1alpha1SnapshotApi(undefined, apiUrl, axios),

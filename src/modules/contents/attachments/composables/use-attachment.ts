@@ -7,8 +7,9 @@ import type {
 } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { ref, watch } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient, type AttachmentLike } from "@halo-dev/admin-shared";
 import { useDialog } from "@halo-dev/components";
+import type { Content, Editor } from "@halo-dev/richtext-editor";
 
 interface useAttachmentControlReturn {
   attachments: Ref<AttachmentList>;
@@ -31,6 +32,10 @@ interface useAttachmentControlReturn {
   handleSelect: (attachment: Attachment | undefined) => void;
   isChecked: (attachment: Attachment) => boolean;
   handleReset: () => void;
+}
+
+interface useAttachmentSelectReturn {
+  onAttachmentSelect: (attachments: AttachmentLike[]) => void;
 }
 
 export function useAttachmentControl(filterOptions?: {
@@ -210,5 +215,43 @@ export function useAttachmentControl(filterOptions?: {
     handleSelect,
     isChecked,
     handleReset,
+  };
+}
+
+export function useAttachmentSelect(
+  editor: Ref<Editor | undefined>
+): useAttachmentSelectReturn {
+  const onAttachmentSelect = (attachments: AttachmentLike[]) => {
+    const images: Content[] = attachments.map((attachment) => {
+      const attrs: { src?: string; alt?: string } = {};
+      if (typeof attachment === "string") {
+        attrs.src = attachment;
+        return {
+          type: "image",
+          attrs,
+        };
+      }
+      if ("url" in attachment) {
+        attrs.src = attachment.url;
+        attrs.alt = attachment.type;
+      }
+      if ("spec" in attachment) {
+        attrs.src = attachment.status?.permalink;
+        attrs.alt = attachment.spec.displayName;
+      }
+      return {
+        type: "image",
+        attrs,
+      };
+    });
+    editor.value
+      ?.chain()
+      .focus()
+      .insertContent([...images, { type: "paragraph", content: "" }])
+      .run();
+  };
+
+  return {
+    onAttachmentSelect,
   };
 }

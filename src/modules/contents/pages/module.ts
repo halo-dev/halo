@@ -1,5 +1,8 @@
-import { BasicLayout, definePlugin } from "@halo-dev/admin-shared";
-import PageList from "./PageList.vue";
+import { BasicLayout, BlankLayout, definePlugin } from "@halo-dev/admin-shared";
+import PageLayout from "./layouts/PageLayout.vue";
+import FunctionalPageList from "./FunctionalPageList.vue";
+import SinglePageList from "./SinglePageList.vue";
+import SinglePageEditor from "./SinglePageEditor.vue";
 import { IconPages } from "@halo-dev/components";
 
 export default definePlugin({
@@ -8,13 +11,50 @@ export default definePlugin({
   routes: [
     {
       path: "/pages",
-      component: BasicLayout,
+      component: BlankLayout,
       name: "BasePages",
+      redirect: {
+        name: "FunctionalPages",
+      },
       children: [
         {
-          path: "",
-          name: "Pages",
-          component: PageList,
+          path: "functional",
+          component: PageLayout,
+          children: [
+            {
+              path: "",
+              name: "FunctionalPages",
+              component: FunctionalPageList,
+            },
+          ],
+        },
+        {
+          path: "single",
+          component: BlankLayout,
+          children: [
+            {
+              path: "",
+              component: PageLayout,
+              children: [
+                {
+                  path: "",
+                  name: "SinglePages",
+                  component: SinglePageList,
+                },
+              ],
+            },
+            {
+              path: "editor",
+              component: BasicLayout,
+              children: [
+                {
+                  path: "",
+                  name: "SinglePageEditor",
+                  component: SinglePageEditor,
+                },
+              ],
+            },
+          ],
         },
       ],
     },

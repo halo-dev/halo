@@ -18,17 +18,17 @@ import AttachmentSelectorModal from "../attachments/components/AttachmentSelecto
 import type { PostRequest } from "@halo-dev/api-client";
 import { computed, onMounted, ref, watch } from "vue";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient, type AttachmentLike } from "@halo-dev/admin-shared";
+import { apiClient } from "@halo-dev/admin-shared";
 import { useRouteQuery } from "@vueuse/router";
 import { v4 as uuid } from "uuid";
 import {
   allExtensions,
   RichTextEditor,
   useEditor,
-  type Content,
 } from "@halo-dev/richtext-editor";
 import ExtensionCharacterCount from "@tiptap/extension-character-count";
 import { formatDatetime } from "@/utils/date";
+import { useAttachmentSelect } from "../attachments/composables/use-attachment";
 
 const initialFormState: PostRequest = {
   post: {
@@ -107,35 +107,7 @@ watch(
   }
 );
 
-const onAttachmentSelect = (attachments: AttachmentLike[]) => {
-  const images: Content[] = attachments.map((attachment) => {
-    const attrs: { src?: string; alt?: string } = {};
-    if (typeof attachment === "string") {
-      attrs.src = attachment;
-      return {
-        type: "image",
-        attrs,
-      };
-    }
-    if ("url" in attachment) {
-      attrs.src = attachment.url;
-      attrs.alt = attachment.type;
-    }
-    if ("spec" in attachment) {
-      attrs.src = attachment.status?.permalink;
-      attrs.alt = attachment.spec.displayName;
-    }
-    return {
-      type: "image",
-      attrs,
-    };
-  });
-  editor.value
-    ?.chain()
-    .focus()
-    .insertContent([...images, { type: "paragraph", content: "" }])
-    .run();
-};
+const { onAttachmentSelect } = useAttachmentSelect(editor);
 
 const handleGenerateTableOfContent = () => {
   if (!editor.value) {
