@@ -94,4 +94,6 @@ jobs:
         with:
           image-name: admin-dev
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
+          dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKER_TOKEN }}
           push: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/next' }} # we only push to GHCR if the push is to the next branch
