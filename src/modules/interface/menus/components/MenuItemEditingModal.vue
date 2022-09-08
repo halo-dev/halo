@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { computed, ref, watch, watchEffect } from "vue";
-import type { MenuItem, Post } from "@halo-dev/api-client";
+import type { MenuItem, Post, SinglePage } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
 import { apiClient } from "@halo-dev/admin-shared";
 import { reset, submitForm } from "@formkit/core";
@@ -127,7 +127,8 @@ watch(
       formState.value = cloneDeep(menuItem);
 
       // Set Ref related
-      const { postRef, categoryRef, tagRef } = formState.value.spec;
+      const { postRef, categoryRef, tagRef, singlePageRef } =
+        formState.value.spec;
 
       if (postRef) {
         selectedMenuItemSource.value = "post";
@@ -143,6 +144,11 @@ watch(
         selectedMenuItemSource.value = "tag";
         selectedRef.value = tagRef.name;
       }
+
+      if (singlePageRef) {
+        selectedMenuItemSource.value = "singlePage";
+        selectedRef.value = singlePageRef.name;
+      }
     } else {
       handleResetForm();
     }
@@ -153,8 +159,8 @@ watch(
 interface MenuItemSource {
   label: string;
   value: string;
-  ref?: "postRef" | "categoryRef" | "tagRef";
-  kind?: "Post" | "Category" | "Tag";
+  ref?: "postRef" | "categoryRef" | "tagRef" | "singlePageRef";
+  kind?: "Post" | "Category" | "Tag" | "SinglePage";
 }
 
 const menuItemSources: MenuItemSource[] = [
@@ -167,6 +173,12 @@ const menuItemSources: MenuItemSource[] = [
     value: "post",
     ref: "postRef",
     kind: "Post",
+  },
+  {
+    label: "自定义页面",
+    value: "singlePage",
+    ref: "singlePageRef",
+    kind: "SinglePage",
   },
   {
     label: "分类",
@@ -187,6 +199,7 @@ const selectedMenuItemSource = ref<string>(menuItemSources[0].value);
 const { categories, handleFetchCategories } = usePostCategory();
 const { tags, handleFetchTags } = usePostTag();
 const posts = ref<Post[]>([] as Post[]);
+const singlePages = ref<SinglePage[]>([] as SinglePage[]);
 
 const postMap = computed(() => {
   return [
@@ -195,6 +208,21 @@ const postMap = computed(() => {
       return {
         label: post.spec.title,
         value: post.metadata.name,
+      };
+    }),
+  ];
+});
+
+const singlePageMap = computed(() => {
+  return [
+    {
+      label: "请选择自定义页面",
+      value: undefined,
+    },
+    ...singlePages.value.map((singlePage) => {
+      return {
+        label: singlePage.spec.title,
+        value: singlePage.metadata.name,
       };
     }),
   ];
@@ -241,6 +269,15 @@ const handleFetchPosts = async () => {
   posts.value = data.items;
 };
 
+const handleFetchSinglePages = async () => {
+  const { data } =
+    await apiClient.extension.singlePage.listcontentHaloRunV1alpha1SinglePage({
+      page: 0,
+      size: 0,
+    });
+  singlePages.value = data.items;
+};
+
 const onMenuItemSourceChange = () => {
   selectedRef.value = "";
 };
@@ -252,6 +289,7 @@ watch(
       handleFetchCategories();
       handleFetchTags();
       handleFetchPosts();
+      handleFetchSinglePages();
     }
   }
 );
@@ -295,6 +333,15 @@ watch(
         label="文章"
         type="select"
         :options="postMap"
+        validation="required"
+      ></FormKit>
+
+      <FormKit
+        v-if="selectedMenuItemSource === 'singlePage'"
+        v-model="selectedRef"
+        label="自定义页面"
+        type="select"
+        :options="singlePageMap"
         validation="required"
       ></FormKit>
 
