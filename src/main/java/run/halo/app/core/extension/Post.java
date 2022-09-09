@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -164,12 +163,57 @@ public class Post extends AbstractExtension {
     }
 
     @Data
-    @Builder
     public static class CompactPost {
         private String name;
 
         private VisibleEnum visible;
 
         private Boolean published;
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        /**
+         * <p>Compact post builder.</p>
+         * <p>Can not replace with lombok builder.</p>
+         * <p>The class used by subclasses of {@link AbstractExtension} must have a no-args
+         * constructor.</p>
+         */
+        public static class Builder {
+            private String name;
+
+            private VisibleEnum visible;
+
+            private Boolean published;
+
+            public Builder name(String name) {
+                this.name = name;
+                return this;
+            }
+
+            public Builder visible(VisibleEnum visible) {
+                this.visible = visible;
+                return this;
+            }
+
+            public Builder published(Boolean published) {
+                this.published = published;
+                return this;
+            }
+
+            /**
+             * Build compact post.
+             *
+             * @return a compact post
+             */
+            public CompactPost build() {
+                CompactPost compactPost = new CompactPost();
+                compactPost.setName(name);
+                compactPost.setVisible(visible);
+                compactPost.setPublished(published);
+                return compactPost;
+            }
+        }
     }
 }
